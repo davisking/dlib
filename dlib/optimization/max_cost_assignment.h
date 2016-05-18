@@ -32,8 +32,8 @@ namespace dlib
                 "\t type assignment_cost(cost,assignment)"
                 << "\n\t cost.nr(): " << cost.nr()
                 << "\n\t cost.nc(): " << cost.nc()
-                << "\n\t min(assignment): " << min(mat(assignment)) 
-                << "\n\t max(assignment): " << max(mat(assignment)) 
+                << "\n\t min(assignment): " << min(mat(assignment))
+                << "\n\t max(assignment): " << max(mat(assignment))
                 );
         }
 #endif
@@ -76,11 +76,11 @@ namespace dlib
     template <typename EXP>
     std::vector<long> max_cost_assignment (
         const matrix_exp<EXP>& cost_
-    )                         
+    )
     {
         const_temp_matrix<EXP> cost(cost_);
         typedef typename EXP::type type;
-        // This algorithm only works if the elements of the cost matrix can be reliably 
+        // This algorithm only works if the elements of the cost matrix can be reliably
         // compared using operator==. However, comparing for equality with floating point
         // numbers is not a stable operation. So you need to use an integer cost matrix.
         COMPILE_TIME_ASSERT(std::numeric_limits<type>::is_integer);
@@ -114,7 +114,7 @@ namespace dlib
 
 
 
-        // Initially, nothing is matched. 
+        // Initially, nothing is matched.
         xy.assign(cost.nc(), -1);
         yx.assign(cost.nc(), -1);
         /*
@@ -129,7 +129,7 @@ namespace dlib
 
 
         // Create an initial feasible labeling.  Moreover, in the following
-        // code we will always have: 
+        // code we will always have:
         //     for all valid x and y:  lx[x] + ly[y] >= cost(x,y)
         lx.resize(cost.nc());
         ly.assign(cost.nc(),0);
@@ -176,7 +176,7 @@ namespace dlib
             long x_start = 0;
             long y_start = 0;
 
-            // Find an augmenting path.  
+            // Find an augmenting path.
             bool found_augmenting_path = false;
             while (!found_augmenting_path)
             {
@@ -189,7 +189,7 @@ namespace dlib
                         if (cost(x,y) == lx[x] + ly[y] && !T[y])
                         {
                             // if vertex y isn't matched with anything
-                            if (yx[y] == -1) 
+                            if (yx[y] == -1)
                             {
                                 y_start = y;
                                 x_start = x;
@@ -211,7 +211,7 @@ namespace dlib
                     break;
 
 
-                // Since we didn't find an augmenting path we need to improve the 
+                // Since we didn't find an augmenting path we need to improve the
                 // feasible labeling stored in lx and ly.  We also need to keep the
                 // slack updated accordingly.
                 type delta = std::numeric_limits<type>::max();
@@ -264,8 +264,8 @@ namespace dlib
 
             // Flip the edges along the augmenting path.  This means we will add one more
             // item to our matching.
-            for (long cx = x_start, cy = y_start, ty; 
-                 cx != -1; 
+            for (long cx = x_start, cy = y_start, ty;
+                 cx != -1;
                  cx = aug_path[cx], cy = ty)
             {
                 ty = xy[cx];

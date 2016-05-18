@@ -7,7 +7,7 @@
 #include "tester.h"
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -50,7 +50,7 @@ namespace
         vector_normalizer<sample_type> normalizer;
         normalizer.train(samples);
         for (unsigned long i = 0; i < samples.size(); ++i)
-            samples[i] = normalizer(samples[i]); 
+            samples[i] = normalizer(samples[i]);
 
         randomize_samples(samples, labels);
 
@@ -87,8 +87,8 @@ namespace
         trainer.set_c(25);
 
         const unsigned long initial_size = 1;
-        std::vector<sample_type> tsamples(samples.begin(), samples.begin()+initial_size); 
-        std::vector<double> tlabels(labels.begin(), labels.begin()+initial_size); 
+        std::vector<sample_type> tsamples(samples.begin(), samples.begin()+initial_size);
+        std::vector<double> tlabels(labels.begin(), labels.begin()+initial_size);
 
         decision_function<linear_kernel<sample_type> > df;
 

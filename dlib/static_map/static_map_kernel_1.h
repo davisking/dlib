@@ -31,7 +31,7 @@ namespace dlib
                 - at_start_ == true
 
 
-            CONVENTION                
+            CONVENTION
                 - size() == map_size
                 - if (size() > 0) then
                     - d == pointer to an array containing all the domain elements
@@ -54,7 +54,7 @@ namespace dlib
             const domain* d;
             range* r;
 
-            const domain& key( 
+            const domain& key(
             ) const { return *d; }
 
             const range& value(
@@ -66,9 +66,9 @@ namespace dlib
 
 
         // I would define this outside the class but Borland 5.5 has some problems
-        // with non-inline templated friend functions.          
+        // with non-inline templated friend functions.
         friend void deserialize (
-            static_map_kernel_1& item, 
+            static_map_kernel_1& item,
             std::istream& in
         )
         {
@@ -87,7 +87,7 @@ namespace dlib
                 }
             }
             catch (serialization_error& e)
-            { 
+            {
                 item.map_size = 0;
                 if (item.d)
                 {
@@ -100,7 +100,7 @@ namespace dlib
                     item.r = 0;
                 }
 
-                throw serialization_error(e.info + "\n   while deserializing object of type static_map_kernel_1"); 
+                throw serialization_error(e.info + "\n   while deserializing object of type static_map_kernel_1");
             }
             catch (...)
             {
@@ -131,7 +131,7 @@ namespace dlib
             );
 
             virtual ~static_map_kernel_1(
-            ); 
+            );
 
             void clear (
             );
@@ -199,9 +199,9 @@ namespace dlib
                 unsigned long right
             );
             /*!
-                requires    
+                requires
                     - left and right are within the bounts of the array
-                ensures 
+                ensures
                     - everything in the convention is still true and d[left] though
                       d[right] is sorted according to operator<
             !*/
@@ -210,17 +210,17 @@ namespace dlib
                 unsigned long& partition_element,
                 const unsigned long left,
                 const unsigned long right
-            );    
+            );
             /*!
-                requires                   
+                requires
                     - left < right
                     - left and right are within the bounts of the array
                 ensures
                     - the convention is still true
-                    - left <= #partition_element <= right                              
-                    - all elements in #d < #d[#partition_element] have 
-                      indices >= left and < #partition_element                         
-                    - all elements in #d >= #d[#partition_element] have 
+                    - left <= #partition_element <= right
+                    - all elements in #d < #d[#partition_element] have
+                      indices >= left and < #partition_element
+                    - all elements in #d >= #d[#partition_element] have
                       indices >= #partition_element and <= right
             !*/
 
@@ -242,7 +242,7 @@ namespace dlib
             // data members
             unsigned long map_size;
             domain* d;
-            range* r;          
+            range* r;
             mutable mpair mp;
             mutable bool at_start_;
             compare comp;
@@ -258,9 +258,9 @@ namespace dlib
         typename compare
         >
     inline void swap (
-        static_map_kernel_1<domain,range,compare>& a, 
-        static_map_kernel_1<domain,range,compare>& b 
-    ) { a.swap(b); }   
+        static_map_kernel_1<domain,range,compare>& a,
+        static_map_kernel_1<domain,range,compare>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -300,7 +300,7 @@ namespace dlib
             delete [] d;
             delete [] r;
         }
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -335,9 +335,9 @@ namespace dlib
     load (
         pair_remover<domain,range>& source
     )
-    {        
+    {
         if (source.size() > 0)
-        {             
+        {
             domain* old_d = d;
             d = new domain[source.size()];
             try { r = new range[source.size()]; }
@@ -370,7 +370,7 @@ namespace dlib
     )
     {
         if (source.size() > 0)
-        {             
+        {
             domain* old_d = d;
             d = new domain[source.size()];
             try { r = new range[source.size()]; }
@@ -404,7 +404,7 @@ namespace dlib
         if (binary_search(d_item,pos))
             return r+pos;
         else
-            return 0;        
+            return 0;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -488,7 +488,7 @@ namespace dlib
     void static_map_kernel_1<domain,range,compare>::
     reset (
     ) const
-    {        
+    {
         mp.d = 0;
         at_start_ = true;
     }
@@ -503,7 +503,7 @@ namespace dlib
     bool static_map_kernel_1<domain,range,compare>::
     current_element_valid (
     ) const
-    {   
+    {
         return (mp.d != 0);
     }
     
@@ -558,7 +558,7 @@ namespace dlib
         else if (mp.d != 0)
         {
             ++mp.d;
-            ++mp.r;            
+            ++mp.r;
             if (static_cast<unsigned long>(mp.d - d) < map_size)
             {
                 return true;
@@ -570,7 +570,7 @@ namespace dlib
             }
         }
         else
-        {      
+        {
             at_start_ = false;
             return false;
         }
@@ -629,7 +629,7 @@ namespace dlib
     sort_arrays (
         unsigned long left,
         unsigned long right
-    ) 
+    )
     {
         if ( left < right)
         {
@@ -674,9 +674,9 @@ namespace dlib
             }
 
             // find an element to the right of partition_element that needs to be moved
-            while ( 
-                !(comp (d[right_scan] , d[partition_element])) &&  
-                (right_scan > left_scan) 
+            while (
+                !(comp (d[right_scan] , d[partition_element])) &&
+                (right_scan > left_scan)
             )
             {
                 --right_scan;
@@ -714,7 +714,7 @@ namespace dlib
             if ( comp( d[two] , d[three]) )
             {
                 // one < two < three : two
-                return two;                
+                return two;
             }
             else
             {
@@ -744,7 +744,7 @@ namespace dlib
                     return three;
                 }
             }
-        }  
+        }
         return one;
     }
 

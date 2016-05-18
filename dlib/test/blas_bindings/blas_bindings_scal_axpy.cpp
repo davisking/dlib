@@ -22,11 +22,11 @@ namespace dlib
     }
 }
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
-    // Declare the logger we will use in this test.  The name of the logger 
+    // Declare the logger we will use in this test.  The name of the logger
     // should start with "test."
     dlib::logger dlog("test.scal_axpy");
 

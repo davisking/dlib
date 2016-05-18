@@ -18,19 +18,19 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is a simple wrapper around the std::vector object.  It 
+                This object is a simple wrapper around the std::vector object.  It
                 provides an identical interface but also checks the preconditions of
                 each member function.  That is, if you violate a requires
-                clause the dlib::fatal_error exception is thrown. 
+                clause the dlib::fatal_error exception is thrown.
         !*/
 
         typedef typename std::vector<T,Allocator> base_type;
     public:
         typedef typename Allocator::reference         reference;
         typedef typename Allocator::const_reference   const_reference;
-        typedef typename base_type::iterator          iterator;       
-        typedef typename base_type::const_iterator    const_iterator; 
-        typedef typename base_type::size_type         size_type;      
+        typedef typename base_type::iterator          iterator;
+        typedef typename base_type::const_iterator    const_iterator;
+        typedef typename base_type::size_type         size_type;
         typedef typename base_type::difference_type   difference_type;
         typedef T                                     value_type;
         typedef Allocator                             allocator_type;
@@ -50,7 +50,7 @@ namespace dlib
         !*/
 
         explicit std_vector_c (
-            size_type n, 
+            size_type n,
             const T& value = T(),
             const Allocator& alloc = Allocator()
         );
@@ -94,7 +94,7 @@ namespace dlib
 
         template <typename InputIterator>
         void assign(
-            InputIterator first, 
+            InputIterator first,
             InputIterator last
         );
         /*!
@@ -104,9 +104,9 @@ namespace dlib
         !*/
 
         void assign(
-            size_type n, 
-            const T& value 
-        ); 
+            size_type n,
+            const T& value
+        );
         /*!
             ensures
                 - #size() == n
@@ -126,7 +126,7 @@ namespace dlib
         /*!
             ensures
                 - if (size() > 0) then
-                    - returns an iterator referring to the first element in 
+                    - returns an iterator referring to the first element in
                       this container.
                 - else
                     - returns end()
@@ -137,14 +137,14 @@ namespace dlib
         /*!
             ensures
                 - if (size() > 0) then
-                    - returns a const_iterator referring to the first element in 
+                    - returns a const_iterator referring to the first element in
                       this container.
                 - else
                     - returns end()
         !*/
 
         iterator end(
-        ); 
+        );
         /*!
             ensures
                 - returns an iterator that represents one past the end of
@@ -181,14 +181,14 @@ namespace dlib
         !*/
 
         const_reverse_iterator rend(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns std::reverse_iterator(begin())
         !*/
 
         size_type size(
-        ) const;  
+        ) const;
         /*!
             ensures
                 - returns end()-begin()
@@ -203,13 +203,13 @@ namespace dlib
         !*/
 
         void resize(
-            size_type sz, 
+            size_type sz,
             T c = T()
         );
         /*!
             ensures
                 - #size() == sz
-                - any element with index between 0 and sz - 1 which was in the 
+                - any element with index between 0 and sz - 1 which was in the
                   vector before the call to resize() retains its value and index.
                   All other elements have a value given by c.
         !*/
@@ -218,12 +218,12 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the total number of elements that the vector can hold without 
-                  requiring reallocation. 
+                - returns the total number of elements that the vector can hold without
+                  requiring reallocation.
         !*/
 
         bool empty(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - if (size() == 0) then
@@ -234,7 +234,7 @@ namespace dlib
 
         void reserve(
             size_type n
-        ); 
+        );
         /*!
             ensures
                 - #capacity() >= n
@@ -242,10 +242,10 @@ namespace dlib
 
         const_reference at(
             size_type n
-        ) const; 
+        ) const;
         /*!
             ensures
-                - if (n < size()) then 
+                - if (n < size()) then
                     - returns a const reference to (*this)[n]
                 - else
                     - throws std::out_of_range
@@ -253,10 +253,10 @@ namespace dlib
 
         reference at(
             size_type n
-        ); 
+        );
         /*!
             ensures
-                - if (n < size()) then 
+                - if (n < size()) then
                     - returns a reference to (*this)[n]
                 - else
                     - throws std::out_of_range
@@ -264,7 +264,7 @@ namespace dlib
 
         void push_back(
             const T& x
-        ); 
+        );
         /*!
             ensures
                 - #size() == size() + 1
@@ -280,7 +280,7 @@ namespace dlib
         !*/
 
         void clear(
-        ); 
+        );
         /*!
             ensures
                 - #size() == 0
@@ -288,7 +288,7 @@ namespace dlib
 
         reference operator[](
             size_type n
-        ); 
+        );
         /*!
             requires
                 - n < size()
@@ -354,7 +354,7 @@ namespace dlib
         !*/
 
         iterator insert(
-            iterator position, 
+            iterator position,
             const T& x
         );
         /*!
@@ -369,8 +369,8 @@ namespace dlib
         !*/
 
         void insert(
-            iterator position, 
-            size_type n, 
+            iterator position,
+            size_type n,
             const T& x
         );
         /*!
@@ -385,7 +385,7 @@ namespace dlib
         template <typename InputIterator>
         void insert(
             iterator position,
-            InputIterator first, 
+            InputIterator first,
             InputIterator last
         );
         /*!
@@ -395,30 +395,30 @@ namespace dlib
                 - first and last are not iterators into *this
             ensures
                 - #size() == size() + std::distance(last,first)
-                - inserts copies of the range of elements [first,last) into *this 
+                - inserts copies of the range of elements [first,last) into *this
                   before the given position
         !*/
 
         iterator erase(
             iterator position
-        ); 
+        );
         /*!
             requires
                 - begin() <= position && position < end()
                   (i.e. position references an element in this vector object)
             ensures
-                - #size() == size() - 1 
+                - #size() == size() - 1
                 - removes the element in this vector referenced by position but
                   leaves all other elements in this vector unmodified.
                 - if (position < end()-1) then
-                    - returns an iterator referencing the element immediately 
+                    - returns an iterator referencing the element immediately
                       following *position prior to the erase.
                 - else
                     - returns end()
         !*/
 
         iterator erase(
-            iterator first, 
+            iterator first,
             iterator last
         );
         /*!
@@ -426,12 +426,12 @@ namespace dlib
                 - begin() <= first && first <= last && last <= end()
                   (i.e. the range [first,last) must be inside this container )
             ensures
-                - #size() == size() - (last-first) 
+                - #size() == size() - (last-first)
                 - removes the elements in this vector referenced by the
-                  iterator range [first,last) but leaves all other elements 
+                  iterator range [first,last) but leaves all other elements
                   in this vector unmodified.
                 - if (last < end()-1) then
-                    - returns an iterator referencing the element immediately 
+                    - returns an iterator referencing the element immediately
                       following *last prior to the erase.
                 - else
                     - returns end()
@@ -447,7 +447,7 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -458,7 +458,7 @@ namespace dlib
         std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

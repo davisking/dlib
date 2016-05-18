@@ -66,8 +66,8 @@ namespace dlib
     );
     /*!
         ensures
-            - executes the given SQL query against db.  If the query results in a 
-              single row and column being returned then the data in the column is 
+            - executes the given SQL query against db.  If the query results in a
+              single row and column being returned then the data in the column is
               interpreted as a binary BLOB and deserialized into item.
         throws
             - sqlite_error or serialization_error if an error occurs which prevents
@@ -83,11 +83,11 @@ namespace dlib
     );
     /*!
         ensures
-            - executes the given SQL query against db.  If the query results in a 
-              single row and column being returned then the data in the column is 
+            - executes the given SQL query against db.  If the query results in a
+              single row and column being returned then the data in the column is
               converted to text and returned.
         throws
-            - sqlite_error if an error occurs which prevents this operation from 
+            - sqlite_error if an error occurs which prevents this operation from
               succeeding.
     !*/
 
@@ -99,11 +99,11 @@ namespace dlib
     );
     /*!
         ensures
-            - executes the given SQL query against db.  If the query results in a 
-              single row and column being returned then the data in the column is 
+            - executes the given SQL query against db.  If the query results in a
+              single row and column being returned then the data in the column is
               converted to a double and returned.
         throws
-            - sqlite_error if an error occurs which prevents this operation from 
+            - sqlite_error if an error occurs which prevents this operation from
               succeeding.
     !*/
 
@@ -115,11 +115,11 @@ namespace dlib
     );
     /*!
         ensures
-            - executes the given SQL query against db.  If the query results in a 
-              single row and column being returned then the data in the column is 
+            - executes the given SQL query against db.  If the query results in a
+              single row and column being returned then the data in the column is
               converted to an int and returned.
         throws
-            - sqlite_error if an error occurs which prevents this operation from 
+            - sqlite_error if an error occurs which prevents this operation from
               succeeding.
     !*/
 
@@ -131,11 +131,11 @@ namespace dlib
     );
     /*!
         ensures
-            - executes the given SQL query against db.  If the query results in a 
-              single row and column being returned then the data in the column is 
+            - executes the given SQL query against db.  If the query results in a
+              single row and column being returned then the data in the column is
               converted to an int64 and returned.
         throws
-            - sqlite_error if an error occurs which prevents this operation from 
+            - sqlite_error if an error occurs which prevents this operation from
               succeeding.
     !*/
 
@@ -147,11 +147,11 @@ namespace dlib
     );
     /*!
         ensures
-            - executes the given SQL query against db.  If the query results in a 
-              single row and column being returned then the data in the column is 
+            - executes the given SQL query against db.  If the query results in a
+              single row and column being returned then the data in the column is
               returned as a binary BLOB.
         throws
-            - sqlite_error if an error occurs which prevents this operation from 
+            - sqlite_error if an error occurs which prevents this operation from
               succeeding.
     !*/
 

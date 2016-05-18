@@ -9,19 +9,19 @@
 
 /*
     This file defines the dlib interface to the BOBYQA software developed by M.J.D Powell.
-    BOBYQA is a method for optimizing a function in the absence of derivative information.  
-    Powell described it as a method that seeks the least value of a function of many 
-    variables, by applying a trust region method that forms quadratic models by 
-    interpolation.  There is usually some freedom in the interpolation conditions, 
-    which is taken up by minimizing the Frobenius norm of the change to the second 
-    derivative of the model, beginning with the zero matrix. The values of the variables 
-    are constrained by upper and lower bounds.  
+    BOBYQA is a method for optimizing a function in the absence of derivative information.
+    Powell described it as a method that seeks the least value of a function of many
+    variables, by applying a trust region method that forms quadratic models by
+    interpolation.  There is usually some freedom in the interpolation conditions,
+    which is taken up by minimizing the Frobenius norm of the change to the second
+    derivative of the model, beginning with the zero matrix. The values of the variables
+    are constrained by upper and lower bounds.
 
 
     The following paper, published in 2009 by Powell, describes the
-    detailed working of the BOBYQA algorithm.  
+    detailed working of the BOBYQA algorithm.
 
-        The BOBYQA algorithm for bound constrained optimization 
+        The BOBYQA algorithm for bound constrained optimization
         without derivatives by M.J.D. Powell
 */
 
@@ -38,7 +38,7 @@ namespace dlib
 
     template <
         typename funct,
-        typename T, 
+        typename T,
         typename U
         >
     double find_min_bobyqa (
@@ -67,19 +67,19 @@ namespace dlib
               (i.e. the given x should be within the bounds defined by x_lower and x_upper)
             - max_f_evals > 1
         ensures
-            - Performs a constrained minimization of the function f() starting from 
-              the initial point x.  
+            - Performs a constrained minimization of the function f() starting from
+              the initial point x.
             - The BOBYQA algorithm uses a number of interpolating points to perform its
               work.  The npt argument controls how many points get used.  Typically,
               a good value to use is 2*x.size()+1.
-            - #x == the value of x (within the bounds defined by x_lower and x_upper) that 
+            - #x == the value of x (within the bounds defined by x_lower and x_upper) that
               was found to minimize f().  More precisely:
                 - min(#x - x_lower) >= 0 && min(x_upper - #x) >= 0
-            - returns f(#x). 
-            - rho_begin and rho_end are used as the initial and final values of a trust 
-              region radius.  Typically, rho_begin should be about one tenth of the greatest 
-              expected change to a variable, while rho_end should indicate the accuracy that 
-              is required in the final values of the variables. 
+            - returns f(#x).
+            - rho_begin and rho_end are used as the initial and final values of a trust
+              region radius.  Typically, rho_begin should be about one tenth of the greatest
+              expected change to a variable, while rho_end should indicate the accuracy that
+              is required in the final values of the variables.
         throws
             - bobyqa_failure
                 This exception is thrown if the algorithm is unable to make progress towards
@@ -92,7 +92,7 @@ namespace dlib
 
     template <
         typename funct,
-        typename T, 
+        typename T,
         typename U
         >
     double find_max_bobyqa (
@@ -107,8 +107,8 @@ namespace dlib
     );
     /*!
         This function is identical to the find_min_bobyqa() routine defined above
-        except that it negates the f() function before performing optimization.  
-        Thus this function will attempt to find the maximizer of f() rather than 
+        except that it negates the f() function before performing optimization.
+        Thus this function will attempt to find the maximizer of f() rather than
         the minimizer.
     !*/
 

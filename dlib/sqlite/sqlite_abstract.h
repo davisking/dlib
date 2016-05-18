@@ -33,18 +33,18 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is a C++ wrapper around a SQLite database connection 
-                handle and therefore represents a SQLite database file. 
+                This object is a C++ wrapper around a SQLite database connection
+                handle and therefore represents a SQLite database file.
 
                 Note that this wrapper is targeted at SQLite Version 3.
 
-                Note also that whenever SQLite indicates an error has occurred 
+                Note also that whenever SQLite indicates an error has occurred
                 this object will throw the sqlite_error exception.
         !*/
 
     public:
         database(
-        ); 
+        );
         /*!
             ensures
                 - #is_open() == false
@@ -84,7 +84,7 @@ namespace dlib
                 - safely disposes of any previous SQLite database connection.  If
                   any statement objects still exist which reference this database
                   then the SQLite database connection won't be fully closed
-                  until those statement objects are also destroyed.  
+                  until those statement objects are also destroyed.
         !*/
 
         bool is_open (
@@ -125,7 +125,7 @@ namespace dlib
             ensures
                 - Each element in a database table has a rowid which uniquely identifies
                   it.  Therefore, this routine returns the rowid of the most recent
-                  successful INSERT into the database via this database instance.  
+                  successful INSERT into the database via this database instance.
                 - If an INSERT has not been performed on the current database instance then
                   the return value is 0.  This is true even if the database is not empty.
                 - See the sqlite documentation for the full details on how this function
@@ -144,7 +144,7 @@ namespace dlib
                 C++ wrapper around a SQLite prepared statement.
 
 
-                Note that whenever SQLite indicates an error has occurred this 
+                Note that whenever SQLite indicates an error has occurred this
                 object will throw the sqlite_error exception.
 
             BINDABLE SQL PARAMETERS
@@ -153,10 +153,10 @@ namespace dlib
                 statement changes only the value of a field.  Since it is somewhat
                 costly to construct a statement object for each SQL operation, SQLite
                 supports defining bindable parameters for a statement object.  This allows
-                you to reuse the same statement object.  
+                you to reuse the same statement object.
                 
-                Therefore, in SQL statements used with SQLite, wherever it is valid to 
-                include a string literal, one can use a parameter in one of the following 
+                Therefore, in SQL statements used with SQLite, wherever it is valid to
+                include a string literal, one can use a parameter in one of the following
                 forms:
 
                     ?
@@ -165,18 +165,18 @@ namespace dlib
                     $AAA
                     @AAA
 
-               In the examples above, NNN is an integer value and AAA is an identifier.  A 
+               In the examples above, NNN is an integer value and AAA is an identifier.  A
                parameter initially has a value of NULL.  You can use the bind_*() routines
-               to attach values to the parameters.  Each call to a bind_*() routine overrides 
+               to attach values to the parameters.  Each call to a bind_*() routine overrides
                prior bindings on the same parameter.
 
                Each SQL parameter has a numeric ID which is used to reference it when invoking
                a bind_*() routine.  The leftmost SQL parameter in a statement has an index of 1,
                the next parameter has an index of 2, and so on, except when the following rules
-               apply.  When the same named SQL parameter is used more than once, second and 
-               subsequent occurrences have the same index as the first occurrence.  The index 
-               for named parameters can be looked up using the get_parameter_id() method if desired.  
-               The index for "?NNN" parameters is the value of NNN. The NNN value must be between 
+               apply.  When the same named SQL parameter is used more than once, second and
+               subsequent occurrences have the same index as the first occurrence.  The index
+               for named parameters can be looked up using the get_parameter_id() method if desired.
+               The index for "?NNN" parameters is the value of NNN. The NNN value must be between
                1 and get_max_parameter_id().
         !*/
 
@@ -189,7 +189,7 @@ namespace dlib
             requires
                 - db.is_open() == true
             ensures
-                - The given SQL statement can be executed against the given 
+                - The given SQL statement can be executed against the given
                   database by calling exec().
                 - #get_sql_string() == sql_statement
         !*/
@@ -228,7 +228,7 @@ namespace dlib
             ensures
                 - if (there is a result row for this query) then
                     - #get_num_columns() == the number of columns in the result row.
-                    - The get_column_as_*() routines can be used to access the elements 
+                    - The get_column_as_*() routines can be used to access the elements
                       of the row data.
                     - returns true
                 - else
@@ -240,7 +240,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of columns of data available via the get_column_as_*() 
+                - returns the number of columns of data available via the get_column_as_*()
                   routines.
         !*/
 
@@ -289,7 +289,7 @@ namespace dlib
         /*!
             requires
                 - idx < get_num_columns()
-                - item is deserializable 
+                - item is deserializable
                   (i.e. Calling deserialize(item, some_input_stream) reads an item
                   of type T from the some_input_stream stream)
             ensures
@@ -304,7 +304,7 @@ namespace dlib
             requires
                 - idx < get_num_columns()
             ensures
-                - returns the contents of the idx-th column as a text string. 
+                - returns the contents of the idx-th column as a text string.
         !*/
 
         double get_column_as_double (
@@ -314,7 +314,7 @@ namespace dlib
             requires
                 - idx < get_num_columns()
             ensures
-                - returns the contents of the idx-th column as a double. 
+                - returns the contents of the idx-th column as a double.
         !*/
 
         int get_column_as_int (
@@ -324,7 +324,7 @@ namespace dlib
             requires
                 - idx < get_num_columns()
             ensures
-                - returns the contents of the idx-th column as an int. 
+                - returns the contents of the idx-th column as an int.
         !*/
 
         int64 get_column_as_int64 (
@@ -334,7 +334,7 @@ namespace dlib
             requires
                 - idx < get_num_columns()
             ensures
-                - returns the contents of the idx-th column as a 64bit int. 
+                - returns the contents of the idx-th column as a 64bit int.
         !*/
 
         const std::string get_column_name (
@@ -345,9 +345,9 @@ namespace dlib
                 - idx < get_num_columns()
             ensures
                 - returns the name of the idx-th column.  In particular:
-                  The name of a result column is the value of the "AS" clause for 
-                  that column, if there is an AS clause. If there is no AS clause 
-                  then the name of the column is unspecified and may change from 
+                  The name of a result column is the value of the "AS" clause for
+                  that column, if there is an AS clause. If there is no AS clause
+                  then the name of the column is unspecified and may change from
                   one release of SQLite to the next.
         !*/
 
@@ -368,7 +368,7 @@ namespace dlib
         /*!
             ensures
                 - if (This SQL statement contains a SQL parameter with the given name) then
-                    - returns the parameter_id number which can be used in the bind_*() 
+                    - returns the parameter_id number which can be used in the bind_*()
                       member functions defined below.
                 - else
                     - returns 0
@@ -408,7 +408,7 @@ namespace dlib
                 - 1 <= parameter_id <= get_max_parameter_id()
             ensures
                 - #get_num_columns() == 0
-                - binds the value of item into the SQL parameter indicated by 
+                - binds the value of item into the SQL parameter indicated by
                   parameter_id.
         !*/
 
@@ -428,7 +428,7 @@ namespace dlib
             ensures
                 - #get_num_columns() == 0
                 - binds the value of item into the SQL parameter indicated by
-                  parameter_id.  This is performed by serializing item and then 
+                  parameter_id.  This is performed by serializing item and then
                   binding it as a binary BLOB.
         !*/
 
@@ -441,7 +441,7 @@ namespace dlib
                 - 1 <= parameter_id <= get_max_parameter_id()
             ensures
                 - #get_num_columns() == 0
-                - binds the value of item into the SQL parameter indicated by 
+                - binds the value of item into the SQL parameter indicated by
                   parameter_id.
         !*/
 
@@ -454,7 +454,7 @@ namespace dlib
                 - 1 <= parameter_id <= get_max_parameter_id()
             ensures
                 - #get_num_columns() == 0
-                - binds the value of item into the SQL parameter indicated by 
+                - binds the value of item into the SQL parameter indicated by
                   parameter_id.
         !*/
 
@@ -467,7 +467,7 @@ namespace dlib
                 - 1 <= parameter_id <= get_max_parameter_id()
             ensures
                 - #get_num_columns() == 0
-                - binds the value of item into the SQL parameter indicated by 
+                - binds the value of item into the SQL parameter indicated by
                   parameter_id.
         !*/
 
@@ -491,7 +491,7 @@ namespace dlib
                 - 1 <= parameter_id <= get_max_parameter_id()
             ensures
                 - #get_num_columns() == 0
-                - binds the value of item into the SQL parameter indicated by 
+                - binds the value of item into the SQL parameter indicated by
                   parameter_id.
         !*/
 

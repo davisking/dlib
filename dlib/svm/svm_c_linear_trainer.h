@@ -19,7 +19,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename matrix_type, 
+        typename matrix_type,
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
@@ -62,13 +62,13 @@ namespace dlib
         }
 
         virtual scalar_type get_c (
-        ) const 
+        ) const
         {
             return C;
         }
 
         virtual long get_num_dimensions (
-        ) const 
+        ) const
         {
             // plus 1 for the bias term
             return dims + 1;
@@ -81,7 +81,7 @@ namespace dlib
             scalar_type current_risk_gap,
             unsigned long num_cutting_planes,
             unsigned long num_iterations
-        ) const 
+        ) const
         {
             if (be_verbose)
             {
@@ -106,17 +106,17 @@ namespace dlib
 
         virtual bool risk_has_lower_bound (
             scalar_type& lower_bound
-        ) const 
-        { 
+        ) const
+        {
             lower_bound = 0;
-            return true; 
+            return true;
         }
 
         virtual void get_risk (
             matrix_type& w,
             scalar_type& risk,
             matrix_type& subgradient
-        ) const 
+        ) const
         {
             line_search(w);
 
@@ -187,7 +187,7 @@ namespace dlib
             }
             else
             {
-                // do line search going from best_so_far to w.  Store results in w.  
+                // do line search going from best_so_far to w.  Store results in w.
                 // Here we use the line search algorithm presented in section 3.1.1 of Franc and Sonnenburg.
 
                 const scalar_type A0 = length_squared(best_so_far - w);
@@ -222,10 +222,10 @@ namespace dlib
                 // ks.size() == 0 shouldn't happen but check anyway
                 if (f0 >= 0 || ks.size() == 0)
                 {
-                    // Getting here means that we aren't searching in a descent direction.  
+                    // Getting here means that we aren't searching in a descent direction.
                     // We could take a zero step but instead lets just assign w to the new best
-                    // so far point just to make sure we don't get stuck coming back to this 
-                    // case over and over.  This might happen if we never move the best point 
+                    // so far point just to make sure we don't get stuck coming back to this
+                    // case over and over.  This might happen if we never move the best point
                     // seen so far.
 
                     // So we let opt_k be 1
@@ -248,7 +248,7 @@ namespace dlib
                 }
 
                 // Don't let the step size get too big.  Otherwise we might pick huge steps
-                // over and over that don't improve the cutting plane approximation.  
+                // over and over that don't improve the cutting plane approximation.
                 if (opt_k > 1.0)
                 {
                     opt_k = 1.0;
@@ -264,8 +264,8 @@ namespace dlib
 
                 const scalar_type mu = 0.1;
                 // Make sure we always take a little bit of a step towards w regardless of what the
-                // line search says to do.  We do this since it is possible that some steps won't 
-                // advance the best_so_far point. So this ensures we always make some progress each 
+                // line search says to do.  We do this since it is possible that some steps won't
+                // advance the best_so_far point. So this ensures we always make some progress each
                 // iteration.
                 w = (1-mu)*best_so_far + mu*w;
 
@@ -308,7 +308,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename matrix_type, 
+        typename matrix_type,
         typename in_sample_vector_type,
         typename in_scalar_vector_type,
         typename scalar_type
@@ -331,7 +331,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svm_c_linear_trainer
     {
@@ -362,14 +362,14 @@ namespace dlib
         }
 
         explicit svm_c_linear_trainer (
-            const scalar_type& C 
+            const scalar_type& C
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
                 "\t svm_c_linear_trainer::svm_c_linear_trainer()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -390,7 +390,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void svm_c_linear_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -405,7 +405,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
@@ -450,7 +450,7 @@ namespace dlib
         {
             learn_nonnegative_weights = value;
             if (learn_nonnegative_weights)
-                prior.set_size(0); 
+                prior.set_size(0);
         }
 
         bool forces_last_weight_to_1 (
@@ -477,8 +477,8 @@ namespace dlib
                         prior_.alpha(0) == 1,
                 "\t void svm_c_linear_trainer::set_prior()"
                 << "\n\t The supplied prior could not have been created by this object's train() method."
-                << "\n\t prior_.basis_vectors.size(): " << prior_.basis_vectors.size() 
-                << "\n\t prior_.alpha(0):             " << prior_.alpha(0) 
+                << "\n\t prior_.basis_vectors.size(): " << prior_.basis_vectors.size()
+                << "\n\t prior_.alpha(0):             " << prior_.alpha(0)
                 << "\n\t this: " << this
                 );
 
@@ -495,14 +495,14 @@ namespace dlib
         }
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_linear_trainer::set_c()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -530,7 +530,7 @@ namespace dlib
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_linear_trainer::set_c_class1()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -545,7 +545,7 @@ namespace dlib
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_linear_trainer::set_c_class2()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -595,10 +595,10 @@ namespace dlib
             DLIB_ASSERT(is_learning_problem(x,y) == true,
                 "\t decision_function svm_c_linear_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t y.nr(): " << y.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t x.nr(): " << x.nr()
+                << "\n\t y.nr(): " << y.nr()
+                << "\n\t x.nc(): " << x.nc()
+                << "\n\t y.nc(): " << y.nc()
                 << "\n\t is_learning_problem(x,y): " << is_learning_problem(x,y)
                 );
 #ifdef ENABLE_ASSERTS
@@ -624,10 +624,10 @@ namespace dlib
                 num_nonnegative = num_dims;
             }
 
-            unsigned long force_weight_1_idx = std::numeric_limits<unsigned long>::max(); 
+            unsigned long force_weight_1_idx = std::numeric_limits<unsigned long>::max();
             if (last_weight_1)
             {
-                force_weight_1_idx = num_dims-1; 
+                force_weight_1_idx = num_dims-1;
             }
 
 
@@ -640,8 +640,8 @@ namespace dlib
                         "\t decision_function svm_c_linear_trainer::train(x,y)"
                         << "\n\t The dimension of the training vectors must match the dimension of\n"
                         << "\n\t those used to create the prior."
-                        << "\n\t num_dims:     " << num_dims 
-                        << "\n\t prior.size(): " << prior.size() 
+                        << "\n\t num_dims:     " << num_dims
+                        << "\n\t prior.size(): " << prior.size()
                     );
                 }
                 const unsigned long dims = std::max(num_dims, (unsigned long)prior.size());
@@ -649,19 +649,19 @@ namespace dlib
                 // vector dimensionality is larger than the prior vector dimensionality.
                 // We need to check for this case and pad prior with zeros if it is the
                 // case.
-                matrix<scalar_type,0,1> prior_temp = join_cols(join_cols(prior, 
+                matrix<scalar_type,0,1> prior_temp = join_cols(join_cols(prior,
                                                                          zeros_matrix<scalar_type>(dims-prior.size(),1)),
                                                                          mat(prior_b));
 
                 svm_objective = solver(
-                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations, dims), 
+                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations, dims),
                     w,
                     prior_temp);
             }
             else
             {
                 svm_objective = solver(
-                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations, num_dims), 
+                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations, num_dims),
                     w,
                     num_nonnegative,
                     force_weight_1_idx);
@@ -693,7 +693,7 @@ namespace dlib
         bool last_weight_1;
         matrix<scalar_type,0,1> prior;
         scalar_type prior_b;
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 

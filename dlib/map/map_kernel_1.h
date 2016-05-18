@@ -16,8 +16,8 @@ namespace dlib
     template <
         typename domain,
         typename range,
-        typename bst_base,  
-        typename mem_manager = default_memory_manager 
+        typename bst_base,
+        typename mem_manager = default_memory_manager
         >
     class map_kernel_1 : public enumerable<map_pair<domain,range> >,
                          public asc_pair_remover<domain,range,typename bst_base::compare_type>
@@ -44,7 +44,7 @@ namespace dlib
             typedef mem_manager mem_manager_type;
 
             map_kernel_1(
-            ) 
+            )
             {}
 
             virtual ~map_kernel_1(
@@ -52,7 +52,7 @@ namespace dlib
             {}
 
             inline void clear(
-            );            
+            );
 
             inline void add (
                 domain& d,
@@ -118,7 +118,7 @@ namespace dlib
             bst_base bst;
 
             // restricted functions
-            map_kernel_1(map_kernel_1&);      
+            map_kernel_1(map_kernel_1&);
             map_kernel_1& operator= ( map_kernel_1&);
     };
 
@@ -130,9 +130,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        map_kernel_1<domain,range,bst_base,mem_manager>& a, 
-        map_kernel_1<domain,range,bst_base,mem_manager>& b 
-    ) { a.swap(b); }   
+        map_kernel_1<domain,range,bst_base,mem_manager>& a,
+        map_kernel_1<domain,range,bst_base,mem_manager>& b
+    ) { a.swap(b); }
 
 
     template <
@@ -142,7 +142,7 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        map_kernel_1<domain,range,bst_base,mem_manager>& item, 
+        map_kernel_1<domain,range,bst_base,mem_manager>& item,
         std::istream& in
     )
     {
@@ -161,9 +161,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type map_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type map_kernel_1");
         }
     }
 
@@ -201,7 +201,7 @@ namespace dlib
     )
     {
         // try to add pair to bst_base
-        bst.add(d,r); 
+        bst.add(d,r);
     }
 
 // ----------------------------------------------------------------------------------------

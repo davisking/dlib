@@ -16,7 +16,7 @@
 #include <dlib/memory_manager_stateless.h>
 #include <dlib/array2d.h>
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -636,7 +636,7 @@ namespace
         ensures
             - runs tests on the matrix stuff compliance with the specs
     !*/
-    {        
+    {
         print_spinner();
 
 
@@ -939,7 +939,7 @@ namespace
                 v[i] = i;
 
             matrix<int,2,3> a;
-            a = 0, 1, 2, 
+            a = 0, 1, 2,
                 3, 4, 5;
 
             DLIB_TEST(mat(&v[0], 2, 3) == a);
@@ -1008,7 +1008,7 @@ namespace
                 9, 0, -4, -2;
 
             s = -1, 1, 1, -1,
-                 1, 1, 1, 1, 
+                 1, 1, 1, 1,
                  1, 1, -1, -1;
 
             DLIB_TEST(sign(m) == s);

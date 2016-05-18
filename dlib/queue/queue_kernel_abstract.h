@@ -21,22 +21,22 @@ namespace dlib
 
         /*!
             REQUIREMENTS ON T
-                T must be swappable by a global swap() 
+                T must be swappable by a global swap()
                 T must have a default constructor
 
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                swap() and current() functions do not invalidate pointers or 
+                swap() and current() functions do not invalidate pointers or
                 references to internal data.
                 All other functions have no such guarantee.
 
             INITIAL VALUE
-                size() == 0    
+                size() == 0
 
             ENUMERATION ORDER
                 The enumerator will iterate over the elements in the queue in the
@@ -62,14 +62,14 @@ namespace dlib
             queue (
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
             !*/
 
             virtual ~queue (
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -82,7 +82,7 @@ namespace dlib
                     - #*this has its initial value
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
-                        if this exception is thrown then *this is unusable 
+                        if this exception is thrown then *this is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -91,8 +91,8 @@ namespace dlib
             );
             /*!
                 ensures
-                    - item is now at the left end of #*this  
-                    - #item has an initial value for its type 
+                    - item is now at the left end of #*this
+                    - #item has an initial value for its type
                     - #size() == size() + 1
                     - #at_start() == true
                 throws
@@ -108,8 +108,8 @@ namespace dlib
                     - size() != 0
                 ensures
                     - #size() == size() - 1
-                    - the far right element of *this has been removed and swapped 
-                      into #item 
+                    - the far right element of *this has been removed and swapped
+                      into #item
                     - #at_start() == true
             !*/
 
@@ -118,12 +118,12 @@ namespace dlib
             );
             /*!
                 ensures
-                    - item has been concatenated onto the left end of *this. 
+                    - item has been concatenated onto the left end of *this.
                       i.e. item.current() is attached onto the left end of *this and
-                      the left most element in item will also be the left most item 
-                      in #*this 
-                    - #size() == size() + item.size() 
-                    - #item has its initial value 
+                      the left most element in item will also be the left most item
+                      in #*this
+                    - #size() == size() + item.size()
+                    - #item has its initial value
                     - #at_start() == true
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
@@ -157,7 +157,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
 
         private:
 
@@ -172,9 +172,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        queue<T,mem_manager>& a, 
-        queue<T,mem_manager>& b 
-    ) { a.swap(b); }   
+        queue<T,mem_manager>& a,
+        queue<T,mem_manager>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -184,11 +184,11 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        queue<T,mem_manager>& item, 
+        queue<T,mem_manager>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 }
 

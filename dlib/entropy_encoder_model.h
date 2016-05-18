@@ -41,7 +41,7 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1        
+        // kernel_1
         typedef     entropy_encoder_model_kernel_1<alphabet_size,entropy_encoder,cc1>
                     kernel_1a;
         typedef     entropy_encoder_model_kernel_c<kernel_1a>
@@ -59,7 +59,7 @@ namespace dlib
 
         // --------------------
 
-        // kernel_2        
+        // kernel_2
         typedef     entropy_encoder_model_kernel_2<alphabet_size,entropy_encoder,cc1,cc1>
                     kernel_2a;
         typedef     entropy_encoder_model_kernel_c<kernel_2a>
@@ -82,7 +82,7 @@ namespace dlib
 
         // --------------------
 
-        // kernel_3        
+        // kernel_3
         typedef     entropy_encoder_model_kernel_3<alphabet_size,entropy_encoder,cc1,cc4b>
                     kernel_3a;
         typedef     entropy_encoder_model_kernel_c<kernel_3a>
@@ -100,7 +100,7 @@ namespace dlib
 
         // --------------------
 
-        // kernel_4        
+        // kernel_4
         typedef     entropy_encoder_model_kernel_4<alphabet_size,entropy_encoder,200000,4>
                     kernel_4a;
         typedef     entropy_encoder_model_kernel_c<kernel_4a>
@@ -113,7 +113,7 @@ namespace dlib
 
         // --------------------
 
-        // kernel_5        
+        // kernel_5
         typedef     entropy_encoder_model_kernel_5<alphabet_size,entropy_encoder,200000,4>
                     kernel_5a;
         typedef     entropy_encoder_model_kernel_c<kernel_5a>
@@ -131,7 +131,7 @@ namespace dlib
     
         // --------------------
 
-        // kernel_6        
+        // kernel_6
         typedef     entropy_encoder_model_kernel_6<alphabet_size,entropy_encoder>
                     kernel_6a;
         typedef     entropy_encoder_model_kernel_c<kernel_6a>

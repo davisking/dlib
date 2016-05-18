@@ -20,7 +20,7 @@ namespace dlib
         >
     class memory_manager_kernel_3
     {
-        /*!            
+        /*!
             INITIAL VALUE
                 allocations == 0
                 next == 0
@@ -35,7 +35,7 @@ namespace dlib
                 This memory manager implementation allocates memory in blocks of chunk_size*sizeof(T)
                 bytes.  All the sizeof(T) subblocks are kept in a linked list of free memory blocks
                 and are given out whenever an allocation request occurs.  Also, memory is not freed
-                until this object is destructed.  
+                until this object is destructed.
                 
 
 
@@ -44,17 +44,17 @@ namespace dlib
                 - if (next != 0) then
                     - next == the next pointer to return from allocate()
                       and next == pointer to the first node in a linked list.  each node
-                      is one item in the memory pool.    
+                      is one item in the memory pool.
                     - the last node in the linked list has next set to 0
                 - else
                     - we need to call new to get the next pointer to return from allocate()
 
                 - if (arrays != 0) then
                     - someone has called allocate_array()
-                    - (*arrays)[size] == an array of size bytes of memory  
+                    - (*arrays)[size] == an array of size bytes of memory
 
                 - if (first_chunk != 0) then
-                    - first_chunk == the first node in a linked list that contains pointers 
+                    - first_chunk == the first node in a linked list that contains pointers
                       to all the chunks we have ever allocated.  The last link in the list
                       has its next pointer set to 0.
         !*/
@@ -76,7 +76,7 @@ namespace dlib
             size_t,
             char*,
             memory_manager_kernel_2<char,5>
-            > bst_of_arrays; 
+            > bst_of_arrays;
 
     public:
 
@@ -108,7 +108,7 @@ namespace dlib
                 {
                     chunk_node* temp = first_chunk;
                     first_chunk = first_chunk->next;
-                    // delete the memory chunk 
+                    // delete the memory chunk
                     ::operator delete ( static_cast<void*>(temp->chunk));
                     // delete the chunk_node
                     delete temp;
@@ -148,7 +148,7 @@ namespace dlib
             if (arrays->current_element_valid())
             {
                 // we have a suitable block of memory already so use that one.
-                arrays->remove_current_element(block_size,temp); 
+                arrays->remove_current_element(block_size,temp);
             }
             else
             {
@@ -193,8 +193,8 @@ namespace dlib
         }
 
         T* allocate (
-        ) 
-        {              
+        )
+        {
             T* temp;
             if (next != 0)
             {
@@ -237,8 +237,8 @@ namespace dlib
                 // allocate a new chunk_node
                 chunk_node* chunk;
                 try {chunk = new chunk_node; }
-                catch (...) 
-                { 
+                catch (...)
+                {
                     temp->~T();
                     ::operator delete ( static_cast<void*>(block));
                     throw;
@@ -268,23 +268,23 @@ namespace dlib
 
         void deallocate (
             T* item
-        ) 
-        { 
-            --allocations;  
+        )
+        {
+            --allocations;
             item->~T();
 
             // add this memory into our linked list.
             node* temp = reinterpret_cast<node*>(item);
             temp->next = next;
-            next = temp;                
+            next = temp;
         }
 
         void swap (
             memory_manager_kernel_3& item
-        ) 
-        { 
-            exchange(allocations,item.allocations); 
-            exchange(next,item.next); 
+        )
+        {
+            exchange(allocations,item.allocations);
+            exchange(next,item.next);
             exchange(first_chunk,item.first_chunk);
             exchange(arrays,item.arrays);
         }
@@ -338,27 +338,27 @@ namespace dlib
         }
 
         // don't do any initialization for the built in types
-        void initialize_array(unsigned char*, size_t) {} 
+        void initialize_array(unsigned char*, size_t) {}
         void deinitialize_array(unsigned char*, size_t) {}
-        void initialize_array(signed char*, size_t) {} 
+        void initialize_array(signed char*, size_t) {}
         void deinitialize_array(signed char*, size_t) {}
-        void initialize_array(char*, size_t) {} 
+        void initialize_array(char*, size_t) {}
         void deinitialize_array(char*, size_t) {}
-        void initialize_array(int*, size_t) {} 
+        void initialize_array(int*, size_t) {}
         void deinitialize_array(int*, size_t) {}
-        void initialize_array(unsigned int*, size_t) {} 
+        void initialize_array(unsigned int*, size_t) {}
         void deinitialize_array(unsigned int*, size_t) {}
-        void initialize_array(unsigned long*, size_t) {} 
+        void initialize_array(unsigned long*, size_t) {}
         void deinitialize_array(unsigned long*, size_t) {}
-        void initialize_array(long*, size_t) {} 
+        void initialize_array(long*, size_t) {}
         void deinitialize_array(long*, size_t) {}
-        void initialize_array(float*, size_t) {} 
+        void initialize_array(float*, size_t) {}
         void deinitialize_array(float*, size_t) {}
-        void initialize_array(double*, size_t) {} 
+        void initialize_array(double*, size_t) {}
         void deinitialize_array(double*, size_t) {}
-        void initialize_array(short*, size_t) {} 
+        void initialize_array(short*, size_t) {}
         void deinitialize_array(short*, size_t) {}
-        void initialize_array(unsigned short*, size_t) {} 
+        void initialize_array(unsigned short*, size_t) {}
         void deinitialize_array(unsigned short*, size_t) {}
 
 
@@ -373,9 +373,9 @@ namespace dlib
         unsigned long chunk_size
         >
     inline void swap (
-        memory_manager_kernel_3<T,chunk_size>& a, 
-        memory_manager_kernel_3<T,chunk_size>& b 
-    ) { a.swap(b); }   
+        memory_manager_kernel_3<T,chunk_size>& a,
+        memory_manager_kernel_3<T,chunk_size>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 

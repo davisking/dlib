@@ -12,7 +12,7 @@
 
 namespace dlib
 {
-    enum 
+    enum
     {
         hog_no_interpolation,
         hog_angle_interpolation,
@@ -58,7 +58,7 @@ namespace dlib
         typedef matrix<double, block_size*block_size*num_orientation_bins, 1> descriptor_type;
 
         hog_image (
-        ) : 
+        ) :
             num_block_rows(0),
             num_block_cols(0)
         {}
@@ -115,9 +115,9 @@ namespace dlib
                 "\t descriptor_type hog_image::operator()()"
                 << "\n\t invalid row or col argument"
                 << "\n\t row:  " << row
-                << "\n\t col:  " << col 
-                << "\n\t nr(): " << nr() 
-                << "\n\t nc(): " << nc() 
+                << "\n\t col:  " << col
+                << "\n\t nr(): " << nr()
+                << "\n\t nc(): " << nc()
                 << "\n\t this: " << this
                 );
 
@@ -212,7 +212,7 @@ namespace dlib
 
 
 
-        // these _PRIVATE_ functions are only here as a workaround for a bug in visual studio 2005.  
+        // these _PRIVATE_ functions are only here as a workaround for a bug in visual studio 2005.
         void _PRIVATE_serialize (std::ostream& out) const
         {
             // serialize hist_cells
@@ -236,7 +236,7 @@ namespace dlib
             deserialize(nr,in);
             hist_cells.set_size(nr,nc);
             while (hist_cells.move_next())
-                deserialize(hist_cells.element().values,in); 
+                deserialize(hist_cells.element().values,in);
             hist_cells.reset();
 
 
@@ -254,7 +254,7 @@ namespace dlib
         )
         {
             // Note that we keep a border of 1 pixel all around the image so that we don't have
-            // to worry about running outside the image when computing the horizontal and vertical 
+            // to worry about running outside the image when computing the horizontal and vertical
             // gradients.
 
             // Note also that we have a border of unused cells around the hist_cells array so that we
@@ -297,10 +297,10 @@ namespace dlib
                     {
                         for (long c = 0; c < (long)cell_size; ++c)
                         {
-                            unsigned long left; 
+                            unsigned long left;
                             unsigned long right;
-                            unsigned long top;   
-                            unsigned long bottom; 
+                            unsigned long top;
+                            unsigned long bottom;
 
                             assign_pixel(left,   img(r+roff,c+coff-1));
                             assign_pixel(right,  img(r+roff,c+coff+1));
@@ -397,7 +397,7 @@ namespace dlib
                                             hist_cells[rh-1][ch+1].values[quantized_angle_lower] += lower_strength * lin_neighbor_c*lin_neighbor_r;
                                         }
                                     }
-                                    else 
+                                    else
                                     {
                                         if (c < center_c)
                                         {
@@ -438,10 +438,10 @@ namespace dlib
             }
 
 
-            // Now figure out how many blocks we should have.  Note again that the hist_cells has a border of 
+            // Now figure out how many blocks we should have.  Note again that the hist_cells has a border of
             // unused cells (thats where that -2 comes from).
-            num_block_rows = (hist_cells.nr()-2 - (block_size-1) + cell_stride - 1)/cell_stride; 
-            num_block_cols = (hist_cells.nc()-2 - (block_size-1) + cell_stride - 1)/cell_stride; 
+            num_block_rows = (hist_cells.nr()-2 - (block_size-1) + cell_stride - 1)/cell_stride;
+            num_block_cols = (hist_cells.nc()-2 - (block_size-1) + cell_stride - 1)/cell_stride;
 
         }
 
@@ -480,7 +480,7 @@ namespace dlib
         unsigned long T3,
         unsigned long T4,
         int           T5,
-        int           T6 
+        int           T6
         >
     void serialize (
         const hog_image<T1,T2,T3,T4,T5,T6>& item,
@@ -496,11 +496,11 @@ namespace dlib
         unsigned long T3,
         unsigned long T4,
         int           T5,
-        int           T6 
+        int           T6
         >
     void deserialize (
         hog_image<T1,T2,T3,T4,T5,T6>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         item._PRIVATE_deserialize(in);

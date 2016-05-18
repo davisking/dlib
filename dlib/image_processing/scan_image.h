@@ -26,7 +26,7 @@ namespace dlib
         )
         /*!
             ensures
-                - returns the smallest rectangle that contains all the 
+                - returns the smallest rectangle that contains all the
                   rectangles in rects.  That is, returns the rectangle that
                   contains translate_rect(rects[i].second,position) for all valid i.
         !*/
@@ -86,8 +86,8 @@ namespace dlib
             DLIB_ASSERT(rects[i].first < images.size(),
                 "\t double sum_of_rects_in_images()"
                 << "\n\t rects["<<i<<"].first must refer to a valid image."
-                << "\n\t rects["<<i<<"].first: " << rects[i].first 
-                << "\n\t images.size(): " << images.size() 
+                << "\n\t rects["<<i<<"].first: " << rects[i].first
+                << "\n\t images.size(): " << images.size()
             );
         }
 #endif
@@ -133,8 +133,8 @@ namespace dlib
             DLIB_ASSERT(fixed_rects[i].first < images.size(),
                 "\t double sum_of_rects_in_images_movable_parts()"
                 << "\n\t fixed_rects["<<i<<"].first must refer to a valid image."
-                << "\n\t fixed_rects["<<i<<"].first: " << fixed_rects[i].first 
-                << "\n\t images.size(): " << images.size() 
+                << "\n\t fixed_rects["<<i<<"].first: " << fixed_rects[i].first
+                << "\n\t images.size(): " << images.size()
             );
         }
         for (unsigned long i = 0; i < movable_rects.size(); ++i)
@@ -142,12 +142,12 @@ namespace dlib
             DLIB_ASSERT(movable_rects[i].first < images.size(),
                 "\t double sum_of_rects_in_images_movable_parts()"
                 << "\n\t movable_rects["<<i<<"].first must refer to a valid image."
-                << "\n\t movable_rects["<<i<<"].first: " << movable_rects[i].first 
-                << "\n\t images.size(): " << images.size() 
+                << "\n\t movable_rects["<<i<<"].first: " << movable_rects[i].first
+                << "\n\t images.size(): " << images.size()
             );
             DLIB_ASSERT(center(movable_rects[i].second) == point(0,0),
                 "\t double sum_of_rects_in_images_movable_parts()"
-                << "\n\t movable_rects["<<i<<"].second: " << movable_rects[i].second 
+                << "\n\t movable_rects["<<i<<"].second: " << movable_rects[i].second
             );
         }
 #endif
@@ -217,7 +217,7 @@ namespace dlib
                     {
                         dets.push_back(std::make_pair(val, point(c,r)));
                     }
-                    else 
+                    else
                     {
                         // The idea here is to cause us to randomly sample possible detection
                         // locations throughout the image rather than just stopping the detection
@@ -251,8 +251,8 @@ namespace dlib
         DLIB_ASSERT(images.size() > 0 && rects.size() > 0 && all_images_same_size(images),
             "\t void scan_image()"
             << "\n\t Invalid arguments given to this function."
-            << "\n\t images.size(): " << images.size() 
-            << "\n\t rects.size():  " << rects.size() 
+            << "\n\t images.size(): " << images.size()
+            << "\n\t rects.size():  " << rects.size()
             << "\n\t all_images_same_size(images): " << all_images_same_size(images)
         );
 #ifdef ENABLE_ASSERTS
@@ -261,8 +261,8 @@ namespace dlib
             DLIB_ASSERT(rects[i].first < images.size(),
                 "\t void scan_image()"
                 << "\n\t rects["<<i<<"].first must refer to a valid image."
-                << "\n\t rects["<<i<<"].first: " << rects[i].first 
-                << "\n\t images.size(): " << images.size() 
+                << "\n\t rects["<<i<<"].first: " << rects[i].first
+                << "\n\t images.size(): " << images.size()
             );
         }
 #endif
@@ -297,14 +297,14 @@ namespace dlib
         const unsigned long max_dets
     )
     {
-        DLIB_ASSERT(images.size() > 0 && all_images_same_size(images) && 
+        DLIB_ASSERT(images.size() > 0 && all_images_same_size(images) &&
                     center(window) == point(0,0) && window.area() > 0,
             "\t void scan_image_movable_parts()"
             << "\n\t Invalid arguments given to this function."
             << "\n\t all_images_same_size(images): " << all_images_same_size(images)
             << "\n\t center(window): " << center(window)
-            << "\n\t window.area():  " << window.area() 
-            << "\n\t images.size():  " << images.size() 
+            << "\n\t window.area():  " << window.area()
+            << "\n\t images.size():  " << images.size()
         );
 #ifdef ENABLE_ASSERTS
         for (unsigned long i = 0; i < fixed_rects.size(); ++i)
@@ -313,8 +313,8 @@ namespace dlib
                 "\t void scan_image_movable_parts()"
                 << "\n\t Invalid arguments given to this function."
                 << "\n\t fixed_rects["<<i<<"].first must refer to a valid image."
-                << "\n\t fixed_rects["<<i<<"].first: " << fixed_rects[i].first 
-                << "\n\t images.size(): " << images.size() 
+                << "\n\t fixed_rects["<<i<<"].first: " << fixed_rects[i].first
+                << "\n\t images.size(): " << images.size()
             );
         }
         for (unsigned long i = 0; i < movable_rects.size(); ++i)
@@ -323,14 +323,14 @@ namespace dlib
                 "\t void scan_image_movable_parts()"
                 << "\n\t Invalid arguments given to this function."
                 << "\n\t movable_rects["<<i<<"].first must refer to a valid image."
-                << "\n\t movable_rects["<<i<<"].first: " << movable_rects[i].first 
-                << "\n\t images.size(): " << images.size() 
+                << "\n\t movable_rects["<<i<<"].first: " << movable_rects[i].first
+                << "\n\t images.size(): " << images.size()
             );
             DLIB_ASSERT(center(movable_rects[i].second) == point(0,0) &&
                         movable_rects[i].second.area() > 0,
                 "\t void scan_image_movable_parts()"
                 << "\n\t Invalid arguments given to this function."
-                << "\n\t movable_rects["<<i<<"].second: " << movable_rects[i].second 
+                << "\n\t movable_rects["<<i<<"].second: " << movable_rects[i].second
                 << "\n\t movable_rects["<<i<<"].second.area(): " << movable_rects[i].second.area()
             );
         }
@@ -353,7 +353,7 @@ namespace dlib
         {
             const rectangle rect = movable_rects[i].second;
             sum_filter_assign(images[movable_rects[i].first], temp, rect);
-            max_filter(temp, accum, window.width(), window.height(), 0);  
+            max_filter(temp, accum, window.width(), window.height(), 0);
         }
 
         find_points_above_thresh(dets, accum, thresh, max_dets);

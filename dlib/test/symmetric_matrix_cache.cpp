@@ -7,7 +7,7 @@
 #include <vector>
 #include <sstream>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -57,7 +57,7 @@ namespace
 
 
             // Get a bunch of columns at once to test out the reference
-            // counting and automatic cache expansion built into the symmetric_matrix_cache.  
+            // counting and automatic cache expansion built into the symmetric_matrix_cache.
             // This test verifies that, for example, getting column 3 doesn't stomp on
             // any of the previous columns.
             typename colm_exp<EXP1>::type c1_0 = colm(m1,0);
@@ -104,7 +104,7 @@ namespace
 
 
             // Get a bunch of rows at once to test out the reference
-            // counting and automatic cache expansion built into the symmetric_matrix_cache.  
+            // counting and automatic cache expansion built into the symmetric_matrix_cache.
             // This test verifies that, for example, getting row 3 doesn't stomp on
             // any of the previous rows.
             typename rowm_exp<EXP1>::type r1_0 = rowm(m1,0);
@@ -150,7 +150,7 @@ namespace
     // -----------------------------------
 
         void test_stuff (
-            long csize 
+            long csize
         )
         {
             print_spinner();
@@ -203,8 +203,8 @@ namespace
 
     // Create an instance of this object.  Doing this causes this test
     // to be automatically inserted into the testing framework whenever this cpp file
-    // is linked into the project.  Note that since we are inside an unnamed-namespace 
-    // we won't get any linker errors about the symbol a being defined multiple times. 
+    // is linked into the project.  Note that since we are inside an unnamed-namespace
+    // we won't get any linker errors about the symbol a being defined multiple times.
     test_symmetric_matrix_cache a;
 
 }

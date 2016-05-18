@@ -20,8 +20,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class letter 
-    {    
+    class letter
+    {
         /*!
             INITIAL VALUE
                 - defined by constructor
@@ -33,7 +33,7 @@ namespace dlib
                 - count == num_of_points()
         !*/
     public:
-        struct point 
+        struct point
         {
             point (){}
 
@@ -59,7 +59,7 @@ namespace dlib
         letter (
             unsigned short width_,
             unsigned short point_count
-        ) : 
+        ) :
             points(new point[point_count]),
             w(width_),
             count(point_count)
@@ -69,7 +69,7 @@ namespace dlib
         )
         {
             if (points)
-                delete [] points; 
+                delete [] points;
         }
             
         unsigned short width (
@@ -80,35 +80,35 @@ namespace dlib
 
         point& operator[] (
             unsigned short i
-        ) 
-        { 
+        )
+        {
             DLIB_ASSERT (i < num_of_points(),
                     "\tvoid letter::operator[]()"
-                    << "\n\ti:               " << i 
+                    << "\n\ti:               " << i
                     << "\n\tnum_of_points(): " << num_of_points() );
-            return points[i]; 
+            return points[i];
         }
 
         const point& operator[] (
             unsigned short i
-        ) const 
-        { 
+        ) const
+        {
             DLIB_ASSERT (i < num_of_points(),
                     "\tvoid letter::operator[]()"
-                    << "\n\ti:               " << i 
+                    << "\n\ti:               " << i
                     << "\n\tnum_of_points(): " << num_of_points() );
-            return points[i]; 
+            return points[i];
         }
     
         friend void serialize (
-            const letter& item, 
-            std::ostream& out 
-        );   
+            const letter& item,
+            std::ostream& out
+        );
 
         friend void deserialize (
-            letter& item, 
+            letter& item,
             std::istream& in
-        );   
+        );
 
         void swap (
             letter& item
@@ -180,9 +180,9 @@ namespace dlib
             typedef std::basic_string<T,traits,alloc> string;
             DLIB_ASSERT ( (last == string::npos) || (first <= last && last < str.size())  ,
                           "\tvoid font::compute_size()"
-                          << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false") 
-                          << "\n\tfirst: " << (unsigned long)first 
-                          << "\n\tlast:  " << (unsigned long)last 
+                          << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false")
+                          << "\n\tfirst: " << (unsigned long)first
+                          << "\n\tlast:  " << (unsigned long)last
                           << "\n\tstr.size():  " << (unsigned long)str.size() );
 
             unsigned long line_width = 0;
@@ -238,9 +238,9 @@ namespace dlib
             typedef std::basic_string<T,traits,alloc> string;
             DLIB_ASSERT ( (last == string::npos) || (first <= last && last < str.size())  ,
                           "\tvoid font::draw_string()"
-                          << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false") 
-                          << "\n\tfirst: " << (unsigned long)first 
-                          << "\n\tlast:  " << (unsigned long)last 
+                          << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false")
+                          << "\n\tfirst: " << (unsigned long)first
+                          << "\n\tlast:  " << (unsigned long)last
                           << "\n\tstr.size():  " << (unsigned long)str.size() );
 
             rectangle area = rect.intersect(c).intersect(area_);
@@ -250,7 +250,7 @@ namespace dlib
             if (last == string::npos)
                 last = str.size()-1;
 
-            const font& f = *this;        
+            const font& f = *this;
 
             long y_offset = rect.top() + f.ascender() - 1;
 
@@ -262,9 +262,9 @@ namespace dlib
                     continue;
 
                 // A combining character should be applied to the previous character, and we
-                // therefore make one step back. If a combining comes right after a newline, 
+                // therefore make one step back. If a combining comes right after a newline,
                 // then there must be some kind of error in the string, and we don't combine.
-                if(is_combining_char(str[i]) && 
+                if(is_combining_char(str[i]) &&
                    pos > rect.left() + static_cast<long>(f.left_overflow()))
                 {
                     pos -= f[str[i]].width();
@@ -283,10 +283,10 @@ namespace dlib
                     // the string is now below our rectangle so we are done
                     break;
                 }
-                else if (area.left() > pos - static_cast<long>(f.left_overflow()) && 
+                else if (area.left() > pos - static_cast<long>(f.left_overflow()) &&
                     pos + static_cast<long>(f[str[i]].width() + f.right_overflow()) < area.left() )
                 {
-                    pos += f[str[i]].width();                
+                    pos += f[str[i]].width();
                     continue;
                 }
                 else if (area.right() + static_cast<long>(f.right_overflow()) < pos)
@@ -296,7 +296,7 @@ namespace dlib
                     continue;
                 }
 
-                // at this point in the loop we know that f[str[i]] overlaps 
+                // at this point in the loop we know that f[str[i]] overlaps
                 // horizontally with the intersection rectangle area.
 
                 const letter& l = f[str[i]];
@@ -320,11 +320,11 @@ namespace dlib
             const canvas& c,
             const rectangle& rect,
             const std::basic_string<T,traits,alloc>& str
-        ) const 
-        { 
-            draw_string(c,rect, str, 0, 0, (std::basic_string<T,traits,alloc>::npos), 
+        ) const
+        {
+            draw_string(c,rect, str, 0, 0, (std::basic_string<T,traits,alloc>::npos),
                         rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
-                                  std::numeric_limits<long>::max(), std::numeric_limits<long>::max())); 
+                                  std::numeric_limits<long>::max(), std::numeric_limits<long>::max()));
         }
 
     // ------------------------------------------------------------------------------------
@@ -341,9 +341,9 @@ namespace dlib
             typedef std::basic_string<T,traits,alloc> string;
             DLIB_ASSERT ( (last == string::npos) || (first <= last && last < str.size())  ,
                           "\trectangle font::compute_cursor_rect()"
-                          << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false") 
-                          << "\n\tfirst: " << (unsigned long)first 
-                          << "\n\tlast:  " << (unsigned long)last 
+                          << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false")
+                          << "\n\tfirst: " << (unsigned long)first
+                          << "\n\tlast:  " << (unsigned long)last
                           << "\n\tindex:  " << index
                           << "\n\tstr.size():  " << (unsigned long)str.size() );
 
@@ -367,7 +367,7 @@ namespace dlib
                         y += f.height();
                         count = 0;
                     }
-                    else if (is_combining_char(str[i]) == false && 
+                    else if (is_combining_char(str[i]) == false &&
                              str[i] != '\r')
                     {
                         x += f[str[i]].width();
@@ -400,11 +400,11 @@ namespace dlib
             typedef std::basic_string<T,traits,alloc> string;
             DLIB_ASSERT ( (last == string::npos) || (first <= last && last < str.size())  ,
                           "\tunsigned long font::compute_cursor_pos()"
-                          << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false") 
-                          << "\n\tfirst: " << (unsigned long)first 
-                          << "\n\tlast:  " << (unsigned long)last 
-                          << "\n\tx:  " << x 
-                          << "\n\ty:  " << y 
+                          << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false")
+                          << "\n\tfirst: " << (unsigned long)first
+                          << "\n\tlast:  " << (unsigned long)last
+                          << "\n\tx:  " << x
+                          << "\n\ty:  " << y
                           << "\n\tstr.size():  " << (unsigned long)str.size() );
             const font& f = *this;
 
@@ -469,7 +469,7 @@ namespace dlib
             {
                 if (pos != start_of_line)
                 {
-                    // we might actually be closer to the previous character 
+                    // we might actually be closer to the previous character
                     // so check for that and if so then jump us back one.
                     const long width = f[str[pos-1]].width();
                     if (x < cur_x - width/2)
@@ -495,14 +495,14 @@ namespace dlib
         default_font(
         );
         default_font(default_font&);        // copy constructor
-        default_font& operator=(default_font&);    // assignment operator   
+        default_font& operator=(default_font&);    // assignment operator
 
 
 
     public:
         static const shared_ptr_thread_safe<font>& get_font (
         )
-        {        
+        {
             static mutex m;
             static shared_ptr_thread_safe<font> f;
             auto_mutex M(m);
@@ -546,7 +546,7 @@ namespace dlib
         {
             if(ch < 256)
                 return l[ch];
-            return l[0]; // just return one of the empty characters in this case 
+            return l[0]; // just return one of the empty characters in this case
         }
     };
 

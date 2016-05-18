@@ -16,7 +16,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is a tool for tracking moving objects in a video stream.  You give it
                 the bounding box of an object in the first frame and it attempts to track the
-                object in the box from frame to frame.  
+                object in the box from frame to frame.
 
                 This tool is an implementation of the method described in the following paper:
                     Danelljan, Martin, et al. "Accurate scale estimation for robust visual
@@ -25,8 +25,8 @@ namespace dlib
 
     public:
 
-        explicit correlation_tracker (unsigned long filter_size = 6, 
-            unsigned long num_scale_levels = 5, 
+        explicit correlation_tracker (unsigned long filter_size = 6,
+            unsigned long num_scale_levels = 5,
             unsigned long scale_window_size = 23,
             double regularizer_space = 0.001,
             double nu_space = 0.025,
@@ -38,9 +38,9 @@ namespace dlib
             requires
                 - p.is_empty() == false
             ensures
-                - Initializes correlation_tracker. Higher value of filter_size and 
-                  num_scale_levels increases tracking precision but requires more CPU 
-                  for processing. Recommended values for filter_size = 5-7, 
+                - Initializes correlation_tracker. Higher value of filter_size and
+                  num_scale_levels increases tracking precision but requires more CPU
+                  for processing. Recommended values for filter_size = 5-7,
                   default = 6, for num_scale_levels = 4-6, default = 5
                 - #get_position().is_empty() == true
         !*/
@@ -55,11 +55,11 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
                 - p.is_empty() == false
             ensures
                 - This object will start tracking the thing inside the bounding box in the
-                  given image.  That is, if you call update() with subsequent video frames 
+                  given image.  That is, if you call update() with subsequent video frames
                   then it will try to keep track of the position of the object inside p.
                 - #get_position() == p
         !*/
@@ -68,7 +68,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the predicted position of the object under track.  
+                - returns the predicted position of the object under track.
         !*/
 
         template <
@@ -81,7 +81,7 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
                 - get_position().is_empty() == false
                   (i.e. you must have started tracking by calling start_track())
             ensures
@@ -107,7 +107,7 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
                 - get_position().is_empty() == false
                   (i.e. you must have started tracking by calling start_track())
             ensures
@@ -131,7 +131,7 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
                 - get_position().is_empty() == false
                   (i.e. you must have started tracking by calling start_track())
             ensures
@@ -146,7 +146,7 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
                 - get_position().is_empty() == false
                   (i.e. you must have started tracking by calling start_track())
             ensures

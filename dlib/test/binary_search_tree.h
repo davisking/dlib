@@ -14,7 +14,7 @@
 #include <dlib/binary_search_tree.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -30,13 +30,13 @@ namespace
     )
     /*!
         requires
-            - bst is an implementation of 
-              binary_search_tree/binary_search_tree_kernel_abstract.h is instantiated 
+            - bst is an implementation of
+              binary_search_tree/binary_search_tree_kernel_abstract.h is instantiated
               to map int to int
         ensures
-            - runs tests on bst for compliance with the specs 
+            - runs tests on bst for compliance with the specs
     !*/
-    {        
+    {
 
         bst test, test2;
 
@@ -583,7 +583,7 @@ namespace
 
 
 
-                // remove a bunch of elements randomly                
+                // remove a bunch of elements randomly
                 for (int i = 0; i < 20000; ++i)
                 {
                     a = ::rand()&0x7FFF;
@@ -861,7 +861,7 @@ namespace
                 for (int j = 0; j < num; ++j)
                 {
                     DLIB_TEST(test.move_next());
-                }					             
+                }
                 DLIB_TEST_MSG(test.current_element_valid(),"size: " << test.size() << "   num: " << num);
                 test.remove_current_element(a,b);
                 DLIB_TEST_MSG(test.current_element_valid(),"size: " << test.size() << "   num: " << num);

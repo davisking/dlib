@@ -140,7 +140,7 @@ namespace dlib
 
         /*
             This function is basically an implementation of the efficient subwindow search (I-ESS)
-            algorithm presented in the following paper: 
+            algorithm presented in the following paper:
                 Efficient Algorithms for Subwindow Search in Object Detection and Localization
                 by Senjian An, Patrick Peursum, Wanquan Liu and Svetha Venkatesh
                 In CVPR 2009
@@ -162,7 +162,7 @@ namespace dlib
         matrix<scalar_type> sum_neg;
         sum_pos.set_size(mat.nr()+1, mat.nc());
         sum_neg.set_size(mat.nr()+1, mat.nc());
-        // integrate over the rows.  
+        // integrate over the rows.
         for (long c = 0; c < mat.nc(); ++c)
         {
             sum_pos(0,c) = 0;
@@ -187,7 +187,7 @@ namespace dlib
 
         std::priority_queue<range_set<scalar_type> > q;
 
-        // the range_sets will represent ranges of columns 
+        // the range_sets will represent ranges of columns
         range_set<scalar_type> universe_set;
         universe_set.bottom_min = 0;
         universe_set.top_min = 0;
@@ -209,7 +209,7 @@ namespace dlib
                 scalar_type weight;
                 find_best_column_range(sum_pos, sum_neg, q.top(), weight, left, right);
 
-                rectangle rect(left, q.top().top_min, 
+                rectangle rect(left, q.top().top_min,
                                right, q.top().bottom_min);
 
                 if (weight <= thresh)

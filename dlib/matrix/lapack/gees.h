@@ -21,21 +21,21 @@ namespace dlib
 
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dgees) (char *jobvs, char *sort, L_fp select, integer *n, 
-                                             double *a, integer *lda, integer *sdim, double *wr, 
-                                             double *wi, double *vs, integer *ldvs, double *work, 
+                void DLIB_FORTRAN_ID(dgees) (char *jobvs, char *sort, L_fp select, integer *n,
+                                             double *a, integer *lda, integer *sdim, double *wr,
+                                             double *wi, double *vs, integer *ldvs, double *work,
                                              integer *lwork, logical *bwork, integer *info);
 
-                void DLIB_FORTRAN_ID(sgees) (char *jobvs, char *sort, L_fp select, integer *n, 
-                                             float *a, integer *lda, integer *sdim, float *wr, 
-                                             float *wi, float *vs, integer *ldvs, float *work, 
+                void DLIB_FORTRAN_ID(sgees) (char *jobvs, char *sort, L_fp select, integer *n,
+                                             float *a, integer *lda, integer *sdim, float *wr,
+                                             float *wi, float *vs, integer *ldvs, float *work,
                                              integer *lwork, logical *bwork, integer *info);
 
             }
 
-            inline int gees (char jobvs, integer n, 
-                             double *a, integer lda, double *wr, 
-                             double *wi, double *vs, integer ldvs, double *work, 
+            inline int gees (char jobvs, integer n,
+                             double *a, integer lda, double *wr,
+                             double *wi, double *vs, integer ldvs, double *work,
                              integer lwork)
             {
                 // No sorting allowed
@@ -52,9 +52,9 @@ namespace dlib
             }
 
 
-            inline int gees (char jobvs, integer n, 
-                             float *a, integer lda, float *wr, 
-                             float *wi, float *vs, integer ldvs, float *work, 
+            inline int gees (char jobvs, integer n,
+                             float *a, integer lda, float *wr,
+                             float *wi, float *vs, integer ldvs, float *work,
                              integer lwork)
             {
                 // No sorting allowed
@@ -204,7 +204,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2, long NR3, long NR4,
             long NC1, long NC2, long NC3, long NC4,
             typename MM,
@@ -232,9 +232,9 @@ namespace dlib
 
             // figure out how big the workspace needs to be.
             T work_size = 1;
-            int info = binding::gees(jobz, n, 
-                                     &a(0,0), a.nr(), &wr(0,0), 
-                                     &wi(0,0), &vs(0,0), vs.nr(), &work_size, 
+            int info = binding::gees(jobz, n,
+                                     &a(0,0), a.nr(), &wr(0,0),
+                                     &wi(0,0), &vs(0,0), vs.nr(), &work_size,
                                      -1);
 
             if (info != 0)
@@ -243,10 +243,10 @@ namespace dlib
             if (work.size() < work_size)
                 work.set_size(static_cast<long>(work_size), 1);
 
-            // compute the actual decomposition 
-            info = binding::gees(jobz, n, 
-                                 &a(0,0), a.nr(), &wr(0,0), 
-                                 &wi(0,0), &vs(0,0), vs.nr(), &work(0,0), 
+            // compute the actual decomposition
+            info = binding::gees(jobz, n,
+                                 &a(0,0), a.nr(), &wr(0,0),
+                                 &wi(0,0), &vs(0,0), vs.nr(), &work(0,0),
                                  work.size());
 
             return info;

@@ -31,7 +31,7 @@ namespace dlib
         /*!
             ensures
                 - advances node_states to the next state by adding 1
-                  to node_states(node_states.size()-1) and carrying any 
+                  to node_states(node_states.size()-1) and carrying any
                   rollover (modulo num_states).  Stores the result into #node_states.
                 - if (#node_states is all zeros) then
                     - returns false
@@ -74,9 +74,9 @@ namespace dlib
             "\t void find_max_factor_graph_viterbi()"
             << "\n\t The order is way too large for this algorithm to handle."
             << "\n\t order:      " << order
-            << "\n\t num_states: " << num_states 
-            << "\n\t std::pow(num_states,order):                " << std::pow(num_states,(double)order) 
-            << "\n\t std::numeric_limits<unsigned long>::max(): " << std::numeric_limits<unsigned long>::max() 
+            << "\n\t num_states: " << num_states
+            << "\n\t std::pow(num_states,order):                " << std::pow(num_states,(double)order)
+            << "\n\t std::numeric_limits<unsigned long>::max(): " << std::numeric_limits<unsigned long>::max()
             );
 
         if (prob.number_of_nodes() == 0)
@@ -109,8 +109,8 @@ namespace dlib
         }
 
 
-        const unsigned long trellis_size = static_cast<unsigned long>(std::pow(num_states,(double)order)); 
-        unsigned long init_ring_size = 1; 
+        const unsigned long trellis_size = static_cast<unsigned long>(std::pow(num_states,(double)order));
+        unsigned long init_ring_size = 1;
 
         array2d<impl::viterbi_data> trellis;
         trellis.set_size(prob.number_of_nodes(), trellis_size);
@@ -128,7 +128,7 @@ namespace dlib
                 unsigned long idx = 0;
                 if (node == 0)
                 {
-                    do 
+                    do
                     {
                         trellis[node][idx].val = prob.factor_value(node,node_states);
                         ++idx;
@@ -137,7 +137,7 @@ namespace dlib
                 else
                 {
                     init_ring_size *= num_states;
-                    do 
+                    do
                     {
                         const unsigned long back_index = idx%init_ring_size;
                         trellis[node][idx].val = prob.factor_value(node,node_states) + trellis[node-1][back_index].val;
@@ -191,7 +191,7 @@ namespace dlib
                 matrix<unsigned long,1,4> node_states;
                 DLIB_FMFGV_WORK
             }
-            else 
+            else
             {
                 // The general case, here we don't define the size of node_states at compile time.
                 matrix<unsigned long,1,0> node_states(order+1);
@@ -201,7 +201,7 @@ namespace dlib
 
 
         map_assignment.resize(prob.number_of_nodes());
-        // Figure out which state of the last node has the biggest value. 
+        // Figure out which state of the last node has the biggest value.
         unsigned long back_index = 0;
         double best_val = -std::numeric_limits<double>::infinity();
         for (long i = 0; i < trellis.nc(); ++i)

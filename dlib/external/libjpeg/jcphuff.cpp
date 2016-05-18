@@ -104,7 +104,7 @@ METHODDEF(void) finish_pass_gather_phuff JPP((j_compress_ptr cinfo));
 
 METHODDEF(void)
 start_pass_phuff (j_compress_ptr cinfo, int gather_statistics)
-{  
+{
   phuff_entropy_ptr entropy = (phuff_entropy_ptr) cinfo->entropy;
   int is_DC_band;
   int ci, tbl;
@@ -744,7 +744,7 @@ encode_mcu_AC_refine (j_compress_ptr cinfo, JBLOCKROW *MCU_data)
 
 METHODDEF(void)
 finish_pass_phuff (j_compress_ptr cinfo)
-{   
+{
   phuff_entropy_ptr entropy = (phuff_entropy_ptr) cinfo->entropy;
 
   entropy->next_output_byte = cinfo->dest->next_output_byte;

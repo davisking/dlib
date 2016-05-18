@@ -16,13 +16,13 @@ namespace dlib
 // ------------------------------------------------------------------------------
 
     template <
-        typename Kern 
+        typename Kern
         >
-    class rbf_network_trainer 
+    class rbf_network_trainer
     {
         /*!
             This is an implementation of an RBF network trainer that follows
-            the directions right off Wikipedia basically.  So nothing 
+            the directions right off Wikipedia basically.  So nothing
             particularly fancy.  Although the way the centers are selected
             is somewhat unique.
         !*/
@@ -54,7 +54,7 @@ namespace dlib
         }
 
         void set_num_centers (
-            const unsigned long num 
+            const unsigned long num
         )
         {
             num_centers = num;
@@ -105,10 +105,10 @@ namespace dlib
             DLIB_ASSERT(is_learning_problem(x,y),
                 "\tdecision_function rbf_network_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t y.nr(): " << y.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t x.nr(): " << x.nr()
+                << "\n\t y.nr(): " << y.nr()
+                << "\n\t x.nc(): " << x.nc()
+                << "\n\t y.nc(): " << y.nc()
                 );
 
             // use the linearly_independent_subset_finder object to select the centers.  So here
@@ -144,7 +144,7 @@ namespace dlib
         kernel_type kernel;
         unsigned long num_centers;
 
-    }; // end of class rbf_network_trainer 
+    }; // end of class rbf_network_trainer
 
 // ----------------------------------------------------------------------------------------
 

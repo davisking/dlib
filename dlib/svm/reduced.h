@@ -20,7 +20,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename trainer_type 
+        typename trainer_type
         >
     class reduced_decision_function_trainer
     {
@@ -36,7 +36,7 @@ namespace dlib
 
         reduced_decision_function_trainer (
             const trainer_type& trainer_,
-            const unsigned long num_sb_ 
+            const unsigned long num_sb_
         ) :
             trainer(trainer_),
             num_bv(num_sb_)
@@ -45,7 +45,7 @@ namespace dlib
             DLIB_ASSERT(num_bv > 0,
                         "\t reduced_decision_function_trainer()"
                         << "\n\t you have given invalid arguments to this function"
-                        << "\n\t num_bv: " << num_bv 
+                        << "\n\t num_bv: " << num_bv
             );
         }
 
@@ -86,10 +86,10 @@ namespace dlib
             linearly_independent_subset_finder<kernel_type> lisf(dec_funct.kernel_function, num_bv);
             fill_lisf(lisf, x);
 
-            // The next few statements just find the best weights with which to approximate 
+            // The next few statements just find the best weights with which to approximate
             // the dec_funct object with the smaller set of vectors in the lisf dictionary.  This
-            // is really just a simple application of some linear algebra.  For the details 
-            // see page 554 of Learning with kernels by Scholkopf and Smola where they talk 
+            // is really just a simple application of some linear algebra.  For the details
+            // see page 554 of Learning with kernels by Scholkopf and Smola where they talk
             // about "Optimal Expansion Coefficients."
 
             const kernel_type kern(dec_funct.kernel_function);
@@ -98,9 +98,9 @@ namespace dlib
 
             alpha = lisf.get_inv_kernel_marix()*(kernel_matrix(kern,lisf,dec_funct.basis_vectors)*dec_funct.alpha);
 
-            decision_function<kernel_type> new_df(alpha, 
+            decision_function<kernel_type> new_df(alpha,
                                                   0,
-                                                  kern, 
+                                                  kern,
                                                   lisf.get_dictionary());
 
             // now we have to figure out what the new bias should be.  It might be a little
@@ -119,7 +119,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         trainer_type trainer;
-        unsigned long num_bv; 
+        unsigned long num_bv;
 
 
     }; // end of class reduced_decision_function_trainer
@@ -134,7 +134,7 @@ namespace dlib
         DLIB_ASSERT(num_bv > 0,
                     "\tconst reduced_decision_function_trainer reduced()"
                     << "\n\t you have given invalid arguments to this function"
-                    << "\n\t num_bv: " << num_bv 
+                    << "\n\t num_bv: " << num_bv
         );
 
         return reduced_decision_function_trainer<trainer_type>(trainer, num_bv);
@@ -154,7 +154,7 @@ namespace dlib
         {
             /*
                 This object represents the objective function we will try to
-                minimize in approximate_distance_function().  
+                minimize in approximate_distance_function().
 
                 The objective is the distance, in kernel induced feature space, between
                 the original distance function and the approximated version.
@@ -333,7 +333,7 @@ namespace dlib
             /*!
                 ensures
                     - loads the current approximate distance function with z
-                    - returns the derivative of the distance between the original 
+                    - returns the derivative of the distance between the original
                       distance function and the approximate one.
             !*/
             {
@@ -348,14 +348,14 @@ namespace dlib
                 {
                     for (long j = 0; j < out_vectors.size(); ++j)
                     {
-                        res(i) += b(j)*k(out_vectors(i), out_vectors(j)); 
+                        res(i) += b(j)*k(out_vectors(i), out_vectors(j));
                     }
                 }
                 for (long i = 0; i < out_vectors.size(); ++i)
                 {
                     for (long j = 0; j < dist_funct.get_basis_vectors().size(); ++j)
                     {
-                        res(i) -= dist_funct.get_alpha()(j)*k(out_vectors(i), dist_funct.get_basis_vectors()(j)); 
+                        res(i) -= dist_funct.get_alpha()(j)*k(out_vectors(i), dist_funct.get_basis_vectors()(j));
                     }
                 }
 
@@ -417,15 +417,15 @@ namespace dlib
                     starting_basis.size() > 0,
                     "\t  distance_function approximate_distance_function()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t target.get_basis_vectors().size(): " << target.get_basis_vectors().size() 
-                    << "\n\t starting_basis.size():             " << starting_basis.size() 
+                    << "\n\t target.get_basis_vectors().size(): " << target.get_basis_vectors().size()
+                    << "\n\t starting_basis.size():             " << starting_basis.size()
         );
 
         using namespace red_impl;
-        // The next few statements just find the best weights with which to approximate 
+        // The next few statements just find the best weights with which to approximate
         // the target object with the set of basis vectors in starting_basis.  This
-        // is really just a simple application of some linear algebra.  For the details 
-        // see page 554 of Learning with kernels by Scholkopf and Smola where they talk 
+        // is really just a simple application of some linear algebra.  For the details
+        // see page 554 of Learning with kernels by Scholkopf and Smola where they talk
         // about "Optimal Expansion Coefficients."
 
         const K kern(target.get_kernel());
@@ -435,14 +435,14 @@ namespace dlib
 
         matrix<scalar_type,0,1,mem_manager_type> beta;
 
-        // Now we compute the fist approximate distance function.  
+        // Now we compute the fist approximate distance function.
         beta = pinv(kernel_matrix(kern,starting_basis)) *
             (kernel_matrix(kern,starting_basis,target.get_basis_vectors())*target.get_alpha());
         matrix<sample_type,0,1,mem_manager_type> out_vectors(mat(starting_basis));
 
 
-        // Now setup to do a global optimization of all the parameters in the approximate 
-        // distance function.  
+        // Now setup to do a global optimization of all the parameters in the approximate
+        // distance function.
         const objective<K> obj(target, beta, out_vectors);
         const objective_derivative<K> obj_der(target, beta, out_vectors);
         matrix<scalar_type,0,1,mem_manager_type> opt_starting_point(obj.state_to_vector());
@@ -451,7 +451,7 @@ namespace dlib
         // perform a full optimization of all the parameters (i.e. both beta and the basis vectors together)
         find_min(lbfgs_search_strategy(20),
                  stop_strategy,
-                 obj, obj_der, opt_starting_point, 0); 
+                 obj, obj_der, opt_starting_point, 0);
 
         // now make sure that the final optimized value is loaded into the beta and
         // out_vectors matrices
@@ -483,7 +483,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename trainer_type 
+        typename trainer_type
         >
     class reduced_decision_function_trainer2
     {
@@ -510,8 +510,8 @@ namespace dlib
             DLIB_ASSERT(num_bv > 0 && eps > 0,
                         "\t reduced_decision_function_trainer2()"
                         << "\n\t you have given invalid arguments to this function"
-                        << "\n\t num_bv: " << num_bv 
-                        << "\n\t eps:    " << eps 
+                        << "\n\t num_bv: " << num_bv
+                        << "\n\t eps:    " << eps
             );
         }
 
@@ -555,9 +555,9 @@ namespace dlib
             target = dec_funct;
             approx = approximate_distance_function(objective_delta_stop_strategy(eps), target, lisf);
 
-            decision_function<kernel_type> new_df(approx.get_alpha(), 
+            decision_function<kernel_type> new_df(approx.get_alpha(),
                                                   0,
-                                                  kern, 
+                                                  kern,
                                                   approx.get_basis_vectors());
 
             // now we have to figure out what the new bias should be.  It might be a little
@@ -596,8 +596,8 @@ namespace dlib
         DLIB_ASSERT(num_bv > 0 && eps > 0,
                     "\tconst reduced_decision_function_trainer2 reduced2()"
                     << "\n\t you have given invalid arguments to this function"
-                    << "\n\t num_bv: " << num_bv 
-                    << "\n\t eps:    " << eps 
+                    << "\n\t num_bv: " << num_bv
+                    << "\n\t eps:    " << eps
         );
 
         return reduced_decision_function_trainer2<trainer_type>(trainer, num_bv, eps);

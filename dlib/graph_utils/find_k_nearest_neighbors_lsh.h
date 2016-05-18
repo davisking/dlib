@@ -18,10 +18,10 @@ namespace dlib
 
     namespace impl
     {
-        struct compare_sample_pair_with_distance 
+        struct compare_sample_pair_with_distance
         {
             inline bool operator() (const sample_pair& a, const sample_pair& b) const
-            { 
+            {
                 return a.distance() < b.distance();
             }
         };
@@ -37,7 +37,7 @@ namespace dlib
                 const vector_type& samples_,
                 const hash_function_type& hash_funct_,
                 std::vector<typename hash_function_type::result_type>& hashes_
-            ) : 
+            ) :
                 samples(samples_),
                 hash_funct(hash_funct_),
                 hashes(hashes_)
@@ -102,7 +102,7 @@ namespace dlib
                 // scan over the hashes and find the best matches for hashes[i]
                 for (unsigned long j = 0; j < hashes.size(); ++j)
                 {
-                    if (i == j) 
+                    if (i == j)
                         continue;
 
                     const unsigned long dist = hash_funct.distance(hashes[i], hashes[j]);
@@ -178,7 +178,7 @@ namespace dlib
         const unsigned long k,
         const unsigned long num_threads,
         std::vector<sample_pair, alloc>& edges,
-        const unsigned long k_oversample = 20 
+        const unsigned long k_oversample = 20
     )
     {
         // make sure requires clause is not broken
@@ -186,8 +186,8 @@ namespace dlib
             "\t void find_k_nearest_neighbors_lsh()"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t samples.size(): " << samples.size()
-            << "\n\t k:              " << k 
-            << "\n\t k_oversample:   " << k_oversample 
+            << "\n\t k:              " << k
+            << "\n\t k_oversample:   " << k_oversample
             );
 
         edges.clear();

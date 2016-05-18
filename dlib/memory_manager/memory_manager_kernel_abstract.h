@@ -12,9 +12,9 @@ namespace dlib
         >
     class memory_manager
     {
-        /*!      
+        /*!
             REQUIREMENTS ON T
-                T must have a default constructor.      
+                T must have a default constructor.
 
             INITIAL VALUE
                 get_number_of_allocations() == 0
@@ -35,21 +35,21 @@ namespace dlib
             memory_manager(
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc
             !*/
 
             virtual ~memory_manager(
-            ); 
+            );
             /*!
                 ensures
                     - if (get_number_of_allocations() == 0) then
                         - all resources associated with *this have been released.
                     - else
                         - The memory still allocated will not be deleted and this
-                          causes a memory leak. 
+                          causes a memory leak.
             !*/
 
             unsigned long get_number_of_allocations (
@@ -67,7 +67,7 @@ namespace dlib
                     - #get_number_of_allocations() == get_number_of_allocations() + 1
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
-                        If this exception is thrown then the call to allocate() 
+                        If this exception is thrown then the call to allocate()
                         has no effect on #*this.
             !*/
 
@@ -90,12 +90,12 @@ namespace dlib
             );
             /*!
                 ensures
-                    - allocates a new array of size objects of type T and returns a 
+                    - allocates a new array of size objects of type T and returns a
                       pointer to it.
                     - #get_number_of_allocations() == get_number_of_allocations() + 1
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
-                        If this exception is thrown then the call to allocate() 
+                        If this exception is thrown then the call to allocate()
                         has no effect on #*this.
             !*/
 
@@ -120,7 +120,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
 
         private:
 
@@ -133,9 +133,9 @@ namespace dlib
         typename T
         >
     inline void swap (
-        memory_manager<T>& a, 
-        memory_manager<T>& b 
-    ) { a.swap(b); }   
+        memory_manager<T>& a,
+        memory_manager<T>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

@@ -11,7 +11,7 @@ namespace dlib
     class drectangle;
     drectangle operator* (
         const drectangle& rect,
-        const double& scale 
+        const double& scale
     );
 
 // ----------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ namespace dlib
 
         drectangle (
             const rectangle& rect
-        ) : l(rect.left()), 
+        ) : l(rect.left()),
             t(rect.top()),
             r(rect.right()),
             b(rect.bottom()) {}
@@ -64,7 +64,7 @@ namespace dlib
         operator rectangle (
         ) const
         {
-            return rectangle((long)std::floor(l+0.5), 
+            return rectangle((long)std::floor(l+0.5),
                              (long)std::floor(t+0.5),
                              (long)std::floor(r+0.5),
                              (long)std::floor(b+0.5));
@@ -84,7 +84,7 @@ namespace dlib
         ) const { return dlib::vector<double,2>(left(), top()); }
 
         const dlib::vector<double,2> bl_corner (
-        ) const { return dlib::vector<double,2>(left(), bottom()); } 
+        ) const { return dlib::vector<double,2>(left(), bottom()); }
 
         const dlib::vector<double,2> tr_corner (
         ) const { return dlib::vector<double,2>(right(), top()); }
@@ -93,21 +93,21 @@ namespace dlib
         ) const { return dlib::vector<double,2>(right(), bottom()); }
 
         double width (
-        ) const 
-        { 
+        ) const
+        {
             if (is_empty())
                 return 0;
             else
-                return r - l + 1; 
+                return r - l + 1;
         }
 
         double height (
-        ) const 
-        { 
+        ) const
+        {
             if (is_empty())
                 return 0;
             else
-                return b - t + 1; 
+                return b - t + 1;
         }
 
         double area (
@@ -219,16 +219,16 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
-        const drectangle& item, 
+        const drectangle& item,
         std::ostream& out
     )
     {
         try
         {
-            serialize(item.left(),out); 
-            serialize(item.top(),out); 
-            serialize(item.right(),out); 
-            serialize(item.bottom(),out); 
+            serialize(item.left(),out);
+            serialize(item.top(),out);
+            serialize(item.right(),out);
+            serialize(item.bottom(),out);
         }
         catch (serialization_error& e)
         {
@@ -237,16 +237,16 @@ namespace dlib
     }
 
     inline void deserialize (
-        drectangle& item, 
+        drectangle& item,
         std::istream& in
     )
     {
         try
         {
-            deserialize(item.left(),in); 
-            deserialize(item.top(),in); 
-            deserialize(item.right(),in); 
-            deserialize(item.bottom(),in); 
+            deserialize(item.left(),in);
+            deserialize(item.top(),in);
+            deserialize(item.right(),in);
+            deserialize(item.bottom(),in);
         }
         catch (serialization_error& e)
         {
@@ -255,17 +255,17 @@ namespace dlib
     }
 
     inline std::ostream& operator<< (
-        std::ostream& out, 
-        const drectangle& item 
-    )   
+        std::ostream& out,
+        const drectangle& item
+    )
     {
         out << "[(" << item.left() << ", " << item.top() << ") (" << item.right() << ", " << item.bottom() << ")]";
         return out;
     }
 
     inline std::istream& operator>>(
-        std::istream& in, 
-        drectangle& item 
+        std::istream& in,
+        drectangle& item
     )
     {
         // ignore any whitespace
@@ -315,7 +315,7 @@ namespace dlib
 
     inline drectangle operator* (
         const drectangle& rect,
-        const double& scale 
+        const double& scale
     )
     {
         if (!rect.is_empty())
@@ -409,7 +409,7 @@ namespace dlib
 
     inline const drectangle shrink_rect (
         const drectangle& rect,
-        double num 
+        double num
     )
     {
         return drectangle(rect.left()+num, rect.top()+num, rect.right()-num, rect.bottom()-num);
@@ -417,7 +417,7 @@ namespace dlib
 
     inline const drectangle grow_rect (
         const drectangle& rect,
-        double num 
+        double num
     )
     {
         return shrink_rect(rect, -num);
@@ -448,7 +448,7 @@ namespace dlib
     {
         DLIB_ASSERT(ratio > 0,
             "\t drectangle set_aspect_ratio()"
-            << "\n\t ratio: " << ratio 
+            << "\n\t ratio: " << ratio
             );
 
         const double h = std::sqrt(rect.area()/ratio);

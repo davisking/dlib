@@ -25,7 +25,7 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
+        // kernel_1a
         typedef     static_set_kernel_1<T,compare>
                     kernel_1a;
         typedef     static_set_kernel_c<kernel_1a>

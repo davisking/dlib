@@ -13,14 +13,14 @@
 // This is called an unnamed-namespace and it has the effect of making everything inside this file "private"
 // so that everything you declare will have static linkage.  Thus we won't have any multiply
 // defined symbol errors coming out of the linker when we try to compile the test suite.
-namespace  
+namespace
 {
 
     using namespace test;
     using namespace dlib;
     using namespace std;
 
-    // Declare the logger we will use in this test.  The name of the tester 
+    // Declare the logger we will use in this test.  The name of the tester
     // should start with "test."
     logger dlog("test.std_vector_c");
 

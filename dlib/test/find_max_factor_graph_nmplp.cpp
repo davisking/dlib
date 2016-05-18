@@ -10,7 +10,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -23,7 +23,7 @@ namespace
     dlib::rand rnd;
 
     template <bool fully_connected>
-    class map_problem 
+    class map_problem
     {
         /*
             This is a simple 8 node problem with two cycles in it unless fully_connected is true
@@ -69,7 +69,7 @@ namespace
 
             bool operator== (const neighbor_iterator& item) const { return item.node_id() == node_id(); }
             bool operator!= (const neighbor_iterator& item) const { return item.node_id() != node_id(); }
-            neighbor_iterator& operator++() 
+            neighbor_iterator& operator++()
             {
                 ++count;
                 return *this;
@@ -81,7 +81,7 @@ namespace
                 {
                     if (count < home_node)
                         return count;
-                    else 
+                    else
                         return count+1;
                 }
 
@@ -150,7 +150,7 @@ namespace
         }
 
         neighbor_iterator end(
-            const node_iterator& 
+            const node_iterator&
         ) const
         {
             neighbor_iterator temp;
@@ -160,7 +160,7 @@ namespace
         }
 
         neighbor_iterator end(
-            const neighbor_iterator& 
+            const neighbor_iterator&
         ) const
         {
             neighbor_iterator temp;
@@ -186,14 +186,14 @@ namespace
 
 
         unsigned long num_states (
-            const node_iterator& 
+            const node_iterator&
         ) const
         {
             return 2;
         }
 
         unsigned long num_states (
-            const neighbor_iterator& 
+            const neighbor_iterator&
         ) const
         {
             return 2;
@@ -271,7 +271,7 @@ namespace
 
             bool operator== (const neighbor_iterator& item) const { return item.node_id() == node_id(); }
             bool operator!= (const neighbor_iterator& item) const { return item.node_id() != node_id(); }
-            neighbor_iterator& operator++() 
+            neighbor_iterator& operator++()
             {
                 ++count;
                 return *this;
@@ -358,7 +358,7 @@ namespace
         }
 
         neighbor_iterator end(
-            const node_iterator& 
+            const node_iterator&
         ) const
         {
             neighbor_iterator temp;
@@ -368,7 +368,7 @@ namespace
         }
 
         neighbor_iterator end(
-            const neighbor_iterator& 
+            const neighbor_iterator&
         ) const
         {
             neighbor_iterator temp;
@@ -394,14 +394,14 @@ namespace
 
 
         unsigned long num_states (
-            const node_iterator& 
+            const node_iterator&
         ) const
         {
             return 2;
         }
 
         unsigned long num_states (
-            const neighbor_iterator& 
+            const neighbor_iterator&
         ) const
         {
             return 2;
@@ -438,7 +438,7 @@ namespace
 // ----------------------------------------------------------------------------------------
 
 
-    class map_problem2 
+    class map_problem2
     {
         /*
             This is a simple tree structured graph.  In particular, it is a star made
@@ -474,7 +474,7 @@ namespace
 
             bool operator== (const neighbor_iterator& item) const { return item.node_id() == node_id(); }
             bool operator!= (const neighbor_iterator& item) const { return item.node_id() != node_id(); }
-            neighbor_iterator& operator++() 
+            neighbor_iterator& operator++()
             {
                 ++count;
                 return *this;
@@ -549,7 +549,7 @@ namespace
         }
 
         neighbor_iterator end(
-            const node_iterator& 
+            const node_iterator&
         ) const
         {
             neighbor_iterator temp;
@@ -558,7 +558,7 @@ namespace
         }
 
         neighbor_iterator end(
-            const neighbor_iterator& 
+            const neighbor_iterator&
         ) const
         {
             neighbor_iterator temp;
@@ -583,14 +583,14 @@ namespace
 
 
         unsigned long num_states (
-            const node_iterator& 
+            const node_iterator&
         ) const
         {
             return 3;
         }
 
         unsigned long num_states (
-            const neighbor_iterator& 
+            const neighbor_iterator&
         ) const
         {
             return 3;
@@ -668,7 +668,7 @@ namespace
         std::vector<unsigned long>& map_assignment
     )
     {
-        std::vector<unsigned long> temp_assignment; 
+        std::vector<unsigned long> temp_assignment;
         temp_assignment.resize(prob.number_of_nodes(),0);
 
         double best_score = -std::numeric_limits<double>::infinity();
@@ -704,10 +704,10 @@ namespace
         map_problem prob;
         find_max_factor_graph_nmplp(prob, map_assignment1, 1000, 1e-8);
 
-        const double score1 = find_total_score(prob, map_assignment1); 
+        const double score1 = find_total_score(prob, map_assignment1);
 
         brute_force_find_max_factor_graph_nmplp(prob, map_assignment2);
-        const double score2 = find_total_score(prob, map_assignment2); 
+        const double score2 = find_total_score(prob, map_assignment2);
 
         dlog << LINFO << "score NMPLP: " << score1;
         dlog << LINFO << "score MAP:   " << score2;
@@ -727,7 +727,7 @@ namespace
         map_problem prob;
         find_max_factor_graph_nmplp(prob, map_assignment1, 10, 1e-8);
 
-        const double score1 = find_total_score(prob, map_assignment1); 
+        const double score1 = find_total_score(prob, map_assignment1);
 
         map_assignment2.resize(6);
         map_assignment2[0] = index_of_max(rowm(prob.numbers,0));
@@ -736,7 +736,7 @@ namespace
         map_assignment2[3] = index_of_max(rowm(prob.numbers,3));
         map_assignment2[4] = index_of_max(rowm(prob.numbers,4));
         map_assignment2[5] = 1;
-        const double score2 = find_total_score(prob, map_assignment2); 
+        const double score2 = find_total_score(prob, map_assignment2);
 
         dlog << LINFO << "score NMPLP: " << score1;
         dlog << LINFO << "score MAP:   " << score2;

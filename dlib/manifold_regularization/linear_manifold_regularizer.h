@@ -18,7 +18,7 @@ namespace dlib
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This object is simply a tool for turning a vector of sample_pair objects
-                    into an adjacency list with floating point weights on each edge.  
+                    into an adjacency list with floating point weights on each edge.
             !*/
         public:
 
@@ -29,7 +29,7 @@ namespace dlib
                 sum_edge_weights = 0;
             }
 
-            struct neighbor 
+            struct neighbor
             {
                 neighbor(unsigned long idx, double w):index(idx), weight(w) {}
                 neighbor():index(0), weight(0) {}
@@ -57,7 +57,7 @@ namespace dlib
                 requires
                     - idx < size()
                 ensures
-                    - returns an iterator that points to the first neighbor of 
+                    - returns an iterator that points to the first neighbor of
                       the idx'th vertex.
             !*/
             {
@@ -83,10 +83,10 @@ namespace dlib
             void build (
                 const vector_type& edges,
                 const weight_function_type& weight_funct
-            ) 
+            )
             /*!
                 requires
-                    - vector_type == a type with an interface compatible with std::vector and 
+                    - vector_type == a type with an interface compatible with std::vector and
                       it must in turn contain objects with an interface compatible with dlib::sample_pair
                     - edges.size() > 0
                     - contains_duplicate_pairs(edges) == false
@@ -101,14 +101,14 @@ namespace dlib
             {
 
 
-                // Figure out how many neighbors each sample ultimately has.  We do this so 
+                // Figure out how many neighbors each sample ultimately has.  We do this so
                 // we will know how much space to allocate in the data vector.
                 std::vector<unsigned long> num_neighbors;
                 num_neighbors.reserve(edges.size());
 
                 for (unsigned long i = 0; i < edges.size(); ++i)
                 {
-                    // make sure num_neighbors is always big enough 
+                    // make sure num_neighbors is always big enough
                     const unsigned long min_size = std::max(edges[i].index1(), edges[i].index2())+1;
                     if (num_neighbors.size() < min_size)
                         num_neighbors.resize(min_size,  0);
@@ -122,7 +122,7 @@ namespace dlib
                 // Now setup the iterators in blocks.  Also setup a version of blocks that holds
                 // non-const iterators so we can use it below when we populate data.
                 std::vector<std::vector<neighbor>::iterator> mutable_blocks;
-                data.resize(edges.size()*2); // each edge will show up twice 
+                data.resize(edges.size()*2); // each edge will show up twice
                 blocks.resize(_size + 1);
                 blocks[0] = data.begin();
                 mutable_blocks.resize(_size + 1);
@@ -144,7 +144,7 @@ namespace dlib
                     DLIB_ASSERT(weight >= 0,
                         "\t void linear_manifold_regularizer::build()"
                         << "\n\t You supplied a weight_funct() that generated a negative weight."
-                        << "\n\t weight: " << weight 
+                        << "\n\t weight: " << weight
                         );
 
                     *mutable_blocks[edges[i].index1()]++ = neighbor(edges[i].index2(), weight);
@@ -172,14 +172,14 @@ namespace dlib
                     - size() == _size
                     - blocks.size() == _size + 1
                     - sum_of_edge_weights() == sum_edge_weights
-                    - blocks == a vector of iterators that point into data.  
+                    - blocks == a vector of iterators that point into data.
                       For all valid i:
                         - The iterator range [blocks[i], blocks[i+1]) contains all the edges
                           for the i'th node in the graph
             !*/
 
             std::vector<neighbor> data;
-            std::vector<const_iterator> blocks; 
+            std::vector<const_iterator> blocks;
             unsigned long _size;
 
             double sum_edge_weights;
@@ -203,8 +203,8 @@ namespace dlib
 
 
         template <
-            typename vector_type1, 
-            typename vector_type2, 
+            typename vector_type1,
+            typename vector_type2,
             typename weight_function_type
             >
         void build (
@@ -221,8 +221,8 @@ namespace dlib
                 << "\n\t Invalid inputs were given to this function."
                 << "\n\t edges.size():                    " << edges.size()
                 << "\n\t samples.size():                  " << samples.size()
-                << "\n\t contains_duplicate_pairs(edges): " << contains_duplicate_pairs(edges) 
-                << "\n\t max_index_plus_one(edges):       " << max_index_plus_one(edges) 
+                << "\n\t contains_duplicate_pairs(edges): " << contains_duplicate_pairs(edges)
+                << "\n\t max_index_plus_one(edges):       " << max_index_plus_one(edges)
                 );
 
 
@@ -245,7 +245,7 @@ namespace dlib
             DLIB_ASSERT(intrinsic_regularization_strength >= 0,
                 "\t matrix linear_manifold_regularizer::get_transformation_matrix()"
                 << "\n\t This value must not be negative"
-                << "\n\t intrinsic_regularization_strength: " << intrinsic_regularization_strength 
+                << "\n\t intrinsic_regularization_strength: " << intrinsic_regularization_strength
                 );
 
             if (dimensionality() == 0)
@@ -272,7 +272,7 @@ namespace dlib
             requires
                 - samples.size() == graph.size()
             ensures
-                - computes trans(X)*lap(graph)*X where X is the data matrix 
+                - computes trans(X)*lap(graph)*X where X is the data matrix
                   (i.e. the matrix that contains all the samples in its rows)
                   and lap(graph) is the laplacian matrix of the graph.  The
                   resulting matrix is stored in reg_mat.

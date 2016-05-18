@@ -18,24 +18,24 @@ namespace dlib
         typename feature_extractor
         >
     class structural_svm_sequence_labeling_problem : noncopyable,
-                                                     public structural_svm_problem_threaded<matrix<double,0,1>, 
+                                                     public structural_svm_problem_threaded<matrix<double,0,1>,
                                                             std::vector<std::pair<unsigned long,double> > >
     {
         /*!
             REQUIREMENTS ON feature_extractor
-                It must be an object that implements an interface compatible with 
+                It must be an object that implements an interface compatible with
                 the example_feature_extractor defined in dlib/svm/sequence_labeler_abstract.h.
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for learning the weight vector needed to use
-                a sequence_labeler object.  
+                a sequence_labeler object.
 
-                It learns the parameter vector by formulating the problem as a structural 
+                It learns the parameter vector by formulating the problem as a structural
                 SVM problem.  The general approach is discussed in the paper:
-                    Hidden Markov Support Vector Machines by 
+                    Hidden Markov Support Vector Machines by
                     Y. Altun, I. Tsochantaridis, T. Hofmann
-                While the particular optimization strategy used is the method from: 
-                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of 
+                While the particular optimization strategy used is the method from:
+                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of
                     Structural SVMs, Machine Learning, 77(1):27-59, 2009.
         !*/
 
@@ -54,15 +54,15 @@ namespace dlib
                 - contains_invalid_labeling(fe, samples, labels) == false
                 - for all valid i and j: labels[i][j] < fe.num_labels()
             ensures
-                - This object attempts to learn a mapping from the given samples to the 
-                  given labels.  In particular, it attempts to learn to predict labels[i] 
-                  based on samples[i].  Or in other words, this object can be used to learn 
+                - This object attempts to learn a mapping from the given samples to the
+                  given labels.  In particular, it attempts to learn to predict labels[i]
+                  based on samples[i].  Or in other words, this object can be used to learn
                   a parameter vector, w, such that a sequence_labeler declared as:
                     sequence_labeler<feature_extractor> labeler(w,fe)
                   results in a labeler object which attempts to compute the following mapping:
                     labels[i] == labeler(samples[i])
-                - This object will use num_threads threads during the optimization 
-                  procedure.  You should set this parameter equal to the number of 
+                - This object will use num_threads threads during the optimization
+                  procedure.  You should set this parameter equal to the number of
                   available processing cores on your machine.
                 - #num_labels() == fe.num_labels()
                 - for all valid i: #get_loss(i) == 1

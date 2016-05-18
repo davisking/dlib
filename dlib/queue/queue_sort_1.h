@@ -12,7 +12,7 @@ namespace dlib
 {
 
     template <
-        typename queue_base 
+        typename queue_base
         >
     class queue_sort_1 : public queue_base
     {
@@ -134,9 +134,9 @@ namespace dlib
         typename queue_base
         >
     inline void swap (
-        queue_sort_1<queue_base>& a, 
-        queue_sort_1<queue_base>& b 
-    ) { a.swap(b); }   
+        queue_sort_1<queue_base>& a,
+        queue_sort_1<queue_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

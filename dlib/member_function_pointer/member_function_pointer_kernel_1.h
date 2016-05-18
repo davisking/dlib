@@ -64,7 +64,7 @@ namespace dlib
         };
 
         template <typename T>
-        class mp_null : public mp_base_base 
+        class mp_null : public mp_base_base
         {
         public:
             typedef void (T::*mfp_pointer_type)() ;
@@ -76,7 +76,7 @@ namespace dlib
         };
 
         template <typename mp_impl>
-        class mp_impl_T : public mp_impl 
+        class mp_impl_T : public mp_impl
         {
             /*
                 This class supplies the implementations clone() and is_same() for any
@@ -101,7 +101,7 @@ namespace dlib
             }
 
             void clone   (void* ptr) const  { new(ptr) mp_impl_T(this->o,this->callback); }
-            bool is_same (const mp_base_base* item) const 
+            bool is_same (const mp_base_base* item) const
             {
                 if (item->o == 0 && this->o == 0)
                 {
@@ -126,7 +126,7 @@ namespace dlib
             const mfp_kernel_1_base_class& item
         ) { item.mp()->clone(mp_memory.get()); }
 
-        mfp_kernel_1_base_class (  
+        mfp_kernel_1_base_class (
         ) { mp_null_impl().safe_clone(mp_memory); }
 
         bool operator == (
@@ -148,7 +148,7 @@ namespace dlib
         ) { mfp_kernel_1_base_class().swap(*this); }
 
         bool is_set (
-        ) const { return mp()->is_set(); } 
+        ) const { return mp()->is_set(); }
 
     private:
         typedef void (dummy::*safe_bool)();
@@ -159,8 +159,8 @@ namespace dlib
 
         void swap (
             mfp_kernel_1_base_class& item
-        ) 
-        {  
+        )
+        {
             // make a temp copy of item
             mfp_kernel_1_base_class temp(item);
 
@@ -169,7 +169,7 @@ namespace dlib
             // copy *this into item
             mp()->clone(item.mp_memory.get());
 
-            // destory the stuff in this 
+            // destory the stuff in this
             destroy_mp_memory();
             // copy temp into *this
             temp.mp()->clone(mp_memory.get());
@@ -182,7 +182,7 @@ namespace dlib
         // Fortunately, no actual real instances of this template seem to end up with that screwed up
         // value so everything works fine if we just add 1 so that this degenerate case doesn't cause
         // trouble.  Note that we know it all works fine because safe_clone() checks the size of this
-        // memory block whenever the member function pointer is used.  
+        // memory block whenever the member function pointer is used.
         stack_based_memory_block<sizeof(mp_null_impl)+1> mp_memory;
 
         void destroy_mp_memory (
@@ -245,14 +245,14 @@ namespace dlib
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const_type<T>,void>::type 
-        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
-        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -303,14 +303,14 @@ namespace dlib
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const_type<T>,void>::type 
-        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
-        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -361,14 +361,14 @@ namespace dlib
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const_type<T>,void>::type 
-        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
-        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -420,14 +420,14 @@ namespace dlib
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const_type<T>,void>::type 
-        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
-        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -476,19 +476,19 @@ namespace dlib
         typedef member_function_pointer kernel_1a;
         typedef member_function_pointer kernel_1a_c;
 
-        void operator() (PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4) const 
+        void operator() (PARAM1 p1, PARAM2 p2, PARAM3 p3, PARAM4 p4) const
         { DLIB_MFP_OC;  static_cast<const mp_base*>(mp_memory.get())->call(p1,p2,p3,p4); }
 
         // the reason for putting disable_if on this function is that it avoids an overload
         // resolution bug in visual studio.
-        template <typename T> typename disable_if<is_const_type<T>,void>::type 
-        set(T& object, typename mp_impl<T>::mfp_pointer_type cb) 
+        template <typename T> typename disable_if<is_const_type<T>,void>::type
+        set(T& object, typename mp_impl<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl<T> >(&object,cb).safe_clone(mp_memory); }
 
-        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb) 
+        template <typename T> void set(const T& object, typename mp_impl_const<T>::mfp_pointer_type cb)
         { DLIB_MFP_SC;  destroy_mp_memory(); mp_impl_T<mp_impl_const<T> >((void*)&object,cb).safe_clone(mp_memory); }
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 

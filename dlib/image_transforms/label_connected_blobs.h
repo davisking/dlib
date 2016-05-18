@@ -13,7 +13,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct neighbors_8 
+    struct neighbors_8
     {
         void operator() (
             const point& p,
@@ -33,7 +33,7 @@ namespace dlib
         }
     };
 
-    struct neighbors_4 
+    struct neighbors_4
     {
         void operator() (
             const point& p,
@@ -90,12 +90,12 @@ namespace dlib
 
     };
 
-    struct nothing_is_background 
+    struct nothing_is_background
     {
         template <typename image_type>
         bool operator() (
-            const image_type&, 
-            const point& 
+            const image_type&,
+            const point&
         ) const
         {
             return false;
@@ -151,7 +151,7 @@ namespace dlib
 
                 label_img[r][c] = next;
 
-                // label all the neighbors of this point 
+                // label all the neighbors of this point
                 neighbors.push(point(c,r));
                 while (neighbors.size() > 0)
                 {

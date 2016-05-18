@@ -18,8 +18,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename node_type, typename directed_graph, bool is_checked>
-    struct directed_graph_checker_helper 
-    { 
+    struct directed_graph_checker_helper
+    {
         /*!
             This object is used to check preconditions based on the value of is_checked
         !*/
@@ -33,8 +33,8 @@ namespace dlib
             DLIB_CASSERT(edge_index < self.number_of_parents(),
                          "\tnode_type& directed_graph::node_type::parent_edge(edge_index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tedge_index:          " << edge_index 
-                         << "\n\tnumber_of_parents(): " << self.number_of_parents() 
+                         << "\n\tedge_index:          " << edge_index
+                         << "\n\tnumber_of_parents(): " << self.number_of_parents()
                          << "\n\tthis:              " << &self
             );
         }
@@ -48,8 +48,8 @@ namespace dlib
             DLIB_CASSERT(edge_index < self.number_of_children(),
                          "\tnode_type& directed_graph::node_type::child_edge(edge_index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tedge_index:           " << edge_index 
-                         << "\n\tnumber_of_children(): " << self.number_of_children() 
+                         << "\n\tedge_index:           " << edge_index
+                         << "\n\tnumber_of_children(): " << self.number_of_children()
                          << "\n\tthis:              " << &self
             );
         }
@@ -63,8 +63,8 @@ namespace dlib
             DLIB_CASSERT(edge_index < self.number_of_parents(),
                          "\tnode_type& directed_graph::node_type::parent(edge_index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tedge_index:          " << edge_index 
-                         << "\n\tnumber_of_parents(): " << self.number_of_parents() 
+                         << "\n\tedge_index:          " << edge_index
+                         << "\n\tnumber_of_parents(): " << self.number_of_parents()
                          << "\n\tthis:              " << &self
             );
         }
@@ -78,8 +78,8 @@ namespace dlib
             DLIB_CASSERT(edge_index < self.number_of_children(),
                          "\tnode_type& directed_graph::node_type::child(edge_index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tedge_index:           " << edge_index 
-                         << "\n\tnumber_of_children(): " << self.number_of_children() 
+                         << "\n\tedge_index:           " << edge_index
+                         << "\n\tnumber_of_children(): " << self.number_of_children()
                          << "\n\tthis:              " << &self
             );
         }
@@ -93,7 +93,7 @@ namespace dlib
             DLIB_CASSERT(index < self.number_of_nodes(),
                          "\tnode_type& directed_graph::node(index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tindex:             " << index 
+                         << "\n\tindex:             " << index
                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
@@ -110,9 +110,9 @@ namespace dlib
                          child_node_index < self.number_of_nodes(),
                          "\tvoid directed_graph::has_edge(parent_node_index, child_node_index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tparent_node_index: " << parent_node_index 
-                         << "\n\tchild_node_index:  " << child_node_index 
-                         << "\n\tnumber_of_nodes(): " << self.number_of_nodes() 
+                         << "\n\tparent_node_index: " << parent_node_index
+                         << "\n\tchild_node_index:  " << child_node_index
+                         << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
         }
@@ -125,10 +125,10 @@ namespace dlib
         {
             DLIB_CASSERT(parent_node_index < self.number_of_nodes() &&
                          child_node_index < self.number_of_nodes(),
-                         "\tvoid directed_graph::add_edge(parent_node_index, child_node_index)" 
+                         "\tvoid directed_graph::add_edge(parent_node_index, child_node_index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tparent_node_index: " << parent_node_index 
-                         << "\n\tchild_node_index:  " << child_node_index 
+                         << "\n\tparent_node_index: " << parent_node_index
+                         << "\n\tchild_node_index:  " << child_node_index
                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
@@ -136,9 +136,9 @@ namespace dlib
             DLIB_CASSERT( self.has_edge(parent_node_index, child_node_index) == false,
                           "\tvoid directed_graph::add_edge(parent_node_index, child_node_index)"
                           << "\n\tYou can't add an edge if it already exists in the graph"
-                          << "\n\tparent_node_index: " << parent_node_index 
-                          << "\n\tchild_node_index:  " << child_node_index 
-                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes() 
+                          << "\n\tparent_node_index: " << parent_node_index
+                          << "\n\tchild_node_index:  " << child_node_index
+                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                           << "\n\tthis:              " << &self
             );
 
@@ -152,10 +152,10 @@ namespace dlib
         {
             DLIB_CASSERT(parent_node_index < self.number_of_nodes() &&
                          child_node_index < self.number_of_nodes(),
-                         "\tvoid directed_graph::remove_edge(parent_node_index, child_node_index)" 
+                         "\tvoid directed_graph::remove_edge(parent_node_index, child_node_index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tparent_node_index: " << parent_node_index 
-                         << "\n\tchild_node_index:  " << child_node_index 
+                         << "\n\tparent_node_index: " << parent_node_index
+                         << "\n\tchild_node_index:  " << child_node_index
                          << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
@@ -163,8 +163,8 @@ namespace dlib
             DLIB_CASSERT( self.has_edge(parent_node_index, child_node_index) == true,
                           "\tvoid directed_graph::remove_edge(parent_node_index, child_node_index)"
                           << "\n\tYou can't remove an edge if it isn't in the graph"
-                          << "\n\tparent_node_index: " << parent_node_index 
-                          << "\n\tchild_node_index:  " << child_node_index 
+                          << "\n\tparent_node_index: " << parent_node_index
+                          << "\n\tchild_node_index:  " << child_node_index
                           << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                           << "\n\tthis:              " << &self
             );
@@ -180,8 +180,8 @@ namespace dlib
             DLIB_CASSERT(index < self.number_of_nodes(),
                          "\tvoid directed_graph::remove_node(index)"
                          << "\n\tYou have specified an invalid index"
-                         << "\n\tindex:             " << index 
-                         << "\n\tnumber_of_nodes(): " << self.number_of_nodes() 
+                         << "\n\tindex:             " << index
+                         << "\n\tnumber_of_nodes(): " << self.number_of_nodes()
                          << "\n\tthis:              " << &self
             );
         }
@@ -189,7 +189,7 @@ namespace dlib
 
     template <typename node_type, typename directed_graph>
     struct directed_graph_checker_helper <node_type, directed_graph, false>
-    { 
+    {
         static inline void check_parent ( unsigned long , const node_type&) { }
         static inline void check_child ( unsigned long , const node_type& ) { }
         static inline void check_parent_edge ( unsigned long , const node_type&) { }
@@ -207,7 +207,7 @@ namespace dlib
         typename T,
         typename E = char,
         typename mem_manager = default_memory_manager,
-        bool is_checked = true 
+        bool is_checked = true
         >
     class directed_graph_kernel_1 : noncopyable
     {
@@ -375,28 +375,28 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename E,
         typename mem_manager,
         bool is_checked
         >
     struct is_directed_graph<directed_graph_kernel_1<T,E,mem_manager, is_checked> >
     {
-        static const bool value = true; 
+        static const bool value = true;
     };
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename E,
         typename mem_manager,
         bool is_checked
         >
     inline void swap (
-        directed_graph_kernel_1<T,E,mem_manager,is_checked>& a, 
-        directed_graph_kernel_1<T,E,mem_manager,is_checked>& b 
-    ) { a.swap(b); }   
+        directed_graph_kernel_1<T,E,mem_manager,is_checked>& a,
+        directed_graph_kernel_1<T,E,mem_manager,is_checked>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
@@ -408,8 +408,8 @@ namespace dlib
         >
     void serialize (
         const directed_graph_kernel_1<T,E,mem_manager,is_checked>& item,
-        std::ostream& out 
-    )   
+        std::ostream& out
+    )
     {
         try
         {
@@ -431,7 +431,7 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while serializing object of type directed_graph_kernel_1"); 
+            throw serialization_error(e.info + "\n   while serializing object of type directed_graph_kernel_1");
         }
     }
 
@@ -446,7 +446,7 @@ namespace dlib
     void deserialize (
         directed_graph_kernel_1<T,E,mem_manager,is_checked>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -486,7 +486,7 @@ namespace dlib
         }
         catch (serialization_error& e)
         {
-            throw serialization_error(e.info + "\n   while deserializing object of type directed_graph_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type directed_graph_kernel_1");
         }
     }
 
@@ -661,22 +661,22 @@ namespace dlib
 
         node_type& n = *nodes[index];
 
-        // remove all edges pointing to this node from its parents 
+        // remove all edges pointing to this node from its parents
         for (unsigned long i = 0; i < n.parents.size(); ++i)
         {
             // remove the edge from this specific parent
-            unsigned long pos = static_cast<unsigned long>(find(n.parents[i]->children.begin(), 
-                     n.parents[i]->children.end(), 
+            unsigned long pos = static_cast<unsigned long>(find(n.parents[i]->children.begin(),
+                     n.parents[i]->children.end(),
                      &n) - n.parents[i]->children.begin());
 
             n.parents[i]->children.erase(n.parents[i]->children.begin() + pos);
             n.parents[i]->edge_children.erase(n.parents[i]->edge_children.begin() + pos);
         }
 
-        // remove all edges pointing to this node from its children 
+        // remove all edges pointing to this node from its children
         for (unsigned long i = 0; i < n.children.size(); ++i)
         {
-            // remove the edge from this specific child 
+            // remove the edge from this specific child
             unsigned long pos = static_cast<unsigned long>(find(n.children[i]->parents.begin(),
                      n.children[i]->parents.end(),
                      &n) - n.children[i]->parents.begin());

@@ -13,7 +13,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     tokenizer_kernel_1::
-    tokenizer_kernel_1 (        
+    tokenizer_kernel_1 (
     ) :
         headset(0),
         bodyset(0),
@@ -171,7 +171,7 @@ namespace dlib
             } // switch (ch)
         }
         
-        // if we get this far it means we have peeked so we should 
+        // if we get this far it means we have peeked so we should
         // return the peek data.
         type = next_type;
         token = next_token;

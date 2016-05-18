@@ -47,9 +47,9 @@ namespace dlib
         typename set_base
         >
     inline void swap (
-        set_kernel_c<set_base>& a, 
-        set_kernel_c<set_base>& b 
-    ) { a.swap(b); } 
+        set_kernel_c<set_base>& a,
+        set_kernel_c<set_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ namespace dlib
                  "\tvoid set::remove"
                  << "\n\titem should be in the set if it's going to be removed"
                  << "\n\tthis:            " << this
-                 << "\n\t&item:           " << &item 
+                 << "\n\t&item:           " << &item
                  << "\n\t&item_copy:      " << &item_copy
                  << "\n\tis_member(item): " << (this->is_member(item)?"true":"false")
         );
@@ -113,11 +113,11 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( this->is_member(item), 
+        DLIB_CASSERT( this->is_member(item),
                  "\tvoid set::destroy"
                  << "\n\titem should be in the set if it's going to be removed"
                  << "\n\tthis:            " << this
-                 << "\n\t&item:           " << &item 
+                 << "\n\t&item:           " << &item
         );
 
         // call the real function
@@ -132,7 +132,7 @@ namespace dlib
     void set_kernel_c<set_base>::
     remove_any (
         T& item
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( this->size() != 0,
@@ -172,7 +172,7 @@ namespace dlib
         >
     const typename set_base::type& set_kernel_c<set_base>::
     element (
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT(this->current_element_valid() == true,

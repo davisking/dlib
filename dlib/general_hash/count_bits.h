@@ -29,10 +29,10 @@ namespace dlib
         // This bit of bit trickery is from:
         // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSet64
 
-        v = v - ((v >> 1) & (T)~(T)0/3);                           
-        v = (v & (T)~(T)0/15*3) + ((v >> 2) & (T)~(T)0/15*3);      
-        v = (v + (v >> 4)) & (T)~(T)0/255*15;                      
-        return (T)(v * ((T)~(T)0/255)) >> (sizeof(T) - 1) * CHAR_BIT; 
+        v = v - ((v >> 1) & (T)~(T)0/3);
+        v = (v & (T)~(T)0/15*3) + ((v >> 2) & (T)~(T)0/15*3);
+        v = (v + (v >> 4)) & (T)~(T)0/255*15;
+        return (T)(v * ((T)~(T)0/255)) >> (sizeof(T) - 1) * CHAR_BIT;
     }
 
 // ----------------------------------------------------------------------------------------

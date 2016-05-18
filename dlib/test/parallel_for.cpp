@@ -6,7 +6,7 @@
 #include <vector>
 #include <sstream>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -23,7 +23,7 @@ namespace
 
         std::vector<int>& vect;
 
-        void go (long i ) 
+        void go (long i )
         {
             DLIB_TEST( 0 <= i && i < (long)vect.size());
             vect[i] = i;

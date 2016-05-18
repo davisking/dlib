@@ -13,10 +13,10 @@
 #include <limits>
 
 #if defined(_MSC_VER) && _MSC_VER < 1400
-// Despite my efforts to disabuse visual studio of its usual nonsense I can't find a 
+// Despite my efforts to disabuse visual studio of its usual nonsense I can't find a
 // way to make this warning go away without just disabling it.   This is the warning:
 //   dlib\geometry\vector.h(129) : warning C4805: '==' : unsafe mix of type 'std::numeric_limits<_Ty>::is_integer' and type 'bool' in operation
-// 
+//
 #pragma warning(disable:4805)
 #endif
 
@@ -31,7 +31,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename U, typename enabled = void> 
+    template <typename T, typename U, typename enabled = void>
     struct vect_promote;
 
     template <typename T, typename U, bool res = (sizeof(T) <= sizeof(U))>
@@ -45,17 +45,17 @@ namespace dlib
         typedef U type;
     };
 
-    template <typename T, typename U> 
-    struct vect_promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer == std::numeric_limits<U>::is_integer>::type> 
-    { 
+    template <typename T, typename U>
+    struct vect_promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer == std::numeric_limits<U>::is_integer>::type>
+    {
         // If both T and U are both either integral or non-integral then just
         // use the biggest one
         typedef typename largest_type<T,U>::type type;
     };
 
-    template <typename T, typename U> 
-    struct vect_promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer != std::numeric_limits<U>::is_integer>::type> 
-    { 
+    template <typename T, typename U>
+    struct vect_promote<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer != std::numeric_limits<U>::is_integer>::type>
+    {
         typedef double type;
     };
 
@@ -64,7 +64,7 @@ namespace dlib
     // This insanity here is to work around a bug in visual studio 8.   These two rebind
     // structures are actually declared at a few points in this file because just having the
     // one declaration here isn't enough for visual studio.  It takes the three spread around
-    // to avoid all its bugs. 
+    // to avoid all its bugs.
     template <typename T, long N>
     struct vc_rebind
     {
@@ -131,10 +131,10 @@ namespace dlib
     };
 
     // This is an overload for the case where you are converting from a floating point
-    // type to an integral type.  These overloads make sure values are rounded to 
+    // type to an integral type.  These overloads make sure values are rounded to
     // the nearest integral value.
     template <typename T, typename U>
-    struct vector_assign_helper<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer == true && 
+    struct vector_assign_helper<T,U, typename enable_if_c<std::numeric_limits<T>::is_integer == true &&
                                                           std::numeric_limits<U>::is_integer == false>::type>
     {
         template <long NR>
@@ -193,13 +193,13 @@ namespace dlib
                 - z() == 0
 
             CONVENTION
-                - (*this)(0) == x() 
-                - (*this)(1) == y() 
-                - (*this)(2) == z() 
+                - (*this)(0) == x()
+                - (*this)(1) == y()
+                - (*this)(2) == z()
 
         !*/
 
-        // This insanity here is to work around a bug in visual studio 8.  
+        // This insanity here is to work around a bug in visual studio 8.
         template <typename V, long N>
         struct vc_rebind
         {
@@ -216,7 +216,7 @@ namespace dlib
         typedef T type;
         
         vector (
-        ) 
+        )
         {
             x() = 0;
             y() = 0;
@@ -229,7 +229,7 @@ namespace dlib
             const T _x,
             const T _y,
             const T _z
-        ) 
+        )
         {
             x() = _x;
             y() = _y;
@@ -302,9 +302,9 @@ namespace dlib
             DLIB_ASSERT((m.nr() == 1 || m.nc() == 1) && (m.size() == 3),
                 "\t vector(const matrix_exp& m)"
                 << "\n\t the given matrix is of the wrong size"
-                << "\n\t m.nr():   " << m.nr() 
-                << "\n\t m.nc():   " << m.nc() 
-                << "\n\t m.size(): " << m.size() 
+                << "\n\t m.nr():   " << m.nr()
+                << "\n\t m.nc():   " << m.nc()
+                << "\n\t m.size(): " << m.size()
                 << "\n\t this: " << this
                 );
 
@@ -338,23 +338,23 @@ namespace dlib
         // ---------------------------------------
 
         double length(
-        ) const 
-        { 
-            return std::sqrt((double)(x()*x() + y()*y() + z()*z())); 
+        ) const
+        {
+            return std::sqrt((double)(x()*x() + y()*y() + z()*z()));
         }
 
         // ---------------------------------------
 
         double length_squared(
-        ) const 
-        { 
-            return (double)(x()*x() + y()*y() + z()*z()); 
+        ) const
+        {
+            return (double)(x()*x() + y()*y() + z()*z());
         }
 
         // ---------------------------------------
 
         typename vc_rebind<double,3>::type normalize (
-        ) const 
+        ) const
         {
             const double tmp = std::sqrt((double)(x()*x() + y()*y() + z()*z()));
             return vector<double,3> ( x()/tmp,
@@ -366,24 +366,24 @@ namespace dlib
         // ---------------------------------------
 
         T& x (
-        ) 
-        { 
+        )
+        {
             return (*this)(0);
         }
 
         // ---------------------------------------
 
         T& y (
-        ) 
-        { 
+        )
+        {
             return (*this)(1);
         }
 
         // ---------------------------------------
 
         T& z (
-        ) 
-        { 
+        )
+        {
             return (*this)(2);
         }
 
@@ -391,15 +391,15 @@ namespace dlib
 
         const T& x (
         ) const
-        { 
+        {
             return (*this)(0);
         }
 
         // ---------------------------------------
 
         const T& y (
-        ) const 
-        { 
+        ) const
+        {
             return (*this)(1);
         }
 
@@ -407,7 +407,7 @@ namespace dlib
 
         const T& z (
         ) const
-        { 
+        {
             return (*this)(2);
         }
 
@@ -415,8 +415,8 @@ namespace dlib
 
         T dot (
             const vector& rhs
-        ) const 
-        { 
+        ) const
+        {
             return x()*rhs.x() + y()*rhs.y() + z()*rhs.z();
         }
 
@@ -425,8 +425,8 @@ namespace dlib
         template <typename U, long N>
         typename vect_promote<T,U>::type dot (
             const vector<U,N>& rhs
-        ) const 
-        { 
+        ) const
+        {
             return x()*rhs.x() + y()*rhs.y() + z()*rhs.z();
         }
 
@@ -559,12 +559,12 @@ namespace dlib
                 - y() == 0
 
             CONVENTION
-                - (*this)(0) == x() 
-                - (*this)(1) == y() 
+                - (*this)(0) == x()
+                - (*this)(1) == y()
                 - z() == 0
         !*/
 
-        // This insanity here is to work around a bug in visual studio 8.  
+        // This insanity here is to work around a bug in visual studio 8.
         template <typename V, long N>
         struct vc_rebind
         {
@@ -582,7 +582,7 @@ namespace dlib
         typedef T type;
         
         vector (
-        ) 
+        )
         {
             x() = 0;
             y() = 0;
@@ -593,7 +593,7 @@ namespace dlib
         vector (
             const T _x,
             const T _y
-        ) 
+        )
         {
             x() = _x;
             y() = _y;
@@ -663,9 +663,9 @@ namespace dlib
             DLIB_ASSERT((m.nr() == 1 || m.nc() == 1) && (m.size() == 2),
                 "\t vector(const matrix_exp& m)"
                 << "\n\t the given matrix is of the wrong size"
-                << "\n\t m.nr():   " << m.nr() 
-                << "\n\t m.nc():   " << m.nc() 
-                << "\n\t m.size(): " << m.size() 
+                << "\n\t m.nr():   " << m.nr()
+                << "\n\t m.nc():   " << m.nc()
+                << "\n\t m.size(): " << m.size()
                 << "\n\t this: " << this
                 );
 
@@ -698,23 +698,23 @@ namespace dlib
         // ---------------------------------------
 
         double length(
-        ) const 
-        { 
-            return std::sqrt((double)(x()*x() + y()*y())); 
+        ) const
+        {
+            return std::sqrt((double)(x()*x() + y()*y()));
         }
 
         // ---------------------------------------
 
         double length_squared(
-        ) const 
-        { 
-            return (double)(x()*x() + y()*y()); 
+        ) const
+        {
+            return (double)(x()*x() + y()*y());
         }
 
         // ---------------------------------------
 
         typename vc_rebind<double,2>::type normalize (
-        ) const 
+        ) const
         {
             const double tmp = std::sqrt((double)(x()*x() + y()*y()));
             return vector<double,2> ( x()/tmp,
@@ -725,16 +725,16 @@ namespace dlib
         // ---------------------------------------
 
         T& x (
-        ) 
-        { 
+        )
+        {
             return (*this)(0);
         }
 
         // ---------------------------------------
 
         T& y (
-        ) 
-        { 
+        )
+        {
             return (*this)(1);
         }
 
@@ -742,15 +742,15 @@ namespace dlib
 
         const T& x (
         ) const
-        { 
+        {
             return (*this)(0);
         }
 
         // ---------------------------------------
 
         const T& y (
-        ) const 
-        { 
+        ) const
+        {
             return (*this)(1);
         }
 
@@ -766,8 +766,8 @@ namespace dlib
 
         T dot (
             const vector& rhs
-        ) const 
-        { 
+        ) const
+        {
             return x()*rhs.x() + y()*rhs.y();
         }
 
@@ -776,8 +776,8 @@ namespace dlib
         template <typename U, long N>
         typename vect_promote<T,U>::type dot (
             const vector<U,N>& rhs
-        ) const 
-        { 
+        ) const
+        {
             return x()*rhs.x() + y()*rhs.y() + z()*rhs.z();
         }
 
@@ -918,7 +918,7 @@ namespace dlib
     template <typename T, typename U>
     inline const typename vc_rebind_promote<T,U,2>::type operator+ (
         const vector<T,2>& lhs,
-        const vector<U,2>& rhs 
+        const vector<U,2>& rhs
     )
     {
         typedef typename vc_rebind_promote<T,U,2>::type ret_type;
@@ -930,7 +930,7 @@ namespace dlib
     template <typename T, typename U>
     inline const typename vc_rebind_promote<T,U,3>::type operator+ (
         const vector<T,3>& lhs,
-        const vector<U,3>& rhs 
+        const vector<U,3>& rhs
     )
     {
         typedef typename vc_rebind_promote<T,U,3>::type ret_type;
@@ -942,7 +942,7 @@ namespace dlib
     template <typename T, typename U>
     inline const typename vc_rebind_promote<T,U,3>::type operator+ (
         const vector<T,2>& lhs,
-        const vector<U,3>& rhs 
+        const vector<U,3>& rhs
     )
     {
         typedef typename vc_rebind_promote<T,U,3>::type ret_type;
@@ -954,7 +954,7 @@ namespace dlib
     template <typename T, typename U>
     inline const typename vc_rebind_promote<T,U,3>::type operator+ (
         const vector<T,3>& lhs,
-        const vector<U,2>& rhs 
+        const vector<U,2>& rhs
     )
     {
         typedef typename vc_rebind_promote<T,U,3>::type ret_type;
@@ -968,7 +968,7 @@ namespace dlib
     template <typename T, typename U>
     inline const typename vc_rebind_promote<T,U,2>::type operator- (
         const vector<T,2>& lhs,
-        const vector<U,2>& rhs 
+        const vector<U,2>& rhs
     )
     {
         typedef typename vc_rebind_promote<T,U,2>::type ret_type;
@@ -980,7 +980,7 @@ namespace dlib
     template <typename T, typename U>
     inline const typename vc_rebind_promote<T,U,3>::type operator- (
         const vector<T,3>& lhs,
-        const vector<U,3>& rhs 
+        const vector<U,3>& rhs
     )
     {
         typedef typename vc_rebind_promote<T,U,3>::type ret_type;
@@ -992,7 +992,7 @@ namespace dlib
     template <typename T, typename U>
     inline const typename vc_rebind_promote<T,U,3>::type operator- (
         const vector<T,2>& lhs,
-        const vector<U,3>& rhs 
+        const vector<U,3>& rhs
     )
     {
         typedef typename vc_rebind_promote<T,U,3>::type ret_type;
@@ -1004,7 +1004,7 @@ namespace dlib
     template <typename T, typename U>
     inline const typename vc_rebind_promote<T,U,3>::type operator- (
         const vector<T,3>& lhs,
-        const vector<U,2>& rhs 
+        const vector<U,2>& rhs
     )
     {
         typedef typename vc_rebind_promote<T,U,3>::type ret_type;
@@ -1065,15 +1065,15 @@ namespace dlib
 
     template<typename T, long NR>
     inline void swap (
-        vector<T,NR> & a, 
-        vector<T,NR> & b 
-    ) { a.swap(b); }   
+        vector<T,NR> & a,
+        vector<T,NR> & b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 
     template<typename T>
     inline void serialize (
-        const vector<T,3>& item,  
+        const vector<T,3>& item,
         std::ostream& out
     )
     {
@@ -1084,14 +1084,14 @@ namespace dlib
             serialize(item.z(),out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type vector"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type vector");
         }
     }
 
     template<typename T>
     inline void deserialize (
-        vector<T,3>& item,  
+        vector<T,3>& item,
         std::istream& in
     )
     {
@@ -1102,11 +1102,11 @@ namespace dlib
             deserialize(item.z(),in);
         }
         catch (serialization_error& e)
-        { 
+        {
             item.x() = 0;
             item.y() = 0;
             item.z() = 0;
-            throw serialization_error(e.info + "\n   while deserializing object of type vector"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type vector");
         }
     }
 
@@ -1114,7 +1114,7 @@ namespace dlib
 
     template<typename T>
     inline void serialize (
-        const vector<T,2>& item,  
+        const vector<T,2>& item,
         std::ostream& out
     )
     {
@@ -1124,14 +1124,14 @@ namespace dlib
             serialize(item.y(),out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type vector"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type vector");
         }
     }
 
     template<typename T>
     inline void deserialize (
-        vector<T,2>& item,  
+        vector<T,2>& item,
         std::istream& in
     )
     {
@@ -1141,10 +1141,10 @@ namespace dlib
             deserialize(item.y(),in);
         }
         catch (serialization_error& e)
-        { 
+        {
             item.x() = 0;
             item.y() = 0;
-            throw serialization_error(e.info + "\n   while deserializing object of type vector"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type vector");
         }
     }
 
@@ -1152,8 +1152,8 @@ namespace dlib
 
     template<typename T>
     std::ostream& operator<< (
-        std::ostream& out, 
-        const vector<T,3>& item 
+        std::ostream& out,
+        const vector<T,3>& item
     )
     {
         out << "(" << item.x() << ", " << item.y() << ", " << item.z() << ")";
@@ -1162,12 +1162,12 @@ namespace dlib
 
     template<typename T>
     std::istream& operator>>(
-        std::istream& in, 
-        vector<T,3>& item 
-    )   
+        std::istream& in,
+        vector<T,3>& item
+    )
     {
 
-        // eat all the crap up to the '(' 
+        // eat all the crap up to the '('
         while (in.peek() == ' ' || in.peek() == '\t' || in.peek() == '\r' || in.peek() == '\n')
             in.get();
 
@@ -1178,7 +1178,7 @@ namespace dlib
             return in;
         }
 
-        // eat all the crap up to the first number 
+        // eat all the crap up to the first number
         while (in.peek() == ' ' || in.peek() == '\t')
             in.get();
         in >> item.x();
@@ -1217,8 +1217,8 @@ namespace dlib
 
     template<typename T>
     std::ostream& operator<< (
-        std::ostream& out, 
-        const vector<T,2>& item 
+        std::ostream& out,
+        const vector<T,2>& item
     )
     {
         out << "(" << item.x() << ", " << item.y() << ")";
@@ -1227,12 +1227,12 @@ namespace dlib
 
     template<typename T>
     std::istream& operator>>(
-        std::istream& in, 
-        vector<T,2>& item 
-    )   
+        std::istream& in,
+        vector<T,2>& item
+    )
     {
 
-        // eat all the crap up to the '(' 
+        // eat all the crap up to the '('
         while (in.peek() == ' ' || in.peek() == '\t' || in.peek() == '\r' || in.peek() == '\n')
             in.get();
 
@@ -1243,7 +1243,7 @@ namespace dlib
             return in;
         }
 
-        // eat all the crap up to the first number 
+        // eat all the crap up to the first number
         while (in.peek() == ' ' || in.peek() == '\t')
             in.get();
         in >> item.x();
@@ -1287,7 +1287,7 @@ namespace std
     struct less<dlib::vector<T,3> > : public binary_function<dlib::vector<T,3> ,dlib::vector<T,3> ,bool>
     {
         inline bool operator() (const dlib::vector<T,3> & a, const dlib::vector<T,3> & b) const
-        { 
+        {
             if      (a.x() < b.x()) return true;
             else if (a.x() > b.x()) return false;
             else if (a.y() < b.y()) return true;
@@ -1305,7 +1305,7 @@ namespace std
     struct less<dlib::vector<T,2> > : public binary_function<dlib::vector<T,2> ,dlib::vector<T,2> ,bool>
     {
         inline bool operator() (const dlib::vector<T,2> & a, const dlib::vector<T,2> & b) const
-        { 
+        {
             if      (a.x() < b.x()) return true;
             else if (a.x() > b.x()) return false;
             else if (a.y() < b.y()) return true;

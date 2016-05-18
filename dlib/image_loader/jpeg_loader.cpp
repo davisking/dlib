@@ -62,7 +62,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct jpeg_loader_error_mgr 
+    struct jpeg_loader_error_mgr
     {
         jpeg_error_mgr pub;    /* "public" fields */
         jmp_buf setjmp_buffer;  /* for return to caller */
@@ -99,7 +99,7 @@ namespace dlib
         jerr.pub.error_exit = jpeg_loader_error_exit;
 
         /* Establish the setjmp return context for my_error_exit to use. */
-        if (setjmp(jerr.setjmp_buffer)) 
+        if (setjmp(jerr.setjmp_buffer))
         {
             /* If we get here, the JPEG code has signaled an error.
              * We need to clean up the JPEG object, close the input file, and return.
@@ -122,7 +122,7 @@ namespace dlib
         width_ = cinfo.output_width;
         output_components_ = cinfo.output_components;
 
-        if (output_components_ != 1 && 
+        if (output_components_ != 1 &&
             output_components_ != 3)
         {
             fclose( fp );

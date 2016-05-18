@@ -23,7 +23,7 @@ namespace dlib
         const canvas& c,
         const point& p1,
         const point& p2,
-        const pixel_type& pixel, 
+        const pixel_type& pixel,
         const rectangle& area = rectangle(std::numeric_limits<long>::min(), std::numeric_limits<long>::min(),
                                           std::numeric_limits<long>::max(), std::numeric_limits<long>::max())
     )
@@ -83,7 +83,7 @@ namespace dlib
 
                 double first, last;
 
-                if (x1 > x2)                
+                if (x1 > x2)
                 {
                     first = std::max(x2,valid_area.left());
                     last = std::min(x1,valid_area.right());
@@ -92,7 +92,7 @@ namespace dlib
                 {
                     first = std::max(x1,valid_area.left());
                     last = std::min(x2,valid_area.right());
-                }                             
+                }
 
 
                 long y;
@@ -100,7 +100,7 @@ namespace dlib
                 const double x1f = x1;
                 const double y1f = y1;
                 for (double i = first; i <= last; ++i)
-                {   
+                {
                     const double dy = slope*(i-x1f) + y1f;
                     const double dx = i;
 
@@ -118,7 +118,7 @@ namespace dlib
                         alpha_pixel.alpha = static_cast<unsigned char>((dy-y)*max_alpha);
                         assign_pixel(c[y+1-c.top()][x-c.left()], alpha_pixel);
                     }
-                }         
+                }
             }
             else
             {
@@ -126,7 +126,7 @@ namespace dlib
 
                 double first, last;
 
-                if (y1 > y2)                
+                if (y1 > y2)
                 {
                     first = std::max(y2,valid_area.top());
                     last = std::min(y1,valid_area.bottom());
@@ -135,14 +135,14 @@ namespace dlib
                 {
                     first = std::max(y1,valid_area.top());
                     last = std::min(y2,valid_area.bottom());
-                }                             
+                }
 
                 long x;
                 long y;
                 const double x1f = x1;
                 const double y1f = y1;
                 for (double i = first; i <= last; ++i)
-                {   
+                {
                     const double dx = slope*(i-y1f) + x1f;
                     const double dy = i;
 
@@ -159,7 +159,7 @@ namespace dlib
                         alpha_pixel.alpha = static_cast<unsigned char>((dx-x)*max_alpha);
                         assign_pixel(c[y-c.top()][x+1-c.left()], alpha_pixel);
                     }
-                } 
+                }
             }
         }
 
@@ -184,7 +184,7 @@ namespace dlib
     inline void draw_pixel (
         const canvas& c,
         const point& p,
-        const pixel_type& pixel 
+        const pixel_type& pixel
     )
     {
         if (c.contains(p))
@@ -285,7 +285,7 @@ namespace dlib
                 top += y;
                 long temp = top;
 
-                while(top >= last) 
+                while(top >= last)
                 {
                     bottom = y - top + y;
                     if (top >= valid_area.top() && top <= valid_area.bottom() )
@@ -316,7 +316,7 @@ namespace dlib
                 top += y;
                 long temp = top;
 
-                while(top >= last) 
+                while(top >= last)
                 {
                     bottom = y - top + y;
                     if (top >= valid_area.top() && top <= valid_area.bottom() )
@@ -392,7 +392,7 @@ namespace dlib
                 top += y;
                 long temp = top;
 
-                while(top >= last) 
+                while(top >= last)
                 {
                     bottom = y - top + y;
                     draw_line(c, point(i,top),point(i,bottom),pixel,area);
@@ -415,7 +415,7 @@ namespace dlib
                 top += y;
                 long temp = top;
 
-                while(top >= last) 
+                while(top >= last)
                 {
                     bottom = y - top + y;
                     draw_line(c, point(i,top),point(i,bottom),pixel,area);
@@ -453,7 +453,7 @@ namespace dlib
         )
         /*!
             requires
-                - 0 <= top <= bottom 
+                - 0 <= top <= bottom
             ensures
                 - interprets points as the coordinates defining a convex polygon.  In
                   particular, we interpret points as a list of the vertices of the polygon
@@ -492,7 +492,7 @@ namespace dlib
                 }
                 else
                 {
-                    // Here we trace out the line from p1 to p2 and record where it hits.  
+                    // Here we trace out the line from p1 to p2 and record where it hits.
 
                     // x = m*y + b
                     const double m = (p2.x() - p1.x())/(double)(p2.y()-p1.y());
@@ -669,7 +669,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void draw_image (
         const canvas& c,
@@ -698,7 +698,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void draw_image (
         const canvas& c,
@@ -741,16 +741,16 @@ namespace dlib
         if ( rect.intersect ( c ).is_empty() )
             return;
 
-        draw_line ( c, point(rect.left() + radius + 1, rect.bottom()), 
+        draw_line ( c, point(rect.left() + radius + 1, rect.bottom()),
                     point(rect.right() - radius - 1, rect.bottom()), color,area_ );
 
-        draw_line ( c, point(rect.left() + radius + 1, rect.top()), 
+        draw_line ( c, point(rect.left() + radius + 1, rect.top()),
                     point(rect.right() - radius - 1, rect.top()), color,area_ );
 
-        draw_line ( c, point(rect.left(), rect.top() + radius + 1), 
+        draw_line ( c, point(rect.left(), rect.top() + radius + 1),
                     point(rect.left(), rect.bottom() - radius - 1), color,area_ );
 
-        draw_line ( c, point(rect.right(), rect.top() + radius + 1), 
+        draw_line ( c, point(rect.right(), rect.top() + radius + 1),
                     point(rect.right(), rect.bottom() - radius - 1), color,area_ );
 
         unsigned x = radius, y = 0, old_x = x;
@@ -860,7 +860,7 @@ namespace dlib
 
             m_prev = m;
 
-            draw_line ( c, point(rect.left() + m, y), 
+            draw_line ( c, point(rect.left() + m, y),
                         point(rect.right() - m, y), color, valid_area );
         }
     }
@@ -942,7 +942,7 @@ namespace dlib
             const long t = rect.bottom()-y;
             const long b = y-rect.top();
             vector_to_pixel(pixel,
-                    ((pixel_to_vector<long>(pixel_top)*t + 
+                    ((pixel_to_vector<long>(pixel_top)*t +
                       pixel_to_vector<long>(pixel_bottom)*b)/s));
 
             for (long x = area.left(); x <= area.right(); ++x)

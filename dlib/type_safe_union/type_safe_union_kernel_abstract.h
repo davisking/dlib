@@ -11,7 +11,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class bad_type_safe_union_cast : public std::bad_cast 
+    class bad_type_safe_union_cast : public std::bad_cast
     {
         /*!
             This is the exception object thrown by type_safe_union::cast_to() if the
@@ -26,7 +26,7 @@ namespace dlib
         typename T2 = _void,  // _void indicates parameter not used.
         typename T3 = _void,
         typename T4 = _void,
-        typename T5 = _void, 
+        typename T5 = _void,
         typename T6 = _void,
         typename T7 = _void,
         typename T8 = _void,
@@ -54,10 +54,10 @@ namespace dlib
                 - is_empty() == true
                 - contains<U>() == false, for all possible values of U
 
-            WHAT THIS OBJECT REPRESENTS 
-                This object is a type safe analogue of the classic C union object. 
-                The type_safe_union, unlike a union, can contain non-POD types such 
-                as std::string.  
+            WHAT THIS OBJECT REPRESENTS
+                This object is a type safe analogue of the classic C union object.
+                The type_safe_union, unlike a union, can contain non-POD types such
+                as std::string.
 
                 For example:
                     union my_union
@@ -216,7 +216,7 @@ namespace dlib
                     - The object returned by this->get<U>() will be const
         !*/
 
-        template <typename T> 
+        template <typename T>
         T& get(
         );
         /*!
@@ -287,9 +287,9 @@ namespace dlib
 
     template < ...  >
     inline void swap (
-        type_safe_union<...>& a, 
-        type_safe_union<...>& b 
-    ) { a.swap(b); }   
+        type_safe_union<...>& a,
+        type_safe_union<...>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -298,11 +298,11 @@ namespace dlib
 
     template < ... >
     void serialize (
-        const type_safe_union<...>& item, 
-        std::ostream& out 
-    );   
+        const type_safe_union<...>& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
 
         Note that type_safe_union objects are serialized as follows:
          - if (item.is_empty()) then
@@ -314,11 +314,11 @@ namespace dlib
 
     template < ...  >
     void deserialize (
-        type_safe_union<...>& item, 
+        type_safe_union<...>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

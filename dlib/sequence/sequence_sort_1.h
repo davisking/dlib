@@ -10,7 +10,7 @@ namespace dlib
 {
 
     template <
-        typename seq_base 
+        typename seq_base
         >
     class sequence_sort_1 : public seq_base
     {
@@ -52,9 +52,9 @@ namespace dlib
         typename seq_base
         >
     inline void swap (
-        sequence_sort_1<seq_base>& a, 
-        sequence_sort_1<seq_base>& b 
-    ) { a.swap(b); } 
+        sequence_sort_1<seq_base>& a,
+        sequence_sort_1<seq_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ namespace dlib
         {
             selection_sort(sequence);
         }
-        else 
+        else
         {
             seq_base left, right;
             T partition_element;
@@ -151,7 +151,7 @@ namespace dlib
 
             unsigned long smallest;
             for (unsigned long i = 0; i < ssize - 1; ++i)
-            {    
+            {
                 // find smallest element and swap into i
                 smallest = i;
                 for (unsigned long j = i+1; j < ssize; ++j)

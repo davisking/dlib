@@ -10,7 +10,7 @@
 namespace dlib
 {
 
-    class base64 
+    class base64
     {
         /*!
             INITIAL VALUE
@@ -23,7 +23,7 @@ namespace dlib
                     - if (x is a valid character in the base64 coding scheme) then
                         - decode_table[x] == the 6 bit value that x encodes
                     - else
-                        - decode_table[x] == bad_value 
+                        - decode_table[x] == bad_value
 
             CONVENTION
                 - The state of this object never changes so just refer to its
@@ -80,7 +80,7 @@ namespace dlib
         base64(base64&);        // copy constructor
         base64& operator=(base64&);    // assignment operator
 
-    };   
+    };
    
 }
 

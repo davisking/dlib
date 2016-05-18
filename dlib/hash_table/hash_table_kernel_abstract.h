@@ -11,7 +11,7 @@
 #include "../algs.h"
 #include <functional>
 
-namespace dlib 
+namespace dlib
 {
 
     template <
@@ -27,8 +27,8 @@ namespace dlib
         /*!
             REQUIREMENTS ON domain
                 domain must be comparable by compare where compare is a functor compatible with std::less and
-                domain must be hashable by general_hash 
-                (general_hash is defined in dlib/general_hash) and 
+                domain must be hashable by general_hash
+                (general_hash is defined in dlib/general_hash) and
                 domain must be swappable by a global swap() and
                 domain must have a default constructor
 
@@ -39,11 +39,11 @@ namespace dlib
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                swap(), count(), and operator[] functions do 
+                swap(), count(), and operator[] functions do
                 not invalidate pointers or references to internal data.
                 All other functions have no such guarantee.
 
@@ -57,8 +57,8 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 hash_table contains items of type T
 
-                This object represents a data dictionary that is built on top of some 
-                kind of hash table.  The number of buckets in the hash table is 
+                This object represents a data dictionary that is built on top of some
+                kind of hash table.  The number of buckets in the hash table is
                 defined by the constructor argument and is some power of 2.
 
                 Also note that unless specified otherwise, no member functions
@@ -85,17 +85,17 @@ namespace dlib
             /*!
                 requires
                     - expnum < 32
-                ensures 
+                ensures
                     - #*this is properly initialized
                     - #*this will use 2^expnum as a suggestion for the initial number
                       of buckets.
                 throws
-                    - std::bad_alloc or any exception thrown by domain's or range's 
+                    - std::bad_alloc or any exception thrown by domain's or range's
                       constructor.
             !*/
 
             virtual ~hash_table(
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -107,9 +107,9 @@ namespace dlib
                 ensures
                     - #*this has its initial value
                 throws
-                    - std::bad_alloc or any exception thrown by domain's or range's 
+                    - std::bad_alloc or any exception thrown by domain's or range's
                       constructor.
-                        if this exception is thrown then *this is unusable 
+                        if this exception is thrown then *this is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -118,9 +118,9 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns the number of elements in the domain of *this that are 
+                    - returns the number of elements in the domain of *this that are
                       equivalent to d
-            !*/ 
+            !*/
 
             void add (
                 domain& d,
@@ -129,7 +129,7 @@ namespace dlib
             /*!
                 requires
                     - &d != &r (i.e. d and r cannot be the same variable)
-                ensures 
+                ensures
                     - adds a mapping between d and r to *this
                     - if (count(d) == 0) then
                         - #*(*this)[d] == r
@@ -139,8 +139,8 @@ namespace dlib
                     - #count(d) == count(d) + 1
                     - #at_start() == true
                     - #size() == size() + 1
-                throws 
-                    - std::bad_alloc or any exception thrown by domain's or range's 
+                throws
+                    - std::bad_alloc or any exception thrown by domain's or range's
                       constructor.
                         if add() throws then it has no effect
             !*/
@@ -152,17 +152,17 @@ namespace dlib
             );
             /*!
                 requires
-                    - (*this)[d] != 0 
-                    - &d != &r (i.e. d and r cannot be the same variable) 
-                    - &d != &d_copy (i.e. d and d_copy cannot be the same variable) 
-                    - &r != &d_copy (i.e. r and d_copy cannot be the same variable) 
+                    - (*this)[d] != 0
+                    - &d != &r (i.e. d and r cannot be the same variable)
+                    - &d != &d_copy (i.e. d and d_copy cannot be the same variable)
+                    - &r != &d_copy (i.e. r and d_copy cannot be the same variable)
                 ensures
                     - some element in the domain of *this that is equivalent to d has
-                      been removed and swapped into #d_copy.  Additionally, its 
+                      been removed and swapped into #d_copy.  Additionally, its
                       associated range element has been removed and swapped into #r.
                     - #count(d) = count(d) - 1
                     - #size() == size() - 1
-                    - #at_start() == true  
+                    - #at_start() == true
             !*/
 
             void destroy (
@@ -170,14 +170,14 @@ namespace dlib
             );
             /*!
                 requires
-                    - (*this)[d] != 0 
+                    - (*this)[d] != 0
                 ensures
-                    - an element in the domain of *this equivalent to d has been removed.  
-                      The element in the range of *this associated with d has also been 
+                    - an element in the domain of *this equivalent to d has been removed.
+                      The element in the range of *this associated with d has also been
                       removed.
                     - #count(d) == count(d) - 1
                     - #size() == size() - 1
-                    - #at_start() == true  
+                    - #at_start() == true
             !*/
 
             const range* operator[] (
@@ -187,7 +187,7 @@ namespace dlib
                 ensures
                     - if (there is an element in the domain equivalent to d) then
                         - returns a pointer to an element in the range of *this that
-                          is associated with an element in the domain of *this 
+                          is associated with an element in the domain of *this
                           equivalent to d.
                     - else
                         - returns 0
@@ -200,7 +200,7 @@ namespace dlib
                 ensures
                     - if (there is an element in the domain equivalent to d) then
                         - returns a pointer to an element in the range of *this that
-                          is associated with an element in the domain of *this 
+                          is associated with an element in the domain of *this
                           equivalent to d.
                     - else
                         - returns 0
@@ -212,12 +212,12 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
 
         private:
 
             // restricted functions
-            hash_table(hash_table&);      
+            hash_table(hash_table&);
             hash_table& operator=(hash_table&);
 
     };
@@ -228,8 +228,8 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        hash_table<domain,range,mem_manager>& a, 
-        hash_table<domain,range,mem_manager>& b 
+        hash_table<domain,range,mem_manager>& a,
+        hash_table<domain,range,mem_manager>& b
     ) { a.swap(b); }
     /*!
         provides a global swap function
@@ -241,11 +241,11 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        hash_table<domain,range,mem_manager>& item, 
+        hash_table<domain,range,mem_manager>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 }
 

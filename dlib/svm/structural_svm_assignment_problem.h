@@ -111,23 +111,23 @@ namespace dlib
 
     private:
         virtual long get_num_dimensions (
-        ) const 
+        ) const
         {
             return fe.num_features()+1; // +1 for the bias term
         }
 
         virtual long get_num_samples (
-        ) const 
+        ) const
         {
             return samples.size();
         }
 
         template <typename psi_type>
         typename enable_if<is_matrix<psi_type> >::type get_joint_feature_vector (
-            const sample_type& sample, 
+            const sample_type& sample,
             const label_type& label,
             psi_type& psi
-        ) const 
+        ) const
         {
             typename feature_extractor::feature_vector_type feats;
             psi.set_size(get_num_dimensions());
@@ -154,10 +154,10 @@ namespace dlib
 
         template <typename psi_type>
         typename disable_if<is_matrix<psi_type> >::type get_joint_feature_vector (
-            const sample_type& sample, 
+            const sample_type& sample,
             const label_type& label,
             psi_type& psi
-        ) const 
+        ) const
         {
             psi.clear();
             feature_vector_type feats;
@@ -176,8 +176,8 @@ namespace dlib
 
         virtual void get_truth_joint_feature_vector (
             long idx,
-            feature_vector_type& psi 
-        ) const 
+            feature_vector_type& psi
+        ) const
         {
             get_joint_feature_vector(samples[idx], labels[idx], psi);
         }
@@ -230,7 +230,7 @@ namespace dlib
                             if (labels[idx][r] == -1)
                                 cost(r,c) = 0;
                             else
-                                cost(r,c) = loss_per_missed_association; 
+                                cost(r,c) = loss_per_missed_association;
                         }
 
                     }

@@ -12,7 +12,7 @@ namespace dlib
         >
     class memory_manager_stateless_kernel_1
     {
-        /*!      
+        /*!
             this implementation just calls new and delete directly
         !*/
         
@@ -36,7 +36,7 @@ namespace dlib
             T* allocate (
             )
             {
-                return new T; 
+                return new T;
             }
 
             void deallocate (
@@ -48,15 +48,15 @@ namespace dlib
 
             T* allocate_array (
                 unsigned long size
-            ) 
-            { 
+            )
+            {
                 return new T[size];
             }
 
             void deallocate_array (
                 T* item
-            ) 
-            { 
+            )
+            {
                 delete [] item;
             }
 
@@ -74,9 +74,9 @@ namespace dlib
         typename T
         >
     inline void swap (
-        memory_manager_stateless_kernel_1<T>& a, 
-        memory_manager_stateless_kernel_1<T>& b 
-    ) { a.swap(b); }   
+        memory_manager_stateless_kernel_1<T>& a,
+        memory_manager_stateless_kernel_1<T>& b
+    ) { a.swap(b); }
 
 }
 

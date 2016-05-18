@@ -24,7 +24,7 @@ namespace dlib
 
         struct two_bytes
         {
-            char a[2]; 
+            char a[2];
         };
 
         template <typename T>
@@ -38,8 +38,8 @@ namespace dlib
 
 
         // This is a template to tell you if a feature_extractor has a num_nonnegative_weights function or not.
-        template <typename T, unsigned long U = work_around_visual_studio_bug<T>::U > 
-        struct has_num_nonnegative_weights 
+        template <typename T, unsigned long U = work_around_visual_studio_bug<T>::U >
+        struct has_num_nonnegative_weights
         {
             static const bool value = false;
         };

@@ -8,13 +8,13 @@ namespace dlib
 
     template <typename T, typename funct>
     T integrate_function_adapt_simp(
-        const funct& f, 
-        T a, 
-        T b, 
+        const funct& f,
+        T a,
+        T b,
         T tol = 1e-10
     );
     /*!
-        requires 
+        requires
             - b > a
             - tol > 0
             - T should be either float, double, or long double
@@ -25,7 +25,7 @@ namespace dlib
               adaptive Simpson method outlined in Gander, W. and W. Gautshi, "Adaptive
               Quadrature -- Revisited" BIT, Vol. 40, (2000), pp.84-101
             - tol is a tolerance parameter that determines the overall accuracy of
-              approximated integral.  We suggest a default value of 1e-10 for tol. 
+              approximated integral.  We suggest a default value of 1e-10 for tol.
     !*/
 
 }

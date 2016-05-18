@@ -1,7 +1,7 @@
 // Copyright (C) 2008  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_THREAD_POOl_CPPh_
-#define DLIB_THREAD_POOl_CPPh_ 
+#define DLIB_THREAD_POOl_CPPh_
 
 #include "thread_pool_extension.h"
 
@@ -13,7 +13,7 @@ namespace dlib
     thread_pool_implementation::
     thread_pool_implementation (
         unsigned long num_threads
-    ) : 
+    ) :
         task_done_signaler(m),
         task_ready_signaler(m),
         we_are_destructing(false)
@@ -165,7 +165,7 @@ namespace dlib
         {
             long idx = 0;
 
-            // wait for a task to do 
+            // wait for a task to do
             { auto_mutex M(m);
                 while ( (idx = find_ready_task()) == -1 && we_are_destructing == false)
                     task_ready_signaler.wait();

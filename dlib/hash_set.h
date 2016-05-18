@@ -35,13 +35,13 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
+        // kernel_1a
         typedef     hash_set_kernel_1<T,expnum,ht1a,mem_manager>
                     kernel_1a;
         typedef     hash_set_kernel_c<kernel_1a>
                     kernel_1a_c;
 
-        // kernel_1b        
+        // kernel_1b
         typedef     hash_set_kernel_1<T,expnum,ht2a,mem_manager>
                     kernel_1b;
         typedef     hash_set_kernel_c<kernel_1b>

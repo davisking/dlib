@@ -10,7 +10,7 @@
 
 namespace dlib
 {
-    namespace cpu 
+    namespace cpu
     {
 
     // -----------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ namespace dlib
         void batch_normalize_inference (
             resizable_tensor& dest,
             const tensor& src,
-            const tensor& gamma, 
+            const tensor& gamma,
             const tensor& beta,
             const tensor& running_means,
             const tensor& running_variances
@@ -133,8 +133,8 @@ namespace dlib
             resizable_tensor& running_means,
             resizable_tensor& running_variances,
             const tensor& src,
-            const tensor& gamma, 
-            const tensor& beta 
+            const tensor& gamma,
+            const tensor& beta
         );
 
         void batch_normalize_gradient (
@@ -144,14 +144,14 @@ namespace dlib
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
-            tensor& gamma_grad, 
-            tensor& beta_grad 
+            tensor& gamma_grad,
+            tensor& beta_grad
         );
 
         void batch_normalize_conv_inference (
             resizable_tensor& dest,
             const tensor& src,
-            const tensor& gamma, 
+            const tensor& gamma,
             const tensor& beta,
             const tensor& running_means,
             const tensor& running_variances
@@ -165,8 +165,8 @@ namespace dlib
             resizable_tensor& running_means,
             resizable_tensor& running_variances,
             const tensor& src,
-            const tensor& gamma, 
-            const tensor& beta 
+            const tensor& gamma,
+            const tensor& beta
         );
 
         void batch_normalize_conv_gradient (
@@ -176,8 +176,8 @@ namespace dlib
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
-            tensor& gamma_grad, 
-            tensor& beta_grad 
+            tensor& gamma_grad,
+            tensor& beta_grad
         );
 
     // -----------------------------------------------------------------------------------
@@ -246,7 +246,7 @@ namespace dlib
             const tensor& src,
             const tensor& gradient_input,
             const tensor& param,
-            tensor& params_grad 
+            tensor& params_grad
         );
 
     // ------------------------------------------------------------------------------------
@@ -304,10 +304,10 @@ namespace dlib
             );
 
             void get_gradient(
-                const tensor& gradient_input, 
+                const tensor& gradient_input,
                 const tensor& dest,
                 const tensor& src,
-                tensor& grad 
+                tensor& grad
             );
 
         private:
@@ -345,13 +345,13 @@ namespace dlib
             );
 
             void get_gradient_for_data (
-                const tensor& gradient_input, 
+                const tensor& gradient_input,
                 const tensor& filters,
                 tensor& data_gradient
             );
 
             void get_gradient_for_filters (
-                const tensor& gradient_input, 
+                const tensor& gradient_input,
                 const tensor& data,
                 tensor& filters_gradient
             );
@@ -366,7 +366,7 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
-    } 
+    }
 }
 
 #ifdef NO_MAKEFILE

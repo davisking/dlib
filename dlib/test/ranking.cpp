@@ -10,7 +10,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -87,8 +87,8 @@ namespace
         ranking_pair<sample_type> data;
 
         sample_type samp;
-        samp = 0, 0, 1; data.relevant.push_back(samp); 
-        samp = 0, 1, 0; data.nonrelevant.push_back(samp); 
+        samp = 0, 0, 1; data.relevant.push_back(samp);
+        samp = 0, 1, 0; data.nonrelevant.push_back(samp);
 
         trainer.set_c(10);
         decision_function<kernel_type> df = trainer.train(data);
@@ -97,8 +97,8 @@ namespace
 
         data.relevant.clear();
         data.nonrelevant.clear();
-        samp = 1, 0, 0; data.relevant.push_back(samp); 
-        samp = 0, 1, 0; data.nonrelevant.push_back(samp); 
+        samp = 1, 0, 0; data.relevant.push_back(samp);
+        samp = 0, 1, 0; data.nonrelevant.push_back(samp);
 
         df = trainer.train(data);
 

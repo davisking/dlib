@@ -16,23 +16,23 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename kern_type 
+        typename kern_type
         >
-    class rvm_trainer 
+    class rvm_trainer
     {
         /*!
             REQUIREMENTS ON kern_type
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             WHAT THIS OBJECT REPRESENTS
-                This object implements a trainer for a relevance vector machine for 
+                This object implements a trainer for a relevance vector machine for
                 solving binary classification problems.
 
                 The implementation of the RVM training algorithm used by this object is based
                 on the following excellent paper:
-                    Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
-                    for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
-                    of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                    Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation
+                    for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings
+                    of the Ninth International Workshop on Artificial Intelligence and Statistics,
                     Key West, FL, Jan 3-6.
         !*/
 
@@ -60,7 +60,7 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
@@ -77,7 +77,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_kernel() == k 
+                - #get_kernel() == k
         !*/
 
         const kernel_type& get_kernel (
@@ -88,7 +88,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the maximum number of iterations the RVM optimizer is allowed to
@@ -97,7 +97,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ); 
+        );
         /*!
             ensures
                 - #get_max_iterations() == max_iter
@@ -119,8 +119,8 @@ namespace dlib
                 - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
-                - trains a relevance vector classifier given the training samples in x and 
-                  labels in y.  
+                - trains a relevance vector classifier given the training samples in x and
+                  labels in y.
                 - returns a decision function F with the following properties:
                     - if (new_x is a sample predicted have +1 label) then
                         - F(new_x) >= 0
@@ -138,7 +138,7 @@ namespace dlib
                 - swaps *this and item
         !*/
 
-    };  
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -156,23 +156,23 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename kern_type 
+        typename kern_type
         >
     class rvm_regression_trainer
     {
         /*!
             REQUIREMENTS ON kern_type
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             WHAT THIS OBJECT REPRESENTS
-                This object implements a trainer for a relevance vector machine for 
+                This object implements a trainer for a relevance vector machine for
                 solving regression problems.
 
                 The implementation of the RVM training algorithm used by this object is based
                 on the following excellent paper:
-                    Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation 
-                    for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings 
-                    of the Ninth International Workshop on Artificial Intelligence and Statistics, 
+                    Tipping, M. E. and A. C. Faul (2003). Fast marginal likelihood maximisation
+                    for sparse Bayesian models. In C. M. Bishop and B. J. Frey (Eds.), Proceedings
+                    of the Ninth International Workshop on Artificial Intelligence and Statistics,
                     Key West, FL, Jan 3-6.
         !*/
 
@@ -199,7 +199,7 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
@@ -216,7 +216,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_kernel() == k 
+                - #get_kernel() == k
         !*/
 
         const kernel_type& get_kernel (
@@ -243,8 +243,8 @@ namespace dlib
                 - is_learning_problem(x,y) == true
                 - x.size() > 0
             ensures
-                - trains a RVM given the training samples in x and 
-                  labels in y and returns the resulting decision_function.  
+                - trains a RVM given the training samples in x and
+                  labels in y and returns the resulting decision_function.
             throws
                 - std::bad_alloc
         !*/
@@ -257,7 +257,7 @@ namespace dlib
                 - swaps *this and item
         !*/
 
-    };  
+    };
 
 // ----------------------------------------------------------------------------------------
 

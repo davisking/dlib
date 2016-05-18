@@ -10,7 +10,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -25,7 +25,7 @@ namespace
         ensures
             - runs tests on the md5 stuff compliance with the specs
     !*/
-    {        
+    {
 
         DLIB_TEST(md5 ("") == "d41d8cd98f00b204e9800998ecf8427e");
         DLIB_TEST(md5 ("a") == "0cc175b9c0f1b6a831c399e269772661");

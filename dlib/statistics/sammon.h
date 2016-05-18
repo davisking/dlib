@@ -21,8 +21,8 @@ namespace dlib
 
         template <typename matrix_type>
         std::vector<matrix<double,0,1> > operator() (
-            const std::vector<matrix_type>& data,       
-            const long num_dims                      
+            const std::vector<matrix_type>& data,
+            const long num_dims
         )
         {
             // make sure requires clause is not broken
@@ -43,7 +43,7 @@ namespace dlib
                 << "\n\t Invalid inputs were given to this function."
                 << "\n\t data.size():    " << data.size()
                 << "\n\t num_dims:       " << num_dims
-                << "\n\t data[0].size(): " << data[0].size() 
+                << "\n\t data[0].size(): " << data[0].size()
                 );
             for (unsigned long i = 0; i < data.size(); ++i)
             {
@@ -51,7 +51,7 @@ namespace dlib
                         "\t std::vector<matrix<double,0,1> > sammon_projection::operator()"
                         << "\n\t Invalid inputs were given to this function."
                         << "\n\t data["<<i<<"].size():    " << data[i].size()
-                        << "\n\t data[0].size(): " << data[0].size() 
+                        << "\n\t data[0].size(): " << data[0].size()
                         << "\n\t is_col_vector(data["<<i<<"]): " << is_col_vector(data[i])
                 );
             }
@@ -66,12 +66,12 @@ namespace dlib
 
         template <typename matrix_type>
         void operator() (
-            const std::vector<matrix_type>& data,       
-            const long num_dims,                     
-            std::vector<matrix<double,0,1> >& result,   
-            double &err,                                
-            const unsigned long num_iters = 1000,             
-            const double err_delta = 1.0e-9            
+            const std::vector<matrix_type>& data,
+            const long num_dims,
+            std::vector<matrix<double,0,1> >& result,
+            double &err,
+            const unsigned long num_iters = 1000,
+            const double err_delta = 1.0e-9
         )
         {
             // make sure requires clause is not broken
@@ -96,7 +96,7 @@ namespace dlib
                 << "\n\t Invalid inputs were given to this function."
                 << "\n\t data.size():    " << data.size()
                 << "\n\t num_dims:       " << num_dims
-                << "\n\t data[0].size(): " << data[0].size() 
+                << "\n\t data[0].size(): " << data[0].size()
                 );
             for (unsigned long i = 0; i < data.size(); ++i)
             {
@@ -104,7 +104,7 @@ namespace dlib
                         "\t std::vector<matrix<double,0,1> > sammon_projection::operator()"
                         << "\n\t Invalid inputs were given to this function."
                         << "\n\t data["<<i<<"].size():    " << data[i].size()
-                        << "\n\t data[0].size(): " << data[0].size() 
+                        << "\n\t data[0].size(): " << data[0].size()
                         << "\n\t is_col_vector(data["<<i<<"]): " << is_col_vector(data[i])
                 );
             }

@@ -12,7 +12,7 @@
 namespace dlib
 {
 
-    class tokenizer_kernel_1 
+    class tokenizer_kernel_1
     {
         /*!
             INITIAL VALUE
@@ -21,12 +21,12 @@ namespace dlib
                 - have_peeked == false
                 - head == "_" + lowercase_letters() + uppercase_letters()
                 - body == "_" + lowercase_letters() + uppercase_letters() + numbers()
-                - headset == pointer to an array of UCHAR_MAX bools and set according 
+                - headset == pointer to an array of UCHAR_MAX bools and set according
                   to the CONVENTION.
-                - bodyset == pointer to an array of UCHAR_MAX bools and set according 
+                - bodyset == pointer to an array of UCHAR_MAX bools and set according
                   to the CONVENTION.
 
-            CONVENTION  
+            CONVENTION
                 - if (stream_is_set()) then
                     - get_stream() == *in
                     - streambuf == in->rdbuf()
@@ -66,7 +66,7 @@ namespace dlib
             WHITE_SPACE
         };
 
-        tokenizer_kernel_1 (        
+        tokenizer_kernel_1 (
         );
 
         virtual ~tokenizer_kernel_1 (
@@ -138,12 +138,12 @@ namespace dlib
         mutable std::string next_token;
         mutable int next_type;
         mutable bool have_peeked;
-    };    
+    };
 
     inline void swap (
-        tokenizer_kernel_1& a, 
-        tokenizer_kernel_1& b 
-    ) { a.swap(b); }   
+        tokenizer_kernel_1& a,
+        tokenizer_kernel_1& b
+    ) { a.swap(b); }
 
 }
 

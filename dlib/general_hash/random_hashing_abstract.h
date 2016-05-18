@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_RANDOM_HAsHING_ABSTRACT_Hh_ 
-#ifdef DLIB_RANDOM_HAsHING_ABSTRACT_Hh_ 
+#undef DLIB_RANDOM_HAsHING_ABSTRACT_Hh_
+#ifdef DLIB_RANDOM_HAsHING_ABSTRACT_Hh_
 
 #include "random_hashing_abstract.h"
 #include "murmur_hash3.h"
@@ -39,7 +39,7 @@ namespace dlib
     /*!
         ensures
             - This function uses hashing to generate Gaussian distributed random values
-              with mean 0 and variance 1.  
+              with mean 0 and variance 1.
             - To define this function precisely, assume we have an arbitrary sequence of
               input triplets.  Then calling gaussian_random_hash() on each of them should
               result in a sequence of double values that look like numbers sampled

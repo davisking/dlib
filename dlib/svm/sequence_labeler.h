@@ -39,7 +39,7 @@ namespace dlib
             double value;
         };
 
-        template <typename feature_extractor, typename EXP, typename sequence_type, typename EXP2> 
+        template <typename feature_extractor, typename EXP, typename sequence_type, typename EXP2>
         double dot(
             const matrix_exp<EXP>& lambda,
             const feature_extractor& fe,
@@ -60,8 +60,8 @@ namespace dlib
     namespace impl
     {
         DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(
-            has_reject_labeling, 
-            bool, 
+            has_reject_labeling,
+            bool,
             template reject_labeling<matrix<unsigned long> >,
             (const typename T::sequence_type&, const matrix_exp<matrix<unsigned long> >&, unsigned long)const
         );
@@ -82,7 +82,7 @@ namespace dlib
             const feature_extractor& ,
             const sequence_type& ,
             const matrix_exp<EXP>& ,
-            unsigned long 
+            unsigned long
         )
         {
             return false;
@@ -93,7 +93,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename feature_extractor 
+        typename feature_extractor
         >
     typename enable_if<dlib::impl::has_reject_labeling<feature_extractor>,bool>::type contains_invalid_labeling (
         const feature_extractor& fe,
@@ -122,12 +122,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename feature_extractor 
+        typename feature_extractor
         >
     typename disable_if<dlib::impl::has_reject_labeling<feature_extractor>,bool>::type contains_invalid_labeling (
         const feature_extractor& ,
         const typename feature_extractor::sequence_type& x,
-        const std::vector<unsigned long>& y 
+        const std::vector<unsigned long>& y
     )
     {
         if (x.size() != y.size())
@@ -139,7 +139,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename feature_extractor 
+        typename feature_extractor
         >
     bool contains_invalid_labeling (
         const feature_extractor& fe,
@@ -195,7 +195,7 @@ namespace dlib
             }
 
             template <
-                typename EXP 
+                typename EXP
                 >
             double factor_value (
                 unsigned long node_id,
@@ -222,15 +222,15 @@ namespace dlib
 
         explicit sequence_labeler(
             const matrix<double,0,1>& weights_
-        ) : 
+        ) :
             weights(weights_)
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(fe.num_features() == static_cast<unsigned long>(weights_.size()),
                 "\t sequence_labeler::sequence_labeler(weights_)"
                 << "\n\t These sizes should match"
-                << "\n\t fe.num_features(): " << fe.num_features() 
-                << "\n\t weights_.size():   " << weights_.size() 
+                << "\n\t fe.num_features(): " << fe.num_features()
+                << "\n\t weights_.size():   " << weights_.size()
                 << "\n\t this: " << this
                 );
         }
@@ -246,8 +246,8 @@ namespace dlib
             DLIB_ASSERT(fe_.num_features() == static_cast<unsigned long>(weights_.size()),
                 "\t sequence_labeler::sequence_labeler(weights_,fe_)"
                 << "\n\t These sizes should match"
-                << "\n\t fe_.num_features(): " << fe_.num_features() 
-                << "\n\t weights_.size():    " << weights_.size() 
+                << "\n\t fe_.num_features(): " << fe_.num_features()
+                << "\n\t weights_.size():    " << weights_.size()
                 << "\n\t this: " << this
                 );
         }
@@ -319,7 +319,7 @@ namespace dlib
         >
     void deserialize (
         sequence_labeler<feature_extractor>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         feature_extractor fe;

@@ -32,7 +32,7 @@ namespace dlib
         typedef Feature_extractor_type feature_extractor_type;
 
         scan_image_pyramid (
-        );  
+        );
 
         template <
             typename image_type
@@ -93,7 +93,7 @@ namespace dlib
 
         void set_min_pyramid_layer_size (
             unsigned long width,
-            unsigned long height 
+            unsigned long height
         );
 
         inline unsigned long get_min_pyramid_layer_width (
@@ -135,7 +135,7 @@ namespace dlib
         template <typename T, typename U>
         friend void deserialize (
             scan_image_pyramid<T,U>& item,
-            std::istream& in 
+            std::istream& in
         );
 
     private:
@@ -151,7 +151,7 @@ namespace dlib
         {
             rectangle object_box; // always centered at (0,0)
             std::vector<rectangle> rects; // template with respect to (0,0)
-            std::vector<rectangle> movable_rects; 
+            std::vector<rectangle> movable_rects;
         };
 
         friend void serialize(const detection_template& item, std::ostream& out)
@@ -255,7 +255,7 @@ namespace dlib
     template <typename T, typename U>
     void deserialize (
         scan_image_pyramid<T,U>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         int version = 0;
@@ -293,7 +293,7 @@ namespace dlib
         >
     scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
     scan_image_pyramid (
-    ) : 
+    ) :
         max_dets_per_template(10000),
         max_pyramid_levels(1000),
         min_pyramid_layer_width(20),
@@ -451,7 +451,7 @@ namespace dlib
     {
 #ifdef ENABLE_ASSERTS
         // make sure requires clause is not broken
-        DLIB_ASSERT((get_num_detection_templates() == 0 || 
+        DLIB_ASSERT((get_num_detection_templates() == 0 ||
                         (get_num_stationary_components_per_detection_template() == stationary_feature_extraction_regions.size() &&
                         get_num_movable_components_per_detection_template() == movable_feature_extraction_regions.size())) &&
                         center(object_box) == point(0,0),
@@ -469,7 +469,7 @@ namespace dlib
         {
             DLIB_ASSERT(center(movable_feature_extraction_regions[i]) == point(0,0),
                         "Invalid inputs were given to this function."
-                        << "\n\t center(movable_feature_extraction_regions["<<i<<"]): " << center(movable_feature_extraction_regions[i]) 
+                        << "\n\t center(movable_feature_extraction_regions["<<i<<"]): " << center(movable_feature_extraction_regions[i])
                         << "\n\t this: " << this
             );
         }
@@ -626,7 +626,7 @@ namespace dlib
         DLIB_ASSERT(max_levels > 0 ,
             "\t void scan_image_pyramid::set_max_pyramid_levels()"
             << "\n\t You can't have zero levels. "
-            << "\n\t max_levels: " << max_levels 
+            << "\n\t max_levels: " << max_levels
             << "\n\t this: " << this
             );
 
@@ -650,7 +650,7 @@ namespace dlib
         // make sure requires clause is not broken
         DLIB_ASSERT(get_num_detection_templates() > 0 &&
                     is_loaded_with_image() &&
-                    w.size() >= get_num_dimensions(), 
+                    w.size() >= get_num_dimensions(),
             "\t void scan_image_pyramid::detect()"
             << "\n\t Invalid inputs were given to this function "
             << "\n\t get_num_detection_templates(): " << get_num_detection_templates()
@@ -665,8 +665,8 @@ namespace dlib
         array<array2d<double> > saliency_images;
         saliency_images.set_max_size(get_num_components_per_detection_template());
         saliency_images.set_size(get_num_components_per_detection_template());
-        std::vector<std::pair<unsigned int,rectangle> > stationary_region_rects(get_num_stationary_components_per_detection_template()); 
-        std::vector<std::pair<unsigned int,rectangle> > movable_region_rects(get_num_movable_components_per_detection_template()); 
+        std::vector<std::pair<unsigned int,rectangle> > stationary_region_rects(get_num_stationary_components_per_detection_template());
+        std::vector<std::pair<unsigned int,rectangle> > movable_region_rects(get_num_movable_components_per_detection_template());
         pyramid_type pyr;
         std::vector<std::pair<double, point> > point_dets;
 
@@ -678,7 +678,7 @@ namespace dlib
                 saliency_images[i].set_size(feats[l].nr(), feats[l].nc());
                 const unsigned long offset = get_num_detection_templates() + feats_config.get_num_dimensions()*i;
 
-                // build saliency images for pyramid level l 
+                // build saliency images for pyramid level l
                 for (long r = 0; r < feats[l].nr(); ++r)
                 {
                     for (long c = 0; c < feats[l].nc(); ++c)
@@ -701,7 +701,7 @@ namespace dlib
                 const point offset = -feats[l].image_to_feat_space(point(0,0));
                 for (unsigned long j = 0; j < stationary_region_rects.size(); ++j)
                 {
-                    stationary_region_rects[j] = std::make_pair(j, translate_rect(feats[l].image_to_feat_space(det_templates[i].rects[j]),offset)); 
+                    stationary_region_rects[j] = std::make_pair(j, translate_rect(feats[l].image_to_feat_space(det_templates[i].rects[j]),offset));
                 }
                 for (unsigned long j = 0; j < movable_region_rects.size(); ++j)
                 {
@@ -709,7 +709,7 @@ namespace dlib
                     // stays at point(0,0).
                     const rectangle temp = feats[l].image_to_feat_space(det_templates[i].movable_rects[j]);
                     movable_region_rects[j] = std::make_pair(j+stationary_region_rects.size(),
-                                                             centered_rect(point(0,0),temp.width(), temp.height())); 
+                                                             centered_rect(point(0,0),temp.width(), temp.height()));
                 }
 
                 // Scale the object box into the feature extraction image, but keeping it
@@ -726,7 +726,7 @@ namespace dlib
 
                 scan_image_movable_parts(point_dets, saliency_images, scaled_object_box,
                                          stationary_region_rects, movable_region_rects,
-                                         thresh+template_specific_thresh, max_dets_per_template); 
+                                         thresh+template_specific_thresh, max_dets_per_template);
 
                 // convert all the point detections into rectangles at the original image scale and coordinate system
                 for (unsigned long j = 0; j < point_dets.size(); ++j)
@@ -789,7 +789,7 @@ namespace dlib
     ) const
     {
         pyramid_type pyr;
-        // Figure out the pyramid level which best matches rect against one of our 
+        // Figure out the pyramid level which best matches rect against one of our
         // detection template object boxes.
         best_level = 0;
         double best_match_score = -1;
@@ -799,7 +799,7 @@ namespace dlib
         for (unsigned long l = 0; l < number_pyramid_levels; ++l)
         {
             const rectangle temp = pyr.rect_down(rect,l);
-            if (temp.area() <= 1) 
+            if (temp.area() <= 1)
                 break;
 
             // At this pyramid level, what matches best?
@@ -817,7 +817,7 @@ namespace dlib
         }
 
 
-        // Now we translate best_template into the right spot (it should be centered at the location 
+        // Now we translate best_template into the right spot (it should be centered at the location
         // determined by rect) and convert it into the feature image coordinate system.
         rect = pyr.rect_down(rect,best_level);
         const point offset = -feats_config.image_to_feat_space(point(0,0));
@@ -858,7 +858,7 @@ namespace dlib
         const feature_vector_type& w
     ) const
     {
-        // fill in movable part positions.  
+        // fill in movable part positions.
 
         rectangle mapped_rect;
         detection_template best_template;
@@ -881,14 +881,14 @@ namespace dlib
             // make the saliency_image for the ith movable part.
 
             const rectangle part_rect = best_template.movable_rects[i];
-            const rectangle area = grow_rect(object_box, 
-                                             part_rect.width()/2, 
+            const rectangle area = grow_rect(object_box,
+                                             part_rect.width()/2,
                                              part_rect.height()/2).intersect(get_rect(feats[best_level]));
 
             saliency_image.set_size(area.height(), area.width());
             const unsigned long offset = get_num_detection_templates() + feats_config.get_num_dimensions()*(i+get_num_stationary_components_per_detection_template());
 
-            // build saliency image for pyramid level best_level 
+            // build saliency image for pyramid level best_level
             for (long r = area.top(); r <= area.bottom(); ++r)
             {
                 for (long c = area.left(); c <= area.right(); ++c)
@@ -980,7 +980,7 @@ namespace dlib
             << "\n\t obj.num_parts():                            " << obj.num_parts()
             << "\n\t this: " << this
             );
-        DLIB_ASSERT(all_parts_in_rect(obj), 
+        DLIB_ASSERT(all_parts_in_rect(obj),
             "\t void scan_image_pyramid::get_feature_vector()"
             << "\n\t Invalid inputs were given to this function "
             << "\n\t obj.get_rect(): " << obj.get_rect()
@@ -1009,7 +1009,7 @@ namespace dlib
                 point loc = feats[best_level].image_to_feat_space(pyr.point_down(obj.part(i), best_level));
                 // Make sure the movable part always stays within the object_box.
                 // Otherwise it would be at a place that the detect() function can never
-                // look.  
+                // look.
                 loc = nearest_point(object_box, loc);
                 rects.push_back(translate_rect(best_template.movable_rects[i], loc));
             }
@@ -1050,15 +1050,15 @@ namespace dlib
     void scan_image_pyramid<Pyramid_type,Feature_extractor_type>::
     set_min_pyramid_layer_size (
         unsigned long width,
-        unsigned long height 
+        unsigned long height
     )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(width > 0 && height > 0 ,
             "\t void scan_image_pyramid::set_min_pyramid_layer_size()"
             << "\n\t These sizes can't be zero. "
-            << "\n\t width:  " << width 
-            << "\n\t height: " << height 
+            << "\n\t width:  " << width
+            << "\n\t height: " << height
             << "\n\t this:   " << this
             );
 

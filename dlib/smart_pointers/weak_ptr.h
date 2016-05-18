@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_WEAK_PTr_
-#define DLIB_WEAK_PTr_ 
+#define DLIB_WEAK_PTr_
 
 #include <algorithm>
 #include <memory>
@@ -13,8 +13,8 @@ namespace dlib {
 
     template <
         typename T
-        > 
-    class weak_ptr 
+        >
+    class weak_ptr
     {
 
         /*!
@@ -40,10 +40,10 @@ namespace dlib {
         {
         }
 
-        template<typename Y> 
+        template<typename Y>
         weak_ptr(
             const shared_ptr<Y>& r
-        ) 
+        )
         {
             data = r.data;
             if (r.shared_node)
@@ -55,7 +55,7 @@ namespace dlib {
                 }
                 else
                 {
-                    weak_node = new weak_ptr_node(r.shared_node); 
+                    weak_node = new weak_ptr_node(r.shared_node);
                     r.shared_node->weak_node = weak_node;
                 }
             }
@@ -75,7 +75,7 @@ namespace dlib {
                 weak_node->ref_count += 1;
         }
 
-        template<typename Y> 
+        template<typename Y>
         weak_ptr(
             const weak_ptr<Y>& r
         )
@@ -112,7 +112,7 @@ namespace dlib {
             return *this;
         }
 
-        template<typename Y> 
+        template<typename Y>
         weak_ptr& operator= (
             const weak_ptr<Y>& r
         )
@@ -121,7 +121,7 @@ namespace dlib {
             return *this;
         }
 
-        template<typename Y> 
+        template<typename Y>
         weak_ptr& operator=(
             const shared_ptr<Y>& r
         )
@@ -142,7 +142,7 @@ namespace dlib {
         bool expired() const { return weak_node == 0 || weak_node->shared_node == 0; }
 
         shared_ptr<T> lock(
-        ) const 
+        ) const
         {
             if (expired())
                 return shared_ptr<T>();
@@ -206,7 +206,7 @@ namespace dlib {
 
     template<typename T, typename U>
     bool operator< (
-        const weak_ptr<T>& a, 
+        const weak_ptr<T>& a,
         const weak_ptr<U>& b
     )
     {
@@ -215,7 +215,7 @@ namespace dlib {
 
     template<typename T>
     void swap(
-        weak_ptr<T>& a, 
+        weak_ptr<T>& a,
         weak_ptr<T> & b
     ) { a.swap(b); }
 }

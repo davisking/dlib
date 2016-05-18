@@ -149,15 +149,15 @@ namespace dlib
         void local_trsm(
             const enum CBLAS_ORDER Order,
             enum CBLAS_SIDE Side,
-            enum CBLAS_UPLO Uplo, 
+            enum CBLAS_UPLO Uplo,
             const enum CBLAS_TRANSPOSE TransA,
-            const enum CBLAS_DIAG Diag, 
-            long m, 
-            long n, 
-            T alpha, 
-            const T *a, 
-            long lda, 
-            T *b, 
+            const enum CBLAS_DIAG Diag,
+            long m,
+            long n,
+            T alpha,
+            const T *a,
+            long lda,
+            T *b,
             long ldb
         )
         /*!
@@ -203,26 +203,26 @@ namespace dlib
 
             /* Function Body */
             lside = (Side == CblasLeft);
-            if (lside) 
+            if (lside)
             {
                 nrowa = m;
-            } else 
+            } else
             {
                 nrowa = n;
             }
-            nounit = (Diag == CblasNonUnit); 
-            upper = (Uplo == CblasUpper); 
+            nounit = (Diag == CblasNonUnit);
+            upper = (Uplo == CblasUpper);
 
             info = 0;
             if (! lside && ! (Side == CblasRight)) {
                 info = 1;
             } else if (! upper && !(Uplo == CblasLower) ) {
                 info = 2;
-            } else if (!(TransA == CblasNoTrans) && 
-                       !(TransA == CblasTrans) && 
+            } else if (!(TransA == CblasNoTrans) &&
+                       !(TransA == CblasTrans) &&
                        !(TransA == CblasConjTrans))  {
                 info = 3;
-            } else if (!(Diag == CblasUnit) && 
+            } else if (!(Diag == CblasUnit) &&
                        !(Diag == CblasNonUnit) ) {
                 info = 4;
             } else if (m < 0) {
@@ -454,7 +454,7 @@ namespace dlib
                                     temp = a[j + k * a_dim1];
                                     i__2 = m;
                                     for (i__ = 1; i__ <= i__2; ++i__) {
-                                        b[i__ + j * b_dim1] -= temp * b[i__ + k * 
+                                        b[i__ + j * b_dim1] -= temp * b[i__ + k *
                                             b_dim1];
                                         /* L280: */
                                     }
@@ -488,7 +488,7 @@ namespace dlib
                                     temp = a[j + k * a_dim1];
                                     i__3 = m;
                                     for (i__ = 1; i__ <= i__3; ++i__) {
-                                        b[i__ + j * b_dim1] -= temp * b[i__ + k * 
+                                        b[i__ + j * b_dim1] -= temp * b[i__ + k *
                                             b_dim1];
                                         /* L330: */
                                     }
@@ -508,7 +508,7 @@ namespace dlib
                     }
                 }
             }
-        } 
+        }
 
     // ------------------------------------------------------------------------------------
 
@@ -563,7 +563,7 @@ namespace dlib
             >
         inline void triangular_solver (
             const enum CBLAS_SIDE Side,
-            const enum CBLAS_UPLO Uplo, 
+            const enum CBLAS_UPLO Uplo,
             const enum CBLAS_TRANSPOSE TransA,
             const enum CBLAS_DIAG Diag,
             const matrix<T,NR1,NC1,MM,row_major_layout>& A,
@@ -585,7 +585,7 @@ namespace dlib
             >
         inline void triangular_solver (
             const enum CBLAS_SIDE Side,
-            const enum CBLAS_UPLO Uplo, 
+            const enum CBLAS_UPLO Uplo,
             const enum CBLAS_TRANSPOSE TransA,
             const enum CBLAS_DIAG Diag,
             const matrix<T,NR1,NC1,MM,column_major_layout>& A,
@@ -607,7 +607,7 @@ namespace dlib
             >
         inline void triangular_solver (
             const enum CBLAS_SIDE Side,
-            const enum CBLAS_UPLO Uplo, 
+            const enum CBLAS_UPLO Uplo,
             const enum CBLAS_TRANSPOSE TransA,
             const enum CBLAS_DIAG Diag,
             const matrix<T,NR1,NC1,MM,column_major_layout>& A,
@@ -631,7 +631,7 @@ namespace dlib
             >
         inline void triangular_solver (
             const enum CBLAS_SIDE Side,
-            const enum CBLAS_UPLO Uplo, 
+            const enum CBLAS_UPLO Uplo,
             const enum CBLAS_TRANSPOSE TransA,
             const enum CBLAS_DIAG Diag,
             const matrix<T,NR1,NC1,MM,layout>& A,

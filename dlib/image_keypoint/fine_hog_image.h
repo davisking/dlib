@@ -42,7 +42,7 @@ namespace dlib
         typedef matrix<double, block_size*block_size*num_orientation_bins, 1> descriptor_type;
 
         fine_hog_image (
-        ) : 
+        ) :
             num_block_rows(0),
             num_block_cols(0)
         {}
@@ -99,9 +99,9 @@ namespace dlib
                 "\t descriptor_type fine_hog_image::operator()()"
                 << "\n\t invalid row or col argument"
                 << "\n\t row:  " << row
-                << "\n\t col:  " << col 
-                << "\n\t nr(): " << nr() 
-                << "\n\t nc(): " << nc() 
+                << "\n\t col:  " << col
+                << "\n\t nr(): " << nr()
+                << "\n\t nc(): " << nc()
                 << "\n\t this: " << this
                 );
 
@@ -180,7 +180,7 @@ namespace dlib
 
 
 
-        // these _PRIVATE_ functions are only here as a workaround for a bug in visual studio 2005.  
+        // these _PRIVATE_ functions are only here as a workaround for a bug in visual studio 2005.
         void _PRIVATE_serialize (std::ostream& out) const
         {
             // serialize hist_counts
@@ -204,7 +204,7 @@ namespace dlib
             deserialize(nr,in);
             hist_counts.set_size(nr,nc);
             while (hist_counts.move_next())
-                hist_counts.element().deserialize(in); 
+                hist_counts.element().deserialize(in);
             hist_counts.reset();
 
 
@@ -222,7 +222,7 @@ namespace dlib
         )
         {
             // Note that we keep a border of 1 pixel all around the image so that we don't have
-            // to worry about running outside the image when computing the horizontal and vertical 
+            // to worry about running outside the image when computing the horizontal and vertical
             // gradients.
 
 
@@ -246,10 +246,10 @@ namespace dlib
             {
                 for (long c = 0; c < hist_counts.nc(); ++c)
                 {
-                    unsigned long left; 
+                    unsigned long left;
                     unsigned long right;
-                    unsigned long top;   
-                    unsigned long bottom; 
+                    unsigned long top;
+                    unsigned long bottom;
 
                     assign_pixel(left,   img(r+1,c));
                     assign_pixel(right,  img(r+1,c+2));
@@ -299,9 +299,9 @@ namespace dlib
             }
 
 
-            // Now figure out how many feature extraction blocks we should have.  
-            num_block_rows = (hist_counts.nr() - block_size*cell_size + 1)/(long)pixel_stride; 
-            num_block_cols = (hist_counts.nc() - block_size*cell_size + 1)/(long)pixel_stride; 
+            // Now figure out how many feature extraction blocks we should have.
+            num_block_rows = (hist_counts.nr() - block_size*cell_size + 1)/(long)pixel_stride;
+            num_block_cols = (hist_counts.nc() - block_size*cell_size + 1)/(long)pixel_stride;
 
         }
 
@@ -319,7 +319,7 @@ namespace dlib
                 dlib::serialize(lower_strength, out);
                 dlib::serialize(upper_strength, out);
             }
-            void deserialize(std::istream& in) 
+            void deserialize(std::istream& in)
             {
                 dlib::deserialize(quantized_angle_lower, in);
                 dlib::deserialize(quantized_angle_upper, in);
@@ -364,7 +364,7 @@ namespace dlib
         >
     void deserialize (
         fine_hog_image<T1,T2,T3,T4,T5>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         item._PRIVATE_deserialize(in);

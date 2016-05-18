@@ -21,11 +21,11 @@ namespace dlib
     }
 }
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
-    // Declare the logger we will use in this test.  The name of the logger 
+    // Declare the logger we will use in this test.  The name of the logger
     // should start with "test."
     dlib::logger dlog("test.gemv");
 
@@ -100,12 +100,12 @@ namespace
             val = trans(cv)*m*trans(rv);
             DLIB_TEST_MSG(counter_gemv() == 1, counter_gemv());
 
-            // This does one dot and two gemv 
+            // This does one dot and two gemv
             counter_gemv() = 0;
             val = (trans(cv)*m)*(m*trans(rv));
             DLIB_TEST_MSG(counter_gemv() == 2, counter_gemv());
 
-            // This does one dot and two gemv 
+            // This does one dot and two gemv
             counter_gemv() = 0;
             val = trans(cv)*m*trans(m)*trans(rv);
             DLIB_TEST_MSG(counter_gemv() == 2, counter_gemv());

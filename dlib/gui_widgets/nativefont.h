@@ -1,4 +1,4 @@
-// Copyright (C) 2006 Keita Mochizuki 
+// Copyright (C) 2006 Keita Mochizuki
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_IGG_FONT_RENDERER_H_
 #define DLIB_IGG_FONT_RENDERER_H_
@@ -203,7 +203,7 @@ namespace nativefont
                             SelectObject(hDCBmp, hFontOld);
                             DeleteObject(hFont);
                         }
-                        hFont = CreateFont(height_want, 0, 0, 0, bold ? FW_BOLD : FW_DONTCARE, italic ? TRUE : FALSE, 
+                        hFont = CreateFont(height_want, 0, 0, 0, bold ? FW_BOLD : FW_DONTCARE, italic ? TRUE : FALSE,
                                            FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
                                            fixed ? (FIXED_PITCH | FF_DONTCARE) : (VARIABLE_PITCH | FF_DONTCARE), NULL);
                         hFontOld = (HFONT)SelectObject(hDCBmp, hFont);
@@ -517,7 +517,7 @@ namespace nativefont
 
 // ----------------------------------------------------------------------------------------
 
-    class native_font : public dlib::font 
+    class native_font : public dlib::font
     {
         unsigned long ascender_;
         native_font(){
@@ -530,7 +530,7 @@ namespace nativefont
         font_renderer::font_renderer fl;
     public:
 
-        virtual ~native_font() 
+        virtual ~native_font()
         {
             // delete all the letter objects we have in our letters map
             letters_map_type::iterator i;

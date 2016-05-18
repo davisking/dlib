@@ -12,7 +12,7 @@ namespace dlib
         typename T1,
         typename T2
         >
-    class map_pair  
+    class map_pair
     {
         /*!
             POINTERS AND REFERENCES TO INTERNAL DATA
@@ -20,7 +20,7 @@ namespace dlib
                 pointers or references to internal data when called.
 
             WHAT THIS OBJECT REPRESENTS
-                this object is used to return the key/value pair used in the 
+                this object is used to return the key/value pair used in the
                 map and hash_map containers when using the enumerable interface.
 
                 note that the enumerable interface is defined in
@@ -34,7 +34,7 @@ namespace dlib
         virtual ~map_pair(
         )=0;
 
-        virtual const T1& key( 
+        virtual const T1& key(
         ) const =0;
         /*!
             ensures
@@ -63,7 +63,7 @@ namespace dlib
     };
 
     // destructor does nothing
-    template <typename T1,typename T2> 
+    template <typename T1,typename T2>
     map_pair<T1,T2>::~map_pair () {}
 
 // ----------------------------------------------------------------------------------------

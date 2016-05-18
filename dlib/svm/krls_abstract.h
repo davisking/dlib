@@ -19,26 +19,26 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON kernel_type
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             INITIAL VALUE
                 - dictionary_size() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of the kernel recursive least squares algorithm 
+                This is an implementation of the kernel recursive least squares algorithm
                 described in the paper:
                     The Kernel Recursive Least Squares Algorithm by Yaakov Engel.
 
-                The long and short of this algorithm is that it is an online kernel based 
+                The long and short of this algorithm is that it is an online kernel based
                 regression algorithm.  You give it samples (x,y) and it learns the function
                 f(x) == y.  For a detailed description of the algorithm read the above paper.
 
-                Also note that the algorithm internally keeps a set of "dictionary vectors" 
-                that are used to represent the regression function.  You can force the 
-                algorithm to use no more than a set number of vectors by setting 
-                the 3rd constructor argument to whatever you want.  However, note that 
-                doing this causes the algorithm to bias it's results towards more 
-                recent training examples.  
+                Also note that the algorithm internally keeps a set of "dictionary vectors"
+                that are used to represent the regression function.  You can force the
+                algorithm to use no more than a set number of vectors by setting
+                the 3rd constructor argument to whatever you want.  However, note that
+                doing this causes the algorithm to bias it's results towards more
+                recent training examples.
         !*/
 
     public:
@@ -48,7 +48,7 @@ namespace dlib
 
 
         explicit krls (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             scalar_type tolerance_ = 0.001,
             unsigned long max_dictionary_size_ = 1000000
         );
@@ -68,14 +68,14 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the tolerance to use for the approximately linearly dependent 
-                  test in the KRLS algorithm.  This is a number which governs how 
-                  accurately this object will approximate the decision function it is 
-                  learning.  Smaller values generally result in a more accurate 
-                  estimate while also resulting in a bigger set of dictionary vectors in 
-                  the learned decision function.  Bigger tolerances values result in a 
+                - returns the tolerance to use for the approximately linearly dependent
+                  test in the KRLS algorithm.  This is a number which governs how
+                  accurately this object will approximate the decision function it is
+                  learning.  Smaller values generally result in a more accurate
+                  estimate while also resulting in a bigger set of dictionary vectors in
+                  the learned decision function.  Bigger tolerances values result in a
                   less accurate decision function but also in less dictionary vectors.
-                - The exact meaning of the tolerance parameter is the following: 
+                - The exact meaning of the tolerance parameter is the following:
                   Imagine that we have an empirical_kernel_map that contains all
                   the current dictionary vectors.  Then the tolerance is the minimum
                   projection error (as given by empirical_kernel_map::project()) required
@@ -105,7 +105,7 @@ namespace dlib
         );
         /*!
             ensures
-                - clears out all learned data 
+                - clears out all learned data
                   (e.g. #get_decision_function().basis_vectors.size() == 0)
         !*/
 
@@ -164,7 +164,7 @@ namespace dlib
         typename kernel_type
         >
     void swap(
-        krls<kernel_type>& a, 
+        krls<kernel_type>& a,
         krls<kernel_type>& b
     )
     { a.swap(b); }
@@ -184,11 +184,11 @@ namespace dlib
     !*/
 
     template <
-        typename kernel_type 
+        typename kernel_type
         >
     void deserialize (
         krls<kernel_type>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for krls objects

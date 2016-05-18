@@ -20,30 +20,30 @@ namespace dlib
                 - must be an object that inherits publicly from matrix_exp (this class).
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an expression that evaluates to a matrix 
-                of nr() rows and nc() columns.  
+                This object represents an expression that evaluates to a matrix
+                of nr() rows and nc() columns.
                 
-                The reason for having an object that represents an expression is that it 
-                allows us to use the "expression templates" technique to eliminate the 
-                temporary matrix objects that would normally be returned from expressions 
+                The reason for having an object that represents an expression is that it
+                allows us to use the "expression templates" technique to eliminate the
+                temporary matrix objects that would normally be returned from expressions
                 such as M = A+B+C+D;  Normally each invocation of the + operator would
-                construct and return a temporary matrix object but using this technique we 
-                can avoid creating all of these temporary objects and receive a large 
+                construct and return a temporary matrix object but using this technique we
+                can avoid creating all of these temporary objects and receive a large
                 speed boost.
 
-                Note that every time you invoke operator() on this object it recomputes 
-                its result which may not be what you want to do.  For example, if you 
-                are going to be accessing the same element over and over it might 
-                be faster to assign the matrix_exp to a temporary matrix and then 
+                Note that every time you invoke operator() on this object it recomputes
+                its result which may not be what you want to do.  For example, if you
+                are going to be accessing the same element over and over it might
+                be faster to assign the matrix_exp to a temporary matrix and then
                 use that temporary.
 
 
                 const_ret_type typedef (defined below)
                     The purpose of the const_ret_type typedef is to allow matrix expressions
-                    to return their elements by reference when appropriate.  So const_ret_type 
+                    to return their elements by reference when appropriate.  So const_ret_type
                     should be one of the following types:
                         - const type
-                        - const type& 
+                        - const type&
         !*/
 
     public:
@@ -105,11 +105,11 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of rows in this matrix expression. 
+                - returns the number of rows in this matrix expression.
         !*/
 
         long nc (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of columns in this matrix expression.
@@ -131,7 +131,7 @@ namespace dlib
                 - if (A change to the state of item could cause a change to the state of *this
                       matrix_exp object.  ) then
                     - returns true
-                    - This happens when this matrix_exp contains item in some way. 
+                    - This happens when this matrix_exp contains item in some way.
                 - else
                     - returns false
         !*/
@@ -139,10 +139,10 @@ namespace dlib
         template <typename U>
         bool destructively_aliases (
             const matrix_exp<U>& item
-        ) const; 
+        ) const;
         /*!
             ensures
-                - if (aliases(item)) then 
+                - if (aliases(item)) then
                     - if (nr() != item.nr() || nc() != item.nc()
                         - returns true
                           (i.e. if this expression has different dimensions than item then
@@ -154,7 +154,7 @@ namespace dlib
                           item(r,c) = (*this)(r,c)
                     - That is, if this matrix expression aliases item in such a way that a modification
                       to element item(r,c) causes a change in the value of something other than
-                      (*this)(r,c) then this function returns true.  
+                      (*this)(r,c) then this function returns true.
 
                     - returns false if none of the above conditions say we should return true
                 - else
@@ -162,7 +162,7 @@ namespace dlib
         !*/
 
         inline const exp_type& ref (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns a reference to the expression contained in *this.
@@ -193,7 +193,7 @@ namespace dlib
     protected:
 
         // Only derived classes of matrix_exp may call the matrix_exp constructors.
-        matrix_exp(const matrix_exp&); 
+        matrix_exp(const matrix_exp&);
         matrix_exp();
 
     private:

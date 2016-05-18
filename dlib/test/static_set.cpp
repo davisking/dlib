@@ -12,7 +12,7 @@
 #include <dlib/set.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -31,9 +31,9 @@ namespace
             - set is an implementation of static_set/static_set_kernel_abstract.h and
               is instantiated to hold ints
         ensures
-            - runs tests on set for compliance with the specs 
+            - runs tests on set for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
 
@@ -53,7 +53,7 @@ namespace
             q.clear();
             qb.clear();
             qc.clear();
-            unsigned long num = k; 
+            unsigned long num = k;
             for (unsigned long i = 0; i < num; ++i)
             {
                 int a = ::rand()&0xFF;
@@ -82,7 +82,7 @@ namespace
 
             DLIB_TEST(se.size() == 0);
             DLIB_TEST(se.at_start() == true);
-            DLIB_TEST(se.current_element_valid() == false);     
+            DLIB_TEST(se.current_element_valid() == false);
             DLIB_TEST(se.move_next() == false);
             DLIB_TEST(se.at_start() == false);
             DLIB_TEST(se.current_element_valid() == false);
@@ -90,7 +90,7 @@ namespace
 
             DLIB_TEST(s.size() == qb.size());
             DLIB_TEST(s.at_start() == true);
-            DLIB_TEST(s.current_element_valid() == false);     
+            DLIB_TEST(s.current_element_valid() == false);
             DLIB_TEST(s.move_next() == true);
             DLIB_TEST(s.at_start() == false);
             DLIB_TEST(s.current_element_valid() == true);
@@ -101,14 +101,14 @@ namespace
 
             DLIB_TEST(s.size() == 0);
             DLIB_TEST(s.at_start() == true);
-            DLIB_TEST(s.current_element_valid() == false);     
+            DLIB_TEST(s.current_element_valid() == false);
             DLIB_TEST(s.move_next() == false);
             DLIB_TEST(s.at_start() == false);
             DLIB_TEST(s.current_element_valid() == false);
 
             DLIB_TEST(se.size() == qb.size());
             DLIB_TEST(se.at_start() == true);
-            DLIB_TEST(se.current_element_valid() == false);     
+            DLIB_TEST(se.current_element_valid() == false);
             DLIB_TEST(se.move_next() == true);
             DLIB_TEST(se.at_start() == false);
             DLIB_TEST(se.current_element_valid() == true);

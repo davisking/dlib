@@ -113,121 +113,121 @@
 
 // ----------------------------------------------------------------------------------------
 
-#ifdef ARG_1_DEFAULT 
+#ifdef ARG_1_DEFAULT
 #define ELSE_ASSIGN_ARG_1 else A1 = ARG_1_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_1
 #endif
 
-#ifdef ARG_2_DEFAULT 
+#ifdef ARG_2_DEFAULT
 #define ELSE_ASSIGN_ARG_2 else A2 = ARG_2_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_2
 #endif
 
-#ifdef ARG_3_DEFAULT 
+#ifdef ARG_3_DEFAULT
 #define ELSE_ASSIGN_ARG_3 else A3 = ARG_3_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_3
 #endif
 
-#ifdef ARG_4_DEFAULT 
+#ifdef ARG_4_DEFAULT
 #define ELSE_ASSIGN_ARG_4 else A4 = ARG_4_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_4
 #endif
 
-#ifdef ARG_5_DEFAULT 
+#ifdef ARG_5_DEFAULT
 #define ELSE_ASSIGN_ARG_5 else A5 = ARG_5_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_5
 #endif
 
-#ifdef ARG_6_DEFAULT 
+#ifdef ARG_6_DEFAULT
 #define ELSE_ASSIGN_ARG_6 else A6 = ARG_6_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_6
 #endif
 
-#ifdef ARG_7_DEFAULT 
+#ifdef ARG_7_DEFAULT
 #define ELSE_ASSIGN_ARG_7 else A7 = ARG_7_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_7
 #endif
 
-#ifdef ARG_8_DEFAULT 
+#ifdef ARG_8_DEFAULT
 #define ELSE_ASSIGN_ARG_8 else A8 = ARG_8_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_8
 #endif
 
-#ifdef ARG_9_DEFAULT 
+#ifdef ARG_9_DEFAULT
 #define ELSE_ASSIGN_ARG_9 else A9 = ARG_9_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_9
 #endif
 
-#ifdef ARG_10_DEFAULT 
+#ifdef ARG_10_DEFAULT
 #define ELSE_ASSIGN_ARG_10 else A10 = ARG_10_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_10
 #endif
 
-#ifdef ARG_11_DEFAULT 
+#ifdef ARG_11_DEFAULT
 #define ELSE_ASSIGN_ARG_11 else A11 = ARG_11_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_11
 #endif
 
-#ifdef ARG_12_DEFAULT 
+#ifdef ARG_12_DEFAULT
 #define ELSE_ASSIGN_ARG_12 else A12 = ARG_12_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_12
 #endif
 
-#ifdef ARG_13_DEFAULT 
+#ifdef ARG_13_DEFAULT
 #define ELSE_ASSIGN_ARG_13 else A13 = ARG_13_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_13
 #endif
 
-#ifdef ARG_14_DEFAULT 
+#ifdef ARG_14_DEFAULT
 #define ELSE_ASSIGN_ARG_14 else A14 = ARG_14_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_14
 #endif
 
-#ifdef ARG_15_DEFAULT 
+#ifdef ARG_15_DEFAULT
 #define ELSE_ASSIGN_ARG_15 else A15 = ARG_15_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_15
 #endif
 
-#ifdef ARG_16_DEFAULT 
+#ifdef ARG_16_DEFAULT
 #define ELSE_ASSIGN_ARG_16 else A16 = ARG_16_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_16
 #endif
 
-#ifdef ARG_17_DEFAULT 
+#ifdef ARG_17_DEFAULT
 #define ELSE_ASSIGN_ARG_17 else A17 = ARG_17_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_17
 #endif
 
-#ifdef ARG_18_DEFAULT 
+#ifdef ARG_18_DEFAULT
 #define ELSE_ASSIGN_ARG_18 else A18 = ARG_18_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_18
 #endif
 
-#ifdef ARG_19_DEFAULT 
+#ifdef ARG_19_DEFAULT
 #define ELSE_ASSIGN_ARG_19 else A19 = ARG_19_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_19
 #endif
 
-#ifdef ARG_20_DEFAULT 
+#ifdef ARG_20_DEFAULT
 #define ELSE_ASSIGN_ARG_20 else A20 = ARG_20_DEFAULT;
 #else
 #define ELSE_ASSIGN_ARG_20
@@ -240,12 +240,12 @@ namespace mex_binding
     using namespace dlib;
 
     template <typename T>
-    struct is_input_type 
+    struct is_input_type
     {
         const static unsigned long value = (!is_same_type<void,T>::value && (!is_reference_type<T>::value || is_const_type<T>::value )) ? 1 : 0;
     };
     template <typename T>
-    struct is_output_type 
+    struct is_output_type
     {
         const static unsigned long value = (!is_same_type<void,T>::value && is_reference_type<T>::value && !is_const_type<T>::value) ? 1 : 0;
     };
@@ -263,17 +263,17 @@ namespace mex_binding
             is_input_type<typename sig_traits<funct>::arg7_type>::value +
             is_input_type<typename sig_traits<funct>::arg8_type>::value +
             is_input_type<typename sig_traits<funct>::arg9_type>::value +
-            is_input_type<typename sig_traits<funct>::arg10_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg11_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg12_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg13_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg14_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg15_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg16_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg17_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg18_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg19_type>::value + 
-            is_input_type<typename sig_traits<funct>::arg20_type>::value; 
+            is_input_type<typename sig_traits<funct>::arg10_type>::value +
+            is_input_type<typename sig_traits<funct>::arg11_type>::value +
+            is_input_type<typename sig_traits<funct>::arg12_type>::value +
+            is_input_type<typename sig_traits<funct>::arg13_type>::value +
+            is_input_type<typename sig_traits<funct>::arg14_type>::value +
+            is_input_type<typename sig_traits<funct>::arg15_type>::value +
+            is_input_type<typename sig_traits<funct>::arg16_type>::value +
+            is_input_type<typename sig_traits<funct>::arg17_type>::value +
+            is_input_type<typename sig_traits<funct>::arg18_type>::value +
+            is_input_type<typename sig_traits<funct>::arg19_type>::value +
+            is_input_type<typename sig_traits<funct>::arg20_type>::value;
 
         const static unsigned long num_outputs= is_output_type<typename sig_traits<funct>::arg1_type>::value +
             is_output_type<typename sig_traits<funct>::arg2_type>::value +
@@ -284,17 +284,17 @@ namespace mex_binding
             is_output_type<typename sig_traits<funct>::arg7_type>::value +
             is_output_type<typename sig_traits<funct>::arg8_type>::value +
             is_output_type<typename sig_traits<funct>::arg9_type>::value +
-            is_output_type<typename sig_traits<funct>::arg10_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg11_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg12_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg13_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg14_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg15_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg16_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg17_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg18_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg19_type>::value + 
-            is_output_type<typename sig_traits<funct>::arg20_type>::value; 
+            is_output_type<typename sig_traits<funct>::arg10_type>::value +
+            is_output_type<typename sig_traits<funct>::arg11_type>::value +
+            is_output_type<typename sig_traits<funct>::arg12_type>::value +
+            is_output_type<typename sig_traits<funct>::arg13_type>::value +
+            is_output_type<typename sig_traits<funct>::arg14_type>::value +
+            is_output_type<typename sig_traits<funct>::arg15_type>::value +
+            is_output_type<typename sig_traits<funct>::arg16_type>::value +
+            is_output_type<typename sig_traits<funct>::arg17_type>::value +
+            is_output_type<typename sig_traits<funct>::arg18_type>::value +
+            is_output_type<typename sig_traits<funct>::arg19_type>::value +
+            is_output_type<typename sig_traits<funct>::arg20_type>::value;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -311,7 +311,7 @@ namespace mex_binding
 
     template <
         typename T,
-        typename enabled = void 
+        typename enabled = void
         >
     struct inner_type
     {
@@ -348,7 +348,7 @@ namespace mex_binding
         long arg_idx,
         const mxArray *prhs,
         T& arg
-    ); 
+    );
 
 // -------------------------------------------------------
 
@@ -361,8 +361,8 @@ namespace mex_binding
         long num_cols,
         typename mem_manager
         >
-    struct is_column_major_matrix<matrix<T,num_rows,num_cols,mem_manager,column_major_layout> > 
-    { static const bool value = true; }; 
+    struct is_column_major_matrix<matrix<T,num_rows,num_cols,mem_manager,column_major_layout> >
+    { static const bool value = true; };
 
 // -------------------------------------------------------
 
@@ -375,7 +375,7 @@ namespace mex_binding
         const long arg_idx,
         matrix_type& m,
         const matrix_exp<EXP>& src
-    )  
+    )
     {
         if (matrix_type::NR != 0 && matrix_type::NR != src.nc())
         {
@@ -405,7 +405,7 @@ namespace mex_binding
         const long arg_idx,
         matrix_type& m,
         const matrix_exp<EXP>& src
-    )  
+    )
     {
         assign_image(m , trans(src));
     }
@@ -414,13 +414,13 @@ namespace mex_binding
         typename matrix_type,
         typename EXP
         >
-    typename disable_if_c<(is_array2d<matrix_type>::value || is_matrix<matrix_type>::value) && 
+    typename disable_if_c<(is_array2d<matrix_type>::value || is_matrix<matrix_type>::value) &&
     is_same_type<typename inner_type<matrix_type>::type,typename EXP::type>::value >::type
     assign_mat (
         const long arg_idx,
         matrix_type& ,
-        const matrix_exp<EXP>& 
-    ) 
+        const matrix_exp<EXP>&
+    )
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
@@ -440,7 +440,7 @@ namespace mex_binding
         const long arg_idx,
         T& dest,
         const U& src
-    )  
+    )
     {
         if (is_signed_type<U>::value && src < 0 && is_unsigned_type<T>::value)
         {
@@ -463,8 +463,8 @@ namespace mex_binding
     assign_scalar (
         const long arg_idx,
         T& ,
-        const U& 
-    )  
+        const U&
+    )
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
@@ -479,7 +479,7 @@ namespace mex_binding
         const long arg_idx,
         function_handle& dest,
         const mxArray* src
-    )  
+    )
     {
         const_cast<void*&>(dest.h) = (void*)src;
     }
@@ -490,8 +490,8 @@ namespace mex_binding
     void assign_function_handle (
         const long arg_idx,
         T& ,
-        const mxArray* 
-    )  
+        const mxArray*
+    )
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
@@ -510,7 +510,7 @@ namespace mex_binding
         const long arg_idx,
         T& dest,
         const mxArray* src
-    )  
+    )
     {
         const long nr = mxGetM(src);
         const long nc = mxGetN(src);
@@ -558,7 +558,7 @@ namespace mex_binding
         const long arg_idx,
         T& ,
         const mxArray*
-    )  
+    )
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
@@ -568,7 +568,7 @@ namespace mex_binding
 
 // -------------------------------------------------------
 
-    template <typename T> 
+    template <typename T>
     void assign_image (
         const long arg_idx,
         T&,
@@ -618,14 +618,14 @@ namespace mex_binding
         long arg_idx,
         const mxArray *prhs,
         T& arg
-    ) 
+    )
     {
         using namespace mex_binding;
         if (is_built_in_scalar_type<T>::value || is_same_type<T,bool>::value)
         {
-            if( !(mxIsDouble(prhs) || mxIsSingle(prhs) || mxIsLogical(prhs) ) || 
+            if( !(mxIsDouble(prhs) || mxIsSingle(prhs) || mxIsLogical(prhs) ) ||
                 mxIsComplex(prhs) ||
-                mxGetNumberOfElements(prhs)!=1 ) 
+                mxGetNumberOfElements(prhs)!=1 )
             {
                 std::ostringstream sout;
                 sout << " argument " << arg_idx+1 << " must be a scalar";
@@ -894,7 +894,7 @@ namespace mex_binding
     template <typename T, typename EXP>
     typename disable_if<is_same_type<dlib::rgb_pixel,typename EXP::type> >::type assign_image_to_matlab (
         T* mat,
-        const matrix_exp<EXP>& 
+        const matrix_exp<EXP>&
     )
     {
         mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
@@ -905,7 +905,7 @@ namespace mex_binding
     typename dlib::enable_if<is_matrix<T> >::type assign_to_matlab(
         mxArray*& plhs,
         const T& item
-    ) 
+    )
     {
         typedef typename T::type type;
 
@@ -1003,7 +1003,7 @@ namespace mex_binding
 
             mat = (type*)mxGetData(plhs);
         }
-        else if (is_same_type<dlib::int64, type>::value  || 
+        else if (is_same_type<dlib::int64, type>::value  ||
                  (is_same_type<long,type>::value && sizeof(long) == sizeof(dlib::int64)))
         {
             plhs = mxCreateNumericMatrix(item.nr(),
@@ -1093,7 +1093,7 @@ namespace mex_binding
     void assign_to_matlab(
         mxArray*& plhs,
         const std::string& item
-    ) 
+    )
     {
         plhs = mxCreateString(item.c_str());
     }
@@ -1102,17 +1102,17 @@ namespace mex_binding
     void assign_to_matlab(
         mxArray*& plhs,
         const array2d<T,MM>& item
-    ) 
+    )
     {
         assign_to_matlab(plhs,array_to_matrix(item));
     }
 
     template <typename T>
-    typename dlib::disable_if_c<is_matrix<T>::value || is_array_type<T>::value || 
+    typename dlib::disable_if_c<is_matrix<T>::value || is_array_type<T>::value ||
                                 is_same_type<T,function_handle>::value>::type assign_to_matlab(
         mxArray*& plhs,
         const T& item
-    ) 
+    )
     {
         plhs = mxCreateDoubleScalar(item);
     }
@@ -1137,7 +1137,7 @@ namespace mex_binding
     typename dlib::enable_if<is_array_type<T> >::type assign_to_matlab(
         mxArray*& plhs,
         const T& item
-    ) 
+    )
     {
         mwSize dims[1] = {item.size()};
         plhs = mxCreateCellArray(1,dims);
@@ -2874,10 +2874,10 @@ namespace mex_binding
 
 
         /* check for proper number of arguments */
-        if(nrhs > expected_nrhs || nrhs < expected_nrhs - defaulted_args) 
+        if(nrhs > expected_nrhs || nrhs < expected_nrhs - defaulted_args)
         {
             std::ostringstream sout;
-            sout << "Expected between " << expected_nrhs-defaulted_args 
+            sout << "Expected between " << expected_nrhs-defaulted_args
                 << " and " << expected_nrhs << " input arguments, got " << nrhs << ".";
 
             mexErrMsgIdAndTxt("mex_function:nrhs",
@@ -2922,7 +2922,7 @@ namespace mex_binding
 
     public:
         mex_streambuf (
-        ) 
+        )
         {
             buf.resize(1000);
             setp(&buf[0], &buf[0] + buf.size()-2);
@@ -2981,7 +2981,7 @@ namespace mex_binding
 
     public:
         mex_warn_streambuf (
-        ) 
+        )
         {
             buf.resize(1000);
             setp(&buf[0], &buf[0] + buf.size()-2);
@@ -3124,7 +3124,7 @@ namespace dlib
 {
     void call_matlab (
         const std::string& function_name
-    ) 
+    )
     {
         using namespace mex_binding;
 
@@ -3158,7 +3158,7 @@ namespace dlib
     void call_matlab (
         const std::string& function_name,
         const T1& A1
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 1;
@@ -3178,14 +3178,14 @@ namespace dlib
     }
 
     template <
-        typename T1, 
+        typename T1,
         typename T2
         >
     void call_matlab (
         const std::string& function_name,
         const T1& A1,
         const T2& A2
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 2;
@@ -3207,7 +3207,7 @@ namespace dlib
     }
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3
         >
@@ -3216,7 +3216,7 @@ namespace dlib
         const T1& A1,
         const T2& A2,
         const T3& A3
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 3;
@@ -3241,7 +3241,7 @@ namespace dlib
 
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4
@@ -3252,7 +3252,7 @@ namespace dlib
         const T2& A2,
         const T3& A3,
         const T4& A4
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 4;
@@ -3279,7 +3279,7 @@ namespace dlib
 
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3292,7 +3292,7 @@ namespace dlib
         const T3& A3,
         const T4& A4,
         const T5& A5
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 5;
@@ -3321,7 +3321,7 @@ namespace dlib
 
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3336,7 +3336,7 @@ namespace dlib
         const T4& A4,
         const T5& A5,
         const T6& A6
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 6;
@@ -3367,7 +3367,7 @@ namespace dlib
 
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3384,7 +3384,7 @@ namespace dlib
         const T5& A5,
         const T6& A6,
         const T7& A7
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 7;
@@ -3417,7 +3417,7 @@ namespace dlib
 
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3436,7 +3436,7 @@ namespace dlib
         const T6& A6,
         const T7& A7,
         const T8& A8
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 8;
@@ -3472,7 +3472,7 @@ namespace dlib
 
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3493,7 +3493,7 @@ namespace dlib
         const T7& A7,
         const T8& A8,
         const T9& A9
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 9;
@@ -3530,7 +3530,7 @@ namespace dlib
 
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3553,7 +3553,7 @@ namespace dlib
         const T8& A8,
         const T9& A9,
         const T10& A10
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 10;
@@ -3591,7 +3591,7 @@ namespace dlib
     }
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3616,7 +3616,7 @@ namespace dlib
         const T9& A9,
         const T10& A10,
         const T11& A11
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 11;
@@ -3656,7 +3656,7 @@ namespace dlib
     }
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3683,7 +3683,7 @@ namespace dlib
         const T10& A10,
         const T11& A11,
         const T12& A12
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 12;
@@ -3725,7 +3725,7 @@ namespace dlib
     }
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3754,7 +3754,7 @@ namespace dlib
         const T11& A11,
         const T12& A12,
         const T13& A13
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 13;
@@ -3798,7 +3798,7 @@ namespace dlib
     }
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3829,7 +3829,7 @@ namespace dlib
         const T12& A12,
         const T13& A13,
         const T14& A14
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 14;
@@ -3875,7 +3875,7 @@ namespace dlib
     }
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3908,7 +3908,7 @@ namespace dlib
         const T13& A13,
         const T14& A14,
         const T15& A15
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 15;
@@ -3956,7 +3956,7 @@ namespace dlib
     }
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -3991,7 +3991,7 @@ namespace dlib
         const T14& A14,
         const T15& A15,
         const T16& A16
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 16;
@@ -4041,7 +4041,7 @@ namespace dlib
     }
 
     template <
-        typename T1, 
+        typename T1,
         typename T2,
         typename T3,
         typename T4,
@@ -4078,7 +4078,7 @@ namespace dlib
         const T15& A15,
         const T16& A16,
         const T17& A17
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 17;
@@ -4140,7 +4140,7 @@ namespace dlib
         const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const
         T12& A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const
         T17& A17, const T18& A18
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 18;
@@ -4205,7 +4205,7 @@ namespace dlib
         const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const
         T12& A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const
         T17& A17, const T18& A18, const T19& A19
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 19;
@@ -4272,7 +4272,7 @@ namespace dlib
         const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const
         T12& A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const
         T17& A17, const T18& A18, const T19& A19, const T20& A20
-    ) 
+    )
     {
         using namespace mex_binding;
         const int num_args = 20;
@@ -4378,7 +4378,7 @@ namespace dlib
     }
 
     matlab_struct::sub matlab_struct::
-    operator[] (const std::string& name) 
+    operator[] (const std::string& name)
     {
         if (struct_handle == 0)
         {
@@ -4426,7 +4426,7 @@ namespace dlib
     }
 
     matlab_struct::sub matlab_struct::sub::
-    operator[] (const std::string& name) 
+    operator[] (const std::string& name)
     {
         if (struct_handle == 0)
             throw dlib::error("Struct does not have a field named '" + name + "'.");
@@ -4482,7 +4482,7 @@ namespace dlib
 
     template <typename T>
     matlab_struct::sub& matlab_struct::sub::operator= (
-        const T& new_val 
+        const T& new_val
     )
     {
         // Delete anything in the field before we overwrite it
@@ -4515,7 +4515,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void call_matlab (
-        const function_handle& funct 
+        const function_handle& funct
     )
     {
         call_matlab("feval", funct);

@@ -6,7 +6,7 @@
 #include <vector>
 #include <sstream>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -152,8 +152,8 @@ namespace
 
     // Create an instance of this object.  Doing this causes this test
     // to be automatically inserted into the testing framework whenever this cpp file
-    // is linked into the project.  Note that since we are inside an unnamed-namespace 
-    // we won't get any linker errors about the symbol a being defined multiple times. 
+    // is linked into the project.  Note that since we are inside an unnamed-namespace
+    // we won't get any linker errors about the symbol a being defined multiple times.
     kernel_matrix_tester a;
 
 }

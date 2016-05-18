@@ -25,13 +25,13 @@ using namespace std;
 
 void mex_function (
     const matlab_struct& input,
-    matlab_struct& output 
-) 
+    matlab_struct& output
+)
 {
     int val = input["val"];
     string stuff = input["stuff"];
 
-    if (input.has_field("val2")) 
+    if (input.has_field("val2"))
     {
         string val2 = input["val2"];
         cout << "The optional val2 field was set to: " << val2 << endl;

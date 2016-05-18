@@ -18,21 +18,21 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object defines the interface a feature extractor must implement
                 if it is to be used with the sequence_labeler defined at the bottom
-                of this file.  
+                of this file.
                 
-                The model used by sequence_labeler objects is the following.  
+                The model used by sequence_labeler objects is the following.
                 Given an input sequence x, predict an output label sequence y
                 such that:
                     y == argmax_Y dot(w, PSI(x,Y))
                     Where w is a parameter vector.
 
-                Therefore, a feature extractor defines how the PSI(x,y) feature vector 
-                is calculated.  It also defines how many output labels there are as 
-                well as the order of the model.  
+                Therefore, a feature extractor defines how the PSI(x,y) feature vector
+                is calculated.  It also defines how many output labels there are as
+                well as the order of the model.
 
-                Finally, note that PSI(x,y) is a sum of feature vectors, each derived 
+                Finally, note that PSI(x,y) is a sum of feature vectors, each derived
                 from the entire input sequence x but only part of the label sequence y.
-                Each of these constituent feature vectors is defined by the get_features() 
+                Each of these constituent feature vectors is defined by the get_features()
                 method of this class.
 
             THREAD SAFETY
@@ -47,7 +47,7 @@ namespace dlib
         typedef the_type_used_to_represent_a_sequence sequence_type;
 
         example_feature_extractor (
-        ); 
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -57,16 +57,16 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the dimensionality of the PSI() feature vector.  
+                - returns the dimensionality of the PSI() feature vector.
         !*/
 
         unsigned long order(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - This object represents a Markov model on the output labels.
-                  This parameter defines the order of the model.  That is, this 
-                  value controls how many previous label values get to be taken 
+                  This parameter defines the order of the model.  That is, this
+                  value controls how many previous label values get to be taken
                   into consideration when performing feature extraction for a
                   particular element of the input sequence.  Note that the runtime
                   of the algorithm is exponential in the order.  So don't make order
@@ -74,7 +74,7 @@ namespace dlib
         !*/
 
         unsigned long num_labels(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of possible output labels.
@@ -93,13 +93,13 @@ namespace dlib
                 - position < x.size()
                 - y.size() == min(position, order()) + 1
                 - is_vector(y) == true
-                - max(y) < num_labels() 
+                - max(y) < num_labels()
             ensures
                 - for all valid i:
                     - interprets y(i) as the label corresponding to x[position-i]
                 - if (the labeling in y for x[position] is always the wrong labeling) then
                     - returns true
-                      (note that reject_labeling() is just an optional tool to allow you 
+                      (note that reject_labeling() is just an optional tool to allow you
                       to overrule the normal labeling algorithm.  You don't have to use
                       it.  So if you don't include a reject_labeling() method in your
                       feature extractor it is the same as including one that always
@@ -123,7 +123,7 @@ namespace dlib
                 - position < x.size()
                 - y.size() == min(position, order()) + 1
                 - is_vector(y) == true
-                - max(y) < num_labels() 
+                - max(y) < num_labels()
                 - set_feature is a function object which allows expressions of the form:
                     - set_features((unsigned long)feature_index, (double)feature_value);
                     - set_features((unsigned long)feature_index);
@@ -131,16 +131,16 @@ namespace dlib
                 - for all valid i:
                     - interprets y(i) as the label corresponding to x[position-i]
                 - This function computes the part of PSI() corresponding to the x[position]
-                  element of the input sequence.  Moreover, this part of PSI() is returned as 
-                  a sparse vector by invoking set_feature().  For example, to set the feature 
+                  element of the input sequence.  Moreover, this part of PSI() is returned as
+                  a sparse vector by invoking set_feature().  For example, to set the feature
                   with an index of 55 to the value of 1 this method would call:
                     set_feature(55);
                   Or equivalently:
                     set_feature(55,1);
-                  Therefore, the first argument to set_feature is the index of the feature 
+                  Therefore, the first argument to set_feature is the index of the feature
                   to be set while the second argument is the value the feature should take.
-                  Additionally, note that calling set_feature() multiple times with the same 
-                  feature index does NOT overwrite the old value, it adds to the previous 
+                  Additionally, note that calling set_feature() multiple times with the same
+                  feature index does NOT overwrite the old value, it adds to the previous
                   value.  For example, if you call set_feature(55) 3 times then it will
                   result in feature 55 having a value of 3.
                 - This function only calls set_feature() with feature_index values < num_features()
@@ -172,22 +172,22 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize(
-        example_feature_extractor& item, 
+        example_feature_extractor& item,
         std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename feature_extractor 
+        typename feature_extractor
         >
     bool contains_invalid_labeling (
         const feature_extractor& fe,
@@ -196,7 +196,7 @@ namespace dlib
     );
     /*!
         requires
-            - feature_extractor must be an object that implements an interface compatible 
+            - feature_extractor must be an object that implements an interface compatible
               with the example_feature_extractor discussed above.
         ensures
             - if (x.size() != y.size() ||
@@ -209,7 +209,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename feature_extractor 
+        typename feature_extractor
         >
     bool contains_invalid_labeling (
         const feature_extractor& fe,
@@ -218,7 +218,7 @@ namespace dlib
     );
     /*!
         requires
-            - feature_extractor must be an object that implements an interface compatible 
+            - feature_extractor must be an object that implements an interface compatible
               with the example_feature_extractor discussed above.
         ensures
             - if (x.size() != y.size() ||
@@ -238,7 +238,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON feature_extractor
-                It must be an object that implements an interface compatible with 
+                It must be an object that implements an interface compatible with
                 the example_feature_extractor discussed above.
 
             WHAT THIS OBJECT REPRESENTS
@@ -246,9 +246,9 @@ namespace dlib
                 capable of representing sequence labeling models such as those produced by
                 Hidden Markov SVMs or Chain Structured Conditional Random fields.  See the
                 following papers for an introduction to these techniques:
-                    - Hidden Markov Support Vector Machines by 
+                    - Hidden Markov Support Vector Machines by
                       Y. Altun, I. Tsochantaridis, T. Hofmann
-                    - Shallow Parsing with Conditional Random Fields by 
+                    - Shallow Parsing with Conditional Random Fields by
                       Fei Sha and Fernando Pereira
 
 
@@ -257,7 +257,7 @@ namespace dlib
                 such that:
                     y == argmax_Y dot(get_weights(), PSI(x,Y))
                     Where PSI() is defined by the feature_extractor template
-                    argument.  
+                    argument.
 
             THREAD SAFETY
                 It is always safe to use distinct instances of this object in different
@@ -277,7 +277,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_feature_extractor() == feature_extractor() 
+                - #get_feature_extractor() == feature_extractor()
                   (i.e. it will have its default value)
                 - #get_weights().size() == #get_feature_extractor().num_features()
                 - #get_weights() == 0
@@ -285,12 +285,12 @@ namespace dlib
 
         explicit sequence_labeler(
             const matrix<double,0,1>& weights
-        ); 
+        );
         /*!
             requires
                 - feature_extractor().num_features() == weights.size()
             ensures
-                - #get_feature_extractor() == feature_extractor() 
+                - #get_feature_extractor() == feature_extractor()
                   (i.e. it will have its default value)
                 - #get_weights() == weights
         !*/
@@ -298,7 +298,7 @@ namespace dlib
         sequence_labeler(
             const matrix<double,0,1>& weights,
             const feature_extractor& fe
-        ); 
+        );
         /*!
             requires
                 - fe.num_features() == weights.size()
@@ -308,7 +308,7 @@ namespace dlib
         !*/
 
         const feature_extractor& get_feature_extractor (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the feature extractor used by this object
@@ -318,8 +318,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the parameter vector associated with this sequence labeler. 
-                  The length of the vector is get_feature_extractor().num_features().  
+                - returns the parameter vector associated with this sequence labeler.
+                  The length of the vector is get_feature_extractor().num_features().
         !*/
 
         unsigned long num_labels (
@@ -327,7 +327,7 @@ namespace dlib
         /*!
             ensures
                 - returns get_feature_extractor().num_labels()
-                  (i.e. returns the number of possible output labels for each 
+                  (i.e. returns the number of possible output labels for each
                   element of a sequence)
         !*/
 
@@ -340,7 +340,7 @@ namespace dlib
             ensures
                 - returns a vector Y of label values such that:
                     - Y.size() == x.size()
-                    - for all valid i: 
+                    - for all valid i:
                         - Y[i] == the predicted label for x[i]
                         - 0 <= Y[i] < num_labels()
         !*/
@@ -371,7 +371,7 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -381,10 +381,10 @@ namespace dlib
         >
     void deserialize (
         sequence_labeler<feature_extractor>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

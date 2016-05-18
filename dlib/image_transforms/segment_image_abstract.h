@@ -25,9 +25,9 @@ namespace dlib
     /*!
         requires
             - in_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - out_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - in_image_type can contain any pixel type with a pixel_traits specialization
               or a dlib matrix object representing a row or column vector.
             - out_image_type must contain an unsigned integer pixel type.
@@ -40,7 +40,7 @@ namespace dlib
             - #out_img.nc() == in_img.nc()
             - for all valid r and c:
                 - #out_img[r][c] == an integer value indicating the identity of the segment
-                  containing the pixel in_img[r][c].  
+                  containing the pixel in_img[r][c].
             - The k parameter is a measure used to influence how large the segment regions
               will be.  Larger k generally results in larger segments being produced.  For
               a deeper discussion of the k parameter you should consult the above
@@ -69,7 +69,7 @@ namespace dlib
     /*!
         requires
             - in_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - is_vector(kvals) == true
             - kvals.size() > 0
         ensures
@@ -78,13 +78,13 @@ namespace dlib
               this by running a version of the segment_image() routine on the image and
               then reports rectangles containing each of the segments as well as rectangles
               containing unions of adjacent segments.  The basic idea is described in the
-              paper: 
+              paper:
                   Segmentation as Selective Search for Object Recognition by Koen E. A. van de Sande, et al.
-              Note that this function deviates from what is described in the paper slightly. 
+              Note that this function deviates from what is described in the paper slightly.
               See the code for details.
             - The basic segmentation is performed kvals.size() times, each time with the k
               parameter (see segment_image() and the Felzenszwalb paper for details on k)
-              set to a different value from kvals.   
+              set to a different value from kvals.
             - When doing the basic segmentations prior to any box merging, we discard all
               rectangles that have an area < min_size.  Therefore, all outputs and
               subsequent merged rectangles are built out of rectangles that contain at

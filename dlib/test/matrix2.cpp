@@ -16,7 +16,7 @@
 #include <dlib/memory_manager_stateless.h>
 #include <dlib/array2d.h>
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -33,7 +33,7 @@ namespace
         ensures
             - runs tests on the matrix stuff compliance with the specs
     !*/
-    {        
+    {
         typedef memory_manager_stateless<char>::kernel_2_2a MM;
         print_spinner();
 
@@ -47,27 +47,27 @@ namespace
             3, 3, 3, 3,
             3, 3, 3, 3,
             3, 3, 3, 3,
-            3, 3, 3, 3 
+            3, 3, 3, 3
         };
 
         const double uniform1[] = {
             1, 1, 1, 1,
             1, 1, 1, 1,
             1, 1, 1, 1,
-            1, 1, 1, 1 
+            1, 1, 1, 1
         };
 
         const double uniform0[] = {
             0, 0, 0, 0,
             0, 0, 0, 0,
             0, 0, 0, 0,
-            0, 0, 0, 0 
+            0, 0, 0, 0
         };
 
         const int array[] = {
             42, 58, 9, 1,
             9, 5, 8, 2,
-            98, 28, 4, 77, 
+            98, 28, 4, 77,
             9, 2, 44, 88 };
 
         const int array2[] = {
@@ -82,7 +82,7 @@ namespace
         };
 
         const double array_f[] = {
-            -0.99, 
+            -0.99,
             0.99};
 
 
@@ -294,10 +294,10 @@ namespace
         DLIB_TEST(m2 == m1);
 
         const double m1inv[] = {
-            -0.00946427624, 0.0593272941,  0.00970564379,  -0.00973323731, 
-            0.0249312057,   -0.0590122427, -0.00583102756, 0.00616002729, 
-            -0.00575431149, 0.110081189,   -0.00806792253, 0.00462297692, 
-            0.00327847478,  -0.0597669712, 0.00317386196,  0.00990759201 
+            -0.00946427624, 0.0593272941,  0.00970564379,  -0.00973323731,
+            0.0249312057,   -0.0590122427, -0.00583102756, 0.00616002729,
+            -0.00575431149, 0.110081189,   -0.00806792253, 0.00462297692,
+            0.00327847478,  -0.0597669712, 0.00317386196,  0.00990759201
         };
 
         m2 = m1inv;
@@ -308,8 +308,8 @@ namespace
                      round(m2*10000) - round(inv(m1)*10000)
                      << "\n\n" << round(m2*10000)
                      << "\n\n" << round(inv(m1)*10000)
-                     << "\n\n" << m2 
-                     << "\n\n" << inv(m1) 
+                     << "\n\n" << m2
+                     << "\n\n" << inv(m1)
                      );
         DLIB_TEST(m1 == abs(-1*m1));
         DLIB_TEST(abs(m2) == abs(-1*m2));
@@ -331,7 +331,7 @@ namespace
         set_all_elements(v,8);
         DLIB_TEST(v == v2);
         DLIB_TEST(v == tmp(v2));
-        DLIB_TEST((v == rotate<2,0>(v))); 
+        DLIB_TEST((v == rotate<2,0>(v)));
 
         m4 = array2;
         m5 = array2_r;
@@ -586,7 +586,7 @@ namespace
             const long M = 50;
             const long N = 40;
 
-            matrix<double> a(M,N);  
+            matrix<double> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -595,11 +595,11 @@ namespace
                 }
             }
 
-            matrix<double> u, u2;  
+            matrix<double> u, u2;
             matrix<double> q, q2;
             matrix<double> v, v2;
 
-            matrix<double> a2;  
+            matrix<double> a2;
             a2 = tmp(a/2);
 
 
@@ -628,7 +628,7 @@ namespace
             const long M = 3;
             const long N = 3;
 
-            matrix<double> a(M,N);  
+            matrix<double> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -637,11 +637,11 @@ namespace
                 }
             }
 
-            matrix<double,M,M> u, u2;  
+            matrix<double,M,M> u, u2;
             matrix<double> q, q2;
             matrix<double,N,N> v, v2;
 
-            matrix<double,M,N,MM> a2;  
+            matrix<double,M,N,MM> a2;
             a2 = tmp(a/2);
 
 
@@ -670,7 +670,7 @@ namespace
             const long N = 3;
 
 
-            matrix<double,0,0,default_memory_manager, column_major_layout> a(M,N);  
+            matrix<double,0,0,default_memory_manager, column_major_layout> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -679,11 +679,11 @@ namespace
                 }
             }
 
-            matrix<double,M,M,default_memory_manager, column_major_layout> u, u2;  
+            matrix<double,M,M,default_memory_manager, column_major_layout> u, u2;
             matrix<double,0,0,default_memory_manager, column_major_layout> q, q2;
             matrix<double,N,N,default_memory_manager, column_major_layout> v, v2;
 
-            matrix<double,M,N,MM, column_major_layout> a2;  
+            matrix<double,M,N,MM, column_major_layout> a2;
             a2 = tmp(a/2);
 
 
@@ -713,7 +713,7 @@ namespace
             const long M = 10;
             const long N = 7;
 
-            matrix<double> a(M,N);  
+            matrix<double> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -722,11 +722,11 @@ namespace
                 }
             }
 
-            matrix<double,M,M> u;  
+            matrix<double,M,M> u;
             matrix<double> q;
             matrix<double,N,N> v;
 
-            matrix<double,M,N,MM> a2;  
+            matrix<double,M,N,MM> a2;
             a2 = tmp(a/2);
 
 
@@ -744,7 +744,7 @@ namespace
             const long M = 10;
             const long N = 7;
 
-            matrix<double> a(M,N);  
+            matrix<double> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -753,11 +753,11 @@ namespace
                 }
             }
 
-            matrix<double,M> u(M,N);  
+            matrix<double,M> u(M,N);
             matrix<double> w;
             matrix<double,N,N> v(N,N);
 
-            matrix<double,M,N,MM> a2;  
+            matrix<double,M,N,MM> a2;
             a2 = tmp(a/2);
 
 
@@ -773,7 +773,7 @@ namespace
             const long M = 1;
             const long N = 1;
 
-            matrix<double> a(M,N);  
+            matrix<double> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -782,11 +782,11 @@ namespace
                 }
             }
 
-            matrix<double,M,N> u;  
+            matrix<double,M,N> u;
             matrix<double> w;
             matrix<double,N,N> v;
 
-            matrix<double,M,N> a2;  
+            matrix<double,M,N> a2;
             a2 = 0;
             a2 = tmp(a/2);
 
@@ -804,7 +804,7 @@ namespace
             const long M = 5;
             const long N = 5;
 
-            matrix<double> a(M,N);  
+            matrix<double> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -813,7 +813,7 @@ namespace
                 }
             }
 
-            matrix<double,0,N> u(M,N);  
+            matrix<double,0,N> u(M,N);
             matrix<double,N,N> w;
             matrix<double> v;
 
@@ -830,7 +830,7 @@ namespace
             const long M = 9;
             const long N = 4;
 
-            matrix<double,0,0,MM> a(M,N);  
+            matrix<double,0,0,MM> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -839,7 +839,7 @@ namespace
                 }
             }
 
-            matrix<double> u;  
+            matrix<double> u;
             matrix<double,0,0,MM> w;
             matrix<double> v;
 
@@ -857,7 +857,7 @@ namespace
             const long M = 2;
             const long N = 4;
 
-            matrix<double> a(M,N);  
+            matrix<double> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -866,7 +866,7 @@ namespace
                 }
             }
 
-            matrix<double> u;  
+            matrix<double> u;
             matrix<double> w;
             matrix<double> v;
 
@@ -881,7 +881,7 @@ namespace
             const long M = 9;
             const long N = 40;
 
-            matrix<double> a(M,N);  
+            matrix<double> a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -890,7 +890,7 @@ namespace
                 }
             }
 
-            matrix<double> u;  
+            matrix<double> u;
             matrix<double> w;
             matrix<double> v;
 
@@ -905,7 +905,7 @@ namespace
             const long N = 40;
 
             typedef matrix<double,0,0,default_memory_manager, column_major_layout> mat;
-            mat a(M,N);  
+            mat a(M,N);
             for (long r = 0; r < a.nr(); ++r)
             {
                 for (long c = 0; c < a.nc(); ++c)
@@ -914,7 +914,7 @@ namespace
                 }
             }
 
-            mat u;  
+            mat u;
             mat w;
             mat v;
 

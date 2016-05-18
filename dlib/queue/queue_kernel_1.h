@@ -22,7 +22,7 @@ namespace dlib
 
         /*!
             INITIAL VALUE
-                queue_size == 0   
+                queue_size == 0
                 current_element == 0
                 at_start_ == true
             
@@ -37,7 +37,7 @@ namespace dlib
                     in points to the last element to be inserted into the queue
                     out points to the next element to be dequeued
 
-                    each node points to the node inserted after it except for the most 
+                    each node points to the node inserted after it except for the most
                     recently inserted node
 
                     current_element == 0
@@ -70,7 +70,7 @@ namespace dlib
             }
 
             virtual ~queue_kernel_1 (
-            ); 
+            );
 
             inline void clear(
             );
@@ -132,11 +132,11 @@ namespace dlib
             );
             /*!
                 requires
-                    - start points to a node in a singly linked list 
-                    - start->last points to the next node in the list 
+                    - start points to a node in a singly linked list
+                    - start->last points to the next node in the list
                     - there are at least length nodes in the list begining with start
                 ensures
-                    - length nodes have been deleted starting with the node pointed 
+                    - length nodes have been deleted starting with the node pointed
                       to by start
             !*/
 
@@ -159,16 +159,16 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        queue_kernel_1<T,mem_manager>& a, 
-        queue_kernel_1<T,mem_manager>& b 
-    ) { a.swap(b); } 
+        queue_kernel_1<T,mem_manager>& a,
+        queue_kernel_1<T,mem_manager>& b
+    ) { a.swap(b); }
 
     template <
         typename T,
         typename mem_manager
         >
     void deserialize (
-        queue_kernel_1<T,mem_manager>& item,  
+        queue_kernel_1<T,mem_manager>& item,
         std::istream& in
     )
     {
@@ -185,9 +185,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type queue_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type queue_kernel_1");
         }
     }
 
@@ -498,7 +498,7 @@ namespace dlib
             {
                 current_element = current_element->last;
                 return true;
-            }           
+            }
         }
     }
 
@@ -515,7 +515,7 @@ namespace dlib
     void queue_kernel_1<T,mem_manager>::
     remove_any (
         T& item
-    ) 
+    )
     {
         dequeue(item);
     }

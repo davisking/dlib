@@ -30,7 +30,7 @@ namespace dlib
         DLIB_ASSERT( is_learning_problem(x_test,y_test) == true,
                     "\tmatrix test_regression_function()"
                     << "\n\t invalid inputs were given to this function"
-                    << "\n\t is_learning_problem(x_test,y_test): " 
+                    << "\n\t is_learning_problem(x_test,y_test): "
                     << is_learning_problem(x_test,y_test));
 
         running_stats<double> rs;
@@ -56,9 +56,9 @@ namespace dlib
     template <
         typename trainer_type,
         typename sample_type,
-        typename label_type 
+        typename label_type
         >
-    matrix<double,1,2> 
+    matrix<double,1,2>
     cross_validate_regression_trainer (
         const trainer_type& trainer,
         const std::vector<sample_type>& x,
@@ -72,8 +72,8 @@ namespace dlib
                     1 < folds && folds <= static_cast<long>(x.size()),
             "\tmatrix cross_validate_regression_trainer()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t x.size(): " << x.size() 
-            << "\n\t folds:  " << folds 
+            << "\n\t x.size(): " << x.size()
+            << "\n\t folds:  " << folds
             << "\n\t is_learning_problem(x,y): " << is_learning_problem(x,y)
             );
 

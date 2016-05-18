@@ -16,7 +16,7 @@ namespace dlib
 
 #ifdef DLIB_TEST_BLAS_BINDINGS
         extern int& counter_gemm();
-        extern int& counter_gemv(); 
+        extern int& counter_gemv();
         extern int& counter_ger();
         extern int& counter_dot();
 #endif
@@ -24,11 +24,11 @@ namespace dlib
     }
 }
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
-    // Declare the logger we will use in this test.  The name of the logger 
+    // Declare the logger we will use in this test.  The name of the logger
     // should start with "test."
     dlib::logger dlog("test.vector");
 

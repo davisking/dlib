@@ -30,8 +30,8 @@ namespace dlib
     template <
         typename T,
         typename deleter = default_deleter<T>
-        > 
-    class scoped_ptr : noncopyable 
+        >
+    class scoped_ptr : noncopyable
     {
         /*!
             REQUIREMENTS ON deleter
@@ -43,15 +43,15 @@ namespace dlib
                 defined by constructor
 
             WHAT THIS OBJECT REPRESENTS
-                This is a smart pointer class inspired by the implementation of the scoped_ptr 
-                class found in the Boost C++ library.  So this is a simple smart pointer 
-                class which guarantees that the pointer contained within it will always be 
-                deleted.   
+                This is a smart pointer class inspired by the implementation of the scoped_ptr
+                class found in the Boost C++ library.  So this is a simple smart pointer
+                class which guarantees that the pointer contained within it will always be
+                deleted.
                 
-                The class does not permit copying and so does not do any kind of 
+                The class does not permit copying and so does not do any kind of
                 reference counting.  Thus it is very simply and quite fast.
                 
-                Note that this class allows you to use pointers to arrays as well as 
+                Note that this class allows you to use pointers to arrays as well as
                 pointers to single items.  To let it know that it is supposed to point
                 to an array you have to declare it using the bracket syntax.  Consider
                 the following examples:
@@ -97,7 +97,7 @@ namespace dlib
                       (i.e. uses the deleter type to delete the pointer that is
                       contained in this scoped pointer)
                 - #get() == p
-                  (i.e. makes this object contain a pointer to p instead of whatever it 
+                  (i.e. makes this object contain a pointer to p instead of whatever it
                   used to contain)
         !*/
 
@@ -129,7 +129,7 @@ namespace dlib
                 - get() != 0
                 - T is an array type (e.g. int[])
             ensures
-                - returns get()[idx] 
+                - returns get()[idx]
         !*/
 
         T* get(
@@ -157,9 +157,9 @@ namespace dlib
 
     template <
         typename T
-        > 
+        >
     void swap(
-        scoped_ptr<T>& a, 
+        scoped_ptr<T>& a,
         scoped_ptr<T>& b
     ) { a.swap(b); }
     /*!

@@ -16,7 +16,7 @@ namespace dlib
         typename stack,
         typename tok
         >
-    class cpp_pretty_printer_kernel_2 
+    class cpp_pretty_printer_kernel_2
     {
         /*!
             REQUIREMENTS ON stack
@@ -27,14 +27,14 @@ namespace dlib
                 must be an implementation of tokenizer/tokenizer_kernel_abstract.h
 
             INFO
-                This implementation applies a black and white color scheme suitable 
-                for printing on a black and white printer.  It also places the document 
+                This implementation applies a black and white color scheme suitable
+                for printing on a black and white printer.  It also places the document
                 title prominently at the top of the pretty printed source file.
         !*/
 
     public:
 
-        cpp_pretty_printer_kernel_2 (        
+        cpp_pretty_printer_kernel_2 (
         );
 
         virtual ~cpp_pretty_printer_kernel_2 (
@@ -79,7 +79,7 @@ namespace dlib
         cpp_pretty_printer_kernel_2(const cpp_pretty_printer_kernel_2&);        // copy constructor
         cpp_pretty_printer_kernel_2& operator=(const cpp_pretty_printer_kernel_2&);    // assignment operator
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ namespace dlib
         typename tok
         >
     cpp_pretty_printer_kernel_2<stack,tok>::
-    cpp_pretty_printer_kernel_2 (        
+    cpp_pretty_printer_kernel_2 (
     )
     {
     }
@@ -130,7 +130,7 @@ namespace dlib
         t.set_stream(in);
 
         out << "<html><!-- "
-            << "Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates." 
+            << "Created using the cpp_pretty_printer from the dlib C++ library.  See http://dlib.net for updates."
             << " --><head>"
             << "<title>" << title << "</title></head><body bgcolor='white'>"
             << "<h1><center>" << title << "</center></h1><pre>\n"
@@ -138,7 +138,7 @@ namespace dlib
         if (!out)
             throw std::ios::failure("error occurred in cpp_pretty_printer_kernel_2::print");
 
-        unsigned long scope = 0; // counts the number of new scopes we have entered 
+        unsigned long scope = 0; // counts the number of new scopes we have entered
                         // since we were at a scope where functions can be declared
 
         bool recently_seen_class_keyword = false;
@@ -149,7 +149,7 @@ namespace dlib
             // true if we have seen the #include keyword and have not seen double
             // quoted text or >
 
-        bool recently_seen_new_scope = false;  
+        bool recently_seen_new_scope = false;
             // true if we have seen the keywords class, namespace, or struct and
             // we have not seen the characters {, ), or ; since then
 
@@ -158,19 +158,19 @@ namespace dlib
 
         bool in_initialization_list = false;
             // true if we have seen a ) followed by any white space or comments and then
-            // followed by a : (in scope==0 with recently_seen_preprocessor==false) and we 
+            // followed by a : (in scope==0 with recently_seen_preprocessor==false) and we
             // have not yet seen the character { or ;
 
         bool recently_seen_preprocessor = false;
-            // true if we have seen the #pragma or #if or #define or #elif keyword and 
+            // true if we have seen the #pragma or #if or #define or #elif keyword and
             // have not seen an identifier.
 
 
         bool recently_seen_extern = false;
-            // true if we have seen the extern keyword and haven't yet seen a 
+            // true if we have seen the extern keyword and haven't yet seen a
             // { or ; character.
 
-        unsigned long paren_count = 0; 
+        unsigned long paren_count = 0;
             // this is the number of ( we have seen minus the number of ) we have
             // seen.
             
@@ -186,7 +186,7 @@ namespace dlib
             case tok::IDENTIFIER: // ------------------------------------------
                 if ( recently_seen_class_keyword)
                 {
-                    // this might be a class name so check if there is a 
+                    // this might be a class name so check if there is a
                     // ; or identifier or * or &amp; coming up.
                     type = t.peek_type();
                     temp.clear();
@@ -213,7 +213,7 @@ namespace dlib
                      scope == 0 &&
                      paren_count == 0)
                 {
-                    // this might be a function name so check if there is a 
+                    // this might be a function name so check if there is a
                     // ( coming up.
                     type = t.peek_type();
                     temp.clear();
@@ -251,7 +251,7 @@ namespace dlib
                     out << "<b><i>" << token << "</i></b>";
                 }
                 // this isn't a keyword if it is something like #include <new>
-                else if (!recently_seen_include) 
+                else if (!recently_seen_include)
                 {
                     // This is a normal keyword
                     out << "<u><font face='Fixedsys'>" << token << "</font></u>";
@@ -261,7 +261,7 @@ namespace dlib
                     out << token;
                 }
 
-                if (token == "#include") 
+                if (token == "#include")
                 {
                     recently_seen_include = true;
                 }
@@ -312,7 +312,7 @@ namespace dlib
                 break;
 
             case tok::DOUBLE_QUOTED_TEXT: // ----------------------------------
-                {                    
+                {
                     out << htmlify(token);
                     recently_seen_paren = false;
                     recently_seen_include = false;
@@ -320,11 +320,11 @@ namespace dlib
                 break;
 
             case tok::NUMBER:
-            case tok::OTHER: // -----------------------------------------------               
+            case tok::OTHER: // -----------------------------------------------
                 switch (token[0])
                 {
                 case '{':
-                    out << "<b>{</b>";  
+                    out << "<b>{</b>";
                     // if we are entering a new scope
                     if (recently_seen_new_scope || recently_seen_extern)
                     {
@@ -364,7 +364,7 @@ namespace dlib
                     recently_seen_paren = false;
                     break;
 
-                case ';': 
+                case ';':
                     out << ';';
                     recently_seen_new_scope = false;
                     recently_seen_paren = false;
@@ -467,7 +467,7 @@ namespace dlib
         {
             if (ch != '\n')
             {
-                out << (char)ch;    
+                out << (char)ch;
             }
             else
             {
@@ -478,7 +478,7 @@ namespace dlib
                 if (count == 100)
                     space = "&nbsp;";
                 if (count == 1000)
-                    space = "";            
+                    space = "";
             }
         }
         if (!out)

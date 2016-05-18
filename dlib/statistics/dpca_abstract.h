@@ -33,19 +33,19 @@ namespace dlib
 
                 This algorithm is basically a straightforward generalization of the classical PCA
                 technique to handle partially labeled data.  It is useful if you want to learn a linear
-                dimensionality reduction rule using a bunch of data that is partially labeled.  
+                dimensionality reduction rule using a bunch of data that is partially labeled.
                 
-                It functions by estimating three different scatter matrices.  The first is the total scatter 
-                matrix St (i.e. the total data covariance matrix), the second is the between class scatter 
-                matrix Sb (basically a measure of the variance between data of different classes) and the 
-                third is the within class scatter matrix Sw (a measure of the variance of data within the 
-                same classes).  
+                It functions by estimating three different scatter matrices.  The first is the total scatter
+                matrix St (i.e. the total data covariance matrix), the second is the between class scatter
+                matrix Sb (basically a measure of the variance between data of different classes) and the
+                third is the within class scatter matrix Sw (a measure of the variance of data within the
+                same classes).
 
                 Once these three matrices are estimated they are combined according to the following equation:
                    S = St + a*Sb - b*Sw
-                Where a and b are user supplied weights.  Then the largest eigenvalues of the S matrix are 
-                computed and their associated eigenvectors are returned as the output of this algorithm.  
-                That is, the desired linear dimensionality reduction is given by the matrix with these 
+                Where a and b are user supplied weights.  Then the largest eigenvalues of the S matrix are
+                computed and their associated eigenvectors are returned as the output of this algorithm.
+                That is, the desired linear dimensionality reduction is given by the matrix with these
                 eigenvectors stored in its rows.
 
                 Note that if a and b are set to 0 (or no labeled data is provided) then the output transformation
@@ -105,7 +105,7 @@ namespace dlib
         /*!
             ensures
                 - returns the weight used when combining the within class scatter matrix with
-                  the other scatter matrices.  
+                  the other scatter matrices.
         !*/
 
         void set_between_class_weight (
@@ -123,7 +123,7 @@ namespace dlib
         /*!
             ensures
                 - returns the weight used when combining the between class scatter matrix with
-                  the other scatter matrices.  
+                  the other scatter matrices.
         !*/
 
         void add_to_within_class_variance(
@@ -174,7 +174,7 @@ namespace dlib
                     - x.size() == in_vector_size()
             ensures
                 - #in_vector_size() == x.size()
-                - let M denote the centroid (or mean) of all the data.  Then this function 
+                - let M denote the centroid (or mean) of all the data.  Then this function
                   Adds (x-M)*trans(x-M) to the total scatter matrix.
                   (i.e. the direction given by (x-M) is recorded as being a direction associated
                   with unlabeled variance and is therefore of default importance and will be weighted
@@ -190,14 +190,14 @@ namespace dlib
                 - in_vector_size() != 0
                   (i.e. you have to have given this object some data)
             ensures
-                - computes and returns the matrix MAT given by dpca_matrix(MAT,eigen,eps).  
+                - computes and returns the matrix MAT given by dpca_matrix(MAT,eigen,eps).
                   That is, this function returns the dpca_matrix computed by the function
-                  defined below.  
-                - Note that MAT is the desired linear transformation matrix.  That is, 
+                  defined below.
+                - Note that MAT is the desired linear transformation matrix.  That is,
                   multiplying a vector by MAT performs the desired linear dimensionality reduction.
             throws
                 - discriminant_pca_error
-                    This exception is thrown if we are unable to create the dpca_matrix for some 
+                    This exception is thrown if we are unable to create the dpca_matrix for some
                     reason.  For example, if only within class examples have been given or
                     within_class_weight() is very large then all eigenvalues will be negative and
                     that prevents this algorithm from working properly.
@@ -215,41 +215,41 @@ namespace dlib
                   (i.e. you have to have given this object some data)
             ensures
                 - is_col_vector(#eigenvalues) == true
-                - #dpca_mat.nr() == eigenvalues.size() 
+                - #dpca_mat.nr() == eigenvalues.size()
                 - #dpca_mat.nc() == in_vector_size()
                 - rowm(#dpca_mat,i) represents the ith eigenvector of the S matrix described
                   in the class description and its eigenvalue is given by eigenvalues(i).
                 - all values in #eigenvalues are > 0.  Moreover, the eigenvalues are in
                   sorted order with the largest eigenvalue stored at eigenvalues(0).
-                - (#dpca_mat)*trans(#dpca_mat) == identity_matrix.  
+                - (#dpca_mat)*trans(#dpca_mat) == identity_matrix.
                   (i.e. the rows of the dpca_matrix are all unit length vectors and are mutually
                   orthogonal)
-                - Note that #dpca_mat is the desired linear transformation matrix.  That is, 
-                  multiplying a vector by #dpca_mat performs the desired linear dimensionality 
+                - Note that #dpca_mat is the desired linear transformation matrix.  That is,
+                  multiplying a vector by #dpca_mat performs the desired linear dimensionality
                   reduction.
-                - sum(#eigenvalues) will be equal to about eps times the total sum of all 
+                - sum(#eigenvalues) will be equal to about eps times the total sum of all
                   positive eigenvalues in the S matrix described in this class's description.
                   This means that eps is a number that controls how "lossy" the dimensionality
-                  reduction will be.  Large values of eps result in more output dimensions 
-                  while smaller values result in fewer. 
+                  reduction will be.  Large values of eps result in more output dimensions
+                  while smaller values result in fewer.
             throws
                 - discriminant_pca_error
-                    This exception is thrown if we are unable to create the dpca_matrix for some 
+                    This exception is thrown if we are unable to create the dpca_matrix for some
                     reason.  For example, if only within class examples have been given or
                     within_class_weight() is very large then all eigenvalues will be negative and
                     that prevents this algorithm from working properly.
         !*/
 
         const general_matrix dpca_matrix_of_size (
-            const long num_rows 
+            const long num_rows
         );
         /*!
             requires
                 - 0 < num_rows <= in_vector_size()
             ensures
-                - computes and returns the matrix MAT given by dpca_matrix_of_size(MAT,eigen,num_rows).  
+                - computes and returns the matrix MAT given by dpca_matrix_of_size(MAT,eigen,num_rows).
                   That is, this function returns the dpca_matrix computed by the function
-                  defined below.  
+                  defined below.
                 - Note that MAT is the desired linear transformation matrix.  That is,
                   multiplying a vector by MAT performs the desired linear dimensionality
                   reduction to num_rows dimensions.
@@ -258,26 +258,26 @@ namespace dlib
         void dpca_matrix_of_size (
             general_matrix& dpca_mat,
             general_matrix& eigenvalues,
-            const long num_rows 
+            const long num_rows
         );
         /*!
             requires
                 - 0 < num_rows <= in_vector_size()
             ensures
                 - is_col_vector(#eigenvalues) == true
-                - #dpca_mat.nr() == eigenvalues.size() 
-                - #dpca_mat.nr() == num_rows 
+                - #dpca_mat.nr() == eigenvalues.size()
+                - #dpca_mat.nr() == num_rows
                 - #dpca_mat.nc() == in_vector_size()
                 - rowm(#dpca_mat,i) represents the ith eigenvector of the S matrix described
                   in the class description and its eigenvalue is given by eigenvalues(i).
                 - The values in #eigenvalues might be positive or negative.  Additionally, the
                   eigenvalues are in sorted order with the largest eigenvalue stored at
                   eigenvalues(0).
-                - (#dpca_mat)*trans(#dpca_mat) == identity_matrix.  
+                - (#dpca_mat)*trans(#dpca_mat) == identity_matrix.
                   (i.e. the rows of the dpca_matrix are all unit length vectors and are mutually
                   orthogonal)
-                - Note that #dpca_mat is the desired linear transformation matrix.  That is, 
-                  multiplying a vector by #dpca_mat performs the desired linear dimensionality 
+                - Note that #dpca_mat is the desired linear transformation matrix.  That is,
+                  multiplying a vector by #dpca_mat performs the desired linear dimensionality
                   reduction to num_rows dimensions.
         !*/
 
@@ -291,10 +291,10 @@ namespace dlib
                 - between_class_weight() == item.between_class_weight()
                 - within_class_weight() == item.within_class_weight()
             ensures
-                - returns a new discriminant_pca object that represents the combination of all 
+                - returns a new discriminant_pca object that represents the combination of all
                   the measurements given to *this and item.  That is, this function returns a
                   discriminant_pca object, R, that is equivalent to what you would obtain if all
-                  modifying calls (e.g. the add_to_*() functions) to *this and item had instead 
+                  modifying calls (e.g. the add_to_*() functions) to *this and item had instead
                   been done to R.
         !*/
 
@@ -328,9 +328,9 @@ namespace dlib
         typename matrix_type
         >
     inline void swap (
-        discriminant_pca<matrix_type>& a, 
-        discriminant_pca<matrix_type>& b 
-    ) { a.swap(b); }   
+        discriminant_pca<matrix_type>& a,
+        discriminant_pca<matrix_type>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -339,22 +339,22 @@ namespace dlib
         typename matrix_type,
         >
     void deserialize (
-        discriminant_pca<matrix_type>& item, 
+        discriminant_pca<matrix_type>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
     template <
         typename matrix_type,
         >
     void serialize (
-        const discriminant_pca<matrix_type>& item, 
-        std::ostream& out 
-    );   
+        const discriminant_pca<matrix_type>& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

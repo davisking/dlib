@@ -35,7 +35,7 @@ namespace dlib
             map_id_to_con& cons,
             const std::vector<hostinfo>& hosts,
             unsigned long node_id,
-            std::string& error_string 
+            std::string& error_string
         )
         {
             cons.clear();
@@ -73,7 +73,7 @@ namespace dlib
             }
 
             // now tell them who to connect to
-            std::vector<hostinfo> targets; 
+            std::vector<hostinfo> targets;
             for (unsigned long i = 0; i < hosts.size(); ++i)
             {
                 hostinfo info(hosts[i], i+1);
@@ -107,24 +107,24 @@ namespace dlib
         // at the same time.
 
         // denotes a normal content message.
-        const static char MESSAGE_HEADER            = 0; 
+        const static char MESSAGE_HEADER            = 0;
 
         // sent to the controller node when someone receives a message via receive_data().
-        const static char GOT_MESSAGE               = 1; 
+        const static char GOT_MESSAGE               = 1;
 
         // sent to the controller node when someone sends a message via send().
-        const static char SENT_MESSAGE              = 2; 
+        const static char SENT_MESSAGE              = 2;
 
         // sent to the controller node when someone enters a call to receive_data()
-        const static char IN_WAITING_STATE          = 3; 
+        const static char IN_WAITING_STATE          = 3;
 
-        // broadcast when a node terminates itself. 
-        const static char NODE_TERMINATE            = 5; 
+        // broadcast when a node terminates itself.
+        const static char NODE_TERMINATE            = 5;
 
         // broadcast by the controller node when it determines that all nodes are blocked
         // on calls to receive_data() and there aren't any messages in flight.  This is also
         // what makes us go to the next epoch.
-        const static char SEE_ALL_IN_WAITING_STATE  = 6; 
+        const static char SEE_ALL_IN_WAITING_STATE  = 6;
 
         // This isn't ever transmitted between nodes.  It is used internally to indicate
         // that an error occurred.
@@ -332,7 +332,7 @@ namespace dlib
     receive_data (
         shared_ptr<std::vector<char> >& item,
         unsigned long& sending_node_id
-    ) 
+    )
     {
         notify_control_node(impl2::IN_WAITING_STATE);
 
@@ -473,7 +473,7 @@ namespace dlib
     send_data(
         const std::vector<char>& item,
         unsigned long target_node_id
-    ) 
+    )
     {
         using namespace impl2;
         if (_cons[target_node_id]->terminated)

@@ -12,7 +12,7 @@
 #include "tester.h"
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -168,7 +168,7 @@ namespace
         batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
         const double scale = (src.num_samples())/(src.num_samples()-1.0);
         // Turn back into biased variance estimate because that's how batch_normalize() works, so if we want to match it this is necessary.
-        running_variances = mat(running_variances)/scale; 
+        running_variances = mat(running_variances)/scale;
         batch_normalize_inference(dest2, src, gamma, beta, running_means, running_variances);
         DLIB_TEST_MSG(max(abs(mat(dest2)-mat(dest))) < 1e-5, max(abs(mat(dest2)-mat(dest))));
         cpu::batch_normalize_inference(dest3, src, gamma, beta, running_means, running_variances);
@@ -254,7 +254,7 @@ namespace
         const double scale = (src.num_samples()*src.nr()*src.nc())/(src.num_samples()*src.nr()*src.nc()-1.0);
         // Turn back into biased variance estimate because that's how
         // batch_normalize_conv() works, so if we want to match it this is necessary.
-        running_variances = mat(running_variances)/scale; 
+        running_variances = mat(running_variances)/scale;
         batch_normalize_conv_inference(dest2, src, gamma, beta, running_means, running_variances);
         DLIB_TEST(max(abs(mat(dest2)-mat(dest))) < 1e-5);
         cpu::batch_normalize_conv_inference(dest3, src, gamma, beta, running_means, running_variances);
@@ -422,33 +422,33 @@ namespace
             dest.set_size(1,4);
 
             tt::multiply(false, dest, A, B);
-            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6);
 
             A.set_size(1,4);
             rnd.fill_uniform(A);
             matrix<float> AA = join_cols(mat(A),mat(A)); AA = join_cols(mat(A),AA);
 
             tt::multiply(false, dest, A, B);
-            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6);
 
             tt::multiply(false, dest, B, A);
-            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6);
             matrix<float> prevdest = mat(dest);
             tt::multiply(true, dest, B, A);
-            DLIB_TEST(max(abs(mat(dest)-prevdest-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-prevdest-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6);
 
             dest.set_size(3,4);
             tt::multiply(false, dest, B, A);
-            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6);
             prevdest = mat(dest);
             tt::multiply(true, dest, B, A);
-            DLIB_TEST(max(abs(mat(dest)-prevdest-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-prevdest-pointwise_multiply(AA,mat(B)))) < 1e-6);
 
             tt::multiply(false, dest, A, B);
-            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6);
             prevdest = mat(dest);
             tt::multiply(true, dest, B, A);
-            DLIB_TEST(max(abs(mat(dest)-prevdest-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-prevdest-pointwise_multiply(AA,mat(B)))) < 1e-6);
         }
 
         {
@@ -582,7 +582,7 @@ namespace
                 prnd.get_random_32bit_number()%5+1,
                 data.k(),
                 prnd.get_random_32bit_number()%6+1,
-                prnd.get_random_32bit_number()%6+1 
+                prnd.get_random_32bit_number()%6+1
             );
 
             tt::tensor_rand rnd;
@@ -605,8 +605,8 @@ namespace
             conv2(output2, data, filters, stride_y,stride_x, padding_y, padding_x);
             dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
             DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2)))
-                 <<"\n\t padding_y: "<< padding_y 
-                 <<"\n\t padding_x: "<< padding_x 
+                 <<"\n\t padding_y: "<< padding_y
+                 <<"\n\t padding_x: "<< padding_x
                  );
 
 
@@ -817,30 +817,30 @@ namespace
             dest.set_size(1,4);
 
             cuda::multiply(false, dest, A, B);
-            DLIB_TEST_MSG(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6, max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B)))))); 
+            DLIB_TEST_MSG(max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))) < 1e-6, max(abs(mat(dest)-sum_rows(pointwise_multiply(mat(A),mat(B))))));
 
             A.set_size(1,4);
             rnd.fill_uniform(A);
             matrix<float> AA = join_cols(mat(A),mat(A)); AA = join_cols(mat(A),AA);
 
             cuda::multiply(false, dest, A, B);
-            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6);
 
             cuda::multiply(false, dest, B, A);
-            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6);
             matrix<float> prevdest = mat(dest);
             cuda::multiply(true, dest, B, A);
-            DLIB_TEST(max(abs(mat(dest)-prevdest-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-prevdest-sum_rows(pointwise_multiply(AA,mat(B))))) < 1e-6);
 
             dest.set_size(3,4);
             cuda::multiply(false, dest, B, A);
-            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6);
             prevdest = mat(dest);
             cuda::multiply(true, dest, B, A);
-            DLIB_TEST(max(abs(mat(dest)-prevdest-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-prevdest-pointwise_multiply(AA,mat(B)))) < 1e-6);
 
             cuda::multiply(false, dest, A, B);
-            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+            DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6);
         }
     }
 
@@ -1107,9 +1107,9 @@ namespace
                                     centered_rect(c*stride_x+x_offset,
                                                   r*stride_y+y_offset,
                                                   window_width,
-                                                  window_height))), 
-                                                  "padding: "<< padding_x << "  " << padding_y 
-                                                  << " window size: " << window_width << " " << window_height 
+                                                  window_height))),
+                                                  "padding: "<< padding_x << "  " << padding_y
+                                                  << " window size: " << window_width << " " << window_height
                                                   << " stride: " << stride_x << " " << stride_y
                                                   );
                     }

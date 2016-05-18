@@ -14,7 +14,7 @@
 #include "tester.h"
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -41,7 +41,7 @@ namespace
             const column_vector& x,
             column_vector& d,
             general_matrix& h
-        ) const 
+        ) const
         {
             d = -matrix_cast<T>(rosen_derivative<T>(x));
             h = -matrix_cast<T>(rosen_hessian<T>(x));

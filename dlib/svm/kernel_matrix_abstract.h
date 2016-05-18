@@ -25,7 +25,7 @@ namespace dlib
         requires
             - kernel == a kernel function object as defined by the file dlib/svm/kernel_abstract.h.
               This kernel must also be capable of operating on the contents of v.
-            - V == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector, 
+            - V == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector,
               dlib::linearly_independent_subset_finder, or kernel_type::sample_type.
             - if (V is a dlib::matrix) then
                 - is_vector(v) == true
@@ -59,9 +59,9 @@ namespace dlib
         requires
             - kernel == a kernel function object as defined by the file dlib/svm/kernel_abstract.h
               This kernel must also be capable of operating on the contents of v1 and v2.
-            - V1 == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector,  
+            - V1 == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector,
               dlib::linearly_independent_subset_finder, or kernel_type::sample_type.
-            - V2 == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector, 
+            - V2 == dlib::matrix, std::vector, dlib::std_vector_c, dlib::random_subset_selector,
               dlib::linearly_independent_subset_finder, or kernel_type::sample_type.
             - if (V1 is a dlib::matrix) then
                 - is_vector(v1) == true
@@ -97,8 +97,8 @@ namespace dlib
 
 
             A note about aliasing (see the examples/matrix_expressions_ex.cpp example program
-            for a discussion of what aliasing is in the context of the dlib::matrix): 
-                kernel_matrix() expressions can detect aliasing of an argument if that 
+            for a discussion of what aliasing is in the context of the dlib::matrix):
+                kernel_matrix() expressions can detect aliasing of an argument if that
                 argument is of type kernel_type::sample_type.  However, it can't detect
                 aliasing though std::vectors or other "list of sample type" container class
                 arguments.  This means that it is safe to assign a kernel_matrix() expression

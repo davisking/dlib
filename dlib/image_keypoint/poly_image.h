@@ -39,7 +39,7 @@ namespace dlib
         }
 
         poly_image (
-        ) 
+        )
         {
             clear();
         }
@@ -80,8 +80,8 @@ namespace dlib
                         window_size_ >= 3 && (window_size_%2) == 1,
                 "\t descriptor_type poly_image::setup()"
                 << "\n\t Invalid arguments were given to this function."
-                << "\n\t order_:       " << order_ 
-                << "\n\t window_size_: " << window_size_ 
+                << "\n\t order_:       " << order_
+                << "\n\t window_size_: " << window_size_
                 << "\n\t this: " << this
                 );
 
@@ -121,7 +121,7 @@ namespace dlib
         {
             normalize = item.normalize;
             rotation_invariance = item.rotation_invariance;
-            if (order != item.order || 
+            if (order != item.order ||
                 window_size != item.window_size)
             {
                 order = item.order;
@@ -227,9 +227,9 @@ namespace dlib
                 "\t descriptor_type poly_image::operator()()"
                 << "\n\t invalid row or col argument"
                 << "\n\t row:  " << row
-                << "\n\t col:  " << col 
-                << "\n\t nr(): " << nr() 
-                << "\n\t nc(): " << nc() 
+                << "\n\t col:  " << col
+                << "\n\t nr(): " << nr()
+                << "\n\t nc(): " << nc()
                 << "\n\t this: " << this
                 );
 
@@ -248,7 +248,7 @@ namespace dlib
             long col
         ) const
         {
-            return centered_rect(Downsample*point(col+border_size, row+border_size), 
+            return centered_rect(Downsample*point(col+border_size, row+border_size),
                                  window_size, window_size);
         }
 
@@ -282,7 +282,7 @@ namespace dlib
 
 
 
-        friend void serialize (const poly_image& item, std::ostream& out) 
+        friend void serialize (const poly_image& item, std::ostream& out)
         {
             int version = 1;
             serialize(version, out);
@@ -330,7 +330,7 @@ namespace dlib
                 w2, -w1;
 
             matrix<double,2,1> x;
-            x = cos_theta, 
+            x = cos_theta,
                 sin_theta;
 
             return matrix_cast<float>(M*x);
@@ -351,7 +351,7 @@ namespace dlib
                 w3, -w2,          w1;
 
             matrix<double,3,1> x;
-            x = std::pow(cos_theta,2.0), 
+            x = std::pow(cos_theta,2.0),
                 cos_theta*sin_theta,
                 std::pow(sin_theta,2.0);
 
@@ -375,7 +375,7 @@ namespace dlib
                 w4, -w3,           w2,          -w1;
 
             matrix<double,4,1> x;
-            x = std::pow(cos_theta,3.0), 
+            x = std::pow(cos_theta,3.0),
                 std::pow(cos_theta,2.0)*sin_theta,
                 cos_theta*std::pow(sin_theta,2.0),
                 std::pow(sin_theta,3.0);
@@ -402,7 +402,7 @@ namespace dlib
                 w5, -w4,            w3,            -w2,          w1;
 
             matrix<double,5,1> x;
-            x = std::pow(cos_theta,4.0), 
+            x = std::pow(cos_theta,4.0),
                 std::pow(cos_theta,3.0)*sin_theta,
                 std::pow(cos_theta,2.0)*std::pow(sin_theta,2.0),
                 cos_theta*std::pow(sin_theta,3.0),
@@ -432,7 +432,7 @@ namespace dlib
                 w6,    -w5,          w4,            -w3,                 w2,         -w1;
 
             matrix<double,6,1> x;
-            x = std::pow(cos_theta,5.0), 
+            x = std::pow(cos_theta,5.0),
                 std::pow(cos_theta,4.0)*sin_theta,
                 std::pow(cos_theta,3.0)*std::pow(sin_theta,2.0),
                 std::pow(cos_theta,2.0)*std::pow(sin_theta,3.0),
@@ -465,7 +465,7 @@ namespace dlib
                 w7,     -w6,          w5,            -w4,                          w3,                 -w2,         w1;
 
             matrix<double,7,1> x;
-            x = std::pow(cos_theta,6.0), 
+            x = std::pow(cos_theta,6.0),
                 std::pow(cos_theta,5.0)*sin_theta,
                 std::pow(cos_theta,4.0)*std::pow(sin_theta,2.0),
                 std::pow(cos_theta,3.0)*std::pow(sin_theta,3.0),
@@ -485,10 +485,10 @@ namespace dlib
                   rotationally invariant
         !*/
         {
-            // The idea here is to use a rotation matrix to rotate the 
+            // The idea here is to use a rotation matrix to rotate the
             // coordinate system for the polynomial so that the x axis
             // always lines up with the gradient vector (or direction of
-            // max curvature).  This way we can make the representation 
+            // max curvature).  This way we can make the representation
             // rotation invariant.
 
             // Note that the rotation matrix is given by:
@@ -515,7 +515,7 @@ namespace dlib
                         g.x() = 1;
                         g.y() = 0;
                     }
-                    // since we normalized g we can find the sin/cos of its angle easily. 
+                    // since we normalized g we can find the sin/cos of its angle easily.
                     const double cos_theta = g.x();
                     const double sin_theta = g.y();
 

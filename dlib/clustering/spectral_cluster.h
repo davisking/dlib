@@ -20,7 +20,7 @@ namespace dlib
         const unsigned long num_clusters
     )
     {
-        DLIB_CASSERT(num_clusters > 0, 
+        DLIB_CASSERT(num_clusters > 0,
             "\t std::vector<unsigned long> spectral_cluster(k,samples,num_clusters)"
             << "\n\t num_clusters can't be 0."
             );
@@ -43,7 +43,7 @@ namespace dlib
         for (long r = 0; r < K.nr(); ++r)
             D(r) = sum(rowm(K,r));
         D = sqrt(reciprocal(D));
-        K = diagm(D)*K*diagm(D); 
+        K = diagm(D)*K*diagm(D);
         matrix<double> u,w,v;
         // Use the normal SVD routine unless the matrix is really big, then use the fast
         // approximate version.

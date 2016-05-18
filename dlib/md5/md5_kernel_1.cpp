@@ -19,8 +19,8 @@ namespace dlib
     {
         
         inline uint32 F (
-            uint32 x, 
-            uint32 y, 
+            uint32 x,
+            uint32 y,
             uint32 z
         )
         {
@@ -30,8 +30,8 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         inline uint32 G (
-            uint32 x, 
-            uint32 y, 
+            uint32 x,
+            uint32 y,
             uint32 z
         )
         {
@@ -41,10 +41,10 @@ namespace dlib
     // ------------------------------------------------------------------------------------
         
         inline uint32 H (
-            uint32 x, 
-            uint32 y, 
+            uint32 x,
+            uint32 y,
             uint32 z
-        ) 
+        )
         {
             return ( x^y^z );
         }
@@ -52,8 +52,8 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         inline uint32 I (
-            uint32 x, 
-            uint32 y, 
+            uint32 x,
+            uint32 y,
             uint32 z
         )
         {
@@ -63,7 +63,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         inline uint32 rotate_left (
-            uint32 x, 
+            uint32 x,
             uint32 n
         )
         {
@@ -73,69 +73,69 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         inline void FF (
-            uint32& a, 
-            uint32 b, 
-            uint32 c, 
-            uint32 d, 
-            uint32 x, 
-            uint32 s, 
+            uint32& a,
+            uint32 b,
+            uint32 c,
+            uint32 d,
+            uint32 x,
+            uint32 s,
             uint32 ac
-        ) 
-        { 
-            a += F(b, c, d) + x + ac; 
-            a = rotate_left(a, s); 
-            a += b; 
+        )
+        {
+            a += F(b, c, d) + x + ac;
+            a = rotate_left(a, s);
+            a += b;
         }
 
     // ------------------------------------------------------------------------------------
 
         inline void GG (
-            uint32& a, 
-            uint32 b, 
-            uint32 c, 
-            uint32 d, 
-            uint32 x, 
-            uint32 s, 
+            uint32& a,
+            uint32 b,
+            uint32 c,
+            uint32 d,
+            uint32 x,
+            uint32 s,
             uint32 ac
-        ) 
-        { 
-            a += G(b, c, d) + x + ac; 
-            a = rotate_left(a, s); 
-            a += b; 
+        )
+        {
+            a += G(b, c, d) + x + ac;
+            a = rotate_left(a, s);
+            a += b;
         }
 
     // ------------------------------------------------------------------------------------
 
         inline void HH (
-            uint32& a, 
-            uint32 b, 
-            uint32 c, 
-            uint32 d, 
-            uint32 x, 
-            uint32 s, 
+            uint32& a,
+            uint32 b,
+            uint32 c,
+            uint32 d,
+            uint32 x,
+            uint32 s,
             uint32 ac
-        ) 
-        { 
-            a += H(b, c, d) + x + ac; 
-            a = rotate_left(a, s); 
-            a += b; 
+        )
+        {
+            a += H(b, c, d) + x + ac;
+            a = rotate_left(a, s);
+            a += b;
         }
 
     // ------------------------------------------------------------------------------------
 
         inline void II (
-            uint32& a, 
-            uint32 b, 
-            uint32 c, 
-            uint32 d, 
-            uint32 x, 
-            uint32 s, 
+            uint32& a,
+            uint32 b,
+            uint32 c,
+            uint32 d,
+            uint32 x,
+            uint32 s,
             uint32 ac
-        ) 
-        { 
-            a += I(b, c, d) + x + ac; 
-            a = rotate_left(a, s); 
-            a += b; 
+        )
+        {
+            a += I(b, c, d) + x + ac;
+            a = rotate_left(a, s);
+            a += b;
         }
 
     // ------------------------------------------------------------------------------------
@@ -184,7 +184,7 @@ namespace dlib
             FF (c, d, a, b, x[14], S13, 0xa679438e); // 15
             FF (b, c, d, a, x[15], S14, 0x49b40821); // 16
 
-            // Round 2 
+            // Round 2
             GG (a, b, c, d, x[ 1], S21, 0xf61e2562); // 17
             GG (d, a, b, c, x[ 6], S22, 0xc040b340); // 18
             GG (c, d, a, b, x[11], S23, 0x265e5a51); // 19
@@ -202,7 +202,7 @@ namespace dlib
             GG (c, d, a, b, x[ 7], S23, 0x676f02d9); // 31
             GG (b, c, d, a, x[12], S24, 0x8d2a4c8a); // 32
 
-            // Round 3 
+            // Round 3
             HH (a, b, c, d, x[ 5], S31, 0xfffa3942); // 33
             HH (d, a, b, c, x[ 8], S32, 0x8771f681); // 34
             HH (c, d, a, b, x[11], S33, 0x6d9d6122); // 35
@@ -220,7 +220,7 @@ namespace dlib
             HH (c, d, a, b, x[15], S33, 0x1fa27cf8); // 47
             HH (b, c, d, a, x[ 2], S34, 0xc4ac5665); // 48
 
-            // Round 4 
+            // Round 4
             II (a, b, c, d, x[ 0], S41, 0xf4292244); // 49
             II (d, a, b, c, x[ 7], S42, 0x432aff97); // 50
             II (c, d, a, b, x[14], S43, 0xab9423a7); // 51
@@ -239,7 +239,7 @@ namespace dlib
             II (b, c, d, a, x[ 9], S44, 0xeb86d391); // 64
         }
 
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -251,7 +251,7 @@ namespace dlib
     )
     {
         unsigned char output[16];
-        md5 ( 
+        md5 (
             reinterpret_cast<const unsigned char*>(input.data()),
             static_cast<unsigned long>(input.size()),
             output
@@ -367,7 +367,7 @@ namespace dlib
                     (static_cast<uint32>(temp[4*(j + 16*i) + 2]) << 16) |
                     (static_cast<uint32>(temp[4*(j + 16*i) + 1]) << 8 ) |
                     (static_cast<uint32>(temp[4*(j + 16*i)    ])      )
-                    );               
+                    );
             }
 
             uint32 aa = a;
@@ -418,7 +418,7 @@ namespace dlib
     )
     {
         unsigned char output[16];
-        md5 ( 
+        md5 (
             input,
             output
             );
@@ -542,7 +542,7 @@ namespace dlib
                     (static_cast<uint32>(temp[4*i + 2]) << 16) |
                     (static_cast<uint32>(temp[4*i + 1]) << 8 ) |
                     (static_cast<uint32>(temp[4*i    ])      )
-                    );               
+                    );
             }
             
 

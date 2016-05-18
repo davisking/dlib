@@ -28,8 +28,8 @@ namespace dlib
                         0 < C_,
                 "\t rls::rls()"
                 << "\n\t invalid arguments were given to this function"
-                << "\n\t forget_factor_: " << forget_factor_ 
-                << "\n\t C_:   " << C_ 
+                << "\n\t forget_factor_: " << forget_factor_
+                << "\n\t C_:   " << C_
                 << "\n\t this: " << this
                 );
 
@@ -68,9 +68,9 @@ namespace dlib
                         (get_w().size() == 0 || get_w().size() == x.size()),
                 "\t void rls::train()"
                 << "\n\t invalid arguments were given to this function"
-                << "\n\t is_col_vector(x): " << is_col_vector(x) 
-                << "\n\t x.size():         " << x.size() 
-                << "\n\t get_w().size():   " << get_w().size() 
+                << "\n\t is_col_vector(x): " << is_col_vector(x)
+                << "\n\t x.size():         " << x.size()
+                << "\n\t get_w().size():   " << get_w().size()
                 << "\n\t this: " << this
                 );
 
@@ -88,7 +88,7 @@ namespace dlib
             R = l*R - l*l*(tmp*trans(tmp))/temp;
 
             // Since we multiplied by the forget factor, we need to add (1-forget_factor) of the
-            // identity matrix back in to keep the regularization alive.  
+            // identity matrix back in to keep the regularization alive.
             add_eye_to_inv(R, (1-forget_factor)/C);
 
             // R should always be symmetric.  This line improves numeric stability of this algorithm.
@@ -113,9 +113,9 @@ namespace dlib
             DLIB_ASSERT(is_col_vector(x) && get_w().size() == x.size(),
                 "\t double rls::operator()()"
                 << "\n\t invalid arguments were given to this function"
-                << "\n\t is_col_vector(x): " << is_col_vector(x) 
-                << "\n\t x.size():         " << x.size() 
-                << "\n\t get_w().size():   " << get_w().size() 
+                << "\n\t is_col_vector(x): " << is_col_vector(x)
+                << "\n\t x.size():         " << x.size()
+                << "\n\t get_w().size():   " << get_w().size()
                 << "\n\t this: " << this
                 );
 
@@ -129,7 +129,7 @@ namespace dlib
             DLIB_ASSERT(get_w().size() != 0,
                 "\t decision_function rls::get_decision_function()"
                 << "\n\t invalid arguments were given to this function"
-                << "\n\t get_w().size():   " << get_w().size() 
+                << "\n\t get_w().size():   " << get_w().size()
                 << "\n\t this: " << this
                 );
 

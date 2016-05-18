@@ -13,7 +13,7 @@
 #include "../serialize.h"
 #include <functional>
 
-namespace dlib 
+namespace dlib
 {
 
     template <
@@ -139,8 +139,8 @@ namespace dlib
 
         private:
 
-            // data members   
-            typename mem_manager::template rebind<bst_base>::other pool;         
+            // data members
+            typename mem_manager::template rebind<bst_base>::other pool;
             unsigned long mask;
             unsigned long hash_size;
             unsigned long num_of_buckets;
@@ -151,7 +151,7 @@ namespace dlib
             compare comp;
 
             // restricted functions
-            hash_table_kernel_2(hash_table_kernel_2&);      
+            hash_table_kernel_2(hash_table_kernel_2&);
             hash_table_kernel_2& operator=(hash_table_kernel_2&);
 
     };
@@ -164,8 +164,8 @@ namespace dlib
         typename compare
         >
     inline void swap (
-        hash_table_kernel_2<domain,range,bst_base,mem_manager,compare>& a, 
-        hash_table_kernel_2<domain,range,bst_base,mem_manager,compare>& b 
+        hash_table_kernel_2<domain,range,bst_base,mem_manager,compare>& a,
+        hash_table_kernel_2<domain,range,bst_base,mem_manager,compare>& b
     ) { a.swap(b); }
 
     template <
@@ -176,7 +176,7 @@ namespace dlib
         typename compare
         >
     void deserialize (
-        hash_table_kernel_2<domain,range,bst_base,mem_manager,compare>& item, 
+        hash_table_kernel_2<domain,range,bst_base,mem_manager,compare>& item,
         std::istream& in
     )
     {
@@ -195,9 +195,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type hash_table_kernel_2"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type hash_table_kernel_2");
         }
     }
 
@@ -227,7 +227,7 @@ namespace dlib
         while (expnum != 0)
         {
             --expnum;
-            num_of_buckets <<= 1;            
+            num_of_buckets <<= 1;
         }
         mask = num_of_buckets-1;
 
@@ -301,7 +301,7 @@ namespace dlib
     void hash_table_kernel_2<domain,range,bst_base,mem_manager,compare>::
     destroy(
         const domain& item
-    ) 
+    )
     {
         table[hash(item)&mask].destroy(item);
         --hash_size;
@@ -436,7 +436,7 @@ namespace dlib
         exchange(num_of_buckets,item.num_of_buckets);
         exchange(table,item.table);
         exchange(current_bucket,item.current_bucket);
-        exchange(at_start_,item.at_start_);        
+        exchange(at_start_,item.at_start_);
         exchange(comp,item.comp);
     }
 
@@ -585,7 +585,7 @@ namespace dlib
                     current_bucket->reset();
                     
                     while (true)
-                    {   
+                    {
                         ++current_bucket;
                         // if we ran out of buckets and didn't find anything
                         if (current_bucket == end)

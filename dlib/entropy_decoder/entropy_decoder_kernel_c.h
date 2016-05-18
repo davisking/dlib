@@ -71,12 +71,12 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( (low_count <= _get_target) && (_get_target < high_count) && 
+        DLIB_CASSERT( (low_count <= _get_target) && (_get_target < high_count) &&
                 (high_count <= TOTAL) &&
                 (this->stream_is_set() == true) && (this->get_target_called() == true),
             "\tvoid entropy_decoder::decode()"
             << "\n\tRefer to the ensures clause for this function for further information."
-            << "\n\tNote that _get_target refers to get_target(TOTAL)" 
+            << "\n\tNote that _get_target refers to get_target(TOTAL)"
             << "\n\tthis:                " << this
             << "\n\tlow_count:           " << low_count
             << "\n\thigh_count:          " << high_count

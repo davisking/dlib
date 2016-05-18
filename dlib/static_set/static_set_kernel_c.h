@@ -31,9 +31,9 @@ namespace dlib
         typename set_base
         >
     inline void swap (
-        static_set_kernel_c<set_base>& a, 
-        static_set_kernel_c<set_base>& b 
-    ) { a.swap(b); } 
+        static_set_kernel_c<set_base>& a,
+        static_set_kernel_c<set_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ namespace dlib
         >
     const typename set_base::type& static_set_kernel_c<set_base>::
     element (
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT(this->current_element_valid() == true,

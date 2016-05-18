@@ -62,7 +62,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void structural_sequence_segmentation_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -77,7 +77,7 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             trainer.set_max_iterations(max_iter);
         }
@@ -121,14 +121,14 @@ namespace dlib
         }
 
         void set_c (
-            double C_ 
+            double C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void structural_sequence_segmentation_trainer::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -208,7 +208,7 @@ namespace dlib
             DLIB_ASSERT(is_sequence_segmentation_problem(x,y) == true,
                         "\t sequence_segmenter structural_sequence_segmentation_trainer::train(x,y)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t x.size(): " << x.size() 
+                        << "\n\t x.size(): " << x.size()
                         << "\n\t is_sequence_segmentation_problem(x,y): " << is_sequence_segmentation_problem(x,y)
                         << "\n\t this: " << this
             );

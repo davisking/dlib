@@ -19,7 +19,7 @@
 #include <dlib/svm_threaded.h>
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -41,12 +41,12 @@ namespace
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return dot(a,b);
         }
 
         bool operator== (
-            const unopt_sparse_linear_kernel& 
+            const unopt_sparse_linear_kernel&
         ) const
         {
             return true;
@@ -64,12 +64,12 @@ namespace
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return trans(a)*b;
         }
 
         bool operator== (
-            const unopt_linear_kernel& 
+            const unopt_linear_kernel&
         ) const
         {
             return true;
@@ -141,7 +141,7 @@ namespace
             - tests the kcentroid object with the given kernel
     !*/
     {
-        // Here we declare that our samples will be 2 dimensional column vectors.  
+        // Here we declare that our samples will be 2 dimensional column vectors.
         typedef typename kernel_type::sample_type sample_type;
 
         kernel_type default_kernel;
@@ -268,7 +268,7 @@ namespace
             - tests the kcentroid object with the given kernel
     !*/
     {
-        // Here we declare that our samples will be 2 dimensional column vectors.  
+        // Here we declare that our samples will be 2 dimensional column vectors.
         typedef typename kernel_type::sample_type sample_type;
 
         kernel_type k;
@@ -300,7 +300,7 @@ namespace
 
         DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
         DLIB_TEST(approx_equal(test(temp2), dist(k,temp2,val)));
-        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val), 1e-6), 
+        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val), 1e-6),
                      test.get_distance_function()(temp2) - dist(k,temp2,val) << "  compare to: " <<
                      test(temp2) - dist(k,temp2,val)
         );
@@ -312,7 +312,7 @@ namespace
         test.train(temp2, 1,-1);
         DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
         DLIB_TEST(approx_equal(test(temp2), dist(k,temp2,val)));
-        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val)), 
+        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val)),
                      test.get_distance_function()(temp2) - dist(k,temp2,val) << "  compare to: " <<
                      test(temp2) - dist(k,temp2,val)
         );
@@ -328,7 +328,7 @@ namespace
 
         temp = 1,0,3,0;
         DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
-        DLIB_TEST_MSG(approx_equal(test(temp2), dist(k,temp2,val), 1e-7), 
+        DLIB_TEST_MSG(approx_equal(test(temp2), dist(k,temp2,val), 1e-7),
                      test(temp2) - dist(k,temp2,val));
         DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
         DLIB_TEST_MSG(approx_equal(test(test), 0, 1e-7), test(test));
@@ -346,7 +346,7 @@ namespace
         DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
         DLIB_TEST(approx_equal(test.inner_product(test), length_squared(val)));
         DLIB_TEST(approx_equal(test(test), 0));
-        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(test.get_distance_function()), 0, 1e-6), 
+        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(test.get_distance_function()), 0, 1e-6),
                      test.get_distance_function()(test.get_distance_function()));
     }
 
@@ -357,14 +357,14 @@ namespace
     )
     /*!
         requires
-            - kernel_type::sample_type == a std::map<unsigned long,double> 
+            - kernel_type::sample_type == a std::map<unsigned long,double>
             - kernel_type == a kernel that just computes a dot product
               between its inputs.  I.e. a linear kernel
         ensures
             - tests the kcentroid object with the given kernel
     !*/
     {
-        // Here we declare that our samples will be 2 dimensional column vectors.  
+        // Here we declare that our samples will be 2 dimensional column vectors.
         typedef typename kernel_type::sample_type sample_type;
 
         kernel_type default_kernel;
@@ -420,7 +420,7 @@ namespace
         dlog << LDEBUG << "AAAA 3.1" ;
         // make test store the point(1,1,0,3,0)
         temp.clear(); temp[3] = 3;
-        temp2.clear(); 
+        temp2.clear();
         temp2[0] = 1;
         temp2[1] = 1;
         temp2[3] = 3;
@@ -535,7 +535,7 @@ namespace
     )
     /*!
         requires
-            - kernel_type::sample_type == a std::map<unsigned long,double> 
+            - kernel_type::sample_type == a std::map<unsigned long,double>
             - kernel_type == a kernel that just computes a dot product
               between its inputs + some constant.  I.e. a linear kernel
               wrapped by offset_kernel
@@ -543,7 +543,7 @@ namespace
             - tests the kcentroid object with the given kernel
     !*/
     {
-        // Here we declare that our samples will be 2 dimensional column vectors.  
+        // Here we declare that our samples will be 2 dimensional column vectors.
         typedef typename kernel_type::sample_type sample_type;
 
         kernel_type k;
@@ -578,7 +578,7 @@ namespace
 
         DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
         DLIB_TEST(approx_equal(test(temp2), dist(k,temp2,val)));
-        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val), 1e-7), 
+        DLIB_TEST_MSG(approx_equal(test.get_distance_function()(temp2), dist(k,temp2,val), 1e-7),
                      test.get_distance_function()(temp2) - dist(k,temp2,val)
         );
         DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
@@ -617,7 +617,7 @@ namespace
         temp[0] = 1;
         temp[2] = 3;
         DLIB_TEST(approx_equal(test(temp), dist(k,temp,val)));
-        DLIB_TEST_MSG(approx_equal(test(temp2), dist(k,temp2,val), 1e-7), 
+        DLIB_TEST_MSG(approx_equal(test(temp2), dist(k,temp2,val), 1e-7),
                      test(temp2) - dist(k,temp2,val));
         DLIB_TEST(approx_equal(test.squared_norm(), length_squared(val)));
 

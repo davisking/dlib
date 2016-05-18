@@ -24,8 +24,8 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     sliding_buffer_kernel_1<T>    
+        // kernel_1a
+        typedef     sliding_buffer_kernel_1<T>
                     kernel_1a;
         typedef     sliding_buffer_kernel_c<kernel_1a>
                     kernel_1a_c;

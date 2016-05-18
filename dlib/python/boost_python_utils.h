@@ -9,9 +9,9 @@
 #include <dlib/serialize.h>
 
 inline bool hasattr(
-    boost::python::object obj, 
+    boost::python::object obj,
     const std::string& attr_name
-) 
+)
 /*!
     ensures
         - if (obj has an attribute named attr_name) then

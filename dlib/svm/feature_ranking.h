@@ -46,7 +46,7 @@ namespace dlib
         matrix<scalar_type,sample_matrix_type::type::NR,1,mm> mask(samples(0).nr());
         set_all_elements(mask,1);
 
-        // figure out what the separation is between the two centroids when all the features are 
+        // figure out what the separation is between the two centroids when all the features are
         // present.
         scalar_type first_separation;
         {
@@ -118,13 +118,13 @@ namespace dlib
 
             }
 
-            // now that we know what the next worst feature is record it 
+            // now that we know what the next worst feature is record it
             mask(worst_feature_idx) = 0;
             results(i,0) = worst_feature_idx;
-            results(i,1) = worst_feature_score; 
+            results(i,1) = worst_feature_score;
         }
 
-        // now normalize the results 
+        // now normalize the results
         const scalar_type max_separation = std::max(max(colm(results,1)), first_separation);
         set_colm(results,1) = colm(results,1)/max_separation;
         for (long r = 0; r < results.nr()-1; ++r)
@@ -167,7 +167,7 @@ namespace dlib
     )
     {
         /*
-            This function ranks features by doing recursive feature addition 
+            This function ranks features by doing recursive feature addition
 
         */
         typedef typename kernel_type::scalar_type scalar_type;
@@ -182,7 +182,7 @@ namespace dlib
             "\tmatrix rank_features()"
             << "\n\t you have given invalid arguments to this function"
             << "\n\t num_features:    " << num_features
-            << "\n\t samples(0).nr(): " << samples(0).nr() 
+            << "\n\t samples(0).nr(): " << samples(0).nr()
             );
 
         matrix<scalar_type,0,2,mm> results(num_features, 2);
@@ -199,7 +199,7 @@ namespace dlib
             // figure out which feature to add next
             for (long j = 0; j < mask.size(); ++j)
             {
-                // skip features we have already added 
+                // skip features we have already added
                 if (mask(j) == 1)
                     continue;
 
@@ -238,13 +238,13 @@ namespace dlib
 
             }
 
-            // now that we know what the next best feature is record it 
+            // now that we know what the next best feature is record it
             mask(best_feature_idx) = 1;
             results(i,0) = best_feature_idx;
-            results(i,1) = best_feature_score; 
+            results(i,1) = best_feature_score;
         }
 
-        // now normalize the results 
+        // now normalize the results
         set_colm(results,1) = colm(results,1)/max(colm(results,1));
 
         return results;
@@ -347,7 +347,7 @@ namespace dlib
 
                 if (verbose)
                 {
-                    cout << "\rChecking goodness of gamma = " << gamma << ".  Goodness = " 
+                    cout << "\rChecking goodness of gamma = " << gamma << ".  Goodness = "
                          << temp << "                    " << flush;
                 }
                 return temp;
@@ -385,7 +385,7 @@ namespace dlib
             
             if (verbose)
             {
-                cout << "\rBest gamma = " << std::exp(best_gamma) << ".  Goodness = " 
+                cout << "\rBest gamma = " << std::exp(best_gamma) << ".  Goodness = "
                     << goodness << "                    " << endl;
             }
 
@@ -409,11 +409,11 @@ namespace dlib
         DLIB_ASSERT(initial_gamma > 0 && num_sv > 0 && is_binary_classification_problem(samples, labels),
             "\t double find_gamma_with_big_centroid_gap()"
             << "\n\t initial_gamma: " << initial_gamma
-            << "\n\t num_sv:        " << num_sv 
-            << "\n\t is_binary_classification_problem(): " << is_binary_classification_problem(samples, labels) 
+            << "\n\t num_sv:        " << num_sv
+            << "\n\t is_binary_classification_problem(): " << is_binary_classification_problem(samples, labels)
             );
 
-        return rank_features_helpers::find_gamma_with_big_centroid_gap_impl(mat(samples), 
+        return rank_features_helpers::find_gamma_with_big_centroid_gap_impl(mat(samples),
                                                              mat(labels),
                                                              initial_gamma,
                                                              num_sv,
@@ -436,11 +436,11 @@ namespace dlib
         DLIB_ASSERT(initial_gamma > 0 && num_sv > 0 && is_binary_classification_problem(samples, labels),
             "\t double verbose_find_gamma_with_big_centroid_gap()"
             << "\n\t initial_gamma: " << initial_gamma
-            << "\n\t num_sv:        " << num_sv 
-            << "\n\t is_binary_classification_problem(): " << is_binary_classification_problem(samples, labels) 
+            << "\n\t num_sv:        " << num_sv
+            << "\n\t is_binary_classification_problem(): " << is_binary_classification_problem(samples, labels)
             );
 
-        return rank_features_helpers::find_gamma_with_big_centroid_gap_impl(mat(samples), 
+        return rank_features_helpers::find_gamma_with_big_centroid_gap_impl(mat(samples),
                                                              mat(labels),
                                                              initial_gamma,
                                                              num_sv,

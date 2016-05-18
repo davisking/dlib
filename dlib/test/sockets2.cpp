@@ -7,21 +7,21 @@
 #include <dlib/array.h>
 #include <algorithm>
 
-// This is called an unnamed-namespace and it has the effect of making everything 
-// inside this file "private" so that everything you declare will have static linkage.  
-// Thus we won't have any multiply defined symbol errors coming out of the linker when 
+// This is called an unnamed-namespace and it has the effect of making everything
+// inside this file "private" so that everything you declare will have static linkage.
+// Thus we won't have any multiply defined symbol errors coming out of the linker when
 // we try to compile the test suite.
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
     using namespace std;
-    // Declare the logger we will use in this test.  The name of the logger 
+    // Declare the logger we will use in this test.  The name of the logger
     // should start with "test."
     dlib::logger dlog("test.sockets2");
 
 
-    class sockets2_tester : public tester, private multithreaded_object 
+    class sockets2_tester : public tester, private multithreaded_object
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -193,8 +193,8 @@ namespace
 
     // Create an instance of this object.  Doing this causes this test
     // to be automatically inserted into the testing framework whenever this cpp file
-    // is linked into the project.  Note that since we are inside an unnamed-namespace 
-    // we won't get any linker errors about the symbol a being defined multiple times. 
+    // is linked into the project.  Note that since we are inside an unnamed-namespace
+    // we won't get any linker errors about the symbol a being defined multiple times.
     sockets2_tester a;
 
 }

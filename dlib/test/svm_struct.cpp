@@ -9,7 +9,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -24,7 +24,7 @@ namespace
         typename label_type
         >
     class test_multiclass_svm_problem : public structural_svm_problem_threaded<matrix_type,
-                                                                 std::vector<std::pair<unsigned long,typename matrix_type::type> > > 
+                                                                 std::vector<std::pair<unsigned long,typename matrix_type::type> > >
     {
 
     public:
@@ -54,7 +54,7 @@ namespace
         }
 
         virtual long get_num_samples (
-        ) const 
+        ) const
         {
             return static_cast<long>(samples.size());
         }
@@ -62,7 +62,7 @@ namespace
         virtual void get_truth_joint_feature_vector (
             long idx,
             feature_vector_type& psi
-        ) const 
+        ) const
         {
             assign(psi, samples[idx]);
             // Add a constant -1 to account for the bias term.
@@ -79,7 +79,7 @@ namespace
             const matrix_type& current_solution,
             scalar_type& loss,
             feature_vector_type& psi
-        ) const 
+        ) const
         {
             scalar_type best_val = -std::numeric_limits<scalar_type>::infinity();
             unsigned long best_idx = 0;
@@ -143,7 +143,7 @@ namespace
 
     template <
         typename K,
-        typename label_type_ = typename K::scalar_type 
+        typename label_type_ = typename K::scalar_type
         >
     class test_svm_multiclass_linear_trainer2
     {
@@ -184,8 +184,8 @@ namespace
             DLIB_ASSERT(is_learning_problem(all_samples,all_labels),
                 "\t trained_function_type test_svm_multiclass_linear_trainer2::train(all_samples,all_labels)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t all_samples.size():     " << all_samples.size() 
-                << "\n\t all_labels.size():      " << all_labels.size() 
+                << "\n\t all_samples.size():     " << all_samples.size()
+                << "\n\t all_labels.size():      " << all_labels.size()
                 );
 
             typedef matrix<scalar_type,0,1> w_type;
@@ -237,7 +237,7 @@ namespace
 
     template <
         typename K,
-        typename label_type_ = typename K::scalar_type 
+        typename label_type_ = typename K::scalar_type
         >
     class test_svm_multiclass_linear_trainer3
     {
@@ -278,8 +278,8 @@ namespace
             DLIB_ASSERT(is_learning_problem(all_samples,all_labels),
                 "\t trained_function_type test_svm_multiclass_linear_trainer3::train(all_samples,all_labels)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t all_samples.size():     " << all_samples.size() 
-                << "\n\t all_labels.size():      " << all_labels.size() 
+                << "\n\t all_samples.size():     " << all_samples.size()
+                << "\n\t all_labels.size():      " << all_labels.size()
                 );
 
             typedef matrix<scalar_type,0,1> w_type;
@@ -318,7 +318,7 @@ namespace
 
     template <
         typename K,
-        typename label_type_ = typename K::scalar_type 
+        typename label_type_ = typename K::scalar_type
         >
     class test_svm_multiclass_linear_trainer4
     {
@@ -359,8 +359,8 @@ namespace
             DLIB_ASSERT(is_learning_problem(all_samples,all_labels),
                 "\t trained_function_type test_svm_multiclass_linear_trainer4::train(all_samples,all_labels)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t all_samples.size():     " << all_samples.size() 
-                << "\n\t all_labels.size():      " << all_labels.size() 
+                << "\n\t all_samples.size():     " << all_samples.size()
+                << "\n\t all_labels.size():      " << all_labels.size()
                 );
 
             typedef matrix<scalar_type,0,1> w_type;
@@ -399,7 +399,7 @@ namespace
 
     template <
         typename K,
-        typename label_type_ = typename K::scalar_type 
+        typename label_type_ = typename K::scalar_type
         >
     class test_svm_multiclass_linear_trainer5
     {
@@ -440,8 +440,8 @@ namespace
             DLIB_ASSERT(is_learning_problem(all_samples,all_labels),
                 "\t trained_function_type test_svm_multiclass_linear_trainer5::train(all_samples,all_labels)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t all_samples.size():     " << all_samples.size() 
-                << "\n\t all_labels.size():      " << all_labels.size() 
+                << "\n\t all_samples.size():     " << all_samples.size()
+                << "\n\t all_labels.size():      " << all_labels.size()
                 );
 
             typedef matrix<scalar_type,0,1> w_type;

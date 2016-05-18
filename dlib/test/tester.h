@@ -49,7 +49,7 @@ namespace test
     
 // -----------------------------------------------------------------------------
 
-// This bool controls any cout statements in this program.  Only print to 
+// This bool controls any cout statements in this program.  Only print to
 // standard out if we should be verbose.  The default is true
     extern bool be_verbose;
 
@@ -135,30 +135,30 @@ namespace test
             requires
                 - is invoked when number_of_args() == 0
             ensures
-                - performs the test and throws an exception 
+                - performs the test and throws an exception
                   derived from std::exception if the test fails.
         !*/
 
         virtual void perform_test (
-            const std::string& arg 
+            const std::string& arg
         );
         /*!
             requires
                 - is invoked when number_of_args() == 1
             ensures
-                - performs the test and throws an exception 
+                - performs the test and throws an exception
                   derived from std::exception if the test fails.
         !*/
 
         virtual void perform_test (
-            const std::string& arg1, 
-            const std::string& arg2 
+            const std::string& arg1,
+            const std::string& arg2
         );
         /*!
             requires
                 - is invoked when number_of_args() == 2
             ensures
-                - performs the test and throws an exception 
+                - performs the test and throws an exception
                   derived from std::exception if the test fails.
         !*/
 

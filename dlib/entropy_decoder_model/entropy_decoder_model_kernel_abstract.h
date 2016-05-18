@@ -12,7 +12,7 @@ namespace dlib
         unsigned long alphabet_size,
         typename entropy_decoder
         >
-    class entropy_decoder_model 
+    class entropy_decoder_model
     {
         /*!
             REQUIREMENTS ON alphabet_size
@@ -29,9 +29,9 @@ namespace dlib
                 can use it to read symbols from an entropy_decoder and it will calculate
                 the cumulative counts/probabilities and manage contexts for you.
 
-                Note that all implementations of entropy_encoder_model and 
-                entropy_decoder_model are paired. This means that if you use 
-                entropy_encoder_model_kernel_n to encode something then you must 
+                Note that all implementations of entropy_encoder_model and
+                entropy_decoder_model are paired. This means that if you use
+                entropy_encoder_model_kernel_n to encode something then you must
                 use the corresponding entropy_decoder_model_kernel_n to decode it.
 
                 Also note that this object does not perform any buffering of symbols.  It
@@ -70,7 +70,7 @@ namespace dlib
                 - does not modify get_entropy_decoder()
             throws
                 - any exception
-                    if this exception is thrown then *this is unusable 
+                    if this exception is thrown then *this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -81,10 +81,10 @@ namespace dlib
             ensures
                 - decodes the next symbol
                 - #symbol == the next symbol
-                - #symbol < alphabet_size                
+                - #symbol < alphabet_size
             throws
                 - any exception
-                    If this exception is thrown then #*this is unusable until 
+                    If this exception is thrown then #*this is unusable until
                     clear() is called and succeeds.
         !*/
         
@@ -108,7 +108,7 @@ namespace dlib
         entropy_decoder_model(entropy_decoder_model<alphabet_size>&);        // copy constructor
         entropy_decoder_model<alphabet_size>& operator=(entropy_decoder_model<alphabet_size>&);    // assignment operator
 
-    };   
+    };
 
 }
 

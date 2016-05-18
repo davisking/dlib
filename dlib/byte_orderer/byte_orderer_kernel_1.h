@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_BYTE_ORDEREr_KERNEL_1_ 
-#define DLIB_BYTE_ORDEREr_KERNEL_1_ 
+#ifndef DLIB_BYTE_ORDEREr_KERNEL_1_
+#define DLIB_BYTE_ORDEREr_KERNEL_1_
 
 #include "byte_orderer_kernel_abstract.h"
 #include "../algs.h"
@@ -10,7 +10,7 @@
 namespace dlib
 {
 
-    class byte_orderer 
+    class byte_orderer
     {
         /*!
             INITIAL VALUE
@@ -37,7 +37,7 @@ namespace dlib
         // this is here for backwards compatibility with older versions of dlib.
         typedef byte_orderer kernel_1a;
 
-        byte_orderer (        
+        byte_orderer (
         )
         {
             // This will probably never be false but if it is then it means chars are not 8bits
@@ -164,13 +164,13 @@ namespace dlib
         }
 
         bool little_endian;
-    };    
+    };
 
     // make flip not do anything at all for chars
-    template <> inline void byte_orderer::flip<char> ( char& ) const {} 
-    template <> inline void byte_orderer::flip<unsigned char> ( unsigned char& ) const {} 
-    template <> inline void byte_orderer::flip<signed char> ( signed char& ) const {} 
+    template <> inline void byte_orderer::flip<char> ( char& ) const {}
+    template <> inline void byte_orderer::flip<unsigned char> ( unsigned char& ) const {}
+    template <> inline void byte_orderer::flip<signed char> ( signed char& ) const {}
 }
 
-#endif // DLIB_BYTE_ORDEREr_KERNEL_1_ 
+#endif // DLIB_BYTE_ORDEREr_KERNEL_1_
 

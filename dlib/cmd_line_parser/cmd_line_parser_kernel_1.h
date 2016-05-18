@@ -25,8 +25,8 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON map
-                is an implementation of map/map_kernel_abstract.h 
-                is instantiated to map items of type std::basic_string<charT> to void*     
+                is an implementation of map/map_kernel_abstract.h
+                is instantiated to map items of type std::basic_string<charT> to void*
 
             REQUIREMENTS ON sequence
                 is an implementation of sequence/sequence_kernel_abstract.h and
@@ -59,8 +59,8 @@ namespace dlib
         typedef cmd_line_parser_option<charT> option_type;
 
         // exception class
-        class cmd_line_parse_error : public dlib::error 
-        { 
+        class cmd_line_parse_error : public dlib::error
+        {
             void set_info_string (
             )
             {
@@ -73,13 +73,13 @@ namespace dlib
                     case ETOO_FEW_ARGS:
                         if (num > 1)
                         {
-                            sout << "Command line error: The '" << narrow(item) << "' option requires " << num 
-                                << " arguments."; 
+                            sout << "Command line error: The '" << narrow(item) << "' option requires " << num
+                                << " arguments.";
                         }
                         else
                         {
-                            sout << "Command line error: The '" << narrow(item) << "' option requires " << num 
-                                << " argument."; 
+                            sout << "Command line error: The '" << narrow(item) << "' option requires " << num
+                                << " argument.";
                         }
                         break;
                     case ETOO_MANY_ARGS:
@@ -92,7 +92,7 @@ namespace dlib
                 const_cast<std::string&>(info) = wrap_string(sout.str(),0,0);
             }
 
-        public: 
+        public:
             cmd_line_parse_error(
                 error_type t,
                 const std::basic_string<charT>& _item
@@ -139,7 +139,7 @@ namespace dlib
                     description_         == description()
                     number_of_arguments_ == number_of_arguments()
                     options[N][arg]      == argument(arg,N)
-                    num_present          == count()                    
+                    num_present          == count()
             !*/
 
             friend class cmd_line_parser_kernel_1<charT,map,sequence,sequence2>;
@@ -155,7 +155,7 @@ namespace dlib
             const std::basic_string<charT>& description (
             ) const { return description_; }
 
-            unsigned long number_of_arguments( 
+            unsigned long number_of_arguments(
             ) const { return number_of_arguments_; }
 
             unsigned long count (
@@ -165,26 +165,26 @@ namespace dlib
                 unsigned long arg,
                 unsigned long N
             ) const
-            {  
+            {
                 // make sure requires clause is not broken
                 DLIB_CASSERT( N < count() && arg < number_of_arguments(),
                     "\tconst string_type& cmd_line_parser_option::argument(unsigned long,unsigned long)"
                     << "\n\tInvalid arguments were given to this function."
                     << "\n\tthis:                  " << this
                     << "\n\tN:                     " << N
-                    << "\n\targ:                   " << arg 
+                    << "\n\targ:                   " << arg
                     << "\n\tname():                " << narrow(name())
                     << "\n\tcount():               " << count()
                     << "\n\tnumber_of_arguments(): " << number_of_arguments()
                     );
 
-                return options[N][arg]; 
+                return options[N][arg];
             }
 
         protected:
 
             option_t (
-            ) : 
+            ) :
                 num_present(0)
             {}
 
@@ -275,7 +275,7 @@ namespace dlib
             const string_type& name
         ) const;
 
-        unsigned long number_of_arguments( 
+        unsigned long number_of_arguments(
         ) const;
 
         const string_type& operator[] (
@@ -320,7 +320,7 @@ namespace dlib
         cmd_line_parser_kernel_1(cmd_line_parser_kernel_1&);        // copy constructor
         cmd_line_parser_kernel_1& operator=(cmd_line_parser_kernel_1&);    // assignment operator
 
-    };   
+    };
    
 // ----------------------------------------------------------------------------------------
 
@@ -331,9 +331,9 @@ namespace dlib
         typename sequence2
         >
     inline void swap (
-        cmd_line_parser_kernel_1<charT,map,sequence,sequence2>& a, 
-        cmd_line_parser_kernel_1<charT,map,sequence,sequence2>& b 
-    ) { a.swap(b); }   
+        cmd_line_parser_kernel_1<charT,map,sequence,sequence2>& a,
+        cmd_line_parser_kernel_1<charT,map,sequence,sequence2>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -364,7 +364,7 @@ namespace dlib
         >
     cmd_line_parser_kernel_1<charT,map,sequence,sequence2>::
     ~cmd_line_parser_kernel_1 (
-    ) 
+    )
     {
         // delete all option_t objects in options
         options.reset();
@@ -427,24 +427,24 @@ namespace dlib
             options.reset();
             while (options.move_next())
             {
-                static_cast<option_t*>(options.element().value())->clear();                
+                static_cast<option_t*>(options.element().value())->clear();
             }
             options.reset();
         }
 
         // this tells us if we have seen -- on the command line all by itself
-        // or not.  
+        // or not.
         bool escape = false;
 
         const unsigned long argc = static_cast<unsigned long>(argc_);
-        try 
-        {     
+        try
+        {
 
             for (unsigned long i = 1; i < argc; ++i)
-            {            
+            {
                 if (argv[i][0] == _dT(charT,'-') && !escape)
                 {
-                    // we are looking at the start of an option                
+                    // we are looking at the start of an option
 
                     // --------------------------------------------------------------------
                     if (argv[i][1] == _dT(charT,'-'))
@@ -467,7 +467,7 @@ namespace dlib
                         // make sure this name is defined
                         if (!options.is_in_domain(temp))
                         {
-                            // the long name is not a valid option                            
+                            // the long name is not a valid option
                             if (argv[i][2] == _dT(charT,'\0'))
                             {
                                 // there was nothing after the -- on the command line
@@ -476,10 +476,10 @@ namespace dlib
                             }
                             else
                             {
-                                // there was something after the command line but it 
+                                // there was something after the command line but it
                                 // wasn't a valid option
                                 throw cmd_line_parse_error(EINVALID_OPTION,temp);
-                            }                            
+                            }
                         }
                         
 
@@ -487,17 +487,17 @@ namespace dlib
 
                         // check the number of arguments after this option and make sure
                         // it is correct
-                        if (argc + extra_argument <= o->number_of_arguments() + i) 
+                        if (argc + extra_argument <= o->number_of_arguments() + i)
                         {
                             // there are too few arguments
-                            throw cmd_line_parse_error(ETOO_FEW_ARGS,temp,o->number_of_arguments());    
+                            throw cmd_line_parse_error(ETOO_FEW_ARGS,temp,o->number_of_arguments());
                         }
-                        if (extra_argument && first_argument.size() == 0 ) 
+                        if (extra_argument && first_argument.size() == 0 )
                         {
-                            // if there would be exactly the right number of arguments if 
+                            // if there would be exactly the right number of arguments if
                             // the first_argument wasn't empty
                             if (argc == o->number_of_arguments() + i)
-                                throw cmd_line_parse_error(ETOO_FEW_ARGS,temp,o->number_of_arguments());    
+                                throw cmd_line_parse_error(ETOO_FEW_ARGS,temp,o->number_of_arguments());
                             else
                             {
                                 // in this case we just ignore the trailing = and parse everything
@@ -533,7 +533,7 @@ namespace dlib
                             }
 
                             for (; j < o->number_of_arguments(); ++j)
-                            {                            
+                            {
                                 stemp[j] = argv[i+j+1-extra_argument];
                             }
                             o->options.add(o->options.size(),stemp);
@@ -541,7 +541,7 @@ namespace dlib
                         o->num_present += 1;
 
 
-                        // adjust the value of i to account for the arguments to 
+                        // adjust the value of i to account for the arguments to
                         // this option
                         i += o->number_of_arguments() - extra_argument;
                     }
@@ -553,7 +553,7 @@ namespace dlib
                         // make sure there is something in this string other than -
                         if (argv[i][1] == _dT(charT,'\0'))
                         {
-                            throw cmd_line_parse_error();                            
+                            throw cmd_line_parse_error();
                         }
 
                         string_type temp = &argv[i][1];
@@ -584,12 +584,12 @@ namespace dlib
                             }
 
                             // check the number of arguments after this option and make sure
-                            // it is correct                            
+                            // it is correct
                             if (argc + delta <= o->number_of_arguments() + i)
                             {
                                 // there are too few arguments
                                 std::ostringstream sout;
-                                throw cmd_line_parse_error(ETOO_FEW_ARGS,name,o->number_of_arguments());    
+                                throw cmd_line_parse_error(ETOO_FEW_ARGS,name,o->number_of_arguments());
                             }
 
                             
@@ -603,8 +603,8 @@ namespace dlib
                                 if (delta == 1)
                                 {
                                     temp = &argv[i][2+k];
-                                    k = (unsigned long)num;  // this ensures that the argument to this 
-                                              // option isn't going to be treated as a 
+                                    k = (unsigned long)num;  // this ensures that the argument to this
+                                              // option isn't going to be treated as a
                                               // list of options
                                     
                                     stemp[0] = temp;
@@ -615,7 +615,7 @@ namespace dlib
                                 }
                                 o->options.add(o->options.size(),stemp);
 
-                                // adjust the value of i to account for the arguments to 
+                                // adjust the value of i to account for the arguments to
                                 // this option
                                 i += o->number_of_arguments()-delta;
                             }
@@ -628,7 +628,7 @@ namespace dlib
                 {
                     // this is just a normal argument
                     string_type temp = argv[i];
-                    this->argv.add(this->argv.size(),temp);             
+                    this->argv.add(this->argv.size(),temp);
                 }
 
             }
@@ -643,11 +643,11 @@ namespace dlib
             options.reset();
             while (options.move_next())
             {
-                static_cast<option_t*>(options.element().value())->clear();                
+                static_cast<option_t*>(options.element().value())->clear();
             }
             options.reset();
 
-            throw;            
+            throw;
         }
     }
 
@@ -715,14 +715,14 @@ namespace dlib
     {
         option_t* temp = new option_t;
         try
-        { 
+        {
             temp->name_ = name;
             temp->group_name_ = group_name;
             temp->description_ = description;
             temp->number_of_arguments_ = number_of_arguments;
             void* t = temp;
             string_type n(name);
-            options.add(n,t); 
+            options.add(n,t);
         }catch (...) { delete temp; throw;}
     }
 
@@ -751,7 +751,7 @@ namespace dlib
         typename sequence2
         >
     unsigned long cmd_line_parser_kernel_1<charT,map,sequence,sequence2>::
-    number_of_arguments( 
+    number_of_arguments(
     ) const
     {
         return argv.size();

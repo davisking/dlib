@@ -23,7 +23,7 @@ namespace dlib
     );
     /*!
         requires
-            - pyramid_type == a type compatible with the image pyramid objects defined 
+            - pyramid_type == a type compatible with the image pyramid objects defined
               in dlib/image_transforms/image_pyramid_abstract.h
             - feature_extractor_type == a local image feature extractor type such as the
               dlib::hog_image
@@ -32,7 +32,7 @@ namespace dlib
               and are swappable by global swap().
         ensures
             - creates an image pyramid for each image in images and performs feature
-              extraction on each pyramid level.  Then selects a random subsample of at 
+              extraction on each pyramid level.  Then selects a random subsample of at
               most num local feature vectors and returns it.
     !*/
 

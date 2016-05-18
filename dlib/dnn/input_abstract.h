@@ -18,7 +18,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 Each deep neural network model in dlib begins with an input layer. The job
                 of the input layer is to convert an input_type into a tensor.  Nothing more
-                and nothing less.  
+                and nothing less.
                 
                 Note that there is no dlib::EXAMPLE_INPUT_LAYER type.  It is shown here
                 purely to document the interface that an input layer object must implement.
@@ -34,7 +34,7 @@ namespace dlib
             ensures
                 - Default constructs this object.  This function is not required to do
                   anything in particular but it must exist, that is, it is required that
-                  layer objects be default constructable. 
+                  layer objects be default constructable.
         !*/
 
         EXAMPLE_INPUT_LAYER (
@@ -58,7 +58,7 @@ namespace dlib
                     relu<fc<relu<fc<my_input_layer2>>>> my_dnn2(my_dnn1);
                   This kind of pattern is useful if you want to use one type of input layer
                   during training but a different type of layer during testing since it
-                  allows you to easily convert between related deep neural network types.  
+                  allows you to easily convert between related deep neural network types.
         !*/
 
         // sample_expansion_factor must be > 0
@@ -77,7 +77,7 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor.
                   Normally you would have #data.num_samples() == distance(ibegin,iend) but
                   you can also expand the output by some integer factor so long as the loss
                   you use can deal with it correctly.
@@ -94,7 +94,7 @@ namespace dlib
     void serialize(const EXAMPLE_INPUT_LAYER& item, std::ostream& out);
     void deserialize(EXAMPLE_INPUT_LAYER& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -102,15 +102,15 @@ namespace dlib
     template <
         typename T
         >
-    class input 
+    class input
     {
         /*!
             REQUIREMENTS ON T
                 T is a matrix or array2d object and it must contain some kind of pixel
-                type.  I.e. pixel_traits<T::type> must be defined. 
+                type.  I.e. pixel_traits<T::type> must be defined.
 
             WHAT THIS OBJECT REPRESENTS
-                This is a basic input layer that simply copies images into a tensor.  
+                This is a basic input layer that simply copies images into a tensor.
         !*/
 
     public:
@@ -175,7 +175,7 @@ namespace dlib
             float avg_red,
             float avg_green,
             float avg_blue
-        ); 
+        );
         /*!
             ensures
                 - #get_avg_red() == avg_red

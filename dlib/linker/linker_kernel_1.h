@@ -12,7 +12,7 @@
 namespace dlib
 {
 
-    class linker 
+    class linker
     {
 
         /*!
@@ -20,12 +20,12 @@ namespace dlib
                 running             == false
                 A                   == 0
                 B                   == 0
-                running_mutex       == a mutex 
+                running_mutex       == a mutex
                 running_signaler    == a signaler associated with running_mutex
                 cons_mutex          == a mutex
                 service_connection_running          == false
                 service_connection_running_mutex    == a mutex
-                service_connection_running_signaler == a signaler associated with 
+                service_connection_running_signaler == a signaler associated with
                                                        service_connection_running_mutex
 
                 service_connection_error        == false
@@ -45,7 +45,7 @@ namespace dlib
                                                        running or is about to run else
                                                        false
                 service_connection_running_mutex    == a mutex for service_connection_running
-                service_connection_running_signaler == a signaler associated with 
+                service_connection_running_signaler == a signaler associated with
                                                        service_connection_running_mutex
 
                 if (running) then
@@ -56,7 +56,7 @@ namespace dlib
                     B               == 0
 
                 service_connection_error        == service_connection uses this bool
-                                                   to indicate if it terminated due to 
+                                                   to indicate if it terminated due to
                                                    an error or not
                 service_connection_error_mutex  == a mutex for service_connection_error
 
@@ -79,7 +79,7 @@ namespace dlib
             );
 
             virtual ~linker(
-            ); 
+            );
 
             void clear(
             );
@@ -105,7 +105,7 @@ namespace dlib
                     waits for data from b and forwards it to a and
                     if (b closes normally or is shutdown()) service_connection ends and
                     if (b closes normally) then a.shutdown_outgoing() is called and
-                    if (a or b returns an error) then a and b are shutdown() 
+                    if (a or b returns an error) then a and b are shutdown()
             !*/
 
 

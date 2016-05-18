@@ -14,13 +14,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class gpu_data 
+    class gpu_data
     {
         /*!
             CONVENTION
                 - if (size() != 0) then
                     - data_host == a pointer to size() floats in CPU memory.
-                - if (data_device) then 
+                - if (data_device) then
                     - data_device == a pointer to size() floats in device memory.
 
                 - if (there might be an active async transfer from host to device) then
@@ -55,7 +55,7 @@ namespace dlib
         int device_id() const { return the_device_id; }
 
 #ifdef DLIB_USE_CUDA
-        void async_copy_to_device() const; 
+        void async_copy_to_device() const;
         void set_size(size_t new_size);
 #else
         // Note that calls to host() or device() will block until any async transfers are complete.
@@ -84,37 +84,37 @@ namespace dlib
         }
 #endif
 
-        const float* host() const 
-        { 
+        const float* host() const
+        {
             copy_to_host();
-            return data_host.get(); 
+            return data_host.get();
         }
 
-        float* host() 
+        float* host()
         {
             copy_to_host();
             device_current = false;
-            return data_host.get(); 
+            return data_host.get();
         }
 
-        float* host_write_only() 
+        float* host_write_only()
         {
             host_current = true;
             device_current = false;
-            return data_host.get(); 
+            return data_host.get();
         }
 
-        const float* device() const 
-        { 
+        const float* device() const
+        {
 #ifndef DLIB_USE_CUDA
             DLIB_CASSERT(false, "CUDA NOT ENABLED");
 #endif
             copy_to_device();
             device_in_use = true;
-            return data_device.get(); 
+            return data_device.get();
         }
 
-        float* device() 
+        float* device()
         {
 #ifndef DLIB_USE_CUDA
             DLIB_CASSERT(false, "CUDA NOT ENABLED");
@@ -122,7 +122,7 @@ namespace dlib
             copy_to_device();
             host_current = false;
             device_in_use = true;
-            return data_device.get(); 
+            return data_device.get();
         }
 
         float* device_write_only()
@@ -134,7 +134,7 @@ namespace dlib
             host_current = false;
             device_current = true;
             device_in_use = true;
-            return data_device.get(); 
+            return data_device.get();
         }
 
         bool host_ready (

@@ -30,7 +30,7 @@ namespace dlib
               to the RGB pixel space and then uses this mapping to create
               a colored version of img.  Returns a matrix which represents
               this colored version of img.
-            - black pixels in img will remain black in the output image.  
+            - black pixels in img will remain black in the output image.
             - The returned matrix will have the same dimensions as img.
     !*/
 
@@ -96,7 +96,7 @@ namespace dlib
     );
     /*!
         ensures
-            - Maps value to a color.  In particular, we use a jet color scheme where 
+            - Maps value to a color.  In particular, we use a jet color scheme where
               values <= min_val are dark blue and larger values become light blue, then
               yellow, and then finally red as they approach max_val.
     !*/

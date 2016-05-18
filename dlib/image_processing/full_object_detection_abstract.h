@@ -65,7 +65,7 @@ namespace dlib
         !*/
 
         rectangle& get_rect(
-        ); 
+        );
         /*!
             ensures
                 - returns the rectangle that indicates where this object is.  In general,
@@ -76,32 +76,32 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of parts in this object.  
+                - returns the number of parts in this object.
         !*/
 
         const point& part(
             unsigned long idx
-        ) const; 
+        ) const;
         /*!
             requires
                 - idx < num_parts()
             ensures
                 - returns the location of the center of the idx-th part of this object.
                   Note that it is valid for a part to be "not present".  This is indicated
-                  when the return value of part() is equal to OBJECT_PART_NOT_PRESENT. 
+                  when the return value of part() is equal to OBJECT_PART_NOT_PRESENT.
                   This is useful for modeling object parts that are not always observed.
         !*/
 
         point& part(
             unsigned long idx
-        ); 
+        );
         /*!
             requires
                 - idx < num_parts()
             ensures
                 - returns the location of the center of the idx-th part of this object.
                   Note that it is valid for a part to be "not present".  This is indicated
-                  when the return value of part() is equal to OBJECT_PART_NOT_PRESENT. 
+                  when the return value of part() is equal to OBJECT_PART_NOT_PRESENT.
                   This is useful for modeling object parts that are not always observed.
         !*/
     };
@@ -109,19 +109,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void serialize (
-        const full_object_detection& item, 
+        const full_object_detection& item,
         std::ostream& out
-    );   
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
-        full_object_detection& item, 
+        full_object_detection& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

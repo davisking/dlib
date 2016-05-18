@@ -14,7 +14,7 @@
 typedef dlib::matrix<double,3,1> lhs_element;
 typedef dlib::matrix<double,3,1> rhs_element;
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;

@@ -13,7 +13,7 @@
 #include <dlib/svm.h>
 
 
-namespace  
+namespace
 {
 
     using namespace test;

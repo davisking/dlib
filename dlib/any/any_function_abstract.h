@@ -30,7 +30,7 @@ namespace dlib
                 - for all T: contains<T>() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a version of dlib::any that is restricted to containing 
+                This object is a version of dlib::any that is restricted to containing
                 elements which are some kind of function object with an operator() which
                 matches the function signature defined by function_type.
 
@@ -49,9 +49,9 @@ namespace dlib
                         f("hello world"); // calls print_message("hello world")
                     }
 
-                Note that any_function objects can be used to store general function 
+                Note that any_function objects can be used to store general function
                 objects (i.e. defined by a class with an overloaded operator()) in
-                addition to regular global functions.  
+                addition to regular global functions.
         !*/
 
     public:
@@ -78,7 +78,7 @@ namespace dlib
         );
         /*!
             ensures
-                - copies the state of item into *this.  
+                - copies the state of item into *this.
                 - Note that *this and item will contain independent copies of the
                   contents of item.  That is, this function performs a deep
                   copy and therefore does not result in *this containing
@@ -119,9 +119,9 @@ namespace dlib
         /*!
             ensures
                 - if (this object contains any kind of object) then
-                    - returns false 
+                    - returns false
                 - else
-                    - returns true 
+                    - returns true
         !*/
 
         bool is_set (
@@ -179,7 +179,7 @@ namespace dlib
         /* !!!!!!!!!  NOTE  !!!!!!!!!
 
            In addition to the above, operator() is defined for up to 10 arguments.
-           They are not listed here because it would clutter the documentation. 
+           They are not listed here because it would clutter the documentation.
 
            !!!!!!!!!  NOTE  !!!!!!!!!  */
 
@@ -226,7 +226,7 @@ namespace dlib
         );
         /*!
             ensures
-                - copies the state of item into *this.  
+                - copies the state of item into *this.
                 - Note that *this and item will contain independent copies of the
                   contents of item.  That is, this function performs a deep
                   copy and therefore does not result in *this containing
@@ -261,7 +261,7 @@ namespace dlib
     template <
         typename T,
         typename function_type
-        > 
+        >
     T& any_cast(
         any_function<function_type>& a
     ) { return a.cast_to<T>(); }
@@ -275,7 +275,7 @@ namespace dlib
     template <
         typename T,
         typename function_type
-        > 
+        >
     const T& any_cast(
         const any_function<function_type>& a
     ) { return a.cast_to<T>(); }

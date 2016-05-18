@@ -31,7 +31,7 @@ namespace dlib
             - images.size() == ignore.size()
             - object_detector_type == some kind of object detector function object
               (e.g. object_detector)
-            - image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
+            - image_array_type must be an implementation of dlib/array/array_kernel_abstract.h
               and it must contain objects which can be accepted by detector().
         ensures
             - Tests the given detector against the supplied object detection problem and
@@ -42,7 +42,7 @@ namespace dlib
               not count as a false alarm and similarly if any element of ignore[i] goes
               undetected it does not count as a missed detection.  So we say that ignore[i]
               contains a set of boxes that we "don't care" if they are detected or not.
-            - In particular, returns a matrix M such that:  
+            - In particular, returns a matrix M such that:
                 - M(0) == the precision of the detector object.  This is a number
                   in the range [0,1] which measures the fraction of detector outputs
                   which correspond to a real target.  A value of 1 means the detector
@@ -60,7 +60,7 @@ namespace dlib
                   the average_precision() routine to score the ranked listing and store the
                   output into M(2).
                 - This function considers a detector output D to match a rectangle T if and
-                  only if overlap_tester(T,D) returns true. 
+                  only if overlap_tester(T,D) returns true.
                 - Note that you can use the adjust_threshold argument to raise or lower the
                   detection threshold.  This value is passed into the identically named
                   argument to the detector object and therefore influences the number of
@@ -89,7 +89,7 @@ namespace dlib
             - converts all the rectangles in truth_dets into full_object_detection objects
               via full_object_detection's rectangle constructor.  Then invokes
               test_object_detection_function() on the full_object_detections and returns
-              the results.  
+              the results.
     !*/
 
     template <
@@ -153,7 +153,7 @@ namespace dlib
             - images.size() == ignore.size()
             - 1 < folds <= images.size()
             - trainer_type == some kind of object detection trainer (e.g structural_object_detection_trainer)
-            - image_array_type must be an implementation of dlib/array/array_kernel_abstract.h 
+            - image_array_type must be an implementation of dlib/array/array_kernel_abstract.h
               and it must contain objects which can be accepted by detector().
             - it is legal to call trainer.train(images, truth_dets)
         ensures
@@ -185,7 +185,7 @@ namespace dlib
             - converts all the rectangles in truth_dets into full_object_detection objects
               via full_object_detection's rectangle constructor.  Then invokes
               cross_validate_object_detection_trainer() on the full_object_detections and
-              returns the results.  
+              returns the results.
     !*/
 
     template <

@@ -102,10 +102,10 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( 
+        DLIB_CASSERT(
             this->is_running() == false ,
             "\tvoid linker::link"
-            << "\n\tis_running() == " << this->is_running() 
+            << "\n\tis_running() == " << this->is_running()
             << "\n\tthis: " << this
             );
 
@@ -141,7 +141,7 @@ namespace dlib
             cons_mutex.lock();
             A = 0;
             B = 0;
-            cons_mutex.unlock();  
+            cons_mutex.unlock();
 
             running_mutex.lock();
             running = false;
@@ -180,7 +180,7 @@ namespace dlib
                 // if a has closed normally
                 if (status == 0)
                     b.shutdown_outgoing();
-                break;            
+                break;
             }
 
             status = b.write(buf,status);
@@ -192,7 +192,7 @@ namespace dlib
             }
             
             if (status <= 0)
-                break;            
+                break;
         }
 
 
@@ -306,10 +306,10 @@ namespace dlib
 
             if (status <= 0)
             {
-                // if b has closed normally 
+                // if b has closed normally
                 if (status == 0)
                     a.shutdown_outgoing();
-                break;            
+                break;
             }
 
 
@@ -322,7 +322,7 @@ namespace dlib
             }
             
             if (status <= 0)
-                break;            
+                break;
         }
 
 

@@ -23,9 +23,9 @@ namespace dlib
         >
     void configure_nuclear_norm_regularizer (
         const image_scanner_type&,
-        svm_struct_prob_type& 
+        svm_struct_prob_type&
     )
-    { 
+    {
         // does nothing by default.  Specific scanner types overload this function to do
         // whatever is appropriate.
     }
@@ -76,9 +76,9 @@ namespace dlib
         }
 
         bool auto_set_overlap_tester (
-        ) const 
-        { 
-            return auto_overlap_tester; 
+        ) const
+        {
+            return auto_overlap_tester;
         }
 
         void set_overlap_tester (
@@ -123,7 +123,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void structural_object_detection_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -143,7 +143,7 @@ namespace dlib
         unsigned long get_max_cache_size (
         ) const
         {
-            return max_cache_size; 
+            return max_cache_size;
         }
 
         void be_verbose (
@@ -172,14 +172,14 @@ namespace dlib
         }
 
         void set_c (
-            scalar_type C_ 
+            scalar_type C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void structural_object_detection_trainer::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -197,10 +197,10 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(0 < eps && eps < 1, 
+            DLIB_ASSERT(0 < eps && eps < 1,
                 "\t void structural_object_detection_trainer::set_match_eps(eps)"
                 << "\n\t Invalid inputs were given to this function "
-                << "\n\t eps:  " << eps 
+                << "\n\t eps:  " << eps
                 << "\n\t this: " << this
                 );
 
@@ -224,7 +224,7 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss > 0, 
+            DLIB_ASSERT(loss > 0,
                 "\t void structural_object_detection_trainer::set_loss_per_missed_target(loss)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t loss: " << loss
@@ -245,7 +245,7 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss > 0, 
+            DLIB_ASSERT(loss > 0,
                 "\t void structural_object_detection_trainer::set_loss_per_false_alarm(loss)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t loss: " << loss
@@ -344,9 +344,9 @@ namespace dlib
                                 all_parts_in_rect(truth_object_detections[i][j]) == true,
                         "\t trained_function_type structural_object_detection_trainer::train()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].num_parts():                " << 
+                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].num_parts():                " <<
                             truth_object_detections[i][j].num_parts()
-                        << "\n\t get_scanner().get_num_movable_components_per_detection_template(): " << 
+                        << "\n\t get_scanner().get_num_movable_components_per_detection_template(): " <<
                             get_scanner().get_num_movable_components_per_detection_template()
                         << "\n\t all_parts_in_rect(truth_object_detections["<<i<<"]["<<j<<"]): " << all_parts_in_rect(truth_object_detections[i][j])
                     );
@@ -354,7 +354,7 @@ namespace dlib
             }
 #endif
 
-            structural_svm_object_detection_problem<image_scanner_type,image_array_type > 
+            structural_svm_object_detection_problem<image_scanner_type,image_array_type >
                 svm_prob(scanner, overlap_tester, auto_overlap_tester, images,
                     truth_object_detections, ignore, ignore_overlap_tester, num_threads);
 
@@ -391,7 +391,7 @@ namespace dlib
         double loss_per_false_alarm;
         bool auto_overlap_tester;
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 

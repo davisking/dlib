@@ -11,7 +11,7 @@
 #include "../serialize.h"
 #include <functional>
 
-namespace dlib 
+namespace dlib
 {
 
     template <
@@ -28,7 +28,7 @@ namespace dlib
             INITIAL VALUE
                 NIL == pointer to a node that represents a leaf
                 tree_size == 0
-                tree_root == NIL     
+                tree_root == NIL
                 at_start == true
                 current_element == 0
 
@@ -49,22 +49,22 @@ namespace dlib
                 else
                     tree_root == NIL
 
-                tree_root->color == black                    
+                tree_root->color == black
                 Every leaf is black and all leafs are the NIL node.
-                The number of black nodes in any path from the root to a leaf is the 
-                same. 
+                The number of black nodes in any path from the root to a leaf is the
+                same.
 
                 for all nodes:
                 {
-                    - left points to the left subtree or NIL if there is no left subtree  
-                    - right points to the right subtree or NIL if there is no right 
-                      subtree                                                             
-                    - parent points to the parent node or NIL if the node is the root     
-                    - ordering of nodes is determined by comparing each node's d member  
-                    - all elements in a left subtree are <= the node                      
-                    - all elements in a right subtree are >= the node                     
-                    - color == red or black                                               
-                    - if (color == red)                                                   
+                    - left points to the left subtree or NIL if there is no left subtree
+                    - right points to the right subtree or NIL if there is no right
+                      subtree
+                    - parent points to the parent node or NIL if the node is the root
+                    - ordering of nodes is determined by comparing each node's d member
+                    - all elements in a left subtree are <= the node
+                    - all elements in a right subtree are >= the node
+                    - color == red or black
+                    - if (color == red)
                         - the node's children are black
                 }
 
@@ -72,7 +72,7 @@ namespace dlib
     
         class node
         {
-        public:            
+        public:
             node* left;
             node* right;
             node* parent;
@@ -87,7 +87,7 @@ namespace dlib
             const domain* d;
             range* r;
 
-            const domain& key( 
+            const domain& key(
             ) const { return *d; }
 
             const range& value(
@@ -124,7 +124,7 @@ namespace dlib
             }
 
             virtual ~binary_search_tree_kernel_2(
-            ); 
+            );
     
             inline void clear(
             );
@@ -211,7 +211,7 @@ namespace dlib
             );
             /*!
                 requires
-                    - t != NIL 
+                    - t != NIL
                     - t->right != NIL
                 ensures
                     - performs a left rotation around t and its right child
@@ -222,7 +222,7 @@ namespace dlib
             );
             /*!
                 requires
-                    - t != NIL 
+                    - t != NIL
                     - t->left != NIL
                 ensures
                     - performs a right rotation around t and its left child
@@ -233,12 +233,12 @@ namespace dlib
             );
             /*!
                 requires
-                    - t != NIL 
-                    - t->left != NIL 
-                    - t->left->right != NIL 
+                    - t != NIL
+                    - t->left != NIL
+                    - t->left->right != NIL
                     - double_rotate_right() is only called in fix_after_add()
                 ensures
-                    - performs a left rotation around t->left 
+                    - performs a left rotation around t->left
                     - then performs a right rotation around t
             !*/
 
@@ -247,12 +247,12 @@ namespace dlib
             );
             /*!
                 requires
-                    - t != NIL 
-                    - t->right != NIL 
-                    - t->right->left != NIL 
+                    - t != NIL
+                    - t->right != NIL
+                    - t->right->left != NIL
                     - double_rotate_left() is only called in fix_after_add()
                 ensures
-                    - performs a right rotation around t->right 
+                    - performs a right rotation around t->right
                     - then performs a left rotation around t
             !*/
 
@@ -265,9 +265,9 @@ namespace dlib
                 requires
                     - t != NIL  (i.e. there must be something in the tree to remove)
                 ensures
-                    - the biggest node in t has been removed 
-                    - the biggest node element in t has been put into #d and #r 
-                    - #t is still a binary search tree 
+                    - the biggest node in t has been removed
+                    - the biggest node element in t has been put into #d and #r
+                    - #t is still a binary search tree
             !*/
 
             bool remove_least_element_in_tree (
@@ -279,9 +279,9 @@ namespace dlib
                 requires
                     - t != NIL  (i.e. there must be something in the tree to remove)
                 ensures
-                    - the least node in t has been removed 
-                    - the least node element in t has been put into #d and #r 
-                    - #t is still a binary search tree 
+                    - the least node in t has been removed
+                    - the least node element in t has been put into #d and #r
+                    - #t is still a binary search tree
                     - if (the node that was removed was the one pointed to by current_element) then
                         - returns true
                     - else
@@ -300,7 +300,7 @@ namespace dlib
                     - d and r are now in #t
                     - there is a mapping from d to r in #t
                     - #d and #r have initial values for their types
-                    - #t is still a binary search tree 
+                    - #t is still a binary search tree
             !*/
 
             void remove_from_tree (
@@ -313,15 +313,15 @@ namespace dlib
                 requires
                     - return_reference(t,d) != 0
                 ensures
-                    - #d_copy is equivalent to d                                     
+                    - #d_copy is equivalent to d
                     - the first element in t equivalent to d that is encountered when searching down the tree
-                      from t has been removed and swapped into #d_copy.  Also, the associated range element 
+                      from t has been removed and swapped into #d_copy.  Also, the associated range element
                       has been removed and swapped into #r.
                     - if (the node that got removed wasn't current_element) then
                         - adjusts the current_element pointer if the data in the node that it points to gets moved.
                     - else
                         - the value of current_element is now invalid
-                    - #t is still a binary search tree 
+                    - #t is still a binary search tree
             !*/
 
             void remove_from_tree (
@@ -331,9 +331,9 @@ namespace dlib
             /*!
                 requires
                     - return_reference(t,d) != 0
-                ensures                                  
-                    - an element in t equivalent to d has been removed                
-                    - #t is still a binary search tree 
+                ensures
+                    - an element in t equivalent to d has been removed
+                    - #t is still a binary search tree
             !*/
 
             const range* return_reference (
@@ -366,7 +366,7 @@ namespace dlib
             /*!
                 requires
                     - t == pointer to the node just added
-                    - t->color == red 
+                    - t->color == red
                     - t->parent != NIL (t must not be the root)
                     - fix_after_add() is only called after a new node has been added
                       to t
@@ -379,13 +379,13 @@ namespace dlib
             );
             /*!
                 requires
-                    - t == pointer to the only child of the node that was spliced out 
+                    - t == pointer to the only child of the node that was spliced out
                     - fix_after_remove() is only called after a node has been removed
                       from t
                     - the color of the spliced out node was black
                 ensures
                     - fixes any deviations from the CONVENTION causes by removing a node
-            !*/            
+            !*/
 
 
             short tree_height (
@@ -393,7 +393,7 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns the number of nodes in the longest path from the root of the 
+                    - returns the number of nodes in the longest path from the root of the
                       tree to a leaf
             !*/
 
@@ -419,7 +419,7 @@ namespace dlib
                     - if (tree_root == NIL) then
                         - returns 0
                     - else
-                        - returns the number of elements in tree_root that are 
+                        - returns the number of elements in tree_root that are
                           equivalent to item
             !*/
 
@@ -438,7 +438,7 @@ namespace dlib
             
 
             // restricted functions
-            binary_search_tree_kernel_2(binary_search_tree_kernel_2&);        
+            binary_search_tree_kernel_2(binary_search_tree_kernel_2&);
             binary_search_tree_kernel_2& operator=(binary_search_tree_kernel_2&);
 
 
@@ -449,10 +449,10 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     inline void swap (
-        binary_search_tree_kernel_2<domain,range,mem_manager,compare>& a, 
-        binary_search_tree_kernel_2<domain,range,mem_manager,compare>& b 
+        binary_search_tree_kernel_2<domain,range,mem_manager,compare>& a,
+        binary_search_tree_kernel_2<domain,range,mem_manager,compare>& b
     ) { a.swap(b); }
 
 
@@ -462,9 +462,9 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void deserialize (
-        binary_search_tree_kernel_2<domain,range,mem_manager,compare>& item, 
+        binary_search_tree_kernel_2<domain,range,mem_manager,compare>& item,
         std::istream& in
     )
     {
@@ -483,9 +483,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type binary_search_tree_kernel_2"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type binary_search_tree_kernel_2");
         }
     }
 
@@ -507,7 +507,7 @@ namespace dlib
     binary_search_tree_kernel_2<domain,range,mem_manager,compare>::
     ~binary_search_tree_kernel_2 (
     )
-    {     
+    {
         if (tree_root != NIL)
             delete_tree(tree_root);
         pool.deallocate(NIL);
@@ -578,7 +578,7 @@ namespace dlib
         const domain& item
     ) const
     {
-        return get_count(item,tree_root);        
+        return get_count(item,tree_root);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -593,7 +593,7 @@ namespace dlib
     add (
         domain& d,
         range& r
-    ) 
+    )
     {
         if (tree_size == 0)
         {
@@ -605,7 +605,7 @@ namespace dlib
             exchange(tree_root->d,d);
             exchange(tree_root->r,r);
         }
-        else 
+        else
         {
             add_to_tree(tree_root,d,r);
         }
@@ -627,7 +627,7 @@ namespace dlib
         const domain& d,
         domain& d_copy,
         range& r
-    ) 
+    )
     {
         remove_from_tree(tree_root,d,d_copy,r);
         --tree_size;
@@ -646,7 +646,7 @@ namespace dlib
     void binary_search_tree_kernel_2<domain,range,mem_manager,compare>::
     destroy (
         const domain& item
-    ) 
+    )
     {
         remove_from_tree(tree_root,item);
         --tree_size;
@@ -666,7 +666,7 @@ namespace dlib
     remove_any (
         domain& d,
         range& r
-    ) 
+    )
     {
         remove_least_element_in_tree(tree_root,d,r);
         --tree_size;
@@ -685,7 +685,7 @@ namespace dlib
     range* binary_search_tree_kernel_2<domain,range,mem_manager,compare>::
     operator[] (
         const domain& d
-    ) 
+    )
     {
         return return_reference(tree_root,d);
     }
@@ -717,7 +717,7 @@ namespace dlib
     void binary_search_tree_kernel_2<domain,range,mem_manager,compare>::
     swap (
         binary_search_tree_kernel_2<domain,range,mem_manager,compare>& item
-    ) 
+    )
     {
         pool.swap(item.pool);
         
@@ -973,7 +973,7 @@ namespace dlib
                 // find the next element in the tree
                 if (current_element->right != NIL)
                 {
-                    // go right and down                    
+                    // go right and down
                     current_element = current_element->right;
                     went_up = false;
                 }
@@ -1007,7 +1007,7 @@ namespace dlib
                         {
                             // we should go up
                             node* parent = current_element->parent;
-                            from_left = (parent->left == current_element);                            
+                            from_left = (parent->left == current_element);
                             current_element = parent;
                             if (current_element == NIL)
                             {
@@ -1035,7 +1035,7 @@ namespace dlib
                     }
                 }
 
-                return true;               
+                return true;
             }
         }
     }
@@ -1055,7 +1055,7 @@ namespace dlib
     void binary_search_tree_kernel_2<domain,range,mem_manager,compare>::
     delete_tree (
         node* t
-    )  
+    )
     {
         if (t->left != NIL)
             delete_tree(t->left);
@@ -1075,7 +1075,7 @@ namespace dlib
     void binary_search_tree_kernel_2<domain,range,mem_manager,compare>::
     rotate_left (
         node* t
-    ) 
+    )
     {
 
         // perform the rotation
@@ -1089,7 +1089,7 @@ namespace dlib
 
         if (t == tree_root)
             tree_root = temp;
-        else 
+        else
         {
             // if t was on the left
             if (t->parent->left == t)
@@ -1112,7 +1112,7 @@ namespace dlib
     void binary_search_tree_kernel_2<domain,range,mem_manager,compare>::
     rotate_right (
         node* t
-    ) 
+    )
     {
         // perform the rotation
         node* temp = t->left;
@@ -1124,7 +1124,7 @@ namespace dlib
 
         if (t == tree_root)
             tree_root = temp;
-        else 
+        else
         {
             // if t is a left child
             if (t->parent->left == t)
@@ -1160,7 +1160,7 @@ namespace dlib
         temp.parent->parent = &temp;
         temp.right = t;
         temp.left = temp.parent;
-        temp.parent = t->parent;  
+        temp.parent = t->parent;
 
 
         if (tree_root == t)
@@ -1200,7 +1200,7 @@ namespace dlib
         temp.parent->parent = &temp;
         temp.left = t;
         temp.right = temp.parent;
-        temp.parent = t->parent;  
+        temp.parent = t->parent;
 
 
         if (tree_root == t)
@@ -1229,7 +1229,7 @@ namespace dlib
         node* t,
         domain& d,
         range& r
-    ) 
+    )
     {
 
         node* next = t->right;
@@ -1250,7 +1250,7 @@ namespace dlib
         else
         {
             // find the least node
-            do 
+            do
             {
                 t = next;
                 next = next->right;
@@ -1272,7 +1272,7 @@ namespace dlib
             fix_after_remove(child);
 
         // free the memory for this removed node
-        pool.deallocate(t);        
+        pool.deallocate(t);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1288,7 +1288,7 @@ namespace dlib
         node* t,
         domain& d,
         range& r
-    ) 
+    )
     {
 
         node* next = t->left;
@@ -1309,7 +1309,7 @@ namespace dlib
         else
         {
             // find the least node
-            do 
+            do
             {
                 t = next;
                 next = next->left;
@@ -1332,7 +1332,7 @@ namespace dlib
 
         bool rvalue = (t == current_element);
         // free the memory for this removed node
-        pool.deallocate(t);        
+        pool.deallocate(t);
         return rvalue;
     }
 
@@ -1349,7 +1349,7 @@ namespace dlib
         node* t,
         domain& d,
         range& r
-    ) 
+    )
     {
         // parent of the current node
         node* parent;
@@ -1393,7 +1393,7 @@ namespace dlib
 
         // keep the red-black properties true
         fix_after_add(t);
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1409,7 +1409,7 @@ namespace dlib
         const domain& d,
         domain& d_copy,
         range& r
-    ) 
+    )
     {
         while (true)
         {
@@ -1442,7 +1442,7 @@ namespace dlib
 
                     // if t is on the left
                     if (parent->left == t)
-                        parent->left = t->right;  
+                        parent->left = t->right;
                     else
                         parent->right = t->right;
                     t->right->parent = parent;
@@ -1455,7 +1455,7 @@ namespace dlib
                         fix_after_remove(t->right);
 
                     // delete old node
-                    pool.deallocate(t);  
+                    pool.deallocate(t);
                 }
                 else if (t->right == NIL)
                 {
@@ -1465,7 +1465,7 @@ namespace dlib
                     
                     // plug hole with left subtree
                     if (parent->left == t)
-                        parent->left = t->left;  
+                        parent->left = t->left;
                     else
                         parent->right = t->left;
                     t->left->parent = parent;
@@ -1483,7 +1483,7 @@ namespace dlib
                 else
                 {
                     // if there is both a left and right subtree
-                    // get an element to fill this node now that its been swapped into 
+                    // get an element to fill this node now that its been swapped into
                     // item_copy
                     if (remove_least_element_in_tree(t->right,t->d,t->r))
                     {
@@ -1511,7 +1511,7 @@ namespace dlib
     remove_from_tree (
         node* t,
         const domain& d
-    ) 
+    )
     {
         while (true)
         {
@@ -1540,7 +1540,7 @@ namespace dlib
 
 
                     if (parent->left == t)
-                        parent->left = t->right;  
+                        parent->left = t->right;
                     else
                         parent->right = t->right;
                     t->right->parent = parent;
@@ -1553,7 +1553,7 @@ namespace dlib
                         fix_after_remove(t->right);
 
                     // delete old node
-                    pool.deallocate(t);  
+                    pool.deallocate(t);
                 }
                 else if (t->right == NIL)
                 {
@@ -1563,7 +1563,7 @@ namespace dlib
                     
                     // plug hole with left subtree
                     if (parent->left == t)
-                        parent->left = t->left;  
+                        parent->left = t->left;
                     else
                         parent->right = t->left;
                     t->left->parent = parent;
@@ -1581,7 +1581,7 @@ namespace dlib
                 else
                 {
                     // if there is both a left and right subtree
-                    // get an element to fill this node now that its been swapped into 
+                    // get an element to fill this node now that its been swapped into
                     // item_copy
                     remove_least_element_in_tree(t->right,t->d,t->r);
 
@@ -1605,7 +1605,7 @@ namespace dlib
     return_reference (
         node* t,
         const domain& d
-    ) 
+    )
     {
         while (t != NIL)
         {
@@ -1681,7 +1681,7 @@ namespace dlib
         {
             node& grandparent = *(t->parent->parent);
 
-            // if both t's parent and its sibling are red 
+            // if both t's parent and its sibling are red
             if (grandparent.left->color == grandparent.right->color)
             {
                 grandparent.color = red;
@@ -1716,7 +1716,7 @@ namespace dlib
                     if (t->parent == grandparent.left)
                     {
                         t->color = black;
-                        grandparent.color = red;                        
+                        grandparent.color = red;
                         double_rotate_right(&grandparent);
                     }
                     // if t's parent is a right child
@@ -1731,7 +1731,7 @@ namespace dlib
             }
         }
         tree_root->color = black;
-    }       
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1826,7 +1826,7 @@ namespace dlib
         }
         t->color = black;
     
-    }         
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1845,12 +1845,12 @@ namespace dlib
             return 0;
 
         short height1 = tree_height(t->left);
-        short height2 = tree_height(t->right);        
+        short height2 = tree_height(t->right);
         if (height1 > height2)
             return height1 + 1;
         else
             return height2 + 1;
-    }       
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1871,7 +1871,7 @@ namespace dlib
             if (comp(d , tree_root->d))
             {
                 // go left
-                return get_count(d,tree_root->left);                
+                return get_count(d,tree_root->left);
             }
             else if (comp(tree_root->d , d))
             {
@@ -1881,8 +1881,8 @@ namespace dlib
             else
             {
                 // go left and right to look for more matches
-                return   get_count(d,tree_root->left) 
-                       + get_count(d,tree_root->right) 
+                return   get_count(d,tree_root->left)
+                       + get_count(d,tree_root->right)
                        + 1;
             }
         }

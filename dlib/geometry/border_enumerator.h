@@ -15,7 +15,7 @@ namespace dlib
     {
     public:
         border_enumerator(
-        ) 
+        )
         {
             reset();
         }
@@ -23,7 +23,7 @@ namespace dlib
         border_enumerator(
             const rectangle& rect_,
             unsigned long border_size
-        ) : 
+        ) :
             rect(rect_),
             inner_rect(shrink_rect(rect_, border_size))
         {
@@ -33,7 +33,7 @@ namespace dlib
         border_enumerator(
             const rectangle& rect_,
             const rectangle& non_border_region
-        ) : 
+        ) :
             rect(rect_),
             inner_rect(non_border_region.intersect(rect))
         {
@@ -41,7 +41,7 @@ namespace dlib
         }
 
         void reset (
-        ) 
+        )
         {
             // make the four rectangles that surround inner_rect and intersect them
             // with rect.

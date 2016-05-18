@@ -12,7 +12,7 @@
 #include "tester.h"
 #include "conditioning_class.h"
 
-namespace  
+namespace
 {
 
 

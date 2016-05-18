@@ -12,7 +12,7 @@ template <typename T>
 struct serialize_pickle : boost::python::pickle_suite
 {
     static boost::python::tuple getstate(
-        const T& item 
+        const T& item
     )
     {
         using namespace dlib;
@@ -25,7 +25,7 @@ struct serialize_pickle : boost::python::pickle_suite
     }
 
     static void setstate(
-        T& item, 
+        T& item,
         boost::python::tuple state
     )
     {

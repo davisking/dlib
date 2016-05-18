@@ -12,7 +12,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
@@ -27,11 +27,11 @@ namespace
     )
     /*!
         requires
-            - buf is an implementation of lz77_buffer/lz77_buffer_kernel_abstract.h 
+            - buf is an implementation of lz77_buffer/lz77_buffer_kernel_abstract.h
         ensures
-            - runs tests on buf for compliance with the specs 
+            - runs tests on buf for compliance with the specs
     !*/
-    {        
+    {
         typedef dlib::sliding_buffer<unsigned char>::kernel_1a sbuf;
 
         buf test(8,20);
@@ -175,13 +175,13 @@ namespace
 
 
 
-            // add the above text to test and make sure it gives the correct results                
+            // add the above text to test and make sure it gives the correct results
             ch = sin.get();
             while (sin)
             {
                 sbuffer[0] = ch; sbuffer.rotate_left(1);
                 test.add(ch);
-                DLIB_TEST(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch);                    
+                DLIB_TEST(test.lookahead_buffer(test.get_lookahead_buffer_size()-1) == ch);
                 DLIB_TEST(test.history_buffer(0) == sbuffer[21]);
                 DLIB_TEST(test.history_buffer(1) == sbuffer[22]);
 
@@ -190,7 +190,7 @@ namespace
 
 
 
-            // make sure the contents of lookahead_buffer and history_buffer 
+            // make sure the contents of lookahead_buffer and history_buffer
             // match what is in sbuffer
             sbuffer.rotate_right(1);
             for (unsigned int i = 0; i < test.get_history_buffer_size(); ++i)
@@ -266,10 +266,10 @@ namespace
             {
                 ch = sin.get();
                 sbuffer[0] = ch; sbuffer.rotate_left(1);
-                test.add(ch);                    
+                test.add(ch);
             }
 
-            // make sure the contents of lookahead_buffer and history_buffer 
+            // make sure the contents of lookahead_buffer and history_buffer
             // match what is in sbuffer
             sbuffer.rotate_right(1);
             for (unsigned int i = 0; i < test.get_history_buffer_size(); ++i)
@@ -307,37 +307,37 @@ namespace
             {
                 ch = sin.get();
                 sbuffer[0] = ch; sbuffer.rotate_left(1);
-                test.add(ch);                    
+                test.add(ch);
             }
 
             ch = '?';
             sbuffer[0] = ch; sbuffer.rotate_left(1);
-            test.add(ch);  
+            test.add(ch);
             ch = 'a';
             sbuffer[0] = ch; sbuffer.rotate_left(1);
-            test.add(ch);  
+            test.add(ch);
             ch = 'v';
             sbuffer[0] = ch; sbuffer.rotate_left(1);
-            test.add(ch);  
+            test.add(ch);
             ch = 'i';
             sbuffer[0] = ch; sbuffer.rotate_left(1);
-            test.add(ch);  
+            test.add(ch);
             ch = 's';
             sbuffer[0] = ch; sbuffer.rotate_left(1);
-            test.add(ch);  
+            test.add(ch);
 
 
             // adjust sbuffer due to the last call to test.find_match()
             // but only if we haven't already added enough (20 or more) chars
-            // to fill the lookahead buffer already.  
+            // to fill the lookahead buffer already.
             if (match_length > static_cast<unsigned int>(12+g*2))
-                sbuffer.rotate_left(match_length-(12+g*2)); 
+                sbuffer.rotate_left(match_length-(12+g*2));
 
 
 
 
 
-            // make sure the contents of lookahead_buffer and history_buffer 
+            // make sure the contents of lookahead_buffer and history_buffer
             // match what is in sbuffer
             sbuffer.rotate_right(1);
             for (unsigned int i = 0; i < test.get_history_buffer_size(); ++i)
@@ -404,10 +404,10 @@ namespace
             {
                 ch = sin.get();
                 sbuffer[0] = ch; sbuffer.rotate_left(1);
-                test.add(ch);                    
+                test.add(ch);
             }
 
-            // make sure the contents of lookahead_buffer and history_buffer 
+            // make sure the contents of lookahead_buffer and history_buffer
             // match what is in sbuffer
             sbuffer.rotate_right(1);
 
@@ -486,10 +486,10 @@ namespace
             {
                 ch = sin.get();
                 sbuffer[0] = ch; sbuffer.rotate_left(1);
-                test.add(ch);                    
+                test.add(ch);
             }
 
-            // make sure the contents of lookahead_buffer and history_buffer 
+            // make sure the contents of lookahead_buffer and history_buffer
             // match what is in sbuffer
             sbuffer.rotate_right(1);
 
@@ -523,7 +523,7 @@ namespace
             }
 
 
-            DLIB_TEST(test.get_lookahead_buffer_size() == lookahead_size_before-match_length);            
+            DLIB_TEST(test.get_lookahead_buffer_size() == lookahead_size_before-match_length);
 
             sbuffer.rotate_right(1);  // do this because we never put anything in sbuffer[0]
             // verify the match with sbuffer

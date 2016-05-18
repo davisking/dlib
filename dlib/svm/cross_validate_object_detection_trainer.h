@@ -25,14 +25,14 @@ namespace dlib
             const std::vector<std::pair<double,rectangle> >& boxes,
             const test_box_overlap& overlap_tester,
             std::vector<std::pair<double,bool> >& all_dets,
-            unsigned long& missing_detections 
+            unsigned long& missing_detections
         )
         /*!
             ensures
-                - returns the number of elements in truth_boxes which are overlapped by an 
+                - returns the number of elements in truth_boxes which are overlapped by an
                   element of boxes.  In this context, two boxes, A and B, overlap if and only if
                   overlap_tester(A,B) == true.
-                - No element of boxes is allowed to account for more than one element of truth_boxes.  
+                - No element of boxes is allowed to account for more than one element of truth_boxes.
                 - The returned number is in the range [0,truth_boxes.size()]
                 - Adds the score for each box from boxes into all_dets and labels each with
                   a bool indicating if it hit a truth box.  Note that we skip boxes that
@@ -103,13 +103,13 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( is_learning_problem(images,truth_dets) == true && 
+        DLIB_CASSERT( is_learning_problem(images,truth_dets) == true &&
                         ignore.size() == images.size(),
                     "\t matrix test_object_detection_function()"
                     << "\n\t invalid inputs were given to this function"
                     << "\n\t is_learning_problem(images,truth_dets): " << is_learning_problem(images,truth_dets)
-                    << "\n\t ignore.size(): " << ignore.size() 
-                    << "\n\t images.size(): " << images.size() 
+                    << "\n\t ignore.size(): " << ignore.size()
+                    << "\n\t images.size(): " << images.size()
                     );
 
 
@@ -123,7 +123,7 @@ namespace dlib
 
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            std::vector<std::pair<double,rectangle> > hits; 
+            std::vector<std::pair<double,rectangle> > hits;
             detector(images[i], hits, adjust_threshold);
 
             correct_hits += impl::number_of_truth_hits(truth_dets[i], ignore[i], hits, overlap_tester, all_dets, missing_detections);
@@ -245,10 +245,10 @@ namespace dlib
         };
 
         template <
-            typename T 
+            typename T
             >
         const matrix_op<op_array_to_mat<array_subset_helper<T> > > mat (
-            const array_subset_helper<T>& m 
+            const array_subset_helper<T>& m
         )
         {
             typedef op_array_to_mat<array_subset_helper<T> > op;
@@ -281,8 +281,8 @@ namespace dlib
                     << "\n\t invalid inputs were given to this function"
                     << "\n\t is_learning_problem(images,truth_dets): " << is_learning_problem(images,truth_dets)
                     << "\n\t folds: "<< folds
-                    << "\n\t ignore.size(): " << ignore.size() 
-                    << "\n\t images.size(): " << images.size() 
+                    << "\n\t ignore.size(): " << ignore.size()
+                    << "\n\t images.size(): " << images.size()
                     );
 
         double correct_hits = 0;
@@ -317,7 +317,7 @@ namespace dlib
             typename trainer_type::trained_function_type detector = trainer.train(array_subset, training_rects, training_ignores, overlap_tester);
             for (unsigned long i = 0; i < test_idx_set.size(); ++i)
             {
-                std::vector<std::pair<double,rectangle> > hits; 
+                std::vector<std::pair<double,rectangle> > hits;
                 detector(images[test_idx_set[i]], hits, adjust_threshold);
 
                 correct_hits += impl::number_of_truth_hits(truth_dets[test_idx_set[i]], ignore[i], hits, overlap_tester, all_dets, missing_detections);

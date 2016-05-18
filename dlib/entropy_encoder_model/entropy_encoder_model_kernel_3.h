@@ -16,7 +16,7 @@ namespace dlib
         typename cc,
         typename cc_high
         >
-    class entropy_encoder_model_kernel_3 
+    class entropy_encoder_model_kernel_3
     {
         /*!
             REQUIREMENTS ON cc
@@ -43,7 +43,7 @@ namespace dlib
                 if (order_2[i] != 0) then
                     &order_2[i]->get_global_state() == &gs_high
 
-                This is an order-2-1-0 model. The last symbol in the order-2, order-1 and 
+                This is an order-2-1-0 model. The last symbol in the order-2, order-1 and
                 order-0 contexts is an escape into the lower context.
 
                 previous_symbol == the last symbol seen
@@ -90,7 +90,7 @@ namespace dlib
         entropy_encoder_model_kernel_3(entropy_encoder_model_kernel_3&);        // copy constructor
         entropy_encoder_model_kernel_3& operator=(entropy_encoder_model_kernel_3&);    // assignment operator
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ namespace dlib
     entropy_encoder_model_kernel_3<alphabet_size,entropy_encoder,cc,cc_high>::
     entropy_encoder_model_kernel_3 (
         entropy_encoder& coder_
-    ) : 
+    ) :
         coder(coder_),
         order_0(gs),
         order_1(0),
@@ -166,7 +166,7 @@ namespace dlib
     )
     {
         for (unsigned long i = 0; i < alphabet_size; ++i)
-        {           
+        {
             delete order_1[i];
         }
 
@@ -256,13 +256,13 @@ namespace dlib
                 
             }
             else
-            {                
+            {
                 order_2[temp] = new cc_high(gs_high);
 
-                // in this case the decoder knows to escape to order-1 because 
+                // in this case the decoder knows to escape to order-1 because
                 // there was no conditioning_class object in this context yet.
                 // so we don't need to actually write the escape symbol
-            }            
+            }
 
             // update the count for this symbol in this context
             order_2[temp]->increment_count(symbol,2);
@@ -284,9 +284,9 @@ namespace dlib
                 coder.encode(low_count,high_count,total_count);
                 previous_symbol = symbol;
                 return;
-            }       
+            }
 
-            // we didn't find the symbol in the order-1 context so we must escape to a 
+            // we didn't find the symbol in the order-1 context so we must escape to a
             // lower context.
 
             // escape to the order-0 context
@@ -311,7 +311,7 @@ namespace dlib
             // update the count for this symbol
             order_0.increment_count(symbol,2);
             // encode this symbol
-            coder.encode(low_count,high_count,total_count);                
+            coder.encode(low_count,high_count,total_count);
             return;
         }
     
@@ -323,7 +323,7 @@ namespace dlib
         order_0.get_range(alphabet_size,low_count,high_count,total_count);
         coder.encode(low_count,high_count,total_count);
         // increment the count for the escape symbol
-        order_0.increment_count(alphabet_size);  
+        order_0.increment_count(alphabet_size);
 
         // update the count for this symbol
         order_0.increment_count(symbol,2);

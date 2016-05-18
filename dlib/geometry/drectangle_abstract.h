@@ -14,7 +14,7 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                The initial value of this object is defined by its constructor.                
+                The initial value of this object is defined by its constructor.
 
             WHAT THIS OBJECT REPRESENTS
                 This object is just like dlib::rectangle except that it stores the
@@ -38,8 +38,8 @@ namespace dlib
             ensures
                 - #left() == 0
                 - #top() == 0
-                - #right() == -1 
-                - #bottom() == -1 
+                - #right() == -1
+                - #bottom() == -1
                 - #is_empty() == true
         !*/
 
@@ -119,7 +119,7 @@ namespace dlib
         );
         /*!
             ensures
-                - returns a non-const reference to the x coordinate for the left side 
+                - returns a non-const reference to the x coordinate for the left side
                   of this rectangle
         !*/
 
@@ -134,7 +134,7 @@ namespace dlib
         );
         /*!
             ensures
-                - returns a non-const reference to the y coordinate for the 
+                - returns a non-const reference to the y coordinate for the
                   top of this rectangle
         !*/
 
@@ -149,7 +149,7 @@ namespace dlib
         );
         /*!
             ensures
-                - returns a non-const reference to the x coordinate for the right 
+                - returns a non-const reference to the x coordinate for the right
                   side of this rectangle
         !*/
 
@@ -164,7 +164,7 @@ namespace dlib
         );
         /*!
             ensures
-                - returns a non-const reference to the y coordinate for the bottom 
+                - returns a non-const reference to the y coordinate for the bottom
                   of this rectangle
         !*/
        
@@ -172,7 +172,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns vector<double,2>(left(), top()) 
+                - returns vector<double,2>(left(), top())
                   (i.e. returns the top left corner point for this rectangle)
         !*/
 
@@ -180,7 +180,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns vector<double,2>(left(), bottom()) 
+                - returns vector<double,2>(left(), bottom())
                   (i.e. returns the bottom left corner point for this rectangle)
         !*/
 
@@ -188,7 +188,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns vector<double,2>(right(), top()) 
+                - returns vector<double,2>(right(), top())
                   (i.e. returns the top right corner point for this rectangle)
         !*/
 
@@ -196,7 +196,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns vector<double,2>(right(), bottom()) 
+                - returns vector<double,2>(right(), bottom())
                   (i.e. returns the bottom right corner point for this rectangle)
         !*/
 
@@ -245,7 +245,7 @@ namespace dlib
         /*!
             ensures
                 - if (rhs.is_empty() == false && this->is_empty() == false) then
-                    - returns the smallest rectangle that contains both *this and 
+                    - returns the smallest rectangle that contains both *this and
                       rhs.
                 - if (rhs.is_empty() == true && this->is_empty() == false) then
                     - returns *this
@@ -261,7 +261,7 @@ namespace dlib
         /*!
             ensures
                 - if (there is a region of intersection between *this and rhs) then
-                    - returns a rectangle that represents the intersection of *this 
+                    - returns a rectangle that represents the intersection of *this
                       and rhs.
                 - else
                     - returns a rectangle where is_empty() == true
@@ -343,26 +343,26 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void serialize (
-        const drectangle& item, 
+        const drectangle& item,
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
-        drectangle& item, 
+        drectangle& item,
         std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     std::ostream& operator<< (
-        std::ostream& out, 
-        const drectangle& item 
+        std::ostream& out,
+        const drectangle& item
     );
     /*!
         ensures
@@ -372,8 +372,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     std::istream& operator>>(
-        std::istream& in, 
-        drectangle& item 
+        std::istream& in,
+        drectangle& item
     );
     /*!
         ensures
@@ -406,7 +406,7 @@ namespace dlib
 
     drectangle operator* (
         const drectangle& rect,
-        const double& scale 
+        const double& scale
     );
     /*!
         ensures
@@ -485,7 +485,7 @@ namespace dlib
     drectangle intersect (
         const drectangle& a,
         const drectangle& b
-    ); 
+    );
     /*!
         ensures
             - returns a.intersect(b)
@@ -514,12 +514,12 @@ namespace dlib
             - returns a rectangle R such that:
                 - center(R) == p
                 - if (width < 1 || height < 1)
-                    - R.width() == 0 
-                    - R.height() == 0 
+                    - R.width() == 0
+                    - R.height() == 0
                     - R.is_empty() == true
                 - else
                     - R.width() == width
-                    - R.height() == height 
+                    - R.height() == height
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -538,7 +538,7 @@ namespace dlib
 
     const drectangle shrink_rect (
         const drectangle& rect,
-        double num 
+        double num
     );
     /*!
         ensures
@@ -550,7 +550,7 @@ namespace dlib
 
     const drectangle grow_rect (
         const drectangle& rect,
-        double num 
+        double num
     );
     /*!
         ensures

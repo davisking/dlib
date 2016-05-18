@@ -34,7 +34,7 @@ namespace dlib
             const string_type& name
         ) const;
 
-        unsigned long number_of_arguments( 
+        unsigned long number_of_arguments(
         ) const;
 
         const option_type& element (
@@ -54,9 +54,9 @@ namespace dlib
         typename clp_base
         >
     inline void swap (
-        cmd_line_parser_kernel_c<clp_base>& a, 
-        cmd_line_parser_kernel_c<clp_base>& b 
-    ) { a.swap(b); } 
+        cmd_line_parser_kernel_c<clp_base>& a,
+        cmd_line_parser_kernel_c<clp_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ namespace dlib
         typename clp_base
         >
     unsigned long cmd_line_parser_kernel_c<clp_base>::
-    number_of_arguments( 
+    number_of_arguments(
     ) const
     {
         // make sure requires clause is not broken
@@ -182,7 +182,7 @@ namespace dlib
         >
     typename clp_base::option_type& cmd_line_parser_kernel_c<clp_base>::
     element (
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT(this->current_element_valid() == true,

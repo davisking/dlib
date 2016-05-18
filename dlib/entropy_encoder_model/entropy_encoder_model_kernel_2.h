@@ -16,7 +16,7 @@ namespace dlib
         typename cc,
         typename ccbig
         >
-    class entropy_encoder_model_kernel_2 
+    class entropy_encoder_model_kernel_2
     {
         /*!
             REQUIREMENTS ON cc
@@ -42,7 +42,7 @@ namespace dlib
                 This is an order-1-0 model. The last symbol in the order-0 and order-1
                 context is an escape into the lower context.
 
-                previous_symbol == the last symbol seen                
+                previous_symbol == the last symbol seen
         !*/
 
     public:
@@ -83,7 +83,7 @@ namespace dlib
         entropy_encoder_model_kernel_2(entropy_encoder_model_kernel_2<alphabet_size,entropy_encoder,cc,ccbig>&);        // copy constructor
         entropy_encoder_model_kernel_2<alphabet_size,entropy_encoder,cc,ccbig>& operator=(entropy_encoder_model_kernel_2<alphabet_size,entropy_encoder,cc,ccbig>&);    // assignment operator
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ namespace dlib
     entropy_encoder_model_kernel_2<alphabet_size,entropy_encoder,cc,ccbig>::
     entropy_encoder_model_kernel_2 (
         entropy_encoder& coder_
-    ) : 
+    ) :
         coder(coder_),
         order_0(gs),
         previous_symbol(0)
@@ -138,7 +138,7 @@ namespace dlib
     )
     {
         for (unsigned long i = 0; i < alphabet_size; ++i)
-        {           
+        {
             delete order_1[i];
         }
     }
@@ -190,9 +190,9 @@ namespace dlib
             coder.encode(low_count,high_count,total_count);
             previous_symbol = symbol;
             return;
-        }       
+        }
 
-        // we didn't find the symbol in the order-1 context so we must escape to a 
+        // we didn't find the symbol in the order-1 context so we must escape to a
         // lower context.
 
         // escape to the order-0 context
@@ -216,7 +216,7 @@ namespace dlib
             // update the count for this symbol
             order_0.increment_count(symbol,2);
             // encode this symbol
-            coder.encode(low_count,high_count,total_count);                
+            coder.encode(low_count,high_count,total_count);
             return;
         }
     
@@ -228,7 +228,7 @@ namespace dlib
         order_0.get_range(alphabet_size,low_count,high_count,total_count);
         coder.encode(low_count,high_count,total_count);
         // increment the count for the escape symbol
-        order_0.increment_count(alphabet_size);  
+        order_0.increment_count(alphabet_size);
 
         // update the count for this symbol
         order_0.increment_count(symbol,2);

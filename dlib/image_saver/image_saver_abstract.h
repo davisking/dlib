@@ -10,8 +10,8 @@
 
 namespace dlib
 {
-    class image_save_error : public dlib::error 
-    { 
+    class image_save_error : public dlib::error
+    {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an exception used to indicate a failure to save an image.
@@ -22,11 +22,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void save_bmp (
         const image_type& image,
-        std::ostream& out 
+        std::ostream& out
     );
     /*!
         requires
@@ -37,20 +37,20 @@ namespace dlib
             - image[0][0] will be in the upper left corner of the image.
             - image[image.nr()-1][image.nc()-1] will be in the lower right
               corner of the image.
-            - This routine can save images containing any type of pixel. However, it 
-              will convert all color pixels into rgb_pixel and grayscale pixels into 
+            - This routine can save images containing any type of pixel. However, it
+              will convert all color pixels into rgb_pixel and grayscale pixels into
               uint8 type before saving to disk.
         throws
             - image_save_error
                 This exception is thrown if there is an error that prevents us
-                from saving the image.  
-            - std::bad_alloc 
+                from saving the image.
+            - std::bad_alloc
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void save_bmp (
         const image_type& image,
@@ -70,17 +70,17 @@ namespace dlib
 
     /*!
         dlib dng file format:
-            This is a file format I created for this library.  It is a lossless 
+            This is a file format I created for this library.  It is a lossless
             compressed image format that is similar to the PNG format but uses
             the dlib PPM compression algorithms instead of the DEFLATE algorithm.
     !*/
 
     template <
-        typename image_type 
+        typename image_type
         >
     void save_dng (
         const image_type& image,
-        std::ostream& out 
+        std::ostream& out
     );
     /*!
         requires
@@ -99,8 +99,8 @@ namespace dlib
         throws
             - image_save_error
                 This exception is thrown if there is an error that prevents us
-                from saving the image.  
-            - std::bad_alloc 
+                from saving the image.
+            - std::bad_alloc
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ namespace dlib
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h or any kind of matrix expression.
         ensures
-            - opens the file indicated by file_name with an output file stream named fout 
+            - opens the file indicated by file_name with an output file stream named fout
               and performs:
               save_dng(image,fout);
     !*/

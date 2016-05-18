@@ -22,7 +22,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize(
-        const surf_point& item,  
+        const surf_point& item,
         std::ostream& out
     )
     {
@@ -33,16 +33,16 @@ namespace dlib
             serialize(item.angle,out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type surf_point"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type surf_point");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     inline void deserialize(
-        surf_point& item,  
-        std::istream& in 
+        surf_point& item,
+        std::istream& in
     )
     {
         try
@@ -52,8 +52,8 @@ namespace dlib
             deserialize(item.angle,in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type surf_point"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type surf_point");
         }
     }
 
@@ -64,7 +64,7 @@ namespace dlib
         DLIB_ASSERT(sig > 0,
             "\tdouble gaussian()"
             << "\n\t sig must be bigger than 0"
-            << "\n\t sig: " << sig 
+            << "\n\t sig: " << sig
         );
         const double sqrt_2_pi = 2.5066282746310002416123552393401041626930;
         return 1.0/(sig*sqrt_2_pi) * std::exp( -(x*x + y*y)/(2*sig*sig));
@@ -83,9 +83,9 @@ namespace dlib
                     scale > 0,
             "\tdouble compute_dominant_angle(img, center, scale)"
             << "\n\tAll arguments to this function must be > 0"
-            << "\n\t get_rect(img): " << get_rect(img) 
-            << "\n\t center:        " << center 
-            << "\n\t scale:         " << scale 
+            << "\n\t get_rect(img): " << get_rect(img)
+            << "\n\t center:        " << center
+            << "\n\t scale:         " << scale
         );
 
 
@@ -116,7 +116,7 @@ namespace dlib
         // now find the dominant direction
         double max_length = 0;
         double best_ang = 0;
-        // look at a bunch of pie shaped slices of a circle 
+        // look at a bunch of pie shaped slices of a circle
         const long slices = 45;
         const double ang_step = (2*pi)/slices;
         for (long ang_i = 0; ang_i < slices; ++ang_i)
@@ -168,9 +168,9 @@ namespace dlib
                     scale > 0,
             "\tvoid compute_surf_descriptor(img, center, scale, angle)"
             << "\n\tAll arguments to this function must be > 0"
-            << "\n\t get_rect(img): " << get_rect(img) 
-            << "\n\t center:        " << center 
-            << "\n\t scale:         " << scale 
+            << "\n\t get_rect(img): " << get_rect(img)
+            << "\n\t center:        " << center
+            << "\n\t scale:         " << scale
         );
 
         point_rotator rot(angle);
@@ -179,7 +179,7 @@ namespace dlib
         const long sc = static_cast<long>(scale+0.5);
         long count = 0;
 
-        // loop over the 4x4 grid of histogram buckets 
+        // loop over the 4x4 grid of histogram buckets
         for (long r = -10; r < 10; r += 5)
         {
             for (long c = -10; c < 10; c += 5)
@@ -200,9 +200,9 @@ namespace dlib
                             continue;
 
                         // get the rotated point for this extraction point
-                        point p(rot(point(x,y)*scale) + center); 
+                        point p(rot(point(x,y)*scale) + center);
 
-                        // Give points farther from the center of the bucket a lower weight.  
+                        // Give points farther from the center of the bucket a lower weight.
                         const long center_r = r+2;
                         const long center_c = c+2;
                         const double weight = 1.0/(4+std::abs(center_r-y) + std::abs(center_c-x));
@@ -210,7 +210,7 @@ namespace dlib
                         temp.x() = weight*haar_x(img, p, 2*sc);
                         temp.y() = weight*haar_y(img, p, 2*sc);
 
-                        // rotate this vector into alignment with the surf descriptor box 
+                        // rotate this vector into alignment with the surf descriptor box
                         temp = inv_rot(temp);
 
                         vect += temp;
@@ -243,11 +243,11 @@ namespace dlib
         DLIB_ASSERT(max_points > 0 && detection_threshold >= 0,
             "\t std::vector<surf_point> get_surf_points()"
             << "\n\t Invalid arguments were given to this function."
-            << "\n\t max_points:          " << max_points 
-            << "\n\t detection_threshold: " << detection_threshold 
+            << "\n\t max_points:          " << max_points
+            << "\n\t detection_threshold: " << detection_threshold
         );
 
-        // Figure out the proper scalar type we should use to work with these pixels.  
+        // Figure out the proper scalar type we should use to work with these pixels.
         typedef typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type bp_type;
         typedef typename promote<bp_type>::type working_pixel_type;
 
@@ -260,7 +260,7 @@ namespace dlib
         pyr.build_pyramid(int_img, 4, 6, 2);
 
         // now get all the interest points from the hessian pyramid
-        std::vector<interest_point> points; 
+        std::vector<interest_point> points;
         get_interest_points(pyr, detection_threshold, points);
         std::vector<surf_point> spoints;
 

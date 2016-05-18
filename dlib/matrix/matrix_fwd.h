@@ -19,9 +19,9 @@ namespace dlib
         long num_rows = 0,
         long num_cols = 0,
         typename mem_manager = default_memory_manager,
-        typename layout = row_major_layout 
+        typename layout = row_major_layout
         >
-    class matrix; 
+    class matrix;
 
 // ----------------------------------------------------------------------------------------
 

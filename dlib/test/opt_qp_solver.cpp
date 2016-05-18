@@ -15,7 +15,7 @@
 #include "tester.h"
 
 
-namespace  
+namespace
 {
 
     using namespace test;

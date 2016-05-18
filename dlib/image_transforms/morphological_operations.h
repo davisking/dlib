@@ -294,7 +294,7 @@ namespace dlib
                 binary_erosion(temp2,temp1,structuring_element);
             }
 
-            // do the extra dilations 
+            // do the extra dilations
             for (unsigned long i = 1; i < iter; ++i)
             {
                 swap(temp1, temp2);
@@ -369,14 +369,14 @@ namespace dlib
             in_image_type temp1, temp2;
             binary_dilation(in_img,temp1,structuring_element);
 
-            // do the extra dilations 
+            // do the extra dilations
             for (unsigned long i = 1; i < iter; ++i)
             {
                 swap(temp1, temp2);
                 binary_dilation(temp2,temp1,structuring_element);
             }
 
-            // do the extra erosions 
+            // do the extra erosions
             for (unsigned long i = 1; i < iter; ++i)
             {
                 swap(temp1, temp2);
@@ -684,28 +684,28 @@ namespace dlib
             unsigned int p8 = img[r][c-1];
             unsigned int p9 = img[r-1][c-1];
 
-            int A  = (p2 == 0 && p3 == 255) + (p3 == 0 && p4 == 255) + 
-                (p4 == 0 && p5 == 255) + (p5 == 0 && p6 == 255) + 
+            int A  = (p2 == 0 && p3 == 255) + (p3 == 0 && p4 == 255) +
+                (p4 == 0 && p5 == 255) + (p5 == 0 && p6 == 255) +
                 (p6 == 0 && p7 == 255) + (p7 == 0 && p8 == 255) +
                 (p8 == 0 && p9 == 255) + (p9 == 0 && p2 == 255);
             int B  = p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9;
             int m1 = iter == 0 ? (p2 * p4 * p6) : (p2 * p4 * p8);
             int m2 = iter == 0 ? (p4 * p6 * p8) : (p2 * p6 * p8);
-            // Decide if we should remove the pixel img[r][c].  
+            // Decide if we should remove the pixel img[r][c].
             return (A == 1 && (B >= 2*255 && B <= 6*255) && m1 == 0 && m2 == 0);
         }
 
         template <typename image_type>
         inline void add_to_remove (
             std::vector<point>& to_remove,
-            array2d<unsigned char>& marker, 
+            array2d<unsigned char>& marker,
             const image_type& img,
             long r,
             long c,
             int iter
         )
         {
-            if (marker[r][c]&&should_remove_pixel(img,r,c,iter)) 
+            if (marker[r][c]&&should_remove_pixel(img,r,c,iter))
             {
                 to_remove.push_back(point(c,r));
                 marker[r][c] = 0;
@@ -735,7 +735,7 @@ namespace dlib
         }
 
         inline void add_if(
-            std::vector<point>& to_check2, 
+            std::vector<point>& to_check2,
             const array2d<unsigned char>& marker,
             long c,
             long r

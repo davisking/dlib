@@ -75,12 +75,12 @@ namespace dlib
                 print_default_logger_header(sout,"some_name",LDEBUG,0);
             }
         };
-        // do this to make sure all the static members of print_default_logger_header get 
+        // do this to make sure all the static members of print_default_logger_header get
         // initialized when the program turns on.
         static helper a;
         // make a logger to make extra sure the static global_data object gets
         // initialized before any threads start up.  Also do this so that there is always
-        // at least one logger so that the global data won't be deleted until the 
+        // at least one logger so that the global data won't be deleted until the
         // program is terminating.
         static logger log("dlib");
     }
@@ -100,7 +100,7 @@ namespace dlib
 
         const uint64 cur_time = (ts.get_timestamp() - first_time)/1000;
         streamsize old_width = out.width(); out.width(5);
-        out << cur_time << " " << l.name; 
+        out << cur_time << " " << l.name;
         out.width(old_width);
 
         out << " [" << thread_id << "] " << logger_name << ": ";
@@ -123,11 +123,11 @@ namespace dlib
 
     logger::global_data::
     global_data(
-    ) : 
-        next_thread_name(1) 
-    { 
+    ) :
+        next_thread_name(1)
+    {
         // make sure the main program thread always has id 0.  Since there is
-        // a global logger object declared in this file we should expect that 
+        // a global logger object declared in this file we should expect that
         // the global_data object will be initialized in the main program thread
         // so if we call get_thread_id() now we should get the main thread id.
         thread_id_type main_id = get_thread_id();
@@ -136,7 +136,7 @@ namespace dlib
 
         // set up the defaults
         auto_flush_table.val = true;
-        streambuf_table.val = std::cout.rdbuf(); 
+        streambuf_table.val = std::cout.rdbuf();
         header_table.val = print_default_logger_header;
 
         // also allocate an initial buffer for hook based logging
@@ -166,7 +166,7 @@ namespace dlib
 
         if (c.table.is_in_domain(first))
         {
-            return search_tables(*c.table[first], last); 
+            return search_tables(*c.table[first], last);
         }
         else
         {
@@ -198,7 +198,7 @@ namespace dlib
 
         if (c.table.is_in_domain(first))
         {
-            assign_tables(*c.table[first], last, val); 
+            assign_tables(*c.table[first], last, val);
         }
         else
         {
@@ -214,8 +214,8 @@ namespace dlib
     const log_level logger::global_data::
     level (
         const std::string& name
-    ) const 
-    {  
+    ) const
+    {
         auto_mutex M(m);
         return search_tables(level_table, name).val;
     }
@@ -283,7 +283,7 @@ namespace dlib
     void logger::global_data::
     set_output_stream (
         const std::string& name,
-        std::streambuf& buf 
+        std::streambuf& buf
     )
     {
         auto_mutex M(m);
@@ -446,9 +446,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     logger::
-    logger (  
+    logger (
         const std::string& name_
-    ) : 
+    ) :
         gd(get_global_data()),
         logger_name(name_),
         out(gd.output_streambuf(logger_name)),
@@ -474,10 +474,10 @@ namespace dlib
 
     logger::
     ~logger (
-    ) 
-    { 
+    )
+    {
         gd.m.lock();
-        gd.loggers.destroy(this);            
+        gd.loggers.destroy(this);
         // if this was the last logger then delete the global data
         if (gd.loggers.size() == 0)
         {

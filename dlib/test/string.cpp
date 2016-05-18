@@ -10,7 +10,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -23,9 +23,9 @@ namespace
     )
     /*!
         ensures
-            - runs tests on string functions for compliance with the specs 
+            - runs tests on string functions for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
 
@@ -101,34 +101,34 @@ namespace
 
 
         dlog << LTRACE << 6;
-        DLIB_TEST( (lpad(wstring(L"davis"), 10) == L"     davis")); 
-        DLIB_TEST( (rpad(wstring(L"davis"), 10) == L"davis     ")); 
-        DLIB_TEST( (pad(wstring(L"davis"), 10) ==  L"  davis   ")); 
+        DLIB_TEST( (lpad(wstring(L"davis"), 10) == L"     davis"));
+        DLIB_TEST( (rpad(wstring(L"davis"), 10) == L"davis     "));
+        DLIB_TEST( (pad(wstring(L"davis"), 10) ==  L"  davis   "));
 
-        DLIB_TEST( (lpad(string("davis"), -10) == "davis")); 
-        DLIB_TEST( (rpad(string("davis"), -10) == "davis")); 
-        DLIB_TEST( (pad(string("davis"), -10) == "davis")); 
-        DLIB_TEST( (lpad(string("davis"), 10) == "     davis")); 
-        DLIB_TEST( (rpad(string("davis"), 10) == "davis     ")); 
-        DLIB_TEST( (pad(string("davis"), 10) ==  "  davis   ")); 
-        DLIB_TEST( (lpad(string("davis"), 10, string("*")) == "*****davis")); 
-        DLIB_TEST( (rpad(string("davis"), 10, string("*")) == "davis*****")); 
-        DLIB_TEST( (pad(string("davis"), 10, string("*")) == "**davis***")); 
-        DLIB_TEST( (lpad(string("davis"), 10, string("_-")) == "_-_-_davis")); 
-        DLIB_TEST( (rpad(string("davis"), 10, string("_-")) == "davis_-_-_")); 
-        DLIB_TEST( (pad(string("davis"), 10, string("_-")) == "_-davis_-_")); 
-        DLIB_TEST( (lpad(string("davis"), 10, string("willy wanka")) == "willydavis")); 
-        DLIB_TEST( (rpad(string("davis"), 10, string("willy wanka")) == "daviswilly")); 
-        DLIB_TEST( (pad(string("davis"), 10, string("willy wanka")) == "widaviswil")); 
-        DLIB_TEST( (lpad(string("davis"), 10, "*")) == "*****davis"); 
-        DLIB_TEST( (rpad(string("davis"), 10, "*") == "davis*****")); 
-        DLIB_TEST( (pad(string("davis"), 10, "*") == "**davis***")); 
-        DLIB_TEST( (lpad(string("davis"), 10, "_-") == "_-_-_davis")); 
-        DLIB_TEST( (rpad(string("davis"), 10, "_-") == "davis_-_-_")); 
-        DLIB_TEST( (pad(string("davis"), 10, "_-") == "_-davis_-_")); 
-        DLIB_TEST( (lpad(string("davis"), 10, "willy wanka") == "willydavis")); 
-        DLIB_TEST( (rpad(string("davis"), 10, "willy wanka") == "daviswilly")); 
-        DLIB_TEST( (pad(string("davis"), 10, "willy wanka") == "widaviswil")); 
+        DLIB_TEST( (lpad(string("davis"), -10) == "davis"));
+        DLIB_TEST( (rpad(string("davis"), -10) == "davis"));
+        DLIB_TEST( (pad(string("davis"), -10) == "davis"));
+        DLIB_TEST( (lpad(string("davis"), 10) == "     davis"));
+        DLIB_TEST( (rpad(string("davis"), 10) == "davis     "));
+        DLIB_TEST( (pad(string("davis"), 10) ==  "  davis   "));
+        DLIB_TEST( (lpad(string("davis"), 10, string("*")) == "*****davis"));
+        DLIB_TEST( (rpad(string("davis"), 10, string("*")) == "davis*****"));
+        DLIB_TEST( (pad(string("davis"), 10, string("*")) == "**davis***"));
+        DLIB_TEST( (lpad(string("davis"), 10, string("_-")) == "_-_-_davis"));
+        DLIB_TEST( (rpad(string("davis"), 10, string("_-")) == "davis_-_-_"));
+        DLIB_TEST( (pad(string("davis"), 10, string("_-")) == "_-davis_-_"));
+        DLIB_TEST( (lpad(string("davis"), 10, string("willy wanka")) == "willydavis"));
+        DLIB_TEST( (rpad(string("davis"), 10, string("willy wanka")) == "daviswilly"));
+        DLIB_TEST( (pad(string("davis"), 10, string("willy wanka")) == "widaviswil"));
+        DLIB_TEST( (lpad(string("davis"), 10, "*")) == "*****davis");
+        DLIB_TEST( (rpad(string("davis"), 10, "*") == "davis*****"));
+        DLIB_TEST( (pad(string("davis"), 10, "*") == "**davis***"));
+        DLIB_TEST( (lpad(string("davis"), 10, "_-") == "_-_-_davis"));
+        DLIB_TEST( (rpad(string("davis"), 10, "_-") == "davis_-_-_"));
+        DLIB_TEST( (pad(string("davis"), 10, "_-") == "_-davis_-_"));
+        DLIB_TEST( (lpad(string("davis"), 10, "willy wanka") == "willydavis"));
+        DLIB_TEST( (rpad(string("davis"), 10, "willy wanka") == "daviswilly"));
+        DLIB_TEST( (pad(string("davis"), 10, "willy wanka") == "widaviswil"));
         dlog << LTRACE << 7;
 
         a = "file.txt";

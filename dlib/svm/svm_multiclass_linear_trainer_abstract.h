@@ -1,6 +1,6 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_Hh_ 
+#undef DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_Hh_
 #ifdef DLIB_SVm_MULTICLASS_LINEAR_TRAINER_ABSTRACT_Hh_
 
 #include "../matrix/matrix_abstract.h"
@@ -17,13 +17,13 @@ namespace dlib
 
     template <
         typename K,
-        typename label_type_ = typename K::scalar_type 
+        typename label_type_ = typename K::scalar_type
         >
     class svm_multiclass_linear_trainer
     {
         /*!
-            REQUIREMENTS ON K 
-                Is either linear_kernel or sparse_linear_kernel.  
+            REQUIREMENTS ON K
+                Is either linear_kernel or sparse_linear_kernel.
 
             REQUIREMENTS ON label_type_
                 label_type_ must be default constructable, copyable, and comparable using
@@ -31,19 +31,19 @@ namespace dlib
                 using operator<<.
 
             INITIAL VALUE
-                - get_num_threads() == 4 
+                - get_num_threads() == 4
                 - learns_nonnegative_weights() == false
                 - get_epsilon() == 0.001
                 - get_max_iterations() == 10000
                 - get_c() == 1
                 - this object will not be verbose unless be_verbose() is called
-                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters)
                 - has_prior() == false
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a tool for training a multiclass support 
-                vector machine.  It is optimized for the case where linear kernels 
-                are used.  
+                This object represents a tool for training a multiclass support
+                vector machine.  It is optimized for the case where linear kernels
+                are used.
         !*/
 
     public:
@@ -68,7 +68,7 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
@@ -76,7 +76,7 @@ namespace dlib
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but take longer 
+                  Smaller values may result in a more accurate solution but take longer
                   to execute.
         !*/
 
@@ -89,7 +89,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ); 
+        );
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -100,7 +100,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -116,14 +116,14 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_oca() == item 
+                - #get_oca() == item
         !*/
 
         const oca get_oca (
         ) const;
         /*!
             ensures
-                - returns a copy of the optimizer used to solve the SVM problem.  
+                - returns a copy of the optimizer used to solve the SVM problem.
         !*/
 
         void set_num_threads (
@@ -138,7 +138,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of threads used during training.  You should 
+                - returns the number of threads used during training.  You should
                   usually set this equal to the number of processing cores on your
                   machine.
         !*/
@@ -159,19 +159,19 @@ namespace dlib
             requires
                 - C > 0
             ensures
-                - #get_c() == C 
+                - #get_c() == C
         !*/
 
         const scalar_type get_c (
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter.  It is the parameter that 
-                  determines the trade off between trying to fit the training data 
-                  exactly or allowing more errors but hopefully improving the 
-                  generalization of the resulting classifier.  Larger values encourage 
-                  exact fitting while smaller values of C may encourage better 
-                  generalization. 
+                - returns the SVM regularization parameter.  It is the parameter that
+                  determines the trade off between trying to fit the training data
+                  exactly or allowing more errors but hopefully improving the
+                  generalization of the resulting classifier.  Larger values encourage
+                  exact fitting while smaller values of C may encourage better
+                  generalization.
         !*/
 
         bool learns_nonnegative_weights (
@@ -182,7 +182,7 @@ namespace dlib
                   define the behavior of a multiclass_linear_decision_function object.  If
                   learns_nonnegative_weights() == true then the resulting weights and bias
                   values will always have non-negative values.  That is, if this function
-                  returns true then all the numbers in the multiclass_linear_decision_function 
+                  returns true then all the numbers in the multiclass_linear_decision_function
                   objects output by train() will be non-negative.
         !*/
        
@@ -231,9 +231,9 @@ namespace dlib
                 - All the vectors in all_samples must have the same dimensionality.
                 - if (has_prior()) then
                     - The vectors in all_samples must have the same dimensionality as the
-                      vectors used to train the prior given to set_prior().  
+                      vectors used to train the prior given to set_prior().
             ensures
-                - trains a multiclass SVM to solve the given multiclass classification problem.  
+                - trains a multiclass SVM to solve the given multiclass classification problem.
                 - returns a multiclass_linear_decision_function F with the following properties:
                     - if (new_x is a sample predicted to have a label of L) then
                         - F(new_x) == L
@@ -252,9 +252,9 @@ namespace dlib
                 - All the vectors in all_samples must have the same dimensionality.
                 - if (has_prior()) then
                     - The vectors in all_samples must have the same dimensionality as the
-                      vectors used to train the prior given to set_prior().  
+                      vectors used to train the prior given to set_prior().
             ensures
-                - trains a multiclass SVM to solve the given multiclass classification problem.  
+                - trains a multiclass SVM to solve the given multiclass classification problem.
                 - returns a multiclass_linear_decision_function F with the following properties:
                     - if (new_x is a sample predicted to have a label of L) then
                         - F(new_x) == L

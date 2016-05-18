@@ -12,7 +12,7 @@ namespace dlib
 {
     using namespace dlib::relational_operators; // defined in algs.h
 
-    class bigint 
+    class bigint
     {
         /*!
             INITIAL VALUE
@@ -43,7 +43,7 @@ namespace dlib
                 operator--(int)  // post decrement
 
 
-                the other comparason operators(>, !=, <=, and >=) are 
+                the other comparason operators(>, !=, <=, and >=) are
                 available and come from the templates in dlib::relational_operators
 
             THREAD SAFETY
@@ -61,7 +61,7 @@ namespace dlib
                 - #*this is properly initialized
             throws
                 - std::bad_alloc
-                    if this is thrown the bigint will be unusable but 
+                    if this is thrown the bigint will be unusable but
                     will not leak memory
         !*/
 
@@ -76,7 +76,7 @@ namespace dlib
                 - #*this == value
             throws
                 - std::bad_alloc
-                    if this is thrown the bigint will be unusable but 
+                    if this is thrown the bigint will be unusable but
                     will not leak memory
         !*/
 
@@ -85,11 +85,11 @@ namespace dlib
         );
         /*!
             ensures
-                - #*this is properly initialized 
+                - #*this is properly initialized
                 - #*this == value
             throws
                 - std::bad_alloc
-                    if this is thrown the bigint will be unusable but 
+                    if this is thrown the bigint will be unusable but
                     will not leak memory
         !*/
 
@@ -120,7 +120,7 @@ namespace dlib
                 - returns #*this
             throws
                 - std::bad_alloc
-                    if this function throws then it has no effect                                        
+                    if this function throws then it has no effect
         !*/
 
         const bigint operator- (
@@ -141,7 +141,7 @@ namespace dlib
         );
         /*!
             requires
-                - *this >= rhs            
+                - *this >= rhs
             ensures
                 - #*this == *this - rhs
                 - returns #*this
@@ -232,7 +232,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if *this is less than rhs 
+                - returns true if *this is less than rhs
                 - returns false otherwise
         !*/
 
@@ -241,7 +241,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if *this and rhs represent the same number 
+                - returns true if *this and rhs represent the same number
                 - returns false otherwise
         !*/
 
@@ -276,8 +276,8 @@ namespace dlib
         );
         /*!
             ensures
-                - reads a number from in and puts it into #*this 
-                - if (there is no positive base ten number on the input stream ) then 
+                - reads a number from in and puts it into #*this
+                - if (there is no positive base ten number on the input stream ) then
                     - #in.fail() == true
             throws
                 - std::bad_alloc
@@ -291,7 +291,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #*this == *this + 1 
+                - #*this == *this + 1
                 - returns #*this
             throws
                 - std::bad_alloc
@@ -312,7 +312,7 @@ namespace dlib
 
         bigint& operator-- (
         );
-        /*! 
+        /*!
             requires
                 - *this != 0
             ensures
@@ -343,7 +343,7 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
 
         // ------------------------------------------------------------------
@@ -388,7 +388,7 @@ namespace dlib
             requires
                 - rhs <= 65535
             ensures
-                - #*this == *this + rhs                
+                - #*this == *this + rhs
                 - returns #this
             throws
                 - std::bad_alloc
@@ -401,7 +401,7 @@ namespace dlib
         );
         /*!
             requires
-                - lhs >= rhs 
+                - lhs >= rhs
                 - lhs <= 65535
             ensures
                 - returns the result of subtracting rhs from lhs
@@ -416,7 +416,7 @@ namespace dlib
         );
         /*!
             requires
-                - lhs >= rhs 
+                - lhs >= rhs
                 - rhs <= 65535
             ensures
                 - returns the result of subtracting rhs from lhs
@@ -430,7 +430,7 @@ namespace dlib
         );
         /*!
             requires
-                - *this >= rhs 
+                - *this >= rhs
                 - rhs <= 65535
             ensures
                 - #*this == *this - rhs
@@ -488,7 +488,7 @@ namespace dlib
         );
         /*!
             requires
-                - rhs != 0 
+                - rhs != 0
                 - lhs <= 65535
             ensures
                 - returns the result of dividing lhs by rhs
@@ -503,7 +503,7 @@ namespace dlib
         );
         /*!
             requires
-                - rhs != 0 
+                - rhs != 0
                 - rhs <= 65535
             ensures
                 - returns the result of dividing lhs by rhs
@@ -517,7 +517,7 @@ namespace dlib
         );
         /*!
             requires
-                - rhs != 0 
+                - rhs != 0
                 - rhs <= 65535
             ensures
                 - #*this == *this / rhs
@@ -533,7 +533,7 @@ namespace dlib
         );
         /*!
             requires
-                - rhs != 0 
+                - rhs != 0
                 - lhs <= 65535
             ensures
                 - returns the result of lhs mod rhs
@@ -548,7 +548,7 @@ namespace dlib
         );
         /*!
             requires
-                - rhs != 0 
+                - rhs != 0
                 - rhs <= 65535
             ensures
                 - returns the result of lhs mod rhs
@@ -562,7 +562,7 @@ namespace dlib
         );
         /*!
             requires
-                - rhs != 0 
+                - rhs != 0
                 - rhs <= 65535
             ensures
                 - #*this == *this % rhs
@@ -581,7 +581,7 @@ namespace dlib
             requires
                 - lhs <= 65535
             ensures
-                - returns true if lhs is less than rhs 
+                - returns true if lhs is less than rhs
                 - returns false otherwise
         !*/
 
@@ -593,7 +593,7 @@ namespace dlib
             requires
                 - rhs <= 65535
             ensures
-                - returns true if lhs is less than rhs 
+                - returns true if lhs is less than rhs
                 - returns false otherwise
         !*/
 
@@ -605,7 +605,7 @@ namespace dlib
             requires
                 - rhs <= 65535
             ensures
-                - returns true if lhs and rhs represent the same number 
+                - returns true if lhs and rhs represent the same number
                 - returns false otherwise
         !*/
 
@@ -617,7 +617,7 @@ namespace dlib
             requires
                 - lhs <= 65535
             ensures
-                - returns true if lhs and rhs represent the same number 
+                - returns true if lhs and rhs represent the same number
                 - returns false otherwise
         !*/
 
@@ -635,30 +635,30 @@ namespace dlib
                     if this function throws then it has no effect
         !*/
 
-    };   
+    };
    
     inline void swap (
-        bigint& a, 
-        bigint& b 
-    ) { a.swap(b); }   
+        bigint& a,
+        bigint& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
 
     void serialize (
-        const bigint& item, 
+        const bigint& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
-        bigint& item, 
+        bigint& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 }

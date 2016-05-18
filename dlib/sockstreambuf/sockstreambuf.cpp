@@ -11,9 +11,9 @@
 namespace dlib
 {
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
     // output functions
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     sockstreambuf::int_type sockstreambuf::
     overflow (
@@ -33,7 +33,7 @@ namespace dlib
         return c;
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     std::streamsize sockstreambuf::
     xsputn (
@@ -41,11 +41,11 @@ namespace dlib
         std::streamsize num
     )
     {
-        // Add a sanity check here 
+        // Add a sanity check here
         DLIB_ASSERT(num >= 0,
             "\tstd::streamsize sockstreambuf::xsputn"
             << "\n\tThe number of bytes to write can't be negative"
-            << "\n\tnum:  " << num 
+            << "\n\tnum:  " << num
             << "\n\tthis: " << this
             );
 
@@ -81,18 +81,18 @@ namespace dlib
                 {
                     // the write was not successful so return that 0 bytes were written
                     return 0;
-                } 
+                }
                 return num;
             }
         }
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
     // input functions
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     sockstreambuf::int_type sockstreambuf::
-    underflow( 
+    underflow(
     )
     {
         if (gptr() < egptr())
@@ -133,27 +133,27 @@ namespace dlib
         return static_cast<unsigned char>(*gptr());
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     std::streamsize sockstreambuf::
     xsgetn (
-        char_type* s, 
+        char_type* s,
         std::streamsize n
     )
-    { 
+    {
         std::streamsize temp = n;
         while (n > 0)
         {
             int num = static_cast<int>(egptr() - gptr());
             if (num >= n)
             {
-                // copy data from our buffer 
+                // copy data from our buffer
                 std::memcpy(s, gptr(), static_cast<size_t>(n));
                 gbump(static_cast<int>(n));
                 return temp;
             }
 
-            // read more data into our buffer  
+            // read more data into our buffer
             if (num == 0)
             {
                 if (underflow() == EOF)
@@ -161,16 +161,16 @@ namespace dlib
                 continue;
             }
 
-            // copy all the data from our buffer 
+            // copy all the data from our buffer
             std::memcpy(s, gptr(), num);
             n -= num;
             gbump(num);
             s += num;
         }
-        return temp-n;       
+        return temp-n;
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
 }
 #endif // DLIB_SOCKStREAMBUF_CPp_

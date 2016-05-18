@@ -12,7 +12,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -40,8 +40,8 @@ namespace
 
             assign_all_pixels(img, 0);
 
-            hog_image<3,3,1,4,hog_signed_gradient,hog_full_interpolation> hog1, hog1_deserialized;    
-            hog_image<4,4,2,4,hog_signed_gradient,hog_full_interpolation> hog2;    
+            hog_image<3,3,1,4,hog_signed_gradient,hog_full_interpolation> hog1, hog1_deserialized;
+            hog_image<4,4,2,4,hog_signed_gradient,hog_full_interpolation> hog2;
 
             hog1.load(img);
             hog2.load(img);

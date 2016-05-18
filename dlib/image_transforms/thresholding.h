@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_THRESHOLDINg_
-#define DLIB_THRESHOLDINg_ 
+#define DLIB_THRESHOLDINg_
 
 #include "../pixel.h"
 #include "thresholding_abstract.h"
@@ -130,7 +130,7 @@ namespace dlib
             }
         }
         
-        // now do k-means clustering with k = 2 on the histogram. 
+        // now do k-means clustering with k = 2 on the histogram.
         moved_a = true;
         moved_b = true;
         while (moved_a || moved_b)
@@ -212,9 +212,9 @@ namespace dlib
         DLIB_ASSERT( lower_thresh <= upper_thresh && is_same_object(in_img_, out_img_) == false,
             "\tvoid hysteresis_threshold(in_img_, out_img_, lower_thresh, upper_thresh)"
             << "\n\tYou can't use an upper_thresh that is less than your lower_thresh"
-            << "\n\tlower_thresh: " << lower_thresh 
-            << "\n\tupper_thresh: " << upper_thresh 
-            << "\n\tis_same_object(in_img_,out_img_): " << is_same_object(in_img_,out_img_) 
+            << "\n\tlower_thresh: " << lower_thresh
+            << "\n\tupper_thresh: " << upper_thresh
+            << "\n\tis_same_object(in_img_,out_img_): " << is_same_object(in_img_,out_img_)
             );
 
         const_image_view<in_image_type> in_img(in_img_);
@@ -336,5 +336,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_THRESHOLDINg_ 
+#endif // DLIB_THRESHOLDINg_
 

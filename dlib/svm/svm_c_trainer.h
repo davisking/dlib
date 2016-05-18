@@ -1,6 +1,6 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SVm_C_TRAINER_Hh_ 
+#ifndef DLIB_SVm_C_TRAINER_Hh_
 #define DLIB_SVm_C_TRAINER_Hh_
 
 //#include "local/make_label_kernel_matrix.h"
@@ -16,13 +16,13 @@
 #include "kernel.h"
 #include "../optimization/optimization_solve_qp3_using_smo.h"
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svm_c_trainer
     {
@@ -43,7 +43,7 @@ namespace dlib
         }
 
         svm_c_trainer (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             const scalar_type& C_
         ) :
             kernel_function(kernel_),
@@ -68,7 +68,7 @@ namespace dlib
             DLIB_ASSERT(cache_size_ > 0,
                 "\tvoid svm_c_trainer::set_cache_size(cache_size_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t cache_size: " << cache_size_ 
+                << "\n\t cache_size: " << cache_size_
                 );
             cache_size = cache_size_;
         }
@@ -87,14 +87,14 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\tvoid svm_c_trainer::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 );
             eps = eps_;
         }
 
         const scalar_type get_epsilon (
         ) const
-        { 
+        {
             return eps;
         }
 
@@ -112,14 +112,14 @@ namespace dlib
         }
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_trainer::set_c()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -147,7 +147,7 @@ namespace dlib
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_trainer::set_c_class1()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -162,7 +162,7 @@ namespace dlib
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_trainer::set_c_class2()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -213,10 +213,10 @@ namespace dlib
             DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
                 "\tdecision_function svm_c_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t y.nr(): " << y.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t x.nr(): " << x.nr()
+                << "\n\t y.nr(): " << y.nr()
+                << "\n\t x.nc(): " << x.nc()
+                << "\n\t y.nc(): " << y.nc()
                 << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
                 );
 
@@ -225,10 +225,10 @@ namespace dlib
 
             solve_qp3_using_smo<scalar_vector_type> solver;
 
-            solver(symmetric_matrix_cache<float>((diagm(y)*kernel_matrix(kernel_function,x)*diagm(y)), cache_size), 
-            //solver(symmetric_matrix_cache<float>(make_label_kernel_matrix(kernel_matrix(kernel_function,x),y), cache_size), 
+            solver(symmetric_matrix_cache<float>((diagm(y)*kernel_matrix(kernel_function,x)*diagm(y)), cache_size),
+            //solver(symmetric_matrix_cache<float>(make_label_kernel_matrix(kernel_matrix(kernel_function,x),y), cache_size),
                    uniform_matrix<scalar_type>(y.size(),1,-1),
-                   y, 
+                   y,
                    0,
                    Cpos,
                    Cneg,

@@ -28,11 +28,11 @@ namespace dlib
                 - train-labels-idx1-ubyte
                 - t10k-images-idx3-ubyte
                 - t10k-labels-idx1-ubyte
-            - #training_images == The 60,000 training images from the dataset. 
-            - #training_labels == The labels for the contents of #training_images.  
+            - #training_images == The 60,000 training images from the dataset.
+            - #training_labels == The labels for the contents of #training_images.
               I.e. #training_labels[i] is the label of #training_images[i].
-            - #testing_images == The 10,000 testing images from the dataset. 
-            - #testing_labels == The labels for the contents of #testing_images.  
+            - #testing_images == The 10,000 testing images from the dataset.
+            - #testing_labels == The labels for the contents of #testing_images.
               I.e. #testing_labels[i] is the label of #testing_images[i].
         throws
             - dlib::error if some problem prevents us from loading the data or the files

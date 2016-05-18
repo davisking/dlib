@@ -21,25 +21,25 @@ namespace dlib
         /*!
             REQUIREMENTS ON T
                 T must be comparable by compare where compare is a functor compatible with std::less and
-                T is swappable by a global swap() and                
+                T is swappable by a global swap() and
                 T must have a default constructor
 
             POINTERS AND REFERENCES TO INTERNAL DATA
                 Only the destructor will invalidate pointers or references
-                to internal data.  
+                to internal data.
 
             INITIAL VALUE
                 size() == 0
 
             ENUMERATION ORDER
-                The enumerator will iterate over the elements in the set in 
-                ascending order according to the compare functor. 
+                The enumerator will iterate over the elements in the set in
+                ascending order according to the compare functor.
                 (i.e. the elements are enumerated in sorted order)
 
             WHAT THIS OBJECT REPRESENTS
                 static_set contains items of type T
 
-                This object represents an unaddressed collection of items. 
+                This object represents an unaddressed collection of items.
 
                 Also note that unless specified otherwise, no member functions
                 of this object throw exceptions.
@@ -56,17 +56,17 @@ namespace dlib
             typedef T type;
             typedef compare compare_type;
 
-            static_set ( 
+            static_set (
             );
             /*!
-                ensures  
-                    - #*this is properly initialized                   
+                ensures
+                    - #*this is properly initialized
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
             !*/
 
             virtual ~static_set(
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -79,7 +79,7 @@ namespace dlib
                     - #*this has its initial value
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
-                        If this exception is thrown then #*this is unusable 
+                        If this exception is thrown then #*this is unusable
                         until clear() is called and succeeds.
             !*/
 
@@ -115,7 +115,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
     
         private:
 
@@ -129,9 +129,9 @@ namespace dlib
         typename compare
         >
     inline void swap (
-        static_set<T,compare>& a, 
-        static_set<T,compare>& b 
-    ) { a.swap(b); }   
+        static_set<T,compare>& a,
+        static_set<T,compare>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -141,11 +141,11 @@ namespace dlib
         typename compare
         >
     void deserialize (
-        static_set<T,compare>& item,  
+        static_set<T,compare>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 }

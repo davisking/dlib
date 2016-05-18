@@ -9,7 +9,7 @@
 #include "tester.h"
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -67,7 +67,7 @@ namespace
             }
 
             // Also save the samples we are generating so we can let the svm_c_linear_trainer
-            // learn from them below.  
+            // learn from them below.
             samples.push_back(sample);
             labels.push_back(label);
 
@@ -141,7 +141,7 @@ namespace
             }
 
             // Also save the samples we are generating so we can let the svm_c_linear_trainer
-            // learn from them below.  
+            // learn from them below.
             samples.push_back(sample);
             labels.push_back(label);
 
@@ -216,7 +216,7 @@ namespace
             }
 
             // Also save the samples we are generating so we can let the svm_c_linear_trainer
-            // learn from them below.  
+            // learn from them below.
             samples.push_back(sample);
             labels.push_back(label);
 
@@ -297,7 +297,7 @@ namespace
             sample(9) = 4;
 
             // Also save the samples we are generating so we can let the svm_c_linear_trainer
-            // learn from them below.  
+            // learn from them below.
             samples.push_back(sample);
             labels.push_back(label);
 
@@ -475,7 +475,7 @@ namespace
             }
 
             // Also save the samples we are generating so we can let the svm_c_linear_trainer
-            // learn from them below.  
+            // learn from them below.
             samples.push_back(sample);
             labels.push_back(label);
         }

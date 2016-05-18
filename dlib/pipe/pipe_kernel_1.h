@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_PIPE_KERNEl_1_ 
-#define DLIB_PIPE_KERNEl_1_ 
+#ifndef DLIB_PIPE_KERNEl_1_
+#define DLIB_PIPE_KERNEl_1_
 
 #include "../algs.h"
 #include "../threads.h"
@@ -13,7 +13,7 @@ namespace dlib
     template <
         typename T
         >
-    class pipe 
+    class pipe
     {
         /*!
             INITIAL VALUE
@@ -35,18 +35,18 @@ namespace dlib
                 - m == the mutex used to lock access to all the members of this class
 
                 - dequeue_waiters == the number of threads blocked on calls to dequeue()
-                - enqueue_waiters == the number of threads blocked on calls to enqueue() and 
+                - enqueue_waiters == the number of threads blocked on calls to enqueue() and
                   wait_until_empty()
-                - unblock_sig_waiters == the number of threads blocked on calls to 
+                - unblock_sig_waiters == the number of threads blocked on calls to
                   wait_for_num_blocked_dequeues() and the destructor.  (i.e. the number of
                   blocking calls to unblock_sig.wait())
 
                 - dequeue_sig == the signaler that threads blocked on calls to dequeue() wait on
-                - enqueue_sig == the signaler that threads blocked on calls to enqueue() 
+                - enqueue_sig == the signaler that threads blocked on calls to enqueue()
                   or wait_until_empty() wait on.
                 - unblock_sig == the signaler that is signaled when a thread stops blocking on a call
                   to enqueue() or dequeue().  It is also signaled when a dequeue that will probably
-                  block is called.  The destructor and wait_for_num_blocked_dequeues are the only 
+                  block is called.  The destructor and wait_for_num_blocked_dequeues are the only
                   things that will wait on this signaler.
 
                 - if (pipe_size > 0) then
@@ -55,7 +55,7 @@ namespace dlib
                 - else if (pipe_max_size == 0)
                     - if (first == 0 && last == 0) then
                         - data[0] == the next item to dequeue
-                    - else if (first == 0 && last == 1) then 
+                    - else if (first == 0 && last == 1) then
                         - data[0] has been taken out already by a dequeue
         !*/
 
@@ -65,7 +65,7 @@ namespace dlib
 
         typedef T type;
 
-        explicit pipe (  
+        explicit pipe (
             unsigned long maximum_size
         );
 
@@ -159,7 +159,7 @@ namespace dlib
         pipe(const pipe&);        // copy constructor
         pipe& operator=(const pipe&);    // assignment operator
 
-    };    
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -171,9 +171,9 @@ namespace dlib
         typename T
         >
     pipe<T>::
-    pipe (  
+    pipe (
         unsigned long maximum_size
-    ) : 
+    ) :
         pipe_size(0),
         pipe_max_size(maximum_size),
         enabled(true),
@@ -338,7 +338,7 @@ namespace dlib
         auto_mutex M(m);
         ++enqueue_waiters;
 
-        // wait until there is room or we are disabled 
+        // wait until there is room or we are disabled
         while (pipe_size == pipe_max_size && enabled && enqueue_enabled &&
                !(pipe_max_size == 0 && first == 1) )
             enqueue_sig.wait();
@@ -434,7 +434,7 @@ namespace dlib
                 enqueue_sig.broadcast();
         }
 
-        // wait until there is something in the pipe or we are disabled 
+        // wait until there is something in the pipe or we are disabled
         while (pipe_size == 0 && enabled && dequeue_enabled &&
                !(pipe_max_size == 0 && first == 0 && last == 0) )
             dequeue_sig.wait();
@@ -451,14 +451,14 @@ namespace dlib
 
         if (pipe_max_size > 0)
         {
-            // set the appropriate values for first 
+            // set the appropriate values for first
             first = (first+1)%pipe_max_size;
 
             --pipe_size;
         }
         else
         {
-            // let the enqueue waiting on us know that we took the 
+            // let the enqueue waiting on us know that we took the
             // item out already.
             last = 1;
         }
@@ -485,7 +485,7 @@ namespace dlib
         auto_mutex M(m);
         ++enqueue_waiters;
 
-        // wait until there is room or we are disabled or 
+        // wait until there is room or we are disabled or
         // we run out of time.
         bool timed_out = false;
         while (pipe_size == pipe_max_size && enabled && enqueue_enabled &&
@@ -614,14 +614,14 @@ namespace dlib
 
         if (pipe_max_size > 0)
         {
-            // set the appropriate values for first 
+            // set the appropriate values for first
             first = (first+1)%pipe_max_size;
 
             --pipe_size;
         }
         else
         {
-            // let the enqueue waiting on us know that we took the 
+            // let the enqueue waiting on us know that we took the
             // item out already.
             last = 1;
         }

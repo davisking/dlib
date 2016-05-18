@@ -14,12 +14,12 @@ namespace dlib
     template <
         unsigned long alphabet_size
         >
-    class conditioning_class_kernel_3 
+    class conditioning_class_kernel_3
     {
         /*!
             INITIAL VALUE
                 total == 1
-                counts == pointer to an array of alphabet_size data structs                
+                counts == pointer to an array of alphabet_size data structs
                 for all i except i == 0: counts[i].count == 0
                 counts[0].count == 1
                 counts[0].symbol == alphabet_size-1
@@ -29,7 +29,7 @@ namespace dlib
             CONVENTION
                 counts == pointer to an array of alphabet_size data structs
                 get_total() == total
-                get_count(symbol) == counts[x].count where 
+                get_count(symbol) == counts[x].count where
                                      counts[x].symbol == symbol
 
 
@@ -90,7 +90,7 @@ namespace dlib
 
         void get_symbol (
             unsigned long target,
-            unsigned long& symbol,            
+            unsigned long& symbol,
             unsigned long& low_count,
             unsigned long& high_count
         ) const;
@@ -122,7 +122,7 @@ namespace dlib
         data* counts;
         global_state_type& global_state;
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -154,11 +154,11 @@ namespace dlib
             start->count = 0;
             start->present = false;
             ++start;
-        }        
+        }
         counts[alphabet_size-1].present = true;
 
         // update memory usage
-        global_state.memory_usage += sizeof(data)*alphabet_size + 
+        global_state.memory_usage += sizeof(data)*alphabet_size +
                                      sizeof(conditioning_class_kernel_3);
 
     }
@@ -174,7 +174,7 @@ namespace dlib
     {
         delete [] counts;
         // update memory usage
-        global_state.memory_usage -= sizeof(data)*alphabet_size + 
+        global_state.memory_usage -= sizeof(data)*alphabet_size +
                                      sizeof(conditioning_class_kernel_3);
     }
 
@@ -199,8 +199,8 @@ namespace dlib
             start->count = 0;
             start->present = false;
             ++start;
-        }        
-        counts[alphabet_size-1].present = true; 
+        }
+        counts[alphabet_size-1].present = true;
 
     }
 
@@ -238,7 +238,7 @@ namespace dlib
         unsigned long symbol,
         unsigned short amount
     )
-    {        
+    {
         // if we are going over a total of 65535 then scale down all counts by 2
         if (static_cast<unsigned long>(total)+static_cast<unsigned long>(amount) >= 65536)
         {
@@ -268,25 +268,25 @@ namespace dlib
                 }
  
                 ++start;
-            }  
+            }
         }
 
 
-        data* start = counts;   
+        data* start = counts;
         data* swap_spot = counts;
 
         if (counts[symbol].present)
         {
             while (true)
-            {                
+            {
                 if (start->symbol == symbol && start->count!=0)
-                {                
+                {
                     unsigned short temp = start->count + amount;
 
                     start->symbol = swap_spot->symbol;
                     start->count = swap_spot->count;
 
-                    swap_spot->symbol = static_cast<unsigned short>(symbol);                
+                    swap_spot->symbol = static_cast<unsigned short>(symbol);
                     swap_spot->count  = temp;
                     break;
                 }
@@ -310,7 +310,7 @@ namespace dlib
                     start->symbol = swap_spot->symbol;
                     start->count = swap_spot->count;
                     
-                    swap_spot->symbol = static_cast<unsigned short>(symbol);                
+                    swap_spot->symbol = static_cast<unsigned short>(symbol);
                     swap_spot->count  = amount;
                     break;
                 }
@@ -342,7 +342,7 @@ namespace dlib
         if (counts[symbol].present == false)
             return 0;
 
-        data* start = counts;        
+        data* start = counts;
         while (start->symbol != symbol)
         {
             ++start;
@@ -356,8 +356,8 @@ namespace dlib
         unsigned long alphabet_size
         >
     unsigned long conditioning_class_kernel_3<alphabet_size>::
-    get_alphabet_size (        
-    ) 
+    get_alphabet_size (
+    )
     {
         return alphabet_size;
     }
@@ -392,12 +392,12 @@ namespace dlib
 
         total_count = total;
         unsigned long low_count_temp = 0;
-        data* start = counts;        
+        data* start = counts;
         while (start->symbol != symbol)
         {
             low_count_temp += start->count;
             ++start;
-        } 
+        }
 
         low_count = low_count_temp;
         high_count = low_count_temp + start->count;
@@ -412,18 +412,18 @@ namespace dlib
     void conditioning_class_kernel_3<alphabet_size>::
     get_symbol (
         unsigned long target,
-        unsigned long& symbol,            
+        unsigned long& symbol,
         unsigned long& low_count,
         unsigned long& high_count
     ) const
     {
         unsigned long high_count_temp = counts->count;
-        const data* start = counts;        
+        const data* start = counts;
         while (target >= high_count_temp)
         {
             ++start;
             high_count_temp += start->count;
-        } 
+        }
 
         low_count = high_count_temp - start->count;
         high_count = high_count_temp;

@@ -126,10 +126,10 @@ namespace dlib
         {
 
             // if high and low don't have the same 8 high order bits
-            if ((high&0xFF000000) != (low&0xFF000000)) 
-            {   
+            if ((high&0xFF000000) != (low&0xFF000000))
+            {
                 // if the distance between high and low is small and there aren't
-                // any bits we can roll off then force high and low to have common high 
+                // any bits we can roll off then force high and low to have common high
                 // order bits.
                 if ((high-low < 0x10000))
                 {
@@ -140,7 +140,7 @@ namespace dlib
                         high = low = high+low;
                         high += 0xFF;
                         low -= 0xFF;
-                    } 
+                    }
                     else /**/
                     {
                         high>>=1;
@@ -155,7 +155,7 @@ namespace dlib
                     break;
                 }
                 
-            }  
+            }
             // else if there are 8 bits we can roll off
             else
             {
@@ -163,16 +163,16 @@ namespace dlib
                 if (streambuf->sgetn(reinterpret_cast<char*>(&buf),1)==0)
                 {
                     // if there isn't anything else in the streambuffer then just
-                    // make buf zero.  
-                    buf = 0;      
+                    // make buf zero.
+                    buf = 0;
                 }
 
                 // also roll off the bits in target
-                target <<= 8;  
+                target <<= 8;
 
                 // roll off the bits
                 high <<= 8;
-                low <<= 8;             
+                low <<= 8;
                 high |= 0xFF;  // note that it is ok to add 0xFF to high here because
                             // of the convention that high == real upper range - 1.
                             // so that means that if we want to shift the upper range
@@ -184,8 +184,8 @@ namespace dlib
                     low = 1;
         
 
-                // put the new bits into target            
-                target |= static_cast<uint32>(buf);               
+                // put the new bits into target
+                target |= static_cast<uint32>(buf);
             }
 
         } // while (true)
@@ -194,9 +194,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     bool entropy_decoder_kernel_2::
-    get_target_called (        
+    get_target_called (
     ) const
-    {           
+    {
         return (r != 0);
     }
 
@@ -205,11 +205,11 @@ namespace dlib
     uint32 entropy_decoder_kernel_2::
     get_target (
         uint32 total
-    ) 
-    {   
+    )
+    {
         // note that we must add one because of the convention that
         // high == the real upper range minus 1
-        r = (high-low+1)/total;   
+        r = (high-low+1)/total;
         uint32 temp = (target-low)/r;
         if (temp < total)
             return temp;

@@ -14,7 +14,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -116,11 +116,11 @@ namespace
     )
     /*!
         requires
-            - ssb is an implementation of sockstreambuf/sockstreambuf_kernel_abstract.h 
+            - ssb is an implementation of sockstreambuf/sockstreambuf_kernel_abstract.h
         ensures
             - runs tests on ssb for compliance with the specs
     !*/
-    {        
+    {
         char ch;
         vector<char> vbuf;
         vbuf.resize(1000000);

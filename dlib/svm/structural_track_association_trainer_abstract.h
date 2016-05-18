@@ -15,8 +15,8 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is a tool for learning to solve a track association problem.  That 
-                is, it takes in a set of training data and outputs a track_association_function 
+                This object is a tool for learning to solve a track association problem.  That
+                is, it takes in a set of training data and outputs a track_association_function
                 you can use to do detection to track association.  The training data takes the
                 form of a set or sets of "track histories".  Each track history is a
                 std::vector where each element contains all the detections from a single time
@@ -30,7 +30,7 @@ namespace dlib
     public:
 
         structural_track_association_trainer (
-        );  
+        );
         /*!
             ensures
                 - #get_c() == 100
@@ -55,7 +55,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of threads used during training.  You should 
+                - returns the number of threads used during training.  You should
                   usually set this equal to the number of processing cores on your
                   machine.
         !*/
@@ -71,7 +71,7 @@ namespace dlib
         !*/
 
         double get_epsilon (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
@@ -93,11 +93,11 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - During training, this object basically runs the track_association_function on 
-                  each training sample, over and over.  To speed this up, it is possible to 
-                  cache the results of these invocations.  This function returns the number 
-                  of cache elements per training sample kept in the cache.  Note that a value 
-                  of 0 means caching is not used at all.  
+                - During training, this object basically runs the track_association_function on
+                  each training sample, over and over.  To speed this up, it is possible to
+                  cache the results of these invocations.  This function returns the number
+                  of cache elements per training sample kept in the cache.  Note that a value
+                  of 0 means caching is not used at all.
         !*/
 
         void be_verbose (
@@ -159,7 +159,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_oca() == item 
+                - #get_oca() == item
         !*/
 
         const oca get_oca (
@@ -168,7 +168,7 @@ namespace dlib
             ensures
                 - Internally this object treats track association learning as a structural
                   SVM problem.  This routine returns a copy of the optimizer used to solve
-                  the structural SVM problem.  
+                  the structural SVM problem.
         !*/
 
         void set_c (
@@ -181,7 +181,7 @@ namespace dlib
                   minimize the loss) or allowing more errors but hopefully improving the
                   generalization of the resulting track_association_function.  Larger
                   values encourage exact fitting while smaller values of C may encourage
-                  better generalization. 
+                  better generalization.
         !*/
 
         double get_c (
@@ -194,7 +194,7 @@ namespace dlib
         !*/
 
         bool learns_nonnegative_weights (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - Ultimately, the output of training is a parameter vector that defines the
@@ -215,7 +215,7 @@ namespace dlib
             typename detection_type,
             typename label_type
             >
-        const track_association_function<detection_type> train (  
+        const track_association_function<detection_type> train (
             const std::vector<std::vector<labeled_detection<detection_type,label_type> > >& sample
         ) const;
         /*!
@@ -225,7 +225,7 @@ namespace dlib
                 - This function attempts to learn to do track association from the given
                   training data.  Note that we interpret sample as a single track history such
                   that sample[0] are all detections from the first time step, then sample[1]
-                  are detections from the second time step, and so on.  
+                  are detections from the second time step, and so on.
                 - returns a function F such that:
                     - Executing F(tracks, detections) will try to correctly associate the
                       contents of detections to the contents of tracks and perform track
@@ -238,7 +238,7 @@ namespace dlib
             typename detection_type,
             typename label_type
             >
-        const track_association_function<detection_type> train (  
+        const track_association_function<detection_type> train (
             const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& sample
         ) const;
         /*!

@@ -34,7 +34,7 @@ namespace dlib
         inline void store(type* ptr)         const { _mm_storeu_si128((__m128i*)ptr, x); }
 
         inline unsigned int size() const { return 4; }
-        inline int32 operator[](unsigned int idx) const 
+        inline int32 operator[](unsigned int idx) const
         {
             int32 temp[4];
             store(temp);
@@ -113,10 +113,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator+ (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator+ (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_add_epi32(lhs, rhs); 
+        return _mm_add_epi32(lhs, rhs);
 #else
         return simd4i(lhs[0]+rhs[0],
                       lhs[1]+rhs[1],
@@ -124,15 +124,15 @@ namespace dlib
                       lhs[3]+rhs[3]);
 #endif
     }
-    inline simd4i& operator+= (simd4i& lhs, const simd4i& rhs) 
+    inline simd4i& operator+= (simd4i& lhs, const simd4i& rhs)
     { return lhs = lhs + rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator- (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator- (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_sub_epi32(lhs, rhs); 
+        return _mm_sub_epi32(lhs, rhs);
 #else
         return simd4i(lhs[0]-rhs[0],
                       lhs[1]-rhs[1],
@@ -140,15 +140,15 @@ namespace dlib
                       lhs[3]-rhs[3]);
 #endif
     }
-    inline simd4i& operator-= (simd4i& lhs, const simd4i& rhs) 
+    inline simd4i& operator-= (simd4i& lhs, const simd4i& rhs)
     { return lhs = lhs - rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator* (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator* (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE41
-        return _mm_mullo_epi32(lhs, rhs); 
+        return _mm_mullo_epi32(lhs, rhs);
 #elif defined(DLIB_HAVE_SSE2)
         int32 _lhs[4]; lhs.store(_lhs);
         int32 _rhs[4]; rhs.store(_rhs);
@@ -163,15 +163,15 @@ namespace dlib
                       lhs[3]*rhs[3]);
 #endif
     }
-    inline simd4i& operator*= (simd4i& lhs, const simd4i& rhs) 
+    inline simd4i& operator*= (simd4i& lhs, const simd4i& rhs)
     { return lhs = lhs * rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator& (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator& (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_and_si128(lhs, rhs); 
+        return _mm_and_si128(lhs, rhs);
 #else
         return simd4i(lhs[0]&rhs[0],
                       lhs[1]&rhs[1],
@@ -179,15 +179,15 @@ namespace dlib
                       lhs[3]&rhs[3]);
 #endif
     }
-    inline simd4i& operator&= (simd4i& lhs, const simd4i& rhs) 
+    inline simd4i& operator&= (simd4i& lhs, const simd4i& rhs)
     { return lhs = lhs & rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator| (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator| (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_or_si128(lhs, rhs); 
+        return _mm_or_si128(lhs, rhs);
 #else
         return simd4i(lhs[0]|rhs[0],
                       lhs[1]|rhs[1],
@@ -195,15 +195,15 @@ namespace dlib
                       lhs[3]|rhs[3]);
 #endif
     }
-    inline simd4i& operator|= (simd4i& lhs, const simd4i& rhs) 
+    inline simd4i& operator|= (simd4i& lhs, const simd4i& rhs)
     { return lhs = lhs | rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator^ (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator^ (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_xor_si128(lhs, rhs); 
+        return _mm_xor_si128(lhs, rhs);
 #else
         return simd4i(lhs[0]^rhs[0],
                       lhs[1]^rhs[1],
@@ -211,15 +211,15 @@ namespace dlib
                       lhs[3]^rhs[3]);
 #endif
     }
-    inline simd4i& operator^= (simd4i& lhs, const simd4i& rhs) 
+    inline simd4i& operator^= (simd4i& lhs, const simd4i& rhs)
     { return lhs = lhs ^ rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator~ (const simd4i& lhs) 
-    { 
+    inline simd4i operator~ (const simd4i& lhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_xor_si128(lhs, _mm_set1_epi32(0xFFFFFFFF)); 
+        return _mm_xor_si128(lhs, _mm_set1_epi32(0xFFFFFFFF));
 #else
         return simd4i(~lhs[0],
                       ~lhs[1],
@@ -230,8 +230,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator<< (const simd4i& lhs, const int& rhs) 
-    { 
+    inline simd4i operator<< (const simd4i& lhs, const int& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
         return _mm_sll_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #else
@@ -241,13 +241,13 @@ namespace dlib
                       lhs[3]<<rhs);
 #endif
     }
-    inline simd4i& operator<<= (simd4i& lhs, const int& rhs) 
+    inline simd4i& operator<<= (simd4i& lhs, const int& rhs)
     { return lhs = lhs << rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator>> (const simd4i& lhs, const int& rhs) 
-    { 
+    inline simd4i operator>> (const simd4i& lhs, const int& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
         return _mm_sra_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #else
@@ -257,15 +257,15 @@ namespace dlib
                       lhs[3]>>rhs);
 #endif
     }
-    inline simd4i& operator>>= (simd4i& lhs, const int& rhs) 
+    inline simd4i& operator>>= (simd4i& lhs, const int& rhs)
     { return lhs = lhs >> rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator== (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator== (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_cmpeq_epi32(lhs, rhs); 
+        return _mm_cmpeq_epi32(lhs, rhs);
 #else
         return simd4i(lhs[0]==rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]==rhs[1] ? 0xFFFFFFFF : 0,
@@ -276,8 +276,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator!= (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator!= (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
         return ~(lhs==rhs);
 #else
@@ -290,10 +290,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator< (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator< (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return _mm_cmplt_epi32(lhs, rhs); 
+        return _mm_cmplt_epi32(lhs, rhs);
 #else
         return simd4i(lhs[0]<rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]<rhs[1] ? 0xFFFFFFFF : 0,
@@ -304,17 +304,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator> (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator> (const simd4i& lhs, const simd4i& rhs)
+    {
         return rhs < lhs;
     }
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator<= (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator<= (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE2
-        return ~(lhs > rhs); 
+        return ~(lhs > rhs);
 #else
         return simd4i(lhs[0]<=rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]<=rhs[1] ? 0xFFFFFFFF : 0,
@@ -325,17 +325,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i operator>= (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i operator>= (const simd4i& lhs, const simd4i& rhs)
+    {
         return rhs <= lhs;
     }
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i min (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i min (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE41
-        return _mm_min_epi32(lhs, rhs); 
+        return _mm_min_epi32(lhs, rhs);
 #elif defined(DLIB_HAVE_SSE2)
         int32 _lhs[4]; lhs.store(_lhs);
         int32 _rhs[4]; rhs.store(_rhs);
@@ -353,10 +353,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd4i max (const simd4i& lhs, const simd4i& rhs) 
-    { 
+    inline simd4i max (const simd4i& lhs, const simd4i& rhs)
+    {
 #ifdef DLIB_HAVE_SSE41
-        return _mm_max_epi32(lhs, rhs); 
+        return _mm_max_epi32(lhs, rhs);
 #elif defined(DLIB_HAVE_SSE2)
         int32 _lhs[4]; lhs.store(_lhs);
         int32 _rhs[4]; rhs.store(_rhs);

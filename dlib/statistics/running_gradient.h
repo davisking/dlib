@@ -12,7 +12,7 @@
 
 namespace dlib
 {
-    class running_gradient 
+    class running_gradient
     {
     public:
 
@@ -84,7 +84,7 @@ namespace dlib
 
             return w(1);
         }
-        double standard_error ( 
+        double standard_error (
         ) const
         {
             // make sure requires clause is not broken
@@ -152,7 +152,7 @@ namespace dlib
 
     private:
 
-        static double normal_cfd(double value, double mean, double stddev) 
+        static double normal_cfd(double value, double mean, double stddev)
         {
             value = (value-mean)/stddev;
             return 0.5 * erfc(-value / std::sqrt(2.0));
@@ -210,7 +210,7 @@ namespace dlib
 
     template <
         typename T
-        > 
+        >
     size_t count_steps_without_decrease (
         const T& container,
         double probability_of_decrease = 0.51
@@ -219,7 +219,7 @@ namespace dlib
         // make sure requires clause is not broken
         DLIB_ASSERT(0.5 < probability_of_decrease && probability_of_decrease < 1,
             "\t size_t count_steps_without_decrease()"
-            << "\n\t probability_of_decrease: "<< probability_of_decrease 
+            << "\n\t probability_of_decrease: "<< probability_of_decrease
         );
 
         running_gradient g;
@@ -247,7 +247,7 @@ namespace dlib
 
     template <
         typename T
-        > 
+        >
     size_t count_steps_without_increase (
         const T& container,
         double probability_of_increase = 0.51
@@ -256,7 +256,7 @@ namespace dlib
         // make sure requires clause is not broken
         DLIB_ASSERT(0.5 < probability_of_increase && probability_of_increase < 1,
             "\t size_t count_steps_without_increase()"
-            << "\n\t probability_of_increase: "<< probability_of_increase 
+            << "\n\t probability_of_increase: "<< probability_of_increase
         );
 
         running_gradient g;

@@ -44,7 +44,7 @@ namespace dlib
         string::size_type pos = state.full_name.find_last_of(directory::get_separator());
         if (pos == string::npos)
         {
-            // no valid full path has no separtor characters.  
+            // no valid full path has no separtor characters.
             throw file_not_found("Unable to find file " + name);
         }
         state.name = state.full_name.substr(pos+1);
@@ -71,8 +71,8 @@ namespace dlib
     bool file::
     operator == (
         const file& rhs
-    ) const 
-    { 
+    ) const
+    {
         using namespace std;
         if (state.full_name.size() == 0 && rhs.state.full_name.size() == 0)
             return true;
@@ -82,11 +82,11 @@ namespace dlib
         char buf[PATH_MAX];
         string left, right;
         if (realpath(state.full_name.c_str(),buf) == 0)
-            return false;    
+            return false;
         left = buf;
 
         if (realpath(rhs.state.full_name.c_str(),buf) == 0)
-            return false;    
+            return false;
         right = buf;
 
         return (left == right);
@@ -152,7 +152,7 @@ namespace dlib
 
     char directory::
     get_separator (
-    ) 
+    )
     {
         return '/';
     }
@@ -162,8 +162,8 @@ namespace dlib
     bool directory::
     operator == (
         const directory& rhs
-    ) const 
-    { 
+    ) const
+    {
         using namespace std;
         if (state.full_name.size() == 0 && rhs.state.full_name.size() == 0)
             return true;
@@ -173,11 +173,11 @@ namespace dlib
         char buf[PATH_MAX];
         string left, right;
         if (realpath(state.full_name.c_str(),buf) == 0)
-            return false;    
+            return false;
         left = buf;
 
         if (realpath(rhs.state.full_name.c_str(),buf) == 0)
-            return false;    
+            return false;
         right = buf;
 
         return (left == right);
@@ -235,7 +235,7 @@ namespace dlib
         if (path.size() == 1 && path[0] == sep)
             return true;
         else
-            return false;   
+            return false;
     }
 
 // ----------------------------------------------------------------------------------------

@@ -18,14 +18,14 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 this object is a middle man between a user and the iostream classes.
-                it allows single bits to be read/written easily to/from 
-                the iostream classes  
+                it allows single bits to be read/written easily to/from
+                the iostream classes
 
             BUFFERING:
-                This object will only read/write single bytes at a time from/to the 
-                iostream objects. Any buffered bits still in the bit_stream object 
-                when it is closed or destructed are lost if it is in read mode.  If 
-                it is in write mode then any remaining bits are guaranteed to be 
+                This object will only read/write single bytes at a time from/to the
+                iostream objects. Any buffered bits still in the bit_stream object
+                when it is closed or destructed are lost if it is in read mode.  If
+                it is in write mode then any remaining bits are guaranteed to be
                 written to the output stream by the time it is closed or destructed.
         !*/
 
@@ -35,7 +35,7 @@ namespace dlib
         bit_stream (
         );
         /*!
-            ensures 
+            ensures
                 - #*this is properly initialized
             throws
                 - std::bad_alloc
@@ -55,7 +55,7 @@ namespace dlib
                 - #*this has its initial value
             throws
                 - std::bad_alloc
-                    if this exception is thrown then *this is unusable 
+                    if this exception is thrown then *this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -65,12 +65,12 @@ namespace dlib
         );
         /*!
             requires
-                - is_in_write_mode() == false                 
-                - is_in_read_mode() == false                  
+                - is_in_write_mode() == false
+                - is_in_read_mode() == false
                 - is is ready to give input
-            ensures 
-                - #is_in_write_mode() == false                 
-                - #is_in_read_mode() == true                   
+            ensures
+                - #is_in_write_mode() == false
+                - #is_in_read_mode() == true
                 - #*this will now be reading from is
             throws
                 - std::bad_alloc
@@ -81,12 +81,12 @@ namespace dlib
         );
         /*!
             requires
-                - is_in_write_mode() == false         
-                - is_in_read_mode() == false          
+                - is_in_write_mode() == false
+                - is_in_read_mode() == false
                 - os is ready to take output
-            ensures 
-                - #is_in_write_mode() == true          
-                - #is_in_read_mode() == false          
+            ensures
+                - #is_in_write_mode() == true
+                - #is_in_read_mode() == false
                 - #*this will now write to os
             throws
                 - std::bad_alloc
@@ -100,8 +100,8 @@ namespace dlib
             requires
                 - is_in_write_mode() == true || is_in_read_mode() == true
             ensures
-                - #is_in_write_mode() == false 
-                - #is_in_read_mode()  == false 
+                - #is_in_write_mode() == false
+                - #is_in_read_mode()  == false
         !*/
 
         bool is_in_write_mode (
@@ -125,7 +125,7 @@ namespace dlib
         );
         /*!
             requires
-                - is_in_write_mode() == true 
+                - is_in_write_mode() == true
                 - bit == 0 || bit == 1
             ensures
                 - bit will be written to the ostream object associated with *this
@@ -135,7 +135,7 @@ namespace dlib
                     this exception will be thrown.  #*this will be unusable until
                     clear() is called and succeeds
                 - any other exception
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -144,14 +144,14 @@ namespace dlib
         );
         /*!
             requires
-                - is_in_read_mode() == true 
+                - is_in_read_mode() == true
             ensures
-                - the next bit has been read and placed into #bit 
-                - returns true if the read was successful, else false 
+                - the next bit has been read and placed into #bit
+                - returns true if the read was successful, else false
                   (ex. false if EOF has been reached)
             throws
                 - any exception
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -161,7 +161,7 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
         private:
 
@@ -172,7 +172,7 @@ namespace dlib
     };
 
     inline void swap (
-        bit_stream& a, 
+        bit_stream& a,
         bit_stream& b
     ) { a.swap(b); }
     /*!

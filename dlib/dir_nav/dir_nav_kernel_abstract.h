@@ -15,7 +15,7 @@ namespace dlib
 
     /*!
         GENERAL WARNING
-            Don't call any of these functions or make any of these objects 
+            Don't call any of these functions or make any of these objects
             before main() has been entered.   That means no instances
             of file or directory at the global scope.
     !*/
@@ -30,11 +30,11 @@ namespace dlib
     );
     /*!
         requires
-            - queue_of_dirs == an implementation of queue/queue_kernel_abstract.h with T 
+            - queue_of_dirs == an implementation of queue/queue_kernel_abstract.h with T
               set to directory or a std::vector<directory> or dlib::std_vector_c<directory>.
         ensures
-            - #roots == a queue containing directories that represent all the roots 
-              of the filesystem on this machine.   (e.g. in windows you have c:\, d:\ 
+            - #roots == a queue containing directories that represent all the roots
+              of the filesystem on this machine.   (e.g. in windows you have c:\, d:\
               etc.)
         throws
             - std::bad_alloc
@@ -42,7 +42,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // file object    
+    // file object
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     
@@ -55,7 +55,7 @@ namespace dlib
                 Note that the size of a file is determined at the time the file
                 object is constructed.  Thus if a file changes sizes after its
                 file object has been created its file object's size() method
-                will not reflect the new file size.    
+                will not reflect the new file size.
         !*/
 
     public:
@@ -71,7 +71,7 @@ namespace dlib
                 - #full_name() == ""
                 - #size() == 0
                 - #*this does not represent any file
-            throws  
+            throws
                 - std::bad_alloc
         !*/
 
@@ -80,16 +80,16 @@ namespace dlib
         );
         /*!
             ensures
-                - #*this has been properly initialized 
+                - #*this has been properly initialized
                 - #*this represents the file given by name
                   Note that name can be a fully qualified path or just a path
-                  relative to the current working directory.  Also, any symbolic 
+                  relative to the current working directory.  Also, any symbolic
                   links in name will be resolved.
-            throws  
+            throws
                 - std::bad_alloc
                 - file_not_found
                     This exception is thrown if the file can not be found or
-                    accessed.                    
+                    accessed.
         !*/
 
         file (
@@ -106,7 +106,7 @@ namespace dlib
         /*!
             ensures
                 - #*this == item
-            throws  
+            throws
                 - std::bad_alloc
         !*/
 
@@ -121,15 +121,15 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the name of the file.  This is full_name() minus 
-                  the path to the file.            
+                - returns the name of the file.  This is full_name() minus
+                  the path to the file.
         !*/
 
         const std::string& full_name (
         ) const;
         /*!
             ensures
-                - returns the fully qualified name for the file represented by *this 
+                - returns the fully qualified name for the file represented by *this
         !*/
 
         uint64 size (
@@ -140,7 +140,7 @@ namespace dlib
         !*/
 
         operator std::string (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns full_name()
@@ -172,9 +172,9 @@ namespace dlib
         /*!
             ensures
                 - if (*this and rhs represent the same file) then
-                    - returns false 
+                    - returns false
                 - else
-                    - returns true 
+                    - returns true
         !*/
 
         bool operator < (
@@ -194,13 +194,13 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // directory object    
+    // directory object
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     
@@ -209,9 +209,9 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object represents a directory in a file system.  It gives
-                the ability to traverse a directory tree.  
+                the ability to traverse a directory tree.
 
-                Note that the directories . and .. are not returned by get_dirs() 
+                Note that the directories . and .. are not returned by get_dirs()
         !*/
 
     public:
@@ -228,7 +228,7 @@ namespace dlib
                 - #name() == ""
                 - #is_root() == true
                 - #*this does not represent any directory
-            throws  
+            throws
                 - std::bad_alloc
         !*/
 
@@ -237,16 +237,16 @@ namespace dlib
         );
         /*!
             ensures
-                - #*this has been properly initialized 
+                - #*this has been properly initialized
                 - #*this represents the directory given by name.
                   Note that name can be a fully qualified path or just a path
-                  relative to the current working directory. Also, any symbolic 
+                  relative to the current working directory. Also, any symbolic
                   links in name will be resolved.
-            throws  
+            throws
                 - std::bad_alloc
                 - dir_not_found
                     This exception is thrown if the directory can not be found or
-                    accessed.    
+                    accessed.
         !*/
 
         directory (
@@ -263,7 +263,7 @@ namespace dlib
         /*!
             ensures
                 - #*this == item
-            throws  
+            throws
                 - std::bad_alloc
         !*/
 
@@ -290,14 +290,14 @@ namespace dlib
         ) const;
         /*!
             requires
-                - queue_of_files == an implementation of queue/queue_kernel_abstract.h with T 
+                - queue_of_files == an implementation of queue/queue_kernel_abstract.h with T
                   set to file or a std::vector<file> or dlib::std_vector_c<file>.
             ensures
                 - #files == A queue containing all the files present in this directory.
-                  (Note that symbolic links will not have been resolved in the names 
+                  (Note that symbolic links will not have been resolved in the names
                   of the returned files.)
                 - #files.size() == the number of files in this directory
-            throws 
+            throws
                 - bad_alloc
                     If this exception is thrown then the call to get_files() has
                     no effect on *this and #files is unusable until files.clear()
@@ -305,9 +305,9 @@ namespace dlib
                 - listing_error
                     This exception is thrown if listing access has been denied to this
                     directory or if some error occurred that prevented us from successfully
-                    getting the contents of this directory.       
+                    getting the contents of this directory.
                     If this exception is thrown then the call to get_files() has
-                    no effect on *this and #files.size()==0.         
+                    no effect on *this and #files.size()==0.
         !*/
 
         std::vector<file> get_files (
@@ -325,14 +325,14 @@ namespace dlib
         ) const;
         /*!
             requires
-                - queue_of_dirs == an implementation of queue/queue_kernel_abstract.h with T 
+                - queue_of_dirs == an implementation of queue/queue_kernel_abstract.h with T
                   set to directory or a std::vector<directory> or dlib::std_vector_c<directory>.
             ensures
                 - #dirs == a queue containing all the directories present in this directory.
-                  (note that symbolic links will not have been resolved in the names 
+                  (note that symbolic links will not have been resolved in the names
                   of the returned directories.)
                 - #dirs.size() == the number of subdirectories in this directory
-            throws 
+            throws
                 - bad_alloc
                     If this exception is thrown then the call to get_files() has
                     no effect on *this and #files is unusable until files.clear()
@@ -367,9 +367,9 @@ namespace dlib
         /*!
             ensures
                 - if (is_root()) then
-                    - returns a copy of *this                    
+                    - returns a copy of *this
                 - else
-                    - returns the parent directory of *this                    
+                    - returns the parent directory of *this
             throws
                 - bad_alloc
                     If this exception is thrown then the call to get_parent() will
@@ -383,15 +383,15 @@ namespace dlib
                 - if (is_root()) then
                     - returns ""
                 - else
-                    - returns the name of the directory.  This is full_name() minus 
-                      the path to the directory.           
+                    - returns the name of the directory.  This is full_name() minus
+                      the path to the directory.
         !*/
 
         const std::string& full_name (
         ) const;
         /*!
             ensures
-                - returns the fully qualified directory name for *this 
+                - returns the fully qualified directory name for *this
                 - if (is_root()) then
                     - the last character of #full_name() is get_separator()
                 - else
@@ -399,7 +399,7 @@ namespace dlib
         !*/
 
         operator std::string (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns full_name()
@@ -431,9 +431,9 @@ namespace dlib
         /*!
             ensures
                 - if (*this and rhs represent the same directory) then
-                    - returns false 
+                    - returns false
                 - else
-                    - returns true 
+                    - returns true
         !*/
 
         bool operator < (
@@ -453,7 +453,7 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
     };
 
@@ -482,9 +482,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void swap (
-        file& a, 
-        file& b 
-    ) { a.swap(b); }   
+        file& a,
+        file& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function for file objects
     !*/
@@ -492,9 +492,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void swap (
-        directory& a, 
-        directory& b 
-    ) { a.swap(b); }   
+        directory& a,
+        directory& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function for directory objects
     !*/

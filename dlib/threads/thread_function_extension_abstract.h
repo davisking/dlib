@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_THREAD_FUNCTIOn_ABSTRACT_
-#ifdef DLIB_THREAD_FUNCTIOn_ABSTRACT_ 
+#ifdef DLIB_THREAD_FUNCTIOn_ABSTRACT_
 
 #include "threads_kernel_abstract.h"
 
@@ -10,7 +10,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class thread_function 
+    class thread_function
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -30,7 +30,7 @@ namespace dlib
             throws
                 - std::bad_alloc
                 - dlib::thread_error
-                    the constructor may throw this exception if there is a problem 
+                    the constructor may throw this exception if there is a problem
                     gathering resources to create threading objects.
         !*/
 
@@ -46,7 +46,7 @@ namespace dlib
             throws
                 - std::bad_alloc
                 - dlib::thread_error
-                    the constructor may throw this exception if there is a problem 
+                    the constructor may throw this exception if there is a problem
                     gathering resources to create threading objects.
         !*/
 
@@ -63,7 +63,7 @@ namespace dlib
             throws
                 - std::bad_alloc
                 - dlib::thread_error
-                    the constructor may throw this exception if there is a problem 
+                    the constructor may throw this exception if there is a problem
                     gathering resources to create threading objects.
         !*/
 
@@ -81,7 +81,7 @@ namespace dlib
             throws
                 - std::bad_alloc
                 - dlib::thread_error
-                    the constructor may throw this exception if there is a problem 
+                    the constructor may throw this exception if there is a problem
                     gathering resources to create threading objects.
         !*/
 
@@ -100,7 +100,7 @@ namespace dlib
             throws
                 - std::bad_alloc
                 - dlib::thread_error
-                    the constructor may throw this exception if there is a problem 
+                    the constructor may throw this exception if there is a problem
                     gathering resources to create threading objects.
         !*/
 
@@ -108,7 +108,7 @@ namespace dlib
         );
         /*!
             ensures
-                - all resources allocated by *this have been freed.  
+                - all resources allocated by *this have been freed.
                 - blocks until is_alive() == false
         !*/
 

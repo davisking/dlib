@@ -13,7 +13,7 @@
 // This is called an unnamed-namespace and it has the effect of making everything inside this file "private"
 // so that everything you declare will have static linkage.  Thus we won't have any multiply
 // defined symbol errors coming out of the linker when we try to compile the test suite.
-namespace  
+namespace
 {
 
     using namespace test;
@@ -22,7 +22,7 @@ namespace
 
 
 
-    // Declare the logger we will use in this test.  The name of the tester 
+    // Declare the logger we will use in this test.  The name of the tester
     // should start with "test."
     logger dlog("test.graph");
 
@@ -33,12 +33,12 @@ namespace
     )
     /*!
         requires
-            - graph is an implementation of graph/graph_kernel_abstract.h 
+            - graph is an implementation of graph/graph_kernel_abstract.h
               is instantiated with int
         ensures
             - runs tests on graph for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
 
@@ -175,7 +175,7 @@ namespace
                 {
                     DLIB_TEST(a.node(i).edge(j) == 'a');
                 }
-                else 
+                else
                 {
                     DLIB_TEST(i != 0 || a.node(i).neighbor(j).index() != e2);
                     DLIB_TEST_MSG(a.node(i).edge(j) == 'c',a.node(i).edge(j));
@@ -227,7 +227,7 @@ namespace
 
             for (unsigned long j = 0; j < a.number_of_nodes(); ++j)
             {
-                if ((a.node(i).data == 1 && a.node(j).data == 1) || 
+                if ((a.node(i).data == 1 && a.node(j).data == 1) ||
                     (a.node(i).data == 1 && a.node(j).data == 3) ||
                     (a.node(i).data == 3 && a.node(j).data == 1))
                 {

@@ -12,7 +12,7 @@
 #include <dlib/pixel.h>
 #include <dlib/image_transforms.h>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -27,12 +27,12 @@ namespace
     )
     /*!
         requires
-            - array2d is an implementation of array2d/array2d_kernel_abstract.h 
-              is instantiated with unsigned long 
+            - array2d is an implementation of array2d/array2d_kernel_abstract.h
+              is instantiated with unsigned long
         ensures
             - runs tests on array2d for compliance with the specs
     !*/
-    {        
+    {
         srand(static_cast<unsigned int>(time(0)));
 
         array2d test,test2;
@@ -400,7 +400,7 @@ namespace
     void test_serialization()
     {
         // Do these tests because there are overloads of the serialize routines
-        // specifically for these types of pixel (except for unsigned short,  
+        // specifically for these types of pixel (except for unsigned short,
         // we do that because you can never have too many tests).
         {
             array2d<rgb_alpha_pixel> img, img2;

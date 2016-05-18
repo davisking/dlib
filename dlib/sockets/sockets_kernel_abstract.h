@@ -13,19 +13,19 @@ namespace dlib
 
     /*!
         GENERAL COMMENTS:
-            Nothing in here will throw exceptions.   
+            Nothing in here will throw exceptions.
             
-            All ip address strings in this file refer to IPv4 addresses.  For 
+            All ip address strings in this file refer to IPv4 addresses.  For
             example "192.168.1.1"
 
             Timeouts:
-                All timeout values are measured in milliseconds but you are not 
+                All timeout values are measured in milliseconds but you are not
                 guaranteed to have that level of resolution.  The actual resolution
                 is implementation defined.
 
             GENERAL WARNING
-                Don't call any of these functions or make any of these objects 
-                before main() has been entered.  
+                Don't call any of these functions or make any of these objects
+                before main() has been entered.
 
         EXCEPTIONS
             Unless specified otherwise, nothing in this file throws exceptions.
@@ -43,12 +43,12 @@ namespace dlib
     /*!
         ensures
             - if (#get_local_hostname() == 0) then
-                - #hostname == a string containing the hostname of the local computer 
+                - #hostname == a string containing the hostname of the local computer
 
             - returns 0 upon success
-            - returns OTHER_ERROR upon failure and in this case #hostname's value 
+            - returns OTHER_ERROR upon failure and in this case #hostname's value
               is undefined
-    !*/ 
+    !*/
 
 // -----------------
 
@@ -64,8 +64,8 @@ namespace dlib
             - if (#hostname_to_ip() == 0) then
                 - #ip == string containing the nth ip address associated with the hostname
 
-            - returns 0 upon success 
-            - returns OTHER_ERROR upon failure  
+            - returns 0 upon success
+            - returns OTHER_ERROR upon failure
     !*/
 
 // -----------------
@@ -79,19 +79,19 @@ namespace dlib
             - if (#ip_to_hostname() == 0) then
                 - #hostname == string containing the hostname associated with ip
 
-            - returns 0 upon success 
-            - returns OTHER_ERROR upon failure 
+            - returns 0 upon success
+            - returns OTHER_ERROR upon failure
     !*/
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
     //
     // socket creation functions
-    // 
+    //
     // The following functions are guaranteed to be thread-safe
     //
 // ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------------------
 
     int create_listener (
         listener*& new_listener,
@@ -103,16 +103,16 @@ namespace dlib
             - 0 <= port <= 65535
         ensures
             - if (#create_listener() == 0) then
-                - #new_listener == a pointer to a listener object that is listening on 
-                  the specified port and ip for an incoming connection 
-                - if (ip == "") then 
-                    - the new listener will be listening on all interfaces 
-                - if (port == 0) then 
-                    - the operating system will assign a free port to listen on 
+                - #new_listener == a pointer to a listener object that is listening on
+                  the specified port and ip for an incoming connection
+                - if (ip == "") then
+                    - the new listener will be listening on all interfaces
+                - if (port == 0) then
+                    - the operating system will assign a free port to listen on
 
 
-            - returns 0 if create_listener was successful 
-            - returns PORTINUSE if the specified local port was already in use 
+            - returns 0 if create_listener was successful
+            - returns PORTINUSE if the specified local port was already in use
             - returns OTHER_ERROR if some other error occurred
     !*/
 
@@ -126,37 +126,37 @@ namespace dlib
         scoped_ptr smart pointer instead of a C pointer.
     !*/
 
-    int create_connection ( 
+    int create_connection (
         connection*& new_connection,
-        unsigned short foreign_port, 
-        const std::string& foreign_ip, 
+        unsigned short foreign_port,
+        const std::string& foreign_ip,
         unsigned short local_port = 0,
         const std::string& local_ip = ""
     );
     /*!
         requires
-            - 0 <  foreign_port <= 65535 
+            - 0 <  foreign_port <= 65535
             - 0 <= local_port   <= 65535
         ensures
             - if (#create_connection() == 0) then
-                - #new_connection  == a pointer to a connection object that is connected 
-                  to foreign_ip on port foreign_port and is using the local interface 
+                - #new_connection  == a pointer to a connection object that is connected
+                  to foreign_ip on port foreign_port and is using the local interface
                   local_ip and local port local_port
                 - #new_connection->user_data == 0
-                - if (local_ip == "") then 
+                - if (local_ip == "") then
                     - the operating system will chose this for you
-                - if (local_port == 0) then 
+                - if (local_port == 0) then
                     - the operating system will chose this for you
 
-            - returns 0 if create_connection was successful 
-            - returns PORTINUSE if the specified local port was already in use 
+            - returns 0 if create_connection was successful
+            - returns PORTINUSE if the specified local port was already in use
             - returns OTHER_ERROR if some other error occurred
         !*/
 
-    int create_connection ( 
+    int create_connection (
         scoped_ptr<connection>& new_connection,
-        unsigned short foreign_port, 
-        const std::string& foreign_ip, 
+        unsigned short foreign_port,
+        const std::string& foreign_ip,
         unsigned short local_port = 0,
         const std::string& local_ip = ""
     );
@@ -177,41 +177,41 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents a TCP connection.
 
-                Instances of this class can only be created by using the 
+                Instances of this class can only be created by using the
                 create_connection function or listener class defined below.
 
-                NOTE:  
-                    A connection object must ALWAYS be closed (delete the pointer to the 
-                    connection) or it will cause a resource leak.  
+                NOTE:
+                    A connection object must ALWAYS be closed (delete the pointer to the
+                    connection) or it will cause a resource leak.
 
                     Note also that all errors indicated by a return code of OTHER_ERROR
                     are fatal so if one occurs the connection should just be closed.
 
             CLOSING A CONNECTION
-                Note that if ~connection() or shutdown() is called before the remote client 
-                has received all sent data it is possible that the data will be lost.  To 
-                avoid this you should call the close_gracefully() function to close your 
-                connections (unless you actually do want to immediately dispose of a 
+                Note that if ~connection() or shutdown() is called before the remote client
+                has received all sent data it is possible that the data will be lost.  To
+                avoid this you should call the close_gracefully() function to close your
+                connections (unless you actually do want to immediately dispose of a
                 connection and don't care about the data).
                 (example: close_gracefully(con); // close con gracefully but force it closed
                                                    // if it takes more than 500 milliseconds.)
 
             THREAD SAFETY
-                - It is always safe to call shutdown() or shutdown_outgoing().   
-                - you may NOT call any function more than once at a time (except the 
+                - It is always safe to call shutdown() or shutdown_outgoing().
+                - you may NOT call any function more than once at a time (except the
                   shutdown functions).
                 - do not call read() more than once at a time
                 - do not call write() more than once at a time
-                - You can safely call shutdown or shutdown_outgoing in conjunction with 
+                - You can safely call shutdown or shutdown_outgoing in conjunction with
                   the read/write functions.
-                    This is helpful if you want to unblock another thread that is 
-                    blocking on a read/write operation.  Shutting down the connection 
+                    This is helpful if you want to unblock another thread that is
+                    blocking on a read/write operation.  Shutting down the connection
                     will cause the read/write functions to return a value of SHUTDOWN.
 
             OUT-OF-BAND DATA:
                 All out-of-band data will be put inline into the normal data stream.
-                This means that you can read any out-of-band data via calls to read(). 
-                (i.e. the SO_OOBINLINE socket option will be set) 
+                This means that you can read any out-of-band data via calls to read().
+                (i.e. the SO_OOBINLINE socket option will be set)
         !*/
 
     public:
@@ -220,9 +220,9 @@ namespace dlib
         );
         /*!
             requires
-                - no other threads are using this connection object 
+                - no other threads are using this connection object
             ensures
-                - closes the connection (this is an abrupt non-graceful close) 
+                - closes the connection (this is an abrupt non-graceful close)
                 - frees the resources used by this object
         !*/
 
@@ -234,39 +234,39 @@ namespace dlib
         !*/
 
         long write (
-            const char* buf, 
+            const char* buf,
             long num
         );
         /*!
             requires
-                - num > 0 
+                - num > 0
                 - buf points to an array of at least num bytes
             ensures
                 - will block until ONE of the following occurs:
-                    - num bytes from buf have been written to the connection 
+                    - num bytes from buf have been written to the connection
                     - an error has occurred
                     - the outgoing channel of the connection has been shutdown locally
 
-                - returns num if write succeeded 
-                - returns OTHER_ERROR if there was an error (this could be due to a 
+                - returns num if write succeeded
+                - returns OTHER_ERROR if there was an error (this could be due to a
                   connection close)
-                - returns SHUTDOWN if the outgoing channel of the connection has been 
+                - returns SHUTDOWN if the outgoing channel of the connection has been
                   shutdown locally
         !*/
 
         long read (
-            char* buf, 
+            char* buf,
             long num
         );
         /*!
             requires
-                - num > 0 
+                - num > 0
                 - buf points to an array of at least num bytes
             ensures
-                - read() will not read more than num bytes of data into #buf 
+                - read() will not read more than num bytes of data into #buf
                 - read blocks until ONE of the following happens:
-                    - there is some data available and it has been written into #buf 
-                    - the remote end of the connection is closed 
+                    - there is some data available and it has been written into #buf
+                    - the remote end of the connection is closed
                     - an error has occurred
                     - the connection has been shutdown locally
 
@@ -277,20 +277,20 @@ namespace dlib
         !*/
 
         long read (
-            char* buf, 
+            char* buf,
             long num,
-            unsigned long timeout 
+            unsigned long timeout
         );
         /*!
             requires
-                - num > 0 
+                - num > 0
                 - buf points to an array of at least num bytes
-                - timeout < 2000000                
+                - timeout < 2000000
             ensures
-                - read() will not read more than num bytes of data into #buf 
+                - read() will not read more than num bytes of data into #buf
                 - if (timeout > 0) then read() blocks until ONE of the following happens:
-                    - there is some data available and it has been written into #buf 
-                    - the remote end of the connection is closed 
+                    - there is some data available and it has been written into #buf
+                    - the remote end of the connection is closed
                     - an error has occurred
                     - the connection has been shutdown locally
                     - timeout milliseconds has elapsed
@@ -311,7 +311,7 @@ namespace dlib
                 - returns the local port number for this connection
         !*/
 
-        unsigned short get_foreign_port ( 
+        unsigned short get_foreign_port (
         ) const;
         /*!
             ensures
@@ -337,29 +337,29 @@ namespace dlib
         /*!
             ensures
                 - if (#shutdown() == 0 && connection was still open) then
-                    - terminates the connection but does not free the resources for the 
-                      connection object 
+                    - terminates the connection but does not free the resources for the
+                      connection object
 
-                - any read() or write() calls on this connection will return immediately 
+                - any read() or write() calls on this connection will return immediately
                   with the code SHUTDOWN.
 
-                - returns 0 upon success 
+                - returns 0 upon success
                 - returns OTHER_ERROR if there was an error
-        !*/        
+        !*/
 
         int shutdown_outgoing (
         );
         /*!
             ensures
                 - if (#shutdown_outgoing() == 0 && outgoing channel was still open) then
-                    - sends a FIN to indicate that no more data will be sent on this 
-                      connection but leaves the receive half of the connection open to 
-                      receive more data from the other host 
+                    - sends a FIN to indicate that no more data will be sent on this
+                      connection but leaves the receive half of the connection open to
+                      receive more data from the other host
 
                 - any calls to write() will return immediately with the code SHUTDOWN.
 
-                - returns 0 upon success 
-                - returns OTHER_ERROR if there was an error 
+                - returns 0 upon success
+                - returns OTHER_ERROR if there was an error
         !*/
 
         int disable_nagle(
@@ -369,10 +369,10 @@ namespace dlib
                 - Sets the TCP_NODELAY socket option to disable Nagle's algorithm.
                   This can sometimes reduce transmission latency, however, in almost
                   all normal cases you don't want to mess with this as the default
-                  setting is usually appropriate.  
+                  setting is usually appropriate.
 
                 - returns 0 upon success
-                - returns OTHER_ERROR if there was an error 
+                - returns OTHER_ERROR if there was an error
         !*/
 
         typedef platform_specific_type socket_descriptor_type;
@@ -381,11 +381,11 @@ namespace dlib
         /*!
             ensures
                 - returns the underlying socket descriptor for this connection
-                  object.  The reason you might want access to this is to 
-                  pass it to some other library that requires a socket file 
-                  descriptor.  However, if you do this then you probably shouldn't 
+                  object.  The reason you might want access to this is to
+                  pass it to some other library that requires a socket file
+                  descriptor.  However, if you do this then you probably shouldn't
                   use the dlib::connection read() and write() anymore since
-                  whatever you are doing with the socket descriptor is probably 
+                  whatever you are doing with the socket descriptor is probably
                   doing I/O with the socket.
         !*/
 
@@ -395,7 +395,7 @@ namespace dlib
         connection(connection&);        // copy constructor
         connection& operator=(connection&);    // assignment operator
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -411,12 +411,12 @@ namespace dlib
                 Calling accept returns a pointer to any new incoming connections on its
                 port.
 
-                Instances of this class can only be created by using the 
+                Instances of this class can only be created by using the
                 create_listener function defined below.
 
-                NOTE:  
-                    A listener object must ALWAYS be closed (delete the pointer to it) or 
-                    it will cause a resource leak.  
+                NOTE:
+                    A listener object must ALWAYS be closed (delete the pointer to it) or
+                    it will cause a resource leak.
 
                     Note also that all errors indicated by a return code of OTHER_ERROR
                     are fatal so if one occurs the listener should be closed.
@@ -432,9 +432,9 @@ namespace dlib
         );
         /*!
             requires
-                - no other threads are using this listener object 
+                - no other threads are using this listener object
             ensures
-                - closes the listener 
+                - closes the listener
                 - frees the resources used by this object
         !*/
 
@@ -444,18 +444,18 @@ namespace dlib
         );
         /*!
             requires
-                - timeout < 2000000                
+                - timeout < 2000000
             ensures
-                - blocks until a new connection is ready or timeout milliseconds have 
+                - blocks until a new connection is ready or timeout milliseconds have
                   elapsed.
-                - #new_connection == a pointer to the new connection object 
+                - #new_connection == a pointer to the new connection object
                 - #new_connection->user_data == 0
-                - if (timeout == 0) then 
+                - if (timeout == 0) then
                     - the timeout argument is ignored
 
-                - returns 0 if accept() was successful                
-                - returns TIMEOUT if timeout milliseconds have elapsed 
-                - returns OTHER_ERROR if an error has occurred 
+                - returns 0 if accept() was successful
+                - returns TIMEOUT if timeout milliseconds have elapsed
+                - returns OTHER_ERROR if an error has occurred
         !*/
 
         int accept (
@@ -478,8 +478,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns a string containing the IP (e.g. "127.0.0.1") of the 
-                  interface this object is listening on 
+                - returns a string containing the IP (e.g. "127.0.0.1") of the
+                  interface this object is listening on
                 - returns "" if it is accepting connections on all interfaces
         !*/
 

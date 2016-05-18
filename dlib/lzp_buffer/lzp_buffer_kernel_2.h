@@ -13,7 +13,7 @@ namespace dlib
     template <
         typename sbuf
         >
-    class lzp_buffer_kernel_2 
+    class lzp_buffer_kernel_2
     {
         /*!
             REQUIREMENTS ON sbuf
@@ -46,7 +46,7 @@ namespace dlib
     public:
 
         explicit lzp_buffer_kernel_2 (
-            unsigned long buffer_size           
+            unsigned long buffer_size
         );
 
         virtual ~lzp_buffer_kernel_2 (
@@ -79,7 +79,7 @@ namespace dlib
             ensures
                 - returns true if buffer[index]'s context matches the current context
         !*/
-        { 
+        {
             if (index+3 < buffer.size())
             {
                 if (buffer[0] != buffer[index+1])
@@ -98,7 +98,7 @@ namespace dlib
         }
 
 
-        sbuf buffer;        
+        sbuf buffer;
         unsigned long* table3;
         unsigned long* table4;
         unsigned long last_element;
@@ -108,7 +108,7 @@ namespace dlib
         lzp_buffer_kernel_2(const lzp_buffer_kernel_2<sbuf>&);        // copy constructor
         lzp_buffer_kernel_2<sbuf>& operator=(const lzp_buffer_kernel_2<sbuf>&);    // assignment operator
 
-    };      
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ namespace dlib
         >
     lzp_buffer_kernel_2<sbuf>::
     lzp_buffer_kernel_2 (
-        unsigned long buffer_size           
+        unsigned long buffer_size
     ) :
         table3(0),
         table4(0),
@@ -196,10 +196,10 @@ namespace dlib
     void lzp_buffer_kernel_2<sbuf>::
     add (
         unsigned char symbol
-    ) 
-    { 
-        buffer.rotate_left(1); 
-        buffer[0] = symbol; 
+    )
+    {
+        buffer.rotate_left(1);
+        buffer[0] = symbol;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -222,7 +222,7 @@ namespace dlib
         unsigned long temp5 = buffer[4];
         temp5 <<= 12;
         
-        unsigned long context1 = temp1|temp2|temp3;    
+        unsigned long context1 = temp1|temp2|temp3;
         unsigned long context2 = context1|temp4;
 
 
@@ -233,7 +233,7 @@ namespace dlib
 
 
         // check the 5-order context's prediction
-        if (table3[i5] != buffer.size() && 
+        if (table3[i5] != buffer.size() &&
             verify(buffer.get_element_index(table3[i5])) )
         {
             index = buffer.get_element_index(table3[i5]);
@@ -241,13 +241,13 @@ namespace dlib
             {
                 // update the prediction for this context
                 table3[i3] = buffer.get_element_id(last_element);
-                table4[i4] = table3[i3];     
+                table4[i4] = table3[i3];
                 table3[i5] = table3[i3];
             }
             return 5;
         }
         // check the 4-order context's prediction
-        else if (table4[i4] != buffer.size() && 
+        else if (table4[i4] != buffer.size() &&
             verify(buffer.get_element_index(table4[i4])) )
         {
             index = buffer.get_element_index(table4[i4]);
@@ -255,8 +255,8 @@ namespace dlib
             {
                 // update the prediction for this context
                 table3[i3] = buffer.get_element_id(last_element);
-                table4[i4] = table3[i3];           
-                table3[i5] = table3[i3];          
+                table4[i4] = table3[i3];
+                table3[i5] = table3[i3];
             }
             return 4;
         }
@@ -270,17 +270,17 @@ namespace dlib
             {
                 // update the prediction for this context
                 table3[i3] = buffer.get_element_id(last_element);
-                table4[i4] = table3[i3];        
-                table3[i5] = table3[i3];             
+                table4[i4] = table3[i3];
+                table3[i5] = table3[i3];
             }
             return 3;
-        } 
+        }
         else
         {
             // update the prediction for this context
             table3[i3] = buffer.get_element_id(last_element);
-            table4[i4] = table3[i3];            
-            table3[i5] = table3[i3];         
+            table4[i4] = table3[i3];
+            table3[i5] = table3[i3];
             
             return 0;
         }
@@ -293,9 +293,9 @@ namespace dlib
         >
     unsigned long lzp_buffer_kernel_2<sbuf>::
     size (
-    ) const 
-    { 
-        return buffer.size(); 
+    ) const
+    {
+        return buffer.size();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -306,9 +306,9 @@ namespace dlib
     unsigned char lzp_buffer_kernel_2<sbuf>::
     operator[] (
         unsigned long index
-    ) const 
-    { 
-        return buffer[index]; 
+    ) const
+    {
+        return buffer[index];
     }
 
 // ----------------------------------------------------------------------------------------

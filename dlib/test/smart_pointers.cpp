@@ -10,13 +10,13 @@
 
 #include "tester.h"
 
-// Don't warn about auto_ptr 
+// Don't warn about auto_ptr
 #if (defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || (__GNUC__ > 4))) || \
     (defined(__clang__) && ((__clang_major__ >= 3 && __clang_minor__ >= 4)))
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-namespace  
+namespace
 {
     bool used_array_delete;
     template <typename T>
@@ -71,7 +71,7 @@ namespace
         ensures
             - runs tests on the smart pointers for compliance with the specs
     !*/
-    {        
+    {
         counter = 0;
         deleter_called = 0;
 

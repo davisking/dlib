@@ -18,15 +18,15 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T should be some object that provides an interface that is 
+                T should be some object that provides an interface that is
                 compatible with double, float, int, long and the like.
 
             REQUIREMENTS ON NR
                 NR == 3 || NR == 2
 
             INITIAL VALUE
-                x() == 0 
-                y() == 0 
+                x() == 0
+                y() == 0
                 z() == 0
 
             WHAT THIS OBJECT REPRESENTS
@@ -34,7 +34,7 @@ namespace dlib
                 this object is limited to representing points on the XY plane where
                 Z is set to 0.
 
-                Also note that this object performs the appropriate integer and 
+                Also note that this object performs the appropriate integer and
                 floating point conversions and promotions when vectors of mixed
                 type are used together.  For example:
                     vector<int,3> vi;
@@ -64,9 +64,9 @@ namespace dlib
             requires
                 - NR == 3
             ensures
-                - #x() == _x 
-                - #y() == _y 
-                - #z() == _z 
+                - #x() == _x
+                - #y() == _y
+                - #z() == _z
         !*/
 
         vector (
@@ -77,8 +77,8 @@ namespace dlib
             requires
                 - NR == 2
             ensures
-                - #x() == _x 
-                - #y() == _y 
+                - #x() == _x
+                - #y() == _y
                 - #z() == 0
         !*/
 
@@ -88,7 +88,7 @@ namespace dlib
         );
         /*!
             ensures
-                - Initializes *this with the contents of v and does any rounding if necessary and also 
+                - Initializes *this with the contents of v and does any rounding if necessary and also
                   takes care of converting between 2 and 3 dimensional vectors.
                 - if (U is a real valued type like float or double and T is an integral type like long) then
                     - if (NR == 3) then
@@ -101,17 +101,17 @@ namespace dlib
                         - #z() == 0
                 - else
                     - if (NR == 3) then
-                        - #x() == v.x() 
-                        - #y() == v.y() 
-                        - #z() == v.z() 
+                        - #x() == v.x()
+                        - #y() == v.y()
+                        - #z() == v.z()
                     - else // NR == 2
-                        - #x() == v.x() 
-                        - #y() == v.y() 
+                        - #x() == v.x()
+                        - #y() == v.y()
                         - #z() == 0
         !*/
 
         template <typename EXP>
-        vector ( 
+        vector (
             const matrix_exp<EXP>& m
         );
         /*!
@@ -119,7 +119,7 @@ namespace dlib
                 - m.size() == NR
                 - m.nr() == 1 || m.nc() == 1 (i.e. m must be a row or column matrix)
             ensures
-                - Initializes *this with the contents of m and does any rounding if necessary and also 
+                - Initializes *this with the contents of m and does any rounding if necessary and also
                   takes care of converting between 2 and 3 dimensional vectors.
                 - if (m contains real valued values like float or double and T is an integral type like long) then
                     - #x() == floor(m(0) + 0.5)
@@ -156,7 +156,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns length()*length() 
+                - returns length()*length()
         !*/
 
         T& x (
@@ -250,7 +250,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns -1*(*this) 
+                - returns -1*(*this)
         !*/
 
         vector operator/ (
@@ -258,7 +258,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the result of dividing *this by rhs 
+                - returns the result of dividing *this by rhs
         !*/
 
         vector& operator= (
@@ -266,8 +266,8 @@ namespace dlib
         );
         /*!
             ensures
-                - #x() == rhs.x() 
-                - #y() == rhs.y() 
+                - #x() == rhs.x()
+                - #y() == rhs.y()
                 - #z() == rhs.z()
                 - returns #*this
         !*/
@@ -354,45 +354,45 @@ namespace dlib
     template<typename T, typename U, long NR>
     vector operator* (
         const U lhs,
-        const vector<T,NR> & rhs   
+        const vector<T,NR> & rhs
     );
-    /*! 
+    /*!
         ensures
             - returns the result of multiplying the scalar lhs by rhs
     !*/
 
     template<typename T, long NR>
     inline void swap (
-        vector<T,NR> & a, 
-        vector<T,NR> & b 
-    ) { a.swap(b); }   
+        vector<T,NR> & a,
+        vector<T,NR> & b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
 
     template<typename T, long NR>
     void serialize (
-        const vector<T,NR>& item, 
+        const vector<T,NR>& item,
         std::ostream& out
-    );   
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     template<typename T, long NR>
     void deserialize (
-        vector<T,NR>& item, 
+        vector<T,NR>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
     template<typename T>
     std::ostream& operator<< (
-        std::ostream& out, 
-        const vector<T,3>& item 
-    );   
+        std::ostream& out,
+        const vector<T,3>& item
+    );
     /*!
         ensures
             - writes item to out in the form "(x, y, z)"
@@ -400,9 +400,9 @@ namespace dlib
 
     template<typename T>
     std::istream& operator>>(
-        std::istream& in, 
-        vector<T,3>& item 
-    );   
+        std::istream& in,
+        vector<T,3>& item
+    );
     /*!
         ensures
             - reads a vector from the input stream in and stores it in #item.
@@ -411,9 +411,9 @@ namespace dlib
 
     template<typename T>
     std::ostream& operator<< (
-        std::ostream& out, 
-        const vector<T,2>& item 
-    );   
+        std::ostream& out,
+        const vector<T,2>& item
+    );
     /*!
         ensures
             - writes item to out in the form "(x, y)"
@@ -421,9 +421,9 @@ namespace dlib
 
     template<typename T>
     std::istream& operator>>(
-        std::istream& in, 
-        vector<T,2>& item 
-    );   
+        std::istream& in,
+        vector<T,2>& item
+    );
     /*!
         ensures
             - reads a vector from the input stream in and stores it in #item.
@@ -433,13 +433,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     /*!A point
-        This is just a typedef of the vector object. 
+        This is just a typedef of the vector object.
     !*/
 
     typedef vector<long,2> point;
 
     /*!A dpoint
-        This is just a typedef of the vector object. 
+        This is just a typedef of the vector object.
     !*/
 
     typedef vector<double,2> dpoint;
@@ -457,7 +457,7 @@ namespace std
     struct less<dlib::vector<T,3> > : public binary_function<dlib::vector<T,3> ,dlib::vector<T,3> ,bool>
     {
         inline bool operator() (const dlib::vector<T,3> & a, const dlib::vector<T,3> & b) const
-        { 
+        {
             if      (a.x() < b.x()) return true;
             else if (a.x() > b.x()) return false;
             else if (a.y() < b.y()) return true;
@@ -475,7 +475,7 @@ namespace std
     struct less<dlib::vector<T,2> > : public binary_function<dlib::vector<T,2> ,dlib::vector<T,2> ,bool>
     {
         inline bool operator() (const dlib::vector<T,2> & a, const dlib::vector<T,2> & b) const
-        { 
+        {
             if      (a.x() < b.x()) return true;
             else if (a.x() > b.x()) return false;
             else if (a.y() < b.y()) return true;

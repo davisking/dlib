@@ -31,8 +31,8 @@ namespace dlib
                 - current_element_valid() == (current < buffer_size) && at_start_ == false
                 - at_start() == at_start_
 
-                - if (buffer_size != 0) then                    
-                    - buffer[(buffer_start+i)&(mask)] == operator[](i)   
+                - if (buffer_size != 0) then
+                    - buffer[(buffer_start+i)&(mask)] == operator[](i)
                     - mask == buffer_size-1
                 - else
                     - buffer == 0
@@ -56,9 +56,9 @@ namespace dlib
         ) { if (buffer) delete [] buffer; }
 
         void clear(
-        ) 
+        )
         {
-            buffer_size = 0; 
+            buffer_size = 0;
             if (buffer) delete [] buffer;
             buffer = 0;
             at_start_ = true;
@@ -75,7 +75,7 @@ namespace dlib
             while (exp_size != 0)
             {
                 --exp_size;
-                buffer_size <<= 1;            
+                buffer_size <<= 1;
             }
             mask = buffer_size-1;
             try { buffer = new T[buffer_size]; }
@@ -106,7 +106,7 @@ namespace dlib
         ) const { return ((buffer_start+index)&mask); }
 
         unsigned long get_element_index (
-            unsigned long element_id 
+            unsigned long element_id
         ) const { return ((element_id-buffer_start)&mask);}
 
         void swap (
@@ -138,8 +138,8 @@ namespace dlib
         ) { return (*this)[current]; }
 
         bool move_next (
-        ) const 
-        { 
+        ) const
+        {
             if (at_start_ == false)
             {
                 if (current+1 < buffer_size)
@@ -153,7 +153,7 @@ namespace dlib
                     return false;
                 }
             }
-            else 
+            else
             {
                 at_start_ = false;
                 current = 0;
@@ -178,23 +178,23 @@ namespace dlib
         sliding_buffer_kernel_1(sliding_buffer_kernel_1<T>&);        // copy constructor
         sliding_buffer_kernel_1<T>& operator=(sliding_buffer_kernel_1<T>&);    // assignment operator
 
-    };      
+    };
 
     template <
         typename T
         >
     inline void swap (
-        sliding_buffer_kernel_1<T>& a, 
-        sliding_buffer_kernel_1<T>& b 
-    ) { a.swap(b); }   
+        sliding_buffer_kernel_1<T>& a,
+        sliding_buffer_kernel_1<T>& b
+    ) { a.swap(b); }
 
     template <
         typename T
         >
     void deserialize (
-        sliding_buffer_kernel_1<T>& item, 
+        sliding_buffer_kernel_1<T>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -216,9 +216,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type sliding_buffer_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type sliding_buffer_kernel_1");
         }
     }
 }

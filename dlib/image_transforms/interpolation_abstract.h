@@ -1,7 +1,7 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_INTERPOlATION_ABSTRACT_
-#ifdef DLIB_INTERPOlATION_ABSTRACT_ 
+#ifdef DLIB_INTERPOlATION_ABSTRACT_
 
 #include "../pixel.h"
 #include "../image_processing/full_object_detection_abstract.h"
@@ -17,13 +17,13 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for performing nearest neighbor interpolation
-                on an image.  
+                on an image.
         !*/
 
     public:
 
         template <
-            typename image_view_type, 
+            typename image_view_type,
             typename pixel_type
             >
         bool operator() (
@@ -33,13 +33,13 @@ namespace dlib
         ) const;
         /*!
             requires
-                - image_view_type == an image_view or const_image_view object. 
+                - image_view_type == an image_view or const_image_view object.
                 - pixel_traits<typename image_view_type::pixel_type>::has_alpha == false
                 - pixel_traits<pixel_type> is defined
             ensures
                 - if (p is located inside img) then
                     - #result == img[p.y()][p.x()]
-                      (This assignment is done using assign_pixel(#result, img[p.y()][p.x()]), 
+                      (This assignment is done using assign_pixel(#result, img[p.y()][p.x()]),
                       therefore any necessary color space conversion will be performed)
                     - returns true
                 - else
@@ -63,7 +63,7 @@ namespace dlib
     public:
 
         template <
-            typename T, 
+            typename T,
             typename image_view_type,
             typename pixel_type
             >
@@ -74,7 +74,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - image_view_type == an image_view or const_image_view object 
+                - image_view_type == an image_view or const_image_view object
                 - pixel_traits<typename image_view_type::pixel_type>::has_alpha == false
                 - pixel_traits<pixel_type> is defined
             ensures
@@ -104,7 +104,7 @@ namespace dlib
     public:
 
         template <
-            typename T, 
+            typename T,
             typename image_view_type,
             typename pixel_type
             >
@@ -115,7 +115,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - image_view_type == an image_view or const_image_view object. 
+                - image_view_type == an image_view or const_image_view object.
                 - pixel_traits<typename image_view_type::pixel_type>::has_alpha == false
                 - pixel_traits<pixel_type> is defined
             ensures
@@ -139,7 +139,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a function object which simply sets a pixel 
+                This is a function object which simply sets a pixel
                 to have a black value.
         !*/
 
@@ -154,7 +154,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a function object which simply sets a pixel 
+                This is a function object which simply sets a pixel
                 to have a white value.
         !*/
 
@@ -199,10 +199,10 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              dlib/image_processing/generic_image.h
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear,
               interpolate_quadratic, or a type with a compatible interface.
             - map_point should be a function which takes dlib::vector<T,2> objects and
               returns dlib::vector<T,2> objects.  An example is point_transform_affine.
@@ -215,10 +215,10 @@ namespace dlib
             - The map_point function defines a mapping from pixels in out_img to pixels
               in in_img.  transform_image() uses this mapping, along with the supplied
               interpolation routine interp, to fill the region of out_img defined by
-              area with an interpolated copy of in_img.  
+              area with an interpolated copy of in_img.
             - This function does not change the size of out_img.
             - Only pixels inside the region defined by area in out_img are modified.
-            - For all locations r and c such that area.contains(c,r) but have no corresponding 
+            - For all locations r and c such that area.contains(c,r) but have no corresponding
               locations in in_img:
                 - set_background(out_img[r][c]) is invoked
                   (i.e. some parts of out_img might correspond to areas outside in_img and
@@ -245,10 +245,10 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              dlib/image_processing/generic_image.h
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear,
               interpolate_quadratic, or a type with a compatible interface.
             - map_point should be a function which takes dlib::vector<T,2> objects and
               returns dlib::vector<T,2> objects.  An example is point_transform_affine.
@@ -257,7 +257,7 @@ namespace dlib
               and no_background.
             - is_same_object(in_img, out_img) == false
         ensures
-            - performs: 
+            - performs:
               transform_image(in_img, out_img, interp, map_point, set_background, get_rect(out_img));
               (i.e. runs transform_image() on the entire out_img)
     !*/
@@ -279,16 +279,16 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              dlib/image_processing/generic_image.h
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear,
               interpolate_quadratic, or a type with a compatible interface.
             - map_point should be a function which takes dlib::vector<T,2> objects and
               returns dlib::vector<T,2> objects.  An example is point_transform_affine.
             - is_same_object(in_img, out_img) == false
         ensures
-            - performs: 
+            - performs:
               transform_image(in_img, out_img, interp, map_point, black_background(), get_rect(out_img));
               (i.e. runs transform_image() on the entire out_img and sets non-interpolated
               pixels to black)
@@ -310,19 +310,19 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              dlib/image_processing/generic_image.h
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear,
               interpolate_quadratic, or a type with a compatible interface.
             - is_same_object(in_img, out_img) == false
         ensures
             - #out_img == a copy of in_img which has been rotated angle radians counter clockwise.
-              The rotation is performed with respect to the center of the image.  
+              The rotation is performed with respect to the center of the image.
             - Parts of #out_img which have no corresponding locations in in_img are set to black.
             - uses the supplied interpolation routine interp to perform the necessary
               pixel interpolation.
-            - returns a transformation object that maps points in in_img into their corresponding 
+            - returns a transformation object that maps points in in_img into their corresponding
               location in #out_img.
     !*/
 
@@ -341,17 +341,17 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - pixel_traits<typename image_traits<image_type1>::pixel_type>::has_alpha == false
             - is_same_object(in_img, out_img) == false
         ensures
             - #out_img == a copy of in_img which has been rotated angle radians counter clockwise.
-              The rotation is performed with respect to the center of the image.  
+              The rotation is performed with respect to the center of the image.
             - Parts of #out_img which have no corresponding locations in in_img are set to black.
             - uses the interpolate_quadratic object to perform the necessary pixel interpolation.
-            - returns a transformation object that maps points in in_img into their corresponding 
+            - returns a transformation object that maps points in in_img into their corresponding
               location in #out_img.
     !*/
 
@@ -370,16 +370,16 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              dlib/image_processing/generic_image.h
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear,
               interpolate_quadratic, or a type with a compatible interface.
             - is_same_object(in_img, out_img) == false
         ensures
-            - #out_img == A copy of in_img which has been stretched so that it 
-              fits exactly into out_img.   
-            - The size of out_img is not modified.  I.e. 
+            - #out_img == A copy of in_img which has been stretched so that it
+              fits exactly into out_img.
+            - The size of out_img is not modified.  I.e.
                 - #out_img.nr() == out_img.nr()
                 - #out_img.nc() == out_img.nc()
             - uses the supplied interpolation routine interp to perform the necessary
@@ -400,15 +400,15 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - pixel_traits<typename image_traits<image_type1>::pixel_type>::has_alpha == false
             - is_same_object(in_img, out_img) == false
         ensures
-            - #out_img == A copy of in_img which has been stretched so that it 
-              fits exactly into out_img.   
-            - The size of out_img is not modified.  I.e. 
+            - #out_img == A copy of in_img which has been stretched so that it
+              fits exactly into out_img.
+            - The size of out_img is not modified.  I.e.
                 - #out_img.nr() == out_img.nr()
                 - #out_img.nc() == out_img.nc()
             - Uses the bilinear interpolation to perform the necessary pixel interpolation.
@@ -427,14 +427,14 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - is_same_object(in_img, out_img) == false
         ensures
             - #out_img.nr() == in_img.nr()
             - #out_img.nc() == in_img.nc()
-            - #out_img == a copy of in_img which has been flipped from left to right.  
+            - #out_img == a copy of in_img which has been flipped from left to right.
               (i.e. it is flipped as if viewed though a mirror)
             - returns a transformation object that maps points in in_img into their
               corresponding location in #out_img.
@@ -508,8 +508,8 @@ namespace dlib
 
     template <
         typename image_array_type,
-        typename EXP, 
-        typename T, 
+        typename EXP,
+        typename T,
         typename U
         >
     void add_image_rotations (
@@ -566,7 +566,7 @@ namespace dlib
             - T == rectangle or full_object_detection
         ensures
             - This function is identical to the add_image_rotations() define above except
-              that it doesn't have objects2 as an argument.  
+              that it doesn't have objects2 as an argument.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -637,7 +637,7 @@ namespace dlib
     /*!
         requires
             - image_array_type == a dlib::array or std::vector of image objects that each
-              implement the interface defined in dlib/image_processing/generic_image.h 
+              implement the interface defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
         ensures
             - This function replaces each image in images with an upsampled version of that
@@ -660,7 +660,7 @@ namespace dlib
     void upsample_image_dataset (
         image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
-        std::vector<std::vector<rectangle> >& objects2 
+        std::vector<std::vector<rectangle> >& objects2
     );
     /*!
         requires
@@ -761,14 +761,14 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - is_same_object(in_img, out_img) == false
         ensures
             - #out_img.nr() == in_img.nr()
             - #out_img.nc() == in_img.nc()
-            - #out_img == a copy of in_img which has been flipped upside down.  
+            - #out_img == a copy of in_img which has been flipped upside down.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -788,24 +788,24 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - pyramid_type == a type compatible with the image pyramid objects defined 
+              dlib/image_processing/generic_image.h
+            - pyramid_type == a type compatible with the image pyramid objects defined
               in dlib/image_transforms/image_pyramid_abstract.h
-            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear,
               interpolate_quadratic, or a type with a compatible interface.
             - is_same_object(in_img, out_img) == false
         ensures
             - This function inverts the downsampling transformation performed by pyr().
               In particular, it attempts to make an image, out_img, which would result
-              in in_img when downsampled with pyr().  
+              in in_img when downsampled with pyr().
             - #out_img == An upsampled copy of in_img.  In particular, downsampling
               #out_img 1 time with pyr() should result in a final image which looks like
               in_img.
             - Uses the supplied interpolation routine interp to perform the necessary
               pixel interpolation.
-            - Note that downsampling an image with pyr() and then upsampling it with 
+            - Note that downsampling an image with pyr() and then upsampling it with
               pyramid_up() will not necessarily result in a final image which is
               the same size as the original.  This is because the exact size of the
               original image cannot be determined based on the downsampled image.
@@ -826,10 +826,10 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - pyramid_type == a type compatible with the image pyramid objects defined 
+              dlib/image_processing/generic_image.h
+            - pyramid_type == a type compatible with the image pyramid objects defined
               in dlib/image_transforms/image_pyramid_abstract.h
             - is_same_object(in_img, out_img) == false
         ensures
@@ -849,13 +849,13 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
-            - pyramid_type == a type compatible with the image pyramid objects defined 
+              dlib/image_processing/generic_image.h
+            - pyramid_type == a type compatible with the image pyramid objects defined
               in dlib/image_transforms/image_pyramid_abstract.h
         ensures
             - Performs an in-place version of pyramid_up() on the given image.  In
               particular, this function is equivalent to:
-                pyramid_up(img, temp, pyr); 
+                pyramid_up(img, temp, pyr);
                 temp.swap(img);
     !*/
 
@@ -870,7 +870,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - performs: pyramid_up(img, pyramid_down<2>());
               (i.e. it upsamples the given image and doubles it in size.)
@@ -912,7 +912,7 @@ namespace dlib
         !*/
 
         chip_details(
-        ); 
+        );
         /*!
             ensures
                 - #rect.is_empty() == true
@@ -947,7 +947,7 @@ namespace dlib
         !*/
 
         chip_details(
-            const drectangle& rect_, 
+            const drectangle& rect_,
             unsigned long size_
         );
         /*!
@@ -968,7 +968,7 @@ namespace dlib
         !*/
 
         chip_details(
-            const drectangle& rect_, 
+            const drectangle& rect_,
             unsigned long size_,
             double angle_
         );
@@ -990,27 +990,27 @@ namespace dlib
         !*/
 
         chip_details(
-            const drectangle& rect_, 
+            const drectangle& rect_,
             const chip_dims& dims
-        ); 
+        );
         /*!
             ensures
                 - #rect == rect_
-                - #size() == dims.rows*dims.cols 
+                - #size() == dims.rows*dims.cols
                 - #angle == 0
                 - #rows == dims.rows
                 - #cols == dims.cols
         !*/
 
         chip_details(
-            const drectangle& rect_, 
+            const drectangle& rect_,
             const chip_dims& dims,
             double angle_
-        ); 
+        );
         /*!
             ensures
                 - #rect == rect_
-                - #size() == dims.rows*dims.cols 
+                - #size() == dims.rows*dims.cols
                 - #angle == angle_
                 - #rows == dims.rows
                 - #cols == dims.cols
@@ -1025,7 +1025,7 @@ namespace dlib
         /*!
             requires
                 - chip_points.size() == img_points.size()
-                - chip_points.size() >= 2 
+                - chip_points.size() >= 2
             ensures
                 - The chip will be extracted such that the pixel locations chip_points[i]
                   in the chip are mapped to img_points[i] in the original image by a
@@ -1034,7 +1034,7 @@ namespace dlib
                   of chip_details constructor to define the mapping.
                 - #rows == dims.rows
                 - #cols == dims.cols
-                - #size() == dims.rows*dims.cols 
+                - #size() == dims.rows*dims.cols
                 - #rect and #angle are computed based on the given size of the output chip
                   (specified by dims) and the similarity transform between the chip and
                   image (specified by chip_points and img_points).
@@ -1048,7 +1048,7 @@ namespace dlib
 
         drectangle rect;
         double angle;
-        unsigned long rows; 
+        unsigned long rows;
         unsigned long cols;
     };
 
@@ -1095,11 +1095,11 @@ namespace dlib
     /*!
         requires
             - image_type1 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - pixel_traits<typename image_traits<image_type1>::pixel_type>::has_alpha == false
-            - for all valid i: 
+            - for all valid i:
                 - chip_locations[i].rect.is_empty() == false
                 - chip_locations[i].size() != 0
         ensures
@@ -1116,7 +1116,7 @@ namespace dlib
                 - #chips[i].nc() == chip_locations[i].cols
                 - The image will have been rotated counter-clockwise by
                   chip_locations[i].angle radians, around the center of
-                  chip_locations[i].rect, before the chip was extracted. 
+                  chip_locations[i].rect, before the chip was extracted.
             - Any pixels in an image chip that go outside img are set to 0 (i.e. black).
     !*/
 
@@ -1147,13 +1147,13 @@ namespace dlib
         /*!
             REQUIREMENTS ON image_type
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
 
             WHAT THIS OBJECT REPRESENTS
                 This is a lightweight image object for referencing a subwindow of an image.
                 It implements the generic image interface and can therefore be used with
                 any function that expects a generic image, excepting that you cannot change
-                the size of a sub_image_proxy.  
+                the size of a sub_image_proxy.
                 
                 Note that it only stores a pointer to the image data given to its
                 constructor and therefore does not perform a copy.  Moreover, this means
@@ -1182,7 +1182,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - returns sub_image_proxy<image_type>(img,rect)
     !*/
@@ -1197,7 +1197,7 @@ namespace dlib
         /*!
             REQUIREMENTS ON image_type
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
 
             WHAT THIS OBJECT REPRESENTS
                 This object is just like sub_image_proxy except that it does not allow the
@@ -1225,7 +1225,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - returns const_sub_image_proxy<image_type>(img,rect)
     !*/
@@ -1247,7 +1247,7 @@ namespace dlib
               annotated using the annotation scheme from the iBUG 300-W face landmark
               dataset.  Given these assumptions, it creates a chip_details object that will
               extract a copy of the face that has been rotated upright, centered, and
-              scaled to a standard size when given to extract_image_chip(). 
+              scaled to a standard size when given to extract_image_chip().
             - The extracted chips will have size rows and columns in them.
             - if padding == 0 then the chip will be closely cropped around the face.
               Setting larger padding values will result a looser cropping.  In particular,

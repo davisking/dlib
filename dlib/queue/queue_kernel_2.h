@@ -27,7 +27,7 @@ namespace dlib
                 0 < block_size < 2000000000
 
             INITIAL VALUE
-                queue_size == 0   
+                queue_size == 0
                 current_element == 0
                 at_start_ == true
             
@@ -38,18 +38,18 @@ namespace dlib
                 if (current_element_valid()) then
                     element() == current_element->item[current_element_pos]
 
-                if (queue_size > 0)                
-                {                    
+                if (queue_size > 0)
+                {
                     in->item[in_pos] == the spot where we will put the next item added
                                         into the queue
                     out->item[out_pos] == current()
 
-                    when enqueuing elements inside each node item[0] is filled first, then 
+                    when enqueuing elements inside each node item[0] is filled first, then
                     item[1], then item[2], etc.
                                                          
 
-                    each node points to the node inserted after it except for the most 
-                    recently inserted node.  
+                    each node points to the node inserted after it except for the most
+                    recently inserted node.
                 }
                 
         !*/
@@ -79,7 +79,7 @@ namespace dlib
             }
 
             virtual ~queue_kernel_2 (
-            ); 
+            );
 
             inline void clear(
             );
@@ -100,7 +100,7 @@ namespace dlib
             );
 
             const T& current (
-            ) const;            
+            ) const;
 
             void swap (
                 queue_kernel_2& item
@@ -141,8 +141,8 @@ namespace dlib
             );
             /*!
                 requires
-                    - start points to a node in a singly linked list 
-                    - start->next points to the next node in the list 
+                    - start points to a node in a singly linked list
+                    - start->next points to the next node in the list
                     - by following the next pointers you eventually hit the node pointed
                       to by end
                 ensures
@@ -151,7 +151,7 @@ namespace dlib
 
             // data members
 
-            typename mem_manager::template rebind<node>::other pool; 
+            typename mem_manager::template rebind<node>::other pool;
 
             node* in;
             node* out;
@@ -176,9 +176,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        queue_kernel_2<T,block_size,mem_manager>& a, 
-        queue_kernel_2<T,block_size,mem_manager>& b 
-    ) { a.swap(b); } 
+        queue_kernel_2<T,block_size,mem_manager>& a,
+        queue_kernel_2<T,block_size,mem_manager>& b
+    ) { a.swap(b); }
 
     template <
         typename T,
@@ -186,7 +186,7 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        queue_kernel_2<T,block_size,mem_manager>& item, 
+        queue_kernel_2<T,block_size,mem_manager>& item,
         std::istream& in
     )
     {
@@ -203,9 +203,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type queue_kernel_2"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type queue_kernel_2");
         }
     }
 
@@ -270,7 +270,7 @@ namespace dlib
             out_pos = 0;
         }
         else if (in_pos >= block_size)
-        {            
+        {
             in->next = pool.allocate();
             in_pos = 0;
             in = in->next;
@@ -354,7 +354,7 @@ namespace dlib
 
             // put the enumerator at the start
             reset();
-        }       
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -404,7 +404,7 @@ namespace dlib
         exchange(out_pos,item.out_pos);
         exchange(current_element,item.current_element);
         exchange(current_element_pos,item.current_element_pos);
-        exchange(at_start_,item.at_start_);        
+        exchange(at_start_,item.at_start_);
         pool.swap(item.pool);
     }
 
@@ -539,8 +539,8 @@ namespace dlib
             else if (current_element_pos == block_size)
             {
                 current_element_pos = 0;
-                current_element = current_element->next;               
-            }           
+                current_element = current_element->next;
+            }
 
             return true;
         }
@@ -560,7 +560,7 @@ namespace dlib
     void queue_kernel_2<T,block_size,mem_manager>::
     remove_any (
         T& item
-    ) 
+    )
     {
         dequeue(item);
     }

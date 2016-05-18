@@ -18,7 +18,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object defines the interface a feature extractor must implement if it
                 is to be used with the sequence_segmenter defined at the bottom of this
-                file.  
+                file.
                 
                 The model used by sequence_segmenter objects is the following.  Given an
                 input sequence x, predict an output label sequence y such that:
@@ -44,19 +44,19 @@ namespace dlib
                 simplified version of the interface used by the dlib::sequence_labeler.  It
                 does this by completely hiding the BIO/BILOU tags from the user and instead
                 exposes an explicit sub-segment based labeling representation.  It also
-                simplifies the construction of the PSI() feature vector. 
+                simplifies the construction of the PSI() feature vector.
 
                 Like in the dlib::sequence_labeler, PSI() is a sum of feature vectors, each
                 derived from the entire input sequence x but only part of the label
                 sequence y.  In the case of the sequence_segmenter, we use an order one
-                Markov model.  This means that 
+                Markov model.  This means that
                     PSI(x,y) == sum_i XI(x, y_{i-1}, y_{i}, i)
                 where the sum is taken over all the elements in the sequence.  At each
                 element we extract a feature vector, XI(), that is expected to encode
                 important details describing what the i-th position of the sequence looks
                 like in the context of the current and previous labels.  To do this, XI()
                 is allowed to look at any part of the input sequence x, the current and
-                previous labels, and of course it must also know the position in question, i.  
+                previous labels, and of course it must also know the position in question, i.
                 
                 The sequence_segmenter simplifies this further by decomposing XI() into
                 components which model the current window around each position as well as
@@ -64,99 +64,99 @@ namespace dlib
                 label.  In particular, the sequence_segmenter only asks a user to provide a
                 single feature vector which characterizes a position of the sequence
                 independent of any labeling.  We denote this feature vector by ZI(x,i), where
-                x is the sequence and i is the position in question.  
+                x is the sequence and i is the position in question.
                 
                 For example, suppose we use a window size of 3 and BIO tags, then we can
                 put all this together and define XI() in terms of ZI().  To do this, we can
                 think of XI() as containing 12*3 slots which contain either a zero vector
                 or a ZI() vector.  Each combination of window position and labeling has a
                 different slot.  To explain further, consider the following examples where
-                we have annotated which parts of XI() correspond to each slot.  
+                we have annotated which parts of XI() correspond to each slot.
 
                 If the previous and current label are both B and we use a window size of 3
                 then XI() would be instantiated as:
-                    XI(x, B, B, i) = [ZI(x,i-1)  \ 
+                    XI(x, B, B, i) = [ZI(x,i-1)  \
                                       ZI(x,i)     > If current label is B
-                                      ZI(x,i+1)  /  
-                                      0          \                        
-                                      0           > If current label is I 
-                                      0          /                        
-                                      0          \                        
-                                      0           > If current label is O 
-                                      0          /  
+                                      ZI(x,i+1)  /
+                                      0          \
+                                      0           > If current label is I
+                                      0          /
+                                      0          \
+                                      0           > If current label is O
+                                      0          /
 
-                                      ZI(x,i-1)  \ 
+                                      ZI(x,i-1)  \
                                       ZI(x,i)     > If previous label is B and current label is B
-                                      ZI(x,i+1)  /  
-                                      0          \                        
-                                      0           > If previous label is B and current label is I 
-                                      0          /                        
-                                      0          \                        
-                                      0           > If previous label is B and current label is O 
-                                      0          /  
+                                      ZI(x,i+1)  /
+                                      0          \
+                                      0           > If previous label is B and current label is I
+                                      0          /
+                                      0          \
+                                      0           > If previous label is B and current label is O
+                                      0          /
 
-                                      0          \ 
+                                      0          \
                                       0           > If previous label is I and current label is B
-                                      0          /  
-                                      0          \                        
-                                      0           > If previous label is I and current label is I 
-                                      0          /                        
-                                      0          \                        
-                                      0           > If previous label is I and current label is O 
-                                      0          /  
+                                      0          /
+                                      0          \
+                                      0           > If previous label is I and current label is I
+                                      0          /
+                                      0          \
+                                      0           > If previous label is I and current label is O
+                                      0          /
 
-                                      0          \ 
+                                      0          \
                                       0           > If previous label is O and current label is B
-                                      0          /  
-                                      0          \                        
-                                      0           > If previous label is O and current label is I 
-                                      0          /                        
-                                      0          \                        
-                                      0           > If previous label is O and current label is O 
-                                      0]         /  
+                                      0          /
+                                      0          \
+                                      0           > If previous label is O and current label is I
+                                      0          /
+                                      0          \
+                                      0           > If previous label is O and current label is O
+                                      0]         /
 
 
                 If the previous label is I and the current label is O and we use a window
                 size of 3 then XI() would be instantiated as:
-                    XI(x, I, O, i) = [0          \ 
+                    XI(x, I, O, i) = [0          \
                                       0           > If current label is B
-                                      0          /  
-                                      0          \                        
-                                      0           > If current label is I 
-                                      0          /                        
-                                      ZI(x,i-1)  \                        
-                                      ZI(x,i)     > If current label is O 
-                                      ZI(x,i+1)  /  
+                                      0          /
+                                      0          \
+                                      0           > If current label is I
+                                      0          /
+                                      ZI(x,i-1)  \
+                                      ZI(x,i)     > If current label is O
+                                      ZI(x,i+1)  /
 
-                                      0          \ 
+                                      0          \
                                       0           > If previous label is B and current label is B
-                                      0          /  
-                                      0          \                        
-                                      0           > If previous label is B and current label is I 
-                                      0          /                        
-                                      0          \                        
-                                      0           > If previous label is B and current label is O 
-                                      0          /  
+                                      0          /
+                                      0          \
+                                      0           > If previous label is B and current label is I
+                                      0          /
+                                      0          \
+                                      0           > If previous label is B and current label is O
+                                      0          /
                                                                                                    
-                                      0          \ 
+                                      0          \
                                       0           > If previous label is I and current label is B
-                                      0          /  
-                                      0          \                        
-                                      0           > If previous label is I and current label is I 
-                                      0          /                        
-                                      ZI(x,i-1)  \                        
-                                      ZI(x,i)     > If previous label is I and current label is O 
-                                      ZI(x,i+1)  /  
+                                      0          /
+                                      0          \
+                                      0           > If previous label is I and current label is I
+                                      0          /
+                                      ZI(x,i-1)  \
+                                      ZI(x,i)     > If previous label is I and current label is O
+                                      ZI(x,i+1)  /
                                                                                                    
-                                      0          \ 
+                                      0          \
                                       0           > If previous label is O and current label is B
-                                      0          /  
-                                      0          \                        
-                                      0           > If previous label is O and current label is I 
-                                      0          /                        
-                                      0          \                        
-                                      0           > If previous label is O and current label is O 
-                                      0]         /  
+                                      0          /
+                                      0          \
+                                      0           > If previous label is O and current label is I
+                                      0          /
+                                      0          \
+                                      0           > If previous label is O and current label is O
+                                      0]         /
                     
                     If we had instead used the BILOU tagging model the XI() vector would
                     have been similarly defined except that there would be 30*3 slots for
@@ -187,26 +187,26 @@ namespace dlib
         // this greatly expands the size of the parameter vector w.  You can optionally
         // disable these higher order features by setting the use_high_order_features bool
         // to false.  This will cause XI() to include only slots which are independent of
-        // the previous label. 
+        // the previous label.
         const static bool use_high_order_features = true;
 
         // You use a tool like the structural_sequence_segmentation_trainer to learn the weight
         // vector needed by a sequence_segmenter.  You can tell the trainer to force all the
         // elements of the weight vector corresponding to ZI() to be non-negative.  This is all
         // the elements of w except for the elements corresponding to the label transition and
-        // bias indicator features.  To do this, just set allow_negative_weights to false.  
+        // bias indicator features.  To do this, just set allow_negative_weights to false.
         const static bool allow_negative_weights = true;
 
 
         example_feature_extractor (
-        ); 
+        );
         /*!
             ensures
                 - this object is properly initialized
         !*/
 
         unsigned long num_features(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the dimensionality of the ZI() feature vector.  This number is
@@ -262,15 +262,15 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize(
-        example_feature_extractor& item, 
+        example_feature_extractor& item,
         std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -288,7 +288,7 @@ namespace dlib
               example_feature_extractor discussed above.
         ensures
             - returns the dimensionality of the PSI() vector defined by the given feature
-              extractor.  
+              extractor.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -301,7 +301,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON feature_extractor
-                It must be an object that implements an interface compatible with 
+                It must be an object that implements an interface compatible with
                 the example_feature_extractor discussed above.
 
             WHAT THIS OBJECT REPRESENTS
@@ -315,7 +315,7 @@ namespace dlib
                 BILOU (Begin, Inside, Last, Outside, Unit) sequence tagging model.
                 Moreover, it is implemented using a dlib::sequence_labeler object and
                 therefore sequence_segmenter objects are examples of chain structured
-                conditional random field style sequence taggers. 
+                conditional random field style sequence taggers.
 
             THREAD SAFETY
                 It is always safe to use distinct instances of this object in different
@@ -335,7 +335,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_feature_extractor() == feature_extractor() 
+                - #get_feature_extractor() == feature_extractor()
                   (i.e. it will have its default value)
                 - #get_weights().size() == total_feature_vector_size(#get_feature_extractor())
                 - #get_weights() == 0
@@ -343,12 +343,12 @@ namespace dlib
 
         explicit sequence_segmenter(
             const matrix<double,0,1>& weights
-        ); 
+        );
         /*!
             requires
                 - total_feature_vector_size(feature_extractor()) == weights.size()
             ensures
-                - #get_feature_extractor() == feature_extractor() 
+                - #get_feature_extractor() == feature_extractor()
                   (i.e. it will have its default value)
                 - #get_weights() == weights
         !*/
@@ -356,7 +356,7 @@ namespace dlib
         sequence_segmenter(
             const matrix<double,0,1>& weights,
             const feature_extractor& fe
-        ); 
+        );
         /*!
             requires
                 - total_feature_vector_size(fe) == weights.size()
@@ -366,7 +366,7 @@ namespace dlib
         !*/
 
         const feature_extractor& get_feature_extractor (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the feature extractor used by this object.
@@ -376,8 +376,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the parameter vector associated with this sequence segmenter. 
-                  The length of the vector is total_feature_vector_size(get_feature_extractor()).  
+                - returns the parameter vector associated with this sequence segmenter.
+                  The length of the vector is total_feature_vector_size(get_feature_extractor()).
         !*/
 
         segmented_sequence_type operator() (
@@ -428,7 +428,7 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -438,10 +438,10 @@ namespace dlib
         >
     void deserialize (
         sequence_segmenter<feature_extractor>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -62,7 +62,7 @@ namespace dlib
         template <
             typename potts_problem
             >
-        class flows_container<potts_problem, 
+        class flows_container<potts_problem,
                               typename enable_if_c<potts_problem::max_number_of_neighbors!=0>::type>
         {
             /*
@@ -97,20 +97,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
         template <
-            typename potts_problem 
+            typename potts_problem
             >
-        class potts_flow_graph 
+        class potts_flow_graph
         {
         public:
             typedef typename potts_problem::value_type edge_type;
         private:
             /*!
-                This is a utility class used by dlib::min_cut to convert a potts_problem 
+                This is a utility class used by dlib::min_cut to convert a potts_problem
                 into the kind of flow graph expected by the min_cut object's main block
                 of code.
 
-                Within this object, we will use the convention that one past 
-                potts_problem::number_of_nodes() is the source node and two past is 
+                Within this object, we will use the convention that one past
+                potts_problem::number_of_nodes() is the source node and two past is
                 the sink node.
             !*/
 
@@ -118,11 +118,11 @@ namespace dlib
 
             // flows(i,j) == the flow from node id i to it's jth neighbor
             flows_container<potts_problem> flows;
-            // source_flows(i,0) == flow from source to node i, 
+            // source_flows(i,0) == flow from source to node i,
             // source_flows(i,1) == flow from node i to source
             matrix<edge_type,0,2> source_flows;
 
-            // sink_flows(i,0) == flow from sink to node i, 
+            // sink_flows(i,0) == flow from sink to node i,
             // sink_flows(i,1) == flow from node i to sink
             matrix<edge_type,0,2> sink_flows;
 
@@ -195,7 +195,7 @@ namespace dlib
             public:
 
                 in_edge_iterator(
-                ):idx(0),cnt(0)  
+                ):idx(0),cnt(0)
                 {}
 
 
@@ -230,36 +230,36 @@ namespace dlib
 
             out_edge_iterator out_end(
                 const unsigned long& it
-            ) const 
-            { 
+            ) const
+            {
                 if (it >= g.number_of_nodes())
-                    return out_edge_iterator(it, g.number_of_nodes()); 
+                    return out_edge_iterator(it, g.number_of_nodes());
                 else
-                    return out_edge_iterator(it, g.number_of_neighbors(it)+2); 
+                    return out_edge_iterator(it, g.number_of_neighbors(it)+2);
             }
 
             in_edge_iterator in_end(
                 const unsigned long& it
-            ) const 
-            { 
+            ) const
+            {
                 if (it >= g.number_of_nodes())
-                    return in_edge_iterator(it, g.number_of_nodes()); 
+                    return in_edge_iterator(it, g.number_of_nodes());
                 else
-                    return in_edge_iterator(it, g.number_of_neighbors(it)+2); 
+                    return in_edge_iterator(it, g.number_of_neighbors(it)+2);
             }
 
 
             template <typename iterator_type>
             unsigned long node_id (
                 const iterator_type& it
-            ) const 
-            { 
+            ) const
+            {
                 // if this isn't an iterator over the source or sink nodes
                 if (it.idx < g.number_of_nodes())
                 {
                     const unsigned long num = g.number_of_neighbors(it.idx);
                     if (it.cnt < num)
-                        return g.get_neighbor(it.idx, it.cnt); 
+                        return g.get_neighbor(it.idx, it.cnt);
                     else if (it.cnt == num)
                         return g.number_of_nodes();
                     else
@@ -273,7 +273,7 @@ namespace dlib
 
 
             edge_type get_flow (
-                const unsigned long& it1,     
+                const unsigned long& it1,
                 const unsigned long& it2
             ) const
             {
@@ -340,12 +340,12 @@ namespace dlib
                 const in_edge_iterator& it
             ) const
             {
-                return get_flow(node_id(it), it.idx); 
+                return get_flow(node_id(it), it.idx);
             }
 
             void adjust_flow (
-                const unsigned long& it1,     
-                const unsigned long& it2,     
+                const unsigned long& it1,
+                const unsigned long& it2,
                 const edge_type& value
             )
             {
@@ -394,7 +394,7 @@ namespace dlib
                     g.set_label(it, value);
                 else if (it == g.number_of_nodes())
                     source_label = value;
-                else 
+                else
                     sink_label = value;
             }
 
@@ -418,7 +418,7 @@ namespace dlib
             typename label_image_type,
             typename image_potts_model
             >
-        class potts_grid_problem 
+        class potts_grid_problem
         {
             label_image_type& label_img;
             long nc;
@@ -432,7 +432,7 @@ namespace dlib
             potts_grid_problem (
                 label_image_type& label_img_,
                 const image_potts_model& image_potts_model_
-            ) : 
+            ) :
                 label_img(label_img_),
                 model(image_potts_model_)
             {
@@ -445,9 +445,9 @@ namespace dlib
             ) const { return num_nodes; }
 
             unsigned long number_of_neighbors (
-                unsigned long 
-            ) const 
-            { 
+                unsigned long
+            ) const
+            {
                 return 4;
             }
 
@@ -462,7 +462,7 @@ namespace dlib
                 else if (diff < -nc)
                     diff += (long)number_of_nodes();
 
-                if (diff == 1) 
+                if (diff == 1)
                     return 0;
                 else if (diff == -1)
                     return 1;
@@ -479,7 +479,7 @@ namespace dlib
             {
                 switch(idx)
                 {
-                    case 0: 
+                    case 0:
                         {
                             long temp = node_id+1;
                             if (temp < (long)number_of_nodes())
@@ -487,7 +487,7 @@ namespace dlib
                             else
                                 return temp - (long)number_of_nodes();
                         }
-                    case 1: 
+                    case 1:
                         {
                             long temp = node_id-1;
                             if (node_id >= 1)
@@ -495,7 +495,7 @@ namespace dlib
                             else
                                 return temp + (long)number_of_nodes();
                         }
-                    case 2: 
+                    case 2:
                         {
                             long temp = node_id+nc;
                             if (temp < (long)number_of_nodes())
@@ -503,7 +503,7 @@ namespace dlib
                             else
                                 return temp - (long)number_of_nodes();
                         }
-                    case 3: 
+                    case 3:
                         {
                             long temp = node_id-nc;
                             if (node_id >= nc)
@@ -565,22 +565,22 @@ namespace dlib
                 unsigned long j = prob.get_neighbor(i,jj);
                 DLIB_ASSERT(prob.factor_value_disagreement(i,j) >= 0,
                     "\t value_type potts_model_score(prob)"
-                    << "\n\t Invalid inputs were given to this function." 
-                    << "\n\t i: " << i 
-                    << "\n\t j: " << j 
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t i: " << i
+                    << "\n\t j: " << j
                     << "\n\t prob.factor_value_disagreement(i,j): " << prob.factor_value_disagreement(i,j)
                     );
                 DLIB_ASSERT(prob.factor_value_disagreement(i,j) == prob.factor_value_disagreement(j,i),
                     "\t value_type potts_model_score(prob)"
-                    << "\n\t Invalid inputs were given to this function." 
-                    << "\n\t i: " << i 
-                    << "\n\t j: " << j 
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t i: " << i
+                    << "\n\t j: " << j
                     << "\n\t prob.factor_value_disagreement(i,j): " << prob.factor_value_disagreement(i,j)
                     << "\n\t prob.factor_value_disagreement(j,i): " << prob.factor_value_disagreement(j,i)
                     );
             }
         }
-#endif 
+#endif
 
         typename potts_model::value_type score = 0;
         for (unsigned long i = 0; i < prob.number_of_nodes(); ++i)
@@ -608,7 +608,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename graph_type 
+        typename graph_type
         >
     typename graph_type::edge_type potts_model_score (
         const graph_type& g,
@@ -617,7 +617,7 @@ namespace dlib
     {
         DLIB_ASSERT(graph_contains_length_one_cycle(g) == false,
                     "\t edge_type potts_model_score(g,labels)"
-                    << "\n\t Invalid inputs were given to this function." 
+                    << "\n\t Invalid inputs were given to this function."
                     );
         typedef typename graph_type::edge_type edge_type;
         typedef typename graph_type::type type;
@@ -633,14 +633,14 @@ namespace dlib
                 unsigned long j = g.node(i).neighbor(jj).index();
                 DLIB_ASSERT(edge(g,i,j) >= 0,
                     "\t edge_type potts_model_score(g,labels)"
-                    << "\n\t Invalid inputs were given to this function." 
-                    << "\n\t i: " << i 
-                    << "\n\t j: " << j 
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t i: " << i
+                    << "\n\t j: " << j
                     << "\n\t edge(g,i,j): " << edge(g,i,j)
                     );
             }
         }
-#endif 
+#endif
 
         typename graph_type::edge_type score = 0;
         for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
@@ -678,7 +678,7 @@ namespace dlib
     {
         DLIB_ASSERT(prob.nr() == labels.nr() && prob.nc() == labels.nc(),
             "\t value_type potts_model_score(prob,labels)"
-            << "\n\t Invalid inputs were given to this function." 
+            << "\n\t Invalid inputs were given to this function."
             << "\n\t prob.nr(): " << labels.nr()
             << "\n\t prob.nc(): " << labels.nc()
             );
@@ -705,17 +705,17 @@ namespace dlib
                 unsigned long node_j = prob.get_neighbor(node_i,jj);
                 DLIB_ASSERT(prob.get_neighbor_idx(node_j,node_i) < prob.number_of_neighbors(node_j),
                     "\t void find_max_factor_graph_potts(prob)"
-                    << "\n\t The supplied potts problem defines an invalid graph." 
-                    << "\n\t node_i: " << node_i 
-                    << "\n\t node_j: " << node_j 
+                    << "\n\t The supplied potts problem defines an invalid graph."
+                    << "\n\t node_i: " << node_i
+                    << "\n\t node_j: " << node_j
                     << "\n\t prob.get_neighbor_idx(node_j,node_i): " << prob.get_neighbor_idx(node_j,node_i)
                     << "\n\t prob.number_of_neighbors(node_j):     " << prob.number_of_neighbors(node_j)
                             );
 
                 DLIB_ASSERT(prob.get_neighbor_idx(node_i,prob.get_neighbor(node_i,jj)) == jj,
                     "\t void find_max_factor_graph_potts(prob)"
-                    << "\n\t The get_neighbor_idx() and get_neighbor() functions must be inverses of each other." 
-                    << "\n\t node_i: " << node_i 
+                    << "\n\t The get_neighbor_idx() and get_neighbor() functions must be inverses of each other."
+                    << "\n\t node_i: " << node_i
                     << "\n\t jj:     " << jj
                     << "\n\t prob.get_neighbor(node_i,jj): " << prob.get_neighbor(node_i,jj)
                     << "\n\t prob.get_neighbor_idx(node_i,prob.get_neighbor(node_i,jj)): " << prob.get_neighbor_idx(node_i,node_j)
@@ -723,31 +723,31 @@ namespace dlib
 
                 DLIB_ASSERT(prob.get_neighbor(node_j,prob.get_neighbor_idx(node_j,node_i))==node_i,
                     "\t void find_max_factor_graph_potts(prob)"
-                    << "\n\t The get_neighbor_idx() and get_neighbor() functions must be inverses of each other." 
-                    << "\n\t node_i: " << node_i 
-                    << "\n\t node_j: " << node_j 
+                    << "\n\t The get_neighbor_idx() and get_neighbor() functions must be inverses of each other."
+                    << "\n\t node_i: " << node_i
+                    << "\n\t node_j: " << node_j
                     << "\n\t prob.get_neighbor_idx(node_j,node_i): " << prob.get_neighbor_idx(node_j,node_i)
                     << "\n\t prob.get_neighbor(node_j,prob.get_neighbor_idx(node_j,node_i)): " << prob.get_neighbor(node_j,prob.get_neighbor_idx(node_j,node_i))
                             );
 
                 DLIB_ASSERT(prob.factor_value_disagreement(node_i,node_j) >= 0,
                     "\t void find_max_factor_graph_potts(prob)"
-                    << "\n\t Invalid inputs were given to this function." 
-                    << "\n\t node_i: " << node_i 
-                    << "\n\t node_j: " << node_j 
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t node_i: " << node_i
+                    << "\n\t node_j: " << node_j
                     << "\n\t prob.factor_value_disagreement(node_i,node_j): " << prob.factor_value_disagreement(node_i,node_j)
                     );
                 DLIB_ASSERT(prob.factor_value_disagreement(node_i,node_j) == prob.factor_value_disagreement(node_j,node_i),
                     "\t void find_max_factor_graph_potts(prob)"
-                    << "\n\t Invalid inputs were given to this function." 
-                    << "\n\t node_i: " << node_i 
-                    << "\n\t node_j: " << node_j 
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t node_i: " << node_i
+                    << "\n\t node_j: " << node_j
                     << "\n\t prob.factor_value_disagreement(node_i,node_j): " << prob.factor_value_disagreement(node_i,node_j)
                     << "\n\t prob.factor_value_disagreement(node_j,node_i): " << prob.factor_value_disagreement(node_j,node_i)
                     );
             }
         }
-#endif 
+#endif
         COMPILE_TIME_ASSERT(is_signed_type<typename potts_model::value_type>::value);
         min_cut mc;
         dlib::impl::potts_flow_graph<potts_model> pfg(prob);
@@ -757,7 +757,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename graph_type 
+        typename graph_type
         >
     void find_max_factor_graph_potts (
         const graph_type& g,
@@ -766,7 +766,7 @@ namespace dlib
     {
         DLIB_ASSERT(graph_contains_length_one_cycle(g) == false,
                     "\t void find_max_factor_graph_potts(g,labels)"
-                    << "\n\t Invalid inputs were given to this function." 
+                    << "\n\t Invalid inputs were given to this function."
                     );
         typedef typename graph_type::edge_type edge_type;
         typedef typename graph_type::type type;
@@ -783,14 +783,14 @@ namespace dlib
                 unsigned long j = g.node(i).neighbor(jj).index();
                 DLIB_ASSERT(edge(g,i,j) >= 0,
                     "\t void find_max_factor_graph_potts(g,labels)"
-                    << "\n\t Invalid inputs were given to this function." 
-                    << "\n\t i: " << i 
-                    << "\n\t j: " << j 
+                    << "\n\t Invalid inputs were given to this function."
+                    << "\n\t i: " << i
+                    << "\n\t j: " << j
                     << "\n\t edge(g,i,j): " << edge(g,i,j)
                     );
             }
         }
-#endif 
+#endif
 
         dlib::impl::general_potts_problem<graph_type> gg(g, labels);
         find_max_factor_graph_potts(gg);
@@ -814,7 +814,7 @@ namespace dlib
         find_max_factor_graph_potts(model);
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     namespace impl
     {
@@ -851,7 +851,7 @@ namespace dlib
 
             value_type factor_value (
                 unsigned long idx
-            ) const 
+            ) const
             {
                 return model.factor_value(*(data1 + idx), *(data2 + idx));
             }
@@ -859,13 +859,13 @@ namespace dlib
             value_type factor_value_disagreement (
                 unsigned long idx1,
                 unsigned long idx2
-            ) const 
+            ) const
             {
                 return model.factor_value_disagreement(*(data1 + idx1), *(data1 + idx2));
             }
         };
 
-    // ---------------------------------------------------------------------------------------- 
+    // ----------------------------------------------------------------------------------------
 
         template <
             typename image_type,
@@ -895,7 +895,7 @@ namespace dlib
 
             value_type factor_value (
                 unsigned long idx
-            ) const 
+            ) const
             {
                 return model.factor_value(*(data1 + idx));
             }
@@ -903,7 +903,7 @@ namespace dlib
             value_type factor_value_disagreement (
                 unsigned long idx1,
                 unsigned long idx2
-            ) const 
+            ) const
             {
                 return model.factor_value_disagreement(*(data1 + idx1), *(data1 + idx2));
             }
@@ -911,7 +911,7 @@ namespace dlib
 
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     template <
         typename pair_image_model,
@@ -927,7 +927,7 @@ namespace dlib
     {
         DLIB_ASSERT(get_rect(img1) == get_rect(img2),
             "\t potts_grid_problem make_potts_grid_problem()"
-            << "\n\t Invalid inputs were given to this function." 
+            << "\n\t Invalid inputs were given to this function."
             << "\n\t get_rect(img1): " << get_rect(img1)
             << "\n\t get_rect(img2): " << get_rect(img2)
             );
@@ -935,7 +935,7 @@ namespace dlib
         return potts_type(model,img1,img2);
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     template <
         typename single_image_model,
@@ -951,7 +951,7 @@ namespace dlib
         return potts_type(model,img);
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
 }
 

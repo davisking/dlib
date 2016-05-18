@@ -10,7 +10,7 @@
 #include <dlib/hash_map.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -26,12 +26,12 @@ namespace
     )
     /*!
         requires
-            - hash_map is an implementation of hash_map/hash_map_kernel_abstract.h and 
+            - hash_map is an implementation of hash_map/hash_map_kernel_abstract.h and
               is instantiated to map int to int
         ensures
-            - runs tests on hash_map for compliance with the specs 
+            - runs tests on hash_map for compliance with the specs
     !*/
-    {        
+    {
 
         srand(static_cast<unsigned int>(time(0)));
 
@@ -349,7 +349,7 @@ namespace
                     test.add(a,b);
             }
 
-            count = 0; 
+            count = 0;
             while (test.move_next())
             {
 
@@ -363,7 +363,7 @@ namespace
 
             test.reset();
 
-            count = 0; 
+            count = 0;
 
             while (test.move_next())
             {

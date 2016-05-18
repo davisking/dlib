@@ -32,7 +32,7 @@ namespace dlib
             THREAD SAFETY
                 No synchronization is required when using this object.  In particular, a
                 single instance of this object can be used from multiple threads at the
-                same time.  
+                same time.
         !*/
 
     public:
@@ -58,7 +58,7 @@ namespace dlib
             ensures
                 - Returns the dimensionality of the feature vector output by operator().
                   This number is the total number of trees in this object times the number
-                  of leaves on each tree.  
+                  of leaves on each tree.
         !*/
 
         template <typename image_type, typename T, typename U>
@@ -70,7 +70,7 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
                 - T is some unsigned integral type (e.g. unsigned int).
                 - U is any scalar type capable of storing the value 1 (e.g. float).
             ensures
@@ -105,7 +105,7 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
             ensures
                 - Calling this function is equivalent to calling (*this)(img, rect, ignored)
                   where the 3d argument is discarded.
@@ -171,7 +171,7 @@ namespace dlib
         !*/
 
         unsigned long get_tree_depth (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the depth of the trees used in the cascade.  In particular, there
@@ -194,7 +194,7 @@ namespace dlib
             ensures
                 - returns the number of trees created for each cascade.  This means that
                   the total number of trees in the learned model is equal to
-                  get_cascade_depth()*get_num_trees_per_cascade_level().  
+                  get_cascade_depth()*get_num_trees_per_cascade_level().
         !*/
 
         void set_num_trees_per_cascade_level (
@@ -208,7 +208,7 @@ namespace dlib
         !*/
 
         double get_nu (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the regularization parameter.  Larger values of this parameter
@@ -233,7 +233,7 @@ namespace dlib
                 - returns the random seed used by the internal random number generator.
                   Since this algorithm is a random forest style algorithm it relies on a
                   random number generator for generating the trees.  So each setting of the
-                  random seed will produce slightly different outputs.  
+                  random seed will produce slightly different outputs.
         !*/
 
         void set_random_seed (
@@ -277,7 +277,7 @@ namespace dlib
                 - At each level of the cascade we randomly sample get_feature_pool_size()
                   pixels from the image.  These pixels are used to generate features for
                   the random trees.  So in general larger settings of this parameter give
-                  better accuracy but make the algorithm run slower.  
+                  better accuracy but make the algorithm run slower.
         !*/
 
         void set_feature_pool_size (
@@ -291,7 +291,7 @@ namespace dlib
         !*/
 
         double get_feature_pool_region_padding (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - When we randomly sample the pixels for the feature pool we do so in a box
@@ -299,7 +299,7 @@ namespace dlib
                   tightest box that contains the landmarks (i.e. this is what happens when
                   get_feature_pool_region_padding()==0).  However, you can expand or shrink
                   the size of the pixel sampling region by setting a different value of
-                  get_feature_pool_region_padding().  
+                  get_feature_pool_region_padding().
 
                   To explain this precisely, for a padding of 0 we say that the pixels are
                   sampled from a box of size 1x1.  The padding value is added to each side
@@ -310,7 +310,7 @@ namespace dlib
         !*/
 
         void set_feature_pool_region_padding (
-            double padding 
+            double padding
         );
         /*!
             ensures
@@ -328,7 +328,7 @@ namespace dlib
                   get_lambda() controls this "nearness" preference.  In particular, smaller
                   values of get_lambda() will make the algorithm prefer to select pixels
                   close together and larger values of get_lambda() will make it care less
-                  about picking nearby pixel pairs.  
+                  about picking nearby pixel pairs.
 
                   Note that this is the inverse of how it is defined in the Kazemi paper.
                   For this object, you should think of lambda as "the fraction of the
@@ -371,7 +371,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -390,12 +390,12 @@ namespace dlib
         /*!
             requires
                 - image_array is a dlib::array of image objects where each image object
-                  implements the interface defined in dlib/image_processing/generic_image.h 
+                  implements the interface defined in dlib/image_processing/generic_image.h
                 - images.size() == objects.size()
                 - images.size() > 0
                 - for some i: objects[i].size() != 0
                   (i.e. there has to be at least one full_object_detection in the training set)
-                - for all valid p, there must exist i and j such that: 
+                - for all valid p, there must exist i and j such that:
                   objects[i][j].part(p) != OBJECT_PART_NOT_PRESENT.
                   (i.e. You can't define a part that is always set to OBJECT_PART_NOT_PRESENT.)
                 - for all valid i,j,k,l:
@@ -403,8 +403,8 @@ namespace dlib
                       (i.e. all objects must agree on the number of parts)
                     - objects[i][j].num_parts() > 0
             ensures
-                - This object will try to learn to predict the locations of an object's parts 
-                  based on the object bounding box (i.e.  full_object_detection::get_rect()) 
+                - This object will try to learn to predict the locations of an object's parts
+                  based on the object bounding box (i.e.  full_object_detection::get_rect())
                   and the image pixels in that box.  That is, we will try to learn a
                   shape_predictor, SP, such that:
                     SP(images[i], objects[i][j].get_rect()) == objects[i][j]
@@ -433,7 +433,7 @@ namespace dlib
     /*!
         requires
             - image_array is a dlib::array of image objects where each image object
-              implements the interface defined in dlib/image_processing/generic_image.h 
+              implements the interface defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - for all valid i and j:
                 - objects[i][j].num_parts() == sp.num_parts()
@@ -445,12 +445,12 @@ namespace dlib
                         - scales[i].size() == objects[i].size()
         ensures
             - Tests the given shape_predictor by running it on each of the given objects and
-              checking how well it recovers the part positions.  In particular, for all 
+              checking how well it recovers the part positions.  In particular, for all
               valid i and j we perform:
                 sp(images[i], objects[i][j].get_rect())
               and compare the result with the truth part positions in objects[i][j].  We
               then return the average distance (measured in pixels) between a predicted
-              part location and its true position.  
+              part location and its true position.
             - Note that any parts in objects that are set to OBJECT_PART_NOT_PRESENT are
               simply ignored.
             - if (scales.size() != 0) then
@@ -474,7 +474,7 @@ namespace dlib
     /*!
         requires
             - image_array is a dlib::array of image objects where each image object
-              implements the interface defined in dlib/image_processing/generic_image.h 
+              implements the interface defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - for all valid i and j:
                 - objects[i][j].num_parts() == sp.num_parts()

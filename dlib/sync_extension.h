@@ -20,8 +20,8 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     sync_extension_kernel_1<base>    
+        // kernel_1a
+        typedef     sync_extension_kernel_1<base>
                     kernel_1a;
  
     };

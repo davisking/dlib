@@ -9,7 +9,7 @@
 
 
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -115,8 +115,8 @@ namespace
     template <typename detection>
     detection sample_detection_from_sensor(long object_id)
     {
-        DLIB_CASSERT(object_id < num_objects, 
-            "You can't ask to sample a detection from an object that doesn't exist."); 
+        DLIB_CASSERT(object_id < num_objects,
+            "You can't ask to sample a detection from an object that doesn't exist.");
         detection temp;
         // Set the measurements equal to the object's true property values plus a little bit of
         // noise.
@@ -136,7 +136,7 @@ namespace
         track_history data;
 
         // At each time step we get a set of detections from the objects in the world.
-        // Simulate 100 time steps worth of data where there are 3 objects present. 
+        // Simulate 100 time steps worth of data where there are 3 objects present.
         const int num_time_steps = 100;
         for (int i = 0; i < num_time_steps; ++i)
         {
@@ -157,7 +157,7 @@ namespace
             data.push_back(dets);
         }
 
-        // Now let's imagine object 1 and 2 are gone but a new object, object 3 has arrived.  
+        // Now let's imagine object 1 and 2 are gone but a new object, object 3 has arrived.
         for (int i = 0; i < num_time_steps; ++i)
         {
             detections_at_single_time_step dets(2);
@@ -181,8 +181,8 @@ namespace
     template <typename detection>
     std::vector<detection> make_random_detections(long num_dets)
     {
-        DLIB_CASSERT(num_dets <= num_objects, 
-            "You can't ask for more detections than there are objects in our little simulation."); 
+        DLIB_CASSERT(num_dets <= num_objects,
+            "You can't ask for more detections than there are objects in our little simulation.");
 
         std::vector<detection> dets(num_dets);
         for (unsigned long i = 0; i < dets.size(); ++i)
@@ -215,9 +215,9 @@ namespace
         trainer.set_c(1000);
         track_association_function<detection> assoc = trainer.train(data);
 
-        double test_val = test_track_association_function(assoc, data); 
+        double test_val = test_track_association_function(assoc, data);
         DLIB_TEST_MSG( test_val == 1, test_val);
-        test_val = cross_validate_track_association_trainer(trainer, data, 5); 
+        test_val = cross_validate_track_association_trainer(trainer, data, 5);
         DLIB_TEST_MSG ( test_val == 1, test_val);
 
 
@@ -265,7 +265,7 @@ namespace
 
 
 
-        ostringstream sout; 
+        ostringstream sout;
         serialize(assoc, sout);
 
         istringstream sin(sout.str());

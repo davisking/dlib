@@ -23,17 +23,17 @@ namespace dlib
                      public remover<T>
     {
 
-        /*!                
+        /*!
             REQUIREMENTS ON T
                 domain must be comparable by compare where compare is a functor compatible with std::less and
                 T must be hashable by general_hash
-                (general_hash is defined in dlib/general_hash) and 
+                (general_hash is defined in dlib/general_hash) and
                 T must be swappable by a global swap() and
                 T must have a default constructor
 
             REQUIREMENTS ON expnum
                 expnum < 32
-                2^expnum is the number of buckets to hash items of type T into. 
+                2^expnum is the number of buckets to hash items of type T into.
                 Note that this is really just a suggestion to the hash table.
                 Implementations are free to manage the table size however is most
                 appropriate.
@@ -41,16 +41,16 @@ namespace dlib
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                swap() and is_member() functions do not invalidate 
+                swap() and is_member() functions do not invalidate
                 pointers or references to internal data.
                 All other functions have no such guarantee.
 
             INITIAL VALUE
-                size() == 0    
+                size() == 0
 
             ENUMERATION ORDER
                 No order is specified.  Only that each element will be visited once
@@ -59,7 +59,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 hash_set contains items of type T
 
-                This object represents an unaddressed collection 
+                This object represents an unaddressed collection
                 of items.  Every element in a hash_set is unique.
 
                 Also note that unless specified otherwise, no member functions
@@ -80,14 +80,14 @@ namespace dlib
             hash_set(
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
             !*/
 
             virtual ~hash_set(
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -100,7 +100,7 @@ namespace dlib
                     - #*this has its initial value
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor
-                        if this exception is thrown then *this is unusable 
+                        if this exception is thrown then *this is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -111,11 +111,11 @@ namespace dlib
                 requires
                     - is_member(item) == false
                 ensures
-                    - #is_member(item) == true 
-                    - #item has an initial value for its type 
+                    - #is_member(item) == true
+                    - #item has an initial value for its type
                     - #size() == size() + 1
                     - #at_start() == true
-                throws 
+                throws
                     - std::bad_alloc or any exception thrown by T's constructor
                         if add() throws then it has no effect
             !*/
@@ -125,7 +125,7 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns whether or not there is an element in *this equivalent 
+                    - returns whether or not there is an element in *this equivalent
                       to item
             !*/
 
@@ -135,13 +135,13 @@ namespace dlib
             );
             /*!
                 requires
-                    - is_member(item) == true 
-                    - &item != &item_copy (i.e. item and item_copy cannot be the 
-                      same variable) 
+                    - is_member(item) == true
+                    - &item != &item_copy (i.e. item and item_copy cannot be the
+                      same variable)
                 ensures
-                    - #is_member(item) == false 
-                    - the element in *this equivalent to item has been removed and 
-                      swapped into #item_copy 
+                    - #is_member(item) == false
+                    - the element in *this equivalent to item has been removed and
+                      swapped into #item_copy
                     - #size() == size() - 1
                     - #at_start() == true
             !*/
@@ -151,9 +151,9 @@ namespace dlib
             );
             /*!
                 requires
-                    - is_member(item) == true 
+                    - is_member(item) == true
                 ensures
-                    - #is_member(item) == false 
+                    - #is_member(item) == false
                     - #size() == size() - 1
                     - #at_start() == true
             !*/
@@ -164,7 +164,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
     
         private:
 
@@ -181,9 +181,9 @@ namespace dlib
         typename compare
         >
     inline void swap (
-        hash_set<T,expnum,mem_manager,compare>& a, 
-        hash_set<T,expnum,mem_manager,compare>& b 
-    ) { a.swap(b); }   
+        hash_set<T,expnum,mem_manager,compare>& a,
+        hash_set<T,expnum,mem_manager,compare>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -195,11 +195,11 @@ namespace dlib
         typename compare
         >
     void deserialize (
-        hash_set<T,expnum,mem_manager,compare>& item, 
+        hash_set<T,expnum,mem_manager,compare>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 }
 

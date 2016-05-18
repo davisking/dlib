@@ -98,8 +98,8 @@ namespace dlib
             }
             else
             {
-                // update H with the BFGS formula from (3.2.12) on page 55 of Fletcher 
-                delta = (x-prev_x); 
+                // update H with the BFGS formula from (3.2.12) on page 55 of Fletcher
+                delta = (x-prev_x);
                 gamma = funct_derivative-prev_derivative;
 
                 double dg = dot(delta,gamma);
@@ -154,7 +154,7 @@ namespace dlib
     class lbfgs_search_strategy
     {
     public:
-        explicit lbfgs_search_strategy(unsigned long max_size_) : max_size(max_size_), been_used(false) 
+        explicit lbfgs_search_strategy(unsigned long max_size_) : max_size(max_size_), been_used(false)
         {
             DLIB_ASSERT (
                 max_size > 0,
@@ -163,7 +163,7 @@ namespace dlib
             );
         }
 
-        lbfgs_search_strategy(const lbfgs_search_strategy& item) 
+        lbfgs_search_strategy(const lbfgs_search_strategy& item)
         {
             max_size = item.max_size;
             been_used = item.been_used;
@@ -225,7 +225,7 @@ namespace dlib
                     }
 
                     // Take a guess at what the first H matrix should be.  This formula below is what is suggested
-                    // in the book Numerical Optimization by Nocedal and Wright in the chapter on Large Scale 
+                    // in the book Numerical Optimization by Nocedal and Wright in the chapter on Large Scale
                     // Unconstrained Optimization (in the L-BFGS section).
                     double H_0 = 1.0/data[data.size()-1].rho/dot(data[data.size()-1].y, data[data.size()-1].y);
                     H_0 = put_in_range(0.001, 1000.0, H_0);

@@ -18,7 +18,7 @@
 namespace dlib
 {
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     struct connect_to_ip_and_port
     {
@@ -31,7 +31,7 @@ namespace dlib
             DLIB_ASSERT(is_ip_address(ip) && port != 0,
                 "\t connect_to_ip_and_port()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t ip:   " << ip 
+                << "\n\t ip:   " << ip
                 << "\n\t port: " << port
                 << "\n\t this: " << this
                 );
@@ -72,7 +72,7 @@ namespace dlib
     {
         listen_on_port(
             unsigned short port_
-        ) : port(port_) 
+        ) : port(port_)
         {
             // make sure requires clause is not broken
             DLIB_ASSERT( port != 0,
@@ -91,7 +91,7 @@ namespace dlib
     template <typename pipe_type>
     struct bridge_transmit_decoration
     {
-        bridge_transmit_decoration ( 
+        bridge_transmit_decoration (
             pipe_type& p_
         ) : p(p_) {}
 
@@ -106,7 +106,7 @@ namespace dlib
     template <typename pipe_type>
     struct bridge_receive_decoration
     {
-        bridge_receive_decoration ( 
+        bridge_receive_decoration (
             pipe_type& p_
         ) : p(p_) {}
 
@@ -296,7 +296,7 @@ namespace dlib
             template <typename pipe_type>
             typename disable_if<is_convertible<bridge_status, typename pipe_type::type> >::type  enqueue_bridge_status (
                 pipe_type* ,
-                const bridge_status& 
+                const bridge_status&
             )
             {
             }
@@ -416,19 +416,19 @@ namespace dlib
                     }
                     catch (std::bad_alloc& )
                     {
-                        dlog << LERROR << "std::bad_alloc thrown while deserializing message from " 
+                        dlog << LERROR << "std::bad_alloc thrown while deserializing message from "
                             << con->get_foreign_ip() << ":" << con->get_foreign_port();
                     }
                     catch (dlib::serialization_error& e)
                     {
-                        dlog << LERROR << "dlib::serialization_error thrown while deserializing message from " 
-                            << con->get_foreign_ip() << ":" << con->get_foreign_port() 
+                        dlog << LERROR << "dlib::serialization_error thrown while deserializing message from "
+                            << con->get_foreign_ip() << ":" << con->get_foreign_port()
                             << ".\nThe exception error message is: \n" << e.what();
                     }
                     catch (std::exception& e)
                     {
-                        dlog << LERROR << "std::exception thrown while deserializing message from " 
-                            << con->get_foreign_ip() << ":" << con->get_foreign_port() 
+                        dlog << LERROR << "std::exception thrown while deserializing message from "
+                            << con->get_foreign_ip() << ":" << con->get_foreign_port()
                             << ".\nThe exception error message is: \n" << e.what();
                     }
 
@@ -492,8 +492,8 @@ namespace dlib
                                 dequeue_timed_out = (transmit_pipe->is_enabled() && transmit_pipe->is_dequeue_enabled());
                             }
 
-                            // Pause for about a second.  Note that we use a wait_or_timeout() call rather 
-                            // than sleep() here because we want to wake up immediately if this object is 
+                            // Pause for about a second.  Note that we use a wait_or_timeout() call rather
+                            // than sleep() here because we want to wake up immediately if this object is
                             // being destructed rather than hang for a second.
                             if (!dequeue_timed_out)
                             {
@@ -504,26 +504,26 @@ namespace dlib
                                 s.wait_or_timeout(1000);
                             }
                             // Just send the keepalive byte periodically so we can
-                            // tell if the connection is alive. 
+                            // tell if the connection is alive.
                             out.write((char*)&keepalive_code, sizeof(keepalive_code));
                             out.flush();
                         }
                     }
                     catch (std::bad_alloc& )
                     {
-                        dlog << LERROR << "std::bad_alloc thrown while serializing message to " 
+                        dlog << LERROR << "std::bad_alloc thrown while serializing message to "
                             << con->get_foreign_ip() << ":" << con->get_foreign_port();
                     }
                     catch (dlib::serialization_error& e)
                     {
-                        dlog << LERROR << "dlib::serialization_error thrown while serializing message to " 
-                            << con->get_foreign_ip() << ":" << con->get_foreign_port() 
+                        dlog << LERROR << "dlib::serialization_error thrown while serializing message to "
+                            << con->get_foreign_ip() << ":" << con->get_foreign_port()
                             << ".\nThe exception error message is: \n" << e.what();
                     }
                     catch (std::exception& e)
                     {
-                        dlog << LERROR << "std::exception thrown while serializing message to " 
-                            << con->get_foreign_ip() << ":" << con->get_foreign_port() 
+                        dlog << LERROR << "std::exception thrown while serializing message to "
+                            << con->get_foreign_ip() << ":" << con->get_foreign_port()
                             << ".\nThe exception error message is: \n" << e.what();
                     }
 
@@ -573,13 +573,13 @@ namespace dlib
         bridge (
             T network_parameters,
             U pipe1,
-            V pipe2 
+            V pipe2
         ) { reconfigure(network_parameters,pipe1,pipe2); }
 
         template < typename T, typename U>
         bridge (
             T network_parameters,
-            U pipe 
+            U pipe
         ) { reconfigure(network_parameters,pipe); }
 
 
@@ -659,7 +659,7 @@ namespace dlib
         scoped_ptr<impl_brns::impl_bridge_base> pimpl;
     };
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
 }
 

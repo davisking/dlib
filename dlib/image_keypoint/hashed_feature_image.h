@@ -29,7 +29,7 @@ namespace dlib
         typedef std::vector<std::pair<unsigned int,double> > descriptor_type;
 
         hashed_feature_image (
-        ); 
+        );
 
         void clear (
         );
@@ -112,7 +112,7 @@ namespace dlib
         template <typename T>
         friend void deserialize (
             hashed_feature_image<T>& item,
-            std::istream& in 
+            std::istream& in
         );
 
     private:
@@ -150,7 +150,7 @@ namespace dlib
     template <typename T>
     void deserialize (
         hashed_feature_image<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         int version = 0;
@@ -177,7 +177,7 @@ namespace dlib
         >
     hashed_feature_image<feature_extractor,hash_function_type>::
     hashed_feature_image (
-    )  
+    )
     {
         clear();
         hash_feats.resize(1);
@@ -379,7 +379,7 @@ namespace dlib
         >
     void hashed_feature_image<feature_extractor,hash_function_type>::
     use_relative_feature_weights (
-    ) 
+    )
     {
         uniform_feature_weights = false;
     }
@@ -392,7 +392,7 @@ namespace dlib
         >
     void hashed_feature_image<feature_extractor,hash_function_type>::
     use_uniform_feature_weights (
-    ) 
+    )
     {
         uniform_feature_weights = true;
     }
@@ -428,7 +428,7 @@ namespace dlib
             "\t descriptor_type hashed_feature_image::operator(row,col)"
             << "\n\t Invalid inputs were given to this function"
             << "\n\t row:  " << row
-            << "\n\t col:  " << col 
+            << "\n\t col:  " << col
             << "\n\t nr(): " << nr()
             << "\n\t nc(): " << nc()
             << "\n\t this: " << this
@@ -504,7 +504,7 @@ namespace dlib
     const rectangle hashed_feature_image<feature_extractor,hash_function_type>::
     feat_to_image_space (
         const rectangle& rect
-    ) const 
+    ) const
     {
         return fe.feat_to_image_space(rect);
     }

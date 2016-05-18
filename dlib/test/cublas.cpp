@@ -15,7 +15,7 @@
 // We only do these tests if CUDA is available to test in the first place.
 #ifdef DLIB_USE_CUDA
 
-namespace  
+namespace
 {
 
     using namespace test;

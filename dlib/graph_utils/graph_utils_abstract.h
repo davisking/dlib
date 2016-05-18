@@ -15,13 +15,13 @@ namespace dlib
         typename T
         >
     typename T::edge_type& edge(
-        T& g,  
-        unsigned long i, 
+        T& g,
+        unsigned long i,
         unsigned long j
     );
     /*!
         requires
-            - T is an implementation of graph/graph_kernel_abstract.h 
+            - T is an implementation of graph/graph_kernel_abstract.h
             - g.has_edge(i,j)
         ensures
             - returns a reference to the edge data for the edge connecting nodes i and j
@@ -32,13 +32,13 @@ namespace dlib
         typename T
         >
     typename const T::edge_type& edge(
-        const T& g,  
-        unsigned long i, 
+        const T& g,
+        unsigned long i,
         unsigned long j
     );
     /*!
         requires
-            - T is an implementation of graph/graph_kernel_abstract.h 
+            - T is an implementation of graph/graph_kernel_abstract.h
             - g.has_edge(i,j)
         ensures
             - returns a const reference to the edge data for the edge connecting nodes i and j
@@ -51,13 +51,13 @@ namespace dlib
         typename T
         >
     typename T::edge_type& edge(
-        T& g,  
-        unsigned long parent_idx, 
-        unsigned long child_idx 
+        T& g,
+        unsigned long parent_idx,
+        unsigned long child_idx
     );
     /*!
         requires
-            - T is an implementation of directed_graph/directed_graph_kernel_abstract.h 
+            - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
             - g.has_edge(parent_idx,child_idx)
         ensures
             - returns a reference to the edge data for the directed edge connecting parent
@@ -68,16 +68,16 @@ namespace dlib
         typename T
         >
     typename const T::edge_type& edge(
-        const T& g,  
-        unsigned long parent_idx, 
-        unsigned long child_idx 
+        const T& g,
+        unsigned long parent_idx,
+        unsigned long child_idx
     );
     /*!
         requires
-            - T is an implementation of directed_graph/directed_graph_kernel_abstract.h 
+            - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
             - g.has_edge(parent_idx,child_idx)
         ensures
-            - returns a const reference to the edge data for the directed edge connecting 
+            - returns a const reference to the edge data for the directed edge connecting
               parent node g.node(parent_idx) to child node g.node(child_idx).
     !*/
 
@@ -91,9 +91,9 @@ namespace dlib
     );
     /*!
         requires
-            - T is an implementation of directed_graph/directed_graph_kernel_abstract.h 
+            - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
         ensures
-            - if (All nodes have either 0 edges between them or 2 edges between them.  
+            - if (All nodes have either 0 edges between them or 2 edges between them.
               That is, if there is an edge pointing from node A to node B then there is
               also an edge from B to A) then
                 - returns true
@@ -111,7 +111,7 @@ namespace dlib
     );
     /*!
         requires
-            - T is an implementation of directed_graph/directed_graph_kernel_abstract.h 
+            - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
         ensures
             - if (there is a directed cycle in the given graph) then
                 - returns true
@@ -161,7 +161,7 @@ namespace dlib
 
     template <
         typename src_type,
-        typename dest_type 
+        typename dest_type
         >
     void copy_graph_structure (
         const src_type& src,
@@ -187,7 +187,7 @@ namespace dlib
 
     template <
         typename src_type,
-        typename dest_type 
+        typename dest_type
         >
     void copy_graph (
         const src_type& src,
@@ -265,7 +265,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T 
+        typename T
         >
     bool graph_is_connected (
         const T& g
@@ -275,7 +275,7 @@ namespace dlib
             - T is an implementation of directed_graph/directed_graph_kernel_abstract.h or
               T is an implementation of graph/graph_kernel_abstract.h
         ensures
-            - every node in g has an undirected path to every other node in g.  
+            - every node in g has an undirected path to every other node in g.
               I.e. g is a connected graph
     !*/
 
@@ -293,12 +293,12 @@ namespace dlib
         requires
             - graph_type is an implementation of graph/graph_kernel_abstract.h
             - sets_of_int is an implementation of set/set_kernel_abstract.h
-              and it contains unsigned long objects. 
+              and it contains unsigned long objects.
             - graph_contains_length_one_cycle(g) == false
             - for all x such that clique.is_member(x):
                 - x < g.number_of_nodes()
         ensures
-            - if (it is true that for all i and j such that clique.is_member(i) and 
+            - if (it is true that for all i and j such that clique.is_member(i) and
               clique.is_member(j) then g.has_edge(i,j) == true) then
                 - returns true
             - else
@@ -324,13 +324,13 @@ namespace dlib
         requires
             - graph_type is an implementation of graph/graph_kernel_abstract.h
             - sets_of_int is an implementation of set/set_kernel_abstract.h
-              and it contains unsigned long objects. 
+              and it contains unsigned long objects.
             - graph_contains_length_one_cycle(g) == false
             - for all x such that clique.is_member(x):
                 - x < g.number_of_nodes()
             - is_clique(g,clique) == true
         ensures
-            - if (there is no x such that clique.is_member(x) == false 
+            - if (there is no x such that clique.is_member(x) == false
               and g.has_edge(i,x) for all i such that cliques.is_member(i)) then
                 - returns true
             - else
@@ -357,16 +357,16 @@ namespace dlib
             - graph_type is an implementation of graph/graph_kernel_abstract.h
             - set_of_sets_of_int is an implementation of set/set_kernel_abstract.h
               and it contains another set object which is comparable by operator< and
-              itself contains unsigned long objects.  
+              itself contains unsigned long objects.
               (e.g. set<set<unsigned long>::compare_1a>::kernel_1a)
             - graph_contains_length_one_cycle(g) == false
             - graph_is_connected(g) == true
         ensures
             - #g.number_of_nodes() == g.number_of_nodes()
-            - all this function does to g is add edges to it until g becomes a 
+            - all this function does to g is add edges to it until g becomes a
               chordal graph where a chordal graph is a graph where each cycle
               in the graph of 4 or more nodes has an edge joining two nodes
-              that are not adjacent in the cycle. 
+              that are not adjacent in the cycle.
             - #cliques.size() == the number of maximal cliques in the graph #g
             - for all valid sets S such that #cliques.is_member(S):
                 - for all valid integers i and j such that S.is_member(i) == true
@@ -390,23 +390,23 @@ namespace dlib
               graph_type is an implementation of graph/graph_kernel_abstract.h
             - join_tree_type is an implementation of graph/graph_kernel_abstract.h
             - join_tree_type::type is an implementation of set/set_compare_abstract.h and
-              this set type contains unsigned long objects. 
+              this set type contains unsigned long objects.
             - join_tree_type::edge_type is an implementation of set/set_compare_abstract.h and
-              this set type contains unsigned long objects. 
+              this set type contains unsigned long objects.
             - graph_contains_length_one_cycle(g) == false
             - graph_is_connected(g) == true
         ensures
-            - if (join_tree is a valid join tree of graph g.  That is, join_tree is a 
+            - if (join_tree is a valid join tree of graph g.  That is, join_tree is a
               tree decomposition of g) then
                 - returns true
             - else
                 - returns false
 
-            - a join tree of graph g is defined as follows: 
+            - a join tree of graph g is defined as follows:
                 - graph_contains_undirected_cycle(join_tree) == false
                 - graph_is_connected(join_tree) == true
                 - for all valid i:
-                    - join_tree.node(i).item == a non-empty set containing node indexes 
+                    - join_tree.node(i).item == a non-empty set containing node indexes
                       from g.  That is, this set contains all the nodes from g that are
                       in this cluster in the join tree
                 - for all valid i and j such that i and j are both < join_tree.number_of_nodes()
@@ -414,9 +414,9 @@ namespace dlib
                       and join_tree.node(j).item
                     - It is the case that all nodes on the unique path between join_tree.node(i)
                       and join_tree.node(j) contain the numbers from X in their sets.
-                    - edge(join_tree,i,j) == a set containing the intersection of 
+                    - edge(join_tree,i,j) == a set containing the intersection of
                       join_tree.node(i).item and join_tree.node(j).item
-                - the node index for every node in g appears in some node in join_tree at 
+                - the node index for every node in g appears in some node in join_tree at
                   least once.
     !*/
 
@@ -435,9 +435,9 @@ namespace dlib
             - graph_type is an implementation of graph/graph_kernel_abstract.h
             - join_tree_type is an implementation of graph/graph_kernel_abstract.h
             - join_tree_type::type is an implementation of set/set_compare_abstract.h and
-              this set type contains unsigned long objects. 
+              this set type contains unsigned long objects.
             - join_tree_type::edge_type is an implementation of set/set_compare_abstract.h and
-              this set type contains unsigned long objects. 
+              this set type contains unsigned long objects.
             - graph_contains_length_one_cycle(g) == false
             - graph_is_connected(g) == true
         ensures

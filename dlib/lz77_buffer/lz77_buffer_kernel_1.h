@@ -14,7 +14,7 @@ namespace dlib
     template <
         typename sliding_buffer
         >
-    class lz77_buffer_kernel_1 
+    class lz77_buffer_kernel_1
     {
         /*!
             REQUIREMENTS ON sliding_buffer
@@ -28,7 +28,7 @@ namespace dlib
                 buffer.size() == history_limit + lookahead_limit
 
 
-            CONVENTION           
+            CONVENTION
                 history_limit == get_history_buffer_limit()
                 lookahead_limit == get_lookahead_buffer_limit()
                 history_size == get_history_buffer_size()
@@ -44,7 +44,7 @@ namespace dlib
 
         lz77_buffer_kernel_1 (
             unsigned long total_limit_,
-            unsigned long lookahead_limit_  
+            unsigned long lookahead_limit_
         );
 
         virtual ~lz77_buffer_kernel_1 (
@@ -108,7 +108,7 @@ namespace dlib
                 - for all i where 0 <= i < #history_size-N:
                   #history_buffer(N+i) == history_buffer(i)
                 - for all i where 0 <= i < #lookahead_size
-                  #lookahead_buffer(i) == lookahead_buffer(N+i)                
+                  #lookahead_buffer(i) == lookahead_buffer(N+i)
         !*/
         {
             unsigned long temp = history_size+N;
@@ -121,7 +121,7 @@ namespace dlib
         }
 
 
-        // member data        
+        // member data
         sliding_buffer buffer;
         unsigned long lookahead_limit;
         unsigned long history_limit;
@@ -134,7 +134,7 @@ namespace dlib
         // restricted functions
         lz77_buffer_kernel_1(lz77_buffer_kernel_1<sliding_buffer>&);        // copy constructor
         lz77_buffer_kernel_1<sliding_buffer>& operator=(lz77_buffer_kernel_1<sliding_buffer>&);    // assignment operator
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -148,9 +148,9 @@ namespace dlib
     lz77_buffer_kernel_1<sliding_buffer>::
     lz77_buffer_kernel_1 (
         unsigned long total_limit_,
-        unsigned long lookahead_limit_  
-    ) :        
-        lookahead_size(0), 
+        unsigned long lookahead_limit_
+    ) :
+        lookahead_size(0),
         history_size(0)
     {
         buffer.set_size(total_limit_);
@@ -183,7 +183,7 @@ namespace dlib
     {
         if (lookahead_size == lookahead_limit)
         {
-            shift_buffer(1);            
+            shift_buffer(1);
         }
         buffer[lookahead_limit-1-lookahead_size] = symbol;
         ++lookahead_size;
@@ -214,7 +214,7 @@ namespace dlib
             // if we are finding a match
             if (history_buffer(hpos) == lookahead_buffer(lpos))
             {
-                ++lpos;   
+                ++lpos;
                 // if we have found a match that is as long as the lookahead buffer
                 // then we are done
                 if (lpos == lookahead_size)
@@ -233,7 +233,7 @@ namespace dlib
             }
         } // while (hpos != 0)
 
-        // if we found a match at the end of the loop that is greater than 
+        // if we found a match at the end of the loop that is greater than
         // the match in match_index
         if (lpos > match_length)
         {

@@ -17,7 +17,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace 
+    namespace
     {
         struct stack_tracer_data
         {

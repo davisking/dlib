@@ -10,7 +10,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -18,18 +18,18 @@ namespace
 
     logger dlog("test.tuple");
 
-    struct nil 
+    struct nil
     {
         template <typename T>
         void operator() (
-            const T& 
+            const T&
         ) const
         {
         }
     };
 
 
-    struct inc 
+    struct inc
     {
         template <typename T>
         void operator() (
@@ -69,9 +69,9 @@ namespace
     )
     /*!
         ensures
-            - runs tests on tuple functions for compliance with the specs 
+            - runs tests on tuple functions for compliance with the specs
     !*/
-    {        
+    {
 
         print_spinner();
 

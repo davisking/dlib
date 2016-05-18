@@ -68,7 +68,7 @@ namespace dlib
         ) const { return items; }
 
         unsigned long size (
-        ) const 
+        ) const
         {
             return items.size();
         }
@@ -91,14 +91,14 @@ namespace dlib
 
         T& operator[] (
             unsigned long idx
-        ) 
+        )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(idx < size(),
                 "\tvoid random_subset_selector::operator[]()"
                 << "\n\t idx is out of range"
-                << "\n\t idx:    " << idx 
-                << "\n\t size(): " << size() 
+                << "\n\t idx:    " << idx
+                << "\n\t size(): " << size()
                 << "\n\t this:   " << this
                 );
 
@@ -113,8 +113,8 @@ namespace dlib
             DLIB_ASSERT(idx < size(),
                 "\tvoid random_subset_selector::operator[]()"
                 << "\n\t idx is out of range"
-                << "\n\t idx:    " << idx 
-                << "\n\t size(): " << size() 
+                << "\n\t idx:    " << idx
+                << "\n\t size(): " << size()
                 << "\n\t this:   " << this
                 );
 
@@ -127,7 +127,7 @@ namespace dlib
         const_iterator          end() const                     { return items.end(); }
 
         bool next_add_accepts (
-        ) const 
+        ) const
         {
             return _next_add_accepts;
         }
@@ -186,7 +186,7 @@ namespace dlib
         template <typename T1, typename T2>
         friend void deserialize (
             random_subset_selector<T1,T2>& item,
-            std::istream& in 
+            std::istream& in
         );
 
     private:
@@ -204,11 +204,11 @@ namespace dlib
             }
             else
             {
-                // At this point each element of items has had an equal chance of being in this object.   
-                // In particular, the probability that each arrived here is currently items.size()/count.    
-                // We need to be able to say that, after this function ends, the probability of any 
-                // particular object ending up in items is items.size()/(count+1).  So this means that 
-                // we should decide to add a new item into items with this probability.  Also, if we do 
+                // At this point each element of items has had an equal chance of being in this object.
+                // In particular, the probability that each arrived here is currently items.size()/count.
+                // We need to be able to say that, after this function ends, the probability of any
+                // particular object ending up in items is items.size()/(count+1).  So this means that
+                // we should decide to add a new item into items with this probability.  Also, if we do
                 // so then we pick one of the current items and replace it at random with the new item.
 
                 // Make me a random 64 bit number.   This might seem excessive but I want this object
@@ -229,7 +229,7 @@ namespace dlib
 
         std::vector<T> items;
         unsigned long _max_size;
-        uint64 count; 
+        uint64 count;
 
         rand_type rnd;
 
@@ -239,7 +239,7 @@ namespace dlib
 
     template <
         typename T,
-        typename rand_type 
+        typename rand_type
         >
     void swap (
         random_subset_selector<T,rand_type>& a,
@@ -264,7 +264,7 @@ namespace dlib
     template <typename T1, typename T2>
     void deserialize (
         random_subset_selector<T1,T2>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         deserialize(item.items, in);
@@ -356,7 +356,7 @@ namespace dlib
         typename T
         >
     const matrix_op<op_array_to_mat<random_subset_selector<T> > > mat (
-        const random_subset_selector<T>& m 
+        const random_subset_selector<T>& m
     )
     {
         typedef op_array_to_mat<random_subset_selector<T> > op;

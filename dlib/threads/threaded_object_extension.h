@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_THREADED_OBJECT_EXTENSIOn_
-#define DLIB_THREADED_OBJECT_EXTENSIOn_ 
+#define DLIB_THREADED_OBJECT_EXTENSIOn_
 
 #include "threaded_object_extension_abstract.h"
 #include "threads_kernel.h"
@@ -19,12 +19,12 @@ namespace dlib
         /*!
             INITIAL VALUE
                 - is_running_ == false
-                - is_alive_ == false 
+                - is_alive_ == false
                 - should_stop_ == false
                 - should_respawn_ == false
 
 #ifdef ENABLE_ASSERTS
-                - id_valid == false 
+                - id_valid == false
                 - id1 == get_main_thread_id()
 #endif
 
@@ -37,7 +37,7 @@ namespace dlib
 
 #ifdef ENABLE_ASSERTS
                 - if (when thread() is executing) then
-                    - id1 == the id of the running thread 
+                    - id1 == the id of the running thread
                     - id_valid == true
                 - else
                     - id1 == an undefined value

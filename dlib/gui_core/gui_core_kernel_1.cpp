@@ -77,7 +77,7 @@ namespace dlib
             {
                 uninitialized,
                 initialized,
-                failure_to_init 
+                failure_to_init
             };
             
             et_state status;
@@ -87,7 +87,7 @@ namespace dlib
             logger dlog;
 
             HINSTANCE hInstance;
-            HWND helper_window;    
+            HWND helper_window;
             const TCHAR* window_class_name;
 
             bool quit_windows_loop;
@@ -149,7 +149,7 @@ namespace dlib
             void start_event_thread (
             )
             /*!
-                we can't call this function from this objects constructor because 
+                we can't call this function from this objects constructor because
                 starting the event thread in windows involves sending messages to the
                 WndProc() and that requires this object to be fully constructed.
             !*/
@@ -186,7 +186,7 @@ namespace dlib
                         // No point calling wait() here since the thread isn't going to
                         // terminate gracefully in this case.  So we just let the program
                         // end as it will and hope for the best.
-                    } 
+                    }
                     else
                     {
                         // wait for the event handler thread to terminate.
@@ -230,7 +230,7 @@ namespace dlib
                 wndclass.lpszMenuName  = NULL ;
                 wndclass.lpszClassName = window_class_name ;
 
-                if (!RegisterClass (&wndclass))  
+                if (!RegisterClass (&wndclass))
                 {
                     dlog << LFATAL << "Error registering window class";
 
@@ -265,20 +265,20 @@ namespace dlib
                 et_signaler.broadcast();
                 window_table.get_mutex().unlock();
 
-                // start the event handler loop.   
+                // start the event handler loop.
                 /*
-                    A note about this quit_windows_loop thing.  If the user is holding 
+                    A note about this quit_windows_loop thing.  If the user is holding
                     the mouse button down on the title bar of a window it will cause
-                    the PostQuitMessage() function to be ignored!!  This extra bool 
+                    the PostQuitMessage() function to be ignored!!  This extra bool
                     is a work around to prevent that from happening.
                 */
                 MSG msg;
-                while (GetMessage (&msg, NULL, 0, 0) && 
+                while (GetMessage (&msg, NULL, 0, 0) &&
                        quit_windows_loop == false)
                 {
                     TranslateMessage (&msg) ;
                     DispatchMessage (&msg) ;
-                } 
+                }
             }
         };
 
@@ -313,13 +313,13 @@ namespace dlib
         {
             ebh_param& p = *static_cast<ebh_param*>(param);
 #ifdef UNICODE
-            MessageBox (NULL,  convert_mbstring_to_wstring(p.text).c_str(), 
-                        convert_mbstring_to_wstring(p.title).c_str(), MB_OK|MB_ICONERROR|MB_SYSTEMMODAL 
-                        ); 
+            MessageBox (NULL,  convert_mbstring_to_wstring(p.text).c_str(),
+                        convert_mbstring_to_wstring(p.title).c_str(), MB_OK|MB_ICONERROR|MB_SYSTEMMODAL
+                        );
 #else
-            MessageBox (NULL,  p.text.c_str(), 
-                        p.title.c_str(), MB_OK|MB_ICONERROR|MB_SYSTEMMODAL 
-                        ); 
+            MessageBox (NULL,  p.text.c_str(),
+                        p.title.c_str(), MB_OK|MB_ICONERROR|MB_SYSTEMMODAL
+                        );
 #endif
             delete &p;
         }
@@ -342,14 +342,14 @@ namespace dlib
                 else
                 {
 #ifdef UNICODE
-                    MessageBox (NULL, convert_mbstring_to_wstring(text).c_str(), 
-                                convert_mbstring_to_wstring(title).c_str(), 
-                                MB_OK|MB_ICONERROR|MB_SYSTEMMODAL 
-                                ); 
+                    MessageBox (NULL, convert_mbstring_to_wstring(text).c_str(),
+                                convert_mbstring_to_wstring(title).c_str(),
+                                MB_OK|MB_ICONERROR|MB_SYSTEMMODAL
+                                );
 #else
-                    MessageBox (NULL,  text, 
-                                title, MB_OK|MB_ICONERROR|MB_SYSTEMMODAL 
-                                ); 
+                    MessageBox (NULL,  text,
+                                title, MB_OK|MB_ICONERROR|MB_SYSTEMMODAL
+                                );
 #endif
                 }
             }
@@ -383,7 +383,7 @@ namespace dlib
                 - else
                     - returns true
                     - #is_printable == true if result is a printable ascii character
-                    - #result == the keycode converted into the proper number to tbe 
+                    - #result == the keycode converted into the proper number to tbe
                       returned by the event handler.
         !*/
         {
@@ -415,15 +415,15 @@ namespace dlib
 
                 // make the result lower case if we need to.
                 if ((shift && caps) || (!caps && !shift))
-                    result = result - 'A' + 'a';               
+                    result = result - 'A' + 'a';
             }
             else
             {
                 switch (keycode)
                 {
-                case VK_BACK:   
+                case VK_BACK:
                     is_printable = false;
-                    result = base_window::KEY_BACKSPACE; 
+                    result = base_window::KEY_BACKSPACE;
                     break;
 
                 case VK_SHIFT:
@@ -572,7 +572,7 @@ namespace dlib
                     break;
       
 
-                case VK_SPACE:  result = ' ';  break;                
+                case VK_SPACE:  result = ' ';  break;
                 case VK_TAB:    result = '\t'; break;
                 case VK_RETURN: result = '\n'; break;
                 case VK_NUMPAD0:  result = '0';  break;
@@ -657,13 +657,13 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        LRESULT CALLBACK WndProc (  
-            HWND hwnd, 
-            UINT message, 
-            WPARAM wParam, 
+        LRESULT CALLBACK WndProc (
+            HWND hwnd,
+            UINT message,
+            WPARAM wParam,
             LPARAM lParam
         )
-        {        
+        {
             using namespace gui_core_kernel_1_globals;
             // Make the event processing thread have a priority slightly above normal.
             // This makes the GUI smother if you do heavy processing in other threads.
@@ -689,15 +689,15 @@ namespace dlib
                 {
                     case WM_USER+QUIT_EVENT_HANDLER_THREAD:
                         if (hwnd == helper_window)
-                        {                            
+                        {
                             globals->quit_windows_loop = true;
-                            PostQuitMessage(0); 
+                            PostQuitMessage(0);
                         }
                         return 0;
 
                     case WM_USER+DESTROY_WINDOW:
                         if (hwnd == helper_window)
-                        {                            
+                        {
                             DestroyWindow((HWND)wParam);
                         }
                         return 0;
@@ -720,7 +720,7 @@ namespace dlib
                     case WM_USER+USER_EVENTS_READY:
                         if (hwnd == helper_window)
                         {
-                            // this is the signal to look in the user_events queue 
+                            // this is the signal to look in the user_events queue
                             globals->user_events.lock();
                             globals->user_events.swap(globals->user_events_temp);
                             globals->user_events.unlock();
@@ -747,14 +747,14 @@ namespace dlib
 
                     case WM_USER+SET_ACTIVE_WINDOW:
                         if (hwnd == helper_window)
-                        {                            
+                        {
                             SetActiveWindow((HWND)wParam);
                         }
                         return 0;
 
                     case WM_USER+SHOW_WINDOW_SHOW:
                         if (hwnd == helper_window)
-                        {                            
+                        {
                             ShowWindow((HWND)wParam,SW_SHOW);
                             BringWindowToTop((HWND)wParam);
                         }
@@ -762,14 +762,14 @@ namespace dlib
 
                     case WM_USER+SHOW_WINDOW_HIDE:
                         if (hwnd == helper_window)
-                        {                            
+                        {
                             ShowWindow((HWND)wParam,SW_HIDE);
                         }
                         return 0;
 
                     case WM_USER+CALL_SET_WINDOW_TITLE:
                         if (hwnd == helper_window)
-                        {                            
+                        {
                             SetWindowTextW((HWND)wParam,globals->window_title.c_str());
                             globals->set_window_title_done = true;
                             globals->et_signaler.broadcast();
@@ -779,7 +779,7 @@ namespace dlib
 
                     case WM_USER+CREATE_WINDOW:
                         if (hwnd == helper_window)
-                        {                 
+                        {
 
                             // if this is stupposed to be a popup window then do the popup window thing
                             if (globals->dwStyle == WS_CHILD)
@@ -865,7 +865,7 @@ namespace dlib
                             else
                                 break;
 
-                            // signal that the window is gaining focus 
+                            // signal that the window is gaining focus
                             win->on_focus_gained();
                         }
                         break;
@@ -887,7 +887,7 @@ namespace dlib
                             else
                                 break;
 
-                            // signal that the window is gaining focus 
+                            // signal that the window is gaining focus
                             win->on_focus_lost();
                         }
                         break;
@@ -918,7 +918,7 @@ namespace dlib
                                 break;
 
 
-                            // signal that the window has moved 
+                            // signal that the window has moved
                             win->on_window_moved();
                            
                         }
@@ -968,7 +968,7 @@ namespace dlib
                             // signal the mouse wheel event
                             if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
                             {
-                                win->on_wheel_up(state);                                
+                                win->on_wheel_up(state);
                             }
                             else
                             {
@@ -986,7 +986,7 @@ namespace dlib
                     case WM_RBUTTONUP:
                         if (btn == base_window::NONE)
                             btn = base_window::RIGHT;
-                        {        
+                        {
                             // release the mouse capture if the user isn't holding any
                             // other mouse buttons
                             if (!((wParam & MK_LBUTTON) | (wParam & MK_MBUTTON) | (wParam & MK_RBUTTON)))
@@ -1106,8 +1106,8 @@ namespace dlib
 
                             // signal the mouse movement if this mouse event isn't identical to the
                             // last one we got
-                            if ( GET_X_LPARAM(lParam) != win->prevx || 
-                                 GET_Y_LPARAM(lParam) != win->prevy || 
+                            if ( GET_X_LPARAM(lParam) != win->prevx ||
+                                 GET_Y_LPARAM(lParam) != win->prevy ||
                                  state != win->prev_state)
                             {
                                 win->on_mouse_move(state,GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam));
@@ -1152,8 +1152,8 @@ namespace dlib
                                 else
                                 {
                                     unsigned long width, height;
-                                    win->get_size(width,height);  
-                                    if (mouse_x >= static_cast<long>(width) || 
+                                    win->get_size(width,height);
+                                    if (mouse_x >= static_cast<long>(width) ||
                                         mouse_y >= static_cast<long>(height))
                                     {
                                         // the mouse is not in the window
@@ -1171,8 +1171,8 @@ namespace dlib
                                 const long mouse_x = GET_X_LPARAM(lParam);
                                 const long mouse_y = GET_Y_LPARAM(lParam);
                                 unsigned long width, height;
-                                win->get_size(width,height);  
-                                if (mouse_x < static_cast<long>(width) && 
+                                win->get_size(width,height);
+                                if (mouse_x < static_cast<long>(width) &&
                                     mouse_y < static_cast<long>(height) &&
                                     mouse_x >= 0 &&
                                     mouse_y >= 0)
@@ -1196,7 +1196,7 @@ namespace dlib
                         return 0;
 
                     case WM_PAINT :
-                        {     
+                        {
 
                             PAINTSTRUCT ps;
                             HDC   hdc = NULL;
@@ -1257,7 +1257,7 @@ namespace dlib
 
                                     if (bitmap_buffer.size() < size)
                                         bitmap_buffer.resize(size);
-                                    bitmap = &bitmap_buffer[0];                         
+                                    bitmap = &bitmap_buffer[0];
 
                                     canvas bits(bitmap,padding,x,y,x+width-1,y+height-1);
 
@@ -1283,7 +1283,7 @@ namespace dlib
                                         );
                                 }
 
-                                EndPaint (hwnd, &ps) ;    
+                                EndPaint (hwnd, &ps) ;
 
                             }
                             catch (...)
@@ -1291,10 +1291,10 @@ namespace dlib
                                 // make sure EndPaint is called even if an exception
                                 // is thrown.
                                 if (hdc != NULL)
-                                    EndPaint (hwnd, &ps);    
+                                    EndPaint (hwnd, &ps);
                                 throw;
                             }
-                        }   
+                        }
                         return 0 ;
 
                     case  WM_ERASEBKGND:
@@ -1313,16 +1313,16 @@ namespace dlib
                                 break;
                             
   
-                            // signal that the window is being closed                                
+                            // signal that the window is being closed
                             if (win->on_window_close() == base_window::DO_NOT_CLOSE_WINDOW)
                             {
                                 DLIB_ASSERT(win->has_been_destroyed == false,
-                                    "\tYou called close_window() inside the on_window_close() event but" 
+                                    "\tYou called close_window() inside the on_window_close() event but"
                                     << "\n\tthen returned DO_NOT_CLOSE_WINDOW.  You can do one or the other but not both."
-                                    << "\n\tthis:     " << win 
+                                    << "\n\tthis:     " << win
                                     );
                                 // this happens if the on_window_close() callback
-                                // tells us to ignore the close event.  
+                                // tells us to ignore the close event.
                                 return 0;
                             }
                             else
@@ -1389,12 +1389,12 @@ namespace dlib
             catch (std::exception& e)
             {
                 error_box("Exception thrown in event handler",e.what());
-                globals->quit_windows_loop = true; 
+                globals->quit_windows_loop = true;
             }
             catch (...)
             {
                 error_box("Exception thrown in event handler","Unknown Exception type.");
-                globals->quit_windows_loop = true; 
+                globals->quit_windows_loop = true;
             }
 
             return DefWindowProc (hwnd, message, wParam, lParam) ;
@@ -1442,7 +1442,7 @@ namespace dlib
         )
         /*!
             ensures
-                - calls DestroyWindow(hwnd) from the event handling thread.  
+                - calls DestroyWindow(hwnd) from the event handling thread.
         !*/
         {
             using namespace gui_core_kernel_1_globals;
@@ -1456,14 +1456,14 @@ namespace dlib
         )
         /*!
             ensures
-                - creates a window by calling CreateWindow and passes on the 
-                  dwStyle argument.  
+                - creates a window by calling CreateWindow and passes on the
+                  dwStyle argument.
                 - returns the HWND that is returned by CreateWindow
                 - ensures that CreateWindow is called from the event handler thread
                 - if (it was unable to create a window) then
                     - returns NULL or helper_window
         !*/
-        {   
+        {
             using namespace gui_core_kernel_1_globals;
             shared_ptr_thread_safe<event_handler_thread> globals(global_data());
             // if we are running in the event handling thread then just call
@@ -1504,7 +1504,7 @@ namespace dlib
                 if (PostMessage(globals->helper_window,WM_USER+CREATE_WINDOW,0,0)==0)
                 {
                     throw gui_error("Unable to schedule function for execution in event handling thread.");
-                } 
+                }
 
                 // wait for our request to be serviced
                 while (globals->new_window == NULL)
@@ -1551,7 +1551,7 @@ namespace dlib
         unsigned long size = row_width/4;
         for (unsigned long i = 0; i < height_; ++i)
         {
-            unsigned long padding = size%3;                
+            unsigned long padding = size%3;
             LONG* start = reinterpret_cast<LONG*>(bits+row_width*i);
             LONG* end = reinterpret_cast<LONG*>(start) + size - padding;
             while (start != end)
@@ -1598,7 +1598,7 @@ namespace dlib
         if (PostMessage(globals->helper_window,WM_USER+USER_EVENTS_READY,0,0)==0)
         {
             throw gui_error("Unable to schedule function for execution in event handling thread.");
-        } 
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1606,7 +1606,7 @@ namespace dlib
     base_window::
     base_window (
         bool resizable,
-        bool undecorated 
+        bool undecorated
     ) :
         globals(gui_core_kernel_1_globals::global_data()),
         has_been_destroyed(false),
@@ -1622,14 +1622,14 @@ namespace dlib
             << "\n\tthis:     " << this
             );
 
-        if (resizable)   
-            style = WS_OVERLAPPEDWINDOW;                
+        if (resizable)
+            style = WS_OVERLAPPEDWINDOW;
         else if (undecorated)
             style = WS_CHILD;
         else
             style = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX;
 
-        hwnd = gui_core_kernel_1_globals::make_window(style);                
+        hwnd = gui_core_kernel_1_globals::make_window(style);
 
         if (hwnd == NULL)
             throw gui_error("unable to create base_window");
@@ -1670,7 +1670,7 @@ namespace dlib
             hwnd = 0;
             has_been_destroyed = true;
             globals->window_close_signaler.broadcast();
-        }  
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1725,9 +1725,9 @@ namespace dlib
             return;
 
 
-        // call the SetWindowText function with our arguments but make sure it is from 
+        // call the SetWindowText function with our arguments but make sure it is from
         // the event thread.  We have to do this because the SetWindowText() apparently blocks
-        // until something happens in the event thread so we have to 
+        // until something happens in the event thread so we have to
         // do this to avoid possible deadlocks.
         if (get_thread_id() == globals->event_thread_id)
         {
@@ -1741,7 +1741,7 @@ namespace dlib
             if (PostMessage(globals->helper_window,WM_USER+CALL_SET_WINDOW_TITLE,(WPARAM)hwnd,0)==0)
             {
                 throw gui_error("Unable to schedule SetWindowText function for execution in event handling thread.");
-            } 
+            }
 
             // wait for any SetWindowText() calls to finish
             while (globals->set_window_title_done == false)
@@ -1753,7 +1753,7 @@ namespace dlib
 
     void base_window::
     show (
-    )    
+    )
     {
         using namespace gui_core_kernel_1_globals;
         auto_mutex M(wm);
@@ -1769,7 +1769,7 @@ namespace dlib
 
     void base_window::
     hide(
-    )    
+    )
     {
         using namespace gui_core_kernel_1_globals;
         auto_mutex M(wm);
@@ -1840,9 +1840,9 @@ namespace dlib
             width = std::abs(rect.right - rect.left);
             height = std::abs(rect.bottom - rect.top);
 
-            // call the MoveWindow function with our arguments.  We 
+            // call the MoveWindow function with our arguments.  We
             // have to do this because the MoveWindow() apparently blocks
-            // until something happens in the event thread so we have to 
+            // until something happens in the event thread so we have to
             // do this to avoid possible deadlocks.
             globals->move_window_hwnd = hwnd;
             globals->move_window_x = x;
@@ -1854,7 +1854,7 @@ namespace dlib
             if (PostMessage(globals->helper_window,WM_USER+CALL_MOVE_WINDOW,0,0)==0)
             {
                 throw gui_error("Unable to schedule MoveWindow function for execution in event handling thread.");
-            } 
+            }
 
             // wait for any MoveWindow calls to finish
             while (globals->move_window_done == false)
@@ -1901,9 +1901,9 @@ namespace dlib
 
 
 
-            // call the MoveWindow function with our arguments.  We 
+            // call the MoveWindow function with our arguments.  We
             // have to do this because the MoveWindow() apparently blocks
-            // until something happens in the event thread so we have to 
+            // until something happens in the event thread so we have to
             // do this to avoid possible deadlocks.
             globals->move_window_hwnd = hwnd;
             globals->move_window_x = x_;
@@ -1915,7 +1915,7 @@ namespace dlib
             if (PostMessage(globals->helper_window,WM_USER+CALL_MOVE_WINDOW,0,0)==0)
             {
                 throw gui_error("Unable to schedule MoveWindow function for execution in event handling thread.");
-            } 
+            }
 
             // wait for any MoveWindow calls to finish
             while (globals->move_window_done == false)
@@ -2152,7 +2152,7 @@ namespace dlib
                 {
                     str.clear();
 
-                    // copy the data from buf into str while also removing any '\r' 
+                    // copy the data from buf into str while also removing any '\r'
                     // characters.
                     while (*buf != L'\0')
                     {

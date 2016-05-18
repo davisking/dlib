@@ -11,7 +11,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename trainer_type 
+        typename trainer_type
         >
     class roc_trainer_type
     {
@@ -20,10 +20,10 @@ namespace dlib
                 - trainer_type == some kind of batch trainer object (e.g. svm_nu_trainer)
 
             WHAT THIS OBJECT REPRESENTS
-                This object is a simple trainer post processor that allows you to 
+                This object is a simple trainer post processor that allows you to
                 easily adjust the bias term in a trained decision_function object.
-                That is, this object lets you pick a point on the ROC curve and 
-                it will adjust the bias term appropriately.  
+                That is, this object lets you pick a point on the ROC curve and
+                it will adjust the bias term appropriately.
 
                 So for example, suppose you wanted to set the bias term so that
                 the accuracy of your decision function on +1 labeled samples was 99%.
@@ -69,7 +69,7 @@ namespace dlib
         const trained_function_type train (
             const in_sample_vector_type& samples,
             const in_scalar_vector_type& labels
-        ) const 
+        ) const
         /*!
             requires
                 - is_binary_classification_problem(samples, labels) == true
@@ -78,12 +78,12 @@ namespace dlib
                 - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
-                - performs training using the trainer object given to this object's 
+                - performs training using the trainer object given to this object's
                   constructor, then modifies the bias term in the returned decision function
                   as discussed above, and finally returns the decision function.
         !*/
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ namespace dlib
             - trainer_type == some kind of batch trainer object that creates decision_function
               objects (e.g. svm_nu_trainer)
         ensures
-            - returns a roc_trainer_type object that has been instantiated with the given 
+            - returns a roc_trainer_type object that has been instantiated with the given
               arguments.  The returned roc trainer will select the decision function
               bias that gives the desired accuracy with respect to the +1 class.
     !*/
@@ -120,7 +120,7 @@ namespace dlib
             - trainer_type == some kind of batch trainer object that creates decision_function
               objects (e.g. svm_nu_trainer)
         ensures
-            - returns a roc_trainer_type object that has been instantiated with the given 
+            - returns a roc_trainer_type object that has been instantiated with the given
               arguments.  The returned roc trainer will select the decision function
               bias that gives the desired accuracy with respect to the -1 class.
     !*/

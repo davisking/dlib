@@ -26,18 +26,18 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is meant to be used as a simple wrapper around the OpenCV
                 IplImage struct or Mat object.  Using this class template you can turn
-                an OpenCV image into something that looks like a normal dlib style 
+                an OpenCV image into something that looks like a normal dlib style
                 image object.
 
                 So you should be able to use cv_image objects with many of the image
                 processing functions in dlib as well as the GUI tools for displaying
                 images on the screen.
 
-                Note that this object does NOT take ownership of the image data you 
+                Note that this object does NOT take ownership of the image data you
                 give to it.  This means it is up to you to make sure the OpenCV image
-                is properly freed at some point.  This also means that an instance of 
-                this object can only be used as long as the OpenCV image it references 
-                remains valid, since a cv_image just points to the OpenCV image's 
+                is properly freed at some point.  This also means that an instance of
+                this object can only be used as long as the OpenCV image it references
+                remains valid, since a cv_image just points to the OpenCV image's
                 memory directly.
         !*/
 
@@ -53,7 +53,7 @@ namespace dlib
                 - img->dataOrder == 0
                   (i.e. Only interleaved color channels are supported with cv_image)
                 - (img->depth&0xFF)/8*img->nChannels == sizeof(pixel_type)
-                  (i.e. The size of the pixel_type needs to match the size of the pixels 
+                  (i.e. The size of the pixel_type needs to match the size of the pixels
                   inside the OpenCV image)
             ensures
                 - #nr() == img->height
@@ -70,7 +70,7 @@ namespace dlib
                 - img.dataOrder == 0
                   (i.e. Only interleaved color channels are supported with cv_image)
                 - (img.depth&0xFF)/8*img.nChannels == sizeof(pixel_type)
-                  (i.e. The size of the pixel_type needs to match the size of the pixels 
+                  (i.e. The size of the pixel_type needs to match the size of the pixels
                   inside the OpenCV image)
             ensures
                 - #nr() == img.height
@@ -81,14 +81,14 @@ namespace dlib
 
         cv_image (
             const cv::Mat img
-        ); 
+        );
         /*!
             requires
                 - img.depth() == cv::DataType<pixel_traits<pixel_type>::basic_pixel_type>::depth
-                  (i.e. The pixel_type template argument needs to match the type of pixel 
+                  (i.e. The pixel_type template argument needs to match the type of pixel
                   used inside the OpenCV image)
                 - img.channels() == pixel_traits<pixel_type>::num
-                  (i.e. the number of channels in the pixel_type needs to match the number of 
+                  (i.e. the number of channels in the pixel_type needs to match the number of
                   channels in the OpenCV image)
             ensures
                 - #nr() == img.rows
@@ -98,7 +98,7 @@ namespace dlib
         !*/
 
         cv_image(
-        ); 
+        );
         /*!
             ensures
                 - #nr() == 0
@@ -109,12 +109,12 @@ namespace dlib
         );
         /*!
             ensures
-                - This function does nothing.  e.g. It doesn't delete the OpenCV 
+                - This function does nothing.  e.g. It doesn't delete the OpenCV
                   image used by this cv_image object
         !*/
 
         long nr(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of rows in this image
@@ -128,7 +128,7 @@ namespace dlib
         !*/
 
         unsigned long size (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns nr()*nc()
@@ -136,7 +136,7 @@ namespace dlib
         !*/
 
         inline pixel_type* operator[] (
-            const long row 
+            const long row
         );
         /*!
             requires
@@ -147,7 +147,7 @@ namespace dlib
         !*/
 
         inline const pixel_type* operator[] (
-            const long row 
+            const long row
         ) const;
         /*!
             requires
@@ -157,7 +157,7 @@ namespace dlib
                   of this image
         !*/
 
-        cv_image& operator= ( 
+        cv_image& operator= (
             const cv_image& item
         );
         /*!
@@ -166,7 +166,7 @@ namespace dlib
                 - returns #*this
         !*/
 
-        cv_image& operator=( 
+        cv_image& operator=(
             const IplImage* img
         );
         /*!
@@ -174,7 +174,7 @@ namespace dlib
                 - img->dataOrder == 0
                   (i.e. Only interleaved color channels are supported with cv_image)
                 - (img->depth&0xFF)/8*img->nChannels == sizeof(pixel_type)
-                  (i.e. The size of the pixel_type needs to match the size of the pixels 
+                  (i.e. The size of the pixel_type needs to match the size of the pixels
                   inside the OpenCV image)
             ensures
                 - #nr() == img->height
@@ -184,7 +184,7 @@ namespace dlib
                 - returns #*this
         !*/
 
-        cv_image& operator=( 
+        cv_image& operator=(
             const IplImage img
         );
         /*!
@@ -192,7 +192,7 @@ namespace dlib
                 - img->dataOrder == 0
                   (i.e. Only interleaved color channels are supported with cv_image)
                 - (img->depth&0xFF)/8*img->nChannels == sizeof(pixel_type)
-                  (i.e. The size of the pixel_type needs to match the size of the pixels 
+                  (i.e. The size of the pixel_type needs to match the size of the pixels
                   inside the OpenCV image)
             ensures
                 - #nr() == img->height
@@ -202,16 +202,16 @@ namespace dlib
                 - returns #*this
         !*/
 
-        cv_image& operator=( 
+        cv_image& operator=(
             const cv::Mat img
         );
         /*!
             requires
                 - img.depth() == cv::DataType<pixel_traits<pixel_type>::basic_pixel_type>::depth
-                  (i.e. The pixel_type template argument needs to match the type of pixel 
+                  (i.e. The pixel_type template argument needs to match the type of pixel
                   used inside the OpenCV image)
                 - img.channels() == pixel_traits<pixel_type>::num
-                  (i.e. the number of channels in the pixel_type needs to match the number of 
+                  (i.e. the number of channels in the pixel_type needs to match the number of
                   channels in the OpenCV image)
             ensures
                 - #nr() == img.rows
@@ -225,7 +225,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the size of one row of the image, in bytes.  
+                - returns the size of one row of the image, in bytes.
                   More precisely, return a number N such that:
                   (char*)&item[0][0] + N == (char*)&item[1][0].
         !*/
@@ -242,7 +242,7 @@ namespace dlib
     /*!
         ensures
             - returns a matrix R such that:
-                - R.nr() == img.nr() 
+                - R.nr() == img.nr()
                 - R.nc() == img.nc()
                 - for all valid r and c:
                   R(r, c) == img[r][c]

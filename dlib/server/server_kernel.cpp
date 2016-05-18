@@ -50,7 +50,7 @@ namespace dlib
     void server::
     set_graceful_close_timeout (
         unsigned long timeout
-    ) 
+    )
     {
         auto_mutex lock(max_connections_mutex);
         graceful_close_timeout = timeout;
@@ -74,10 +74,10 @@ namespace dlib
     void server::
     set_max_connections (
         int max
-    ) 
+    )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( 
+        DLIB_CASSERT(
             max >= 0 ,
             "\tvoid server::set_max_connections"
             << "\n\tmax == " << max
@@ -105,7 +105,7 @@ namespace dlib
         max_connections_mutex.lock();
         listening_port_mutex.lock();
         listening_ip_mutex.lock();
-        listening_ip = "";        
+        listening_ip = "";
         listening_port = 0;
         max_connections = 1000;
         graceful_close_timeout = 500;
@@ -125,7 +125,7 @@ namespace dlib
         cons_mutex.unlock();
 
 
-        // wait for all the connections to shut down 
+        // wait for all the connections to shut down
         thread_count_mutex.lock();
         while (thread_count > 0)
         {
@@ -204,7 +204,7 @@ namespace dlib
                 max_connections_mutex.lock();
                 listening_port_mutex.lock();
                 listening_ip_mutex.lock();
-                listening_ip = "";        
+                listening_ip = "";
                 listening_port = 0;
                 max_connections = 1000;
                 graceful_close_timeout = 500;
@@ -227,7 +227,7 @@ namespace dlib
             {
                 throw dlib::socket_error(
                     "error occurred in server::start()\nunable to create listener"
-                );            
+                );
             }
         }
 
@@ -243,10 +243,10 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( 
+        DLIB_CASSERT(
               this->is_running() == false,
             "\tvoid server::start"
-            << "\n\tis_running() == " << this->is_running() 
+            << "\n\tis_running() == " << this->is_running()
             << "\n\tthis: " << this
             );
 
@@ -297,10 +297,10 @@ namespace dlib
             shutting_down_mutex.lock();
             // if we are shutting down then signal that we should quit the loop
             exit = shutting_down;
-            shutting_down_mutex.unlock();  
+            shutting_down_mutex.unlock();
 
 
-            // if we should be shutting down 
+            // if we should be shutting down
             if (exit)
             {
                 // if a connection was opened then close it
@@ -314,7 +314,7 @@ namespace dlib
             // if the accept timed out
             if (status == TIMEOUT)
             {
-                continue;       
+                continue;
             }
 
 
@@ -326,7 +326,7 @@ namespace dlib
             connection* client_temp = client;
             try{cons.add(client_temp);}
             catch(...)
-            { 
+            {
                 sock.reset();
                 delete client;
                 cons_mutex.unlock();
@@ -335,10 +335,10 @@ namespace dlib
                 running_mutex.lock();
                 running = false;
                 running_signaler.broadcast();
-                running_mutex.unlock();               
+                running_mutex.unlock();
                 
 
-                clear(); 
+                clear();
                 throw;
             }
             cons_mutex.unlock();
@@ -350,9 +350,9 @@ namespace dlib
             temp = new param (
                             *this,
                             *client,
-                            get_graceful_close_timeout() 
+                            get_graceful_close_timeout()
                             );
-            } catch (...) 
+            } catch (...)
             {
                 sock.reset();
                 delete client;
@@ -360,7 +360,7 @@ namespace dlib
                 running = false;
                 running_signaler.broadcast();
                 running_mutex.unlock();
-                clear(); 
+                clear();
                 throw;
             }
 
@@ -396,7 +396,7 @@ namespace dlib
                 throw dlib::thread_error(
                     ECREATE_THREAD,
                     "error occurred in server::start()\nunable to start thread"
-                    );    
+                    );
             }
             // if we made the new thread then update thread_count
             else
@@ -423,7 +423,7 @@ namespace dlib
                 {
                     max_connections_mutex.unlock();
                     thread_count_signaler.wait();
-                    max_connections_mutex.lock();     
+                    max_connections_mutex.lock();
 
                     // if we are shutting down the quit the loop
                     shutting_down_mutex.lock();
@@ -461,7 +461,7 @@ namespace dlib
             // throw the exception
             throw dlib::socket_error(
              "error occurred in server::start()\nlistening socket returned error"
-                );            
+                );
         }
     }
 
@@ -497,7 +497,7 @@ namespace dlib
     {
         listening_port_mutex.lock();
         int port = listening_port;
-        listening_port_mutex.unlock();        
+        listening_port_mutex.unlock();
         return port;
     }
 
@@ -509,12 +509,12 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( 
+        DLIB_CASSERT(
             ( port >= 0 &&
               this->is_running() == false ),
             "\tvoid server::set_listening_port"
             << "\n\tport         == " << port
-            << "\n\tis_running() == " << this->is_running() 
+            << "\n\tis_running() == " << this->is_running()
             << "\n\tthis: " << this
             );
 
@@ -531,12 +531,12 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( 
+        DLIB_CASSERT(
             ( ( is_ip_address(ip) || ip == "" ) &&
               this->is_running() == false ),
             "\tvoid server::set_listening_ip"
             << "\n\tip           == " << ip
-            << "\n\tis_running() == " << this->is_running() 
+            << "\n\tis_running() == " << this->is_running()
             << "\n\tthis: " << this
             );
 
@@ -571,8 +571,8 @@ namespace dlib
             p.the_server.cons.remove(&p.new_connection,temp);
         p.the_server.cons_mutex.unlock();
 
-        try{ close_gracefully(&p.new_connection, p.graceful_close_timeout); } 
-        catch (...) { sdlog << LERROR << "close_gracefully() threw"; } 
+        try{ close_gracefully(&p.new_connection, p.graceful_close_timeout); }
+        catch (...) { sdlog << LERROR << "close_gracefully() threw"; }
 
         // decrement the thread count and signal if it is now zero
         p.the_server.thread_count_mutex.lock();

@@ -1,29 +1,29 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_Hh_ 
+#undef DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_Hh_
 #ifdef DLIB_SVm_C_LINEAR_DCD_TRAINER_ABSTRACT_Hh_
 
 #include "function_abstract.h"
 #include "kernel_abstract.h"
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svm_c_linear_dcd_trainer
     {
         /*!
-            REQUIREMENTS ON K 
-                Is either linear_kernel or sparse_linear_kernel.  
+            REQUIREMENTS ON K
+                Is either linear_kernel or sparse_linear_kernel.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a tool for training the C formulation of a support
                 vector machine.  It is optimized for the case where linear kernels are
-                used.  
+                used.
 
 
                 In particular, it is implemented using the algorithm described in the
@@ -32,7 +32,7 @@ namespace dlib
                     by Cho-Jui Hsieh, Kai-Wei Chang, and Chih-Jen Lin
 
                 It solves the optimization problem of:
-                min_w: 0.5||w||^2 + C*sum_i (hinge loss for sample i)   
+                min_w: 0.5||w||^2 + C*sum_i (hinge loss for sample i)
                 where w is the learned SVM parameter vector.
 
                 Note that this object is very similar to the svm_c_linear_trainer, however,
@@ -95,7 +95,7 @@ namespace dlib
         /*!
             ensures
                 - returns true if this trainer will produce decision_functions with
-                  non-zero bias values.  
+                  non-zero bias values.
         !*/
 
         void include_bias (
@@ -112,7 +112,7 @@ namespace dlib
             ensures
                 - returns true if this trainer has the constraint that the last weight in
                   the learned parameter vector must be 1.  This is the weight corresponding
-                  to the feature in the training vectors with the highest dimension.  
+                  to the feature in the training vectors with the highest dimension.
                 - Forcing the last weight to 1 also disables the bias and therefore the b
                   field of the learned decision_function will be 0 when forces_last_weight_to_1() == true.
                   This is true regardless of the setting of #include_bias().
@@ -127,7 +127,7 @@ namespace dlib
         !*/
 
         bool shrinking_enabled (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns true if the shrinking heuristic is enabled.  Typically this makes
@@ -136,14 +136,14 @@ namespace dlib
 
         void enable_shrinking (
             bool enabled
-        ); 
+        );
         /*!
             ensures
                 - #shrinking_enabled() == enabled
         !*/
 
         bool solving_svm_l2_problem (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns true if this solver will solve the L2 version of the SVM
@@ -153,7 +153,7 @@ namespace dlib
 
         void solve_svm_l2_problem (
             bool enabled
-        ); 
+        );
         /*!
             ensures
                 - #solving_svm_l2_problem() == enabled
@@ -163,7 +163,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -181,7 +181,7 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
@@ -190,7 +190,7 @@ namespace dlib
             ensures
                 - returns the error epsilon that determines when training should stop.
                   Smaller values may result in a more accurate solution but take longer to
-                  train.    
+                  train.
         !*/
 
         const kernel_type& get_kernel (
@@ -203,7 +203,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -212,21 +212,21 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ); 
+        );
         /*!
             ensures
                 - #get_max_iterations() == max_iter
         !*/
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         );
         /*!
             requires
                 - C > 0
             ensures
-                - #get_c_class1() == C 
-                - #get_c_class2() == C 
+                - #get_c_class1() == C
+                - #get_c_class2() == C
         !*/
 
         const scalar_type get_c_class1 (
@@ -238,7 +238,7 @@ namespace dlib
                   training data exactly or allowing more errors but hopefully improving the
                   generalization of the resulting classifier.  Larger values encourage
                   exact fitting while smaller values of C may encourage better
-                  generalization. 
+                  generalization.
         !*/
 
         const scalar_type get_c_class2 (
@@ -250,7 +250,7 @@ namespace dlib
                   training data exactly or allowing more errors but hopefully improving the
                   generalization of the resulting classifier.  Larger values encourage
                   exact fitting while smaller values of C may encourage better
-                  generalization. 
+                  generalization.
         !*/
 
         void set_c_class1 (
@@ -291,8 +291,8 @@ namespace dlib
                 - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
-                - Trains a C support vector classifier given the training samples in x and 
-                  labels in y.  
+                - Trains a C support vector classifier given the training samples in x and
+                  labels in y.
                 - returns a decision function F with the following properties:
                     - F.alpha.size() == 1
                     - F.basis_vectors.size() == 1
@@ -312,7 +312,7 @@ namespace dlib
         {
         public:
             const std::vector<scalar_type>& get_alpha (
-            ) const; 
+            ) const;
         };
 
         template <
@@ -322,7 +322,7 @@ namespace dlib
         const decision_function<kernel_type> train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            optimizer_state& state 
+            optimizer_state& state
         ) const;
         /*!
             requires
@@ -332,7 +332,7 @@ namespace dlib
                 - state must be either a default initialized optimizer_state object or all the
                   following conditions must be satisfied:
                     - Let LAST denote the previous trainer used with the state object, then
-                      we must have: 
+                      we must have:
                         - LAST.includes_bias() == includes_bias()
                         - LAST.forces_last_weight_to_1() == forces_last_weight_to_1()
                     - Let X denote the previous training samples used with state, then the
@@ -352,8 +352,8 @@ namespace dlib
                 - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
-                - Trains a C support vector classifier given the training samples in x and 
-                  labels in y.  
+                - Trains a C support vector classifier given the training samples in x and
+                  labels in y.
                 - The point of the state object is to allow you to warm start the SVM
                   optimizer from the solution to a previous call to train().  Doing this
                   might make the training run faster.  This is useful when you are trying
@@ -372,7 +372,7 @@ namespace dlib
                     - else
                         - F(new_x) < 0
         !*/
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 

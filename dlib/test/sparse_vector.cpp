@@ -9,7 +9,7 @@
 #include <sstream>
 #include <ctime>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -229,7 +229,7 @@ namespace
                 aa.assign(a.begin(), a.end());
                 bb.assign(b.begin(), b.end());
 
-                cc = add(aa,bb); 
+                cc = add(aa,bb);
                 DLIB_TEST(cc.size() == 3);
                 DLIB_TEST(cc[0].first == 0);
                 DLIB_TEST(cc[1].first == 1);
@@ -238,7 +238,7 @@ namespace
                 DLIB_TEST(cc[1].second == 3);
                 DLIB_TEST(cc[2].second == 5);
 
-                cc = subtract(aa,bb); 
+                cc = subtract(aa,bb);
                 DLIB_TEST(cc.size() == 3);
                 DLIB_TEST(cc[0].first == 0);
                 DLIB_TEST(cc[1].first == 1);
@@ -247,7 +247,7 @@ namespace
                 DLIB_TEST(cc[1].second == 1);
                 DLIB_TEST(cc[2].second == 5);
 
-                cc = add(bb,aa); 
+                cc = add(bb,aa);
                 DLIB_TEST(cc.size() == 3);
                 DLIB_TEST(cc[0].first == 0);
                 DLIB_TEST(cc[1].first == 1);
@@ -256,7 +256,7 @@ namespace
                 DLIB_TEST(cc[1].second == 3);
                 DLIB_TEST(cc[2].second == 5);
 
-                cc = subtract(bb,aa); 
+                cc = subtract(bb,aa);
                 DLIB_TEST(cc.size() == 3);
                 DLIB_TEST(cc[0].first == 0);
                 DLIB_TEST(cc[1].first == 1);

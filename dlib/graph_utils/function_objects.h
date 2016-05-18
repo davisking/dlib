@@ -17,7 +17,7 @@ namespace dlib
     struct squared_euclidean_distance
     {
         squared_euclidean_distance (
-        ) : 
+        ) :
             lower(0),
             upper(std::numeric_limits<double>::infinity())
         {}
@@ -38,7 +38,7 @@ namespace dlib
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             const double len = length_squared(a-b);
             if (lower <= len && len <= upper)
                 return len;
@@ -49,14 +49,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct cosine_distance 
+    struct cosine_distance
     {
         template <typename sample_type>
         double operator() (
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             const double temp = length(a)*length(b);
             if (temp == 0)
                 return 0;
@@ -67,37 +67,37 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct negative_dot_product_distance 
+    struct negative_dot_product_distance
     {
         template <typename sample_type>
         double operator() (
             const sample_type& a,
             const sample_type& b
         ) const
-        { 
+        {
             return -dot(a,b);
         }
     };
 
 // ----------------------------------------------------------------------------------------
 
-    struct use_weights_of_one 
+    struct use_weights_of_one
     {
         template <typename edge_type>
         double operator() (
             const edge_type&
         ) const
-        { 
+        {
             return 1;
         }
     };
 
 // ----------------------------------------------------------------------------------------
 
-    struct use_gaussian_weights 
+    struct use_gaussian_weights
     {
         use_gaussian_weights (
-        ) 
+        )
         {
             gamma = 0.1;
         }
@@ -115,7 +115,7 @@ namespace dlib
         double operator() (
             const edge_type& e
         ) const
-        { 
+        {
             return std::exp(-gamma*e.distance());
         }
     };

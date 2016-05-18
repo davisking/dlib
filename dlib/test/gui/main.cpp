@@ -28,7 +28,7 @@ typedef dlib::array2d<hsi_pixel> image;
 
 
 
-class color_box : public draggable 
+class color_box : public draggable
 {
     unsigned char red, green,blue;
 
@@ -215,7 +215,7 @@ class win : public drawable_window
     )
     {
         if (sb_enabled.is_checked())
-        { 
+        {
             sb.enable();
             lb.enable();
             b.enable();
@@ -269,7 +269,7 @@ class win : public drawable_window
 
     void tab_change (
         unsigned long new_idx,
-        unsigned long 
+        unsigned long
     )
     {
         tab_label.set_text(tabs.tab_name(new_idx));
@@ -304,7 +304,7 @@ class win : public drawable_window
     }
 
     void lb_double_click (
-        unsigned long 
+        unsigned long
     )
     {
         dlib::queue<unsigned long>::kernel_2a_c sel;
@@ -341,7 +341,7 @@ class win : public drawable_window
     }
 
 	static void try_this_junk2 (
-		void* 
+		void*
 		)
 	{
 
@@ -386,7 +386,7 @@ public:
     }
 
     win (
-    ): 
+    ):
         drawable_window(true),
         lbl_last_keydown(*this),
         lbl_mod_shift(*this),
@@ -547,7 +547,7 @@ public:
         //throw dlib::error("holy crap batman");
         tab_label.set_pos(10,440);
 
-        tabs.set_click_handler(*this,&win::tab_change); 
+        tabs.set_click_handler(*this,&win::tab_change);
         tabs.set_pos(5,mbar.bottom()+10);
         tabs.set_size(280,100);
         tabs.set_number_of_tabs(3);
@@ -669,8 +669,8 @@ public:
 
         nrect.wrap_around(
             cbox.get_rect() +
-            rb.get_rect() + 
-            sb_enabled.get_rect() + 
+            rb.get_rect() +
+            sb_enabled.get_rect() +
             sb_shown.get_rect());
 
         flip = 0;

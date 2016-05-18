@@ -14,10 +14,10 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dpotrf) (char *uplo, integer *n, double *a, 
+                void DLIB_FORTRAN_ID(dpotrf) (char *uplo, integer *n, double *a,
                                               integer* lda, integer *info);
 
-                void DLIB_FORTRAN_ID(spotrf) (char *uplo, integer *n, float *a, 
+                void DLIB_FORTRAN_ID(spotrf) (char *uplo, integer *n, float *a,
                                               integer* lda, integer *info);
 
             }
@@ -98,9 +98,9 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1,
-            long NC1, 
+            long NC1,
             typename MM
             >
         int potrf (
@@ -108,7 +108,7 @@ namespace dlib
             matrix<T,NR1,NC1,MM,column_major_layout>& a
         )
         {
-            // compute the actual decomposition 
+            // compute the actual decomposition
             int info = binding::potrf(uplo, a.nr(), &a(0,0), a.nr());
 
             // If it fails part way though the factorization then make sure
@@ -127,9 +127,9 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1,
-            long NC1, 
+            long NC1,
             typename MM
             >
         int potrf (
@@ -145,7 +145,7 @@ namespace dlib
             else
                 uplo = 'L';
 
-            // compute the actual decomposition 
+            // compute the actual decomposition
             int info = binding::potrf(uplo, a.nr(), &a(0,0), a.nr());
 
             // If it fails part way though the factorization then make sure

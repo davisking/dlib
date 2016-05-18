@@ -16,14 +16,14 @@ namespace dlib
         typename matrix_type_,
         typename feature_vector_type_ = matrix_type_
         >
-    class structural_svm_problem : public oca_problem<matrix_type_> 
+    class structural_svm_problem : public oca_problem<matrix_type_>
     {
     public:
         /*!
             REQUIREMENTS ON matrix_type_
                 - matrix_type_ == a dlib::matrix capable of storing column vectors
 
-            REQUIREMENTS ON feature_vector_type_ 
+            REQUIREMENTS ON feature_vector_type_
                 - feature_vector_type_ == a dlib::matrix capable of storing column vectors
                   or an unsorted sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
 
@@ -46,7 +46,7 @@ namespace dlib
                 complex outputs such as entire parse trees or DNA sequence alignments.  To
                 do this, it learns a function F(x,y) which measures how well a particular
                 data sample x matches a label y.  When used for prediction, the best label
-                for a new x is given by the y which maximizes F(x,y).   
+                for a new x is given by the y which maximizes F(x,y).
 
                 To use this object you inherit from it, provide implementations of its four
                 pure virtual functions, and then pass your object to the oca optimizer.
@@ -59,8 +59,8 @@ namespace dlib
 
                 To define the optimization problem precisely, we first introduce some notation:
                     - let PSI(x,y)    == the joint feature vector for input x and a label y.
-                    - let F(x,y|w)    == dot(w,PSI(x,y)).  
-                    - let LOSS(idx,y) == the loss incurred for predicting that the idx-th training 
+                    - let F(x,y|w)    == dot(w,PSI(x,y)).
+                    - let LOSS(idx,y) == the loss incurred for predicting that the idx-th training
                       sample has a label of y.  Note that LOSS() should always be >= 0 and should
                       become exactly 0 when y is the correct label for the idx-th sample.
                     - let x_i == the i-th training sample.
@@ -76,18 +76,18 @@ namespace dlib
 
                 
 
-                For an introduction to structured support vector machines you should consult 
-                the following paper: 
-                    Predicting Structured Objects with Support Vector Machines by 
+                For an introduction to structured support vector machines you should consult
+                the following paper:
+                    Predicting Structured Objects with Support Vector Machines by
                     Thorsten Joachims, Thomas Hofmann, Yisong Yue, and Chun-nam Yu
 
                 For a more detailed discussion of the particular algorithm implemented by this
-                object see the following paper:  
-                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural SVMs, 
+                object see the following paper:
+                    T. Joachims, T. Finley, Chun-Nam Yu, Cutting-Plane Training of Structural SVMs,
                     Machine Learning, 77(1):27-59, 2009.
 
                     Note that this object is essentially a tool for solving the 1-Slack structural
-                    SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced 
+                    SVM with margin-rescaling.  Specifically, see Algorithm 3 in the above referenced
                     paper.
         !*/
 
@@ -117,13 +117,13 @@ namespace dlib
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but take longer 
+                  Smaller values may result in a more accurate solution but take longer
                   to execute.  Specifically, the algorithm stops when the average sample
                   risk (i.e. R(w) as defined above) is within epsilon of its optimal value.
 
                   Also note that sample risk is an upper bound on a sample's loss.  So
                   you can think of this epsilon value as saying "solve the optimization
-                  problem until the average loss per sample is within epsilon of it's 
+                  problem until the average loss per sample is within epsilon of it's
                   optimal value".
         !*/
 
@@ -147,7 +147,7 @@ namespace dlib
                       problem to a high accuracy or their ranks may be difficult to
                       determine, so the extra accuracy given by the cache based refinement
                       is very useful.  Finally, note that we include the nuclear norm term
-                      as part of the "risk" for the purposes of determining when to stop.  
+                      as part of the "risk" for the purposes of determining when to stop.
                 - else
                     - The value of #get_cache_based_epsilon() has no effect.
         !*/
@@ -171,7 +171,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ); 
+        );
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -187,14 +187,14 @@ namespace dlib
         !*/
 
         unsigned long get_max_cache_size (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - Returns the number of joint feature vectors per training sample kept in 
-                  the separation oracle cache.  This cache is used to avoid unnecessary 
-                  calls to the user supplied separation_oracle() function.  Note that a 
-                  value of 0 means that caching is not used at all.  This is appropriate 
-                  if the separation oracle is cheap to evaluate. 
+                - Returns the number of joint feature vectors per training sample kept in
+                  the separation oracle cache.  This cache is used to avoid unnecessary
+                  calls to the user supplied separation_oracle() function.  Note that a
+                  value of 0 means that caching is not used at all.  This is appropriate
+                  if the separation oracle is cheap to evaluate.
         !*/
 
         void add_nuclear_norm_regularizer (
@@ -220,13 +220,13 @@ namespace dlib
                   function. In particular, the part of w included in the nuclear norm is
                   exactly the matrix reshape(rowm(w, range(first_dimension, first_dimension+rows*cols-1)), rows, cols).
                   Therefore, if you think of the w vector as being the concatenation of a
-                  bunch of matrices then you can use multiple calls to add_nuclear_norm_regularizer() 
+                  bunch of matrices then you can use multiple calls to add_nuclear_norm_regularizer()
                   to add nuclear norm regularization terms to any of the matrices packed into w.
                 - #num_nuclear_norm_regularizers() == num_nuclear_norm_regularizers() + 1
         !*/
 
         unsigned long num_nuclear_norm_regularizers (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of nuclear norm regularizers that are currently a part
@@ -247,7 +247,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -259,15 +259,15 @@ namespace dlib
         !*/
 
         scalar_type get_c (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter.  It is the parameter that 
-                  determines the trade off between trying to fit the training data 
-                  exactly or allowing more errors but hopefully improving the 
-                  generalization of the resulting classifier.  Larger values encourage 
-                  exact fitting while smaller values of C may encourage better 
-                  generalization. 
+                - returns the SVM regularization parameter.  It is the parameter that
+                  determines the trade off between trying to fit the training data
+                  exactly or allowing more errors but hopefully improving the
+                  generalization of the resulting classifier.  Larger values encourage
+                  exact fitting while smaller values of C may encourage better
+                  generalization.
         !*/
 
         void set_c (
@@ -295,12 +295,12 @@ namespace dlib
         ) const = 0;
         /*!
             ensures
-                - returns the number of training samples in this problem. 
+                - returns the number of training samples in this problem.
         !*/
 
         virtual void get_truth_joint_feature_vector (
             long idx,
-            feature_vector_type& psi 
+            feature_vector_type& psi
         ) const = 0;
         /*!
             requires
@@ -321,21 +321,21 @@ namespace dlib
                 - 0 <= idx < get_num_samples()
                 - current_solution.size() == get_num_dimensions()
             ensures
-                - runs the separation oracle on the idx-th sample.  We define this as follows: 
+                - runs the separation oracle on the idx-th sample.  We define this as follows:
                     - let X           == the idx-th training sample.
                     - let PSI(X,y)    == the joint feature vector for input X and an arbitrary label y.
-                    - let F(X,y)      == dot(current_solution,PSI(X,y)).  
+                    - let F(X,y)      == dot(current_solution,PSI(X,y)).
                     - let LOSS(idx,y) == the loss incurred for predicting that the idx-th sample
                       has a label of y.  Note that LOSS() should always be >= 0 and should
                       become exactly 0 when y is the correct label for the idx-th sample.
 
-                        Then the separation oracle finds a Y such that: 
-                            Y = argmax over all y: LOSS(idx,y) + F(X,y) 
+                        Then the separation oracle finds a Y such that:
+                            Y = argmax over all y: LOSS(idx,y) + F(X,y)
                             (i.e. It finds the label which maximizes the above expression.)
 
                         Finally, we can define the outputs of this function as:
-                        - #loss == LOSS(idx,Y) 
-                        - #psi == PSI(X,Y) 
+                        - #loss == LOSS(idx,Y)
+                        - #psi == PSI(X,Y)
         !*/
     };
 

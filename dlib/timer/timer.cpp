@@ -12,7 +12,7 @@ namespace dlib
 
     timer_global_clock::
     timer_global_clock(
-    ): 
+    ):
         s(m),
         shutdown(false),
         running(false)

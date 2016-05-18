@@ -143,8 +143,8 @@ namespace dlib
                     if (streambuf->sgetn(reinterpret_cast<char*>(&buf),1)==0)
                     {
                         // if there isn't anything else in the streambuffer then just
-                        // make buf zero.  
-                        buf = 0;      
+                        // make buf zero.
+                        buf = 0;
                     }
                 }
 
@@ -152,11 +152,11 @@ namespace dlib
                 --buf_used;
 
                 // roll off the bit in target
-                target <<= 1;  
+                target <<= 1;
 
                 // roll off the bit
                 high <<= 1;
-                low <<= 1;                
+                low <<= 1;
                 high |= 1;  // note that it is ok to add one to high here because
                             // of the convention that high == real upper range - 1.
                             // so that means that if we want to shift the upper range
@@ -167,8 +167,8 @@ namespace dlib
                 if (low == 0)
                     low = 1;
 
-                  // take a bit from buf to fill in the one we threw away                
-                target += (buf>>buf_used)&0x01;   
+                  // take a bit from buf to fill in the one we threw away
+                target += (buf>>buf_used)&0x01;
             }
             // if the distance between high and low is small and there aren't
             // any bits we can roll off then round low up or high down.
@@ -190,9 +190,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     bool entropy_decoder_kernel_1::
-    get_target_called (        
+    get_target_called (
     ) const
-    {           
+    {
         return (r != 0);
     }
 
@@ -201,11 +201,11 @@ namespace dlib
     uint32 entropy_decoder_kernel_1::
     get_target (
         uint32 total
-    ) 
-    {   
+    )
+    {
         // note that we must add one because of the convention that
         // high == the real upper range minus 1
-        r = (high-low+1)/total;                   
+        r = (high-low+1)/total;
         uint32 temp = (target-low)/r;
         if (temp < total)
             return temp;

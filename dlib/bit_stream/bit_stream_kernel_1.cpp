@@ -13,7 +13,7 @@ namespace dlib
 {
 
     inline void swap (
-        bit_stream_kernel_1& a, 
+        bit_stream_kernel_1& a,
         bit_stream_kernel_1& b
     ) { a.swap(b); }
 

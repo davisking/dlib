@@ -12,22 +12,22 @@ namespace dlib
     template <
         typename T
         >
-    class remover 
+    class remover
     {
 
         /*!
             REQUIREMENTS ON T
-                T is swappable by a global swap() and                
+                T is swappable by a global swap() and
                 T must have a default constructor
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                The size() function does not invalidate pointers or 
-                references to internal data.  All other functions have no such 
+                The size() function does not invalidate pointers or
+                references to internal data.  All other functions have no such
                 guarantee.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents some generalized interface for removing
-                single items from container classes.                  
+                single items from container classes.
         !*/
         
 
@@ -35,7 +35,7 @@ namespace dlib
             typedef T type;
 
             virtual ~remover(
-            ); 
+            );
             /*!
                 ensures
                     - all resources associated with *this have been released.
@@ -45,11 +45,11 @@ namespace dlib
                 T& item
             ) = 0;
             /*!
-                requires 
+                requires
                     - size() != 0
                 ensures
                     - #size() == size() - 1
-                    - removes an element from *this and swaps it into item.  
+                    - removes an element from *this and swaps it into item.
                     - if (*this implements the enumerable interface) then
                         - #at_start() == true
             !*/
@@ -77,14 +77,14 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T is swappable by a global swap() and                
+                T is swappable by a global swap() and
                 T must have a default constructor and
-                T must be comparable by compare where compare is a functor compatible with std::less 
+                T must be comparable by compare where compare is a functor compatible with std::less
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents the same thing as remover except
                 that remove_any() will remove elements in ascending order
-                according to the compare functor.  
+                according to the compare functor.
         !*/
     public:
         typedef compare compare_type;
@@ -100,12 +100,12 @@ namespace dlib
         typename domain,
         typename range
         >
-    class pair_remover 
+    class pair_remover
     {
 
         /*!
             REQUIREMENTS ON domain
-                domain is swappable by a global swap() and                
+                domain is swappable by a global swap() and
                 domain must have a default constructor
 
             REQUIREMENTS ON range
@@ -113,14 +113,14 @@ namespace dlib
                 range must have a default constructor
 
             POINTERS AND REFERENCES TO INTERNAL DATA
-                The size() function does not invalidate pointers or 
-                references to internal data.  All other functions have no such 
+                The size() function does not invalidate pointers or
+                references to internal data.  All other functions have no such
                 guarantee.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents some generalized interface for removing
                 pairs from container classes which enforce some kind of pairing on
-                the elements that they contain.  
+                the elements that they contain.
         !*/
         
         public:
@@ -128,7 +128,7 @@ namespace dlib
             typedef range range_type;
 
             virtual ~pair_remover(
-            ); 
+            );
             /*!
                 ensures
                     - all resources associated with *this have been released.
@@ -139,14 +139,14 @@ namespace dlib
                 range& r
             ) = 0;
             /*!
-                requires                     
-                    - &d != &r (i.e. d and r cannot be the same variable) 
+                requires
+                    - &d != &r (i.e. d and r cannot be the same variable)
                     - size() != 0
                 ensures
                     - #size() == size() - 1
                     - removes an element from the domain of *this and swaps it
-                      into d.  
-                    - removes the element in *this's range that is associated 
+                      into d.
+                    - removes the element in *this's range that is associated
                       with #d and swaps it into r.
                     - if (*this implements the enumerable interface) then
                         - #at_start() == true
@@ -156,7 +156,7 @@ namespace dlib
             ) const = 0;
             /*!
                 ensures
-                    - returns the number of elements in *this 
+                    - returns the number of elements in *this
             !*/
 
 
@@ -179,9 +179,9 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON domain
-                domain is swappable by a global swap() and                
+                domain is swappable by a global swap() and
                 domain must have a default constructor and
-                domain must be comparable by compare where compare is a functor compatible with std::less 
+                domain must be comparable by compare where compare is a functor compatible with std::less
 
             REQUIREMENTS ON range
                 range is swappable by a global swap() and
@@ -189,8 +189,8 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents the same thing as pair_remover except
-                that remove_any() will remove domain elements in ascending 
-                order according to the compare functor.  
+                that remove_any() will remove domain elements in ascending
+                order according to the compare functor.
         !*/
     public:
         typedef compare compare_type;

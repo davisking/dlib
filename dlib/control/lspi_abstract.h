@@ -39,7 +39,7 @@ namespace dlib
 
         explicit lspi(
             const feature_extractor& fe_
-        ); 
+        );
         /*!
             ensures
                 - #get_feature_extractor() == fe_
@@ -54,7 +54,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_feature_extractor() == feature_extractor() 
+                - #get_feature_extractor() == feature_extractor()
                   (i.e. it will have its default value)
                 - #get_lambda() == 0.01
                 - #get_discount == 0.8
@@ -92,7 +92,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -119,41 +119,41 @@ namespace dlib
             ensures
                 - returns the error epsilon that determines when training should stop.
                   Smaller values may result in a more accurate solution but take longer to
-                  train.  
+                  train.
         !*/
 
         void set_lambda (
-            double lambda_ 
-        ); 
+            double lambda_
+        );
         /*!
             requires
                 - lambda >= 0
             ensures
-                - #get_lambda() == lambda 
+                - #get_lambda() == lambda
         !*/
 
         double get_lambda (
         ) const;
         /*!
             ensures
-                - returns the regularization parameter.  It is the parameter that 
-                  determines the trade off between trying to fit the training data 
-                  exactly or allowing more errors but hopefully improving the 
-                  generalization ability of the resulting function.  Smaller values 
-                  encourage exact fitting while larger values of lambda may encourage 
-                  better generalization. 
+                - returns the regularization parameter.  It is the parameter that
+                  determines the trade off between trying to fit the training data
+                  exactly or allowing more errors but hopefully improving the
+                  generalization ability of the resulting function.  Smaller values
+                  encourage exact fitting while larger values of lambda may encourage
+                  better generalization.
         !*/
 
         void set_max_iterations (
             unsigned long max_iter
-        ); 
+        );
         /*!
             ensures
                 - #get_max_iterations() == max_iter
         !*/
 
         unsigned long get_max_iterations (
-        ); 
+        );
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -169,17 +169,17 @@ namespace dlib
         /*!
             requires
                 - samples.size() > 0
-                - samples is something with an interface that looks like 
+                - samples is something with an interface that looks like
                   std::vector<process_sample<feature_extractor>>.  That is, it should
                   be some kind of array of process_sample objects.
             ensures
                 - Trains a policy based on the given data and returns the results.  The
                   idea is to find a policy that will obtain the largest possible reward
-                  when run on the process that generated the samples.  In particular, 
+                  when run on the process that generated the samples.  In particular,
                   if the returned policy is P then:
                     - P(S) == the best action to take when in state S.
                     - if (feature_extractor::force_last_weight_to_1) then
-                        - The last element of P.get_weights() is 1. 
+                        - The last element of P.get_weights() is 1.
         !*/
 
     };

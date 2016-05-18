@@ -35,7 +35,7 @@ namespace dlib
         !*/
 
         ranking_pair(
-            const std::vector<T>& r, 
+            const std::vector<T>& r,
             const std::vector<T>& nr
         ) : relevant(r), nonrelevant(nr) {}
         /*!
@@ -64,7 +64,7 @@ namespace dlib
         >
     void deserialize (
         ranking_pair<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides deserialization support
@@ -87,7 +87,7 @@ namespace dlib
                 - for all valid i:
                     - samples[i].relevant.size() > 0
                     - samples[i].nonrelevant.size() > 0
-                - if (is_matrix<T>::value == true) then 
+                - if (is_matrix<T>::value == true) then
                     - All the elements of samples::nonrelevant and samples::relevant must
                       represent row or column vectors and they must be the same dimension.
     !*/
@@ -175,7 +175,7 @@ namespace dlib
               also returns the mean average precision.
             - In particular, this function returns a matrix M summarizing the results.
               Specifically, it returns an M such that:
-                - M(0) == the fraction of times that the following is true:                
+                - M(0) == the fraction of times that the following is true:
                     - funct(samples[k].relevant[i]) > funct(samples[k].nonrelevant[j])
                       (for all valid i,j,k)
                 - M(1) == the mean average precision of the rankings induced by funct.
@@ -203,7 +203,7 @@ namespace dlib
             - This is just a convenience routine for calling the above
               test_ranking_function() routine.  That is, it just copies sample into a
               std::vector object and invokes the above test_ranking_function() routine.
-              This means that calling this function is equivalent to invoking: 
+              This means that calling this function is equivalent to invoking:
                 return test_ranking_function(funct, std::vector<ranking_pair<T> >(1, sample));
     !*/
 

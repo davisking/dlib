@@ -8,7 +8,7 @@
 #include <dlib/rand.h>
 
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -29,7 +29,7 @@ namespace
         const static bool use_high_order_features = use_high_order_features_;
         const static bool allow_negative_weights = allow_negative_weights_;
 
-        typedef std::vector<unsigned long> sequence_type; 
+        typedef std::vector<unsigned long> sequence_type;
 
         std::map<unsigned long, matrix<double,0,1> > feats;
 

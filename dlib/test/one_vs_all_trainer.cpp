@@ -6,7 +6,7 @@
 #include <vector>
 #include <sstream>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -57,7 +57,7 @@ namespace
                 m(0) = 2*radius*rnd.get_random_double()-radius;
                 m(1) = sign*sqrt(radius*radius - m(0)*m(0));
 
-                // add this sample to our set of samples we will run k-means 
+                // add this sample to our set of samples we will run k-means
                 samples.push_back(m);
                 labels.push_back(1);
             }
@@ -72,12 +72,12 @@ namespace
                 m(0) = 2*radius*rnd.get_random_double()-radius;
                 m(1) = sign*sqrt(radius*radius - m(0)*m(0));
 
-                // add this sample to our set of samples we will run k-means 
+                // add this sample to our set of samples we will run k-means
                 samples.push_back(m);
                 labels.push_back(2);
             }
 
-            // make some samples in a circle around the point (25,25) 
+            // make some samples in a circle around the point (25,25)
             radius = 4.0;
             for (long i = 0; i < num+30; ++i)
             {
@@ -91,7 +91,7 @@ namespace
                 m(0) += 25;
                 m(1) += 25;
 
-                // add this sample to our set of samples we will run k-means 
+                // add this sample to our set of samples we will run k-means
                 samples.push_back(m);
                 labels.push_back(3);
             }
@@ -134,13 +134,13 @@ namespace
             print_spinner();
 
             matrix<scalar_type> ans(3,3);
-            ans = 60,  0,  0, 
-                  0, 70,  0, 
+            ans = 60,  0,  0,
+                  0, 70,  0,
                   0,  0, 80;
 
             DLIB_TEST_MSG(ans == res, "res: \n" << res);
 
-            // test using a normalized_function with a one_vs_all_decision_function 
+            // test using a normalized_function with a one_vs_all_decision_function
             {
                 poly_trainer.set_kernel(poly_kernel(1.1, 1, 2));
                 trainer.set_trainer(poly_trainer, 1);
@@ -168,7 +168,7 @@ namespace
             DLIB_TEST(df(samples[90])  == labels[90]);
 
 
-            one_vs_all_decision_function<ova_trainer, 
+            one_vs_all_decision_function<ova_trainer,
                 decision_function<poly_kernel>,  // This is the output of the poly_trainer
                 decision_function<rbf_kernel>    // This is the output of the rbf_trainer
             > df2, df3;
@@ -179,7 +179,7 @@ namespace
             serialize(df2, fout);
             fout.close();
 
-            // load the function back in from disk and store it in df3.  
+            // load the function back in from disk and store it in df3.
             ifstream fin("df.dat", ios::binary);
             deserialize(df3, fin);
 
@@ -230,8 +230,8 @@ namespace
             print_spinner();
 
             matrix<scalar_type> ans(3,3);
-            ans = 60,  0,  0, 
-                  0, 70,  0, 
+            ans = 60,  0,  0,
+                  0, 70,  0,
                   0,  0, 80;
 
             DLIB_TEST_MSG(ans == res, "res: \n" << res);
@@ -244,7 +244,7 @@ namespace
             DLIB_TEST(df(samples[90])  == labels[90]);
 
 
-            one_vs_all_decision_function<ova_trainer, 
+            one_vs_all_decision_function<ova_trainer,
                 probabilistic_function<decision_function<poly_kernel> >,  // This is the output of the poly_trainer
                 probabilistic_function<decision_function<rbf_kernel> >    // This is the output of the rbf_trainer
             > df2, df3;
@@ -255,7 +255,7 @@ namespace
             serialize(df2, fout);
             fout.close();
 
-            // load the function back in from disk and store it in df3.  
+            // load the function back in from disk and store it in df3.
             ifstream fin("df.dat", ios::binary);
             deserialize(df3, fin);
 

@@ -50,7 +50,7 @@ namespace dlib
         typedef Box_generator box_generator;
 
         scan_image_boxes (
-        );  
+        );
 
         template <
             typename image_type
@@ -71,7 +71,7 @@ namespace dlib
         );
 
         const box_generator& get_box_generator (
-        ) const { return detect_boxes; } 
+        ) const { return detect_boxes; }
 
         const Feature_extractor_type& get_feature_extractor (
         ) const { return feats; }
@@ -129,7 +129,7 @@ namespace dlib
         template <typename T, typename U>
         friend void deserialize (
             scan_image_boxes<T,U>& item,
-            std::istream& in 
+            std::istream& in
         );
 
     private:
@@ -172,7 +172,7 @@ namespace dlib
             const rectangle& object_box,
             unsigned int cells_x,
             unsigned int cells_y
-        ) 
+        )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(cells_x > 0 && cells_y > 0,
@@ -199,7 +199,7 @@ namespace dlib
         void get_feature_extraction_regions (
             const rectangle& rect,
             std::vector<rectangle>& regions
-        ) const 
+        ) const
         /*!
             ensures
                 - #regions.size() is always the same number no matter what the input is.  The
@@ -255,7 +255,7 @@ namespace dlib
     template <typename T, typename U>
     void deserialize (
         scan_image_boxes<T,U>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         int version = 0;
@@ -354,7 +354,7 @@ namespace dlib
         >
     void scan_image_boxes<Feature_extractor_type,Box_generator>::
     copy_configuration(
-        const box_generator& bg 
+        const box_generator& bg
     )
     {
         detect_boxes = bg;
@@ -398,13 +398,13 @@ namespace dlib
     void scan_image_boxes<Feature_extractor_type,Box_generator>::
     set_num_spatial_pyramid_levels (
         unsigned long levels
-    ) 
+    )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(levels > 0, 
+        DLIB_ASSERT(levels > 0,
             "\t void scan_image_boxes::set_num_spatial_pyramid_levels()"
             << "\n\t Invalid inputs were given to this function "
-            << "\n\t levels: " << levels 
+            << "\n\t levels: " << levels
             << "\n\t this: " << this
             );
         
@@ -440,7 +440,7 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(is_loaded_with_image() &&
-                    w.size() >= get_num_dimensions(), 
+                    w.size() >= get_num_dimensions(),
             "\t void scan_image_boxes::detect()"
             << "\n\t Invalid inputs were given to this function "
             << "\n\t is_loaded_with_image(): " << is_loaded_with_image()
@@ -455,7 +455,7 @@ namespace dlib
 
         array2d<double> temp_img(feats.nr(), feats.nc());
 
-        // build saliency images  
+        // build saliency images
         for (unsigned long i = 0; i < saliency_images.size(); ++i)
         {
             const unsigned long offset = 2*box_sizedims + feats.get_num_dimensions()*i;

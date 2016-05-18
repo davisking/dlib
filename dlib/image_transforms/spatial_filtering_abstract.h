@@ -29,12 +29,12 @@ namespace dlib
     /*!
         requires
             - in_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - out_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - in_img and out_img do not contain pixels with an alpha channel.  That is,
               pixel_traits::has_alpha is false for the pixels in these objects.
-            - is_same_object(in_img, out_img) == false 
+            - is_same_object(in_img, out_img) == false
             - T must be some scalar type
             - filter.size() != 0
             - scale != 0
@@ -43,12 +43,12 @@ namespace dlib
                   (i.e. You can only use the use_abs and add_to options with grayscale images)
         ensures
             - Applies the given spatial filter to in_img and stores the result in out_img (i.e.
-              cross-correlates in_img with filter).  Also divides each resulting pixel by scale.  
+              cross-correlates in_img with filter).  Also divides each resulting pixel by scale.
             - The intermediate filter computations will be carried out using variables of type EXP::type.
-              This is whatever scalar type is used inside the filter matrix. 
+              This is whatever scalar type is used inside the filter matrix.
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
-              any applicable color space conversion or value saturation is performed.  Note that if 
-              add_to is true then the filtered output value will be added to out_img rather than 
+              any applicable color space conversion or value saturation is performed.  Note that if
+              add_to is true then the filtered output value will be added to out_img rather than
               overwriting the original value.
             - if (in_img doesn't contain grayscale pixels) then
                 - The filter is applied to each color channel independently.
@@ -60,11 +60,11 @@ namespace dlib
               that writes its output to a pixel at location point(c,r) and is W by H (width
               by height) pixels in size operates on exactly the pixels in the rectangle
               centered_rect(point(c,r),W,H) within in_img.
-            - Pixels close enough to the edge of in_img to not have the filter still fit 
+            - Pixels close enough to the edge of in_img to not have the filter still fit
               inside the image are always set to zero.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
-            - returns a rectangle which indicates what pixels in #out_img are considered 
+            - returns a rectangle which indicates what pixels in #out_img are considered
               non-border pixels and therefore contain output from the filter.
             - if (use_abs == false && all images and filers contain float types) then
                 - This function will use SIMD instructions and is particularly fast.  So if
@@ -92,12 +92,12 @@ namespace dlib
     /*!
         requires
             - in_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - out_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - in_img and out_img do not contain pixels with an alpha channel.  That is,
               pixel_traits::has_alpha is false for the pixels in these objects.
-            - is_same_object(in_img, out_img) == false 
+            - is_same_object(in_img, out_img) == false
             - T must be some scalar type
             - scale != 0
             - row_filter.size() != 0
@@ -108,16 +108,16 @@ namespace dlib
                 - use_abs == false && add_to == false
                   (i.e. You can only use the use_abs and add_to options with grayscale images)
         ensures
-            - Applies the given separable spatial filter to in_img and stores the result in out_img.  
+            - Applies the given separable spatial filter to in_img and stores the result in out_img.
               Also divides each resulting pixel by scale.  Calling this function has the same
               effect as calling the regular spatially_filter_image() routine with a filter,
-              FILT, defined as follows: 
+              FILT, defined as follows:
                 - FILT(r,c) == col_filter(r)*row_filter(c)
             - The intermediate filter computations will be carried out using variables of type EXP1::type.
-              This is whatever scalar type is used inside the row_filter matrix. 
+              This is whatever scalar type is used inside the row_filter matrix.
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
-              any applicable color space conversion or value saturation is performed.  Note that if 
-              add_to is true then the filtered output value will be added to out_img rather than 
+              any applicable color space conversion or value saturation is performed.  Note that if
+              add_to is true then the filtered output value will be added to out_img rather than
               overwriting the original value.
             - if (in_img doesn't contain grayscale pixels) then
                 - The filter is applied to each color channel independently.
@@ -129,11 +129,11 @@ namespace dlib
               the filter that writes its output to a pixel at location point(c,r) and is W
               by H (width by height) pixels in size operates on exactly the pixels in the
               rectangle centered_rect(point(c,r),W,H) within in_img.
-            - Pixels close enough to the edge of in_img to not have the filter still fit 
+            - Pixels close enough to the edge of in_img to not have the filter still fit
               inside the image are always set to zero.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
-            - returns a rectangle which indicates what pixels in #out_img are considered 
+            - returns a rectangle which indicates what pixels in #out_img are considered
               non-border pixels and therefore contain output from the filter.
             - if (use_abs == false && all images and filers contain float types) then
                 - This function will use SIMD instructions and is particularly fast.  So if
@@ -159,11 +159,11 @@ namespace dlib
     /*!
         requires
             - in_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - out_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - in_img, out_img, row_filter, and col_filter must all contain float type elements.
-            - is_same_object(in_img, out_img) == false 
+            - is_same_object(in_img, out_img) == false
             - row_filter.size() != 0
             - col_filter.size() != 0
             - is_vector(row_filter) == true
@@ -204,13 +204,13 @@ namespace dlib
     /*!
         requires
             - in_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - out_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - in_img and out_img do not contain pixels with an alpha channel.  That is,
               pixel_traits::has_alpha is false for the pixels in these objects.
             - out_img contains grayscale pixels.
-            - is_same_object(in_img, out_img) == false 
+            - is_same_object(in_img, out_img) == false
             - T must be some scalar type
             - scale != 0
             - is_vector(row_filter) == true
@@ -219,14 +219,14 @@ namespace dlib
             - col_filter.size() % 2 == 1  (i.e. must be odd)
             - downsample > 0
         ensures
-            - This function is equivalent to calling 
+            - This function is equivalent to calling
               spatially_filter_image_separable(in_img,out_img,row_filter,col_filter,scale,use_abs,add_to)
-              and then downsampling the output image by a factor of downsample.  Therefore, 
+              and then downsampling the output image by a factor of downsample.  Therefore,
               we will have that:
                 - #out_img.nr() == ceil((double)in_img.nr()/downsample)
                 - #out_img.nc() == ceil((double)in_img.nc()/downsample)
                 - #out_img[r][c] == filtered pixel corresponding to in_img[r*downsample][c*downsample]
-            - returns a rectangle which indicates what pixels in #out_img are considered 
+            - returns a rectangle which indicates what pixels in #out_img are considered
               non-border pixels and therefore contain output from the filter.
             - Note that the first row and column of non-zero padded data are the following
                 - first_row == ceil(floor(col_filter.size()/2.0)/downsample)
@@ -247,21 +247,21 @@ namespace dlib
         const in_image_type& img,
         const long& r,
         const long& c,
-        const U& fe1, 
-        const U& fm,  
-        const U& fe2 
+        const U& fe1,
+        const U& fm,
+        const U& fe2
     );
     /*!
         requires
             - in_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - T and U should be scalar types
             - shrink_rect(get_rect(img),1).contains(c,r)
             - shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1)
         ensures
-            - Filters the image in the sub-window of img defined by a rectangle 
+            - Filters the image in the sub-window of img defined by a rectangle
               with its upper left corner at (c,r) and lower right at (c+NC-1,r+NR-1).
-            - The output of the filter is stored in #block.  Note that img will be 
+            - The output of the filter is stored in #block.  Note that img will be
               interpreted as a grayscale image.
             - The filter used is defined by the separable filter [fe1 fm fe2].  So the
               spatial filter is thus:
@@ -284,14 +284,14 @@ namespace dlib
         const in_image_type& img,
         const long& r,
         const long& c,
-        const U& fe1, 
-        const U& fm, 
+        const U& fe1,
+        const U& fm,
         const U& fe2
     );
     /*!
         requires
             - in_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - img must contain RGB pixels, that is pixel_traits::rgb == true for the pixels
               in img.
             - T should be a struct with .red .green and .blue members.
@@ -299,7 +299,7 @@ namespace dlib
             - shrink_rect(get_rect(img),1).contains(c,r)
             - shrink_rect(get_rect(img),1).contains(c+NC-1,r+NR-1)
         ensures
-            - Filters the image in the sub-window of img defined by a rectangle 
+            - Filters the image in the sub-window of img defined by a rectangle
               with its upper left corner at (c,r) and lower right at (c+NC-1,r+NR-1).
             - The output of the filter is stored in #block.  Note that the filter is applied
               to each color component independently.
@@ -313,14 +313,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline double gaussian (
-        double x, 
+        double x,
         double sigma
     );
     /*!
         requires
             - sigma > 0
         ensures
-            - computes and returns the value of a 1D Gaussian function with mean 0 
+            - computes and returns the value of a 1D Gaussian function with mean 0
               and standard deviation sigma at the given x value.
     !*/
 
@@ -331,19 +331,19 @@ namespace dlib
         >
     matrix<T,0,1> create_gaussian_filter (
         double sigma,
-        int size 
+        int size
     );
     /*!
         requires
             - sigma > 0
-            - size > 0 
+            - size > 0
             - size is an odd number
         ensures
             - returns a separable Gaussian filter F such that:
-                - is_vector(F) == true 
-                - F.size() == size 
+                - is_vector(F) == true
+                - F.size() == size
                 - F is suitable for use with the spatially_filter_image_separable() routine
-                  and its use with this function corresponds to running a Gaussian filter 
+                  and its use with this function corresponds to running a Gaussian filter
                   of sigma width over an image.
     !*/
 
@@ -362,36 +362,36 @@ namespace dlib
     /*!
         requires
             - in_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - out_image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - in_img and out_img do not contain pixels with an alpha channel.  That is,
               pixel_traits::has_alpha is false for the pixels in these objects.
-            - is_same_object(in_img, out_img) == false 
+            - is_same_object(in_img, out_img) == false
             - sigma > 0
             - max_size > 0
             - max_size is an odd number
         ensures
             - Filters in_img with a Gaussian filter of sigma width.  The actual spatial filter will
               be applied to pixel blocks that are at most max_size wide and max_size tall (note that
-              this function will automatically select a smaller block size as appropriate).  The 
+              this function will automatically select a smaller block size as appropriate).  The
               results are stored into #out_img.
             - Pixel values are stored into out_img using the assign_pixel() function and therefore
               any applicable color space conversion or value saturation is performed.
             - if (in_img doesn't contain grayscale pixels) then
                 - The filter is applied to each color channel independently.
-            - Pixels close enough to the edge of in_img to not have the filter still fit 
+            - Pixels close enough to the edge of in_img to not have the filter still fit
               inside the image are set to zero.
             - #out_img.nc() == in_img.nc()
             - #out_img.nr() == in_img.nr()
-            - returns a rectangle which indicates what pixels in #out_img are considered 
+            - returns a rectangle which indicates what pixels in #out_img are considered
               non-border pixels and therefore contain output from the filter.
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type1, 
+        typename image_type1,
         typename image_type2
         >
     void sum_filter (
@@ -401,7 +401,7 @@ namespace dlib
     );
     /*!
         requires
-            - out.nr() == img.nr() 
+            - out.nr() == img.nr()
             - out.nc() == img.nc()
             - image_type1 == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h and it must contain grayscale pixels.
@@ -410,7 +410,7 @@ namespace dlib
             - is_same_object(img,out) == false
         ensures
             - for all valid r and c:
-                - let SUM(r,c) == sum of pixels from img which are inside the rectangle 
+                - let SUM(r,c) == sum of pixels from img which are inside the rectangle
                   translate_rect(rect, point(c,r)).
                 - #out[r][c] == out[r][c] + SUM(r,c)
     !*/
@@ -418,7 +418,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type1, 
+        typename image_type1,
         typename image_type2
         >
     void sum_filter_assign (
@@ -434,10 +434,10 @@ namespace dlib
               dlib/image_processing/generic_image.h and it must contain grayscale pixels.
             - is_same_object(img,out) == false
         ensures
-            - #out.nr() == img.nr() 
+            - #out.nr() == img.nr()
             - #out.nc() == img.nc()
             - for all valid r and c:
-                - let SUM(r,c) == sum of pixels from img which are inside the rectangle 
+                - let SUM(r,c) == sum of pixels from img which are inside the rectangle
                   translate_rect(rect, point(c,r)).
                 - #out[r][c] == SUM(r,c)
     !*/
@@ -445,7 +445,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type1, 
+        typename image_type1,
         typename image_type2
         >
     void max_filter (
@@ -457,7 +457,7 @@ namespace dlib
     );
     /*!
         requires
-            - out.nr() == img.nr() 
+            - out.nr() == img.nr()
             - out.nc() == img.nc()
             - image_type1 == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h and it must contain grayscale pixels.
@@ -467,16 +467,16 @@ namespace dlib
             - width > 0 && height > 0
         ensures
             - for all valid r and c:
-                - let MAX(r,c) == maximum of pixels from img which are inside the rectangle 
+                - let MAX(r,c) == maximum of pixels from img which are inside the rectangle
                   centered_rect(point(c,r), width, height)
                 - if (MAX(r,c) >= thresh)
                     - #out[r][c] == out[r][c] + MAX(r,c)
                 - else
-                    - #out[r][c] == out[r][c] + thresh 
+                    - #out[r][c] == out[r][c] + thresh
             - Does not change the size of img.
             - Uses img as scratch space.  Therefore, the pixel values in img will have
               been modified by this function.  That is, max_filter() destroys the contents
-              of img. 
+              of img.
     !*/
 
 // ----------------------------------------------------------------------------------------

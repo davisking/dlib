@@ -12,9 +12,9 @@ namespace dlib
 
     template <
         unsigned long alphabet_size,
-        typename entropy_encoder 
+        typename entropy_encoder
         >
-    class entropy_encoder_model_kernel_6 
+    class entropy_encoder_model_kernel_6
     {
         /*!
             INITIAL VALUE
@@ -59,7 +59,7 @@ namespace dlib
         entropy_encoder_model_kernel_6(entropy_encoder_model_kernel_6<alphabet_size,entropy_encoder>&);        // copy constructor
         entropy_encoder_model_kernel_6<alphabet_size,entropy_encoder>& operator=(entropy_encoder_model_kernel_6<alphabet_size,entropy_encoder>&);    // assignment operator
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -69,12 +69,12 @@ namespace dlib
 
     template <
         unsigned long alphabet_size,
-        typename entropy_encoder 
+        typename entropy_encoder
         >
     entropy_encoder_model_kernel_6<alphabet_size,entropy_encoder>::
     entropy_encoder_model_kernel_6 (
         entropy_encoder& coder_
-    ) : 
+    ) :
         coder(coder_)
     {
         COMPILE_TIME_ASSERT( 1 < alphabet_size && alphabet_size < 65535 );
@@ -84,7 +84,7 @@ namespace dlib
 
     template <
         unsigned long alphabet_size,
-        typename entropy_encoder 
+        typename entropy_encoder
         >
     entropy_encoder_model_kernel_6<alphabet_size,entropy_encoder>::
     ~entropy_encoder_model_kernel_6 (
@@ -96,7 +96,7 @@ namespace dlib
 
     template <
         unsigned long alphabet_size,
-        typename entropy_encoder 
+        typename entropy_encoder
         >
     void entropy_encoder_model_kernel_6<alphabet_size,entropy_encoder>::
     clear(
@@ -108,7 +108,7 @@ namespace dlib
 
     template <
         unsigned long alphabet_size,
-        typename entropy_encoder 
+        typename entropy_encoder
         >
     void entropy_encoder_model_kernel_6<alphabet_size,entropy_encoder>::
     encode (
@@ -116,7 +116,7 @@ namespace dlib
     )
     {
         // use order minus one context
-        coder.encode(symbol,symbol+1,alphabet_size);  
+        coder.encode(symbol,symbol+1,alphabet_size);
     }
 
 // ----------------------------------------------------------------------------------------

@@ -76,9 +76,9 @@ namespace dlib
 
     public:
 
-        class decompression_error : public dlib::error 
-        { 
-            public: 
+        class decompression_error : public dlib::error
+        {
+            public:
                 decompression_error(
                     const char* i
                 ) :
@@ -153,7 +153,7 @@ namespace dlib
         fce_length model_length(coder);
         fce_index model_index(coder);
 
-        const unsigned long LOOKAHEAD_LIMIT = 512; 
+        const unsigned long LOOKAHEAD_LIMIT = 512;
         lz77_buffer buffer(15,LOOKAHEAD_LIMIT);
         
         crc32 crc;
@@ -194,15 +194,15 @@ namespace dlib
             unsigned long sum = ppm_count + lz77_count;
             if (sum >= 65536)
             {
-                ppm_count >>= 1;                    
+                ppm_count >>= 1;
                 lz77_count >>= 1;
                 ppm_count |= 1;
                 lz77_count |= 1;
-                sum = ppm_count+lz77_count;                    
+                sum = ppm_count+lz77_count;
             }
 
             // if there are still more symbols in the lookahead buffer to encode
-            if (buffer.get_lookahead_buffer_size() > 0)  
+            if (buffer.get_lookahead_buffer_size() > 0)
             {
                 unsigned long match_index, match_length;
                 buffer.find_match(match_index,match_length,6);
@@ -214,25 +214,25 @@ namespace dlib
                     ++lz77_count;
                     
                     // encode the index and length pair
-                    model_index.encode(match_index);                   
-                    model_length.encode(match_length);                   
+                    model_index.encode(match_index);
+                    model_length.encode(match_length);
 
                 }
                 else
                 {
 
-                    // signal the decoder that we are using ppm 
+                    // signal the decoder that we are using ppm
                     coder.encode(lz77_count,sum,sum);
                     ++ppm_count;
 
                     // encode the symbol using the ppm model
                     model.encode(buffer.lookahead_buffer(0));
-                    buffer.shift_buffers(1);                    
+                    buffer.shift_buffers(1);
                 }
             }
             else
             {
-                // signal the decoder that we are using ppm 
+                // signal the decoder that we are using ppm
                 coder.encode(lz77_count,sum,sum);
                 
 
@@ -249,9 +249,9 @@ namespace dlib
                 model.encode(byte3);
                 model.encode(byte4);
 
-                break;      
+                break;
             }
-        } // while (true)        
+        } // while (true)
     }
 
 // ----------------------------------------------------------------------------------------
@@ -323,11 +323,11 @@ namespace dlib
             unsigned long sum = ppm_count + lz77_count;
             if (sum >= 65536)
             {
-                ppm_count >>= 1;                    
+                ppm_count >>= 1;
                 lz77_count >>= 1;
                 ppm_count |= 1;
                 lz77_count |= 1;
-                sum = ppm_count+lz77_count;                    
+                sum = ppm_count+lz77_count;
             }
 
             // check if we are decoding a lz77 or ppm block

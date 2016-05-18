@@ -26,7 +26,7 @@ namespace dlib
             - dists == trans(dists)
               (l.e. dists should be symmetric)
         ensures
-            - Runs a bottom up agglomerative clustering algorithm.   
+            - Runs a bottom up agglomerative clustering algorithm.
             - Interprets dists as a matrix that gives the distances between dists.nr()
               items.  In particular, we take dists(i,j) to be the distance between the ith
               and jth element of some set.  This function clusters the elements of this set
@@ -37,9 +37,9 @@ namespace dlib
             - #labels.size() == dists.nr()
             - for all valid i:
                 - #labels[i] == the cluster ID of the node with index i (i.e. the node
-                  corresponding to the distances dists(i,*)).  
+                  corresponding to the distances dists(i,*)).
                 - 0 <= #labels[i] < the number of clusters found
-                  (i.e. cluster IDs are assigned contiguously and start at 0) 
+                  (i.e. cluster IDs are assigned contiguously and start at 0)
     !*/
 
 // ----------------------------------------------------------------------------------------

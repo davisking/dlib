@@ -10,7 +10,7 @@
 #include "tester.h"
 
 #include "cmd_line_parser.h"
-namespace  
+namespace
 {
 
     class cmd_line_parser_tester : public tester

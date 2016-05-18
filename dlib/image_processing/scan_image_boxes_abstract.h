@@ -48,7 +48,7 @@ namespace dlib
     inline void deserialize(      default_box_generator&, std::istream& ) {}
     /*!
         ensures
-            - provides serialization support.  
+            - provides serialization support.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -61,9 +61,9 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON Feature_extractor_type
-                - must be an object with an interface compatible with the hashed_feature_image 
-                  object defined in dlib/image_keypoint/hashed_feature_image_abstract.h or 
-                  with the nearest_neighbor_feature_image object defined in 
+                - must be an object with an interface compatible with the hashed_feature_image
+                  object defined in dlib/image_keypoint/hashed_feature_image_abstract.h or
+                  with the nearest_neighbor_feature_image object defined in
                   dlib/image_keypoint/nearest_neighbor_feature_image_abstract.h
 
             REQUIREMENTS ON Box_generator
@@ -77,7 +77,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for running a classifier over an image with the goal
                 of localizing each object present.  The localization is in the form of the
-                bounding box around each object of interest.  
+                bounding box around each object of interest.
 
                 Unlike the scan_image_pyramid object which scans a fixed sized window over
                 an image pyramid, the scan_image_boxes tool allows you to define your own
@@ -86,16 +86,16 @@ namespace dlib
                 The scan_image_boxes object will then evaluate the classifier at each of
                 these locations and return the subset of rectangles which appear to have
                 objects in them.  The candidate object location generation is provided by
-                the Box_generator that is passed in as a template argument.  
+                the Box_generator that is passed in as a template argument.
 
                 This object can also be understood as a general tool for implementing the
                 spatial pyramid models described in the paper:
-                    Beyond Bags of Features: Spatial Pyramid Matching for Recognizing 
-                    Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid, 
+                    Beyond Bags of Features: Spatial Pyramid Matching for Recognizing
+                    Natural Scene Categories by Svetlana Lazebnik, Cordelia Schmid,
                     and Jean Ponce
 
 
-                The classifiers used by this object have three parts: 
+                The classifiers used by this object have three parts:
                    1. The underlying feature extraction provided by Feature_extractor_type
                       objects, which associate a vector with each location in an image.
 
@@ -144,7 +144,7 @@ namespace dlib
         typedef Box_generator box_generator;
 
         scan_image_boxes (
-        );  
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -181,8 +181,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns a const reference to the feature_extractor_type object used 
-                  internally for local feature extraction.  
+                - returns a const reference to the feature_extractor_type object used
+                  internally for local feature extraction.
         !*/
 
         void copy_configuration(
@@ -219,9 +219,9 @@ namespace dlib
         );
         /*!
             ensures
-                - Copies all the state information of item into *this, except for state 
-                  information populated by load().  More precisely, given two scan_image_boxes 
-                  objects S1 and S2, the following sequence of instructions should always 
+                - Copies all the state information of item into *this, except for state
+                  information populated by load().  More precisely, given two scan_image_boxes
+                  objects S1 and S2, the following sequence of instructions should always
                   result in both of them having the exact same state:
                     S2.copy_configuration(S1);
                     S1.load(img);
@@ -278,11 +278,11 @@ namespace dlib
                   THIS OBJECT REPRESENTS section and stores all detections into #dets.
                 - for all valid i:
                     - #dets[i].second == The candidate object location which produced this
-                      detection.  This rectangle gives the location of the detection.  
+                      detection.  This rectangle gives the location of the detection.
                     - #dets[i].first == The score for this detection.  This value is equal
                       to dot(w, feature vector for this candidate object location).
                     - #dets[i].first >= thresh
-                - #dets will be sorted in descending order. 
+                - #dets will be sorted in descending order.
                   (i.e.  #dets[i].first >= #dets[j].first for all i, and j>i)
                 - Elements of w beyond index get_num_dimensions()-1 are ignored.  I.e. only
                   the first get_num_dimensions() are used.
@@ -296,7 +296,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - obj.num_parts() == 0 
+                - obj.num_parts() == 0
                 - is_loaded_with_image() == true
                 - psi.size() >= get_num_dimensions()
                   (i.e. psi must have preallocated its memory before this function is called)
@@ -344,8 +344,8 @@ namespace dlib
         ) const { return 1; }
         /*!
             ensures
-                - returns 1.  Note that this function is here only for compatibility with 
-                  the scan_image_pyramid object.  Notionally, its return value indicates 
+                - returns 1.  Note that this function is here only for compatibility with
+                  the scan_image_pyramid object.  Notionally, its return value indicates
                   that a scan_image_boxes object is always ready to detect objects once
                   an image has been loaded.
         !*/
@@ -364,26 +364,26 @@ namespace dlib
 
     template <
         typename Feature_extractor_type,
-        typename Box_generator 
+        typename Box_generator
         >
     void serialize (
         const scan_image_boxes<Feature_extractor_type,Box_generator>& item,
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     template <
         typename Feature_extractor_type,
-        typename Box_generator 
+        typename Box_generator
         >
     void deserialize (
         scan_image_boxes<Feature_extractor_type,Box_generator>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

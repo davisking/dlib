@@ -1,22 +1,22 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 // This code was adapted from code from the JAMA part of NIST's TNT library.
-//    See: http://math.nist.gov/tnt/ 
+//    See: http://math.nist.gov/tnt/
 #ifndef DLIB_MATRIX_LU_DECOMPOSITION_H
 #define DLIB_MATRIX_LU_DECOMPOSITION_H
 
-#include "matrix.h" 
+#include "matrix.h"
 #include "matrix_utilities.h"
 #include "matrix_subexp.h"
 #include "matrix_trsm.h"
 #include <algorithm>
 
-#ifdef DLIB_USE_LAPACK 
+#ifdef DLIB_USE_LAPACK
 #include "lapack/getrf.h"
 #endif
 
 
-namespace dlib 
+namespace dlib
 {
 
     template <
@@ -38,7 +38,7 @@ namespace dlib
 
         // You have supplied an invalid type of matrix_exp_type.  You have
         // to use this object with matrices that contain float or double type data.
-        COMPILE_TIME_ASSERT((is_same_type<float, type>::value || 
+        COMPILE_TIME_ASSERT((is_same_type<float, type>::value ||
                              is_same_type<double, type>::value ));
 
         template <typename EXP>
@@ -59,7 +59,7 @@ namespace dlib
         ) const;
 
         const matrix_type get_l (
-        ) const; 
+        ) const;
 
         const matrix_type get_u (
         ) const;
@@ -79,11 +79,11 @@ namespace dlib
 
         /* Array for internal storage of decomposition.  */
         matrix<type,0,0,mem_manager_type,column_major_layout>  LU;
-        long m, n, pivsign; 
+        long m, n, pivsign;
         pivot_column_vector_type piv;
 
 
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ namespace dlib
     lu_decomposition<matrix_exp_type>::
     lu_decomposition (
         const matrix_exp<EXP>& A
-    ) : 
+    ) :
         LU(A),
         m(A.nr()),
         n(A.nc())
@@ -145,21 +145,21 @@ namespace dlib
         column_vector_type LUcolj(m);
 
         // Outer loop.
-        for (long j = 0; j < n; j++) 
+        for (long j = 0; j < n; j++)
         {
 
             // Make a copy of the j-th column to localize references.
             LUcolj = colm(LU,j);
 
             // Apply previous transformations.
-            for (long i = 0; i < m; i++) 
+            for (long i = 0; i < m; i++)
             {
                 // Most of the time is spent in the following dot product.
                 const long kmax = std::min(i,j);
                 type s;
                 if (kmax > 0)
                     s = rowm(LU,i, kmax)*colm(LUcolj,0,kmax);
-                else 
+                else
                     s = 0;
 
                 LU(i,j) = LUcolj(i) -= s;
@@ -167,32 +167,32 @@ namespace dlib
 
             // Find pivot and exchange if necessary.
             long p = j;
-            for (long i = j+1; i < m; i++) 
+            for (long i = j+1; i < m; i++)
             {
-                if (abs(LUcolj(i)) > abs(LUcolj(p))) 
+                if (abs(LUcolj(i)) > abs(LUcolj(p)))
                 {
                     p = i;
                 }
             }
-            if (p != j) 
+            if (p != j)
             {
                 long k=0;
-                for (k = 0; k < n; k++) 
+                for (k = 0; k < n; k++)
                 {
-                    type t = LU(p,k); 
-                    LU(p,k) = LU(j,k); 
+                    type t = LU(p,k);
+                    LU(p,k) = LU(j,k);
                     LU(j,k) = t;
                 }
-                k = piv(p); 
-                piv(p) = piv(j); 
+                k = piv(p);
+                piv(p) = piv(j);
                 piv(j) = k;
                 pivsign = -pivsign;
             }
 
             // Compute multipliers.
-            if ((j < m) && (LU(j,j) != 0.0)) 
+            if ((j < m) && (LU(j,j) != 0.0))
             {
-                for (long i = j+1; i < m; i++) 
+                for (long i = j+1; i < m; i++)
                 {
                     LU(i,j) /= LU(j,j);
                 }
@@ -278,7 +278,7 @@ namespace dlib
     template <typename matrix_exp_type>
     const typename lu_decomposition<matrix_exp_type>::matrix_type lu_decomposition<matrix_exp_type>::
     get_u (
-    ) const 
+    ) const
     {
         if (LU.nr() >= LU.nc())
             return upperm(subm(LU,0,0,n,n));
@@ -310,7 +310,7 @@ namespace dlib
             << "\n\tthis: " << this
             );
 
-        // Check if it is singular and if it is just return 0.  
+        // Check if it is singular and if it is just return 0.
         // We want to do this because a prod() operation can easily
         // overcome a single diagonal element that is effectively 0 when
         // LU is a big enough matrix.
@@ -336,8 +336,8 @@ namespace dlib
             "\ttype lu_decomposition::solve()"
             << "\n\tInvalid arguments to this function"
             << "\n\tis_square():   " << (is_square()? "true":"false" )
-            << "\n\tB.nr():        " << B.nr() 
-            << "\n\tnr():          " << nr() 
+            << "\n\tB.nr():        " << B.nr()
+            << "\n\tnr():          " << nr()
             << "\n\tthis:          " << this
             );
 
@@ -354,8 +354,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-} 
+}
 
-#endif // DLIB_MATRIX_LU_DECOMPOSITION_H 
+#endif // DLIB_MATRIX_LU_DECOMPOSITION_H
 
 

@@ -34,7 +34,7 @@ namespace dlib
 
     base64::
     base64 (
-    ) : 
+    ) :
         encode_table(0),
         decode_table(0),
         bad_value(100),
@@ -271,7 +271,7 @@ namespace dlib
 
                 break;
             }
-            else // in this case status must be 1 
+            else // in this case status must be 1
             {
                 // we are at the end of the input stream and need to add some padding
 
@@ -336,7 +336,7 @@ namespace dlib
             {
                 inbuf_pos = 0;
 
-                // this might be the end of the encoded data so we need to figure out if 
+                // this might be the end of the encoded data so we need to figure out if
                 // there was any padding applied.
                 outsize = 3;
                 if (inbuf[3] == '=')
@@ -374,10 +374,10 @@ namespace dlib
                 }
             }
 
-            // get more input characters 
+            // get more input characters
             status = in.sgetn(reinterpret_cast<char*>(inbuf + inbuf_pos),1);
-            // only count this character if it isn't some kind of filler 
-            if ((decode_table[inbuf[inbuf_pos]] != bad_value || inbuf[inbuf_pos] == '=') && 
+            // only count this character if it isn't some kind of filler
+            if ((decode_table[inbuf[inbuf_pos]] != bad_value || inbuf[inbuf_pos] == '=') &&
                 status != 0)
                 ++inbuf_pos;
         } // while (status != 0)

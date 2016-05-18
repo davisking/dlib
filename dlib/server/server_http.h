@@ -63,10 +63,10 @@ namespace dlib
     };
 
 
-    class less_case_insensitive 
+    class less_case_insensitive
     {
     public:
-        bool operator()(const std::string& a, const std::string& b) const 
+        bool operator()(const std::string& a, const std::string& b) const
         {
             unsigned long i = 0;
             while (i < a.size() && i < b.size())
@@ -88,14 +88,14 @@ namespace dlib
     typedef constmap< std::string, std::string, less_case_insensitive > key_value_map_ci;
     typedef constmap< std::string, std::string > key_value_map;
 
-    struct incoming_things 
+    struct incoming_things
     {
         incoming_things (
             const std::string& foreign_ip_,
             const std::string& local_ip_,
             unsigned short foreign_port_,
             unsigned short local_port_
-        ): 
+        ):
             foreign_ip(foreign_ip_),
             foreign_port(foreign_port_),
             local_ip(local_ip_),
@@ -119,7 +119,7 @@ namespace dlib
         unsigned short local_port;
     };
 
-    struct outgoing_things 
+    struct outgoing_things
     {
         outgoing_things() : http_return(200), http_return_status("OK") { }
 
@@ -131,7 +131,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long parse_http_request ( 
+    unsigned long parse_http_request (
         std::istream& in,
         incoming_things& incoming,
         unsigned long max_content_length
@@ -150,17 +150,17 @@ namespace dlib
 
     void write_http_response (
         std::ostream& out,
-        const http_parse_error& e 
+        const http_parse_error& e
     );
 
     void write_http_response (
         std::ostream& out,
-        const std::exception& e 
+        const std::exception& e
     );
 
 // ----------------------------------------------------------------------------------------
 
-    class server_http : public server_iostream 
+    class server_http : public server_iostream
     {
 
     public:
@@ -171,10 +171,10 @@ namespace dlib
         }
 
         unsigned long get_max_content_length (
-        ) const 
-        { 
+        ) const
+        {
             auto_mutex lock(http_class_mutex);
-            return max_content_length; 
+            return max_content_length;
         }
 
         void set_max_content_length (

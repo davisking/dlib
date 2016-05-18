@@ -24,11 +24,11 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
+        // kernel_1a
         typedef     cpp_pretty_printer_kernel_1<stack,tok>
                     kernel_1a;
 
-        // kernel_2a        
+        // kernel_2a
         typedef     cpp_pretty_printer_kernel_2<stack,tok>
                     kernel_2a;
 

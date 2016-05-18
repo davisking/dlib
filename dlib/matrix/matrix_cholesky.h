@@ -1,11 +1,11 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 // This code was adapted from code from the JAMA part of NIST's TNT library.
-//    See: http://math.nist.gov/tnt/ 
+//    See: http://math.nist.gov/tnt/
 #ifndef DLIB_MATRIX_CHOLESKY_DECOMPOSITION_H
 #define DLIB_MATRIX_CHOLESKY_DECOMPOSITION_H
 
-#include "matrix.h" 
+#include "matrix.h"
 #include "matrix_utilities.h"
 #include "matrix_subexp.h"
 #include <cmath>
@@ -16,7 +16,7 @@
 
 #include "matrix_trsm.h"
 
-namespace dlib 
+namespace dlib
 {
 
     template <
@@ -38,7 +38,7 @@ namespace dlib
 
         // You have supplied an invalid type of matrix_exp_type.  You have
         // to use this object with matrices that contain float or double type data.
-        COMPILE_TIME_ASSERT((is_same_type<float, type>::value || 
+        COMPILE_TIME_ASSERT((is_same_type<float, type>::value ||
                              is_same_type<double, type>::value ));
 
 
@@ -122,7 +122,7 @@ namespace dlib
             for (long c = r+1; c < L_.nc() && is_symmetric; ++c)
             {
                 // this is approximately doing: is_symmetric = is_symmetric && ( L_(k,j) == L_(j,k))
-                is_symmetric = is_symmetric && (std::abs(L_(r,c) - L_(c,r)) < eps ); 
+                is_symmetric = is_symmetric && (std::abs(L_(r,c) - L_(c,r)) < eps );
             }
         }
 
@@ -143,18 +143,18 @@ namespace dlib
         isspd = true;
 
         const long n = A.nc();
-        L_.set_size(n,n); 
+        L_.set_size(n,n);
 
         const type eps = max(abs(diag(A)))*std::sqrt(std::numeric_limits<type>::epsilon())/100;
 
         // Main loop.
-        for (long j = 0; j < n; j++) 
+        for (long j = 0; j < n; j++)
         {
             type d(0.0);
-            for (long k = 0; k < j; k++) 
+            for (long k = 0; k < j; k++)
             {
                 type s(0.0);
-                for (long i = 0; i < k; i++) 
+                for (long i = 0; i < k; i++)
                 {
                     s += L_(k,i)*L_(j,i);
                 }
@@ -175,12 +175,12 @@ namespace dlib
                 d = d + s*s;
 
                 // this is approximately doing: isspd = isspd && ( A(k,j) == A(j,k))
-                isspd = isspd && (std::abs(A(k,j) - A(j,k)) < eps ); 
+                isspd = isspd && (std::abs(A(k,j) - A(j,k)) < eps );
             }
             d = A(j,j) - d;
             isspd = isspd && (d > eps);
             L_(j,j) = sqrt(d > 0.0 ? d : 0.0);
-            for (long k = j+1; k < n; k++) 
+            for (long k = j+1; k < n; k++)
             {
                 L_(j,k) = 0.0;
             }
@@ -203,12 +203,12 @@ namespace dlib
         DLIB_ASSERT(L_.nr() == B.nr(),
             "\tconst matrix cholesky_decomposition::solve(B)"
             << "\n\tInvalid arguments were given to this function."
-            << "\n\tL_.nr():  " << L_.nr() 
-            << "\n\tB.nr():   " << B.nr() 
+            << "\n\tL_.nr():  " << L_.nr()
+            << "\n\tB.nr():   " << B.nr()
             << "\n\tthis:     " << this
             );
 
-        matrix<type, NR, EXP::NC, mem_manager_type, layout_type>  X(B); 
+        matrix<type, NR, EXP::NC, mem_manager_type, layout_type>  X(B);
 
         using namespace blas_bindings;
         // Solve L*y = b;
@@ -222,9 +222,9 @@ namespace dlib
 
 
 
-} 
+}
 
-#endif // DLIB_MATRIX_CHOLESKY_DECOMPOSITION_H 
+#endif // DLIB_MATRIX_CHOLESKY_DECOMPOSITION_H
 
 
 

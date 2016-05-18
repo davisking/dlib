@@ -70,8 +70,8 @@ namespace dlib
                 << "\n\tYou have given a rectangle that goes outside the image"
                 << "\n\tthis:            " << this
                 << "\n\trect.is_empty(): " << rect.is_empty()
-                << "\n\trect:            " << rect 
-                << "\n\tget_rect(*this): " << get_rect(*this) 
+                << "\n\trect:            " << rect
+                << "\n\tget_rect(*this): " << get_rect(*this)
             );
 
             T top_left = 0, top_right = 0, bottom_left = 0, bottom_right = 0;
@@ -130,9 +130,9 @@ namespace dlib
         DLIB_ASSERT(get_rect(img).contains(centered_rect(p,width,width)) == true,
             "\tlong haar_x(img,p,width)"
             << "\n\tYou have given a point and with that goes outside the image"
-            << "\n\tget_rect(img):  " << get_rect(img) 
-            << "\n\tp:              " << p 
-            << "\n\twidth:          " << width 
+            << "\n\tget_rect(img):  " << get_rect(img)
+            << "\n\tp:              " << p
+            << "\n\twidth:          " << width
         );
 
         rectangle left_rect;
@@ -162,9 +162,9 @@ namespace dlib
         DLIB_ASSERT(get_rect(img).contains(centered_rect(p,width,width)) == true,
             "\tlong haar_y(img,p,width)"
             << "\n\tYou have given a point and with that goes outside the image"
-            << "\n\tget_rect(img):  " << get_rect(img) 
-            << "\n\tp:              " << p 
-            << "\n\twidth:          " << width 
+            << "\n\tget_rect(img):  " << get_rect(img)
+            << "\n\tp:              " << p
+            << "\n\twidth:          " << width
         );
 
         rectangle top_rect;

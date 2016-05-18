@@ -1,6 +1,6 @@
 // Copyright (C) 2010  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SVm_EPSILON_REGRESSION_TRAINER_Hh_ 
+#ifndef DLIB_SVm_EPSILON_REGRESSION_TRAINER_Hh_
 #define DLIB_SVm_EPSILON_REGRESSION_TRAINER_Hh_
 
 
@@ -14,13 +14,13 @@
 #include "kernel.h"
 #include "../optimization/optimization_solve_qp3_using_smo.h"
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svr_trainer
     {
@@ -48,7 +48,7 @@ namespace dlib
             DLIB_ASSERT(cache_size_ > 0,
                 "\tvoid svr_trainer::set_cache_size(cache_size_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t cache_size: " << cache_size_ 
+                << "\n\t cache_size: " << cache_size_
                 );
             cache_size = cache_size_;
         }
@@ -67,14 +67,14 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\tvoid svr_trainer::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 );
             eps = eps_;
         }
 
         const scalar_type get_epsilon (
         ) const
-        { 
+        {
             return eps;
         }
 
@@ -86,14 +86,14 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\tvoid svr_trainer::set_epsilon_insensitivity(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 );
             eps_insensitivity = eps_;
         }
 
         const scalar_type get_epsilon_insensitivity (
         ) const
-        { 
+        {
             return eps_insensitivity;
         }
 
@@ -111,14 +111,14 @@ namespace dlib
         }
 
         void set_c (
-            scalar_type C_ 
+            scalar_type C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void svr_trainer::set_c()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -159,9 +159,9 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <typename M>
-        struct op_quad 
+        struct op_quad
         {
-            explicit op_quad( 
+            explicit op_quad(
                 const M& m_
             ) : m(m_) {}
 
@@ -172,7 +172,7 @@ namespace dlib
             const static long cost = M::cost + 2;
 
             inline const_ret_type apply ( long r, long c) const
-            { 
+            {
                 if (r < m.nr())
                 {
                     if (c < m.nc())
@@ -205,9 +205,9 @@ namespace dlib
             long nr () const { return 2*m.nr(); }
             long nc () const { return 2*m.nc(); }
 
-            template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+            template <typename U> bool aliases               ( const matrix_exp<U>& item) const
             { return m.aliases(item); }
-            template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+            template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
             { return m.aliases(item); }
         };
 
@@ -249,10 +249,10 @@ namespace dlib
             DLIB_ASSERT(is_learning_problem(x,y) == true,
                 "\tdecision_function svr_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t y.nr(): " << y.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t x.nr(): " << x.nr()
+                << "\n\t y.nr(): " << y.nr()
+                << "\n\t x.nc(): " << x.nc()
+                << "\n\t y.nc(): " << y.nc()
                 );
 
 
@@ -260,9 +260,9 @@ namespace dlib
 
             solve_qp3_using_smo<scalar_vector_type> solver;
 
-            solver(symmetric_matrix_cache<float>(make_quad(kernel_matrix(kernel_function,x)), cache_size), 
+            solver(symmetric_matrix_cache<float>(make_quad(kernel_matrix(kernel_function,x)), cache_size),
                    uniform_matrix<scalar_type>(2*x.size(),1, eps_insensitivity) + join_cols(y,-y),
-                   join_cols(uniform_matrix<scalar_type>(x.size(),1,1), uniform_matrix<scalar_type>(x.size(),1,-1)), 
+                   join_cols(uniform_matrix<scalar_type>(x.size(),1,1), uniform_matrix<scalar_type>(x.size(),1,-1)),
                    0,
                    C,
                    C,

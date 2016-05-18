@@ -11,26 +11,26 @@
 namespace dlib
 {
     template <
-        typename K 
+        typename K
         >
     class krr_trainer
     {
         /*!
-            REQUIREMENTS ON K 
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+            REQUIREMENTS ON K
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             INITIAL VALUE
                 - get_lambda() == 0
                 - basis_loaded() == false
                 - get_max_basis_size() == 400
                 - will_use_regression_loss_for_loo_cv() == true
-                - get_search_lambdas() == logspace(-9, 2, 50) 
+                - get_search_lambdas() == logspace(-9, 2, 50)
                 - this object will not be verbose unless be_verbose() is called
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a tool for performing kernel ridge regression 
-                (This basic algorithm is also known my many other names, e.g. regularized 
-                least squares or least squares SVM). 
+                This object represents a tool for performing kernel ridge regression
+                (This basic algorithm is also known my many other names, e.g. regularized
+                least squares or least squares SVM).
 
                 The exact definition of what this algorithm does is this:
                     Find w and b that minimizes the following (x_i are input samples and y_i are target values):
@@ -43,7 +43,7 @@ namespace dlib
                     application of the kernel trick.
 
 
-                It is implemented using the empirical_kernel_map and thus allows you 
+                It is implemented using the empirical_kernel_map and thus allows you
                 to run the algorithm on large datasets and obtain sparse outputs.  It is also
                 capable of estimating the lambda parameter using leave-one-out cross-validation.
 
@@ -93,7 +93,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_kernel() == k 
+                - #get_kernel() == k
         !*/
 
         template <typename T>
@@ -132,7 +132,7 @@ namespace dlib
         /*!
             ensures
                 - returns the maximum number of basis vectors this object is allowed
-                  to use.  This parameter only matters when the user has not supplied 
+                  to use.  This parameter only matters when the user has not supplied
                   a basis via set_basis().
         !*/
 
@@ -143,29 +143,29 @@ namespace dlib
             requires
                 - max_basis_size > 0
             ensures
-                - #get_max_basis_size() == max_basis_size 
+                - #get_max_basis_size() == max_basis_size
         !*/
 
         void set_lambda (
-            scalar_type lambda 
+            scalar_type lambda
         );
         /*!
             requires
                 - lambda >= 0
             ensures
-                - #get_lambda() == lambda 
+                - #get_lambda() == lambda
         !*/
 
         const scalar_type get_lambda (
         ) const;
         /*!
             ensures
-                - returns the regularization parameter.  It is the parameter that 
-                  determines the trade off between trying to fit the training data 
-                  exactly or allowing more errors but hopefully improving the 
-                  generalization ability of the resulting function.  Smaller values 
-                  encourage exact fitting while larger values of lambda may encourage 
-                  better generalization. 
+                - returns the regularization parameter.  It is the parameter that
+                  determines the trade off between trying to fit the training data
+                  exactly or allowing more errors but hopefully improving the
+                  generalization ability of the resulting function.  Smaller values
+                  encourage exact fitting while larger values of lambda may encourage
+                  better generalization.
 
                   Note that a lambda of 0 has a special meaning.  It indicates to this
                   object that it should automatically determine an appropriate lambda
@@ -183,7 +183,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #will_use_regression_loss_for_loo_cv() == false 
+                - #will_use_regression_loss_for_loo_cv() == false
         !*/
 
         bool will_use_regression_loss_for_loo_cv (
@@ -216,7 +216,7 @@ namespace dlib
                 - returns a matrix M such that:
                     - is_vector(M) == true
                     - M == a list of all the lambda values which will be tried when performing
-                      LOO cross-validation for determining the best lambda. 
+                      LOO cross-validation for determining the best lambda.
         !*/
 
         template <
@@ -240,7 +240,7 @@ namespace dlib
                       classification functions then you had better give a valid classification
                       problem)
             ensures
-                - performs kernel ridge regression given the training samples in x and target values in y.  
+                - performs kernel ridge regression given the training samples in x and target values in y.
                 - returns a decision_function F with the following properties:
                     - F(new_x) == predicted y value
 
@@ -250,13 +250,13 @@ namespace dlib
                     - this object will attempt to automatically select an appropriate basis
 
                 - if (get_lambda() == 0) then
-                    - This object will perform internal leave-one-out cross-validation to determine an 
+                    - This object will perform internal leave-one-out cross-validation to determine an
                       appropriate lambda automatically.  It will compute the LOO error for each lambda
                       in get_search_lambdas() and select the best one.
                     - if (will_use_regression_loss_for_loo_cv()) then
                         - the lambda selected will be the one that minimizes the mean squared error.
                     - else
-                        - the lambda selected will be the one that minimizes the number classification 
+                        - the lambda selected will be the one that minimizes the number classification
                           mistakes.  We say a point is classified correctly if the output of the
                           decision_function has the same sign as its label.
                     - #get_lambda() == 0
@@ -285,7 +285,7 @@ namespace dlib
                   (i.e. executes train(x,y) and returns its result)
                 - #loo_values.size() == y.size()
                 - for all valid i:
-                    - #loo_values[i] == leave-one-out prediction for the value of y(i) based 
+                    - #loo_values[i] == leave-one-out prediction for the value of y(i) based
                       on all the training samples other than (x(i),y(i)).
         !*/
 
@@ -297,7 +297,7 @@ namespace dlib
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
             std::vector<scalar_type>& loo_values,
-            scalar_type& lambda_used 
+            scalar_type& lambda_used
         ) const;
         /*!
             requires
@@ -307,14 +307,14 @@ namespace dlib
                   (i.e. executes train(x,y) and returns its result)
                 - #loo_values.size() == y.size()
                 - for all valid i:
-                    - #loo_values[i] == leave-one-out prediction for the value of y(i) based 
+                    - #loo_values[i] == leave-one-out prediction for the value of y(i) based
                       on all the training samples other than (x(i),y(i)).
-                - #lambda_used == the value of lambda used to generate the 
-                  decision_function.  Note that this lambda value is always 
+                - #lambda_used == the value of lambda used to generate the
+                  decision_function.  Note that this lambda value is always
                   equal to get_lambda() if get_lambda() isn't 0.
         !*/
 
-    }; 
+    };
 
 }
 

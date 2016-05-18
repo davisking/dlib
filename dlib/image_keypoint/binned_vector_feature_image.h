@@ -28,7 +28,7 @@ namespace dlib
         typedef std::vector<std::pair<unsigned int,double> > descriptor_type;
 
         binned_vector_feature_image (
-        ); 
+        );
 
         void clear (
         );
@@ -102,7 +102,7 @@ namespace dlib
         template <typename T>
         friend void deserialize (
             binned_vector_feature_image<T>& item,
-            std::istream& in 
+            std::istream& in
         );
 
     private:
@@ -130,7 +130,7 @@ namespace dlib
     template <typename T>
     void deserialize (
         binned_vector_feature_image<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         int version = 0;
@@ -154,7 +154,7 @@ namespace dlib
         >
     binned_vector_feature_image<feature_extractor,hash_function_type>::
     binned_vector_feature_image (
-    )  
+    )
     {
     }
 
@@ -344,7 +344,7 @@ namespace dlib
             "\t descriptor_type binned_vector_feature_image::operator(row,col)"
             << "\n\t Invalid inputs were given to this function"
             << "\n\t row:  " << row
-            << "\n\t col:  " << col 
+            << "\n\t col:  " << col
             << "\n\t nr(): " << nr()
             << "\n\t nc(): " << nc()
             << "\n\t this: " << this
@@ -419,7 +419,7 @@ namespace dlib
     const rectangle binned_vector_feature_image<feature_extractor,hash_function_type>::
     feat_to_image_space (
         const rectangle& rect
-    ) const 
+    ) const
     {
         return fe.feat_to_image_space(rect);
     }

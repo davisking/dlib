@@ -47,9 +47,9 @@ namespace dlib
         }
 
         template <typename kernel_type>
-        inline const typename kernel_type::sample_type& access ( 
-            const typename kernel_type::sample_type& samp, 
-            long 
+        inline const typename kernel_type::sample_type& access (
+            const typename kernel_type::sample_type& samp,
+            long
         )
         {
             return samp;
@@ -58,15 +58,15 @@ namespace dlib
         // --------------------------------------------
 
         template <typename kernel_type, typename T>
-        inline typename disable_if<is_same_type<T,typename kernel_type::sample_type>,unsigned long>::type 
+        inline typename disable_if<is_same_type<T,typename kernel_type::sample_type>,unsigned long>::type
         size ( const T& m)
         {
             return m.size();
         }
 
         template <typename kernel_type>
-        inline unsigned long size ( 
-            const typename kernel_type::sample_type&  
+        inline unsigned long size (
+            const typename kernel_type::sample_type&
         )
         {
             return 1;
@@ -79,7 +79,7 @@ namespace dlib
         {}
 
         template <typename T>
-        // This funny #ifdef thing is here because gcc sometimes gives a warning 
+        // This funny #ifdef thing is here because gcc sometimes gives a warning
         // about v being unused otherwise.
 #ifdef ENABLE_ASSERTS
         void assert_is_vector(const matrix_exp<T>& v)
@@ -99,16 +99,16 @@ namespace dlib
     }
 
     template <typename K, typename vect_type1, typename vect_type2>
-    struct op_kern_mat  
+    struct op_kern_mat
     {
-        op_kern_mat( 
-            const K& kern_, 
+        op_kern_mat(
+            const K& kern_,
             const vect_type1& vect1_,
             const vect_type2& vect2_
-        ) : 
-            kern(kern_), 
+        ) :
+            kern(kern_),
             vect1(vect1_),
-            vect2(vect2_) 
+            vect2(vect2_)
         {
             // make sure the requires clauses get checked eventually
             impl::assert_is_vector(vect1);
@@ -129,9 +129,9 @@ namespace dlib
         typedef typename K::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
 
-        const_ret_type apply (long r, long c ) const 
-        { 
-            return kern(impl::access<K>(vect1,r), impl::access<K>(vect2,c)); 
+        const_ret_type apply (long r, long c ) const
+        {
+            return kern(impl::access<K>(vect1,r), impl::access<K>(vect2,c));
         }
 
         long nr () const { return impl::size<K>(vect1); }
@@ -148,14 +148,14 @@ namespace dlib
         bool alias_helper                   (const samp_type& item ) const { return are_same(item, vect1) || are_same(item, vect2); }
         template <typename U> bool are_same (const samp_type& , const U& )         const { return false; }
         bool are_same                       (const samp_type& a, const samp_type& b) const { return (&a == &b); }
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
     template <
         typename K,
         typename V1,
-        typename V2 
+        typename V2
         >
     const matrix_op<op_kern_mat<K,V1,V2> > kernel_matrix (
         const K& kern,
@@ -172,16 +172,16 @@ namespace dlib
     /*
         It is possible to implement the kernel_matrix() operator with just one operator
         class but treating the version that takes only a single vector separately
-        leads to more efficient output by gcc in certain instances.  
+        leads to more efficient output by gcc in certain instances.
     */
     template <typename K, typename vect_type1>
-    struct op_kern_mat_single  
+    struct op_kern_mat_single
     {
-        op_kern_mat_single( 
-            const K& kern_, 
+        op_kern_mat_single(
+            const K& kern_,
             const vect_type1& vect1_
-        ) : 
-            kern(kern_), 
+        ) :
+            kern(kern_),
             vect1(vect1_)
         {
             // make sure the requires clauses get checked eventually
@@ -201,9 +201,9 @@ namespace dlib
         typedef typename K::mem_manager_type mem_manager_type;
         typedef row_major_layout layout_type;
 
-        const_ret_type apply (long r, long c ) const 
-        { 
-            return kern(impl::access<K>(vect1,r), impl::access<K>(vect1,c)); 
+        const_ret_type apply (long r, long c ) const
+        {
+            return kern(impl::access<K>(vect1,r), impl::access<K>(vect1,c));
         }
 
         long nr () const { return impl::size<K>(vect1); }
@@ -220,7 +220,7 @@ namespace dlib
         bool alias_helper                   (const samp_type& item ) const { return are_same(item, vect1); }
         template <typename U> bool are_same (const samp_type& , const U& )         const { return false; }
         bool are_same                       (const samp_type& a, const samp_type& b) const { return (&a == &b); }
-    }; 
+    };
 
     template <
         typename K,

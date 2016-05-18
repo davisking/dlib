@@ -9,7 +9,7 @@
 #include <sstream>
 #include <ctime>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -147,7 +147,7 @@ namespace
                 dpca.add_to_total_variance(randm(4,1,rnd));
                 DLIB_TEST(dpca.in_vector_size() == 4);
 
-                // do this to subtract out the variance along the 3rd axis 
+                // do this to subtract out the variance along the 3rd axis
                 samp1 = 0,0,0,0;
                 samp2 = 0,0,1,0;
                 dpca.add_to_within_class_variance(samp1, samp2);
@@ -184,12 +184,12 @@ namespace
                 dpca.add_to_total_variance(randm(4,1,rnd));
                 DLIB_TEST(dpca.in_vector_size() == 4);
 
-                // do this to subtract out the variance along the 3rd axis 
+                // do this to subtract out the variance along the 3rd axis
                 samp1 = 0,0,0,0;
                 samp2 = 0,0,1,0;
                 dpca.add_to_within_class_variance(samp1, samp2);
 
-                // do this to subtract out the variance along the 1st axis 
+                // do this to subtract out the variance along the 1st axis
                 samp1 = 0,0,0,0;
                 samp2 = 1,0,0,0;
                 dpca.add_to_within_class_variance(samp1, samp2);
@@ -231,13 +231,13 @@ namespace
                 add_dpca4.add_to_total_variance(samp);
                 DLIB_TEST(dpca.in_vector_size() == 4);
 
-                // do this to subtract out the variance along the 3rd axis 
+                // do this to subtract out the variance along the 3rd axis
                 samp1 = 0,0,0,0;
                 samp2 = 0,0,1,0;
                 dpca.add_to_within_class_variance(samp1, samp2);
                 add_dpca1.add_to_within_class_variance(samp1, samp2);
 
-                // do this to subtract out the variance along the 1st axis 
+                // do this to subtract out the variance along the 1st axis
                 samp1 = 0,0,0,0;
                 samp2 = 1,0,0,0;
                 dpca.add_to_within_class_variance(samp1, samp2);
@@ -356,8 +356,8 @@ namespace
 
     // Create an instance of this object.  Doing this causes this test
     // to be automatically inserted into the testing framework whenever this cpp file
-    // is linked into the project.  Note that since we are inside an unnamed-namespace 
-    // we won't get any linker errors about the symbol a being defined multiple times. 
+    // is linked into the project.  Note that since we are inside an unnamed-namespace
+    // we won't get any linker errors about the symbol a being defined multiple times.
     discriminant_pca_tester a;
 
 }

@@ -13,7 +13,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // button object methods  
+    // button object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -179,7 +179,7 @@ namespace dlib
     {
         auto_mutex M(m);
         name_ = name;
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the std::string implementation.
         name_[0] = name_[0];
 
@@ -198,7 +198,7 @@ namespace dlib
     {
         auto_mutex M(m);
         std::string temp = convert_wstring_to_mbstring(wname());
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the std::string implementation.
         char c = temp[0];
         temp[0] = c;
@@ -211,7 +211,7 @@ namespace dlib
     {
         auto_mutex M(m);
         std::wstring temp = convert_utf32_to_wstring(uname());
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the std::wstring implementation.
         wchar_t w = temp[0];
         temp[0] = w;
@@ -224,7 +224,7 @@ namespace dlib
     {
         auto_mutex M(m);
         dlib::ustring temp = name_;
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the dlib::ustring implementation.
         temp[0] = name_[0];
         return temp;
@@ -237,7 +237,7 @@ namespace dlib
         bool mouse_over
     )
     {
-        if (mouse_over)                
+        if (mouse_over)
         {
             // this is a valid button click
             if (event_handler.is_set())
@@ -265,7 +265,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // draggable object methods  
+    // draggable object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -288,7 +288,7 @@ namespace dlib
             long new_x = x - this->x;
             long new_y = y - this->y;
 
-            // make sure these points are inside the draggable area.  
+            // make sure these points are inside the draggable area.
             if (new_x < area.left())
                 new_x = area.left();
             if (new_x + static_cast<long>(rect.width()) - 1 > area.right())
@@ -331,7 +331,7 @@ namespace dlib
         unsigned long ,
         unsigned long state,
         long ,
-        long 
+        long
     )
     {
         if (drag && (state & base_window::LEFT) == 0)
@@ -349,7 +349,7 @@ namespace dlib
         unsigned long ,
         long x,
         long y,
-        bool 
+        bool
     )
     {
         if (enabled && !hidden && rect.contains(x,y) && btn == base_window::LEFT)
@@ -362,7 +362,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // mouse_over_event object methods  
+    // mouse_over_event object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -417,7 +417,7 @@ namespace dlib
         {
             // trigger a user event to call on_mouse_not_over() and repaint this object.
             // we must do this in another event because someone might call is_mouse_over()
-            // from draw() and you don't want this function to end up calling 
+            // from draw() and you don't want this function to end up calling
             // parent.invalidate_rectangle().  It would lead to draw() being called over
             // and over.
             parent.trigger_user_event((void*)this,drawable::next_free_user_event_number());
@@ -431,7 +431,7 @@ namespace dlib
 
     void mouse_over_event::
     on_user_event (
-        int num 
+        int num
     )
     {
         if (is_mouse_over_ && num == drawable::next_free_user_event_number())
@@ -443,7 +443,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // button_action object methods  
+    // button_action object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -547,7 +547,7 @@ namespace dlib
                 is_depressed_ = false;
                 parent.invalidate_rectangle(rect);
 
-                if (rect.contains(x,y))                
+                if (rect.contains(x,y))
                 {
                     on_button_up(true);
                 }
@@ -588,7 +588,7 @@ namespace dlib
         {
             // trigger a user event to call on_button_up() and repaint this object.
             // we must do this in another event because someone might call is_depressed()
-            // from draw() and you don't want this function to end up calling 
+            // from draw() and you don't want this function to end up calling
             // parent.invalidate_rectangle().  It would lead to draw() being called over
             // and over.
             parent.trigger_user_event((void*)this,mouse_over_event::next_free_user_event_number());
@@ -618,14 +618,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // scroll_bar object methods  
+    // scroll_bar object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     scroll_bar::
-    scroll_bar(  
+    scroll_bar(
         drawable_window& w,
-        bar_orientation orientation 
+        bar_orientation orientation
     ) :
         drawable(w),
         b1(w),
@@ -666,7 +666,7 @@ namespace dlib
     )
     {
         disable_events();
-        parent.invalidate_rectangle(rect); 
+        parent.invalidate_rectangle(rect);
         // wait for all the timers to be stopped
         b1_timer.stop_and_wait();
         b2_timer.stop_and_wait();
@@ -729,8 +729,8 @@ namespace dlib
         // call this to put everything is in the right spot.
         set_pos (rect.left(),rect.top());
 
-        if ((b2.get_rect().top() - b1.get_rect().bottom() - 1 <= 8 && ori == VERTICAL) || 
-            (b2.get_rect().left() - b1.get_rect().right() - 1 <= 8 && ori == HORIZONTAL) || 
+        if ((b2.get_rect().top() - b1.get_rect().bottom() - 1 <= 8 && ori == VERTICAL) ||
+            (b2.get_rect().left() - b1.get_rect().right() - 1 <= 8 && ori == HORIZONTAL) ||
             max_pos == 0)
         {
             hide_slider();
@@ -791,7 +791,7 @@ namespace dlib
                 slider_pos /= max_pos;
                 slider_pos *= range;
                 slider.set_pos(
-                    rect.left(), 
+                    rect.left(),
                     static_cast<long>(slider_pos) + rect.top() + b1.get_rect().height()
                     );
 
@@ -896,8 +896,8 @@ namespace dlib
     show_slider (
     )
     {
-        if ((b2.get_rect().top() - b1.get_rect().bottom() - 1 <= 8 && ori == VERTICAL) || 
-            (b2.get_rect().left() - b1.get_rect().right() - 1 <= 8 && ori == HORIZONTAL) || 
+        if ((b2.get_rect().top() - b1.get_rect().bottom() - 1 <= 8 && ori == VERTICAL) ||
+            (b2.get_rect().left() - b1.get_rect().right() - 1 <= 8 && ori == HORIZONTAL) ||
             max_pos == 0)
             return;
 
@@ -1026,7 +1026,7 @@ namespace dlib
 
     void scroll_bar::
     draw (
-        const canvas& 
+        const canvas&
     ) const
     {
     }
@@ -1055,7 +1055,7 @@ namespace dlib
 
     void scroll_bar::
     b1_up (
-        bool 
+        bool
     )
     {
         b1_timer.stop();
@@ -1086,7 +1086,7 @@ namespace dlib
 
     void scroll_bar::
     b2_up (
-        bool 
+        bool
     )
     {
         b2_timer.stop();
@@ -1132,7 +1132,7 @@ namespace dlib
 
     void scroll_bar::
     top_filler_up (
-        bool 
+        bool
     )
     {
         top_filler_timer.stop();
@@ -1178,7 +1178,7 @@ namespace dlib
 
     void scroll_bar::
     bottom_filler_up (
-        bool 
+        bool
     )
     {
         bottom_filler_timer.stop();
@@ -1231,7 +1231,7 @@ namespace dlib
                 bottom_filler_down();
                 break;
             case 4:
-                // if the position we are supposed to switch the slider too isn't 
+                // if the position we are supposed to switch the slider too isn't
                 // already set
                 if (delayed_pos != pos)
                 {
@@ -1250,60 +1250,60 @@ namespace dlib
     void scroll_bar::
     delayed_set_slider_pos (
         unsigned long dpos
-    ) 
+    )
     {
         delayed_pos = dpos;
-        parent.trigger_user_event(this,4); 
+        parent.trigger_user_event(this,4);
     }
 
 // ----------------------------------------------------------------------------------------
 
     void scroll_bar::
     b1_down_t (
-    ) 
-    { 
-        parent.trigger_user_event(this,0); 
+    )
+    {
+        parent.trigger_user_event(this,0);
     }
 
 // ----------------------------------------------------------------------------------------
 
     void scroll_bar::
     b2_down_t (
-    ) 
-    { 
-        parent.trigger_user_event(this,1); 
+    )
+    {
+        parent.trigger_user_event(this,1);
     }
 
 // ----------------------------------------------------------------------------------------
 
     void scroll_bar::
     top_filler_down_t (
-    ) 
-    { 
-        parent.trigger_user_event(this,2); 
+    )
+    {
+        parent.trigger_user_event(this,2);
     }
 
 // ----------------------------------------------------------------------------------------
 
     void scroll_bar::
     bottom_filler_down_t (
-    ) 
-    { 
-        parent.trigger_user_event(this,3); 
+    )
+    {
+        parent.trigger_user_event(this,3);
     }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//                  widget_group object methods  
+//                  widget_group object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     void widget_group::
     empty (
-    ) 
-    {  
-        auto_mutex M(m); 
-        widgets.clear(); 
+    )
+    {
+        auto_mutex M(m);
+        widgets.clear();
         wg_widgets.clear();
     }
 
@@ -1316,7 +1316,7 @@ namespace dlib
         unsigned long y
     )
     {
-        auto_mutex M(m); 
+        auto_mutex M(m);
         drawable* w = &widget;
         relpos rp;
         rp.x = x;
@@ -1353,7 +1353,7 @@ namespace dlib
         unsigned long y
     )
     {
-        auto_mutex M(m); 
+        auto_mutex M(m);
         drawable& w = widget;
         add(w, x, y);
 
@@ -1366,11 +1366,11 @@ namespace dlib
     bool widget_group::
     is_member (
         const drawable& widget
-    ) const 
-    { 
-        auto_mutex M(m); 
+    ) const
+    {
+        auto_mutex M(m);
         drawable* w = const_cast<drawable*>(&widget);
-        return widgets.is_in_domain(w); 
+        return widgets.is_in_domain(w);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1380,7 +1380,7 @@ namespace dlib
         const drawable& widget
     )
     {
-        auto_mutex M(m); 
+        auto_mutex M(m);
         drawable* w = const_cast<drawable*>(&widget);
         if (widgets.is_in_domain(w))
         {
@@ -1400,10 +1400,10 @@ namespace dlib
 
     unsigned long widget_group::
     size (
-    ) const 
-    {  
-        auto_mutex M(m); 
-        return widgets.size(); 
+    ) const
+    {
+        auto_mutex M(m);
+        return widgets.size();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1511,7 +1511,7 @@ namespace dlib
 
         if (r.is_empty())
         {
-            // make sure it is still empty after we set it at the correct position 
+            // make sure it is still empty after we set it at the correct position
             r.set_right(rect.left()-1);
             r.set_bottom(rect.top()-1);
         }
@@ -1551,7 +1551,7 @@ namespace dlib
         DLIB_ASSERT ( idx < size() ,
                       "\tvoid popup_menu::enable_menu_item()"
                       << "\n\tidx:    " << idx
-                      << "\n\tsize(): " << size() 
+                      << "\n\tsize(): " << size()
         );
         auto_mutex M(wm);
         item_enabled[idx] = true;
@@ -1568,7 +1568,7 @@ namespace dlib
         DLIB_ASSERT ( idx < size() ,
                       "\tvoid popup_menu::enable_menu_item()"
                       << "\n\tidx:    " << idx
-                      << "\n\tsize(): " << size() 
+                      << "\n\tsize(): " << size()
         );
         auto_mutex M(wm);
         item_enabled[idx] = false;
@@ -1580,7 +1580,7 @@ namespace dlib
     unsigned long popup_menu::
     size (
     ) const
-    { 
+    {
         auto_mutex M(wm);
         return items.size();
     }
@@ -1704,7 +1704,7 @@ namespace dlib
             submenus[selected_item]->select_first_item();
             return true;
         }
-        else if (key == KEY_LEFT && selected_item != submenus.size() && 
+        else if (key == KEY_LEFT && selected_item != submenus.size() &&
                  submenus[selected_item] != 0 && submenu_open)
         {
             close_submenu();
@@ -1737,7 +1737,7 @@ namespace dlib
             // check if there is a hotkey for this key
             for (unsigned long i = 0; i < items.size(); ++i)
             {
-                if (std::tolower(key) == std::tolower(items[i]->get_hot_key()) && 
+                if (std::tolower(key) == std::tolower(items[i]->get_hot_key()) &&
                     (items[i]->has_click_event() || submenus[i]) && item_enabled[i] )
                 {
                     // only hide this popup window if this isn't a submenu
@@ -1802,7 +1802,7 @@ namespace dlib
     {
         if (cur_rect.contains(x,y) && btn == LEFT)
         {
-            // figure out which item this was on 
+            // figure out which item this was on
             for (unsigned long i = 0; i < items.size(); ++i)
             {
                 if (line_rects[i].contains(x,y) && item_enabled[i] && items[i]->has_click_event())
@@ -1851,7 +1851,7 @@ namespace dlib
                 }
 
 
-                // figure out if we should redraw any menu items 
+                // figure out if we should redraw any menu items
                 for (unsigned long i = 0; i < items.size(); ++i)
                 {
                     if (items[i]->has_click_event() || submenus[i])
@@ -1938,7 +1938,7 @@ namespace dlib
         for (unsigned long i = 0; i < items.size(); ++i)
         {
             bool is_selected = false;
-            if (selected_item != submenus.size() && i == selected_item && 
+            if (selected_item != submenus.size() && i == selected_item &&
                 item_enabled[i])
                 is_selected = true;
 
@@ -1958,7 +1958,7 @@ namespace dlib
     zoomable_region::
     zoomable_region (
         drawable_window& w,
-        unsigned long events 
+        unsigned long events
     ) :
         drawable(w,MOUSE_CLICK | MOUSE_WHEEL | MOUSE_MOVE | events),
         min_scale(0.15),
@@ -1978,7 +1978,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     zoomable_region::
-    ~zoomable_region() 
+    ~zoomable_region()
     {
     }
 
@@ -2035,13 +2035,13 @@ namespace dlib
 
     void zoomable_region::
     set_max_zoom_scale (
-        double ms 
+        double ms
     )
     {
         DLIB_ASSERT(ms > 0,
                     "\tvoid zoomable_region::set_max_zoom_scale(ms)"
                     << "\n\t the max zoom scale must be greater than 0"
-                    << "\n\t ms:   " << ms 
+                    << "\n\t ms:   " << ms
                     << "\n\t this: " << this
         );
 
@@ -2059,13 +2059,13 @@ namespace dlib
 
     void zoomable_region::
     set_min_zoom_scale (
-        double ms 
+        double ms
     )
     {
         DLIB_ASSERT(ms > 0,
                     "\tvoid zoomable_region::set_min_zoom_scale(ms)"
                     << "\n\t the min zoom scale must be greater than 0"
-                    << "\n\t ms:   " << ms 
+                    << "\n\t ms:   " << ms
                     << "\n\t this: " << this
         );
 
@@ -2233,7 +2233,7 @@ namespace dlib
 
     rectangle zoomable_region::
     display_rect (
-    ) const 
+    ) const
     {
         return display_rect_;
     }
@@ -2254,7 +2254,7 @@ namespace dlib
         double new_scale
     )
     {
-        // if new_scale isn't in the right range then put it back in range before we do the 
+        // if new_scale isn't in the right range then put it back in range before we do the
         // rest of this function
         if (!(min_scale <= new_scale && new_scale <= max_scale))
         {
@@ -2289,7 +2289,7 @@ namespace dlib
 
     void zoomable_region::
     on_wheel_down (
-        unsigned long 
+        unsigned long
     )
     {
         // zoom out
@@ -2301,7 +2301,7 @@ namespace dlib
             scale *= zoom_increment_;
             if (scale < min_scale)
                 scale = min_scale;
-            redraw_graph(); 
+            redraw_graph();
             adjust_origin(gui_p, graph_p);
 
             if (scale != old_scale)
@@ -2313,10 +2313,10 @@ namespace dlib
 
     void zoomable_region::
     on_wheel_up (
-        unsigned long 
+        unsigned long
     )
     {
-        // zoom in 
+        // zoom in
         if (enabled && !hidden && scale < max_scale  && display_rect_.contains(lastx,lasty))
         {
             point gui_p(lastx,lasty);
@@ -2325,7 +2325,7 @@ namespace dlib
             scale /= zoom_increment_;
             if (scale > max_scale)
                 scale = max_scale;
-            redraw_graph(); 
+            redraw_graph();
             adjust_origin(gui_p, graph_p);
 
             if (scale != old_scale)
@@ -2363,7 +2363,7 @@ namespace dlib
         unsigned long ,
         unsigned long ,
         long ,
-        long 
+        long
     )
     {
         mouse_drag_screen = false;
@@ -2377,7 +2377,7 @@ namespace dlib
         unsigned long ,
         long x,
         long y,
-        bool 
+        bool
     )
     {
         if (enabled && !hidden && display_rect_.contains(x,y) && btn == base_window::LEFT)
@@ -2471,7 +2471,7 @@ namespace dlib
 
         hsb.set_max_slider_pos((unsigned long)std::max(lr_point.x()-(lr_rect_corner_graph_space.x()-ul_rect_corner_graph_space.x()),0.0));
         vsb.set_max_slider_pos((unsigned long)std::max(lr_point.y()-(lr_rect_corner_graph_space.y()-ul_rect_corner_graph_space.y()),0.0));
-        // adjust slider position now.  
+        // adjust slider position now.
         hsb.set_slider_pos(static_cast<long>(ul_rect_corner_graph_space.x()));
         vsb.set_slider_pos(static_cast<long>(ul_rect_corner_graph_space.y()));
 
@@ -2486,7 +2486,7 @@ namespace dlib
     scrollable_region::
     scrollable_region (
         drawable_window& w,
-        unsigned long events 
+        unsigned long events
     ) :
         drawable(w, MOUSE_WHEEL|events|MOUSE_CLICK|MOUSE_MOVE),
         hsb(w,scroll_bar::HORIZONTAL),
@@ -2617,7 +2617,7 @@ namespace dlib
         }
         else if (need_h_scroll())
         {
-            // only hsb is hidden 
+            // only hsb is hidden
             if (!hidden)
             {
                 hsb.show();
@@ -2639,7 +2639,7 @@ namespace dlib
         }
         else if (need_v_scroll())
         {
-            // only vsb is hidden 
+            // only vsb is hidden
             if (!hidden)
             {
                 hsb.hide();
@@ -2660,7 +2660,7 @@ namespace dlib
         }
         else
         {
-            // both are hidden 
+            // both are hidden
             if (!hidden)
             {
                 hsb.hide();
@@ -2890,12 +2890,12 @@ namespace dlib
         DLIB_ASSERT((width > 0 && height > 0) || (width == 0 && height == 0),
                     "\tvoid scrollable_region::set_total_rect_size(width,height)"
                     << "\n\twidth and height must be > 0 or both == 0"
-                    << "\n\twidth:  " << width 
-                    << "\n\theight: " << height 
+                    << "\n\twidth:  " << width
+                    << "\n\theight: " << height
                     << "\n\tthis: " << this
         );
 
-        total_rect_ = move_rect(rectangle(width,height), 
+        total_rect_ = move_rect(rectangle(width,height),
                                 display_rect_.left()-static_cast<long>(hsb.slider_pos()),
                                 display_rect_.top()-static_cast<long>(vsb.slider_pos()));
 
@@ -2947,8 +2947,8 @@ namespace dlib
 
 
         // adjust total_rect_ so that it matches where the scroll bars are now
-        total_rect_ = move_rect(total_rect_, 
-                                display_rect_.left()-hscroll_bar_inc*hsb.slider_pos(), 
+        total_rect_ = move_rect(total_rect_,
+                                display_rect_.left()-hscroll_bar_inc*hsb.slider_pos(),
                                 display_rect_.top()-vscroll_bar_inc*vsb.slider_pos());
 
         // only redraw if we actually changed something
@@ -2962,7 +2962,7 @@ namespace dlib
 
     void scrollable_region::
     on_wheel_down (
-        unsigned long 
+        unsigned long
     )
     {
         if (rect.contains(lastx,lasty) && enabled && !hidden)
@@ -3013,7 +3013,7 @@ namespace dlib
         unsigned long ,
         long x,
         long y,
-        bool 
+        bool
     )
     {
         if (mouse_drag_enabled_ && enabled && !hidden && display_rect().contains(x,y) && (btn==base_window::LEFT))
@@ -3034,7 +3034,7 @@ namespace dlib
         unsigned long ,
         unsigned long ,
         long ,
-        long 
+        long
     )
     {
         user_is_dragging_mouse = false;
@@ -3044,7 +3044,7 @@ namespace dlib
 
     void scrollable_region::
     on_wheel_up (
-        unsigned long 
+        unsigned long
     )
     {
         if (rect.contains(lastx,lasty) && enabled && !hidden)
@@ -3088,7 +3088,7 @@ namespace dlib
         {
             // check if we would need a vertical scroll bar and if adding one would make us need
             // a horizontal one
-            if (total_rect_.height() > rect.height()-style->get_border_size()*2 && 
+            if (total_rect_.height() > rect.height()-style->get_border_size()*2 &&
                 total_rect_.width() > rect.width()-style->get_border_size()*2-vsb.width())
                 return true;
             else
@@ -3110,7 +3110,7 @@ namespace dlib
         {
             // check if we would need a horizontal scroll bar and if adding one would make us need
             // a vertical_scroll_pos one
-            if (total_rect_.width() > rect.width()-style->get_border_size()*2 && 
+            if (total_rect_.width() > rect.width()-style->get_border_size()*2 &&
                 total_rect_.height() > rect.height()-style->get_border_size()*2-hsb.height())
                 return true;
             else
@@ -3144,12 +3144,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-// class popup_menu_region 
+// class popup_menu_region
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     popup_menu_region::
-    popup_menu_region(  
+    popup_menu_region(
         drawable_window& w
     ) :
         drawable(w,MOUSE_CLICK | KEYBOARD_EVENTS | FOCUS_EVENTS | WINDOW_MOVED),
@@ -3165,7 +3165,7 @@ namespace dlib
     popup_menu_region::
     ~popup_menu_region(
     )
-    { 
+    {
         disable_events();
     }
 
@@ -3173,7 +3173,7 @@ namespace dlib
 
     void popup_menu_region::
     set_size (
-        unsigned long width, 
+        unsigned long width,
         unsigned long height
     )
     {
@@ -3307,7 +3307,7 @@ namespace dlib
         unsigned long ,
         long x,
         long y,
-        bool 
+        bool
     )
     {
         if (enabled && !hidden && rect.contains(x,y) && btn == base_window::RIGHT)
@@ -3329,7 +3329,7 @@ namespace dlib
 
     void popup_menu_region::
     draw (
-        const canvas& 
+        const canvas&
     ) const
     {
     }
@@ -3338,5 +3338,5 @@ namespace dlib
 
 }
 
-#endif // DLIB_BASE_WIDGETs_CPP_ 
+#endif // DLIB_BASE_WIDGETs_CPP_
 

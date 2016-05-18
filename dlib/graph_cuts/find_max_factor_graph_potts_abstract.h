@@ -13,22 +13,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class potts_problem 
+    class potts_problem
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a boolean valued factor graph or graphical model 
-                that can be efficiently operated on using graph cuts.  In particular, this 
-                object defines the interface a MAP problem on a factor graph must 
-                implement if it is to be solved using the find_max_factor_graph_potts() 
-                routine defined at the bottom of this file.  
+                This object represents a boolean valued factor graph or graphical model
+                that can be efficiently operated on using graph cuts.  In particular, this
+                object defines the interface a MAP problem on a factor graph must
+                implement if it is to be solved using the find_max_factor_graph_potts()
+                routine defined at the bottom of this file.
 
-                Note that there is no dlib::potts_problem object.  What you are looking 
-                at here is simply the interface definition for a Potts problem.  You must 
-                implement your own version of this object for the problem you wish to 
+                Note that there is no dlib::potts_problem object.  What you are looking
+                at here is simply the interface definition for a Potts problem.  You must
+                implement your own version of this object for the problem you wish to
                 solve and then pass it to the find_max_factor_graph_potts() routine.
 
-                Note also that a factor graph should not have any nodes which are 
+                Note also that a factor graph should not have any nodes which are
                 neighbors with themselves.  Additionally, the graph is undirected. This
                 mean that if A is a neighbor of B then B must be a neighbor of A for
                 the MAP problem to be valid.
@@ -37,16 +37,16 @@ namespace dlib
     public:
 
         unsigned long number_of_nodes (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the number of nodes in the factor graph.  Or in other words, 
+                - returns the number of nodes in the factor graph.  Or in other words,
                   returns the number of variables in the MAP problem/Potts model.
         !*/
 
         unsigned long number_of_neighbors (
             unsigned long idx
-        ) const; 
+        ) const;
         /*!
             requires
                 - idx < number_of_nodes()
@@ -56,23 +56,23 @@ namespace dlib
 
         // This is an optional variable which specifies a number that is always
         // greater than or equal to number_of_neighbors(idx).  If you don't know
-        // the value at compile time then either don't include max_number_of_neighbors 
+        // the value at compile time then either don't include max_number_of_neighbors
         // in your potts_problem object or set it to 0.
-        const static unsigned long max_number_of_neighbors = 0; 
+        const static unsigned long max_number_of_neighbors = 0;
 
         unsigned long get_neighbor (
             unsigned long idx,
-            unsigned long n 
+            unsigned long n
         ) const;
         /*!
             requires
                 - idx < number_of_nodes()
                 - n < number_of_neighbors(idx)
             ensures
-                - returns the node index value of the n-th neighbor of 
+                - returns the node index value of the n-th neighbor of
                   the node with index value idx.
-                - The neighbor relationship is reciprocal.  That is, if 
-                  get_neighbor(A,i)==B then there is a value of j such 
+                - The neighbor relationship is reciprocal.  That is, if
+                  get_neighbor(A,i)==B then there is a value of j such
                   that get_neighbor(B,j)==A.
                 - A node is never its own neighbor.  That is, there is
                   no i such that get_neighbor(idx,i)==idx.
@@ -112,13 +112,13 @@ namespace dlib
                 - idx < number_of_nodes()
             ensures
                 - returns the current label for the idx-th node.  This is a value which is
-                  0 if the node's label is false and is any other value if it is true.  
+                  0 if the node's label is false and is any other value if it is true.
 
                   Note that this value is not used by factor_value() or factor_value_disagreement().
                   It is simply here to provide a mechanism for find_max_factor_graph_potts()
-                  to return its labeled result.  Additionally, the reason it returns a 
-                  node_label rather than a bool is because doing it this way facilitates 
-                  use of a graph cut algorithm for the solution of the MAP problem.  For 
+                  to return its labeled result.  Additionally, the reason it returns a
+                  node_label rather than a bool is because doing it this way facilitates
+                  use of a graph cut algorithm for the solution of the MAP problem.  For
                   more of an explanation you should read the paper referenced by the min_cut
                   object.
         !*/
@@ -135,16 +135,16 @@ namespace dlib
                 - idx < number_of_nodes()
             ensures
                 - returns a value which indicates how "good" it is to assign the idx-th
-                  node the label of true.  The larger the value, the more desirable it is 
+                  node the label of true.  The larger the value, the more desirable it is
                   to give it this label.  Similarly, a negative value indicates that it is
                   better to give the node a label of false.
-                - It is valid for the returned value to be positive or negative infinity.  
+                - It is valid for the returned value to be positive or negative infinity.
                   A value of positive infinity indicates that the idx-th node must be labeled
                   true while negative infinity means it must be labeled false.
         !*/
 
         value_type factor_value_disagreement (
-            unsigned long idx1, 
+            unsigned long idx1,
             unsigned long idx2
         ) const;
         /*!
@@ -152,15 +152,15 @@ namespace dlib
                 - idx1 < number_of_nodes()
                 - idx2 < number_of_nodes()
                 - idx1 != idx2
-                - the idx1-th node and idx2-th node are neighbors in the graph.  That is, 
+                - the idx1-th node and idx2-th node are neighbors in the graph.  That is,
                   get_neighbor(idx1,i)==idx2 for some value of i.
             ensures
                 - returns a number >= 0.  This is the penalty for giving node idx1 and idx2
                   different labels.  Larger values indicate a larger penalty.
-                - this function is symmetric.  That is, it is true that: 
+                - this function is symmetric.  That is, it is true that:
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
                 - It is valid for the returned value to be positive infinity.  Returning
-                  infinity indicates that the idx1-th and idx2-th nodes must share the same 
+                  infinity indicates that the idx1-th and idx2-th nodes must share the same
                   label.
         !*/
 
@@ -168,7 +168,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class potts_grid_problem 
+    class potts_grid_problem
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -184,7 +184,7 @@ namespace dlib
                 Note that all nodes always have four neighbors, even nodes on the edge
                 of the graph.  This is because these border nodes are connected to
                 the border nodes on the other side of the graph.  That is, the graph
-                "wraps" around at the borders.  
+                "wraps" around at the borders.
         !*/
 
     public:
@@ -194,7 +194,7 @@ namespace dlib
         typedef an_integer_or_real_type value_type;
 
         long nr(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of rows in the grid
@@ -215,16 +215,16 @@ namespace dlib
                 - idx < nr()*nc()
             ensures
                 - The grid is represented in row-major-order format.  Therefore, idx
-                  identifies a node according to its position in the row-major-order 
+                  identifies a node according to its position in the row-major-order
                   representation of the grid graph.  Or in other words, idx corresponds
                   to the following row and column location in the graph:
                     - row == idx/nc()
                     - col == idx%nc()
-                - returns a value which indicates how "good" it is to assign the idx-th 
-                  node the label of true.  The larger the value, the more desirable it is 
+                - returns a value which indicates how "good" it is to assign the idx-th
+                  node the label of true.  The larger the value, the more desirable it is
                   to give it this label.  Similarly, a negative value indicates that it is
                   better to give the node a label of false.
-                - It is valid for the returned value to be positive or negative infinity.  
+                - It is valid for the returned value to be positive or negative infinity.
                   A value of positive infinity indicates that the idx-th node must be labeled
                   true while negative infinity means it must be labeled false.
         !*/
@@ -238,20 +238,20 @@ namespace dlib
                 - idx1 < nr()*nc()
                 - idx2 < nr()*nc()
                 - idx1 != idx2
-                - the idx1-th node and idx2-th node are neighbors in the grid graph.  
+                - the idx1-th node and idx2-th node are neighbors in the grid graph.
             ensures
-                - The grid is represented in row-major-order format.  Therefore, idx1 and 
-                  idx2 identify nodes according to their positions in the row-major-order 
+                - The grid is represented in row-major-order format.  Therefore, idx1 and
+                  idx2 identify nodes according to their positions in the row-major-order
                   representation of the grid graph.  For example, idx1 corresponds
                   to the following row and column location in the graph:
                     - row == idx1/nc()
                     - col == idx1%nc()
                 - returns a number >= 0.  This is the penalty for giving node idx1 and idx2
                   different labels.  Larger values indicate a larger penalty.
-                - this function is symmetric.  That is, it is true that: 
+                - this function is symmetric.  That is, it is true that:
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
                 - It is valid for the returned value to be positive infinity.  Returning
-                  infinity indicates that the idx1-th and idx2-th nodes must share the same 
+                  infinity indicates that the idx1-th and idx2-th nodes must share the same
                   label.
         !*/
     };
@@ -263,11 +263,11 @@ namespace dlib
         typename potts_problem
         >
     typename potts_problem::value_type potts_model_score (
-        const potts_problem& prob 
+        const potts_problem& prob
     );
     /*!
         requires
-            - potts_problem == an object with an interface compatible with the potts_problem 
+            - potts_problem == an object with an interface compatible with the potts_problem
               object defined at the top of this file.
             - for all valid i and j:
                 - prob.factor_value_disagreement(i,j) >= 0
@@ -275,11 +275,11 @@ namespace dlib
         ensures
             - computes the model score for the given potts_problem.  We define this
               precisely below:
-                - let L(i) == the boolean label of the i-th variable in prob.  Or in other 
+                - let L(i) == the boolean label of the i-th variable in prob.  Or in other
                   words, L(i) == (prob.get_label(i) != 0).
                 - let F == the sum of values of prob.factor_value(i) for only i values
                   where L(i) == true.
-                - Let D == the sum of values of prob.factor_value_disagreement(i,j) 
+                - Let D == the sum of values of prob.factor_value_disagreement(i,j)
                   for only i and j values which meet the following conditions:
                     - i and j are neighbors in the graph defined by prob, that is,
                       it is valid to call prob.factor_value_disagreement(i,j).
@@ -293,7 +293,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename graph_type 
+        typename graph_type
         >
     typename graph_type::edge_type potts_model_score (
         const graph_type& g,
@@ -303,7 +303,7 @@ namespace dlib
         requires
             - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
             - graph_type::edge_type is some signed type such as int or double
-            - graph_type::type must be the same type as graph_type::edge_type 
+            - graph_type::type must be the same type as graph_type::edge_type
             - graph_contains_length_one_cycle(g) == false
             - for all valid i and j:
                 - edge(g,i,j) >= 0
@@ -313,11 +313,11 @@ namespace dlib
               instead of a potts_problem object.
             - computes the model score for the given graph and labeling.  We define this
               precisely below:
-                - let L(i) == the boolean label of the i-th variable in g.  Or in other 
+                - let L(i) == the boolean label of the i-th variable in g.  Or in other
                   words, L(i) == (labels[i] != 0).
                 - let F == the sum of values of g.node(i).data for only i values
                   where L(i) == true.
-                - Let D == the sum of values of edge(g,i,j) for only i and j 
+                - Let D == the sum of values of edge(g,i,j) for only i and j
                   values which meet the following conditions:
                     - i and j are neighbors in the graph defined by g, that is,
                       it is valid to call edge(g,i,j).
@@ -342,7 +342,7 @@ namespace dlib
         requires
             - prob.nr() == labels.nr()
             - prob.nc() == labels.nc()
-            - potts_grid_problem == an object with an interface compatible with the 
+            - potts_grid_problem == an object with an interface compatible with the
               potts_grid_problem object defined above.
             - for all valid i and j:
                 - prob.factor_value_disagreement(i,j) >= 0
@@ -350,11 +350,11 @@ namespace dlib
         ensures
             - computes the model score for the given potts_grid_problem.  We define this
               precisely below:
-                - let L(i) == the boolean label of the i-th variable in prob.  Or in other 
+                - let L(i) == the boolean label of the i-th variable in prob.  Or in other
                   words, L(i) == (labels[i/labels.nc()][i%labels.nc()] != 0).
                 - let F == the sum of values of prob.factor_value(i) for only i values
                   where L(i) == true.
-                - Let D == the sum of values of prob.factor_value_disagreement(i,j) 
+                - Let D == the sum of values of prob.factor_value_disagreement(i,j)
                   for only i and j values which meet the following conditions:
                     - i and j are neighbors in the graph defined by prob, that is,
                       it is valid to call prob.factor_value_disagreement(i,j).
@@ -372,18 +372,18 @@ namespace dlib
         typename potts_problem
         >
     void find_max_factor_graph_potts (
-        potts_problem& prob 
+        potts_problem& prob
     );
     /*!
         requires
-            - potts_problem == an object with an interface compatible with the potts_problem 
+            - potts_problem == an object with an interface compatible with the potts_problem
               object defined at the top of this file.
             - for all valid i and j:
                 - prob.factor_value_disagreement(i,j) >= 0
                 - prob.factor_value_disagreement(i,j) == prob.factor_value_disagreement(j,i)
         ensures
             - This function is a tool for exactly solving the MAP problem in a Potts
-              model.  In particular, this means that this function finds the assignments 
+              model.  In particular, this means that this function finds the assignments
               to all the labels in prob which maximizes potts_model_score(#prob).
             - The optimal labels are stored in #prob.
     !*/
@@ -391,7 +391,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename graph_type 
+        typename graph_type
         >
     void find_max_factor_graph_potts (
         const graph_type& g,
@@ -401,7 +401,7 @@ namespace dlib
         requires
             - graph_type is an implementation of dlib/graph/graph_kernel_abstract.h
             - graph_type::edge_type is some signed type such as int or double
-            - graph_type::type must be the same type as graph_type::edge_type 
+            - graph_type::type must be the same type as graph_type::edge_type
             - graph_contains_length_one_cycle(g) == false
             - for all valid i and j:
                 - edge(g,i,j) >= 0
@@ -409,10 +409,10 @@ namespace dlib
             - This routine simply converts g into a potts_problem and calls the
               version of find_max_factor_graph_potts() defined above on it.  Therefore,
               this routine is just a convenience wrapper that lets you use a dlib::graph
-              to represent a potts problem.  This means that this function maximizes 
+              to represent a potts problem.  This means that this function maximizes
               the value of potts_model_score(g, #labels).
-            - #labels.size() == g.number_of_nodes() 
-            - for all valid i:  
+            - #labels.size() == g.number_of_nodes()
+            - for all valid i:
                 - #labels[i] == the optimal label for g.node(i)
             - The correspondence between g and a potts_problem is the following:
                 - the factor_value() for a node is stored in g.node(i).data.
@@ -431,7 +431,7 @@ namespace dlib
     );
     /*!
         requires
-            - potts_grid_problem == an object with an interface compatible with the 
+            - potts_grid_problem == an object with an interface compatible with the
               potts_grid_problem object defined above.
             - for all valid i and j:
                 - prob.factor_value_disagreement(i,j) >= 0
@@ -439,31 +439,31 @@ namespace dlib
         ensures
             - This routine solves a version of a potts problem where the graph is a
               regular grid where each node is connected to its four immediate neighbors.
-              In particular, this means that this function finds the assignments 
+              In particular, this means that this function finds the assignments
               to all the labels in prob which maximizes potts_model_score(prob,#labels).
             - The optimal labels are stored in #labels.
             - #labels.nr() == prob.nr()
             - #labels.nc() == prob.nc()
     !*/
 
-// ---------------------------------------------------------------------------------------- 
-// ---------------------------------------------------------------------------------------- 
-//    The following functions and interface definitions are convenience routines for use 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//    The following functions and interface definitions are convenience routines for use
 //    with the potts grid problem version of find_max_factor_graph_potts() defined above.
-// ---------------------------------------------------------------------------------------- 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
-    struct single_image_model 
+    struct single_image_model
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object defines a slightly more convenient interface for creating
-                potts_grid_problems which operate on an image.  In this case, the goal 
-                is to assign a binary label to each pixel in an image.  In particular, 
-                this object defines the interface used by the make_potts_grid_problem() 
-                routine defined below. 
+                potts_grid_problems which operate on an image.  In this case, the goal
+                is to assign a binary label to each pixel in an image.  In particular,
+                this object defines the interface used by the make_potts_grid_problem()
+                routine defined below.
 
-                In the following comments, we will refer to the image supplied to 
+                In the following comments, we will refer to the image supplied to
                 make_potts_grid_problem() as IMG.
         !*/
 
@@ -480,10 +480,10 @@ namespace dlib
                 - v is a pixel value from IMG.
             ensures
                 - returns a value which indicates how "good" it is to assign the location
-                  in IMG corresponding to v with the label of true.  The larger the value, 
-                  the more desirable it is to give it this label.  Similarly, a negative 
+                  in IMG corresponding to v with the label of true.  The larger the value,
+                  the more desirable it is to give it this label.  Similarly, a negative
                   value indicates that it is better to give the node a label of false.
-                - It is valid for the returned value to be positive or negative infinity.  
+                - It is valid for the returned value to be positive or negative infinity.
                   A value of positive infinity indicates that the pixel must be labeled
                   true while negative infinity means it must be labeled false.
         !*/
@@ -491,26 +491,26 @@ namespace dlib
         template <typename pixel_type>
         value_type factor_value_disagreement (
             const pixel_type& v1,
-            const pixel_type& v2 
+            const pixel_type& v2
         ) const;
         /*!
             requires
                 - v1 and v2 are pixel values from neighboring pixels in the IMG image.
             ensures
-                - returns a number >= 0.  This is the penalty for giving neighboring pixels 
-                  with values v1 and v2 different labels.  Larger values indicate a larger 
+                - returns a number >= 0.  This is the penalty for giving neighboring pixels
+                  with values v1 and v2 different labels.  Larger values indicate a larger
                   penalty.
-                - this function is symmetric.  That is, it is true that: 
+                - this function is symmetric.  That is, it is true that:
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
                 - It is valid for the returned value to be positive infinity.  Returning
-                  infinity indicates that the idx1-th and idx2-th nodes must share the same 
+                  infinity indicates that the idx1-th and idx2-th nodes must share the same
                   label.
         !*/
     };
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
-    struct pair_image_model 
+    struct pair_image_model
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -518,9 +518,9 @@ namespace dlib
                 potts_grid_problems which operate on a pair of identically sized images.
                 In this case, the goal is to assign a label to each pixel in the first
                 image of the pair.  In particular, this object defines the interface
-                used by the make_potts_grid_problem() routine defined below. 
+                used by the make_potts_grid_problem() routine defined below.
 
-                In the following comments, we will refer to the two images supplied to 
+                In the following comments, we will refer to the two images supplied to
                 make_potts_grid_problem() as IMG1 and IMG2.  The goal of the potts
                 problem will be to assign labels to each pixel in IMG1 (IMG2 is
                 not labeled, it is simply used as a place to keep auxiliary data).
@@ -533,7 +533,7 @@ namespace dlib
         template <typename pixel_type1, typename pixel_type2>
         value_type factor_value (
             const pixel_type1& v1,
-            const pixel_type2& v2 
+            const pixel_type2& v2
         ) const;
         /*!
             requires
@@ -543,10 +543,10 @@ namespace dlib
                   of IMG2[4][5].
             ensures
                 - returns a value which indicates how "good" it is to assign the location
-                  in IMG1 corresponding to v1 with the label of true.  The larger the value, 
-                  the more desirable it is to give it this label.  Similarly, a negative 
+                  in IMG1 corresponding to v1 with the label of true.  The larger the value,
+                  the more desirable it is to give it this label.  Similarly, a negative
                   value indicates that it is better to give the node a label of false.
-                - It is valid for the returned value to be positive or negative infinity.  
+                - It is valid for the returned value to be positive or negative infinity.
                   A value of positive infinity indicates that the pixel must be labeled
                   true while negative infinity means it must be labeled false.
         !*/
@@ -554,24 +554,24 @@ namespace dlib
         template <typename pixel_type>
         value_type factor_value_disagreement (
             const pixel_type& v1,
-            const pixel_type& v2 
+            const pixel_type& v2
         ) const;
         /*!
             requires
                 - v1 and v2 are pixel values from neighboring pixels in the IMG1 image.
             ensures
-                - returns a number >= 0.  This is the penalty for giving neighboring pixels 
-                  with values v1 and v2 different labels.  Larger values indicate a larger 
+                - returns a number >= 0.  This is the penalty for giving neighboring pixels
+                  with values v1 and v2 different labels.  Larger values indicate a larger
                   penalty.
-                - this function is symmetric.  That is, it is true that: 
+                - this function is symmetric.  That is, it is true that:
                   factor_value_disagreement(i,j) == factor_value_disagreement(j,i)
                 - It is valid for the returned value to be positive infinity.  Returning
-                  infinity indicates that the idx1-th and idx2-th nodes must share the same 
+                  infinity indicates that the idx1-th and idx2-th nodes must share the same
                   label.
         !*/
     };
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     template <
         typename single_image_model,
@@ -584,15 +584,15 @@ namespace dlib
     );
     /*!
         requires
-            - single_image_model == an object with an interface compatible with the 
+            - single_image_model == an object with an interface compatible with the
               single_image_model object defined above.
             - for all valid i and j:
                 - model.factor_value_disagreement(i,j) >= 0
                 - model.factor_value_disagreement(i,j) == model.factor_value_disagreement(j,i)
         ensures
-            - returns a potts_grid_problem which can be solved using the 
+            - returns a potts_grid_problem which can be solved using the
               find_max_factor_graph_potts(prob,array2d) routine defined above.  That is,
-              given an image to store the labels, the following statement would solve the 
+              given an image to store the labels, the following statement would solve the
               potts problem defined by the given model and image:
                 find_max_factor_graph_potts(make_potts_grid_problem(model,img),labels);
     !*/
@@ -614,15 +614,15 @@ namespace dlib
         requires
             - get_rect(img1) == get_rect(img2)
               (i.e. img1 and img2 have the same dimensions)
-            - pair_image_model == an object with an interface compatible with the 
+            - pair_image_model == an object with an interface compatible with the
               pair_image_model object defined above.
             - for all valid i and j:
                 - model.factor_value_disagreement(i,j) >= 0
                 - model.factor_value_disagreement(i,j) == model.factor_value_disagreement(j,i)
         ensures
-            - returns a potts_grid_problem which can be solved using the 
+            - returns a potts_grid_problem which can be solved using the
               find_max_factor_graph_potts(prob,array2d) routine defined above.  That is,
-              given an image to store the labels, the following statement would solve the 
+              given an image to store the labels, the following statement would solve the
               potts problem defined by the given model and pair of images:
                 find_max_factor_graph_potts(make_potts_grid_problem(model,img1,img2),labels);
     !*/

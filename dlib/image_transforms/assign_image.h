@@ -69,19 +69,19 @@ namespace dlib
     void impl_assign_image_scaled (
         image_view<dest_image_type>& dest,
         const src_image_type& src,
-        const double thresh 
+        const double thresh
     )
     {
         DLIB_ASSERT( thresh > 0,
             "\tvoid assign_image_scaled()"
             << "\n\t You have given an threshold value"
-            << "\n\t thresh: " << thresh 
+            << "\n\t thresh: " << thresh
             );
 
 
         typedef typename image_traits<dest_image_type>::pixel_type dest_pixel;
 
-        // If the destination has a dynamic range big enough to contain the source image data then just do a 
+        // If the destination has a dynamic range big enough to contain the source image data then just do a
         // regular assign_image()
         if (pixel_traits<dest_pixel>::max() >= pixel_traits<typename src_image_type::type>::max() &&
             pixel_traits<dest_pixel>::min() <= pixel_traits<typename src_image_type::type>::min() )
@@ -101,7 +101,7 @@ namespace dlib
             return;
         }
 
-        // gather image statistics 
+        // gather image statistics
         running_stats<double> rs;
         for (long r = 0; r < src.nr(); ++r)
         {
@@ -114,7 +114,7 @@ namespace dlib
 
         if (std::numeric_limits<spix_type>::is_integer)
         {
-            // If the destination has a dynamic range big enough to contain the source image data then just do a 
+            // If the destination has a dynamic range big enough to contain the source image data then just do a
             // regular assign_image()
             if (pixel_traits<dest_pixel>::max() >= rs.max() &&
                 pixel_traits<dest_pixel>::min() <= rs.min() )
@@ -153,7 +153,7 @@ namespace dlib
     void impl_assign_image_scaled (
         dest_image_type& dest_,
         const src_image_type& src,
-        const double thresh 
+        const double thresh
     )
     {
         image_view<dest_image_type> dest(dest_);

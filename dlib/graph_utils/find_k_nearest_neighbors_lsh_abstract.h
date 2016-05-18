@@ -55,7 +55,7 @@ namespace dlib
         const unsigned long k,
         const unsigned long num_threads,
         std::vector<sample_pair, alloc>& edges,
-        const unsigned long k_oversample = 20 
+        const unsigned long k_oversample = 20
     );
     /*!
         requires
@@ -65,7 +65,7 @@ namespace dlib
             - k > 0
             - k_oversample > 0
             - dist_funct(samples[i], samples[j]) must be a valid expression that evaluates
-              to a floating point number 
+              to a floating point number
             - vector_type is any container that looks like a std::vector or dlib::array.
             - hash_funct must be a function object with an interface compatible with the
               objects defined in dlib/lsh/hashes_abstract.h.  In particular, hash_funct
@@ -77,7 +77,7 @@ namespace dlib
               function hash_funct().  Then it performs an exact k nearest neighbors on the
               hashes which can be done very quickly.  For each of these neighbors we
               compute the true distance using dist_funct() and the k nearest neighbors for
-              each sample are stored into #edges.  
+              each sample are stored into #edges.
             - Note that samples with an infinite distance between them are considered to be
               not connected at all. Therefore, we exclude edges with such distances from
               being output.
@@ -91,7 +91,7 @@ namespace dlib
             - The hash based k nearest neighbor step is approximate, however, you can
               improve the output accuracy by using a larger k value for this first step.
               Therefore, this function finds k*k_oversample nearest neighbors during the
-              first hashing based step. 
+              first hashing based step.
     !*/
 
 // ----------------------------------------------------------------------------------------

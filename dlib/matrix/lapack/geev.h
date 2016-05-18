@@ -14,39 +14,39 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dgeev) (char *jobvl, char *jobvr, integer *n, double * a, 
-                                             integer *lda, double *wr, double *wi, double *vl, 
-                                             integer *ldvl, double *vr, integer *ldvr, double *work, 
+                void DLIB_FORTRAN_ID(dgeev) (char *jobvl, char *jobvr, integer *n, double * a,
+                                             integer *lda, double *wr, double *wi, double *vl,
+                                             integer *ldvl, double *vr, integer *ldvr, double *work,
                                              integer *lwork, integer *info);
 
-                void DLIB_FORTRAN_ID(sgeev) (char *jobvl, char *jobvr, integer *n, float * a, 
-                                             integer *lda, float *wr, float *wi, float *vl, 
-                                             integer *ldvl, float *vr, integer *ldvr, float *work, 
+                void DLIB_FORTRAN_ID(sgeev) (char *jobvl, char *jobvr, integer *n, float * a,
+                                             integer *lda, float *wr, float *wi, float *vl,
+                                             integer *ldvl, float *vr, integer *ldvr, float *work,
                                              integer *lwork, integer *info);
 
             }
 
-            inline int geev (char jobvl, char jobvr, integer n, double *a, 
-                             integer lda, double *wr, double *wi, double *vl, 
-                             integer ldvl, double *vr, integer ldvr, double *work, 
+            inline int geev (char jobvl, char jobvr, integer n, double *a,
+                             integer lda, double *wr, double *wi, double *vl,
+                             integer ldvl, double *vr, integer ldvr, double *work,
                              integer lwork)
             {
                 integer info = 0;
                 DLIB_FORTRAN_ID(dgeev)(&jobvl, &jobvr, &n, a,
-                                       &lda, wr, wi, vl, 
+                                       &lda, wr, wi, vl,
                                        &ldvl, vr, &ldvr, work,
                                        &lwork, &info);
                 return info;
             }
 
-            inline int geev (char jobvl, char jobvr, integer n, float *a, 
-                             integer lda, float *wr, float *wi, float *vl, 
-                             integer ldvl, float *vr, integer ldvr, float *work, 
+            inline int geev (char jobvl, char jobvr, integer n, float *a,
+                             integer lda, float *wr, float *wi, float *vl,
+                             integer ldvl, float *vr, integer ldvr, float *work,
                              integer lwork)
             {
                 integer info = 0;
                 DLIB_FORTRAN_ID(sgeev)(&jobvl, &jobvr, &n, a,
-                                       &lda, wr, wi, vl, 
+                                       &lda, wr, wi, vl,
                                        &ldvl, vr, &ldvr, work,
                                        &lwork, &info);
                 return info;
@@ -165,7 +165,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2, long NR3, long NR4, long NR5,
             long NC1, long NC2, long NC3, long NC4, long NC5,
             typename MM,
@@ -203,7 +203,7 @@ namespace dlib
             T work_size = 1;
             int info = binding::geev(jobvl, jobvr, n, &a(0,0),
                                      a.nr(), &wr(0,0), &wi(0,0), &vl(0,0),
-                                     vl.nr(), &vr(0,0), vr.nr(), &work_size, 
+                                     vl.nr(), &vr(0,0), vr.nr(), &work_size,
                                      -1);
 
             if (info != 0)
@@ -212,10 +212,10 @@ namespace dlib
             if (work.size() < work_size)
                 work.set_size(static_cast<long>(work_size), 1);
 
-            // compute the actual decomposition 
+            // compute the actual decomposition
             info = binding::geev(jobvl, jobvr, n, &a(0,0),
                                  a.nr(), &wr(0,0), &wi(0,0), &vl(0,0),
-                                 vl.nr(), &vr(0,0), vr.nr(), &work(0,0), 
+                                 vl.nr(), &vr(0,0), vr.nr(), &work(0,0),
                                  work.size());
 
             return info;

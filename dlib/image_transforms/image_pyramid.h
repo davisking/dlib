@@ -20,7 +20,7 @@ namespace dlib
 
         template <typename T>
         vector<double,2> point_down (
-            const vector<T,2>& 
+            const vector<T,2>&
         ) const
         {
             return vector<double,2>(0,0);
@@ -28,7 +28,7 @@ namespace dlib
 
         template <typename T>
         vector<double,2> point_up (
-            const vector<T,2>& 
+            const vector<T,2>&
         ) const
         {
             return vector<double,2>(0,0);
@@ -113,9 +113,9 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_same_object(original, down) == false, 
+            DLIB_ASSERT(is_same_object(original, down) == false,
                         "\t void pyramid_disable::operator()"
-                        << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                        << "\n\t is_same_object(original, down): " << is_same_object(original, down)
                         << "\n\t this:                           " << this
                         );
 
@@ -249,9 +249,9 @@ namespace dlib
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT( is_same_object(original_, down_) == false, 
+                DLIB_ASSERT( is_same_object(original_, down_) == false,
                             "\t void pyramid_down_2_1::operator()"
-                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_) 
+                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_)
                             << "\n\t this:                           " << this
                             );
 
@@ -316,11 +316,11 @@ namespace dlib
                 {
                     for (long c = 0; c < temp_img.nc(); ++c)
                     {
-                        ptype temp = temp_img[r-2][c] + 
-                                    temp_img[r-1][c]*4 +  
-                                    temp_img[r  ][c]*6 +  
-                                    temp_img[r-1][c]*4 +  
-                                    temp_img[r-2][c];  
+                        ptype temp = temp_img[r-2][c] +
+                                    temp_img[r-1][c]*4 +
+                                    temp_img[r  ][c]*6 +
+                                    temp_img[r-1][c]*4 +
+                                    temp_img[r-2][c];
 
                         assign_pixel(down[dr][c],temp/256);
                     }
@@ -330,7 +330,7 @@ namespace dlib
             }
 
         private:
-            struct rgbptype 
+            struct rgbptype
             {
                 uint16 red;
                 uint16 green;
@@ -350,9 +350,9 @@ namespace dlib
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT( is_same_object(original_, down_) == false, 
+                DLIB_ASSERT( is_same_object(original_, down_) == false,
                             "\t void pyramid_down_2_1::operator()"
-                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_) 
+                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_)
                             << "\n\t this:                           " << this
                             );
 
@@ -440,21 +440,21 @@ namespace dlib
                     for (long c = 0; c < temp_img.nc(); ++c)
                     {
                         rgbptype temp;
-                        temp.red = temp_img[r-2][c].red + 
-                                temp_img[r-1][c].red*4 +  
-                                temp_img[r  ][c].red*6 +  
-                                temp_img[r-1][c].red*4 +  
-                                temp_img[r-2][c].red;  
-                        temp.green = temp_img[r-2][c].green + 
-                                    temp_img[r-1][c].green*4 +  
-                                    temp_img[r  ][c].green*6 +  
-                                    temp_img[r-1][c].green*4 +  
-                                    temp_img[r-2][c].green;  
-                        temp.blue = temp_img[r-2][c].blue + 
-                                    temp_img[r-1][c].blue*4 +  
-                                    temp_img[r  ][c].blue*6 +  
-                                    temp_img[r-1][c].blue*4 +  
-                                    temp_img[r-2][c].blue;  
+                        temp.red = temp_img[r-2][c].red +
+                                temp_img[r-1][c].red*4 +
+                                temp_img[r  ][c].red*6 +
+                                temp_img[r-1][c].red*4 +
+                                temp_img[r-2][c].red;
+                        temp.green = temp_img[r-2][c].green +
+                                    temp_img[r-1][c].green*4 +
+                                    temp_img[r  ][c].green*6 +
+                                    temp_img[r-1][c].green*4 +
+                                    temp_img[r-2][c].green;
+                        temp.blue = temp_img[r-2][c].blue +
+                                    temp_img[r-1][c].blue*4 +
+                                    temp_img[r  ][c].blue*6 +
+                                    temp_img[r-1][c].blue*4 +
+                                    temp_img[r-2][c].blue;
 
                         down[dr][c].red = temp.red/256;
                         down[dr][c].green = temp.green/256;
@@ -590,9 +590,9 @@ namespace dlib
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT(is_same_object(original_, down_) == false, 
+                DLIB_ASSERT(is_same_object(original_, down_) == false,
                             "\t void pyramid_down_3_2::operator()"
-                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_) 
+                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_)
                             << "\n\t this:                           " << this
                             );
 
@@ -633,7 +633,7 @@ namespace dlib
                         ptype block[size_in][size_in];
                         separable_3x3_filter_block_grayscale(block, original_, rr, cc, 2, 12, 2);
 
-                        // bi-linearly interpolate block 
+                        // bi-linearly interpolate block
                         assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
                         assign_pixel(down[r][c+1]   , (block[0][2]*9 + block[1][2]*3 + block[0][1]*3 + block[1][1])/(16*256));
                         assign_pixel(down[r+1][c]   , (block[2][0]*9 + block[1][0]*3 + block[2][1]*3 + block[1][1])/(16*256));
@@ -646,7 +646,7 @@ namespace dlib
                         ptype block[size_in][2];
                         separable_3x3_filter_block_grayscale(block, original_, rr, cc, 2, 12, 2);
 
-                        // bi-linearly interpolate partial block 
+                        // bi-linearly interpolate partial block
                         assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
                         assign_pixel(down[r+1][c]   , (block[2][0]*9 + block[1][0]*3 + block[2][1]*3 + block[1][1])/(16*256));
                     }
@@ -661,7 +661,7 @@ namespace dlib
                         ptype block[2][size_in];
                         separable_3x3_filter_block_grayscale(block, original_, rr, cc, 2, 12, 2);
 
-                        // bi-linearly interpolate partial block 
+                        // bi-linearly interpolate partial block
                         assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
                         assign_pixel(down[r][c+1]   , (block[0][2]*9 + block[1][2]*3 + block[0][1]*3 + block[1][1])/(16*256));
 
@@ -672,7 +672,7 @@ namespace dlib
                         ptype block[2][2];
                         separable_3x3_filter_block_grayscale(block, original_, rr, cc, 2, 12, 2);
 
-                        // bi-linearly interpolate partial block 
+                        // bi-linearly interpolate partial block
                         assign_pixel(down[r][c]     , (block[0][0]*9 + block[1][0]*3 + block[0][1]*3 + block[1][1])/(16*256));
                     }
                 }
@@ -680,7 +680,7 @@ namespace dlib
             }
 
         private:
-            struct rgbptype 
+            struct rgbptype
             {
                 uint32 red;
                 uint32 green;
@@ -701,9 +701,9 @@ namespace dlib
             ) const
             {
                 // make sure requires clause is not broken
-                DLIB_ASSERT( is_same_object(original_, down_) == false, 
+                DLIB_ASSERT( is_same_object(original_, down_) == false,
                             "\t void pyramid_down_3_2::operator()"
-                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_) 
+                            << "\n\t is_same_object(original_, down_): " << is_same_object(original_, down_)
                             << "\n\t this:                           " << this
                             );
 
@@ -742,7 +742,7 @@ namespace dlib
                         rgbptype block[size_in][size_in];
                         separable_3x3_filter_block_rgb(block, original_, rr, cc, 2, 12, 2);
 
-                        // bi-linearly interpolate block 
+                        // bi-linearly interpolate block
                         down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
                         down[r][c].green     = (block[0][0].green*9 + block[1][0].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
                         down[r][c].blue      = (block[0][0].blue*9  + block[1][0].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
@@ -766,7 +766,7 @@ namespace dlib
                         rgbptype block[size_in][2];
                         separable_3x3_filter_block_rgb(block, original_, rr, cc, 2, 12, 2);
 
-                        // bi-linearly interpolate partial block 
+                        // bi-linearly interpolate partial block
                         down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
                         down[r][c].green     = (block[0][0].green*9 + block[1][0].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
                         down[r][c].blue      = (block[0][0].blue*9  + block[1][0].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
@@ -786,7 +786,7 @@ namespace dlib
                         rgbptype block[2][size_in];
                         separable_3x3_filter_block_rgb(block, original_, rr, cc, 2, 12, 2);
 
-                        // bi-linearly interpolate partial block 
+                        // bi-linearly interpolate partial block
                         down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
                         down[r][c].green     = (block[0][0].green*9 + block[1][0].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
                         down[r][c].blue      = (block[0][0].blue*9  + block[1][0].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
@@ -802,7 +802,7 @@ namespace dlib
                         rgbptype block[2][2];
                         separable_3x3_filter_block_rgb(block, original_, rr, cc, 2, 12, 2);
 
-                        // bi-linearly interpolate partial block 
+                        // bi-linearly interpolate partial block
                         down[r][c].red       = (block[0][0].red*9   + block[1][0].red*3   + block[0][1].red*3   + block[1][1].red)/(16*256);
                         down[r][c].green     = (block[0][0].green*9 + block[1][0].green*3 + block[0][1].green*3 + block[1][1].green)/(16*256);
                         down[r][c].blue      = (block[0][0].blue*9  + block[1][0].blue*3  + block[0][1].blue*3  + block[1][1].blue)/(16*256);
@@ -929,9 +929,9 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_same_object(original, down) == false, 
+            DLIB_ASSERT(is_same_object(original, down) == false,
                         "\t void pyramid_down::operator()"
-                        << "\n\t is_same_object(original, down): " << is_same_object(original, down) 
+                        << "\n\t is_same_object(original, down): " << is_same_object(original, down)
                         << "\n\t this:                           " << this
                         );
 

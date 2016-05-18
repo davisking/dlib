@@ -22,19 +22,19 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type2 should contain a grayscale pixel type such as unsigned char.
         ensures
             - #lbp.nr() == img.nr()
             - #lbp.nc() == img.nc()
             - This function extracts the uniform local-binary-pattern feature at every pixel
-              and stores it into #lbp.  In particular, we have the following for all valid 
+              and stores it into #lbp.  In particular, we have the following for all valid
               r and c:
-                - #lbp[r][c] == the uniform LBP for the 3x3 pixel window centered on img[r][c].  
-                  In particular, this is a value in the range 0 to 58 inclusive. 
-            - We use the idea of uniform LBPs from the paper: 
+                - #lbp[r][c] == the uniform LBP for the 3x3 pixel window centered on img[r][c].
+                  In particular, this is a value in the range 0 to 58 inclusive.
+            - We use the idea of uniform LBPs from the paper:
                 Face Description with Local Binary Patterns: Application to Face Recognition
                 by Ahonen, Hadid, and Pietikainen.
     !*/
@@ -56,7 +56,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
             - image_type contains unsigned char valued pixels.
             - T is some scalar type like int or double
             - All pixel values in img are <= max_val

@@ -11,7 +11,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -78,9 +78,9 @@ namespace
         }
 
         void thread1() { thread(1); }
-        void thread2() 
-        { 
-            thread(2); 
+        void thread2()
+        {
+            thread(2);
             if (is_dlib_thread() == false)
                 failure = true;
         }

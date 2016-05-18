@@ -118,11 +118,11 @@ namespace dlib
             );
 
 
-        const int vert_filter[3][3] = {{-1,-2,-1}, 
-        {0,0,0}, 
+        const int vert_filter[3][3] = {{-1,-2,-1},
+        {0,0,0},
         {1,2,1}};
-        const int horz_filter[3][3] = { {-1,0,1}, 
-        {-2,0,2}, 
+        const int horz_filter[3][3] = { {-1,0,1},
+        {-2,0,2},
         {-1,0,1}};
 
         const long M = 3;
@@ -181,8 +181,8 @@ namespace dlib
     {
         template <typename T>
         typename promote<T>::type square (const T& a)
-        { 
-            return static_cast<T>(a)*static_cast<T>(a); 
+        {
+            return static_cast<T>(a)*static_cast<T>(a);
         }
     }
 
@@ -204,10 +204,10 @@ namespace dlib
         DLIB_ASSERT( horz.nr() == vert.nr() && horz.nc() == vert.nc(),
             "\tvoid suppress_non_maximum_edges(horz, vert, out_img)"
             << "\n\tYou have to give horz and vert gradient images that are the same size"
-            << "\n\thorz.nr():   " << horz.nr() 
-            << "\n\thorz.nc():   " << horz.nc() 
-            << "\n\tvert.nr():   " << vert.nr() 
-            << "\n\tvert.nc():   " << vert.nc() 
+            << "\n\thorz.nr():   " << horz.nr()
+            << "\n\thorz.nc():   " << horz.nc()
+            << "\n\tvert.nr():   " << vert.nr()
+            << "\n\tvert.nc():   " << vert.nc()
             );
         DLIB_ASSERT( !is_same_object(out_img_,horz_) && !is_same_object(out_img_,vert_),
             "\tvoid suppress_non_maximum_edges(horz_, vert_, out_img_)"
@@ -231,7 +231,7 @@ namespace dlib
 
         zero_border_pixels(out_img,1,1);
 
-        // now do non maximum suppression while we copy the 
+        // now do non maximum suppression while we copy the
         const long M = 3;
         const long N = 3;
 
@@ -253,7 +253,7 @@ namespace dlib
 
                 using impl::square;
 
-                const T val = square(horz[r][c]) + square(vert[r][c]); 
+                const T val = square(horz[r][c]) + square(vert[r][c]);
 
                 const char ori = edge_orientation(x,y);
                 const unsigned char zero = 0;

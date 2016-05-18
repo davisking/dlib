@@ -43,7 +43,7 @@ namespace dlib
             const in_sample_vector_type* x;
         };
 
-        struct task  
+        struct task
         {
             template <
                 typename trainer_type,
@@ -83,7 +83,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type>
     cross_validate_trainer_threaded_impl (
         const trainer_type& trainer,
         const in_sample_vector_type& x,
@@ -103,8 +103,8 @@ namespace dlib
             "\tmatrix cross_validate_trainer()"
             << "\n\t invalid inputs were given to this function"
             << "\n\t std::min(sum(y>0),sum(y<0)): " << std::min(sum(y>0),sum(y<0))
-            << "\n\t folds:  " << folds 
-            << "\n\t num_threads:  " << num_threads 
+            << "\n\t folds:  " << folds
+            << "\n\t num_threads:  " << num_threads
             << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
             );
 
@@ -125,10 +125,10 @@ namespace dlib
         }
 
         // figure out how many positive and negative examples we will have in each fold
-        const long num_pos_test_samples = num_pos/folds; 
-        const long num_pos_train_samples = num_pos - num_pos_test_samples; 
-        const long num_neg_test_samples = num_neg/folds; 
-        const long num_neg_train_samples = num_neg - num_neg_test_samples; 
+        const long num_pos_test_samples = num_pos/folds;
+        const long num_pos_train_samples = num_pos - num_pos_test_samples;
+        const long num_neg_test_samples = num_neg/folds;
+        const long num_neg_train_samples = num_neg - num_neg_test_samples;
 
 
         long pos_idx = 0;
@@ -229,7 +229,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type>
     cross_validate_trainer_threaded (
         const trainer_type& trainer,
         const in_sample_vector_type& x,

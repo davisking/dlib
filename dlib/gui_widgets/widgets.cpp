@@ -12,7 +12,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // toggle_button object methods  
+    // toggle_button object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -206,7 +206,7 @@ namespace dlib
     {
         auto_mutex M(m);
         name_ = name;
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the std::string implementation.
         name_[0] = name_[0];
 
@@ -239,7 +239,7 @@ namespace dlib
     {
         auto_mutex M(m);
         dlib::ustring temp = name_;
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the std::string implementation.
         temp[0] = name_[0];
         return temp;
@@ -252,7 +252,7 @@ namespace dlib
         bool mouse_over
     )
     {
-        if (mouse_over)                
+        if (mouse_over)
         {
             checked = !checked;
             // this is a valid toggle_button click
@@ -265,7 +265,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // label object methods  
+    // label object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -344,17 +344,17 @@ namespace dlib
         using namespace std;
         auto_mutex M(m);
         text_ = text;
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the std::string implementation.
         text_[0] = text[0];
 
         rectangle old(rect);
 
-        unsigned long width; 
+        unsigned long width;
         unsigned long height;
         mfont->compute_size(text,width,height);
 
-        rect.set_right(rect.left() + width - 1); 
+        rect.set_right(rect.left() + width - 1);
         rect.set_bottom(rect.top() + height - 1);
 
         parent.invalidate_rectangle(rect+old);
@@ -382,7 +382,7 @@ namespace dlib
     {
         auto_mutex M(m);
         dlib::ustring temp = text_;
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the std::string implementation.
         temp[0] = text_[0];
         return temp;
@@ -413,7 +413,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // text_field object methods  
+    // text_field object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -421,7 +421,7 @@ namespace dlib
     get_text_rect (
     ) const
     {
-        // figure out where the text string should appear        
+        // figure out where the text string should appear
         unsigned long vertical_pad = (rect.height() - mfont->height())/2+1;
 
         rectangle text_rect;
@@ -693,7 +693,7 @@ namespace dlib
                 "\tvoid text_field::set_text()"
                 << "\n\ttext:  " << narrow(text) );
         auto_mutex M(m);
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the std::string implementation.
         text_ = text.c_str();
                 
@@ -728,7 +728,7 @@ namespace dlib
     ) const
     {
         auto_mutex M(m);
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the dlib::ustring implementation.
         dlib::ustring temp = text_.c_str();
         return temp;
@@ -740,14 +740,14 @@ namespace dlib
     set_width (
         unsigned long width
     )
-    {        
+    {
         auto_mutex M(m);
         if (width < style->get_padding(*mfont)*2)
             return;
 
         rectangle old(rect);
 
-        rect.set_right(rect.left() + width - 1); 
+        rect.set_right(rect.left() + width - 1);
 
         right_click_menu.set_rect(get_text_rect());
         parent.invalidate_rectangle(rect+old);
@@ -854,7 +854,7 @@ namespace dlib
         unsigned long btn,
         unsigned long,
         long ,
-        long 
+        long
     )
     {
         if (!enabled || hidden)
@@ -872,7 +872,7 @@ namespace dlib
         unsigned long state,
         long x,
         long y,
-        bool double_clicked 
+        bool double_clicked
     )
     {
         using namespace std;
@@ -1135,7 +1135,7 @@ namespace dlib
                 }
             }
             else if (key == base_window::KEY_BACKSPACE)
-            {                
+            {
                 // if something is highlighted then delete that
                 if (highlight_start <= highlight_end)
                 {
@@ -1212,7 +1212,7 @@ namespace dlib
         }
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     void text_field::
     on_string_put(
@@ -1264,7 +1264,7 @@ namespace dlib
             else
                 text_pos = 0;
 
-            cursor_pos = pos;    
+            cursor_pos = pos;
             unsigned long height;
             mfont->compute_size(text_,text_width,height,text_pos);
 
@@ -1285,7 +1285,7 @@ namespace dlib
             unsigned long width;
             mfont->compute_size(text_,width,height,text_pos,pos-1);
 
-            unsigned long new_x = style->get_padding(*mfont) + 
+            unsigned long new_x = style->get_padding(*mfont) +
                 width - mfont->right_overflow();
 
             // move the text to the left if necessary
@@ -1299,7 +1299,7 @@ namespace dlib
             }
 
             cursor_x = new_x;
-            cursor_pos = pos;     
+            cursor_pos = pos;
             mfont->compute_size(text_,text_width,height,text_pos);
         }
 
@@ -1331,14 +1331,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//             tabbed_display object methods  
+//             tabbed_display object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     tabbed_display::
-    tabbed_display(  
+    tabbed_display(
         drawable_window& w
-    ) : 
+    ) :
         drawable(w,MOUSE_CLICK),
         selected_tab_(0),
         left_pad(6),
@@ -1359,7 +1359,7 @@ namespace dlib
     )
     {
         disable_events();
-        parent.invalidate_rectangle(rect); 
+        parent.invalidate_rectangle(rect);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1498,7 +1498,7 @@ namespace dlib
 
         DLIB_ASSERT ( idx < number_of_tabs() ,
                 "\tvoid tabbed_display::tab_name()"
-                << "\n\tidx:              " << idx 
+                << "\n\tidx:              " << idx
                 << "\n\tnumber_of_tabs(): " << number_of_tabs() );
 
         return tabs[idx].name;
@@ -1535,7 +1535,7 @@ namespace dlib
 
         DLIB_ASSERT ( idx < number_of_tabs() ,
                 "\tvoid tabbed_display::set_tab_name()"
-                << "\n\tidx:              " << idx 
+                << "\n\tidx:              " << idx
                 << "\n\tnumber_of_tabs(): " << number_of_tabs() );
 
 
@@ -1559,7 +1559,7 @@ namespace dlib
         unsigned long,
         long x,
         long y,
-        bool 
+        bool
     )
     {
         if (rect.contains(x,y) && btn == base_window::LEFT && enabled && !hidden)
@@ -1607,7 +1607,7 @@ namespace dlib
 
         DLIB_ASSERT ( idx < number_of_tabs() ,
                 "\tvoid tabbed_display::set_tab_group()"
-                << "\n\tidx:              " << idx 
+                << "\n\tidx:              " << idx
                 << "\n\tnumber_of_tabs(): " << number_of_tabs() );
 
 
@@ -1821,12 +1821,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//             named_rectangle object methods  
+//             named_rectangle object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     named_rectangle::
-    named_rectangle(  
+    named_rectangle(
         drawable_window& w
     ) :
         drawable(w),
@@ -1844,7 +1844,7 @@ namespace dlib
     )
     {
         disable_events();
-        parent.invalidate_rectangle(rect); 
+        parent.invalidate_rectangle(rect);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1988,26 +1988,26 @@ namespace dlib
         const rgb_pixel gray(128,128,128);
 
         mfont->draw_string(c,strrect,name_);
-        draw_line(c,point(rect.left(), rtop),             
+        draw_line(c,point(rect.left(), rtop),
                   point(rect.left()+gap/2, rtop), gray);
-        draw_line(c,point(rect.left(), rtop),             
+        draw_line(c,point(rect.left(), rtop),
                   point(rect.left(), rect.bottom()-1), gray);
-        draw_line(c,point(rect.left(), rect.bottom()-1),  
+        draw_line(c,point(rect.left(), rect.bottom()-1),
                   point(rect.right()-1, rect.bottom()-1), gray);
-        draw_line(c,point(rect.right()-1, rtop),          
+        draw_line(c,point(rect.right()-1, rtop),
                   point(rect.right()-1, rect.bottom()-2), gray);
-        draw_line(c,point(strrect.left() + name_width + 2, rtop), 
+        draw_line(c,point(strrect.left() + name_width + 2, rtop),
                   point(rect.right()-1, rtop), gray);
 
-        draw_line(c,point(strrect.left() + name_width + 2, rtop+1),   
+        draw_line(c,point(strrect.left() + name_width + 2, rtop+1),
                   point( rect.right()-2, rtop+1), white);
-        draw_line(c,point(rect.right(), rtop), 
+        draw_line(c,point(rect.right(), rtop),
                   point(rect.right(), rect.bottom()), white);
-        draw_line(c,point(rect.left(), rect.bottom()),                
+        draw_line(c,point(rect.left(), rect.bottom()),
                   point(rect.right(), rect.bottom()), white);
-        draw_line(c,point(rect.left()+1, rtop+1), 
+        draw_line(c,point(rect.left()+1, rtop+1),
                   point(rect.left()+1, rect.bottom()-2), white);
-        draw_line(c,point(rect.left()+1, rtop+1), 
+        draw_line(c,point(rect.left()+1, rtop+1),
                   point(rect.left()+gap/2, rtop+1), white);
     }
 
@@ -2018,7 +2018,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     mouse_tracker::
-    mouse_tracker(  
+    mouse_tracker(
         drawable_window& w
     ) :
         draggable(w),
@@ -2056,9 +2056,9 @@ namespace dlib
     mouse_tracker::
     ~mouse_tracker(
     )
-    { 
-        disable_events(); 
-        parent.invalidate_rectangle(rect); 
+    {
+        disable_events();
+        parent.invalidate_rectangle(rect);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2147,7 +2147,7 @@ namespace dlib
         unsigned long state,
         long x,
         long y,
-        bool double_clicked 
+        bool double_clicked
     )
     {
         draggable::on_mouse_down(btn,state,x,y,double_clicked);
@@ -2225,8 +2225,8 @@ namespace dlib
     void mouse_tracker::
     draw (
         const canvas& c
-    ) const 
-    { 
+    ) const
+    {
         fill_rect(c, rect,rgb_pixel(212,208,200));
         draw_pixel(c, point(click_x,click_y),rgb_pixel(255,0,0));
     }
@@ -2240,9 +2240,9 @@ namespace dlib
     namespace list_box_helper{
     template <typename S>
     list_box<S>::
-    list_box(  
+    list_box(
         drawable_window& w
-    ) : 
+    ) :
         scrollable_region(w,MOUSE_WHEEL|MOUSE_CLICK),
         ms_enabled(false),
         last_selected(0)
@@ -2262,7 +2262,7 @@ namespace dlib
     )
     {
         disable_events();
-        parent.invalidate_rectangle(rect); 
+        parent.invalidate_rectangle(rect);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2295,7 +2295,7 @@ namespace dlib
         auto_mutex M(m);
         DLIB_ASSERT ( index < size() ,
                 "\tbool list_box::is_selected(index)"
-                << "\n\tindex:  " << index 
+                << "\n\tindex:  " << index
                 << "\n\tsize(): " << size() );
 
         return items[index].is_selected;
@@ -2306,13 +2306,13 @@ namespace dlib
     template <typename S>
     void list_box<S>::
     select (
-        unsigned long index 
+        unsigned long index
     )
     {
         auto_mutex M(m);
         DLIB_ASSERT ( index < size() ,
                 "\tvoid list_box::select(index)"
-                << "\n\tindex:  " << index 
+                << "\n\tindex:  " << index
                 << "\n\tsize(): " << size() );
 
         last_selected = index;
@@ -2325,13 +2325,13 @@ namespace dlib
     template <typename S>
     void list_box<S>::
     unselect (
-        unsigned long index 
+        unsigned long index
     )
     {
         auto_mutex M(m);
         DLIB_ASSERT ( index < size() ,
                 "\tvoid list_box::unselect(index)"
-                << "\n\tindex:  " << index 
+                << "\n\tindex:  " << index
                 << "\n\tsize(): " << size() );
         items[index].is_selected = false;
         parent.invalidate_rectangle(rect);
@@ -2347,7 +2347,7 @@ namespace dlib
         auto_mutex M(m);
         DLIB_ASSERT ( index < size() ,
                 "\tconst std::string& list_box::operator[](index)"
-                << "\n\tindex:  " << index 
+                << "\n\tindex:  " << index
                 << "\n\tsize(): " << size() );
         return items[index].name;
     }
@@ -2368,7 +2368,7 @@ namespace dlib
     template <typename S>
     void list_box<S>::
     enable_multiple_select (
-    ) 
+    )
     {
         auto_mutex M(m);
         ms_enabled = true;
@@ -2519,7 +2519,7 @@ namespace dlib
     {
         if (display_rect().contains(x,y) && btn == base_window::LEFT && enabled && !hidden )
         {
-            if ( ms_enabled == false || 
+            if ( ms_enabled == false ||
                  ((!(state&base_window::CONTROL)) && !(state&base_window::SHIFT)))
             {
                 items.reset();
@@ -2609,7 +2609,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // function message_box()  
+    // function message_box()
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -2644,7 +2644,7 @@ namespace dlib
         box_win (
             const std::string& title_,
             const std::string& message_
-        ) : 
+        ) :
             drawable_window(false),
             title(convert_mbstring_to_wstring(title_)),
             message(convert_mbstring_to_wstring(message_)),
@@ -2660,7 +2660,7 @@ namespace dlib
         box_win (
             const std::wstring& title_,
             const std::wstring& message_
-        ) : 
+        ) :
             drawable_window(false),
             title(title_),
             message(message_),
@@ -2676,7 +2676,7 @@ namespace dlib
         box_win (
             const dlib::ustring& title_,
             const dlib::ustring& message_
-        ) : 
+        ) :
             drawable_window(false),
             title(convert_utf32_to_wstring(title_)),
             message(convert_utf32_to_wstring(message_)),
@@ -2703,14 +2703,14 @@ namespace dlib
         )
         {
             // The point of this extra event_handler stuff is to allow the user
-            // to end the program from within the callback.  So we want to destroy the 
+            // to end the program from within the callback.  So we want to destroy the
             // window *before* we call their callback.
             box_win& w = *static_cast<box_win*>(param);
             w.close_window();
             any_function<void()> event_handler(w.event_handler);
             delete &w;
             if (event_handler.is_set())
-                event_handler(); 
+                event_handler();
         }
 
     // ------------------------------------------------------------------------------------
@@ -2730,8 +2730,8 @@ namespace dlib
         )
         {
             // The point of this extra event_handler stuff is to allow the user
-            // to end the program within the callback.  So we want to destroy the 
-            // window *before* we call their callback. 
+            // to end the program within the callback.  So we want to destroy the
+            // window *before* we call their callback.
             any_function<void()> event_handler_copy(event_handler);
             delete this;
             if (event_handler_copy.is_set())
@@ -2772,7 +2772,7 @@ namespace dlib
         blocking_box_win (
             const std::string& title_,
             const std::string& message_
-        ) : 
+        ) :
             drawable_window(false),
             title(convert_mbstring_to_wstring(title_)),
             message(convert_mbstring_to_wstring(message_)),
@@ -2788,7 +2788,7 @@ namespace dlib
         blocking_box_win (
             const std::wstring& title_,
             const std::wstring& message_
-        ) : 
+        ) :
             drawable_window(false),
             title(title_),
             message(message_),
@@ -2804,7 +2804,7 @@ namespace dlib
         blocking_box_win (
             const dlib::ustring& title_,
             const dlib::ustring& message_
-        ) : 
+        ) :
             drawable_window(false),
             title(convert_utf32_to_wstring(title_)),
             message(convert_utf32_to_wstring(message_)),
@@ -2819,8 +2819,8 @@ namespace dlib
         blocking_box_win::
         ~blocking_box_win (
         )
-        { 
-            close_window(); 
+        {
+            close_window();
         }
 
     // ------------------------------------------------------------------------------------
@@ -2836,7 +2836,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // function open_file_box() 
+    // function open_file_box()
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -2845,8 +2845,8 @@ namespace dlib
         box_win::
         box_win (
             const std::string& title,
-            bool has_text_field 
-        ) : 
+            bool has_text_field
+        ) :
             lbl_dirs(*this),
             lbl_files(*this),
             lbl_file_name(*this),
@@ -2905,7 +2905,7 @@ namespace dlib
                     full_name.clear();
 
                 if (left.size() > 0)
-                    enter_folder(left); 
+                    enter_folder(left);
             }
 
 
@@ -2978,10 +2978,10 @@ namespace dlib
 
         void box_win::
         deleter_thread (
-        ) 
-        {  
+        )
+        {
             close_window();
-            delete this; 
+            delete this;
         }
 
     // ------------------------------------------------------------------------------------
@@ -3063,7 +3063,7 @@ namespace dlib
 
         void box_win::
         on_files_double_click (
-            unsigned long 
+            unsigned long
         )
         {
             on_open_click();
@@ -3279,7 +3279,7 @@ namespace dlib
     menu_bar::
     menu_bar(
         drawable_window& w
-    ) : 
+    ) :
         drawable(w, 0xFFFF), // listen for all events
         open_menu(0)
     {
@@ -3291,9 +3291,9 @@ namespace dlib
 
     menu_bar::
     ~menu_bar()
-    { 
-        disable_events(); 
-        parent.invalidate_rectangle(rect); 
+    {
+        disable_events();
+        parent.invalidate_rectangle(rect);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3347,7 +3347,7 @@ namespace dlib
     set_menu_name (
         unsigned long idx,
         const std::string name,
-        char underline_ch 
+        char underline_ch
     )
     {
         set_menu_name(idx, convert_mbstring_to_wstring(name), underline_ch);
@@ -3359,7 +3359,7 @@ namespace dlib
     set_menu_name (
         unsigned long idx,
         const std::wstring name,
-        char underline_ch 
+        char underline_ch
     )
     {
         set_menu_name(idx, convert_wstring_to_utf32(name), underline_ch);
@@ -3371,13 +3371,13 @@ namespace dlib
     set_menu_name (
         unsigned long idx,
         const dlib::ustring name,
-        char underline_ch 
+        char underline_ch
     )
     {
         DLIB_ASSERT ( idx < number_of_menus() ,
                       "\tvoid menu_bar::set_menu_name()"
                       << "\n\tidx:               " << idx
-                      << "\n\tnumber_of_menus(): " << number_of_menus() 
+                      << "\n\tnumber_of_menus(): " << number_of_menus()
         );
         auto_mutex M(m);
         menus[idx].name = name.c_str();
@@ -3416,7 +3416,7 @@ namespace dlib
         DLIB_ASSERT ( idx < number_of_menus() ,
                       "\tstd::string menu_bar::menu_name()"
                       << "\n\tidx:               " << idx
-                      << "\n\tnumber_of_menus(): " << number_of_menus() 
+                      << "\n\tnumber_of_menus(): " << number_of_menus()
         );
         auto_mutex M(m);
         return menus[idx].name.c_str();
@@ -3432,7 +3432,7 @@ namespace dlib
         DLIB_ASSERT ( idx < number_of_menus() ,
                       "\tpopup_menu& menu_bar::menu()"
                       << "\n\tidx:               " << idx
-                      << "\n\tnumber_of_menus(): " << number_of_menus() 
+                      << "\n\tnumber_of_menus(): " << number_of_menus()
         );
         auto_mutex M(m);
         return menus[idx].menu;
@@ -3448,7 +3448,7 @@ namespace dlib
         DLIB_ASSERT ( idx < number_of_menus() ,
                       "\tconst popup_menu& menu_bar::menu()"
                       << "\n\tidx:               " << idx
-                      << "\n\tnumber_of_menus(): " << number_of_menus() 
+                      << "\n\tnumber_of_menus(): " << number_of_menus()
         );
         auto_mutex M(m);
         return menus[idx].menu;
@@ -3480,9 +3480,9 @@ namespace dlib
                                          rgb_alpha_pixel(0,0,0,opacity));
 
         // first draw the border between the menu and the rest of the window
-        draw_line(c, point(rect.left(),rect.bottom()-1), 
+        draw_line(c, point(rect.left(),rect.bottom()-1),
                   point(rect.right(),rect.bottom()-1), 100);
-        draw_line(c, point(rect.left(),rect.bottom()), 
+        draw_line(c, point(rect.left(),rect.bottom()),
                   point(rect.right(),rect.bottom()), 255);
 
         // now draw all the menu buttons
@@ -3525,7 +3525,7 @@ namespace dlib
         unsigned long ,
         long x,
         long y,
-        bool 
+        bool
     )
     {
 
@@ -3573,7 +3573,7 @@ namespace dlib
             // if the mouse is still in the same rectangle then don't do anything
             if (menus[open_menu].bgrect.contains(x,y) == false)
             {
-                // figure out which menu should be instead   
+                // figure out which menu should be instead
                 for (unsigned long i = 0; i < menus.size(); ++i)
                 {
                     if (menus[i].bgrect.contains(x,y))
@@ -3602,7 +3602,7 @@ namespace dlib
             for (unsigned long i = 0; i < menus.size(); ++i)
             {
                 // if we have found a matching key
-                if (is_printable && 
+                if (is_printable &&
                     menus[i].underline_pos != std::string::npos &&
                     std::tolower(menus[i].name[menus[i].underline_pos]) == std::tolower(key))
                 {
@@ -3729,12 +3729,12 @@ namespace dlib
             {
                 // now compute the location of the underline bar
                 rectangle r1 = mfont->compute_cursor_rect(
-                    menus[i].rect, 
+                    menus[i].rect,
                     menus[i].name,
                     menus[i].underline_pos);
 
                 rectangle r2 = mfont->compute_cursor_rect(
-                    menus[i].rect, 
+                    menus[i].rect,
                     menus[i].name,
                     menus[i].underline_pos+1);
 
@@ -3795,8 +3795,8 @@ namespace dlib
     ~text_grid (
     )
     {
-        // Disable all further events for this drawable object.  We have to do this 
-        // because we don't want draw() events coming to this object while or after 
+        // Disable all further events for this drawable object.  We have to do this
+        // because we don't want draw() events coming to this object while or after
         // it has been destructed.
         disable_events();
 
@@ -3917,10 +3917,10 @@ namespace dlib
         auto_mutex M(m);
         DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
                       "\tconst std::string text_grid::text(row,col)"
-                      << "\n\trow:              " << row 
-                      << "\n\tcol:              " << col 
-                      << "\n\tnumber_of_rows(): " << number_of_rows() 
-                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\trow:              " << row
+                      << "\n\tcol:              " << col
+                      << "\n\tnumber_of_rows(): " << number_of_rows()
+                      << "\n\tnumber_of_columns(): " << number_of_columns()
                       << "\n\tthis:             " << this
         );
         return grid[row][col].text.c_str();
@@ -3933,7 +3933,7 @@ namespace dlib
         unsigned long row,
         unsigned long col,
         const std::string& str
-    ) 
+    )
     {
         set_text(row, col, convert_mbstring_to_wstring(str));
     }
@@ -3945,7 +3945,7 @@ namespace dlib
         unsigned long row,
         unsigned long col,
         const std::wstring& str
-    ) 
+    )
     {
         set_text(row, col, convert_wstring_to_utf32(str));
     }
@@ -3957,15 +3957,15 @@ namespace dlib
         unsigned long row,
         unsigned long col,
         const dlib::ustring& str
-    ) 
+    )
     {
         auto_mutex M(m);
         DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
                       "\tvoid text_grid::set_text(row,col)"
-                      << "\n\trow:              " << row 
-                      << "\n\tcol:              " << col 
-                      << "\n\tnumber_of_rows(): " << number_of_rows() 
-                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\trow:              " << row
+                      << "\n\tcol:              " << col
+                      << "\n\tnumber_of_rows(): " << number_of_rows()
+                      << "\n\tnumber_of_columns(): " << number_of_columns()
                       << "\n\tthis:             " << this
         );
         grid[row][col].text = str.c_str();
@@ -3983,10 +3983,10 @@ namespace dlib
         auto_mutex M(m);
         DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
                       "\tconst rgb_pixel text_grid::text_color(row,col)"
-                      << "\n\trow:              " << row 
-                      << "\n\tcol:              " << col 
-                      << "\n\tnumber_of_rows(): " << number_of_rows() 
-                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\trow:              " << row
+                      << "\n\tcol:              " << col
+                      << "\n\tnumber_of_rows(): " << number_of_rows()
+                      << "\n\tnumber_of_columns(): " << number_of_columns()
                       << "\n\tthis:             " << this
         );
         return grid[row][col].text_color;
@@ -3999,15 +3999,15 @@ namespace dlib
         unsigned long row,
         unsigned long col,
         const rgb_pixel color
-    ) 
+    )
     {
         auto_mutex M(m);
         DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
                       "\tvoid text_grid::set_text_color(row,col,color)"
-                      << "\n\trow:              " << row 
-                      << "\n\tcol:              " << col 
-                      << "\n\tnumber_of_rows(): " << number_of_rows() 
-                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\trow:              " << row
+                      << "\n\tcol:              " << col
+                      << "\n\tnumber_of_rows(): " << number_of_rows()
+                      << "\n\tnumber_of_columns(): " << number_of_columns()
                       << "\n\tthis:             " << this
         );
         grid[row][col].text_color = color;
@@ -4025,10 +4025,10 @@ namespace dlib
         auto_mutex M(m);
         DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
                       "\tconst rgb_pixel text_grid::background_color(row,col,color)"
-                      << "\n\trow:              " << row 
-                      << "\n\tcol:              " << col 
-                      << "\n\tnumber_of_rows(): " << number_of_rows() 
-                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\trow:              " << row
+                      << "\n\tcol:              " << col
+                      << "\n\tnumber_of_rows(): " << number_of_rows()
+                      << "\n\tnumber_of_columns(): " << number_of_columns()
                       << "\n\tthis:             " << this
         );
         return grid[row][col].bg_color;
@@ -4041,15 +4041,15 @@ namespace dlib
         unsigned long row,
         unsigned long col,
         const rgb_pixel color
-    ) 
+    )
     {
         auto_mutex M(m);
         DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
                       "\tvoid text_grid::set_background_color(row,col,color)"
-                      << "\n\trow:              " << row 
-                      << "\n\tcol:              " << col 
-                      << "\n\tnumber_of_rows(): " << number_of_rows() 
-                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\trow:              " << row
+                      << "\n\tcol:              " << col
+                      << "\n\tnumber_of_rows(): " << number_of_rows()
+                      << "\n\tnumber_of_columns(): " << number_of_columns()
                       << "\n\tthis:             " << this
         );
         grid[row][col].bg_color = color;
@@ -4067,10 +4067,10 @@ namespace dlib
         auto_mutex M(m);
         DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
                       "\tbool text_grid::is_editable(row,col)"
-                      << "\n\trow:              " << row 
-                      << "\n\tcol:              " << col 
-                      << "\n\tnumber_of_rows(): " << number_of_rows() 
-                      << "\n\tnumber_of_columns(): " << number_of_columns() 
+                      << "\n\trow:              " << row
+                      << "\n\tcol:              " << col
+                      << "\n\tnumber_of_rows(): " << number_of_rows()
+                      << "\n\tnumber_of_columns(): " << number_of_columns()
                       << "\n\tthis:             " << this
         );
         return grid[row][col].is_editable;
@@ -4083,16 +4083,16 @@ namespace dlib
         unsigned long row,
         unsigned long col,
         bool editable
-    ) 
+    )
     {
         auto_mutex M(m);
         DLIB_ASSERT ( row < number_of_rows()  && col < number_of_columns(),
                       "\tvoid text_grid::set_editable(row,col,editable)"
-                      << "\n\trow:              " << row 
-                      << "\n\tcol:              " << col 
-                      << "\n\tnumber_of_rows(): " << number_of_rows() 
-                      << "\n\tnumber_of_columns(): " << number_of_columns() 
-                      << "\n\teditable:         " << editable 
+                      << "\n\trow:              " << row
+                      << "\n\tcol:              " << col
+                      << "\n\tnumber_of_rows(): " << number_of_rows()
+                      << "\n\tnumber_of_columns(): " << number_of_columns()
+                      << "\n\teditable:         " << editable
                       << "\n\tthis:             " << this
         );
         grid[row][col].is_editable = editable;
@@ -4113,9 +4113,9 @@ namespace dlib
         auto_mutex M(m);
         DLIB_ASSERT ( col < number_of_columns(),
                       "\tvoid text_grid::set_column_width(col,width)"
-                      << "\n\tcol:              " << col 
-                      << "\n\tnumber_of_columns(): " << number_of_columns() 
-                      << "\n\twidth:            " << width 
+                      << "\n\tcol:              " << col
+                      << "\n\tnumber_of_columns(): " << number_of_columns()
+                      << "\n\twidth:            " << width
                       << "\n\tthis:             " << this
         );
         col_width[col] = width;
@@ -4128,15 +4128,15 @@ namespace dlib
     void text_grid::
     set_row_height (
         unsigned long row,
-        unsigned long height 
+        unsigned long height
     )
     {
         auto_mutex M(m);
         DLIB_ASSERT ( row < number_of_rows() ,
                       "\tvoid text_grid::set_row_height(row,height)"
-                      << "\n\trow:              " << row 
-                      << "\n\tnumber_of_rows(): " << number_of_rows() 
-                      << "\n\theight:           " << height 
+                      << "\n\trow:              " << row
+                      << "\n\tnumber_of_rows(): " << number_of_rows()
+                      << "\n\theight:           " << height
                       << "\n\tthis:             " << this
         );
         row_height[row] = height;
@@ -4148,7 +4148,7 @@ namespace dlib
 
     void text_grid::
     disable (
-    ) 
+    )
     {
         auto_mutex M(m);
         scrollable_region::disable();
@@ -4159,7 +4159,7 @@ namespace dlib
 
     void text_grid::
     hide (
-    ) 
+    )
     {
         auto_mutex M(m);
         scrollable_region::hide();
@@ -4189,9 +4189,9 @@ namespace dlib
 
     void text_grid::
     timer_action (
-    ) 
-    { 
-        parent.trigger_user_event(this,scrollable_region::next_free_user_event_number()); 
+    )
+    {
+        parent.trigger_user_event(this,scrollable_region::next_free_user_event_number());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -4217,7 +4217,7 @@ namespace dlib
                 else
                     p2.x() = p1.x() + col_width[col]-1;
 
-                // at this point p1 is the upper left corner of this box and p2 is the 
+                // at this point p1 is the upper left corner of this box and p2 is the
                 // lower right corner of the box;
                 rectangle bg_rect(p1);
                 bg_rect += p2;
@@ -4259,7 +4259,7 @@ namespace dlib
 
     void text_grid::
     on_keydown (
-        unsigned long key,          
+        unsigned long key,
         bool is_printable,
         unsigned long state
     )
@@ -4416,7 +4416,7 @@ namespace dlib
             // if we hit a box
             if (hit.is_empty() == false)
             {
-                move_cursor(row, 
+                move_cursor(row,
                             col,
                             mfont->compute_cursor_pos(get_text_rect(row,col), grid[row][col].text, x, y, grid[row][col].first)
                 );
@@ -4440,7 +4440,7 @@ namespace dlib
         unsigned long state,
         long x,
         long y
-    ) 
+    )
     {
         scrollable_region::on_mouse_up(btn, state, x, y);
     }
@@ -4467,7 +4467,7 @@ namespace dlib
             return;
 
         if (enabled)
-            fill_rect(c, area, 255); 
+            fill_rect(c, area, 255);
 
         // don't do anything if the grid is empty
         if (grid.size() == 0)
@@ -4520,21 +4520,21 @@ namespace dlib
                     fill_rect(c,bg_rect.intersect(area),grid[row][col].bg_color);
 
                     mfont->draw_string(c,
-                                       text_rect, 
-                                       grid[row][col].text, 
-                                       grid[row][col].text_color, 
-                                       grid[row][col].first, 
-                                       std::string::npos, 
+                                       text_rect,
+                                       grid[row][col].text,
+                                       grid[row][col].text_color,
+                                       grid[row][col].first,
+                                       std::string::npos,
                                        area);
                 }
                 else
                 {
                     mfont->draw_string(c,
-                                       text_rect, 
-                                       grid[row][col].text, 
-                                       128, 
-                                       grid[row][col].first, 
-                                       std::string::npos, 
+                                       text_rect,
+                                       grid[row][col].text,
+                                       128,
+                                       grid[row][col].first,
+                                       std::string::npos,
                                        area);
                 }
 
@@ -4629,7 +4629,7 @@ namespace dlib
             {
                 new_cursor_pos = 0;
             }
-            else 
+            else
             {
                 --col;
                 new_cursor_pos = grid[row][col].text.size();
@@ -4642,7 +4642,7 @@ namespace dlib
             {
                 new_cursor_pos = grid[row][col].text.size();
             }
-            else 
+            else
             {
                 ++col;
                 new_cursor_pos = 0;
@@ -4712,7 +4712,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // text_field object methods  
+    // text_field object methods
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -4939,8 +4939,8 @@ namespace dlib
        
         const point origin(total_rect().left(), total_rect().top());
 
-        style->draw_text_box(c,display_rect(),get_text_rect(), enabled, *mfont, text_, 
-                             translate_rect(cursor_rect, origin), 
+        style->draw_text_box(c,display_rect(),get_text_rect(), enabled, *mfont, text_,
+                             translate_rect(cursor_rect, origin),
                                text_color_, bg_color_, has_focus, cursor_visible, highlight_start,
                                highlight_end);
     }
@@ -4969,7 +4969,7 @@ namespace dlib
     )
     {
         auto_mutex M(m);
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the std::string implementation.
         text_ = text.c_str();
                 
@@ -5003,7 +5003,7 @@ namespace dlib
     ) const
     {
         auto_mutex M(m);
-        // do this to get rid of any reference counting that may be present in 
+        // do this to get rid of any reference counting that may be present in
         // the dlib::ustring implementation.
         dlib::ustring temp = text_.c_str();
         return temp;
@@ -5014,9 +5014,9 @@ namespace dlib
     void text_box::
     set_size (
         unsigned long width,
-        unsigned long height 
+        unsigned long height
     )
-    {        
+    {
         auto_mutex M(m);
         scrollable_region::set_size(width,height);
         right_click_menu.set_rect(display_rect());
@@ -5123,7 +5123,7 @@ namespace dlib
         unsigned long btn,
         unsigned long,
         long ,
-        long 
+        long
     )
     {
         if (!enabled || hidden)
@@ -5141,7 +5141,7 @@ namespace dlib
         unsigned long state,
         long x,
         long y,
-        bool double_clicked 
+        bool double_clicked
     )
     {
         using namespace std;
@@ -5360,10 +5360,10 @@ namespace dlib
                 else
                 {
                     const point origin(total_rect().left(), total_rect().top());
-                    // move the cursor so the position that is just a few pixels above 
+                    // move the cursor so the position that is just a few pixels above
                     // the current cursor_rect
                     move_cursor(mfont->compute_cursor_pos(
-                            get_text_rect(), text_, cursor_rect.left()+origin.x(), 
+                            get_text_rect(), text_, cursor_rect.left()+origin.x(),
                             cursor_rect.top()+origin.y()-mfont->height()/2));
 
                 }
@@ -5385,10 +5385,10 @@ namespace dlib
                 else
                 {
                     const point origin(total_rect().left(), total_rect().top());
-                    // move the cursor so the position that is just a few pixels above 
+                    // move the cursor so the position that is just a few pixels above
                     // the current cursor_rect
                     move_cursor(mfont->compute_cursor_pos(
-                            get_text_rect(), text_, cursor_rect.left()+origin.x(), 
+                            get_text_rect(), text_, cursor_rect.left()+origin.x(),
                             cursor_rect.bottom()+origin.y()+mfont->height()/2));
                 }
 
@@ -5421,7 +5421,7 @@ namespace dlib
                         on_cut();
                     }
                 }
-                else 
+                else
                 {
                     if (highlight_start <= highlight_end)
                     {
@@ -5455,7 +5455,7 @@ namespace dlib
                 }
             }
             else if (key == base_window::KEY_BACKSPACE)
-            {                
+            {
                 // if something is highlighted then delete that
                 if (highlight_start <= highlight_end)
                 {
@@ -5551,14 +5551,14 @@ namespace dlib
             }
             else if (key == base_window::KEY_PAGE_DOWN || key == base_window::KEY_PAGE_UP)
             {
-                long jump_size = display_rect().height() - 
+                long jump_size = display_rect().height() -
                     std::min(mfont->height()*3, display_rect().height()/5);
 
                 // if we are supposed to page up then just jump in the other direction
                 if (key == base_window::KEY_PAGE_UP)
                     jump_size = -jump_size;
 
-                scroll_to_rect(translate_rect(display_rect(), point(0, jump_size ))); 
+                scroll_to_rect(translate_rect(display_rect(), point(0, jump_size )));
             }
 
             cursor_visible = true;
@@ -5567,7 +5567,7 @@ namespace dlib
         }
     }
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     void text_box::
     on_string_put(
@@ -5621,15 +5621,15 @@ namespace dlib
         const point origin(total_rect().left(), total_rect().top());
 
 
-        cursor_pos = pos;     
+        cursor_pos = pos;
 
 
         const unsigned long padding = style->get_padding(*mfont);
 
-        // find the delta between the cursor rect and the corner of the total rect 
+        // find the delta between the cursor rect and the corner of the total rect
         point delta = point(cursor_rect.left(), cursor_rect.top()) - point(total_rect().left(), total_rect().top());
 
-        // now scroll us so that we can see the current cursor 
+        // now scroll us so that we can see the current cursor
         scroll_to_rect(centered_rect(cursor_rect, cursor_rect.width() + padding + 6, cursor_rect.height() + 1));
 
         // adjust the cursor_rect so that it is relative to the total_rect
@@ -5669,13 +5669,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     perspective_display::
-    perspective_display(  
+    perspective_display(
         drawable_window& w
-    ) : 
+    ) :
         drawable(w,MOUSE_MOVE|MOUSE_CLICK|MOUSE_WHEEL)
     {
         clear_overlay();
-        enable_events(); 
+        enable_events();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -5685,7 +5685,7 @@ namespace dlib
     )
     {
         disable_events();
-        parent.invalidate_rectangle(rect); 
+        parent.invalidate_rectangle(rect);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -5693,7 +5693,7 @@ namespace dlib
     void perspective_display::
     set_size (
         unsigned long width,
-        unsigned long height 
+        unsigned long height
     )
     {
         auto_mutex lock(m);
@@ -5819,8 +5819,8 @@ namespace dlib
         for (unsigned long i = 0; i < overlay_lines.size(); ++i)
         {
             draw_line(c, tform(overlay_lines[i].p1)+rect.tl_corner(),
-                         tform(overlay_lines[i].p2)+rect.tl_corner(), 
-                         overlay_lines[i].color, 
+                         tform(overlay_lines[i].p2)+rect.tl_corner(),
+                         overlay_lines[i].color,
                          area);
         }
         for (unsigned long i = 0; i < overlay_dots.size(); ++i)
@@ -5935,7 +5935,7 @@ namespace dlib
             delta *= 2*pi*length(radius)/600.0;
             vector<double> tangent_x = tform.get_camera_up_direction().cross(radius).normalize();
             vector<double> tangent_y = radius.cross(tangent_x).normalize();
-            vector<double> new_pos = tform.get_camera_pos() + tangent_x*delta.x() + tangent_y*-delta.y(); 
+            vector<double> new_pos = tform.get_camera_pos() + tangent_x*delta.x() + tangent_y*-delta.y();
 
             // now make it have the correct radius relative to the looking at point.
             new_pos = (new_pos-tform.get_camera_looking_at()).normalize()*length(radius) + tform.get_camera_looking_at();
@@ -5959,7 +5959,7 @@ namespace dlib
             vector<double> tangent_x = tform.get_camera_up_direction().cross(radius).normalize();
             vector<double> tangent_y = radius.cross(tangent_x).normalize();
 
-            vector<double> offset = tangent_x*delta.x() + tangent_y*-delta.y(); 
+            vector<double> offset = tangent_x*delta.x() + tangent_y*-delta.y();
 
 
             tform = camera_transform(
@@ -5998,9 +5998,9 @@ namespace dlib
     }
 
     image_display::
-    image_display(  
+    image_display(
         drawable_window& w
-    ): 
+    ):
         scrollable_region(w,KEYBOARD_EVENTS),
         zoom_in_scale(1),
         zoom_out_scale(1),
@@ -6013,7 +6013,7 @@ namespace dlib
         overlay_editing_enabled(true),
         highlight_timer(*this, &image_display::timer_event_unhighlight_rect),
         highlighted_rect(std::numeric_limits<unsigned long>::max())
-    { 
+    {
         enable_mouse_drag();
 
         highlight_timer.set_delay_time(250);
@@ -6025,7 +6025,7 @@ namespace dlib
         parts_menu.disable();
 
 
-        enable_events(); 
+        enable_events();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -6055,7 +6055,7 @@ namespace dlib
         }
 
         overlay_rects[selected_rect].parts[part_name] = c1;
-        parent.invalidate_rectangle(rect); 
+        parent.invalidate_rectangle(rect);
 
         if (event_handler.is_set())
             event_handler();
@@ -6069,7 +6069,7 @@ namespace dlib
     {
         highlight_timer.stop_and_wait();
         disable_events();
-        parent.invalidate_rectangle(rect); 
+        parent.invalidate_rectangle(rect);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -6204,7 +6204,7 @@ namespace dlib
 
     rectangle image_display::
     get_rect_on_screen (
-        rectangle orect 
+        rectangle orect
     ) const
     {
         const point origin(total_rect().tl_corner());
@@ -6256,7 +6256,7 @@ namespace dlib
         {
             for (long col = img_area.left(); col <= img_area.right(); ++col)
             {
-                assign_pixel(c[row-c.top()][col-c.left()], 
+                assign_pixel(c[row-c.top()][col-c.left()],
                              img[(row-origin.y())*zoom_out_scale/zoom_in_scale][(col-origin.x())*zoom_out_scale/zoom_in_scale]);
             }
         }
@@ -6303,7 +6303,7 @@ namespace dlib
             {
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r(orect.br_corner(),  c.br_corner());
-                mfont->draw_string(c, r, overlay_rects[i].label, overlay_rects[i].color, 0, 
+                mfont->draw_string(c, r, overlay_rects[i].label, overlay_rects[i].color, 0,
                                    std::string::npos, area);
             }
 
@@ -6317,7 +6317,7 @@ namespace dlib
 
                 rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
 
-                if (rect_is_selected && selected_rect == i && 
+                if (rect_is_selected && selected_rect == i &&
                     selected_part_name.size() != 0 && selected_part_name == itr->first)
                 {
                     draw_circle(c, center(temp), temp.width()/2, invert_pixel(overlay_rects[i].color), area);
@@ -6328,9 +6328,9 @@ namespace dlib
                 }
 
                 // make a rectangle that is at the spot we want to draw our string
-                rectangle r((temp.br_corner() + temp.bl_corner())/2,  
+                rectangle r((temp.br_corner() + temp.bl_corner())/2,
                             c.br_corner());
-                mfont->draw_string(c, r, itr->first, overlay_rects[i].color, 0, 
+                mfont->draw_string(c, r, itr->first, overlay_rects[i].color, 0,
                                    std::string::npos, area);
             }
 
@@ -6349,23 +6349,23 @@ namespace dlib
             }
         }
 
-        // now draw all the overlay lines 
+        // now draw all the overlay lines
         for (unsigned long i = 0; i < overlay_lines.size(); ++i)
         {
-            draw_line(c, 
-                      zoom_in_scale*overlay_lines[i].p1/zoom_out_scale + origin, 
-                      zoom_in_scale*overlay_lines[i].p2/zoom_out_scale + origin, 
+            draw_line(c,
+                      zoom_in_scale*overlay_lines[i].p1/zoom_out_scale + origin,
+                      zoom_in_scale*overlay_lines[i].p2/zoom_out_scale + origin,
                       overlay_lines[i].color, area);
         }
 
-        // now draw all the overlay circles 
+        // now draw all the overlay circles
         for (unsigned long i = 0; i < overlay_circles.size(); ++i)
         {
             const point center = zoom_in_scale*overlay_circles[i].center/zoom_out_scale + origin;
             const int radius = zoom_in_scale*overlay_circles[i].radius/zoom_out_scale;
-            draw_circle(c, 
-                      center, 
-                      radius, 
+            draw_circle(c,
+                      center,
+                      radius,
                       overlay_circles[i].color, area);
 
             if (overlay_circles[i].label.size() != 0)
@@ -6374,7 +6374,7 @@ namespace dlib
 
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r(temp,  c.br_corner());
-                mfont->draw_string(c, r, overlay_circles[i].label, overlay_circles[i].color, 0, 
+                mfont->draw_string(c, r, overlay_circles[i].label, overlay_circles[i].color, 0,
                                    std::string::npos, area);
             }
         }
@@ -6394,7 +6394,7 @@ namespace dlib
     {
         scrollable_region::on_keydown(key,is_printable, state);
 
-        if (!is_printable && !hidden && enabled && rect_is_selected && 
+        if (!is_printable && !hidden && enabled && rect_is_selected &&
             (key == base_window::KEY_BACKSPACE || key == base_window::KEY_DELETE))
         {
             moving_overlay = false;
@@ -6549,7 +6549,7 @@ namespace dlib
                         moving_what = MOVING_RECT_TOP;
                     else if (dist_right == min_val)
                         moving_what = MOVING_RECT_RIGHT;
-                    else 
+                    else
                         moving_what = MOVING_RECT_BOTTOM;
                 }
                 else
@@ -6861,7 +6861,7 @@ namespace dlib
                             event_handler();
                     }
                 }
-                else 
+                else
                 {
                     rectangle original = overlay_rects[moving_rect].rect;
                     if (moving_what == MOVING_RECT_LEFT)
@@ -6870,7 +6870,7 @@ namespace dlib
                         overlay_rects[moving_rect].rect.right() = std::max(p.x()-1, overlay_rects[moving_rect].rect.left());
                     else if (moving_what == MOVING_RECT_TOP)
                         overlay_rects[moving_rect].rect.top() = std::min(p.y(), overlay_rects[moving_rect].rect.bottom());
-                    else 
+                    else
                         overlay_rects[moving_rect].rect.bottom() = std::max(p.y()-1, overlay_rects[moving_rect].rect.top());
 
                     if (original != overlay_rects[moving_rect].rect)
@@ -6922,7 +6922,7 @@ namespace dlib
 
             // make is to the pixel under the mouse doesn't move while we zoom
             const point delta = total_rect().tl_corner() - (mouse_loc - pix_loc*zoom_in_scale);
-            scroll_to_rect(translate_rect(display_rect(), delta)); 
+            scroll_to_rect(translate_rect(display_rect(), delta));
         }
         else if (zoom_out_scale != 1)
         {
@@ -6938,7 +6938,7 @@ namespace dlib
 
             // make is to the pixel under the mouse doesn't move while we zoom
             const point delta = total_rect().tl_corner() - (mouse_loc - pix_loc/zoom_out_scale);
-            scroll_to_rect(translate_rect(display_rect(), delta)); 
+            scroll_to_rect(translate_rect(display_rect(), delta));
         }
     }
 
@@ -6978,7 +6978,7 @@ namespace dlib
 
             // make is to the pixel under the mouse doesn't move while we zoom
             const point delta = total_rect().tl_corner() - (mouse_loc - pix_loc*zoom_in_scale);
-            scroll_to_rect(translate_rect(display_rect(), delta)); 
+            scroll_to_rect(translate_rect(display_rect(), delta));
         }
         else if (std::max(img.nr(), img.nc())/zoom_out_scale > 10)
         {
@@ -6992,7 +6992,7 @@ namespace dlib
 
             // make is to the pixel under the mouse doesn't move while we zoom
             const point delta = total_rect().tl_corner() - (mouse_loc - pix_loc/zoom_out_scale);
-            scroll_to_rect(translate_rect(display_rect(), delta)); 
+            scroll_to_rect(translate_rect(display_rect(), delta));
         }
     }
 
@@ -7017,7 +7017,7 @@ namespace dlib
         gui_img.disable_overlay_editing();
         // show this window on the screen
         show();
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -7026,8 +7026,8 @@ namespace dlib
     )
     {
         // You should always call close_window() in the destructor of window
-        // objects to ensure that no events will be sent to this window while 
-        // it is being destructed.  
+        // objects to ensure that no events will be sent to this window while
+        // it is being destructed.
         close_window();
     }
 
@@ -7049,7 +7049,7 @@ namespace dlib
         unsigned long& key,
         bool& is_printable,
         unsigned long& state
-    ) 
+    )
     {
         auto_mutex lock(wm);
         while (have_last_keypress == false && !window_has_closed &&
@@ -7132,8 +7132,8 @@ namespace dlib
     bool image_window::
     get_next_double_click (
         point& p,
-        unsigned long& mouse_button 
-    ) 
+        unsigned long& mouse_button
+    )
     {
         p = point(-1,-1);
 
@@ -7185,9 +7185,9 @@ namespace dlib
     void image_window::
     add_overlay (
         const overlay_rect& overlay
-    ) 
-    { 
-        gui_img.add_overlay(overlay); 
+    )
+    {
+        gui_img.add_overlay(overlay);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -7195,9 +7195,9 @@ namespace dlib
     void image_window::
     add_overlay (
         const overlay_line& overlay
-    ) 
-    { 
-        gui_img.add_overlay(overlay); 
+    )
+    {
+        gui_img.add_overlay(overlay);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -7205,9 +7205,9 @@ namespace dlib
     void image_window::
     add_overlay (
         const overlay_circle& overlay
-    ) 
-    { 
-        gui_img.add_overlay(overlay); 
+    )
+    {
+        gui_img.add_overlay(overlay);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -7215,9 +7215,9 @@ namespace dlib
     void image_window::
     add_overlay (
         const std::vector<overlay_rect>& overlay
-    ) 
-    { 
-        gui_img.add_overlay(overlay); 
+    )
+    {
+        gui_img.add_overlay(overlay);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -7225,9 +7225,9 @@ namespace dlib
     void image_window::
     add_overlay (
         const std::vector<overlay_line>& overlay
-    ) 
-    { 
-        gui_img.add_overlay(overlay); 
+    )
+    {
+        gui_img.add_overlay(overlay);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -7235,18 +7235,18 @@ namespace dlib
     void image_window::
     add_overlay (
         const std::vector<overlay_circle>& overlay
-    ) 
-    { 
-        gui_img.add_overlay(overlay); 
+    )
+    {
+        gui_img.add_overlay(overlay);
     }
 
 // ----------------------------------------------------------------------------------------
 
     void image_window::
     clear_overlay (
-    ) 
-    { 
-        gui_img.clear_overlay(); 
+    )
+    {
+        gui_img.clear_overlay();
     }
 
 // ----------------------------------------------------------------------------------------

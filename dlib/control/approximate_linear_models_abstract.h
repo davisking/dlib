@@ -10,7 +10,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct example_feature_extractor 
+    struct example_feature_extractor
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -26,7 +26,7 @@ namespace dlib
 
                 Therefore, a feature extractor defines how the PSI(x,y) feature vector is
                 calculated.  It also defines the types used to represent the state and
-                action objects. 
+                action objects.
 
 
             THREAD SAFETY
@@ -37,7 +37,7 @@ namespace dlib
 
         // The state and actions can be any types so long as you provide typedefs for them.
         typedef T state_type;
-        typedef U action_type; 
+        typedef U action_type;
         // We can also say that the last element in the weight vector w must be 1.  This
         // can be useful for including a prior into your model.
         const static bool force_last_weight_to_1 = false;
@@ -53,7 +53,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the dimensionality of the PSI() feature vector.  
+                - returns the dimensionality of the PSI() feature vector.
         !*/
 
         action_type find_best_action (
@@ -155,7 +155,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_feature_extractor() == feature_extractor() 
+                - #get_feature_extractor() == feature_extractor()
                   (i.e. it will have its default value)
                 - #get_weights().size() == #get_feature_extractor().num_features()
                 - #get_weights() == 0
@@ -164,7 +164,7 @@ namespace dlib
         policy (
             const matrix<double,0,1>& weights,
             const feature_extractor& fe
-        ); 
+        );
         /*!
             requires
                 - fe.num_features() == weights.size()
@@ -182,18 +182,18 @@ namespace dlib
         !*/
 
         const feature_extractor& get_feature_extractor (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the feature extractor used by this object
         !*/
 
         const matrix<double,0,1>& get_weights (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the parameter vector (w) associated with this object.  The length
-                  of the vector is get_feature_extractor().num_features().  
+                  of the vector is get_feature_extractor().num_features().
         !*/
 
     };

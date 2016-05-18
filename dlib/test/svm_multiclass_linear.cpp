@@ -9,7 +9,7 @@
 #include <map>
 #include <sstream>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;

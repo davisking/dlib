@@ -11,14 +11,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class ordered_sample_pair 
+    class ordered_sample_pair
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is intended to represent an edge in a directed graph which has
                 data samples at its vertices.  So it contains two integers (index1 and
                 index2) which represent the identifying indices of the samples at the ends
-                of an edge.  
+                of an edge.
 
                 This object also contains a double which can be used for any purpose.
         !*/
@@ -30,7 +30,7 @@ namespace dlib
             ensures
                 - #index1() == 0
                 - #index2() == 0
-                - #distance() == 1 
+                - #distance() == 1
         !*/
 
         ordered_sample_pair (
@@ -41,7 +41,7 @@ namespace dlib
             ensures
                 - #index1() == idx1
                 - #index2() == idx2
-                - #distance() == 1 
+                - #distance() == 1
         !*/
 
         ordered_sample_pair (
@@ -57,17 +57,17 @@ namespace dlib
         !*/
 
         const unsigned long& index1 (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the first index value stored in this object 
+                - returns the first index value stored in this object
         !*/
 
         const unsigned long& index2 (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the second index value stored in this object 
+                - returns the second index value stored in this object
         !*/
 
         const double& distance (
@@ -88,7 +88,7 @@ namespace dlib
     /*!
         ensures
             - returns a.index1() == b.index1() && a.index2() == b.index2();
-              I.e. returns true if a and b both represent the same pair and false otherwise.  
+              I.e. returns true if a and b both represent the same pair and false otherwise.
               Note that the distance field is not involved in this comparison.
     !*/
 
@@ -108,15 +108,15 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     inline void deserialize (
         ordered_sample_pair& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

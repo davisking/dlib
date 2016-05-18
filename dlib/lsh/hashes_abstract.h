@@ -19,13 +19,13 @@ namespace dlib
                 particular, this object creates 64 random planes which pass though the
                 origin and uses them to create a 64bit hash.  To compute the hash for a new
                 vector, this object checks which side of each plane the vector falls on and
-                records this information into a 64bit integer.  
+                records this information into a 64bit integer.
         !*/
 
     public:
 
         hash_similar_angles_64 (
-        ); 
+        );
         /*!
             ensures
                 - #get_seed() == 0
@@ -59,7 +59,7 @@ namespace dlib
                   column or row vector.
             ensures
                 - returns a 64 bit hash of the input vector v.  The bits in the hash record
-                  which side of each random plane v falls on.  
+                  which side of each random plane v falls on.
 
         !*/
 
@@ -85,13 +85,13 @@ namespace dlib
                 particular, this object creates 128 random planes which pass though the
                 origin and uses them to create a 128bit hash.  To compute the hash for a new
                 vector, this object checks which side of each plane the vector falls on and
-                records this information into a 128bit integer.  
+                records this information into a 128bit integer.
         !*/
 
     public:
 
         hash_similar_angles_128 (
-        ); 
+        );
         /*!
             ensures
                 - #get_seed() == 0
@@ -125,7 +125,7 @@ namespace dlib
                   column or row vector.
             ensures
                 - returns a 128 bit hash of the input vector v.  The bits in the hash record
-                  which side of each random plane v falls on.  
+                  which side of each random plane v falls on.
 
         !*/
 
@@ -152,13 +152,13 @@ namespace dlib
                 particular, this object creates 256 random planes which pass though the
                 origin and uses them to create a 256bit hash.  To compute the hash for a new
                 vector, this object checks which side of each plane the vector falls on and
-                records this information into a 256bit integer.  
+                records this information into a 256bit integer.
         !*/
 
     public:
 
         hash_similar_angles_256 (
-        ); 
+        );
         /*!
             ensures
                 - #get_seed() == 0
@@ -193,7 +193,7 @@ namespace dlib
                   column or row vector.
             ensures
                 - returns a 256 bit hash of the input vector v.  The bits in the hash record
-                  which side of each random plane v falls on.  
+                  which side of each random plane v falls on.
 
         !*/
 
@@ -220,13 +220,13 @@ namespace dlib
                 particular, this object creates 512 random planes which pass though the
                 origin and uses them to create a 512bit hash.  To compute the hash for a new
                 vector, this object checks which side of each plane the vector falls on and
-                records this information into a 512bit integer.  
+                records this information into a 512bit integer.
         !*/
 
     public:
 
         hash_similar_angles_512 (
-        ); 
+        );
         /*!
             ensures
                 - #get_seed() == 0
@@ -261,7 +261,7 @@ namespace dlib
                   column or row vector.
             ensures
                 - returns a 512 bit hash of the input vector v.  The bits in the hash record
-                  which side of each random plane v falls on.  
+                  which side of each random plane v falls on.
 
         !*/
 

@@ -45,11 +45,11 @@ namespace dlib
 
         decision_function (
             const decision_function& d
-        ) : 
-            alpha(d.alpha), 
+        ) :
+            alpha(d.alpha),
             b(d.b),
             kernel_function(d.kernel_function),
-            basis_vectors(d.basis_vectors) 
+            basis_vectors(d.basis_vectors)
         {}
 
         decision_function (
@@ -92,8 +92,8 @@ namespace dlib
             serialize(item.basis_vectors, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type decision_function"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type decision_function");
         }
     }
 
@@ -102,7 +102,7 @@ namespace dlib
         >
     void deserialize (
         decision_function<K>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
@@ -113,8 +113,8 @@ namespace dlib
             deserialize(item.basis_vectors, in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type decision_function"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type decision_function");
         }
     }
 
@@ -139,7 +139,7 @@ namespace dlib
 
         probabilistic_function (
             const probabilistic_function& d
-        ) : 
+        ) :
             alpha(d.alpha),
             beta(d.beta),
             decision_funct(d.decision_funct)
@@ -148,7 +148,7 @@ namespace dlib
         probabilistic_function (
             const scalar_type a_,
             const scalar_type b_,
-            const function_type& decision_funct_ 
+            const function_type& decision_funct_
         ) :
             alpha(a_),
             beta(b_),
@@ -165,7 +165,7 @@ namespace dlib
     };
 
     template <
-        typename function_type 
+        typename function_type
         >
     void serialize (
         const probabilistic_function<function_type>& item,
@@ -179,8 +179,8 @@ namespace dlib
             serialize(item.decision_funct, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type probabilistic_function"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type probabilistic_function");
         }
     }
 
@@ -189,7 +189,7 @@ namespace dlib
         >
     void deserialize (
         probabilistic_function<function_type>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
@@ -199,15 +199,15 @@ namespace dlib
             deserialize(item.decision_funct, in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type probabilistic_function"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type probabilistic_function");
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     struct probabilistic_decision_function
     {
@@ -226,7 +226,7 @@ namespace dlib
 
         probabilistic_decision_function (
             const probabilistic_function<decision_function<K> >& d
-        ) : 
+        ) :
             alpha(d.alpha),
             beta(d.beta),
             decision_funct(d.decision_funct)
@@ -234,7 +234,7 @@ namespace dlib
 
         probabilistic_decision_function (
             const probabilistic_decision_function& d
-        ) : 
+        ) :
             alpha(d.alpha),
             beta(d.beta),
             decision_funct(d.decision_funct)
@@ -243,7 +243,7 @@ namespace dlib
         probabilistic_decision_function (
             const scalar_type a_,
             const scalar_type b_,
-            const decision_function<K>& decision_funct_ 
+            const decision_function<K>& decision_funct_
         ) :
             alpha(a_),
             beta(b_),
@@ -260,7 +260,7 @@ namespace dlib
     };
 
     template <
-        typename K 
+        typename K
         >
     void serialize (
         const probabilistic_decision_function<K>& item,
@@ -274,17 +274,17 @@ namespace dlib
             serialize(item.decision_funct, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type probabilistic_decision_function"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type probabilistic_decision_function");
         }
     }
 
     template <
-        typename K 
+        typename K
         >
     void deserialize (
         probabilistic_decision_function<K>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
@@ -294,8 +294,8 @@ namespace dlib
             deserialize(item.decision_funct, in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type probabilistic_decision_function"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type probabilistic_decision_function");
         }
     }
 
@@ -355,11 +355,11 @@ namespace dlib
 
         distance_function (
             const distance_function& d
-        ) : 
-            alpha(d.alpha), 
+        ) :
+            alpha(d.alpha),
             b(d.b),
             kernel_function(d.kernel_function),
-            basis_vectors(d.basis_vectors) 
+            basis_vectors(d.basis_vectors)
         {
         }
 
@@ -422,7 +422,7 @@ namespace dlib
             for (long i = 0; i < alpha.nr(); ++i)
                 temp += alpha(i) * kernel_function(x,basis_vectors(i));
 
-            temp = b + kernel_function(x,x) - 2*temp; 
+            temp = b + kernel_function(x,x) - 2*temp;
             if (temp > 0)
                 return std::sqrt(temp);
             else
@@ -542,8 +542,8 @@ namespace dlib
             serialize(item.basis_vectors, out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type distance_function"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type distance_function");
         }
     }
 
@@ -552,7 +552,7 @@ namespace dlib
         >
     void deserialize (
         distance_function<K>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
@@ -563,8 +563,8 @@ namespace dlib
             deserialize(item.basis_vectors, in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type distance_function"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type distance_function");
         }
     }
 
@@ -574,7 +574,7 @@ namespace dlib
         typename function_type,
         typename normalizer_type = vector_normalizer<typename function_type::sample_type>
         >
-    struct normalized_function 
+    struct normalized_function
     {
         typedef typename function_type::result_type result_type;
         typedef typename function_type::sample_type sample_type;
@@ -601,7 +601,7 @@ namespace dlib
 
         normalized_function (
             const vector_normalizer<sample_type>& normalizer_,
-            const function_type& funct 
+            const function_type& funct
         ) : normalizer(normalizer_), function(funct) {}
 
         result_type operator() (
@@ -611,7 +611,7 @@ namespace dlib
 
     template <
         typename function_type,
-        typename normalizer_type 
+        typename normalizer_type
         >
     void serialize (
         const normalized_function<function_type,normalizer_type>& item,
@@ -624,18 +624,18 @@ namespace dlib
             serialize(item.function,     out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type normalized_function"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type normalized_function");
         }
     }
 
     template <
         typename function_type,
-        typename normalizer_type 
+        typename normalizer_type
         >
     void deserialize (
         normalized_function<function_type,normalizer_type>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
@@ -644,8 +644,8 @@ namespace dlib
             deserialize(item.function, in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type normalized_function"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type normalized_function");
         }
     }
 
@@ -654,7 +654,7 @@ namespace dlib
     template <
         typename K
         >
-    struct projection_function 
+    struct projection_function
     {
         typedef K kernel_type;
         typedef typename K::scalar_type scalar_type;
@@ -718,8 +718,8 @@ namespace dlib
             serialize(item.basis_vectors,     out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type projection_function"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type projection_function");
         }
     }
 
@@ -728,7 +728,7 @@ namespace dlib
         >
     void deserialize (
         projection_function<K>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
@@ -738,8 +738,8 @@ namespace dlib
             deserialize(item.basis_vectors,     in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type projection_function"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type projection_function");
         }
     }
 
@@ -747,7 +747,7 @@ namespace dlib
 
     template <
         typename K,
-        typename result_type_ = typename K::scalar_type 
+        typename result_type_ = typename K::scalar_type
         >
     struct multiclass_linear_decision_function
     {
@@ -762,7 +762,7 @@ namespace dlib
         typedef matrix<scalar_type,0,0,mem_manager_type> scalar_matrix_type;
 
         // You are getting a compiler error on this line because you supplied a non-linear kernel
-        // to the multiclass_linear_decision_function object.  You have to use one of the linear 
+        // to the multiclass_linear_decision_function object.  You have to use one of the linear
         // kernels with this object.
         COMPILE_TIME_ASSERT((is_same_type<K, linear_kernel<sample_type> >::value ||
                              is_same_type<K, sparse_linear_kernel<sample_type> >::value ));
@@ -770,7 +770,7 @@ namespace dlib
 
         scalar_matrix_type       weights;
         scalar_vector_type       b;
-        std::vector<result_type> labels; 
+        std::vector<result_type> labels;
 
         const std::vector<result_type>& get_labels(
         ) const { return labels; }
@@ -783,7 +783,7 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(weights.size() > 0 && 
+            DLIB_ASSERT(weights.size() > 0 &&
                         weights.nr() == (long)number_of_classes() &&
                         weights.nr() == b.size(),
                 "\t pair<result_type,scalar_type> multiclass_linear_decision_function::predict(x)"
@@ -817,7 +817,7 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(weights.size() > 0 && 
+            DLIB_ASSERT(weights.size() > 0 &&
                         weights.nr() == (long)number_of_classes() &&
                         weights.nr() == b.size(),
                 "\t result_type multiclass_linear_decision_function::operator()(x)"
@@ -847,8 +847,8 @@ namespace dlib
             serialize(item.labels,          out);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type multiclass_linear_decision_function"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type multiclass_linear_decision_function");
         }
     }
 
@@ -858,7 +858,7 @@ namespace dlib
         >
     void deserialize (
         multiclass_linear_decision_function<K,result_type_>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         try
@@ -868,8 +868,8 @@ namespace dlib
             deserialize(item.labels,          in);
         }
         catch (serialization_error& e)
-        { 
-            throw serialization_error(e.info + "\n   while deserializing object of type multiclass_linear_decision_function"); 
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type multiclass_linear_decision_function");
         }
     }
 

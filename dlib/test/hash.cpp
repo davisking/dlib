@@ -12,7 +12,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -114,7 +114,7 @@ namespace
         dlib::rand rnd;
         for (int i = 0; i < 100; ++i)
         {
-            uint32 buf[4] = { rnd.get_random_32bit_number(), 
+            uint32 buf[4] = { rnd.get_random_32bit_number(),
                 rnd.get_random_32bit_number(),
                 rnd.get_random_32bit_number(),
                 rnd.get_random_32bit_number()
@@ -124,7 +124,7 @@ namespace
 
             std::pair<uint64,uint64> temp1, temp2;
 
-            // Make sure the 4 integer version of murmur hash does the same thing 
+            // Make sure the 4 integer version of murmur hash does the same thing
             // as the memory block version.
             temp1 = murmur_hash3_128bit(buf, sizeof(buf), 0);
             temp2 = murmur_hash3_128bit(buf[0], buf[1], buf[2], buf[3]);
@@ -139,7 +139,7 @@ namespace
         dlib::rand rnd;
         for (int i = 0; i < 100; ++i)
         {
-            uint64 buf[2] = { rnd.get_random_64bit_number(), 
+            uint64 buf[2] = { rnd.get_random_64bit_number(),
                 rnd.get_random_64bit_number(),
             };
 
@@ -148,7 +148,7 @@ namespace
             bo.host_to_little(buf);
             std::pair<uint64,uint64> temp1, temp2;
 
-            // Make sure the 3 integer version of murmur hash does the same thing 
+            // Make sure the 3 integer version of murmur hash does the same thing
             // as the memory block version.
             temp1 = murmur_hash3_128bit(buf, sizeof(buf), seed);
             temp2 = murmur_hash3_128bit_3(buf[0], buf[1], seed);
@@ -170,7 +170,7 @@ namespace
             bo.host_to_little(val);
             uint32 temp1, temp2;
 
-            // Make sure the 2 integer version of murmur hash does the same thing 
+            // Make sure the 2 integer version of murmur hash does the same thing
             // as the memory block version.
             temp1 = murmur_hash3(&val, sizeof(val), seed);
             temp2 = murmur_hash3_2(val, seed);
@@ -184,7 +184,7 @@ namespace
         dlib::rand rnd;
         for (int i = 0; i < 100; ++i)
         {
-            uint32 buf[2] = {rnd.get_random_32bit_number(), 
+            uint32 buf[2] = {rnd.get_random_32bit_number(),
                              rnd.get_random_32bit_number()};
             const uint32 seed = rnd.get_random_32bit_number();
 
@@ -192,7 +192,7 @@ namespace
             bo.host_to_little(buf);
             uint32 temp1, temp2;
 
-            // Make sure the 2 integer version of murmur hash does the same thing 
+            // Make sure the 2 integer version of murmur hash does the same thing
             // as the memory block version.
             temp1 = murmur_hash3(&buf, sizeof(buf), seed);
             temp2 = murmur_hash3_3(buf[0], buf[1], seed);

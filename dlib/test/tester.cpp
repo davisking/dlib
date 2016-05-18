@@ -47,15 +47,15 @@ namespace test
         test_count_mutex.lock();
         ++test_count;
         test_count_mutex.unlock();
-        if ( !(_exp) )                                                         
-        {                                                                       
-            std::ostringstream dlib_o_out;                                       
-            dlib_o_out << "\n\nError occurred at line " << line << ".\n";    
-            dlib_o_out << "Error occurred in file " << file << ".\n";      
-            dlib_o_out << "Failing expression was " << _exp_str << ".\n";           
-            throw dlib::error(dlib_o_out.str());      
+        if ( !(_exp) )
+        {
+            std::ostringstream dlib_o_out;
+            dlib_o_out << "\n\nError occurred at line " << line << ".\n";
+            dlib_o_out << "Error occurred in file " << file << ".\n";
+            dlib_o_out << "Failing expression was " << _exp_str << ".\n";
+            throw dlib::error(dlib_o_out.str());
         }
-    }                                                                      
+    }
 
 // -----------------------------------------------------------------------------
 
@@ -129,7 +129,7 @@ namespace test
 
     void tester::
     perform_test (
-        const std::string&  
+        const std::string&
     )
     {
     }
@@ -138,8 +138,8 @@ namespace test
 
     void tester::
     perform_test (
-        const std::string&, 
-        const std::string& 
+        const std::string&,
+        const std::string&
     )
     {
     }

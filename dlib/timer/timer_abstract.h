@@ -11,41 +11,41 @@ namespace dlib
     template <
         typename T
         >
-    class timer 
+    class timer
     {
         /*!
             INITIAL VALUE
                 is_running()      == false
                 delay_time()      == 1000
                 action_object()   == The object that is passed into the constructor
-                action_function() == The member function pointer that is passed to 
+                action_function() == The member function pointer that is passed to
                                      the constructor.
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a timer that will call a given member function 
+                This object represents a timer that will call a given member function
                 (the action function) repeatedly at regular intervals and in its own
                 thread.
 
-                Note that the delay_time() is measured in milliseconds but you are not 
+                Note that the delay_time() is measured in milliseconds but you are not
                 guaranteed to have that level of resolution.  The actual resolution
                 is implementation dependent.
 
             THREAD SAFETY
-                All methods of this class are thread safe. 
+                All methods of this class are thread safe.
         !*/
 
     public:
 
         typedef void (T::*af_type)();
 
-        timer (  
+        timer (
             T& ao,
             af_type af
         );
         /*!
             requires
                 - af does not throw
-            ensures                
+            ensures
                 - does not block.
                 - #*this is properly initialized
                 - #action_object() == ao
@@ -76,7 +76,7 @@ namespace dlib
                 - does not block
             throws
                 - std::bad_alloc or dlib::thread_error
-                    If either of these exceptions are thrown then #*this is unusable 
+                    If either of these exceptions are thrown then #*this is unusable
                     until clear() is called and succeeds.
         !*/
 
@@ -131,7 +131,7 @@ namespace dlib
         void set_delay_time (
             unsigned long milliseconds
         );
-        /*!            
+        /*!
             ensures
                 - does not block.
                 - #delay_time() == milliseconds
@@ -141,7 +141,7 @@ namespace dlib
                     but otherwise this function succeeds
         !*/
         
-        void start (            
+        void start (
         );
         /*!
             ensures
@@ -149,13 +149,13 @@ namespace dlib
                 - if (is_running() == false) then
                     - #is_running() == true
                     - The action_function() will run in another thread.
-                    - The first call to the action_function() will occur in roughly 
+                    - The first call to the action_function() will occur in roughly
                       delay_time() milliseconds.
                 - else
                     - this call to start() has no effect
             throws
                 - dlib::thread_error or std::bad_alloc
-                    If this exception is thrown then #is_running() == false but 
+                    If this exception is thrown then #is_running() == false but
                     otherwise this call to start() has no effect.
         !*/
 
@@ -170,7 +170,7 @@ namespace dlib
         void stop_and_wait (
         );
         /*!
-            ensures 
+            ensures
                 - #is_running() == false
                 - if (the action function is currently executing) then
                     - blocks until it finishes
@@ -182,7 +182,7 @@ namespace dlib
         timer(const timer<T>&);        // copy constructor
         timer<T>& operator=(const timer<T>&);    // assignment operator
 
-    };    
+    };
 
 }
 

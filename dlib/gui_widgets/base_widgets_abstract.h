@@ -14,7 +14,7 @@ namespace dlib
 
     /*!
         GENERAL REMARKS
-            This file contains objects that are useful for creating complex drawable 
+            This file contains objects that are useful for creating complex drawable
             widgets.
 
         THREAD SAFETY
@@ -22,15 +22,15 @@ namespace dlib
             call them from any thread without serializing access to them.
 
         EVENT HANDLERS
-            If you derive from any of the drawable objects and redefine any of the on_*() 
-            event handlers then you should ensure that your version calls the same event 
-            handler in the base object so that the base class part of your object will also 
-            be able to process the event. 
+            If you derive from any of the drawable objects and redefine any of the on_*()
+            event handlers then you should ensure that your version calls the same event
+            handler in the base object so that the base class part of your object will also
+            be able to process the event.
 
             Also note that all event handlers, including the user registered callback
             functions, are executed in the event handling thread.   Additionally,
             the drawable::m mutex will always be locked while these event handlers
-            are running.  Also, don't rely on get_thread_id() always returning the 
+            are running.  Also, don't rely on get_thread_id() always returning the
             same ID from inside event handlers.
     !*/
 
@@ -44,31 +44,31 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                draggable_area() == an initial value for its type 
+                draggable_area() == an initial value for its type
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a drawable object that is draggable by the mouse.  
+                This object represents a drawable object that is draggable by the mouse.
                 You use it by inheriting from it and defining the draw() method and any
-                of the on_*() event handlers you need.  
+                of the on_*() event handlers you need.
 
-                This object is draggable by the user when is_enabled() == true and 
+                This object is draggable by the user when is_enabled() == true and
                 not draggable otherwise.
         !*/
 
     public:
 
-        draggable(  
+        draggable(
             drawable_window& w,
             unsigned long events = 0
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
-                - This object will not receive any events or draw() requests until 
+                - This object will not receive any events or draw() requests until
                   enable_events() is called
-                - the events flags are passed on to the drawable object's 
+                - the events flags are passed on to the drawable object's
                   constructor.
             throws
                 - std::bad_alloc
@@ -86,12 +86,12 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the area that this draggable can be dragged around in. 
+                - returns the area that this draggable can be dragged around in.
         !*/
 
         void set_draggable_area (
-            const rectangle& area 
-        ); 
+            const rectangle& area
+        );
         /*!
             ensures
                 - #draggable_area() == area
@@ -125,7 +125,7 @@ namespace dlib
                   of this object.
                 - is_being_dragged() == true
             ensures
-                - does not change the state of mutex drawable::m. 
+                - does not change the state of mutex drawable::m.
         !*/
 
         // does nothing by default
@@ -136,9 +136,9 @@ namespace dlib
                 - enable_events() has been called
                 - mutex drawable::m is locked
                 - is called when the user stops dragging this object
-                - is_being_dragged() == false 
+                - is_being_dragged() == false
             ensures
-                - does not change the state of mutex drawable::m. 
+                - does not change the state of mutex drawable::m.
         !*/
 
     private:
@@ -150,7 +150,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class mouse_over_event 
+    // class mouse_over_event
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -165,23 +165,23 @@ namespace dlib
                 that will alert you when the mouse enters or leaves your drawable object.
 
                 You use it by inheriting from it and defining the draw() method and any
-                of the on_*() event handlers you need.  
+                of the on_*() event handlers you need.
         !*/
 
     public:
 
-        mouse_over_event(  
+        mouse_over_event(
             drawable_window& w,
             unsigned long events = 0
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
-                - #*this will not receive any events or draw() requests until 
+                - #*this will not receive any events or draw() requests until
                   enable_events() is called
-                - the events flags are passed on to the drawable object's 
+                - the events flags are passed on to the drawable object's
                   constructor.
             throws
                 - std::bad_alloc
@@ -221,7 +221,7 @@ namespace dlib
                 - is called whenever this object transitions from the state where
                   is_mouse_over() == false to is_mouse_over() == true
             ensures
-                - does not change the state of mutex drawable::m. 
+                - does not change the state of mutex drawable::m.
         !*/
 
         // does nothing by default
@@ -232,9 +232,9 @@ namespace dlib
                 - enable_events() has been called
                 - mutex drawable::m is locked
                 - is called whenever this object transitions from the state where
-                  is_mouse_over() == true to is_mouse_over() == false 
+                  is_mouse_over() == true to is_mouse_over() == false
             ensures
-                - does not change the state of mutex drawable::m. 
+                - does not change the state of mutex drawable::m.
         !*/
 
     private:
@@ -246,11 +246,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class button_action 
+    // class button_action
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class button_action : public mouse_over_event 
+    class button_action : public mouse_over_event
     {
         /*!
             INITIAL VALUE
@@ -258,27 +258,27 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents the clicking action of a push button.  It provides
-                simple callbacks that can be used to make various kinds of button 
+                simple callbacks that can be used to make various kinds of button
                 widgets.
 
                 You use it by inheriting from it and defining the draw() method and any
-                of the on_*() event handlers you need.  
+                of the on_*() event handlers you need.
         !*/
 
     public:
 
-        button_action(  
+        button_action(
             drawable_window& w,
             unsigned long events = 0
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
-                - #*this will not receive any events or draw() requests until 
+                - #*this will not receive any events or draw() requests until
                   enable_events() is called
-                - the events flags are passed on to the drawable object's 
+                - the events flags are passed on to the drawable object's
                   constructor.
             throws
                 - std::bad_alloc
@@ -317,12 +317,12 @@ namespace dlib
                 - mutex drawable::m is locked
                 - is_enabled() == true
                 - is_hidden() == false
-                - the area in parent_window() defined by get_rect() has been invalidated. 
+                - the area in parent_window() defined by get_rect() has been invalidated.
                   (This means you don't have to call invalidate_rectangle())
                 - is called whenever this object transitions from the state where
                   is_depressed() == false to is_depressed() == true
             ensures
-                - does not change the state of mutex drawable::m. 
+                - does not change the state of mutex drawable::m.
         !*/
 
         // does nothing by default
@@ -333,16 +333,16 @@ namespace dlib
             requires
                 - enable_events() has been called
                 - mutex drawable::m is locked
-                - the area in parent_window() defined by get_rect() has been invalidated. 
+                - the area in parent_window() defined by get_rect() has been invalidated.
                   (This means you don't have to call invalidate_rectangle())
                 - is called whenever this object transitions from the state where
-                  is_depressed() == true to is_depressed() == false 
+                  is_depressed() == true to is_depressed() == false
                 - if (the mouse was over this button when this event occurred) then
                     - mouse_over == true
                 - else
                     - mouse_over == false
             ensures
-                - does not change the state of mutex drawable::m. 
+                - does not change the state of mutex drawable::m.
         !*/
 
     private:
@@ -358,7 +358,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class button : public button_action 
+    class button : public button_action
     {
         /*!
             INITIAL VALUE
@@ -366,19 +366,19 @@ namespace dlib
                 tooltip_text() == "" (i.e. there is no tooltip by default)
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a simple button.  
+                This object represents a simple button.
 
                 When this object is disabled it means it will not respond to user clicks.
         !*/
 
     public:
 
-        button(  
+        button(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -397,7 +397,7 @@ namespace dlib
             unsigned long width_,
             unsigned long height_
         );
-        /*! 
+        /*!
             ensures
                 - if (width and height are big enough to contain the name of this button) then
                     - #width() == width_
@@ -488,12 +488,12 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
-                - the event_handler function is called on object when the button is 
+                - the event_handler function is called on object when the button is
                   clicked by the user.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -504,10 +504,10 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the button is clicked by 
+                - the event_handler function is called when the button is clicked by
                   the user.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -522,13 +522,13 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - &self == this
-                - the event_handler function is called on object when the button is 
+                - the event_handler function is called on object when the button is
                   clicked by the user.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -540,10 +540,10 @@ namespace dlib
         /*!
             ensures
                 - &self == this
-                - the event_handler function is called when the button is clicked by 
+                - the event_handler function is called when the button is clicked by
                   the user.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -558,12 +558,12 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
-                - the event_handler function is called on object when the user causes 
+                - the event_handler function is called on object when the user causes
                   the button to go into its depressed state.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -574,10 +574,10 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the user causes the button 
+                - the event_handler function is called when the user causes the button
                   to go into its depressed state.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -592,16 +592,16 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
-                - the event_handler function is called on object when the user causes 
+                - the event_handler function is called on object when the user causes
                   the button to go into its non-depressed state.
                 - if (the mouse is over this button when this event occurs) then
                     - mouse_over == true
                 - else
                     - mouse_over == false
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -612,14 +612,14 @@ namespace dlib
         );
         /*!
             ensures
-                - the event_handler function is called when the user causes the 
+                - the event_handler function is called when the user causes the
                   button to go into its non-depressed state.
                 - if (the mouse is over this button when this event occurs) then
                     - mouse_over == true
                 - else
                     - mouse_over == false
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -634,13 +634,13 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - &self == this
-                - the event_handler function is called on object when the user causes 
+                - the event_handler function is called on object when the user causes
                   the button to go into its depressed state.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -652,10 +652,10 @@ namespace dlib
         /*!
             ensures
                 - &self == this
-                - the event_handler function is called when the user causes the button 
+                - the event_handler function is called when the user causes the button
                   to go into its depressed state.
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -670,17 +670,17 @@ namespace dlib
         );
         /*!
             requires
-                - event_handler is a valid pointer to a member function in T 
+                - event_handler is a valid pointer to a member function in T
             ensures
                 - &self == this
-                - the event_handler function is called on object when the user causes 
+                - the event_handler function is called on object when the user causes
                   the button to go into its non-depressed state.
                 - if (the mouse is over this button when this event occurs) then
                     - mouse_over == true
                 - else
                     - mouse_over == false
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -692,14 +692,14 @@ namespace dlib
         /*!
             ensures
                 - &self == this
-                - the event_handler function is called when the user causes the 
+                - the event_handler function is called when the user causes the
                   button to go into its non-depressed state.
                 - if (the mouse is over this button when this event occurs) then
                     - mouse_over == true
                 - else
                     - mouse_over == false
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -714,11 +714,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class scroll_bar 
+    // class scroll_bar
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class scroll_bar : public drawable 
+    class scroll_bar : public drawable
     {
         /*!
             INITIAL VALUE
@@ -736,21 +736,21 @@ namespace dlib
         !*/
 
     public:
-        enum bar_orientation 
+        enum bar_orientation
         {
             HORIZONTAL,
             VERTICAL
         };
 
-        scroll_bar(  
+        scroll_bar(
             drawable_window& w,
-            bar_orientation orientation 
+            bar_orientation orientation
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
-                - #orientation() == orientation 
+                - #orientation() == orientation
                 - #parent_window() == w
             throws
                 - std::bad_alloc
@@ -768,7 +768,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the orientation of this scroll_bar 
+                - returns the orientation of this scroll_bar
         !*/
 
         template <
@@ -779,7 +779,7 @@ namespace dlib
         );
         /*!
             requires
-                - style_type == a type that inherits from scroll_bar_style 
+                - style_type == a type that inherits from scroll_bar_style
             ensures
                 - this scroll_bar object will draw itself using the given
                   scroll bar style
@@ -788,7 +788,7 @@ namespace dlib
         void set_length (
             unsigned long length,
         );
-        /*! 
+        /*!
             ensures
                 - if (orientation() == HORIZONTAL) then
                     - #width() == max(length,1)
@@ -800,7 +800,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the maximum value that slider_pos() can take. 
+                - returns the maximum value that slider_pos() can take.
         !*/
 
         void set_max_slider_pos (
@@ -813,7 +813,7 @@ namespace dlib
                 - else
                     - #max_slider_pos() == mpos
                 - if (slider_pos() > #max_slider_pos()) then
-                    - #slider_pos() == #max_slider_pos() 
+                    - #slider_pos() == #max_slider_pos()
                 - else
                     - #slider_pos() == slider_pos()
         !*/
@@ -844,19 +844,19 @@ namespace dlib
             ensures
                 - returns the number of positions that the slider bar will jump when the
                   user clicks on the empty gaps above or below the slider bar.
-                  (note that the slider will jump less than the jump size if it hits the 
+                  (note that the slider will jump less than the jump size if it hits the
                   end of the scroll bar)
         !*/
 
         void set_jump_size (
-            long js 
+            long js
         );
         /*!
             ensures
                 - if (js < 1) then
                     - #jump_size() == 1
                 - else
-                    - #jump_size() == js 
+                    - #jump_size() == js
         !*/
 
 
@@ -872,10 +872,10 @@ namespace dlib
                 - event_handler is a valid pointer to a member function in T
             ensures
                 - The event_handler function is called whenever the user causes the slider box
-                  to move.  
+                  to move.
                 - This event is NOT triggered by calling set_slider_pos()
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -887,10 +887,10 @@ namespace dlib
         /*!
             ensures
                 - The event_handler function is called whenever the user causes the slider box
-                  to move.  
+                  to move.
                 - This event is NOT triggered by calling set_slider_pos()
-                - any previous calls to this function are overridden by this new call.  
-                  (i.e. you can only have one event handler associated with this 
+                - any previous calls to this function are overridden by this new call.
+                  (i.e. you can only have one event handler associated with this
                   event at a time)
             throws
                 - std::bad_alloc
@@ -905,11 +905,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class widget_group 
+    // class widget_group
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class widget_group : public drawable 
+    class widget_group : public drawable
     {
         /*!
             INITIAL VALUE
@@ -919,18 +919,18 @@ namespace dlib
                 top() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a grouping of drawable widgets.  It doesn't draw 
+                This object represents a grouping of drawable widgets.  It doesn't draw
                 anything itself, rather it lets you manipulate the position, enabled
                 status, and visibility of a set of widgets as a group.
         !*/
 
     public:
-        widget_group(  
+        widget_group(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -956,15 +956,15 @@ namespace dlib
         );
         /*!
             ensures
-                - does not change the position of this object. 
+                - does not change the position of this object.
                   (i.e. the upper left corner of get_rect() remains at the same position)
                 - if (size() == 0) then
                     - #get_rect().is_empty() == true
                 - else
                     - recursively calls fit_to_contents() on any widget_groups inside
                       this object.
-                    - #get_rect() will be the smallest rectangle that contains all the 
-                      widgets in this group and the upper left corner of get_rect(). 
+                    - #get_rect() will be the smallest rectangle that contains all the
+                      widgets in this group and the upper left corner of get_rect().
         !*/
 
         unsigned long size (
@@ -986,8 +986,8 @@ namespace dlib
                     - #size() == size() + 1
                 - else
                     - #size() == size()
-                - The following conditions apply to this function as well as to all of the 
-                  following functions so long as is_member(widget) == true: 
+                - The following conditions apply to this function as well as to all of the
+                  following functions so long as is_member(widget) == true:
                   enable(), disable(), hide(), show(), set_z_order(), and set_pos().
                     - #widget.left() == left()+x
                     - #widget.width() == widget.width()
@@ -1013,7 +1013,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #is_member(widget) == false 
+                - #is_member(widget) == false
                 - if (is_member(widget) == true) then
                     - #size() == size() - 1
                 - else
@@ -1036,7 +1036,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class image_widget 
+    // class image_widget
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -1045,13 +1045,13 @@ namespace dlib
         /*!
             INITIAL VALUE
                 draggable_area() == an initial value for its type.
-                This object isn't displaying anything. 
+                This object isn't displaying anything.
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a draggable image.  You give it an image to display
                 by calling set_image().
 
-                Also note that initially the draggable area is empty so it won't be 
+                Also note that initially the draggable area is empty so it won't be
                 draggable unless you call set_draggable_area() to some non-empty region.
 
                 The image is drawn such that:
@@ -1064,12 +1064,12 @@ namespace dlib
 
     public:
 
-        image_widget(  
+        image_widget(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -1085,7 +1085,7 @@ namespace dlib
         !*/
 
         template <
-            typename image_type 
+            typename image_type
             >
         void set_image (
             const image_type& img
@@ -1093,7 +1093,7 @@ namespace dlib
         /*!
             requires
                 - image_type == an implementation of array2d/array2d_kernel_abstract.h
-                - pixel_traits<typename image_type::type> must be defined 
+                - pixel_traits<typename image_type::type> must be defined
             ensures
                 - #width() == img.nc()
                 - #height() == img.nr()
@@ -1109,11 +1109,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class tooltip 
+    // class tooltip
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class tooltip : public mouse_over_event 
+    class tooltip : public mouse_over_event
     {
         /*!
             INITIAL VALUE
@@ -1129,12 +1129,12 @@ namespace dlib
 
     public:
 
-        tooltip(  
+        tooltip(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -1150,8 +1150,8 @@ namespace dlib
         !*/
 
         void set_size (
-            unsigned long width_, 
-            unsigned long height_ 
+            unsigned long width_,
+            unsigned long height_
         );
         /*!
             ensures
@@ -1194,7 +1194,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // popup menu stuff  
+    // popup menu stuff
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -1255,7 +1255,7 @@ namespace dlib
         !*/
 
         virtual rectangle get_middle_size (
-        ) const = 0; 
+        ) const = 0;
         /*!
             ensures
                 - returns the dimensions of the middle part of the menu_item
@@ -1283,8 +1283,8 @@ namespace dlib
                 - enabled == true if the menu_item is to be drawn enabled
                 - is_selected == true if the menu_item is to be drawn selected
             ensures
-                - draws the background of the menu_item on the canvas c at the location 
-                  given by rect.  
+                - draws the background of the menu_item on the canvas c at the location
+                  given by rect.
         !*/
 
         virtual void draw_left (
@@ -1302,8 +1302,8 @@ namespace dlib
                 - enabled == true if the menu_item is to be drawn enabled
                 - is_selected == true if the menu_item is to be drawn selected
             ensures
-                - draws the left part of the menu_item on the canvas c at the location 
-                  given by rect.  
+                - draws the left part of the menu_item on the canvas c at the location
+                  given by rect.
         !*/
 
         virtual void draw_middle (
@@ -1321,8 +1321,8 @@ namespace dlib
                 - enabled == true if the menu_item is to be drawn enabled
                 - is_selected == true if the menu_item is to be drawn selected
             ensures
-                - draws the middle part of the menu_item on the canvas c at the location 
-                  given by rect.  
+                - draws the middle part of the menu_item on the canvas c at the location
+                  given by rect.
         !*/
 
         virtual void draw_right (
@@ -1340,8 +1340,8 @@ namespace dlib
                 - enabled == true if the menu_item is to be drawn enabled
                 - is_selected == true if the menu_item is to be drawn selected
             ensures
-                - draws the right part of the menu_item on the canvas c at the location 
-                  given by rect.  
+                - draws the right part of the menu_item on the canvas c at the location
+                  given by rect.
         !*/
     };
 
@@ -1364,11 +1364,11 @@ namespace dlib
             T& object,
             void (T::*on_click_handler)(),
             unichar hotkey = 0
-        ); 
+        );
         /*!
             ensures
                 - The text of this menu item will be str
-                - the on_click_handler function is called on object when this menu_item 
+                - the on_click_handler function is called on object when this menu_item
                   clicked by the user.
                 - #get_hot_key() == hotkey
         !*/
@@ -1377,11 +1377,11 @@ namespace dlib
             const std::string& str,
             const any_function<void()>& on_click_handler,
             unichar hotkey = 0
-        ); 
+        );
         /*!
             ensures
                 - The text of this menu item will be str
-                - the on_click_handler function is called when this menu_item 
+                - the on_click_handler function is called when this menu_item
                   clicked by the user.
                 - #get_hot_key() == hotkey
         !*/
@@ -1395,13 +1395,13 @@ namespace dlib
             T& object,
             void (T::*on_click_handler)(),
             unichar hotkey = 0
-        ); 
+        );
 
         menu_item_text (
             const std::wstring& str,
             const any_function<void()>& on_click_handler,
             unichar hotkey = 0
-        ); 
+        );
 
         template <
             typename T
@@ -1411,7 +1411,7 @@ namespace dlib
             T& object,
             void (T::*on_click_handler)(),
             unichar hotkey = 0
-        ); 
+        );
 
         template <
             typename T
@@ -1420,7 +1420,7 @@ namespace dlib
             const dlib::ustring& str,
             const any_function<void()>& on_click_handler,
             unichar hotkey = 0
-        ); 
+        );
     };
 
 // ----------------------------------------------------------------------------------------
@@ -1438,7 +1438,7 @@ namespace dlib
         menu_item_submenu (
             const std::string& str,
             unichar hotkey = 0
-        ); 
+        );
         /*!
             ensures
                 - The text of this menu item will be str
@@ -1449,12 +1449,12 @@ namespace dlib
         menu_item_submenu (
             const std::wstring& str,
             unichar hotkey = 0
-        ); 
+        );
 
         menu_item_submenu (
             const dlib::ustring& str,
             unichar hotkey = 0
-        ); 
+        );
     };
 
 // ----------------------------------------------------------------------------------------
@@ -1463,7 +1463,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is a horizontal separator in a popup menu 
+                This object is a horizontal separator in a popup menu
         !*/
     };
 
@@ -1485,8 +1485,8 @@ namespace dlib
         popup_menu (
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
             throws
                 - std::bad_alloc
                 - dlib::thread_error
@@ -1499,7 +1499,7 @@ namespace dlib
             ensures
                 - #*this has its initial value
             throws
-                - std::bad_alloc 
+                - std::bad_alloc
                   if this exception is thrown then *this is unusable
                   until clear() is called and succeeds
         !*/
@@ -1512,10 +1512,10 @@ namespace dlib
         );
         /*!
             requires
-                - menu_item_type == a type that inherits from menu_item 
+                - menu_item_type == a type that inherits from menu_item
             ensures
-                - adds new_item onto the bottom of this popup_menu. 
-                - returns size() 
+                - adds new_item onto the bottom of this popup_menu.
+                - returns size()
                   (This is also the index by which this item can be
                   referenced by the enable_menu_item() and disable_menu_item()
                   functions.)
@@ -1530,12 +1530,12 @@ namespace dlib
         );
         /*!
             requires
-                - menu_item_type == a type that inherits from menu_item 
+                - menu_item_type == a type that inherits from menu_item
             ensures
-                - adds new_item onto the bottom of this popup_menu. 
+                - adds new_item onto the bottom of this popup_menu.
                 - when the user puts the mouse above this menu_item the given
                   submenu popup_menu will be displayed.
-                - returns size() 
+                - returns size()
                   (This is also the index by which this item can be
                   referenced by the enable_menu_item() and disable_menu_item()
                   functions.)
@@ -1548,7 +1548,7 @@ namespace dlib
             requires
                 - idx < size()
             ensures
-                - the menu_item in this with the index idx has been enabled 
+                - the menu_item in this with the index idx has been enabled
         !*/
 
         void disable_menu_item (
@@ -1576,16 +1576,16 @@ namespace dlib
         /*!
             ensures
                 - the event_handler function is called on object when this popup_menu
-                  hides itself due to an action by the user. 
-                - Note that you can register multiple handlers for this event. 
+                  hides itself due to an action by the user.
+                - Note that you can register multiple handlers for this event.
         !*/
 
         void select_first_item (
         );
         /*!
             ensures
-                - causes this popup menu to highlight the first 
-                  menu item that it contains which has a click event 
+                - causes this popup menu to highlight the first
+                  menu item that it contains which has a click event
                   and is enabled.
         !*/
 
@@ -1617,11 +1617,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class popup_menu_region 
+    // class popup_menu_region
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class popup_menu_region : public drawable 
+    class popup_menu_region : public drawable
     {
         /*!
             INITIAL VALUE
@@ -1631,18 +1631,18 @@ namespace dlib
                 This object represents a region on a window where if the user
                 right clicks the mouse over this region a popup_menu pops up.
                 
-                Note that this widget doesn't actually draw anything, it just 
+                Note that this widget doesn't actually draw anything, it just
                 provides a region the user can click on to get a popup menu.
         !*/
 
     public:
 
-        popup_menu_region(  
+        popup_menu_region(
             drawable_window& w
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
             throws
@@ -1658,8 +1658,8 @@ namespace dlib
         !*/
 
         void set_size (
-            unsigned long width_, 
-            unsigned long height_ 
+            unsigned long width_,
+            unsigned long height_
         );
         /*!
             ensures
@@ -1694,7 +1694,7 @@ namespace dlib
         /*!
             ensures
                 - returns a reference to the popup_menu for this object. It is
-                  the menu that is displayed when the user right clicks on 
+                  the menu that is displayed when the user right clicks on
                   this widget
         !*/
 
@@ -1707,11 +1707,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // class zoomable_region 
+    // class zoomable_region
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class zoomable_region : public drawable 
+    class zoomable_region : public drawable
     {
         /*
             INITIAL VALUE
@@ -1722,25 +1722,25 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a 2D Cartesian graph that you can zoom into and
-                out of.  It is a graphical widget that draws a rectangle with 
+                out of.  It is a graphical widget that draws a rectangle with
                 a horizontal and vertical scroll bar that allow the user to scroll
-                around on a Cartesian graph that is much larger than the actual 
-                area occupied by this object on the screen.  It also allows 
+                around on a Cartesian graph that is much larger than the actual
+                area occupied by this object on the screen.  It also allows
                 the user to zoom in and out.
 
                 To use this object you inherit from it and make use of its public and
                 protected member functions.  It provides functions for converting between
-                pixel locations and the points in our 2D Cartesian graph so that when the 
+                pixel locations and the points in our 2D Cartesian graph so that when the
                 user is scrolling/zooming the widget you can still determine where
                 things are to be placed on the screen and what screen pixels correspond
                 to in the Cartesian graph.
 
                 Note that the Cartesian graph in this object is bounded by the point
-                (0,0), corresponding to the upper left corner when we are zoomed all 
-                the way out, and max_graph_point() which corresponds to the lower right 
-                corner when zoomed all the way out. The value of max_graph_point() is 
-                determined automatically from the size of this object's on screen 
-                rectangle and the value of min_zoom_scale() which determines how far 
+                (0,0), corresponding to the upper left corner when we are zoomed all
+                the way out, and max_graph_point() which corresponds to the lower right
+                corner when zoomed all the way out. The value of max_graph_point() is
+                determined automatically from the size of this object's on screen
+                rectangle and the value of min_zoom_scale() which determines how far
                 out you can zoom.
         */
 
@@ -1751,13 +1751,13 @@ namespace dlib
             unsigned long events = 0
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
-                - This object will not receive any events or draw() requests until 
+                - This object will not receive any events or draw() requests until
                   enable_events() is called
-                - the events flags are passed on to the drawable object's 
+                - the events flags are passed on to the drawable object's
                   constructor.
             throws
                 - std::bad_alloc
@@ -1779,7 +1779,7 @@ namespace dlib
         );
         /*!
             requires
-                - style_type == a type that inherits from scrollable_region_style 
+                - style_type == a type that inherits from scrollable_region_style
             ensures
                 - this zoomable_region object will draw itself using the given
                   style
@@ -1808,7 +1808,7 @@ namespace dlib
         !*/
 
         void set_max_zoom_scale (
-            double ms 
+            double ms
         );
         /*!
             requires
@@ -1818,7 +1818,7 @@ namespace dlib
         !*/
 
         void set_min_zoom_scale (
-            double ms 
+            double ms
         );
         /*!
             requires
@@ -1839,7 +1839,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the maximum allowed value of zoom_scale() 
+                - returns the maximum allowed value of zoom_scale()
                   (i.e. this is the number that determines how far in the user is allowed to zoom)
         !*/
 
@@ -1847,7 +1847,7 @@ namespace dlib
             unsigned long width,
             unsigned long height
         );
-        /*! 
+        /*!
             ensures
                 - #width() == width_
                 - #height() == height_
@@ -1910,11 +1910,11 @@ namespace dlib
             requires
                 - mutex drawable::m is locked
             ensures
-                - returns a double Z that represents the current zoom.  
-                    - Smaller values of Z represent the user zooming out. 
-                    - Bigger values of Z represent the user zooming in.  
+                - returns a double Z that represents the current zoom.
+                    - Smaller values of Z represent the user zooming out.
+                    - Bigger values of Z represent the user zooming in.
                     - The default unzoomed case is when Z == 1
-                    - objects should be drawn such that they are zoom_scale() 
+                    - objects should be drawn such that they are zoom_scale()
                       times their normal size
         !*/
 
@@ -1929,9 +1929,9 @@ namespace dlib
                 - if (min_zoom_scale() <= new_scale && new_scale <= max_zoom_scale()) then
                     - #zoom_scale() == new_scale
                 - else if (new_scale < min_zoom_scale()) then
-                    - #zoom_scale() == min_zoom_scale() 
+                    - #zoom_scale() == min_zoom_scale()
                 - else if (new_scale > max_zoom_scale()) then
-                    - #zoom_scale() == max_zoom_scale() 
+                    - #zoom_scale() == max_zoom_scale()
         !*/
 
         void center_display_at_graph_point (
@@ -1960,7 +1960,7 @@ namespace dlib
 
     // ---------------------------- event handlers ----------------------------
     // The following event handlers are used in this object.  So if you
-    // use any of them in your derived object you should pass the events 
+    // use any of them in your derived object you should pass the events
     // back to it so that they still operate unless you wish to hijack the
     // event for your own reasons (e.g. to override the mouse drag this object
     // performs)
@@ -1982,7 +1982,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class scrollable_region : public drawable 
+    class scrollable_region : public drawable
     {
         /*!
             INITIAL VALUE
@@ -1997,18 +1997,18 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a 2D region of arbitrary size that is displayed
-                within a possibly smaller scrollable gui widget.  That is, it is a 
-                graphical widget that draws a rectangle with a horizontal and vertical 
-                scroll bar that allows the user to scroll around on a region that is much 
-                larger than the actual area occupied by this object on the screen. 
+                within a possibly smaller scrollable gui widget.  That is, it is a
+                graphical widget that draws a rectangle with a horizontal and vertical
+                scroll bar that allows the user to scroll around on a region that is much
+                larger than the actual area occupied by this object on the screen.
                 
                 To use this object you inherit from it and make use of its public and
                 protected member functions.  It provides a function, total_rect(), that
-                tells you where the 2D region is on the screen.  You draw your stuff 
-                inside total_rect() as you would normally except that you only modify 
+                tells you where the 2D region is on the screen.  You draw your stuff
+                inside total_rect() as you would normally except that you only modify
                 pixels that are also inside display_rect().  When the user moves the
                 scroll bars the position of total_rect() is updated accordingly, causing
-                the widget's content to scroll across the screen. 
+                the widget's content to scroll across the screen.
         !*/
 
     public:
@@ -2017,13 +2017,13 @@ namespace dlib
             unsigned long events = 0
         );
         /*!
-            ensures 
-                - #*this is properly initialized 
+            ensures
+                - #*this is properly initialized
                 - #*this has been added to window w
                 - #parent_window() == w
-                - This object will not receive any events or draw() requests until 
+                - This object will not receive any events or draw() requests until
                   enable_events() is called
-                - the events flags are passed on to the drawable object's 
+                - the events flags are passed on to the drawable object's
                   constructor.
             throws
                 - std::bad_alloc
@@ -2045,7 +2045,7 @@ namespace dlib
         );
         /*!
             requires
-                - style_type == a type that inherits from scrollable_region_style 
+                - style_type == a type that inherits from scrollable_region_style
             ensures
                 - this scrollable_region object will draw itself using the given
                   style
@@ -2055,7 +2055,7 @@ namespace dlib
             unsigned long width,
             unsigned long height
         );
-        /*! 
+        /*!
             ensures
                 - #width() == width_
                 - #height() == height_
@@ -2110,7 +2110,7 @@ namespace dlib
         /*!
             ensures
                 - returns the number of positions the horizontal scroll bar
-                  moves when the user scrolls the mouse wheel.  
+                  moves when the user scrolls the mouse wheel.
         !*/
 
         unsigned long vertical_mouse_wheel_scroll_increment (
@@ -2118,7 +2118,7 @@ namespace dlib
         /*!
             ensures
                 - returns the number of positions the vertical scroll bar
-                  moves when the user scrolls the mouse wheel.  
+                  moves when the user scrolls the mouse wheel.
         !*/
 
         void set_horizontal_mouse_wheel_scroll_increment (
@@ -2203,7 +2203,7 @@ namespace dlib
             requires
                 - mutex drawable::m is locked
             ensures
-                - returns the rectangle on the screen that contains the scrollable 
+                - returns the rectangle on the screen that contains the scrollable
                   area in this widget.  I.e. this is the area of this widget minus
                   the area taken up by the scroll bars and border decorations.
         !*/
@@ -2218,8 +2218,8 @@ namespace dlib
                 - (width > 0 && height > 0) || (width == 0 && height == 0)
             ensures
                 - #total_rect().width()  == width
-                - #total_rect().height() == height 
-                - The scroll bars as well as the position of #total_rect() 
+                - #total_rect().height() == height
+                - The scroll bars as well as the position of #total_rect()
                   is updated so that the total rect is still in the correct
                   position with respect to the scroll bars.
         !*/
@@ -2232,7 +2232,7 @@ namespace dlib
             ensures
                 - returns a rectangle that represents the entire scrollable
                   region inside this widget, even the parts that are outside
-                  display_rect().  
+                  display_rect().
         !*/
 
         void scroll_to_rect (
@@ -2242,8 +2242,8 @@ namespace dlib
             requires
                 - mutex drawable::m is locked
             ensures
-                - Adjusts the scroll bars of this object so that the part of 
-                  the total_rect() rectangle that overlaps with r is displayed in 
+                - Adjusts the scroll bars of this object so that the part of
+                  the total_rect() rectangle that overlaps with r is displayed in
                   the display_rect() rectangle on the screen.
         !*/
 
@@ -2261,9 +2261,9 @@ namespace dlib
 
     // ---------------------------- event handlers ----------------------------
     // The following event handlers are used in this object.  So if you
-    // use any of them in your derived object you should pass the events 
+    // use any of them in your derived object you should pass the events
     // back to it so that they still operate unless you wish to hijack the
-    // event for your own reasons (e.g. to override the mouse wheel action 
+    // event for your own reasons (e.g. to override the mouse wheel action
     // this object performs)
 
         void on_wheel_down (unsigned long state);

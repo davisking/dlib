@@ -37,19 +37,19 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
+        // kernel_1a
         typedef     hash_map_kernel_1<domain,range,expnum,hash_table_1,mem_manager>
                     kernel_1a;
         typedef     hash_map_kernel_c<kernel_1a>
                     kernel_1a_c;
 
-        // kernel_1b        
+        // kernel_1b
         typedef     hash_map_kernel_1<domain,range,expnum,hash_table_2,mem_manager>
                     kernel_1b;
         typedef     hash_map_kernel_c<kernel_1b>
                     kernel_1b_c;
  
-        // kernel_1c        
+        // kernel_1c
         typedef     hash_map_kernel_1<domain,range,expnum,hash_table_3,mem_manager>
                     kernel_1c;
         typedef     hash_map_kernel_c<kernel_1c>

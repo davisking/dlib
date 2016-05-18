@@ -1,7 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_PARALLEL_FoR_ABSTRACT_Hh_
-#ifdef DLIB_PARALLEL_FoR_ABSTRACT_Hh_ 
+#ifdef DLIB_PARALLEL_FoR_ABSTRACT_Hh_
 
 #include "thread_pool_extension_abstract.h"
 
@@ -25,7 +25,7 @@ namespace dlib
             - chunks_per_thread > 0
             - funct does not throw any exceptions
         ensures
-            - This is a convenience function for submitting a block of jobs to a thread_pool.  
+            - This is a convenience function for submitting a block of jobs to a thread_pool.
               In particular, given the half open range [begin, end), this function will
               split the range into approximately tp.num_threads_in_pool()*chunks_per_thread
               blocks, which it will then submit to the thread_pool.  The given thread_pool
@@ -142,10 +142,10 @@ namespace dlib
             - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following function call:
-              parallel_for_blocked(tp, begin, end, [&](long begin_sub, long end_sub) 
+              parallel_for_blocked(tp, begin, end, [&](long begin_sub, long end_sub)
                 {
                   for (long i = begin_sub; i < end_sub; ++i)
-                      (obj.*funct)(i);  
+                      (obj.*funct)(i);
                 }, chunks_per_thread);
             - Therefore, this routine invokes (obj.*funct)(i) for all i in the range
               [begin, end).  However, it does so using tp.num_threads_in_pool() parallel
@@ -193,10 +193,10 @@ namespace dlib
             - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following function call:
-              parallel_for_blocked(tp, begin, end, [&](long begin_sub, long end_sub) 
+              parallel_for_blocked(tp, begin, end, [&](long begin_sub, long end_sub)
                 {
                   for (long i = begin_sub; i < end_sub; ++i)
-                      funct(i);  
+                      funct(i);
                 }, chunks_per_thread);
             - Therefore, this routine invokes funct(i) for all i in the range [begin, end).
               However, it does so using tp.num_threads_in_pool() parallel threads.

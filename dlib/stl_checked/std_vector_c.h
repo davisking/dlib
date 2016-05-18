@@ -92,128 +92,128 @@ namespace dlib
 
         reference operator[](
             size_type n
-        ) 
-        { 
+        )
+        {
             DLIB_CASSERT(n < size(),
                 "\treference std_vector_c::operator[](n)"
                 << "\n\tYou have supplied an invalid index"
                 << "\n\tthis:   " << this
-                << "\n\tn:      " << n 
+                << "\n\tn:      " << n
                 << "\n\tsize(): " << size()
             );
-            return static_cast<base_type&>(*this)[n]; 
+            return static_cast<base_type&>(*this)[n];
         }
 
     // ------------------------------------------------------
 
         const_reference operator[](
             size_type n
-        ) const 
-        { 
+        ) const
+        {
             DLIB_CASSERT(n < size(),
                 "\tconst_reference std_vector_c::operator[](n)"
                 << "\n\tYou have supplied an invalid index"
                 << "\n\tthis:   " << this
-                << "\n\tn:      " << n 
+                << "\n\tn:      " << n
                 << "\n\tsize(): " << size()
             );
-            return static_cast<const base_type&>(*this)[n]; 
+            return static_cast<const base_type&>(*this)[n];
         }
 
     // ------------------------------------------------------
 
         reference front(
-        ) 
-        { 
+        )
+        {
             DLIB_CASSERT(size() > 0,
                 "\treference std_vector_c::front()"
                 << "\n\tYou can't call front() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            return base_type::front(); 
+            return base_type::front();
         }
 
     // ------------------------------------------------------
 
         const_reference front(
-        ) const 
+        ) const
         {
             DLIB_CASSERT(size() > 0,
                 "\tconst_reference std_vector_c::front()"
                 << "\n\tYou can't call front() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            return base_type::front(); 
+            return base_type::front();
         }
 
     // ------------------------------------------------------
 
         reference back(
-        ) 
-        { 
+        )
+        {
             DLIB_CASSERT(size() > 0,
                 "\treference std_vector_c::back()"
                 << "\n\tYou can't call back() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            return base_type::back(); 
+            return base_type::back();
         }
 
     // ------------------------------------------------------
 
         const_reference back(
-        ) const 
-        { 
+        ) const
+        {
             DLIB_CASSERT(size() > 0,
                 "\tconst_reference std_vector_c::back()"
                 << "\n\tYou can't call back() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            return base_type::back(); 
+            return base_type::back();
         }
 
     // ------------------------------------------------------
 
         void pop_back(
-        ) 
-        { 
+        )
+        {
             DLIB_CASSERT(size() > 0,
                 "\tconst_reference std_vector_c::pop_back()"
                 << "\n\tYou can't call pop_back() on an empty vector"
                 << "\n\tthis:   " << this
             );
-            base_type::pop_back(); 
+            base_type::pop_back();
         }
 
     // ------------------------------------------------------
 
         iterator insert(
-            iterator position, 
+            iterator position,
             const T& x
-        ) 
-        { 
-            DLIB_CASSERT( begin() <= position && position <= end(), 
+        )
+        {
+            DLIB_CASSERT( begin() <= position && position <= end(),
                 "\titerator std_vector_c::insert(position,x)"
                 << "\n\tYou have called insert() with an invalid position"
                 << "\n\tthis:   " << this
             );
-            return base_type::insert(position, x); 
+            return base_type::insert(position, x);
         }
 
     // ------------------------------------------------------
 
         void insert(
-            iterator position, 
-            size_type n, 
+            iterator position,
+            size_type n,
             const T& x
-        ) 
-        { 
-            DLIB_CASSERT( begin() <= position && position <= end(), 
+        )
+        {
+            DLIB_CASSERT( begin() <= position && position <= end(),
                 "\tvoid std_vector_c::insert(position,n,x)"
                 << "\n\tYou have called insert() with an invalid position"
                 << "\n\tthis:   " << this
             );
-            base_type::insert(position, n, x); 
+            base_type::insert(position, n, x);
         }
 
     // ------------------------------------------------------
@@ -221,45 +221,45 @@ namespace dlib
         template <typename InputIterator>
         void insert(
             iterator position,
-            InputIterator first, 
+            InputIterator first,
             InputIterator last
-        ) 
-        { 
-            DLIB_CASSERT( begin() <= position && position <= end(), 
+        )
+        {
+            DLIB_CASSERT( begin() <= position && position <= end(),
                 "\tvoid std_vector_c::insert(position,first,last)"
                 << "\n\tYou have called insert() with an invalid position"
                 << "\n\tthis:   " << this
             );
-            base_type::insert(position, first, last); 
+            base_type::insert(position, first, last);
         }
 
     // ------------------------------------------------------
 
         iterator erase(
             iterator position
-        ) 
-        { 
-            DLIB_CASSERT( begin() <= position && position < end(), 
+        )
+        {
+            DLIB_CASSERT( begin() <= position && position < end(),
                 "\titerator std_vector_c::erase(position)"
                 << "\n\tYou have called erase() with an invalid position"
                 << "\n\tthis:   " << this
             );
-            return base_type::erase(position); 
+            return base_type::erase(position);
         }
 
     // ------------------------------------------------------
 
         iterator erase(
-            iterator first, 
+            iterator first,
             iterator last
-        ) 
-        { 
+        )
+        {
             DLIB_CASSERT( begin() <= first && first <= last && last <= end(),
                 "\titerator std_vector_c::erase(first,last)"
                 << "\n\tYou have called erase() with an invalid range of iterators"
                 << "\n\tthis:   " << this
             );
-            return base_type::erase(first,last); 
+            return base_type::erase(first,last);
         }
 
     // ------------------------------------------------------
@@ -289,10 +289,10 @@ namespace dlib
     )
     {
         try
-        { 
+        {
             const unsigned long size = static_cast<unsigned long>(item.size());
 
-            serialize(size,out); 
+            serialize(size,out);
             for (unsigned long i = 0; i < item.size(); ++i)
                 serialize(item[i],out);
         }
@@ -308,10 +308,10 @@ namespace dlib
         std::istream& in
     )
     {
-        try 
-        { 
+        try
+        {
             unsigned long size;
-            deserialize(size,in); 
+            deserialize(size,in);
             item.resize(size);
             for (unsigned long i = 0; i < size; ++i)
                 deserialize(item[i],in);
@@ -322,7 +322,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename alloc> 
+    template <typename T, typename alloc>
     struct is_std_vector<std_vector_c<T,alloc> >        { const static bool value = true; };
 
 // ----------------------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 
 namespace dlib
 {
-    namespace cuda 
+    namespace cuda
     {
 
     // ----------------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ namespace dlib
         );
 
         // Note that this function isn't in the tt:: namespace because add_scaled() is
-        // called by cuda::add() so we don't need a tt:: version of add_scaled().  
+        // called by cuda::add() so we don't need a tt:: version of add_scaled().
         void add_scaled(
             tensor& dest,
             const float scale,
@@ -241,7 +241,7 @@ namespace dlib
             const tensor& src,
             const tensor& gradient_input,
             const tensor& param,
-            tensor& params_grad 
+            tensor& params_grad
         );
 
     // ------------------------------------------------------------------------------------
@@ -284,7 +284,7 @@ namespace dlib
 
 #endif // DLIB_USE_CUDA
 
-    } 
+    }
 }
 
 

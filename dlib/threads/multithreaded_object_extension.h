@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_MULTITHREADED_OBJECT_EXTENSIOn_
-#define DLIB_MULTITHREADED_OBJECT_EXTENSIOn_ 
+#define DLIB_MULTITHREADED_OBJECT_EXTENSIOn_
 
 #include "multithreaded_object_extension_abstract.h"
 #include "threads_kernel.h"
@@ -30,14 +30,14 @@ namespace dlib
 
             CONVENTION
                 - number_of_threads_registered() == thread_ids.size() + dead_threads.size()
-                - number_of_threads_alive() == threads_started 
+                - number_of_threads_alive() == threads_started
 
                 - is_running() == is_running_
                 - should_stop() == should_stop_
 
                 - thread_ids == a map of current thread ids to the member function
-                  pointers that that thread runs.  
-                - threads_started == the number of threads that have been spawned to run 
+                  pointers that that thread runs.
+                - threads_started == the number of threads that have been spawned to run
                   thread_helper but haven't ended yet.
                   
                 - dead_threads == a queue that contains all the member function pointers

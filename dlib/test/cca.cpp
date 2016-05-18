@@ -7,7 +7,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -80,7 +80,7 @@ namespace
 
         for (long i = 0; i < correlations.size(); ++i)
         {
-            // compare what the measured correlation values are (in A) to the 
+            // compare what the measured correlation values are (in A) to the
             // predicted values.
             cout << "error: "<< A(i) - correlations(i);
         }

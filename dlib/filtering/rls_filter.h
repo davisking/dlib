@@ -18,11 +18,11 @@ namespace dlib
     {
         /*!
             CONVENTION
-                - data.size() == the number of variables in a measurement 
-                - data[i].size() == data[j].size() for all i and j.  
-                - data[i].size() == get_window_size() 
+                - data.size() == the number of variables in a measurement
+                - data[i].size() == data[j].size() for all i and j.
+                - data[i].size() == get_window_size()
                 - data[i][0] == most recent measurement of i-th variable given to update.
-                - data[i].back() == oldest measurement of i-th variable given to update 
+                - data[i].back() == oldest measurement of i-th variable given to update
                   (or zero if we haven't seen this much data yet).
 
                 - if (count <= 2) then
@@ -48,8 +48,8 @@ namespace dlib
                         0 < C && size_ >= 2,
                 "\t rls_filter::rls_filter()"
                 << "\n\t invalid arguments were given to this function"
-                << "\n\t forget_factor: " << forget_factor 
-                << "\n\t C:     " << C 
+                << "\n\t forget_factor: " << forget_factor
+                << "\n\t C:     " << C
                 << "\n\t size_: " << size_
                 << "\n\t this: " << this
                 );
@@ -85,7 +85,7 @@ namespace dlib
 
             for (unsigned long i = 0; i < data.size(); ++i)
             {
-                // Put old predicted value into the circular buffer as if it was 
+                // Put old predicted value into the circular buffer as if it was
                 // the measurement we just observed.  But don't update the rls filter.
                 data[i].push_front(next(i));
             }
@@ -106,13 +106,13 @@ namespace dlib
                         (get_predicted_next_state().size()==0 || z.size()==get_predicted_next_state().size()),
                 "\t void rls_filter::update(z)"
                 << "\n\t invalid arguments were given to this function"
-                << "\n\t is_col_vector(z): " << is_col_vector(z) 
+                << "\n\t is_col_vector(z): " << is_col_vector(z)
                 << "\n\t z.size():         " << z.size()
                 << "\n\t get_predicted_next_state().size(): " << get_predicted_next_state().size()
                 << "\n\t this: " << this
                 );
 
-            // initialize data if necessary 
+            // initialize data if necessary
             if (data.size() == 0)
             {
                 data.resize(z.size());

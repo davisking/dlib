@@ -27,7 +27,7 @@ namespace dlib
             const T& current(
             ) const;
 
-            const T& element( 
+            const T& element(
             ) const;
 
             T& element(
@@ -44,9 +44,9 @@ namespace dlib
         typename stack_base
         >
     inline void swap (
-        stack_kernel_c<stack_base>& a, 
-        stack_kernel_c<stack_base>& b 
-    ) { a.swap(b); } 
+        stack_kernel_c<stack_base>& a,
+        stack_kernel_c<stack_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -167,13 +167,13 @@ namespace dlib
     void stack_kernel_c<stack_base>::
     remove_any (
         T& item
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( (this->size() > 0),
             "\tvoid stack::remove_any"
             << "\n\tsize() must be greater than zero if something is going to be removed"
-            << "\n\tsize(): " << this->size() 
+            << "\n\tsize(): " << this->size()
             << "\n\tthis:   " << this
             );
 

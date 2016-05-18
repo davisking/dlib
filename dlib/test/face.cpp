@@ -13,7 +13,7 @@
 //#include <dlib/gui_widgets.h>
 //#include <dlib/image_processing/render_face_detections.h>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;

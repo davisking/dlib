@@ -3,7 +3,7 @@
 #ifndef DLIB_NUMERIC_CONSTANTs_H_
 #define DLIB_NUMERIC_CONSTANTs_H_
 
-namespace dlib 
+namespace dlib
 {
 
     // pi -- Pi
@@ -27,17 +27,17 @@ namespace dlib
     // newton_G  -- Newton's gravitational constant (in metric units of m^3/(kg*s^2))
     const double newton_G = 6.67384e-11;
 
-    // planck_cst -- Planck's constant (in units of Joules * seconds) 
+    // planck_cst -- Planck's constant (in units of Joules * seconds)
     const double planck_cst = 6.62606957e-34;
 
     // golden_ratio -- The Golden Ratio
     const double golden_ratio = 1.6180339887498948482;
 
-    // euler_gamma -- The Euler Mascheroni Constant 
+    // euler_gamma -- The Euler Mascheroni Constant
     const double euler_gamma = 0.5772156649015328606065;
 
     // catalan -- Catalan's Constant
-    const double catalan = 0.91596559417721901505; 
+    const double catalan = 0.91596559417721901505;
 
     // glaisher -- Glaisher Kinkelin constant
     const double glaisher = 1.2824271291006226369;

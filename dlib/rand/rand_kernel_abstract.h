@@ -13,7 +13,7 @@ namespace dlib
     class rand
     {
 
-        /*!      
+        /*!
             INITIAL VALUE
                 get_seed() == ""
 
@@ -28,7 +28,7 @@ namespace dlib
             rand(
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                 throws
                     - std::bad_alloc
@@ -38,9 +38,9 @@ namespace dlib
                 time_t seed_value
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
-                    - #get_seed() == cast_to_string(seed_value) 
+                    - #get_seed() == cast_to_string(seed_value)
                     - This version of the constructor is equivalent to using
                       the default constructor and then calling set_seed(cast_to_string(seed_value))
                 throws
@@ -51,7 +51,7 @@ namespace dlib
                 const std::string& seed_value
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
                     - #get_seed() == seed_value
                     - This version of the constructor is equivalent to using
@@ -61,7 +61,7 @@ namespace dlib
             !*/
 
             virtual ~rand(
-            ); 
+            );
             /*!
                 ensures
                     - all memory associated with *this has been released
@@ -74,7 +74,7 @@ namespace dlib
                     - #*this has its initial value
                 throws
                     - std::bad_alloc
-                        if this exception is thrown then *this is unusable 
+                        if this exception is thrown then *this is unusable
                         until clear() is called and succeeds
             !*/
 
@@ -104,21 +104,21 @@ namespace dlib
             );
             /*!
                 ensures
-                    - returns a pseudorandom number in the range 0 to 2^16-1 
+                    - returns a pseudorandom number in the range 0 to 2^16-1
             !*/
 
             uint32 get_random_32bit_number (
             );
             /*!
                 ensures
-                    - returns a pseudorandom number in the range 0 to 2^32-1 
+                    - returns a pseudorandom number in the range 0 to 2^32-1
             !*/
 
             uint64 get_random_64bit_number (
             );
             /*!
                 ensures
-                    - returns a pseudorandom number in the range 0 to 2^64-1 
+                    - returns a pseudorandom number in the range 0 to 2^64-1
             !*/
 
             float get_random_float (
@@ -139,8 +139,8 @@ namespace dlib
             );
             /*!
                 ensures
-                    - returns a random number sampled from a Gaussian distribution 
-                      with mean 0 and standard deviation 1. 
+                    - returns a random number sampled from a Gaussian distribution
+                      with mean 0 and standard deviation 1.
             !*/
 
             void swap (
@@ -149,32 +149,32 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
 
     };
 
     inline void swap (
-        rand& a, 
-        rand& b 
-    ) { a.swap(b); }   
+        rand& a,
+        rand& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
 
     void serialize (
-        const rand& item, 
-        std::ostream& out 
-    );   
+        const rand& item,
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
-        rand& item, 
+        rand& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 }
 

@@ -11,7 +11,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
@@ -107,11 +107,11 @@ namespace
     )
     /*!
         requires
-            - mfp is an implementation of member_function_pointer/member_function_pointer_kernel_abstract.h 
+            - mfp is an implementation of member_function_pointer/member_function_pointer_kernel_abstract.h
         ensures
             - runs tests on mfp for compliance with the specs
     !*/
-    {        
+    {
 
 
         test_helper helper;
@@ -415,18 +415,18 @@ namespace
 
         a0.set(helper,&test_helper::go0);
         a0c.set(helper,&test_helper::go0);
-        b0 = a0; 
+        b0 = a0;
         b0c = a0c;
-        helper.i = -1; 
+        helper.i = -1;
         a0();
         DLIB_TEST(helper.i == 0);
-        helper.i = -1; 
+        helper.i = -1;
         b0();
         DLIB_TEST(helper.i == 0);
-        helper.i = -1; 
+        helper.i = -1;
         a0c();
         DLIB_TEST(helper.i == 0);
-        helper.i = -1; 
+        helper.i = -1;
         b0c();
         DLIB_TEST(helper.i == 0);
 
@@ -435,16 +435,16 @@ namespace
         a1c.set(helper,&test_helper::go1);
         b1 = a1;
         b1c = a1c;
-        helper.i = -1; 
+        helper.i = -1;
         a1(1);
         DLIB_TEST(helper.i == 1);
-        helper.i = -1; 
+        helper.i = -1;
         b1(10);
         DLIB_TEST(helper.i == 1*10);
-        helper.i = -1; 
+        helper.i = -1;
         a1c(20);
         DLIB_TEST(helper.i == 1*20);
-        helper.i = -1; 
+        helper.i = -1;
         b1c(30);
         DLIB_TEST(helper.i == 1*30);
 
@@ -453,16 +453,16 @@ namespace
         a2c.set(helper,&test_helper::go2);
         b2 = a2;
         b2c = a2c;
-        helper.i = -1; 
+        helper.i = -1;
         a2(1,2);
         DLIB_TEST(helper.i == 2*1*2);
-        helper.i = -1; 
+        helper.i = -1;
         b2(3,4);
         DLIB_TEST(helper.i == 2*3*4);
-        helper.i = -1; 
+        helper.i = -1;
         a2c(5,6);
         DLIB_TEST(helper.i == 2*5*6);
-        helper.i = -1; 
+        helper.i = -1;
         b2c(7,8);
         DLIB_TEST(helper.i == 2*7*8);
 
@@ -471,16 +471,16 @@ namespace
         a3c.set(helper,&test_helper::go3);
         b3 = a3;
         b3c = a3c;
-        helper.i = -1; 
+        helper.i = -1;
         a3(1,2,3);
         DLIB_TEST(helper.i == 3*1*2*3);
-        helper.i = -1; 
+        helper.i = -1;
         b3(4,5,6);
         DLIB_TEST(helper.i == 3*4*5*6);
-        helper.i = -1; 
+        helper.i = -1;
         a3c(7,8,9);
         DLIB_TEST(helper.i == 3*7*8*9);
-        helper.i = -1; 
+        helper.i = -1;
         b3c(1,2,3);
         DLIB_TEST(helper.i == 3*1*2*3);
 
@@ -490,16 +490,16 @@ namespace
         DLIB_TEST(a4 == a4c);
         b4 = a4;
         b4c = a4c;
-        helper.i = -1; 
+        helper.i = -1;
         a4(1,2,3,4);
         DLIB_TEST(helper.i == 4*1*2*3*4);
-        helper.i = -1; 
+        helper.i = -1;
         b4(5,6,7,8);
         DLIB_TEST(helper.i == 4*5*6*7*8);
-        helper.i = -1; 
+        helper.i = -1;
         a4c(9,1,2,3);
         DLIB_TEST(helper.i == 4*9*1*2*3);
-        helper.i = -1; 
+        helper.i = -1;
         b4c(4,5,6,7);
         DLIB_TEST(helper.i == 4*4*5*6*7);
 

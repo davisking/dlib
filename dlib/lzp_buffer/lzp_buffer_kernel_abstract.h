@@ -8,7 +8,7 @@
 namespace dlib
 {
 
-    class lzp_buffer 
+    class lzp_buffer
     {
         /*!
             INITIAL VALUE
@@ -24,24 +24,24 @@ namespace dlib
                 The LZP algorithm is a lot like lz77 except there is no need to pass
                 the location of matches in the history buffer to the decoder because
                 LZP uses the data it has already seen to predict the location of the
-                next match.  
+                next match.
 
             NOTE
                 The add() and predict_match() functions must be called in the same
-                order by the coder and decoder.  If they aren't the state of the 
-                lzp_buffer objects in the coder and decoder may differ and the decoder 
+                order by the coder and decoder.  If they aren't the state of the
+                lzp_buffer objects in the coder and decoder may differ and the decoder
                 won't be able to correctly decode the data stream.
         !*/
 
     public:
 
         explicit lzp_buffer (
-            unsigned long buffer_size           
+            unsigned long buffer_size
         );
         /*!
             requires
                 - 10 < buffer_size < 32
-            ensures                
+            ensures
                 - #*this is properly initialized
                 - #size() == 2^buffer_size
             throws
@@ -62,7 +62,7 @@ namespace dlib
                 - #*this has its initial value
             throws
                 - std::bad_alloc
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -76,8 +76,8 @@ namespace dlib
                 - #(*this)[0] == symbol
             throws
                 - std::bad_alloc
-                    if this exception is thrown then #*this is unusable 
-                    until clear() is called and succeeds  
+                    if this exception is thrown then #*this is unusable
+                    until clear() is called and succeeds
         !*/
 
         unsigned long predict_match (
@@ -86,7 +86,7 @@ namespace dlib
         /*!
             ensures
                 - updates the prediction for the current context.
-                  (the current context is the last few symbols seen. i.e. (*this)[0], 
+                  (the current context is the last few symbols seen. i.e. (*this)[0],
                    (*this)[1], etc.)
                 - if (*this can generate a prediction) then
                     - #index == the predicted location of a match in the history buffer.
@@ -96,8 +96,8 @@ namespace dlib
                     - returns 0
             throws
                 - std::bad_alloc
-                    if this exception is thrown then #*this is unusable 
-                    until clear() is called and succeeds            
+                    if this exception is thrown then #*this is unusable
+                    until clear() is called and succeeds
         !*/
 
         unsigned long size (
@@ -123,7 +123,7 @@ namespace dlib
         lzp_buffer(const lzp_buffer&);        // copy constructor
         lzp_buffer& operator=(const lzp_buffer&);    // assignment operator
 
-    };      
+    };
 }
 
 #endif // DLIB_LZP_BUFFER_KERNEl_ABSTRACT_

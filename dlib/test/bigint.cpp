@@ -9,7 +9,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -17,7 +17,7 @@ namespace
 
     logger dlog("test.bigint");
 
-    namespace bigint_kernel_test_helpers 
+    namespace bigint_kernel_test_helpers
     {
         template <
             typename bint
@@ -71,7 +71,7 @@ namespace
             using namespace relational_operators;
 
             bint a = 1;
-            int k = 0; 
+            int k = 0;
             for (bint i = 2; i <= value; ++i)
             {
                 ++k;
@@ -81,7 +81,7 @@ namespace
             }
 
             return a;
-        }        
+        }
     }
 
     template <
@@ -93,9 +93,9 @@ namespace
         requires
             - bint is an implementation of bigint/bigint_kernel_abstract.h
         ensures
-            - runs tests on bint for compliance with the specs 
+            - runs tests on bint for compliance with the specs
     !*/
-    {        
+    {
         using namespace bigint_kernel_test_helpers;
         using namespace relational_operators;
         istringstream sin;
@@ -138,7 +138,7 @@ namespace
         {
             // compute the factorial of k using the O(n) multiplication algorithm
             a = short_fact<bint>(k);
-            // compute the factorial of k using the full blown big int 
+            // compute the factorial of k using the full blown big int
             // multiplication algorithm.
             b = big_fact<bint>(k);
             // compute the square of the factorial of k using the full blown
@@ -148,7 +148,7 @@ namespace
             DLIB_TEST_MSG(a == b,
                          "k: " << k << "\n"
                          "short_fact: " << a << "\n"
-                         "big_fact: " << b 
+                         "big_fact: " << b
             );
             // make sure c really is the square of the factorial of k
             DLIB_TEST_MSG(short_fact_squared<bint>(k) == c,"k: " << k);
@@ -164,7 +164,7 @@ namespace
             DLIB_TEST_MSG(a == b,
                          "k: " << k << "\n"
                          "short_fact: " << a << "\n"
-                         "big_fact: " << b 
+                         "big_fact: " << b
             );
             DLIB_TEST_MSG(short_fact_squared<bint>(k) == c,"k: " << k);
             print_spinner();
@@ -246,7 +246,7 @@ namespace
             if (i%2 == 0)
                 a = a + i;
             else
-                a += i;          
+                a += i;
             ++mel;
             if ((mel&0xFFF) == 0)
                 print_spinner();
@@ -277,7 +277,7 @@ namespace
             if (i%2 == 0)
                 a = a + i;
             else
-                a += i;  
+                a += i;
             ++mel;
             if ((mel&0xFF) == 0)
                 print_spinner();
@@ -466,7 +466,7 @@ namespace
 
         DLIB_TEST(a > b);
         DLIB_TEST(a != b);
-        DLIB_TEST(b < a);            
+        DLIB_TEST(b < a);
         DLIB_TEST(b != a);
         DLIB_TEST(b <= a);
         DLIB_TEST(a >= b);

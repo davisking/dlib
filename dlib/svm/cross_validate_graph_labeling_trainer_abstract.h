@@ -68,7 +68,7 @@ namespace dlib
               samples[i].node(j), this routine counts a value of losses[i][j].  Under this
               interpretation, the loss values represent how useful it is to correctly label
               each node.  Therefore, the values returned represent fractions of overall
-              labeling utility rather than raw labeling accuracy.  
+              labeling utility rather than raw labeling accuracy.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -91,9 +91,9 @@ namespace dlib
               (e.g. structural_graph_labeling_trainer)
         ensures
             - performs k-fold cross validation by using the given trainer to solve the
-              given graph labeling problem for the given number of folds.  Each fold 
-              is tested using the output of the trainer and the average classification 
-              accuracy from all folds is returned.  In particular, this function returns 
+              given graph labeling problem for the given number of folds.  Each fold
+              is tested using the output of the trainer and the average classification
+              accuracy from all folds is returned.  In particular, this function returns
               a matrix R such that:
                 - R(0) == The fraction of nodes which are supposed to have a label of
                   true that are labeled as such by the learned labeler.
@@ -134,7 +134,7 @@ namespace dlib
               samples[i].node(j), this routine counts a value of losses[i][j].  Under this
               interpretation, the loss values represent how useful it is to correctly label
               each node.  Therefore, the values returned represent fractions of overall
-              labeling utility rather than raw labeling accuracy.  
+              labeling utility rather than raw labeling accuracy.
     !*/
 
 // ----------------------------------------------------------------------------------------

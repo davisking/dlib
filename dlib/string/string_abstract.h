@@ -11,7 +11,7 @@
 namespace dlib
 {
 
-// ---------------------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------------------
 
     class string_cast_error : public error
     {
@@ -60,12 +60,12 @@ namespace dlib
                 Note that you can use string_assign to assign to any type which you could
                 use with string_cast(), except for std::basic_string, assigning to this
                 type is ambiguous for boring technical reasons.  But there isn't much
-                point in using this tool to assign from one string to another so it doesn't 
-                matter.   
+                point in using this tool to assign from one string to another so it doesn't
+                matter.
 
-                Additionally, note that there is a global instance of this object, dlib::sa. 
-                So you never have to create a string_assign object yourself.  Finally, this 
-                object is totally stateless and threadsafe.   
+                Additionally, note that there is a global instance of this object, dlib::sa.
+                So you never have to create a string_assign object yourself.  Finally, this
+                object is totally stateless and threadsafe.
         !*/
     };
 
@@ -83,7 +83,7 @@ namespace dlib
         typename T
         >
     const std::string cast_to_string (
-        const T& item 
+        const T& item
     );
     /*!
         requires
@@ -93,14 +93,14 @@ namespace dlib
         throws
             - cast_to_string_error
                 This exception is thrown if cast_to_string() is unable to convert
-                item into a std::string.  
+                item into a std::string.
     !*/
 
     template <
         typename T
         >
     const std::wstring cast_to_wstring (
-        const T& item 
+        const T& item
     );
     /*!
         requires
@@ -110,7 +110,7 @@ namespace dlib
         throws
             - cast_to_string_error
                 This exception is thrown if cast_to_string() is unable to convert
-                item into a std::string.  
+                item into a std::string.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -139,7 +139,7 @@ namespace dlib
     /*!
         ensures
             - returns str as a std::string by converting every character in it to a char.
-              Note that any characters that do not have a mapping to type char will be 
+              Note that any characters that do not have a mapping to type char will be
               converted to a space.
     !*/
 
@@ -167,13 +167,13 @@ namespace dlib
                 - The first line starts with first_pad space characters.
                 - The second and all subsequent lines start with rest_pad space characters.
                 - The first line is no longer than max_per_line - (rest_pad-first_pad) characters.
-                - The second and all subsequent lines are no longer than max_per_line characters. 
+                - The second and all subsequent lines are no longer than max_per_line characters.
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename traits 
+        typename traits
         typename alloc
         >
     const std::basic_string<char,traits,alloc> tolower (
@@ -243,12 +243,12 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> ltrim (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& trim_chars 
+        const std::basic_string<charT,traits,alloc>& trim_chars
     );
     /*!
         ensures
-            - returns a copy of str with any leading trim_chars  
-              from the left side of the string removed. 
+            - returns a copy of str with any leading trim_chars
+              from the left side of the string removed.
     !*/
 
     template <
@@ -276,12 +276,12 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> rtrim (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& trim_chars 
+        const std::basic_string<charT,traits,alloc>& trim_chars
     );
     /*!
         ensures
-            - returns a copy of str with any trailing trim_chars 
-              from the right side of the string removed. 
+            - returns a copy of str with any trailing trim_chars
+              from the right side of the string removed.
     !*/
 
     template <
@@ -309,12 +309,12 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> trim (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& trim_chars 
+        const std::basic_string<charT,traits,alloc>& trim_chars
     );
     /*!
         ensures
-            - returns a copy of str with any leading or trailing trim_chars 
-              from the ends of the string removed. 
+            - returns a copy of str with any leading or trailing trim_chars
+              from the ends of the string removed.
     !*/
 
     template <
@@ -343,7 +343,7 @@ namespace dlib
     const std::basic_string<charT,traits,alloc> rpad (
         const std::basic_string<charT,traits,alloc>& str,
         long pad_length,
-        const std::basic_string<charT,traits,alloc>& pad_string 
+        const std::basic_string<charT,traits,alloc>& pad_string
     );
     /*!
         ensures
@@ -355,7 +355,7 @@ namespace dlib
                     - P == (pad_string + pad_string + ... + pad_string).substr(0,pad_length - str.size())
                       (i.e. P == a string with the above specified size that contains just
                       repitions of the pad_string)
-                - returns the string str + P 
+                - returns the string str + P
     !*/
 
     template <
@@ -385,7 +385,7 @@ namespace dlib
     const std::basic_string<charT,traits,alloc> lpad (
         const std::basic_string<charT,traits,alloc>& str,
         long pad_length,
-        const std::basic_string<charT,traits,alloc>& pad_string 
+        const std::basic_string<charT,traits,alloc>& pad_string
     );
     /*!
         ensures
@@ -427,13 +427,13 @@ namespace dlib
     const std::basic_string<charT,traits,alloc> pad (
         const std::basic_string<charT,traits,alloc>& str,
         long pad_length,
-        const std::basic_string<charT,traits,alloc>& pad_string 
+        const std::basic_string<charT,traits,alloc>& pad_string
     );
     /*!
         ensures
             - let str_size == static_cast<long>(str.size())
-            - returns rpad( lpad(str, (pad_length-str_size)/2 + str_size, pad_string),  
-                            pad_length, 
+            - returns rpad( lpad(str, (pad_length-str_size)/2 + str_size, pad_string),
+                            pad_length,
                             pad_string);
     !*/
 
@@ -463,7 +463,7 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> left_substr (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     );
     /*!
         ensures
@@ -496,7 +496,7 @@ namespace dlib
         >
     const std::basic_string<charT,traits,alloc> right_substr (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     );
     /*!
         ensures
@@ -530,7 +530,7 @@ namespace dlib
         typename traits,
         typename alloc
         >
-    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> >
     split_on_first (
         const std::basic_string<charT,traits,alloc>& str,
         const charT* delim = _dT(charT, " \n\r\t")
@@ -538,7 +538,7 @@ namespace dlib
     /*!
         ensures
             - This function splits string into two parts, the split is based on the first
-              occurrence of any character from delim.  
+              occurrence of any character from delim.
             - let delim_pos = str.find_first_of(delim)
             - if (delim_pos == std::string::npos) then
                 - returns make_pair(str,"")
@@ -551,10 +551,10 @@ namespace dlib
         typename traits,
         typename alloc
         >
-    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> >
     split_on_first (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     );
     /*!
         requires
@@ -570,15 +570,15 @@ namespace dlib
         typename traits,
         typename alloc
         >
-    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> >
     split_on_last (
         const std::basic_string<charT,traits,alloc>& str,
         const charT* delim = _dT(charT, " \n\r\t")
     );
     /*!
         ensures
-            - This function splits string into two parts, the split is based on the last 
-              occurrence of any character from delim.  
+            - This function splits string into two parts, the split is based on the last
+              occurrence of any character from delim.
             - let delim_pos = str.find_last_of(delim)
             - if (delim_pos == std::string::npos) then
                 - returns make_pair(str,"")
@@ -591,10 +591,10 @@ namespace dlib
         typename traits,
         typename alloc
         >
-    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> > 
+    std::pair<std::basic_string<charT,traits,alloc>, std::basic_string<charT,traits,alloc> >
     split_on_last (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     );
     /*!
         requires
@@ -612,12 +612,12 @@ namespace dlib
         >
     const std::vector<std::basic_string<charT,traits,alloc> > split (
         const std::basic_string<charT,traits,alloc>& str,
-        const std::basic_string<charT,traits,alloc>& delim 
+        const std::basic_string<charT,traits,alloc>& delim
     );
     /*!
         ensures
             - Breaks the given string str into a sequence of substrings delimited
-              by characters in delim and returns the results.  
+              by characters in delim and returns the results.
             - returns a vector V such that:
                 - V.size() == the number of substrings found in str.
                 - for all i: V[i] == The ith substring.  Note that it will not contain

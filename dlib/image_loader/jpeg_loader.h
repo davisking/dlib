@@ -68,7 +68,7 @@ namespace dlib
         }
 
         void read_image( const char* filename );
-        unsigned long height_; 
+        unsigned long height_;
         unsigned long width_;
         unsigned long output_components_;
         std::vector<unsigned char> data;
@@ -93,8 +93,8 @@ namespace dlib
 
 #ifdef NO_MAKEFILE
 #include "jpeg_loader.cpp"
-#endif 
+#endif
 
-#endif // DLIB_JPEG_IMPORT 
+#endif // DLIB_JPEG_IMPORT
 
 

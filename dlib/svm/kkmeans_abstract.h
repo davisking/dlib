@@ -15,21 +15,21 @@ namespace dlib
 {
 
     template <
-        typename kernel_type 
+        typename kernel_type
         >
     class kkmeans : public noncopyable
     {
         /*!
             REQUIREMENTS ON kernel_type
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             INITIAL VALUE
                 - number_of_centers() == 1
                 - get_min_change() == 0.01
 
             WHAT THIS OBJECT REPRESENTS
-                This is an implementation of a kernelized k-means clustering algorithm.  
-                It performs k-means clustering by using the kcentroid object.  
+                This is an implementation of a kernelized k-means clustering algorithm.
+                It performs k-means clustering by using the kcentroid object.
         !*/
 
     public:
@@ -38,7 +38,7 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
         kkmeans (
-            const kcentroid<kernel_type>& kc_ 
+            const kcentroid<kernel_type>& kc_
         );
         /*!
             ensures
@@ -59,7 +59,7 @@ namespace dlib
         );
         /*!
             ensures
-                - for all idx:  
+                - for all idx:
                     - #get_kcentroid(idx) == a copy of kc_
         !*/
 
@@ -121,8 +121,8 @@ namespace dlib
             ensures
                 - performs k-means clustering of the given set of samples.  The initial center points
                   are taken from the initial_centers argument.
-                - loops over the data and continues to refine the clustering until either less than 
-                  get_min_change() fraction of the data points change clusters or we have done max_iter 
+                - loops over the data and continues to refine the clustering until either less than
+                  get_min_change() fraction of the data points change clusters or we have done max_iter
                   iterations over the data.
                 - After this function finishes you can call the operator() function below
                   to determine which centroid a given sample is closest to.
@@ -172,7 +172,7 @@ namespace dlib
         typename kernel_type
         >
     void swap(
-        kkmeans<kernel_type>& a, 
+        kkmeans<kernel_type>& a,
         kkmeans<kernel_type>& b
     ) { a.swap(b); }
     /*!
@@ -191,11 +191,11 @@ namespace dlib
     !*/
 
     template <
-        typename kernel_type 
+        typename kernel_type
         >
     void deserialize (
         kkmeans<kernel_type>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for kkmeans objects
@@ -204,15 +204,15 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type1, 
-        typename vector_type2, 
+        typename vector_type1,
+        typename vector_type2,
         typename kernel_type
         >
     void pick_initial_centers(
-        long num_centers, 
-        vector_type1& centers, 
-        const vector_type2& samples, 
-        const kernel_type& k, 
+        long num_centers,
+        vector_type1& centers,
+        const vector_type2& samples,
+        const kernel_type& k,
         double percentile = 0.01
     );
     /*!
@@ -223,15 +223,15 @@ namespace dlib
             - vector_type1 == something with an interface compatible with std::vector
             - vector_type2 == something with an interface compatible with std::vector
             - k(samples[0],samples[0]) must be a valid expression that returns a double
-            - both centers and samples must be able to contain kernel_type::sample_type 
+            - both centers and samples must be able to contain kernel_type::sample_type
               objects
         ensures
-            - finds num_centers candidate cluster centers in the data in the samples 
-              vector.  Assumes that k is the kernel that will be used during clustering 
+            - finds num_centers candidate cluster centers in the data in the samples
+              vector.  Assumes that k is the kernel that will be used during clustering
               to define the space in which clustering occurs.
-            - The centers are found by looking for points that are far away from other 
-              candidate centers.  However, if the data is noisy you probably want to 
-              ignore the farthest way points since they will be outliers.  To do this 
+            - The centers are found by looking for points that are far away from other
+              candidate centers.  However, if the data is noisy you probably want to
+              ignore the farthest way points since they will be outliers.  To do this
               set percentile to the fraction of outliers you expect the data to contain.
             - #centers.size() == num_centers
             - #centers == a vector containing the candidate centers found
@@ -240,13 +240,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type1, 
+        typename vector_type1,
         typename vector_type2
         >
     void pick_initial_centers(
-        long num_centers, 
-        vector_type1& centers, 
-        const vector_type2& samples, 
+        long num_centers,
+        vector_type1& centers,
+        const vector_type2& samples,
         double percentile = 0.01
     );
     /*!
@@ -266,7 +266,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename array_type, 
+        typename array_type,
         typename sample_type,
         typename alloc
         >
@@ -282,7 +282,7 @@ namespace dlib
               same length.
             - centers.size() > 0
             - array_type == something with an interface compatible with std::vector
-              and it must contain row or column vectors capable of being stored in 
+              and it must contain row or column vectors capable of being stored in
               sample_type objects.
             - sample_type == a dlib::matrix capable of representing vectors
         ensures
@@ -296,7 +296,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename array_type, 
+        typename array_type,
         typename sample_type,
         typename alloc
         >
@@ -312,7 +312,7 @@ namespace dlib
               same length.
             - centers.size() > 0
             - array_type == something with an interface compatible with std::vector
-              and it must contain row or column vectors capable of being stored in 
+              and it must contain row or column vectors capable of being stored in
               sample_type objects.
             - sample_type == a dlib::matrix capable of representing vectors
         ensures
@@ -336,8 +336,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename array_type, 
-        typename EXP 
+        typename array_type,
+        typename EXP
         >
     unsigned long nearest_center (
         const array_type& centers,

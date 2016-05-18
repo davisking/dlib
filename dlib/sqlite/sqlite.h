@@ -33,8 +33,8 @@ namespace dlib
         {
             void operator()(
                 sqlite3* db
-            )const 
-            { 
+            )const
+            {
                 sqlite3_close(db);
             }
         };
@@ -46,13 +46,13 @@ namespace dlib
     {
     public:
         database(
-        ) 
+        )
         {
         }
 
         database (
             const std::string& file
-        ) 
+        )
         {
             open(file);
         }
@@ -116,7 +116,7 @@ namespace dlib
         statement (
             database& db_,
             const std::string sql_statement
-        ) : 
+        ) :
             needs_reset(false),
             step_status(SQLITE_DONE),
             at_first_step(true),
@@ -131,7 +131,7 @@ namespace dlib
                         << "\n\t this: " << this
             );
 
-            int status = sqlite3_prepare_v2(db.get(), 
+            int status = sqlite3_prepare_v2(db.get(),
                                          sql_string.c_str(),
                                          sql_string.size()+1,
                                          &stmt,
@@ -259,7 +259,7 @@ namespace dlib
             DLIB_ASSERT(idx < get_num_columns(),
                         "\t std::vector<char> statement::get_column_as_blob()"
                         << "\n\t Invalid column index."
-                        << "\n\t idx:  " << idx 
+                        << "\n\t idx:  " << idx
                         << "\n\t this: " << this
             );
 
@@ -279,7 +279,7 @@ namespace dlib
             DLIB_ASSERT(idx < get_num_columns(),
                         "\t void statement::get_column_as_object()"
                         << "\n\t Invalid column index."
-                        << "\n\t idx:  " << idx 
+                        << "\n\t idx:  " << idx
                         << "\n\t this: " << this
             );
 
@@ -297,7 +297,7 @@ namespace dlib
             DLIB_ASSERT(idx < get_num_columns(),
                         "\t std::string statement::get_column_as_text()"
                         << "\n\t Invalid column index."
-                        << "\n\t idx:  " << idx 
+                        << "\n\t idx:  " << idx
                         << "\n\t this: " << this
             );
 
@@ -316,7 +316,7 @@ namespace dlib
             DLIB_ASSERT(idx < get_num_columns(),
                         "\t double statement::get_column_as_double()"
                         << "\n\t Invalid column index."
-                        << "\n\t idx:  " << idx 
+                        << "\n\t idx:  " << idx
                         << "\n\t this: " << this
             );
 
@@ -331,7 +331,7 @@ namespace dlib
             DLIB_ASSERT(idx < get_num_columns(),
                         "\t int statement::get_column_as_int()"
                         << "\n\t Invalid column index."
-                        << "\n\t idx:  " << idx 
+                        << "\n\t idx:  " << idx
                         << "\n\t this: " << this
             );
 
@@ -346,7 +346,7 @@ namespace dlib
             DLIB_ASSERT(idx < get_num_columns(),
                         "\t int64 statement::get_column_as_int64()"
                         << "\n\t Invalid column index."
-                        << "\n\t idx:  " << idx 
+                        << "\n\t idx:  " << idx
                         << "\n\t this: " << this
             );
 
@@ -361,7 +361,7 @@ namespace dlib
             DLIB_ASSERT(idx < get_num_columns(),
                         "\t std::string statement::get_column_name()"
                         << "\n\t Invalid column index."
-                        << "\n\t idx:  " << idx 
+                        << "\n\t idx:  " << idx
                         << "\n\t this: " << this
             );
 
@@ -385,7 +385,7 @@ namespace dlib
         typename enable_if_c<std::numeric_limits<T>::is_integer>::type bind (
             unsigned long idx,
             const T& item
-        ) 
+        )
         {
             // unsigned ints won't fit into int all the time so put those into 64bit ints.
             if (sizeof(T) < sizeof(int) || (sizeof(T)==sizeof(int) && is_signed_type<T>::value))
@@ -403,7 +403,7 @@ namespace dlib
         typename disable_if_c<std::numeric_limits<T>::is_integer>::type bind (
             unsigned long idx,
             const T& item
-        ) 
+        )
         {
             bind_object(idx, item);
         }
@@ -417,8 +417,8 @@ namespace dlib
             DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
                         "\t void statement::bind_blob()"
                         << "\n\t Invalid parameter id."
-                        << "\n\t parameter_id:           " << parameter_id 
-                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                        << "\n\t parameter_id:           " << parameter_id
+                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id()
                         << "\n\t this:                   " << this
             );
 
@@ -441,8 +441,8 @@ namespace dlib
             DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
                         "\t void statement::bind_object()"
                         << "\n\t Invalid parameter id."
-                        << "\n\t parameter_id:           " << parameter_id 
-                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                        << "\n\t parameter_id:           " << parameter_id
+                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id()
                         << "\n\t this:                   " << this
             );
 
@@ -467,8 +467,8 @@ namespace dlib
             DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
                         "\t void statement::bind_double()"
                         << "\n\t Invalid parameter id."
-                        << "\n\t parameter_id:           " << parameter_id 
-                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                        << "\n\t parameter_id:           " << parameter_id
+                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id()
                         << "\n\t this:                   " << this
             );
 
@@ -490,8 +490,8 @@ namespace dlib
             DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
                         "\t void statement::bind_int()"
                         << "\n\t Invalid parameter id."
-                        << "\n\t parameter_id:           " << parameter_id 
-                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                        << "\n\t parameter_id:           " << parameter_id
+                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id()
                         << "\n\t this:                   " << this
             );
 
@@ -513,8 +513,8 @@ namespace dlib
             DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
                         "\t void statement::bind_int64()"
                         << "\n\t Invalid parameter id."
-                        << "\n\t parameter_id:           " << parameter_id 
-                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                        << "\n\t parameter_id:           " << parameter_id
+                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id()
                         << "\n\t this:                   " << this
             );
 
@@ -535,8 +535,8 @@ namespace dlib
             DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
                         "\t void statement::bind_null()"
                         << "\n\t Invalid parameter id."
-                        << "\n\t parameter_id:           " << parameter_id 
-                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                        << "\n\t parameter_id:           " << parameter_id
+                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id()
                         << "\n\t this:                   " << this
             );
 
@@ -558,8 +558,8 @@ namespace dlib
             DLIB_ASSERT(1 <= parameter_id && parameter_id <= get_max_parameter_id(),
                         "\t void statement::bind_text()"
                         << "\n\t Invalid parameter id."
-                        << "\n\t parameter_id:           " << parameter_id 
-                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id() 
+                        << "\n\t parameter_id:           " << parameter_id
+                        << "\n\t get_max_parameter_id(): " << get_max_parameter_id()
                         << "\n\t this:                   " << this
             );
 
@@ -589,7 +589,7 @@ namespace dlib
             }
         }
 
-        bool needs_reset; // true if sqlite3_step() has been called more recently than sqlite3_reset() 
+        bool needs_reset; // true if sqlite3_step() has been called more recently than sqlite3_reset()
         int step_status;
         bool at_first_step;
 

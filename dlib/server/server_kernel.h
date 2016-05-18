@@ -44,9 +44,9 @@ namespace dlib
                 thread_count_mutex      == a mutex
                 thread_count_signaler   == a signaler associated with thread_count_mutex
                 thread_count_zero       == a signaler associated with thread_count_mutex
-                max_connections         == 1000 
+                max_connections         == 1000
                 max_connections_mutex   == a mutex for max_connections and graceful_close_timeout
-                graceful_close_timeout  == 500 
+                graceful_close_timeout  == 500
              
             CONVENTION
                 listening_port          == get_listening_port()
@@ -60,7 +60,7 @@ namespace dlib
                 listening_ip_mutex      == a mutex for listening_ip
                 running_mutex           == a mutex for running
                 running_signaler        == a signaler for running and
-                                           is associated with running_mutex.  it is 
+                                           is associated with running_mutex.  it is
                                            used to signal when running is false
                 shutting_down_mutex     == a mutex for shutting_down
                 cons_mutex              == a mutex for cons
@@ -69,7 +69,7 @@ namespace dlib
                 thread_count_signaler   == a signaler for thread_count and
                                            is associated with thread_count_mutex.  it
                                            is used to signal when thread_count is
-                                           decremented  
+                                           decremented
                 thread_count_zero       == a signaler for thread_count and
                                            is associated with thread_count_mutex.  it
                                            is used to signal when thread_count becomes
@@ -96,7 +96,7 @@ namespace dlib
 
             server& the_server;
             connection& new_connection;
-            unsigned long graceful_close_timeout; 
+            unsigned long graceful_close_timeout;
         };
         
 
@@ -115,7 +115,7 @@ namespace dlib
             );
 
             virtual ~server(
-            ); 
+            );
 
             void clear(
             );
@@ -123,7 +123,7 @@ namespace dlib
             void start (
             );
 
-            bool is_running ( 
+            bool is_running (
             ) const;
 
             const std::string get_listening_ip (
@@ -185,9 +185,9 @@ namespace dlib
                     item is a pointer to a param struct
                 ensures
                     services the new connection
-                    will take care of closing the connection and 
+                    will take care of closing the connection and
                     adding the connection to cons when it first starts and
-                    remove the connection from cons and signal that it has 
+                    remove the connection from cons and signal that it has
                     done so when it ends
             !*/
 
@@ -215,10 +215,10 @@ namespace dlib
 
 
             // restricted functions
-            server(server&);   
+            server(server&);
             server& operator= (
                 server&
-                );    
+                );
     };
 
 // ----------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ namespace dlib
         inline simd8i() {}
         inline simd8i(int32 f) { x = _mm256_set1_epi32(f); }
         inline simd8i(int32 r0, int32 r1, int32 r2, int32 r3,
-               int32 r4, int32 r5, int32 r6, int32 r7 ) 
+               int32 r4, int32 r5, int32 r6, int32 r7 )
         { x = _mm256_setr_epi32(r0,r1,r2,r3,r4,r5,r6,r7); }
 
         inline simd8i(const __m256i& val):x(val) {}
@@ -45,7 +45,7 @@ namespace dlib
         inline simd4i high() const { return _mm256_extractf128_si256(x,1); }
 
         inline unsigned int size() const { return 4; }
-        inline int32 operator[](unsigned int idx) const 
+        inline int32 operator[](unsigned int idx) const
         {
             int32 temp[8];
             store(temp);
@@ -71,8 +71,8 @@ namespace dlib
         {
             simd4i low, high;
         };
-        inline simd8i(const rawarray& a) 
-        { 
+        inline simd8i(const rawarray& a)
+        {
             _low = a.low;
             _high = a.high;
         }
@@ -83,7 +83,7 @@ namespace dlib
         inline void store(type* ptr)         const { _low.store(ptr); _high.store(ptr+4); }
 
         inline unsigned int size() const { return 8; }
-        inline int32 operator[](unsigned int idx) const 
+        inline int32 operator[](unsigned int idx) const
         {
             if (idx < 4)
                 return _low[idx];
@@ -113,94 +113,94 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator+ (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator+ (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_add_epi32(lhs, rhs); 
+        return _mm256_add_epi32(lhs, rhs);
 #else
         return simd8i(lhs.low()+rhs.low(),
                       lhs.high()+rhs.high());
 #endif
     }
-    inline simd8i& operator+= (simd8i& lhs, const simd8i& rhs) 
+    inline simd8i& operator+= (simd8i& lhs, const simd8i& rhs)
     { return lhs = lhs + rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator- (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator- (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_sub_epi32(lhs, rhs); 
+        return _mm256_sub_epi32(lhs, rhs);
 #else
         return simd8i(lhs.low()-rhs.low(),
                       lhs.high()-rhs.high());
 #endif
     }
-    inline simd8i& operator-= (simd8i& lhs, const simd8i& rhs) 
+    inline simd8i& operator-= (simd8i& lhs, const simd8i& rhs)
     { return lhs = lhs - rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator* (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator* (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_mullo_epi32(lhs, rhs); 
+        return _mm256_mullo_epi32(lhs, rhs);
 #else
         return simd8i(lhs.low()*rhs.low(),
                       lhs.high()*rhs.high());
 #endif
     }
-    inline simd8i& operator*= (simd8i& lhs, const simd8i& rhs) 
+    inline simd8i& operator*= (simd8i& lhs, const simd8i& rhs)
     { return lhs = lhs * rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator& (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator& (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_and_si256(lhs, rhs); 
+        return _mm256_and_si256(lhs, rhs);
 #else
         return simd8i(lhs.low()&rhs.low(),
                       lhs.high()&rhs.high());
 #endif
     }
-    inline simd8i& operator&= (simd8i& lhs, const simd8i& rhs) 
+    inline simd8i& operator&= (simd8i& lhs, const simd8i& rhs)
     { return lhs = lhs & rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator| (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator| (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_or_si256(lhs, rhs); 
+        return _mm256_or_si256(lhs, rhs);
 #else
         return simd8i(lhs.low()|rhs.low(),
                       lhs.high()|rhs.high());
 #endif
     }
-    inline simd8i& operator|= (simd8i& lhs, const simd8i& rhs) 
+    inline simd8i& operator|= (simd8i& lhs, const simd8i& rhs)
     { return lhs = lhs | rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator^ (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator^ (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_xor_si256(lhs, rhs); 
+        return _mm256_xor_si256(lhs, rhs);
 #else
         return simd8i(lhs.low()^rhs.low(),
                       lhs.high()^rhs.high());
 #endif
     }
-    inline simd8i& operator^= (simd8i& lhs, const simd8i& rhs) 
+    inline simd8i& operator^= (simd8i& lhs, const simd8i& rhs)
     { return lhs = lhs ^ rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator~ (const simd8i& lhs) 
-    { 
+    inline simd8i operator~ (const simd8i& lhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_xor_si256(lhs, _mm256_set1_epi32(0xFFFFFFFF)); 
+        return _mm256_xor_si256(lhs, _mm256_set1_epi32(0xFFFFFFFF));
 #else
         return simd8i(~lhs.low(), ~lhs.high());
 #endif
@@ -208,8 +208,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator<< (const simd8i& lhs, const int& rhs) 
-    { 
+    inline simd8i operator<< (const simd8i& lhs, const int& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
         return _mm256_sll_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #else
@@ -217,13 +217,13 @@ namespace dlib
                       lhs.high()<<rhs);
 #endif
     }
-    inline simd8i& operator<<= (simd8i& lhs, const int& rhs) 
+    inline simd8i& operator<<= (simd8i& lhs, const int& rhs)
     { return lhs = lhs << rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator>> (const simd8i& lhs, const int& rhs) 
-    { 
+    inline simd8i operator>> (const simd8i& lhs, const int& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
         return _mm256_sra_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #else
@@ -231,15 +231,15 @@ namespace dlib
                       lhs.high()>>rhs);
 #endif
     }
-    inline simd8i& operator>>= (simd8i& lhs, const int& rhs) 
+    inline simd8i& operator>>= (simd8i& lhs, const int& rhs)
     { return lhs = lhs >> rhs; return lhs;}
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator== (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator== (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_cmpeq_epi32(lhs, rhs); 
+        return _mm256_cmpeq_epi32(lhs, rhs);
 #else
         return simd8i(lhs.low()==rhs.low(),
                       lhs.high()==rhs.high());
@@ -248,17 +248,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator!= (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator!= (const simd8i& lhs, const simd8i& rhs)
+    {
         return ~(lhs==rhs);
     }
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator> (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator> (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_cmpgt_epi32(lhs, rhs); 
+        return _mm256_cmpgt_epi32(lhs, rhs);
 #else
         return simd8i(lhs.low()>rhs.low(),
                       lhs.high()>rhs.high());
@@ -267,31 +267,31 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator< (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator< (const simd8i& lhs, const simd8i& rhs)
+    {
         return rhs > lhs;
     }
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator<= (const simd8i& lhs, const simd8i& rhs) 
-    { 
-        return ~(lhs > rhs); 
+    inline simd8i operator<= (const simd8i& lhs, const simd8i& rhs)
+    {
+        return ~(lhs > rhs);
     }
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i operator>= (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i operator>= (const simd8i& lhs, const simd8i& rhs)
+    {
         return rhs <= lhs;
     }
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i min (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i min (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_min_epi32(lhs, rhs); 
+        return _mm256_min_epi32(lhs, rhs);
 #else
         return simd8i(min(lhs.low(),rhs.low()),
                       min(lhs.high(),rhs.high()));
@@ -300,10 +300,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline simd8i max (const simd8i& lhs, const simd8i& rhs) 
-    { 
+    inline simd8i max (const simd8i& lhs, const simd8i& rhs)
+    {
 #ifdef DLIB_HAVE_AVX2
-        return _mm256_max_epi32(lhs, rhs); 
+        return _mm256_max_epi32(lhs, rhs);
 #else
         return simd8i(max(lhs.low(),rhs.low()),
                       max(lhs.high(),rhs.high()));

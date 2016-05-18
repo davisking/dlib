@@ -5,8 +5,8 @@
 
 #include <vector>
 #include <string>
-#include "../algs.h" 
-#include "../serialize.h" 
+#include "../algs.h"
+#include "../serialize.h"
 
 namespace dlib
 {
@@ -16,7 +16,7 @@ namespace dlib
     template <
         typename T
         >
-    struct constituent 
+    struct constituent
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -37,7 +37,7 @@ namespace dlib
         !*/
 
         unsigned long begin, end, k;
-        T left_tag; 
+        T left_tag;
         T right_tag;
     };
 
@@ -57,10 +57,10 @@ namespace dlib
         >
     void deserialize(
         constituent<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // -----------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ namespace dlib
                 We follow the convention that the first element of this vector is always
                 the root of the entire tree.
 
-                The fields of this object have the following interpretations:   
+                The fields of this object have the following interpretations:
                     - c == the constituent spanned by this node in the parse tree.
                       Therefore, the node spans the words in the range [c.begin, c.end).
                     - tag == the syntactic category of this node in the parse tree.
@@ -109,11 +109,11 @@ namespace dlib
         !*/
 
         constituent<T> c;
-        T tag; 
-        double score; 
+        T tag;
+        double score;
 
         unsigned long left;
-        unsigned long right; 
+        unsigned long right;
     };
 
     template <
@@ -132,10 +132,10 @@ namespace dlib
         >
     void deserialize (
         parse_tree_element<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // -----------------------------------------------------------------------------------------
@@ -149,18 +149,18 @@ namespace dlib
     /*!
         requires
             - 0 <= c.begin < c.k < c.end <= words.size()
-            - possible_tags.size() == 0 
+            - possible_tags.size() == 0
         ensures
             - Finds all the syntactic categories that can be used to label c and puts those
               categories, along with their scores, into possible_tags.  Or in other words,
               this function determines which production rules can be used to turn the left
               and right sub-constituents in c into a single constituent.  The contents of c
               have the following interpretations:
-                - The left sub-constituent has syntactic category c.left_tag 
-                - for all i such that c.begin <= i < c.k: 
+                - The left sub-constituent has syntactic category c.left_tag
+                - for all i such that c.begin <= i < c.k:
                     - words[i] is part of the left sub-constituent.
-                - The right sub-constituent has syntactic category c.right_tag 
-                - for all i such that c.k <= i < c.end: 
+                - The right sub-constituent has syntactic category c.right_tag
+                - for all i such that c.k <= i < c.end:
                     - words[i] is part of the right sub-constituent.
 
             - Note that example_production_rule_function() is not a real function.  It is
@@ -169,7 +169,7 @@ namespace dlib
     !*/
 
     template <
-        typename T, 
+        typename T,
         typename production_rule_function
         >
     void find_max_parse_cky (
@@ -184,7 +184,7 @@ namespace dlib
             - It must be possible to store T objects in a std::map.
         ensures
             - Uses the CKY algorithm to find the most probable/highest scoring binary parse
-              tree of the given vector of words.  
+              tree of the given vector of words.
             - if (#parse_tree.size() == 0) then
                 - There is no parse tree, using the given production_rules, that can cover
                   the given word sequence.
@@ -198,7 +198,7 @@ namespace dlib
                 - #parse_tree[0].end == words.size()
             - This function uses production_rules() to find out what the allowed production
               rules are.  That is, production_rules() defines all properties of the grammar
-              used by find_max_parse_cky(). 
+              used by find_max_parse_cky().
     !*/
 
 // -----------------------------------------------------------------------------------------
@@ -216,7 +216,7 @@ namespace dlib
 // -----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename U
         >
     std::string parse_tree_to_string (
@@ -229,8 +229,8 @@ namespace dlib
             - It must be possible to print U objects to an ostream using operator<<
               (typically, U would be something like std::string)
         ensures
-            - Interprets tree as a parse tree defined over the given sequence of words.  
-            - returns a bracketed string that represents the parse tree over the words.  
+            - Interprets tree as a parse tree defined over the given sequence of words.
+            - returns a bracketed string that represents the parse tree over the words.
               For example, suppose the following parse tree is input:
 
                         /\
@@ -240,7 +240,7 @@ namespace dlib
                    the dog  ran
 
               Then the output would be the string "[[the dog] ran]"
-            - Only the sub-tree rooted at tree[root_idx] will be output.  If root_idx >= 
+            - Only the sub-tree rooted at tree[root_idx] will be output.  If root_idx >=
               tree.size() then the empty string is returned.
         throws
             - parse_tree_to_string_error
@@ -252,7 +252,7 @@ namespace dlib
 // -----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename U
         >
     std::string parse_tree_to_string_tagged (
@@ -292,7 +292,7 @@ namespace dlib
 // -----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename U
         >
     std::string parse_trees_to_string (
@@ -320,7 +320,7 @@ namespace dlib
 // -----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         typename U
         >
     std::string parse_trees_to_string_tagged (
@@ -354,14 +354,14 @@ namespace dlib
     void find_trees_not_rooted_with_tag (
         const std::vector<parse_tree_element<T> >& tree,
         const T& tag,
-        std::vector<unsigned long>& tree_roots 
+        std::vector<unsigned long>& tree_roots
     );
     /*!
         requires
             - objects of type T must be comparable using operator==
         ensures
             - Finds all the largest non-overlapping trees in tree that are not rooted with
-              the given tag.  
+              the given tag.
             - find_trees_not_rooted_with_tag() is useful when you want to cut a parse tree
               into a bunch of sub-trees and you know that the top level of the tree is all
               composed of the same kind of tag.  So if you want to just "slice off" the top
@@ -371,10 +371,10 @@ namespace dlib
                 - tree[#tree_roots[i]].tag != tag
             - To make the operation of this function clearer, here are a few examples of
               what it will do:
-                - if (tree[0].tag != tag) then 
+                - if (tree[0].tag != tag) then
                     - #tree_roots.size() == 0
                     - #tree_roots[0] == 0
-                - else if (tree[0].tag == tag but its immediate children's tags are not equal to tag) then 
+                - else if (tree[0].tag == tag but its immediate children's tags are not equal to tag) then
                     - #tree_roots.size() == 2
                     - #tree_roots[0] == tree[0].left
                     - #tree_roots[1] == tree[0].right

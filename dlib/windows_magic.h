@@ -1,14 +1,14 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_WINDOWS_MAGIc_ 
-#define DLIB_WINDOWS_MAGIc_ 
+#ifndef DLIB_WINDOWS_MAGIc_
+#define DLIB_WINDOWS_MAGIc_
 
 #include "platform.h"
 
 #ifdef WIN32
 
 // This file contains all the magical #defines you have to setup  before you
-// include the windows header files.  
+// include the windows header files.
 
 #ifndef NOMINMAX
 #define NOMINMAX // prevent windows from messing with std::min and std::max
@@ -24,12 +24,12 @@
 #undef min
 #endif
 
-#ifdef max 
-#undef max 
+#ifdef max
+#undef max
 #endif
 
 #ifdef NO_MAKEFILE
-// only define this if all the cpp files are going to be sucked into the headers 
+// only define this if all the cpp files are going to be sucked into the headers
 // because otherwise we don't need it since everything is isolated in the sockets
 // cpp file and this declaration for _WINSOCKAPI_ appears there also.
 #ifndef _WINSOCKAPI_

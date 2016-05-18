@@ -19,7 +19,7 @@ namespace dlib
         
         public:
         lzp_buffer_kernel_c (
-            unsigned long buffer_size         
+            unsigned long buffer_size
         );
 
      

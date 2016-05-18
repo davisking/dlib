@@ -9,10 +9,10 @@
 namespace dlib
 {
 
-    class config_reader 
+    class config_reader
     {
 
-        /*!                
+        /*!
             INITIAL VALUE
                 - there aren't any keys defined for this object
                 - there aren't any blocks defined for this object
@@ -34,7 +34,7 @@ namespace dlib
 
                 key_name       = identifier;
                 block_name     = identifier;
-                value          = matches any string of text that ends with a newline character, # or }.  
+                value          = matches any string of text that ends with a newline character, # or }.
                                  note that the trailing newline, # or } is not part of the value though.
                 identifier     = Any string that matches the following regular expression:
                                  [a-zA-Z][a-zA-Z0-9_-\.]*
@@ -42,15 +42,15 @@ namespace dlib
                                  with any number of letters, numbers, _ . or - characters.
 
                 Whitespace and comments are ignored.  A comment is text that starts with # (but not \#
-                since the \ escapes the # so that you can have a # symbol in a value if you want) and 
-                ends in a new line.  You can also escape a } (e.g. "\}") if you want to have one in a 
+                since the \ escapes the # so that you can have a # symbol in a value if you want) and
+                ends in a new line.  You can also escape a } (e.g. "\}") if you want to have one in a
                 value.
 
-                Note that in a value the leading and trailing white spaces are stripped off but any 
+                Note that in a value the leading and trailing white spaces are stripped off but any
                 white space inside the value is preserved.
 
-                Also note that all key_names and block_names within a block syntax group must be unique 
-                but don't have to be globally unique.  I.e. different blocks can reuse names. 
+                Also note that all key_names and block_names within a block syntax group must be unique
+                but don't have to be globally unique.  I.e. different blocks can reuse names.
 
                 EXAMPLE CONFIG FILES:
 
@@ -58,7 +58,7 @@ namespace dlib
                         #comment.  This line is ignored because it starts with #
 
                         #here we have key1 which will have the value of "my value"
-                        key1 = my value 
+                        key1 = my value
 
                         another_key=  another value  # this is another key called "another_key" with
                                                      # a value of "another value"
@@ -87,7 +87,7 @@ namespace dlib
     public:
 
         // exception classes
-        class config_reader_error : public dlib::error 
+        class config_reader_error : public dlib::error
         {
             /*!
                 GENERAL
@@ -96,7 +96,7 @@ namespace dlib
                     to ECONFIG_READER.
 
                 INTERPRETING THIS EXCEPTION
-                    - line_number == the line number the parser was at when the 
+                    - line_number == the line number the parser was at when the
                       error occurred.
                     - if (redefinition) then
                         - The key or block name on line line_number has already
@@ -109,7 +109,7 @@ namespace dlib
             const bool redefinition;
         };
 
-        class file_not_found : public dlib::error 
+        class file_not_found : public dlib::error
         {
             /*!
                 GENERAL
@@ -130,7 +130,7 @@ namespace dlib
             /*!
                 GENERAL
                     This exception is thrown if you try to access a key or
-                    block that doesn't exist inside a config reader.  The type 
+                    block that doesn't exist inside a config reader.  The type
                     member of this exception will be set to ECONFIG_READER.
             !*/
         public:
@@ -153,9 +153,9 @@ namespace dlib
         config_reader(
         );
         /*!
-            ensures 
+            ensures
                 - #*this is properly initialized
-                - This object will not have any keys or blocks defined in it.  
+                - This object will not have any keys or blocks defined in it.
             throws
                 - std::bad_alloc
                 - config_reader_error
@@ -165,7 +165,7 @@ namespace dlib
             std::istream& in
         );
         /*!
-            ensures 
+            ensures
                 - #*this is properly initialized
                 - reads the config file to parse from the given input stream,
                   parses it and loads this object up with all the sub blocks and
@@ -180,12 +180,12 @@ namespace dlib
         !*/
 
         config_reader(
-            const std::string& config_file 
+            const std::string& config_file
         );
         /*!
-            ensures 
+            ensures
                 - #*this is properly initialized
-                - parses the config file named by the config_file string.  Specifically, 
+                - parses the config file named by the config_file string.  Specifically,
                   parses it and loads this object up with all the sub blocks and
                   key/value pairs it finds in the file.
                 - before the load is performed, the previous state of the config file
@@ -199,7 +199,7 @@ namespace dlib
         !*/
 
         virtual ~config_reader(
-        ); 
+        );
         /*!
             ensures
                 - all memory associated with *this has been released
@@ -211,8 +211,8 @@ namespace dlib
             ensures
                 - #*this has its initial value
             throws
-                - std::bad_alloc 
-                    If this exception is thrown then *this is unusable 
+                - std::bad_alloc
+                    If this exception is thrown then *this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -220,7 +220,7 @@ namespace dlib
             std::istream& in
         );
         /*!
-            ensures 
+            ensures
                 - reads the config file to parse from the given input stream,
                   parses it and loads this object up with all the sub blocks and
                   key/value pairs it finds.
@@ -230,8 +230,8 @@ namespace dlib
                 - *this will represent the top most block of the config file contained
                   in the input stream in.
             throws
-                - std::bad_alloc 
-                    If this exception is thrown then *this is unusable 
+                - std::bad_alloc
+                    If this exception is thrown then *this is unusable
                     until clear() is called and succeeds
                 - config_reader_error
                     If this exception is thrown then this object will
@@ -242,17 +242,17 @@ namespace dlib
             const std::string& config_file
         );
         /*!
-            ensures 
-                - parses the config file named by the config_file string.  Specifically, 
+            ensures
+                - parses the config file named by the config_file string.  Specifically,
                   parses it and loads this object up with all the sub blocks and
-                  key/value pairs it finds in the file.  
+                  key/value pairs it finds in the file.
                 - before the load is performed, the previous state of the config file
                   reader is erased.  So after the load the config file reader will contain
                   only information from the given config file.
                 - This object will represent the top most block of the config file.
             throws
-                - std::bad_alloc 
-                    If this exception is thrown then *this is unusable 
+                - std::bad_alloc
+                    If this exception is thrown then *this is unusable
                     until clear() is called and succeeds
                 - config_reader_error
                     If this exception is thrown then this object will
@@ -306,7 +306,7 @@ namespace dlib
         /*!
             ensures
                 - if (is_key_defined(key_name) == true) then
-                    - returns a const reference to the value string associated with the given key in 
+                    - returns a const reference to the value string associated with the given key in
                       this config_reader's block.
                 - else
                     - throws config_reader_access_error
@@ -324,10 +324,10 @@ namespace dlib
         ) const;
         /*!
             requires
-                - queue_of_strings is an implementation of queue/queue_kernel_abstract.h 
-                  with T set to std::string, or std::vector<std::string>, or 
+                - queue_of_strings is an implementation of queue/queue_kernel_abstract.h
+                  with T set to std::string, or std::vector<std::string>, or
                   dlib::std_vector_c<std::string>
-            ensures 
+            ensures
                 - #keys == a collection containing all the keys defined in this config_reader's block.
                   (i.e. for all strings str in keys it is the case that is_key_defined(str) == true)
         !*/
@@ -340,11 +340,11 @@ namespace dlib
         ) const;
         /*!
             requires
-                - queue_of_strings is an implementation of queue/queue_kernel_abstract.h 
-                  with T set to std::string, or std::vector<std::string>, or 
+                - queue_of_strings is an implementation of queue/queue_kernel_abstract.h
+                  with T set to std::string, or std::vector<std::string>, or
                   dlib::std_vector_c<std::string>
-            ensures 
-                - #blocks == a collection containing the names of all the blocks defined in this 
+            ensures
+                - #blocks == a collection containing the names of all the blocks defined in this
                   config_reader's block.
                   (i.e. for all strings str in blocks it is the case that is_block_defined(str) == true)
         !*/

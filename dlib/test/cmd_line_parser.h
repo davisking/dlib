@@ -11,7 +11,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -28,16 +28,16 @@ namespace
         requires
             - clp is an implementation of cmd_line_parser_kernel_abstract.h
         ensures
-            - runs tests on clp for compliance with the specs 
+            - runs tests on clp for compliance with the specs
     !*/
-    {        
+    {
         typedef typename clp::char_type ct;
 
 
 
 
         int argc;
-        const ct* argv[100];            
+        const ct* argv[100];
         bool ok;
 
         for (int j = 0; j < 3; ++j)
@@ -206,7 +206,7 @@ namespace
                         DLIB_TEST(test.element().count() == 0);
                     }
                     else
-                    {                            
+                    {
                         DLIB_TEST(test.element().count() == 1);
                     }
 
@@ -287,7 +287,7 @@ namespace
                         DLIB_TEST(test.element().count() == 0);
                     }
                     else
-                    {                            
+                    {
                         DLIB_TEST(test.element().count() == 1);
                     }
 
@@ -367,7 +367,7 @@ namespace
                         DLIB_TEST(test.element().count() == 0);
                     }
                     else
-                    {                            
+                    {
                         DLIB_TEST(test.element().count() == 1);
                     }
 
@@ -446,7 +446,7 @@ namespace
                         DLIB_TEST(test.element().count() == 0);
                     }
                     else
-                    {                            
+                    {
                         DLIB_TEST(test.element().count() == 1);
                     }
 
@@ -523,7 +523,7 @@ namespace
                         DLIB_TEST(test.element().count() == 0);
                     }
                     else
-                    {                            
+                    {
                         DLIB_TEST(test.element().count() == 1);
                     }
 
@@ -627,7 +627,7 @@ namespace
             {
 
                 ok = false;
-                test.parse(argc,argv); 
+                test.parse(argc,argv);
 
                 DLIB_TEST(test.option(_dT(ct,"c")).count()==2);
 
@@ -650,8 +650,8 @@ namespace
             test.clear();
 
             // this is a bad line because the davis argument requires 2 arguments but
-            // only gets one. 
-            // program arg1 --davis darg darg2 --davis zarg 
+            // only gets one.
+            // program arg1 --davis darg darg2 --davis zarg
             argv[0] = _dT(ct,"program");
             argv[1] = _dT(ct,"arg1");
             argv[2] = _dT(ct,"--davis");
@@ -808,7 +808,7 @@ namespace
             for (int k = 0; k < 5; ++k)
             {
 
-                test.parse(argc,argv); 
+                test.parse(argc,argv);
 
 
                 DLIB_TEST(test.number_of_arguments() == 0);

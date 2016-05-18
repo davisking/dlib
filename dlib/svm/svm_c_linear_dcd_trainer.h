@@ -1,6 +1,6 @@
 // Copyright (C) 2012  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_SVm_C_LINEAR_DCD_TRAINER_Hh_ 
+#ifndef DLIB_SVm_C_LINEAR_DCD_TRAINER_Hh_
 #define DLIB_SVm_C_LINEAR_DCD_TRAINER_Hh_
 
 #include "svm_c_linear_dcd_trainer_abstract.h"
@@ -13,13 +13,13 @@
 #include "function.h"
 #include "kernel.h"
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename K 
+        typename K
         >
     class svm_c_linear_dcd_trainer
     {
@@ -74,16 +74,16 @@ namespace dlib
         }
 
         bool includes_bias (
-        ) const 
-        { 
-            return have_bias; 
+        ) const
+        {
+            return have_bias;
         }
 
         void include_bias (
             bool should_have_bias
-        ) 
-        { 
-            have_bias = should_have_bias; 
+        )
+        {
+            have_bias = should_have_bias;
         }
 
         bool forces_last_weight_to_1 (
@@ -133,14 +133,14 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\tvoid svm_c_linear_dcd_trainer::set_epsilon(eps_)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 );
             eps = eps_;
         }
 
         const scalar_type get_epsilon (
         ) const
-        { 
+        {
             return eps;
         }
 
@@ -155,20 +155,20 @@ namespace dlib
 
         void set_max_iterations (
             unsigned long max_iter
-        ) 
+        )
         {
             max_iterations = max_iter;
         }
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_linear_dcd_trainer::set_c()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -196,7 +196,7 @@ namespace dlib
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_linear_dcd_trainer::set_c_class1()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -211,7 +211,7 @@ namespace dlib
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_linear_dcd_trainer::set_c_class2()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -247,7 +247,7 @@ namespace dlib
                 if (did_init)
                 {
                     DLIB_CASSERT(have_bias_ == have_bias &&
-                                 last_weight_1_ == last_weight_1, 
+                                 last_weight_1_ == last_weight_1,
                                 "\t decision_function svm_c_linear_dcd_trainer::train(x,y,state)"
                                 << "\n\t The given state object is invalid because the previous trainer was configured differently."
                                 << "\n\t have_bias_:     " << have_bias_
@@ -260,14 +260,14 @@ namespace dlib
                                 "\t decision_function svm_c_linear_dcd_trainer::train(x,y,state)"
                                 << "\n\t The given state object is invalid because the training data dimensions have shrunk."
                                 << "\n\t new_dims:  " << new_dims
-                                << "\n\t dims:      " << dims 
+                                << "\n\t dims:      " << dims
                         );
 
                     DLIB_CASSERT( x.size() >= static_cast<long>(alpha.size()),
                                 "\t decision_function svm_c_linear_dcd_trainer::train(x,y,state)"
                                 << "\n\t The given state object is invalid because the training data has fewer samples than previously."
-                                << "\n\t x.size():     " << x.size() 
-                                << "\n\t alpha.size(): " << alpha.size() 
+                                << "\n\t x.size():     " << x.size()
+                                << "\n\t alpha.size(): " << alpha.size()
                         );
 
                     // make sure we amortize the cost of growing the alpha vector.
@@ -290,11 +290,11 @@ namespace dlib
                         // have given too low of a result.  But for dense vectors it is
                         // definitely a user error if the dimensions don't match.
 
-                        DLIB_CASSERT(is_matrix<sample_type>::value == false, 
+                        DLIB_CASSERT(is_matrix<sample_type>::value == false,
                                 "\t decision_function svm_c_linear_dcd_trainer::train(x,y,state)"
                                 << "\n\t The given state object is invalid because the training data dimensions have changed."
                                 << "\n\t new_dims:  " << new_dims
-                                << "\n\t dims:      " << dims 
+                                << "\n\t dims:      " << dims
                             );
 
                         // extend w by the right number of elements
@@ -304,8 +304,8 @@ namespace dlib
                             // right length.  Here we are being careful to move the bias
                             // weight to the end of the resulting vector.
                             w = join_cols(join_cols(
-                                    colm(w,0,dims), 
-                                    zeros_matrix<scalar_type>(new_dims-dims,1)), 
+                                    colm(w,0,dims),
+                                    zeros_matrix<scalar_type>(new_dims-dims,1)),
                                     uniform_matrix<scalar_type>(1,1,w(dims))
                                     );
                         }
@@ -375,7 +375,7 @@ namespace dlib
                 else
                 {
                     // skip the last dimension
-                    return dlib::dot(colm(x,0,x.size()-1), 
+                    return dlib::dot(colm(x,0,x.size()-1),
                                      colm(x,0,x.size()-1));
                 }
 
@@ -476,7 +476,7 @@ namespace dlib
         const decision_function<kernel_type> train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            optimizer_state& state 
+            optimizer_state& state
         ) const
         {
             return do_train(mat(x), mat(y), state);
@@ -493,15 +493,15 @@ namespace dlib
         const decision_function<kernel_type> do_train (
             const in_sample_vector_type& x,
             const in_scalar_vector_type& y,
-            optimizer_state& state 
+            optimizer_state& state
         ) const
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_learning_problem(x,y) == true,
                 "\t decision_function svm_c_linear_dcd_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.size(): " << x.size() 
-                << "\n\t y.size(): " << y.size() 
+                << "\n\t x.size(): " << x.size()
+                << "\n\t y.size(): " << y.size()
                 << "\n\t is_learning_problem(x,y): " << is_learning_problem(x,y)
                 );
 #ifdef ENABLE_ASSERTS
@@ -595,9 +595,9 @@ namespace dlib
                         PG = G;
                     }
 
-                    if (PG > PG_max) 
+                    if (PG > PG_max)
                         PG_max = PG;
-                    if (PG < PG_min) 
+                    if (PG < PG_min)
                         PG_min = PG;
 
                     // if PG != 0
@@ -663,7 +663,7 @@ namespace dlib
             df.basis_vectors.set_size(1);
             // Copy the plane normal into the output basis vector.  The output vector might
             // be a sparse vector container so we need to use this special kind of copy to
-            // handle that case.  
+            // handle that case.
             assign(df.basis_vectors(0), colm(w, 0, dims));
             df.alpha.set_size(1);
             df.alpha(0) = 1;

@@ -8,7 +8,7 @@
 namespace dlib
 {
 
-    class lz77_buffer 
+    class lz77_buffer
     {
         /*!
             INITIAL VALUE
@@ -19,7 +19,7 @@ namespace dlib
 
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a pair of buffers (history and lookahead buffers) 
+                This object represents a pair of buffers (history and lookahead buffers)
                 used during lz77 style compression.
 
                 It's main function is to search the history buffer for long strings which
@@ -38,7 +38,7 @@ namespace dlib
 
                 What shift_buffers() does in english:
                     This function just means that the buffers have their contents shifted
-                    left by N elements and that elements shifted out of the lookahead buffer 
+                    left by N elements and that elements shifted out of the lookahead buffer
                     go into the history buffer.   An example will make it clearer.
 
                     Suppose that we have the following buffers before we apply shift_buffers()
@@ -52,22 +52,22 @@ namespace dlib
                         lookahead_buffer() == "ahead buffer"
                         history_buffer() == "heylook" or "eylook" or "ylook" or "look"
 
-                    You might be wondering why the history_buffer can resize itself in 
-                    such a nondeterministic way.  It is just to allow a lot of freedom in the 
-                    implementations of this object.                                  
+                    You might be wondering why the history_buffer can resize itself in
+                    such a nondeterministic way.  It is just to allow a lot of freedom in the
+                    implementations of this object.
         !*/
 
     public:
 
         lz77_buffer (
             unsigned long total_limit,
-            unsigned long lookahead_limit            
+            unsigned long lookahead_limit
         );
         /*!
             requires
                 - 6 < total_limit < 32
                 - 15 < lookahead_limit <= 2^(total_limit-2)
-            ensures                
+            ensures
                 - #*this is properly initialized
                 - #get_history_buffer_limit() == 2^total_limit  - lookahead_limit
                 - #get_lookahead_buffer_limit() == lookahead_limit
@@ -89,7 +89,7 @@ namespace dlib
                 - #*this has its initial value
             throws
                 - std::bad_alloc
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -109,7 +109,7 @@ namespace dlib
                 - for all i where 0 <= i < #get_history_buffer_size()-N:
                     #history_buffer(N+i) == history_buffer(i)
                 - for all i where 0 <= i < #get_lookahead_buffer_size()
-                    #lookahead_buffer(i) == lookahead_buffer(N+i)            
+                    #lookahead_buffer(i) == lookahead_buffer(N+i)
         !*/
 
         void add (
@@ -123,10 +123,10 @@ namespace dlib
                     - #get_lookahead_buffer_size() == get_lookahead_buffer_size()
                 - else
                     - #lookahead_buffer(get_lookahead_buffer_size()) == symbol
-                    - #get_lookahead_buffer_size() == get_lookahead_buffer_size() + 1                                    
+                    - #get_lookahead_buffer_size() == get_lookahead_buffer_size() + 1
             throws
                 - std::bad_alloc
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -144,7 +144,7 @@ namespace dlib
                     - performs shift_buffers(#length)
             throws
                 - std::bad_alloc
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -203,7 +203,7 @@ namespace dlib
         lz77_buffer(lz77_buffer&);        // copy constructor
         lz77_buffer& operator=(lz77_buffer&);    // assignment operator
 
-    };      
+    };
 }
 
 #endif // DLIB_LZ77_BUFFER_KERNEl_ABSTRACT_

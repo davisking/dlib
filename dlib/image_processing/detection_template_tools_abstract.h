@@ -31,11 +31,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     std::vector<rectangle> create_single_box_detection_template (
-        const rectangle& object_box 
+        const rectangle& object_box
     );
     /*!
         ensures
-            - returns a vector that contains only object_box.  
+            - returns a vector that contains only object_box.
             - In particular, returns a vector V such that:
                 - V.size() == 1
                 - V[0] == object_box
@@ -44,7 +44,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     std::vector<rectangle> create_overlapped_2x2_detection_template (
-        const rectangle& object_box 
+        const rectangle& object_box
     );
     /*!
         ensures
@@ -53,10 +53,10 @@ namespace dlib
               four rectangles are returned inside a std::vector.
             - In particular, returns a vector V such that:
                 - V.size() == 4
-                - V[0] == top half of object_box 
-                - V[1] == bottom half of object_box 
-                - V[2] == left half of object_box 
-                - V[3] == right half of object_box 
+                - V[0] == top half of object_box
+                - V[1] == bottom half of object_box
+                - V[2] == left half of object_box
+                - V[3] == right half of object_box
                 - for all valid i: object_box.contains(V[i]) == true
     !*/
 
@@ -72,16 +72,16 @@ namespace dlib
             - cells_x > 0
             - cells_y > 0
         ensures
-            - Divides object_box up into a grid and returns a vector 
+            - Divides object_box up into a grid and returns a vector
               containing all the rectangles corresponding to elements
               of the grid.  Moreover, the grid will be cells_x elements
               wide and cells_y elements tall.
             - In particular, returns a vector V such that:
-                - V.size() == cells_x*cells_y 
-                - for all valid i: 
+                - V.size() == cells_x*cells_y
+                - for all valid i:
                     - object_box.contains(V[i]) == true
                     - V[i] == The rectangle corresponding to the ith grid
-                      element. 
+                      element.
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -43,7 +43,7 @@ namespace dlib
             - T, U, and V must all be implementations of set/set_kernel_abstract.h
             - the types of objects contained in these sets must be copyable
         ensures
-            - #u == the union of a and b.  That is, u contains all elements 
+            - #u == the union of a and b.  That is, u contains all elements
               of a and all the elements of b.
     !*/
 
@@ -64,7 +64,7 @@ namespace dlib
             - T, U, and V must all be implementations of set/set_kernel_abstract.h
             - the types of objects contained in these sets must be copyable
         ensures
-            - #i == the intersection of a and b.  That is, i contains all elements 
+            - #i == the intersection of a and b.  That is, i contains all elements
               of a that are also in b.
     !*/
 
@@ -78,14 +78,14 @@ namespace dlib
     void set_difference (
         const T& a,
         const U& b,
-        V& d 
+        V& d
     );
     /*!
         requires
             - T, U, and V must all be implementations of set/set_kernel_abstract.h
             - the types of objects contained in these sets must be copyable
         ensures
-            - #d == the difference of a and b.  That is, d contains all elements 
+            - #d == the difference of a and b.  That is, d contains all elements
               of a that are NOT in b.
     !*/
 

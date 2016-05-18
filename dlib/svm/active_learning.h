@@ -30,17 +30,17 @@ namespace dlib
         const in_sample_vector_type& samples,
         const in_scalar_vector_type& labels,
         const in_sample_vector_type2& unlabeled_samples,
-        const active_learning_mode mode 
+        const active_learning_mode mode
     )
     {
         DLIB_ASSERT(is_vector(unlabeled_samples) &&
                      (samples.size() == 0 || is_learning_problem(samples, labels)) ,
                 "\t std::vector<unsigned long> rank_unlabeled_training_samples()"
                 << "\n\t Invalid inputs were given to this function"
-                << "\n\t is_vector(unlabeled_samples):         " << is_vector(unlabeled_samples) 
-                << "\n\t is_learning_problem(samples, labels): " << is_learning_problem(samples, labels) 
-                << "\n\t samples.size(): " << samples.size() 
-                << "\n\t labels.size():  " << labels.size() 
+                << "\n\t is_vector(unlabeled_samples):         " << is_vector(unlabeled_samples)
+                << "\n\t is_learning_problem(samples, labels): " << is_learning_problem(samples, labels)
+                << "\n\t samples.size(): " << samples.size()
+                << "\n\t labels.size():  " << labels.size()
                 );
 
         // If there aren't any training samples then all unlabeled_samples are equally good.
@@ -61,7 +61,7 @@ namespace dlib
 
         // make sure we use this trainer's ability to warm start itself since that will make
         // this whole function run a lot faster.  But first, we need to find out what the state
-        // we will be warm starting from is. 
+        // we will be warm starting from is.
         typedef typename svm_c_linear_dcd_trainer<kernel_type>::optimizer_state optimizer_state;
         optimizer_state state;
         trainer.train(samples, labels, state); // call train() just to get state
@@ -106,7 +106,7 @@ namespace dlib
                 // In this case, the score for the sample is a ratio that tells how close the
                 // two margin values are to each other.  The closer they are the better.  So in
                 // this case we are saying we are looking for samples that have the same
-                // preference for either class label. 
+                // preference for either class label.
                 if (std::abs(margin_p) >= std::abs(margin_n))
                 {
                     if (margin_p != 0)

@@ -37,7 +37,7 @@ namespace dlib
         DLIB_ASSERT(0 < min_match_score && min_match_score <= 1,
             "\t std::vector<rectangle> determine_object_boxes()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t min_match_score: " << min_match_score 
+            << "\n\t min_match_score: " << min_match_score
             );
 
         typename image_scanner_type::pyramid_type pyr;
@@ -64,7 +64,7 @@ namespace dlib
         }
         sorted_rects.sort(dlib::impl::compare_first);
 
-        // Make sure this area value is comfortably larger than all the 
+        // Make sure this area value is comfortably larger than all the
         // rectangles' areas.
         max_area = 3*max_area + 100;
 
@@ -78,8 +78,8 @@ namespace dlib
 
             // Scale cur up the image pyramid and remove any rectangles which match.
             // But also stop when cur gets large enough to not match anything.
-            for (unsigned long itr = 0; 
-                 itr < scanner.get_max_pyramid_levels() && cur.area() < max_area; 
+            for (unsigned long itr = 0;
+                 itr < scanner.get_max_pyramid_levels() && cur.area() < max_area;
                  ++itr)
             {
                 list_type::iterator i = sorted_rects.begin();
@@ -118,7 +118,7 @@ namespace dlib
         DLIB_ASSERT(0 < min_match_score && min_match_score <= 1,
             "\t std::vector<rectangle> determine_object_boxes()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t min_match_score: " << min_match_score 
+            << "\n\t min_match_score: " << min_match_score
             );
 
         std::vector<rectangle> temp;
@@ -166,7 +166,7 @@ namespace dlib
         std::cout << "number of detection templates: "<< object_boxes.size() << std::endl;
         for (unsigned long i = 0; i < object_boxes.size(); ++i)
         {
-            std::cout << "  object box " << i << ":  width: " << object_boxes[i].width() 
+            std::cout << "  object box " << i << ":  width: " << object_boxes[i].width()
                       << "  height: "<< object_boxes[i].height() << std::endl;
             scanner.add_detection_template(object_boxes[i], create_grid_detection_template(object_boxes[i], cells_x, cells_y));
         }

@@ -23,13 +23,13 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
+        // kernel_1a
         typedef     bigint_kernel_1
                     kernel_1a;
         typedef     bigint_kernel_c<kernel_1a>
                     kernel_1a_c;
           
-        // kernel_2a        
+        // kernel_2a
         typedef     bigint_kernel_2
                     kernel_2a;
         typedef     bigint_kernel_c<kernel_2a>

@@ -15,15 +15,15 @@ namespace dlib
         The algorithm defined in the solve_qp_using_smo() function below can be
         derived by using an important theorem from the theory of constrained optimization.
         This theorem tells us that any optimal point of a constrained function must
-        satisfy what are called the KKT conditions (also sometimes called just the KT 
-        conditions, especially in older literature).  A very good book to consult 
-        regarding this topic is Practical Methods of Optimization (second edition) by 
-        R. Fletcher.  Below I will try to explain the general idea of how this is 
+        satisfy what are called the KKT conditions (also sometimes called just the KT
+        conditions, especially in older literature).  A very good book to consult
+        regarding this topic is Practical Methods of Optimization (second edition) by
+        R. Fletcher.  Below I will try to explain the general idea of how this is
         applied.
 
         Let e == ones_matrix(alpha.size(),1)
 
-        First, note that the function below solves the following quadratic program.  
+        First, note that the function below solves the following quadratic program.
             Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b
             subject to the following constraints:
                 - trans(e)*alpha == C (i.e. the sum of alpha values doesn't change)
@@ -31,7 +31,7 @@ namespace dlib
             Where f is convex.  This means that Q should be positive-semidefinite.
 
 
-        To get from this problem formulation to the algorithm below we have to 
+        To get from this problem formulation to the algorithm below we have to
         consider the KKT conditions.  They tell us that any solution to the above
         problem must satisfy the following 5 conditions:
             1. trans(e)*alpha == C
@@ -62,10 +62,10 @@ namespace dlib
 
         
         The important thing to take away is the final rule.  It tells us that at the
-        optimal solution all elements of the gradient of f have the same value if 
+        optimal solution all elements of the gradient of f have the same value if
         their corresponding alpha is non-zero.  It also tells us that all the other
         gradient values are bigger than y.  We can use this information to help us
-        pick which alpha variables to optimize at each iteration. 
+        pick which alpha variables to optimize at each iteration.
     */
 
 // ----------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ namespace dlib
         typename EXP2,
         typename T, long NR, long NC, typename MM, typename L
         >
-    unsigned long solve_qp_using_smo ( 
+    unsigned long solve_qp_using_smo (
         const matrix_exp<EXP1>& Q,
         const matrix_exp<EXP2>& b,
         matrix<T,NR,NC,MM,L>& alpha,
@@ -99,17 +99,17 @@ namespace dlib
                      << "\n\t Q.nc():               " << Q.nc()
                      << "\n\t is_col_vector(b):     " << is_col_vector(b)
                      << "\n\t is_col_vector(alpha): " << is_col_vector(alpha)
-                     << "\n\t b.size():             " << b.size() 
-                     << "\n\t alpha.size():         " << alpha.size() 
-                     << "\n\t Q.nr():               " << Q.nr() 
-                     << "\n\t min(alpha):           " << min(alpha) 
-                     << "\n\t eps:                  " << eps 
-                     << "\n\t max_iter:             " << max_iter 
+                     << "\n\t b.size():             " << b.size()
+                     << "\n\t alpha.size():         " << alpha.size()
+                     << "\n\t Q.nr():               " << Q.nr()
+                     << "\n\t min(alpha):           " << min(alpha)
+                     << "\n\t eps:                  " << eps
+                     << "\n\t max_iter:             " << max_iter
         );
 
         const T C = sum(alpha);
 
-        // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.  
+        // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.
         matrix<T,NR,NC,MM,L> df = Q*alpha - b;
 
         const T tau = 1000*std::numeric_limits<T>::epsilon();
@@ -121,8 +121,8 @@ namespace dlib
             // Find the two elements of df that satisfy the following:
             //    - little_idx == index_of_min(df)
             //    - big_idx   == the index of the largest element in df such that alpha(big_idx) > 0
-            // These two indices will tell us which two alpha values are most in violation of the KKT 
-            // optimality conditions.  
+            // These two indices will tell us which two alpha values are most in violation of the KKT
+            // optimality conditions.
             big = -std::numeric_limits<T>::max();
             long big_idx = 0;
             little = std::numeric_limits<T>::max();
@@ -141,15 +141,15 @@ namespace dlib
                 }
             }
 
-            // Check if the KKT conditions are still violated and stop if so.  
+            // Check if the KKT conditions are still violated and stop if so.
             //if (alpha(little_idx) > 0 && (big - little) < eps)
             //    break;
 
-            // Check how big the duality gap is and stop when it goes below eps.  
+            // Check how big the duality gap is and stop when it goes below eps.
             // The duality gap is the gap between the objective value of the function
-            // we are optimizing and the value of its primal form.  This value is always 
-            // greater than or equal to the distance to the optimum solution so it is a 
-            // good way to decide if we should stop.   See the book referenced above for 
+            // we are optimizing and the value of its primal form.  This value is always
+            // greater than or equal to the distance to the optimum solution so it is a
+            // good way to decide if we should stop.   See the book referenced above for
             // more information.  In particular, see the part about the Wolfe Dual.
             if (trans(alpha)*df - C*little < eps)
                 break;
@@ -160,7 +160,7 @@ namespace dlib
             const T old_alpha_little = alpha(little_idx);
 
 
-            // Now optimize the two variables we just picked. 
+            // Now optimize the two variables we just picked.
             T quad_coef = Q(big_idx,big_idx) + Q(little_idx,little_idx) - 2*Q(big_idx, little_idx);
             if (quad_coef <= tau)
                 quad_coef = tau;
@@ -169,7 +169,7 @@ namespace dlib
             alpha(little_idx) += delta;
 
             // Make sure alpha stays feasible.  That is, make sure the updated alpha doesn't
-            // violate the non-negativity constraint.  
+            // violate the non-negativity constraint.
             if (alpha(big_idx) < 0)
             {
                 // Since an alpha can't be negative we will just set it to 0 and shift all the
@@ -219,7 +219,7 @@ namespace dlib
         typename T, long NR, long NC, typename MM, typename L,
         long NR2, long NC2
         >
-    unsigned long solve_qp4_using_smo ( 
+    unsigned long solve_qp4_using_smo (
         const matrix_exp<EXP1>& A,
         const matrix_exp<EXP2>& Q,
         const matrix_exp<EXP3>& b,
@@ -249,12 +249,12 @@ namespace dlib
                      << "\n\t Q.nc():               " << Q.nc()
                      << "\n\t is_col_vector(b):     " << is_col_vector(b)
                      << "\n\t is_col_vector(alpha): " << is_col_vector(alpha)
-                     << "\n\t b.size():             " << b.size() 
-                     << "\n\t alpha.size():         " << alpha.size() 
-                     << "\n\t Q.nr():               " << Q.nr() 
-                     << "\n\t min(alpha):           " << min(alpha) 
-                     << "\n\t eps:                  " << eps 
-                     << "\n\t max_iter:             " << max_iter 
+                     << "\n\t b.size():             " << b.size()
+                     << "\n\t alpha.size():         " << alpha.size()
+                     << "\n\t Q.nr():               " << Q.nr()
+                     << "\n\t min(alpha):           " << min(alpha)
+                     << "\n\t eps:                  " << eps
+                     << "\n\t max_iter:             " << max_iter
         );
         DLIB_ASSERT(is_col_vector(d) == true &&
                      max_lambda >= 0 &&
@@ -271,10 +271,10 @@ namespace dlib
         /*
             For this optimization problem, it is the case that the optimal
             value of lambda is given by a simple closed form expression if we
-            know the optimal alpha.  So what we will do is to just optimize 
+            know the optimal alpha.  So what we will do is to just optimize
             alpha and every now and then we will update lambda with its optimal
             value.  Therefore, we use essentially the same method as the
-            solve_qp_using_smo() routine.  
+            solve_qp_using_smo() routine.
         */
 
         const bool d_is_zero = d==zeros_matrix(d);
@@ -286,7 +286,7 @@ namespace dlib
             lambda = A*alpha + d;
         lambda = clamp(lambda, 0, max_lambda);
 
-        // Compute f'(alpha) (i.e. the gradient of f(alpha) with respect to alpha) for the current alpha.  
+        // Compute f'(alpha) (i.e. the gradient of f(alpha) with respect to alpha) for the current alpha.
         matrix<T,NR,NC,MM,L> df = Q*alpha - b - trans(A)*lambda;
 
         const T tau = 1000*std::numeric_limits<T>::epsilon();
@@ -298,8 +298,8 @@ namespace dlib
             // Find the two elements of df that satisfy the following:
             //    - little_idx == index_of_min(df)
             //    - big_idx   == the index of the largest element in df such that alpha(big_idx) > 0
-            // These two indices will tell us which two alpha values are most in violation of the KKT 
-            // optimality conditions.  
+            // These two indices will tell us which two alpha values are most in violation of the KKT
+            // optimality conditions.
             big = -std::numeric_limits<T>::max();
             long big_idx = 0;
             little = std::numeric_limits<T>::max();
@@ -318,11 +318,11 @@ namespace dlib
                 }
             }
 
-            // Check how big the duality gap is and stop when it goes below eps.  
+            // Check how big the duality gap is and stop when it goes below eps.
             // The duality gap is the gap between the objective value of the function
-            // we are optimizing and the value of its primal form.  This value is always 
-            // greater than or equal to the distance to the optimum solution so it is a 
-            // good way to decide if we should stop.   
+            // we are optimizing and the value of its primal form.  This value is always
+            // greater than or equal to the distance to the optimum solution so it is a
+            // good way to decide if we should stop.
             if (trans(alpha)*df - C*little < eps)
             {
                 // compute optimal lambda and recheck the duality gap to make
@@ -346,7 +346,7 @@ namespace dlib
             const T old_alpha_little = alpha(little_idx);
 
 
-            // Now optimize the two variables we just picked. 
+            // Now optimize the two variables we just picked.
             T quad_coef = Q(big_idx,big_idx) + Q(little_idx,little_idx) - 2*Q(big_idx, little_idx);
             if (quad_coef <= tau)
                 quad_coef = tau;
@@ -355,7 +355,7 @@ namespace dlib
             alpha(little_idx) += delta;
 
             // Make sure alpha stays feasible.  That is, make sure the updated alpha doesn't
-            // violate the non-negativity constraint.  
+            // violate the non-negativity constraint.
             if (alpha(big_idx) < 0)
             {
                 // Since an alpha can't be negative we will just set it to 0 and shift all the
@@ -411,7 +411,7 @@ namespace dlib
         typename EXP2,
         typename T, long NR, long NC, typename MM, typename L
         >
-    unsigned long solve_qp_box_constrained ( 
+    unsigned long solve_qp_box_constrained (
         const matrix_exp<EXP1>& _Q,
         const matrix_exp<EXP2>& _b,
         matrix<T,NR,NC,MM,L>& alpha,
@@ -447,23 +447,23 @@ namespace dlib
                      << "\n\t is_col_vector(alpha): " << is_col_vector(alpha)
                      << "\n\t is_col_vector(lower): " << is_col_vector(lower)
                      << "\n\t is_col_vector(upper): " << is_col_vector(upper)
-                     << "\n\t b.size():             " << b.size() 
-                     << "\n\t alpha.size():         " << alpha.size() 
-                     << "\n\t lower.size():         " << lower.size() 
-                     << "\n\t upper.size():         " << upper.size() 
-                     << "\n\t Q.nr():               " << Q.nr() 
-                     << "\n\t min(alpha-lower):     " << min(alpha-lower) 
-                     << "\n\t max(upper-alpha):     " << max(upper-alpha) 
-                     << "\n\t eps:                  " << eps 
-                     << "\n\t max_iter:             " << max_iter 
+                     << "\n\t b.size():             " << b.size()
+                     << "\n\t alpha.size():         " << alpha.size()
+                     << "\n\t lower.size():         " << lower.size()
+                     << "\n\t upper.size():         " << upper.size()
+                     << "\n\t Q.nr():               " << Q.nr()
+                     << "\n\t min(alpha-lower):     " << min(alpha-lower)
+                     << "\n\t max(upper-alpha):     " << max(upper-alpha)
+                     << "\n\t eps:                  " << eps
+                     << "\n\t max_iter:             " << max_iter
         );
 
 
-        // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.  
+        // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.
         matrix<T,NR,NC,MM,L> df = Q*alpha + b;
         matrix<T,NR,NC,MM,L> QQ = reciprocal_max(diag(Q));
 
-        // First we use a coordinate descent method to initialize alpha. 
+        // First we use a coordinate descent method to initialize alpha.
         double max_df = 0;
         for (long iter = 0; iter < alpha.size()*2; ++iter)
         {
@@ -507,7 +507,7 @@ namespace dlib
         // we used above can improve the objective rapidly in the beginning.  However,
         // Nesterov's method has more rapid convergence once it gets going so this is what
         // we use for the main iteration.
-        matrix<T,NR,NC,MM,L> v, v_old; 
+        matrix<T,NR,NC,MM,L> v, v_old;
         v = alpha;
         // We need to get an upper bound on the Lipschitz constant for this QP. Since that
         // is just the max eigenvalue of Q we can do it using Gershgorin disks.

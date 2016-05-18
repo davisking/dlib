@@ -15,24 +15,24 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename vector_type 
+        typename vector_type
         >
     class structural_graph_labeling_trainer
     {
         /*!
-            REQUIREMENTS ON vector_type 
-                - vector_type is a dlib::matrix capable of representing column 
-                  vectors or it is a sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.  
+            REQUIREMENTS ON vector_type
+                - vector_type is a dlib::matrix capable of representing column
+                  vectors or it is a sparse vector type as defined in dlib/svm/sparse_vector_abstract.h.
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for learning to solve a graph labeling problem based
-                on a training dataset of example labeled graphs.  The training procedure 
+                on a training dataset of example labeled graphs.  The training procedure
                 produces a graph_labeler object which can be used to predict the labelings
                 of new graphs.
 
-                Note that this is just a convenience wrapper around the 
-                structural_svm_graph_labeling_problem to make it look 
-                similar to all the other trainers in dlib.  
+                Note that this is just a convenience wrapper around the
+                structural_svm_graph_labeling_problem to make it look
+                similar to all the other trainers in dlib.
         !*/
 
     public:
@@ -64,7 +64,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the number of threads used during training.  You should 
+                - returns the number of threads used during training.  You should
                   usually set this equal to the number of processing cores on your
                   machine.
         !*/
@@ -84,9 +84,9 @@ namespace dlib
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but take longer 
-                  to train.  You can think of this epsilon value as saying "solve the 
-                  optimization problem until the average number of labeling mistakes per 
+                  Smaller values may result in a more accurate solution but take longer
+                  to train.  You can think of this epsilon value as saying "solve the
+                  optimization problem until the average number of labeling mistakes per
                   example graph is within epsilon of its optimal value".
         !*/
 
@@ -102,18 +102,18 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - During training, this object basically runs the graph_labeler on each 
-                  training sample, over and over.  To speed this up, it is possible to 
-                  cache the results of these invocations.  This function returns the number 
-                  of cache elements per training sample kept in the cache.  Note that a value 
-                  of 0 means caching is not used at all.  
+                - During training, this object basically runs the graph_labeler on each
+                  training sample, over and over.  To speed this up, it is possible to
+                  cache the results of these invocations.  This function returns the number
+                  of cache elements per training sample kept in the cache.  Note that a value
+                  of 0 means caching is not used at all.
         !*/
 
         void be_verbose (
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -129,14 +129,14 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_oca() == item 
+                - #get_oca() == item
         !*/
 
         const oca get_oca (
         ) const;
         /*!
             ensures
-                - returns a copy of the optimizer used to solve the structural SVM problem.  
+                - returns a copy of the optimizer used to solve the structural SVM problem.
         !*/
 
         void set_c (
@@ -153,12 +153,12 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter.  It is the parameter 
-                  that determines the trade-off between trying to fit the training 
-                  data (i.e. minimize the loss) or allowing more errors but hopefully 
-                  improving the generalization of the resulting graph_labeler.  Larger 
-                  values encourage exact fitting while smaller values of C may encourage 
-                  better generalization. 
+                - returns the SVM regularization parameter.  It is the parameter
+                  that determines the trade-off between trying to fit the training
+                  data (i.e. minimize the loss) or allowing more errors but hopefully
+                  improving the generalization of the resulting graph_labeler.  Larger
+                  values encourage exact fitting while smaller values of C may encourage
+                  better generalization.
         !*/
 
         void set_loss_on_positive_class (
@@ -186,8 +186,8 @@ namespace dlib
         /*!
             ensures
                 - returns the loss incurred when a graph node which is supposed to have
-                  a label of true gets misclassified.  This value controls how much we care 
-                  about correctly classifying nodes which should be labeled as true.  Larger 
+                  a label of true gets misclassified.  This value controls how much we care
+                  about correctly classifying nodes which should be labeled as true.  Larger
                   loss values indicate that we care more strongly than smaller values.
         !*/
 
@@ -196,15 +196,15 @@ namespace dlib
         /*!
             ensures
                 - returns the loss incurred when a graph node which is supposed to have
-                  a label of false gets misclassified.  This value controls how much we care 
-                  about correctly classifying nodes which should be labeled as false.  Larger 
+                  a label of false gets misclassified.  This value controls how much we care
+                  about correctly classifying nodes which should be labeled as false.  Larger
                   loss values indicate that we care more strongly than smaller values.
         !*/
 
         template <
             typename graph_type
             >
-        const graph_labeler<vector_type> train (  
+        const graph_labeler<vector_type> train (
             const dlib::array<graph_type>& samples,
             const std::vector<label_type>& labels
         ) const;
@@ -215,7 +215,7 @@ namespace dlib
                 - Uses the structural_svm_graph_labeling_problem to train a graph_labeler
                   on the given samples/labels training pairs.  The idea is to learn to
                   predict a label given an input sample.
-                - The values of get_loss_on_positive_class() and get_loss_on_negative_class() 
+                - The values of get_loss_on_positive_class() and get_loss_on_negative_class()
                   are used to determine how to value mistakes on each node during training.
                 - returns a function F with the following properties:
                     - F(new_sample) == The predicted labels for the nodes in the graph
@@ -225,7 +225,7 @@ namespace dlib
         template <
             typename graph_type
             >
-        const graph_labeler<vector_type> train (  
+        const graph_labeler<vector_type> train (
             const dlib::array<graph_type>& samples,
             const std::vector<label_type>& labels,
             const std::vector<std::vector<double> >& losses
@@ -244,7 +244,7 @@ namespace dlib
                     - F(new_sample) == The predicted labels for the nodes in the graph
                       new_sample.
                 - if (losses.size() == 0) then
-                    - The values of get_loss_on_positive_class() and get_loss_on_negative_class() 
+                    - The values of get_loss_on_positive_class() and get_loss_on_negative_class()
                       are used to determine how to value mistakes on each node during training.
                     - The losses argument is effectively ignored if its size is zero.
                 - else

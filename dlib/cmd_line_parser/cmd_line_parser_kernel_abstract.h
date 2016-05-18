@@ -28,42 +28,42 @@ namespace dlib
                 - option_is_defined(x) == false, for all values of x
                 - get_group_name() == ""
 
-            ENUMERATION ORDER   
-                The enumerator will enumerate over all the options defined in *this 
+            ENUMERATION ORDER
+                The enumerator will enumerate over all the options defined in *this
                 in alphebetical order according to the name of the option.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
                 parsed_line(), option_is_defined(), option(), number_of_arguments(),
-                operator[](), and swap() functions do not invalidate pointers or 
+                operator[](), and swap() functions do not invalidate pointers or
                 references to internal data.  All other functions have no such guarantee.
 
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a command line parser. 
-                The command lines must match the following BNF.  
+                This object represents a command line parser.
+                The command lines must match the following BNF.
 
                 command_line     ::= <program_name> { <options> | <arg> } [ -- {<word>} ]
                 program_name     ::= <word>
-                arg              ::= any <word> that does not start with - 
-                option_arg       ::= <sword> 
-                option_name      ::= <char>                
+                arg              ::= any <word> that does not start with -
+                option_arg       ::= <sword>
+                option_name      ::= <char>
                 long_option_name ::= <char> {<char> | - }
                 options          ::= <bword> - <option_name> {<option_name>}  {<option_arg>}  |
                                      <bword> -- <long_option_name> [=<option_arg>] {<bword> <option_arg>}
                 char             ::= any character other than - or =
-                word             ::= any string from argv where argv is the second 
-                                     parameter to main() 
-                sword            ::= any suffix of a string from argv where argv is the 
-                                     second parameter to main() 
-                bword            ::= This is an empty string which denotes the begining of a 
+                word             ::= any string from argv where argv is the second
+                                     parameter to main()
+                sword            ::= any suffix of a string from argv where argv is the
+                                     second parameter to main()
+                bword            ::= This is an empty string which denotes the begining of a
                                      <word>.
 
 
                 Options with arguments:
                     An option with N arguments will consider the next N swords to be
-                    its arguments. 
+                    its arguments.
 
-                    so for example, if we have an option o that expects 2 arguments 
+                    so for example, if we have an option o that expects 2 arguments
                     then the following are a few legal examples:
 
                         program -o arg1 arg2 general_argument
@@ -80,7 +80,7 @@ namespace dlib
                     following it are considered to be general command line arguments.
 
 
-                    Consider the following two examples involving a command line and 
+                    Consider the following two examples involving a command line and
                     a cmd_line_parser object called parser.
 
                     Example 1:
@@ -97,7 +97,7 @@ namespace dlib
 
                     Example 2:
                         command line: program general_arg1 -- -o arg1 arg2 general_arg2
-                        Then the following is true (the -- causes everything following 
+                        Then the following is true (the -- causes everything following
                         it to be treated as a general argument).
                         
                         parser[0] == "general_arg1"
@@ -116,13 +116,13 @@ namespace dlib
         typedef cmd_line_parser_option<charT> option_type;
 
         // exception class
-        class cmd_line_parse_error : public dlib::error 
+        class cmd_line_parse_error : public dlib::error
         {
             /*!
                 GENERAL
-                    This exception is thrown if there is an error detected in a 
-                    command line while it is being parsed.  You can consult this 
-                    object's type and item members to determine the nature of the 
+                    This exception is thrown if there is an error detected in a
+                    command line while it is being parsed.  You can consult this
+                    object's type and item members to determine the nature of the
                     error. (note that the type member is inherited from dlib::error).
 
                 INTERPRETING THIS EXCEPTION
@@ -169,7 +169,7 @@ namespace dlib
                 - #*this has its initial value
             throws
                 - std::bad_alloc
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -178,14 +178,14 @@ namespace dlib
             const charT** argv
         );
         /*!
-            requires                
-                - argv == an array of strings that was obtained from the second argument 
+            requires
+                - argv == an array of strings that was obtained from the second argument
                           of the function main().
                           (i.e. argv[0] should be the <program> token, argv[1] should be
                           an <options> or <arg> token, etc.)
                 - argc == the number of strings in argv
             ensures
-                - parses the command line given by argc and argv 
+                - parses the command line given by argc and argv
                 - #parsed_line() == true
                 - #at_start() == true
             throws
@@ -194,8 +194,8 @@ namespace dlib
                     is called successfully
                 - cmd_line_parse_error
                     This exception is thrown if there is an error parsing the command line.
-                    If this exception is thrown then #parsed_line() == false and all 
-                    options will have their count() set to 0 but otherwise there will 
+                    If this exception is thrown then #parsed_line() == false and all
+                    options will have their count() set to 0 but otherwise there will
                     be no effect (i.e. all registered options will remain registered).
         !*/
 
@@ -212,7 +212,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if parse() has been called successfully 
+                - returns true if parse() has been called successfully
                 - returns false otherwise
         !*/
 
@@ -221,8 +221,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if the option has been added to the parser object 
-                  by calling add_option(name). 
+                - returns true if the option has been added to the parser object
+                  by calling add_option(name).
                 - returns false otherwise
         !*/
 
@@ -233,42 +233,42 @@ namespace dlib
         );
         /*!
             requires
-                - parsed_line() == false 
-                - option_is_defined(name) == false 
+                - parsed_line() == false
+                - option_is_defined(name) == false
                 - name does not contain any ' ', '\t', '\n', or '=' characters
                 - name[0] != '-'
                 - name.size() > 0
             ensures
-                - #option_is_defined(name) == true 
+                - #option_is_defined(name) == true
                 - #at_start() == true
                 - #option(name).count() == 0
-                - #option(name).description() == description 
+                - #option(name).description() == description
                 - #option(name).number_of_arguments() == number_of_arguments
                 - #option(name).group_name() == get_group_name()
             throws
                 - std::bad_alloc
-                    if this exception is thrown then the add_option() function has no 
+                    if this exception is thrown then the add_option() function has no
                     effect
         !*/
 
         const option_type& option (
             const string_type& name
         ) const;
-        /*! 
+        /*!
             requires
                 - option_is_defined(name) == true
             ensures
                 - returns the option specified by name
-        !*/ 
+        !*/
 
-        unsigned long number_of_arguments( 
+        unsigned long number_of_arguments(
         ) const;
         /*!
             requires
                 - parsed_line() == true
             ensures
                 - returns the number of arguments present in the command line.
-                  This count does not include options or their arguments.  Only 
+                  This count does not include options or their arguments.  Only
                   arguments unrelated to any option are counted.
         !*/
 
@@ -298,9 +298,9 @@ namespace dlib
             ensures
                 - prints all the command line options to out.
                 - #at_start() == true
-            throws                
+            throws
                 - any exception.
-                    if an exception is thrown then #at_start() == true but otherwise  
+                    if an exception is thrown then #at_start() == true but otherwise
                     it will have no effect on the state of #*this.
         !*/
 
@@ -310,9 +310,9 @@ namespace dlib
             ensures
                 - prints all the command line options to cout.
                 - #at_start() == true
-            throws                
+            throws
                 - any exception.
-                    if an exception is thrown then #at_start() == true but otherwise  
+                    if an exception is thrown then #at_start() == true but otherwise
                     it will have no effect on the state of #*this.
         !*/
 
@@ -321,7 +321,7 @@ namespace dlib
         /*!
             ensures
                 - returns the current group name.  This is the group new options will be
-                  added into when added via add_option().  
+                  added into when added via add_option().
                 - The group name of an option is used by print_options().  In particular,
                   it groups all options with the same group name together and displays them
                   under a title containing the text of the group name.  This allows you to
@@ -342,7 +342,7 @@ namespace dlib
     //                    Input Validation Tools
     // -------------------------------------------------------------
 
-        class cmd_line_check_error : public dlib::error 
+        class cmd_line_check_error : public dlib::error
         {
             /*!
                 This is the exception thrown by the check_*() routines if they find a
@@ -353,8 +353,8 @@ namespace dlib
         public:
             const string_type opt;
             const string_type opt2;
-            const string_type arg; 
-            const std::vector<string_type> required_opts; 
+            const string_type arg;
+            const std::vector<string_type> required_opts;
         };
 
         template <
@@ -374,7 +374,7 @@ namespace dlib
             throws
                 - std::bad_alloc
                 - cmd_line_check_error
-                    This exception is thrown if the ensures clause could not be satisfied. 
+                    This exception is thrown if the ensures clause could not be satisfied.
                     The exception's members will be set as follows:
                         - type == EINVALID_OPTION_ARG
                         - opt == option_name
@@ -480,8 +480,8 @@ namespace dlib
                 - cmd_line_check_error
                     This exception is thrown if the ensures clause could not be satisfied.
                     The exception's members will be set as follows:
-                        - type == EMULTIPLE_OCCURANCES 
-                        - opt == the option that occurred more than once on the command line. 
+                        - type == EMULTIPLE_OCCURANCES
+                        - opt == the option that occurred more than once on the command line.
         !*/
 
         void check_incompatible_options (
@@ -501,9 +501,9 @@ namespace dlib
                 - cmd_line_check_error
                     This exception is thrown if the ensures clause could not be satisfied.
                     The exception's members will be set as follows:
-                        - type == EINCOMPATIBLE_OPTIONS 
-                        - opt == option_name1 
-                        - opt2 == option_name2 
+                        - type == EINCOMPATIBLE_OPTIONS
+                        - opt == option_name1
+                        - opt2 == option_name2
         !*/
 
         template <
@@ -525,7 +525,7 @@ namespace dlib
                 - cmd_line_check_error
                     This exception is thrown if the ensures clause could not be satisfied.
                     The exception's members will be set as follows:
-                        - type == EINCOMPATIBLE_OPTIONS 
+                        - type == EINCOMPATIBLE_OPTIONS
                         - opt == One of the incompatible options found.
                         - opt2 == The next incompatible option found.
         !*/
@@ -547,9 +547,9 @@ namespace dlib
                 - cmd_line_check_error
                     This exception is thrown if the ensures clause could not be satisfied.
                     The exception's members will be set as follows:
-                        - type == EMISSING_REQUIRED_OPTION 
-                        - opt == sub_option. 
-                        - required_opts == a vector that contains only parent_option. 
+                        - type == EMISSING_REQUIRED_OPTION
+                        - opt == sub_option.
+                        - required_opts == a vector that contains only parent_option.
         !*/
 
         template <
@@ -575,8 +575,8 @@ namespace dlib
                 - cmd_line_check_error
                     This exception is thrown if the ensures clause could not be satisfied.
                     The exception's members will be set as follows:
-                        - type == EMISSING_REQUIRED_OPTION 
-                        - opt == the first option from the sub_option that is present. 
+                        - type == EMISSING_REQUIRED_OPTION
+                        - opt == the first option from the sub_option that is present.
                         - required_opts == a vector containing everything from parent_option_set.
         !*/
 
@@ -602,9 +602,9 @@ namespace dlib
                 - cmd_line_check_error
                     This exception is thrown if the ensures clause could not be satisfied.
                     The exception's members will be set as follows:
-                        - type == EMISSING_REQUIRED_OPTION 
+                        - type == EMISSING_REQUIRED_OPTION
                         - opt == the first option from the sub_option_set that is present.
-                        - required_opts == a vector that contains only parent_option. 
+                        - required_opts == a vector that contains only parent_option.
         !*/
 
         template <
@@ -633,8 +633,8 @@ namespace dlib
                 - cmd_line_check_error
                     This exception is thrown if the ensures clause could not be satisfied.
                     The exception's members will be set as follows:
-                        - type == EMISSING_REQUIRED_OPTION 
-                        - opt == the first option from the sub_option_set that is present. 
+                        - type == EMISSING_REQUIRED_OPTION
+                        - opt == the first option from the sub_option_set that is present.
                         - required_opts == a vector containing everything from parent_option_set.
         !*/
 
@@ -645,7 +645,7 @@ namespace dlib
         cmd_line_parser(cmd_line_parser&);        // copy constructor
         cmd_line_parser& operator=(cmd_line_parser&);    // assignment operator
 
-    };   
+    };
 
 // -----------------------------------------------------------------------------------------
 
@@ -658,9 +658,9 @@ namespace dlib
         typename charT
         >
     inline void swap (
-        cmd_line_parser<charT>& a, 
-        cmd_line_parser<charT>& b 
-    ) { a.swap(b); }   
+        cmd_line_parser<charT>& a,
+        cmd_line_parser<charT>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

@@ -15,7 +15,7 @@ namespace dlib
         typename entropy_encoder,
         typename cc
         >
-    class entropy_encoder_model_kernel_1 
+    class entropy_encoder_model_kernel_1
     {
         /*!
             REQUIREMENTS ON cc
@@ -29,7 +29,7 @@ namespace dlib
                 &get_entropy_encoder() == coder
                 &order_0.get_global_state() == &gs
 
-                This is an order-0 model. The last symbol in the order-0 context is 
+                This is an order-0 model. The last symbol in the order-0 context is
                 an escape into the order minus 1 context.
         !*/
 
@@ -67,7 +67,7 @@ namespace dlib
         entropy_encoder_model_kernel_1(entropy_encoder_model_kernel_1<alphabet_size,entropy_encoder,cc>&);        // copy constructor
         entropy_encoder_model_kernel_1<alphabet_size,entropy_encoder,cc>& operator=(entropy_encoder_model_kernel_1<alphabet_size,entropy_encoder,cc>&);    // assignment operator
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ namespace dlib
     entropy_encoder_model_kernel_1<alphabet_size,entropy_encoder,cc>::
     entropy_encoder_model_kernel_1 (
         entropy_encoder& coder_
-    ) : 
+    ) :
         coder(coder_),
         order_0(gs)
     {
@@ -137,7 +137,7 @@ namespace dlib
             // update the count for this symbol
             order_0.increment_count(symbol,2);
             // encode this symbol
-            coder.encode(low_count,high_count,total_count);                
+            coder.encode(low_count,high_count,total_count);
             return;
         }
     
@@ -149,7 +149,7 @@ namespace dlib
         order_0.get_range(alphabet_size,low_count,high_count,total_count);
         coder.encode(low_count,high_count,total_count);
         // increment the count for the escape symbol
-        order_0.increment_count(alphabet_size);  
+        order_0.increment_count(alphabet_size);
 
         // update the count for this symbol
         order_0.increment_count(symbol,2);

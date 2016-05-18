@@ -58,7 +58,7 @@ namespace dlib
         std::string& hostname
     )
     {
-        try 
+        try
         {
             char temp[MAXHOSTNAMELEN];
 
@@ -69,7 +69,7 @@ namespace dlib
             // ensure that NUL is at the end of the string
             temp[MAXHOSTNAMELEN-1] = '\0';
 
-            hostname = temp; 
+            hostname = temp;
         }
         catch (...)
         {
@@ -84,14 +84,14 @@ namespace dlib
 // cygwin currently doesn't support the getaddrinfo stuff
 #ifndef __CYGWIN__
 
-    int 
+    int
     hostname_to_ip (
         const std::string& hostname,
         std::string& ip,
         int n
     )
     {
-        try 
+        try
         {
             set<std::string>::kernel_1a sos;
 
@@ -157,7 +157,7 @@ namespace dlib
     )
     {
 
-        try 
+        try
         {
 
             if (ip.empty())
@@ -175,7 +175,7 @@ namespace dlib
                     0,
                     0,
                     NI_NAMEREQD
-                ) 
+                )
             )
             {
                 return OTHER_ERROR;
@@ -191,14 +191,14 @@ namespace dlib
         return 0;
     }
 #else
-    int 
+    int
     hostname_to_ip (
         const std::string& hostname,
         std::string& ip,
         int n
     )
     {
-        try 
+        try
         {
             // lock this mutex since gethostbyname isn't really thread safe
             auto_mutex M(sockets_kernel_2_mutex::startup_lock);
@@ -253,7 +253,7 @@ namespace dlib
         std::string& hostname
     )
     {
-        try 
+        try
         {
             // lock this mutex since gethostbyaddr isn't really thread safe
             auto_mutex M(sockets_kernel_2_mutex::startup_lock);
@@ -295,8 +295,8 @@ namespace dlib
     connection::
     connection(
         int sock,
-        int foreign_port, 
-        const std::string& foreign_ip, 
+        int foreign_port,
+        const std::string& foreign_ip,
         int local_port,
         const std::string& local_ip
     ) :
@@ -328,7 +328,7 @@ namespace dlib
 
     long connection::
     write (
-        const char* buf, 
+        const char* buf,
         long num
     )
     {
@@ -337,7 +337,7 @@ namespace dlib
         const long max_send_length = 1024*1024*100;
         while (num > 0)
         {
-            // Make sure to cap the max value num can take on so that if it is 
+            // Make sure to cap the max value num can take on so that if it is
             // really large (it might be big on 64bit platforms) so that the OS
             // can't possibly get upset about it being large.
             const long length = std::min(max_send_length, num);
@@ -359,7 +359,7 @@ namespace dlib
             }
             num -= status;
             buf += status;
-        } 
+        }
         return old_num;
     }
 
@@ -367,7 +367,7 @@ namespace dlib
 
     long connection::
     read (
-        char* buf, 
+        char* buf,
         long num
     )
     {
@@ -375,7 +375,7 @@ namespace dlib
         const long max_recv_length = 1024*1024*100;
         while (true)
         {
-            // Make sure to cap the max value num can take on so that if it is 
+            // Make sure to cap the max value num can take on so that if it is
             // really large (it might be big on 64bit platforms) so that the OS
             // can't possibly get upset about it being large.
             const long length = std::min(max_recv_length, num);
@@ -405,7 +405,7 @@ namespace dlib
 
     long connection::
     read (
-        char* buf, 
+        char* buf,
         long num,
         unsigned long timeout
     )
@@ -416,14 +416,14 @@ namespace dlib
         if (readable(timeout) == false)
             return TIMEOUT;
 
-        // Make sure to cap the max value num can take on so that if it is 
+        // Make sure to cap the max value num can take on so that if it is
         // really large (it might be big on 64bit platforms) so that the OS
         // can't possibly get upset about it being large.
         const long length = std::min(max_recv_length, num);
         status = recv(connection_socket,buf,length,0);
         if (status == -1)
         {
-            // if recv was interupted then call this a timeout 
+            // if recv was interupted then call this a timeout
             if (errno == EINTR)
             {
                 return TIMEOUT;
@@ -478,11 +478,11 @@ namespace dlib
 
     connection::
     ~connection (
-    )        
+    )
     {
         while (true)
         {
-            int status = ::close(connection_socket);  
+            int status = ::close(connection_socket);
             if (status == -1 && errno == EINTR)
                 continue;
             break;
@@ -512,11 +512,11 @@ namespace dlib
 
     listener::
     ~listener (
-    )        
+    )
     {
         while (true)
         {
-            int status = ::close(listening_socket);  
+            int status = ::close(listening_socket);
             if (status == -1 && errno == EINTR)
                 continue;
             break;
@@ -587,8 +587,8 @@ namespace dlib
                 {
                     // if select was interupted or the connection was aborted
                     // then go back to select
-                    if (errno == EINTR || 
-                        errno == ECONNABORTED || 
+                    if (errno == EINTR ||
+                        errno == ECONNABORTED ||
 #ifdef EPROTO
                         errno == EPROTO ||
 #endif
@@ -614,8 +614,8 @@ namespace dlib
                 if ( incoming == -1 )
                 {
                     // if accept was interupted then go back to accept
-                    if (errno == EINTR || 
-                        errno == ECONNABORTED || 
+                    if (errno == EINTR ||
+                        errno == ECONNABORTED ||
 #ifdef EPROTO
                         errno == EPROTO ||
 #endif
@@ -652,8 +652,8 @@ namespace dlib
                 if ( incoming == -1 )
                 {
                     // if accept was interupted then go back to accept
-                    if (errno == EINTR || 
-                        errno == ECONNABORTED || 
+                    if (errno == EINTR ||
+                        errno == ECONNABORTED ||
 #ifdef EPROTO
                         errno == EPROTO ||
 #endif
@@ -728,24 +728,24 @@ namespace dlib
                     continue;
                 break;
             }
-            return OTHER_ERROR;  
+            return OTHER_ERROR;
         }
 
 
 
         // make a new connection object for this new connection
-        try 
-        { 
+        try
+        {
             new_connection = new connection (
                                     incoming,
                                     foreign_port,
                                     foreign_ip,
                                     listening_port,
                                     local_ip
-                                ); 
+                                );
         }
-        catch (...) 
-        { 
+        catch (...)
+        {
             while (true)
             {
                 int status = ::close(incoming);
@@ -753,7 +753,7 @@ namespace dlib
                     continue;
                 break;
             }
-            return OTHER_ERROR; 
+            return OTHER_ERROR;
         }
 
         return 0;
@@ -763,13 +763,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
     // socket creation functions
 // ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------------------
 
     static void
     close_socket (
         int sock
     )
-    /*! 
+    /*!
         requires
             - sock == a socket
         ensures
@@ -785,7 +785,7 @@ namespace dlib
         }
     }
 
-// ----------------------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------------------
 
     int create_listener (
         scoped_ptr<listener>& new_listener,
@@ -824,11 +824,11 @@ namespace dlib
             return OTHER_ERROR;
         }
 
-        // set the local socket structure 
+        // set the local socket structure
         sa.sin_family = AF_INET;
         sa.sin_port = htons(port);
         if (ip.empty())
-        {            
+        {
             // if the listener should listen on any IP
             sa.sin_addr.s_addr = htons(INADDR_ANY);
         }
@@ -856,14 +856,14 @@ namespace dlib
 
         // bind the new socket to the requested port and ip
         if (bind(sock,reinterpret_cast<sockaddr*>(&sa),sizeof(sockaddr_in)) == -1)
-        {   // if there was an error 
-            close_socket(sock); 
+        {   // if there was an error
+            close_socket(sock);
 
             // if the port is already bound then return PORTINUSE
             if (errno == EADDRINUSE)
                 return PORTINUSE;
             else
-                return OTHER_ERROR;            
+                return OTHER_ERROR;
         }
 
 
@@ -871,13 +871,13 @@ namespace dlib
         if ( listen(sock,SOMAXCONN) == -1)
         {
             // if there was an error return OTHER_ERROR
-            close_socket(sock); 
+            close_socket(sock);
 
             // if the port is already bound then return PORTINUSE
             if (errno == EADDRINUSE)
                 return PORTINUSE;
             else
-                return OTHER_ERROR;   
+                return OTHER_ERROR;
         }
 
         // determine the used local port if necessary
@@ -894,7 +894,7 @@ namespace dlib
                 close_socket(sock);
                 return OTHER_ERROR;
             }
-            port = ntohs(local_info.sin_port);            
+            port = ntohs(local_info.sin_port);
         }
 
         // initialize a listener object on the heap with the new socket
@@ -908,8 +908,8 @@ namespace dlib
 
     int create_connection (
         scoped_ptr<connection>& new_connection,
-        unsigned short foreign_port, 
-        const std::string& foreign_ip, 
+        unsigned short foreign_port,
+        const std::string& foreign_ip,
         unsigned short local_port,
         const std::string& local_ip
     )
@@ -924,11 +924,11 @@ namespace dlib
         return status;
     }
 
-    int 
-    create_connection ( 
+    int
+    create_connection (
         connection*& new_connection,
-        unsigned short foreign_port, 
-        const std::string& foreign_ip, 
+        unsigned short foreign_port,
+        const std::string& foreign_ip,
         unsigned short local_port,
         const std::string& local_ip
     )
@@ -950,7 +950,7 @@ namespace dlib
             return OTHER_ERROR;
         }
 
-        // set the foreign socket structure 
+        // set the foreign socket structure
         foreign_sa.sin_family = AF_INET;
         foreign_sa.sin_port = htons(foreign_port);
         foreign_sa.sin_addr.s_addr = inet_addr(foreign_ip.c_str());
@@ -971,14 +971,14 @@ namespace dlib
 
         // set the local ip
         if (local_ip.empty())
-        {            
+        {
             // if the listener should listen on any IP
             local_sa.sin_addr.s_addr = htons(INADDR_ANY);
         }
         else
         {
             // if there is a specific ip to listen on
-            local_sa.sin_addr.s_addr = inet_addr(local_ip.c_str());  
+            local_sa.sin_addr.s_addr = inet_addr(local_ip.c_str());
 
             // if inet_addr couldn't convert the ip then return an error
             if ( local_sa.sin_addr.s_addr == ( in_addr_t)(-1))
@@ -994,17 +994,17 @@ namespace dlib
 
         // bind the new socket to the requested local port and local ip
         if ( bind(sock,reinterpret_cast<sockaddr*>(&local_sa),sizeof(sockaddr_in)) == -1)
-        {   // if there was an error 
-            close_socket(sock); 
+        {   // if there was an error
+            close_socket(sock);
 
             // if the port is already bound then return PORTINUSE
             if (errno == EADDRINUSE)
                 return PORTINUSE;
             else
-                return OTHER_ERROR;           
+                return OTHER_ERROR;
         }
 
-        // connect the socket        
+        // connect the socket
         if ( connect (
                 sock,
                 reinterpret_cast<sockaddr*>(&foreign_sa),
@@ -1012,16 +1012,16 @@ namespace dlib
             ) == -1
         )
         {
-            close_socket(sock); 
+            close_socket(sock);
             // if the port is already bound then return PORTINUSE
             if (errno == EADDRINUSE)
                 return PORTINUSE;
             else
-                return OTHER_ERROR;    
+                return OTHER_ERROR;
         }
 
 
-        // determine the local port and IP and store them in used_local_ip 
+        // determine the local port and IP and store them in used_local_ip
         // and used_local_port
         int used_local_port;
         char temp_used_local_ip[16];
@@ -1041,7 +1041,7 @@ namespace dlib
                 close_socket(sock);
                 return OTHER_ERROR;
             }
-            used_local_port = ntohs(local_info.sin_port);            
+            used_local_port = ntohs(local_info.sin_port);
         }
         else
         {
@@ -1079,20 +1079,20 @@ namespace dlib
         if (setsockopt(sock,SOL_SOCKET,SO_OOBINLINE,reinterpret_cast<const void*>(&flag_value),sizeof(int)))
         {
             close_socket(sock);
-            return OTHER_ERROR;  
+            return OTHER_ERROR;
         }
 
 
         // initialize a connection object on the heap with the new socket
-        try 
-        { 
+        try
+        {
             new_connection = new connection (
                                     sock,
                                     foreign_port,
                                     foreign_ip,
                                     used_local_port,
                                     used_local_ip
-                                ); 
+                                );
         }
         catch(...) {close_socket(sock);  return OTHER_ERROR; }
 

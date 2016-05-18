@@ -109,8 +109,8 @@ namespace dlib
             char junk;
 
             // restricted functions
-            set_kernel_1(set_kernel_1&);        
-            set_kernel_1& operator=(set_kernel_1&); 
+            set_kernel_1(set_kernel_1&);
+            set_kernel_1& operator=(set_kernel_1&);
 
     };
 
@@ -120,9 +120,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        set_kernel_1<T,bst_base,mem_manager>& a, 
-        set_kernel_1<T,bst_base,mem_manager>& b 
-    ) { a.swap(b); } 
+        set_kernel_1<T,bst_base,mem_manager>& a,
+        set_kernel_1<T,bst_base,mem_manager>& b
+    ) { a.swap(b); }
 
     template <
         typename T,
@@ -130,7 +130,7 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        set_kernel_1<T,bst_base,mem_manager>& item, 
+        set_kernel_1<T,bst_base,mem_manager>& item,
         std::istream& in
     )
     {
@@ -147,9 +147,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type set_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type set_kernel_1");
         }
     }
 

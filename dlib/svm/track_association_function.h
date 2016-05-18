@@ -18,7 +18,7 @@ namespace dlib
 
     template <
         typename detection_type
-        > 
+        >
     class feature_extractor_track_association
     {
     public:
@@ -50,13 +50,13 @@ namespace dlib
             track.get_similarity_features(det, feats);
         }
 
-        friend void serialize (const feature_extractor_track_association& item, std::ostream& out) 
-        { 
+        friend void serialize (const feature_extractor_track_association& item, std::ostream& out)
+        {
             serialize(item.num_dims, out);
             serialize(item.num_nonnegative, out);
         }
 
-        friend void deserialize (feature_extractor_track_association& item, std::istream& in) 
+        friend void deserialize (feature_extractor_track_association& item, std::istream& in)
         {
             deserialize(item.num_dims, in);
             deserialize(item.num_nonnegative, in);

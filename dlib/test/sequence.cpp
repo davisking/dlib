@@ -10,7 +10,7 @@
 #include <dlib/sequence.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -26,12 +26,12 @@ namespace
     )
     /*!
         requires
-            - seq is an implementation of sequence/sequence_sort_aseqract.h is instantiated 
+            - seq is an implementation of sequence/sequence_sort_aseqract.h is instantiated
               with int
         ensures
-            - runs tests on seq for compliance with the specs 
+            - runs tests on seq for compliance with the specs
     !*/
-    {        
+    {
 
 
         srand(static_cast<unsigned int>(time(0)));
@@ -69,7 +69,7 @@ namespace
                 for (unsigned long j = i+1; j < a.size(); ++j)
                 {
                     if ((a[j]+a[i])%3 ==0)
-                    {                    
+                    {
                         a.remove(j,x);
                         --j;
                     }
@@ -81,7 +81,7 @@ namespace
             for (int i = 0; i < (int)a.size(); ++i)
             {
                 //   cout << a[i] << endl;
-                DLIB_TEST_MSG(a[i] >= i,"2");               
+                DLIB_TEST_MSG(a[i] >= i,"2");
             }
 
         }
@@ -135,9 +135,9 @@ namespace
             DLIB_TEST(test.size() == 100);
 
             for (int i = 0; i < static_cast<int>(test.size()); ++i)
-            {       
+            {
                 DLIB_TEST(test[i] == i);
-            }   
+            }
 
             swap(test,test2);
 
@@ -184,7 +184,7 @@ namespace
 
             for (unsigned long i = 0; i < test.size()-1; ++i)
             {
-                DLIB_TEST(test[i] <= test[i+1]);    
+                DLIB_TEST(test[i] <= test[i+1]);
             }
 
             a = 0;

@@ -81,7 +81,7 @@ namespace dlib
               num_separable_filters(threshold_filter_singular_values(detector,thresh,weight_index),weight_index)
               will generally get smaller and therefore give a faster running detector.
               However, note that at some point a large enough thresh will drop too much
-              information from the filters and their accuracy will suffer.  
+              information from the filters and their accuracy will suffer.
             - returns the updated detector
     !*/
 
@@ -92,19 +92,19 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 The scan_fhog_pyramid object defined below is primarily meant to be used
-                with the feature extraction technique implemented by extract_fhog_features().  
+                with the feature extraction technique implemented by extract_fhog_features().
                 This technique can generally be understood as taking an input image and
                 outputting a multi-planed output image of floating point numbers that
                 somehow describe the image contents.  Since there are many ways to define
                 how this feature mapping is performed, the scan_fhog_pyramid allows you to
                 replace the extract_fhog_features() method with a customized method of your
                 choosing.  To do this you implement a class with the same interface as
-                default_fhog_feature_extractor.  
+                default_fhog_feature_extractor.
 
                 Therefore, the point of default_fhog_feature_extractor is two fold.  First,
                 it provides the default FHOG feature extraction method used by scan_fhog_pyramid.
-                Second, it serves to document the interface you need to implement to define 
-                your own custom HOG style feature extraction. 
+                Second, it serves to document the interface you need to implement to define
+                your own custom HOG style feature extraction.
         !*/
 
     public:
@@ -149,8 +149,8 @@ namespace dlib
             typename image_type
             >
         void operator()(
-            const image_type& img, 
-            dlib::array<array2d<float> >& hog, 
+            const image_type& img,
+            dlib::array<array2d<float> >& hog,
             int cell_size,
             int filter_rows_padding,
             int filter_cols_padding
@@ -158,7 +158,7 @@ namespace dlib
         /*!
             requires
                 - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-                - img contains some kind of pixel type. 
+                - img contains some kind of pixel type.
                   (i.e. pixel_traits<typename image_type::type> is defined)
             ensures
                 - Extracts FHOG features by calling extract_fhog_features().  The results are
@@ -168,8 +168,8 @@ namespace dlib
                     - #hog.size() == get_num_planes()
                     - Each image plane in #hog has the same dimensions.
                     - for all valid i, r, and c:
-                        - #hog[i][r][c] == a feature value describing the image content centered at the 
-                          following pixel location in img: 
+                        - #hog[i][r][c] == a feature value describing the image content centered at the
+                          following pixel location in img:
                             feats_to_image(point(c,r),cell_size,filter_rows_padding,filter_cols_padding)
         !*/
 
@@ -222,15 +222,15 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for running a fixed sized sliding window classifier
                 over an image pyramid.  In particular,  it slides a linear classifier over
-                a HOG pyramid as discussed in the paper:  
+                a HOG pyramid as discussed in the paper:
                     Histograms of Oriented Gradients for Human Detection by Navneet Dalal
                     and Bill Triggs, CVPR 2005
-                However, we augment the method slightly to use the version of HOG features 
-                from: 
+                However, we augment the method slightly to use the version of HOG features
+                from:
                     Object Detection with Discriminatively Trained Part Based Models by
                     P. Felzenszwalb, R. Girshick, D. McAllester, D. Ramanan
                     IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 32, No. 9, Sep. 2010
-                Since these HOG features have been shown to give superior performance. 
+                Since these HOG features have been shown to give superior performance.
 
             THREAD SAFETY
                 Concurrent access to an instance of this object is not safe and should be
@@ -246,7 +246,7 @@ namespace dlib
         typedef Feature_extractor_type feature_extractor_type;
 
         scan_fhog_pyramid (
-        );  
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -254,7 +254,7 @@ namespace dlib
 
         explicit scan_fhog_pyramid (
             const feature_extractor_type& fe
-        );  
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -270,7 +270,7 @@ namespace dlib
         /*!
             requires
                 - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-                - img contains some kind of pixel type. 
+                - img contains some kind of pixel type.
                   (i.e. pixel_traits<typename image_type::type> is defined)
             ensures
                 - #is_loaded_with_image() == true
@@ -298,9 +298,9 @@ namespace dlib
         );
         /*!
             ensures
-                - Copies all the state information of item into *this, except for state 
+                - Copies all the state information of item into *this, except for state
                   information populated by load().  More precisely, given two scan_fhog_pyramid
-                  objects S1 and S2, the following sequence of instructions should always 
+                  objects S1 and S2, the following sequence of instructions should always
                   result in both of them having the exact same state:
                     S2.copy_configuration(S1);
                     S1.load(img);
@@ -330,14 +330,14 @@ namespace dlib
                     Step 1. Make an image pyramid.
                     Step 2. Convert each layer of the image pyramid into a multi-planed HOG "image".
                     (the number of bands is given by get_feature_extractor().get_num_planes())
-                    Step 3. Scan a linear classifier over each HOG image in the pyramid. 
+                    Step 3. Scan a linear classifier over each HOG image in the pyramid.
                   Moreover, the HOG features quantize the input image into a grid of cells,
                   each cell being get_cell_size() by get_cell_size() pixels in size.  So
                   when we scan the object detector over the pyramid we are scanning an
                   appropriately sized window over these smaller quantized HOG features.  In
                   particular, the size of the window we scan over the HOG feature pyramid
                   is #get_fhog_window_width() by #get_fhog_window_height() HOG cells in
-                  size.    
+                  size.
                 - #is_loaded_with_image() == false
         !*/
 
@@ -346,25 +346,25 @@ namespace dlib
         /*!
             ensures
                 - returns the width, in pixels, of the detection window that is scanned
-                  over the image when detect() is called.    
+                  over the image when detect() is called.
         !*/
 
         inline unsigned long get_detection_window_height (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the height, in pixels, of the detection window that is scanned
-                  over the image when detect() is called.  
+                  over the image when detect() is called.
         !*/
 
         unsigned long get_fhog_window_width (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - Returns the width of the HOG scanning window in terms of HOG cell blocks.
-                  Note that this is a function of get_detection_window_width(), get_cell_size(), 
-                  and get_padding() and is therefore not something you set directly. 
-                - #get_fhog_window_width() is approximately equal to the number of HOG cells 
+                  Note that this is a function of get_detection_window_width(), get_cell_size(),
+                  and get_padding() and is therefore not something you set directly.
+                - #get_fhog_window_width() is approximately equal to the number of HOG cells
                   that fit into get_detection_window_width() pixels plus 2*get_padding()
                   since we include additional padding around each window to add context.
         !*/
@@ -373,10 +373,10 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - Returns the height of the HOG scanning window in terms of HOG cell blocks.  
-                  Note that this is a function of get_detection_window_height(), get_cell_size(), 
-                  and get_padding() and is therefore not something you set directly. 
-                - #get_fhog_window_height() is approximately equal to the number of HOG cells 
+                - Returns the height of the HOG scanning window in terms of HOG cell blocks.
+                  Note that this is a function of get_detection_window_height(), get_cell_size(),
+                  and get_padding() and is therefore not something you set directly.
+                - #get_fhog_window_height() is approximately equal to the number of HOG cells
                   that fit into get_detection_window_height() pixels plus 2*get_padding()
                   since we include additional padding around each window to add context.
         !*/
@@ -433,8 +433,8 @@ namespace dlib
         ) const { return 1; }
         /*!
             ensures
-                - returns 1.  Note that this function is here only for compatibility with 
-                  the scan_image_pyramid object.  Notionally, its return value indicates 
+                - returns 1.  Note that this function is here only for compatibility with
+                  the scan_image_pyramid object.  Notionally, its return value indicates
                   that a scan_fhog_pyramid object is always ready to detect objects once
                   an image has been loaded.
         !*/
@@ -455,7 +455,7 @@ namespace dlib
                 - returns the maximum number of image pyramid levels this object will use.
                   Note that #get_max_pyramid_levels() == 1 indicates that no image pyramid
                   will be used at all.  That is, only the original image will be processed
-                  and no lower scale versions will be created.  
+                  and no lower scale versions will be created.
         !*/
 
         void set_max_pyramid_levels (
@@ -470,7 +470,7 @@ namespace dlib
 
         void set_min_pyramid_layer_size (
             unsigned long width,
-            unsigned long height 
+            unsigned long height
         );
         /*!
             requires
@@ -502,7 +502,7 @@ namespace dlib
         !*/
 
         fhog_filterbank build_fhog_filterbank (
-            const feature_vector_type& weights 
+            const feature_vector_type& weights
         ) const;
         /*!
             requires
@@ -515,14 +515,14 @@ namespace dlib
                       represent all the filters in FB.get_filters().
         !*/
 
-        class fhog_filterbank 
+        class fhog_filterbank
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS
-                    This object represents a HOG filter bank.  That is, the classifier that is 
-                    slid over a HOG pyramid is a set of get_feature_extractor().get_num_planes() 
-                    linear filters, each get_fhog_window_width() rows by get_fhog_window_height() 
-                    columns in size.  This object contains that set of filters.  
+                    This object represents a HOG filter bank.  That is, the classifier that is
+                    slid over a HOG pyramid is a set of get_feature_extractor().get_num_planes()
+                    linear filters, each get_fhog_window_width() rows by get_fhog_window_height()
+                    columns in size.  This object contains that set of filters.
             !*/
 
         public:
@@ -530,11 +530,11 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - Returns the total number of values in the filters.  
+                    - Returns the total number of values in the filters.
             !*/
 
             const std::vector<matrix<float> >& get_filters(
-            ) const; 
+            ) const;
             /*!
                 ensures
                     - returns the set of HOG filters in this object.
@@ -560,13 +560,13 @@ namespace dlib
                 - is_loaded_with_image() == true
             ensures
                 - Scans the HOG filter defined by w over the HOG pyramid that was populated
-                  by the last call to load() and stores all object detections into #dets.  
+                  by the last call to load() and stores all object detections into #dets.
                 - for all valid i:
                     - #dets[i].second == The object box which produced this detection.  This rectangle gives
                       the location of the detection.  Note that the rectangle will have been converted back into
                       the original image input space.  That is, if this detection was made at a low level in the
                       image pyramid then the object box will have been automatically mapped up the pyramid layers
-                      to the original image space.  Or in other words, if you plot #dets[i].second on top of the 
+                      to the original image space.  Or in other words, if you plot #dets[i].second on top of the
                       image given to load() it will show up in the right place.
                     - #dets[i].first == The score for this detection.  This value is equal to dot(w, feature vector
                       for this sliding window location).
@@ -597,7 +597,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - obj.num_parts() == 0 
+                - obj.num_parts() == 0
                 - is_loaded_with_image() == true
                 - psi.size() >= get_num_dimensions()
                   (i.e. psi must have preallocated its memory before this function is called)
@@ -652,7 +652,7 @@ namespace dlib
                   get_nuclear_norm_regularization_strength() is a multiplier on a nuclear
                   norm regularizer which will encourage the selection of filters that use a
                   small number of separable components.  Larger values encourage tend to
-                  give a smaller number of separable filters. 
+                  give a smaller number of separable filters.
                 - if (get_nuclear_norm_regularization_strength() == 0) then
                     - This feature is disabled
                 - else
@@ -682,7 +682,7 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -690,10 +690,10 @@ namespace dlib
     template <typename T>
     void deserialize (
         scan_fhog_pyramid<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -712,7 +712,7 @@ namespace dlib
     /*!
         requires
             - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - img contains some kind of pixel type. 
+            - img contains some kind of pixel type.
               (i.e. pixel_traits<typename image_type::type> is defined)
         ensures
             - This function runs each of the provided object_detector objects over img and
@@ -725,7 +725,7 @@ namespace dlib
               faster than running the detectors individually.
             - This function applies non-max suppression individually to the output of each
               detector.  Therefore, the output is the same as if you ran each detector
-              individually and then concatenated the results. 
+              individually and then concatenated the results.
             - To be precise, this function performs object detection on the given image and
               stores the detected objects into #dets.  In particular, we will have that:
                 - #dets is sorted such that the highest confidence detections come first.
@@ -764,7 +764,7 @@ namespace dlib
     /*!
         requires
             - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - img contains some kind of pixel type. 
+            - img contains some kind of pixel type.
               (i.e. pixel_traits<typename image_type::type> is defined)
         ensures
             - This function just calls the above evaluate_detectors() routine and copies

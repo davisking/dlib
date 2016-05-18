@@ -18,7 +18,7 @@ namespace dlib
 {
 
 
-    namespace blas_bindings 
+    namespace blas_bindings
     {
 
 #ifdef DLIB_TEST_BLAS_BINDINGS
@@ -36,10 +36,10 @@ namespace dlib
         #define DLIB_TEST_BLAS_BINDING_AXPY ++counter_axpy();
         #define DLIB_TEST_BLAS_BINDING_SCAL ++counter_scal();
 #else
-        #define DLIB_TEST_BLAS_BINDING_GEMM 
-        #define DLIB_TEST_BLAS_BINDING_GEMV 
-        #define DLIB_TEST_BLAS_BINDING_GER 
-        #define DLIB_TEST_BLAS_BINDING_DOT 
+        #define DLIB_TEST_BLAS_BINDING_GEMM
+        #define DLIB_TEST_BLAS_BINDING_GEMV
+        #define DLIB_TEST_BLAS_BINDING_GER
+        #define DLIB_TEST_BLAS_BINDING_DOT
         #define DLIB_TEST_BLAS_BINDING_AXPY
         #define DLIB_TEST_BLAS_BINDING_SCAL
 #endif
@@ -447,8 +447,8 @@ namespace dlib
         int get_inc (const matrix<T,NR,NC,MM,L>& ) { return 1; }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc (const matrix_op<op_subm<matrix<T,NR,NC,MM,row_major_layout> > >& m) 
-        { 
+        int get_inc (const matrix_op<op_subm<matrix<T,NR,NC,MM,row_major_layout> > >& m)
+        {
             // if the sub-view doesn't cover all the columns then it can't have a uniform
             // layout.
             if (m.nc() < m.op.m.nc())
@@ -458,8 +458,8 @@ namespace dlib
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc (const matrix_op<op_subm<matrix<T,NR,NC,MM,column_major_layout> > >& m) 
-        { 
+        int get_inc (const matrix_op<op_subm<matrix<T,NR,NC,MM,column_major_layout> > >& m)
+        {
             if (m.nr() < m.op.m.nr())
                 return 0;
             else
@@ -467,15 +467,15 @@ namespace dlib
         }
 
         template <typename T, long NR, long NC, typename MM>
-        int get_inc (const assignable_sub_matrix<T,NR,NC,MM,row_major_layout>& m) 
-        { 
+        int get_inc (const assignable_sub_matrix<T,NR,NC,MM,row_major_layout>& m)
+        {
             if (m.nc() < m.m.nc())
                 return 0;
             else
                 return 1;
         }
         template <typename T, long NR, long NC, typename MM>
-        int get_inc (const assignable_sub_matrix<T,NR,NC,MM,column_major_layout>& m) 
+        int get_inc (const assignable_sub_matrix<T,NR,NC,MM,column_major_layout>& m)
         {
             if (m.nr() < m.m.nr())
                 return 0;
@@ -619,8 +619,8 @@ namespace dlib
         // simply here so we can build matrix expressions with the DLIB_ADD_BLAS_BINDING marco.
 
 
-        // Note that the fact that these are double matrices isn't important, it is just a placeholder in this case.  
-        extern matrix<double> m;     // general matrix 
+        // Note that the fact that these are double matrices isn't important, it is just a placeholder in this case.
+        extern matrix<double> m;     // general matrix
         extern matrix<double,1,0> rv;  // general row vector
         extern matrix<double,0,1> cv;  // general column vector
         extern const double s;
@@ -724,7 +724,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(m*m)
         {
             //cout << "BLAS GEMM: m*m" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
@@ -750,7 +750,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(m)*m)
         {
             //cout << "BLAS GEMM: trans(m)*m" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
             const CBLAS_TRANSPOSE TransB = CblasNoTrans;
@@ -778,7 +778,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(m*trans(m))
         {
             //cout << "BLAS GEMM: m*trans(m)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
             const CBLAS_TRANSPOSE TransB = CblasTrans;
@@ -806,7 +806,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(m)*trans(m))
         {
             //cout << "BLAS GEMM: trans(m)*trans(m)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(src.nr());
             const int N = static_cast<int>(src.nc());
@@ -833,7 +833,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(conj(m))*m)
         {
             //cout << "BLAS GEMM: trans(conj(m))*m" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
             const CBLAS_TRANSPOSE TransB = CblasNoTrans;
@@ -861,7 +861,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(conj(m))*trans(m))
         {
             //cout << "BLAS GEMM: trans(conj(m))*trans(m)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
             const CBLAS_TRANSPOSE TransB = CblasTrans;
@@ -889,7 +889,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(m*trans(conj(m)))
         {
             //cout << "BLAS GEMM: m*trans(conj(m))" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
             const CBLAS_TRANSPOSE TransB = CblasConjTrans;
@@ -915,7 +915,7 @@ namespace dlib
 
         DLIB_ADD_BLAS_BINDING(trans(m)*trans(conj(m)))
         {
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
             const CBLAS_TRANSPOSE TransB = CblasConjTrans;
@@ -942,7 +942,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(conj(m))*trans(conj(m)))
         {
             //cout << "BLAS GEMM: trans(conj(m))*trans(conj(m))" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
             const CBLAS_TRANSPOSE TransB = CblasConjTrans;
@@ -973,7 +973,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(m*cv)
         {
             //cout << "BLAS GEMV: m*cv" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
             const int M = static_cast<int>(src.lhs.nr());
@@ -997,7 +997,7 @@ namespace dlib
             // Note that rv*m is the same as trans(m)*trans(rv)
 
             //cout << "BLAS GEMV: rv*m" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
             const int M = static_cast<int>(src.rhs.nr());
@@ -1021,7 +1021,7 @@ namespace dlib
             // Note that trans(cv)*m is the same as trans(m)*cv
 
             //cout << "BLAS GEMV: trans(cv)*m" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
             const int M = static_cast<int>(src.rhs.nr());
@@ -1043,7 +1043,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(m*trans(rv))
         {
             //cout << "BLAS GEMV: m*trans(rv)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
             const int M = static_cast<int>(src.lhs.nr());
@@ -1067,7 +1067,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(m)*cv)
         {
             //cout << "BLAS GEMV: trans(m)*cv" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
             const int M = static_cast<int>(src.lhs.op.m.nr());
@@ -1091,7 +1091,7 @@ namespace dlib
             // Note that rv*trans(m) is the same as m*trans(rv)
 
             //cout << "BLAS GEMV: rv*trans(m)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
             const int M = static_cast<int>(src.rhs.op.m.nr());
@@ -1115,7 +1115,7 @@ namespace dlib
             // Note that trans(cv)*trans(m) is the same as m*cv
 
             //cout << "BLAS GEMV: trans(cv)*trans(m)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasNoTrans;
             const int M = static_cast<int>(src.rhs.op.m.nr());
@@ -1137,7 +1137,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(m)*trans(rv))
         {
             //cout << "BLAS GEMV: trans(m)*trans(rv)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasTrans;
             const int M = static_cast<int>(src.lhs.op.m.nr());
@@ -1162,7 +1162,7 @@ namespace dlib
         {
             // Note that trans(cv)*conj(m) == conj(trans(m))*cv
             //cout << "BLAS GEMV: trans(cv)*conj(m)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
             const int M = static_cast<int>(src.rhs.op.m.nr());
@@ -1185,7 +1185,7 @@ namespace dlib
         {
             // Note that rv*conj(m) == conj(trans(m))*cv
             //cout << "BLAS GEMV: rv*conj(m)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
             const int M = static_cast<int>(src.rhs.op.m.nr());
@@ -1207,7 +1207,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(conj(m))*cv)
         {
             //cout << "BLAS GEMV: trans(conj(m))*cv" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
             const int M = static_cast<int>(src.lhs.op.m.nr());
@@ -1229,7 +1229,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(conj(m))*trans(rv))
         {
             //cout << "BLAS GEMV: trans(conj(m))*trans(rv)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const CBLAS_TRANSPOSE TransA = CblasConjTrans;
             const int M = static_cast<int>(src.lhs.op.m.nr());
@@ -1255,7 +1255,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(cv*rv)
         {
             //cout << "BLAS GER: cv*rv" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
@@ -1282,7 +1282,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(rv)*rv)
         {
             //cout << "BLAS GER: trans(rv)*rv" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
@@ -1308,7 +1308,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(cv*trans(cv))
         {
             //cout << "BLAS GER: cv*trans(cv)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
@@ -1334,7 +1334,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(rv)*trans(cv))
         {
             //cout << "BLAS GER: trans(rv)*trans(cv)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
@@ -1365,7 +1365,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(cv*conj(rv))
         {
             //cout << "BLAS GERC: cv*conj(rv)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
@@ -1392,7 +1392,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(cv*conj(trans(cv)))
         {
             //cout << "BLAS GERC: cv*conj(trans(cv))" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
@@ -1424,7 +1424,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(rv)*conj(trans(cv)))
         {
             //cout << "BLAS GERC: trans(rv)*conj(trans(cv))" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());
@@ -1457,7 +1457,7 @@ namespace dlib
         DLIB_ADD_BLAS_BINDING(trans(rv)*conj(rv))
         {
             //cout << "BLAS GERC: trans(rv)*conj(rv)" << endl;
-            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;  
+            const bool is_row_major_order = is_same_type<typename dest_exp::layout_type,row_major_layout>::value;
             const CBLAS_ORDER Order = is_row_major_order ? CblasRowMajor : CblasColMajor;
             const int M = static_cast<int>(dest.nr());
             const int N = static_cast<int>(dest.nc());

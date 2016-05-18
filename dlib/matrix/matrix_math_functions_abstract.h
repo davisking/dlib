@@ -10,7 +10,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//                          Exponential Functions 
+//                          Exponential Functions
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::exp(m(r,c)) 
+                  R(r,c) == std::exp(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::log10(m(r,c)) 
+                  R(r,c) == std::log10(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::log(m(r,c)) 
+                  R(r,c) == std::log(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == sqrt(m(r,c)) 
+                  R(r,c) == sqrt(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -77,13 +77,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == pow(m(r,c),e) 
+                  R(r,c) == pow(m(r,c),e)
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -95,13 +95,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == pow(b, m(r,c)) 
+                  R(r,c) == pow(b, m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == 1/(1 + exp(-m(r,c))) 
+                  R(r,c) == 1/(1 + exp(-m(r,c)))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -177,12 +177,12 @@ namespace dlib
         ensures
             - returns a matrix R such that:
                 - if (m contains std::complex<T> objects) then
-                    - R::type == T 
+                    - R::type == T
                 - else
                     - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::abs(m(r,c)) 
+                  R(r,c) == std::abs(m(r,c))
                   (note that if m is complex then std::abs(val) performs sqrt(std::norm(val))
     !*/
 
@@ -201,7 +201,7 @@ namespace dlib
                 - R has the same dimensions as m
                 - for all valid r and c:
                     - if (m(r,c) != 0) then
-                        - R(r,c) == 1.0/m(r,c) 
+                        - R(r,c) == 1.0/m(r,c)
                     - else
                         - R(r,c) == 0
     !*/
@@ -220,9 +220,9 @@ namespace dlib
                 - R has the same dimensions as m
                 - for all valid r and c:
                     - if (m(r,c) != 0) then
-                        - R(r,c) == 1.0/m(r,c) 
+                        - R(r,c) == 1.0/m(r,c)
                     - else
-                        - R(r,c) == std::numeric_limits<R::type>::max() 
+                        - R(r,c) == std::numeric_limits<R::type>::max()
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -232,7 +232,7 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - if (sqrt(sum(squared(m))) != 0) then
                 - returns m/sqrt(sum(squared(m)))
@@ -275,7 +275,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::ceil(m(r,c)) 
+                  R(r,c) == std::ceil(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -289,7 +289,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::floor(m(r,c)) 
+                  R(r,c) == std::floor(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -320,7 +320,7 @@ namespace dlib
 
     const matrix_exp round_zeros (
         const matrix_exp& m,
-        matrix_exp::type eps 
+        matrix_exp::type eps
     );
     /*!
         requires
@@ -415,7 +415,7 @@ namespace dlib
         ensures
             - returns a matrix R such that:
                 - R::type == std::complex<T> where T is whatever type real_part used.
-                - R has the same dimensions as real_part. 
+                - R has the same dimensions as real_part.
                 - for all valid r and c:
                   R(r,c) == std::complex(real_part(r,c), 0)
     !*/
@@ -441,7 +441,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//                              Trigonometric Functions 
+//                              Trigonometric Functions
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -450,13 +450,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::sin(m(r,c)) 
+                  R(r,c) == std::sin(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -466,13 +466,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::cos(m(r,c)) 
+                  R(r,c) == std::cos(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -482,13 +482,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::tan(m(r,c)) 
+                  R(r,c) == std::tan(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -498,13 +498,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::asin(m(r,c)) 
+                  R(r,c) == std::asin(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -514,13 +514,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::acos(m(r,c)) 
+                  R(r,c) == std::acos(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -530,13 +530,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::atan(m(r,c)) 
+                  R(r,c) == std::atan(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -546,13 +546,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::sinh(m(r,c)) 
+                  R(r,c) == std::sinh(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -562,13 +562,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::cosh(m(r,c)) 
+                  R(r,c) == std::cosh(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -578,13 +578,13 @@ namespace dlib
     );
     /*!
         requires
-            - matrix_exp::type == float, double, or long double 
+            - matrix_exp::type == float, double, or long double
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::tanh(m(r,c)) 
+                  R(r,c) == std::tanh(m(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------

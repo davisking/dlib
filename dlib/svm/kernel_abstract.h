@@ -19,21 +19,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    /*! 
+    /*!
         WHAT IS A KERNEL FUNCTION OBJECT?
             In the context of the dlib library documentation a kernel function object
             is an object with an interface with the following properties:
                 - a public typedef named sample_type
-                - a public typedef named scalar_type which should be a float, double, or 
+                - a public typedef named scalar_type which should be a float, double, or
                   long double type.
-                - an overloaded operator() that operates on two items of sample_type 
-                  and returns a scalar_type.  
-                  (e.g. scalar_type val = kernel_function(sample1,sample2); 
+                - an overloaded operator() that operates on two items of sample_type
+                  and returns a scalar_type.
+                  (e.g. scalar_type val = kernel_function(sample1,sample2);
                    would be a valid expression)
-                - a public typedef named mem_manager_type that is an implementation of 
+                - a public typedef named mem_manager_type that is an implementation of
                   dlib/memory_manager/memory_manager_kernel_abstract.h or
                   dlib/memory_manager_global/memory_manager_global_kernel_abstract.h or
-                  dlib/memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                  dlib/memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 - an overloaded == operator that tells you if two kernels are
                   identical or not.
 
@@ -43,7 +43,7 @@ namespace dlib
             simultaneously from multiple threads, even when the threads operate on the same
             object instances (i.e. kernel_function, sample1, and sample2).  The most common
             way to make this safe is to ensure that the kernel function does not mutate any
-            data, either in itself or in its arguments.  
+            data, either in itself or in its arguments.
 
         For examples of kernel functions see the following objects
         (e.g. the radial_basis_kernel).
@@ -56,13 +56,13 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T must be a dlib::matrix object 
+                T must be a dlib::matrix object
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a radial basis function kernel
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::type scalar_type;
@@ -75,7 +75,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #gamma == 0.1 
+                - #gamma == 0.1
         !*/
 
         radial_basis_kernel(
@@ -145,7 +145,7 @@ namespace dlib
         >
     void deserialize (
         radial_basis_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides deserialization support for radial_basis_kernel
@@ -160,13 +160,13 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T must be a dlib::matrix object 
+                T must be a dlib::matrix object
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a sigmoid kernel
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::type scalar_type;
@@ -180,8 +180,8 @@ namespace dlib
         );
         /*!
             ensures
-                - #gamma == 0.1 
-                - #coef == -1.0 
+                - #gamma == 0.1
+                - #coef == -1.0
         !*/
 
         sigmoid_kernel(
@@ -254,7 +254,7 @@ namespace dlib
         >
     void deserialize (
         sigmoid_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides deserialization support for sigmoid_kernel
@@ -270,13 +270,13 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T must be a dlib::matrix object 
+                T must be a dlib::matrix object
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a polynomial kernel
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::type scalar_type;
@@ -291,9 +291,9 @@ namespace dlib
         );
         /*!
             ensures
-                - #gamma == 1 
-                - #coef == 0 
-                - #degree == 1 
+                - #gamma == 1
+                - #coef == 0
+                - #degree == 1
         !*/
 
         polynomial_kernel(
@@ -370,7 +370,7 @@ namespace dlib
         >
     void deserialize (
         polynomial_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides deserialization support for polynomial_kernel
@@ -385,13 +385,13 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T must be a dlib::matrix object 
+                T must be a dlib::matrix object
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a linear function kernel
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::type scalar_type;
@@ -436,10 +436,10 @@ namespace dlib
         >
     void deserialize (
         linear_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support for linear_kernel 
+        provides deserialization support for linear_kernel
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -451,13 +451,13 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T must be a dlib::matrix object 
+                T must be a dlib::matrix object
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a histogram intersection kernel kernel
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::type scalar_type;
@@ -470,13 +470,13 @@ namespace dlib
         ) const;
         /*!
             requires
-                - is_vector(a) 
-                - is_vector(b) 
+                - is_vector(a)
+                - is_vector(b)
                 - a.size() == b.size()
                 - min(a) >= 0
                 - min(b) >= 0
             ensures
-                - returns sum over all i: std::min(a(i), b(i)) 
+                - returns sum over all i: std::min(a(i), b(i))
         !*/
 
         bool operator== (
@@ -504,10 +504,10 @@ namespace dlib
         >
     void deserialize (
         histogram_intersection_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support for histogram_intersection_kernel 
+        provides deserialization support for histogram_intersection_kernel
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -519,14 +519,14 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T must be a kernel object (e.g. radial_basis_kernel, polynomial_kernel, etc.) 
+                T must be a kernel object (e.g. radial_basis_kernel, polynomial_kernel, etc.)
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a kernel with a fixed value offset
                 added to it.
 
             THREAD SAFETY
-                This kernel is threadsafe.  
+                This kernel is threadsafe.
         !*/
 
         typedef typename T::scalar_type scalar_type;
@@ -540,7 +540,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #offset == 0.01 
+                - #offset == 0.01
         !*/
 
         offset_kernel(
@@ -558,8 +558,8 @@ namespace dlib
         );
         /*!
             ensures
-                - #kernel == k 
-                - #offset == off 
+                - #kernel == k
+                - #offset == off
         !*/
 
         scalar_type operator() (
@@ -608,7 +608,7 @@ namespace dlib
         >
     void deserialize (
         offset_kernel<T>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides deserialization support for offset_kernel
@@ -627,13 +627,13 @@ namespace dlib
             REQUIREMENTS ON kernel_type
                 kernel_type must be one of the following kernel types:
                     - radial_basis_kernel
-                    - polynomial_kernel 
+                    - polynomial_kernel
                     - sigmoid_kernel
                     - linear_kernel
                     - offset_kernel
 
             WHAT THIS OBJECT REPRESENTS
-                This is a function object that computes the derivative of a kernel 
+                This is a function object that computes the derivative of a kernel
                 function object.
 
             THREAD SAFETY
@@ -652,7 +652,7 @@ namespace dlib
 
         kernel_derivative(
             const kernel_type& k_
-        ); 
+        );
         /*!
             ensures
                 - this object will return derivatives of the kernel object k_
@@ -660,12 +660,12 @@ namespace dlib
         !*/
 
         const sample_type operator() (
-            const sample_type& x, 
+            const sample_type& x,
             const sample_type& y
         ) const;
         /*!
             ensures
-                - returns the derivative of k with respect to y.  
+                - returns the derivative of k with respect to y.
         !*/
 
         const kernel_type& k;

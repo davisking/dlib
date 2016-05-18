@@ -9,7 +9,7 @@
 #include <sstream>
 #include <ctime>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -90,9 +90,9 @@ namespace
                     DLIB_TEST(df2.get_kernel() == kern);
 
                     // make sure the norms are correct
-                    DLIB_TEST(std::abs(df1.get_squared_norm()  - 
+                    DLIB_TEST(std::abs(df1.get_squared_norm()  -
                                        trans(df1.get_alpha())*kernel_matrix(df1.get_kernel(),df1.get_basis_vectors())*df1.get_alpha()) < 1e-10);
-                    DLIB_TEST(std::abs(df2.get_squared_norm()  - 
+                    DLIB_TEST(std::abs(df2.get_squared_norm()  -
                                        trans(df2.get_alpha())*kernel_matrix(df2.get_kernel(),df2.get_basis_vectors())*df2.get_alpha()) < 1e-10);
 
 
@@ -118,8 +118,8 @@ namespace
                     df1 = dec1;
 
                     temp = df1 + df2;
-                    decision_function<kernel_type> dec3(temp.get_alpha(), 0, temp.get_kernel(), temp.get_basis_vectors()); 
-                    DLIB_TEST(std::abs(temp.get_squared_norm()  - 
+                    decision_function<kernel_type> dec3(temp.get_alpha(), 0, temp.get_kernel(), temp.get_basis_vectors());
+                    DLIB_TEST(std::abs(temp.get_squared_norm()  -
                                        trans(temp.get_alpha())*kernel_matrix(temp.get_kernel(),temp.get_basis_vectors())*temp.get_alpha()) < 1e-10);
                     for (unsigned long j = 0; j < samples.size(); ++j)
                     {
@@ -128,8 +128,8 @@ namespace
 
 
                     temp = df1 - df2;
-                    dec3 = decision_function<kernel_type>(temp.get_alpha(), 0, temp.get_kernel(), temp.get_basis_vectors()); 
-                    DLIB_TEST(std::abs(temp.get_squared_norm()  - 
+                    dec3 = decision_function<kernel_type>(temp.get_alpha(), 0, temp.get_kernel(), temp.get_basis_vectors());
+                    DLIB_TEST(std::abs(temp.get_squared_norm()  -
                                        trans(temp.get_alpha())*kernel_matrix(temp.get_kernel(),temp.get_basis_vectors())*temp.get_alpha()) < 1e-10);
                     for (unsigned long j = 0; j < samples.size(); ++j)
                     {
@@ -137,8 +137,8 @@ namespace
                     }
 
                     temp = 3*(df1 - df2)*2;
-                    dec3 = decision_function<kernel_type>(temp.get_alpha(), 0, temp.get_kernel(), temp.get_basis_vectors()); 
-                    DLIB_TEST(std::abs(temp.get_squared_norm()  - 
+                    dec3 = decision_function<kernel_type>(temp.get_alpha(), 0, temp.get_kernel(), temp.get_basis_vectors());
+                    DLIB_TEST(std::abs(temp.get_squared_norm()  -
                                        trans(temp.get_alpha())*kernel_matrix(temp.get_kernel(),temp.get_basis_vectors())*temp.get_alpha()) < 1e-10);
                     for (unsigned long j = 0; j < samples.size(); ++j)
                     {
@@ -148,8 +148,8 @@ namespace
                     distance_function<kernel_type> df_empty(kern);
 
                     temp = df_empty + (df1 + df2)/2 + df_empty - df_empty + (df_empty + df_empty) - (df_empty - df_empty);
-                    dec3 = decision_function<kernel_type>(temp.get_alpha(), 0, temp.get_kernel(), temp.get_basis_vectors()); 
-                    DLIB_TEST(std::abs(temp.get_squared_norm()  - 
+                    dec3 = decision_function<kernel_type>(temp.get_alpha(), 0, temp.get_kernel(), temp.get_basis_vectors());
+                    DLIB_TEST(std::abs(temp.get_squared_norm()  -
                                        trans(temp.get_alpha())*kernel_matrix(temp.get_kernel(),temp.get_basis_vectors())*temp.get_alpha()) < 1e-10);
                     for (unsigned long j = 0; j < samples.size(); ++j)
                     {
@@ -217,7 +217,7 @@ namespace
                 {
                     samples.push_back(randm(4,1,rnd));
                 }
-                // add on a little bit to make sure there is at least one non-zero sample.  If all the 
+                // add on a little bit to make sure there is at least one non-zero sample.  If all the
                 // samples are zero then empirical_kernel_map_error will be thrown and we don't want that.
                 samples.front()(0) += 0.001;
 
@@ -257,18 +257,18 @@ namespace
                     decision_function<kernel_type> dec_funct = ekm.convert_to_decision_function(proj_samples[idx1]);
                     distance_function<kernel_type> dist_funct = ekm.convert_to_distance_function(proj_samples[idx1]);
 
-                    // make sure the distances match 
+                    // make sure the distances match
                     const double dist_error = abs(length(proj_samples[idx1] - proj_samples[idx2]) - dist_funct(samples[idx2]));
                     DLIB_TEST_MSG( dist_error < 1e-6, dist_error);
-                    // make sure the dot products match 
+                    // make sure the dot products match
                     DLIB_TEST(abs(dot(proj_samples[idx1],proj_samples[idx2]) - dec_funct(samples[idx2])) < 1e-10);
 
                     // also try the dec_funct with samples that weren't in the original set
                     samp = 100*randm(4,1,rnd);
-                    // make sure the dot products match 
+                    // make sure the dot products match
                     DLIB_TEST(abs(dot(proj_samples[idx1],ekm.project(samp)) - dec_funct(samp)) < 1e-10);
                     samp = randm(4,1,rnd);
-                    // make sure the dot products match 
+                    // make sure the dot products match
                     DLIB_TEST(abs(dot(proj_samples[idx1],ekm.project(samp)) - dec_funct(samp)) < 1e-10);
                 }
 
@@ -310,15 +310,15 @@ namespace
                     const unsigned long idx2 = rnd.get_random_32bit_number()%samples.size();
                     decision_function<kernel_type> dec_funct = convert_to_decision_function(proj,proj_samples[idx1]);
 
-                    // make sure the dot products match 
+                    // make sure the dot products match
                     DLIB_TEST(abs(dot(proj_samples[idx1],proj_samples[idx2]) - dec_funct(samples[idx2])) < 1e-10);
 
                     // also try the dec_funct with samples that weren't in the original set
                     samp = 100*randm(4,1,rnd);
-                    // make sure the dot products match 
+                    // make sure the dot products match
                     DLIB_TEST(abs(dot(proj_samples[idx1],proj(samp)) - dec_funct(samp)) < 1e-10);
                     samp = randm(4,1,rnd);
-                    // make sure the dot products match 
+                    // make sure the dot products match
                     DLIB_TEST(abs(dot(proj_samples[idx1],proj(samp)) - dec_funct(samp)) < 1e-10);
                 }
 
@@ -345,7 +345,7 @@ namespace
                 {
                     samples2.push_back(randm(10,1,rnd));
                 }
-                // add on a little bit to make sure there is at least one non-zero sample.  If all the 
+                // add on a little bit to make sure there is at least one non-zero sample.  If all the
                 // samples are zero then empirical_kernel_map_error will be thrown and we don't want that.
                 samples1.front()(0) += 0.001;
                 samples2.front()(0) += 0.001;
@@ -435,8 +435,8 @@ namespace
 
     // Create an instance of this object.  Doing this causes this test
     // to be automatically inserted into the testing framework whenever this cpp file
-    // is linked into the project.  Note that since we are inside an unnamed-namespace 
-    // we won't get any linker errors about the symbol a being defined multiple times. 
+    // is linked into the project.  Note that since we are inside an unnamed-namespace
+    // we won't get any linker errors about the symbol a being defined multiple times.
     empirical_kernel_map_tester a;
 
 }

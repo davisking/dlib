@@ -10,7 +10,7 @@
 
 // The point of this block of code is to cause a link time error that will prevent a user
 // from compiling part of their application with DLIB_ASSERT enabled and part with them
-// disabled since doing that would be a violation of C++'s one definition rule. 
+// disabled since doing that would be a violation of C++'s one definition rule.
 extern "C"
 {
 #ifdef ENABLE_ASSERTS
@@ -34,7 +34,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    namespace threads_kernel_shared 
+    namespace threads_kernel_shared
     {
 
         bool thread_pool_has_been_destroyed = false;
@@ -42,7 +42,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
         threader& thread_pool (
-        ) 
+        )
         {
             static threader* thread_pool = new threader;
             return *thread_pool;
@@ -52,7 +52,7 @@ namespace dlib
 
         struct threader_destruct_helper
         {
-            // cause the thread pool to begin its destruction process when 
+            // cause the thread pool to begin its destruction process when
             // global objects start to be destroyed
             ~threader_destruct_helper()
             {
@@ -95,7 +95,7 @@ namespace dlib
             // the destruction of the global thread pool since it doesn't matter anyway.
             // It's resources will just get freed by the OS.  This is even the recommended
             // thing to do by Microsoft (http://blogs.msdn.com/b/oldnewthing/archive/2012/01/05/10253268.aspx).
-            // 
+            //
             // As an aside, it's worth pointing out that the reason we try and free
             // resources on program shutdown on other operating systems is so we can have
             // clean reports from tools like valgrind which check for memory leaks.  But
@@ -110,7 +110,7 @@ namespace dlib
         threader::
         ~threader (
         )
-        { 
+        {
             data_mutex.lock();
             destruct = true;
             data_ready.broadcast();
@@ -147,7 +147,7 @@ namespace dlib
             {
                 // There are still some user threads running so there isn't
                 // much we can really do.  Just let the program end without
-                // cleaning up threading resources.  
+                // cleaning up threading resources.
                 data_mutex.unlock();
             }
         }
@@ -163,7 +163,7 @@ namespace dlib
             thread_id_type id_copy;
             member_function_pointer<> mfp;
 
-            // Remove all the member function pointers for this thread from the tree 
+            // Remove all the member function pointers for this thread from the tree
             // and call them.
             while (reg.reg[id] != 0)
             {
@@ -253,7 +253,7 @@ namespace dlib
                 // if data is ready then process it and launch the thread
                 // if its not ready then go back into the pool
                 while (self.function_pointer != 0)
-                {                
+                {
                     // indicate that this thread is now out of the thread pool
                     --self.pool_count;
 
@@ -283,7 +283,7 @@ namespace dlib
 
                 // if we timed out and there isn't any work to do then
                 // this thread will quit this loop and end.
-                if (self.data_ready.wait_or_timeout(DLIB_THREAD_POOL_TIMEOUT) == false && 
+                if (self.data_ready.wait_or_timeout(DLIB_THREAD_POOL_TIMEOUT) == false &&
                     self.function_pointer == 0)
                     break;
 

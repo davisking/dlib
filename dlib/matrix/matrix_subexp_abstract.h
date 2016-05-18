@@ -36,7 +36,7 @@ namespace dlib
         long start,
         long inc,
         long end
-    ); 
+    );
     /*!
         requires
             - inc > 0
@@ -66,7 +66,7 @@ namespace dlib
     /*!
         requires
             - rows and cols contain integral elements (e.g. int, long)
-            - 0 <= min(rows) && max(rows) < m.nr() 
+            - 0 <= min(rows) && max(rows) < m.nr()
             - 0 <= min(cols) && max(cols) < m.nc()
             - rows.nr() == 1 || rows.nc() == 1
             - cols.nr() == 1 || cols.nc() == 1
@@ -99,7 +99,7 @@ namespace dlib
             - col + nc <= m.nc()
         ensures
             - returns a matrix R such that:
-                - R.nr() == nr 
+                - R.nr() == nr
                 - R.nc() == nc
                 - for all valid r and c:
                   R(r, c) == m(r+row,c+col)
@@ -117,7 +117,7 @@ namespace dlib
               (i.e. rect is a region inside the matrix m)
         ensures
             - returns a matrix R such that:
-                - R.nr() == rect.height()  
+                - R.nr() == rect.height()
                 - R.nc() == rect.width()
                 - for all valid r and c:
                   R(r, c) == m(r+rect.top(), c+rect.left())
@@ -157,7 +157,7 @@ namespace dlib
         ensures
             - Let box_clipped == rect.intersect(get_rect(m))
             - returns a matrix R such that:
-                - R.nr() == box_clipped.height()  
+                - R.nr() == box_clipped.height()
                 - R.nc() == box_clipped.width()
                 - for all valid r and c:
                   R(r, c) == m(r+box_clipped.top(), c+box_clipped.left())
@@ -185,7 +185,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This struct allows you to determine the type of matrix expression 
+                This struct allows you to determine the type of matrix expression
                 object returned from the rowm(m,row) function.  An example makes its
                 use clear:
 
@@ -197,7 +197,7 @@ namespace dlib
 
                     // Print the first row of mat.  So we see that by using
                     // rowm_exp we can save the object returned by rowm() in
-                    // a local variable.    
+                    // a local variable.
                     cout << r << endl;
 
                     // Note that you can only save the return value of rowm() to
@@ -238,14 +238,14 @@ namespace dlib
     /*!
         requires
             - rows contains integral elements (e.g. int, long)
-            - 0 <= min(rows) && max(rows) < m.nr() 
+            - 0 <= min(rows) && max(rows) < m.nr()
             - rows.nr() == 1 || rows.nc() == 1
               (i.e. rows must be a vector)
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
                 - R.nr() == rows.size()
-                - R.nc() == m.nc() 
+                - R.nc() == m.nc()
                 - for all valid r and c:
                   R(r,c) == m(rows(r),c)
     !*/
@@ -254,14 +254,14 @@ namespace dlib
 
     const matrix_exp colm (
         const matrix_exp& m,
-        long col 
+        long col
     );
     /*!
         requires
             - 0 <= col < m.nc()
         ensures
             - returns a matrix R such that:
-                - R.nr() == m.nr() 
+                - R.nr() == m.nr()
                 - R.nc() == 1
                 - for all valid i:
                   R(i) == m(i,col)
@@ -272,7 +272,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This struct allows you to determine the type of matrix expression 
+                This struct allows you to determine the type of matrix expression
                 object returned from the colm(m,col) function.  An example makes its
                 use clear:
 
@@ -284,7 +284,7 @@ namespace dlib
 
                     // Print the first column of mat.  So we see that by using
                     // colm_exp we can save the object returned by colm() in
-                    // a local variable.    
+                    // a local variable.
                     cout << c << endl;
 
                     // Note that you can only save the return value of colm() to
@@ -310,7 +310,7 @@ namespace dlib
             - 0 <= length <= m.nr()
         ensures
             - returns a matrix R such that:
-                - R.nr() == length 
+                - R.nr() == length
                 - R.nc() == 1
                 - for all valid i:
                   R(i) == m(i,col)
@@ -325,7 +325,7 @@ namespace dlib
     /*!
         requires
             - cols contains integral elements (e.g. int, long)
-            - 0 <= min(cols) && max(cols) < m.nc() 
+            - 0 <= min(cols) && max(cols) < m.nc()
             - cols.nr() == 1 || cols.nc() == 1
               (i.e. cols must be a vector)
         ensures
@@ -435,7 +435,7 @@ namespace dlib
     /*!
         requires
             - rows and cols contain integral elements (e.g. int, long)
-            - 0 <= min(rows) && max(rows) < m.nr() 
+            - 0 <= min(rows) && max(rows) < m.nr()
             - 0 <= min(cols) && max(cols) < m.nc()
             - rows.nr() == 1 || rows.nc() == 1
             - cols.nr() == 1 || cols.nc() == 1
@@ -490,7 +490,7 @@ namespace dlib
     /*!
         requires
             - rows contains integral elements (e.g. int, long)
-            - 0 <= min(rows) && max(rows) < m.nr() 
+            - 0 <= min(rows) && max(rows) < m.nr()
             - rows.nr() == 1 || rows.nc() == 1
               (i.e. rows must be a vector)
         ensures
@@ -513,7 +513,7 @@ namespace dlib
 
     assignable_matrix_expression set_colm (
         matrix& m,
-        long col 
+        long col
     );
     /*!
         requires
@@ -543,7 +543,7 @@ namespace dlib
     /*!
         requires
             - cols contains integral elements (e.g. int, long)
-            - 0 <= min(cols) && max(cols) < m.nc() 
+            - 0 <= min(cols) && max(cols) < m.nc()
             - cols.nr() == 1 || cols.nc() == 1
               (i.e. cols must be a vector)
         ensures

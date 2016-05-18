@@ -7,11 +7,11 @@
 
 #ifdef _MSC_VER
 // This #pragma directive is also located in the algs.h file but for whatever
-// reason visual studio 9 just ignores it when it is only there. 
+// reason visual studio 9 just ignores it when it is only there.
 
 // this is to disable the "'this' : used in base member initializer list"
 // warning you get from some of the GUI objects since all the objects
-// require that their parent class be passed into their constructor. 
+// require that their parent class be passed into their constructor.
 // In this case though it is totally safe so it is ok to disable this warning.
 #pragma warning(disable : 4355)
 #endif
@@ -56,12 +56,12 @@ namespace dlib
         matrix_range_exp (
             T start_,
             T end_
-        ) 
+        )
         {
             start = start_;
             if (start_ <= end_)
                 inc = 1;
-            else 
+            else
                 inc = -1;
             nc_ = std::abs(end_ - start_) + 1;
         }
@@ -69,7 +69,7 @@ namespace dlib
             T start_,
             T inc_,
             T end_
-        ) 
+        )
         {
             start = start_;
             nc_ = std::abs(end_ - start_)/inc_ + 1;
@@ -84,7 +84,7 @@ namespace dlib
             T end_,
             long num,
             bool
-        ) 
+        )
         {
             start = start_;
             nc_ = num;
@@ -92,7 +92,7 @@ namespace dlib
             {
                 inc = (end_-start_)/(num-1);
             }
-            else 
+            else
             {
                 inc = 0;
                 start = end_;
@@ -101,7 +101,7 @@ namespace dlib
         }
 
         const_ret_type operator() (
-            long, 
+            long,
             long c
         ) const { return start + c*inc;  }
 
@@ -111,12 +111,12 @@ namespace dlib
 
         template <typename U>
         bool aliases (
-            const matrix_exp<U>& 
+            const matrix_exp<U>&
         ) const { return false; }
 
         template <typename U>
         bool destructively_aliases (
-            const matrix_exp<U>& 
+            const matrix_exp<U>&
         ) const { return false; }
 
         long nr (
@@ -164,7 +164,7 @@ namespace dlib
             T start_,
             T end_,
             long num
-        ) 
+        )
         {
             start = start_;
             nc_ = num;
@@ -172,7 +172,7 @@ namespace dlib
             {
                 inc = (end_-start_)/(num-1);
             }
-            else 
+            else
             {
                 inc = 0;
                 start = end_;
@@ -191,12 +191,12 @@ namespace dlib
 
         template <typename U>
         bool aliases (
-            const matrix_exp<U>& 
+            const matrix_exp<U>&
         ) const { return false; }
 
         template <typename U>
         bool destructively_aliases (
-            const matrix_exp<U>& 
+            const matrix_exp<U>&
         ) const { return false; }
 
         long nr (
@@ -228,7 +228,7 @@ namespace dlib
     };
 
     template <long start, long inc_, long end_>
-    class matrix_range_static_exp : public matrix_exp<matrix_range_static_exp<start,inc_,end_> > 
+    class matrix_range_static_exp : public matrix_exp<matrix_range_static_exp<start,inc_,end_> >
     {
     public:
         typedef typename matrix_traits<matrix_range_static_exp>::type type;
@@ -246,7 +246,7 @@ namespace dlib
         ) {}
 
         const_ret_type operator() (
-            long , 
+            long ,
             long c
         ) const { return start + c*inc;  }
 
@@ -256,12 +256,12 @@ namespace dlib
 
         template <typename U>
         bool aliases (
-            const matrix_exp<U>& 
+            const matrix_exp<U>&
         ) const { return false; }
 
         template <typename U>
         bool destructively_aliases (
-            const matrix_exp<U>& 
+            const matrix_exp<U>&
         ) const { return false; }
 
         long nr (

@@ -25,7 +25,7 @@ namespace dlib
     template <typename EXP>
     typename EXP::matrix_type fft (
         const matrix_exp<EXP>& data
-    );  
+    );
     /*!
         requires
             - data contains elements of type std::complex<>
@@ -47,7 +47,7 @@ namespace dlib
     template <typename EXP>
     typename EXP::matrix_type ifft (
         const matrix_exp<EXP>& data
-    );  
+    );
     /*!
         requires
             - data contains elements of type std::complex<>
@@ -59,17 +59,17 @@ namespace dlib
               that:
                 - D.nr() == data.nr()
                 - D.nc() == data.nc()
-                - fft(D) == data 
+                - fft(D) == data
     !*/
 
 // ----------------------------------------------------------------------------------------
 
-    template < 
-        typename T, 
+    template <
+        typename T,
         long NR,
         long NC,
         typename MM,
-        typename L 
+        typename L
         >
     void fft_inplace (
         matrix<std::complex<T>,NR,NC,MM,L>& data
@@ -87,12 +87,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template < 
-        typename T, 
+    template <
+        typename T,
         long NR,
         long NC,
         typename MM,
-        typename L 
+        typename L
         >
     void ifft_inplace (
         matrix<std::complex<T>,NR,NC,MM,L>& data
@@ -106,8 +106,8 @@ namespace dlib
             - This function is identical to ifft() except that it does the inverse FFT
               in-place.  That is, after this function executes we will have:
                 - #data == ifft(data)*data.size()
-                - Note that the output needs to be divided by data.size() to complete the 
-                  inverse transformation.  
+                - Note that the output needs to be divided by data.size() to complete the
+                  inverse transformation.
     !*/
 
 // ----------------------------------------------------------------------------------------

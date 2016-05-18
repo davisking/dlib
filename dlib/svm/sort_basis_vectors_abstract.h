@@ -31,23 +31,23 @@ namespace dlib
             - is_binary_classification_problem(samples, labels)
             - 0 < eps <= 1
             - basis.size() > 0
-            - kernel_type is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+            - kernel_type is a kernel function object as defined in dlib/svm/kernel_abstract.h
               It must be capable of operating on the elements of samples and basis.
             - vect1_type == a matrix or something convertible to a matrix via mat()
             - vect2_type == a matrix or something convertible to a matrix via mat()
             - vect3_type == a matrix or something convertible to a matrix via mat()
         ensures
             - A kernel based learning method ultimately needs to select a set of basis functions
-              represented by a particular choice of kernel and a set of basis vectors.  
+              represented by a particular choice of kernel and a set of basis vectors.
               sort_basis_vectors() attempts to order the elements of basis so that elements which are
               most useful in solving the binary classification problem defined by samples and
-              labels come first. 
+              labels come first.
             - In particular, this function returns a std::vector, SB, of sorted basis vectors such that:
                 - 0 < SB.size() <= basis.size()
-                - SB will contain elements from basis but they will have been sorted so that 
-                  the most useful elements come first (i.e. SB[0] is the most important). 
-                - eps notionally controls how big SB will be.  Bigger eps corresponds to a 
-                  bigger basis.  You can think of it like asking for eps percent of the 
+                - SB will contain elements from basis but they will have been sorted so that
+                  the most useful elements come first (i.e. SB[0] is the most important).
+                - eps notionally controls how big SB will be.  Bigger eps corresponds to a
+                  bigger basis.  You can think of it like asking for eps percent of the
                   discriminating power from the input basis.
     !*/
 

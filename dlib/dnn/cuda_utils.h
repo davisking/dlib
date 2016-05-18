@@ -73,7 +73,7 @@ namespace dlib
         )
         /*!
             ensures
-                - This function computes the inverse of pack_idx().  Therefore, 
+                - This function computes the inverse of pack_idx().  Therefore,
                   if PACKED == pack_idx(dim_size3,dim_size2,dim_size1, idx4,idx3,idx2,idx1)
                   then unpack_idx(PACKED,dim_size3,dim_size2,dim_size1, IDX4,IDX3,IDX2,IDX1)
                   results in:
@@ -99,9 +99,9 @@ namespace dlib
 
         // This function is from the article:
         // http://devblogs.nvidia.com/parallelforall/faster-parallel-reductions-kepler/
-        __inline__ __device__ float warp_reduce_sum(float val) 
+        __inline__ __device__ float warp_reduce_sum(float val)
         {
-            for (int offset = warpSize/2; offset > 0; offset /= 2) 
+            for (int offset = warpSize/2; offset > 0; offset /= 2)
                 val += __shfl_down(val, offset);
             return val;
         }
@@ -112,13 +112,13 @@ namespace dlib
         }
 
         __inline__ __device__ void warp_reduce_atomic_add(
-            float& out, 
+            float& out,
             float val
-        ) 
+        )
         /*!
             ensures
                 - Atomically adds all the val variables in the current warp to out.
-                  See this page for an extended discussion: 
+                  See this page for an extended discussion:
                   http://devblogs.nvidia.com/parallelforall/faster-parallel-reductions-kepler/
         !*/
         {
@@ -164,7 +164,7 @@ namespace dlib
                   additionally supply a max_jobs number that tells it how many possible
                   total threads could be used.  This is useful when launching potentially
                   small jobs that might not need the number of threads suggested by
-                  launch_kernel().  
+                  launch_kernel().
         !*/
         {
             if (m.num == 0)
@@ -191,9 +191,9 @@ namespace dlib
                     the following kernel would add the vector a to the vector b and store
                     the output in out (assuming all vectors are of dimension n):
                         __global__ void add_arrays(
-                            const float* a, 
-                            const float* b, 
-                            float* out, 
+                            const float* a,
+                            const float* b,
+                            float* out,
                             size_t n
                         )
                         {
@@ -208,7 +208,7 @@ namespace dlib
             __device__ grid_stride_range(
                 size_t ibegin_,
                 size_t iend_
-            ) : 
+            ) :
                 ibegin(ibegin_),
                 iend(iend_)
             {}
@@ -269,9 +269,9 @@ namespace dlib
                     So the code in the kernel would look like this if you wanted to add two
                     2D matrices:
                         __global__ void add_arrays(
-                            const float* a, 
-                            const float* b, 
-                            float* out, 
+                            const float* a,
+                            const float* b,
+                            float* out,
                             size_t nr,
                             size_t nc
                         )
@@ -291,7 +291,7 @@ namespace dlib
             __device__ grid_stride_range_y(
                 size_t ibegin_,
                 size_t iend_
-            ) : 
+            ) :
                 ibegin(ibegin_),
                 iend(iend_)
             {}

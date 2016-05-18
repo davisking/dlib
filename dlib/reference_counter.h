@@ -20,8 +20,8 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     reference_counter_kernel_1<T,copy>    
+        // kernel_1a
+        typedef     reference_counter_kernel_1<T,copy>
                     kernel_1a;
 
     };

@@ -43,7 +43,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class timestamper 
+    class timestamper
     {
     public:
         uint64 get_timestamp (
@@ -52,17 +52,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class dir_create_error : public error 
+    class dir_create_error : public error
     {
     public:
         dir_create_error(
             const std::string& dir_name
-        ) : 
+        ) :
             error(EDIR_CREATE,"Error creating directory '" + dir_name + "'."),
             name(dir_name)
         {}
         const std::string& name;
-    }; 
+    };
 
 
     void create_directory (

@@ -13,13 +13,13 @@
 
 namespace dlib
 {
-    // Don't do anything when libpng calls us to tell us about an error.  Just return to 
+    // Don't do anything when libpng calls us to tell us about an error.  Just return to
     // our own code and throw an exception (at the long jump target).
-    void png_reader_user_error_fn_silent(png_structp  png_struct, png_const_charp ) 
+    void png_reader_user_error_fn_silent(png_structp  png_struct, png_const_charp )
     {
         longjmp(png_jmpbuf(png_struct),1);
     }
-    void png_reader_user_warning_fn_silent(png_structp , png_const_charp ) 
+    void png_reader_user_warning_fn_silent(png_structp , png_const_charp )
     {
     }
 

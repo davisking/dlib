@@ -22,28 +22,28 @@ namespace dlib
         And also provides a specialization of the image_traits template that looks like:
             namespace dlib
             {
-                template <> 
+                template <>
                 struct image_traits<image_type>
                 {
                     typedef the_type_of_pixel_used_in_image_type pixel_type;
                 };
             }
 
-        Additionally, an image object must be default constructable.  This means that 
+        Additionally, an image object must be default constructable.  This means that
         expressions of the form:
             image_type img;
         Must be legal.
 
         Finally, the type of pixel in image_type must have a pixel_traits specialization.
         That is, pixel_traits<typename image_traits<image_type>::pixel_type> must be one of
-        the specializations of pixel_traits.  
+        the specializations of pixel_traits.
         
         
         To be very precise, the seven functions defined above are defined thusly:
 
             long num_rows(
                 const image_type& img
-            ); 
+            );
             /!*
                 ensures
                     - returns the number of rows in the given image
@@ -60,7 +60,7 @@ namespace dlib
             void set_image_size(
                 image_type& img,
                 long rows,
-                long cols 
+                long cols
             );
             /!*
                 requires
@@ -141,7 +141,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON image_type
-                image_type must be an image object as defined at the top of this file.  
+                image_type must be an image object as defined at the top of this file.
 
             WHAT THIS OBJECT REPRESENTS
                 This object takes an image object and wraps it with an interface that makes
@@ -153,7 +153,7 @@ namespace dlib
                 constructor is modified through an interface other than the image_view
                 instance.  This is because, for example, someone might cause the underlying
                 image object to reallocate its memory, thus invalidating the pointer to its
-                pixel data stored in the image_view.    
+                pixel data stored in the image_view.
 
                 As an side, the reason why this object stores a pointer to the image
                 object's data and uses that pointer instead of calling image_data() each
@@ -170,12 +170,12 @@ namespace dlib
 
         image_view(
             image_type& img
-        ) : 
-            _data((char*)image_data(img)), 
+        ) :
+            _data((char*)image_data(img)),
             _width_step(width_step(img)),
             _nr(num_rows(img)),
             _nc(num_columns(img)),
-            _img(&img) 
+            _img(&img)
         {}
 
         long nr() const { return _nr; }
@@ -223,17 +223,17 @@ namespace dlib
             pix_row(pixel_type* data_, long nc_) : data(data_),_nc(nc_) {}
             const pixel_type& operator[] (long col) const
             {
-                DLIB_ASSERT(0 <= col && col < _nc, 
+                DLIB_ASSERT(0 <= col && col < _nc,
                     "\t The given column index is out of range."
-                    << "\n\t col: " << col 
+                    << "\n\t col: " << col
                     << "\n\t _nc: " << _nc);
                 return data[col];
             }
             pixel_type& operator[] (long col)
             {
-                DLIB_ASSERT(0 <= col && col < _nc, 
+                DLIB_ASSERT(0 <= col && col < _nc,
                     "\t The given column index is out of range."
-                    << "\n\t col: " << col 
+                    << "\n\t col: " << col
                     << "\n\t _nc: " << _nc);
                 return data[col];
             }
@@ -241,25 +241,25 @@ namespace dlib
             pixel_type* const data;
             const long _nc;
         };
-        pix_row operator[] (long row) 
-        { 
-            DLIB_ASSERT(0 <= row && row < _nr, 
+        pix_row operator[] (long row)
+        {
+            DLIB_ASSERT(0 <= row && row < _nr,
                 "\t The given row index is out of range."
-                << "\n\t row: " << row 
+                << "\n\t row: " << row
                 << "\n\t _nr: " << _nr);
-            return pix_row((pixel_type*)(_data+_width_step*row), _nc); 
+            return pix_row((pixel_type*)(_data+_width_step*row), _nc);
         }
-        const pix_row operator[] (long row) const 
-        { 
-            DLIB_ASSERT(0 <= row && row < _nr, 
+        const pix_row operator[] (long row) const
+        {
+            DLIB_ASSERT(0 <= row && row < _nr,
                 "\t The given row index is out of range."
-                << "\n\t row: " << row 
+                << "\n\t row: " << row
                 << "\n\t _nr: " << _nr);
-            return pix_row((pixel_type*)(_data+_width_step*row), _nc); 
+            return pix_row((pixel_type*)(_data+_width_step*row), _nc);
         }
 #endif
 
-        void set_size(long rows, long cols) 
+        void set_size(long rows, long cols)
         /*!
             requires
                 - rows >= 0 && cols >= 0
@@ -269,14 +269,14 @@ namespace dlib
                 - #nr() == rows
                 - #nc() == cols
         !*/
-        { 
+        {
             DLIB_ASSERT((cols >= 0 && rows >= 0),
                         "\t image_view::set_size(long rows, long cols)"
                         << "\n\t The images can't have negative rows or columns."
-                        << "\n\t cols: " << cols 
-                        << "\n\t rows: " << rows 
+                        << "\n\t cols: " << cols
+                        << "\n\t rows: " << rows
             );
-            set_image_size(*_img, rows, cols); *this = *_img; 
+            set_image_size(*_img, rows, cols); *this = *_img;
         }
 
         void clear() { set_size(0,0); }
@@ -301,7 +301,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON image_type
-                image_type must be an image object as defined at the top of this file.  
+                image_type must be an image object as defined at the top of this file.
 
             WHAT THIS OBJECT REPRESENTS
                 This object is just like the image_view except that it provides a "const"
@@ -314,8 +314,8 @@ namespace dlib
 
         const_image_view(
             const image_type& img
-        ) : 
-            _data((char*)image_data(img)), 
+        ) :
+            _data((char*)image_data(img)),
             _width_step(width_step(img)),
             _nr(num_rows(img)),
             _nc(num_columns(img))
@@ -334,9 +334,9 @@ namespace dlib
             pix_row(pixel_type* data_, long nc_) : data(data_),_nc(nc_) {}
             const pixel_type& operator[] (long col) const
             {
-                DLIB_ASSERT(0 <= col && col < _nc, 
+                DLIB_ASSERT(0 <= col && col < _nc,
                     "\t The given column index is out of range."
-                    << "\n\t col: " << col 
+                    << "\n\t col: " << col
                     << "\n\t _nc: " << _nc);
                 return data[col];
             }
@@ -344,13 +344,13 @@ namespace dlib
             pixel_type* const data;
             const long _nc;
         };
-        const pix_row operator[] (long row) const 
-        { 
-            DLIB_ASSERT(0 <= row && row < _nr, 
+        const pix_row operator[] (long row) const
+        {
+            DLIB_ASSERT(0 <= row && row < _nr,
                 "\t The given row index is out of range."
-                << "\n\t row: " << row 
+                << "\n\t row: " << row
                 << "\n\t _nr: " << _nr);
-            return pix_row((pixel_type*)(_data+_width_step*row), _nc); 
+            return pix_row((pixel_type*)(_data+_width_step*row), _nc);
         }
 #endif
 
@@ -364,7 +364,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename image_type>
-    image_view<image_type> make_image_view ( image_type& img) 
+    image_view<image_type> make_image_view ( image_type& img)
     { return image_view<image_type>(img); }
     /*!
         requires
@@ -375,7 +375,7 @@ namespace dlib
     !*/
 
     template <typename image_type>
-    const_image_view<image_type> make_image_view (const image_type& img) 
+    const_image_view<image_type> make_image_view (const image_type& img)
     { return const_image_view<image_type>(img); }
     /*!
         requires

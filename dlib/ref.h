@@ -10,13 +10,13 @@ namespace dlib
 
     template<
         typename T
-        > 
-    class reference_wrapper 
+        >
+    class reference_wrapper
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a simple object that just holds a reference to another object. 
-                It is useful because it can serve as a kind of "copyable reference".  
+                This is a simple object that just holds a reference to another object.
+                It is useful because it can serve as a kind of "copyable reference".
         !*/
 
     public:

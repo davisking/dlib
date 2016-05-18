@@ -10,7 +10,7 @@
 namespace dlib
 {
 
-    class entropy_encoder 
+    class entropy_encoder
     {
         /*!
             INITIAL VALUE
@@ -18,21 +18,21 @@ namespace dlib
 
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents an entropy encoder (could be implemented as an 
-                arithmetic encoder for example).      
+                This object represents an entropy encoder (could be implemented as an
+                arithmetic encoder for example).
                 
-                Note that all implementations of entropy_encoder and entropy_decoder 
-                are paired. This means that if you use entropy_encoder_kernel_n to 
-                encode something then you must use the corresponding 
+                Note that all implementations of entropy_encoder and entropy_decoder
+                are paired. This means that if you use entropy_encoder_kernel_n to
+                encode something then you must use the corresponding
                 entropy_decoder_kernel_n to decode it.
 
-            NOTATION:              
-                At any moment each symbol has a certain probability of appearing in 
-                the input stream.  These probabilities may change as each symbol is 
+            NOTATION:
+                At any moment each symbol has a certain probability of appearing in
+                the input stream.  These probabilities may change as each symbol is
                 encountered and the probability model is updated accordingly.
 
 
-                let P(i) be a function which gives the probability of seeing the ith 
+                let P(i) be a function which gives the probability of seeing the ith
                 symbol of an N symbol alphabet BEFORE the probability model is updated
                 to account for the current symbol.  ( The domain of P(i) is from 0 to N-1. )
 
@@ -61,7 +61,7 @@ namespace dlib
             ensures
                 - all memory associated with *this has been released
                 - if (stream_is_set()) then
-                    - any buffered data in *this will be written to get_stream() 
+                    - any buffered data in *this will be written to get_stream()
         !*/
 
         void clear(
@@ -70,7 +70,7 @@ namespace dlib
             ensures
                 - #*this has its initial value
                 - if (stream_is_set()) then
-                    - any buffered data in *this will be written to get_stream() 
+                    - any buffered data in *this will be written to get_stream()
                     - clears any memory of all previous calls to encode() from #*this
             throws
                 - std::ios_base::failure
@@ -78,7 +78,7 @@ namespace dlib
                     then this exception will be thrown.  #*this will be unusable until
                     clear() is called and succeeds
                 - any other exception
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -91,7 +91,7 @@ namespace dlib
                 - #get_stream()    == out
                 - #stream_is_set() == true
                 - if (stream_is_set()) then
-                    - any buffered data in *this will be written to get_stream() 
+                    - any buffered data in *this will be written to get_stream()
                     - clears any memory of all previous calls to encode() from #*this
             throws
                 - std::ios_base::failure
@@ -99,7 +99,7 @@ namespace dlib
                     then this exception will be thrown.  #*this will be unusable until
                     clear() is called and succeeds
                 - any other exception
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -117,7 +117,7 @@ namespace dlib
             requires
                 - stream_is_set() == true
             ensures
-                - returns a reference to the ostream object that *this writes its 
+                - returns a reference to the ostream object that *this writes its
                   encoded data to
         !*/
 
@@ -130,10 +130,10 @@ namespace dlib
             requires
                 - 0 < total <  65536 (2^16)
                 - total == TOTAL
-                - low_count < high_count <= total    
+                - low_count < high_count <= total
                 - stream_is_set() == true
             ensures
-                - encodes the symbol S where: 
+                - encodes the symbol S where:
                     - LOW_COUNT(S)  == low_count
                     - HIGH_COUNT(S) == high_count
             throws
@@ -142,7 +142,7 @@ namespace dlib
                     this exception will be thrown.  #*this will be unusable until
                     clear() is called and succeeds
                 - any other exception
-                    if this exception is thrown then #*this is unusable 
+                    if this exception is thrown then #*this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -153,7 +153,7 @@ namespace dlib
         entropy_encoder(entropy_encoder&);        // copy constructor
         entropy_encoder& operator=(entropy_encoder&);    // assignment operator
 
-    };   
+    };
    
 }
 

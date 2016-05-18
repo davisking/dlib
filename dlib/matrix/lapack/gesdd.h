@@ -14,13 +14,13 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dgesdd) (char const* jobz, 
+                void DLIB_FORTRAN_ID(dgesdd) (char const* jobz,
                                               const integer* m, const integer* n, double* a, const integer* lda,
                                               double* s, double* u, const integer* ldu,
                                               double* vt, const integer* ldvt,
                                               double* work, const integer* lwork, integer* iwork, integer* info);
 
-                void DLIB_FORTRAN_ID(sgesdd) (char const* jobz, 
+                void DLIB_FORTRAN_ID(sgesdd) (char const* jobz,
                                               const integer* m, const integer* n, float* a, const integer* lda,
                                               float* s, float* u, const integer* ldu,
                                               float* vt, const integer* ldvt,
@@ -28,7 +28,7 @@ namespace dlib
 
             }
 
-            inline integer gesdd (const char jobz, 
+            inline integer gesdd (const char jobz,
                               const integer m, const integer n, double* a, const integer lda,
                               double* s, double* u, const integer ldu,
                               double* vt, const integer ldvt,
@@ -39,7 +39,7 @@ namespace dlib
                 return info;
             }
 
-            inline integer gesdd (const char jobz, 
+            inline integer gesdd (const char jobz,
                               const integer m, const integer n, float* a, const integer lda,
                               float* s, float* u, const integer ldu,
                               float* vt, const integer ldvt,
@@ -190,7 +190,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2, long NR3, long NR4,
             long NC1, long NC2, long NC3, long NC4,
             typename MM
@@ -243,13 +243,13 @@ namespace dlib
             if (info != 0)
                 return info;
 
-            // There is a bug in an older version of LAPACK in Debian etch 
+            // There is a bug in an older version of LAPACK in Debian etch
             // that causes the gesdd to return the wrong value for work_size
             // when jobz == 'N'.  So verify the value of work_size.
             if (jobz == 'N')
             {
-                using std::min; 
-                using std::max; 
+                using std::min;
+                using std::max;
                 const T min_work_size = 3*min(m,n) + max(max(m,n),7*min(m,n));
                 if (work_size < min_work_size)
                     work_size = min_work_size;
@@ -269,7 +269,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2, long NR3, long NR4,
             long NC1, long NC2, long NC3, long NC4,
             typename MM
@@ -327,13 +327,13 @@ namespace dlib
             if (info != 0)
                 return info;
 
-            // There is a bug in an older version of LAPACK in Debian etch 
+            // There is a bug in an older version of LAPACK in Debian etch
             // that causes the gesdd to return the wrong value for work_size
             // when jobz == 'N'.  So verify the value of work_size.
             if (jobz == 'N')
             {
-                using std::min; 
-                using std::max; 
+                using std::min;
+                using std::max;
                 const T min_work_size = 3*min(m,n) + max(max(m,n),7*min(m,n));
                 if (work_size < min_work_size)
                     work_size = min_work_size;

@@ -12,7 +12,7 @@ namespace dlib
         unsigned long alphabet_size,
         typename entropy_encoder
         >
-    class entropy_encoder_model 
+    class entropy_encoder_model
     {
         /*!
             REQUIREMENTS ON alphabet_size
@@ -29,9 +29,9 @@ namespace dlib
                 can use it to write symbols to an entropy_encoder and it will calculate
                 the cumulative counts/probabilities and manage contexts for you.
 
-                Note that all implementations of entropy_encoder_model and 
-                entropy_decoder_model are paired. This means that if you use 
-                entropy_encoder_model_kernel_n to encode something then you must 
+                Note that all implementations of entropy_encoder_model and
+                entropy_decoder_model are paired. This means that if you use
+                entropy_encoder_model_kernel_n to encode something then you must
                 use the corresponding entropy_decoder_model_kernel_n to decode it.
 
                 Also note that this object does not perform any buffering of symbols.  It
@@ -70,7 +70,7 @@ namespace dlib
                 - does not modify get_entropy_encoder()
             throws
                 - any exception
-                    if this exception is thrown then *this is unusable 
+                    if this exception is thrown then *this is unusable
                     until clear() is called and succeeds
         !*/
 
@@ -86,7 +86,7 @@ namespace dlib
                   written immediately to the entropy_encoder.
             throws
                 - any exception
-                    If this exception is thrown then #*this is unusable until 
+                    If this exception is thrown then #*this is unusable until
                     clear() is called and succeeds.
         !*/
 
@@ -110,7 +110,7 @@ namespace dlib
         entropy_encoder_model(entropy_encoder_model<alphabet_size,entropy_encoder>&);        // copy constructor
         entropy_encoder_model<alphabet_size,entropy_encoder>& operator=(entropy_encoder_model<alphabet_size,entropy_encoder>&);    // assignment operator
 
-    };   
+    };
 
 }
 

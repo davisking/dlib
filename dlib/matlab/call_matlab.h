@@ -20,7 +20,7 @@ void check_for_matlab_ctrl_c();
 
 // ----------------------------------------------------------------------------------------
 
-class matlab_struct 
+class matlab_struct
 {
     /*!
         WHAT THIS OBJECT REPRESENTS
@@ -33,8 +33,8 @@ class matlab_struct
 
             To get the values as C++ types you do something like this:
                 int val = mystruct["field"];
-            or 
-                int val;  
+            or
+                int val;
                 mystruct["field"].get(val);
 
             See also example_mex_struct.cpp for an example that uses this part of the API.
@@ -53,13 +53,13 @@ public:
     void set_struct_handle(const void* sh) { struct_handle = sh; }
 private:
 
-    class sub 
+    class sub
     {
     public:
         sub() : struct_handle(0), field_idx(-1) {}
 
         template <typename T> operator T() const;
-        template <typename T> void get(T& item) const; 
+        template <typename T> void get(T& item) const;
         template <typename T> sub& operator= (const T& new_val);
         const sub operator[] (const std::string& name) const;
         sub operator[] (const std::string& name);
@@ -72,13 +72,13 @@ private:
     };
     const void* struct_handle;
     bool should_free;
-    matlab_struct& operator=(const matlab_struct&); 
+    matlab_struct& operator=(const matlab_struct&);
 };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-template <typename T> 
+template <typename T>
 struct output_decorator
 {
     output_decorator(T& item_):item(item_){}
@@ -126,7 +126,7 @@ void call_matlab (
 // ----------------------------------------------------------------------------------------
 
 void call_matlab (
-    const function_handle& funct 
+    const function_handle& funct
 );
 /*!
     ensures
@@ -144,7 +144,7 @@ void call_matlab (
 );
 /*!
     ensures
-        - calls MATLAB's function of the given name.  
+        - calls MATLAB's function of the given name.
         - if (A1 is not decorated as an output by returns()) then
             - A1 is passed as an argument into the MATLAB function
         - else
@@ -171,15 +171,15 @@ void call_matlab (
 // ----------------------------------------------------------------------------------------
 /*
     The rest of this file is just overloads of call_matlab() for up to 10 arguments (or
-    just 9 arguments if function_handle is used).  They all do the same thing as the above 
-    version of call_matlab().  Generally, any argument not decorated by returns() is an 
-    input to the MATLAB function.  On the other hand, all arguments decorated by returns() 
-    are treated as outputs.  
+    just 9 arguments if function_handle is used).  They all do the same thing as the above
+    version of call_matlab().  Generally, any argument not decorated by returns() is an
+    input to the MATLAB function.  On the other hand, all arguments decorated by returns()
+    are treated as outputs.
 */
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename T1, 
+    typename T1,
     typename T2
     >
 void call_matlab (
@@ -191,7 +191,7 @@ void call_matlab (
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename T1, 
+    typename T1,
     typename T2,
     typename T3
     >
@@ -205,7 +205,7 @@ void call_matlab (
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename T1, 
+    typename T1,
     typename T2,
     typename T3,
     typename T4
@@ -221,7 +221,7 @@ void call_matlab (
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename T1, 
+    typename T1,
     typename T2,
     typename T3,
     typename T4,
@@ -239,7 +239,7 @@ void call_matlab (
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename T1, 
+    typename T1,
     typename T2,
     typename T3,
     typename T4,
@@ -259,7 +259,7 @@ void call_matlab (
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename T1, 
+    typename T1,
     typename T2,
     typename T3,
     typename T4,
@@ -281,7 +281,7 @@ void call_matlab (
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename T1, 
+    typename T1,
     typename T2,
     typename T3,
     typename T4,

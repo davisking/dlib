@@ -31,7 +31,7 @@ namespace dlib
                     x_{i+1} = A*x_i + B*u_i + C
                 That is, the next state the system goes into is a linear function of its
                 current state (x_i) and the current control (u_i) plus some constant bias
-                or disturbance.  
+                or disturbance.
                 
                 A model predictive controller can find the control (u) you should apply to
                 drive the state (x) to some reference value, or alternatively to make the
@@ -42,10 +42,10 @@ namespace dlib
                 To be precise, each time you ask this object for a control, it solves the
                 following quadratic program:
         
-                    min    sum_i trans(x_i-target_i)*Q*(x_i-target_i) + trans(u_i)*R*u_i 
+                    min    sum_i trans(x_i-target_i)*Q*(x_i-target_i) + trans(u_i)*R*u_i
                   x_i,u_i
 
-                    such that: x_0     == current_state 
+                    such that: x_0     == current_state
                                x_{i+1} == A*x_i + B*u_i + C
                                lower <= u_i <= upper
                                0 <= i < horizon_
@@ -53,7 +53,7 @@ namespace dlib
                 and reports u_0 as the control you should take given that you are currently
                 in current_state.  Q and R are user supplied matrices that define how we
                 penalize variations away from the target state as well as how much we want
-                to avoid generating large control signals.  
+                to avoid generating large control signals.
                 
                 Finally, the algorithm we use to solve this quadratic program is based
                 largely on the method described in:
@@ -85,7 +85,7 @@ namespace dlib
             const matrix<double,I,1>& R,
             const matrix<double,I,1>& lower,
             const matrix<double,I,1>& upper
-        ); 
+        );
         /*!
             requires
                 - A.nr() > 0
@@ -102,33 +102,33 @@ namespace dlib
                 - #get_Q() == Q
                 - #get_R() == R
                 - #get_lower_constraints() == lower
-                - #get_upper_constraints() == upper 
+                - #get_upper_constraints() == upper
                 - for all valid i:
                     - get_target(i) == a vector of all zeros
                     - get_target(i).size() == A.nr()
-                - #get_max_iterations() == 10000 
+                - #get_max_iterations() == 10000
                 - #get_epsilon() == 0.01
         !*/
 
         const matrix<double,S,S>& get_A (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the A matrix from the quadratic program defined above. 
+                - returns the A matrix from the quadratic program defined above.
         !*/
 
         const matrix<double,S,I>& get_B (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the B matrix from the quadratic program defined above. 
+                - returns the B matrix from the quadratic program defined above.
         !*/
 
         const matrix<double,S,1>& get_C (
         ) const;
         /*!
             ensures
-                - returns the C matrix from the quadratic program defined above. 
+                - returns the C matrix from the quadratic program defined above.
         !*/
 
         const matrix<double,S,1>& get_Q (
@@ -136,7 +136,7 @@ namespace dlib
         /*!
             ensures
                 - returns the diagonal of the Q matrix from the quadratic program defined
-                  above. 
+                  above.
         !*/
 
         const matrix<double,I,1>& get_R (
@@ -144,7 +144,7 @@ namespace dlib
         /*!
             ensures
                 - returns the diagonal of the R matrix from the quadratic program defined
-                  above. 
+                  above.
         !*/
 
         const matrix<double,I,1>& get_lower_constraints (
@@ -174,7 +174,7 @@ namespace dlib
             ensures
                 - This object will try to find the control sequence that results in the
                   process obtaining get_target(time) state at the indicated time.  Note
-                  that the next time instant after "right now" is time 0. 
+                  that the next time instant after "right now" is time 0.
         !*/
 
         void set_target (
@@ -206,7 +206,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - When operator() is called it solves an optimization problem to

@@ -9,7 +9,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -24,14 +24,14 @@ namespace
     )
     /*!
         requires
-            - base64 is an implementation of base64/base64_kernel_abstract.h 
+            - base64 is an implementation of base64/base64_kernel_abstract.h
         ensures
             - runs tests on base64 for compliance with the specs
     !*/
-    {        
+    {
 
         const unsigned int seed = static_cast<unsigned int>(time(0));
-        try 
+        try
         {
  
             srand(seed);
@@ -176,8 +176,8 @@ LCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=";
         }
         catch (typename base64::decode_error& e)
         {
-            DLIB_TEST_MSG(false, 
-                "decode_error thrown when it shouldn't have been (" << seed << "):\n " 
+            DLIB_TEST_MSG(false,
+                "decode_error thrown when it shouldn't have been (" << seed << "):\n "
                  << e.info);
         }
     }

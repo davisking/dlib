@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <functional>
 
-namespace dlib 
+namespace dlib
 {
 
     template <
@@ -65,9 +65,9 @@ namespace dlib
                     r is the item in the range of *this contained in the node
                     balance:
                         balance == 0 if both subtrees have the same height
-                        balance == -1 if the left subtree has a height that is greater 
+                        balance == -1 if the left subtree has a height that is greater
                                    than the height of the right subtree by 1
-                        balance == 1 if the right subtree has a height that is greater 
+                        balance == 1 if the right subtree has a height that is greater
                                    than the height of the left subtree by 1
                     for all trees:
                         the height of the left and right subtrees differ by at most one
@@ -91,7 +91,7 @@ namespace dlib
             const domain* d;
             range* r;
 
-            const domain& key( 
+            const domain& key(
             ) const { return *d; }
 
             const range& value(
@@ -122,7 +122,7 @@ namespace dlib
             }
 
             virtual ~binary_search_tree_kernel_1(
-            ); 
+            );
     
             inline void clear(
             );
@@ -211,12 +211,12 @@ namespace dlib
             );
             /*!
                 requires
-                    - t->balance == 2 
-                    - t->right->balance == 0 or 1 
+                    - t->balance == 2
+                    - t->right->balance == 0 or 1
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - #t is still a binary search tree 
-                    - #t->balance is between 1 and -1 
+                    - #t is still a binary search tree
+                    - #t->balance is between 1 and -1
                     - #t now has a height smaller by 1 if #t->balance == 0
             !*/
 
@@ -225,12 +225,12 @@ namespace dlib
             );
             /*!
                 requires
-                    - t->balance == -2 
-                    - t->left->balance == 0 or -1 
+                    - t->balance == -2
+                    - t->left->balance == 0 or -1
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - #t is still a binary search tree 
-                    - #t->balance is between 1 and -1 
+                    - #t is still a binary search tree
+                    - #t->balance is between 1 and -1
                     - #t now has a height smaller by 1 if #t->balance == 0
 
             !*/
@@ -240,13 +240,13 @@ namespace dlib
             );
             /*!
                 requires
-                    - t->balance == -2 
-                    - t->left->balance == 1 
+                    - t->balance == -2
+                    - t->left->balance == 1
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - #t is still a binary search tree 
-                    - #t now has a balance of 0 
-                    - #t now has a height smaller by 1             
+                    - #t is still a binary search tree
+                    - #t now has a balance of 0
+                    - #t now has a height smaller by 1
             !*/
 
             inline void double_rotate_left (
@@ -254,12 +254,12 @@ namespace dlib
             );
             /*!
                 requires
-                    - t->balance == 2 
-                    - t->right->balance == -1 
+                    - t->balance == 2
+                    - t->right->balance == -1
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - #t is still a binary search tree 
-                    - #t now has a balance of 0 
+                    - #t is still a binary search tree
+                    - #t now has a balance of 0
                     - #t now has a height smaller by 1
             !*/
 
@@ -270,14 +270,14 @@ namespace dlib
             );
             /*!
                 requires
-                    - t != 0  (i.e. there must be something in the tree to remove) 
+                    - t != 0  (i.e. there must be something in the tree to remove)
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - the biggest node in t has been removed 
-                    - the biggest node domain element in t has been put into #d 
+                    - the biggest node in t has been removed
+                    - the biggest node domain element in t has been put into #d
                     - the biggest node range element in t has been put into #r
-                    - #t is still a binary search tree 
-                    - returns false if the height of the tree has not changed 
+                    - #t is still a binary search tree
+                    - returns false if the height of the tree has not changed
                     - returns true if the height of the tree has shrunk by one
             !*/
 
@@ -288,14 +288,14 @@ namespace dlib
             );
             /*!
                 requires
-                    - t != 0  (i.e. there must be something in the tree to remove) 
+                    - t != 0  (i.e. there must be something in the tree to remove)
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - the least node in t has been removed 
-                    - the least node domain element in t has been put into #d 
+                    - the least node in t has been removed
+                    - the least node domain element in t has been put into #d
                     - the least node range element in t has been put into #r
-                    - #t is still a binary search tree 
-                    - returns false if the height of the tree has not changed 
+                    - #t is still a binary search tree
+                    - returns false if the height of the tree has not changed
                     - returns true if the height of the tree has shrunk by one
             !*/
 
@@ -308,10 +308,10 @@ namespace dlib
                 requires
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - the mapping (d --> r) has been added to #t 
+                    - the mapping (d --> r) has been added to #t
                     - #d and #r have initial values for their types
-                    - #t is still a binary search tree 
-                    - returns false if the height of the tree has not changed 
+                    - #t is still a binary search tree
+                    - returns false if the height of the tree has not changed
                     - returns true if the height of the tree has grown by one
             !*/
 
@@ -326,12 +326,12 @@ namespace dlib
                     - return_reference(t,d) != 0
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - #d_copy is equivalent to d                                    
-                    - an element in t equivalent to d has been removed and swapped 
-                      into #d_copy and its associated range object has been 
+                    - #d_copy is equivalent to d
+                    - an element in t equivalent to d has been removed and swapped
+                      into #d_copy and its associated range object has been
                       swapped into #r
-                    - #t is still a binary search tree                                     
-                    - returns false if the height of the tree has not changed 
+                    - #t is still a binary search tree
+                    - returns false if the height of the tree has not changed
                     - returns true if the height of the tree has shrunk by one
             !*/
 
@@ -344,9 +344,9 @@ namespace dlib
                     - return_reference(t,item) != 0
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - an element in t equivalent to item has been removed                      
-                    - #t is still a binary search tree                                     
-                    - returns false if the height of the tree has not changed 
+                    - an element in t equivalent to item has been removed
+                    - #t is still a binary search tree
+                    - returns false if the height of the tree has not changed
                     - returns true if the height of the tree has shrunk by one
             !*/
 
@@ -380,13 +380,13 @@ namespace dlib
             );
             /*!
                 requires
-                    - t != 0 
+                    - t != 0
                     - t == reference to the pointer in t's parent node that points to t
                 ensures
-                    - if (t->balance is < 1 or > 1) then 
+                    - if (t->balance is < 1 or > 1) then
                         - keep_node_balanced() will ensure that #t->balance == 0, -1, or 1
                     - #t is still a binary search tree
-                    - returns true if it made the tree one height shorter 
+                    - returns true if it made the tree one height shorter
                     - returns false if it didn't change the height
             !*/
 
@@ -402,7 +402,7 @@ namespace dlib
                     - if (tree_root == 0) then
                         - returns 0
                     - else
-                        - returns the number of elements in tree_root that are 
+                        - returns the number of elements in tree_root that are
                           equivalent to item
             !*/
 
@@ -448,7 +448,7 @@ namespace dlib
                 ensures
                     - makes the stack contain the correct set of parent pointers.
                       also adjusts stack_pos so it is correct.
-                    - #t is still a binary search tree                                     
+                    - #t is still a binary search tree
             !*/
 
             bool remove_current_element_from_tree (
@@ -456,20 +456,20 @@ namespace dlib
                 domain& d,
                 range& r,
                 unsigned long cur_stack_pos = 1
-            ); 
+            );
             /*!
                 requires
                     - t == tree_root
                     - cur_stack_pos == 1
                     - current_element != 0
                 ensures
-                    - removes the data in the node given by current_element and swaps it into 
-                      #d and #r.  
-                    - #t is still a binary search tree                                     
-                    - the enumerator is advances on to the next element but its stack is 
+                    - removes the data in the node given by current_element and swaps it into
+                      #d and #r.
+                    - #t is still a binary search tree
+                    - the enumerator is advances on to the next element but its stack is
                       potentially corrupted.  so you must call fix_stack(tree_root) to fix
                       it.
-                    - returns false if the height of the tree has not changed 
+                    - returns false if the height of the tree has not changed
                     - returns true if the height of the tree has shrunk by one
             !*/
 
@@ -477,20 +477,20 @@ namespace dlib
             // data members
 
             mutable mpair p;
-            unsigned long tree_size;            
+            unsigned long tree_size;
             node* tree_root;
-            mutable node* current_element;            
+            mutable node* current_element;
             typename mem_manager::template rebind<node>::other pool;
             typename mem_manager::template rebind<node*>::other ppool;
             short tree_height;
             mutable bool at_start_;
             mutable unsigned char stack_pos;
             mutable node** stack;
-            compare comp; 
+            compare comp;
 
             // restricted functions
-            binary_search_tree_kernel_1(binary_search_tree_kernel_1&);        
-            binary_search_tree_kernel_1& operator=(binary_search_tree_kernel_1&); 
+            binary_search_tree_kernel_1(binary_search_tree_kernel_1&);
+            binary_search_tree_kernel_1& operator=(binary_search_tree_kernel_1&);
 
 
     };
@@ -500,10 +500,10 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     inline void swap (
-        binary_search_tree_kernel_1<domain,range,mem_manager,compare>& a, 
-        binary_search_tree_kernel_1<domain,range,mem_manager,compare>& b 
+        binary_search_tree_kernel_1<domain,range,mem_manager,compare>& a,
+        binary_search_tree_kernel_1<domain,range,mem_manager,compare>& b
     ) { a.swap(b); }
 
 
@@ -514,9 +514,9 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void deserialize (
-        binary_search_tree_kernel_1<domain,range,mem_manager,compare>& item, 
+        binary_search_tree_kernel_1<domain,range,mem_manager,compare>& item,
         std::istream& in
     )
     {
@@ -535,9 +535,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type binary_search_tree_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type binary_search_tree_kernel_1");
         }
     }
 
@@ -554,7 +554,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     ~binary_search_tree_kernel_1 (
     )
@@ -563,7 +563,7 @@ namespace dlib
         if (tree_size != 0)
         {
             delete_tree(tree_root);
-        }        
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -573,7 +573,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     clear (
     )
@@ -596,7 +596,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     unsigned long binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     size (
     ) const
@@ -611,7 +611,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     short binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     height (
     ) const
@@ -626,13 +626,13 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     unsigned long binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     count (
         const domain& item
     ) const
     {
-        return get_count(item,tree_root);        
+        return get_count(item,tree_root);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -642,12 +642,12 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     add (
         domain& d,
         range& r
-    ) 
+    )
     {
         tree_height += add_to_tree(tree_root,d,r);
         ++tree_size;
@@ -662,13 +662,13 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     remove (
         const domain& d,
         domain& d_copy,
         range& r
-    ) 
+    )
     {
         tree_height -= remove_from_tree(tree_root,d,d_copy,r);
         --tree_size;
@@ -683,11 +683,11 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     destroy (
         const domain& item
-    ) 
+    )
     {
         tree_height -= remove_from_tree(tree_root,item);
         --tree_size;
@@ -702,12 +702,12 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     remove_any (
         domain& d,
         range& r
-    ) 
+    )
     {
         tree_height -= remove_least_element_in_tree(tree_root,d,r);
         --tree_size;
@@ -722,11 +722,11 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     range* binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     operator[] (
         const domain& item
-    ) 
+    )
     {
         return return_reference(tree_root,item);
     }
@@ -738,7 +738,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     const range* binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     operator[] (
         const domain& item
@@ -754,11 +754,11 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     swap (
         binary_search_tree_kernel_1<domain,range,mem_manager,compare>& item
-    ) 
+    )
     {
         pool.swap(item.pool);
         ppool.swap(item.ppool);
@@ -899,7 +899,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     at_start (
     ) const
@@ -914,7 +914,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     reset (
     ) const
@@ -931,7 +931,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     current_element_valid (
     ) const
@@ -946,7 +946,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     const map_pair<domain,range>& binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     element (
     ) const
@@ -963,7 +963,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     map_pair<domain,range>& binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     element (
     )
@@ -980,7 +980,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     move_next (
     ) const
@@ -994,7 +994,7 @@ namespace dlib
                 return false;
             }
             else
-            {                    
+            {
                 // find the first element in the tree
                 current_element = tree_root;
                 node* temp = current_element->left;
@@ -1021,7 +1021,7 @@ namespace dlib
                 // find the next element in the tree
                 if (current_element->right != 0)
                 {
-                    // go right and down    
+                    // go right and down
                     temp = current_element;
                     push(current_element);
                     current_element = temp->right;
@@ -1066,7 +1066,7 @@ namespace dlib
                             }
                             // we should go up
                             node* parent = pop();
-                            from_left = (parent->left == current_element);                            
+                            from_left = (parent->left == current_element);
                             current_element = parent;
                         }
                     }
@@ -1089,7 +1089,7 @@ namespace dlib
                     }
                 }
 
-                return true;               
+                return true;
             }
         }
 
@@ -1106,11 +1106,11 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     delete_tree (
         node* t
-    ) 
+    )
     {
         if (t->left != 0)
             delete_tree(t->left);
@@ -1126,11 +1126,11 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     rotate_left (
         node*& t
-    ) 
+    )
     {
 
         // set the new balance numbers
@@ -1142,7 +1142,7 @@ namespace dlib
         else
         {
             t->balance = 1;
-            t->right->balance = -1;            
+            t->right->balance = -1;
         }
 
         // perform the rotation
@@ -1159,11 +1159,11 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     rotate_right (
         node*& t
-    ) 
+    )
     {
         // set the new balance numbers
         if (t->left->balance == -1)
@@ -1174,14 +1174,14 @@ namespace dlib
         else
         {
             t->balance = -1;
-            t->left->balance = 1;            
+            t->left->balance = 1;
         }
 
         // preform the rotation
         node* temp = t->left;
         t->left = temp->right;
         temp->right = t;
-        t = temp;    
+        t = temp;
 
     }
 
@@ -1192,7 +1192,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     double_rotate_right (
         node*& t
@@ -1209,7 +1209,7 @@ namespace dlib
         t->right = temp;
 
         if (t->balance < 0)
-        {  
+        {
             t->left->balance = 0;
             t->right->balance = 1;
         }
@@ -1218,7 +1218,7 @@ namespace dlib
             t->left->balance = -1;
             t->right->balance = 0;
         }
-        else 
+        else
         {
             t->left->balance = 0;
             t->right->balance = 0;
@@ -1233,7 +1233,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     void binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     double_rotate_left (
         node*& t
@@ -1249,7 +1249,7 @@ namespace dlib
         t->left = temp;
 
         if (t->balance < 0)
-        {  
+        {
             t->left->balance = 0;
             t->right->balance = 1;
         }
@@ -1258,7 +1258,7 @@ namespace dlib
             t->left->balance = -1;
             t->right->balance = 0;
         }
-        else 
+        else
         {
             t->left->balance = 0;
             t->right->balance = 0;
@@ -1274,15 +1274,15 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     remove_biggest_element_in_tree (
         node*& t,
         domain& d,
         range& r
-    ) 
+    )
     {
-        // make a reference to the current node so we don't have to dereference a 
+        // make a reference to the current node so we don't have to dereference a
         // pointer a bunch of times
         node& tree = *t;
 
@@ -1297,7 +1297,7 @@ namespace dlib
             t = tree.left;
 
             // delete the node that was just removed
-            pool.deallocate(&tree);    
+            pool.deallocate(&tree);
 
             // return that the height of this part of the tree has decreased
             return true;
@@ -1308,7 +1308,7 @@ namespace dlib
             // keep going right
 
             // if remove made the tree one height shorter
-            if ( remove_biggest_element_in_tree(tree.right,d,r) ) 
+            if ( remove_biggest_element_in_tree(tree.right,d,r) )
             {
                 // if this caused the current tree to strink then report that
                 if ( tree.balance == 1)
@@ -1320,10 +1320,10 @@ namespace dlib
                 {
                     --tree.balance;
                     return keep_node_balanced(t);
-                }                
+                }
             }
 
-            return false;            
+            return false;
         }
     }
 
@@ -1334,15 +1334,15 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     remove_least_element_in_tree (
         node*& t,
         domain& d,
         range& r
-    ) 
+    )
     {
-        // make a reference to the current node so we don't have to dereference a 
+        // make a reference to the current node so we don't have to dereference a
         // pointer a bunch of times
         node& tree = *t;
 
@@ -1357,7 +1357,7 @@ namespace dlib
             t = tree.right;
 
             // delete the node that was just removed
-            pool.deallocate(&tree);    
+            pool.deallocate(&tree);
 
             // return that the height of this part of the tree has decreased
             return true;
@@ -1368,7 +1368,7 @@ namespace dlib
             // keep going left
 
             // if remove made the tree one height shorter
-            if ( remove_least_element_in_tree(tree.left,d,r) ) 
+            if ( remove_least_element_in_tree(tree.left,d,r) )
             {
                 // if this caused the current tree to strink then report that
                 if ( tree.balance == -1)
@@ -1380,10 +1380,10 @@ namespace dlib
                 {
                     ++tree.balance;
                     return keep_node_balanced(t);
-                }                
+                }
             }
 
-            return false;            
+            return false;
         }
     }
 
@@ -1394,27 +1394,27 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     add_to_tree (
         node*& t,
         domain& d,
         range& r
-    ) 
+    )
     {
 
         // if found place to add
         if (t == 0)
         {
             // create a node to add new item into
-            t = pool.allocate(); 
+            t = pool.allocate();
 
-            // make a reference to the current node so we don't have to dereference a 
+            // make a reference to the current node so we don't have to dereference a
             // pointer a bunch of times
             node& tree = *t;
 
 
-            // set left and right pointers to NULL to indicate that there are no 
+            // set left and right pointers to NULL to indicate that there are no
             // left or right subtrees
             tree.left = 0;
             tree.right = 0;
@@ -1429,7 +1429,7 @@ namespace dlib
         }
         else  // keep looking for a place to add the new item
         {
-            // make a reference to the current node so we don't have to dereference 
+            // make a reference to the current node so we don't have to dereference
             // a pointer a bunch of times
             node& tree = *t;
             signed char old_balance = tree.balance;
@@ -1472,7 +1472,7 @@ namespace dlib
                 }
             }
         }
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1481,12 +1481,12 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     fix_stack (
         node* t,
-        unsigned char depth 
-    ) 
+        unsigned char depth
+    )
     {
         // if we found the node we were looking for
         if (t == current_element)
@@ -1506,7 +1506,7 @@ namespace dlib
             {
                 stack[depth] = t;
                 return true;
-            }            
+            }
         }
         if (!(comp(current_element->d , t->d)))
         {
@@ -1515,7 +1515,7 @@ namespace dlib
             {
                 stack[depth] = t;
                 return true;
-            }            
+            }
         }
         return false;
     }
@@ -1527,16 +1527,16 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     remove_current_element_from_tree (
         node*& t,
         domain& d,
         range& r,
-        unsigned long cur_stack_pos 
-    ) 
+        unsigned long cur_stack_pos
+    )
     {
-        // make a reference to the current node so we don't have to dereference 
+        // make a reference to the current node so we don't have to dereference
         // a pointer a bunch of times
         node& tree = *t;
 
@@ -1551,7 +1551,7 @@ namespace dlib
             // if there is no left node
             if (tree.left == 0)
             {
-                // move the enumerator on to the next element before we mess with the 
+                // move the enumerator on to the next element before we mess with the
                 // tree
                 move_next();
 
@@ -1559,7 +1559,7 @@ namespace dlib
                 t = tree.right;  // plug hole with right subtree
                 
                 // delete old node
-                pool.deallocate(&tree);  
+                pool.deallocate(&tree);
 
                 // indicate that the height has changed
                 return true;
@@ -1567,7 +1567,7 @@ namespace dlib
             // if there is no right node
             else if (tree.right == 0)
             {
-                // move the enumerator on to the next element before we mess with the 
+                // move the enumerator on to the next element before we mess with the
                 // tree
                 move_next();
 
@@ -1575,7 +1575,7 @@ namespace dlib
                 t = tree.left;  // plug hole with left subtree
 
                 // delete old node
-                pool.deallocate(&tree);  
+                pool.deallocate(&tree);
 
                 // indicate that the height of this tree has changed
                 return true;
@@ -1588,7 +1588,7 @@ namespace dlib
                 // into this t node.
                 current_element = t;
 
-                // get an element that can replace the one being removed and do this 
+                // get an element that can replace the one being removed and do this
                 // if it made the right subtree shrink by one
                 if (remove_least_element_in_tree(tree.right,tree.d,tree.r))
                 {
@@ -1614,7 +1614,7 @@ namespace dlib
             }
 
         }
-        else if (  (cur_stack_pos < stack_pos && stack[cur_stack_pos] == tree.left) || 
+        else if (  (cur_stack_pos < stack_pos && stack[cur_stack_pos] == tree.left) ||
                     tree.left == current_element )
         {
             // go left
@@ -1633,7 +1633,7 @@ namespace dlib
                 return keep_node_balanced(t);
             }
         }
-        else if (  (cur_stack_pos < stack_pos && stack[cur_stack_pos] == tree.right) || 
+        else if (  (cur_stack_pos < stack_pos && stack[cur_stack_pos] == tree.right) ||
                     tree.right == current_element )
         {
             // go right
@@ -1664,16 +1664,16 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     remove_from_tree (
         node*& t,
         const domain& d,
         domain& d_copy,
         range& r
-    ) 
+    )
     {
-        // make a reference to the current node so we don't have to dereference 
+        // make a reference to the current node so we don't have to dereference
         // a pointer a bunch of times
         node& tree = *t;
 
@@ -1718,7 +1718,7 @@ namespace dlib
             }
         }
         // if item is found
-        else 
+        else
         {
 
             // swap nodes domain and range elements into d_copy and r
@@ -1733,7 +1733,7 @@ namespace dlib
                 t = tree.right;  // plug hole with right subtree
                 
                 // delete old node
-                pool.deallocate(&tree);  
+                pool.deallocate(&tree);
 
                 // indicate that the height has changed
                 return true;
@@ -1746,7 +1746,7 @@ namespace dlib
                 t = tree.left;  // plug hole with left subtree
 
                 // delete old node
-                pool.deallocate(&tree);  
+                pool.deallocate(&tree);
 
                 // indicate that the height of this tree has changed
                 return true;
@@ -1755,7 +1755,7 @@ namespace dlib
             else
             {
 
-                // get an element that can replace the one being removed and do this 
+                // get an element that can replace the one being removed and do this
                 // if it made the right subtree shrink by one
                 if (remove_least_element_in_tree(tree.right,tree.d,tree.r))
                 {
@@ -1789,14 +1789,14 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     remove_from_tree (
         node*& t,
         const domain& d
-    ) 
+    )
     {
-        // make a reference to the current node so we don't have to dereference 
+        // make a reference to the current node so we don't have to dereference
         // a pointer a bunch of times
         node& tree = *t;
 
@@ -1841,7 +1841,7 @@ namespace dlib
             }
         }
         // if item is found
-        else 
+        else
         {
 
             // if there is no left node
@@ -1852,7 +1852,7 @@ namespace dlib
                 t = tree.right;  // plug hole with right subtree
                 
                 // delete old node
-                pool.deallocate(&tree);  
+                pool.deallocate(&tree);
 
                 // indicate that the height has changed
                 return true;
@@ -1865,7 +1865,7 @@ namespace dlib
                 t = tree.left;  // plug hole with left subtree
 
                 // delete old node
-                pool.deallocate(&tree);  
+                pool.deallocate(&tree);
 
                 // indicate that the height of this tree has changed
                 return true;
@@ -1874,7 +1874,7 @@ namespace dlib
             else
             {
 
-                // get an element that can replace the one being removed and do this 
+                // get an element that can replace the one being removed and do this
                 // if it made the right subtree shrink by one
                 if (remove_least_element_in_tree(tree.right,tree.d,tree.r))
                 {
@@ -1908,12 +1908,12 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     range* binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     return_reference (
         node* t,
         const domain& d
-    ) 
+    )
     {
         while (t != 0)
         {
@@ -1944,7 +1944,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     const range* binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     return_reference (
         const node* t,
@@ -1980,13 +1980,13 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     bool binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     keep_node_balanced (
         node*& t
     )
     {
-        // make a reference to the current node so we don't have to dereference 
+        // make a reference to the current node so we don't have to dereference
         // a pointer a bunch of times
         node& tree = *t;
  
@@ -2016,7 +2016,7 @@ namespace dlib
         if (t->balance == 0)
             return true;
         else
-            return false; 
+            return false;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2026,7 +2026,7 @@ namespace dlib
         typename range,
         typename mem_manager,
         typename compare
-        >   
+        >
     unsigned long binary_search_tree_kernel_1<domain,range,mem_manager,compare>::
     get_count (
         const domain& d,
@@ -2038,7 +2038,7 @@ namespace dlib
             if (comp(d , tree_root->d))
             {
                 // go left
-                return get_count(d,tree_root->left);                
+                return get_count(d,tree_root->left);
             }
             else if (comp(tree_root->d , d))
             {
@@ -2048,8 +2048,8 @@ namespace dlib
             else
             {
                 // go left and right to look for more matches
-                return   get_count(d,tree_root->left) 
-                       + get_count(d,tree_root->right) 
+                return   get_count(d,tree_root->left)
+                       + get_count(d,tree_root->right)
                        + 1;
             }
         }

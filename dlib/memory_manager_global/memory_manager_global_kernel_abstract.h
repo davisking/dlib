@@ -14,9 +14,9 @@ namespace dlib
         >
     class memory_manager_global
     {
-        /*!      
+        /*!
             REQUIREMENTS ON T
-                T must have a default constructor.      
+                T must have a default constructor.
 
             REQUIREMENTS ON factory
                 factory must be defined as follows:
@@ -33,27 +33,27 @@ namespace dlib
                     / *!
                         ensures
                             - returns a pointer to an instance of a memory_manager object
-                              where memory_manager_type implements the interface defined 
+                              where memory_manager_type implements the interface defined
                               by dlib/memory_manager/memory_manager_kernel_abstract.h
                     !* /
                 };
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents some kind of global memory manager or memory pool.  
-                It is identical to the memory_manager object except that it gets all of 
-                its allocations from a global instance of a memory_manager object which 
+                This object represents some kind of global memory manager or memory pool.
+                It is identical to the memory_manager object except that it gets all of
+                its allocations from a global instance of a memory_manager object which
                 is provided by the factory object's static member get_instance().
 
             THREAD SAFETY
                 This object is, by itself, threadsafe.  However, if you want to use this
                 object in multiple threads then you must ensure that your factory is
-                threadsafe.  This means its factory::get_instance() method should be 
+                threadsafe.  This means its factory::get_instance() method should be
                 threadsafe and the memory_manager object it returns must also be threadsafe.
         !*/
         
         public:
 
-            typedef typename factory::template return_type<T>::type mm_global_type; 
+            typedef typename factory::template return_type<T>::type mm_global_type;
 
             typedef T type;
 
@@ -65,16 +65,16 @@ namespace dlib
             memory_manager_global(
             );
             /*!
-                ensures 
+                ensures
                     - #*this is properly initialized
-                    - #get_global_memory_manager() == the memory manager that was 
+                    - #get_global_memory_manager() == the memory manager that was
                       returned by a call to factory::get_instance<T>()
                 throws
                     - std::bad_alloc
             !*/
 
             virtual ~memory_manager_global(
-            ); 
+            );
             /*!
                 ensures
                     - This destructor has no effect on the global memory_manager
@@ -104,7 +104,7 @@ namespace dlib
                     - returns get_global_memory_manager().allocate()
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
-                        If this exception is thrown then the call to allocate() 
+                        If this exception is thrown then the call to allocate()
                         has no effect on #*this.
             !*/
 
@@ -130,7 +130,7 @@ namespace dlib
                     - returns get_global_memory_manager().allocate_array()
                 throws
                     - std::bad_alloc or any exception thrown by T's constructor.
-                        If this exception is thrown then the call to allocate_array() 
+                        If this exception is thrown then the call to allocate_array()
                         has no effect on #*this.
             !*/
 
@@ -153,7 +153,7 @@ namespace dlib
             /*!
                 ensures
                     - swaps *this and item
-            !*/ 
+            !*/
 
         private:
 
@@ -167,9 +167,9 @@ namespace dlib
         typename factory
         >
     inline void swap (
-        memory_manager_global<T,factory>& a, 
-        memory_manager_global<T,factory>& b 
-    ) { a.swap(b); }   
+        memory_manager_global<T,factory>& a,
+        memory_manager_global<T,factory>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

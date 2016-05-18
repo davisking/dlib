@@ -13,7 +13,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_binary_hinge_ 
+    class loss_binary_hinge_
     {
     public:
 
@@ -31,8 +31,8 @@ namespace dlib
         ) const
         {
             const tensor& output_tensor = sub.get_output();
-            DLIB_CASSERT(output_tensor.nr() == 1 && 
-                         output_tensor.nc() == 1 && 
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1 &&
                          output_tensor.k() == 1,"");
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
 
@@ -49,7 +49,7 @@ namespace dlib
             >
         double compute_loss_value_and_gradient (
             const tensor& input_tensor,
-            const_label_iterator truth, 
+            const_label_iterator truth,
             SUBNET& sub
         ) const
         {
@@ -60,8 +60,8 @@ namespace dlib
             DLIB_CASSERT(input_tensor.num_samples()%sample_expansion_factor == 0,"");
             DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples(),"");
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
-            DLIB_CASSERT(output_tensor.nr() == 1 && 
-                         output_tensor.nc() == 1 && 
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1 &&
                          output_tensor.k() == 1,"");
 
             // The loss we output is the average loss over the mini-batch.
@@ -113,7 +113,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_binary_log_ 
+    class loss_binary_log_
     {
     public:
 
@@ -131,8 +131,8 @@ namespace dlib
         ) const
         {
             const tensor& output_tensor = sub.get_output();
-            DLIB_CASSERT(output_tensor.nr() == 1 && 
-                         output_tensor.nc() == 1 && 
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1 &&
                          output_tensor.k() == 1,"");
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
 
@@ -150,7 +150,7 @@ namespace dlib
             >
         double compute_loss_value_and_gradient (
             const tensor& input_tensor,
-            const_label_iterator truth, 
+            const_label_iterator truth,
             SUBNET& sub
         ) const
         {
@@ -161,11 +161,11 @@ namespace dlib
             DLIB_CASSERT(input_tensor.num_samples()%sample_expansion_factor == 0,"");
             DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples(),"");
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
-            DLIB_CASSERT(output_tensor.nr() == 1 && 
-                         output_tensor.nc() == 1 && 
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1 &&
                          output_tensor.k() == 1,"");
-            DLIB_CASSERT(grad.nr() == 1 && 
-                         grad.nc() == 1 && 
+            DLIB_CASSERT(grad.nr() == 1 &&
+                         grad.nc() == 1 &&
                          grad.k() == 1,"");
 
             tt::sigmoid(grad, output_tensor);
@@ -222,7 +222,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_multiclass_log_ 
+    class loss_multiclass_log_
     {
     public:
 
@@ -240,7 +240,7 @@ namespace dlib
         ) const
         {
             const tensor& output_tensor = sub.get_output();
-            DLIB_CASSERT(output_tensor.nr() == 1 && 
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
                          output_tensor.nc() == 1 ,"");
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
 
@@ -261,7 +261,7 @@ namespace dlib
             >
         double compute_loss_value_and_gradient (
             const tensor& input_tensor,
-            const_label_iterator truth, 
+            const_label_iterator truth,
             SUBNET& sub
         ) const
         {
@@ -272,9 +272,9 @@ namespace dlib
             DLIB_CASSERT(input_tensor.num_samples()%sample_expansion_factor == 0,"");
             DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples(),"");
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
-            DLIB_CASSERT(output_tensor.nr() == 1 && 
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
                          output_tensor.nc() == 1,"");
-            DLIB_CASSERT(grad.nr() == 1 && 
+            DLIB_CASSERT(grad.nr() == 1 &&
                          grad.nc() == 1,"");
 
             tt::softmax(grad, output_tensor);

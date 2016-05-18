@@ -18,18 +18,18 @@ namespace dlib
         typename feature_extractor
         >
     class structural_svm_assignment_problem : noncopyable,
-                                              public structural_svm_problem_threaded<matrix<double,0,1>, 
+                                              public structural_svm_problem_threaded<matrix<double,0,1>,
                                                      typename feature_extractor::feature_vector_type >
     {
         /*!
             REQUIREMENTS ON feature_extractor
-                It must be an object that implements an interface compatible with 
+                It must be an object that implements an interface compatible with
                 the example_feature_extractor defined in dlib/svm/assignment_function_abstract.h.
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for learning the parameters needed to use an
                 assignment_function object.  It learns the parameters by formulating the
-                problem as a structural SVM problem.  
+                problem as a structural SVM problem.
         !*/
 
     public:
@@ -57,15 +57,15 @@ namespace dlib
                 - if (force_assignment) then
                     - is_forced_assignment_problem(samples,labels) == true
             ensures
-                - This object attempts to learn a mapping from the given samples to the 
-                  given labels.  In particular, it attempts to learn to predict labels[i] 
-                  based on samples[i].  Or in other words, this object can be used to learn 
+                - This object attempts to learn a mapping from the given samples to the
+                  given labels.  In particular, it attempts to learn to predict labels[i]
+                  based on samples[i].  Or in other words, this object can be used to learn
                   a parameter vector and bias, w and b, such that an assignment_function declared as:
                     assignment_function<feature_extractor> assigner(w,b,fe,force_assignment)
                   results in an assigner object which attempts to compute the following mapping:
                     labels[i] == labeler(samples[i])
-                - This object will use num_threads threads during the optimization 
-                  procedure.  You should set this parameter equal to the number of 
+                - This object will use num_threads threads during the optimization
+                  procedure.  You should set this parameter equal to the number of
                   available processing cores on your machine.
                 - When solving the structural SVM problem, we will use
                   loss_per_false_association as the loss for incorrectly associating

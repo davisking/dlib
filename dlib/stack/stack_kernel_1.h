@@ -22,7 +22,7 @@ namespace dlib
 
         /*!
             INITIAL VALUE
-                stack_size == 0 
+                stack_size == 0
                 top == 0
                 current_element == 0
                 _at_start == true
@@ -34,7 +34,7 @@ namespace dlib
                 if (current_element != 0) then
                     element() == current_element->item
 
-                stack_size == the number of elements in the stack. 
+                stack_size == the number of elements in the stack.
                 Each node points to the next node to be poped off the stack.
                 The last node in the list has its next pointer is set to 0.
                 
@@ -94,7 +94,7 @@ namespace dlib
             // functions from the remover interface
             inline void remove_any (
                 T& item
-            ); 
+            );
 
             // functions from the enumerable interface
             inline unsigned long size (
@@ -127,7 +127,7 @@ namespace dlib
                 requires
                     - top points to the top of the stack
                 ensures
-                    - all memory has been freed 
+                    - all memory has been freed
                     - #top = 0
             !*/
 
@@ -152,16 +152,16 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        stack_kernel_1<T,mem_manager>& a, 
-        stack_kernel_1<T,mem_manager>& b 
-    ) { a.swap(b); } 
+        stack_kernel_1<T,mem_manager>& a,
+        stack_kernel_1<T,mem_manager>& b
+    ) { a.swap(b); }
 
     template <
         typename T,
         typename mem_manager
         >
     void deserialize (
-        stack_kernel_1<T,mem_manager>& item, 
+        stack_kernel_1<T,mem_manager>& item,
         std::istream& in
     )
     {
@@ -184,9 +184,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type stack_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type stack_kernel_1");
         }
     }
 
@@ -202,7 +202,7 @@ namespace dlib
         >
     stack_kernel_1<T,mem_manager>::
     ~stack_kernel_1(
-    ) 
+    )
     {
         delete_elements_in_stack(top);
     }
@@ -491,7 +491,7 @@ namespace dlib
     void stack_kernel_1<T,mem_manager>::
     remove_any (
         T& item
-    ) 
+    )
     {
         pop(item);
     }

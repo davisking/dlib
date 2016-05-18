@@ -39,7 +39,7 @@ namespace dlib
         typedef one_vs_all_decision_function<one_vs_all_trainer> trained_function_type;
 
         one_vs_all_trainer (
-        ) : 
+        ) :
             verbose(false),
             num_threads(4)
         {}
@@ -85,8 +85,8 @@ namespace dlib
             return num_threads;
         }
 
-        struct invalid_label : public dlib::error 
-        { 
+        struct invalid_label : public dlib::error
+        {
             invalid_label(const std::string& msg, const label_type& l_
                 ) : dlib::error(msg), l(l_) {};
 
@@ -105,8 +105,8 @@ namespace dlib
             DLIB_ASSERT(is_learning_problem(all_samples,all_labels),
                 "\t trained_function_type one_vs_all_trainer::train(all_samples,all_labels)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t all_samples.size():     " << all_samples.size() 
-                << "\n\t all_labels.size():      " << all_labels.size() 
+                << "\n\t all_samples.size():     " << all_samples.size()
+                << "\n\t all_labels.size():      " << all_labels.size()
                 );
 
             const std::vector<label_type> distinct_labels = select_all_distinct_labels(all_labels);
@@ -148,17 +148,17 @@ namespace dlib
                 const any_trainer& default_trainer_,
                 const binary_function_table& trainers_,
                 const bool verbose_,
-                const std::vector<label_type>& distinct_labels_ 
-            ) : 
+                const std::vector<label_type>& distinct_labels_
+            ) :
                 all_samples(all_samples_),
                 all_labels(all_labels_),
                 default_trainer(default_trainer_),
-                trainers(trainers_), 
+                trainers(trainers_),
                 verbose(verbose_),
                 distinct_labels(distinct_labels_)
             {}
 
-            void operator()(long i) const 
+            void operator()(long i) const
             {
                 try
                 {
@@ -171,7 +171,7 @@ namespace dlib
                     {
                         if (all_labels[k] == l)
                             labels.push_back(+1);
-                        else 
+                        else
                             labels.push_back(-1);
                     }
 
@@ -184,11 +184,11 @@ namespace dlib
 
                     any_trainer trainer;
                     // now train a binary classifier using the samples we selected
-                    { auto_mutex lock(class_mutex); 
+                    { auto_mutex lock(class_mutex);
                     const typename binary_function_table::const_iterator itr = trainers.find(l);
                     if (itr != trainers.end())
                         trainer = itr->second;
-                    else 
+                    else
                         trainer = default_trainer;
                     }
 

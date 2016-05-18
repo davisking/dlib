@@ -11,16 +11,16 @@ namespace dlib
 {
     template <
         typename T,
-        typename mem_manager 
+        typename mem_manager
         >
     class memory_manager_stateless_kernel_2
     {
-        /*!      
+        /*!
             REQUIREMENTS ON mem_manager
                 mem_manager must be an implementation of memory_manager/memory_manager_kernel_abstract.h
 
             CONVENTION
-                this object has a single global instance of mem_manager 
+                this object has a single global instance of mem_manager
         !*/
 
         public:
@@ -35,8 +35,8 @@ namespace dlib
 
             memory_manager_stateless_kernel_2(
             )
-            { 
-                // call this just to make sure the mutex is is initialized before 
+            {
+                // call this just to make sure the mutex is is initialized before
                 // multiple threads start calling the member functions.
                 global_mutex();
             }
@@ -61,16 +61,16 @@ namespace dlib
 
             T* allocate_array (
                 unsigned long size
-            ) 
-            { 
+            )
+            {
                 auto_mutex M(global_mutex());
                 return global_mm().allocate_array(size);
             }
 
             void deallocate_array (
                 T* item
-            ) 
-            { 
+            )
+            {
                 auto_mutex M(global_mutex());
                 return global_mm().deallocate_array(item);
             }
@@ -87,10 +87,10 @@ namespace dlib
                 return lock;
             }
 
-            typedef typename mem_manager::template rebind<T>::other rebound_mm_type; 
+            typedef typename mem_manager::template rebind<T>::other rebound_mm_type;
 
             static rebound_mm_type& global_mm (
-            ) 
+            )
             {
                 static rebound_mm_type mm;
                 return mm;
@@ -106,9 +106,9 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        memory_manager_stateless_kernel_2<T,mem_manager>& a, 
-        memory_manager_stateless_kernel_2<T,mem_manager>& b 
-    ) { a.swap(b); }   
+        memory_manager_stateless_kernel_2<T,mem_manager>& a,
+        memory_manager_stateless_kernel_2<T,mem_manager>& b
+    ) { a.swap(b); }
 
 }
 

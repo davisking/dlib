@@ -17,7 +17,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type> 
+    const matrix<typename trainer_type::scalar_type, 1, 2, typename trainer_type::mem_manager_type>
     cross_validate_trainer_threaded (
         const trainer_type& trainer,
         const in_sample_vector_type& x,
@@ -38,13 +38,13 @@ namespace dlib
         ensures
             - performs k-fold cross validation by using the given trainer to solve the
               given binary classification problem for the given number of folds.
-              Each fold is tested using the output of the trainer and the average 
-              classification accuracy from all folds is returned.  
-            - uses num_threads threads of execution in doing the cross validation.  
-            - The accuracy is returned in a row vector, let us call it R.  Both 
-              quantities in R are numbers between 0 and 1 which represent the fraction 
-              of examples correctly classified.  R(0) is the fraction of +1 examples 
-              correctly classified and R(1) is the fraction of -1 examples correctly 
+              Each fold is tested using the output of the trainer and the average
+              classification accuracy from all folds is returned.
+            - uses num_threads threads of execution in doing the cross validation.
+            - The accuracy is returned in a row vector, let us call it R.  Both
+              quantities in R are numbers between 0 and 1 which represent the fraction
+              of examples correctly classified.  R(0) is the fraction of +1 examples
+              correctly classified and R(1) is the fraction of -1 examples correctly
               classified.
             - The number of folds used is given by the folds argument.
         throws

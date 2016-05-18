@@ -1,6 +1,6 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_BYTE_ORDEREr_ABSTRACT_ 
+#undef DLIB_BYTE_ORDEREr_ABSTRACT_
 #ifdef DLIB_BYTE_ORDEREr_ABSTRACT_
 
 #include "../algs.h"
@@ -8,7 +8,7 @@
 namespace dlib
 {
 
-    class byte_orderer 
+    class byte_orderer
     {
         /*!
             INITIAL VALUE
@@ -16,28 +16,28 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object simply provides a mechanism to convert data from a
-                host machine's own byte ordering to big or little endian and to 
+                host machine's own byte ordering to big or little endian and to
                 also do the reverse.
 
                 It also provides a pair of functions to convert to/from network byte
                 order where network byte order is big endian byte order.  This pair of
                 functions does the exact same thing as the host_to_big() and big_to_host()
-                functions and is provided simply so that client code can use the most 
+                functions and is provided simply so that client code can use the most
                 self documenting name appropriate.
 
-                Also note that this object is capable of correctly flipping the contents 
-                of arrays when the arrays are declared on the stack.  e.g.  You can  
+                Also note that this object is capable of correctly flipping the contents
+                of arrays when the arrays are declared on the stack.  e.g.  You can
                 say things like:
-                int array[10]; 
+                int array[10];
                 bo.host_to_network(array);
         !*/
 
     public:
 
-        byte_orderer (        
+        byte_orderer (
         );
         /*!
-            ensures                
+            ensures
                 - #*this is properly initialized
             throws
                 - std::bad_alloc
@@ -78,7 +78,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - #item == the value of item converted from host byte order 
+                - #item == the value of item converted from host byte order
                   to network byte order.
         !*/
 
@@ -102,7 +102,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - #item == the value of item converted from host byte order 
+                - #item == the value of item converted from host byte order
                   to big endian byte order.
         !*/
 
@@ -126,7 +126,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - #item == the value of item converted from host byte order 
+                - #item == the value of item converted from host byte order
                   to little endian byte order.
         !*/
 
@@ -142,8 +142,8 @@ namespace dlib
                   to host byte order.
         !*/
 
-    };    
+    };
 }
 
-#endif // DLIB_BYTE_ORDEREr_ABSTRACT_ 
+#endif // DLIB_BYTE_ORDEREr_ABSTRACT_
 

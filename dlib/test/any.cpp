@@ -13,7 +13,7 @@
 #include "tester.h"
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -85,10 +85,10 @@ namespace
         test_contains_4(a);
 
         c.get<string>() = "test string";
-        DLIB_TEST(c.get<string>() == "test string"); 
+        DLIB_TEST(c.get<string>() == "test string");
 
         a = c;
-        DLIB_TEST(a.cast_to<string>() == "test string"); 
+        DLIB_TEST(a.cast_to<string>() == "test string");
 
 
         a.clear();

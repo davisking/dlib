@@ -30,8 +30,8 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     sequence_kernel_1<T,mem_manager>    
+        // kernel_1a
+        typedef     sequence_kernel_1<T,mem_manager>
                     kernel_1a;
         typedef     sequence_kernel_c<kernel_1a>
                     kernel_1a_c;

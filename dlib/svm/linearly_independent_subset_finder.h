@@ -45,8 +45,8 @@ namespace dlib
 
                 - if (dictionary.size() == my_max_dictionary_size) then
                     - for all valid 0 < i < dictionary.size():
-                        - Let STRENGTHS[i] == the delta you would get for dictionary[i] (i.e. Approximately 
-                          Linearly Dependent value) if you removed dictionary[i] from this object and then 
+                        - Let STRENGTHS[i] == the delta you would get for dictionary[i] (i.e. Approximately
+                          Linearly Dependent value) if you removed dictionary[i] from this object and then
                           tried to add it back in.
                         - min_strength == the minimum value from STRENGTHS
                         - min_vect_idx == the index of the element in STRENGTHS with the smallest value
@@ -59,7 +59,7 @@ namespace dlib
         typedef typename kernel_type::mem_manager_type mem_manager_type;
 
         linearly_independent_subset_finder (
-        ) : 
+        ) :
             my_max_dictionary_size(100),
             min_tolerance(0.001)
         {
@@ -67,11 +67,11 @@ namespace dlib
         }
 
         linearly_independent_subset_finder (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             unsigned long max_dictionary_size_,
             scalar_type min_tolerance_ = 0.001
-        ) : 
-            kernel(kernel_), 
+        ) :
+            kernel(kernel_),
             my_max_dictionary_size(max_dictionary_size_),
             min_tolerance(min_tolerance_)
         {
@@ -187,12 +187,12 @@ namespace dlib
                 scalar_type delta = kx - trans(k)*a;
 
                 // if this new vector is approximately linearly independent of the vectors
-                // in our dictionary.  
+                // in our dictionary.
                 if (delta > min_strength && delta > min_tolerance)
                 {
                     if (dictionary.size() == my_max_dictionary_size)
                     {
-                        // if we have never computed the min_strength then we should compute it 
+                        // if we have never computed the min_strength then we should compute it
                         if (min_strength == 0)
                             recompute_min_strength();
 
@@ -301,7 +301,7 @@ namespace dlib
 
         const matrix<sample_type,0,1,mem_manager_type> get_dictionary (
         ) const
-        { 
+        {
             return mat(dictionary);
         }
 
@@ -394,7 +394,7 @@ namespace dlib
         unsigned long my_max_dictionary_size;
         scalar_type min_tolerance;
 
-        // temp variables here just so we don't have to reconstruct them over and over.  Thus, 
+        // temp variables here just so we don't have to reconstruct them over and over.  Thus,
         // they aren't really part of the state of this object.
         mutable matrix<scalar_type,0,1,mem_manager_type> a, a2;
         mutable matrix<scalar_type,0,1,mem_manager_type> k, k2;
@@ -414,7 +414,7 @@ namespace dlib
         typename T
         >
     const matrix_op<op_array_to_mat<linearly_independent_subset_finder<T> > > mat (
-        const linearly_independent_subset_finder<T>& m 
+        const linearly_independent_subset_finder<T>& m
     )
     {
         typedef op_array_to_mat<linearly_independent_subset_finder<T> > op;
@@ -433,14 +433,14 @@ namespace dlib
             linearly_independent_subset_finder<kernel_type>& lisf,
             const vector_type& samples,
             rand_type& rnd,
-            int sampling_size 
+            int sampling_size
         )
-        {   
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(is_vector(samples) && sampling_size > 0,
                 "\t void fill_lisf()"
                 << "\n\t invalid arguments to this function"
-                << "\n\t is_vector(samples): " << is_vector(samples) 
+                << "\n\t is_vector(samples): " << is_vector(samples)
                 << "\n\t sampling_size: " << sampling_size
                 );
 
@@ -456,7 +456,7 @@ namespace dlib
             for (int i = 0; i < sampling_size; ++i)
             {
                 const unsigned long idx = rnd.get_random_32bit_number()%samples.size();
-                const scalar_type temp = lisf.projection_error(samples(idx)); 
+                const scalar_type temp = lisf.projection_error(samples(idx));
                 if (temp > tol)
                     tol = temp;
             }
@@ -473,7 +473,7 @@ namespace dlib
                 // Keep picking random samples and adding them into the lisf.  Stop when we either
                 // fill it up or can't find any more samples with projection error larger than the
                 // current tolerance.
-                while (lisf.size() < lisf.max_dictionary_size() && add_failures < sampling_size) 
+                while (lisf.size() < lisf.max_dictionary_size() && add_failures < sampling_size)
                 {
                     if (lisf.add(samples(rnd.get_random_32bit_number()%samples.size())) == false)
                     {
@@ -495,7 +495,7 @@ namespace dlib
         linearly_independent_subset_finder<kernel_type>& lisf,
         const vector_type& samples
     )
-    {   
+    {
         dlib::rand rnd;
         impl::fill_lisf(lisf, mat(samples),rnd, 2000);
     }
@@ -511,7 +511,7 @@ namespace dlib
         rand_type& rnd,
         const int sampling_size = 2000
     )
-    {   
+    {
         impl::fill_lisf(lisf, mat(samples),rnd, sampling_size);
     }
 
@@ -526,7 +526,7 @@ namespace dlib
         rand_type random_seed,
         const int sampling_size = 2000
     )
-    {   
+    {
         dlib::rand rnd;
         rnd.set_seed(cast_to_string(random_seed));
         impl::fill_lisf(lisf, mat(samples), rnd, sampling_size);

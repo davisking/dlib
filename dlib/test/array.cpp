@@ -1,5 +1,5 @@
 // Copyright (C) 2005  Davis E. King (davis@dlib.net)
-// License: Boost Software License   See LICENSE.txt for the full license.  
+// License: Boost Software License   See LICENSE.txt for the full license.
 
 #include <sstream>
 #include <string>
@@ -12,7 +12,7 @@
 
 #include "tester.h"
 
-namespace 
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -29,12 +29,12 @@ namespace
     )
     /*!
         requires
-            - array is an implementation of array/array_sort_abstract.h 
+            - array is an implementation of array/array_sort_abstract.h
               array is instantiated with unsigned long
         ensures
             - runs tests on array for compliance with the specs
     !*/
-    {        
+    {
         dlib::rand rnd;
 
         DLIB_TEST(dlib::is_array<array>::value == true);
@@ -79,7 +79,7 @@ namespace
         DLIB_TEST(a1.move_next() == false);
         DLIB_TEST(a1.current_element_valid() == false);
         DLIB_TEST(a1.size() == 0);
-        DLIB_TEST(a1.at_start() == false);            
+        DLIB_TEST(a1.at_start() == false);
         DLIB_TEST(a1.size() == 0);
 
         swap(a1,a2);
@@ -89,7 +89,7 @@ namespace
         DLIB_TEST(a2.move_next() == false);
         DLIB_TEST(a2.current_element_valid() == false);
         DLIB_TEST(a2.size() == 0);
-        DLIB_TEST(a2.at_start() == false);            
+        DLIB_TEST(a2.at_start() == false);
         DLIB_TEST(a2.size() == 0);
 
 
@@ -104,7 +104,7 @@ namespace
         DLIB_TEST(a1.move_next() == false);
         DLIB_TEST(a1.current_element_valid() == false);
         DLIB_TEST(a1.size() == 0);
-        DLIB_TEST(a1.at_start() == false);            
+        DLIB_TEST(a1.at_start() == false);
         DLIB_TEST(a1.size() == 0);
 
         a1.reset();
@@ -123,7 +123,7 @@ namespace
             DLIB_TEST(a1.move_next() == false);
             DLIB_TEST(a1.current_element_valid() == false);
             DLIB_TEST(a1.size() == 0);
-            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.at_start() == false);
             DLIB_TEST(a1.size() == 0);
 
             swap(a1,a2);
@@ -133,7 +133,7 @@ namespace
             DLIB_TEST(a2.move_next() == false);
             DLIB_TEST(a2.current_element_valid() == false);
             DLIB_TEST(a2.size() == 0);
-            DLIB_TEST(a2.at_start() == false);            
+            DLIB_TEST(a2.at_start() == false);
             DLIB_TEST(a2.size() == 0);
 
 
@@ -148,7 +148,7 @@ namespace
             DLIB_TEST(a1.move_next() == false);
             DLIB_TEST(a1.current_element_valid() == false);
             DLIB_TEST(a1.size() == 0);
-            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.at_start() == false);
             DLIB_TEST(a1.size() == 0);
 
             a1.clear();
@@ -165,7 +165,7 @@ namespace
             DLIB_TEST(a1.move_next() == false);
             DLIB_TEST(a1.current_element_valid() == false);
             DLIB_TEST(a1.size() == 0);
-            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.at_start() == false);
             DLIB_TEST(a1.size() == 0);
 
             swap(a1,a2);
@@ -175,7 +175,7 @@ namespace
             DLIB_TEST(a2.move_next() == false);
             DLIB_TEST(a2.current_element_valid() == false);
             DLIB_TEST(a2.size() == 0);
-            DLIB_TEST(a2.at_start() == false);            
+            DLIB_TEST(a2.at_start() == false);
             DLIB_TEST(a2.size() == 0);
 
 
@@ -190,7 +190,7 @@ namespace
             DLIB_TEST(a1.move_next() == false);
             DLIB_TEST(a1.current_element_valid() == false);
             DLIB_TEST(a1.size() == 0);
-            DLIB_TEST(a1.at_start() == false);            
+            DLIB_TEST(a1.at_start() == false);
             DLIB_TEST(a1.size() == 0);
 
             a1.clear();

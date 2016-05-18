@@ -18,7 +18,7 @@
 #include <dlib/svm_threaded.h>
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -33,7 +33,7 @@ namespace
     )
     {
         dlog << LINFO << "   being test_clutering()";
-        // Here we declare that our samples will be 2 dimensional column vectors.  
+        // Here we declare that our samples will be 2 dimensional column vectors.
         typedef matrix<double,2,1> sample_type;
 
         // Now we are making a typedef for the kind of kernel we want to use.  I picked the
@@ -42,7 +42,7 @@ namespace
         typedef radial_basis_kernel<sample_type> kernel_type;
 
         // Here we declare an instance of the kcentroid object.  The first argument to the constructor
-        // is the kernel we wish to use.  The second is a parameter that determines the numerical 
+        // is the kernel we wish to use.  The second is a parameter that determines the numerical
         // accuracy with which the object will perform part of the learning algorithm.  Generally
         // smaller values give better results but cause the algorithm to run slower.  You just have
         // to play with it to decide what balance of speed and accuracy is right for your problem.
@@ -74,7 +74,7 @@ namespace
             m(0) = 2*radius*rnd.get_random_double()-radius;
             m(1) = sign*sqrt(radius*radius - m(0)*m(0));
 
-            // add this sample to our set of samples we will run k-means 
+            // add this sample to our set of samples we will run k-means
             samples.push_back(m);
         }
 
@@ -88,11 +88,11 @@ namespace
             m(0) = 2*radius*rnd.get_random_double()-radius;
             m(1) = sign*sqrt(radius*radius - m(0)*m(0));
 
-            // add this sample to our set of samples we will run k-means 
+            // add this sample to our set of samples we will run k-means
             samples.push_back(m);
         }
 
-        // make some samples in a circle around the point (25,25) 
+        // make some samples in a circle around the point (25,25)
         radius = 4.0;
         for (long i = 0; i < num; ++i)
         {
@@ -106,22 +106,22 @@ namespace
             m(0) += 25;
             m(1) += 25;
 
-            // add this sample to our set of samples we will run k-means 
+            // add this sample to our set of samples we will run k-means
             samples.push_back(m);
         }
         print_spinner();
 
-        // tell the kkmeans object we made that we want to run k-means with k set to 3. 
+        // tell the kkmeans object we made that we want to run k-means with k set to 3.
         // (i.e. we want 3 clusters)
         test.set_number_of_centers(3);
 
         // You need to pick some initial centers for the k-means algorithm.  So here
         // we will use the dlib::pick_initial_centers() function which tries to find
-        // n points that are far apart (basically).  
+        // n points that are far apart (basically).
         pick_initial_centers(3, initial_centers, samples, test.get_kernel());
 
         print_spinner();
-        // now run the k-means algorithm on our set of samples.  
+        // now run the k-means algorithm on our set of samples.
         test.train(samples,initial_centers);
         print_spinner();
 
@@ -167,7 +167,7 @@ namespace
         typedef radial_basis_kernel<sample_type> kernel_type;
 
         // Here we declare an instance of the krls object.  The first argument to the constructor
-        // is the kernel we wish to use.  The second is a parameter that determines the numerical 
+        // is the kernel we wish to use.  The second is a parameter that determines the numerical
         // accuracy with which the object will perform part of the regression algorithm.  Generally
         // smaller values give better results but cause the algorithm to run slower.  You just have
         // to play with it to decide what balance of speed and accuracy is right for your problem.
@@ -216,7 +216,7 @@ namespace
         decision_function<kernel_type> test5 = svr_test.train(samples, labels);
         print_spinner();
 
-        // now we output the value of the sinc function for a few test points as well as the 
+        // now we output the value of the sinc function for a few test points as well as the
         // value predicted by krls object.
         m(0) = 2.5; dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_TEST(abs(sinc(m(0)) - test(m)) < 0.01);
         m(0) = 0.1; dlog << LDEBUG << "krls: " << sinc(m(0)) << "   " << test(m); DLIB_TEST(abs(sinc(m(0)) - test(m)) < 0.01);
@@ -271,10 +271,10 @@ namespace
 // ----------------------------------------------------------------------------------------
 
     void test_anomaly_detection (
-    ) 
+    )
     {
         dlog << LINFO << "   begin test_anomaly_detection()";
-        // Here we declare that our samples will be 2 dimensional column vectors.  
+        // Here we declare that our samples will be 2 dimensional column vectors.
         typedef matrix<double,2,1> sample_type;
 
         // Now we are making a typedef for the kind of kernel we want to use.  I picked the
@@ -283,7 +283,7 @@ namespace
         typedef radial_basis_kernel<sample_type> kernel_type;
 
         // Here we declare an instance of the kcentroid object.  The first argument to the constructor
-        // is the kernel we wish to use.  The second is a parameter that determines the numerical 
+        // is the kernel we wish to use.  The second is a parameter that determines the numerical
         // accuracy with which the object will perform part of the learning algorithm.  Generally
         // smaller values give better results but cause the algorithm to run slower.  You just have
         // to play with it to decide what balance of speed and accuracy is right for your problem.
@@ -344,41 +344,41 @@ namespace
         dlog << LDEBUG;
         // Lets output the distance from the centroid to some points that are NOT from the sinc function.
         // These numbers should all be significantly bigger than previous set of numbers.  We will also
-        // use the rs.scale() function to find out how many standard deviations they are away from the 
+        // use the rs.scale() function to find out how many standard deviations they are away from the
         // mean of the test points from the sinc function.  So in this case our criterion for "significantly bigger"
         // is > 3 or 4 standard deviations away from the above points that actually are on the sinc function.
         dlog << LDEBUG << "Points that are NOT on the sinc function:\n";
-        m(0) = -1.5; m(1) = sinc(m(0))+4;   
+        m(0) = -1.5; m(1) = sinc(m(0))+4;
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
         DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
         DLIB_TEST_MSG(df(m) + thresh < 0, df(m));
 
-        m(0) = -1.5; m(1) = sinc(m(0))+3;   
+        m(0) = -1.5; m(1) = sinc(m(0))+3;
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
         DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
         DLIB_TEST_MSG(df(m) + thresh < 0, df(m));
 
-        m(0) = -0;   m(1) = -sinc(m(0));    
+        m(0) = -0;   m(1) = -sinc(m(0));
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
         DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
         DLIB_TEST_MSG(df(m) + thresh < 0, df(m));
 
-        m(0) = -0.5; m(1) = -sinc(m(0));    
+        m(0) = -0.5; m(1) = -sinc(m(0));
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
         DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
         DLIB_TEST_MSG(df(m) + thresh < 0, df(m));
 
-        m(0) = -4.1; m(1) = sinc(m(0))+2;   
+        m(0) = -4.1; m(1) = sinc(m(0))+2;
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
         DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
         DLIB_TEST_MSG(df(m) + thresh < 0, df(m));
 
-        m(0) = -1.5; m(1) = sinc(m(0))+0.9; 
+        m(0) = -1.5; m(1) = sinc(m(0))+0.9;
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
         DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
         DLIB_TEST_MSG(df(m) + thresh < 0, df(m));
 
-        m(0) = -0.5; m(1) = sinc(m(0))+1;   
+        m(0) = -0.5; m(1) = sinc(m(0))+1;
         dlog << LDEBUG << "   " << test(m) << " is " << rs.scale(test(m)) << " standard deviations from sinc.";
         DLIB_TEST_MSG(rs.scale(test(m)) > 6, rs.scale(test(m)));
         DLIB_TEST_MSG(df(m) + thresh < 0, df(m));
@@ -394,7 +394,7 @@ namespace
         ensures
             - runs tests on the svm stuff compliance with the specs
     !*/
-    {        
+    {
         dlog << LINFO << "   begin unittest_binary_classification()";
         print_spinner();
 
@@ -544,8 +544,8 @@ namespace
     template <typename kernel_type>
     void test_kernel_derivative (
         const kernel_type& k,
-        const typename kernel_type::sample_type& x, 
-        const typename kernel_type::sample_type& y 
+        const typename kernel_type::sample_type& x,
+        const typename kernel_type::sample_type& y
     )
     {
         kernel_der_obj<kernel_type> obj;

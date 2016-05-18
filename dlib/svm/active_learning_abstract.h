@@ -38,7 +38,7 @@ namespace dlib
                 - it must be legal to call trainer.train(samples, labels)
                 - is_learning_problem(samples, labels) == true
             - unlabeled_samples must contain the same kind of vectors as samples.
-            - unlabeled_samples, samples, and labels must be matrices or types of 
+            - unlabeled_samples, samples, and labels must be matrices or types of
               objects convertible to a matrix via mat().
             - is_vector(unlabeled_samples) == true
         ensures
@@ -54,7 +54,7 @@ namespace dlib
             - The method used by this function is described in the paper:
                 Support Vector Machine Active Learning with Applications to Text Classification
                 by Simon Tong and Daphne Koller
-              In particular, this function implements the MaxMin Margin and Ratio Margin 
+              In particular, this function implements the MaxMin Margin and Ratio Margin
               selection strategies described in the paper.  Moreover, the mode argument
               to this function selects which of these strategies is used.
             - returns a std::vector V such that:

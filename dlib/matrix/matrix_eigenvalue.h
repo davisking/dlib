@@ -1,11 +1,11 @@
 // Copyright (C) 2009  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 // This code was adapted from code from the JAMA part of NIST's TNT library.
-//    See: http://math.nist.gov/tnt/ 
+//    See: http://math.nist.gov/tnt/
 #ifndef DLIB_MATRIX_EIGENVALUE_DECOMPOSITION_H
 #define DLIB_MATRIX_EIGENVALUE_DECOMPOSITION_H
 
-#include "matrix.h" 
+#include "matrix.h"
 #include "matrix_utilities.h"
 #include "matrix_subexp.h"
 #include <algorithm>
@@ -20,7 +20,7 @@
 
 #define DLIB_LAPACK_EIGENVALUE_DECOMP_SIZE_THRESH 4
 
-namespace dlib 
+namespace dlib
 {
 
     template <
@@ -46,19 +46,19 @@ namespace dlib
 
         // You have supplied an invalid type of matrix_exp_type.  You have
         // to use this object with matrices that contain float or double type data.
-        COMPILE_TIME_ASSERT((is_same_type<float, type>::value || 
+        COMPILE_TIME_ASSERT((is_same_type<float, type>::value ||
                              is_same_type<double, type>::value ));
 
 
         template <typename EXP>
         eigenvalue_decomposition(
             const matrix_exp<EXP>& A
-        ); 
+        );
 
         template <typename EXP>
         eigenvalue_decomposition(
             const matrix_op<op_make_symmetric<EXP> >& A
-        ); 
+        );
 
         long dim (
         ) const;
@@ -76,20 +76,20 @@ namespace dlib
         ) const;
 
         const complex_matrix_type get_d (
-        ) const; 
+        ) const;
 
         const matrix_type& get_pseudo_v (
         ) const;
 
         const matrix_type get_pseudo_d (
-        ) const; 
+        ) const;
 
     private:
 
         /** Row and column dimension (square matrix).  */
         long n;
 
-        bool issymmetric; 
+        bool issymmetric;
 
         /** Arrays for internal storage of eigenvalues. */
 
@@ -128,7 +128,7 @@ namespace dlib
 
 
         // Nonsymmetric reduction from Hessenberg to real Schur form.
-        void hqr2 (); 
+        void hqr2 ();
     };
 
 // ----------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ namespace dlib
     eigenvalue_decomposition<matrix_exp_type>::
     eigenvalue_decomposition(
         const matrix_exp<EXP>& A_
-    ) 
+    )
     {
         COMPILE_TIME_ASSERT((is_same_type<type, typename EXP::type>::value));
 
@@ -167,15 +167,15 @@ namespace dlib
 
 
         issymmetric = true;
-        for (long j = 0; (j < n) && issymmetric; j++) 
+        for (long j = 0; (j < n) && issymmetric; j++)
         {
-            for (long i = 0; (i < n) && issymmetric; i++) 
+            for (long i = 0; (i < n) && issymmetric; i++)
             {
                 issymmetric = (A(i,j) == A(j,i));
             }
         }
 
-        if (issymmetric) 
+        if (issymmetric)
         {
             V = A;
 
@@ -202,8 +202,8 @@ namespace dlib
             // Diagonalize.
             tql2();
 
-        } 
-        else 
+        }
+        else
         {
 
 #ifdef DLIB_USE_LAPACK
@@ -235,7 +235,7 @@ namespace dlib
     eigenvalue_decomposition<matrix_exp_type>::
     eigenvalue_decomposition(
         const matrix_op<op_make_symmetric<EXP> >& A
-    ) 
+    )
     {
         COMPILE_TIME_ASSERT((is_same_type<type, typename EXP::type>::value));
 
@@ -339,7 +339,7 @@ namespace dlib
     template <typename matrix_exp_type>
     const typename eigenvalue_decomposition<matrix_exp_type>::complex_matrix_type eigenvalue_decomposition<matrix_exp_type>::
     get_d (
-    ) const 
+    ) const
     {
         return diagm(complex_matrix(get_real_eigenvalues(), get_imag_eigenvalues()));
     }
@@ -349,17 +349,17 @@ namespace dlib
     template <typename matrix_exp_type>
     const typename eigenvalue_decomposition<matrix_exp_type>::complex_matrix_type eigenvalue_decomposition<matrix_exp_type>::
     get_v (
-    ) const 
+    ) const
     {
         complex_matrix_type CV(n,n);
 
-        for (long i = 0; i < n; i++) 
+        for (long i = 0; i < n; i++)
         {
-            if (e(i) > 0) 
+            if (e(i) > 0)
             {
                 set_colm(CV,i) = complex_matrix(colm(V,i), colm(V,i+1));
-            } 
-            else if (e(i) < 0) 
+            }
+            else if (e(i) < 0)
             {
                 set_colm(CV,i) = complex_matrix(colm(V,i), colm(V,i-1));
             }
@@ -377,22 +377,22 @@ namespace dlib
     template <typename matrix_exp_type>
     const typename eigenvalue_decomposition<matrix_exp_type>::matrix_type eigenvalue_decomposition<matrix_exp_type>::
     get_pseudo_d (
-    ) const 
+    ) const
     {
         matrix_type D(n,n);
 
-        for (long i = 0; i < n; i++) 
+        for (long i = 0; i < n; i++)
         {
-            for (long j = 0; j < n; j++) 
+            for (long j = 0; j < n; j++)
             {
                 D(i,j) = 0.0;
             }
             D(i,i) = d(i);
-            if (e(i) > 0) 
+            if (e(i) > 0)
             {
                 D(i,i+1) = e(i);
-            } 
-            else if (e(i) < 0) 
+            }
+            else if (e(i) < 0)
             {
                 D(i,i-1) = e(i);
             }
@@ -410,7 +410,7 @@ namespace dlib
 // Symmetric Householder reduction to tridiagonal form.
     template <typename matrix_exp_type>
     void eigenvalue_decomposition<matrix_exp_type>::
-    tred2() 
+    tred2()
     {
         using std::abs;
         using std::sqrt;
@@ -420,66 +420,66 @@ namespace dlib
         //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
         //  Fortran subroutine in EISPACK.
 
-        for (long j = 0; j < n; j++) 
+        for (long j = 0; j < n; j++)
         {
             d(j) = V(n-1,j);
         }
 
         // Householder reduction to tridiagonal form.
 
-        for (long i = n-1; i > 0; i--) 
+        for (long i = n-1; i > 0; i--)
         {
 
             // Scale to avoid under/overflow.
 
             type scale = 0.0;
             type h = 0.0;
-            for (long k = 0; k < i; k++) 
+            for (long k = 0; k < i; k++)
             {
                 scale = scale + abs(d(k));
             }
-            if (scale == 0.0) 
+            if (scale == 0.0)
             {
                 e(i) = d(i-1);
-                for (long j = 0; j < i; j++) 
+                for (long j = 0; j < i; j++)
                 {
                     d(j) = V(i-1,j);
                     V(i,j) = 0.0;
                     V(j,i) = 0.0;
                 }
             }
-            else 
+            else
             {
 
                 // Generate Householder vector.
 
-                for (long k = 0; k < i; k++) 
+                for (long k = 0; k < i; k++)
                 {
                     d(k) /= scale;
                     h += d(k) * d(k);
                 }
                 type f = d(i-1);
                 type g = sqrt(h);
-                if (f > 0) 
+                if (f > 0)
                 {
                     g = -g;
                 }
                 e(i) = scale * g;
                 h = h - f * g;
                 d(i-1) = f - g;
-                for (long j = 0; j < i; j++) 
+                for (long j = 0; j < i; j++)
                 {
                     e(j) = 0.0;
                 }
 
                 // Apply similarity transformation to remaining columns.
 
-                for (long j = 0; j < i; j++) 
+                for (long j = 0; j < i; j++)
                 {
                     f = d(j);
                     V(j,i) = f;
                     g = e(j) + V(j,j) * f;
-                    for (long k = j+1; k <= i-1; k++) 
+                    for (long k = j+1; k <= i-1; k++)
                     {
                         g += V(k,j) * d(k);
                         e(k) += V(k,j) * f;
@@ -487,21 +487,21 @@ namespace dlib
                     e(j) = g;
                 }
                 f = 0.0;
-                for (long j = 0; j < i; j++) 
+                for (long j = 0; j < i; j++)
                 {
                     e(j) /= h;
                     f += e(j) * d(j);
                 }
                 type hh = f / (h + h);
-                for (long j = 0; j < i; j++) 
+                for (long j = 0; j < i; j++)
                 {
                     e(j) -= hh * d(j);
                 }
-                for (long j = 0; j < i; j++) 
+                for (long j = 0; j < i; j++)
                 {
                     f = d(j);
                     g = e(j);
-                    for (long k = j; k <= i-1; k++) 
+                    for (long k = j; k <= i-1; k++)
                     {
                         V(k,j) -= (f * e(k) + g * d(k));
                     }
@@ -514,49 +514,49 @@ namespace dlib
 
         // Accumulate transformations.
 
-        for (long i = 0; i < n-1; i++) 
+        for (long i = 0; i < n-1; i++)
         {
             V(n-1,i) = V(i,i);
             V(i,i) = 1.0;
             type h = d(i+1);
-            if (h != 0.0) 
+            if (h != 0.0)
             {
-                for (long k = 0; k <= i; k++) 
+                for (long k = 0; k <= i; k++)
                 {
                     d(k) = V(k,i+1) / h;
                 }
-                for (long j = 0; j <= i; j++) 
+                for (long j = 0; j <= i; j++)
                 {
                     type g = 0.0;
-                    for (long k = 0; k <= i; k++) 
+                    for (long k = 0; k <= i; k++)
                     {
                         g += V(k,i+1) * V(k,j);
                     }
-                    for (long k = 0; k <= i; k++) 
+                    for (long k = 0; k <= i; k++)
                     {
                         V(k,j) -= g * d(k);
                     }
                 }
             }
-            for (long k = 0; k <= i; k++) 
+            for (long k = 0; k <= i; k++)
             {
                 V(k,i+1) = 0.0;
             }
         }
-        for (long j = 0; j < n; j++) 
+        for (long j = 0; j < n; j++)
         {
             d(j) = V(n-1,j);
             V(n-1,j) = 0.0;
         }
         V(n-1,n-1) = 1.0;
         e(0) = 0.0;
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename matrix_exp_type>
     void eigenvalue_decomposition<matrix_exp_type>::
-    tql2 () 
+    tql2 ()
     {
         using std::pow;
         using std::min;
@@ -568,7 +568,7 @@ namespace dlib
         //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
         //  Fortran subroutine in EISPACK.
 
-        for (long i = 1; i < n; i++) 
+        for (long i = 1; i < n; i++)
         {
             e(i-1) = e(i);
         }
@@ -577,7 +577,7 @@ namespace dlib
         type f = 0.0;
         type tst1 = 0.0;
         const type eps = std::numeric_limits<type>::epsilon();
-        for (long l = 0; l < n; l++) 
+        for (long l = 0; l < n; l++)
         {
 
             // Find small subdiagonal element
@@ -586,9 +586,9 @@ namespace dlib
             long m = l;
 
             // Original while-loop from Java code
-            while (m < n) 
+            while (m < n)
             {
-                if (abs(e(m)) <= eps*tst1) 
+                if (abs(e(m)) <= eps*tst1)
                 {
                     break;
                 }
@@ -601,10 +601,10 @@ namespace dlib
             // If m == l, d(l) is an eigenvalue,
             // otherwise, iterate.
 
-            if (m > l) 
+            if (m > l)
             {
                 long iter = 0;
-                do 
+                do
                 {
                     iter = iter + 1;  // (Could check iteration count here.)
 
@@ -613,7 +613,7 @@ namespace dlib
                     type g = d(l);
                     type p = (d(l+1) - g) / (2.0 * e(l));
                     type r = hypot(p,1.0);
-                    if (p < 0) 
+                    if (p < 0)
                     {
                         r = -r;
                     }
@@ -621,7 +621,7 @@ namespace dlib
                     d(l+1) = e(l) * (p + r);
                     type dl1 = d(l+1);
                     type h = g - d(l);
-                    for (long i = l+2; i < n; i++) 
+                    for (long i = l+2; i < n; i++)
                     {
                         d(i) -= h;
                     }
@@ -636,7 +636,7 @@ namespace dlib
                     type el1 = e(l+1);
                     type s = 0.0;
                     type s2 = 0.0;
-                    for (long i = m-1; i >= l; i--) 
+                    for (long i = m-1; i >= l; i--)
                     {
                         c3 = c2;
                         c2 = c;
@@ -652,7 +652,7 @@ namespace dlib
 
                         // Accumulate transformation.
 
-                        for (long k = 0; k < n; k++) 
+                        for (long k = 0; k < n; k++)
                         {
                             h = V(k,i+1);
                             V(k,i+1) = s * V(k,i) + c * h;
@@ -672,7 +672,7 @@ namespace dlib
         }
 
         /*
-            The code to sort the eigenvalues and eigenvectors 
+            The code to sort the eigenvalues and eigenvectors
             has been removed from here since, in the non-symmetric case,
             we can't sort the eigenvalues in a meaningful way.  If we left this
             code in here then the user might supply what they thought was a symmetric
@@ -687,7 +687,7 @@ namespace dlib
 
     template <typename matrix_exp_type>
     void eigenvalue_decomposition<matrix_exp_type>::
-    orthes () 
+    orthes ()
     {
         using std::abs;
         using std::sqrt;
@@ -700,29 +700,29 @@ namespace dlib
         long low = 0;
         long high = n-1;
 
-        for (long m = low+1; m <= high-1; m++) 
+        for (long m = low+1; m <= high-1; m++)
         {
 
             // Scale column.
 
             type scale = 0.0;
-            for (long i = m; i <= high; i++) 
+            for (long i = m; i <= high; i++)
             {
                 scale = scale + abs(H(i,m-1));
             }
-            if (scale != 0.0) 
+            if (scale != 0.0)
             {
 
                 // Compute Householder transformation.
 
                 type h = 0.0;
-                for (long i = high; i >= m; i--) 
+                for (long i = high; i >= m; i--)
                 {
                     ort(i) = H(i,m-1)/scale;
                     h += ort(i) * ort(i);
                 }
                 type g = sqrt(h);
-                if (ort(m) > 0) 
+                if (ort(m) > 0)
                 {
                     g = -g;
                 }
@@ -732,29 +732,29 @@ namespace dlib
                 // Apply Householder similarity transformation
                 // H = (I-u*u'/h)*H*(I-u*u')/h)
 
-                for (long j = m; j < n; j++) 
+                for (long j = m; j < n; j++)
                 {
                     type f = 0.0;
-                    for (long i = high; i >= m; i--) 
+                    for (long i = high; i >= m; i--)
                     {
                         f += ort(i)*H(i,j);
                     }
                     f = f/h;
-                    for (long i = m; i <= high; i++) 
+                    for (long i = m; i <= high; i++)
                     {
                         H(i,j) -= f*ort(i);
                     }
                 }
 
-                for (long i = 0; i <= high; i++) 
+                for (long i = 0; i <= high; i++)
                 {
                     type f = 0.0;
-                    for (long j = high; j >= m; j--) 
+                    for (long j = high; j >= m; j--)
                     {
                         f += ort(j)*H(i,j);
                     }
                     f = f/h;
-                    for (long j = m; j <= high; j++) 
+                    for (long j = m; j <= high; j++)
                     {
                         H(i,j) -= f*ort(j);
                     }
@@ -766,32 +766,32 @@ namespace dlib
 
         // Accumulate transformations (Algol's ortran).
 
-        for (long i = 0; i < n; i++) 
+        for (long i = 0; i < n; i++)
         {
-            for (long j = 0; j < n; j++) 
+            for (long j = 0; j < n; j++)
             {
                 V(i,j) = (i == j ? 1.0 : 0.0);
             }
         }
 
-        for (long m = high-1; m >= low+1; m--) 
+        for (long m = high-1; m >= low+1; m--)
         {
-            if (H(m,m-1) != 0.0) 
+            if (H(m,m-1) != 0.0)
             {
-                for (long i = m+1; i <= high; i++) 
+                for (long i = m+1; i <= high; i++)
                 {
                     ort(i) = H(i,m-1);
                 }
-                for (long j = m; j <= high; j++) 
+                for (long j = m; j <= high; j++)
                 {
                     type g = 0.0;
-                    for (long i = m; i <= high; i++) 
+                    for (long i = m; i <= high; i++)
                     {
                         g += ort(i) * V(i,j);
                     }
                     // Double division avoids possible underflow
                     g = (g / ort(m)) / H(m,m-1);
-                    for (long i = m; i <= high; i++) 
+                    for (long i = m; i <= high; i++)
                     {
                         V(i,j) += g * ort(i);
                     }
@@ -804,18 +804,18 @@ namespace dlib
 
     template <typename matrix_exp_type>
     void eigenvalue_decomposition<matrix_exp_type>::
-    cdiv_(type xr, type xi, type yr, type yi)  
+    cdiv_(type xr, type xi, type yr, type yi)
     {
         using std::abs;
         type r,d;
-        if (abs(yr) > abs(yi)) 
+        if (abs(yr) > abs(yi))
         {
             r = yi/yr;
             d = yr + r*yi;
             cdivr = (xr + r*xi)/d;
             cdivi = (xi - r*xr)/d;
-        } 
-        else 
+        }
+        else
         {
             r = yr/yi;
             d = yi + r*yr;
@@ -854,14 +854,14 @@ namespace dlib
         // Store roots isolated by balanc and compute matrix norm
 
         type norm = 0.0;
-        for (long i = 0; i < nn; i++) 
+        for (long i = 0; i < nn; i++)
         {
-            if ((i < low) || (i > high)) 
+            if ((i < low) || (i > high))
             {
                 d(i) = H(i,i);
                 e(i) = 0.0;
             }
-            for (long j = max(i-1,0L); j < nn; j++) 
+            for (long j = max(i-1,0L); j < nn; j++)
             {
                 norm = norm + abs(H(i,j));
             }
@@ -870,20 +870,20 @@ namespace dlib
         // Outer loop over eigenvalue index
 
         long iter = 0;
-        while (n >= low) 
+        while (n >= low)
         {
 
             // Look for single small sub-diagonal element
 
             long l = n;
-            while (l > low) 
+            while (l > low)
             {
                 s = abs(H(l-1,l-1)) + abs(H(l,l));
-                if (s == 0.0) 
+                if (s == 0.0)
                 {
                     s = norm;
                 }
-                if (abs(H(l,l-1)) < eps * s) 
+                if (abs(H(l,l-1)) < eps * s)
                 {
                     break;
                 }
@@ -893,7 +893,7 @@ namespace dlib
             // Check for convergence
             // One root found
 
-            if (l == n) 
+            if (l == n)
             {
                 H(n,n) = H(n,n) + exshift;
                 d(n) = H(n,n);
@@ -903,8 +903,8 @@ namespace dlib
 
                 // Two roots found
 
-            } 
-            else if (l == n-1) 
+            }
+            else if (l == n-1)
             {
                 w = H(n,n-1) * H(n-1,n);
                 p = (H(n-1,n-1) - H(n,n)) / 2.0;
@@ -916,19 +916,19 @@ namespace dlib
 
                 // type pair
 
-                if (q >= 0) 
+                if (q >= 0)
                 {
-                    if (p >= 0) 
+                    if (p >= 0)
                     {
                         z = p + z;
-                    } 
-                    else 
+                    }
+                    else
                     {
                         z = p - z;
                     }
                     d(n-1) = x + z;
                     d(n) = d(n-1);
-                    if (z != 0.0) 
+                    if (z != 0.0)
                     {
                         d(n) = x - w / z;
                     }
@@ -944,7 +944,7 @@ namespace dlib
 
                     // Row modification
 
-                    for (long j = n-1; j < nn; j++) 
+                    for (long j = n-1; j < nn; j++)
                     {
                         z = H(n-1,j);
                         H(n-1,j) = q * z + p * H(n,j);
@@ -953,7 +953,7 @@ namespace dlib
 
                     // Column modification
 
-                    for (long i = 0; i <= n; i++) 
+                    for (long i = 0; i <= n; i++)
                     {
                         z = H(i,n-1);
                         H(i,n-1) = q * z + p * H(i,n);
@@ -962,7 +962,7 @@ namespace dlib
 
                     // Accumulate transformations
 
-                    for (long i = low; i <= high; i++) 
+                    for (long i = low; i <= high; i++)
                     {
                         z = V(i,n-1);
                         V(i,n-1) = q * z + p * V(i,n);
@@ -971,8 +971,8 @@ namespace dlib
 
                     // Complex pair
 
-                } 
-                else 
+                }
+                else
                 {
                     d(n-1) = x + p;
                     d(n) = x + p;
@@ -984,8 +984,8 @@ namespace dlib
 
                 // No convergence yet
 
-            } 
-            else 
+            }
+            else
             {
 
                 // Form shift
@@ -993,7 +993,7 @@ namespace dlib
                 x = H(n,n);
                 y = 0.0;
                 w = 0.0;
-                if (l < n) 
+                if (l < n)
                 {
                     y = H(n-1,n-1);
                     w = H(n,n-1) * H(n-1,n);
@@ -1001,10 +1001,10 @@ namespace dlib
 
                 // Wilkinson's original ad hoc shift
 
-                if (iter == 10) 
+                if (iter == 10)
                 {
                     exshift += x;
-                    for (long i = low; i <= n; i++) 
+                    for (long i = low; i <= n; i++)
                     {
                         H(i,i) -= x;
                     }
@@ -1015,19 +1015,19 @@ namespace dlib
 
                 // MATLAB's new ad hoc shift
 
-                if (iter == 30) 
+                if (iter == 30)
                 {
                     s = (y - x) / 2.0;
                     s = s * s + w;
-                    if (s > 0) 
+                    if (s > 0)
                     {
                         s = sqrt(s);
-                        if (y < x) 
+                        if (y < x)
                         {
                             s = -s;
                         }
                         s = x - w / ((y - x) / 2.0 + s);
-                        for (long i = low; i <= n; i++) 
+                        for (long i = low; i <= n; i++)
                         {
                             H(i,i) -= s;
                         }
@@ -1041,7 +1041,7 @@ namespace dlib
                 // Look for two consecutive small sub-diagonal elements
 
                 long m = n-2;
-                while (m >= l) 
+                while (m >= l)
                 {
                     z = H(m,m);
                     r = x - z;
@@ -1053,23 +1053,23 @@ namespace dlib
                     p = p / s;
                     q = q / s;
                     r = r / s;
-                    if (m == l) 
+                    if (m == l)
                     {
                         break;
                     }
                     if (abs(H(m,m-1)) * (abs(q) + abs(r)) <
                         eps * (abs(p) * (abs(H(m-1,m-1)) + abs(z) +
-                                         abs(H(m+1,m+1))))) 
+                                         abs(H(m+1,m+1)))))
                     {
                         break;
                     }
                     m--;
                 }
 
-                for (long i = m+2; i <= n; i++) 
+                for (long i = m+2; i <= n; i++)
                 {
                     H(i,i-2) = 0.0;
-                    if (i > m+2) 
+                    if (i > m+2)
                     {
                         H(i,i-3) = 0.0;
                     }
@@ -1077,38 +1077,38 @@ namespace dlib
 
                 // Double QR step involving rows l:n and columns m:n
 
-                for (long k = m; k <= n-1; k++) 
+                for (long k = m; k <= n-1; k++)
                 {
                     long notlast = (k != n-1);
-                    if (k != m) 
+                    if (k != m)
                     {
                         p = H(k,k-1);
                         q = H(k+1,k-1);
                         r = (notlast ? H(k+2,k-1) : 0.0);
                         x = abs(p) + abs(q) + abs(r);
-                        if (x != 0.0) 
+                        if (x != 0.0)
                         {
                             p = p / x;
                             q = q / x;
                             r = r / x;
                         }
                     }
-                    if (x == 0.0) 
+                    if (x == 0.0)
                     {
                         break;
                     }
                     s = sqrt(p * p + q * q + r * r);
-                    if (p < 0) 
+                    if (p < 0)
                     {
                         s = -s;
                     }
-                    if (s != 0) 
+                    if (s != 0)
                     {
-                        if (k != m) 
+                        if (k != m)
                         {
                             H(k,k-1) = -s * x;
-                        } 
-                        else if (l != m) 
+                        }
+                        else if (l != m)
                         {
                             H(k,k-1) = -H(k,k-1);
                         }
@@ -1121,10 +1121,10 @@ namespace dlib
 
                         // Row modification
 
-                        for (long j = k; j < nn; j++) 
+                        for (long j = k; j < nn; j++)
                         {
                             p = H(k,j) + q * H(k+1,j);
-                            if (notlast) 
+                            if (notlast)
                             {
                                 p = p + r * H(k+2,j);
                                 H(k+2,j) = H(k+2,j) - p * z;
@@ -1135,10 +1135,10 @@ namespace dlib
 
                         // Column modification
 
-                        for (long i = 0; i <= min(n,k+3); i++) 
+                        for (long i = 0; i <= min(n,k+3); i++)
                         {
                             p = x * H(i,k) + y * H(i,k+1);
-                            if (notlast) 
+                            if (notlast)
                             {
                                 p = p + z * H(i,k+2);
                                 H(i,k+2) = H(i,k+2) - p * r;
@@ -1149,10 +1149,10 @@ namespace dlib
 
                         // Accumulate transformations
 
-                        for (long i = low; i <= high; i++) 
+                        for (long i = low; i <= high; i++)
                         {
                             p = x * V(i,k) + y * V(i,k+1);
-                            if (notlast) 
+                            if (notlast)
                             {
                                 p = p + z * V(i,k+2);
                                 V(i,k+2) = V(i,k+2) - p * r;
@@ -1167,64 +1167,64 @@ namespace dlib
 
         // Backsubstitute to find vectors of upper triangular form
 
-        if (norm == 0.0) 
+        if (norm == 0.0)
         {
             return;
         }
 
-        for (n = nn-1; n >= 0; n--) 
+        for (n = nn-1; n >= 0; n--)
         {
             p = d(n);
             q = e(n);
 
             // Real vector
 
-            if (q == 0) 
+            if (q == 0)
             {
                 long l = n;
                 H(n,n) = 1.0;
-                for (long i = n-1; i >= 0; i--) 
+                for (long i = n-1; i >= 0; i--)
                 {
                     w = H(i,i) - p;
                     r = 0.0;
-                    for (long j = l; j <= n; j++) 
+                    for (long j = l; j <= n; j++)
                     {
                         r = r + H(i,j) * H(j,n);
                     }
-                    if (e(i) < 0.0) 
+                    if (e(i) < 0.0)
                     {
                         z = w;
                         s = r;
-                    } 
-                    else 
+                    }
+                    else
                     {
                         l = i;
-                        if (e(i) == 0.0) 
+                        if (e(i) == 0.0)
                         {
-                            if (w != 0.0) 
+                            if (w != 0.0)
                             {
                                 H(i,n) = -r / w;
-                            } 
-                            else 
+                            }
+                            else
                             {
                                 H(i,n) = -r / (eps * norm);
                             }
 
                             // Solve real equations
 
-                        } 
-                        else 
+                        }
+                        else
                         {
                             x = H(i,i+1);
                             y = H(i+1,i);
                             q = (d(i) - p) * (d(i) - p) + e(i) * e(i);
                             t = (x * s - z * r) / q;
                             H(i,n) = t;
-                            if (abs(x) > abs(z)) 
+                            if (abs(x) > abs(z))
                             {
                                 H(i+1,n) = (-r - w * t) / x;
-                            } 
-                            else 
+                            }
+                            else
                             {
                                 H(i+1,n) = (-s - y * t) / z;
                             }
@@ -1233,9 +1233,9 @@ namespace dlib
                         // Overflow control
 
                         t = abs(H(i,n));
-                        if ((eps * t) * t > 1) 
+                        if ((eps * t) * t > 1)
                         {
-                            for (long j = i; j <= n; j++) 
+                            for (long j = i; j <= n; j++)
                             {
                                 H(j,n) = H(j,n) / t;
                             }
@@ -1245,19 +1245,19 @@ namespace dlib
 
                 // Complex vector
 
-            } 
-            else if (q < 0) 
+            }
+            else if (q < 0)
             {
                 long l = n-1;
 
                 // Last vector component imaginary so matrix is triangular
 
-                if (abs(H(n,n-1)) > abs(H(n-1,n))) 
+                if (abs(H(n,n-1)) > abs(H(n-1,n)))
                 {
                     H(n-1,n-1) = q / H(n,n-1);
                     H(n-1,n) = -(H(n,n) - p) / H(n,n-1);
-                } 
-                else 
+                }
+                else
                 {
                     cdiv_(0.0,-H(n-1,n),H(n-1,n-1)-p,q);
                     H(n-1,n-1) = cdivr;
@@ -1265,34 +1265,34 @@ namespace dlib
                 }
                 H(n,n-1) = 0.0;
                 H(n,n) = 1.0;
-                for (long i = n-2; i >= 0; i--) 
+                for (long i = n-2; i >= 0; i--)
                 {
                     type ra,sa,vr,vi;
                     ra = 0.0;
                     sa = 0.0;
-                    for (long j = l; j <= n; j++) 
+                    for (long j = l; j <= n; j++)
                     {
                         ra = ra + H(i,j) * H(j,n-1);
                         sa = sa + H(i,j) * H(j,n);
                     }
                     w = H(i,i) - p;
 
-                    if (e(i) < 0.0) 
+                    if (e(i) < 0.0)
                     {
                         z = w;
                         r = ra;
                         s = sa;
-                    } 
-                    else 
+                    }
+                    else
                     {
                         l = i;
-                        if (e(i) == 0) 
+                        if (e(i) == 0)
                         {
                             cdiv_(-ra,-sa,w,q);
                             H(i,n-1) = cdivr;
                             H(i,n) = cdivi;
-                        } 
-                        else 
+                        }
+                        else
                         {
 
                             // Solve complex equations
@@ -1301,7 +1301,7 @@ namespace dlib
                             y = H(i+1,i);
                             vr = (d(i) - p) * (d(i) - p) + e(i) * e(i) - q * q;
                             vi = (d(i) - p) * 2.0 * q;
-                            if ((vr == 0.0) && (vi == 0.0)) 
+                            if ((vr == 0.0) && (vi == 0.0))
                             {
                                 vr = eps * norm * (abs(w) + abs(q) +
                                                    abs(x) + abs(y) + abs(z));
@@ -1309,12 +1309,12 @@ namespace dlib
                             cdiv_(x*r-z*ra+q*sa,x*s-z*sa-q*ra,vr,vi);
                             H(i,n-1) = cdivr;
                             H(i,n) = cdivi;
-                            if (abs(x) > (abs(z) + abs(q))) 
+                            if (abs(x) > (abs(z) + abs(q)))
                             {
                                 H(i+1,n-1) = (-ra - w * H(i,n-1) + q * H(i,n)) / x;
                                 H(i+1,n) = (-sa - w * H(i,n) - q * H(i,n-1)) / x;
                             }
-                            else 
+                            else
                             {
                                 cdiv_(-r-y*H(i,n-1),-s-y*H(i,n),z,q);
                                 H(i+1,n-1) = cdivr;
@@ -1325,9 +1325,9 @@ namespace dlib
                         // Overflow control
 
                         t = max(abs(H(i,n-1)),abs(H(i,n)));
-                        if ((eps * t) * t > 1) 
+                        if ((eps * t) * t > 1)
                         {
-                            for (long j = i; j <= n; j++) 
+                            for (long j = i; j <= n; j++)
                             {
                                 H(j,n-1) = H(j,n-1) / t;
                                 H(j,n) = H(j,n) / t;
@@ -1340,11 +1340,11 @@ namespace dlib
 
         // Vectors of isolated roots
 
-        for (long i = 0; i < nn; i++) 
+        for (long i = 0; i < nn; i++)
         {
-            if (i < low || i > high) 
+            if (i < low || i > high)
             {
-                for (long j = i; j < nn; j++) 
+                for (long j = i; j < nn; j++)
                 {
                     V(i,j) = H(i,j);
                 }
@@ -1353,12 +1353,12 @@ namespace dlib
 
         // Back transformation to get eigenvectors of original matrix
 
-        for (long j = nn-1; j >= low; j--) 
+        for (long j = nn-1; j >= low; j--)
         {
-            for (long i = low; i <= high; i++) 
+            for (long i = low; i <= high; i++)
             {
                 z = 0.0;
-                for (long k = low; k <= min(j,high); k++) 
+                for (long k = low; k <= min(j,high); k++)
                 {
                     z = z + V(i,k) * H(k,j);
                 }
@@ -1370,9 +1370,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 
-} 
+}
 
-#endif // DLIB_MATRIX_EIGENVALUE_DECOMPOSITION_H 
+#endif // DLIB_MATRIX_EIGENVALUE_DECOMPOSITION_H
 
 
 

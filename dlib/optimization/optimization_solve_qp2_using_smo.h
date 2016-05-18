@@ -11,14 +11,14 @@
 #include "../algs.h"
 
 
-namespace dlib 
+namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
-    class invalid_nu_error : public dlib::error 
-    { 
-    public: 
+    class invalid_nu_error : public dlib::error
+    {
+    public:
         invalid_nu_error(const std::string& msg, double nu_) : dlib::error(msg), nu(nu_) {};
         const double nu;
     };
@@ -37,8 +37,8 @@ namespace dlib
         DLIB_ASSERT(y.size() > 1 && is_col_vector(y),
             "\ttypedef T::type maximum_nu(y)"
             << "\n\ty should be a column vector with more than one entry"
-            << "\n\ty.nr(): " << y.nr() 
-            << "\n\ty.nc(): " << y.nc() 
+            << "\n\ty.nr(): " << y.nr()
+            << "\n\ty.nc(): " << y.nc()
             );
 
         long pos_count = 0;
@@ -59,8 +59,8 @@ namespace dlib
                 DLIB_ASSERT(y(r) == -1.0 || y(r) == 1.0,
                        "\ttypedef T::type maximum_nu(y)"
                        << "\n\ty should contain only 1 and 0 entries"
-                       << "\n\tr:    " << r 
-                       << "\n\ty(r): " << y(r) 
+                       << "\n\tr:    " << r
+                       << "\n\ty(r): " << y(r)
                 );
             }
         }
@@ -107,13 +107,13 @@ namespace dlib
             typename EXP2,
             long NR
             >
-        unsigned long operator() ( 
+        unsigned long operator() (
             const matrix_exp<EXP1>& Q,
             const matrix_exp<EXP2>& y,
             const scalar_type nu,
             matrix<scalar_type,NR,1,mem_manager_type, layout_type>& alpha,
             scalar_type eps
-        ) 
+        )
         {
             DLIB_ASSERT(Q.nr() == Q.nc() && y.size() == Q.nr() && y.size() > 1 && is_col_vector(y) &&
                         sum((y == +1) + (y == -1)) == y.size() &&
@@ -121,13 +121,13 @@ namespace dlib
                         eps > 0,
                 "\t void solve_qp2_using_smo::operator()"
                 << "\n\t invalid arguments were given to this function"
-                << "\n\t Q.nr():                     " << Q.nr() 
-                << "\n\t Q.nc():                     " << Q.nc() 
-                << "\n\t is_col_vector(y):           " << is_col_vector(y) 
-                << "\n\t y.size():                   " << y.size() 
-                << "\n\t sum((y == +1) + (y == -1)): " << sum((y == +1) + (y == -1)) 
-                << "\n\t nu:                         " << nu 
-                << "\n\t eps:                        " << eps 
+                << "\n\t Q.nr():                     " << Q.nr()
+                << "\n\t Q.nc():                     " << Q.nc()
+                << "\n\t is_col_vector(y):           " << is_col_vector(y)
+                << "\n\t y.size():                   " << y.size()
+                << "\n\t sum((y == +1) + (y == -1)): " << sum((y == +1) + (y == -1))
+                << "\n\t nu:                         " << nu
+                << "\n\t eps:                        " << eps
                 );
 
             alpha.set_size(Q.nr(),1);
@@ -210,7 +210,7 @@ namespace dlib
                         ++count;
                         alpha(i) = 1;
                     }
-                    else 
+                    else
                     {
                         has_slack = true;
                         if (num_total > num)
@@ -241,7 +241,7 @@ namespace dlib
                         ++count;
                         alpha(i) = 1;
                     }
-                    else 
+                    else
                     {
                         has_slack = true;
                         if (num_total > num)
@@ -348,7 +348,7 @@ namespace dlib
 
                         if (b > 0)
                         {
-                            scalar_type a = Q_ip(ip) + Q_diag(j) - 2*Q_ip(j); 
+                            scalar_type a = Q_ip(ip) + Q_diag(j) - 2*Q_ip(j);
                             if (a <= 0)
                                 a = tau;
                             scalar_type temp = -b*b/a;
@@ -370,7 +370,7 @@ namespace dlib
 
                         if (b > 0)
                         {
-                            scalar_type a = Q_in(in) + Q_diag(j) - 2*Q_in(j); 
+                            scalar_type a = Q_in(in) + Q_diag(j) - 2*Q_in(j);
                             if (a <= 0)
                                 a = tau;
                             scalar_type temp = -b*b/a;

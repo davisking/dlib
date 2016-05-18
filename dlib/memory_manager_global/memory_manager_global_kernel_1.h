@@ -15,7 +15,7 @@ namespace dlib
         >
     class memory_manager_global_kernel_1
     {
-        /*!      
+        /*!
             INITIAL VALUE
                 - *global_mm == get_global_memory_manager()
 
@@ -26,7 +26,7 @@ namespace dlib
         
         public:
 
-            typedef typename factory::template return_type<T>::type mm_global_type; 
+            typedef typename factory::template return_type<T>::type mm_global_type;
 
             typedef T type;
 
@@ -52,28 +52,28 @@ namespace dlib
             T* allocate (
             )
             {
-                return global_mm->allocate(); 
+                return global_mm->allocate();
             }
 
             void deallocate (
                 T* item
             )
             {
-                global_mm->deallocate(item); 
+                global_mm->deallocate(item);
             }
 
             T* allocate_array (
                 unsigned long size
-            ) 
-            { 
-                return global_mm->allocate_array(size); 
+            )
+            {
+                return global_mm->allocate_array(size);
             }
 
             void deallocate_array (
                 T* item
-            ) 
-            { 
-                global_mm->deallocate_array(item); 
+            )
+            {
+                global_mm->deallocate_array(item);
             }
 
             void swap (
@@ -98,9 +98,9 @@ namespace dlib
         typename factory
         >
     inline void swap (
-        memory_manager_global_kernel_1<T,factory>& a, 
-        memory_manager_global_kernel_1<T,factory>& b 
-    ) { a.swap(b); }   
+        memory_manager_global_kernel_1<T,factory>& a,
+        memory_manager_global_kernel_1<T,factory>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

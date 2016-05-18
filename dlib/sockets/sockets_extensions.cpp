@@ -46,7 +46,7 @@ namespace dlib
 
     void deserialize(
         network_address& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         deserialize(item.host_address, in);
@@ -119,7 +119,7 @@ namespace dlib
         {
             std::ostringstream sout;
             sout << "unable to connect to '" << host_or_ip << ":" << port << "'";
-            throw socket_error(sout.str()); 
+            throw socket_error(sout.str());
         }
 
         return con;
@@ -157,7 +157,7 @@ namespace dlib
             thread_data p = *static_cast<thread_data*>(param);
             try
             {
-                p.con = connect(p.host_or_ip, p.port); 
+                p.con = connect(p.host_or_ip, p.port);
             }
             catch (...)
             {
@@ -205,7 +205,7 @@ namespace dlib
             }
             else
             {
-                throw socket_error("unable to connect to '" + host_or_ip + "' because connect timed out"); 
+                throw socket_error("unable to connect to '" + host_or_ip + "' because connect timed out");
             }
             
             connect_signaler.wait_or_timeout(timeout);
@@ -223,12 +223,12 @@ namespace dlib
         if (create_new_thread(thread, data) == false)
         {
             delete data;
-            throw socket_error("unable to connect to '" + host_or_ip); 
+            throw socket_error("unable to connect to '" + host_or_ip);
         }
 
         ++outstanding_connects;
 
-        // wait until we have a connection object 
+        // wait until we have a connection object
         while (data->con == 0)
         {
             uint64 cur_time = ts.get_timestamp();
@@ -242,9 +242,9 @@ namespace dlib
                 data->connect_ended = true;
                 connect_signaler.broadcast();
                 if (data->error_occurred)
-                    throw socket_error("unable to connect to '" + host_or_ip); 
+                    throw socket_error("unable to connect to '" + host_or_ip);
                 else
-                    throw socket_error("unable to connect to '" + host_or_ip + "' because connect timed out"); 
+                    throw socket_error("unable to connect to '" + host_or_ip + "' because connect timed out");
             }
 
             connect_signaler.wait_or_timeout(timeout);
@@ -291,7 +291,7 @@ namespace dlib
 
     void close_gracefully (
         connection* con,
-        unsigned long timeout 
+        unsigned long timeout
     )
     {
         scoped_ptr<connection> ptr(con);
@@ -302,7 +302,7 @@ namespace dlib
 
     void close_gracefully (
         scoped_ptr<connection>& con,
-        unsigned long timeout 
+        unsigned long timeout
     )
     {
         if (!con)

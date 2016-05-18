@@ -30,8 +30,8 @@ namespace dlib
         of the std::complex template class.
 
         For example:
-            is_complex<float>::value == false              
-            is_complex<std::complex<float> >::value == true   
+            is_complex<float>::value == false
+            is_complex<std::complex<float> >::value == true
     !*/
 
     template <typename T>
@@ -68,8 +68,8 @@ namespace dlib
     template <typename EXP>
     inline bool is_finite (
         const matrix_exp<EXP>& m
-    ) 
-    { 
+    )
+    {
         for (long r = 0; r < m.nr(); ++r)
         {
             for (long c = 0; c < m.nc(); ++c)
@@ -100,10 +100,10 @@ namespace dlib
         typename EXP::type& max_val
     )
     {
-        DLIB_ASSERT(m.size() > 0, 
+        DLIB_ASSERT(m.size() > 0,
             "\ttype find_min_and_max(const matrix_exp& m, min_val, max_val)"
             << "\n\tYou can't ask for the min and max of an empty matrix"
-            << "\n\tm.size():     " << m.size() 
+            << "\n\tm.size():     " << m.size()
             );
         typedef typename matrix_exp<EXP>::type type;
 
@@ -131,12 +131,12 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0, 
+        DLIB_ASSERT(m.size() > 0,
             "\tpoint max_point(const matrix_exp& m)"
             << "\n\tm can't be empty"
-            << "\n\tm.size():   " << m.size() 
-            << "\n\tm.nr():     " << m.nr() 
-            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tm.size():   " << m.size()
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc()
             );
         typedef typename matrix_exp<EXP>::type type;
 
@@ -166,12 +166,12 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0, 
+        DLIB_ASSERT(m.size() > 0,
             "\tpoint min_point(const matrix_exp& m)"
             << "\n\tm can't be empty"
-            << "\n\tm.size():   " << m.size() 
-            << "\n\tm.nr():     " << m.nr() 
-            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tm.size():   " << m.size()
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc()
             );
         typedef typename matrix_exp<EXP>::type type;
 
@@ -201,12 +201,12 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0 && is_vector(m) == true, 
+        DLIB_ASSERT(m.size() > 0 && is_vector(m) == true,
             "\tlong index_of_max(const matrix_exp& m)"
             << "\n\tm must be a row or column matrix"
-            << "\n\tm.size():   " << m.size() 
-            << "\n\tm.nr():     " << m.nr() 
-            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tm.size():   " << m.size()
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc()
             );
         typedef typename matrix_exp<EXP>::type type;
 
@@ -233,12 +233,12 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0 && is_vector(m), 
+        DLIB_ASSERT(m.size() > 0 && is_vector(m),
             "\tlong index_of_min(const matrix_exp& m)"
             << "\n\tm must be a row or column matrix"
-            << "\n\tm.size():   " << m.size() 
-            << "\n\tm.nr():     " << m.nr() 
-            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tm.size():   " << m.size()
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc()
             );
         typedef typename matrix_exp<EXP>::type type;
 
@@ -265,10 +265,10 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0, 
+        DLIB_ASSERT(m.size() > 0,
             "\ttype max(const matrix_exp& m)"
             << "\n\tYou can't ask for the max() of an empty matrix"
-            << "\n\tm.size():     " << m.size() 
+            << "\n\tm.size():     " << m.size()
             );
         typedef typename matrix_exp<EXP>::type type;
 
@@ -294,10 +294,10 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0, 
+        DLIB_ASSERT(m.size() > 0,
             "\ttype min(const matrix_exp& m)"
             << "\n\tYou can't ask for the min() of an empty matrix"
-            << "\n\tm.size():     " << m.size() 
+            << "\n\tm.size():     " << m.size()
             );
         typedef typename matrix_exp<EXP>::type type;
 
@@ -323,11 +323,11 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(is_vector(m) == true, 
+        DLIB_ASSERT(is_vector(m) == true,
             "\ttype length(const matrix_exp& m)"
             << "\n\tm must be a row or column vector"
-            << "\n\tm.nr():     " << m.nr() 
-            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc()
             );
         
         return std::sqrt(static_cast<double>(sum(squared(m))));
@@ -340,11 +340,11 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(is_vector(m) == true, 
+        DLIB_ASSERT(is_vector(m) == true,
             "\ttype length(const matrix_exp& m)"
             << "\n\tm must be a row or column vector"
-            << "\n\tm.nr():     " << m.nr() 
-            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc()
             );
         return std::sqrt(sum(squared(m)));
     }
@@ -358,11 +358,11 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(is_vector(m) == true, 
+        DLIB_ASSERT(is_vector(m) == true,
             "\ttype length_squared(const matrix_exp& m)"
             << "\n\tm must be a row or column vector"
-            << "\n\tm.nr():     " << m.nr() 
-            << "\n\tm.nc():     " << m.nc() 
+            << "\n\tm.nr():     " << m.nr()
+            << "\n\tm.nc():     " << m.nc()
             );
         return sum(squared(m));
     }
@@ -372,7 +372,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
     
     template <typename M>
-    struct op_trans 
+    struct op_trans
     {
         op_trans( const M& m_) : m(m_){}
 
@@ -394,7 +394,7 @@ namespace dlib
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
 
-    }; 
+    };
 
     template <
         typename M
@@ -431,101 +431,101 @@ namespace dlib
         typename EXP2
         >
     typename enable_if_c<(is_not_ct_vector<EXP1>::value) || (is_not_ct_vector<EXP2>::value),
-                         typename EXP1::type>::type 
+                         typename EXP1::type>::type
     dot (
         const matrix_exp<EXP1>& m1,
         const matrix_exp<EXP2>& m2
     )
     {
-        // You are getting an error on this line because you are trying to 
-        // compute the dot product between two matrices that aren't both vectors (i.e. 
+        // You are getting an error on this line because you are trying to
+        // compute the dot product between two matrices that aren't both vectors (i.e.
         // they aren't column or row matrices).
         COMPILE_TIME_ASSERT(EXP1::NR*EXP1::NC == 0 ||
                             EXP2::NR*EXP2::NC == 0);
 
         DLIB_ASSERT(is_vector(m1) && is_vector(m2) && m1.size() == m2.size() &&
-                    m1.size() > 0, 
+                    m1.size() > 0,
             "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
             << "\n\t You can only compute the dot product between non-empty vectors of equal length."
-            << "\n\t is_vector(m1): " << is_vector(m1) 
-            << "\n\t is_vector(m2): " << is_vector(m2) 
-            << "\n\t m1.size():     " << m1.size() 
-            << "\n\t m2.size():     " << m2.size() 
+            << "\n\t is_vector(m1): " << is_vector(m1)
+            << "\n\t is_vector(m2): " << is_vector(m2)
+            << "\n\t m1.size():     " << m1.size()
+            << "\n\t m2.size():     " << m2.size()
             );
 
         if (is_col_vector(m1) && is_col_vector(m2)) return (trans(m1)*m2)(0);
         if (is_col_vector(m1) && is_row_vector(m2)) return (m2*m1)(0);
         if (is_row_vector(m1) && is_col_vector(m2)) return (m1*m2)(0);
 
-        //if (is_row_vector(m1) && is_row_vector(m2)) 
+        //if (is_row_vector(m1) && is_row_vector(m2))
         return (m1*trans(m2))(0);
     }
 
     template < typename EXP1, typename EXP2 >
-    typename enable_if_c<EXP1::NR == 1 && EXP2::NR == 1 && EXP1::NC != 1 && EXP2::NC != 1, typename EXP1::type>::type 
-    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
-    { 
-        DLIB_ASSERT(m1.size() == m2.size(), 
+    typename enable_if_c<EXP1::NR == 1 && EXP2::NR == 1 && EXP1::NC != 1 && EXP2::NC != 1, typename EXP1::type>::type
+    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2)
+    {
+        DLIB_ASSERT(m1.size() == m2.size(),
             "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
             << "\n\t You can only compute the dot product between vectors of equal length"
-            << "\n\t m1.size():     " << m1.size() 
-            << "\n\t m2.size():     " << m2.size() 
+            << "\n\t m1.size():     " << m1.size()
+            << "\n\t m2.size():     " << m2.size()
             );
         
-        return m1*trans(m2); 
+        return m1*trans(m2);
     }
 
     template < typename EXP1, typename EXP2 >
-    typename enable_if_c<EXP1::NR == 1 && EXP2::NC == 1 && EXP1::NC != 1 && EXP2::NR != 1, typename EXP1::type>::type 
-    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
-    { 
-        DLIB_ASSERT(m1.size() == m2.size(), 
+    typename enable_if_c<EXP1::NR == 1 && EXP2::NC == 1 && EXP1::NC != 1 && EXP2::NR != 1, typename EXP1::type>::type
+    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2)
+    {
+        DLIB_ASSERT(m1.size() == m2.size(),
             "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
             << "\n\t You can only compute the dot product between vectors of equal length"
-            << "\n\t m1.size():     " << m1.size() 
-            << "\n\t m2.size():     " << m2.size() 
+            << "\n\t m1.size():     " << m1.size()
+            << "\n\t m2.size():     " << m2.size()
             );
         
-        return m1*m2; 
+        return m1*m2;
     }
 
     template < typename EXP1, typename EXP2 >
-    typename enable_if_c<EXP1::NC == 1 && EXP2::NR == 1 && EXP1::NR != 1 && EXP2::NC != 1, typename EXP1::type>::type 
-    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
-    { 
-        DLIB_ASSERT(m1.size() == m2.size(), 
+    typename enable_if_c<EXP1::NC == 1 && EXP2::NR == 1 && EXP1::NR != 1 && EXP2::NC != 1, typename EXP1::type>::type
+    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2)
+    {
+        DLIB_ASSERT(m1.size() == m2.size(),
             "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
             << "\n\t You can only compute the dot product between vectors of equal length"
-            << "\n\t m1.size():     " << m1.size() 
-            << "\n\t m2.size():     " << m2.size() 
+            << "\n\t m1.size():     " << m1.size()
+            << "\n\t m2.size():     " << m2.size()
             );
         
-        return m2*m1; 
+        return m2*m1;
     }
 
     template < typename EXP1, typename EXP2 >
-    typename enable_if_c<EXP1::NC == 1 && EXP2::NC == 1 && EXP1::NR != 1 && EXP2::NR != 1, typename EXP1::type>::type 
-    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
-    { 
-        DLIB_ASSERT(m1.size() == m2.size(), 
+    typename enable_if_c<EXP1::NC == 1 && EXP2::NC == 1 && EXP1::NR != 1 && EXP2::NR != 1, typename EXP1::type>::type
+    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2)
+    {
+        DLIB_ASSERT(m1.size() == m2.size(),
             "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
             << "\n\t You can only compute the dot product between vectors of equal length"
-            << "\n\t m1.size():     " << m1.size() 
-            << "\n\t m2.size():     " << m2.size() 
+            << "\n\t m1.size():     " << m1.size()
+            << "\n\t m2.size():     " << m2.size()
             );
         
-        return trans(m1)*m2; 
+        return trans(m1)*m2;
     }
 
     template < typename EXP1, typename EXP2 >
-    typename enable_if_c<(EXP1::NC*EXP1::NR == 1) || (EXP2::NC*EXP2::NR == 1), typename EXP1::type>::type 
-    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2) 
-    { 
-        DLIB_ASSERT(m1.size() == m2.size(), 
+    typename enable_if_c<(EXP1::NC*EXP1::NR == 1) || (EXP2::NC*EXP2::NR == 1), typename EXP1::type>::type
+    dot ( const matrix_exp<EXP1>& m1, const matrix_exp<EXP2>& m2)
+    {
+        DLIB_ASSERT(m1.size() == m2.size(),
             "\t type dot(const matrix_exp& m1, const matrix_exp& m2)"
             << "\n\t You can only compute the dot product between vectors of equal length"
-            << "\n\t m1.size():     " << m1.size() 
-            << "\n\t m2.size():     " << m2.size() 
+            << "\n\t m1.size():     " << m1.size()
+            << "\n\t m2.size():     " << m2.size()
             );
         
         return m1(0)*m2(0);
@@ -534,7 +534,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M, long R, long C>
-    struct op_removerc 
+    struct op_removerc
     {
         op_removerc( const M& m_) : m(m_){}
 
@@ -548,20 +548,20 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply (long r, long c) const
-        { 
+        {
             if (r < R)
             {
                 if (c < C)
-                    return m(r,c); 
+                    return m(r,c);
                 else
-                    return m(r,c+1); 
+                    return m(r,c+1);
             }
             else
             {
                 if (c < C)
-                    return m(r+1,c); 
+                    return m(r+1,c);
                 else
-                    return m(r+1,c+1); 
+                    return m(r+1,c+1);
             }
         }
 
@@ -573,7 +573,7 @@ namespace dlib
     };
 
     template <typename M>
-    struct op_removerc2 
+    struct op_removerc2
     {
         op_removerc2( const M& m_, const long R_, const long C_) : m(m_), R(R_), C(C_){}
         const M& m;
@@ -588,20 +588,20 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply (long r, long c) const
-        { 
+        {
             if (r < R)
             {
                 if (c < C)
-                    return m(r,c); 
+                    return m(r,c);
                 else
-                    return m(r,c+1); 
+                    return m(r,c+1);
             }
             else
             {
                 if (c < C)
-                    return m(r+1,c); 
+                    return m(r+1,c);
                 else
-                    return m(r+1,c+1); 
+                    return m(r+1,c+1);
             }
         }
 
@@ -623,15 +623,15 @@ namespace dlib
     {
         // you can't remove a row from a matrix with only one row
         COMPILE_TIME_ASSERT((EXP::NR > R && R >= 0) || EXP::NR == 0);
-        // you can't remove a column from a matrix with only one column 
+        // you can't remove a column from a matrix with only one column
         COMPILE_TIME_ASSERT((EXP::NC > C && C >= 0) || EXP::NR == 0);
-        DLIB_ASSERT(m.nr() > R && R >= 0 && m.nc() > C && C >= 0, 
+        DLIB_ASSERT(m.nr() > R && R >= 0 && m.nc() > C && C >= 0,
             "\tconst matrix_exp removerc<R,C>(const matrix_exp& m)"
             << "\n\tYou can't remove a row/column from a matrix if it doesn't have that row/column"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
-            << "\n\tR:      " << R 
-            << "\n\tC:      " << C 
+            << "\n\tm.nc(): " << m.nc()
+            << "\n\tR:      " << R
+            << "\n\tC:      " << C
             );
         typedef op_removerc<EXP,R,C> op;
         return matrix_op<op>(op(m.ref()));
@@ -646,13 +646,13 @@ namespace dlib
         long C
     )
     {
-        DLIB_ASSERT(m.nr() > R && R >= 0 && m.nc() > C && C >= 0, 
+        DLIB_ASSERT(m.nr() > R && R >= 0 && m.nc() > C && C >= 0,
             "\tconst matrix_exp removerc(const matrix_exp& m,R,C)"
             << "\n\tYou can't remove a row/column from a matrix if it doesn't have that row/column"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
-            << "\n\tR:      " << R 
-            << "\n\tC:      " << C 
+            << "\n\tm.nc(): " << m.nc()
+            << "\n\tR:      " << R
+            << "\n\tC:      " << C
             );
         typedef op_removerc2<EXP> op;
         return matrix_op<op>(op(m.ref(),R,C));
@@ -661,7 +661,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M, long C>
-    struct op_remove_col 
+    struct op_remove_col
     {
         op_remove_col( const M& m_) : m(m_){}
         const M& m;
@@ -674,14 +674,14 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (c < C)
             {
-                return m(r,c); 
+                return m(r,c);
             }
             else
             {
-                return m(r,c+1); 
+                return m(r,c+1);
             }
         }
 
@@ -693,7 +693,7 @@ namespace dlib
     };
 
     template <typename M>
-    struct op_remove_col2 
+    struct op_remove_col2
     {
         op_remove_col2( const M& m_,  const long C_) : m(m_), C(C_){}
         const M& m;
@@ -707,14 +707,14 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (c < C)
             {
-                return m(r,c); 
+                return m(r,c);
             }
             else
             {
-                return m(r,c+1); 
+                return m(r,c+1);
             }
         }
 
@@ -736,12 +736,12 @@ namespace dlib
         // You can't remove the given column from the matrix because the matrix doesn't
         // have a column with that index.
         COMPILE_TIME_ASSERT((EXP::NC > C && C >= 0) || EXP::NC == 0);
-        DLIB_ASSERT(m.nc() > C && C >= 0 , 
+        DLIB_ASSERT(m.nc() > C && C >= 0 ,
             "\tconst matrix_exp remove_col<C>(const matrix_exp& m)"
             << "\n\tYou can't remove a col from a matrix if it doesn't have it"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
-            << "\n\tC:      " << C 
+            << "\n\tm.nc(): " << m.nc()
+            << "\n\tC:      " << C
             );
         typedef op_remove_col<EXP,C> op;
         return matrix_op<op>(op(m.ref()));
@@ -755,12 +755,12 @@ namespace dlib
         long C
     )
     {
-        DLIB_ASSERT(m.nc() > C && C >= 0 , 
+        DLIB_ASSERT(m.nc() > C && C >= 0 ,
             "\tconst matrix_exp remove_col(const matrix_exp& m,C)"
             << "\n\tYou can't remove a col from a matrix if it doesn't have it"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
-            << "\n\tC:      " << C 
+            << "\n\tm.nc(): " << m.nc()
+            << "\n\tC:      " << C
             );
         typedef op_remove_col2<EXP> op;
         return matrix_op<op>(op(m.ref(),C));
@@ -769,7 +769,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M, long R>
-    struct op_remove_row 
+    struct op_remove_row
     {
         op_remove_row( const M& m_) : m(m_){}
         const M& m;
@@ -782,14 +782,14 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r < R)
             {
-                return m(r,c); 
+                return m(r,c);
             }
             else
             {
-                return m(r+1,c); 
+                return m(r+1,c);
             }
         }
 
@@ -801,7 +801,7 @@ namespace dlib
     };
 
     template <typename M>
-    struct op_remove_row2 
+    struct op_remove_row2
     {
         op_remove_row2( const M& m_,  const long R_) : m(m_), R(R_){}
         const M& m;
@@ -815,14 +815,14 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r < R)
             {
-                return m(r,c); 
+                return m(r,c);
             }
             else
             {
-                return m(r+1,c); 
+                return m(r+1,c);
             }
         }
 
@@ -844,12 +844,12 @@ namespace dlib
         // You can't remove the given row from the matrix because the matrix doesn't
         // have a row with that index.
         COMPILE_TIME_ASSERT((EXP::NR > R && R >= 0) || EXP::NR == 0);
-        DLIB_ASSERT(m.nr() > R && R >= 0, 
+        DLIB_ASSERT(m.nr() > R && R >= 0,
             "\tconst matrix_exp remove_row<R>(const matrix_exp& m)"
             << "\n\tYou can't remove a row from a matrix if it doesn't have it"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
-            << "\n\tR:      " << R 
+            << "\n\tm.nc(): " << m.nc()
+            << "\n\tR:      " << R
             );
         typedef op_remove_row<EXP,R> op;
         return matrix_op<op>(op(m.ref()));
@@ -863,12 +863,12 @@ namespace dlib
         long R
     )
     {
-        DLIB_ASSERT(m.nr() > R && R >= 0, 
+        DLIB_ASSERT(m.nr() > R && R >= 0,
             "\tconst matrix_exp remove_row(const matrix_exp& m, long R)"
             << "\n\tYou can't remove a row from a matrix if it doesn't have it"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
-            << "\n\tR:      " << R 
+            << "\n\tm.nc(): " << m.nc()
+            << "\n\tR:      " << R
             );
         typedef op_remove_row2<EXP> op;
         return matrix_op<op>(op(m.ref(),R));
@@ -877,7 +877,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_diagm 
+    struct op_diagm
     {
         op_diagm( const M& m_) : m(m_){}
         const M& m;
@@ -891,9 +891,9 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r==c)
-                return m(r); 
+                return m(r);
             else
                 return 0;
         }
@@ -914,11 +914,11 @@ namespace dlib
     {
         // You can only make a diagonal matrix out of a row or column vector
         COMPILE_TIME_ASSERT(EXP::NR == 0 || EXP::NR == 1 || EXP::NC == 1 || EXP::NC == 0);
-        DLIB_ASSERT(is_vector(m), 
+        DLIB_ASSERT(is_vector(m),
             "\tconst matrix_exp diagm(const matrix_exp& m)"
             << "\n\tYou can only apply diagm() to a row or column matrix"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             );
         typedef op_diagm<EXP> op;
         return matrix_diag_op<op>(op(m.ref()));
@@ -936,9 +936,9 @@ namespace dlib
         const static long cost = M1::cost + M2::cost + 1;
 
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r == c)
-                return this->m1(r,c)*this->m2(r,c); 
+                return this->m1(r,c)*this->m2(r,c);
             else
                 return 0;
         }
@@ -950,20 +950,20 @@ namespace dlib
         >
     inline const matrix_diag_op<op_diagm_mult<EXP1,EXP2> > operator* (
         const matrix_diag_exp<EXP1>& a,
-        const matrix_diag_exp<EXP2>& b 
+        const matrix_diag_exp<EXP2>& b
     )
     {
         COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type, typename EXP2::type>::value));
         COMPILE_TIME_ASSERT(EXP1::NR == EXP2::NR || EXP1::NR == 0 || EXP2::NR == 0);
         COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || EXP1::NC == 0 || EXP2::NC == 0);
         DLIB_ASSERT(a.nr() == b.nr() &&
-                    a.nc() == b.nc(), 
+                    a.nc() == b.nc(),
             "\tconst matrix_exp operator(const matrix_diag_exp& a, const matrix_diag_exp& b)"
             << "\n\tYou can only multiply diagonal matrices together if they are the same size"
             << "\n\ta.nr(): " << a.nr()
-            << "\n\ta.nc(): " << a.nc() 
+            << "\n\ta.nc(): " << a.nc()
             << "\n\tb.nr(): " << b.nr()
-            << "\n\tb.nc(): " << b.nc() 
+            << "\n\tb.nc(): " << b.nc()
             );
         typedef op_diagm_mult<EXP1,EXP2> op;
         return matrix_diag_op<op>(op(a.ref(),b.ref()));
@@ -972,7 +972,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_diag 
+    struct op_diag
     {
         op_diag( const M& m_) : m(m_){}
         const M& m;
@@ -1013,7 +1013,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M, typename target_type>
-    struct op_cast 
+    struct op_cast
     {
         op_cast( const M& m_) : m(m_){}
         const M& m;
@@ -1448,7 +1448,7 @@ namespace dlib
 
         type val;
         if (m.size() > 0)
-            val.set_size(m(0,0).nr(),m(0,0).nc()); 
+            val.set_size(m(0,0).nr(),m(0,0).nc());
         set_all_elements(val,0);
 
         for (long r = 0; r < m.nr(); ++r)
@@ -1464,7 +1464,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_sumr 
+    struct op_sumr
     {
         op_sumr(const M& m_) : m(m_) {}
         const M& m;
@@ -1477,11 +1477,11 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply ( long , long c) const
-        { 
+        {
             type temp = m(0,c);
             for (long r = 1; r < m.nr(); ++r)
                 temp += m(r,c);
-            return temp; 
+            return temp;
         }
 
         long nr () const { return 1; }
@@ -1489,7 +1489,7 @@ namespace dlib
 
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
-    }; 
+    };
 
     template <
         typename EXP
@@ -1498,10 +1498,10 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0 , 
+        DLIB_ASSERT(m.size() > 0 ,
                     "\tconst matrix_exp sum_rows(m)"
                     << "\n\t The matrix can't be empty"
-                    << "\n\t m.size(): " << m.size() 
+                    << "\n\t m.size(): " << m.size()
         );
         typedef op_sumr<EXP> op;
         return matrix_op<op>(op(m.ref()));
@@ -1510,7 +1510,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_sumc 
+    struct op_sumc
     {
         op_sumc(const M& m_) : m(m_) {}
         const M& m;
@@ -1523,11 +1523,11 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply ( long r, long ) const
-        { 
+        {
             type temp = m(r,0);
             for (long c = 1; c < m.nc(); ++c)
                 temp += m(r,c);
-            return temp; 
+            return temp;
         }
 
         long nr () const { return m.nr(); }
@@ -1535,7 +1535,7 @@ namespace dlib
 
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
-    }; 
+    };
 
     template <
         typename EXP
@@ -1544,10 +1544,10 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.size() > 0 , 
+        DLIB_ASSERT(m.size() > 0 ,
                     "\tconst matrix_exp sum_cols(m)"
                     << "\n\t The matrix can't be empty"
-                    << "\n\t m.size(): " << m.size() 
+                    << "\n\t m.size(): " << m.size()
         );
         typedef op_sumc<EXP> op;
         return matrix_op<op>(op(m.ref()));
@@ -1610,7 +1610,7 @@ namespace dlib
         else
         {
             // Note, for some reason, in gcc 4.1 performing this division using a
-            // double instead of a long value avoids a segmentation fault.  That is, 
+            // double instead of a long value avoids a segmentation fault.  That is,
             // using 1.0 instead of 1 does the trick.
             return val/(m.nr()*m.nc() - 1.0);
         }
@@ -1647,29 +1647,29 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        // perform static checks to make sure m is a column vector 
+        // perform static checks to make sure m is a column vector
         COMPILE_TIME_ASSERT(EXP::NR == 0 || EXP::NR > 1);
         COMPILE_TIME_ASSERT(EXP::NC == 1 || EXP::NC == 0);
 
         // perform static checks to make sure the matrices contained in m are column vectors
         COMPILE_TIME_ASSERT(EXP::type::NC == 1 || EXP::type::NC == 0 );
 
-        DLIB_ASSERT(m.size() > 1 && is_col_vector(m), 
+        DLIB_ASSERT(m.size() > 1 && is_col_vector(m),
             "\tconst matrix covariance(const matrix_exp& m)"
             << "\n\tYou can only apply covariance() to a column matrix"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             );
 #ifdef ENABLE_ASSERTS
         for (long i = 0; i < m.nr(); ++i)
         {
-            DLIB_ASSERT(m(0).size() == m(i).size() && m(i).size() > 0 && is_col_vector(m(i)), 
+            DLIB_ASSERT(m(0).size() == m(i).size() && m(i).size() > 0 && is_col_vector(m(i)),
                    "\tconst matrix covariance(const matrix_exp& m)"
                    << "\n\tYou can only apply covariance() to a column matrix of column matrices"
                    << "\n\tm(0).size(): " << m(0).size()
-                   << "\n\tm(i).size(): " << m(i).size() 
+                   << "\n\tm(i).size(): " << m(i).size()
                    << "\n\tis_col_vector(m(i)): " << (is_col_vector(m(i)) ? "true" : "false")
-                   << "\n\ti:         " << i 
+                   << "\n\ti:         " << i
                 );
         }
 #endif
@@ -1714,11 +1714,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T 
+        typename T
         >
-    struct op_uniform_matrix_3 : does_not_alias 
+    struct op_uniform_matrix_3 : does_not_alias
     {
-        op_uniform_matrix_3(const long& rows_, const long& cols_, const T& val_ ) : 
+        op_uniform_matrix_3(const long& rows_, const long& cols_, const T& val_ ) :
             rows(rows_), cols(cols_), val(val_)  {}
 
         const long rows;
@@ -1747,7 +1747,7 @@ namespace dlib
         const T& val
     )
     {
-        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+        DLIB_ASSERT(nr >= 0 && nc >= 0,
             "\tconst matrix_exp uniform_matrix<T>(nr, nc, val)"
             << "\n\tnr and nc have to be bigger than 0"
             << "\n\tnr: " << nr
@@ -1767,7 +1767,7 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+        DLIB_ASSERT(nr >= 0 && nc >= 0,
             "\tconst matrix_exp zeros_matrix<T>(nr, nc)"
             << "\n\tnr and nc have to be >= 0"
             << "\n\tnr: " << nr
@@ -1786,7 +1786,7 @@ namespace dlib
         const matrix_exp<EXP>& mat
     )
     {
-        DLIB_ASSERT(mat.nr() >= 0 && mat.nc() >= 0, 
+        DLIB_ASSERT(mat.nr() >= 0 && mat.nc() >= 0,
             "\tconst matrix_exp zeros_matrix(mat)"
             << "\n\t nr and nc have to be >= 0"
             << "\n\t mat.nr(): " << mat.nr()
@@ -1807,7 +1807,7 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+        DLIB_ASSERT(nr >= 0 && nc >= 0,
             "\tconst matrix_exp ones_matrix<T>(nr, nc)"
             << "\n\tnr and nc have to be >= 0"
             << "\n\tnr: " << nr
@@ -1826,7 +1826,7 @@ namespace dlib
         const matrix_exp<EXP>& mat
     )
     {
-        DLIB_ASSERT(mat.nr() >= 0 && mat.nc() >= 0, 
+        DLIB_ASSERT(mat.nr() >= 0 && mat.nc() >= 0,
             "\tconst matrix_exp ones_matrix(mat)"
             << "\n\t nr and nc have to be >= 0"
             << "\n\t mat.nr(): " << mat.nr()
@@ -1840,11 +1840,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
-        long NR_, 
-        long NC_ 
+        typename T,
+        long NR_,
+        long NC_
         >
-    struct op_uniform_matrix_2 : does_not_alias 
+    struct op_uniform_matrix_2 : does_not_alias
     {
         op_uniform_matrix_2( const T& val_ ) : val(val_) {}
         const T val;
@@ -1865,7 +1865,7 @@ namespace dlib
 
     template <
         typename T,
-        long NR, 
+        long NR,
         long NC
         >
     const matrix_op<op_uniform_matrix_2<T,NR,NC> > uniform_matrix (
@@ -1881,12 +1881,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
-        long NR_, 
-        long NC_, 
+        typename T,
+        long NR_,
+        long NC_,
         T val
         >
-    struct op_uniform_matrix : does_not_alias 
+    struct op_uniform_matrix : does_not_alias
     {
         const static long cost = 1;
         const static long NR = NR_;
@@ -1902,9 +1902,9 @@ namespace dlib
     };
 
     template <
-        typename T, 
-        long NR, 
-        long NC, 
+        typename T,
+        long NR,
+        long NC,
         T val
         >
     const matrix_op<op_uniform_matrix<T,NR,NC,val> > uniform_matrix (
@@ -1917,7 +1917,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct op_gaussian_randm : does_not_alias 
+    struct op_gaussian_randm : does_not_alias
     {
         op_gaussian_randm (
             long nr_,
@@ -1948,11 +1948,11 @@ namespace dlib
         unsigned long seed = 0
     )
     {
-        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+        DLIB_ASSERT(nr >= 0 && nc >= 0,
             "\tmatrix_exp gaussian_randm(nr, nc, seed)"
             << "\n\tInvalid inputs to this function"
-            << "\n\tnr: " << nr 
-            << "\n\tnc: " << nc 
+            << "\n\tnr: " << nr
+            << "\n\tnc: " << nc
             );
 
         typedef op_gaussian_randm op;
@@ -1962,7 +1962,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_add_diag 
+    struct op_add_diag
     {
         op_add_diag( const M& m_, const typename M::type& value_) : m(m_), value(value_){}
         const M& m;
@@ -1976,9 +1976,9 @@ namespace dlib
         typedef typename M::mem_manager_type mem_manager_type;
         typedef typename M::layout_type layout_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r==c)
-                return m(r,c)+value; 
+                return m(r,c)+value;
             else
                 return m(r,c);
         }
@@ -1993,9 +1993,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T 
+        typename T
         >
-    struct op_identity_matrix_2 : does_not_alias 
+    struct op_identity_matrix_2 : does_not_alias
     {
         op_identity_matrix_2(const long& size_) : size(size_) {}
 
@@ -2019,33 +2019,33 @@ namespace dlib
         typename U
         >
     const matrix_diag_op<op_identity_matrix_2<T> > identity_matrix (
-        const U& size 
+        const U& size
     )
     {
         // the size argument must be some scalar value, not a matrix!
         COMPILE_TIME_ASSERT(is_matrix<U>::value == false);
 
-        DLIB_ASSERT(size > 0, 
+        DLIB_ASSERT(size > 0,
             "\tconst matrix_exp identity_matrix<T>(size)"
             << "\n\tsize must be bigger than 0"
-            << "\n\tsize: " << size 
+            << "\n\tsize: " << size
             );
         typedef op_identity_matrix_2<T> op;
         return matrix_diag_op<op>(op(size));
     }
 
     template <
-        typename EXP 
+        typename EXP
         >
     const matrix_diag_op<op_identity_matrix_2<typename EXP::type> > identity_matrix (
         const matrix_exp<EXP>& mat
     )
     {
-        DLIB_ASSERT(mat.nr() == mat.nc(), 
+        DLIB_ASSERT(mat.nr() == mat.nc(),
             "\tconst matrix_exp identity_matrix(mat)"
             << "\n\t mat must be a square matrix."
-            << "\n\t mat.nr(): " << mat.nr() 
-            << "\n\t mat.nc(): " << mat.nc() 
+            << "\n\t mat.nr(): " << mat.nr()
+            << "\n\t mat.nc(): " << mat.nc()
             );
         typedef typename EXP::type T;
         typedef op_identity_matrix_2<T> op;
@@ -2068,15 +2068,15 @@ namespace dlib
 
         // You can only add matrices together if they both have the same number of rows and columns.
         DLIB_ASSERT(lhs.nc() == rhs.nc() &&
-                    lhs.nr() == rhs.nr(), 
+                    lhs.nr() == rhs.nr(),
             "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
             << "\n\tYou are trying to add two incompatible matrices together"
             << "\n\tlhs.nr(): " << lhs.nr()
             << "\n\tlhs.nc(): " << lhs.nc()
             << "\n\trhs.nr(): " << rhs.nr()
             << "\n\trhs.nc(): " << rhs.nc()
-            << "\n\t&lhs: " << &lhs 
-            << "\n\t&rhs: " << &rhs 
+            << "\n\t&lhs: " << &lhs
+            << "\n\t&rhs: " << &rhs
             );
 
 
@@ -2091,7 +2091,7 @@ namespace dlib
         typename T
         >
     const matrix_op<op_add_diag<EXP> > operator+ (
-        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >& DLIB_IF_ASSERT(lhs), 
+        const matrix_exp<matrix_diag_op<op_identity_matrix_2<T> > >& DLIB_IF_ASSERT(lhs),
         const matrix_exp<EXP>& rhs
     )
     {
@@ -2100,15 +2100,15 @@ namespace dlib
 
         // You can only add matrices together if they both have the same number of rows and columns.
         DLIB_ASSERT(lhs.nc() == rhs.nc() &&
-                    lhs.nr() == rhs.nr(), 
+                    lhs.nr() == rhs.nr(),
             "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
             << "\n\tYou are trying to add two incompatible matrices together"
             << "\n\tlhs.nr(): " << lhs.nr()
             << "\n\tlhs.nc(): " << lhs.nc()
             << "\n\trhs.nr(): " << rhs.nr()
             << "\n\trhs.nc(): " << rhs.nc()
-            << "\n\t&lhs: " << &lhs 
-            << "\n\t&rhs: " << &rhs 
+            << "\n\t&lhs: " << &lhs
+            << "\n\t&rhs: " << &rhs
             );
 
 
@@ -2122,7 +2122,7 @@ namespace dlib
         typename T,
         long N
         >
-    struct op_const_diag_matrix : does_not_alias 
+    struct op_const_diag_matrix : does_not_alias
     {
         op_const_diag_matrix(const long& size_, const T& value_) : size(size_),value(value_) {}
 
@@ -2136,8 +2136,8 @@ namespace dlib
         typedef row_major_layout layout_type;
         typedef T type;
         typedef const T const_ret_type;
-        const_ret_type apply (long r, long c) const 
-        { 
+        const_ret_type apply (long r, long c) const
+        {
             if (r == c)
                 return value;
             else
@@ -2183,7 +2183,7 @@ namespace dlib
         >
     const matrix_op<op_add_diag<EXP> > operator+ (
         const matrix_exp<EXP>& lhs,
-        const matrix_exp<matrix_diag_op<op_const_diag_matrix<T,N> > >& rhs 
+        const matrix_exp<matrix_diag_op<op_const_diag_matrix<T,N> > >& rhs
     )
     {
         // both matrices must contain the same type of element
@@ -2191,15 +2191,15 @@ namespace dlib
 
         // You can only add matrices together if they both have the same number of rows and columns.
         DLIB_ASSERT(lhs.nc() == rhs.nc() &&
-                    lhs.nr() == rhs.nr(), 
+                    lhs.nr() == rhs.nr(),
             "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
             << "\n\tYou are trying to add two incompatible matrices together"
             << "\n\tlhs.nr(): " << lhs.nr()
             << "\n\tlhs.nc(): " << lhs.nc()
             << "\n\trhs.nr(): " << rhs.nr()
             << "\n\trhs.nc(): " << rhs.nc()
-            << "\n\t&lhs: " << &lhs 
-            << "\n\t&rhs: " << &rhs 
+            << "\n\t&lhs: " << &lhs
+            << "\n\t&rhs: " << &rhs
             );
 
 
@@ -2213,7 +2213,7 @@ namespace dlib
         long N
         >
     const matrix_op<op_add_diag<EXP> > operator+ (
-        const matrix_exp<matrix_diag_op<op_const_diag_matrix<T,N> > >& lhs, 
+        const matrix_exp<matrix_diag_op<op_const_diag_matrix<T,N> > >& lhs,
         const matrix_exp<EXP>& rhs
     )
     {
@@ -2222,15 +2222,15 @@ namespace dlib
 
         // You can only add matrices together if they both have the same number of rows and columns.
         DLIB_ASSERT(lhs.nc() == rhs.nc() &&
-                    lhs.nr() == rhs.nr(), 
+                    lhs.nr() == rhs.nr(),
             "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
             << "\n\tYou are trying to add two incompatible matrices together"
             << "\n\tlhs.nr(): " << lhs.nr()
             << "\n\tlhs.nc(): " << lhs.nc()
             << "\n\trhs.nr(): " << rhs.nr()
             << "\n\trhs.nc(): " << rhs.nc()
-            << "\n\t&lhs: " << &lhs 
-            << "\n\t&rhs: " << &rhs 
+            << "\n\t&lhs: " << &lhs
+            << "\n\t&rhs: " << &rhs
             );
 
 
@@ -2241,10 +2241,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T, 
+        typename T,
         long N
         >
-    struct op_identity_matrix : does_not_alias 
+    struct op_identity_matrix : does_not_alias
     {
         const static long cost = 1;
         const static long NR = N;
@@ -2260,7 +2260,7 @@ namespace dlib
     };
 
     template <
-        typename T, 
+        typename T,
         long N
         >
     const matrix_diag_op<op_identity_matrix<T,N> > identity_matrix (
@@ -2308,7 +2308,7 @@ namespace dlib
         long N
         >
     const matrix_op<op_add_diag<EXP> > operator+ (
-        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& DLIB_IF_ASSERT(lhs), 
+        const matrix_exp<matrix_diag_op<op_identity_matrix<T,N> > >& DLIB_IF_ASSERT(lhs),
         const matrix_exp<EXP>& rhs
     )
     {
@@ -2317,15 +2317,15 @@ namespace dlib
 
         // You can only add matrices together if they both have the same number of rows and columns.
         DLIB_ASSERT(lhs.nc() == rhs.nc() &&
-                    lhs.nr() == rhs.nr(), 
+                    lhs.nr() == rhs.nr(),
             "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
             << "\n\tYou are trying to add two incompatible matrices together"
             << "\n\tlhs.nr(): " << lhs.nr()
             << "\n\tlhs.nc(): " << lhs.nc()
             << "\n\trhs.nr(): " << rhs.nr()
             << "\n\trhs.nc(): " << rhs.nc()
-            << "\n\t&lhs: " << &lhs 
-            << "\n\t&rhs: " << &rhs 
+            << "\n\t&lhs: " << &lhs
+            << "\n\t&rhs: " << &rhs
             );
 
 
@@ -2348,15 +2348,15 @@ namespace dlib
 
         // You can only add matrices together if they both have the same number of rows and columns.
         DLIB_ASSERT(lhs.nc() == rhs.nc() &&
-                    lhs.nr() == rhs.nr(), 
+                    lhs.nr() == rhs.nr(),
             "\tconst matrix_exp operator+(const matrix_exp& lhs, const matrix_exp& rhs)"
             << "\n\tYou are trying to add two incompatible matrices together"
             << "\n\tlhs.nr(): " << lhs.nr()
             << "\n\tlhs.nc(): " << lhs.nc()
             << "\n\trhs.nr(): " << rhs.nr()
             << "\n\trhs.nc(): " << rhs.nc()
-            << "\n\t&lhs: " << &lhs 
-            << "\n\t&rhs: " << &rhs 
+            << "\n\t&lhs: " << &lhs
+            << "\n\t&rhs: " << &rhs
             );
 
 
@@ -2367,7 +2367,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M, long R, long C>
-    struct op_rotate 
+    struct op_rotate
     {
         op_rotate(const M& m_) : m(m_) {}
         const M& m;
@@ -2433,20 +2433,20 @@ namespace dlib
         >
     inline const matrix_op<op_pointwise_multiply<EXP1,EXP2> > pointwise_multiply (
         const matrix_exp<EXP1>& a,
-        const matrix_exp<EXP2>& b 
+        const matrix_exp<EXP2>& b
     )
     {
         COMPILE_TIME_ASSERT((impl::compatible<typename EXP1::type,typename EXP2::type>::value == true));
         COMPILE_TIME_ASSERT(EXP1::NR == EXP2::NR || EXP1::NR == 0 || EXP2::NR == 0);
         COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || EXP1::NC == 0 || EXP2::NC == 0);
         DLIB_ASSERT(a.nr() == b.nr() &&
-               a.nc() == b.nc(), 
+               a.nc() == b.nc(),
             "\tconst matrix_exp pointwise_multiply(const matrix_exp& a, const matrix_exp& b)"
             << "\n\tYou can only make a do a pointwise multiply with two equally sized matrices"
             << "\n\ta.nr(): " << a.nr()
-            << "\n\ta.nc(): " << a.nc() 
+            << "\n\ta.nc(): " << a.nc()
             << "\n\tb.nr(): " << b.nr()
-            << "\n\tb.nc(): " << b.nc() 
+            << "\n\tb.nc(): " << b.nc()
             );
         typedef op_pointwise_multiply<EXP1,EXP2> op;
         return matrix_op<op>(op(a.ref(),b.ref()));
@@ -2457,7 +2457,7 @@ namespace dlib
     template <typename M1, typename M2, typename M3>
     struct op_pointwise_multiply3 : basic_op_mmm<M1,M2,M3>
     {
-        op_pointwise_multiply3( const M1& m1_, const M2& m2_, const M3& m3_) : 
+        op_pointwise_multiply3( const M1& m1_, const M2& m2_, const M3& m3_) :
             basic_op_mmm<M1,M2,M3>(m1_,m2_,m3_){}
 
         typedef typename M1::type type;
@@ -2473,10 +2473,10 @@ namespace dlib
         typename EXP2,
         typename EXP3
         >
-    inline const matrix_op<op_pointwise_multiply3<EXP1,EXP2,EXP3> > 
+    inline const matrix_op<op_pointwise_multiply3<EXP1,EXP2,EXP3> >
         pointwise_multiply (
         const matrix_exp<EXP1>& a,
-        const matrix_exp<EXP2>& b, 
+        const matrix_exp<EXP2>& b,
         const matrix_exp<EXP3>& c
     )
     {
@@ -2489,15 +2489,15 @@ namespace dlib
         DLIB_ASSERT(a.nr() == b.nr() &&
                a.nc() == b.nc() &&
                b.nr() == c.nr() &&
-               b.nc() == c.nc(), 
+               b.nc() == c.nc(),
             "\tconst matrix_exp pointwise_multiply(a,b,c)"
             << "\n\tYou can only make a do a pointwise multiply between equally sized matrices"
             << "\n\ta.nr(): " << a.nr()
-            << "\n\ta.nc(): " << a.nc() 
+            << "\n\ta.nc(): " << a.nc()
             << "\n\tb.nr(): " << b.nr()
-            << "\n\tb.nc(): " << b.nc() 
+            << "\n\tb.nc(): " << b.nc()
             << "\n\tc.nr(): " << c.nr()
-            << "\n\tc.nc(): " << c.nc() 
+            << "\n\tc.nc(): " << c.nc()
             );
 
         typedef op_pointwise_multiply3<EXP1,EXP2,EXP3> op;
@@ -2509,7 +2509,7 @@ namespace dlib
     template <typename M1, typename M2, typename M3, typename M4>
     struct op_pointwise_multiply4 : basic_op_mmmm<M1,M2,M3,M4>
     {
-        op_pointwise_multiply4( const M1& m1_, const M2& m2_, const M3& m3_, const M4& m4_) : 
+        op_pointwise_multiply4( const M1& m1_, const M2& m2_, const M3& m3_, const M4& m4_) :
             basic_op_mmmm<M1,M2,M3,M4>(m1_,m2_,m3_,m4_){}
 
         typedef typename M1::type type;
@@ -2529,7 +2529,7 @@ namespace dlib
         >
     inline const matrix_op<op_pointwise_multiply4<EXP1,EXP2,EXP3,EXP4> > pointwise_multiply (
         const matrix_exp<EXP1>& a,
-        const matrix_exp<EXP2>& b, 
+        const matrix_exp<EXP2>& b,
         const matrix_exp<EXP3>& c,
         const matrix_exp<EXP4>& d
     )
@@ -2548,17 +2548,17 @@ namespace dlib
                b.nr() == c.nr() &&
                b.nc() == c.nc() &&
                c.nr() == d.nr() &&
-               c.nc() == d.nc(), 
+               c.nc() == d.nc(),
             "\tconst matrix_exp pointwise_multiply(a,b,c,d)"
             << "\n\tYou can only make a do a pointwise multiply between equally sized matrices"
             << "\n\ta.nr(): " << a.nr()
-            << "\n\ta.nc(): " << a.nc() 
+            << "\n\ta.nc(): " << a.nc()
             << "\n\tb.nr(): " << b.nr()
-            << "\n\tb.nc(): " << b.nc() 
+            << "\n\tb.nc(): " << b.nc()
             << "\n\tc.nr(): " << c.nr()
-            << "\n\tc.nc(): " << c.nc() 
+            << "\n\tc.nc(): " << c.nc()
             << "\n\td.nr(): " << d.nr()
-            << "\n\td.nc(): " << d.nc() 
+            << "\n\td.nc(): " << d.nc()
             );
 
         typedef op_pointwise_multiply4<EXP1,EXP2,EXP3,EXP4> op;
@@ -2730,7 +2730,7 @@ namespace dlib
         >
     inline void vector_to_pixel (
         P& pixel,
-        const matrix_exp<EXP>& vector 
+        const matrix_exp<EXP>& vector
     )
     {
         COMPILE_TIME_ASSERT(pixel_traits<P>::num == matrix_exp<EXP>::NR);
@@ -2750,7 +2750,7 @@ namespace dlib
         const static long cost = M::cost + 2;
 
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             const type temp = this->m(r,c);
             if (temp > static_cast<type>(upper))
                 return static_cast<type>(upper);
@@ -2762,7 +2762,7 @@ namespace dlib
     };
 
     template <
-        long l, 
+        long l,
         long u,
         typename EXP
         >
@@ -2781,7 +2781,7 @@ namespace dlib
     {
         typedef typename M::type type;
 
-        op_clamp2( const M& m_, const type& l, const type& u) : 
+        op_clamp2( const M& m_, const type& l, const type& u) :
             basic_op_m<M>(m_), lower(l), upper(u){}
 
         const type& lower;
@@ -2791,7 +2791,7 @@ namespace dlib
         const static long cost = M::cost + 2;
 
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             const type temp = this->m(r,c);
             if (temp > upper)
                 return upper;
@@ -2820,7 +2820,7 @@ namespace dlib
     template <typename M1, typename M2, typename M3>
     struct op_clamp_m : basic_op_mmm<M1,M2,M3>
     {
-        op_clamp_m( const M1& m1_, const M2& m2_, const M3& m3_) : 
+        op_clamp_m( const M1& m1_, const M2& m2_, const M3& m3_) :
             basic_op_mmm<M1,M2,M3>(m1_,m2_,m3_){}
 
         typedef typename M1::type type;
@@ -2828,7 +2828,7 @@ namespace dlib
         const static long cost = M1::cost + M2::cost + M3::cost + 2;
 
         const_ret_type apply (long r, long c) const
-        { 
+        {
             const type val = this->m1(r,c);
             const type lower = this->m2(r,c);
             const type upper = this->m3(r,c);
@@ -2839,7 +2839,7 @@ namespace dlib
                 else
                     return lower;
             }
-            else 
+            else
             {
                 return upper;
             }
@@ -2851,10 +2851,10 @@ namespace dlib
         typename EXP2,
         typename EXP3
         >
-    const matrix_op<op_clamp_m<EXP1,EXP2,EXP3> > 
+    const matrix_op<op_clamp_m<EXP1,EXP2,EXP3> >
     clamp (
         const matrix_exp<EXP1>& m,
-        const matrix_exp<EXP2>& lower, 
+        const matrix_exp<EXP2>& lower,
         const matrix_exp<EXP3>& upper
     )
     {
@@ -2871,11 +2871,11 @@ namespace dlib
             "\tconst matrix_exp clamp(m,lower,upper)"
             << "\n\t Invalid inputs were given to this function."
             << "\n\t m.nr():     " << m.nr()
-            << "\n\t m.nc():     " << m.nc() 
+            << "\n\t m.nc():     " << m.nc()
             << "\n\t lower.nr(): " << lower.nr()
-            << "\n\t lower.nc(): " << lower.nc() 
+            << "\n\t lower.nc(): " << lower.nc()
             << "\n\t upper.nr(): " << upper.nr()
-            << "\n\t upper.nc(): " << upper.nc() 
+            << "\n\t upper.nc(): " << upper.nc()
             );
 
         typedef op_clamp_m<EXP1,EXP2,EXP3> op;
@@ -2889,7 +2889,7 @@ namespace dlib
     {
         typedef typename M::type type;
 
-        op_lowerbound( const M& m_, const type& thresh_) : 
+        op_lowerbound( const M& m_, const type& thresh_) :
             basic_op_m<M>(m_), thresh(thresh_){}
 
         const type& thresh;
@@ -2898,7 +2898,7 @@ namespace dlib
         const static long cost = M::cost + 2;
 
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             const type temp = this->m(r,c);
             if (temp >= thresh)
                 return temp;
@@ -2926,7 +2926,7 @@ namespace dlib
     {
         typedef typename M::type type;
 
-        op_upperbound( const M& m_, const type& thresh_) : 
+        op_upperbound( const M& m_, const type& thresh_) :
             basic_op_m<M>(m_), thresh(thresh_){}
 
         const type& thresh;
@@ -2935,7 +2935,7 @@ namespace dlib
         const static long cost = M::cost + 2;
 
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             const type temp = this->m(r,c);
             if (temp <= thresh)
                 return temp;
@@ -2959,7 +2959,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_reshape 
+    struct op_reshape
     {
         op_reshape(const M& m_, const long& rows_, const long& cols_) : m(m_),rows(rows_),cols(cols_) {}
         const M& m;
@@ -2975,7 +2975,7 @@ namespace dlib
         typedef typename M::layout_type layout_type;
 
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             const long idx = r*cols + c;
             return m(idx/m.nc(), idx%m.nc());
         }
@@ -2993,16 +2993,16 @@ namespace dlib
     const matrix_op<op_reshape<EXP> > reshape (
         const matrix_exp<EXP>& m,
         const long& rows,
-        const long& cols 
+        const long& cols
     )
     {
-        DLIB_ASSERT(m.size() == rows*cols && rows > 0 && cols > 0, 
+        DLIB_ASSERT(m.size() == rows*cols && rows > 0 && cols > 0,
             "\tconst matrix_exp reshape(m, rows, cols)"
             << "\n\t The size of m must match the dimensions you want to reshape it into."
             << "\n\t m.size():  " << m.size()
-            << "\n\t rows*cols: " << rows*cols 
-            << "\n\t rows:      " << rows 
-            << "\n\t cols:      " << cols 
+            << "\n\t rows*cols: " << rows*cols
+            << "\n\t rows:      " << rows
+            << "\n\t cols:      " << cols
             );
 
         typedef op_reshape<EXP> op;
@@ -3034,7 +3034,7 @@ namespace dlib
             }
         }
 
-        // no non-equal points found so we return true 
+        // no non-equal points found so we return true
         return true;
     }
 
@@ -3062,14 +3062,14 @@ namespace dlib
             }
         }
 
-        // no non-equal points found so we return true 
+        // no non-equal points found so we return true
         return true;
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2>
-    struct op_scale_columns  
+    struct op_scale_columns
     {
         op_scale_columns(const M1& m1_, const M2& m2_) : m1(m1_), m2(m2_) {}
         const M1& m1;
@@ -3088,9 +3088,9 @@ namespace dlib
         long nr () const { return m1.nr(); }
         long nc () const { return m1.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item) ; }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.destructively_aliases(item) || m2.aliases(item); }
     };
 
@@ -3100,7 +3100,7 @@ namespace dlib
         >
     const matrix_op<op_scale_columns<EXP1,EXP2> > scale_columns (
         const matrix_exp<EXP1>& m,
-        const matrix_exp<EXP2>& v 
+        const matrix_exp<EXP2>& v
     )
     {
         // Both arguments to this function must contain the same type of element
@@ -3114,13 +3114,13 @@ namespace dlib
         // the length of v must match the number of columns in m
         COMPILE_TIME_ASSERT(EXP1::NC == v_len || EXP1::NC == 0 || v_len == 0);
 
-        DLIB_ASSERT(is_vector(v) == true && v.size() == m.nc(), 
+        DLIB_ASSERT(is_vector(v) == true && v.size() == m.nc(),
             "\tconst matrix_exp scale_columns(m, v)"
             << "\n\tv must be a row or column vector and its length must match the number of columns in m"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             << "\n\tv.nr(): " << v.nr()
-            << "\n\tv.nc(): " << v.nc() 
+            << "\n\tv.nc(): " << v.nc()
             );
         typedef op_scale_columns<EXP1,EXP2> op;
         return matrix_op<op>(op(m.ref(),v.ref()));
@@ -3129,7 +3129,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2>
-    struct op_scale_columns_diag  
+    struct op_scale_columns_diag
     {
         op_scale_columns_diag(const M1& m1_, const M2& m2_) : m1(m1_), m2(m2_) {}
         const M1& m1;
@@ -3148,9 +3148,9 @@ namespace dlib
         long nr () const { return m1.nr(); }
         long nc () const { return m1.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item) ; }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.destructively_aliases(item) || m2.aliases(item); }
     };
 
@@ -3161,7 +3161,7 @@ namespace dlib
         >
     const matrix_op<op_scale_columns_diag<EXP1,EXP2> > operator* (
         const matrix_exp<EXP1>& m,
-        const matrix_diag_exp<EXP2>& d 
+        const matrix_diag_exp<EXP2>& d
     )
     {
         // Both arguments to this function must contain the same type of element
@@ -3173,13 +3173,13 @@ namespace dlib
         // the length of d must match the number of columns in m
         COMPILE_TIME_ASSERT(EXP1::NC == v_len || EXP1::NC == 0 || v_len == 0);
 
-        DLIB_ASSERT(m.nc() == d.nr(), 
+        DLIB_ASSERT(m.nc() == d.nr(),
             "\tconst matrix_exp operator*(m, d)"
             << "\n\tmatrix dimensions don't match"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             << "\n\td.nr(): " << d.nr()
-            << "\n\td.nc(): " << d.nc() 
+            << "\n\td.nc(): " << d.nc()
             );
         typedef op_scale_columns_diag<EXP1,EXP2> op;
         return matrix_op<op>(op(m.ref(),d.ref()));
@@ -3188,7 +3188,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2>
-    struct op_scale_rows  
+    struct op_scale_rows
     {
         op_scale_rows(const M1& m1_, const M2& m2_) : m1(m1_), m2(m2_) {}
         const M1& m1;
@@ -3207,9 +3207,9 @@ namespace dlib
         long nr () const { return m1.nr(); }
         long nc () const { return m1.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item) ; }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.destructively_aliases(item) || m2.aliases(item); }
     };
 
@@ -3219,7 +3219,7 @@ namespace dlib
         >
     const matrix_op<op_scale_rows<EXP1,EXP2> > scale_rows (
         const matrix_exp<EXP1>& m,
-        const matrix_exp<EXP2>& v 
+        const matrix_exp<EXP2>& v
     )
     {
         // Both arguments to this function must contain the same type of element
@@ -3233,13 +3233,13 @@ namespace dlib
         // the length of v must match the number of rows in m
         COMPILE_TIME_ASSERT(EXP1::NR == v_len || EXP1::NR == 0 || v_len == 0);
 
-        DLIB_ASSERT(is_vector(v) == true && v.size() == m.nr(), 
+        DLIB_ASSERT(is_vector(v) == true && v.size() == m.nr(),
             "\tconst matrix_exp scale_rows(m, v)"
             << "\n\tv must be a row or column vector and its length must match the number of rows in m"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             << "\n\tv.nr(): " << v.nr()
-            << "\n\tv.nc(): " << v.nc() 
+            << "\n\tv.nc(): " << v.nc()
             );
         typedef op_scale_rows<EXP1,EXP2> op;
         return matrix_op<op>(op(m.ref(),v.ref()));
@@ -3248,7 +3248,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2>
-    struct op_scale_rows_diag  
+    struct op_scale_rows_diag
     {
         op_scale_rows_diag(const M1& m1_, const M2& m2_) : m1(m1_), m2(m2_) {}
         const M1& m1;
@@ -3267,9 +3267,9 @@ namespace dlib
         long nr () const { return m1.nr(); }
         long nc () const { return m1.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item) ; }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.destructively_aliases(item) || m2.aliases(item); }
     };
 
@@ -3279,7 +3279,7 @@ namespace dlib
         typename EXP2
         >
     const matrix_op<op_scale_rows_diag<EXP1,EXP2> > operator* (
-        const matrix_diag_exp<EXP2>& d, 
+        const matrix_diag_exp<EXP2>& d,
         const matrix_exp<EXP1>& m
     )
     {
@@ -3292,13 +3292,13 @@ namespace dlib
         // the length of d must match the number of rows in m
         COMPILE_TIME_ASSERT(EXP1::NR == v_len || EXP1::NR == 0 || v_len == 0);
 
-        DLIB_ASSERT(d.nc() == m.nr(), 
+        DLIB_ASSERT(d.nc() == m.nr(),
             "\tconst matrix_exp operator*(d, m)"
             << "\n\tThe dimensions of the d and m matrices don't match."
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             << "\n\td.nr(): " << d.nr()
-            << "\n\td.nc(): " << d.nc() 
+            << "\n\td.nc(): " << d.nc()
             );
         typedef op_scale_rows_diag<EXP1,EXP2> op;
         return matrix_op<op>(op(m.ref(),d.ref()));
@@ -3309,16 +3309,16 @@ namespace dlib
 
     /*
         The idea here is to catch expressions of the form d*M*d where d is diagonal and M
-        is some square matrix and turn them into something equivalent to 
+        is some square matrix and turn them into something equivalent to
         pointwise_multiply(diag(d)*trans(diag(d)), M).
 
         The reason for this is that doing it this way is more numerically stable.  In particular,
-        doing 2 matrix multiplies as suggested by d*M*d could result in an asymmetric matrix even 
-        if M is symmetric to begin with. 
+        doing 2 matrix multiplies as suggested by d*M*d could result in an asymmetric matrix even
+        if M is symmetric to begin with.
     */
 
     template <typename M1, typename M2, typename M3>
-    struct op_diag_m_diag  
+    struct op_diag_m_diag
     {
         // This operator represents M1*M2*M3 where M1 and M3 are diagonal
 
@@ -3340,9 +3340,9 @@ namespace dlib
         long nr () const { return m2.nr(); }
         long nc () const { return m2.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item) || m3.aliases(item) ; }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m2.destructively_aliases(item) || m1.aliases(item) || m3.aliases(item) ; }
     };
 
@@ -3366,13 +3366,13 @@ namespace dlib
         // the length of d must match the number of rows in m
         COMPILE_TIME_ASSERT(EXP2::NR == v_len || EXP2::NR == 0 || v_len == 0);
 
-        DLIB_ASSERT(d.nc() == m.nr(), 
+        DLIB_ASSERT(d.nc() == m.nr(),
             "\tconst matrix_exp operator*(d, m)"
             << "\n\tmatrix dimensions don't match"
             << "\n\td.nr(): " << d.nr()
-            << "\n\td.nc(): " << d.nc() 
+            << "\n\td.nc(): " << d.nc()
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             );
         typedef op_diag_m_diag<EXP1,EXP2,EXP3> op;
         return matrix_op<op>(op(d.ref(), m.ref().op.m1, m.ref().op.m2));
@@ -3386,7 +3386,7 @@ namespace dlib
         >
     const matrix_op<op_diag_m_diag<EXP1,EXP2,EXP3> > operator* (
         const matrix_exp<matrix_op<op_scale_rows_diag<EXP2,EXP1> > >& m,
-        const matrix_diag_exp<EXP3>& d 
+        const matrix_diag_exp<EXP3>& d
     )
     {
         // Both arguments to this function must contain the same type of element
@@ -3398,13 +3398,13 @@ namespace dlib
         // the length of d must match the number of columns in m
         COMPILE_TIME_ASSERT(EXP2::NC == v_len || EXP2::NC == 0 || v_len == 0);
 
-        DLIB_ASSERT(m.nc() == d.nr(), 
+        DLIB_ASSERT(m.nc() == d.nr(),
             "\tconst matrix_exp operator*(m, d)"
             << "\n\tmatrix dimensions don't match"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             << "\n\td.nr(): " << d.nr()
-            << "\n\td.nc(): " << d.nc() 
+            << "\n\td.nc(): " << d.nc()
             );
         typedef op_diag_m_diag<EXP1,EXP2,EXP3> op;
         return matrix_op<op>(op(m.ref().op.m2, m.ref().op.m1, d.ref()));
@@ -3437,13 +3437,13 @@ namespace dlib
         COMPILE_TIME_ASSERT(NC2 == 1 || NC2 == 0);
         COMPILE_TIME_ASSERT(NC == NR2 || NC == 0 || NR2 == 0);
 
-        DLIB_ASSERT(is_col_vector(v) == true && v.size() == m.nc(), 
+        DLIB_ASSERT(is_col_vector(v) == true && v.size() == m.nc(),
             "\tconst matrix_exp sort_columns(m, v)"
             << "\n\tv must be a column vector and its length must match the number of columns in m"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             << "\n\tv.nr(): " << v.nr()
-            << "\n\tv.nc(): " << v.nc() 
+            << "\n\tv.nc(): " << v.nc()
             );
 
 
@@ -3484,13 +3484,13 @@ namespace dlib
         COMPILE_TIME_ASSERT(NC2 == 1 || NC2 == 0);
         COMPILE_TIME_ASSERT(NC == NR2 || NC == 0 || NR2 == 0);
 
-        DLIB_ASSERT(is_col_vector(v) == true && v.size() == m.nc(), 
+        DLIB_ASSERT(is_col_vector(v) == true && v.size() == m.nc(),
             "\tconst matrix_exp rsort_columns(m, v)"
             << "\n\tv must be a column vector and its length must match the number of columns in m"
             << "\n\tm.nr(): " << m.nr()
-            << "\n\tm.nc(): " << m.nc() 
+            << "\n\tm.nc(): " << m.nc()
             << "\n\tv.nr(): " << v.nr()
-            << "\n\tv.nc(): " << v.nc() 
+            << "\n\tv.nc(): " << v.nc()
             );
 
 
@@ -3520,7 +3520,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2>
-    struct op_tensor_product 
+    struct op_tensor_product
     {
         op_tensor_product(const M1& m1_, const M2& m2_) : m1(m1_),m2(m2_) {}
         const M1& m1;
@@ -3535,16 +3535,16 @@ namespace dlib
         typedef typename M1::layout_type layout_type;
 
         const_ret_type apply ( long r, long c) const
-        { 
-            return m1(r/m2.nr(),c/m2.nc())*m2(r%m2.nr(),c%m2.nc()); 
+        {
+            return m1(r/m2.nr(),c/m2.nc())*m2(r%m2.nr(),c%m2.nc());
         }
 
         long nr () const { return m1.nr()*m2.nr(); }
         long nc () const { return m1.nc()*m2.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item); }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item); }
     };
 
@@ -3554,7 +3554,7 @@ namespace dlib
         >
     inline const matrix_op<op_tensor_product<EXP1,EXP2> > tensor_product (
         const matrix_exp<EXP1>& a,
-        const matrix_exp<EXP2>& b 
+        const matrix_exp<EXP2>& b
     )
     {
         COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
@@ -3573,7 +3573,7 @@ namespace dlib
         typedef typename M::type type;
         typedef typename M::const_ret_type const_ret_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r >= c)
                 return this->m(r,c);
             else
@@ -3588,7 +3588,7 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        DLIB_ASSERT(m.nr() == m.nc(), 
+        DLIB_ASSERT(m.nr() == m.nc(),
             "\tconst matrix make_symmetric(m)"
             << "\n\t m must be a square matrix"
             << "\n\t m.nr(): " << m.nr()
@@ -3610,9 +3610,9 @@ namespace dlib
         typedef typename M::type type;
         typedef const typename M::type const_ret_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r >= c)
-                return this->m(r,c); 
+                return this->m(r,c);
             else
                 return 0;
         }
@@ -3629,9 +3629,9 @@ namespace dlib
         const static long cost = M::cost+2;
         typedef const typename M::type const_ret_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r > c)
-                return this->m(r,c); 
+                return this->m(r,c);
             else if (r==c)
                 return s;
             else
@@ -3673,9 +3673,9 @@ namespace dlib
         typedef typename M::type type;
         typedef const typename M::type const_ret_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r <= c)
-                return this->m(r,c); 
+                return this->m(r,c);
             else
                 return 0;
         }
@@ -3692,9 +3692,9 @@ namespace dlib
         const static long cost = M::cost+2;
         typedef const typename M::type const_ret_type;
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r < c)
-                return this->m(r,c); 
+                return this->m(r,c);
             else if (r==c)
                 return s;
             else
@@ -3728,17 +3728,17 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename rand_gen>
-    inline const matrix<double> randm( 
+    inline const matrix<double> randm(
         long nr,
         long nc,
         rand_gen& rnd
     )
     {
-        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+        DLIB_ASSERT(nr >= 0 && nc >= 0,
             "\tconst matrix randm(nr, nc, rnd)"
             << "\n\tInvalid inputs to this function"
-            << "\n\tnr: " << nr 
-            << "\n\tnc: " << nc 
+            << "\n\tnr: " << nr
+            << "\n\tnc: " << nc
             );
 
         matrix<double> m(nr,nc);
@@ -3755,16 +3755,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline const matrix<double> randm( 
+    inline const matrix<double> randm(
         long nr,
         long nc
     )
     {
-        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+        DLIB_ASSERT(nr >= 0 && nc >= 0,
             "\tconst matrix randm(nr, nc)"
             << "\n\tInvalid inputs to this function"
-            << "\n\tnr: " << nr 
-            << "\n\tnc: " << nc 
+            << "\n\tnr: " << nr
+            << "\n\tnc: " << nc
             );
 
         matrix<double> m(nr,nc);
@@ -3790,40 +3790,40 @@ namespace dlib
         double start,
         double end,
         long num
-    ) 
-    { 
-        DLIB_ASSERT(num >= 0, 
+    )
+    {
+        DLIB_ASSERT(num >= 0,
             "\tconst matrix_exp linspace(start, end, num)"
             << "\n\tInvalid inputs to this function"
-            << "\n\tstart: " << start 
+            << "\n\tstart: " << start
             << "\n\tend:   " << end
-            << "\n\tnum:   " << num 
+            << "\n\tnum:   " << num
             );
 
-        return matrix_range_exp<double>(start,end,num,false); 
+        return matrix_range_exp<double>(start,end,num,false);
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_linpiece  
+    struct op_linpiece
     {
         op_linpiece(const double val_, const M& joints_) : joints(joints_), val(val_){}
 
         const M& joints;
         const double val;
 
-        const static long cost = 10; 
+        const static long cost = 10;
 
-        const static long NR = (M::NR*M::NC==0) ? (0) : (M::NR*M::NC-1); 
-        const static long NC = 1; 
+        const static long NR = (M::NR*M::NC==0) ? (0) : (M::NR*M::NC-1);
+        const static long NC = 1;
         typedef typename M::type type;
         typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
         typedef type const_ret_type;
-        const_ret_type apply (long i, long ) const 
-        { 
+        const_ret_type apply (long i, long ) const
+        {
             if (joints(i) < val)
                 return std::min<type>(val,joints(i+1)) - joints(i);
             else
@@ -3835,7 +3835,7 @@ namespace dlib
 
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return joints.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return joints.aliases(item); }
-    }; 
+    };
 
     template < typename EXP >
     const matrix_op<op_linpiece<EXP> > linpiece (
@@ -3844,20 +3844,20 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(is_vector(joints) && joints.size() >= 2, 
+        DLIB_ASSERT(is_vector(joints) && joints.size() >= 2,
             "\t matrix_exp linpiece()"
             << "\n\t Invalid inputs were given to this function "
-            << "\n\t is_vector(joints): " << is_vector(joints) 
-            << "\n\t joints.size():     " << joints.size() 
+            << "\n\t is_vector(joints): " << is_vector(joints)
+            << "\n\t joints.size():     " << joints.size()
             );
 #ifdef ENABLE_ASSERTS
         for (long i = 1; i < joints.size(); ++i)
         {
-            DLIB_ASSERT(joints(i-1) < joints(i), 
+            DLIB_ASSERT(joints(i-1) < joints(i),
                 "\t matrix_exp linpiece()"
                 << "\n\t Invalid inputs were given to this function "
-                << "\n\t joints("<<i-1<<"): " << joints(i-1) 
-                << "\n\t joints("<<i<<"): " << joints(i) 
+                << "\n\t joints("<<i-1<<"): " << joints(i-1)
+                << "\n\t joints("<<i<<"): " << joints(i)
             );
         }
 #endif
@@ -3872,23 +3872,23 @@ namespace dlib
         double start,
         double end,
         long num
-    ) 
-    { 
-        DLIB_ASSERT(num >= 0, 
+    )
+    {
+        DLIB_ASSERT(num >= 0,
             "\tconst matrix_exp logspace(start, end, num)"
             << "\n\tInvalid inputs to this function"
-            << "\n\tstart: " << start 
+            << "\n\tstart: " << start
             << "\n\tend:   " << end
-            << "\n\tnum:   " << num 
+            << "\n\tnum:   " << num
             );
 
-        return matrix_log_range_exp<double>(start,end,num); 
+        return matrix_log_range_exp<double>(start,end,num);
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2>
-    struct op_cart_prod  
+    struct op_cart_prod
     {
         op_cart_prod(const M1& m1_, const M2& m2_) : m1(m1_),m2(m2_) {}
         const M1& m1;
@@ -3904,7 +3904,7 @@ namespace dlib
         const static long NC = M1::NC*M2::NC;
 
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r < m1.nr())
                 return m1(r, c/m2.nc());
             else
@@ -3914,9 +3914,9 @@ namespace dlib
         long nr () const { return m1.nr() + m2.nr(); }
         long nc () const { return m1.nc() * m2.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item); }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item); }
     };
 
@@ -3926,7 +3926,7 @@ namespace dlib
         >
     const matrix_op<op_cart_prod<EXP1,EXP2> > cartesian_product (
         const matrix_exp<EXP1>& a,
-        const matrix_exp<EXP2>& b 
+        const matrix_exp<EXP2>& b
     )
     {
         COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
@@ -3938,7 +3938,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_mat_to_vect 
+    struct op_mat_to_vect
     {
         op_mat_to_vect(const M& m_) : m(m_) {}
         const M& m;
@@ -3958,7 +3958,7 @@ namespace dlib
 
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
-    }; 
+    };
 
     template <
         typename EXP
@@ -4000,7 +4000,7 @@ namespace dlib
 
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
-    }; 
+    };
 
     template <
         typename T,
@@ -4019,7 +4019,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2>
-    struct op_join_rows 
+    struct op_join_rows
     {
         op_join_rows(const M1& m1_, const M2& m2_) : m1(m1_),m2(m2_) {}
         const M1& m1;
@@ -4033,7 +4033,7 @@ namespace dlib
         struct type_selector<T,U,false> { typedef U type; };
 
         // If both const_ret_types are references then we should use them as the const_ret_type type
-        // but otherwise we should use the normal type.  
+        // but otherwise we should use the normal type.
         typedef typename M1::const_ret_type T1;
         typedef typename M1::type T2;
         typedef typename M2::const_ret_type T3;
@@ -4047,7 +4047,7 @@ namespace dlib
         typedef typename M1::layout_type layout_type;
 
         const_ret_type apply (long r, long c) const
-        { 
+        {
             if (c < m1.nc())
                 return m1(r,c);
             else
@@ -4057,9 +4057,9 @@ namespace dlib
         long nr () const { return m1.nr(); }
         long nc () const { return m1.nc()+m2.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item); }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item); }
     };
 
@@ -4069,7 +4069,7 @@ namespace dlib
         >
     inline const matrix_op<op_join_rows<EXP1,EXP2> > join_rows (
         const matrix_exp<EXP1>& a,
-        const matrix_exp<EXP2>& b 
+        const matrix_exp<EXP2>& b
     )
     {
         COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
@@ -4093,7 +4093,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M1, typename M2>
-    struct op_join_cols 
+    struct op_join_cols
     {
         op_join_cols(const M1& m1_, const M2& m2_) : m1(m1_),m2(m2_) {}
         const M1& m1;
@@ -4107,7 +4107,7 @@ namespace dlib
         struct type_selector<T,U,false> { typedef U type; };
 
         // If both const_ret_types are references then we should use them as the const_ret_type type
-        // but otherwise we should use the normal type.  
+        // but otherwise we should use the normal type.
         typedef typename M1::const_ret_type T1;
         typedef typename M1::type T2;
         typedef typename M2::const_ret_type T3;
@@ -4123,7 +4123,7 @@ namespace dlib
         typedef typename M1::layout_type layout_type;
 
         const_ret_type apply ( long r, long c) const
-        { 
+        {
             if (r < m1.nr())
                 return m1(r,c);
             else
@@ -4133,9 +4133,9 @@ namespace dlib
         long nr () const { return m1.nr()+m2.nr(); }
         long nc () const { return m1.nc(); }
 
-        template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
+        template <typename U> bool aliases               ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item); }
-        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const 
+        template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const
         { return m1.aliases(item) || m2.aliases(item); }
     };
 
@@ -4145,12 +4145,12 @@ namespace dlib
         >
     inline const matrix_op<op_join_cols<EXP1,EXP2> > join_cols (
         const matrix_exp<EXP1>& a,
-        const matrix_exp<EXP2>& b 
+        const matrix_exp<EXP2>& b
     )
     {
         COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
         // You are getting an error on this line because you are trying to join two matrices that
-        // don't have the same number of columns 
+        // don't have the same number of columns
         COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || (EXP1::NC*EXP2::NC == 0));
 
         DLIB_ASSERT(a.nc() == b.nc() || a.size() == 0 || b.size() == 0,
@@ -4169,7 +4169,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_fliplr 
+    struct op_fliplr
     {
         op_fliplr( const M& m_) : m(m_){}
 
@@ -4191,7 +4191,7 @@ namespace dlib
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
 
-    }; 
+    };
 
     template <
         typename M
@@ -4207,7 +4207,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_flipud 
+    struct op_flipud
     {
         op_flipud( const M& m_) : m(m_){}
 
@@ -4229,7 +4229,7 @@ namespace dlib
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
 
-    }; 
+    };
 
     template <
         typename M
@@ -4245,7 +4245,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename M>
-    struct op_flip 
+    struct op_flip
     {
         op_flip( const M& m_) : m(m_){}
 
@@ -4267,7 +4267,7 @@ namespace dlib
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const { return m.aliases(item); }
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const { return m.aliases(item); }
 
-    }; 
+    };
 
     template <
         typename M

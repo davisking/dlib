@@ -67,7 +67,7 @@ namespace dlib
             }
 
             // throw away the thread handle
-            CloseHandle(thandle); 
+            CloseHandle(thandle);
             return true;
         }
 

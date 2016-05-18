@@ -32,7 +32,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    // forward declaration of signaler 
+    // forward declaration of signaler
     class signaler;
 
     class mutex
@@ -43,12 +43,12 @@ namespace dlib
 
         mutex (
         )
-        { 
-            if (pthread_mutex_init(&myMutex,0)) 
+        {
+            if (pthread_mutex_init(&myMutex,0))
             {
                 throw dlib::thread_error(ECREATE_MUTEX,
         "in function mutex::mutex() an error occurred making the mutex"
-                );      
+                );
             }
         }
 
@@ -87,12 +87,12 @@ namespace dlib
         ) :
             associated_mutex(&assoc_mutex.myMutex),
             m(assoc_mutex)
-        { 
+        {
             if (pthread_cond_init(&cond,0))
             {
                 throw dlib::thread_error(ECREATE_SIGNALER,
         "in function signaler::signaler() an error occurred making the signaler"
-                );      
+                );
             }
         }
 
@@ -101,14 +101,14 @@ namespace dlib
 
         void wait (
         ) const
-        { 
+        {
             pthread_cond_wait(&cond,associated_mutex);
         }
 
         bool wait_or_timeout (
             unsigned long milliseconds
         ) const
-        { 
+        {
             timespec time_to_wait;
 
             timeval curtime;
@@ -117,7 +117,7 @@ namespace dlib
             // get the time and adjust the timespec object by the appropriate amount
             time_to_wait.tv_sec = milliseconds/1000 + curtime.tv_sec;
             time_to_wait.tv_nsec = curtime.tv_usec;
-            time_to_wait.tv_nsec *= 1000; 
+            time_to_wait.tv_nsec *= 1000;
             time_to_wait.tv_nsec += (milliseconds%1000)*1000000;
 
             time_to_wait.tv_sec += time_to_wait.tv_nsec/1000000000;
@@ -127,7 +127,7 @@ namespace dlib
             {
                 return false;
             }
-            else 
+            else
             {
                 return true;
             }

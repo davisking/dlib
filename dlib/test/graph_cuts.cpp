@@ -14,7 +14,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -26,7 +26,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    class dense_potts_problem 
+    class dense_potts_problem
     {
     public:
         typedef double value_type;
@@ -117,7 +117,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    class image_potts_problem 
+    class image_potts_problem
     {
     public:
         typedef double value_type;
@@ -165,8 +165,8 @@ namespace
 
         unsigned long number_of_neighbors (
             unsigned long idx
-        ) const 
-        { 
+        ) const
+        {
             ++count;
             const point& p = get_loc(idx);
             if (inner_rect.contains(p))
@@ -290,8 +290,8 @@ namespace
                          "\n idx2: "<< idx2  <<
                          "\n get_neighbor_idx(idx2,idx1): "<< get_neighbor_idx(idx2,idx1) <<
                          "\n number_of_neighbors(idx2): " << number_of_neighbors(idx2) <<
-                         "\n nr: "<< nr << 
-                         "\n nc: "<< nc 
+                         "\n nr: "<< nr <<
+                         "\n nc: "<< nc
             );
 
             return factors2(idx1, get_neighbor_idx(idx1,idx2));
@@ -838,7 +838,7 @@ namespace
 
         value_type factor_value(unsigned long idx) const
         {
-            // Copy idx into a char buffer to avoid warnings about violation of strict aliasing 
+            // Copy idx into a char buffer to avoid warnings about violation of strict aliasing
             // rules when murmur_hash3() gets inlined into this function.
             char buf[sizeof(idx)];
             memcpy(buf,&idx,sizeof(idx));
@@ -1068,14 +1068,14 @@ namespace
         DLIB_TEST(labels[3] != 0);
     }
 
-    struct potts_pair_image_model 
+    struct potts_pair_image_model
     {
         typedef double value_type;
 
         template <typename pixel_type1, typename pixel_type2>
         value_type factor_value (
             const pixel_type1& ,
-            const pixel_type2& v2 
+            const pixel_type2& v2
         ) const
         {
             return v2;
@@ -1084,7 +1084,7 @@ namespace
         template <typename pixel_type>
         value_type factor_value_disagreement (
             const pixel_type& v1,
-            const pixel_type& v2 
+            const pixel_type& v2
         ) const
         {
             if (v1 == v2)

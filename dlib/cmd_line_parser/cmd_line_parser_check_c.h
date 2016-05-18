@@ -111,9 +111,9 @@ namespace dlib
         typename clp_check
         >
     inline void swap (
-        cmd_line_parser_check_c<clp_check>& a, 
-        cmd_line_parser_check_c<clp_check>& b 
-    ) { a.swap(b); } 
+        cmd_line_parser_check_c<clp_check>& a,
+        cmd_line_parser_check_c<clp_check>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ namespace dlib
             << "\n\tthis:                           " << this
             << "\n\toption_is_defined(option_name): " << ((this->option_is_defined(option_name))?"true":"false")
             << "\n\tparsed_line():                  " << ((this->parsed_line())?"true":"false")
-            << "\n\toption_name:                    " << option_name 
+            << "\n\toption_name:                    " << option_name
             );
 
         clp_check::template check_option_arg_type<T>(option_name);
@@ -164,9 +164,9 @@ namespace dlib
             << "\n\tthis:                           " << this
             << "\n\toption_is_defined(option_name): " << ((this->option_is_defined(option_name))?"true":"false")
             << "\n\tparsed_line():                  " << ((this->parsed_line())?"true":"false")
-            << "\n\toption_name:                    " << option_name 
-            << "\n\tfirst:                          " << first 
-            << "\n\tlast:                           " << last 
+            << "\n\toption_name:                    " << option_name
+            << "\n\tfirst:                          " << first
+            << "\n\tlast:                           " << last
             );
 
         clp_check::check_option_arg_range(option_name,first,last);
@@ -174,7 +174,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename clp_check> 
+    template <typename clp_check>
     template < typename T, size_t length >
     void cmd_line_parser_check_c<clp_check>::
     check_option_arg_range (
@@ -185,13 +185,13 @@ namespace dlib
         COMPILE_TIME_ASSERT(is_pointer_type<T>::value == false);
 
         // make sure requires clause is not broken
-        DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(option_name), 
+        DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(option_name),
                "\tvoid cmd_line_parser_check::check_option_arg_range()"
             << "\n\tSee the requires clause for this function."
             << "\n\tthis:                           " << this
             << "\n\toption_is_defined(option_name): " << ((this->option_is_defined(option_name))?"true":"false")
             << "\n\tparsed_line():                  " << ((this->parsed_line())?"true":"false")
-            << "\n\toption_name:                    " << option_name 
+            << "\n\toption_name:                    " << option_name
             );
 
         clp_check::check_option_arg_range(option_name,arg_set);
@@ -208,13 +208,13 @@ namespace dlib
     ) const
     {
         // make sure requires clause is not broken
-        DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(option_name), 
+        DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(option_name),
                "\tvoid cmd_line_parser_check::check_option_arg_range()"
             << "\n\tSee the requires clause for this function."
             << "\n\tthis:                           " << this
             << "\n\toption_is_defined(option_name): " << ((this->option_is_defined(option_name))?"true":"false")
             << "\n\tparsed_line():                  " << ((this->parsed_line())?"true":"false")
-            << "\n\toption_name:                    " << option_name 
+            << "\n\toption_name:                    " << option_name
             );
 
         clp_check::check_option_arg_range(option_name,arg_set);
@@ -232,14 +232,14 @@ namespace dlib
         // make sure requires clause is not broken
         for (size_t i = 0; i < length; ++i)
         {
-            DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(option_set[i]), 
+            DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(option_set[i]),
                      "\tvoid cmd_line_parser_check::check_incompatible_options()"
                      << "\n\tSee the requires clause for this function."
                      << "\n\tthis:                             " << this
                      << "\n\toption_is_defined(option_set[i]): " << ((this->option_is_defined(option_set[i]))?"true":"false")
                      << "\n\tparsed_line():                    " << ((this->parsed_line())?"true":"false")
-                     << "\n\toption_set[i]:                    " << option_set[i] 
-                     << "\n\ti:                                " << static_cast<unsigned long>(i) 
+                     << "\n\toption_set[i]:                    " << option_set[i]
+                     << "\n\ti:                                " << static_cast<unsigned long>(i)
             );
 
         }
@@ -257,15 +257,15 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(option_name1) &&
-                 this->option_is_defined(option_name2), 
+                 this->option_is_defined(option_name2),
                "\tvoid cmd_line_parser_check::check_incompatible_options()"
             << "\n\tSee the requires clause for this function."
             << "\n\tthis:                            " << this
             << "\n\toption_is_defined(option_name1): " << ((this->option_is_defined(option_name1))?"true":"false")
             << "\n\toption_is_defined(option_name2): " << ((this->option_is_defined(option_name2))?"true":"false")
             << "\n\tparsed_line():                   " << ((this->parsed_line())?"true":"false")
-            << "\n\toption_name1:                    " << option_name1 
-            << "\n\toption_name2:                    " << option_name2 
+            << "\n\toption_name1:                    " << option_name1
+            << "\n\toption_name2:                    " << option_name2
             );
 
         clp_check::check_incompatible_options(option_name1,option_name2);
@@ -282,15 +282,15 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(parent_option) &&
-                      this->option_is_defined(sub_option), 
+                      this->option_is_defined(sub_option),
                  "\tvoid cmd_line_parser_check::check_sub_option()"
                  << "\n\tSee the requires clause for this function."
                  << "\n\tthis:                             " << this
                  << "\n\tparsed_line():                    " << this->parsed_line()
                  << "\n\toption_is_defined(parent_option): " << this->option_is_defined(parent_option)
                  << "\n\toption_is_defined(sub_option):    " << this->option_is_defined(sub_option)
-                 << "\n\tparent_option:                    " << parent_option 
-                 << "\n\tsub_option:                       " << sub_option 
+                 << "\n\tparent_option:                    " << parent_option
+                 << "\n\tsub_option:                       " << sub_option
         );
         clp_check::check_sub_option(parent_option,sub_option);
     }
@@ -308,25 +308,25 @@ namespace dlib
         // make sure requires clause is not broken
         for (size_t i = 0; i < length; ++i)
         {
-            DLIB_CASSERT( this->option_is_defined(sub_option_set[i]), 
+            DLIB_CASSERT( this->option_is_defined(sub_option_set[i]),
                      "\tvoid cmd_line_parser_check::check_sub_options()"
                      << "\n\tSee the requires clause for this function."
                      << "\n\tthis:                                 " << this
-                     << "\n\toption_is_defined(sub_option_set[i]): " 
+                     << "\n\toption_is_defined(sub_option_set[i]): "
                          << ((this->option_is_defined(sub_option_set[i]))?"true":"false")
-                     << "\n\tsub_option_set[i]:                    " << sub_option_set[i] 
-                     << "\n\ti:                                    " << static_cast<unsigned long>(i) 
+                     << "\n\tsub_option_set[i]:                    " << sub_option_set[i]
+                     << "\n\ti:                                    " << static_cast<unsigned long>(i)
             );
 
         }
 
-        DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(parent_option), 
+        DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(parent_option),
                  "\tvoid cmd_line_parser_check::check_sub_options()"
                  << "\n\tSee the requires clause for this function."
                  << "\n\tthis:                             " << this
                  << "\n\toption_is_defined(parent_option): " << ((this->option_is_defined(parent_option))?"true":"false")
                  << "\n\tparsed_line():                    " << ((this->parsed_line())?"true":"false")
-                 << "\n\tparent_option:                    " << parent_option 
+                 << "\n\tparent_option:                    " << parent_option
         );
         clp_check::check_sub_options(parent_option,sub_option_set);
 
@@ -345,25 +345,25 @@ namespace dlib
         // make sure requires clause is not broken
         for (size_t i = 0; i < length; ++i)
         {
-            DLIB_CASSERT( this->option_is_defined(parent_option_set[i]), 
+            DLIB_CASSERT( this->option_is_defined(parent_option_set[i]),
                      "\tvoid cmd_line_parser_check::check_sub_options()"
                      << "\n\tSee the requires clause for this function."
                      << "\n\tthis:                                    " << this
-                     << "\n\toption_is_defined(parent_option_set[i]): " 
+                     << "\n\toption_is_defined(parent_option_set[i]): "
                          << ((this->option_is_defined(parent_option_set[i]))?"true":"false")
-                     << "\n\tparent_option_set[i]:                    " << parent_option_set[i] 
-                     << "\n\ti:                                       " << static_cast<unsigned long>(i) 
+                     << "\n\tparent_option_set[i]:                    " << parent_option_set[i]
+                     << "\n\ti:                                       " << static_cast<unsigned long>(i)
             );
 
         }
 
-        DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(sub_option), 
+        DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(sub_option),
                  "\tvoid cmd_line_parser_check::check_sub_options()"
                  << "\n\tSee the requires clause for this function."
                  << "\n\tthis:                          " << this
                  << "\n\toption_is_defined(sub_option): " << ((this->option_is_defined(sub_option))?"true":"false")
                  << "\n\tparsed_line():                 " << ((this->parsed_line())?"true":"false")
-                 << "\n\tsub_option:                    " << sub_option 
+                 << "\n\tsub_option:                    " << sub_option
         );
         clp_check::check_sub_options(parent_option_set,sub_option);
 
@@ -372,7 +372,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename clp_check>
-    template < size_t parent_length, size_t sub_length > 
+    template < size_t parent_length, size_t sub_length >
     void cmd_line_parser_check_c<clp_check>::
     check_sub_options (
         const char_type* (&parent_option_set)[parent_length],
@@ -382,33 +382,33 @@ namespace dlib
         // make sure requires clause is not broken
         for (size_t i = 0; i < sub_length; ++i)
         {
-            DLIB_CASSERT( this->option_is_defined(sub_option_set[i]), 
+            DLIB_CASSERT( this->option_is_defined(sub_option_set[i]),
                      "\tvoid cmd_line_parser_check::check_sub_options()"
                      << "\n\tSee the requires clause for this function."
                      << "\n\tthis:                                 " << this
-                     << "\n\toption_is_defined(sub_option_set[i]): " 
+                     << "\n\toption_is_defined(sub_option_set[i]): "
                          << ((this->option_is_defined(sub_option_set[i]))?"true":"false")
-                     << "\n\tsub_option_set[i]:                    " << sub_option_set[i] 
-                     << "\n\ti:                                    " << static_cast<unsigned long>(i) 
+                     << "\n\tsub_option_set[i]:                    " << sub_option_set[i]
+                     << "\n\ti:                                    " << static_cast<unsigned long>(i)
             );
         }
 
         for (size_t i = 0; i < parent_length; ++i)
         {
-            DLIB_CASSERT( this->option_is_defined(parent_option_set[i]), 
+            DLIB_CASSERT( this->option_is_defined(parent_option_set[i]),
                      "\tvoid cmd_line_parser_check::check_parent_options()"
                      << "\n\tSee the requires clause for this function."
                      << "\n\tthis:                                    " << this
-                     << "\n\toption_is_defined(parent_option_set[i]): " 
+                     << "\n\toption_is_defined(parent_option_set[i]): "
                          << ((this->option_is_defined(parent_option_set[i]))?"true":"false")
-                     << "\n\tparent_option_set[i]:                    " << parent_option_set[i] 
+                     << "\n\tparent_option_set[i]:                    " << parent_option_set[i]
                      << "\n\ti:                                       " << static_cast<unsigned long>(i)
             );
         }
 
 
 
-        DLIB_CASSERT( this->parsed_line() == true , 
+        DLIB_CASSERT( this->parsed_line() == true ,
                  "\tvoid cmd_line_parser_check::check_sub_options()"
                  << "\n\tYou must have parsed the command line before you call this function."
                  << "\n\tthis:                             " << this
@@ -431,13 +431,13 @@ namespace dlib
         // make sure requires clause is not broken
         for (size_t i = 0; i < length; ++i)
         {
-            DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(option_set[i]), 
+            DLIB_CASSERT( this->parsed_line() == true && this->option_is_defined(option_set[i]),
                      "\tvoid cmd_line_parser_check::check_one_time_options()"
                      << "\n\tSee the requires clause for this function."
                      << "\n\tthis:                             " << this
                      << "\n\toption_is_defined(option_set[i]): " << ((this->option_is_defined(option_set[i]))?"true":"false")
                      << "\n\tparsed_line():                    " << ((this->parsed_line())?"true":"false")
-                     << "\n\toption_set[i]:                    " << option_set[i] 
+                     << "\n\toption_set[i]:                    " << option_set[i]
                      << "\n\ti:                                " << static_cast<unsigned long>(i)
             );
 

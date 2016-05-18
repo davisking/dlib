@@ -76,18 +76,18 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(0 < bits && bits <= 32 &&
-                    num_samples > 1 && 
+                    num_samples > 1 &&
                     images.size() > 0,
             "\t void setup_hashed_features()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t bits:          " << bits 
-            << "\n\t num_samples:   " << num_samples 
-            << "\n\t images.size(): " << images.size() 
+            << "\n\t bits:          " << bits
+            << "\n\t num_samples:   " << num_samples
+            << "\n\t images.size(): " << images.size()
             );
 
         pyramid pyr;
 
-        const random_subset_selector<typename feature_extractor::descriptor_type>& samps = 
+        const random_subset_selector<typename feature_extractor::descriptor_type>& samps =
             randomly_sample_image_features(images, pyr, fe, num_samples);
 
         if (samps.size() <= 1)
@@ -119,13 +119,13 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(0 < bits && bits <= 32 &&
-                    num_samples > 1 && 
+                    num_samples > 1 &&
                     images.size() > 0,
             "\t void setup_hashed_features()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t bits:          " << bits 
-            << "\n\t num_samples:   " << num_samples 
-            << "\n\t images.size(): " << images.size() 
+            << "\n\t bits:          " << bits
+            << "\n\t num_samples:   " << num_samples
+            << "\n\t images.size(): " << images.size()
             );
 
         feature_extractor fe;
@@ -154,18 +154,18 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(0 < bits && bits <= 32 &&
-                    num_samples > 1 && 
+                    num_samples > 1 &&
                     images.size() > 0,
             "\t void setup_hashed_features()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t bits:          " << bits 
-            << "\n\t num_samples:   " << num_samples 
-            << "\n\t images.size(): " << images.size() 
+            << "\n\t bits:          " << bits
+            << "\n\t num_samples:   " << num_samples
+            << "\n\t images.size(): " << images.size()
             );
 
         pyramid_disable pyr;
 
-        const random_subset_selector<typename feature_extractor::descriptor_type>& samps = 
+        const random_subset_selector<typename feature_extractor::descriptor_type>& samps =
             randomly_sample_image_features(images, pyr, fe, num_samples);
 
         if (samps.size() <= 1)
@@ -197,13 +197,13 @@ namespace dlib
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(0 < bits && bits <= 32 &&
-                    num_samples > 1 && 
+                    num_samples > 1 &&
                     images.size() > 0,
             "\t void setup_hashed_features()"
             << "\n\t Invalid inputs were given to this function. "
-            << "\n\t bits:          " << bits 
-            << "\n\t num_samples:   " << num_samples 
-            << "\n\t images.size(): " << images.size() 
+            << "\n\t bits:          " << bits
+            << "\n\t num_samples:   " << num_samples
+            << "\n\t images.size(): " << images.size()
             );
 
         feature_extractor fe;

@@ -36,7 +36,7 @@ namespace dlib
             ) const;
 
             unsigned long get_element_index (
-                unsigned long element_id 
+                unsigned long element_id
             ) const;
 
             const T& element (
@@ -52,9 +52,9 @@ namespace dlib
         typename sb_base
         >
     inline void swap (
-        sliding_buffer_kernel_c<sb_base>& a, 
-        sliding_buffer_kernel_c<sb_base>& b 
-    ) { a.swap(b); }  
+        sliding_buffer_kernel_c<sb_base>& a,
+        sliding_buffer_kernel_c<sb_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ namespace dlib
     void sliding_buffer_kernel_c<sb_base>::
     set_size (
         unsigned long exp_size
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( 0 < exp_size && exp_size < 32,
@@ -159,7 +159,7 @@ namespace dlib
     typename sb_base::type& sliding_buffer_kernel_c<sb_base>::
     operator[] (
         unsigned long index
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( index < this->size(),
@@ -201,7 +201,7 @@ namespace dlib
         >
     typename sb_base::type& sliding_buffer_kernel_c<sb_base>::
     element (
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT(this->current_element_valid() == true,

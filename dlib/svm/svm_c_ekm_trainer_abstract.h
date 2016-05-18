@@ -12,16 +12,16 @@
 namespace dlib
 {
     template <
-        typename K 
+        typename K
         >
     class svm_c_ekm_trainer
     {
         /*!
-            REQUIREMENTS ON K 
-                is a kernel function object as defined in dlib/svm/kernel_abstract.h 
+            REQUIREMENTS ON K
+                is a kernel function object as defined in dlib/svm/kernel_abstract.h
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a tool for training the C formulation of 
+                This object represents a tool for training the C formulation of
                 a support vector machine.   It is implemented using the empirical_kernel_map
                 to kernelize the svm_c_linear_trainer.  This makes it a very fast algorithm
                 capable of learning from very large datasets.
@@ -40,20 +40,20 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used
                   to train a support vector machine.
-                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters)
                 - #get_c_class1() == 1
                 - #get_c_class2() == 1
                 - #get_epsilon() == 0.001
                 - #basis_loaded() == false
                 - #get_initial_basis_size() == 10
-                - #get_basis_size_increment() == 50 
+                - #get_basis_size_increment() == 50
                 - #get_max_basis_size() == 300
                 - this object will not be verbose unless be_verbose() is called
                 - #get_max_iterations() == 10000
         !*/
 
         explicit svm_c_ekm_trainer (
-            const scalar_type& C 
+            const scalar_type& C
         );
         /*!
             requires
@@ -61,7 +61,7 @@ namespace dlib
             ensures
                 - This object is properly initialized and ready to be used
                   to train a support vector machine.
-                - #get_oca() == oca() (i.e. an instance of oca with default parameters) 
+                - #get_oca() == oca() (i.e. an instance of oca with default parameters)
                 - #get_c_class1() == C
                 - #get_c_class2() == C
                 - #get_epsilon() == 0.001
@@ -80,7 +80,7 @@ namespace dlib
             requires
                 - eps > 0
             ensures
-                - #get_epsilon() == eps 
+                - #get_epsilon() == eps
         !*/
 
         const scalar_type get_epsilon (
@@ -88,7 +88,7 @@ namespace dlib
         /*!
             ensures
                 - returns the error epsilon that determines when training should stop.
-                  Smaller values may result in a more accurate solution but take longer 
+                  Smaller values may result in a more accurate solution but take longer
                   to execute.
         !*/
 
@@ -101,7 +101,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_iterations (
-        ); 
+        );
         /*!
             ensures
                 - returns the maximum number of iterations the SVM optimizer is allowed to
@@ -112,7 +112,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -120,7 +120,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print a lot of status messages to standard out so that a 
+                - This object will print a lot of status messages to standard out so that a
                   user can observe the progress of the algorithm.  In addition to the
                   few status messages normal verbosity produces this setting also causes
                   the underlying svm_c_linear_trainer to be verbose.
@@ -138,14 +138,14 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_oca() == item 
+                - #get_oca() == item
         !*/
 
         const oca get_oca (
         ) const;
         /*!
             ensures
-                - returns a copy of the optimizer used to solve the SVM problem.  
+                - returns a copy of the optimizer used to solve the SVM problem.
         !*/
 
         const kernel_type get_kernel (
@@ -160,7 +160,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_kernel() == k 
+                - #get_kernel() == k
         !*/
 
         template <typename T>
@@ -199,7 +199,7 @@ namespace dlib
         /*!
             ensures
                 - returns the maximum number of basis vectors this object is allowed
-                  to use.  This parameter only matters when the user has not supplied 
+                  to use.  This parameter only matters when the user has not supplied
                   a basis via set_basis().
         !*/
 
@@ -210,7 +210,7 @@ namespace dlib
             requires
                 - max_basis_size > 0
             ensures
-                - #get_max_basis_size() == max_basis_size 
+                - #get_max_basis_size() == max_basis_size
                 - if (get_initial_basis_size() > max_basis_size) then
                     - #get_initial_basis_size() == max_basis_size
         !*/
@@ -243,8 +243,8 @@ namespace dlib
         /*!
             ensures
                 - If the user does not supply a basis via set_basis() then this object
-                  will generate one automatically.  It does this by starting with a small 
-                  basis and repeatedly adds sets of N basis vectors to it until a stopping 
+                  will generate one automatically.  It does this by starting with a small
+                  basis and repeatedly adds sets of N basis vectors to it until a stopping
                   condition is reached.  This function returns that increment size N.
         !*/
 
@@ -259,38 +259,38 @@ namespace dlib
         !*/
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         );
         /*!
             requires
                 - C > 0
             ensures
-                - #get_c_class1() == C 
-                - #get_c_class2() == C 
+                - #get_c_class1() == C
+                - #get_c_class2() == C
         !*/
 
         const scalar_type get_c_class1 (
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter for the +1 class.  
+                - returns the SVM regularization parameter for the +1 class.
                   It is the parameter that determines the trade off between
-                  trying to fit the +1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization ability of the 
-                  resulting classifier.  Larger values encourage exact fitting 
-                  while smaller values of C may encourage better generalization. 
+                  trying to fit the +1 training data exactly or allowing more errors
+                  but hopefully improving the generalization ability of the
+                  resulting classifier.  Larger values encourage exact fitting
+                  while smaller values of C may encourage better generalization.
         !*/
 
         const scalar_type get_c_class2 (
         ) const;
         /*!
             ensures
-                - returns the SVM regularization parameter for the -1 class.  
+                - returns the SVM regularization parameter for the -1 class.
                   It is the parameter that determines the trade off between
-                  trying to fit the -1 training data exactly or allowing more errors 
-                  but hopefully improving the generalization ability of the 
-                  resulting classifier.  Larger values encourage exact fitting 
-                  while smaller values of C may encourage better generalization. 
+                  trying to fit the -1 training data exactly or allowing more errors
+                  but hopefully improving the generalization ability of the
+                  resulting classifier.  Larger values encourage exact fitting
+                  while smaller values of C may encourage better generalization.
         !*/
 
         void set_c_class1 (
@@ -329,8 +329,8 @@ namespace dlib
                 - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
-                - trains a C support vector classifier given the training samples in x and 
-                  labels in y.  
+                - trains a C support vector classifier given the training samples in x and
+                  labels in y.
                 - if (basis_loaded()) then
                     - training will be carried out in the span of the user supplied basis vectors
                 - else
@@ -360,8 +360,8 @@ namespace dlib
                 - y == a matrix or something convertible to a matrix via mat().
                   Also, y should contain scalar_type objects.
             ensures
-                - trains a C support vector classifier given the training samples in x and 
-                  labels in y.  
+                - trains a C support vector classifier given the training samples in x and
+                  labels in y.
                 - if (basis_loaded()) then
                     - training will be carried out in the span of the user supplied basis vectors
                 - else
@@ -375,7 +375,7 @@ namespace dlib
                         - F(new_x) < 0
         !*/
 
-    }; 
+    };
 
 }
 

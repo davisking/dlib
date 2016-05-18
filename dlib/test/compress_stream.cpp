@@ -11,7 +11,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -28,12 +28,12 @@ namespace
     )
     /*!
         requires
-            - cs is an implementation of compress_stream/compress_stream_kernel_abstract.h            
+            - cs is an implementation of compress_stream/compress_stream_kernel_abstract.h
               the alphabet_size for cc is 256
         ensures
-            - runs tests on cs for compliance with the specs 
+            - runs tests on cs for compliance with the specs
     !*/
-    {        
+    {
 
 
         srand(seed);
@@ -116,14 +116,14 @@ namespace
                 sin.str(sout.str());
                 sout.str("");
                 test.decompress(sin,sout);
-                DLIB_TEST(sout.str() == buffer);                   
+                DLIB_TEST(sout.str() == buffer);
             }
 
             print_spinner();
 
             // make sure you can compress a single char, then append a new
             // compressed single char.  and make sure you can decode the
-            // two streams.  Just to make sure the decoder doesn't leave 
+            // two streams.  Just to make sure the decoder doesn't leave
             // extra bytes behind or eat more than it should.
             for (int i = 0; i < 500; ++i)
             {

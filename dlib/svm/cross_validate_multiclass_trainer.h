@@ -29,7 +29,7 @@ namespace dlib
         DLIB_ASSERT( is_learning_problem(x_test,y_test) == true,
                     "\tmatrix test_multiclass_decision_function()"
                     << "\n\t invalid inputs were given to this function"
-                    << "\n\t is_learning_problem(x_test,y_test): " 
+                    << "\n\t is_learning_problem(x_test,y_test): "
                     << is_learning_problem(x_test,y_test));
 
 
@@ -47,7 +47,7 @@ namespace dlib
 
         typename std::map<label_type,unsigned long>::const_iterator iter;
 
-        // now test this trained object 
+        // now test this trained object
         for (unsigned long i = 0; i < x_test.size(); ++i)
         {
             iter = label_to_int.find(y_test[i]);
@@ -66,16 +66,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class cross_validation_error : public dlib::error 
-    { 
-    public: 
+    class cross_validation_error : public dlib::error
+    {
+    public:
         cross_validation_error(const std::string& msg) : dlib::error(msg){};
     };
 
     template <
         typename trainer_type,
         typename sample_type,
-        typename label_type 
+        typename label_type
         >
     const matrix<double> cross_validate_multiclass_trainer (
         const trainer_type& trainer,
@@ -91,20 +91,20 @@ namespace dlib
                     1 < folds && folds <= static_cast<long>(x.size()),
             "\tmatrix cross_validate_multiclass_trainer()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t x.size(): " << x.size() 
-            << "\n\t folds:  " << folds 
+            << "\n\t x.size(): " << x.size()
+            << "\n\t folds:  " << folds
             << "\n\t is_learning_problem(x,y): " << is_learning_problem(x,y)
             );
 
         const std::vector<label_type> all_labels = select_all_distinct_labels(y);
 
-        // count the number of times each label shows up 
+        // count the number of times each label shows up
         std::map<label_type,long> label_counts;
         for (unsigned long i = 0; i < y.size(); ++i)
             label_counts[y[i]] += 1;
 
 
-        // figure out how many samples from each class will be in the test and train splits 
+        // figure out how many samples from each class will be in the test and train splits
         std::map<label_type,long> num_in_test, num_in_train;
         for (typename std::map<label_type,long>::iterator i = label_counts.begin(); i != label_counts.end(); ++i)
         {
@@ -118,7 +118,7 @@ namespace dlib
                 sout << "  size of class " << i->first << ": "<< i->second << std::endl;
                 throw cross_validation_error(sout.str());
             }
-            num_in_test[i->first] = in_test; 
+            num_in_test[i->first] = in_test;
             num_in_train[i->first] = i->second - in_test;
         }
 

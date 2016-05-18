@@ -15,7 +15,7 @@ namespace dlib
     /*!
         requires
             - image_type == an image object that implements the interface defined in
-              dlib/image_processing/generic_image.h 
+              dlib/image_processing/generic_image.h
         ensures
             - This function loads an image from disk, in the indicated file file_name, and
               writes it to the indicated image object.
@@ -32,6 +32,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_LOAd_IMAGE_ABSTRACT_ 
+#endif // DLIB_LOAd_IMAGE_ABSTRACT_
 
  

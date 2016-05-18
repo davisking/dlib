@@ -16,7 +16,7 @@ namespace dlib
 {
 
     template <
-        typename clp_base 
+        typename clp_base
         >
     class cmd_line_parser_print_1 : public clp_base
     {
@@ -39,9 +39,9 @@ namespace dlib
         typename clp_base
         >
     inline void swap (
-        cmd_line_parser_print_1<clp_base>& a, 
-        cmd_line_parser_print_1<clp_base>& b 
-    ) { a.swap(b); }   
+        cmd_line_parser_print_1<clp_base>& a,
+        cmd_line_parser_print_1<clp_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -67,14 +67,14 @@ namespace dlib
         {
 
 
-            size_type max_len = 0; 
+            size_type max_len = 0;
             this->reset();
 
             // this loop here is just the bottom loop but without the print statements.
             // I'm doing this to figure out what len should be.
             while (this->move_next())
             {
-                size_type len = 0; 
+                size_type len = 0;
                 len += 3;
                 if (this->element().name().size() > 1)
                 {
@@ -122,7 +122,7 @@ namespace dlib
             {
                 ostringstream& sout = *groups[this->element().group_name()];
 
-                size_type len = 0; 
+                size_type len = 0;
                 sout << _dT(ct,"\n  -");
                 len += 3;
                 if (this->element().name().size() > 1)
@@ -159,7 +159,7 @@ namespace dlib
                 }
 
                 const unsigned long ml = static_cast<unsigned long>(max_len);
-                // now print the description but make it wrap around nicely if it 
+                // now print the description but make it wrap around nicely if it
                 // is to long to fit on one line.
                 if (len <= max_len)
                     sout << wrap_string(this->element().description(),0,ml);

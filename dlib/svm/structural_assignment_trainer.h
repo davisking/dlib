@@ -28,7 +28,7 @@ namespace dlib
         typedef assignment_function<feature_extractor> trained_function_type;
 
         structural_assignment_trainer (
-        )  
+        )
         {
             set_defaults();
         }
@@ -64,7 +64,7 @@ namespace dlib
             DLIB_ASSERT(eps_ > 0,
                 "\t void structural_assignment_trainer::set_epsilon()"
                 << "\n\t eps_ must be greater than 0"
-                << "\n\t eps_: " << eps_ 
+                << "\n\t eps_: " << eps_
                 << "\n\t this: " << this
                 );
 
@@ -84,7 +84,7 @@ namespace dlib
         unsigned long get_max_cache_size (
         ) const
         {
-            return max_cache_size; 
+            return max_cache_size;
         }
 
         void be_verbose (
@@ -113,14 +113,14 @@ namespace dlib
         }
 
         void set_c (
-            double C_ 
+            double C_
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C_ > 0,
                 "\t void structural_assignment_trainer::set_c()"
                 << "\n\t C_ must be greater than 0"
-                << "\n\t C_:    " << C_ 
+                << "\n\t C_:    " << C_
                 << "\n\t this: " << this
                 );
 
@@ -134,7 +134,7 @@ namespace dlib
         }
 
         bool forces_assignment(
-        ) const { return force_assignment; } 
+        ) const { return force_assignment; }
 
         void set_forces_assignment (
             bool new_value
@@ -148,7 +148,7 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss > 0, 
+            DLIB_ASSERT(loss > 0,
                 "\t void structural_assignment_trainer::set_loss_per_false_association(loss)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t loss: " << loss
@@ -169,7 +169,7 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss > 0, 
+            DLIB_ASSERT(loss > 0,
                 "\t void structural_assignment_trainer::set_loss_per_missed_association(loss)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t loss: " << loss
@@ -198,7 +198,7 @@ namespace dlib
             last_weight_1 = should_last_weight_be_1;
         }
 
-        const assignment_function<feature_extractor> train (  
+        const assignment_function<feature_extractor> train (
             const std::vector<sample_type>& samples,
             const std::vector<label_type>& labels
         ) const
@@ -207,7 +207,7 @@ namespace dlib
 #ifdef ENABLE_ASSERTS
             if (force_assignment)
             {
-                DLIB_ASSERT(is_forced_assignment_problem(samples, labels), 
+                DLIB_ASSERT(is_forced_assignment_problem(samples, labels),
                             "\t assignment_function structural_assignment_trainer::train()"
                             << "\n\t invalid inputs were given to this function"
                             << "\n\t is_forced_assignment_problem(samples,labels): " << is_forced_assignment_problem(samples,labels)
@@ -238,7 +238,7 @@ namespace dlib
             prob.set_epsilon(eps);
             prob.set_max_cache_size(max_cache_size);
 
-            matrix<double,0,1> weights; 
+            matrix<double,0,1> weights;
 
             // Take the min here because we want to prevent the user from accidentally
             // forcing the bias term to be non-negative.

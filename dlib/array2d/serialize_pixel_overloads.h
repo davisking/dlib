@@ -25,9 +25,9 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array2d<rgb_pixel,mem_manager>& item, 
-        std::ostream& out 
-    )   
+        const array2d<rgb_pixel,mem_manager>& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -44,8 +44,8 @@ namespace dlib
                 out.write((char*)&item[0][0], sizeof(rgb_pixel)*item.size());
         }
         catch (serialization_error e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type array2d");
         }
     }
 
@@ -53,9 +53,9 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        array2d<rgb_pixel,mem_manager>& item, 
+        array2d<rgb_pixel,mem_manager>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -82,9 +82,9 @@ namespace dlib
                 in.read((char*)&item[0][0], sizeof(rgb_pixel)*item.size());
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type array2d");
         }
     }
 
@@ -94,9 +94,9 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array2d<bgr_pixel,mem_manager>& item, 
-        std::ostream& out 
-    )   
+        const array2d<bgr_pixel,mem_manager>& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -113,8 +113,8 @@ namespace dlib
                 out.write((char*)&item[0][0], sizeof(bgr_pixel)*item.size());
         }
         catch (serialization_error e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type array2d");
         }
     }
 
@@ -122,9 +122,9 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        array2d<bgr_pixel,mem_manager>& item, 
+        array2d<bgr_pixel,mem_manager>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -152,9 +152,9 @@ namespace dlib
                 in.read((char*)&item[0][0], sizeof(bgr_pixel)*item.size());
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type array2d");
         }
     }
 
@@ -164,9 +164,9 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array2d<hsi_pixel,mem_manager>& item, 
-        std::ostream& out 
-    )   
+        const array2d<hsi_pixel,mem_manager>& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -183,8 +183,8 @@ namespace dlib
                 out.write((char*)&item[0][0], sizeof(hsi_pixel)*item.size());
         }
         catch (serialization_error e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type array2d");
         }
     }
 
@@ -192,9 +192,9 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        array2d<hsi_pixel,mem_manager>& item, 
+        array2d<hsi_pixel,mem_manager>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -222,9 +222,9 @@ namespace dlib
                 in.read((char*)&item[0][0], sizeof(hsi_pixel)*item.size());
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type array2d");
         }
     }
 
@@ -234,9 +234,9 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array2d<rgb_alpha_pixel,mem_manager>& item, 
-        std::ostream& out 
-    )   
+        const array2d<rgb_alpha_pixel,mem_manager>& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -253,8 +253,8 @@ namespace dlib
                 out.write((char*)&item[0][0], sizeof(rgb_alpha_pixel)*item.size());
         }
         catch (serialization_error e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type array2d");
         }
     }
 
@@ -262,9 +262,9 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        array2d<rgb_alpha_pixel,mem_manager>& item, 
+        array2d<rgb_alpha_pixel,mem_manager>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -292,9 +292,9 @@ namespace dlib
                 in.read((char*)&item[0][0], sizeof(rgb_alpha_pixel)*item.size());
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type array2d");
         }
     }
 
@@ -304,9 +304,9 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array2d<unsigned char,mem_manager>& item, 
-        std::ostream& out 
-    )   
+        const array2d<unsigned char,mem_manager>& item,
+        std::ostream& out
+    )
     {
         try
         {
@@ -321,8 +321,8 @@ namespace dlib
                 out.write((char*)&item[0][0], sizeof(unsigned char)*item.size());
         }
         catch (serialization_error e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type array2d");
         }
     }
 
@@ -330,9 +330,9 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        array2d<unsigned char,mem_manager>& item, 
+        array2d<unsigned char,mem_manager>& item,
         std::istream& in
-    )   
+    )
     {
         try
         {
@@ -357,9 +357,9 @@ namespace dlib
                 in.read((char*)&item[0][0], sizeof(unsigned char)*item.size());
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type array2d");
         }
     }
 

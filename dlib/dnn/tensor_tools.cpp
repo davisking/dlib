@@ -87,7 +87,7 @@ namespace dlib { namespace tt
     tensor_rand::
     tensor_rand(
         unsigned long long seed
-    ) 
+    )
 #ifdef DLIB_USE_CUDA
     :rnd(seed){}
 #else
@@ -105,7 +105,7 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         rnd.fill_gaussian(data, mean, stddev);
 #else
-        for (auto& x : data) 
+        for (auto& x : data)
             x = rnd.get_random_gaussian()*stddev + mean;
 #endif
     }
@@ -118,7 +118,7 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         rnd.fill_uniform(data);
 #else
-        for (auto& x : data) 
+        for (auto& x : data)
             x = rnd.get_random_float();
 #endif
     }
@@ -301,7 +301,7 @@ namespace dlib { namespace tt
     void batch_normalize_inference (
         resizable_tensor& dest,
         const tensor& src,
-        const tensor& gamma, 
+        const tensor& gamma,
         const tensor& beta,
         const tensor& running_means,
         const tensor& running_variances
@@ -322,8 +322,8 @@ namespace dlib { namespace tt
         resizable_tensor& running_means,
         resizable_tensor& running_variances,
         const tensor& src,
-        const tensor& gamma, 
-        const tensor& beta 
+        const tensor& gamma,
+        const tensor& beta
     )
     {
 #ifdef DLIB_USE_CUDA
@@ -340,8 +340,8 @@ namespace dlib { namespace tt
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
-            tensor& gamma_grad, 
-            tensor& beta_grad 
+            tensor& gamma_grad,
+            tensor& beta_grad
     )
     {
              
@@ -357,7 +357,7 @@ namespace dlib { namespace tt
     void batch_normalize_conv_inference (
         resizable_tensor& dest,
         const tensor& src,
-        const tensor& gamma, 
+        const tensor& gamma,
         const tensor& beta,
         const tensor& running_means,
         const tensor& running_variances
@@ -378,8 +378,8 @@ namespace dlib { namespace tt
         resizable_tensor& running_means,
         resizable_tensor& running_variances,
         const tensor& src,
-        const tensor& gamma, 
-        const tensor& beta 
+        const tensor& gamma,
+        const tensor& beta
     )
     {
 #ifdef DLIB_USE_CUDA
@@ -396,8 +396,8 @@ namespace dlib { namespace tt
             const tensor& src,
             const tensor& gamma,
             tensor& src_grad,
-            tensor& gamma_grad, 
-            tensor& beta_grad 
+            tensor& gamma_grad,
+            tensor& beta_grad
     )
     {
              
@@ -597,7 +597,7 @@ namespace dlib { namespace tt
         const tensor& src,
         const tensor& gradient_input,
         const tensor& param,
-        tensor& params_grad 
+        tensor& params_grad
     )
     {
 #ifdef DLIB_USE_CUDA

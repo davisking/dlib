@@ -27,7 +27,7 @@ namespace dlib
                 to the host do not happen before the relevant computations have completed.
 
                 If DLIB_USE_CUDA is not #defined then this object will not use CUDA at all.
-                Instead, it will simply store one host side memory block of floats.  
+                Instead, it will simply store one host side memory block of floats.
 
                 Finally, the convention in dlib code is to interpret the tensor as a set of
                 num_samples() 3D arrays, each of dimension k() by nr() by nc().  Also,
@@ -46,15 +46,15 @@ namespace dlib
         virtual ~tensor();
 
         long num_samples(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of 3D arrays of dimension k() by nr() by nc() there
-                  are in this object.  
+                  are in this object.
         !*/
 
         long k(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the k dimension of this tensor.  Generally, we think of a tensor
@@ -63,14 +63,14 @@ namespace dlib
         !*/
 
         long nr(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of rows in this tensor.
         !*/
 
         long nc(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of columns in this tensor.
@@ -104,7 +104,7 @@ namespace dlib
         const_iterator end() const   { return host()+size(); }
         /*!
             ensures
-                - makes a tensor iterable just like the STL containers.   
+                - makes a tensor iterable just like the STL containers.
         !*/
 
         virtual const float* host(
@@ -115,7 +115,7 @@ namespace dlib
                   values or nullptr if size()==0.
                 - if (the host's copy of the data is out of date) then
                     - copies the data from the device to the host, while this is happening
-                      the call to host() blocks. 
+                      the call to host() blocks.
         !*/
 
         virtual float* host(
@@ -126,7 +126,7 @@ namespace dlib
                   values or nullptr if size()==0.
                 - if (the host's copy of the data is out of date) then
                     - copies the data from the device to the host, while this is happening
-                      the call to host() blocks. 
+                      the call to host() blocks.
                 - Marks the device side data as out of date so that the next call to
                   device() will perform a host to device transfer.  If you want to begin
                   the transfer immediately then you can call async_copy_to_device() after
@@ -142,7 +142,7 @@ namespace dlib
                   device side data as out of date, effectively discarding it.  Therefore,
                   the values in the data pointed to by host_write_only() are undefined and
                   you should only call host_write_only() if you are going to assign to
-                  every memory location in the returned memory block.  
+                  every memory location in the returned memory block.
         !*/
 
         virtual const float* device(
@@ -155,7 +155,7 @@ namespace dlib
                   values or nullptr if size()==0.
                 - if (the device's copy of the data is out of date) then
                     - copies the data from the host to the device, while this is happening
-                      the call to device() blocks. 
+                      the call to device() blocks.
         !*/
 
         virtual float* device(
@@ -168,7 +168,7 @@ namespace dlib
                   values or nullptr if size()==0.
                 - if (the device's copy of the data is out of date) then
                     - copies the data from the host to the device, while this is happening
-                      the call to device() blocks. 
+                      the call to device() blocks.
                 - Marks the host side data as out of date so that the next call to
                   host() will perform a device to host transfer.
         !*/
@@ -184,11 +184,11 @@ namespace dlib
                   host side data as out of date, effectively discarding it.  Therefore, the
                   values in the data pointed to by device_write_only() are undefined and
                   you should only call device_write_only() if you are going to assign to
-                  every memory location in the returned memory block.  
+                  every memory location in the returned memory block.
         !*/
 
         int device_id(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the ID of the CUDA device that allocated this memory. I.e. the
@@ -301,16 +301,16 @@ namespace dlib
         // You can't move or copy another tensor into *this since that might modify the
         // tensor's dimensions.  If you want to do that sort of thing then use a
         // resizable_tensor.
-        tensor(const tensor& item);  
-        tensor& operator= (const tensor& item); 
-        tensor(tensor&& item); 
-        tensor& operator=(tensor&& item); 
+        tensor(const tensor& item);
+        tensor& operator= (const tensor& item);
+        tensor(tensor&& item);
+        tensor& operator=(tensor&& item);
     };
 
 // ----------------------------------------------------------------------------------------
 
     void memcpy (
-        tensor& dest, 
+        tensor& dest,
         const tensor& src
     );
     /*!
@@ -339,7 +339,7 @@ namespace dlib
         ensures
             - returns a matrix M such that:
                 - M.nr() == nr
-                - m.nc() == nc 
+                - m.nc() == nc
                 - for all valid r and c:
                   M(r,c) == t.host()[r*nc + c]
                   (i.e. the tensor is interpreted as a matrix laid out in memory
@@ -385,9 +385,9 @@ namespace dlib
     /*!
         ensures
             - returns true if and only if all of the fallowing are satisfied:
-                - a.num_samples() == b.num_samples() 
-                - a.k()  == b.k() 
-                - a.nr() == b.nr() 
+                - a.num_samples() == b.num_samples()
+                - a.k()  == b.k()
+                - a.nr() == b.nr()
                 - a.nc() == b.nc()
     !*/
 
@@ -503,16 +503,16 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is a tensor that aliases another tensor.  That is, it doesn't
                 have its own block of memory but instead simply holds pointers to the
-                memory of another tensor object.  
+                memory of another tensor object.
         !*/
 
         // You can't default initialize this object.  You can only get instances of it from
         // alias_tensor::operator().
         alias_tensor_instance(
-        ); 
+        );
     };
 
-    class alias_tensor 
+    class alias_tensor
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -528,7 +528,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #size() == 0 
+                - #size() == 0
                 - #num_samples() == 0
                 - #k() == 0
                 - #nr() == 0
@@ -552,10 +552,10 @@ namespace dlib
                 - #nc() == nc_
         !*/
 
-        long num_samples() const; 
-        long k() const; 
-        long nr() const; 
-        long nc() const; 
+        long num_samples() const;
+        long k() const;
+        long nr() const;
+        long nc() const;
         size_t size() const;
 
         alias_tensor_instance operator() (
@@ -582,7 +582,7 @@ namespace dlib
     void serialize(const alias_tensor& item, std::ostream& out);
     void deserialize(alias_tensor& item, std::istream& in);
     /*!
-        provides serialization support for alias_tensor.  
+        provides serialization support for alias_tensor.
     !*/
 
 // ----------------------------------------------------------------------------------------

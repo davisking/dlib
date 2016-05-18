@@ -14,9 +14,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     /*
-        Note that these operator prototypes are not correct C++ (the real versions, which 
-        you can see in the implementation are really complex and so probably would 
-        distract/confuse people if shown here).  Think of this as just a list of the 
+        Note that these operator prototypes are not correct C++ (the real versions, which
+        you can see in the implementation are really complex and so probably would
+        distract/confuse people if shown here).  Think of this as just a list of the
         operators available to you and what they do.
     */
 
@@ -74,7 +74,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns the result of multiplying all the elements of matrix m by the given 
+            - returns the result of multiplying all the elements of matrix m by the given
               scalar value.  The resulting matrix will have the same dimensions as m.
     !*/
 
@@ -85,7 +85,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns the result of multiplying all the elements of matrix m by the given 
+            - returns the result of multiplying all the elements of matrix m by the given
               scalar value.  The resulting matrix will have the same dimensions as m.
     !*/
 
@@ -104,7 +104,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns the result of dividing all the elements of matrix m by the given 
+            - returns the result of dividing all the elements of matrix m by the given
               scalar value.  The resulting matrix will have the same dimensions as m.
     !*/
 
@@ -115,7 +115,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns the result of dividing the given scalar value by all the elements 
+            - returns the result of dividing the given scalar value by all the elements
               of matrix m.  The resulting matrix will have the same dimensions as m.
     !*/
 
@@ -126,7 +126,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns the result of adding value to all the elements of matrix m.  
+            - returns the result of adding value to all the elements of matrix m.
               The resulting matrix will have the same dimensions as m.
     !*/
 
@@ -137,7 +137,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns the result of adding value to all the elements of matrix m.  
+            - returns the result of adding value to all the elements of matrix m.
               The resulting matrix will have the same dimensions as m.
     !*/
 
@@ -148,7 +148,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns the result of subtracting value from all the elements of matrix m.  
+            - returns the result of subtracting value from all the elements of matrix m.
               The resulting matrix will have the same dimensions as m.
     !*/
 
@@ -195,9 +195,9 @@ namespace dlib
         long num_rows = 0,
         long num_cols = 0,
         typename mem_manager = default_memory_manager,
-        typename layout = row_major_layout 
+        typename layout = row_major_layout
         >
-    class matrix : public matrix_exp<matrix<T,num_rows,num_cols,mem_manager,layout> > 
+    class matrix : public matrix_exp<matrix<T,num_rows,num_cols,mem_manager,layout> >
     {
         /*!
             REQUIREMENTS ON num_rows and num_cols
@@ -206,7 +206,7 @@ namespace dlib
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             REQUIREMENTS ON layout
@@ -231,18 +231,18 @@ namespace dlib
                 The number of rows and columns of this object are determined by the template
                 arguments num_rows and num_cols.  If num_rows or num_cols are 0 then
                 the matrix starts out empty (i.e. nr() == 0 and nc() == 0) and you may change
-                its size via the set_size() member function. 
+                its size via the set_size() member function.
                 
                 Setting num_rows or num_cols to something other than 0 causes that dimension
-                to have a fixed size.  Setting a fixed size at compile time is useful because 
-                any errors related to operating on matrices with incompatible dimensions will 
-                be detected at compile time.  It also allows the compiler to perform loop 
+                to have a fixed size.  Setting a fixed size at compile time is useful because
+                any errors related to operating on matrices with incompatible dimensions will
+                be detected at compile time.  It also allows the compiler to perform loop
                 unrolling which can result in substantially faster code.
 
-                Also note that the elements of this matrix are laid out in memory by the layout 
-                object supplied as a template argument to this class.  The row_major_layout  
-                sets elements down contiguously in memory and in row major order.  Additionally, 
-                all memory allocations are performed using the memory manager object supplied as 
+                Also note that the elements of this matrix are laid out in memory by the layout
+                object supplied as a template argument to this class.  The row_major_layout
+                sets elements down contiguously in memory and in row major order.  Additionally,
+                all memory allocations are performed using the memory manager object supplied as
                 a template argument to this class.
         !*/
 
@@ -253,8 +253,8 @@ namespace dlib
         const static long NR = num_rows;
         const static long NC = num_cols;
         const static long cost = 1;
-        typedef T*          iterator;       
-        typedef const T*    const_iterator; 
+        typedef T*          iterator;
+        typedef const T*    const_iterator;
 
         matrix (
         );
@@ -266,12 +266,12 @@ namespace dlib
         !*/
 
         explicit matrix (
-            long length 
+            long length
         );
         /*!
             requires
                 - NR == 1 || NC == 1 (i.e. this must be a column or row vector)
-                - length >= 0 
+                - length >= 0
                 - if (NR == 1 && NC > 0) then
                     - length == NC
                 - if (NC == 1 && NR > 0) then
@@ -362,20 +362,20 @@ namespace dlib
         !*/
 
         T& operator() (
-            long r, 
+            long r,
             long c
-        ); 
+        );
         /*!
             requires
                 - 0 <= r < nr()
                 - 0 <= c < nc()
             ensures
-                - returns a reference to the value at the given row and column in 
+                - returns a reference to the value at the given row and column in
                   this matrix.
         !*/
 
         const T& operator() (
-            long r, 
+            long r,
             long c
         ) const;
         /*!
@@ -383,13 +383,13 @@ namespace dlib
                 - 0 <= r < nr()
                 - 0 <= c < nc()
             ensures
-                - returns a const reference to the value at the given row and column in 
+                - returns a const reference to the value at the given row and column in
                   this matrix.
         !*/
 
         T& operator() (
             long i
-        ); 
+        );
         /*!
             requires
                 - nc() == 1 || nr() == 1 (i.e. this must be a column or row vector)
@@ -466,7 +466,7 @@ namespace dlib
         /*!
             requires
                 - NR == 1 || NC == 1 (i.e. this must be a column or row vector)
-                - length >= 0 
+                - length >= 0
                 - if (NR == 1 && NC > 0) then
                     - length == NC
                 - if (NC == 1 && NR > 0) then
@@ -538,7 +538,7 @@ namespace dlib
                     - #(*this) == *this + m
                 - else
                     - #(*this) == m
-                      (i.e. if the dimensions don't match then this function performs a 
+                      (i.e. if the dimensions don't match then this function performs a
                       normal assignment)
                 - returns *this
         !*/
@@ -632,9 +632,9 @@ namespace dlib
             You can also use this function to assign to all elements of a matrix.  So
             saying m = 3; would assign all elements of m equal to 3.
 
-            Note that to use this method of assignment it is required that you supply 
-            exactly m.size() or 1 values so that the matrix is fully initialized.  Supplying 
-            fewer or more than that is an error that will cause a dlib::fatal_error to be 
+            Note that to use this method of assignment it is required that you supply
+            exactly m.size() or 1 values so that the matrix is fully initialized.  Supplying
+            fewer or more than that is an error that will cause a dlib::fatal_error to be
             thrown.
 
             Note also that using an expression of the form m = scalar; when m.size() == 0
@@ -673,7 +673,7 @@ namespace dlib
         /*!
             ensures
                 - returns a random access iterator pointing to the first element in this
-                  matrix.  
+                  matrix.
                 - The iterator will iterate over the elements of the matrix in row major
                   order if layout is row_major_layout or in column major order if layout is
                   column_major_layout.
@@ -690,13 +690,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    /*!A matrix_colmajor 
-        This is just a typedef of the matrix object that uses column major layout. 
+    /*!A matrix_colmajor
+        This is just a typedef of the matrix object that uses column major layout.
     !*/
     typedef matrix<double,0,0,default_memory_manager,column_major_layout> matrix_colmajor;
 
-    /*!A fmatrix_colmajor 
-        This is just a typedef of the matrix object that uses column major layout. 
+    /*!A fmatrix_colmajor
+        This is just a typedef of the matrix object that uses column major layout.
     !*/
     typedef matrix<float,0,0,default_memory_manager,column_major_layout> fmatrix_colmajor;
 
@@ -724,9 +724,9 @@ template <
         typename l
         >
     void serialize (
-        const matrix<T,NR,NC,mm,l>& item, 
+        const matrix<T,NR,NC,mm,l>& item,
         std::ostream& out
-    );   
+    );
     /*!
         Provides serialization support.  Note that the serialization formats used by the
         dlib::matrix and dlib::array2d objects are compatible.  That means you can load the
@@ -741,11 +741,11 @@ template <
         typename l
         >
     void deserialize (
-        matrix<T,NR,NC,mm,l>& item, 
+        matrix<T,NR,NC,mm,l>& item,
         std::istream& in
-    );   
+    );
     /*!
-        Provides deserialization support 
+        Provides deserialization support
     !*/
 
     template <
@@ -762,8 +762,8 @@ template <
     !*/
 
     template <
-        typename T, 
-        long NR, 
+        typename T,
+        long NR,
         long NC,
         typename MM,
         typename L
@@ -778,13 +778,13 @@ template <
             - The format expected is the text format output by the above operator<<().
               That is, the format should be a grid of text such as:
                 2 3 4
-                5 2 6 
+                5 2 6
             - The separation between numbers can be any number of whitespace characters or
-              commas.      
+              commas.
             - The matrix data is assumed to end upon the first blank line or end-of-file,
               whichever comes first.  This means you can create an input stream with
               multiple matrices in it by separating them with empty lines.
-            - returns in. 
+            - returns in.
             - If there was a formatting error or something which prevents the input data
               from being parsed into a matrix then #in.fail() == true.
     !*/
@@ -800,7 +800,7 @@ template <
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP>
-    class const_temp_matrix : public matrix_exp<const_temp_matrix<EXP> >, noncopyable 
+    class const_temp_matrix : public matrix_exp<const_temp_matrix<EXP> >, noncopyable
     {
         /*!
             REQUIREMENTS ON EXP
@@ -810,7 +810,7 @@ template <
                 This object represents a copy of a matrix expression.  The twist
                 is that it only actually makes a copy of its input matrix expression
                 if that matrix expression is costly to evaluate.  If it has
-                low cost then this object just stores a reference.  
+                low cost then this object just stores a reference.
 
                 This class is useful in cases where you write a function that
                 takes a matrix_exp object as input and you want to do some
@@ -831,7 +831,7 @@ template <
                 - if (EXP::cost <= 1) then
                     - this const_temp_matrix stores a reference to the item matrix
                 - else
-                    - this const_temp_matrix creates a temporary matrix and copies 
+                    - this const_temp_matrix creates a temporary matrix and copies
                       item into it
         !*/
 
@@ -844,7 +844,7 @@ template <
                 - if (EXP::cost <= 1) then
                     - this const_temp_matrix stores a reference to the item matrix
                 - else
-                    - this const_temp_matrix creates a temporary matrix and copies 
+                    - this const_temp_matrix creates a temporary matrix and copies
                       item into it
         !*/
     };

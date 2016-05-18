@@ -13,7 +13,7 @@
 #include "tester.h"
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -37,16 +37,16 @@ namespace
     void set_vals6( int& a, int& b, int& c, int& d, int& e, int& f) { a = 1; b = 2; c = 3; d = 4; e = 5; f = 6; }
     void set_vals7( int& a, int& b, int& c, int& d, int& e, int& f, int& g) { a = 1; b = 2; c = 3; d = 4; e = 5; f = 6; g = 7; }
 
-    void set_vals8( int& a, int& b, int& c, int& d, int& e, int& f, int& g, int& h) 
+    void set_vals8( int& a, int& b, int& c, int& d, int& e, int& f, int& g, int& h)
     { a = 1; b = 2; c = 3; d = 4; e = 5; f = 6; g = 7; h = 8; }
 
-    void set_vals9( int& a, int& b, int& c, int& d, int& e, int& f, int& g, int& h, int& i) 
+    void set_vals9( int& a, int& b, int& c, int& d, int& e, int& f, int& g, int& h, int& i)
     { a = 1; b = 2; c = 3; d = 4; e = 5; f = 6; g = 7; h = 8; i = 9;}
 
-    void set_vals10( int& a, int& b, int& c, int& d, int& e, int& f, int& g, int& h, int& i, int& j) 
+    void set_vals10( int& a, int& b, int& c, int& d, int& e, int& f, int& g, int& h, int& i, int& j)
     { a = 1; b = 2; c = 3; d = 4; e = 5; f = 6; g = 7; h = 8; i = 9; j = 10;}
 
-    void zero_vals( int& a, int& b, int& c, int& d, int& e, int& f, int& g, int& h, int& i, int& j) 
+    void zero_vals( int& a, int& b, int& c, int& d, int& e, int& f, int& g, int& h, int& i, int& j)
     { a = 0; b = 0; c = 0; d = 0; e = 0; f = 0; g = 0; h = 0; i = 0; j = 0;}
 
 // ----------------------------------------------------------------------------------------
@@ -122,10 +122,10 @@ namespace
         test_contains_4(a);
 
         c.get<test2>() = test2(10);
-        DLIB_TEST(c.get<test2>().v == 10); 
+        DLIB_TEST(c.get<test2>().v == 10);
 
         a = c;
-        DLIB_TEST(a.cast_to<test2>().v == 10); 
+        DLIB_TEST(a.cast_to<test2>().v == 10);
 
 
         a.clear();

@@ -13,7 +13,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -88,12 +88,12 @@ namespace
     )
     /*!
         requires
-            - rand is an implementation of rand/rand_kernel_abstract.h 
+            - rand is an implementation of rand/rand_kernel_abstract.h
               is instantiated with int
         ensures
             - runs tests on rand for compliance with the specs
     !*/
-    {        
+    {
 
         ostringstream seed;
         seed << (unsigned int)time(0);
@@ -121,7 +121,7 @@ namespace
 
         print_spinner();
         unsigned long size = 100000;
-        for (unsigned long i = 0; i < size; ++i) 
+        for (unsigned long i = 0; i < size; ++i)
         {
             uint32 ch = r.get_random_32bit_number();
             sout.write((char*)&ch,4);
@@ -132,7 +132,7 @@ namespace
         sout.str("");
 
         print_spinner();
-        for (unsigned long i = 0; i < size; ++i) 
+        for (unsigned long i = 0; i < size; ++i)
         {
             uint16 ch = r.get_random_16bit_number();
             sout.write((char*)&ch,2);
@@ -143,7 +143,7 @@ namespace
         sout.str("");
 
         print_spinner();
-        for (unsigned long i = 0; i < size; ++i) 
+        for (unsigned long i = 0; i < size; ++i)
         {
             unsigned char ch = r.get_random_8bit_number();
             sout.write((char*)&ch,1);
@@ -213,7 +213,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test normality";
         double cnt1 = 0; // num <= -1.2
-        double cnt2 = 0; // num <= -0.5 
+        double cnt2 = 0; // num <= -0.5
         double cnt3 = 0; // num <= 0
         double cnt4 = 0; // num <= 0.5
         double cnt5 = 0; // num <= 1.2
@@ -254,7 +254,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test_gaussian_random_hash()";
         double cnt1 = 0; // num <= -1.2
-        double cnt2 = 0; // num <= -0.5 
+        double cnt2 = 0; // num <= -0.5
         double cnt3 = 0; // num <= 0
         double cnt4 = 0; // num <= 0.5
         double cnt5 = 0; // num <= 1.2
@@ -312,7 +312,7 @@ namespace
         print_spinner();
         dlog << LINFO << "test_uniform_random_hash()";
         double cnt1 = 0; // num <= 0.2
-        double cnt2 = 0; // num <= 0.4 
+        double cnt2 = 0; // num <= 0.4
         double cnt3 = 0; // num <= 0.6
         double cnt4 = 0; // num <= 0.8
         double cnt5 = 0; // num <= 1.0

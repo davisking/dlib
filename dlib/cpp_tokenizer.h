@@ -26,7 +26,7 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
+        // kernel_1a
         typedef     cpp_tokenizer_kernel_1<tok,queue,set>
                     kernel_1a;
         typedef     cpp_tokenizer_kernel_c<kernel_1a>

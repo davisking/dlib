@@ -13,7 +13,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    class EXAMPLE_SOLVER 
+    class EXAMPLE_SOLVER
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -47,7 +47,7 @@ namespace dlib
                   always supplied with the same layer instance, l.  That is, the solver is
                   allowed to remember things from one invocation to another and to assume
                   that it is being serially applied to optimize the same layer's
-                  parameters. 
+                  parameters.
             ensures
                 - Returns a step vector V that is intended to be used to update the
                   parameters by adding V to l.get_layer_params().
@@ -61,7 +61,7 @@ namespace dlib
     void serialize(const EXAMPLE_SOLVER& item, std::ostream& out);
     void deserialize(EXAMPLE_SOLVER& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -77,39 +77,39 @@ namespace dlib
                 decay.  In particular, it computes the update vector V according to:
                     V = momentum*V - weight_decay*learning_rate*l.get_layer_params() - learning_rate*params_grad;
                 Here V is a momentum term that is remembered by the solver from one
-                invocation of operator() to the next.  
+                invocation of operator() to the next.
         !*/
     public:
 
         sgd(
-        ); 
+        );
         /*!
             ensures
-                - #get_weight_decay()  == 0.0005 
-                - #get_momentum()      == 0.9 
+                - #get_weight_decay()  == 0.0005
+                - #get_momentum()      == 0.9
         !*/
 
         sgd(
             float weight_decay,
-            float momentum 
-        ); 
+            float momentum
+        );
         /*!
             requires
                 - weight_decay >= 0
                 - momentum >= 0
             ensures
-                - #get_weight_decay()  == weight_decay 
-                - #get_momentum()      == momentum 
+                - #get_weight_decay()  == weight_decay
+                - #get_momentum()      == momentum
         !*/
 
         float get_weight_decay () const;
-        float get_momentum () const; 
+        float get_momentum () const;
     };
 
     void serialize(const sgd& item, std::ostream& out);
     void deserialize(sgd& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -128,39 +128,39 @@ namespace dlib
     public:
 
         adam(
-        ); 
+        );
         /*!
             ensures
-                - #get_weight_decay()  == 0.0005 
-                - #get_momentum1()     == 0.9 
-                - #get_momentum2()     == 0.999 
+                - #get_weight_decay()  == 0.0005
+                - #get_momentum1()     == 0.9
+                - #get_momentum2()     == 0.999
         !*/
 
         adam(
             float weight_decay,
-            float momentum1, 
-            float momentum2 
-        ); 
+            float momentum1,
+            float momentum2
+        );
         /*!
             requires
                 - weight_decay >= 0
                 - 0 <= momentum1 < 1
                 - 0 <= momentum2 < 1
             ensures
-                - #get_weight_decay()  == weight_decay 
+                - #get_weight_decay()  == weight_decay
                 - #get_momentum1()     == momentum1
                 - #get_momentum2()     == momentum2
         !*/
 
         float get_weight_decay () const;
-        float get_momentum1 () const; 
-        float get_momentum2 () const; 
+        float get_momentum1 () const;
+        float get_momentum2 () const;
     };
 
     void serialize(const adam& item, std::ostream& out);
     void deserialize(adam& item, std::istream& in);
     /*!
-        provides serialization support  
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ namespace dlib
         const vector_type& v,
         const int bits,
         dlib::rand& rnd
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(0 < bits && bits <= 32 &&
@@ -31,18 +31,18 @@ namespace dlib
             "\t projection_hash create_random_projection_hash()"
             << "\n\t Invalid arguments were given to this function."
             << "\n\t bits: " << bits
-            << "\n\t v.size(): " << v.size() 
+            << "\n\t v.size(): " << v.size()
             );
 
 #ifdef ENABLE_ASSERTS
         for (unsigned long i = 0; i < v.size(); ++i)
         {
-            DLIB_ASSERT(v[0].size() == v[i].size() && v[i].size() > 0 && is_col_vector(v[i]), 
+            DLIB_ASSERT(v[0].size() == v[i].size() && v[i].size() > 0 && is_col_vector(v[i]),
                     "\t projection_hash create_random_projection_hash()"
                    << "\n\t Invalid arguments were given to this function."
                    << "\n\t m(0).size(): " << v[0].size()
-                   << "\n\t m("<<i<<").size(): " << v[i].size() 
-                   << "\n\t is_col_vector(v["<<i<<"]): " << is_col_vector(v[i]) 
+                   << "\n\t m("<<i<<").size(): " << v[i].size()
+                   << "\n\t is_col_vector(v["<<i<<"]): " << is_col_vector(v[i])
                 );
         }
 #endif
@@ -122,7 +122,7 @@ namespace dlib
     projection_hash create_random_projection_hash (
         const vector_type& v,
         const int bits
-    ) 
+    )
     {
         dlib::rand rnd;
         return create_random_projection_hash(v,bits,rnd);
@@ -138,7 +138,7 @@ namespace dlib
         const int bits,
         const double C,
         dlib::rand& rnd
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_ASSERT(0 < bits && bits <= 32 &&
@@ -146,18 +146,18 @@ namespace dlib
             "\t projection_hash create_max_margin_projection_hash()"
             << "\n\t Invalid arguments were given to this function."
             << "\n\t bits: " << bits
-            << "\n\t v.size(): " << v.size() 
+            << "\n\t v.size(): " << v.size()
             );
 
 #ifdef ENABLE_ASSERTS
         for (unsigned long i = 0; i < v.size(); ++i)
         {
-            DLIB_ASSERT(v[0].size() == v[i].size() && v[i].size() > 0 && is_col_vector(v[i]), 
+            DLIB_ASSERT(v[0].size() == v[i].size() && v[i].size() > 0 && is_col_vector(v[i]),
                     "\t projection_hash create_max_margin_projection_hash()"
                    << "\n\t Invalid arguments were given to this function."
                    << "\n\t m(0).size(): " << v[0].size()
-                   << "\n\t m("<<i<<").size(): " << v[i].size() 
-                   << "\n\t is_col_vector(v["<<i<<"]): " << is_col_vector(v[i]) 
+                   << "\n\t m("<<i<<").size(): " << v[i].size()
+                   << "\n\t is_col_vector(v["<<i<<"]): " << is_col_vector(v[i])
                 );
         }
 #endif
@@ -176,7 +176,7 @@ namespace dlib
         random_subset_selector<sample_type> training_samples;
         random_subset_selector<double> training_labels;
         // We set this up to use enough samples to cover the vector space used by elements
-        // of v.  
+        // of v.
         training_samples.set_max_size(v[0].size()*10);
         training_labels.set_max_size(v[0].size()*10);
 
@@ -218,7 +218,7 @@ namespace dlib
         const vector_type& v,
         const int bits,
         const double C = 10
-    ) 
+    )
     {
         dlib::rand rnd;
         return create_max_margin_projection_hash(v,bits,C,rnd);

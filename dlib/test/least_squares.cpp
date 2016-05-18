@@ -14,7 +14,7 @@
 #include "tester.h"
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -162,7 +162,7 @@ namespace
             dlog << LINFO << "chebyquad 6 error: " << length(ch - chebyquad_solution(6));
 
             // the ch variable contains a permutation of what is in chebyquad_solution(6).
-            // Apparently there is more than one minimum?.  Just check that the objective 
+            // Apparently there is more than one minimum?.  Just check that the objective
             // goes to zero.
             DLIB_TEST(chebyquad(ch) < 1e-10);
 

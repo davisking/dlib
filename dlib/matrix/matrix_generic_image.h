@@ -55,7 +55,7 @@ namespace dlib
     inline void set_image_size(
         matrix<T,NR,NC,MM>& img,
         long rows,
-        long cols 
+        long cols
     ) { img.set_size(rows,cols); }
 
     template <
@@ -98,8 +98,8 @@ namespace dlib
         >
     inline long width_step(
         const matrix<T,NR,NC,MM>& img
-    ) 
-    { 
+    )
+    {
         return img.nc()*sizeof(T);
     }
 

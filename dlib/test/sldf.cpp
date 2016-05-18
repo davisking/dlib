@@ -10,7 +10,7 @@
 #include <ctime>
 #include <dlib/data_io.h>
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -81,7 +81,7 @@ namespace
                 }
 
                 // Also save the samples we are generating so we can let the svm_c_linear_trainer
-                // learn from them below.  
+                // learn from them below.
                 samples.push_back(sample);
                 labels.push_back(label);
             }
@@ -286,8 +286,8 @@ namespace
 
     // Create an instance of this object.  Doing this causes this test
     // to be automatically inserted into the testing framework whenever this cpp file
-    // is linked into the project.  Note that since we are inside an unnamed-namespace 
-    // we won't get any linker errors about the symbol a being defined multiple times. 
+    // is linked into the project.  Note that since we are inside an unnamed-namespace
+    // we won't get any linker errors about the symbol a being defined multiple times.
     sldf_tester a;
 
 }

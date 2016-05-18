@@ -13,8 +13,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class invalid_network_address : public dlib::error 
-    { 
+    class invalid_network_address : public dlib::error
+    {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is the exception thrown by network_address's constructor if the
@@ -67,7 +67,7 @@ namespace dlib
             requires
                 - full_address == a valid pointer to a null terminated string
             ensures
-                - Invoking this constructor is equivalent to performing 
+                - Invoking this constructor is equivalent to performing
                   network_address(std::string(full_address))
         !*/
 
@@ -140,7 +140,7 @@ namespace dlib
 
     void deserialize(
         network_address& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         ensures
@@ -158,7 +158,7 @@ namespace dlib
                 cout << network_address("localhost", 80);
               would print:
                 localhost:80
-            - returns #out 
+            - returns #out
     !*/
 
     std::istream& operator>> (
@@ -168,7 +168,7 @@ namespace dlib
     /*!
         ensures
             - reads a network_address from the given input stream.  The expected format is
-              the same as the one used to print them by the above operator<<() routine. 
+              the same as the one used to print them by the above operator<<() routine.
             - returns #in
             - if (there is an error reading the network_address) then
                 - #in.good() == false
@@ -182,7 +182,7 @@ namespace dlib
     );
     /*!
         ensures
-            - returns a connection object that is connected to the given host at the 
+            - returns a connection object that is connected to the given host at the
               given port
         throws
             - dlib::socket_error
@@ -210,8 +210,8 @@ namespace dlib
     );
     /*!
         ensures
-            - returns a connection object that is connected to the given host at the 
-              given port.  
+            - returns a connection object that is connected to the given host at the
+              given port.
             - blocks for at most timeout milliseconds
         throws
             - dlib::socket_error
@@ -247,7 +247,7 @@ namespace dlib
         ensures
             - This function does nothing if con == 0, otherwise it performs the following:
                 - performs a graceful close of the given connection and if it takes longer
-                  than timeout milliseconds to complete then forces the connection closed. 
+                  than timeout milliseconds to complete then forces the connection closed.
                     - Specifically, a graceful close means that the outgoing part of con is
                       closed (a FIN is sent) and then we wait for the other end to to close
                       their end of the connection.  This way any data still on its way to
@@ -259,7 +259,7 @@ namespace dlib
         throws
             - std::bad_alloc or dlib::thread_error
                 If either of these exceptions are thrown con will still be closed via
-                "delete con;" 
+                "delete con;"
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -275,7 +275,7 @@ namespace dlib
             - This function does nothing if con.get() == 0, otherwise it performs the
               following:
                 - performs a graceful close of the given connection and if it takes longer
-                  than timeout milliseconds to complete then forces the connection closed. 
+                  than timeout milliseconds to complete then forces the connection closed.
                     - Specifically, a graceful close means that the outgoing part of con is
                       closed (a FIN is sent) and then we wait for the other end to to close
                       their end of the connection.  This way any data still on its way to

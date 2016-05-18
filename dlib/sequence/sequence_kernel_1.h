@@ -23,11 +23,11 @@ namespace dlib
         /*!
             INITIAL VALUE
                 - tree_root == 0
-                - tree_size == 0 
+                - tree_size == 0
                 - at_start_ == true
                 - current_element == 0
                 - stack == array of 50 node pointers
-                - stack_pos == 0         
+                - stack_pos == 0
 
             CONVENTION
                 
@@ -56,22 +56,22 @@ namespace dlib
 
 
                 - for all nodes:
-                    - left_size == the number of elements in the left subtree. 
-                    - left points to the left subtree or 0 if there is no left subtree. 
-                    - right points to the right subtree or 0 if there is no right subtree. 
+                    - left_size == the number of elements in the left subtree.
+                    - left points to the left subtree or 0 if there is no left subtree.
+                    - right points to the right subtree or 0 if there is no right subtree.
 
-                    - all elements in a left subtree have a position in the sequence < that 
-                      of the root of the current tree. 
+                    - all elements in a left subtree have a position in the sequence < that
+                      of the root of the current tree.
 
-                    - all elements in a right subtree have a position in the 
-                      sequence > that of the root of the current tree.      
+                    - all elements in a right subtree have a position in the
+                      sequence > that of the root of the current tree.
 
-                    - item is the sequence element for that node. 
+                    - item is the sequence element for that node.
                     - balance:
                         - balance == 0 if both subtrees have the same height
-                        - balance == -1 if the left subtree has a height that is 
+                        - balance == -1 if the left subtree has a height that is
                           greater than the height of the right subtree by 1
-                        - balance == 1 if the right subtree has a height that is 
+                        - balance == 1 if the right subtree has a height that is
                           greater than the height of the left subtree by 1
                     - for all subtrees:
                         - the height of the left and right subtrees differ by at most one
@@ -86,7 +86,7 @@ namespace dlib
             node* right;
             unsigned long left_size;
             T item;
-            signed char balance;            
+            signed char balance;
         };
 
 
@@ -97,7 +97,7 @@ namespace dlib
             typedef mem_manager mem_manager_type;
 
             sequence_kernel_1 (
-            ) : 
+            ) :
                 tree_root(0),
                 tree_size(0),
                 stack(ppool.allocate_array(50)),
@@ -183,11 +183,11 @@ namespace dlib
             );
             /*!
                 requires
-                    - t->balance == 2 
+                    - t->balance == 2
                     - t->right->balance == 0 or 1
                 ensures
-                    - #t is still a binary search tree 
-                    - #t->balance is between 1 and -1 
+                    - #t is still a binary search tree
+                    - #t->balance is between 1 and -1
                     - #t now has a height smaller by 1 if #t->balance == 0
             !*/
 
@@ -196,11 +196,11 @@ namespace dlib
             );
             /*!
                 requires
-                    - t->balance == -2 
+                    - t->balance == -2
                     - t->left->balance == 0 or -1
                 ensures
-                    - #t is still a binary search tree 
-                    - #t->balance is between 1 and -1 
+                    - #t is still a binary search tree
+                    - #t->balance is between 1 and -1
                     - #t now has a height smaller by 1 if #t->balance == 0
 
             !*/
@@ -210,12 +210,12 @@ namespace dlib
             );
             /*!
                 requires
-                    - #t->balance == -2 
+                    - #t->balance == -2
                     - #t->left->balance == 1
                 ensures
-                    - #t is still a binary search tree 
-                    - #t now has a balance of 0 
-                    - #t now has a height smaller by 1             
+                    - #t is still a binary search tree
+                    - #t now has a balance of 0
+                    - #t now has a height smaller by 1
             !*/
 
             inline void double_rotate_left (
@@ -223,10 +223,10 @@ namespace dlib
             );
             /*!
                 requires
-                    - #t->balance == 2 
+                    - #t->balance == 2
                     - #t->right->balance == -1
                 ensures
-                    - #t is still a binary search tree 
+                    - #t is still a binary search tree
                     - #t now has a balance of 0 and
                     - #t now has a height smaller by 1
             !*/
@@ -239,10 +239,10 @@ namespace dlib
                 requires
                     - t != 0  (i.e. there must be something in the tree to remove)
                 ensures
-                    - the least node in t has been removed 
-                    - the least node element in t has been put into #item 
-                    - #t is still a binary search tree 
-                    - returns false if the height of the tree has not changed 
+                    - the least node in t has been removed
+                    - the least node element in t has been put into #item
+                    - #t is still a binary search tree
+                    - returns false if the height of the tree has not changed
                     - returns true if the height of the tree has shrunk by one
             !*/
 
@@ -255,11 +255,11 @@ namespace dlib
                 requires
                     - pos <= the number of items in the tree
                 ensures
-                    - item has been added to #t 
-                    - #return_reference(pos) == item 
-                    - the convention is still satisfied 
-                    - #item has an initial value for its type 
-                    - returns false if the height of the tree has not changed 
+                    - item has been added to #t
+                    - #return_reference(pos) == item
+                    - the convention is still satisfied
+                    - #item has an initial value for its type
+                    - returns false if the height of the tree has not changed
                     - returns true if the height of the tree has grown by one
             !*/
 
@@ -272,10 +272,10 @@ namespace dlib
                 requires
                     - there is an item in the tree associated with pos
                 ensures
-                    - the element in the tree associated with pos has been removed 
-                      and put into #item                                                  
-                    - the convention is still satisfied                                   
-                    - returns false if the height of the tree has not changed 
+                    - the element in the tree associated with pos has been removed
+                      and put into #item
+                    - the convention is still satisfied
+                    - returns false if the height of the tree has not changed
                     - returns true if the height of the tree has shrunk by one
             !*/
 
@@ -298,7 +298,7 @@ namespace dlib
                 requires
                     - there is an item in the tree associated with pos
                 ensures
-                    - returns a non-const reference to the item in the tree associated 
+                    - returns a non-const reference to the item in the tree associated
                       with pos
             !*/
 
@@ -309,9 +309,9 @@ namespace dlib
                 requires
                     - t != 0
                 ensures
-                    - if (t->balance is < 1 or > 1) then 
+                    - if (t->balance is < 1 or > 1) then
                         - keep_node_balanced() will ensure that t->balance == 0, -1, or 1
-                    - returns true if it made the tree one height shorter 
+                    - returns true if it made the tree one height shorter
                     - returns false if it didn't change the height
             !*/
 
@@ -345,7 +345,7 @@ namespace dlib
 
             // restricted functions
             sequence_kernel_1(sequence_kernel_1&);        // copy constructor
-            sequence_kernel_1& operator=(sequence_kernel_1&); // assignment operator        
+            sequence_kernel_1& operator=(sequence_kernel_1&); // assignment operator
 
     };
 
@@ -354,16 +354,16 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        sequence_kernel_1<T,mem_manager>& a, 
-        sequence_kernel_1<T,mem_manager>& b 
-    ) { a.swap(b); } 
+        sequence_kernel_1<T,mem_manager>& a,
+        sequence_kernel_1<T,mem_manager>& b
+    ) { a.swap(b); }
 
     template <
         typename T,
         typename mem_manager
         >
     void deserialize (
-        sequence_kernel_1<T,mem_manager>& item, 
+        sequence_kernel_1<T,mem_manager>& item,
         std::istream& in
     )
     {
@@ -380,9 +380,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type sequence_kernel_1"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type sequence_kernel_1");
         }
     }
 
@@ -416,7 +416,7 @@ namespace dlib
     swap (
         sequence_kernel_1<T,mem_manager>& item
     )
-    {        
+    {
         exchange(stack,item.stack);
         exchange(stack_pos,item.stack_pos);
         
@@ -527,7 +527,7 @@ namespace dlib
     cat (
         sequence_kernel_1<T,mem_manager>& item
     )
-    {   
+    {
         for (unsigned long i = 0; i < item.tree_size; ++i)
         {
             add_to_tree(
@@ -539,9 +539,9 @@ namespace dlib
             ++tree_size;
         }
 
-        item.clear();   
+        item.clear();
         // reset the enumerator
-        reset();     
+        reset();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -559,9 +559,9 @@ namespace dlib
             delete_nodes(tree_root);
             tree_root = 0;
             tree_size = 0;
-        }    
+        }
         // reset the enumerator
-        reset();    
+        reset();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -654,7 +654,7 @@ namespace dlib
                 return false;
             }
             else
-            {                    
+            {
                 // find the first element in the tree
                 current_element = tree_root;
                 node* temp = current_element->left;
@@ -681,7 +681,7 @@ namespace dlib
                 // find the next element in the tree
                 if (current_element->right != 0)
                 {
-                    // go right and down    
+                    // go right and down
                     temp = current_element;
                     push(current_element);
                     current_element = temp->right;
@@ -726,7 +726,7 @@ namespace dlib
                             }
                             // we should go up
                             node* parent = pop();
-                            from_left = (parent->left == current_element);                            
+                            from_left = (parent->left == current_element);
                             current_element = parent;
                         }
                     }
@@ -749,7 +749,7 @@ namespace dlib
                     }
                 }
 
-                return true;               
+                return true;
             }
         }
 
@@ -768,7 +768,7 @@ namespace dlib
     void sequence_kernel_1<T,mem_manager>::
     remove_any (
         T& item
-    ) 
+    )
     {
         remove(0,item);
     }
@@ -786,7 +786,7 @@ namespace dlib
     void sequence_kernel_1<T,mem_manager>::
     rotate_left (
         node*& t
-    ) 
+    )
     {
 
         // set the new balance numbers
@@ -798,7 +798,7 @@ namespace dlib
         else
         {
             t->balance = 1;
-            t->right->balance = -1;            
+            t->right->balance = -1;
         }
 
         // perform the rotation
@@ -821,7 +821,7 @@ namespace dlib
     void sequence_kernel_1<T,mem_manager>::
     rotate_right (
         node*& t
-    ) 
+    )
     {
         // set the new balance numbers
         if (t->left->balance == -1)
@@ -832,14 +832,14 @@ namespace dlib
         else
         {
             t->balance = -1;
-            t->left->balance = 1;            
+            t->left->balance = 1;
         }
 
         // preform the rotation
         node* temp = t->left;
         t->left = temp->right;
         temp->right = t;
-        t = temp;    
+        t = temp;
 
 
         // set left_size to its correct value
@@ -869,7 +869,7 @@ namespace dlib
         t->right = temp;
 
         if (t->balance < 0)
-        {  
+        {
             t->left->balance = 0;
             t->right->balance = 1;
         }
@@ -878,7 +878,7 @@ namespace dlib
             t->left->balance = -1;
             t->right->balance = 0;
         }
-        else 
+        else
         {
             t->left->balance = 0;
             t->right->balance = 0;
@@ -913,7 +913,7 @@ namespace dlib
         t->left = temp;
 
         if (t->balance < 0)
-        {  
+        {
             t->left->balance = 0;
             t->right->balance = 1;
         }
@@ -922,7 +922,7 @@ namespace dlib
             t->left->balance = -1;
             t->right->balance = 0;
         }
-        else 
+        else
         {
             t->left->balance = 0;
             t->right->balance = 0;
@@ -945,9 +945,9 @@ namespace dlib
     remove_least_element_in_tree (
         node*& t,
         T& item
-    ) 
+    )
     {
-        // make a reference to the current node so we don't have to dereference 
+        // make a reference to the current node so we don't have to dereference
         // a pointer a bunch of times
         node& tree = *t;
 
@@ -962,7 +962,7 @@ namespace dlib
 
             // delete the node that was just removed
             tree.right = 0;
-            delete_nodes(&tree);    
+            delete_nodes(&tree);
 
             // return that the height of this part of the tree has decreased
             return true;
@@ -975,7 +975,7 @@ namespace dlib
             // keep going left
 
             // if remove made the tree one height shorter
-            if ( remove_least_element_in_tree(tree.left,item) ) 
+            if ( remove_least_element_in_tree(tree.left,item) )
             {
                 // if this caused the current tree to strink then report that
                 if ( tree.balance == -1)
@@ -987,10 +987,10 @@ namespace dlib
                 {
                     ++tree.balance;
                     return keep_node_balanced(t);
-                }                
+                }
             }
 
-            return false;            
+            return false;
         }
     }
 
@@ -1005,7 +1005,7 @@ namespace dlib
         node*& t,
         unsigned long pos,
         T& item
-    ) 
+    )
     {
         // if found place to add
         if (t == 0)
@@ -1013,12 +1013,12 @@ namespace dlib
             // create a node to add new item into
             t = pool.allocate();
 
-            // make a reference to the current node so we don't have to dereference 
+            // make a reference to the current node so we don't have to dereference
             // a pointer a bunch of times
             node& tree = *t;
 
 
-            // set left and right pointers to 0 to indicate that there are no 
+            // set left and right pointers to 0 to indicate that there are no
             // left or right subtrees
             tree.left = 0;
             tree.right = 0;
@@ -1033,7 +1033,7 @@ namespace dlib
         }
         else  // keep looking for a place to add the new item
         {
-            // make a reference to the current node so we don't have to dereference 
+            // make a reference to the current node so we don't have to dereference
             // a pointer a bunch of times
             node& tree = *t;
             signed char old_balance = tree.balance;
@@ -1078,7 +1078,7 @@ namespace dlib
                     }
                 }
             }
-        }  
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1092,10 +1092,10 @@ namespace dlib
         node*& t,
         unsigned long pos,
         T& item
-    ) 
+    )
     {
         
-        // make a reference to the current node so we don't have to dereference 
+        // make a reference to the current node so we don't have to dereference
         // a pointer a bunch of times
         node& tree = *t;
 
@@ -1132,7 +1132,7 @@ namespace dlib
                 
                 // delete old node
                 tree.right = 0;
-                delete_nodes(&tree);  
+                delete_nodes(&tree);
 
                 // indicate that the height has changed
                 return true;
@@ -1148,7 +1148,7 @@ namespace dlib
 
                 // delete old node
                 tree.left = 0;
-                delete_nodes(&tree);  
+                delete_nodes(&tree);
 
                 // indicate that the height of this tree has changed
                 return true;
@@ -1156,14 +1156,14 @@ namespace dlib
             // if there are both a left and right sub node
             else
             {
-                // get an element that can replace the one being removed and do this 
+                // get an element that can replace the one being removed and do this
                 // if it made the right subtree shrink by one
                 if (remove_least_element_in_tree(tree.right,item))
                 {
                     // adjust the tree height
                     --tree.balance;
 
-                    // put the element into item copy and also plug the 
+                    // put the element into item copy and also plug the
                     // hole with the smallest element from the right.
                     exchange(item,tree.item);
 
@@ -1180,7 +1180,7 @@ namespace dlib
                 // else this remove did not effect the height of this tree
                 else
                 {
-                    // put the element into item copy and also plug the 
+                    // put the element into item copy and also plug the
                     // hole with the smallest element from the right.
                     exchange(item,tree.item);
 
@@ -1217,7 +1217,7 @@ namespace dlib
     return_reference (
         node* t,
         unsigned long pos
-    ) 
+    )
     {
         while (true)
         {
@@ -1282,7 +1282,7 @@ namespace dlib
         node*& t
     )
     {
-        // make a reference to the current node so we don't have to dereference 
+        // make a reference to the current node so we don't have to dereference
         // a pointer a bunch of times
         node& tree = *t;
  
@@ -1312,7 +1312,7 @@ namespace dlib
         if (t->balance == 0)
             return true;
         else
-            return false; 
+            return false;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1326,10 +1326,10 @@ namespace dlib
         node* t
     )
     {
-        if (t->left) 
-            delete_nodes(t->left); 
-        if (t->right) 
-            delete_nodes(t->right); 
+        if (t->left)
+            delete_nodes(t->left);
+        if (t->right)
+            delete_nodes(t->right);
         pool.deallocate(t);
     }
 

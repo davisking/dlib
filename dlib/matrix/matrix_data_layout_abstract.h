@@ -25,8 +25,8 @@ namespace dlib
     struct column_major_layout
     {
         /*!
-            Any matrix object that uses this layout will be laid out in memory in 
-            column major order.  Additionally, all elements are contiguous (e.g. 
+            Any matrix object that uses this layout will be laid out in memory in
+            column major order.  Additionally, all elements are contiguous (e.g.
             there isn't any padding at the ends of rows or anything like that)
         !*/
     };

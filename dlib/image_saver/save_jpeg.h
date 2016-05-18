@@ -42,7 +42,7 @@ namespace dlib
         int quality = 75
     )
     {
-        // Convert any kind of grayscale image to an unsigned char image 
+        // Convert any kind of grayscale image to an unsigned char image
         if (pixel_traits<typename image_traits<image_type>::pixel_type>::grayscale)
         {
             array2d<unsigned char> temp;
@@ -61,7 +61,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP 
+        typename EXP
         >
     void save_jpeg(
         const matrix_exp<EXP>& img,

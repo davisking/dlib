@@ -26,7 +26,7 @@
 #if __cplusplus >= 201103
 #include "../dnn/cpu_dlib.cpp"
 #include "../dnn/tensor_tools.cpp"
-#endif 
+#endif
 
 #ifndef DLIB_ISO_CPP_ONLY
 // Code that depends on OS specific APIs

@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_ANY_FUNCTION_RETURN
-#error "You aren't supposed to directly #include this file.  #include <dlib/any.h> instead."  
+#error "You aren't supposed to directly #include this file.  #include <dlib/any.h> instead."
 #endif
 
 #ifdef _MSC_VER
@@ -13,10 +13,10 @@
 #ifdef DLIB_ANY_FUNCTION_RETURN
 
 // This file contains the body of the any_function class.  We use the
-// preprocessor to generate many different versions.  There are 
+// preprocessor to generate many different versions.  There are
 // versions which return a value and those which return void.  For
 // each of these types there are versions with differing numbers
-// of arguments. 
+// of arguments.
 
 public:
 typedef typename sig_traits<function_type>::result_type result_type;
@@ -83,7 +83,7 @@ bool is_set(
 
 template <typename T>
 T& cast_to(
-) 
+)
 {
     typedef typename basic_type<T>::type U;
     derived<U,function_type>* d = dynamic_cast<derived<U,function_type>*>(data.get());
@@ -111,7 +111,7 @@ const T& cast_to(
 
 template <typename T>
 T& get(
-) 
+)
 {
     typedef typename basic_type<T>::type U;
     derived<U,function_type>* d = dynamic_cast<derived<U,function_type>*>(data.get());
@@ -139,13 +139,13 @@ void swap (
     data.swap(item.data);
 }
 
-result_type operator()(DLIB_ANY_FUNCTION_ARG_LIST) const 
+result_type operator()(DLIB_ANY_FUNCTION_ARG_LIST) const
 { validate(); DLIB_ANY_FUNCTION_RETURN data->evaluate(DLIB_ANY_FUNCTION_ARGS); }
 /* !!!!!!!!    ERRORS ON THE ABOVE LINE    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     If you are getting an error on the above line then it means you
-    have attempted to call a dlib::any_function but you have supplied 
+    have attempted to call a dlib::any_function but you have supplied
     arguments which don't match the function signature used by the
-    dlib::any_function. 
+    dlib::any_function.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 private:
@@ -170,7 +170,7 @@ struct Tbase
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1
     >
 struct Tbase<T (A1)>
@@ -181,7 +181,7 @@ struct Tbase<T (A1)>
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1, typename A2
     >
 struct Tbase<T (A1,A2)>
@@ -192,7 +192,7 @@ struct Tbase<T (A1,A2)>
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1, typename A2, typename A3
     >
 struct Tbase<T (A1,A2,A3)>
@@ -203,7 +203,7 @@ struct Tbase<T (A1,A2,A3)>
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1, typename A2, typename A3,
     typename A4
     >
@@ -215,7 +215,7 @@ struct Tbase<T (A1,A2,A3,A4)>
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1, typename A2, typename A3,
     typename A4, typename A5
     >
@@ -227,7 +227,7 @@ struct Tbase<T (A1,A2,A3,A4,A5)>
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1, typename A2, typename A3,
     typename A4, typename A5, typename A6
     >
@@ -239,7 +239,7 @@ struct Tbase<T (A1,A2,A3,A4,A5,A6)>
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1, typename A2, typename A3,
     typename A4, typename A5, typename A6,
     typename A7
@@ -252,7 +252,7 @@ struct Tbase<T (A1,A2,A3,A4,A5,A6,A7)>
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1, typename A2, typename A3,
     typename A4, typename A5, typename A6,
     typename A7, typename A8
@@ -265,7 +265,7 @@ struct Tbase<T (A1,A2,A3,A4,A5,A6,A7,A8)>
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1, typename A2, typename A3,
     typename A4, typename A5, typename A6,
     typename A7, typename A8, typename A9
@@ -278,7 +278,7 @@ struct Tbase<T (A1,A2,A3,A4,A5,A6,A7,A8,A9)>
 };
 
 template <
-    typename T, 
+    typename T,
     typename A1, typename A2, typename A3,
     typename A4, typename A5, typename A6,
     typename A7, typename A8, typename A9,

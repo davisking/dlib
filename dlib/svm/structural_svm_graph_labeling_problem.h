@@ -79,7 +79,7 @@ namespace dlib
 
                 if (ismat && node_dims == -1)
                     node_dims = samples[i].node(j).data.size();
-                // all nodes must have vectors of the same size. 
+                // all nodes must have vectors of the same size.
                 if (ismat && (long)samples[i].node(j).data.size() != node_dims)
                 {
                     sout << "Not all node vectors in samples["<<i<<"] are the same dimension.";
@@ -193,8 +193,8 @@ namespace dlib
             // with an node vector.
             typedef typename T::type      node_mat;
             typedef typename T::edge_type edge_mat;
-            const static long NRd = node_mat::NR; 
-            const static long NRe = edge_mat::NR; 
+            const static long NRd = node_mat::NR;
+            const static long NRe = edge_mat::NR;
             const static long NR = ((NRd!=0) && (NRe!=0)) ? (NRd+NRe) : 0;
             typedef typename node_mat::value_type value_type;
 
@@ -205,10 +205,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename graph_type 
+        typename graph_type
         >
     class structural_svm_graph_labeling_problem : noncopyable,
-        public structural_svm_problem_threaded<matrix<double,0,1>, 
+        public structural_svm_problem_threaded<matrix<double,0,1>,
                                             typename dlib::impl::fvect<graph_type>::type >
     {
     public:
@@ -236,18 +236,18 @@ namespace dlib
             DLIB_ASSERT(is_graph_labeling_problem(samples, labels, reason_for_failure) == true ,
                     "\t structural_svm_graph_labeling_problem::structural_svm_graph_labeling_problem()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t reason_for_failure: " << reason_for_failure 
-                    << "\n\t samples.size(): " << samples.size() 
-                    << "\n\t labels.size():  " << labels.size() 
+                    << "\n\t reason_for_failure: " << reason_for_failure
+                    << "\n\t samples.size(): " << samples.size()
+                    << "\n\t labels.size():  " << labels.size()
                     << "\n\t this: " << this );
             DLIB_ASSERT((losses.size() == 0 || sizes_match(labels, losses) == true) &&
                         all_values_are_nonnegative(losses) == true,
                     "\t structural_svm_graph_labeling_problem::structural_svm_graph_labeling_problem()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t labels.size():  " << labels.size() 
-                    << "\n\t losses.size():  " << losses.size() 
-                    << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses) 
-                    << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses) 
+                    << "\n\t labels.size():  " << labels.size()
+                    << "\n\t losses.size():  " << losses.size()
+                    << "\n\t sizes_match(labels,losses): " << sizes_match(labels,losses)
+                    << "\n\t all_values_are_nonnegative(losses): " << all_values_are_nonnegative(losses)
                     << "\n\t this: " << this );
 #endif
 
@@ -275,7 +275,7 @@ namespace dlib
 
         long get_num_edge_weights (
         ) const
-        { 
+        {
             return edge_dims;
         }
 
@@ -287,7 +287,7 @@ namespace dlib
             DLIB_ASSERT(loss >= 0 && get_losses().size() == 0,
                     "\t void structural_svm_graph_labeling_problem::set_loss_on_positive_class()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t loss: " << loss 
+                    << "\n\t loss: " << loss
                     << "\n\t this: " << this );
 
             loss_pos = loss;
@@ -301,57 +301,57 @@ namespace dlib
             DLIB_ASSERT(loss >= 0 && get_losses().size() == 0,
                     "\t void structural_svm_graph_labeling_problem::set_loss_on_negative_class()"
                     << "\n\t Invalid inputs were given to this function."
-                    << "\n\t loss: " << loss 
+                    << "\n\t loss: " << loss
                     << "\n\t this: " << this );
 
             loss_neg = loss;
         }
 
         double get_loss_on_negative_class (
-        ) const 
-        { 
+        ) const
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(get_losses().size() == 0,
                     "\t double structural_svm_graph_labeling_problem::get_loss_on_negative_class()"
                     << "\n\t Invalid inputs were given to this function."
                     << "\n\t this: " << this );
 
-            return loss_neg; 
+            return loss_neg;
         }
 
         double get_loss_on_positive_class (
-        ) const 
-        { 
+        ) const
+        {
             // make sure requires clause is not broken
             DLIB_ASSERT(get_losses().size() == 0,
                     "\t double structural_svm_graph_labeling_problem::get_loss_on_positive_class()"
                     << "\n\t Invalid inputs were given to this function."
                     << "\n\t this: " << this );
 
-            return loss_pos; 
+            return loss_pos;
         }
 
 
     private:
         virtual long get_num_dimensions (
-        ) const 
+        ) const
         {
             // The psi/w vector will begin with all the edge dims and then follow with the node dims.
             return edge_dims + node_dims;
         }
 
         virtual long get_num_samples (
-        ) const 
+        ) const
         {
             return samples.size();
         }
 
         template <typename psi_type>
         typename enable_if<is_matrix<psi_type> >::type get_joint_feature_vector (
-            const sample_type& sample, 
+            const sample_type& sample,
             const label_type& label,
             psi_type& psi
-        ) const 
+        ) const
         {
             psi.set_size(get_num_dimensions());
             psi = 0;
@@ -379,7 +379,7 @@ namespace dlib
         void add_to_sparse_vect (
             T& psi,
             const T& vect,
-            unsigned long offset 
+            unsigned long offset
         ) const
         {
             for (typename T::const_iterator i = vect.begin(); i != vect.end(); ++i)
@@ -402,10 +402,10 @@ namespace dlib
 
         template <typename psi_type>
         typename disable_if<is_matrix<psi_type> >::type get_joint_feature_vector (
-            const sample_type& sample, 
+            const sample_type& sample,
             const label_type& label,
             psi_type& psi
-        ) const 
+        ) const
         {
             psi.clear();
             for (unsigned long i = 0; i < sample.number_of_nodes(); ++i)
@@ -430,8 +430,8 @@ namespace dlib
 
         virtual void get_truth_joint_feature_vector (
             long idx,
-            feature_vector_type& psi 
-        ) const 
+            feature_vector_type& psi
+        ) const
         {
             get_joint_feature_vector(samples[idx], labels[idx], psi);
         }
@@ -446,7 +446,7 @@ namespace dlib
             const sample_type& samp = samples[idx];
 
             // setup the potts graph based on samples[idx] and current_solution.
-            graph<double,double>::kernel_1a g; 
+            graph<double,double>::kernel_1a g;
             copy_graph_structure(samp, g);
             for (unsigned long i = 0; i < g.number_of_nodes(); ++i)
             {
@@ -463,7 +463,7 @@ namespace dlib
                 for (unsigned long n = 0; n < g.node(i).number_of_neighbors(); ++n)
                 {
                     const unsigned long j = g.node(i).neighbor(n).index();
-                    // Don't compute an edge weight more than once. 
+                    // Don't compute an edge weight more than once.
                     if (i < j)
                     {
                         g.node(i).edge(n) = dot(rowm(current_solution,range(0,edge_dims-1)),

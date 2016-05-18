@@ -60,9 +60,9 @@ namespace dlib
         typename hash_map_base
         >
     inline void swap (
-        hash_map_kernel_c<hash_map_base>& a, 
-        hash_map_kernel_c<hash_map_base>& b 
-    ) { a.swap(b); }  
+        hash_map_kernel_c<hash_map_base>& a,
+        hash_map_kernel_c<hash_map_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ namespace dlib
             "\tvoid hash_map::remove_any"
             << "\n\tsize() must be greater than zero if something is going to be removed"
             << "\n\tand d and r must not be the same variable."
-            << "\n\tsize(): " << this->size() 
+            << "\n\tsize(): " << this->size()
             << "\n\tthis:   " << this
             << "\n\t&d:     " << static_cast<void*>(&d)
             << "\n\t&r:     " << static_cast<void*>(&r)
@@ -174,7 +174,7 @@ namespace dlib
 
 
         // make sure requires clause is not broken
-        DLIB_CASSERT( this->is_in_domain(d), 
+        DLIB_CASSERT( this->is_in_domain(d),
             "\tvoid hash_map::destroy"
             << "\n\tcan't remove something that isn't in the hash_map"
             << "\n\tthis:      " << this
@@ -255,7 +255,7 @@ namespace dlib
         >
     map_pair<typename hash_map_base::domain_type,typename hash_map_base::range_type>& hash_map_kernel_c<hash_map_base>::
     element (
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT(this->current_element_valid() == true,

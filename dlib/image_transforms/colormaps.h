@@ -14,7 +14,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct op_randomly_color_image : does_not_alias 
+    struct op_randomly_color_image : does_not_alias
     {
         op_randomly_color_image( const T& img_) : img(img_){}
 
@@ -28,8 +28,8 @@ namespace dlib
         typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
-        const_ret_type apply (long r, long c ) const 
-        { 
+        const_ret_type apply (long r, long c ) const
+        {
             const unsigned long gray = get_pixel_intensity(mat(img)(r,c));
             if (gray != 0)
             {
@@ -49,12 +49,12 @@ namespace dlib
 
         long nr () const { return num_rows(img); }
         long nc () const { return num_columns(img); }
-    }; 
+    };
 
     template <
         typename image_type
         >
-    const matrix_op<op_randomly_color_image<image_type> >  
+    const matrix_op<op_randomly_color_image<image_type> >
     randomly_color_image (
         const image_type& img
     )
@@ -92,9 +92,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct op_heatmap : does_not_alias 
+    struct op_heatmap : does_not_alias
     {
-        op_heatmap( 
+        op_heatmap(
             const T& img_,
             const double max_val_,
             const double min_val_
@@ -113,19 +113,19 @@ namespace dlib
         typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
-        const_ret_type apply (long r, long c ) const 
-        { 
+        const_ret_type apply (long r, long c ) const
+        {
             return colormap_heat(get_pixel_intensity(mat(img)(r,c)), min_val, max_val);
         }
 
         long nr () const { return num_rows(img); }
         long nc () const { return num_columns(img); }
-    }; 
+    };
 
     template <
         typename image_type
         >
-    const matrix_op<op_heatmap<image_type> >  
+    const matrix_op<op_heatmap<image_type> >
     heatmap (
         const image_type& img,
         double max_val,
@@ -139,7 +139,7 @@ namespace dlib
     template <
         typename image_type
         >
-    const matrix_op<op_heatmap<image_type> >  
+    const matrix_op<op_heatmap<image_type> >
     heatmap (
         const image_type& img
     )
@@ -202,9 +202,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct op_jet : does_not_alias 
+    struct op_jet : does_not_alias
     {
-        op_jet( 
+        op_jet(
             const T& img_,
             const double max_val_,
             const double min_val_
@@ -223,19 +223,19 @@ namespace dlib
         typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
-        const_ret_type apply (long r, long c ) const 
-        { 
+        const_ret_type apply (long r, long c ) const
+        {
             return colormap_jet(get_pixel_intensity(mat(img)(r,c)), min_val, max_val);
         }
 
         long nr () const { return num_rows(img); }
         long nc () const { return num_columns(img); }
-    }; 
+    };
 
     template <
         typename image_type
         >
-    const matrix_op<op_jet<image_type> >  
+    const matrix_op<op_jet<image_type> >
     jet (
         const image_type& img,
         double max_val,
@@ -249,7 +249,7 @@ namespace dlib
     template <
         typename image_type
         >
-    const matrix_op<op_jet<image_type> >  
+    const matrix_op<op_jet<image_type> >
     jet (
         const image_type& img
     )

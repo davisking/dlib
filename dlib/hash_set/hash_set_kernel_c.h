@@ -49,9 +49,9 @@ namespace dlib
         typename hash_set_base
         >
     inline void swap (
-        hash_set_kernel_c<hash_set_base>& a, 
-        hash_set_kernel_c<hash_set_base>& b 
-    ) { a.swap(b); } 
+        hash_set_kernel_c<hash_set_base>& a,
+        hash_set_kernel_c<hash_set_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ namespace dlib
     void hash_set_kernel_c<hash_set_base>::
     remove_any (
         T& item
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( this->size() != 0,
@@ -171,7 +171,7 @@ namespace dlib
         >
     const typename hash_set_base::type& hash_set_kernel_c<hash_set_base>::
     element (
-    ) 
+    )
     {
         DLIB_CASSERT(this->current_element_valid() == true,
             "\tT& hash_set::element()"

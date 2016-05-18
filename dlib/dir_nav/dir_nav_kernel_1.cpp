@@ -45,7 +45,7 @@ namespace dlib
         string::size_type pos = state.full_name.find_last_of(directory::get_separator());
         if (pos == string::npos)
         {
-            // no valid full path has no separator characters.  
+            // no valid full path has no separator characters.
             throw file_not_found("Unable to find file " + name);
         }
         state.name = state.full_name.substr(pos+1);
@@ -57,16 +57,16 @@ namespace dlib
         if (ffind == INVALID_HANDLE_VALUE ||
             (data.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) != 0)
         {
-            throw file_not_found("Unable to find file " + name);                
+            throw file_not_found("Unable to find file " + name);
         }
         else
         {
-            uint64 temp = data.nFileSizeHigh;            
+            uint64 temp = data.nFileSizeHigh;
             temp <<= 32;
             temp |= data.nFileSizeLow;
             state.file_size = temp;
             FindClose(ffind);
-        } 
+        }
 
     }
 
@@ -75,8 +75,8 @@ namespace dlib
     bool file::
     operator == (
         const file& rhs
-    ) const 
-    { 
+    ) const
+    {
         using namespace std;
 
         if (state.full_name.size() != rhs.state.full_name.size())
@@ -145,7 +145,7 @@ namespace dlib
 
     char directory::
     get_separator (
-    ) 
+    )
     {
         return '\\';
     }
@@ -155,8 +155,8 @@ namespace dlib
     bool directory::
     operator == (
         const directory& rhs
-    ) const 
-    { 
+    ) const
+    {
         using namespace std;
 
         if (state.full_name.size() != rhs.state.full_name.size())
@@ -223,7 +223,7 @@ namespace dlib
             // in this case this is a windows share path
             string::size_type pos = path.find_first_of(sep,2);
             if (pos != string::npos)
-            {                
+            {
                 pos = path.find_first_of(sep,pos+1);
 
                 if (pos == string::npos && path[path.size()-1] != sep)

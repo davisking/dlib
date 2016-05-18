@@ -508,7 +508,7 @@ extern "C" {
 /* Single Precision */
 
    void F77_srot(FINT, float *, FINT, float *, FINT, const float *, const float *);
-   void F77_srotg(float *,float *,float *,float *);    
+   void F77_srotg(float *,float *,float *,float *);
    void F77_srotm( FINT, float *, FINT, float *, FINT, const float *);
    void F77_srotmg(float *,float *,float *,const float *, float *);
    void F77_sswap( FINT, float *, FINT, float *, FINT);
@@ -524,7 +524,7 @@ extern "C" {
 /* Double Precision */
 
    void F77_drot(FINT, double *, FINT, double *, FINT, const double *, const double *);
-   void F77_drotg(double *,double *,double *,double *);    
+   void F77_drotg(double *,double *,double *,double *);
    void F77_drotm( FINT, double *, FINT, double *, FINT, const double *);
    void F77_drotmg(double *,double *,double *,const double *, double *);
    void F77_dswap( FINT, double *, FINT, double *, FINT);
@@ -585,8 +585,8 @@ extern "C" {
    void F77_stpsv( FCHAR, FCHAR, FCHAR, FINT, const float *, float *, FINT);
    void F77_sger( FINT, FINT, const float *, const float *, FINT, const float *, FINT, float *, FINT);
    void F77_ssyr(FCHAR, FINT, const float *, const float *, FINT, float *, FINT);
-   void F77_sspr(FCHAR, FINT, const float *, const float *, FINT, float *); 
-   void F77_sspr2(FCHAR, FINT, const float *, const float *, FINT, const float *, FINT,  float *); 
+   void F77_sspr(FCHAR, FINT, const float *, const float *, FINT, float *);
+   void F77_sspr2(FCHAR, FINT, const float *, const float *, FINT, const float *, FINT,  float *);
    void F77_ssyr2(FCHAR, FINT, const float *, const float *, FINT, const float *, FINT,  float *, FINT);
 
 /* Double Precision */
@@ -604,8 +604,8 @@ extern "C" {
    void F77_dtpsv( FCHAR, FCHAR, FCHAR, FINT, const double *, double *, FINT);
    void F77_dger( FINT, FINT, const double *, const double *, FINT, const double *, FINT, double *, FINT);
    void F77_dsyr(FCHAR, FINT, const double *, const double *, FINT, double *, FINT);
-   void F77_dspr(FCHAR, FINT, const double *, const double *, FINT, double *); 
-   void F77_dspr2(FCHAR, FINT, const double *, const double *, FINT, const double *, FINT,  double *); 
+   void F77_dspr(FCHAR, FINT, const double *, const double *, FINT, double *);
+   void F77_dspr2(FCHAR, FINT, const double *, const double *, FINT, const double *, FINT,  double *);
    void F77_dsyr2(FCHAR, FINT, const double *, const double *, FINT, const double *, FINT,  double *, FINT);
 
 /* Single Complex Precision */

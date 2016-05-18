@@ -17,9 +17,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class impossible_labeling_error : public dlib::error 
-    { 
-    public: 
+    class impossible_labeling_error : public dlib::error
+    {
+    public:
         impossible_labeling_error(const std::string& msg) : dlib::error(msg) {};
     };
 
@@ -27,7 +27,7 @@ namespace dlib
 
     template <
         typename image_scanner_type,
-        typename image_array_type 
+        typename image_array_type
         >
     class structural_svm_object_detection_problem : public structural_svm_problem_threaded<matrix<double,0,1> >,
                                                     noncopyable
@@ -56,15 +56,15 @@ namespace dlib
         {
 #ifdef ENABLE_ASSERTS
             // make sure requires clause is not broken
-            DLIB_ASSERT(is_learning_problem(images_, truth_object_detections_) && 
+            DLIB_ASSERT(is_learning_problem(images_, truth_object_detections_) &&
                         ignore_.size() == images_.size() &&
                          scanner.get_num_detection_templates() > 0,
                 "\t structural_svm_object_detection_problem::structural_svm_object_detection_problem()"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t scanner.get_num_detection_templates(): " << scanner.get_num_detection_templates()
                 << "\n\t is_learning_problem(images_,truth_object_detections_): " << is_learning_problem(images_,truth_object_detections_)
-                << "\n\t ignore.size(): " << ignore.size() 
-                << "\n\t images.size(): " << images.size() 
+                << "\n\t ignore.size(): " << ignore.size()
+                << "\n\t images.size(): " << images.size()
                 << "\n\t this: " << this
                 );
             for (unsigned long i = 0; i < truth_object_detections.size(); ++i)
@@ -74,9 +74,9 @@ namespace dlib
                     DLIB_ASSERT(truth_object_detections[i][j].num_parts() == scanner.get_num_movable_components_per_detection_template(),
                         "\t trained_function_type structural_object_detection_trainer::train()"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].num_parts():          " << 
+                        << "\n\t truth_object_detections["<<i<<"]["<<j<<"].num_parts():          " <<
                             truth_object_detections[i][j].num_parts()
-                        << "\n\t scanner.get_num_movable_components_per_detection_template(): " << 
+                        << "\n\t scanner.get_num_movable_components_per_detection_template(): " <<
                             scanner.get_num_movable_components_per_detection_template()
                         << "\n\t all_parts_in_rect(truth_object_detections["<<i<<"]["<<j<<"]): " << all_parts_in_rect(truth_object_detections[i][j])
                     );
@@ -108,7 +108,7 @@ namespace dlib
         }
 
         test_box_overlap get_overlap_tester (
-        ) const 
+        ) const
         {
             return boxes_overlap;
         }
@@ -118,10 +118,10 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(0 < eps && eps < 1, 
+            DLIB_ASSERT(0 < eps && eps < 1,
                 "\t void structural_svm_object_detection_problem::set_match_eps(eps)"
                 << "\n\t Invalid inputs were given to this function "
-                << "\n\t eps:  " << eps 
+                << "\n\t eps:  " << eps
                 << "\n\t this: " << this
                 );
 
@@ -145,7 +145,7 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss > 0, 
+            DLIB_ASSERT(loss > 0,
                 "\t void structural_svm_object_detection_problem::set_loss_per_missed_target(loss)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t loss: " << loss
@@ -166,7 +166,7 @@ namespace dlib
         )
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(loss > 0, 
+            DLIB_ASSERT(loss > 0,
                 "\t void structural_svm_object_detection_problem::set_loss_per_false_alarm(loss)"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t loss: " << loss
@@ -196,22 +196,22 @@ namespace dlib
 
 
         virtual long get_num_dimensions (
-        ) const 
+        ) const
         {
-            return scanners[0].get_num_dimensions() + 
+            return scanners[0].get_num_dimensions() +
                 1;// for threshold
         }
 
         virtual long get_num_samples (
-        ) const 
+        ) const
         {
             return images.size();
         }
 
         virtual void get_truth_joint_feature_vector (
             long idx,
-            feature_vector_type& psi 
-        ) const 
+            feature_vector_type& psi
+        ) const
         {
             const image_scanner_type& scanner = scanners[idx];
 
@@ -308,7 +308,7 @@ namespace dlib
             const matrix_type& current_solution,
             scalar_type& loss,
             feature_vector_type& psi
-        ) const 
+        ) const
         {
             const image_scanner_type& scanner = scanners[idx];
 
@@ -331,7 +331,7 @@ namespace dlib
             std::vector<bool> hit_truth_table(truth_object_detections[idx].size(), false);
 
             std::vector<rectangle> final_dets;
-            // The point of this loop is to fill out the truth_score_hits array. 
+            // The point of this loop is to fill out the truth_score_hits array.
             for (unsigned long i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
             {
                 if (overlaps_any_box(boxes_overlap, final_dets, dets[i].second))
@@ -366,7 +366,7 @@ namespace dlib
             double total_score = 0;
 #endif
             // Now figure out which detections jointly maximize the loss and detection score sum.  We
-            // need to take into account the fact that allowing a true detection in the output, while 
+            // need to take into account the fact that allowing a true detection in the output, while
             // initially reducing the loss, may allow us to increase the loss later with many duplicate
             // detections.
             for (unsigned long i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
@@ -419,7 +419,7 @@ namespace dlib
 #ifdef ENABLE_ASSERTS
             const double psi_score = dot(psi, current_solution);
             DLIB_CASSERT(std::abs(psi_score-total_score) <= 1e-4 * std::max(1.0,std::max(std::abs(psi_score),std::abs(total_score))),
-                        "\t The get_feature_vector() and detect() methods of image_scanner_type are not in sync." 
+                        "\t The get_feature_vector() and detect() methods of image_scanner_type are not in sync."
                         << "\n\t The relative error is too large to be attributed to rounding error."
                         << "\n\t error:       " << std::abs(psi_score-total_score)
                         << "\n\t psi_score:   " << psi_score

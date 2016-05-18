@@ -91,7 +91,7 @@ namespace dlib
         if (data->references != 1)
         {
             data_record* temp = new data_record(std::max(data->digits_used,rhs.data->digits_used)+slack);
-            data->references -= 1;   
+            data->references -= 1;
             long_add(data,rhs.data,temp);
             data = temp;
         }
@@ -132,7 +132,7 @@ namespace dlib
         const bigint_kernel_2& rhs
     )
     {
-        // if there are other references to this data 
+        // if there are other references to this data
         if (data->references != 1)
         {
             data_record* temp = new data_record(data->digits_used+slack);
@@ -169,7 +169,7 @@ namespace dlib
     )
     {
         // create a data_record to store the result of the multiplication in
-        data_record* temp = new data_record(rhs.data->digits_used+data->digits_used+slack);        
+        data_record* temp = new data_record(rhs.data->digits_used+data->digits_used+slack);
         long_mul(data,rhs.data,temp);
 
         // if there are other references to data
@@ -195,7 +195,7 @@ namespace dlib
         data_record* temp = new data_record(data->digits_used+slack);
         data_record* remainder;
         try {
-            remainder = new data_record(data->digits_used+slack);           
+            remainder = new data_record(data->digits_used+slack);
         } catch (...) { delete temp; throw; }
 
         long_div(data,rhs.data,temp,remainder);
@@ -217,7 +217,7 @@ namespace dlib
         data_record* remainder;
         try {
             remainder = new data_record(data->digits_used+slack);
-        } catch (...) { delete temp; throw; }    
+        } catch (...) { delete temp; throw; }
 
         long_div(data,rhs.data,temp,remainder);
 
@@ -381,7 +381,7 @@ namespace dlib
 
         // keep looping until temp represents zero
         while (temp->digits_used != 1 || *(temp->number) != 0)
-        {            
+        {
             rhs.short_div(temp,10000,temp,remainder);
 
             // pull the digits out of remainder
@@ -397,7 +397,7 @@ namespace dlib
             *str = a; --str;
             *str = b; --str;
             *str = c; --str;
-            *str = d; --str;              
+            *str = d; --str;
         }
 
         // throw away and extra leading zeros
@@ -449,7 +449,7 @@ namespace dlib
             // try to get 4 chars from in
             num_read = 1;
             char a = 0;
-            char b = 0; 
+            char b = 0;
             char c = 0;
             char d = 0;
 
@@ -549,11 +549,11 @@ namespace dlib
         uint16 rhs
     )
     {
-        // if there are other references to this data 
+        // if there are other references to this data
         if (data->references != 1)
         {
             data_record* temp = new data_record(data->digits_used+slack);
-            data->references -= 1;    
+            data->references -= 1;
             short_add(data,rhs,temp);
             data = temp;
         }
@@ -610,7 +610,7 @@ namespace dlib
         uint16 rhs
     )
     {
-        // if there are other references to this data 
+        // if there are other references to this data
         if (data->references != 1)
         {
             data_record* temp = new data_record(data->digits_used+slack);
@@ -637,7 +637,7 @@ namespace dlib
                 (rhs.data->digits_used+rhs.slack);
 
         rhs.short_mul(rhs.data,lhs,temp);
-        return bigint_kernel_2(temp,0);        
+        return bigint_kernel_2(temp,0);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -652,7 +652,7 @@ namespace dlib
                 (lhs.data->digits_used+lhs.slack);
 
         lhs.short_mul(lhs.data,rhs,temp);
-        return bigint_kernel_2(temp,0);  
+        return bigint_kernel_2(temp,0);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -662,7 +662,7 @@ namespace dlib
         uint16 rhs
     )
     {
-        // if there are other references to this data 
+        // if there are other references to this data
         if (data->references != 1)
         {
             data_record* temp = new data_record(data->digits_used+slack);
@@ -701,7 +701,7 @@ namespace dlib
             *(temp->number) = lhs/ *(rhs.data->number);
         }
         
-        return bigint_kernel_2(temp,0);  
+        return bigint_kernel_2(temp,0);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -717,7 +717,7 @@ namespace dlib
 
         uint16 remainder;
         lhs.short_div(lhs.data,rhs,temp,remainder);
-        return bigint_kernel_2(temp,0);  
+        return bigint_kernel_2(temp,0);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -733,7 +733,7 @@ namespace dlib
         {
             data_record* temp = new data_record(data->digits_used+slack);
             data->references -= 1;
-            short_div(data,rhs,temp,remainder);    
+            short_div(data,rhs,temp,remainder);
             data = temp;
         }
         else
@@ -765,7 +765,7 @@ namespace dlib
             *(temp->number) = lhs;
         }
         
-        return bigint_kernel_2(temp,0);  
+        return bigint_kernel_2(temp,0);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -783,7 +783,7 @@ namespace dlib
         lhs.short_div(lhs.data,rhs,temp,remainder);
         temp->digits_used = 1;
         *(temp->number) = remainder;
-        return bigint_kernel_2(temp,0);          
+        return bigint_kernel_2(temp,0);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -931,7 +931,7 @@ namespace dlib
     operator-- (
     )
     {
-        // if there are other references to this data 
+        // if there are other references to this data
         if (data->references != 1)
         {
             data_record* temp = new data_record(data->digits_used+slack);
@@ -973,7 +973,7 @@ namespace dlib
 
     void bigint_kernel_2::
     short_add (
-        const data_record* data,        
+        const data_record* data,
         uint16 value,
         data_record* result
     ) const
@@ -1003,7 +1003,7 @@ namespace dlib
         {
             result->digits_used = data->digits_used + 1;
             // store the carry in the most significant digit of the result
-            *r = static_cast<uint16>(temp>>16); 
+            *r = static_cast<uint16>(temp>>16);
         }
         else
         {
@@ -1015,7 +1015,7 @@ namespace dlib
 
     void bigint_kernel_2::
     short_sub (
-        const data_record* data,        
+        const data_record* data,
         uint16 value,
         data_record* result
     ) const
@@ -1028,7 +1028,7 @@ namespace dlib
 
         uint32 temp = *number - value;
 
-        // put the low word of temp into *data 
+        // put the low word of temp into *data
         *r = static_cast<uint16>(temp & 0xFFFF);
 
         
@@ -1037,10 +1037,10 @@ namespace dlib
             ++number;
             ++r;
 
-            // subtract the carry from *number 
+            // subtract the carry from *number
             temp = *number - (temp>>31);
 
-            // put the low word of temp into *r 
+            // put the low word of temp into *r
             *r = static_cast<uint16>(temp & 0xFFFF);
         }
 
@@ -1064,7 +1064,7 @@ namespace dlib
 
     void bigint_kernel_2::
     short_mul (
-        const data_record* data,        
+        const data_record* data,
         uint16 value,
         data_record* result
     ) const
@@ -1073,7 +1073,7 @@ namespace dlib
         uint32 temp = 0;
 
 
-        const uint16* number = data->number;        
+        const uint16* number = data->number;
         uint16* r = result->number;
         const uint16* end = r + data->digits_used;
 
@@ -1111,8 +1111,8 @@ namespace dlib
 
     void bigint_kernel_2::
     short_div (
-        const data_record* data,        
-        uint16 value,   
+        const data_record* data,
+        uint16 value,
         data_record* result,
         uint16& rem
     ) const
@@ -1168,7 +1168,7 @@ namespace dlib
     ) const
     {
         // put value into the carry part of temp
-        uint32 temp=0;        
+        uint32 temp=0;
 
         uint16* min_num;  // the number with the least digits used
         uint16* max_num;  // the number with the most digits used
@@ -1219,7 +1219,7 @@ namespace dlib
 
             ++max_num;
             ++r;
-        }        
+        }
 
         // check if there was a final carry
         if ((temp>>16) != 0)
@@ -1263,7 +1263,7 @@ namespace dlib
             // subtract *number2 from *number1 and then subtract any carry
             temp = *number1 - *number2 - (temp>>31);
 
-            // put the low word of temp into *r 
+            // put the low word of temp into *r
             *r = static_cast<uint16>(temp & 0xFFFF);
 
             ++number1;
@@ -1275,10 +1275,10 @@ namespace dlib
         while (number1 != end)
         {
 
-            // subtract the carry from *number1 
+            // subtract the carry from *number1
             temp = *number1 - (temp>>31);
 
-            // put the low word of temp into *r 
+            // put the low word of temp into *r
             *r = static_cast<uint16>(temp & 0xFFFF);
 
             ++number1;
@@ -1286,7 +1286,7 @@ namespace dlib
         }
 
         result->digits_used = lhs->digits_used;
-        // adjust the number of digits used appropriately 
+        // adjust the number of digits used appropriately
         --r;
         while (*r == 0 && result->digits_used > 1)
         {
@@ -1330,7 +1330,7 @@ namespace dlib
         // so then we can quit right now
         if (is_less_than(lhs,rhs))
         {
-            return;            
+            return;
         }
 
 
@@ -1340,7 +1340,7 @@ namespace dlib
 
         // shift rhs left until it is one shift away from being larger than lhs and
         // put the number of left shifts necessary into shifts
-        uint32 shifts; 
+        uint32 shifts;
         shifts = (lhs->digits_used - rhs->digits_used) * 16;
 
         shift_left(rhs,&temp,shifts);
@@ -1436,7 +1436,7 @@ namespace dlib
             }
 
             // copy the larger(approximately) of lhs and rhs into b
-            data_record b(*bb,aa->digits_used+slack); 
+            data_record b(*bb,aa->digits_used+slack);
 
 
             uint32 shift_value = 0;
@@ -1459,15 +1459,15 @@ namespace dlib
                     bit <<= 1;
                 }
 
-                ++anum;                        
+                ++anum;
             }
         }
-        else  // else if both lhs and rhs are large then use the more complex 
+        else  // else if both lhs and rhs are large then use the more complex
               // O(n*logn) algorithm
         {
             uint32 size = 1;
             // make size a power of 2
-            while (size < (lhs->digits_used + rhs->digits_used)*2)  
+            while (size < (lhs->digits_used + rhs->digits_used)*2)
             {
                 size *= 2;
             }
@@ -1476,9 +1476,9 @@ namespace dlib
             ct* a = new ct[size];
             ct* b; try {b = new ct[size]; } catch (...) { delete [] a; throw; }
 
-            // load lhs into the a array.  We are breaking the input number into 
-            // 8bit chunks for the purpose of using this fft algorithm.  The reason 
-            // for this is so that we have smaller numbers coming out of the final 
+            // load lhs into the a array.  We are breaking the input number into
+            // 8bit chunks for the purpose of using this fft algorithm.  The reason
+            // for this is so that we have smaller numbers coming out of the final
             // ifft.  This helps avoid overflow.
             for (uint32 i = 0; i < lhs->digits_used; ++i)
             {
@@ -1514,13 +1514,13 @@ namespace dlib
                 a[i] = l*a[i]*b[i];
             }
 
-            // Now compute the inverse fft of the pointwise multiplication of a and b.  
-            // This is basically the result.  We just have to take care of any carries 
+            // Now compute the inverse fft of the pointwise multiplication of a and b.
+            // This is basically the result.  We just have to take care of any carries
             // that should happen.
             ifft(a,size);
 
-            // loop over the result and propagate any carries that need to take place.  
-            // We will also be moving the resulting numbers into result->number at 
+            // loop over the result and propagate any carries that need to take place.
+            // We will also be moving the resulting numbers into result->number at
             // the same time.
             uint64 carry = 0;
             result->digits_used = 0;
@@ -1676,7 +1676,7 @@ namespace dlib
         // if lhs is definitely greater than rhs
         else if (lhs_digits_used > rhs_digits_used)
             return false;
-        else 
+        else
         {
             uint16* end = lhs->number;
             uint16* l = end         + lhs_digits_used;
@@ -1711,8 +1711,8 @@ namespace dlib
         {
             return false;
         }
-        else 
-        {            
+        else
+        {
             uint16* l = lhs->number;
             uint16* r = rhs->number;
             uint16* end = l + lhs->digits_used;
@@ -1764,7 +1764,7 @@ namespace dlib
             }
             
 
-            ++s;            
+            ++s;
 
             // if we have hit the end of s and there was a carry up to this point
             // then just make the next digit 1 and add one to the digits used
@@ -1798,7 +1798,7 @@ namespace dlib
             // if there was no carry then break out of the loop
             if (*d != 0xFFFF)
             {
-                // if we lost a digit in the subtraction 
+                // if we lost a digit in the subtraction
                 if (*d == 0 && s+1 == end)
                 {
                     if (source->digits_used == 1)
@@ -1835,9 +1835,9 @@ namespace dlib
 
     void bigint_kernel_2::
     fft (
-        ct* data, 
+        ct* data,
         unsigned long len
-    ) const 
+    ) const
     {
         const t pi2 = -2.0*3.1415926535897932384626433832795028841971693993751;
 
@@ -1855,7 +1855,7 @@ namespace dlib
         // compute the twiddle factors
         for (std::vector<ct>::size_type j = 0; j < twiddle_factors.size(); ++j)
         {
-            twiddle_factors[j] = w_pow; 
+            twiddle_factors[j] = w_pow;
             w_pow *= w;
         }
 
@@ -1888,9 +1888,9 @@ namespace dlib
 
     void bigint_kernel_2::
     ifft(
-        ct* data, 
+        ct* data,
         unsigned long len
-    ) const 
+    ) const
     {
         const t pi2 = 2.0*3.1415926535897932384626433832795028841971693993751;
 
@@ -1908,7 +1908,7 @@ namespace dlib
         // compute the twiddle factors
         for (std::vector<ct>::size_type j = 0; j < twiddle_factors.size(); ++j)
         {
-            twiddle_factors[j] = w_pow; 
+            twiddle_factors[j] = w_pow;
             w_pow *= w;
         }
 

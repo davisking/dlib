@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_RSIGNALER_EXTENSIOn_
-#define DLIB_RSIGNALER_EXTENSIOn_ 
+#define DLIB_RSIGNALER_EXTENSIOn_
 
 #include "rsignaler_extension_abstract.h"
 #include "rmutex_extension.h"
@@ -16,7 +16,7 @@ namespace dlib
     public:
         rsignaler (
             const rmutex& associated_mutex
-        ) : 
+        ) :
             assoc_mutex(associated_mutex),
             s(m)
         {}
@@ -50,18 +50,18 @@ namespace dlib
         }
 
         void signal (
-        ) const 
-        { 
+        ) const
+        {
             m.lock();
-            s.signal(); 
+            s.signal();
             m.unlock();
         }
 
         void broadcast (
-        ) const 
-        { 
+        ) const
+        {
             m.lock();
-            s.broadcast(); 
+            s.broadcast();
             m.unlock();
         }
 
@@ -84,7 +84,7 @@ namespace dlib
 
 }
 
-#endif // DLIB_RSIGNALER_EXTENSIOn_ 
+#endif // DLIB_RSIGNALER_EXTENSIOn_
 
 
 

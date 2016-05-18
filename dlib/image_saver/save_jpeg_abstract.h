@@ -35,13 +35,13 @@ namespace dlib
               save_jpeg() can only natively store rgb_pixel and uint8 pixel types.  All
               other pixel types will be converted into one of these types as appropriate
               before being saved to disk.
-            - The quality value determines how lossy the compression is.  Larger quality 
+            - The quality value determines how lossy the compression is.  Larger quality
               values result in larger output images but the images will look better.
         throws
             - image_save_error
-                This exception is thrown if there is an error that prevents us from saving 
-                the image.  
-            - std::bad_alloc 
+                This exception is thrown if there is an error that prevents us from saving
+                the image.
+            - std::bad_alloc
     !*/
 
 // ----------------------------------------------------------------------------------------

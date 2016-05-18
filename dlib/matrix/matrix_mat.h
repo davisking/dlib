@@ -30,7 +30,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename image_type, typename pixel_type>
-    struct op_image_to_mat : does_not_alias 
+    struct op_image_to_mat : does_not_alias
     {
         op_image_to_mat( const image_type& img) : imgview(img){}
 
@@ -48,7 +48,7 @@ namespace dlib
 
         long nr () const { return imgview.nr(); }
         long nc () const { return imgview.nc(); }
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ namespace dlib
           // to not alias any matrix.  But obviously that would be a problem if we let it
           // take a matrix.
     const typename disable_if<is_matrix<image_type>,matrix_op<op_image_to_mat<image_type, typename image_traits<image_type>::pixel_type> > >::type mat (
-        const image_type& img 
+        const image_type& img
     )
     {
         typedef op_image_to_mat<image_type, typename image_traits<image_type>::pixel_type> op;
@@ -68,7 +68,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename image_type>
-    struct op_image_view_to_mat : does_not_alias 
+    struct op_image_view_to_mat : does_not_alias
     {
         op_image_view_to_mat( const image_view<image_type>& img) : imgview(img){}
 
@@ -88,13 +88,13 @@ namespace dlib
 
         long nr () const { return imgview.nr(); }
         long nc () const { return imgview.nc(); }
-    }; 
+    };
 
     template <
         typename image_type
-        > 
+        >
     const matrix_op<op_image_view_to_mat<image_type> > mat (
-        const image_view<image_type>& img 
+        const image_view<image_type>& img
     )
     {
         typedef op_image_view_to_mat<image_type> op;
@@ -104,7 +104,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename image_type>
-    struct op_const_image_view_to_mat : does_not_alias 
+    struct op_const_image_view_to_mat : does_not_alias
     {
         op_const_image_view_to_mat( const const_image_view<image_type>& img) : imgview(img){}
 
@@ -124,13 +124,13 @@ namespace dlib
 
         long nr () const { return imgview.nr(); }
         long nc () const { return imgview.nc(); }
-    }; 
+    };
 
     template <
         typename image_type
-        > 
+        >
     const matrix_op<op_const_image_view_to_mat<image_type> > mat (
-        const const_image_view<image_type>& img 
+        const const_image_view<image_type>& img
     )
     {
         typedef op_const_image_view_to_mat<image_type> op;
@@ -140,7 +140,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct op_array_to_mat : does_not_alias 
+    struct op_array_to_mat : does_not_alias
     {
         op_array_to_mat( const T& vect_) : vect(vect_){}
 
@@ -158,7 +158,7 @@ namespace dlib
 
         long nr () const { return vect.size(); }
         long nc () const { return 1; }
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -167,7 +167,7 @@ namespace dlib
         typename MM
         >
     const matrix_op<op_array_to_mat<array<T,MM> > > mat (
-        const array<T,MM>& m 
+        const array<T,MM>& m
     )
     {
         typedef op_array_to_mat<array<T,MM> > op;
@@ -185,7 +185,7 @@ namespace dlib
     }
 
     template <typename T>
-    struct op_std_vect_to_mat : does_not_alias 
+    struct op_std_vect_to_mat : does_not_alias
     {
         op_std_vect_to_mat( const T& vect_) : vect(vect_){}
 
@@ -206,7 +206,7 @@ namespace dlib
 
         long nr () const { return vect.size(); }
         long nc () const { return 1; }
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -239,10 +239,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct op_pointer_to_mat;   
+    struct op_pointer_to_mat;
 
     template <typename T>
-    struct op_pointer_to_col_vect   
+    struct op_pointer_to_col_vect
     {
         op_pointer_to_col_vect(
             const T* ptr_,
@@ -271,12 +271,12 @@ namespace dlib
         template <long num_rows, long num_cols, typename mem_manager, typename layout>
         bool aliases (
             const matrix_exp<matrix<T,num_rows,num_cols, mem_manager,layout> >& item
-        ) const 
-        { 
+        ) const
+        {
             if (item.size() == 0)
                 return false;
             else
-                return (ptr == &item(0,0)); 
+                return (ptr == &item(0,0));
         }
 
         inline bool aliases (
@@ -289,7 +289,7 @@ namespace dlib
         {
             return item.ref().op.ptr == ptr;
         }
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -301,7 +301,7 @@ namespace dlib
         long nr
     )
     {
-        DLIB_ASSERT(nr > 0 , 
+        DLIB_ASSERT(nr > 0 ,
                     "\tconst matrix_exp mat(ptr, nr)"
                     << "\n\t nr must be bigger than 0"
                     << "\n\t nr: " << nr
@@ -313,12 +313,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct op_pointer_to_mat  
+    struct op_pointer_to_mat
     {
         op_pointer_to_mat(
             const T* ptr_,
             const long nr_,
-            const long nc_ 
+            const long nc_
         ) : ptr(ptr_), rows(nr_), cols(nc_){}
 
         const T* ptr;
@@ -344,12 +344,12 @@ namespace dlib
         template <long num_rows, long num_cols, typename mem_manager, typename layout>
         bool aliases (
             const matrix_exp<matrix<T,num_rows,num_cols, mem_manager,layout> >& item
-        ) const 
-        { 
+        ) const
+        {
             if (item.size() == 0)
                 return false;
             else
-                return (ptr == &item(0,0)); 
+                return (ptr == &item(0,0));
         }
 
         bool aliases (
@@ -365,7 +365,7 @@ namespace dlib
         {
             return item.ref().op.ptr == ptr;
         }
-    }; 
+    };
 
     template <typename T>
     bool op_pointer_to_col_vect<T>::
@@ -409,7 +409,7 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(nr > 0 && nc > 0 , 
+        DLIB_ASSERT(nr > 0 && nc > 0 ,
                     "\tconst matrix_exp mat(ptr, nr, nc)"
                     << "\n\t nr and nc must be bigger than 0"
                     << "\n\t nr: " << nr
@@ -430,7 +430,7 @@ namespace arma
 namespace dlib
 {
     template <typename T>
-    struct op_arma_Mat_to_mat : does_not_alias 
+    struct op_arma_Mat_to_mat : does_not_alias
     {
         op_arma_Mat_to_mat( const T& array_) : array(array_){}
 
@@ -448,7 +448,7 @@ namespace dlib
 
         long nr () const { return array.n_rows; }
         long nc () const { return array.n_cols; }
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -473,7 +473,7 @@ namespace Eigen
 namespace dlib
 {
     template <typename T, int _Rows, int _Cols>
-    struct op_eigen_Matrix_to_mat : does_not_alias 
+    struct op_eigen_Matrix_to_mat : does_not_alias
     {
         op_eigen_Matrix_to_mat( const T& array_) : m(array_){}
 
@@ -491,7 +491,7 @@ namespace dlib
 
         long nr () const { return m.rows(); }
         long nc () const { return m.cols(); }
-    }; 
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -519,7 +519,7 @@ namespace dlib
     template <
         typename vector_type
         >
-    const typename disable_if<is_matrix<vector_type>, matrix_op<op_array_to_mat<vector_type> > >::type 
+    const typename disable_if<is_matrix<vector_type>, matrix_op<op_array_to_mat<vector_type> > >::type
     vector_to_matrix (
         const vector_type& vector
     )
@@ -571,7 +571,7 @@ namespace dlib
     template <
         typename array_type
         >
-    const typename enable_if<is_matrix<array_type>,array_type>::type& 
+    const typename enable_if<is_matrix<array_type>,array_type>::type&
     array_to_matrix (
         const array_type& array
     )
@@ -582,7 +582,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    struct op_array2d_to_mat : does_not_alias 
+    struct op_array2d_to_mat : does_not_alias
     {
         op_array2d_to_mat( const T& array_) : array(array_){}
 
@@ -600,7 +600,7 @@ namespace dlib
 
         long nr () const { return array.nr(); }
         long nc () const { return array.nc(); }
-    }; 
+    };
 
     // Note that we have this version of mat() because it's slightly faster executing
     // than the general one that handles any generic image.  This is because it avoids
@@ -618,7 +618,7 @@ namespace dlib
     template <
         typename array_type
         >
-    const typename disable_if<is_matrix<array_type>,matrix_op<op_array2d_to_mat<array_type> > >::type 
+    const typename disable_if<is_matrix<array_type>,matrix_op<op_array2d_to_mat<array_type> > >::type
     array_to_matrix (
         const array_type& array
     )
@@ -638,7 +638,7 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(nr > 0 && nc > 0 , 
+        DLIB_ASSERT(nr > 0 && nc > 0 ,
                     "\tconst matrix_exp pointer_to_matrix(ptr, nr, nc)"
                     << "\n\t nr and nc must be bigger than 0"
                     << "\n\t nr: " << nr
@@ -656,7 +656,7 @@ namespace dlib
         long nr
     )
     {
-        DLIB_ASSERT(nr > 0 , 
+        DLIB_ASSERT(nr > 0 ,
                     "\tconst matrix_exp pointer_to_column_vector(ptr, nr)"
                     << "\n\t nr must be bigger than 0"
                     << "\n\t nr: " << nr

@@ -16,7 +16,7 @@
 namespace dlib
 {
     template <
-        typename K 
+        typename K
         >
     class svm_c_ekm_trainer
     {
@@ -40,14 +40,14 @@ namespace dlib
         }
 
         explicit svm_c_ekm_trainer (
-            const scalar_type& C 
+            const scalar_type& C
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
                 "\t svm_c_ekm_trainer::svm_c_ekm_trainer()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -69,7 +69,7 @@ namespace dlib
             DLIB_ASSERT(eps > 0,
                 "\t void svm_c_ekm_trainer::set_epsilon()"
                 << "\n\t eps must be greater than 0"
-                << "\n\t eps: " << eps 
+                << "\n\t eps: " << eps
                 << "\n\t this: " << this
                 );
 
@@ -96,24 +96,24 @@ namespace dlib
         }
 
         void be_verbose (
-        ) 
-        { 
+        )
+        {
             verbose = true;
-            ocas.be_quiet(); 
+            ocas.be_quiet();
         }
 
         void be_very_verbose (
         )
         {
             verbose = true;
-            ocas.be_verbose(); 
+            ocas.be_verbose();
         }
 
         void be_quiet (
         )
-        { 
+        {
             verbose = false;
-            ocas.be_quiet(); 
+            ocas.be_quiet();
         }
 
         void set_oca (
@@ -152,8 +152,8 @@ namespace dlib
             DLIB_ASSERT(basis_samples.size() > 0 && is_vector(mat(basis_samples)),
                 "\tvoid svm_c_ekm_trainer::set_basis(basis_samples)"
                 << "\n\t You have to give a non-empty set of basis_samples and it must be a vector"
-                << "\n\t basis_samples.size():                       " << basis_samples.size() 
-                << "\n\t is_vector(mat(basis_samples)): " << is_vector(mat(basis_samples)) 
+                << "\n\t basis_samples.size():                       " << basis_samples.size()
+                << "\n\t is_vector(mat(basis_samples)): " << is_vector(mat(basis_samples))
                 << "\n\t this: " << this
                 );
 
@@ -189,7 +189,7 @@ namespace dlib
             DLIB_ASSERT(max_basis_size_ > 0,
                 "\t void svm_c_ekm_trainer::set_max_basis_size()"
                 << "\n\t max_basis_size_ must be greater than 0"
-                << "\n\t max_basis_size_: " << max_basis_size_ 
+                << "\n\t max_basis_size_: " << max_basis_size_
                 << "\n\t this:            " << this
                 );
 
@@ -212,7 +212,7 @@ namespace dlib
             DLIB_ASSERT(initial_basis_size_ > 0,
                 "\t void svm_c_ekm_trainer::set_initial_basis_size()"
                 << "\n\t initial_basis_size_ must be greater than 0"
-                << "\n\t initial_basis_size_: " << initial_basis_size_ 
+                << "\n\t initial_basis_size_: " << initial_basis_size_
                 << "\n\t this:                " << this
                 );
 
@@ -236,7 +236,7 @@ namespace dlib
             DLIB_ASSERT(basis_size_increment_ > 0,
                 "\t void svm_c_ekm_trainer::set_basis_size_increment()"
                 << "\n\t basis_size_increment_ must be greater than 0"
-                << "\n\t basis_size_increment_: " << basis_size_increment_ 
+                << "\n\t basis_size_increment_: " << basis_size_increment_
                 << "\n\t this:                  " << this
                 );
 
@@ -244,14 +244,14 @@ namespace dlib
         }
 
         void set_c (
-            scalar_type C 
+            scalar_type C
         )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_ekm_trainer::set_c()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -278,7 +278,7 @@ namespace dlib
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_ekm_trainer::set_c_class1()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -293,7 +293,7 @@ namespace dlib
             DLIB_ASSERT(C > 0,
                 "\t void svm_c_ekm_trainer::set_c_class2()"
                 << "\n\t C must be greater than 0"
-                << "\n\t C:    " << C 
+                << "\n\t C:    " << C
                 << "\n\t this: " << this
                 );
 
@@ -355,10 +355,10 @@ namespace dlib
             DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
                 "\t decision_function svm_c_ekm_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t y.nr(): " << y.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t x.nr(): " << x.nr()
+                << "\n\t y.nr(): " << y.nr()
+                << "\n\t x.nc(): " << x.nc()
+                << "\n\t y.nc(): " << y.nc()
                 << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
                 );
 
@@ -421,10 +421,10 @@ namespace dlib
             DLIB_ASSERT(is_binary_classification_problem(x,y) == true,
                 "\t decision_function svm_c_ekm_trainer::train(x,y)"
                 << "\n\t invalid inputs were given to this function"
-                << "\n\t x.nr(): " << x.nr() 
-                << "\n\t y.nr(): " << y.nr() 
-                << "\n\t x.nc(): " << x.nc() 
-                << "\n\t y.nc(): " << y.nc() 
+                << "\n\t x.nr(): " << x.nr()
+                << "\n\t y.nr(): " << y.nr()
+                << "\n\t x.nc(): " << x.nc()
+                << "\n\t y.nc(): " << y.nc()
                 << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
                 );
 
@@ -432,7 +432,7 @@ namespace dlib
             std::vector<matrix<scalar_type,0,1, mem_manager_type> > proj_samples(x.size());
             decision_function<linear_kernel<matrix<scalar_type,0,1, mem_manager_type> > > df;
 
-            // we will use a linearly_independent_subset_finder to store our basis set. 
+            // we will use a linearly_independent_subset_finder to store our basis set.
             linearly_independent_subset_finder<kernel_type> lisf(get_kernel(), max_basis_size);
 
             dlib::rand rnd;
@@ -445,7 +445,7 @@ namespace dlib
 
             ekm.load(lisf);
 
-            // first project all samples into the span of the current basis 
+            // first project all samples into the span of the current basis
             for (long i = 0; i < x.size(); ++i)
             {
                 proj_samples[i] = ekm.project(x(i));
@@ -470,13 +470,13 @@ namespace dlib
             while (true)
             {
                 // if the basis is already as big as it's going to get then just do the most
-                // accurate training right now.  
+                // accurate training right now.
                 if (lisf.size() == max_basis_size)
                     trainer.set_epsilon(min_epsilon);
 
                 while (true)
                 {
-                    // now do the training.  
+                    // now do the training.
                     df = trainer.train(proj_samples, y, svm_objective);
 
                     if (svm_objective < prev_svm_objective)
@@ -508,8 +508,8 @@ namespace dlib
 
                 // now add more elements to the basis
                 unsigned long count = 0;
-                for (unsigned long j = 0; 
-                     (j < 100*basis_size_increment) && (count < basis_size_increment) && (lisf.size() < max_basis_size); 
+                for (unsigned long j = 0;
+                     (j < 100*basis_size_increment) && (count < basis_size_increment) && (lisf.size() < max_basis_size);
                      ++j)
                 {
                     // pick a random sample
@@ -518,7 +518,7 @@ namespace dlib
                     if (df(proj_samples[idx])*y(idx) < 1)
                     {
                         // Add the sample into the basis set if it is linearly independent of all the
-                        // vectors already in the basis set.  
+                        // vectors already in the basis set.
                         if (lisf.add(x(idx)))
                         {
                             ++count;
@@ -556,8 +556,8 @@ namespace dlib
                 }
             }
             
-            // Reproject all the data samples using the final basis.  We could just use what we 
-            // already have but the recursive thing done above to compute the proj_samples 
+            // Reproject all the data samples using the final basis.  We could just use what we
+            // already have but the recursive thing done above to compute the proj_samples
             // might have accumulated a little numerical error.  So lets just be safe.
             running_stats<scalar_type> rs, rs_margin;
             for (long i = 0; i < x.size(); ++i)
@@ -567,7 +567,7 @@ namespace dlib
                     scalar_type err;
                     proj_samples[i] = ekm.project(x(i),err);
                     rs.add(err);
-                    // if this point is within the margin 
+                    // if this point is within the margin
                     if (df(proj_samples[i])*y(i) < 1)
                         rs_margin.add(err);
                 }
@@ -624,9 +624,9 @@ namespace dlib
 
         matrix<sample_type,0,1,mem_manager_type> basis;
         mutable empirical_kernel_map<kernel_type> ekm;
-        mutable bool ekm_stale; 
+        mutable bool ekm_stale;
 
-    }; 
+    };
 
 }
 

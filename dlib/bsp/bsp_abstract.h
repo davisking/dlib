@@ -27,7 +27,7 @@ namespace dlib
 
                 To do this, each processing node needs an API used to send and receive
                 messages.  This API is implemented by the bsp_connect object which provides
-                these services to a BSP node.  
+                these services to a BSP node.
 
                 Note that BSP processing nodes are spawned using the bsp_connect() and
                 bsp_listen() routines defined at the bottom of this file.  For example, to
@@ -40,7 +40,7 @@ namespace dlib
                 as try_receive() until it returns false.  That is, the bsp_context's
                 receive methods incorporate a barrier synchronization that happens once all
                 the BSP nodes are blocked on receive calls and there are no more messages
-                in flight. 
+                in flight.
 
 
             THREAD SAFETY
@@ -61,7 +61,7 @@ namespace dlib
         );
         /*!
             requires
-                - item is serializable 
+                - item is serializable
                 - target_node_id < number_of_nodes()
                 - target_node_id != node_id()
             ensures
@@ -71,7 +71,7 @@ namespace dlib
                     This exception is thrown if there is an error which prevents us from
                     delivering the message to the given node.  One way this might happen is
                     if the target node has already terminated its execution or has lost
-                    network connectivity. 
+                    network connectivity.
         !*/
 
         template <typename T>
@@ -81,7 +81,7 @@ namespace dlib
         /*!
             ensures
                 - item is serializable
-                - sends a copy of item to all other processing nodes.   
+                - sends a copy of item to all other processing nodes.
             throws
                 - dlib::socket_error
                     This exception is thrown if there is an error which prevents us from
@@ -91,10 +91,10 @@ namespace dlib
         !*/
 
         unsigned long node_id (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - Returns the id of the current processing node.  That is, 
+                - Returns the id of the current processing node.  That is,
                   returns a number N such that:
                     - N < number_of_nodes()
                     - N == the node id of the processing node that called node_id().  This
@@ -102,7 +102,7 @@ namespace dlib
         !*/
 
         unsigned long number_of_nodes (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the number of processing nodes participating in the BSP
@@ -124,17 +124,17 @@ namespace dlib
                     - The following must have been true for this function to return false:
                         - All other nodes were blocked on calls to receive(),
                           try_receive(), or have terminated.
-                        - There were not any messages in flight between any nodes.  
+                        - There were not any messages in flight between any nodes.
                         - That is, if all the nodes had continued to block on receive
                           methods then they all would have blocked forever.  Therefore,
                           this function only returns false once there are no more messages
                           to process by any node and there is no possibility of more being
                           generated until control is returned to the callers of receive
-                          methods. 
+                          methods.
                     - When one BSP node's receive method returns because of the above
                       conditions then all of them will also return.  That is, it is NOT the
                       case that just a subset of BSP nodes unblock.  Moreover, they all
-                      unblock at the same time.  
+                      unblock at the same time.
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
@@ -175,7 +175,7 @@ namespace dlib
         bool try_receive (
             T& item,
             unsigned long& sending_node_id
-        ); 
+        );
         /*!
             requires
                 - item is serializable
@@ -189,17 +189,17 @@ namespace dlib
                     - The following must have been true for this function to return false:
                         - All other nodes were blocked on calls to receive(),
                           try_receive(), or have terminated.
-                        - There were not any messages in flight between any nodes.  
+                        - There were not any messages in flight between any nodes.
                         - That is, if all the nodes had continued to block on receive
                           methods then they all would have blocked forever.  Therefore,
                           this function only returns false once there are no more messages
                           to process by any node and there is no possibility of more being
                           generated until control is returned to the callers of receive
-                          methods. 
+                          methods.
                     - When one BSP node's receive method returns because of the above
                       conditions then all of them will also return.  That is, it is NOT the
                       case that just a subset of BSP nodes unblock.  Moreover, they all
-                      unblock at the same time.  
+                      unblock at the same time.
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
@@ -215,7 +215,7 @@ namespace dlib
         void receive (
             T& item,
             unsigned long& sending_node_id
-        ); 
+        );
         /*!
             requires
                 - item is serializable
@@ -245,16 +245,16 @@ namespace dlib
                 - Waits for the following to all be true:
                     - All other nodes were blocked on calls to receive(), try_receive(), or
                       have terminated.
-                    - There are not any messages in flight between any nodes.  
+                    - There are not any messages in flight between any nodes.
                     - That is, if all the nodes had continued to block on receive methods
                       then they all would have blocked forever.  Therefore, this function
                       only returns once there are no more messages to process by any node
                       and there is no possibility of more being generated until control is
-                      returned to the callers of receive methods. 
+                      returned to the callers of receive methods.
                 - When one BSP node's receive method returns because of the above
                   conditions then all of them will also return.  That is, it is NOT the
                   case that just a subset of BSP nodes unblock.  Moreover, they all unblock
-                  at the same time.  
+                  at the same time.
             throws
                 - dlib::socket_error:
                     This exception is thrown if some error occurs which prevents us from
@@ -278,7 +278,7 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT) must be a valid expression 
+                - funct(CONTEXT) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function spawns a BSP job consisting of hosts.size()+1 processing nodes.
@@ -288,13 +288,13 @@ namespace dlib
             - The other processing nodes are executed on the hosts indicated by the input
               argument.  In particular, this function interprets hosts as a list addresses
               identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
-              routines.  
+              routines.
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -313,7 +313,7 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1) must be a valid expression 
+                - funct(CONTEXT,arg1) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function spawns a BSP job consisting of hosts.size()+1 processing nodes.
@@ -323,13 +323,13 @@ namespace dlib
             - The other processing nodes are executed on the hosts indicated by the input
               argument.  In particular, this function interprets hosts as a list addresses
               identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
-              routines.  
+              routines.
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -350,7 +350,7 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1,arg2) must be a valid expression 
+                - funct(CONTEXT,arg1,arg2) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function spawns a BSP job consisting of hosts.size()+1 processing nodes.
@@ -360,13 +360,13 @@ namespace dlib
             - The other processing nodes are executed on the hosts indicated by the input
               argument.  In particular, this function interprets hosts as a list addresses
               identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
-              routines.  
+              routines.
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -389,7 +389,7 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1,arg2,arg3) must be a valid expression 
+                - funct(CONTEXT,arg1,arg2,arg3) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function spawns a BSP job consisting of hosts.size()+1 processing nodes.
@@ -399,13 +399,13 @@ namespace dlib
             - The other processing nodes are executed on the hosts indicated by the input
               argument.  In particular, this function interprets hosts as a list addresses
               identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
-              routines.  
+              routines.
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -430,7 +430,7 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1,arg2,arg3,arg4) must be a valid expression 
+                - funct(CONTEXT,arg1,arg2,arg3,arg4) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function spawns a BSP job consisting of hosts.size()+1 processing nodes.
@@ -440,13 +440,13 @@ namespace dlib
             - The other processing nodes are executed on the hosts indicated by the input
               argument.  In particular, this function interprets hosts as a list addresses
               identifying machines running the bsp_listen() or bsp_listen_dynamic_port()
-              routines.  
+              routines.
             - This call to bsp_connect() blocks until the BSP computation has completed on
               all processing nodes.
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -465,13 +465,13 @@ namespace dlib
         requires
             - listening_port != 0
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT) must be a valid expression 
+                - funct(CONTEXT) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT) will be executed and it will
               then be able to participate in the BSP computation as one of the processing
-              nodes.  
+              nodes.
             - This function will listen on TCP port listening_port for a connection from
               bsp_connect().  Once the connection is established, it will close the
               listening port so it is free for use by other applications.  The connection
@@ -481,7 +481,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -501,13 +501,13 @@ namespace dlib
         requires
             - listening_port != 0
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1) must be a valid expression 
+                - funct(CONTEXT,arg1) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1) will be executed and it will
               then be able to participate in the BSP computation as one of the processing
-              nodes.  
+              nodes.
             - This function will listen on TCP port listening_port for a connection from
               bsp_connect().  Once the connection is established, it will close the
               listening port so it is free for use by other applications.  The connection
@@ -517,7 +517,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -539,13 +539,13 @@ namespace dlib
         requires
             - listening_port != 0
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1,arg2) must be a valid expression 
+                - funct(CONTEXT,arg1,arg2) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2) will be executed and
               it will then be able to participate in the BSP computation as one of the
-              processing nodes.  
+              processing nodes.
             - This function will listen on TCP port listening_port for a connection from
               bsp_connect().  Once the connection is established, it will close the
               listening port so it is free for use by other applications.  The connection
@@ -555,7 +555,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -579,13 +579,13 @@ namespace dlib
         requires
             - listening_port != 0
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1,arg2,arg3) must be a valid expression 
+                - funct(CONTEXT,arg1,arg2,arg3) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2,arg3) will be
               executed and it will then be able to participate in the BSP computation as
-              one of the processing nodes.  
+              one of the processing nodes.
             - This function will listen on TCP port listening_port for a connection from
               bsp_connect().  Once the connection is established, it will close the
               listening port so it is free for use by other applications.  The connection
@@ -595,7 +595,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -621,13 +621,13 @@ namespace dlib
         requires
             - listening_port != 0
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1,arg2,arg3,arg4) must be a valid expression 
+                - funct(CONTEXT,arg1,arg2,arg3,arg4) must be a valid expression
                   (i.e. funct must be a function or function object)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2,arg3,arg4) will be
               executed and it will then be able to participate in the BSP computation as
-              one of the processing nodes.  
+              one of the processing nodes.
             - This function will listen on TCP port listening_port for a connection from
               bsp_connect().  Once the connection is established, it will close the
               listening port so it is free for use by other applications.  The connection
@@ -637,7 +637,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -657,22 +657,22 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT) must be a valid expression 
+                - funct(CONTEXT) must be a valid expression
                   (i.e. funct must be a function or function object)
             - port_notify_function((unsigned short) 1234) must be a valid expression
-              (i.e. port_notify_function() must be a function or function object taking an 
+              (i.e. port_notify_function() must be a function or function object taking an
               unsigned short)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT) will be executed and it will
               then be able to participate in the BSP computation as one of the processing
-              nodes.  
+              nodes.
             - if (listening_port != 0) then
                 - This function will listen on TCP port listening_port for a connection
-                  from bsp_connect().  
+                  from bsp_connect().
             - else
                 - An available TCP port number is automatically selected and this function
-                  will listen on it for a connection from bsp_connect(). 
+                  will listen on it for a connection from bsp_connect().
             - Once a listening port is opened, port_notify_function() is called with the
               port number used.  This provides a mechanism to find out what listening port
               has been used if it is automatically selected.  It also allows you to find
@@ -686,7 +686,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -707,22 +707,22 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1) must be a valid expression 
+                - funct(CONTEXT,arg1) must be a valid expression
                   (i.e. funct must be a function or function object)
             - port_notify_function((unsigned short) 1234) must be a valid expression
-              (i.e. port_notify_function() must be a function or function object taking an 
+              (i.e. port_notify_function() must be a function or function object taking an
               unsigned short)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1) will be executed and it
               will then be able to participate in the BSP computation as one of the
-              processing nodes.  
+              processing nodes.
             - if (listening_port != 0) then
                 - This function will listen on TCP port listening_port for a connection
-                  from bsp_connect().  
+                  from bsp_connect().
             - else
                 - An available TCP port number is automatically selected and this function
-                  will listen on it for a connection from bsp_connect(). 
+                  will listen on it for a connection from bsp_connect().
             - Once a listening port is opened, port_notify_function() is called with the
               port number used.  This provides a mechanism to find out what listening port
               has been used if it is automatically selected.  It also allows you to find
@@ -736,7 +736,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -759,22 +759,22 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1,arg2) must be a valid expression 
+                - funct(CONTEXT,arg1,arg2) must be a valid expression
                   (i.e. funct must be a function or function object)
             - port_notify_function((unsigned short) 1234) must be a valid expression
-              (i.e. port_notify_function() must be a function or function object taking an 
+              (i.e. port_notify_function() must be a function or function object taking an
               unsigned short)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2) will be executed and
               it will then be able to participate in the BSP computation as one of the
-              processing nodes.  
+              processing nodes.
             - if (listening_port != 0) then
                 - This function will listen on TCP port listening_port for a connection
-                  from bsp_connect().  
+                  from bsp_connect().
             - else
                 - An available TCP port number is automatically selected and this function
-                  will listen on it for a connection from bsp_connect(). 
+                  will listen on it for a connection from bsp_connect().
             - Once a listening port is opened, port_notify_function() is called with the
               port number used.  This provides a mechanism to find out what listening port
               has been used if it is automatically selected.  It also allows you to find
@@ -788,7 +788,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -813,22 +813,22 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1,arg2,arg3) must be a valid expression 
+                - funct(CONTEXT,arg1,arg2,arg3) must be a valid expression
                   (i.e. funct must be a function or function object)
             - port_notify_function((unsigned short) 1234) must be a valid expression
-              (i.e. port_notify_function() must be a function or function object taking an 
+              (i.e. port_notify_function() must be a function or function object taking an
               unsigned short)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2,arg3) will be
               executed and it will then be able to participate in the BSP computation as
-              one of the processing nodes.  
+              one of the processing nodes.
             - if (listening_port != 0) then
                 - This function will listen on TCP port listening_port for a connection
-                  from bsp_connect().  
+                  from bsp_connect().
             - else
                 - An available TCP port number is automatically selected and this function
-                  will listen on it for a connection from bsp_connect(). 
+                  will listen on it for a connection from bsp_connect().
             - Once a listening port is opened, port_notify_function() is called with the
               port number used.  This provides a mechanism to find out what listening port
               has been used if it is automatically selected.  It also allows you to find
@@ -842,7 +842,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/
@@ -869,22 +869,22 @@ namespace dlib
     /*!
         requires
             - let CONTEXT be an instance of a bsp_context object.  Then:
-                - funct(CONTEXT,arg1,arg2,arg3,arg4) must be a valid expression 
+                - funct(CONTEXT,arg1,arg2,arg3,arg4) must be a valid expression
                   (i.e. funct must be a function or function object)
             - port_notify_function((unsigned short) 1234) must be a valid expression
-              (i.e. port_notify_function() must be a function or function object taking an 
+              (i.e. port_notify_function() must be a function or function object taking an
               unsigned short)
         ensures
             - This function listens for a connection from the bsp_connect() routine.  Once
               this connection is established, funct(CONTEXT,arg1,arg2,arg3,arg4) will be
               executed and it will then be able to participate in the BSP computation as
-              one of the processing nodes.  
+              one of the processing nodes.
             - if (listening_port != 0) then
                 - This function will listen on TCP port listening_port for a connection
-                  from bsp_connect().  
+                  from bsp_connect().
             - else
                 - An available TCP port number is automatically selected and this function
-                  will listen on it for a connection from bsp_connect(). 
+                  will listen on it for a connection from bsp_connect().
             - Once a listening port is opened, port_notify_function() is called with the
               port number used.  This provides a mechanism to find out what listening port
               has been used if it is automatically selected.  It also allows you to find
@@ -898,7 +898,7 @@ namespace dlib
         throws
             - dlib::socket_error
                 This exception is thrown if there is an error which prevents the BSP
-                job from executing.  
+                job from executing.
             - Any exception thrown by funct() will be propagated out of this call to
               bsp_connect().
     !*/

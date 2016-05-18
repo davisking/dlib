@@ -13,24 +13,24 @@ namespace dlib
     template <
         typename T,
         typename E = char,
-        typename mem_manager = default_memory_manager 
+        typename mem_manager = default_memory_manager
         >
     class directed_graph : noncopyable
     {
 
         /*!
-            REQUIREMENTS ON T 
+            REQUIREMENTS ON T
                 T must be swappable by a global swap() and
                 T must have a default constructor
 
-            REQUIREMENTS ON E 
+            REQUIREMENTS ON E
                 E must be swappable by a global swap() and
                 E must have a default constructor
 
             REQUIREMENTS ON mem_manager
                 must be an implementation of memory_manager/memory_manager_kernel_abstract.h or
                 must be an implementation of memory_manager_global/memory_manager_global_kernel_abstract.h or
-                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h 
+                must be an implementation of memory_manager_stateless/memory_manager_stateless_kernel_abstract.h
                 mem_manager::type can be set to anything.
 
             POINTERS AND REFERENCES TO INTERNAL DATA
@@ -42,9 +42,9 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a directed graph which is a set of nodes with directed
-                edges connecting various nodes.  
+                edges connecting various nodes.
 
-                In this object if there is a directed edge from a node A to a node B then I say 
+                In this object if there is a directed edge from a node A to a node B then I say
                 that A is the parent of B and B is the child of A.
 
                 Also note that unless specified otherwise, no member functions
@@ -65,14 +65,14 @@ namespace dlib
         directed_graph(
         );
         /*!
-            ensures 
+            ensures
                 - #*this is properly initialized
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
         !*/
 
         virtual ~directed_graph(
-        ); 
+        );
         /*!
             ensures
                 - all resources associated with *this has been released
@@ -85,7 +85,7 @@ namespace dlib
                 - #*this has its initial value
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
-                  If this exception is thrown then *this is unusable 
+                  If this exception is thrown then *this is unusable
                   until clear() is called and succeeds
         !*/
 
@@ -100,7 +100,7 @@ namespace dlib
                     - number_of_children(i) == 0
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
-                  If this exception is thrown then this object reverts back 
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -129,14 +129,14 @@ namespace dlib
             ) const;
             /*!
                 ensures
-                    - returns the number of parents of this node 
+                    - returns the number of parents of this node
             !*/
 
             unsigned long number_of_children (
             ) const;
             /*!
                 ensures
-                    - returns the number of children of this node 
+                    - returns the number of children of this node
             !*/
 
             const node_type& parent (
@@ -270,10 +270,10 @@ namespace dlib
                 - child_node_index < number_of_nodes()
                 - has_edge(parent_node_index, child_node_index) == false
             ensures
-                - #has_edge(parent_node_index, child_node_index) == true 
+                - #has_edge(parent_node_index, child_node_index) == true
             throws
-                - std::bad_alloc 
-                  If this exception is thrown then this object reverts back 
+                - std::bad_alloc
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -285,12 +285,12 @@ namespace dlib
             requires
                 - parent_node_index < number_of_nodes()
                 - child_node_index < number_of_nodes()
-                - has_edge(parent_node_index, child_node_index) == true 
+                - has_edge(parent_node_index, child_node_index) == true
             ensures
-                - #has_edge(parent_node_index, child_node_index) == false 
+                - #has_edge(parent_node_index, child_node_index) == false
             throws
-                - std::bad_alloc 
-                  If this exception is thrown then this object reverts back 
+                - std::bad_alloc
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -300,13 +300,13 @@ namespace dlib
             ensures
                 - does not change the index number of existing nodes
                 - adds a node with index N == number_of_nodes() such that:
-                    - #node(N).number_of_parents() == 0 
-                    - #node(N).number_of_children() == 0 
+                    - #node(N).number_of_parents() == 0
+                    - #node(N).number_of_children() == 0
                     - #number_of_nodes() == number_of_nodes() + 1
-                    - returns N  
+                    - returns N
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
-                  If this exception is thrown then this object reverts back 
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -317,7 +317,7 @@ namespace dlib
             requires
                 - index < number_of_nodes()
             ensures
-                - removes the node with the given index from the graph. 
+                - removes the node with the given index from the graph.
                 - removes all edges linking the removed node to the rest
                   of the graph.
                 - the remaining node indexes are remapped so that they remain
@@ -326,7 +326,7 @@ namespace dlib
                 - #number_of_nodes() == number_of_nodes() - 1
             throws
                 - std::bad_alloc or any exception thrown by T's constructor.
-                  If this exception is thrown then this object reverts back 
+                  If this exception is thrown then this object reverts back
                   to its initial state.
         !*/
 
@@ -336,18 +336,18 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
     };
 
     template <
-        typename T, 
+        typename T,
         typename mem_manager
         >
     inline void swap (
-        directed_graph<T,mem_manager>& a, 
-        directed_graph<T,mem_manager>& b 
-    ) { a.swap(b); }   
+        directed_graph<T,mem_manager>& a,
+        directed_graph<T,mem_manager>& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/
@@ -358,10 +358,10 @@ namespace dlib
         >
     void serialize (
         const directed_graph<T,mem_manager>& item,
-        std::ostream& out 
-    );   
+        std::ostream& out
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
     template <
@@ -371,9 +371,9 @@ namespace dlib
     void deserialize (
         directed_graph<T,mem_manager>& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 }

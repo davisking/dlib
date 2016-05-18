@@ -66,7 +66,7 @@ namespace dlib
                 unsigned char b8 = 0;
 
                 unsigned char x = 0;
-                if (get_pixel_intensity(img[r-1][c-1]) > pix) b1 = 0x80; 
+                if (get_pixel_intensity(img[r-1][c-1]) > pix) b1 = 0x80;
                 if (get_pixel_intensity(img[r-1][c  ]) > pix) b2 = 0x40;
                 if (get_pixel_intensity(img[r-1][c+1]) > pix) b3 = 0x20;
                 x |= b1;
@@ -105,7 +105,7 @@ namespace dlib
     )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT(cell_size >= 1 && block_size >= 1 && max_val < 256 && 
+        DLIB_ASSERT(cell_size >= 1 && block_size >= 1 && max_val < 256 &&
                     (unsigned int)max(mat(img_)) <= max_val,
             "\t void extract_histogram_descriptors()"
             << "\n\t Invalid inputs were given to this function."
@@ -216,23 +216,23 @@ namespace dlib
             << "\n\t det.num_parts(): " << det.num_parts()
             );
 
-        const unsigned long num_scales = 5; 
+        const unsigned long num_scales = 5;
         feats.clear();
         dlib::vector<double,2> l, r;
         double cnt = 0;
-        // Find the center of the left eye by averaging the points around 
+        // Find the center of the left eye by averaging the points around
         // the eye.
-        for (unsigned long i = 36; i <= 41; ++i) 
+        for (unsigned long i = 36; i <= 41; ++i)
         {
             l += det.part(i);
             ++cnt;
         }
         l /= cnt;
 
-        // Find the center of the right eye by averaging the points around 
+        // Find the center of the right eye by averaging the points around
         // the eye.
         cnt = 0;
-        for (unsigned long i = 42; i <= 47; ++i) 
+        for (unsigned long i = 42; i <= 47; ++i)
         {
             r += det.part(i);
             ++cnt;

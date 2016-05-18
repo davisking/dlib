@@ -46,8 +46,8 @@ namespace dlib
         typename queue_base
         >
     inline void swap (
-        queue_kernel_c<queue_base>& a, 
-        queue_kernel_c<queue_base>& b 
+        queue_kernel_c<queue_base>& a,
+        queue_kernel_c<queue_base>& b
     ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ namespace dlib
         >
     typename queue_base::type& queue_kernel_c<queue_base>::
     current (
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT(this->size() != 0,
@@ -144,7 +144,7 @@ namespace dlib
         >
     typename queue_base::type& queue_kernel_c<queue_base>::
     element (
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT(this->current_element_valid() == true,
@@ -165,13 +165,13 @@ namespace dlib
     void queue_kernel_c<queue_base>::
     remove_any (
         T& item
-    ) 
+    )
     {
         // make sure requires clause is not broken
         DLIB_CASSERT( (this->size() > 0),
             "\tvoid queue::remove_any"
             << "\n\tsize() must be greater than zero if something is going to be removed"
-            << "\n\tsize(): " << this->size() 
+            << "\n\tsize(): " << this->size()
             << "\n\tthis:   " << this
             );
 

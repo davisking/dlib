@@ -15,7 +15,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename net_type, 
+        typename net_type,
         typename solver_type = sgd
         >
     class dnn_trainer
@@ -51,16 +51,16 @@ namespace dlib
         dnn_trainer& operator=(const dnn_trainer&) = delete;
 
         dnn_trainer(
-            net_type& net, 
+            net_type& net,
             const solver_type& solver = solver_type(),
             const std::vector<int>& cuda_extra_devices = {}
-        ); 
+        );
         /*!
             requires
                 - for all valid i:
                     - 0 <= cuda_extra_devices[i] < dlib::cuda::get_num_devices()
             ensures
-                - &#get_net() == &net 
+                - &#get_net() == &net
                   (i.e. The dnn_trainer holds a reference to net, it does not copy it.
                   Therefore, you must ensure net has a lifetime at least as long as the
                   dnn_trainer).
@@ -68,7 +68,7 @@ namespace dlib
                   provided solver instance.
                 - #get_max_num_epochs() == 10000
                 - #get_mini_batch_size() == 128
-                - #get_learning_rate() == 1e-2 
+                - #get_learning_rate() == 1e-2
                 - #get_min_learning_rate() == 1e-5
                 - #get_iterations_without_progress_threshold() == 2000
                 - #get_learning_rate_shrink_factor() == 0.1
@@ -83,7 +83,7 @@ namespace dlib
         !*/
 
        net_type& get_net (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the neural network object used by this trainer.  This is the
@@ -92,11 +92,11 @@ namespace dlib
                   simply holds a reference to an external network which was provided to the
                   dnn_trainer's constructor.
                 - This function blocks until all threads inside the dnn_trainer have
-                  stopped touching the net. 
+                  stopped touching the net.
         !*/
 
         const std::vector<solver_type>& get_solvers (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the solvers used to optimize each layer of the neural network
@@ -104,11 +104,11 @@ namespace dlib
                   get_solvers()[0], the second layer's solver is
                   get_solvers()[1], and so on.
                 - This function blocks until all threads inside the dnn_trainer have
-                  stopped touching the net. 
+                  stopped touching the net.
         !*/
 
         unsigned long get_mini_batch_size (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - During training, we call the network's update() routine over and over
@@ -118,7 +118,7 @@ namespace dlib
         !*/
 
         void set_mini_batch_size (
-            unsigned long batch_size 
+            unsigned long batch_size
         );
         /*!
             requires
@@ -128,7 +128,7 @@ namespace dlib
         !*/
 
         unsigned long get_max_num_epochs (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - train() will execute at most get_max_num_epochs() iterations over the
@@ -155,7 +155,7 @@ namespace dlib
                 - #get_learning_rate() == lr
                 - #get_learning_rate_schedule().size() == 0
                 - This function blocks until all threads inside the dnn_trainer have
-                  stopped touching the net. 
+                  stopped touching the net.
         !*/
 
         double get_learning_rate(
@@ -181,7 +181,7 @@ namespace dlib
                 - #get_min_learning_rate() == lr
                 - #get_learning_rate_schedule().size() == 0
                 - This function blocks until all threads inside the dnn_trainer have
-                  stopped touching the net. 
+                  stopped touching the net.
         !*/
 
         double get_min_learning_rate (
@@ -193,7 +193,7 @@ namespace dlib
                   by setting it to get_learning_rate()*get_learning_rate_shrink_factor().
                   However, it will not reduce it below get_min_learning_rate().  Once this
                   minimum learning rate is crossed the training will terminate.
-                - get_min_learning_rate() doesn't apply if you are using train_one_step().  
+                - get_min_learning_rate() doesn't apply if you are using train_one_step().
                   You can keep calling train_one_step() as many times as you want and the
                   learning rate will drop infinitely close to 0 if you run long enough.
         !*/
@@ -223,7 +223,7 @@ namespace dlib
                       example, if get_learning_rate_schedule() returned {0.1, 0.09, 0.08,
                       0.07, 0.6} then the first training mini-batch would use a learning
                       rate of 0.1, then the next training mini-batch uses 0.09, and then
-                      0.8, and so on until the end of the schedule is reached.  
+                      0.8, and so on until the end of the schedule is reached.
                       
                       If you continue to run training after the end of the schedule has
                       been reached then the learning rate will be fixed to 0.99 times the
@@ -244,14 +244,14 @@ namespace dlib
         !*/
 
         void set_iterations_without_progress_threshold (
-            unsigned long thresh 
+            unsigned long thresh
         );
         /*!
             ensures
                 - #get_iterations_without_progress_threshold() == thresh
                 - #get_learning_rate_schedule().size() == 0
                 - This function blocks until all threads inside the dnn_trainer have
-                  stopped touching the net. 
+                  stopped touching the net.
         !*/
 
         unsigned long get_iterations_without_progress_threshold (
@@ -268,7 +268,7 @@ namespace dlib
                   Therefore, get_iterations_without_progress_threshold() should always be
                   set to something sensibly large so that this test can be done with
                   reasonably high confidence.  Think of this test as saying "if the loss
-                  hasn't decreased for the previous get_iterations_without_progress_threshold() 
+                  hasn't decreased for the previous get_iterations_without_progress_threshold()
                   then shrink the learning rate".
         !*/
 
@@ -282,7 +282,7 @@ namespace dlib
                 - #get_learning_rate_shrink_factor() == shrink
                 - #get_learning_rate_schedule().size() == 0
                 - This function blocks until all threads inside the dnn_trainer have
-                  stopped touching the net. 
+                  stopped touching the net.
         !*/
 
         double get_learning_rate_shrink_factor (
@@ -299,7 +299,7 @@ namespace dlib
         );
         /*!
             ensures
-                - This object will print status messages to standard out so that a 
+                - This object will print status messages to standard out so that a
                   user can observe the progress of the algorithm.
         !*/
 
@@ -328,28 +328,28 @@ namespace dlib
 
         void train (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
-        ); 
+            const std::vector<label_type>& labels
+        );
         /*!
             requires
                 - data.size() == labels.size()
                 - data.size() > 0
-                - net_type uses a supervised loss.  
+                - net_type uses a supervised loss.
                   i.e. net_type::label_type != no_label_type.
             ensures
                 - Trains a supervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
-                  get_net().compute_loss(data.begin(), data.end(), labels.begin()). 
-                - The optimizer will run until get_learning_rate() < get_min_learning_rate() 
-                  or get_max_num_epochs() training epochs have been executed. 
+                  get_net().compute_loss(data.begin(), data.end(), labels.begin()).
+                - The optimizer will run until get_learning_rate() < get_min_learning_rate()
+                  or get_max_num_epochs() training epochs have been executed.
                 - Each layer in the network will be optimized by its corresponding solver
-                  in get_solvers().  
+                  in get_solvers().
                 - Each call to train DOES NOT reinitialize the state of get_net() or
                   get_solvers().  That is, the existing state of the solvers and network is
                   the starting point for the optimization each time train() is called.  In
                   particular, if you use the set_synchronization_file() method you can
                   resume an interrupted train() call by simply calling train() again and it
-                  will pick up from the last synchronization point.  
+                  will pick up from the last synchronization point.
                 - You can obtain the average loss value during the final training epoch by
                   calling get_average_loss().
         !*/
@@ -358,37 +358,37 @@ namespace dlib
             const std::vector<input_type>& data
         );
         /*!
-            requires 
+            requires
                 - data.size() > 0
-                - net_type uses an unsupervised loss.  
+                - net_type uses an unsupervised loss.
                   i.e. net_type::label_type == no_label_type.
             ensures
                 - Trains an unsupervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
-                  get_net().compute_loss(data.begin(), data.end()). 
-                - The optimizer will run until get_learning_rate() < get_min_learning_rate() 
-                  or get_max_num_epochs() training epochs have been executed. 
+                  get_net().compute_loss(data.begin(), data.end()).
+                - The optimizer will run until get_learning_rate() < get_min_learning_rate()
+                  or get_max_num_epochs() training epochs have been executed.
                 - Each layer in the network will be optimized by its corresponding solver
-                  in get_solvers().  
+                  in get_solvers().
                 - Each call to train DOES NOT reinitialize the state of get_net() or
                   get_solvers().  That is, the existing state of the solvers and network is
                   the starting point for the optimization each time train() is called.  In
                   particular, if you use the set_synchronization_file() method you can
                   resume an interrupted train() call by simply calling train() again and it
-                  will pick up from the last synchronization point.  
+                  will pick up from the last synchronization point.
                 - You can obtain the average loss value during the final training epoch by
                   calling get_average_loss().
         !*/
 
         void train_one_step (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
+            const std::vector<label_type>& labels
         );
         /*!
             requires
                 - data.size() == labels.size()
                 - data.size() > 0
-                - net_type uses a supervised loss.  
+                - net_type uses a supervised loss.
                   i.e. net_type::label_type != no_label_type.
             ensures
                 - Performs one stochastic gradient update step based on the mini-batch of
@@ -411,7 +411,7 @@ namespace dlib
         /*!
             requires
                 - data.size() > 0
-                - net_type uses an unsupervised loss.  
+                - net_type uses an unsupervised loss.
                   i.e. net_type::label_type == no_label_type.
             ensures
                 - Performs one stochastic gradient update step based on the mini-batch of
@@ -439,7 +439,7 @@ namespace dlib
                   automatically call clear_average_loss() periodically when it logs the
                   loss to the console.
                 - This function blocks until all threads inside the dnn_trainer have
-                  stopped touching the net. 
+                  stopped touching the net.
         !*/
 
         void clear_average_loss (
@@ -453,7 +453,7 @@ namespace dlib
                   running_stats object so it forgets about all previous loss values
                   observed.
                 - This function blocks until all threads inside the dnn_trainer have
-                  stopped touching the net. 
+                  stopped touching the net.
         !*/
 
     };
@@ -462,6 +462,6 @@ namespace dlib
 
 }
 
-#endif // DLIB_DNn_TRAINER_ABSTRACT_H_ 
+#endif // DLIB_DNn_TRAINER_ABSTRACT_H_
 
 

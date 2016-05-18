@@ -30,11 +30,11 @@ namespace dlib
 
 
         explicit krls (
-            const kernel_type& kernel_, 
+            const kernel_type& kernel_,
             scalar_type tolerance_ = 0.001,
             unsigned long max_dictionary_size_ = 1000000
-        ) : 
-            kernel(kernel_), 
+        ) :
+            kernel(kernel_),
             my_tolerance(tolerance_),
             my_max_dictionary_size(max_dictionary_size_)
         {
@@ -43,7 +43,7 @@ namespace dlib
                 "\tkrls::krls()"
                 << "\n\t You have to give a positive tolerance"
                 << "\n\t this: " << this
-                << "\n\t tolerance: " << tolerance_ 
+                << "\n\t tolerance: " << tolerance_
                 );
 
             clear_dictionary();
@@ -129,7 +129,7 @@ namespace dlib
                     if (dictionary.size() >= my_max_dictionary_size)
                     {
                         // We need to remove one of the old members of the dictionary before
-                        // we proceed with adding a new one.  So remove the oldest one. 
+                        // we proceed with adding a new one.  So remove the oldest one.
                         remove_dictionary_vector(0);
 
                         // recompute these guys since they were computed with the old
@@ -175,7 +175,7 @@ namespace dlib
                     // Now update the P matrix (equation 3.15)
                     temp.set_size(P.nr()+1, P.nc()+1);
                     set_subm(temp, get_rect(P)) = P;
-                    // initialize the new sides of P 
+                    // initialize the new sides of P
                     set_rowm(temp,P.nr()) = 0;
                     set_colm(temp,P.nr()) = 0;
                     temp(P.nr(), P.nc()) = 1;
@@ -233,7 +233,7 @@ namespace dlib
         {
             return decision_function<kernel_type>(
                 mat(alpha),
-                -sum(mat(alpha))*tau, 
+                -sum(mat(alpha))*tau,
                 kernel,
                 mat(dictionary)
             );
@@ -266,7 +266,7 @@ namespace dlib
     private:
 
         inline scalar_type kern (const sample_type& m1, const sample_type& m2) const
-        { 
+        {
             return kernel(m1,m2) + tau;
         }
 
@@ -283,17 +283,17 @@ namespace dlib
                   kernel matrix
                 - also removes the necessary row and column from the K matrix
                 - uses the this->a variable so after this function runs that variable
-                  will contain a different value.  
+                  will contain a different value.
         !*/
         {
-            // remove the dictionary vector 
+            // remove the dictionary vector
             dictionary.erase(dictionary.begin()+i);
 
             // remove the i'th vector from the inverse kernel matrix.  This formula is basically
             // just the reverse of the way K_inv is updated by equation 3.14 during normal training.
             K_inv = removerc(K_inv,i,i) - remove_row(colm(K_inv,i)/K_inv(i,i),i)*remove_col(rowm(K_inv,i),i);
 
-            // now compute the updated alpha values to take account that we just removed one of 
+            // now compute the updated alpha values to take account that we just removed one of
             // our dictionary vectors
             a = (K_inv*remove_row(K,i)*mat(alpha));
 
@@ -330,7 +330,7 @@ namespace dlib
         unsigned long my_max_dictionary_size;
 
 
-        // temp variables here just so we don't have to reconstruct them over and over.  Thus, 
+        // temp variables here just so we don't have to reconstruct them over and over.  Thus,
         // they aren't really part of the state of this object.
         matrix<scalar_type,0,1,mem_manager_type> q;
         matrix<scalar_type,0,1,mem_manager_type> a;

@@ -18,7 +18,7 @@
 #include <dlib/svm.h>
 
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -267,7 +267,7 @@ namespace
         DLIB_TEST_MSG(abs(obj - 0.72222222222) < 1e-7, abs(obj - 0.72222222222));
         // There shouldn't be any margin violations since this dataset is so trivial.  So that means the objective
         // should be exactly the squared norm of the decision plane (times 0.5).
-        DLIB_TEST_MSG(abs(length_squared(df.basis_vectors(0))*0.5 + df.b*df.b*0.5 - 0.72222222222) < 1e-7, 
+        DLIB_TEST_MSG(abs(length_squared(df.basis_vectors(0))*0.5 + df.b*df.b*0.5 - 0.72222222222) < 1e-7,
                       length_squared(df.basis_vectors(0))*0.5 + df.b*df.b*0.5);
 
         DLIB_TEST(abs(df(samples[0]) - (-1)) < 1e-6);

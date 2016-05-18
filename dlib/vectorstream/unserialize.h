@@ -29,7 +29,7 @@ namespace dlib
                 std::istream& str_
             ) :
                 read_pos(0),
-                str(str_) 
+                str(str_)
             {
                 // put the item into our buffer.
                 vectorstream vstr(buffer);
@@ -39,7 +39,7 @@ namespace dlib
 
             // ------------------------ INPUT FUNCTIONS ------------------------
 
-            int_type underflow( 
+            int_type underflow(
             )
             {
                 if (read_pos < buffer.size())
@@ -48,9 +48,9 @@ namespace dlib
                     return str.peek();
             }
 
-            int_type uflow( 
+            int_type uflow(
             )
-            {   
+            {
                 if (read_pos < buffer.size())
                     return static_cast<unsigned char>(buffer[read_pos++]);
                 else
@@ -58,10 +58,10 @@ namespace dlib
             }
 
             std::streamsize xsgetn (
-                char* s, 
+                char* s,
                 std::streamsize n
             )
-            { 
+            {
                 if (read_pos < buffer.size())
                 {
                     const size_type num = std::min<size_type>(n, buffer.size()-read_pos);
@@ -83,7 +83,7 @@ namespace dlib
         template <typename T>
         unserialize (
             const T& item,
-            std::istream& str 
+            std::istream& str
         ) :
             std::istream(&buf),
             buf(item, str)

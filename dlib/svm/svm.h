@@ -34,9 +34,9 @@ namespace dlib
         const U& x_labels
     )
     {
-        return is_col_vector(x) && 
-               is_col_vector(x_labels) && 
-               x.size() == x_labels.size() && 
+        return is_col_vector(x) &&
+               is_col_vector(x_labels) &&
+               x.size() == x_labels.size() &&
                x.size() > 0;
     }
 
@@ -115,7 +115,7 @@ namespace dlib
         DLIB_ASSERT( is_binary_classification_problem(x_test,y_test) == true,
                     "\tmatrix test_binary_decision_function()"
                     << "\n\t invalid inputs were given to this function"
-                    << "\n\t is_binary_classification_problem(x_test,y_test): " 
+                    << "\n\t is_binary_classification_problem(x_test,y_test): "
                     << ((is_binary_classification_problem(x_test,y_test))? "true":"false"));
 
 
@@ -128,7 +128,7 @@ namespace dlib
         long num_neg_correct = 0;
 
 
-        // now test this trained object 
+        // now test this trained object
         for (long i = 0; i < x_test.nr(); ++i)
         {
             // if this is a positive example
@@ -152,8 +152,8 @@ namespace dlib
 
 
         matrix<double, 1, 2> res;
-        res(0) = (double)num_pos_correct/(double)(num_pos); 
-        res(1) = (double)num_neg_correct/(double)(num_neg); 
+        res(0) = (double)num_pos_correct/(double)(num_pos);
+        res(1) = (double)num_neg_correct/(double)(num_neg);
         return res;
     }
 
@@ -176,7 +176,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sequence_type 
+        typename sequence_type
         >
     bool is_sequence_labeling_problem (
         const std::vector<sequence_type>& samples,
@@ -199,7 +199,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sequence_type 
+        typename sequence_type
         >
     bool is_sequence_segmentation_problem (
         const std::vector<sequence_type>& samples,
@@ -242,7 +242,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename lhs_type, 
+        typename lhs_type,
         typename rhs_type
         >
     bool is_assignment_problem (
@@ -285,7 +285,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename lhs_type, 
+        typename lhs_type,
         typename rhs_type
         >
     bool is_forced_assignment_problem (
@@ -323,7 +323,7 @@ namespace dlib
 
     template <
         typename detection_type_,
-        typename label_type_ 
+        typename label_type_
         >
     inline void serialize ( const labeled_detection<detection_type_,label_type_>& item, std::ostream& out)
     {
@@ -333,7 +333,7 @@ namespace dlib
 
     template <
         typename detection_type_,
-        typename label_type_ 
+        typename label_type_
         >
     inline void deserialize (labeled_detection<detection_type_,label_type_>& item, std::istream& in)
     {
@@ -344,8 +344,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename detection_type, 
-        typename label_type 
+        typename detection_type,
+        typename label_type
         >
     bool is_track_association_problem (
         const std::vector<std::vector<labeled_detection<detection_type,label_type> > >& samples
@@ -380,8 +380,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename detection_type, 
-        typename label_type 
+        typename detection_type,
+        typename label_type
         >
     bool is_track_association_problem (
         const std::vector<std::vector<std::vector<labeled_detection<detection_type,label_type> > > >& samples
@@ -404,7 +404,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<double, 1, 2, typename trainer_type::mem_manager_type> 
+    const matrix<double, 1, 2, typename trainer_type::mem_manager_type>
     cross_validate_trainer_impl (
         const trainer_type& trainer,
         const in_sample_vector_type& x,
@@ -422,7 +422,7 @@ namespace dlib
             "\tmatrix cross_validate_trainer()"
             << "\n\t invalid inputs were given to this function"
             << "\n\t std::min(sum(y>0),sum(y<0)): " << std::min(sum(y>0),sum(y<0))
-            << "\n\t folds:  " << folds 
+            << "\n\t folds:  " << folds
             << "\n\t is_binary_classification_problem(x,y): " << ((is_binary_classification_problem(x,y))? "true":"false")
             );
 
@@ -439,10 +439,10 @@ namespace dlib
         }
 
         // figure out how many positive and negative examples we will have in each fold
-        const long num_pos_test_samples = num_pos/folds; 
-        const long num_pos_train_samples = num_pos - num_pos_test_samples; 
-        const long num_neg_test_samples = num_neg/folds; 
-        const long num_neg_train_samples = num_neg - num_neg_test_samples; 
+        const long num_pos_test_samples = num_pos/folds;
+        const long num_pos_train_samples = num_pos - num_pos_test_samples;
+        const long num_neg_test_samples = num_neg/folds;
+        const long num_neg_train_samples = num_neg - num_neg_test_samples;
 
 
         matrix<long,0,1> x_test, x_train;
@@ -538,7 +538,7 @@ namespace dlib
         typename in_sample_vector_type,
         typename in_scalar_vector_type
         >
-    const matrix<double, 1, 2, typename trainer_type::mem_manager_type> 
+    const matrix<double, 1, 2, typename trainer_type::mem_manager_type>
     cross_validate_trainer (
         const trainer_type& trainer,
         const in_sample_vector_type& x,
@@ -576,7 +576,7 @@ namespace dlib
                 {
                     const double val = A*f[i]+B;
                     // See the paper "A Note on Platt's Probabilistic Outputs for Support Vector Machines"
-                    // for an explanation of why this code looks the way it does (rather than being the 
+                    // for an explanation of why this code looks the way it does (rather than being the
                     // obvious formula).
                     if (val < 0)
                         res += (t[i] - 1)*val + std::log(1 + std::exp(val));
@@ -613,7 +613,7 @@ namespace dlib
                 {
                     const double val = A*f[i]+B;
                     double p;
-                    // compute p = 1/(1+exp(val)) 
+                    // compute p = 1/(1+exp(val))
                     // but do so in a way that avoids numerical overflow.
                     if (val < 0)
                         p = 1.0/(1 + std::exp(val));
@@ -634,7 +634,7 @@ namespace dlib
         };
 
         template <typename vect_type>
-        struct hessian 
+        struct hessian
         {
             hessian (
                 const vect_type& f_,
@@ -662,13 +662,13 @@ namespace dlib
                     {
                         const double temp = std::exp(val);
                         pp = 1.0/(1 + temp);
-                        pn = temp*pp; 
+                        pn = temp*pp;
                     }
                     else
                     {
                         const double temp = std::exp(-val);
                         pn = 1.0/(1 + temp);
-                        pp = temp*pn; 
+                        pp = temp*pn;
                     }
 
                     h(0,0) += f[i]*f[i]*pp*pn;
@@ -708,12 +708,12 @@ namespace dlib
         DLIB_ASSERT(is_binary_classification_problem(scores,labels) == true,
             "\t std::pair<T,T> learn_platt_scaling()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t scores.size(): " << scores.size() 
-            << "\n\t labels.size(): " << labels.size() 
+            << "\n\t scores.size(): " << scores.size()
+            << "\n\t labels.size(): " << labels.size()
             << "\n\t is_binary_classification_problem(scores,labels): " << is_binary_classification_problem(scores,labels)
             );
 
-        const T num_pos = sum(mat(labels)>0); 
+        const T num_pos = sum(mat(labels)>0);
         const T num_neg = sum(mat(labels)<0);
         const T hi_target = (num_pos+1)/(num_pos+2);
         const T lo_target = 1.0/(num_neg+2);
@@ -736,7 +736,7 @@ namespace dlib
             }
         }
 
-        // Now find the maximum likelihood parameters of the sigmoid.  
+        // Now find the maximum likelihood parameters of the sigmoid.
 
         prob_impl::objective<std::vector<T,alloc> > obj(scores, target);
         prob_impl::der<std::vector<T,alloc> > obj_der(scores, target);
@@ -764,7 +764,7 @@ namespace dlib
         typename sample_vector_type,
         typename label_vector_type
         >
-    const probabilistic_function<typename trainer_type::trained_function_type> 
+    const probabilistic_function<typename trainer_type::trained_function_type>
     train_probabilistic_decision_function (
         const trainer_type& trainer,
         const sample_vector_type& x,
@@ -776,12 +776,12 @@ namespace dlib
         typedef typename label_vector_type::value_type scalar_type;
 
         /*
-            This function fits a sigmoid function to the output of the 
-            svm trained by svm_nu_trainer or a similar trainer.  The 
+            This function fits a sigmoid function to the output of the
+            svm trained by svm_nu_trainer or a similar trainer.  The
             technique used is the one described in the papers:
                 
                 Probabilistic Outputs for Support Vector Machines and
-                Comparisons to Regularized Likelihood Methods by 
+                Comparisons to Regularized Likelihood Methods by
                 John C. Platt.  March 26, 1999
 
                 A Note on Platt's Probabilistic Outputs for Support Vector Machines
@@ -793,9 +793,9 @@ namespace dlib
                     1 < folds && folds <= (long)x.size(),
             "\tprobabilistic_decision_function train_probabilistic_decision_function()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t x.size(): " << x.size() 
-            << "\n\t y.size(): " << y.size() 
-            << "\n\t folds:  " << folds 
+            << "\n\t x.size(): " << x.size()
+            << "\n\t y.size(): " << y.size()
+            << "\n\t folds:  " << folds
             << "\n\t is_binary_classification_problem(x,y): " << is_binary_classification_problem(x,y)
             );
 
@@ -804,10 +804,10 @@ namespace dlib
         const long num_neg = (long)sum(mat(y) < 0);
 
         // figure out how many positive and negative examples we will have in each fold
-        const long num_pos_test_samples = num_pos/folds; 
-        const long num_pos_train_samples = num_pos - num_pos_test_samples; 
-        const long num_neg_test_samples = num_neg/folds; 
-        const long num_neg_train_samples = num_neg - num_neg_test_samples; 
+        const long num_pos_test_samples = num_pos/folds;
+        const long num_pos_train_samples = num_pos - num_pos_test_samples;
+        const long num_neg_test_samples = num_neg/folds;
+        const long num_neg_train_samples = num_neg - num_neg_test_samples;
 
         typename trainer_type::trained_function_type d;
         std::vector<sample_type> x_test, x_train;
@@ -883,7 +883,7 @@ namespace dlib
             // do the training
             d = trainer.train (x_train,y_train);
 
-            // now test this fold 
+            // now test this fold
             for (unsigned long i = 0; i < x_test.size(); ++i)
             {
                 out.push_back(d(x_test[i]));
@@ -916,7 +916,7 @@ namespace dlib
         ) : trainer(trainer_),folds(folds_) {}
 
         template <
-            typename T, 
+            typename T,
             typename U
             >
         const trained_function_type train (
@@ -937,7 +937,7 @@ namespace dlib
         const long folds
     )
     {
-        return trainer_adapter_probabilistic<trainer_type>(trainer,folds); 
+        return trainer_adapter_probabilistic<trainer_type>(trainer,folds);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -947,7 +947,7 @@ namespace dlib
         typename T,
         typename U,
         typename V,
-        typename rand_type 
+        typename rand_type
         >
     typename enable_if<is_matrix<T>,void>::type randomize_samples (
         T& t,
@@ -1046,7 +1046,7 @@ namespace dlib
     template <
         typename T,
         typename U,
-        typename rand_type 
+        typename rand_type
         >
     typename enable_if_c<is_matrix<T>::value && is_rand<rand_type>::value,void>::type randomize_samples (
         T& t,

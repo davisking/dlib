@@ -41,7 +41,7 @@ namespace dlib
     public:
 
         mutex (
-        ) 
+        )
         {
             InitializeCriticalSection(&cs);
         }
@@ -81,22 +81,22 @@ namespace dlib
             waiters(0),
             hCountSema(CreateSemaphore (NULL,0,100000000,NULL)),
             m(associated_mutex)
-        {           
+        {
             if (hSemaphore == NULL || hCountSema == NULL)
             {
                 if (hSemaphore != NULL)
                 {
-                    CloseHandle(hSemaphore); 
+                    CloseHandle(hSemaphore);
                 }
 
                 if (hCountSema != NULL)
                 {
-                    CloseHandle(hCountSema); 
+                    CloseHandle(hCountSema);
                 }
 
                 throw dlib::thread_error(ECREATE_SIGNALER,
         "in function signaler::signaler() an error occurred making the signaler"
-                );        
+                );
             }
         }
 
@@ -105,7 +105,7 @@ namespace dlib
 
         void wait (
         ) const
-        { 
+        {
             // get a lock on the mutex for the waiters variable
             waiters_mutex.lock();
             // mark that one more thread will be waiting on this signaler
@@ -122,14 +122,14 @@ namespace dlib
             // signal that we are awake
             ReleaseSemaphore(hCountSema,(LONG)1,NULL);
 
-            // relock the associated mutex 
+            // relock the associated mutex
             m.lock();
         }
 
         bool wait_or_timeout (
             unsigned long milliseconds
         ) const
-        { 
+        {
             // get a lock on the mutex for the waiters variable
             waiters_mutex.lock();
             // mark that one more thread will be waiting on this signaler
@@ -146,7 +146,7 @@ namespace dlib
             if ( WaitForSingleObject (hSemaphore, milliseconds ) == WAIT_TIMEOUT )
             {
                 // in this case we should decrement waiters because we are returning
-                // due to a timeout rather than because someone called signal() or 
+                // due to a timeout rather than because someone called signal() or
                 // broadcast().
                 value = false;
 
@@ -155,13 +155,13 @@ namespace dlib
 
                 // get a lock on the mutex for the waiters variable
                 waiters_mutex.lock();
-                // mark that one less thread will be waiting on this signaler. 
+                // mark that one less thread will be waiting on this signaler.
                 if (waiters != 0)
                     --waiters;
                 // release the mutex for waiters
                 waiters_mutex.unlock();
             }
-            else 
+            else
             {
                 value = true;
 
@@ -170,15 +170,15 @@ namespace dlib
             }
 
 
-            // relock the associated mutex 
+            // relock the associated mutex
             m.lock();
 
             return value;
         }
 
         void signal (
-        ) const 
-        { 
+        ) const
+        {
             // get a lock on the mutex for the waiters variable
             waiters_mutex.lock();
             
@@ -189,7 +189,7 @@ namespace dlib
                 ReleaseSemaphore(hSemaphore,1,NULL);
 
                 // wait for signaled thread to wake up
-                WaitForSingleObject(hCountSema,INFINITE);               
+                WaitForSingleObject(hCountSema,INFINITE);
             }
 
             // release the mutex for waiters
@@ -197,13 +197,13 @@ namespace dlib
         }
 
         void broadcast (
-        ) const 
-        { 
+        ) const
+        {
             // get a lock on the mutex for the waiters variable
             waiters_mutex.lock();
             
             if (waiters > 0)
-            {   
+            {
                 // make the semaphore release all the waiting threads
                 ReleaseSemaphore(hSemaphore,(LONG)waiters,NULL);
 

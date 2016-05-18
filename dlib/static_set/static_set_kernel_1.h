@@ -31,9 +31,9 @@ namespace dlib
             CONVENTION
                 - size() == set_size
                 - if (set_size > 0) then
-                    - d == pointer to an array containing all the elements of the set                
+                    - d == pointer to an array containing all the elements of the set
                     - d is sorted according to operator<
-                - else  
+                - else
                     - d == 0
 
                 - current_element_valid() == (cur != 0)
@@ -45,9 +45,9 @@ namespace dlib
         // I would define this outside the class but Borland 5.5 has some problems
         // with non-inline templated friend functions.
         friend void deserialize (
-            static_set_kernel_1& item, 
+            static_set_kernel_1& item,
             std::istream& in
-        )    
+        )
         {
             try
             {
@@ -62,7 +62,7 @@ namespace dlib
                 }
             }
             catch (serialization_error e)
-            { 
+            {
                 item.set_size = 0;
                 if (item.d)
                 {
@@ -70,7 +70,7 @@ namespace dlib
                     item.d = 0;
                 }
 
-                throw serialization_error(e.info + "\n   while deserializing object of type static_set_kernel_1"); 
+                throw serialization_error(e.info + "\n   while deserializing object of type static_set_kernel_1");
             }
             catch (...)
             {
@@ -83,7 +83,7 @@ namespace dlib
 
                 throw;
             }
-        } 
+        }
 
         public:
 
@@ -94,7 +94,7 @@ namespace dlib
             );
 
             virtual ~static_set_kernel_1(
-            ); 
+            );
 
             void clear (
             );
@@ -157,9 +157,9 @@ namespace dlib
         typename compare
         >
     inline void swap (
-        static_set_kernel_1<T,compare>& a, 
-        static_set_kernel_1<T,compare>& b 
-    ) { a.swap(b); }   
+        static_set_kernel_1<T,compare>& a,
+        static_set_kernel_1<T,compare>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ namespace dlib
     {
         if (set_size > 0)
             delete [] d;
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -212,7 +212,7 @@ namespace dlib
             d = 0;
         }
         reset();
-    } 
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -370,7 +370,7 @@ namespace dlib
     bool static_set_kernel_1<T,compare>::
     current_element_valid (
     ) const
-    {   
+    {
         return (cur != 0);
     }
     
@@ -409,7 +409,7 @@ namespace dlib
     bool static_set_kernel_1<T,compare>::
     move_next (
     ) const
-    {      
+    {
         // if at_start() && size() > 0
         if (at_start_ && set_size > 0)
         {

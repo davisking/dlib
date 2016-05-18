@@ -14,7 +14,7 @@ namespace dlib
     namespace edmk4
     {
         struct node
-        {            
+        {
             node* next;
             node* child_context;
             node* parent_context;
@@ -33,7 +33,7 @@ namespace dlib
         unsigned long total_nodes,
         unsigned long order
         >
-    class entropy_decoder_model_kernel_4 
+    class entropy_decoder_model_kernel_4
     {
         /*!
             REQUIREMENTS ON total_nodes
@@ -42,17 +42,17 @@ namespace dlib
 
             REQUIREMENTS ON order
                 - 0 <= order
-                - this is the maximum depth-1 the tree will be allowed to go (note 
-                  that the root level is depth 0).  
+                - this is the maximum depth-1 the tree will be allowed to go (note
+                  that the root level is depth 0).
 
 
             GENERAL NOTES
-                This implementation follows more or less the implementation 
+                This implementation follows more or less the implementation
                 strategy laid out by Alistair Moffat in his paper
-                Implementing the PPM data compression scheme.  Published in IEEE 
+                Implementing the PPM data compression scheme.  Published in IEEE
                 Transactions on Communications, 38(11):1917-1921, 1990.
 
-                The escape method used will be method D. 
+                The escape method used will be method D.
 
 
             INITIAL VALUE
@@ -68,13 +68,13 @@ namespace dlib
                 - stack_size == 0
 
             CONVENTION
-                - pop() == stack[stack_size-1] 
+                - pop() == stack[stack_size-1]
                 - &get_entropy_decoder() == coder
                 - root == pointer to an array of total_nodes nodes.
                   this is also the root of the tree.
 
                 - if (next_node < total_nodes) then
-                    - next_node == the next node in root that has not yet been allocated                                
+                    - next_node == the next node in root that has not yet been allocated
 
 
                 - root->next == 0
@@ -83,30 +83,30 @@ namespace dlib
 
                 - for every node in the tree:
                   {
-                    - NOTATION: 
+                    - NOTATION:
                         - The "context" of a node is the string of symbols seen
                           when you go from the root of the tree down (down though
-                          child context pointers) to the node, including the symbol at 
-                          the node itself.  (note that the context of the root node 
+                          child context pointers) to the node, including the symbol at
+                          the node itself.  (note that the context of the root node
                           is "" or the empty string)
                         - A set of nodes is in the same "context set" if all the node's
                           contexts are of length n and all the node's contexts share
                           the same prefix of length n-1.
                         - The "child context set" of a node is a set of nodes with
-                          contexts that are one symbol longer and prefixed by the node's 
-                          context.  For example, if a node has a context "abc" then the 
-                          nodes for contexts "abca", "abcb", "abcc", etc. are all in 
+                          contexts that are one symbol longer and prefixed by the node's
+                          context.  For example, if a node has a context "abc" then the
+                          nodes for contexts "abca", "abcb", "abcc", etc. are all in
                           the child context set of the node.
-                        - The "parent context" of a node is the context that is one 
-                          symbol shorter than the node's context and includes the 
-                          symbol in the node.  So the parent context of a node with 
+                        - The "parent context" of a node is the context that is one
+                          symbol shorter than the node's context and includes the
+                          symbol in the node.  So the parent context of a node with
                           context "abcd" would be the context "bcd".
 
 
-                    - if (next != 0) then 
+                    - if (next != 0) then
                         - next == pointer to the next node in the same context set
                     - if (child_context != 0) then
-                        - child_context == pointer to the first node of the child 
+                        - child_context == pointer to the first node of the child
                           context set for this node.
                     - if (parent_context != 0) then
                         - parent_context == pointer to the parent context of this node.
@@ -122,8 +122,8 @@ namespace dlib
                         - the root doesn't have a symbol.  i.e. the context for the
                           root node is "" or the empty string.
 
-                    - total == The sum of the counts of all the nodes 
-                      in the child context set + escapes. 
+                    - total == The sum of the counts of all the nodes
+                      in the child context set + escapes.
                     - escapes == the escape count for the context represented
                       by the node.
                 }
@@ -229,7 +229,7 @@ namespace dlib
 
 
         entropy_decoder& coder;
-        unsigned long next_node;        
+        unsigned long next_node;
         node* root;
         node* cur;
         unsigned long cur_order;
@@ -240,7 +240,7 @@ namespace dlib
         entropy_decoder_model_kernel_4(entropy_decoder_model_kernel_4<alphabet_size,entropy_decoder,total_nodes,order>&);        // copy constructor
         entropy_decoder_model_kernel_4<alphabet_size,entropy_decoder,total_nodes,order>& operator=(entropy_decoder_model_kernel_4<alphabet_size,entropy_decoder,total_nodes,order>&);    // assignment operator
 
-    };   
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -257,7 +257,7 @@ namespace dlib
     entropy_decoder_model_kernel_4<alphabet_size,entropy_decoder,total_nodes,order>::
     entropy_decoder_model_kernel_4 (
         entropy_decoder& coder_
-    ) : 
+    ) :
         coder(coder_),
         next_node(1),
         cur_order(0),
@@ -266,14 +266,14 @@ namespace dlib
         COMPILE_TIME_ASSERT( 1 < alphabet_size && alphabet_size < 65535);
         COMPILE_TIME_ASSERT( 4096 < total_nodes );
 
-        root = new node[total_nodes];  
+        root = new node[total_nodes];
         cur = root;
 
         root->child_context = 0;
         root->escapes = 0;
         root->next = 0;
         root->parent_context = 0;
-        root->total = 0; 
+        root->total = 0;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -318,7 +318,7 @@ namespace dlib
     decode (
         unsigned long& symbol
     )
-    {        
+    {
         node* temp = cur;
         cur = 0;
         unsigned long low_count, high_count, total_count;
@@ -330,7 +330,7 @@ namespace dlib
 
 
         while (true)
-        {            
+        {
             high_count = 0;
             if (space_left())
             {
@@ -347,10 +347,10 @@ namespace dlib
 
                     target = coder.get_target(total_count);
 
-                    // find either the symbol we are looking for or the 
+                    // find either the symbol we are looking for or the
                     // end of the context set
                     node* n = temp->child_context;
-                    node* last = 0;   
+                    node* last = 0;
                     while (true)
                     {
                         high_count += n->count;
@@ -359,7 +359,7 @@ namespace dlib
                             break;
                         last = n;
                         n = n->next;
-                    }             
+                    }
 
                     low_count = high_count - n->count;
              
@@ -368,7 +368,7 @@ namespace dlib
                     {
                         if (new_node != 0)
                         {
-                            new_node->parent_context = n;                            
+                            new_node->parent_context = n;
                         }
 
                         symbol = n->symbol;
@@ -377,7 +377,7 @@ namespace dlib
                         n->count += 8;
                         temp->total += 8;
 
-                        // move this node to the front 
+                        // move this node to the front
                         if (last)
                         {
                             last->next = n->next;
@@ -392,7 +392,7 @@ namespace dlib
                             {
                                 cur_order = local_order+1;
                                 cur = n;
-                            }  
+                            }
                             else
                             {
                                 cur = n->parent_context;
@@ -400,12 +400,12 @@ namespace dlib
                             }
                         }
 
-                        break;                    
+                        break;
                      
                     }
                     // if we hit the end of the context set without finding the symbol
                     else
-                    {   
+                    {
                         if (new_node != 0)
                         {
                             new_node->parent_context = allocate_node();
@@ -422,7 +422,7 @@ namespace dlib
                         coder.decode(high_count,total_count);
                     }
                         
-                } 
+                }
                 else // if (total_count == 0)
                 {
                     // this means that temp->child_context == 0 so we should make
@@ -475,16 +475,16 @@ namespace dlib
                 {
                     cur = root;
                     cur_order = 0;
-                }                    
-                break;               
+                }
+                break;
             }
-            else 
+            else
             {
                 // there isn't enough space so we should rebuild the tree
                 destroy_tree();
                 temp = cur;
                 local_order = cur_order;
-                cur = 0;        
+                cur = 0;
                 new_node = 0;
             }
         } // while (true)
@@ -509,7 +509,7 @@ namespace dlib
         >
     edmk4::node* entropy_decoder_model_kernel_4<alphabet_size,entropy_decoder,total_nodes,order>::
     allocate_node (
-    )    
+    )
     {
         node* temp;
         temp = root + next_node;
@@ -528,7 +528,7 @@ namespace dlib
     void entropy_decoder_model_kernel_4<alphabet_size,entropy_decoder,total_nodes,order>::
     destroy_tree (
     )
-    {        
+    {
         next_node = 1;
         root->child_context = 0;
         root->escapes = 0;
@@ -581,7 +581,7 @@ namespace dlib
     edmk4::node* entropy_decoder_model_kernel_4<alphabet_size,entropy_decoder,total_nodes,order>::
     pop (
     )
-    {   
+    {
         --stack_size;
         return stack[stack_size];
     }

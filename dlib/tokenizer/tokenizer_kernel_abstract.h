@@ -9,13 +9,13 @@
 namespace dlib
 {
 
-    class tokenizer 
+    class tokenizer
     {
         /*!
             INITIAL VALUE
                 stream_is_set() == false
                 get_identifier_head() == "_" + lowercase_letters() + uppercase_letters()
-                get_identifier_body() == "_" + lowercase_letters() + uppercase_letters() + 
+                get_identifier_body() == "_" + lowercase_letters() + uppercase_letters() +
                                          numbers()
 
             WHAT THIS OBJECT REPRESENTS
@@ -27,35 +27,35 @@ namespace dlib
                 any buffered data will be lost.
 
             TOKENS
-                When picking out tokens the tokenizer will always extract the 
-                longest token it can.  For example, if faced with the string 
-                "555" it will consider the three 5s to be a single NUMBER 
+                When picking out tokens the tokenizer will always extract the
+                longest token it can.  For example, if faced with the string
+                "555" it will consider the three 5s to be a single NUMBER
                 token not three smaller NUMBER tokens.
 
                 Also note that no characters in the input stream are discarded.
-                They will all be returned in the text of some token.  
-                Additionally, each character will never be returned more than once.  
+                They will all be returned in the text of some token.
+                Additionally, each character will never be returned more than once.
                 This means that if you concatenated all returned tokens it would exactly
                 reproduce the contents of the input stream.
 
                 The tokens are defined as follows:
 
                 END_OF_LINE
-                    This is a single character token and is always the '\n' 
+                    This is a single character token and is always the '\n'
                     character.
 
                 END_OF_FILE
                     This token represents the end of file.  It doesn't have any
-                    actual characters associated with it.  
+                    actual characters associated with it.
 
                 IDENTIFIER
                     This is a multi-character token.  It is defined as a string that
-                    begins with a character from get_identifier_head() and is 
+                    begins with a character from get_identifier_head() and is
                     followed by any number of characters from get_identifier_body().
                        
                 NUMBER
                     This is a multi-character token.  It is defined as a sequence of
-                    numbers. 
+                    numbers.
 
                 WHITE_SPACE
                     This is a multi character token.  It is defined as a sequence of
@@ -64,12 +64,12 @@ namespace dlib
 
                 CHAR
                     This is a single character token.  It matches anything that isn't
-                    part of one of the above tokens.                    
+                    part of one of the above tokens.
         !*/
 
     public:
 
-        enum 
+        enum
         {
             END_OF_LINE,
             END_OF_FILE,
@@ -79,10 +79,10 @@ namespace dlib
             WHITE_SPACE
         };
 
-        tokenizer (        
+        tokenizer (
         );
         /*!
-            ensures                
+            ensures
                 - #*this is properly initialized
             throws
                 - std::bad_alloc
@@ -102,7 +102,7 @@ namespace dlib
                 - #*this has its initial value
             throws
                 - std::bad_alloc
-                    If this exception is thrown then #*this is unusable 
+                    If this exception is thrown then #*this is unusable
                     until clear() is called and succeeds.
         !*/
 
@@ -130,7 +130,7 @@ namespace dlib
             requires
                 - stream_is_set() == true
             ensures
-                - returns a reference to the istream object that *this is reading 
+                - returns a reference to the istream object that *this is reading
                   from.
         !*/
 
@@ -146,8 +146,8 @@ namespace dlib
                 - #type == the type of the token in #token
             throws
                 - bad_alloc
-                    If this exception is thrown then the call to this function will 
-                    have no effect on *this but the values of #type and #token will be 
+                    If this exception is thrown then the call to this function will
+                    have no effect on *this but the values of #type and #token will be
                     undefined.  Additionally, some characters may have been read
                     from the stream get_stream() and lost.
         !*/
@@ -162,8 +162,8 @@ namespace dlib
                   the next call to get_token()
             throws
                 - bad_alloc
-                    If this exception is thrown then the call to this function will 
-                    have no effect on *this.  However, some characters may have been 
+                    If this exception is thrown then the call to this function will
+                    have no effect on *this.  However, some characters may have been
                     read from the stream get_stream() and lost.
         !*/
 
@@ -177,8 +177,8 @@ namespace dlib
                   the next call to get_token()
             throws
                 - bad_alloc
-                    If this exception is thrown then the call to this function will 
-                    have no effect on *this.  However, some characters may have been 
+                    If this exception is thrown then the call to this function will
+                    have no effect on *this.  However, some characters may have been
                     read from the stream get_stream() and lost.
         !*/
 
@@ -198,7 +198,7 @@ namespace dlib
                 - #get_identifier_body() == body
             throws
                 - std::bad_alloc
-                    If this exception is thrown then #*this is unusable 
+                    If this exception is thrown then #*this is unusable
                     until clear() is called and succeeds.
         !*/
 
@@ -265,7 +265,7 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
     private:
 
@@ -273,12 +273,12 @@ namespace dlib
         tokenizer(const tokenizer&);        // copy constructor
         tokenizer& operator=(const tokenizer&);    // assignment operator
 
-    };    
+    };
 
     inline void swap (
-        tokenizer& a, 
-        tokenizer& b 
-    ) { a.swap(b); }   
+        tokenizer& a,
+        tokenizer& b
+    ) { a.swap(b); }
     /*!
         provides a global swap function
     !*/

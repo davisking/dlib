@@ -24,7 +24,7 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1        
+        // kernel_1
         typedef      memory_manager_global_kernel_1<T,factory>
                      kernel_1a;
       

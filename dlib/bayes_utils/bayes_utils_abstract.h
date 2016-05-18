@@ -22,8 +22,8 @@ namespace dlib
                 - size() == 0
 
             ENUMERATION ORDER
-                The enumerator will iterate over the entries in the assignment in 
-                ascending order according to index values.  (i.e. the elements are 
+                The enumerator will iterate over the entries in the assignment in
+                ascending order according to index values.  (i.e. the elements are
                 enumerated in sorted order according to the value of their keys)
 
             WHAT THIS OBJECT REPRESENTS
@@ -46,14 +46,14 @@ namespace dlib
                     a.set(A, 1);
                     a.set(B, 0);
                     // and now it is the case that:
-                    table.probability(a) == 0.1 
+                    table.probability(a) == 0.1
                     a[A] == 1
                     a[B] == 0
 
 
                 Also note that when enumerating the elements of an assignment object
                 the key() refers to the index and the value() refers to the value at that
-                index. For example: 
+                index. For example:
 
                 // assume a is an assignment object
                 a.reset();
@@ -105,7 +105,7 @@ namespace dlib
                 - The exact functioning of this operator is undefined.  The only guarantee
                   is that it establishes a total ordering on all possible assignment objects.
                   In other words, this operator makes it so that you can use assignment
-                  objects in the associative containers but otherwise isn't of any 
+                  objects in the associative containers but otherwise isn't of any
                   particular use.
         !*/
 
@@ -128,8 +128,8 @@ namespace dlib
             requires
                 - has_index(idx) == false
             ensures
-                - #has_index(idx) == true 
-                - #(*this)[idx] == value 
+                - #has_index(idx) == true
+                - #(*this)[idx] == value
         !*/
 
         void remove (
@@ -137,9 +137,9 @@ namespace dlib
         );
         /*!
             requires
-                - has_index(idx) == true 
+                - has_index(idx) == true
             ensures
-                - #has_index(idx) == false 
+                - #has_index(idx) == false
         !*/
 
         unsigned long& operator[] (
@@ -192,18 +192,18 @@ namespace dlib
 
     void serialize (
         const assignment& item,
-        std::ostream& out 
-    );   
+        std::ostream& out
+    );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     void deserialize (
         assignment& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ------------------------------------------------------------------------
@@ -215,7 +215,7 @@ namespace dlib
                 - size() == 0
 
             ENUMERATION ORDER
-                The enumerator will iterate over the entries in the probability table 
+                The enumerator will iterate over the entries in the probability table
                 in no particular order but they will all be visited.
 
             WHAT THIS OBJECT REPRESENTS
@@ -319,7 +319,7 @@ namespace dlib
                 - T is an implementation of set/set_kernel_abstract.h
             ensures
                 - marginalizes *this by summing over all variables not in vars.  The
-                  result is stored in output_table.  
+                  result is stored in output_table.
         !*/
 
         void marginalize (
@@ -364,8 +364,8 @@ namespace dlib
 
     void serialize (
         const joint_probability_table& item,
-        std::ostream& out 
-    );   
+        std::ostream& out
+    );
     /*!
         provides serialization support
     !*/
@@ -373,9 +373,9 @@ namespace dlib
     void deserialize (
         joint_probability_table& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -389,9 +389,9 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object models a conditional probability table.  That is, it models
-                the function p( X | parents).  So this object models the conditional 
-                probability of a particular variable (referred to as X) given another set 
-                of variables (referred to as parents).  
+                the function p( X | parents).  So this object models the conditional
+                probability of a particular variable (referred to as X) given another set
+                of variables (referred to as parents).
         !*/
 
     public:
@@ -416,7 +416,7 @@ namespace dlib
             ensures
                 - for all possible v and p:
                     - #has_entry_for(v,p) == false
-                  (i.e. this function clears out the table when you call it but doesn't 
+                  (i.e. this function clears out the table when you call it but doesn't
                   change the value of num_values())
         !*/
 
@@ -432,7 +432,7 @@ namespace dlib
         !*/
 
         unsigned long num_values (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - This object models the probability table p(X | parents).  This
@@ -474,7 +474,7 @@ namespace dlib
                 - value < num_values()
                 - has_entry_for(value, ps) == true
             ensures
-                - returns the probability p( X = value | parents = ps). 
+                - returns the probability p( X = value | parents = ps).
         !*/
 
         void swap (
@@ -496,8 +496,8 @@ namespace dlib
 
     void serialize (
         const conditional_probability_table& item,
-        std::ostream& out 
-    );   
+        std::ostream& out
+    );
     /*!
         provides serialization support
     !*/
@@ -505,9 +505,9 @@ namespace dlib
     void deserialize (
         conditional_probability_table& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ------------------------------------------------------------------------
@@ -564,7 +564,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns a const reference to the conditional_probability_table associated with this 
+                - returns a const reference to the conditional_probability_table associated with this
                   node.
         !*/
 
@@ -589,7 +589,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #is_evidence() == true 
+                - #is_evidence() == true
         !*/
 
         void swap (
@@ -612,8 +612,8 @@ namespace dlib
 
     void serialize (
         const bayes_node& item,
-        std::ostream& out 
-    );   
+        std::ostream& out
+    );
     /*!
         provides serialization support
     !*/
@@ -621,9 +621,9 @@ namespace dlib
     void deserialize (
         bayes_node& item,
         std::istream& in
-    );   
+    );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -631,7 +631,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     /*
-        The following group of functions are convenience functions for manipulating 
+        The following group of functions are convenience functions for manipulating
         bayes_node objects while they are inside a directed_graph.   These functions
         also have additional requires clauses that, in debug mode, will protect you
         from attempts to manipulate a bayesian network in an inappropriate way.
@@ -684,7 +684,7 @@ namespace dlib
         bool node_is_evidence (
             const T& bn,
             unsigned long n
-        ); 
+        );
         /*!
             requires
                 - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
@@ -739,7 +739,7 @@ namespace dlib
             T& bn,
             unsigned long n,
             unsigned long num
-        ); 
+        );
         /*!
             requires
                 - T is an implementation of directed_graph/directed_graph_kernel_abstract.h
@@ -765,7 +765,7 @@ namespace dlib
                 - T::type == bayes_node
                 - n < bn.number_of_nodes()
             ensures
-                - returns bn.node(n).data.table().num_values() 
+                - returns bn.node(n).data.table().num_values()
                   (i.e. returns the number of different values this node can take)
         !*/
 
@@ -778,7 +778,7 @@ namespace dlib
             const T& bn,
             unsigned long n,
             unsigned long value,
-            const assignment& parents 
+            const assignment& parents
         );
         /*!
             requires
@@ -914,13 +914,13 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object performs Markov Chain Monte Carlo sampling of a bayesian
-                network using the Gibbs sampling technique. 
+                network using the Gibbs sampling technique.
 
-                Note that this object is limited to only bayesian networks that 
+                Note that this object is limited to only bayesian networks that
                 don't contain deterministic nodes.  That is, incorrect results may
-                be computed if this object is used when the bayesian network contains 
+                be computed if this object is used when the bayesian network contains
                 any nodes that have a probability of 1 in their conditional probability
-                tables for any event.  So don't use this object for networks with 
+                tables for any event.  So don't use this object for networks with
                 deterministic nodes.
         !*/
     public:
@@ -956,7 +956,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object represents an implementation of the join tree algorithm
                 for inference in bayesian networks.  It doesn't have any mutable state.
-                To you use you just give it a directed_graph that contains a bayesian 
+                To you use you just give it a directed_graph that contains a bayesian
                 network and a graph object that contains that networks corresponding
                 join tree.  Then you may query this object to determine the probabilities
                 of any variables in the original bayesian network.
@@ -966,7 +966,7 @@ namespace dlib
 
         template <
             typename bn_type,
-            typename join_tree_type 
+            typename join_tree_type
             >
         bayesian_network_join_tree (
             const bn_type& bn,
@@ -978,9 +978,9 @@ namespace dlib
                 - bn_type::type == bayes_node
                 - join_tree_type is an implementation of graph/graph_kernel_abstract.h
                 - join_tree_type::type is an implementation of set/set_compare_abstract.h and
-                  this set type contains unsigned long objects. 
+                  this set type contains unsigned long objects.
                 - join_tree_type::edge_type is an implementation of set/set_compare_abstract.h and
-                  this set type contains unsigned long objects. 
+                  this set type contains unsigned long objects.
                 - is_join_tree(bn, join_tree) == true
                 - bn == a valid bayesian network with all its conditional probability tables
                   filled out
@@ -1008,11 +1008,11 @@ namespace dlib
             requires
                 - idx < number_of_nodes()
             ensures
-                - returns the probability distribution for the node with index idx that was in the bayesian 
+                - returns the probability distribution for the node with index idx that was in the bayesian
                   network that *this was instantiated from.  Let D represent this distribution, then:
                     - D.nc() == the number of values the node idx ranges over
-                    - D.nr() == 1 
-                    - D(i) == the probability of node idx taking on the value i 
+                    - D.nr() == 1
+                    - D(i) == the probability of node idx taking on the value i
         !*/
 
         void swap (

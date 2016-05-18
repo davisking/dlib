@@ -15,7 +15,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//                    Functions that transform other functions  
+//                    Functions that transform other functions
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ namespace dlib
         template <typename T>
         typename T::matrix_type operator()(const T& x) const
         {
-            // T must be some sort of dlib matrix 
+            // T must be some sort of dlib matrix
             COMPILE_TIME_ASSERT(is_matrix<T>::value);
 
             typename T::matrix_type der(x.size());
@@ -54,7 +54,7 @@ namespace dlib
         template <typename T, typename U>
         typename U::matrix_type operator()(const T& item, const U& x) const
         {
-            // U must be some sort of dlib matrix 
+            // U must be some sort of dlib matrix
             COMPILE_TIME_ASSERT(is_matrix<U>::value);
 
             typename U::matrix_type der(x.size());
@@ -91,15 +91,15 @@ namespace dlib
     template <typename funct>
     const central_differences<funct> derivative(const funct& f) { return central_differences<funct>(f); }
     template <typename funct>
-    const central_differences<funct> derivative(const funct& f, double eps) 
-    { 
+    const central_differences<funct> derivative(const funct& f, double eps)
+    {
         DLIB_ASSERT (
             eps > 0,
             "\tcentral_differences derivative(f,eps)"
             << "\n\tYou must give an epsilon > 0"
-            << "\n\teps:     " << eps 
+            << "\n\teps:     " << eps
         );
-        return central_differences<funct>(f,eps); 
+        return central_differences<funct>(f,eps);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ namespace dlib
         clamped_function_object(
             const funct& f_,
             const matrix_exp<EXP1>& x_lower_,
-            const matrix_exp<EXP2>& x_upper_ 
+            const matrix_exp<EXP2>& x_upper_
         ) : f(f_), x_lower(x_lower_), x_upper(x_upper_)
         {
         }
@@ -125,42 +125,42 @@ namespace dlib
         
         const funct& f;
         const matrix_exp<EXP1>& x_lower;
-        const matrix_exp<EXP2>& x_upper; 
+        const matrix_exp<EXP2>& x_upper;
     };
 
     template <typename funct, typename EXP1, typename EXP2>
     clamped_function_object<funct,EXP1,EXP2> clamp_function(
         const funct& f,
         const matrix_exp<EXP1>& x_lower,
-        const matrix_exp<EXP2>& x_upper 
+        const matrix_exp<EXP2>& x_upper
     ) { return clamped_function_object<funct,EXP1,EXP2>(f,x_lower,x_upper); }
 
 // ----------------------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//                    Functions that perform unconstrained optimization 
+//                    Functions that perform unconstrained optimization
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
         typename search_strategy_type,
         typename stop_strategy_type,
-        typename funct, 
-        typename funct_der, 
+        typename funct,
+        typename funct_der,
         typename T
         >
     double find_min (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
-        const funct& f, 
-        const funct_der& der, 
-        T& x, 
+        const funct& f,
+        const funct_der& der,
+        T& x,
         double min_f
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         DLIB_CASSERT (
@@ -210,21 +210,21 @@ namespace dlib
     template <
         typename search_strategy_type,
         typename stop_strategy_type,
-        typename funct, 
-        typename funct_der, 
+        typename funct,
+        typename funct_der,
         typename T
         >
     double find_max (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
-        const funct& f, 
-        const funct_der& der, 
-        T& x, 
+        const funct& f,
+        const funct_der& der,
+        T& x,
         double max_f
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         DLIB_CASSERT (
@@ -263,7 +263,7 @@ namespace dlib
             // Take the search step indicated by the above line search
             x += alpha*s;
 
-            // Don't forget to negate these outputs from the line search since they are 
+            // Don't forget to negate these outputs from the line search since they are
             // from the unnegated versions of f() and der()
             g *= -1;
             f_value *= -1;
@@ -295,7 +295,7 @@ namespace dlib
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         DLIB_CASSERT (
@@ -303,7 +303,7 @@ namespace dlib
             "\tdouble find_min_using_approximate_derivatives()"
             << "\n\tYou have to supply column vectors to this function"
             << "\n\tx.nc():         " << x.nc()
-            << "\n\tderivative_eps: " << derivative_eps 
+            << "\n\tderivative_eps: " << derivative_eps
         );
 
         T g, s;
@@ -324,7 +324,7 @@ namespace dlib
                         make_line_search_function(f,x,s,f_value),
                         f_value,
                         derivative(make_line_search_function(f,x,s),derivative_eps),
-                        dot(g,s),  // Sometimes the following line is a better way of determining the initial gradient. 
+                        dot(g,s),  // Sometimes the following line is a better way of determining the initial gradient.
                         //derivative(make_line_search_function(f,x,s),derivative_eps)(0),
                         search_strategy.get_wolfe_rho(), search_strategy.get_wolfe_sigma(), min_f,
                         search_strategy.get_max_line_search_iterations()
@@ -362,7 +362,7 @@ namespace dlib
     )
     {
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         DLIB_CASSERT (
@@ -370,13 +370,13 @@ namespace dlib
             "\tdouble find_max_using_approximate_derivatives()"
             << "\n\tYou have to supply column vectors to this function"
             << "\n\tx.nc():         " << x.nc()
-            << "\n\tderivative_eps: " << derivative_eps 
+            << "\n\tderivative_eps: " << derivative_eps
         );
 
         // Just negate the necessary things and call the find_min version of this function.
         return -find_min_using_approximate_derivatives(
-            search_strategy, 
-            stop_strategy, 
+            search_strategy,
+            stop_strategy,
             negate_function(f),
             x,
             -max_f,
@@ -443,8 +443,8 @@ namespace dlib
     template <
         typename search_strategy_type,
         typename stop_strategy_type,
-        typename funct, 
-        typename funct_der, 
+        typename funct,
+        typename funct_der,
         typename T,
         typename EXP1,
         typename EXP2
@@ -452,8 +452,8 @@ namespace dlib
     double find_min_box_constrained (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
-        const funct& f, 
-        const funct_der& der, 
+        const funct& f,
+        const funct_der& der,
         T& x,
         const matrix_exp<EXP1>& x_lower,
         const matrix_exp<EXP2>& x_upper
@@ -466,7 +466,7 @@ namespace dlib
 
         // make sure the requires clause is not violated
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         DLIB_CASSERT (
@@ -513,8 +513,8 @@ namespace dlib
                         make_line_search_function(clamp_function(f,x_lower,x_upper), x, s, f_value),
                         f_value,
                         dot(g,s), // compute gradient for the line search
-                        last_alpha, 
-                        search_strategy.get_wolfe_rho(), 
+                        last_alpha,
+                        search_strategy.get_wolfe_rho(),
                         search_strategy.get_max_line_search_iterations());
 
             // Do a trust region style thing for alpha.  The idea is that if we take a
@@ -544,21 +544,21 @@ namespace dlib
     template <
         typename search_strategy_type,
         typename stop_strategy_type,
-        typename funct, 
-        typename funct_der, 
+        typename funct,
+        typename funct_der,
         typename T
         >
     double find_min_box_constrained (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
-        const funct& f, 
-        const funct_der& der, 
+        const funct& f,
+        const funct_der& der,
         T& x,
         double x_lower,
         double x_upper
     )
     {
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         typedef typename T::type scalar_type;
@@ -576,8 +576,8 @@ namespace dlib
     template <
         typename search_strategy_type,
         typename stop_strategy_type,
-        typename funct, 
-        typename funct_der, 
+        typename funct,
+        typename funct_der,
         typename T,
         typename EXP1,
         typename EXP2
@@ -585,8 +585,8 @@ namespace dlib
     double find_max_box_constrained (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
-        const funct& f, 
-        const funct_der& der, 
+        const funct& f,
+        const funct_der& der,
         T& x,
         const matrix_exp<EXP1>& x_lower,
         const matrix_exp<EXP2>& x_upper
@@ -594,7 +594,7 @@ namespace dlib
     {
         // make sure the requires clause is not violated
         COMPILE_TIME_ASSERT(is_matrix<T>::value);
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         DLIB_CASSERT (
@@ -616,7 +616,7 @@ namespace dlib
             << "\n\r min(x_upper-x_lower): " << min(x_upper-x_lower)
         );
 
-        // This function is basically just a copy of find_min_box_constrained() but with - put 
+        // This function is basically just a copy of find_min_box_constrained() but with - put
         // in the right places to flip things around so that it ends up looking for the max
         // rather than the min.
 
@@ -644,8 +644,8 @@ namespace dlib
                         negate_function(make_line_search_function(clamp_function(f,x_lower,x_upper), x, s, f_value)),
                         f_value,
                         dot(g,s), // compute gradient for the line search
-                        last_alpha, 
-                        search_strategy.get_wolfe_rho(), 
+                        last_alpha,
+                        search_strategy.get_wolfe_rho(),
                         search_strategy.get_max_line_search_iterations());
 
             // Do a trust region style thing for alpha.  The idea is that if we take a
@@ -662,7 +662,7 @@ namespace dlib
             g = -der(x);
 
             // Don't forget to negate the output from the line search since it is  from the
-            // unnegated version of f() 
+            // unnegated version of f()
             f_value *= -1;
 
             if (!is_finite(f_value))
@@ -679,21 +679,21 @@ namespace dlib
     template <
         typename search_strategy_type,
         typename stop_strategy_type,
-        typename funct, 
-        typename funct_der, 
+        typename funct,
+        typename funct_der,
         typename T
         >
     double find_max_box_constrained (
         search_strategy_type search_strategy,
         stop_strategy_type stop_strategy,
-        const funct& f, 
-        const funct_der& der, 
+        const funct& f,
+        const funct_der& der,
         T& x,
         double x_lower,
         double x_upper
     )
     {
-        // The starting point (i.e. x) must be a column vector.  
+        // The starting point (i.e. x) must be a column vector.
         COMPILE_TIME_ASSERT(T::NC <= 1);
 
         typedef typename T::type scalar_type;

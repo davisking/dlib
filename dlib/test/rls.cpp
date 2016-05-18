@@ -11,7 +11,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -143,7 +143,7 @@ namespace
                         DLIB_TEST(std::abs(df(trans(rowm(X,0))) - r(trans(rowm(X,0)))) < 1e-15);
                     }
                 }
-            } 
+            }
         }
 
         dlog << LINFO << "rs1.mean(): " << rs1.mean();

@@ -14,7 +14,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -220,9 +220,9 @@ namespace
     )
         /*!
             ensures
-                - runs tests on the bayesian network objects and functions for compliance with the specs 
+                - runs tests on the bayesian network objects and functions for compliance with the specs
         !*/
-    {        
+    {
 
         print_spinner();
 
@@ -273,7 +273,7 @@ namespace
         DLIB_TEST(abs(sum(dist) - 1.0) < 1e-5);
         DLIB_TEST(abs(dist(1) - 0.4359706 ) < 1e-5);
 
-        // now lets modify the probabilities of the bayesian network by making O 
+        // now lets modify the probabilities of the bayesian network by making O
         // not a deterministic node anymore but otherwise leave the network alone
         setup_dyspnea_network(bn, false);
 
@@ -322,7 +322,7 @@ namespace
         DLIB_TEST(abs(dist(1) - 0.7535685520 ) < 1e-5);
 
 
-        // now lets test the bayesian_network_gibbs_sampler 
+        // now lets test the bayesian_network_gibbs_sampler
         set_node_value(bn, A, 1);
         set_node_value(bn, T, 1);
         set_node_value(bn, O, 1);

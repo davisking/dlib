@@ -14,14 +14,14 @@
 // This is called an unnamed-namespace and it has the effect of making everything inside this file "private"
 // so that everything you declare will have static linkage.  Thus we won't have any multiply
 // defined symbol errors coming out of the linker when we try to compile the test suite.
-namespace  
+namespace
 {
 
     using namespace test;
     using namespace dlib;
     using namespace std;
 
-    // Declare the logger we will use in this test.  The name of the tester 
+    // Declare the logger we will use in this test.  The name of the tester
     // should start with "test."
     logger dlog("test.config_reader");
 
@@ -41,29 +41,29 @@ namespace
 
         std_vector_c<string> blocks;
         cr.block("all").get_blocks(blocks);
-        DLIB_TEST(blocks.size() == 4); 
-        cr.block("all").block("block1").get_blocks(blocks); DLIB_TEST(blocks.size() == 0); 
-        cr.block("all").block("block2").get_blocks(blocks); DLIB_TEST(blocks.size() == 0); 
-        cr.block("all").block("block3").get_blocks(blocks); DLIB_TEST(blocks.size() == 0); 
-        cr.block("all").block("block4").get_blocks(blocks); DLIB_TEST(blocks.size() == 0); 
+        DLIB_TEST(blocks.size() == 4);
+        cr.block("all").block("block1").get_blocks(blocks); DLIB_TEST(blocks.size() == 0);
+        cr.block("all").block("block2").get_blocks(blocks); DLIB_TEST(blocks.size() == 0);
+        cr.block("all").block("block3").get_blocks(blocks); DLIB_TEST(blocks.size() == 0);
+        cr.block("all").block("block4").get_blocks(blocks); DLIB_TEST(blocks.size() == 0);
 
-        DLIB_TEST(cr.block("all").block("block1").is_key_defined("name")); 
-        DLIB_TEST(cr.block("all").block("block2").is_key_defined("name")); 
-        DLIB_TEST(cr.block("all").block("block3").is_key_defined("name")); 
-        DLIB_TEST(cr.block("all").block("block4").is_key_defined("name")); 
-        DLIB_TEST(cr.block("all").block("block1").is_key_defined("age")); 
-        DLIB_TEST(cr.block("all").block("block2").is_key_defined("age")); 
-        DLIB_TEST(cr.block("all").block("block3").is_key_defined("age")); 
-        DLIB_TEST(cr.block("all").block("block4").is_key_defined("age")); 
+        DLIB_TEST(cr.block("all").block("block1").is_key_defined("name"));
+        DLIB_TEST(cr.block("all").block("block2").is_key_defined("name"));
+        DLIB_TEST(cr.block("all").block("block3").is_key_defined("name"));
+        DLIB_TEST(cr.block("all").block("block4").is_key_defined("name"));
+        DLIB_TEST(cr.block("all").block("block1").is_key_defined("age"));
+        DLIB_TEST(cr.block("all").block("block2").is_key_defined("age"));
+        DLIB_TEST(cr.block("all").block("block3").is_key_defined("age"));
+        DLIB_TEST(cr.block("all").block("block4").is_key_defined("age"));
 
-        DLIB_TEST(cr.block("all").block("block1")["name"] == "davis king"); 
-        DLIB_TEST(cr.block("all").block("block2")["name"] == "joel"); 
-        DLIB_TEST(cr.block("all").block("block3")["name"] == "john"); 
-        DLIB_TEST(cr.block("all").block("block4")["name"] == "dude"); 
-        DLIB_TEST(cr.block("all").block("block1")["age"] == "24"); 
-        DLIB_TEST(cr.block("all").block("block2")["age"] == "24"); 
-        DLIB_TEST(cr.block("all").block("block3")["age"] == "24"); 
-        DLIB_TEST(cr.block("all").block("block4")["age"] == "53"); 
+        DLIB_TEST(cr.block("all").block("block1")["name"] == "davis king");
+        DLIB_TEST(cr.block("all").block("block2")["name"] == "joel");
+        DLIB_TEST(cr.block("all").block("block3")["name"] == "john");
+        DLIB_TEST(cr.block("all").block("block4")["name"] == "dude");
+        DLIB_TEST(cr.block("all").block("block1")["age"] == "24");
+        DLIB_TEST(cr.block("all").block("block2")["age"] == "24");
+        DLIB_TEST(cr.block("all").block("block3")["age"] == "24");
+        DLIB_TEST(cr.block("all").block("block4")["age"] == "53");
 
 
         int count2 = 0;
@@ -160,12 +160,12 @@ namespace
     )
     /*!
         requires
-            - config_reader is an implementation of config_reader/config_reader_kernel_abstract.h 
+            - config_reader is an implementation of config_reader/config_reader_kernel_abstract.h
               is instantiated with int
         ensures
             - runs tests on config_reader for compliance with the specs
     !*/
-    {        
+    {
 
 
 
@@ -394,10 +394,10 @@ namespace
 
     void test_get_option()
     {
-        const char* argv[100];            
+        const char* argv[100];
         int argc;
 
-        // program --opt 4 -d dude 
+        // program --opt 4 -d dude
         argv[0] = "program";
         argv[1] = "--opt";
         argv[2] = "4";

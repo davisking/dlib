@@ -12,7 +12,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -90,7 +90,7 @@ namespace
         R = 0.3, 0,
         0,  0.3;
 
-        // the variables in the state are 
+        // the variables in the state are
         // x,y, x velocity, y velocity, x acceleration, and y acceleration
         matrix<double,6,6> A;
         A = 1, 0, 1, 0, 0, 0,
@@ -106,8 +106,8 @@ namespace
         0, 1, 0, 0, 0, 0;
 
 
-        kalman_filter<6,2> kf; 
-        kf.set_measurement_noise(R);  
+        kalman_filter<6,2> kf;
+        kf.set_measurement_noise(R);
         matrix<double> pn = 0.01*identity_matrix<double,6>();
         kf.set_process_noise(pn);
         kf.set_observation_model(H);

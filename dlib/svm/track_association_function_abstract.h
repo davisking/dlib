@@ -38,7 +38,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object defines the interface a track must implement if it is to be
                 used with the track_association_function defined at the bottom of this
-                file.   
+                file.
         !*/
 
     public:
@@ -76,7 +76,7 @@ namespace dlib
         /*!
             ensures
                 - Updates this track with the given detection assuming that det is the most
-                  current observation of the object under track. 
+                  current observation of the object under track.
         !*/
 
         void propagate_track (
@@ -93,17 +93,17 @@ namespace dlib
 
     template <
         typename detection_type
-        > 
+        >
     class feature_extractor_track_association
     {
         /*!
             REQUIREMENTS ON detection_type
                 It must be an object that implements an interface compatible with the
-                example_detection discussed above.  This also means that detection_type::track_type 
-                must be an object that implements an interface compatible with example_track 
+                example_detection discussed above.  This also means that detection_type::track_type
+                must be an object that implements an interface compatible with example_track
                 defined above.
 
-            WHAT THIS OBJECT REPRESENTS 
+            WHAT THIS OBJECT REPRESENTS
                 This object is an adapter that converts from the detection/track style
                 interface defined above to the feature extraction interface required by the
                 association rule learning tools in dlib.  Specifically, it converts the
@@ -118,7 +118,7 @@ namespace dlib
         typedef track_type rhs_element;
 
         unsigned long num_features(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the dimensionality of the feature vectors produced by get_features().
@@ -137,9 +137,9 @@ namespace dlib
 
     template <
         typename detection_type
-        > 
+        >
     void serialize (
-        const feature_extractor_track_association<detection_type>& item, 
+        const feature_extractor_track_association<detection_type>& item,
         std::ostream& out
     );
     /*!
@@ -148,7 +148,7 @@ namespace dlib
 
     template <
         typename detection_type
-        > 
+        >
     void deserialize (
         feature_extractor_track_association<detection_type>& item,
         std::istream& in
@@ -167,8 +167,8 @@ namespace dlib
         /*!
             REQUIREMENTS ON detection_type
                 It must be an object that implements an interface compatible with the
-                example_detection discussed above.  This also means that detection_type::track_type 
-                must be an object that implements an interface compatible with example_track 
+                example_detection discussed above.  This also means that detection_type::track_type
+                must be an object that implements an interface compatible with example_track
                 defined above.
 
             WHAT THIS OBJECT REPRESENTS
@@ -185,10 +185,10 @@ namespace dlib
                 some of the track management tasks like creating a new track when a
                 detection doesn't match any of the existing tracks.
 
-                Internally, this object is implemented using the assignment_function object.  
+                Internally, this object is implemented using the assignment_function object.
                 In fact, it's really just a thin wrapper around assignment_function and
                 exists just to provide a more convenient interface to users doing detection
-                to track association.   
+                to track association.
         !*/
     public:
 
@@ -205,7 +205,7 @@ namespace dlib
 
         track_association_function (
             const association_function_type& assoc
-        ); 
+        );
         /*!
             ensures
                 - #get_assignment_function() == assoc
@@ -228,7 +228,7 @@ namespace dlib
                 - This function uses get_assignment_function() to assign each detection
                   in dets to its appropriate track in tracks.  Then each track which
                   associates to a detection is updated by calling update_track() with the
-                  associated detection.  
+                  associated detection.
                 - Detections that don't associate with any of the elements of tracks will
                   spawn new tracks.  For each unassociated detection, this is done by
                   creating a new track_type object, calling update_track() on it with the
@@ -242,7 +242,7 @@ namespace dlib
 
     template <
         typename detection_type
-        > 
+        >
     void serialize (
         const track_association_function<detection_type>& item,
         std::ostream& out
@@ -253,9 +253,9 @@ namespace dlib
 
     template <
         typename detection_type
-        > 
+        >
     void deserialize (
-        track_association_function<detection_type>& item, 
+        track_association_function<detection_type>& item,
         std::istream& in
     );
     /*!

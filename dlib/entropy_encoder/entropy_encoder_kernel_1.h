@@ -11,7 +11,7 @@
 namespace dlib
 {
 
-    class entropy_encoder_kernel_1 
+    class entropy_encoder_kernel_1
     {
         /*!
             GENERAL NOTES
@@ -34,11 +34,11 @@ namespace dlib
                 else
                     false     == stream_is_set()
 
-                buf      == used to accumulate bits before writing them to out.  
-                buf_used == the number of low order bits in buf that are currently 
+                buf      == used to accumulate bits before writing them to out.
+                buf_used == the number of low order bits in buf that are currently
                             in use
                 low      == the low end of the range used for arithmetic encoding.
-                            this number is used as a 32bit fixed point real number. 
+                            this number is used as a 32bit fixed point real number.
                             the point is fixed just before the first bit, so it is
                             always in the range [0,1)
 
@@ -46,14 +46,14 @@ namespace dlib
                             in the calculation (high-low+1)/total.
 
                 high     == the high end of the range - 1 used for arithmetic encoding.
-                            this number is used as a 32bit fixed point real number. 
+                            this number is used as a 32bit fixed point real number.
                             the point is fixed just before the first bit, so when we
                             interpret high as a real number then it is always in the
                             range [0,1)
 
-                            the range for arithmetic encoding is always 
+                            the range for arithmetic encoding is always
                             [low,high + 0.9999999...)   the 0.9999999... is why
-                            high == real upper range - 1         
+                            high == real upper range - 1
  
         !*/
 
@@ -86,11 +86,11 @@ namespace dlib
 
     private:
 
-        void flush ( 
+        void flush (
         );
         /*!
             requires
-                out != 0 (i.e.  there is a stream object to flush the data to 
+                out != 0 (i.e.  there is a stream object to flush the data to
         !*/
 
         // restricted functions
@@ -103,11 +103,11 @@ namespace dlib
         std::ostream* out;
         uint32 low;
         uint32 high;
-        unsigned char buf; 
-        uint32 buf_used; 
+        unsigned char buf;
+        uint32 buf_used;
         std::streambuf* streambuf;
 
-    };   
+    };
    
 }
 

@@ -17,7 +17,7 @@
 namespace dlib
 {
 
-    namespace logger_config_file_helpers 
+    namespace logger_config_file_helpers
     {
 
 // ----------------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
         log_level string_to_log_level (
-            const std::string& level 
+            const std::string& level
         )
         {
             using namespace std;
@@ -84,7 +84,7 @@ namespace dlib
         
         void configure_sub_blocks (
             const config_reader& cr,
-            const std::string& name 
+            const std::string& name
         )
         {
             using namespace std;
@@ -137,7 +137,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void configure_loggers_from_file (
-        const std::string& file_name 
+        const std::string& file_name
     )
     {
         std::ifstream fin(file_name.c_str());
@@ -152,7 +152,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void configure_loggers_from_file (
-        const config_reader& main_cr 
+        const config_reader& main_cr
     )
     {
         using namespace logger_config_file_helpers;

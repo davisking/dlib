@@ -36,7 +36,7 @@
     }
 
     This program would output:
-        Timing report: 
+        Timing report:
             block #1: 5.0 seconds
             block #2: 10.0 seconds
 
@@ -56,13 +56,13 @@
             block tb(1, "main loop");
 
             dlib::sleep(1500);
-        } 
+        }
 
         print();
     }
 
     This program would output:
-        Timing report: 
+        Timing report:
             block main loop: 15.0 seconds
 
 !*/
@@ -131,7 +131,7 @@ namespace dlib
                 // Check if the name buffer is empty.  Use the name it contains if it isn't.
                 if (name_buf(i,"")[0] != '\0')
                     name = cast_to_string(i) + ": " + name_buf(i,"");
-                else 
+                else
                     name = cast_to_string(i);
                 max_name_length = std::max<unsigned long>(max_name_length, name.size());
             }
@@ -145,7 +145,7 @@ namespace dlib
                     // Check if the name buffer is empty.  Use the name it contains if it isn't.
                     if (name_buf(i,"")[0] != '\0')
                         name = cast_to_string(i) + ": " + name_buf(i,"");
-                    else 
+                    else
                         name = cast_to_string(i);
 
                     // make sure the name is always the same length.  Do so by padding with spaces

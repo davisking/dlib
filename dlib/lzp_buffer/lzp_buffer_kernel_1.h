@@ -12,7 +12,7 @@ namespace dlib
     template <
         typename sbuf
         >
-    class lzp_buffer_kernel_1 
+    class lzp_buffer_kernel_1
     {
         /*!
             REQUIREMENTS ON sbuf
@@ -23,7 +23,7 @@ namespace dlib
                 - buffer.size() == the size as defined by the constructor
                 - table_size == the number of elements in the table array
                 - for all i: buffer[i] == 0
-                - for all i: table[i] == buffer.size()                
+                - for all i: table[i] == buffer.size()
 
             CONVENTION
                 - table_size == the number of elements in the table array
@@ -31,7 +31,7 @@ namespace dlib
                 - operator[](i) == buffer[i]
 
                 - if (table[hash()] != buffer.size()) then
-                    - buffer.get_element_index(table[hash()]) == the index we will 
+                    - buffer.get_element_index(table[hash()]) == the index we will
                       predict for the current context
                 - else
                     - there is no prediction for the current context
@@ -46,7 +46,7 @@ namespace dlib
     public:
 
         explicit lzp_buffer_kernel_1 (
-            unsigned long buffer_size           
+            unsigned long buffer_size
         );
 
         virtual ~lzp_buffer_kernel_1 (
@@ -101,7 +101,7 @@ namespace dlib
         lzp_buffer_kernel_1(const lzp_buffer_kernel_1<sbuf>&);        // copy constructor
         lzp_buffer_kernel_1<sbuf>& operator=(const lzp_buffer_kernel_1<sbuf>&);    // assignment operator
 
-    };      
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ namespace dlib
         >
     lzp_buffer_kernel_1<sbuf>::
     lzp_buffer_kernel_1 (
-        unsigned long buffer_size           
+        unsigned long buffer_size
     ) :
         table_size(65536),
         table(new unsigned long[table_size])
@@ -166,10 +166,10 @@ namespace dlib
     void lzp_buffer_kernel_1<sbuf>::
     add (
         unsigned char symbol
-    ) 
-    { 
-        buffer.rotate_left(1); 
-        buffer[0] = symbol; 
+    )
+    {
+        buffer.rotate_left(1);
+        buffer[0] = symbol;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -210,9 +210,9 @@ namespace dlib
         >
     unsigned long lzp_buffer_kernel_1<sbuf>::
     size (
-    ) const 
-    { 
-        return buffer.size(); 
+    ) const
+    {
+        return buffer.size();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -223,9 +223,9 @@ namespace dlib
     unsigned char lzp_buffer_kernel_1<sbuf>::
     operator[] (
         unsigned long index
-    ) const 
-    { 
-        return buffer[index]; 
+    ) const
+    {
+        return buffer[index];
     }
 
 // ----------------------------------------------------------------------------------------

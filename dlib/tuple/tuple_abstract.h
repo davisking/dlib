@@ -17,7 +17,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is the default type used as the default
-                template argument to the tuple object's template arguments. 
+                template argument to the tuple object's template arguments.
 
                 Also note that it has no state associated with it.
         !*/
@@ -32,7 +32,7 @@ namespace dlib
         std::istream&
     ){}
     /*!
-        Serialization support is provided for null_type because in some cases 
+        Serialization support is provided for null_type because in some cases
         it makes your code a little more concise and easier to deal with
         when using tuple objects and serialization.  The serialization literally
         does nothing though.
@@ -40,12 +40,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template < 
-        typename T0 = null_type, 
-        typename T1 = null_type, 
-        typename T2 = null_type, 
-        typename T3 = null_type, 
-           ... 
+    template <
+        typename T0 = null_type,
+        typename T1 = null_type,
+        typename T2 = null_type,
+        typename T3 = null_type,
+           ...
         typename T31 = null_type
         >
     class tuple
@@ -57,7 +57,7 @@ namespace dlib
                 state.
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a container of between 0 and 31 objects 
+                This object represents a container of between 0 and 31 objects
                 where the objects contained are specified in the template
                 arguments.
 
@@ -67,7 +67,7 @@ namespace dlib
 
                 Then we can access each of these by their index number.  The index number
                 is just the order each type has in the template argument list.  So we have:
-                ex.get<0>() = 5;     // assign the int the value 5 
+                ex.get<0>() = 5;     // assign the int the value 5
                 ex.get<1>() = 3.14;  // assign the float the value 3.14
                 ex.get<2>() = 'c';   // assign the char the value 'c'
 
@@ -79,22 +79,22 @@ namespace dlib
                 ex.get<char>()  // returns 'c'
 
                 We can also get the indexes of each of these fields like so:
-                ex.index<int>()   // returns 0 
-                ex.index<float>() // returns 1 
-                ex.index<char>()  // returns 2 
+                ex.index<int>()   // returns 0
+                ex.index<float>() // returns 1
+                ex.index<char>()  // returns 2
         !*/
 
     public:
         // the maximum number of items this tuple template can contain
         const static long max_fields = 32;
 
-        template <long index> 
-        struct get_type 
-        { 
+        template <long index>
+        struct get_type
+        {
             typedef (the type of the Tindex template argument) type;
         };
 
-        template <long index> 
+        template <long index>
         const get_type<index>::type& get (
         ) const;
         /*!
@@ -105,7 +105,7 @@ namespace dlib
                   inside this tuple
         !*/
 
-        template <long index>       
+        template <long index>
         get_type<index>::type& get (
         );
         /*!
@@ -116,7 +116,7 @@ namespace dlib
                   inside this tuple
         !*/
 
-        template <typename Q>  
+        template <typename Q>
         const long index (
         ) const;
         /*!
@@ -127,7 +127,7 @@ namespace dlib
                 - returns the index of the object in this tuple with type Q
         !*/
 
-        template <typename Q>  
+        template <typename Q>
         const Q& get (
         ) const;
         /*!
@@ -136,19 +136,19 @@ namespace dlib
                   only one object of that type in the tuple
             ensures
                 - returns a const reference to the object in this tuple
-                  with type Q 
+                  with type Q
         !*/
 
-        template <typename Q> 
+        template <typename Q>
         Q& get (
-        ); 
+        );
         /*!
             requires
                 - Q is a type of object contained in this tuple and there is
                   only one object of that type in the tuple
             ensures
                 - returns a non-const reference to the object in this tuple
-                  with type Q 
+                  with type Q
         !*/
 
         template <typename F>
@@ -157,9 +157,9 @@ namespace dlib
         );
         /*!
             requires
-                - funct is a templated function object 
+                - funct is a templated function object
             ensures
-                - for each item X in this tuple that isn't a null_type object: 
+                - for each item X in this tuple that isn't a null_type object:
                     - calls funct(X);
         !*/
 
@@ -169,9 +169,9 @@ namespace dlib
         ) const;
         /*!
             requires
-                - funct is a templated function object 
+                - funct is a templated function object
             ensures
-                - for each item X in this tuple that isn't a null_type object: 
+                - for each item X in this tuple that isn't a null_type object:
                     - calls funct(X);
         !*/
 
@@ -181,9 +181,9 @@ namespace dlib
         );
         /*!
             requires
-                - funct is a templated function object 
+                - funct is a templated function object
             ensures
-                - for each item X in this tuple that isn't a null_type object: 
+                - for each item X in this tuple that isn't a null_type object:
                     - calls funct(X);
         !*/
 
@@ -193,9 +193,9 @@ namespace dlib
         ) const;
         /*!
             requires
-                - funct is a templated function object 
+                - funct is a templated function object
             ensures
-                - for each item X in this tuple that isn't a null_type object: 
+                - for each item X in this tuple that isn't a null_type object:
                     - calls funct(X);
         !*/
 
@@ -206,7 +206,7 @@ namespace dlib
         );
         /*!
             requires
-                - funct is a templated function object 
+                - funct is a templated function object
                 - 0 <= idx < max_fields && get_type<idx>::type != null_type
                   (i.e. idx must be the index of a non-null_type object in this tuple)
             ensures
@@ -220,7 +220,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - funct is a templated function object 
+                - funct is a templated function object
                 - 0 <= idx < max_fields && get_type<idx>::type != null_type
                   (i.e. idx must be the index of a non-null_type object in this tuple)
             ensures
@@ -234,7 +234,7 @@ namespace dlib
         );
         /*!
             requires
-                - funct is a templated function object 
+                - funct is a templated function object
                 - 0 <= idx < max_fields && get_type<idx>::type != null_type
                   (i.e. idx must be the index of a non-null_type object in this tuple)
             ensures
@@ -248,7 +248,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - funct is a templated function object 
+                - funct is a templated function object
                 - 0 <= idx < max_fields && get_type<idx>::type != null_type
                   (i.e. idx must be the index of a non-null_type object in this tuple)
             ensures
@@ -261,34 +261,34 @@ namespace dlib
         /*!
             ensures
                 - swaps *this and item
-        !*/ 
+        !*/
 
         // -------------------------------------------------
         //        global functions for tuple objects
         // -------------------------------------------------
 
         friend void swap (
-            tuple& a, 
-            tuple& b 
-        ) { a.swap(b); }   
+            tuple& a,
+            tuple& b
+        ) { a.swap(b); }
         /*!
             provides a global swap function
         !*/
 
         friend void serialize (
-            const tuple& item, 
-            std::ostream& out 
-        );   
+            const tuple& item,
+            std::ostream& out
+        );
         /*!
-            provides serialization support 
+            provides serialization support
         !*/
 
         friend void deserialize (
-            tuple& item, 
+            tuple& item,
             std::istream& in
-        );   
+        );
         /*!
-            provides deserialization support 
+            provides deserialization support
         !*/
 
     };

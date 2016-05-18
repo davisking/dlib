@@ -13,7 +13,7 @@ namespace dlib
 {
 
     template <
-        typename set_base 
+        typename set_base
         >
     class set_compare_1 : public set_base
     {
@@ -35,9 +35,9 @@ namespace dlib
         typename set_base
         >
     inline void swap (
-        set_compare_1<set_base>& a, 
-        set_compare_1<set_base>& b 
-    ) { a.swap(b); }  
+        set_compare_1<set_base>& a,
+        set_compare_1<set_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ namespace dlib
                 {
                     break;
                 }
-            }            
+            }
         }
 
         set_base::reset();
@@ -100,7 +100,7 @@ namespace dlib
         rhs.reset();
         set_base::reset();
         while (rhs.move_next() && set_base::move_next())
-        {            
+        {
             if (!(rhs.element() == set_base::element()))
             {
                 result = false;

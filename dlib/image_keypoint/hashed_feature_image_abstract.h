@@ -20,11 +20,11 @@ namespace dlib
     class hashed_feature_image : noncopyable
     {
         /*!
-            REQUIREMENTS ON feature_extractor 
+            REQUIREMENTS ON feature_extractor
                 - must be an object with an interface compatible with dlib::hog_image
 
-            REQUIREMENTS ON hash_function_type_ 
-                - must be an object with an interface compatible with projection_hash 
+            REQUIREMENTS ON hash_function_type_
+                - must be an object with an interface compatible with projection_hash
 
             INITIAL VALUE
                  - size() == 0
@@ -36,19 +36,19 @@ namespace dlib
                 wrapped image feature vectors into sparse indicator vectors.  It does this
                 by hashing each feature vector into the range [0, get_num_dimensions()-1]
                 and then returns a new vector which is zero everywhere except for the
-                position determined by the hash. 
+                position determined by the hash.
 
 
             THREAD SAFETY
                 Concurrent access to an instance of this object is not safe and should be protected
-                by a mutex lock except for the case where you are copying the configuration 
-                (via copy_configuration()) of a hashed_feature_image object to many other threads.  
+                by a mutex lock except for the case where you are copying the configuration
+                (via copy_configuration()) of a hashed_feature_image object to many other threads.
                 In this case, it is safe to copy the configuration of a shared object so long
                 as no other operations are performed on it.
 
 
-            NOTATION 
-                let BASE_FE denote the base feature_extractor object contained inside 
+            NOTATION
+                let BASE_FE denote the base feature_extractor object contained inside
                 the hashed_feature_image.
         !*/
 
@@ -59,7 +59,7 @@ namespace dlib
         typedef std::vector<std::pair<unsigned int,double> > descriptor_type;
 
         hashed_feature_image (
-        ); 
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -101,9 +101,9 @@ namespace dlib
         );
         /*!
             ensures
-                - copies all the state information of item into *this, except for state 
-                  information populated by load().  More precisely, given two hashed_feature_image 
-                  objects H1 and H2, the following sequence of instructions should always 
+                - copies all the state information of item into *this, except for state
+                  information populated by load().  More precisely, given two hashed_feature_image
+                  objects H1 and H2, the following sequence of instructions should always
                   result in both of them having the exact same state.
                     H2.copy_configuration(H1);
                     H1.load(img);
@@ -118,7 +118,7 @@ namespace dlib
         );
         /*!
             requires
-                - image_type == any type that can be supplied to feature_extractor::load() 
+                - image_type == any type that can be supplied to feature_extractor::load()
             ensures
                 - performs BASE_FE.load(img)
                   i.e. does feature extraction.  The features can be accessed using
@@ -129,28 +129,28 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns BASE_FE.size() 
+                - returns BASE_FE.size()
         !*/
 
         long nr (
         ) const;
         /*!
             ensures
-                - returns BASE_FE.nr() 
+                - returns BASE_FE.nr()
         !*/
 
         long nc (
         ) const;
         /*!
             ensures
-                - returns BASE_FE.nc() 
+                - returns BASE_FE.nc()
         !*/
 
         long get_num_dimensions (
         ) const;
         /*!
             ensures
-                - returns the dimensionality of the feature vectors returned by operator().  
+                - returns the dimensionality of the feature vectors returned by operator().
                   In this case, this is the number of hash bins.  That is, get_hash().num_hash_bins()
         !*/
 
@@ -165,7 +165,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #uses_uniform_feature_weights() == true 
+                - #uses_uniform_feature_weights() == true
         !*/
 
         bool uses_uniform_feature_weights (
@@ -190,12 +190,12 @@ namespace dlib
                   (e.g. the hash function must be properly configured to process the feature
                   vectors produced by the base feature extractor)
             ensures
-                - hashes BASE_FE(row,col) and returns the resulting indicator vector. 
+                - hashes BASE_FE(row,col) and returns the resulting indicator vector.
                 - To be precise, this function returns a sparse vector V such that:
-                    - V.size() == 1 
+                    - V.size() == 1
                     - V[0].first == get_hash()(BASE_FE(row,col))
                     - if (uses_uniform_feature_weights()) then
-                        - V[0].second == 1 
+                        - V[0].second == 1
                     - else
                         - V[0].second == 1/N where N is the number of times a feature in
                           hash bin V[0].first was observed in the image given to load().
@@ -222,10 +222,10 @@ namespace dlib
                 - returns BASE_FE.image_to_feat_space(p)
                   I.e. Each local feature is extracted from a certain point in the input image.
                   This function returns the identity of the local feature corresponding
-                  to the image location p.  Or in other words, let P == image_to_feat_space(p), 
-                  then (*this)(P.y(),P.x()) == the local feature closest to, or centered at, 
-                  the point p in the input image.  Note that some image points might not have 
-                  corresponding feature locations.  E.g. border points or points outside the 
+                  to the image location p.  Or in other words, let P == image_to_feat_space(p),
+                  then (*this)(P.y(),P.x()) == the local feature closest to, or centered at,
+                  the point p in the input image.  Note that some image points might not have
+                  corresponding feature locations.  E.g. border points or points outside the
                   image.  In these cases the returned point will be outside get_rect(*this).
         !*/
 
@@ -247,9 +247,9 @@ namespace dlib
                 - returns BASE_FE.feat_to_image_space(p)
                   I.e. returns the location in the input image space corresponding to the center
                   of the local feature at point p.  In other words, this function computes
-                  the inverse of image_to_feat_space().  Note that it may only do so approximately, 
-                  since more than one image location might correspond to the same local feature.  
-                  That is, image_to_feat_space() might not be invertible so this function gives 
+                  the inverse of image_to_feat_space().  Note that it may only do so approximately,
+                  since more than one image location might correspond to the same local feature.
+                  That is, image_to_feat_space() might not be invertible so this function gives
                   the closest possible result.
         !*/
 
@@ -276,7 +276,7 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -287,10 +287,10 @@ namespace dlib
         >
     void deserialize (
         hashed_feature_image<T,U>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

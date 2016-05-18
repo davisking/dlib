@@ -28,7 +28,7 @@ namespace dlib
         typedef sequence<document_handler*>::kernel_2a seq_dh;
         typedef sequence<error_handler*>::kernel_2a seq_eh;
 
-         /*!                
+         /*!
             INITIAL VALUE
                 dh_list.size() == 0
                 eh_list.size() == 0
@@ -142,12 +142,12 @@ namespace dlib
                 eof,           // this token is returned when we reach the end of input
                 error,         // this token indicates that the tokenizer couldn't
                                // determine which category the next token fits into
-                dtd,           // this token is for an entire dtd 
+                dtd,           // this token is for an entire dtd
                 comment        // this is a token for comments
             };
             /*
                 notes about the tokens:
-                    the tokenizer guarantees that the following tokens to not 
+                    the tokenizer guarantees that the following tokens to not
                     contain the '<' character except as the first character of the token
                     element_start, element_end, empty_element, and pi.  they also only
                     contain the '>' characer as their last character.
@@ -235,7 +235,7 @@ namespace dlib
                                 apos;  -> '
                                 quot;  -> "
 
-                    or returns -1 if we hit an undefined entity reference or EOF. 
+                    or returns -1 if we hit an undefined entity reference or EOF.
                             (i.e. it was not one of the entities listed above)
 
             !*/
@@ -249,17 +249,17 @@ namespace dlib
             // -----------------------------------
 
             // restricted functions: assignment and copy construction
-            xml_parser(xml_parser&);   
+            xml_parser(xml_parser&);
             xml_parser& operator= (
                         xml_parser&
-                        );  
+                        );
 
     };
 
     inline void swap (
-        xml_parser& a, 
-        xml_parser& b 
-    ) { a.swap(b); }   
+        xml_parser& a,
+        xml_parser& b
+    ) { a.swap(b); }
 
 
 // ----------------------------------------------------------------------------------------
@@ -298,12 +298,12 @@ namespace dlib
         in.exceptions(std::ios::goodbit);
 
 
-        try 
+        try
         {
             unsigned long line_number = 1;
 
             // skip any whitespace before the start of the document
-            while (in.peek() == ' ' || in.peek() == '\t' || in.peek() == '\n' || in.peek() == '\r' ) 
+            while (in.peek() == ' ' || in.peek() == '\t' || in.peek() == '\n' || in.peek() == '\r' )
             {
                 if (in.peek() == '\n')
                     ++line_number;
@@ -326,7 +326,7 @@ namespace dlib
 
 
             std::string chars_buf; // used to collect chars data between consecutive
-                                // chars and chars_cdata tokens so that 
+                                // chars and chars_cdata tokens so that
                                 // document_handlers receive all chars data between
                                 // tags in one call
 
@@ -346,7 +346,7 @@ namespace dlib
 
 
             while (token_kind != eof)
-            {          
+            {
                 bool is_empty = false;  // this becomes true when this token is an empty_element
 
                 switch (token_kind)
@@ -444,7 +444,7 @@ namespace dlib
                                 eh_list[i]->error(line_number);
                             }
                         }
-                        while (in.peek() == ' ' || in.peek() == '\t' || in.peek() == '\n' || in.peek() == '\r' ) 
+                        while (in.peek() == ' ' || in.peek() == '\t' || in.peek() == '\n' || in.peek() == '\r' )
                         {
                             if (in.peek() == '\n')
                                 ++line_number;
@@ -465,7 +465,7 @@ namespace dlib
                         else if (token_text.find_first_not_of(" \t\r\n") != std::string::npos)
                         {
                             // you can't have non whitespace chars data outside the root element
-                            seen_fatal_error = true;                        
+                            seen_fatal_error = true;
                         }
                     }break;
 
@@ -520,9 +520,9 @@ namespace dlib
 
                 // if the next token is not a chars or chars_cdata token then flush
                 // the chars_buf to the document_handlers
-                if ( (token_kind != chars) && 
+                if ( (token_kind != chars) &&
                     (token_kind != chars_cdata) &&
-                    (token_kind != dtd) && 
+                    (token_kind != dtd) &&
                     (token_kind != comment) &&
                     (chars_buf.size() != 0)
                     )
@@ -648,7 +648,7 @@ namespace dlib
                 
                 // ---------------------------------
 
-                    // this is a dtd, comment, or chars_cdata token 
+                    // this is a dtd, comment, or chars_cdata token
                 case '!':
                     {
                         // if this is a CDATA section *******************************
@@ -661,7 +661,7 @@ namespace dlib
 
                             // make sure the next chars are CDATA[
                             std::istream::int_type ch = in.get();
-                            if (ch != 'C')                                
+                            if (ch != 'C')
                                 token_kind = error;
                             ch = in.get();
                             if (ch != 'D')
@@ -696,7 +696,7 @@ namespace dlib
 
                                 token_text += ch;
 
-                                // if this is the closing 
+                                // if this is the closing
                                 if (brackets_seen == 2 && ch == '>')
                                     seen_closing = true;
                                 // if we are seeing a bracket
@@ -793,7 +793,7 @@ namespace dlib
 
                             token_text += ch1;
                             token_text += ch2;
-                            int bracket_depth = 1;  // this is the number of '<' chars seen 
+                            int bracket_depth = 1;  // this is the number of '<' chars seen
                                                     // minus the number of '>' chars seen
 
                             std::istream::int_type ch;
@@ -826,7 +826,7 @@ namespace dlib
 
                 // ---------------------------------
 
-                    // this is a pi token 
+                    // this is a pi token
                 case '?':
                     {
                         token_text += ch1;
@@ -847,8 +847,8 @@ namespace dlib
                         if (ch == '>')
                         {
                             // make sure there was a trailing '?'
-                            if ( (token_text.size() > 3) && 
-                                (token_text[token_text.size()-2] != '?') 
+                            if ( (token_text.size() > 3) &&
+                                (token_text[token_text.size()-2] != '?')
                                 )
                             {
                                 token_kind = error;
@@ -891,7 +891,7 @@ namespace dlib
                             // else if we hit a < then thats an error
                             else if (ch == '<')
                                 ch = EOF;
-                            token_text += ch;                                
+                            token_text += ch;
                         } while ( (ch != '>') && (ch != EOF));
 
                         // check if this is an error token
@@ -922,7 +922,7 @@ namespace dlib
                             // else if we hit a < then thats an error
                             else if (ch == '<')
                                 ch = EOF;
-                            token_text += ch;                                
+                            token_text += ch;
                         } while ( (ch != '>') && (ch != EOF));
 
                         // check if this is an error token
@@ -956,7 +956,7 @@ namespace dlib
             // this is an eof token
         case EOF:
             {
-                token_kind = eof;                
+                token_kind = eof;
             }
             break;
 
@@ -1058,11 +1058,11 @@ namespace dlib
         i = 2;
 
         // fill out name.  the name can not contain any of the following characters
-        while ( (ch != '>') && 
-                (ch != ' ') && 
-                (ch != '=') && 
-                (ch != '/') && 
-                (ch != '\t') && 
+        while ( (ch != '>') &&
+                (ch != ' ') &&
+                (ch != '=') &&
+                (ch != '/') &&
+                (ch != '\t') &&
                 (ch != '\r') &&
                 (ch != '\n')
             )
@@ -1086,9 +1086,9 @@ namespace dlib
             std::string attribute_value;
 
             // fill out attribute_name
-            while ( (ch != '=') && 
-                    (ch != ' ') && 
-                    (ch != '\t') && 
+            while ( (ch != '=') &&
+                    (ch != ' ') &&
+                    (ch != '\t') &&
                     (ch != '\r') &&
                     (ch != '\n') &&
                     (ch != '>')
@@ -1097,7 +1097,7 @@ namespace dlib
                 attribute_name += ch;
                 ch = token[i];
                 ++i;
-            }    
+            }
 
             // you can't have empty attribute names
             if (attribute_name.size() == 0)
@@ -1119,8 +1119,8 @@ namespace dlib
                 return -1;
 
             // get the next char
-            ch = token[i];  
-            ++i;  
+            ch = token[i];
+            ++i;
 
             // skip any whitespaces
             while (ch == ' ' || ch == '\t' || ch =='\n' || ch =='\r')
@@ -1133,7 +1133,7 @@ namespace dlib
             // get the delimiter for the attribute value
             std::istream::int_type delimiter = ch; // this should be either a ' or " character
             ch = token[i];  // get the next char
-            ++i;            
+            ++i;
             if (delimiter != '\'' && delimiter!='"')
                 return -1;
 
@@ -1146,14 +1146,14 @@ namespace dlib
                 attribute_value += ch;
                 ch = token[i];
                 ++i;
-            }  
+            }
 
 
             // if there was no delimiter then this is an error
             if (ch == '>')
             {
                 return -1;
-            }          
+            }
 
             // go to the next char
             ch = token[i];
@@ -1273,7 +1273,7 @@ namespace dlib
         buf[1] = in.get();
 
         // if this is an undefined entity reference then return error
-        if (buf[1] != 'a' && 
+        if (buf[1] != 'a' &&
             buf[1] != 'l' &&
             buf[1] != 'g' &&
             buf[1] != 'q'
@@ -1283,7 +1283,7 @@ namespace dlib
 
         buf[2] = in.get();
         // if this is an undefined entity reference then return error
-        if (buf[2] != 'm' && 
+        if (buf[2] != 'm' &&
             buf[2] != 't' &&
             buf[2] != 'p' &&
             buf[2] != 'u'
@@ -1293,7 +1293,7 @@ namespace dlib
 
         buf[3] = in.get();
         // if this is an undefined entity reference then return error
-        if (buf[3] != 'p' && 
+        if (buf[3] != 'p' &&
             buf[3] != ';' &&
             buf[3] != 'o'
             )
@@ -1323,7 +1323,7 @@ namespace dlib
         {
             // if this is not &amp; then return error
             if (buf[1] != 'a' ||
-                buf[2] != 'm' || 
+                buf[2] != 'm' ||
                 buf[3] != 'p'
                 )
                 return -1;
@@ -1385,7 +1385,7 @@ namespace dlib
             ) :filename(filename_) {}
 
             virtual void error (
-                const unsigned long 
+                const unsigned long
             )
             {
                 // just ignore non-fatal errors

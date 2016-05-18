@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_SCOPED_PTr_
-#define DLIB_SCOPED_PTr_ 
+#define DLIB_SCOPED_PTr_
 
 #include <algorithm>
 #include "../noncopyable.h"
@@ -36,8 +36,8 @@ namespace dlib
     template <
         typename T,
         typename deleter = default_deleter<T>
-        > 
-    class scoped_ptr : noncopyable 
+        >
+    class scoped_ptr : noncopyable
     {
         /*!
             CONVENTION
@@ -52,23 +52,23 @@ namespace dlib
             T* p = 0
         ) : ptr(p) { }
 
-        ~scoped_ptr() 
-        { 
-            if (ptr) 
+        ~scoped_ptr()
+        {
+            if (ptr)
             {
                 deleter del;
-                del(ptr); 
+                del(ptr);
             }
         }
 
         void reset (
             T* p = 0
-        ) 
-        { 
-            if (ptr) 
+        )
+        {
+            if (ptr)
             {
                 deleter del;
-                del(ptr); 
+                del(ptr);
             }
 
             ptr = p;
@@ -122,9 +122,9 @@ namespace dlib
 
     template <
         typename T,
-        typename deleter 
-        > 
-    class scoped_ptr<T[],deleter> : noncopyable 
+        typename deleter
+        >
+    class scoped_ptr<T[],deleter> : noncopyable
     {
         /*!
             CONVENTION
@@ -138,23 +138,23 @@ namespace dlib
             T* p = 0
         ) : ptr(p) { }
 
-        ~scoped_ptr() 
-        { 
-            if (ptr) 
+        ~scoped_ptr()
+        {
+            if (ptr)
             {
                 deleter del;
-                del(ptr); 
+                del(ptr);
             }
         }
 
         void reset (
             T* p = 0
-        ) 
-        { 
-            if (ptr) 
+        )
+        {
+            if (ptr)
             {
                 deleter del;
-                del(ptr); 
+                del(ptr);
             }
             ptr = p;
         }
@@ -199,9 +199,9 @@ namespace dlib
     template <
         typename T,
         typename deleter
-        > 
+        >
     void swap(
-        scoped_ptr<T,deleter>& a, 
+        scoped_ptr<T,deleter>& a,
         scoped_ptr<T,deleter>& b
     )
     {

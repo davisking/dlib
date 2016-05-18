@@ -15,7 +15,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -41,7 +41,7 @@ namespace
         {
             for (long col = 0; col < m.nc(); ++col)
             {
-                m(row,col) = static_cast<type>(rnd.get_random_double()); 
+                m(row,col) = static_cast<type>(rnd.get_random_double());
             }
         }
 
@@ -56,7 +56,7 @@ namespace
         {
             for (long col = 0; col < m.nc(); ++col)
             {
-                m(row,col) = static_cast<type>(rnd.get_random_double()); 
+                m(row,col) = static_cast<type>(rnd.get_random_double());
             }
         }
 
@@ -84,7 +84,7 @@ namespace
         type temp;
         DLIB_TEST_MSG( (temp= max(abs(test.get_q()*test.get_r() - m))) < eps,temp);
 
-        // none of the matrices we should be passing in to test_qr() should be non-full rank.  
+        // none of the matrices we should be passing in to test_qr() should be non-full rank.
         DLIB_TEST(test.is_full_rank() == true);
 
         if (m.nr() == m.nc())
@@ -103,7 +103,7 @@ namespace
         }
         else
         {
-            DLIB_TEST_MSG(dlib::equal(pinv(m), test.solve(identity_matrix<type>(m.nr())), eps), 
+            DLIB_TEST_MSG(dlib::equal(pinv(m), test.solve(identity_matrix<type>(m.nr())), eps),
                         max(abs(pinv(m) - test.solve(identity_matrix<type>(m.nr())))) );
         }
 

@@ -159,7 +159,7 @@ namespace  {
                 int i;
                 for (i = 0; i < min_bytes_sent; ++i)
                 {
-                    con->write(&magic_num,1); 
+                    con->write(&magic_num,1);
                 }
 
                 dlog << LTRACE << "shutting down connection to server";
@@ -187,12 +187,12 @@ namespace  {
     )
     /*!
         requires
-            - sockets is an implementation of sockets/sockets_kernel_abstract.h 
+            - sockets is an implementation of sockets/sockets_kernel_abstract.h
               is instantiated with int
         ensures
             - runs tests on sockets for compliance with the specs
     !*/
-    {        
+    {
 
         dlog << LTRACE << "starting test";
         serv srv;
@@ -218,8 +218,8 @@ namespace  {
         srv.clear();
 
         dlog << LTRACE << "ending successful test";
-        DLIB_TEST( !srv.error_occurred); 
-        DLIB_TEST( srv.got_connections); 
+        DLIB_TEST( !srv.error_occurred);
+        DLIB_TEST( srv.got_connections);
     }
 
 // ----------------------------------------------------------------------------------------

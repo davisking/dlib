@@ -17,27 +17,27 @@ namespace dlib
     class poly_image : noncopyable
     {
         /*!
-            REQUIREMENTS ON TEMPLATE PARAMETERS 
+            REQUIREMENTS ON TEMPLATE PARAMETERS
                 - Downsample >= 1
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for extracting local feature descriptors from an image.
-                In particular, it fits polynomials to local pixel patches and allows you to 
-                query the coefficients of these polynomials.  Additionally, the coefficients 
-                may be intensity normalized by dividing them by the constant term of the fitted 
-                polynomial and then the constant term is discarded. 
+                In particular, it fits polynomials to local pixel patches and allows you to
+                query the coefficients of these polynomials.  Additionally, the coefficients
+                may be intensity normalized by dividing them by the constant term of the fitted
+                polynomial and then the constant term is discarded.
 
                 Finally, the user can specify a downsampling rate.  If the template argument
                 Downsample is set to 1 then feature extraction is performed at every pixel of
                 an input image (except for a small area around the image border).  However,
                 if Downsample is set to 2 then feature extraction is only performed at every
                 other pixel location.  More generally, if Downsample is set to N then feature
-                extraction is performed only every N pixels.  
+                extraction is performed only every N pixels.
                 
             THREAD SAFETY
                 Concurrent access to an instance of this object is not safe and should be protected
-                by a mutex lock except for the case where you are copying the configuration 
-                (via copy_configuration()) of a poly_image object to many other threads.  
+                by a mutex lock except for the case where you are copying the configuration
+                (via copy_configuration()) of a poly_image object to many other threads.
                 In this case, it is safe to copy the configuration of a shared object so long
                 as no other operations are performed on it.
         !*/
@@ -48,14 +48,14 @@ namespace dlib
         const static long downsample = Downsample;
 
         poly_image (
-        ); 
+        );
         /*!
             ensures
                 - #get_order() == 3
                 - #get_window_size() == 13
                 - #size() == 0
                 - #uses_normalization() == true
-                - #is_rotationally_invariant() == false 
+                - #is_rotationally_invariant() == false
         !*/
 
         poly_image(
@@ -100,7 +100,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the order of the polynomial that will be fitted to 
+                - returns the order of the polynomial that will be fitted to
                   each local pixel patch during feature extraction.
         !*/
 
@@ -113,11 +113,11 @@ namespace dlib
         !*/
 
         bool uses_normalization (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns true if the polynomial coefficients are intensity normalized
-                  and false otherwise. 
+                  and false otherwise.
         !*/
 
         void set_uses_normalization (
@@ -150,9 +150,9 @@ namespace dlib
         );
         /*!
             ensures
-                - copies all the state information of item into *this, except for state 
-                  information populated by load().  More precisely, given two poly_image 
-                  objects H1 and H2, the following sequence of instructions should always 
+                - copies all the state information of item into *this, except for state
+                  information populated by load().  More precisely, given two poly_image
+                  objects H1 and H2, the following sequence of instructions should always
                   result in both of them having the exact same state.
                     H2.copy_configuration(H1);
                     H1.load(img);
@@ -168,12 +168,12 @@ namespace dlib
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
-                  dlib/image_processing/generic_image.h 
+                  dlib/image_processing/generic_image.h
                 - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
             ensures
                 - Performs the feature extraction described in the WHAT THIS OBJECT REPRESENTS
-                  section above.  This means after load() finishes you can call (*this)(row,col) 
-                  to obtain the polynomial coefficients for an order get_order() polynomial which 
+                  section above.  This means after load() finishes you can call (*this)(row,col)
+                  to obtain the polynomial coefficients for an order get_order() polynomial which
                   was fitted to the image patch get_block_rect(row,col).
                 - #size() > 0
         !*/
@@ -184,21 +184,21 @@ namespace dlib
             ensures
                 - #nr() == 0
                 - #nc() == 0
-                - clears only the state information which is populated by load().  For 
-                  example, let H be a poly_image object.  Then consider the two sequences 
+                - clears only the state information which is populated by load().  For
+                  example, let H be a poly_image object.  Then consider the two sequences
                   of instructions:
                     Sequence 1:
-                        H.load(img);      
+                        H.load(img);
                         H.unload();
                         H.load(img);
 
                     Sequence 2:
                         H.load(img);
-                  Both sequence 1 and sequence 2 should have the same effect on H.  
+                  Both sequence 1 and sequence 2 should have the same effect on H.
         !*/
 
         inline unsigned long size (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns nr()*nc()
@@ -223,8 +223,8 @@ namespace dlib
         /*!
             ensures
                 - returns the number of dimensions in the feature vectors generated by
-                  this object.  
-                - In this case, this will be the number of coefficients in an order 
+                  this object.
+                - In this case, this will be the number of coefficients in an order
                   get_order() polynomial, except for the constant term of the polynomial
                   if uses_normalization() == true.
         !*/
@@ -238,7 +238,7 @@ namespace dlib
                 - 0 <= row < nr()
                 - 0 <= col < nc()
             ensures
-                - returns the descriptor for the polynomial filtering block at the given row and column.  
+                - returns the descriptor for the polynomial filtering block at the given row and column.
                   This vector will contain the polynomial coefficients for a polynomial fitted to the
                   image patch located at get_block_rect(row,col) in the original image given to load().
                 - The returned descriptor vector will have get_num_dimensions() elements.
@@ -251,7 +251,7 @@ namespace dlib
         /*!
             ensures
                 - returns a rectangle that tells you what part of the original image is associated
-                  with a particular polynomial filter block.  That is, what part of the input image 
+                  with a particular polynomial filter block.  That is, what part of the input image
                   is associated with (*this)(row,col).
                 - The returned rectangle will be get_window_size() pixels wide and tall.
         !*/
@@ -263,10 +263,10 @@ namespace dlib
             ensures
                 - Each local feature is extracted from a certain point in the input image.
                   This function returns the identity of the local feature corresponding
-                  to the image location p.  Or in other words, let P == image_to_feat_space(p), 
-                  then (*this)(P.y(),P.x()) == the local feature closest to, or centered at, 
-                  the point p in the input image.  Note that some image points might not have 
-                  corresponding feature locations.  E.g. border points or points outside the 
+                  to the image location p.  Or in other words, let P == image_to_feat_space(p),
+                  then (*this)(P.y(),P.x()) == the local feature closest to, or centered at,
+                  the point p in the input image.  Note that some image points might not have
+                  corresponding feature locations.  E.g. border points or points outside the
                   image.  In these cases the returned point will be outside get_rect(*this).
         !*/
 
@@ -286,9 +286,9 @@ namespace dlib
             ensures
                 - returns the location in the input image space corresponding to the center
                   of the local feature at point p.  In other words, this function computes
-                  the inverse of image_to_feat_space().  Note that it may only do so approximately, 
-                  since more than one image location might correspond to the same local feature.  
-                  That is, image_to_feat_space() might not be invertible so this function gives 
+                  the inverse of image_to_feat_space().  Note that it may only do so approximately,
+                  since more than one image location might correspond to the same local feature.
+                  That is, image_to_feat_space() might not be invertible so this function gives
                   the closest possible result.
         !*/
 
@@ -312,7 +312,7 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     template <
@@ -320,10 +320,10 @@ namespace dlib
         >
     void deserialize (
         poly_image<downsample>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

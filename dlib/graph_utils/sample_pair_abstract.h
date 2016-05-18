@@ -11,15 +11,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class sample_pair 
+    class sample_pair
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object is intended to represent an edge in an undirected graph 
+                This object is intended to represent an edge in an undirected graph
                 which has data samples at its vertices.  So it contains two integers
-                (index1 and index2) which represent the identifying indices of 
+                (index1 and index2) which represent the identifying indices of
                 the samples at the ends of an edge.  Note that this object enforces
-                the constraint that index1 <= index2.  This has the effect of 
+                the constraint that index1 <= index2.  This has the effect of
                 making the edges undirected since a sample_pair is incapable
                 of representing a single edge in more than one way.  That is,
                 sample_pair(i,j) == sample_pair(j,i) for any value of i and j.
@@ -34,7 +34,7 @@ namespace dlib
             ensures
                 - #index1() == 0
                 - #index2() == 0
-                - #distance() == 1 
+                - #distance() == 1
         !*/
 
         sample_pair (
@@ -45,7 +45,7 @@ namespace dlib
             ensures
                 - #index1() == min(idx1,idx2)
                 - #index2() == max(idx1,idx2)
-                - #distance() == 1 
+                - #distance() == 1
         !*/
 
         sample_pair (
@@ -61,17 +61,17 @@ namespace dlib
         !*/
 
         const unsigned long& index1 (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the first index value stored in this object 
+                - returns the first index value stored in this object
         !*/
 
         const unsigned long& index2 (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the second index value stored in this object 
+                - returns the second index value stored in this object
         !*/
 
         const double& distance (
@@ -94,7 +94,7 @@ namespace dlib
         requires
             - T is a type with an interface compatible with sample_pair.
         ensures
-            - provides a total ordering of sample_pair objects that will cause pairs that are 
+            - provides a total ordering of sample_pair objects that will cause pairs that are
               equal to be adjacent when sorted.  So for example, this function can be used
               with std::sort() to first sort a sequence of sample_pair objects and then
               find duplicate edges.
@@ -109,7 +109,7 @@ namespace dlib
         requires
             - T is a type with an interface compatible with sample_pair.
         ensures
-            - provides a total ordering of sample_pair objects that causes pairs with 
+            - provides a total ordering of sample_pair objects that causes pairs with
               smallest distance to be the first in a sorted list.  This function can be
               used with std::sort().
     !*/
@@ -123,7 +123,7 @@ namespace dlib
         requires
             - T is a type with an interface compatible with sample_pair.
         ensures
-            - provides a total ordering of sample_pair objects that causes pairs with 
+            - provides a total ordering of sample_pair objects that causes pairs with
               largest distance to be the first in a sorted list.  This function can be
               used with std::sort().
     !*/
@@ -152,7 +152,7 @@ namespace dlib
     /*!
         ensures
             - returns a.index1() == b.index1() && a.index2() == b.index2();
-              I.e. returns true if a and b both represent the same pair and false otherwise.  
+              I.e. returns true if a and b both represent the same pair and false otherwise.
               Note that the distance field is not involved in this comparison.
     !*/
 
@@ -172,15 +172,15 @@ namespace dlib
         std::ostream& out
     );
     /*!
-        provides serialization support 
+        provides serialization support
     !*/
 
     inline void deserialize (
         sample_pair& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
-        provides deserialization support 
+        provides deserialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

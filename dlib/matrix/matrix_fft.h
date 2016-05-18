@@ -67,7 +67,7 @@ namespace dlib
         template <typename T>
         void R2TX(int nthpo, std::complex<T> *c0, std::complex<T> *c1)
         {
-            for(int k=0; k<nthpo; k+=2) 
+            for(int k=0; k<nthpo; k+=2)
             {
                 std::complex<T> temp = c0[k] + c1[k];
                 c1[k] = c0[k] - c1[k];
@@ -82,7 +82,7 @@ namespace dlib
         void R4TX(int nthpo, std::complex<T> *c0, std::complex<T> *c1,
             std::complex<T> *c2, std::complex<T> *c3)
         {
-            for(int k=0;k<nthpo;k+=4) 
+            for(int k=0;k<nthpo;k+=4)
             {
                 std::complex<T> t1, t2, t3, t4;
                 t1 = c0[k] + c2[k];
@@ -114,8 +114,8 @@ namespace dlib
             }
             
             const std::complex<T>* get_twiddles (
-                int p 
-            ) 
+                int p
+            )
             /*!
                 requires
                     - 0 <= p <= 64
@@ -163,9 +163,9 @@ namespace dlib
         {
             const T irt2 = 0.707106781186548;  /* 1.0/sqrt(2.0) */
 
-            for(int j=0; j<nxtlt; j++) 
+            for(int j=0; j<nxtlt; j++)
             {
-                for(int k=j;k<nthpo;k+=length) 
+                for(int k=j;k<nthpo;k+=length)
                 {
                     std::complex<T> a0, a1, a2, a3, a4, a5, a6, a7;
                     std::complex<T> b0, b1, b2, b3, b4, b5, b6, b7;
@@ -200,7 +200,7 @@ namespace dlib
                     cc5[k] = b4 - tmp1;
                     cc6[k] = b6 + tmp2;
                     cc7[k] = b6 - tmp2;
-                    if(j>0) 
+                    if(j>0)
                     {
                         cc1[k] *= cs[3];
                         cc2[k] *= cs[1];
@@ -252,7 +252,7 @@ namespace dlib
             if(n8pow)
             {
                 /* Radix 8 iterations */
-                for(ipass=1;ipass<=n8pow;ipass++) 
+                for(ipass=1;ipass<=n8pow;ipass++)
                 {
                     const int p = n2pow - 3*ipass;
                     nxtlt = 0x1 << p;
@@ -263,19 +263,19 @@ namespace dlib
                 }
             }
 
-            if(n2pow%3 == 1) 
+            if(n2pow%3 == 1)
             {
                 /* A final radix 2 iteration is needed */
-                R2TX(nthpo, b, b+1); 
+                R2TX(nthpo, b, b+1);
             }
 
-            if(n2pow%3 == 2)  
+            if(n2pow%3 == 2)
             {
                 /* A final radix 4 iteration is needed */
-                R4TX(nthpo, b, b+1, b+2, b+3); 
+                R4TX(nthpo, b, b+1, b+2, b+3);
             }
 
-            for(j=1;j<=15;j++) 
+            for(j=1;j<=15;j++)
             {
                 L[j] = 1;
                 if(j-n2pow <= 0) L[j] = 0x1 << (n2pow + 1 - j);
@@ -300,7 +300,7 @@ namespace dlib
                                                         for(j12=j11;j12<L12;j12+=L11)
                                                             for(j13=j12;j13<L13;j13+=L12)
                                                                 for(j14=j13;j14<L14;j14+=L13)
-                                                                    for(ji=j14;ji<L15;ji+=L14) 
+                                                                    for(ji=j14;ji<L15;ji+=L14)
                                                                     {
                                                                         if(ij<ji)
                                                                             swap(b[ij], b[ji]);
@@ -309,7 +309,7 @@ namespace dlib
 
 
             // unscramble outputs
-            if(!do_backward_fft) 
+            if(!do_backward_fft)
             {
                 for(long i=1, j=data.size()-1; i<data.size()/2; i++,j--)
                 {
@@ -333,7 +333,7 @@ namespace dlib
             twiddles<double> cs;
 
             // Compute transform row by row
-            for(long r=0; r<data.nr(); ++r) 
+            for(long r=0; r<data.nr(); ++r)
             {
                 buff = matrix_cast<std::complex<double> >(rowm(data,r));
                 fft1d_inplace(buff, do_backward_fft, cs);
@@ -341,7 +341,7 @@ namespace dlib
             }
 
             // Compute transform column by column
-            for(long c=0; c<data.nc(); ++c) 
+            for(long c=0; c<data.nc(); ++c)
             {
                 buff = matrix_cast<std::complex<double> >(colm(data,c));
                 fft1d_inplace(buff, do_backward_fft, cs);
@@ -352,11 +352,11 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
         template <
-            typename EXP, 
+            typename EXP,
             typename T
             >
         void fft2d(
-            const matrix_exp<EXP>& data, 
+            const matrix_exp<EXP>& data,
             matrix<std::complex<T> >& data_out,
             bool do_backward_fft
         )
@@ -379,7 +379,7 @@ namespace dlib
             twiddles<double> cs;
 
             // Compute transform row by row
-            for(long r=0; r<data.nr(); ++r) 
+            for(long r=0; r<data.nr(); ++r)
             {
                 buff = matrix_cast<std::complex<double> >(rowm(data,r));
                 fft1d_inplace(buff, do_backward_fft, cs);
@@ -387,7 +387,7 @@ namespace dlib
             }
 
             // Compute transform column by column
-            for(long c=0; c<data_out.nc(); ++c) 
+            for(long c=0; c<data_out.nc(); ++c)
             {
                 buff = matrix_cast<std::complex<double> >(colm(data_out,c));
                 fft1d_inplace(buff, do_backward_fft, cs);
@@ -555,7 +555,7 @@ namespace dlib
             p = fftw_plan_dft_1d(data.size(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
         else
             p = fftw_plan_dft_2d(data.nr(), data.nc(), in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-        fftw_execute(p); 
+        fftw_execute(p);
         fftw_destroy_plan(p);
         return m2;
     }
@@ -587,7 +587,7 @@ namespace dlib
             p = fftw_plan_dft_1d(data.size(), in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
         else
             p = fftw_plan_dft_2d(data.nr(), data.nc(), in, out, FFTW_BACKWARD, FFTW_ESTIMATE);
-        fftw_execute(p); 
+        fftw_execute(p);
         fftw_destroy_plan(p);
         return m2;
     }

@@ -85,7 +85,7 @@ namespace dlib
 
         template <typename T>
         T& cast_to(
-        ) 
+        )
         {
             typedef typename basic_type<T>::type U;
             derived<U>* d = dynamic_cast<derived<U>*>(data.get());
@@ -113,7 +113,7 @@ namespace dlib
 
         template <typename T>
         T& get(
-        ) 
+        )
         {
             typedef typename basic_type<T>::type U;
             derived<U>* d = dynamic_cast<derived<U>*>(data.get());
@@ -172,7 +172,7 @@ namespace dlib
 
             virtual result_type evaluate (
                 const sample_type& samp
-            ) const 
+            ) const
             {
                 return item(samp);
             }
@@ -194,10 +194,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename U, typename V> 
+    template <typename T, typename U, typename V>
     T& any_cast(any_decision_function<U,V>& a) { return a.template cast_to<T>(); }
 
-    template <typename T, typename U, typename V> 
+    template <typename T, typename U, typename V>
     const T& any_cast(const any_decision_function<U,V>& a) { return a.template cast_to<T>(); }
 
 // ----------------------------------------------------------------------------------------

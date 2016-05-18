@@ -10,7 +10,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // button style stuff 
+    // button style stuff
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ namespace dlib
 
             mfont.draw_string(c,name_rect,name,rgb_pixel(red,green,blue));
 
-            draw_button_down(c,rect); 
+            draw_button_down(c,rect);
         }
         else
         {
@@ -87,11 +87,11 @@ namespace dlib
     rectangle button_style_default::
     get_min_size (
         const ustring& name,
-        const font& mfont 
-    ) const 
+        const font& mfont
+    ) const
     {
 
-        unsigned long width; 
+        unsigned long width;
         unsigned long height;
         mfont.compute_size(name,width,height);
         name_width = width;
@@ -129,7 +129,7 @@ namespace dlib
 
             long d = 0;
             if (rect.contains(lastx,lasty))
-                d = -70; 
+                d = -70;
 
             if (is_depressed)
                 d = 20;
@@ -138,12 +138,12 @@ namespace dlib
             {
                 rectangle temp(rect);
                 temp.left()--; temp.top()--; temp.right()++; temp.bottom()++;
-                draw_rounded_rectangle(c, temp, radius, rgb_alpha_pixel(255,255,0,120)); 
+                draw_rounded_rectangle(c, temp, radius, rgb_alpha_pixel(255,255,0,120));
                 temp.left()--; temp.top()--; temp.right()++; temp.bottom()++;
-                draw_rounded_rectangle(c, temp, radius, rgb_alpha_pixel(255,255,0,40)); 
+                draw_rounded_rectangle(c, temp, radius, rgb_alpha_pixel(255,255,0,40));
             }
 
-            fill_gradient_rounded(c,rect,radius,rgb_alpha_pixel(255, 255, 255,120-d), 
+            fill_gradient_rounded(c,rect,radius,rgb_alpha_pixel(255, 255, 255,120-d),
                                   rgb_alpha_pixel(255, 255, 255,0));
             draw_rounded_rectangle(c,rect,radius, rgb_alpha_pixel(30,30,30,200));
         }
@@ -194,11 +194,11 @@ namespace dlib
     rectangle button_style_toolbar1::
     get_min_size (
         const ustring& name,
-        const font& mfont 
-    ) const 
+        const font& mfont
+    ) const
     {
 
-        unsigned long width; 
+        unsigned long width;
         unsigned long height;
         mfont.compute_size(name,width,height);
         name_width = width;
@@ -233,13 +233,13 @@ namespace dlib
             {
                 if (is_depressed)
                 {
-                    fill_gradient_rounded(c,rect,radius,rgb_alpha_pixel(100,100,200,150), 
+                    fill_gradient_rounded(c,rect,radius,rgb_alpha_pixel(100,100,200,150),
                                                         rgb_alpha_pixel(50,50,100,100));
                     draw_rounded_rectangle(c,rect,radius, rgb_alpha_pixel(150,150,30,200));
                 }
                 else
                 {
-                    fill_gradient_rounded(c,rect,radius,rgb_alpha_pixel(150,150,250,130), 
+                    fill_gradient_rounded(c,rect,radius,rgb_alpha_pixel(150,150,250,130),
                                                         rgb_alpha_pixel(100,100,150,90));
                     draw_rounded_rectangle(c,rect,radius, rgb_alpha_pixel(150,150,30,200));
                 }
@@ -275,8 +275,8 @@ namespace dlib
     rectangle button_style_toolbar_icon1::
     get_min_size (
         const ustring& ,
-        const font&  
-    ) const 
+        const font&
+    ) const
     {
         return rectangle(img_normal.nc()+2*padding, img_normal.nr()+2*padding);
     }
@@ -306,7 +306,7 @@ namespace dlib
         const long height = rect.height();
         const long width = rect.width();
 
-        const long smallest = (width < height) ? width : height; 
+        const long smallest = (width < height) ? width : height;
 
         const long rows = (smallest+3)/4;
         const long start = rows + rows/2-1;
@@ -316,7 +316,7 @@ namespace dlib
         long tip_y = 0;
         long wy = 0;
         long hy = 0;
-        long wx = 0; 
+        long wx = 0;
         long hx = 0;
 
         if (is_depressed)
@@ -324,7 +324,7 @@ namespace dlib
             dep = 0;
 
             // draw the button's border
-            draw_button_down(c,rect); 
+            draw_button_down(c,rect);
         }
         else
         {
@@ -393,8 +393,8 @@ namespace dlib
 
         for (long i = 0; i < rows; ++i)
         {
-            draw_line(c,point(tip_x + wx*i + hx*i, tip_y + wy*i + hy*i), 
-                      point(tip_x + wx*i*-1 + hx*i, tip_y + wy*i*-1 + hy*i), 
+            draw_line(c,point(tip_x + wx*i + hx*i, tip_y + wy*i + hy*i),
+                      point(tip_x + wx*i*-1 + hx*i, tip_y + wy*i*-1 + hy*i),
                       color);
         }
 
@@ -402,7 +402,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // toggle button style stuff 
+    // toggle button style stuff
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -480,11 +480,11 @@ namespace dlib
     rectangle toggle_button_style_default::
     get_min_size (
         const ustring& name,
-        const font& mfont 
-    ) const 
+        const font& mfont
+    ) const
     {
 
-        unsigned long width; 
+        unsigned long width;
         unsigned long height;
         mfont.compute_size(name,width,height);
         name_width = width;
@@ -571,8 +571,8 @@ namespace dlib
     rectangle toggle_button_style_check_box::
     get_min_size (
         const ustring& name,
-        const font& mfont 
-    ) const 
+        const font& mfont
+    ) const
     {
         unsigned long width;
         unsigned long height;
@@ -690,8 +690,8 @@ namespace dlib
     rectangle toggle_button_style_radio_button::
     get_min_size (
         const ustring& name,
-        const font& mfont 
-    ) const 
+        const font& mfont
+    ) const
     {
         unsigned long width;
         unsigned long height;
@@ -705,7 +705,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // scroll bar style stuff 
+    // scroll bar style stuff
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -745,7 +745,7 @@ namespace dlib
     long scroll_bar_style_default::
     get_button_length (
         long total_length,
-        long 
+        long
     ) const
     {
         // if the length is too small then we have to smash up the arrow buttons
@@ -787,7 +787,7 @@ namespace dlib
         const bool ,
         const long ,
         const long ,
-        const bool 
+        const bool
     ) const
     {
         fill_rect(c, rect, rgb_pixel(212,208,200));
@@ -796,15 +796,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // text_field styles  
+    // text_field styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     unsigned long text_field_style_default::
     get_padding (
-        const font& mfont 
-    ) const  
-    { 
+        const font& mfont
+    ) const
+    {
         return mfont.height()-mfont.ascender();
     }
 
@@ -826,7 +826,7 @@ namespace dlib
         const bool cursor_visible,
         const long highlight_start,
         const long highlight_end
-    ) const 
+    ) const
     {
         rectangle area = rect.intersect(c);
 
@@ -837,7 +837,7 @@ namespace dlib
         }
         else
         {
-            // first fill our area with gray 
+            // first fill our area with gray
             fill_rect(c, area,rgb_pixel(212,208,200));
         }
 
@@ -876,7 +876,7 @@ namespace dlib
                     canvas::pixel& pixel = c[row-c.top()][col-c.left()];
                     if (pixel.red == 255 && pixel.green == 255 && pixel.blue == 255)
                     {
-                        // this is a background (and white) pixel so set it to a dark 
+                        // this is a background (and white) pixel so set it to a dark
                         // blueish color.
                         pixel.red = 10;
                         pixel.green = 36;
@@ -905,7 +905,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-    // text_box styles  
+    // text_box styles
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -924,7 +924,7 @@ namespace dlib
         const bool cursor_visible,
         const long highlight_start,
         const long highlight_end
-    ) const 
+    ) const
     {
         rectangle area = display_rect.intersect(c);
 
@@ -935,7 +935,7 @@ namespace dlib
         }
         else
         {
-            // first fill our area with gray 
+            // first fill our area with gray
             fill_rect(c, area,rgb_pixel(212,208,200));
         }
 

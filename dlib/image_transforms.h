@@ -6,7 +6,7 @@
 #endif
 
 #ifndef DLIB_IMAGE_TRANSFORMs_
-#define DLIB_IMAGE_TRANSFORMs_ 
+#define DLIB_IMAGE_TRANSFORMs_
 
 #include "image_transforms/assign_image.h"
 #include "image_transforms/equalize_histogram.h"

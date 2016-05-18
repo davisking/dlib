@@ -6,7 +6,7 @@ using namespace std;
 
 
 /*!
-    This file defines a function callable from MATLAB once you mex it. 
+    This file defines a function callable from MATLAB once you mex it.
 
     It computes the same thing as the following MATLAB function:
 
@@ -34,24 +34,24 @@ using namespace std;
                   MATLAB's matrices.
 
             - RGB color images
-                - dlib::array2d<dlib::rgb_pixel> can be used to represent 
+                - dlib::array2d<dlib::rgb_pixel> can be used to represent
                   MATLAB uint8 MxNx3 images.
 
             - Types corresponding to a MATLAB scalar
                 - any kind of scalar value, e.g. double, int, etc.
 
-            - Types corresponding to a MATLAB string 
-                - std::string 
+            - Types corresponding to a MATLAB string
+                - std::string
         
             - Types corresponding to a MATLAB cell array
-                - a std::vector or dlib::array containing any of the above 
+                - a std::vector or dlib::array containing any of the above
                   types of objects or std::vector or dlib::array objects.
 !*/
 
 
 // You can also define default values for your input arguments.  So
-// here we say that if the user in MATLAB doesn't provide the "some_number" 
-// then it will get a value of 3.141.  
+// here we say that if the user in MATLAB doesn't provide the "some_number"
+// then it will get a value of 3.141.
 #define ARG_5_DEFAULT 3.141
 
 // Make a function named mex_function() and put your code inside it.
@@ -63,8 +63,8 @@ void mex_function (
     const matrix_colmajor& y,
     matrix_colmajor& out1,
     double& out2,
-    double some_number 
-) 
+    double some_number
+)
 {
     out1 = x + y;
     out2 = sum(x+y);

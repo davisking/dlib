@@ -14,23 +14,23 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dsyevr) (char *jobz, char *range, char *uplo, integer *n, 
-                                              double *a, integer *lda, double *vl, double *vu, integer * il, 
-                                              integer *iu, double *abstol, integer *m, double *w, 
-                                              double *z_, integer *ldz, integer *isuppz, double *work, 
+                void DLIB_FORTRAN_ID(dsyevr) (char *jobz, char *range, char *uplo, integer *n,
+                                              double *a, integer *lda, double *vl, double *vu, integer * il,
+                                              integer *iu, double *abstol, integer *m, double *w,
+                                              double *z_, integer *ldz, integer *isuppz, double *work,
                                               integer *lwork, integer *iwork, integer *liwork, integer *info);
 
-                void DLIB_FORTRAN_ID(ssyevr) (char *jobz, char *range, char *uplo, integer *n, 
-                                              float *a, integer *lda, float *vl, float *vu, integer * il, 
-                                              integer *iu, float *abstol, integer *m, float *w, 
-                                              float *z_, integer *ldz, integer *isuppz, float *work, 
+                void DLIB_FORTRAN_ID(ssyevr) (char *jobz, char *range, char *uplo, integer *n,
+                                              float *a, integer *lda, float *vl, float *vu, integer * il,
+                                              integer *iu, float *abstol, integer *m, float *w,
+                                              float *z_, integer *ldz, integer *isuppz, float *work,
                                               integer *lwork, integer *iwork, integer *liwork, integer *info);
             }
 
-            inline int syevr (char jobz, char range, char uplo, integer n, 
-                              double* a, integer lda, double vl, double vu, integer il, 
-                              integer iu, double abstol, integer *m, double *w, 
-                              double *z, integer ldz, integer *isuppz, double *work, 
+            inline int syevr (char jobz, char range, char uplo, integer n,
+                              double* a, integer lda, double vl, double vu, integer il,
+                              integer iu, double abstol, integer *m, double *w,
+                              double *z, integer ldz, integer *isuppz, double *work,
                               integer lwork, integer *iwork, integer liwork)
             {
                 integer info = 0;
@@ -42,10 +42,10 @@ namespace dlib
                 return info;
             }
 
-            inline int syevr (char jobz, char range, char uplo, integer n, 
-                              float* a, integer lda, float vl, float vu, integer il, 
-                              integer iu, float abstol, integer *m, float *w, 
-                              float *z, integer ldz, integer *isuppz, float *work, 
+            inline int syevr (char jobz, char range, char uplo, integer n,
+                              float* a, integer lda, float vl, float vu, integer il,
+                              integer iu, float abstol, integer *m, float *w,
+                              float *z, integer ldz, integer *isuppz, float *work,
                               integer lwork, integer *iwork, integer liwork)
             {
                 integer info = 0;
@@ -292,7 +292,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2, long NR3, long NR4,
             long NC1, long NC2, long NC3, long NC4,
             typename MM
@@ -347,7 +347,7 @@ namespace dlib
             if (iwork.size() < iwork_size)
                 iwork.set_size(iwork_size, 1);
 
-            // compute the actual decomposition 
+            // compute the actual decomposition
             info = binding::syevr(jobz, range, uplo, n, &a(0,0),
                                   a.nr(), vl, vu, il, iu, abstol, &num_eigenvalues_found,
                                   &w(0,0), &z(0,0), z.nr(), &isuppz(0,0), &work(0,0), work.size(),
@@ -360,7 +360,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         template <
-            typename T, 
+            typename T,
             long NR1, long NR2, long NR3, long NR4,
             long NC1, long NC2, long NC3, long NC4,
             typename MM
@@ -420,7 +420,7 @@ namespace dlib
             if (iwork.size() < iwork_size)
                 iwork.set_size(iwork_size, 1);
 
-            // compute the actual decomposition 
+            // compute the actual decomposition
             info = binding::syevr(jobz, range, uplo, n, &a(0,0),
                                   a.nc(), vl, vu, il, iu, abstol, &num_eigenvalues_found,
                                   &w(0,0), &z(0,0), z.nc(), &isuppz(0,0), &work(0,0), work.size(),

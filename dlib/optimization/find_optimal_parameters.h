@@ -24,7 +24,7 @@ namespace dlib
         const matrix<double,0,1>& x_lower,
         const matrix<double,0,1>& x_upper,
         const funct& f
-    ) 
+    )
     {
         DLIB_CASSERT(x.size() == x_lower.size() && x_lower.size() == x_upper.size() && x.size() > 0,
             "\t double find_optimal_parameters()"
@@ -46,7 +46,7 @@ namespace dlib
                      min(x - x_lower) >= 0 && min(x_upper - x) >= 0,
             "\t double find_optimal_parameters()"
             << "\n\t The bounds constraints have to make sense and also contain the starting point."
-            << "\n\t min(x_upper - x_lower):                         " << min(x_upper - x_lower) 
+            << "\n\t min(x_upper - x_lower):                         " << min(x_upper - x_lower)
             << "\n\t min(x - x_lower) >= 0 && min(x_upper - x) >= 0: " << (min(x - x_lower) >= 0 && min(x_upper - x) >= 0)
         );
 
@@ -65,7 +65,7 @@ namespace dlib
             auto ff = [&](const double& xx)
             {
                 temp = xx;
-                double obj = f(temp);  
+                double obj = f(temp);
                 ++num_iter_used;
                 // keep track of the best x.
                 if (obj < objective_val)
@@ -87,7 +87,7 @@ namespace dlib
         {
             auto ff = [&](const matrix<double,0,1>& xx)
             {
-                double obj = f(xx); 
+                double obj = f(xx);
                 ++num_iter_used;
                 // keep track of the best x.
                 if (obj < objective_val)

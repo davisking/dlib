@@ -11,7 +11,7 @@ namespace dlib
 {
 
     template <
-        typename seq_base 
+        typename seq_base
         >
     class sequence_sort_2 : public seq_base
     {
@@ -34,9 +34,9 @@ namespace dlib
         typename seq_base
         >
     inline void swap (
-        sequence_sort_2<seq_base>& a, 
-        sequence_sort_2<seq_base>& b 
-    ) { a.swap(b); }    
+        sequence_sort_2<seq_base>& a,
+        sequence_sort_2<seq_base>& b
+    ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

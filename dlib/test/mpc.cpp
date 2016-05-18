@@ -9,7 +9,7 @@
 #include <dlib/optimization.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace std;
@@ -22,7 +22,7 @@ namespace
         typename EXP2,
         typename T, long NR, long NC, typename MM, typename L
         >
-    unsigned long solve_qp_box_using_smo ( 
+    unsigned long solve_qp_box_using_smo (
         const matrix_exp<EXP1>& _Q,
         const matrix_exp<EXP2>& _b,
         matrix<T,NR,NC,MM,L>& alpha,
@@ -67,19 +67,19 @@ namespace
                      << "\n\t is_col_vector(alpha): " << is_col_vector(alpha)
                      << "\n\t is_col_vector(lower): " << is_col_vector(lower)
                      << "\n\t is_col_vector(upper): " << is_col_vector(upper)
-                     << "\n\t b.size():             " << b.size() 
-                     << "\n\t alpha.size():         " << alpha.size() 
-                     << "\n\t lower.size():         " << lower.size() 
-                     << "\n\t upper.size():         " << upper.size() 
-                     << "\n\t Q.nr():               " << Q.nr() 
-                     << "\n\t min(alpha-lower):     " << min(alpha-lower) 
-                     << "\n\t max(upper-alpha):     " << max(upper-alpha) 
-                     << "\n\t eps:                  " << eps 
-                     << "\n\t max_iter:             " << max_iter 
+                     << "\n\t b.size():             " << b.size()
+                     << "\n\t alpha.size():         " << alpha.size()
+                     << "\n\t lower.size():         " << lower.size()
+                     << "\n\t upper.size():         " << upper.size()
+                     << "\n\t Q.nr():               " << Q.nr()
+                     << "\n\t min(alpha-lower):     " << min(alpha-lower)
+                     << "\n\t max(upper-alpha):     " << max(upper-alpha)
+                     << "\n\t eps:                  " << eps
+                     << "\n\t max_iter:             " << max_iter
         );
 
 
-        // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.  
+        // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.
         matrix<T,NR,NC,MM,L> df = Q*alpha + b;
         matrix<T,NR,NC,MM,L> QQ = reciprocal_max(diag(Q));
 
@@ -164,7 +164,7 @@ namespace
         template <long N>
         void unpack(
             std::vector<matrix<double,N,1> >& out,
-            const matrix<double,0,1>& item 
+            const matrix<double,0,1>& item
         )
         {
             DLIB_CASSERT(out.size() != 0,"");
@@ -185,7 +185,7 @@ namespace
         const matrix<double,I,1>& R,
         const matrix<double,I,1>& _lower,
         const matrix<double,I,1>& _upper,
-        const std::vector<matrix<double,S,1> >& target, 
+        const std::vector<matrix<double,S,1> >& target,
         const matrix<double,S,1>& initial_state,
         std::vector<matrix<double,I,1> >& controls // input and output
     )

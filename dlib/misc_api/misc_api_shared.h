@@ -29,7 +29,7 @@ namespace dlib
         }
 
         const std::string& old_dir (
-        ) const 
+        ) const
         {
             return _old_dir;
         }

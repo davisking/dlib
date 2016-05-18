@@ -15,14 +15,14 @@ namespace dlib
                 - matrix_type == a dlib::matrix capable of storing column vectors
 
             WHAT THIS OBJECT REPRESENTS
-                This object is the interface used to define the optimization 
+                This object is the interface used to define the optimization
                 problems solved by the oca optimizer defined later in this file.
 
                 OCA solves optimization problems with the following form:
                     Minimize: f(w) == 0.5*length_squared(w) + C*R(w)
 
                     Where R(w) is a user-supplied convex function and C > 0.  Optionally,
-                    there can also be non-negativity constraints on some or all of the 
+                    there can also be non-negativity constraints on some or all of the
                     elements of w.
 
                 Or it can alternatively solve:
@@ -71,7 +71,7 @@ namespace dlib
         ) const = 0;
         /*!
             requires
-                - This function is called by the OCA optimizer each iteration.  
+                - This function is called by the OCA optimizer each iteration.
                 - current_objective_value == the current value of the objective function f(w)
                 - current_error_gap == The bound on how much lower the objective function
                   can drop before we reach the optimal point.  At the optimal solution the
@@ -113,9 +113,9 @@ namespace dlib
             ensures
                 - #current_solution will be set to one of the following:
                     - current_solution (i.e. it won't be modified at all)
-                    - The result of a line search passing through current_solution.  
-                - #risk_value == R(#current_solution) 
-                - #risk_subgradient == an element of the subgradient of R() at the 
+                    - The result of a line search passing through current_solution.
+                - #risk_value == R(#current_solution)
+                - #risk_subgradient == an element of the subgradient of R() at the
                   point #current_solution
                 - Note that #risk_value and #risk_subgradient are NOT multiplied by get_c()
         !*/
@@ -134,7 +134,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for solving the optimization problem defined above
-                by the oca_problem abstract class.  
+                by the oca_problem abstract class.
 
                 For reference, OCA solves optimization problems with the following form:
                     Minimize: f(w) == 0.5*length_squared(w) + C*R(w)
@@ -160,15 +160,15 @@ namespace dlib
                 For a detailed discussion you should consult the following papers
                 from the Journal of Machine Learning Research:
                     Optimized Cutting Plane Algorithm for Large-Scale Risk Minimization
-                        Vojtech Franc, Soren Sonnenburg; 10(Oct):2157--2192, 2009. 
+                        Vojtech Franc, Soren Sonnenburg; 10(Oct):2157--2192, 2009.
 
                     Bundle Methods for Regularized Risk Minimization
-                        Choon Hui Teo, S.V.N. Vishwanthan, Alex J. Smola, Quoc V. Le; 11(Jan):311-365, 2010. 
+                        Choon Hui Teo, S.V.N. Vishwanthan, Alex J. Smola, Quoc V. Le; 11(Jan):311-365, 2010.
         !*/
     public:
 
         oca (
-        ); 
+        );
         /*!
             ensures
                 - this object is properly initialized
@@ -191,7 +191,7 @@ namespace dlib
                 - solves the given oca problem and stores the solution in #w.  In particular,
                   this function solves:
                     Minimize: f(w) == 0.5*length_squared(w) + C*R(w)
-                - The optimization algorithm runs until problem.optimization_status() 
+                - The optimization algorithm runs until problem.optimization_status()
                   indicates it is time to stop.
                 - returns the objective value at the solution #w
                 - if (num_nonnegative != 0) then
@@ -204,7 +204,7 @@ namespace dlib
                     - The optimizer enforces the following constraints:
                         - #w(force_weight_to_1) == 1
                         - for all i > force_weight_to_1:
-                            - #w(i) == 0 
+                            - #w(i) == 0
                         - That is, the element in the weight vector at the index indicated
                           by force_weight_to_1 will have a value of 1 upon completion of
                           this function, while all subsequent elements of w will have
@@ -230,7 +230,7 @@ namespace dlib
                 - In this mode, we solve a version of the problem with a different
                   regularizer.  In particular, this function solves:
                     Minimize: f(w) == 0.5*length_squared(w-prior) + C*R(w)
-                - The optimization algorithm runs until problem.optimization_status() 
+                - The optimization algorithm runs until problem.optimization_status()
                   indicates it is time to stop.
                 - returns the objective value at the solution #w
         !*/
@@ -254,14 +254,14 @@ namespace dlib
                   elastic net regularizer instead of the normal L2 regularizer.  In
                   particular, this function solves:
                     Minimize: f(w) == 0.5*(1-lasso_lambda)*length_squared(w) + lasso_lambda*sum(abs(w)) + C*R(w)
-                - The optimization algorithm runs until problem.optimization_status() 
+                - The optimization algorithm runs until problem.optimization_status()
                   indicates it is time to stop.
                 - returns the objective value at the solution #w
                 - if (force_weight_to_1 < problem.get_num_dimensions()) then
                     - The optimizer enforces the following constraints:
                         - #w(force_weight_to_1) == 1
                         - for all i > force_weight_to_1:
-                            - #w(i) == 0 
+                            - #w(i) == 0
                         - That is, the element in the weight vector at the index indicated
                           by force_weight_to_1 will have a value of 1 upon completion of
                           this function, while all subsequent elements of w will have
@@ -270,16 +270,16 @@ namespace dlib
 
         void set_subproblem_epsilon (
             double eps
-        ); 
+        );
         /*!
             requires
                 - eps > 0
             ensures
-                - #get_subproblem_epsilon() == eps 
+                - #get_subproblem_epsilon() == eps
         !*/
 
         double get_subproblem_epsilon (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the accuracy used in solving the quadratic programming
@@ -288,7 +288,7 @@ namespace dlib
 
         void set_subproblem_max_iterations (
             unsigned long sub_max_iter
-        ); 
+        );
         /*!
             requires
                 - sub_max_iter > 0
@@ -297,7 +297,7 @@ namespace dlib
         !*/
 
         unsigned long get_subproblem_max_iterations (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns the maximum number of iterations this object will perform
@@ -306,7 +306,7 @@ namespace dlib
 
         void set_inactive_plane_threshold (
             unsigned long inactive_thresh
-        ); 
+        );
         /*!
             requires
                 - inactive_thresh > 0
@@ -315,7 +315,7 @@ namespace dlib
         !*/
 
         unsigned long get_inactive_plane_threshold (
-        ) const; 
+        ) const;
         /*!
             ensures
                 - As OCA runs it builds up a set of cutting planes.  Typically

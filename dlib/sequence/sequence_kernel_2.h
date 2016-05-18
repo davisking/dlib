@@ -22,7 +22,7 @@ namespace dlib
     {
         /*!
             INITIAL VALUE
-                sequence_size   == 0 
+                sequence_size   == 0
                 at_start_       == true
                 current_enumeration_node == 0
 
@@ -41,7 +41,7 @@ namespace dlib
                     current_node        == pointer to a node in the linked list and
                     current_node->right->right->... eventually == current_node and
                     current_node->left->left->... eventually == current_node and
-                    current_pos         == the position in the sequence of 
+                    current_pos         == the position in the sequence of
                                            current_node->item
                 }
 
@@ -66,7 +66,7 @@ namespace dlib
             {}
 
             virtual ~sequence_kernel_2 (
-            ); 
+            );
 
             inline void clear (
             );
@@ -150,7 +150,7 @@ namespace dlib
                     0 <= pos < size
                 ensures
                     current_pos == pos and
-                    current_node->item is the item in the sequence associated with 
+                    current_node->item is the item in the sequence associated with
                     position pos
             !*/
 
@@ -164,7 +164,7 @@ namespace dlib
 
             // restricted functions
             sequence_kernel_2(sequence_kernel_2&);        // copy constructor
-            sequence_kernel_2& operator=(sequence_kernel_2&); // assignment operator        
+            sequence_kernel_2& operator=(sequence_kernel_2&); // assignment operator
 
     };
 
@@ -174,16 +174,16 @@ namespace dlib
         typename mem_manager
         >
     inline void swap (
-        sequence_kernel_2<T,mem_manager>& a, 
-        sequence_kernel_2<T,mem_manager>& b 
-    ) { a.swap(b); }   
+        sequence_kernel_2<T,mem_manager>& a,
+        sequence_kernel_2<T,mem_manager>& b
+    ) { a.swap(b); }
 
     template <
         typename T,
         typename mem_manager
         >
     void deserialize (
-        sequence_kernel_2<T,mem_manager>& item, 
+        sequence_kernel_2<T,mem_manager>& item,
         std::istream& in
     )
     {
@@ -200,9 +200,9 @@ namespace dlib
             }
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type sequence_kernel_2"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type sequence_kernel_2");
         }
     }
 
@@ -306,7 +306,7 @@ namespace dlib
         }
 
         // make the new node the current node
-        current_node = new_node;    
+        current_node = new_node;
     
         ++sequence_size;
         // reset the enumerator
@@ -401,7 +401,7 @@ namespace dlib
             else
             {
                 // *this is empty so just swap
-                item.swap(*this);                
+                item.swap(*this);
             }
         }
         item.clear();
@@ -418,7 +418,7 @@ namespace dlib
     T& sequence_kernel_2<T,mem_manager>::
     operator[] (
         unsigned long pos
-    ) 
+    )
     {
         move_to_pos(current_node,current_pos,pos,sequence_size);
         return current_node->item;
@@ -551,8 +551,8 @@ namespace dlib
     ) const
     {
         if (at_start_ && sequence_size>0)
-        {            
-            move_to_pos(current_node,current_pos,0,sequence_size);            
+        {
+            move_to_pos(current_node,current_pos,0,sequence_size);
             current_enumeration_node = current_node;
             current_enumeration_pos = 0;
         }
@@ -560,7 +560,7 @@ namespace dlib
         {
             ++current_enumeration_pos;
             if (current_enumeration_pos<sequence_size)
-            {                
+            {
                 current_enumeration_node = current_enumeration_node->right;
             }
             else
@@ -587,7 +587,7 @@ namespace dlib
     void sequence_kernel_2<T,mem_manager>::
     remove_any (
         T& item
-    ) 
+    )
     {
         remove(0,item);
     }

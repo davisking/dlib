@@ -26,10 +26,10 @@ namespace dlib
         ranking_pair() {}
 
         ranking_pair(
-            const std::vector<T>& r, 
+            const std::vector<T>& r,
             const std::vector<T>& nr
         ) :
-            relevant(r), nonrelevant(nr) 
+            relevant(r), nonrelevant(nr)
         {}
 
         std::vector<T> relevant;
@@ -56,7 +56,7 @@ namespace dlib
         >
     void deserialize (
         ranking_pair<T>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         int version = 0;
@@ -196,7 +196,7 @@ namespace dlib
         for (i = 0, j = 0; i < x_count.size(); ++i)
         {
             // Skip past y values that are in the correct order with respect to xsort[i].
-            while (j < ysort.size() && ysort[j].first < xsort[i].first) 
+            while (j < ysort.size() && ysort[j].first < xsort[i].first)
                 ++j;
 
             x_count[xsort[i].second] = ysort.size() - j;
@@ -207,7 +207,7 @@ namespace dlib
         for (i = 0, j = 0; j < y_count.size(); ++j)
         {
             // Skip past x values that are in the incorrect order with respect to ysort[j].
-            while (i < xsort.size() && !(ysort[j].first < xsort[i].first)) 
+            while (i < xsort.size() && !(ysort[j].first < xsort[i].first))
                 ++i;
 
             y_count[ysort[j].second] = i;
@@ -247,7 +247,7 @@ namespace dlib
         DLIB_ASSERT(is_ranking_problem(samples),
             "\t double test_ranking_function()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t samples.size(): " << samples.size() 
+            << "\n\t samples.size(): " << samples.size()
             << "\n\t is_ranking_problem(samples): " << is_ranking_problem(samples)
             );
 
@@ -340,8 +340,8 @@ namespace dlib
                     1 < folds && folds <= static_cast<long>(samples.size()),
             "\t double cross_validate_ranking_trainer()"
             << "\n\t invalid inputs were given to this function"
-            << "\n\t samples.size(): " << samples.size() 
-            << "\n\t folds:  " << folds 
+            << "\n\t samples.size(): " << samples.size()
+            << "\n\t folds:  " << folds
             << "\n\t is_ranking_problem(samples): " << is_ranking_problem(samples)
             );
 

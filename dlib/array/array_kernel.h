@@ -15,14 +15,14 @@ namespace dlib
 
     template <
         typename T,
-        typename mem_manager = default_memory_manager 
+        typename mem_manager = default_memory_manager
         >
     class array : public enumerable<T>
     {
 
         /*!
             INITIAL VALUE
-                - array_size == 0    
+                - array_size == 0
                 - max_array_size == 0
                 - array_elements == 0
                 - pos == 0
@@ -30,20 +30,20 @@ namespace dlib
                 - _at_start == true
 
             CONVENTION
-                - array_size == size() 
-                - max_array_size == max_size() 
+                - array_size == size()
+                - max_array_size == max_size()
                 - if (max_array_size > 0)
                     - array_elements == pointer to max_array_size elements of type T
                 - else
                     - array_elements == 0
 
-                - if (array_size > 0) 
+                - if (array_size > 0)
                     - last_pos == array_elements + array_size - 1
                 - else
                     - last_pos == 0
 
 
-                - at_start() == _at_start 
+                - at_start() == _at_start
                 - current_element_valid() == pos != 0
                 - if (current_element_valid()) then
                     - *pos == element()
@@ -104,7 +104,7 @@ namespace dlib
         }
 
         ~array (
-        ); 
+        );
 
         void clear (
         );
@@ -200,17 +200,17 @@ namespace dlib
 
         // restricted functions
         array(array<T>&);        // copy constructor
-        array<T>& operator=(array<T>&);    // assignment operator        
+        array<T>& operator=(array<T>&);    // assignment operator
 
     };
 
     template <
         typename T,
-        typename mem_manager 
+        typename mem_manager
         >
     inline void swap (
-        array<T,mem_manager>& a, 
-        array<T,mem_manager>& b 
+        array<T,mem_manager>& a,
+        array<T,mem_manager>& b
     ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
@@ -220,7 +220,7 @@ namespace dlib
         typename mem_manager
         >
     void serialize (
-        const array<T,mem_manager>& item,  
+        const array<T,mem_manager>& item,
         std::ostream& out
     )
     {
@@ -233,8 +233,8 @@ namespace dlib
                 serialize(item[i],out);
         }
         catch (serialization_error e)
-        { 
-            throw serialization_error(e.info + "\n   while serializing object of type array"); 
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type array");
         }
     }
 
@@ -243,7 +243,7 @@ namespace dlib
         typename mem_manager
         >
     void deserialize (
-        array<T,mem_manager>& item,  
+        array<T,mem_manager>& item,
         std::istream& in
     )
     {
@@ -258,9 +258,9 @@ namespace dlib
                 deserialize(item[i],in);
         }
         catch (serialization_error e)
-        { 
+        {
             item.clear();
-            throw serialization_error(e.info + "\n   while deserializing object of type array"); 
+            throw serialization_error(e.info + "\n   while deserializing object of type array");
         }
     }
 
@@ -318,10 +318,10 @@ namespace dlib
     ) const
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( pos < this->size() , 
+        DLIB_ASSERT( pos < this->size() ,
             "\tconst T& array::operator[]"
-            << "\n\tpos must < size()" 
-            << "\n\tpos: " << pos 
+            << "\n\tpos must < size()"
+            << "\n\tpos: " << pos
             << "\n\tsize(): " << this->size()
             << "\n\tthis: " << this
             );
@@ -338,13 +338,13 @@ namespace dlib
     T& array<T,mem_manager>::
     operator[] (
         unsigned long pos
-    ) 
+    )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( pos < this->size() , 
+        DLIB_ASSERT( pos < this->size() ,
             "\tT& array::operator[]"
-            << "\n\tpos must be < size()" 
-            << "\n\tpos: " << pos 
+            << "\n\tpos must be < size()"
+            << "\n\tpos: " << pos
             << "\n\tsize(): " << this->size()
             << "\n\tthis: " << this
             );
@@ -367,7 +367,7 @@ namespace dlib
         DLIB_CASSERT(( size <= this->max_size() ),
             "\tvoid array::set_size"
             << "\n\tsize must be <= max_size()"
-            << "\n\tsize: " << size 
+            << "\n\tsize: " << size
             << "\n\tmax size: " << this->max_size()
             << "\n\tthis: " << this
             );
@@ -655,12 +655,12 @@ namespace dlib
         >
     T& array<T,mem_manager>::
     back (
-    ) 
+    )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( this->size() > 0 , 
+        DLIB_ASSERT( this->size() > 0 ,
                       "\tT& array::back()"
-                      << "\n\tsize() must be bigger than 0" 
+                      << "\n\tsize() must be bigger than 0"
                       << "\n\tsize(): " << this->size()
                       << "\n\tthis:   " << this
         );
@@ -679,9 +679,9 @@ namespace dlib
     ) const
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( this->size() > 0 , 
+        DLIB_ASSERT( this->size() > 0 ,
                       "\tconst T& array::back()"
-                      << "\n\tsize() must be bigger than 0" 
+                      << "\n\tsize() must be bigger than 0"
                       << "\n\tsize(): " << this->size()
                       << "\n\tthis:   " << this
         );
@@ -698,12 +698,12 @@ namespace dlib
     void array<T,mem_manager>::
     pop_back (
         T& item
-    ) 
+    )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( this->size() > 0 , 
+        DLIB_ASSERT( this->size() > 0 ,
                       "\tvoid array::pop_back()"
-                      << "\n\tsize() must be bigger than 0" 
+                      << "\n\tsize() must be bigger than 0"
                       << "\n\tsize(): " << this->size()
                       << "\n\tthis:   " << this
         );
@@ -720,12 +720,12 @@ namespace dlib
         >
     void array<T,mem_manager>::
     pop_back (
-    ) 
+    )
     {
         // make sure requires clause is not broken
-        DLIB_ASSERT( this->size() > 0 , 
+        DLIB_ASSERT( this->size() > 0 ,
                       "\tvoid array::pop_back()"
-                      << "\n\tsize() must be bigger than 0" 
+                      << "\n\tsize() must be bigger than 0"
                       << "\n\tsize(): " << this->size()
                       << "\n\tthis:   " << this
         );
@@ -742,7 +742,7 @@ namespace dlib
     void array<T,mem_manager>::
     push_back (
         T& item
-    ) 
+    )
     {
         if (this->max_size() == this->size())
         {
@@ -767,7 +767,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename T, typename MM>
-    struct is_array <array<T,MM> >  
+    struct is_array <array<T,MM> >
     {
         const static bool value = true;
     };

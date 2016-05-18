@@ -14,7 +14,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename feature_extractor 
+        typename feature_extractor
         >
     class assignment_function
     {
@@ -40,7 +40,7 @@ namespace dlib
         explicit assignment_function(
             const matrix<double,0,1>& weights_,
             double bias_
-        ) : 
+        ) :
             weights(weights_),
             bias(bias_),
             force_assignment(false)
@@ -49,8 +49,8 @@ namespace dlib
             DLIB_ASSERT(fe.num_features() == static_cast<unsigned long>(weights_.size()),
                 "\t assignment_function::assignment_function(weights_)"
                 << "\n\t These sizes should match"
-                << "\n\t fe.num_features(): " << fe.num_features() 
-                << "\n\t weights_.size():   " << weights_.size() 
+                << "\n\t fe.num_features(): " << fe.num_features()
+                << "\n\t weights_.size():   " << weights_.size()
                 << "\n\t this: " << this
                 );
 
@@ -70,8 +70,8 @@ namespace dlib
             DLIB_ASSERT(fe_.num_features() == static_cast<unsigned long>(weights_.size()),
                 "\t assignment_function::assignment_function(weights_,fe_)"
                 << "\n\t These sizes should match"
-                << "\n\t fe_.num_features(): " << fe_.num_features() 
-                << "\n\t weights_.size():    " << weights_.size() 
+                << "\n\t fe_.num_features(): " << fe_.num_features()
+                << "\n\t weights_.size():    " << weights_.size()
                 << "\n\t this: " << this
                 );
         }
@@ -91,8 +91,8 @@ namespace dlib
             DLIB_ASSERT(fe_.num_features() == static_cast<unsigned long>(weights_.size()),
                 "\t assignment_function::assignment_function(weights_,fe_,force_assignment_)"
                 << "\n\t These sizes should match"
-                << "\n\t fe_.num_features(): " << fe_.num_features() 
-                << "\n\t weights_.size():    " << weights_.size() 
+                << "\n\t fe_.num_features(): " << fe_.num_features()
+                << "\n\t weights_.size():    " << weights_.size()
                 << "\n\t this: " << this
                 );
         }
@@ -178,7 +178,7 @@ namespace dlib
 
         result_type operator()(
             const std::vector<lhs_element>& lhs,
-            const std::vector<rhs_element>& rhs 
+            const std::vector<rhs_element>& rhs
         ) const
         {
             result_type temp;
@@ -227,7 +227,7 @@ namespace dlib
         >
     void deserialize (
         assignment_function<feature_extractor>& item,
-        std::istream& in 
+        std::istream& in
     )
     {
         feature_extractor fe;

@@ -20,28 +20,28 @@ namespace dlib
     /*!A sparse_vectors
 
         In dlib, sparse vectors are represented using the container objects
-        in the C++ STL.  In particular, a sparse vector is any container that 
+        in the C++ STL.  In particular, a sparse vector is any container that
         contains a range of std::pair<key, scalar_value> objects where:
-            - key is an unsigned integral type 
+            - key is an unsigned integral type
             - scalar_value is float, double, or long double
             - the std::pair objects have unique key values
-            - the std::pair objects are sorted such that small keys come first 
+            - the std::pair objects are sorted such that small keys come first
 
         Therefore, if an object satisfies the above requirements we call it a
         "sparse vector".  Additionally, we define the concept of an "unsorted sparse vector"
-        to be a sparse vector that doesn't necessarily have sorted or unique key values.  
-        Therefore, all sparse vectors are valid unsorted sparse vectors but not the other 
-        way around.  
+        to be a sparse vector that doesn't necessarily have sorted or unique key values.
+        Therefore, all sparse vectors are valid unsorted sparse vectors but not the other
+        way around.
 
         An unsorted sparse vector with duplicate keys is always interpreted as
-        a vector where each dimension contains the sum of all corresponding elements 
-        of the unsorted sparse vector.  For example, an unsorted sparse vector 
+        a vector where each dimension contains the sum of all corresponding elements
+        of the unsorted sparse vector.  For example, an unsorted sparse vector
         with the elements { (3,1), (0, 4), (3,5) } represents the 4D vector:
             [4, 0, 0, 1+5]
 
 
 
-        Examples of valid sparse vectors are:    
+        Examples of valid sparse vectors are:
             - std::map<unsigned long, double>
             - std::vector<std::pair<unsigned long, float> > where the vector is sorted.
               (you could make sure it was sorted by applying std::sort to it)
@@ -50,7 +50,7 @@ namespace dlib
         Finally, by "dense vector" we mean a dlib::matrix object which represents
         either a row or column vector.
 
-        The rest of this file defines a number of helper functions for doing normal 
+        The rest of this file defines a number of helper functions for doing normal
         vector arithmetic things with sparse vectors.
     !*/
 
@@ -148,7 +148,7 @@ namespace dlib
               because we don't know what the proper dimensionality should be for the
               dense vector)
         ensures
-            - #src represents the same vector as dest.  
+            - #src represents the same vector as dest.
               (conversion between sparse/dense formats is done automatically)
     !*/
 
@@ -162,7 +162,7 @@ namespace dlib
     );
     /*!
         requires
-            - a and b are sparse vectors 
+            - a and b are sparse vectors
         ensures
             - returns the dot product between the vectors a and b
     !*/
@@ -174,7 +174,7 @@ namespace dlib
     );
     /*!
         requires
-            - a and b are sparse vectors 
+            - a and b are sparse vectors
         ensures
             - returns the dot product between the vectors a and b
     !*/
@@ -186,7 +186,7 @@ namespace dlib
     );
     /*!
         requires
-            - a and b are sparse vectors 
+            - a and b are sparse vectors
         ensures
             - returns the dot product between the vectors a and b
     !*/
@@ -203,7 +203,7 @@ namespace dlib
             - a is an unsorted sparse vector
             - is_vector(b) == true
         ensures
-            - returns the dot product between the vectors a and b.  
+            - returns the dot product between the vectors a and b.
             - if (max_index_plus_one(a) >= b.size()) then
                 - a's dimensionality is greater than b's dimensionality.  In this case we
                   pretend b is padded by as many zeros as is needed to make the dot product
@@ -241,7 +241,7 @@ namespace dlib
         requires
             - a is a sparse vector
         ensures
-            - returns dot(a,a) 
+            - returns dot(a,a)
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -309,27 +309,27 @@ namespace dlib
     template <typename T>
     unsigned long max_index_plus_one (
         const T& samples
-    ); 
+    );
     /*!
         requires
             - samples == a single vector (either sparse or dense), or a container
-              of vectors which is either a dlib::matrix of vectors or something 
+              of vectors which is either a dlib::matrix of vectors or something
               convertible to a dlib::matrix via mat() (e.g. a std::vector)
               Valid types of samples include (but are not limited to):
-                - dlib::matrix<double,0,1>                      // A single dense vector 
+                - dlib::matrix<double,0,1>                      // A single dense vector
                 - std::map<unsigned int, double>                // A single sparse vector
                 - std::vector<dlib::matrix<double,0,1> >        // An array of dense vectors
                 - std::vector<std::map<unsigned int, double> >  // An array of sparse vectors
         ensures
             - This function tells you the dimensionality of a set of vectors.  The vectors
-              can be either sparse or dense.  
+              can be either sparse or dense.
             - if (samples.size() == 0) then
                 - returns 0
             - else if (samples contains dense vectors or is a dense vector) then
                 - returns the number of elements in the first sample vector.  This means
                   we implicitly assume all dense vectors have the same length)
             - else
-                - In this case samples contains sparse vectors or is a sparse vector.  
+                - In this case samples contains sparse vectors or is a sparse vector.
                 - returns the largest element index in any sample + 1.  Note that the element index values
                   are the values stored in std::pair::first.  So this number tells you the dimensionality
                   of a set of sparse vectors.
@@ -421,8 +421,8 @@ namespace dlib
               representation.  That is, this function returns a vector V such that:
                 - V.size() == max_index_plus_one(vect)
                 - for all valid j:
-                    - V(j) == The value of the j'th dimension of the vector vect.  Note 
-                      that V(j) is zero if it is a sparse vector that doesn't contain an 
+                    - V(j) == The value of the j'th dimension of the vector vect.  Note
+                      that V(j) is zero if it is a sparse vector that doesn't contain an
                       entry for the j'th dimension.
     !*/
 
@@ -433,7 +433,7 @@ namespace dlib
         >
     matrix<typename sample_type::value_type::second_type,0,1> sparse_to_dense (
         const sample_type& vect,
-        unsigned long num_dimensions 
+        unsigned long num_dimensions
     );
     /*!
         requires
@@ -441,17 +441,17 @@ namespace dlib
         ensures
             - converts the single sparse or dense vector vect to a dense (column matrix form)
               representation.  That is, this function returns a vector V such that:
-                - V.size() == num_dimensions 
+                - V.size() == num_dimensions
                 - for all valid j:
-                    - V(j) == The value of the j'th dimension of the vector vect.  Note 
-                      that V(j) is zero if it is a sparse vector that doesn't contain an 
+                    - V(j) == The value of the j'th dimension of the vector vect.  Note
+                      that V(j) is zero if it is a sparse vector that doesn't contain an
                       entry for the j'th dimension.
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sample_type, 
+        typename sample_type,
         typename alloc
         >
     std::vector<matrix<typename sample_type::value_type::second_type,0,1> > sparse_to_dense (
@@ -463,9 +463,9 @@ namespace dlib
         ensures
             - converts from sparse sample vectors to dense (column matrix form)
             - That is, this function returns a std::vector R such that:
-                - R contains column matrices    
+                - R contains column matrices
                 - R.size() == samples.size()
-                - for all valid i: 
+                - for all valid i:
                     - R[i] == sparse_to_dense(samples[i], max_index_plus_one(samples))
                       (i.e. the dense (i.e. dlib::matrix) version of the sparse sample
                       given by samples[i].)
@@ -474,12 +474,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename sample_type, 
+        typename sample_type,
         typename alloc
         >
     std::vector<matrix<typename sample_type::value_type::second_type,0,1> > sparse_to_dense (
         const std::vector<sample_type, alloc>& samples,
-        unsigned long num_dimensions 
+        unsigned long num_dimensions
     );
     /*!
         requires
@@ -487,9 +487,9 @@ namespace dlib
         ensures
             - converts from sparse sample vectors to dense (column matrix form)
             - That is, this function returns a std::vector R such that:
-                - R contains column matrices    
+                - R contains column matrices
                 - R.size() == samples.size()
-                - for all valid i: 
+                - for all valid i:
                     - R[i] == sparse_to_dense(samples[i], num_dimensions)
                       (i.e. the dense (i.e. dlib::matrix) version of the sparse sample
                       given by samples[i].)
@@ -507,7 +507,7 @@ namespace dlib
         requires
             - v is an unsorted sparse vector
         ensures
-            - returns a copy of v which is a sparse vector. 
+            - returns a copy of v which is a sparse vector.
               (i.e. it will be properly sorted and not have any duplicate key values but
               will still logically represent the same vector).
     !*/
@@ -533,11 +533,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP, 
-        typename T, 
-        long NR, 
-        long NC, 
-        typename MM, 
+        typename EXP,
+        typename T,
+        long NR,
+        long NC,
+        typename MM,
         typename L
         >
     void sparse_matrix_vector_multiply (
@@ -552,7 +552,7 @@ namespace dlib
         ensures
             - Interprets edges as representing a symmetric sparse matrix M.  The elements
               of M are defined such that, for all valid i,j:
-                - M(i,j) == sum of edges[k].distance() for all k where edges[k]==sample_pair(i,j) 
+                - M(i,j) == sum of edges[k].distance() for all k where edges[k]==sample_pair(i,j)
                 - This means that any element of M that doesn't have any edges associated
                   with it will have a value of 0.
             - #result == M*v
@@ -565,11 +565,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP, 
-        typename T, 
-        long NR, 
-        long NC, 
-        typename MM, 
+        typename EXP,
+        typename T,
+        long NR,
+        long NC,
+        typename MM,
         typename L
         >
     void sparse_matrix_vector_multiply (
@@ -584,7 +584,7 @@ namespace dlib
         ensures
             - Interprets edges as representing a square sparse matrix M.  The elements of M
               are defined such that, for all valid i,j:
-                - M(i,j) == sum of edges[k].distance() for all k where edges[k]==ordered_sample_pair(i,j) 
+                - M(i,j) == sum of edges[k].distance() for all k where edges[k]==ordered_sample_pair(i,j)
                 - This means that any element of M that doesn't have any edges associated
                   with it will have a value of 0.
             - #result == M*v
@@ -637,7 +637,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP, 
+        typename EXP,
         typename sparse_vector_type,
         typename T,
         long NR,
@@ -662,7 +662,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename EXP, 
+        typename EXP,
         typename sparse_vector_type
         >
     matrix<typename EXP::type,0,1> sparse_matrix_vector_multiply (

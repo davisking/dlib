@@ -30,15 +30,15 @@ namespace dlib
         
         //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     binary_search_tree_kernel_1<domain,range,mem_manager,compare>    
+        // kernel_1a
+        typedef     binary_search_tree_kernel_1<domain,range,mem_manager,compare>
                     kernel_1a;
         typedef     binary_search_tree_kernel_c<kernel_1a>
                     kernel_1a_c;
 
 
-        // kernel_2a        
-        typedef     binary_search_tree_kernel_2<domain,range,mem_manager,compare>    
+        // kernel_2a
+        typedef     binary_search_tree_kernel_2<domain,range,mem_manager,compare>
                     kernel_2a;
         typedef     binary_search_tree_kernel_c<kernel_2a>
                     kernel_2a_c;

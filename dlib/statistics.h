@@ -1,7 +1,7 @@
 // Copyright (C) 2008  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_STATISTICs_H_
-#define DLIB_STATISTICs_H_ 
+#define DLIB_STATISTICs_H_
 
 #include "statistics/statistics.h"
 #include "statistics/dpca.h"
@@ -13,7 +13,7 @@
 #include "statistics/vector_normalizer_frobmetric.h"
 #include "statistics/lda.h"
 
-#endif // DLIB_STATISTICs_H_ 
+#endif // DLIB_STATISTICs_H_
 
 
 

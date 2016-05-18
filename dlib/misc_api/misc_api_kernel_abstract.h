@@ -24,7 +24,7 @@ namespace dlib
     );
     /*!
         ensures
-            - causes the calling thread to sleep for the given number of 
+            - causes the calling thread to sleep for the given number of
               milliseconds.
     !*/
 
@@ -105,10 +105,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class dir_create_error : public error { 
+    class dir_create_error : public error {
     public:
         const std::string name
-    }; 
+    };
 
     void create_directory (
         const std::string& dir
@@ -122,20 +122,20 @@ namespace dlib
         throws
             - dir_create_error
                 This exception is thrown if we were unable to create the requested
-                directory and it didn't already exist.  The type member of the exception 
+                directory and it didn't already exist.  The type member of the exception
                 will bet set to EDIR_CREATE and the name member will be set to dir.
     !*/
 
 // ----------------------------------------------------------------------------------------
 
-    class timestamper 
+    class timestamper
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a timer that is capable of returning 
+                This object represents a timer that is capable of returning
                 timestamps.
 
-                Note that the time is measured in microseconds but you are not 
+                Note that the time is measured in microseconds but you are not
                 guaranteed to have that level of resolution.  The actual resolution
                 is implementation dependent.
         !*/
@@ -145,7 +145,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns a timestamp that measures the time in microseconds since an 
+                - returns a timestamp that measures the time in microseconds since an
                   arbitrary point in the past.  Note that this arbitrary point remains
                   the same between all calls to get_timestamp().
         !*/

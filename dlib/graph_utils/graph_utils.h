@@ -20,38 +20,7 @@ namespace dlib
 
     template <typename T>
     typename enable_if<is_graph<T>,typename T::edge_type>::type& edge(
-        T& g, 
-        unsigned long idx_i, 
-        unsigned long idx_j
-    )
-    {
-        // make sure requires clause is not broken
-        DLIB_ASSERT(g.has_edge(idx_i,idx_j) == true,
-            "\tT::edge_type& edge(g, idx_i, idx_j)"
-            << "\n\t you have requested an invalid edge"
-            << "\n\t idx_i: " << idx_i
-            << "\n\t idx_j: " << idx_j 
-            );
-
-        for (unsigned long i = 0; i < g.node(idx_i).number_of_neighbors(); ++i)
-        {
-            if (g.node(idx_i).neighbor(i).index() == idx_j)
-                return g.node(idx_i).edge(i);
-        }
-
-        // put this here just so compilers don't complain about a lack of
-        // a return here
-        DLIB_CASSERT(false,
-            "\tT::edge_type& edge(g, idx_i, idx_j)"
-            << "\n\t you have requested an invalid edge"
-            << "\n\t idx_i: " << idx_i
-            << "\n\t idx_j: " << idx_j 
-            );
-    }
-
-    template <typename T>
-    const typename enable_if<is_graph<T>,typename T::edge_type>::type& edge(
-        const T& g,  
+        T& g,
         unsigned long idx_i,
         unsigned long idx_j
     )
@@ -61,7 +30,7 @@ namespace dlib
             "\tT::edge_type& edge(g, idx_i, idx_j)"
             << "\n\t you have requested an invalid edge"
             << "\n\t idx_i: " << idx_i
-            << "\n\t idx_j: " << idx_j 
+            << "\n\t idx_j: " << idx_j
             );
 
         for (unsigned long i = 0; i < g.node(idx_i).number_of_neighbors(); ++i)
@@ -76,7 +45,38 @@ namespace dlib
             "\tT::edge_type& edge(g, idx_i, idx_j)"
             << "\n\t you have requested an invalid edge"
             << "\n\t idx_i: " << idx_i
-            << "\n\t idx_j: " << idx_j 
+            << "\n\t idx_j: " << idx_j
+            );
+    }
+
+    template <typename T>
+    const typename enable_if<is_graph<T>,typename T::edge_type>::type& edge(
+        const T& g,
+        unsigned long idx_i,
+        unsigned long idx_j
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(g.has_edge(idx_i,idx_j) == true,
+            "\tT::edge_type& edge(g, idx_i, idx_j)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t idx_i: " << idx_i
+            << "\n\t idx_j: " << idx_j
+            );
+
+        for (unsigned long i = 0; i < g.node(idx_i).number_of_neighbors(); ++i)
+        {
+            if (g.node(idx_i).neighbor(i).index() == idx_j)
+                return g.node(idx_i).edge(i);
+        }
+
+        // put this here just so compilers don't complain about a lack of
+        // a return here
+        DLIB_CASSERT(false,
+            "\tT::edge_type& edge(g, idx_i, idx_j)"
+            << "\n\t you have requested an invalid edge"
+            << "\n\t idx_i: " << idx_i
+            << "\n\t idx_j: " << idx_j
             );
     }
 
@@ -84,9 +84,9 @@ namespace dlib
     
     template <typename T>
     typename enable_if<is_directed_graph<T>,typename T::edge_type>::type& edge(
-        T& g, 
-        unsigned long parent_idx, 
-        unsigned long child_idx 
+        T& g,
+        unsigned long parent_idx,
+        unsigned long child_idx
     )
     {
         // make sure requires clause is not broken
@@ -94,7 +94,7 @@ namespace dlib
             "\t T::edge_type& edge(g, parent_idx, child_idx)"
             << "\n\t you have requested an invalid edge"
             << "\n\t parent_idx: " << parent_idx
-            << "\n\t child_idx: " << child_idx 
+            << "\n\t child_idx: " << child_idx
             );
 
         for (unsigned long i = 0; i < g.node(parent_idx).number_of_children(); ++i)
@@ -109,15 +109,15 @@ namespace dlib
             "\t T::edge_type& edge(g, parent_idx, child_idx)"
             << "\n\t you have requested an invalid edge"
             << "\n\t parent_idx: " << parent_idx
-            << "\n\t child_idx: " << child_idx 
+            << "\n\t child_idx: " << child_idx
             );
     }
 
     template <typename T>
     const typename enable_if<is_directed_graph<T>,typename T::edge_type>::type& edge(
-        const T& g,  
-        unsigned long parent_idx, 
-        unsigned long child_idx 
+        const T& g,
+        unsigned long parent_idx,
+        unsigned long child_idx
     )
     {
         // make sure requires clause is not broken
@@ -125,7 +125,7 @@ namespace dlib
             "\t T::edge_type& edge(g, parent_idx, child_idx)"
             << "\n\t you have requested an invalid edge"
             << "\n\t parent_idx: " << parent_idx
-            << "\n\t child_idx: " << child_idx 
+            << "\n\t child_idx: " << child_idx
             );
 
         for (unsigned long i = 0; i < g.node(parent_idx).number_of_children(); ++i)
@@ -140,13 +140,13 @@ namespace dlib
             "\t T::edge_type& edge(g, parent_idx, child_idx)"
             << "\n\t you have requested an invalid edge"
             << "\n\t parent_idx: " << parent_idx
-            << "\n\t child_idx: " << child_idx 
+            << "\n\t child_idx: " << child_idx
             );
     }
 
 // ----------------------------------------------------------------------------------------
     
-    namespace graph_helpers 
+    namespace graph_helpers
     {
         template <typename T, typename U>
         inline bool is_same_object (
@@ -172,16 +172,16 @@ namespace dlib
         )
         /*!
             requires
-                - visited.size() >= number of nodes in the graph that contains the given node 
-                - temp.size() >= number of nodes in the graph that contains the given node 
-                - for all i in temp: 
+                - visited.size() >= number of nodes in the graph that contains the given node
+                - temp.size() >= number of nodes in the graph that contains the given node
+                - for all i in temp:
                     - temp[i] == false
             ensures
                 - checks the connected subgraph containing the given node for directed cycles
                   and returns true if any are found and false otherwise.
                 - for all nodes N in the connected subgraph containing the given node:
                     - #visited[N.index()] == true
-                - for all i in temp: 
+                - for all i in temp:
                     - #temp[i] == false
         !*/
         {
@@ -214,7 +214,7 @@ namespace dlib
         )
         /*!
             requires
-                - visited.size() >= number of nodes in the graph that contains the given node 
+                - visited.size() >= number of nodes in the graph that contains the given node
                 - for all nodes N in the connected subgraph containing the given node:
                     - visited[N.index] == false
             ensures
@@ -232,14 +232,14 @@ namespace dlib
 
             for (unsigned long i = 0; i < node.number_of_children(); ++i)
             {
-                if (node.child(i).index() != prev && 
+                if (node.child(i).index() != prev &&
                     search_for_undirected_cycles(node.child(i), visited, node.index()))
                     return true;
             }
                 
             for (unsigned long i = 0; i < node.number_of_parents(); ++i)
             {
-                if (node.parent(i).index() != prev && 
+                if (node.parent(i).index() != prev &&
                     search_for_undirected_cycles(node.parent(i), visited, node.index()))
                     return true;
             }
@@ -259,7 +259,7 @@ namespace dlib
         )
         /*!
             requires
-                - visited.size() >= number of nodes in the graph that contains the given node 
+                - visited.size() >= number of nodes in the graph that contains the given node
                 - for all nodes N in the connected subgraph containing the given node:
                     - visited[N.index] == false
             ensures
@@ -277,7 +277,7 @@ namespace dlib
 
             for (unsigned long i = 0; i < node.number_of_neighbors(); ++i)
             {
-                if (node.neighbor(i).index() != prev && 
+                if (node.neighbor(i).index() != prev &&
                     search_for_undirected_cycles(node.neighbor(i), visited, node.index()))
                     return true;
             }
@@ -306,7 +306,7 @@ namespace dlib
         dest.clear();
         dest.set_number_of_nodes(src.number_of_nodes());
 
-        // copy all the edges from src into dest 
+        // copy all the edges from src into dest
         for (unsigned long i = 0; i < src.number_of_nodes(); ++i)
         {
             for (unsigned long j = 0; j < src.node(i).number_of_neighbors(); ++j)
@@ -337,7 +337,7 @@ namespace dlib
         dest.clear();
         dest.set_number_of_nodes(src.number_of_nodes());
 
-        // copy all the edges from src into dest 
+        // copy all the edges from src into dest
         for (unsigned long i = 0; i < src.number_of_nodes(); ++i)
         {
             for (unsigned long j = 0; j < src.node(i).number_of_children(); ++j)
@@ -369,7 +369,7 @@ namespace dlib
 
         copy_graph_structure(src,dest);
 
-        // copy all the node and edge content 
+        // copy all the node and edge content
         for (unsigned long i = 0; i < src.number_of_nodes(); ++i)
         {
             dest.node(i).data = src.node(i).data;
@@ -401,7 +401,7 @@ namespace dlib
 
         copy_graph_structure(src,dest);
 
-        // copy all the node and edge content 
+        // copy all the node and edge content
         for (unsigned long i = 0; i < src.number_of_nodes(); ++i)
         {
             dest.node(i).data = src.node(i).data;
@@ -457,7 +457,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T 
+        typename T
         >
     bool graph_is_connected (
         const T& g
@@ -629,10 +629,10 @@ namespace dlib
         while (clique.move_next())
         {
             const unsigned long x = clique.element();
-            DLIB_ASSERT( x < g.number_of_nodes(), 
+            DLIB_ASSERT( x < g.number_of_nodes(),
                 "\tvoid is_clique(g, clique)"
                 << "\n\tthe clique set contained an invalid node index"
-                << "\n\tx:                   " << x 
+                << "\n\tx:                   " << x
                 << "\n\tg.number_of_nodes(): " << g.number_of_nodes()
                 );
         }
@@ -687,10 +687,10 @@ namespace dlib
         while (clique.move_next())
         {
             const unsigned long x = clique.element();
-            DLIB_ASSERT( x < g.number_of_nodes(), 
+            DLIB_ASSERT( x < g.number_of_nodes(),
                 "\tvoid is_maximal_clique(g, clique)"
                 << "\n\tthe clique set contained an invalid node index"
-                << "\n\tx:                   " << x 
+                << "\n\tx:                   " << x
                 << "\n\tg.number_of_nodes(): " << g.number_of_nodes()
                 );
         }
@@ -702,7 +702,7 @@ namespace dlib
             return true;
 
         // get an element in the clique and make sure that
-        // none of its neighbors that aren't in the clique are connected 
+        // none of its neighbors that aren't in the clique are connected
         // to all the elements of the clique.
         clique.reset();
         clique.move_next();
@@ -813,7 +813,7 @@ namespace dlib
 
             // we want to visit all the neighbors of this node but do
             // so by visiting the nodes with the most neighbors first.  So
-            // lets make a vector that lists the nodes in the order we 
+            // lets make a vector that lists the nodes in the order we
             // want to visit them
             std::vector<pair> neighbors;
             for (unsigned long i = 0; i < n.number_of_neighbors(); ++i)
@@ -886,7 +886,7 @@ namespace dlib
 
         set_of_int clique;
 
-        // now add edges to the graph to make it triangulated  
+        // now add edges to the graph to make it triangulated
         while (visited.size() > 0)
         {
             // we are going to enumerate over the nodes in the reverse of the
@@ -901,7 +901,7 @@ namespace dlib
             clique.add(temp);
 
             // now we want to make a clique that contains node g.node(idx) and
-            // all of its neighbors that are still recorded in the visited set 
+            // all of its neighbors that are still recorded in the visited set
             // (except for neighbors that have only one edge).
             for (unsigned long i = 0; i < g.node(idx).number_of_neighbors(); ++i)
             {
@@ -910,10 +910,10 @@ namespace dlib
 
                 // add it to the clique if it is still in visited and it isn't
                 // a node with only one neighbor
-                if (visited.is_member(nidx) == true && 
+                if (visited.is_member(nidx) == true &&
                     g.node(nidx).number_of_neighbors() != 1)
                 {
-                    // add edges between this new node and all the nodes 
+                    // add edges between this new node and all the nodes
                     // that are already in the clique
                     clique.reset();
                     while (clique.move_next())
@@ -1023,7 +1023,7 @@ namespace dlib
             }
         }
 
-        // now we just need to remove the unnecessary edges so that we get a 
+        // now we just need to remove the unnecessary edges so that we get a
         // proper join tree
         s.clear();
         set_of_int& good = s; // rename s to something slightly more meaningful
@@ -1204,7 +1204,7 @@ namespace dlib
             }
         }
 
-        // and finally check that all the nodes in g show up in the join tree 
+        // and finally check that all the nodes in g show up in the join tree
         if (all.size() != g.number_of_nodes())
             return false;
         all.reset();

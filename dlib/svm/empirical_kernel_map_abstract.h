@@ -16,7 +16,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename kernel_type, 
+        typename kernel_type,
         typename EXP
         >
     const decision_function<kernel_type> convert_to_decision_function (
@@ -30,16 +30,16 @@ namespace dlib
             - project_funct.out_vector_size() > 0
             - project_funct.weights.nc() == project_funct.basis_vectors.size()
         ensures
-            - This function interprets the given vector as a point in the kernel feature space defined 
-              by the given projection function.  The return value of this function is a decision 
+            - This function interprets the given vector as a point in the kernel feature space defined
+              by the given projection function.  The return value of this function is a decision
               function, DF, that represents the given vector in the following sense:
                 - for all possible sample_type objects, S, it is the case that DF(S) == dot(project_funct(S), vect)
-                  (i.e. the returned decision function computes dot products, in kernel feature space, 
+                  (i.e. the returned decision function computes dot products, in kernel feature space,
                   between vect and any argument you give it.  Note also that this equality is exact, even
                   for sample_type objects not in the span of the basis_vectors.)
                 - DF.kernel_function == project_funct.kernel_function
                 - DF.b == 0
-                - DF.basis_vectors == project_funct.basis_vectors.  
+                - DF.basis_vectors == project_funct.basis_vectors.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -58,35 +58,35 @@ namespace dlib
                 - basis_size() == 0
 
             WHAT THIS OBJECT REPRESENTS
-                This object represents a map from objects of sample_type (the kind of object 
-                a kernel function operates on) to finite dimensional column vectors which 
-                represent points in the kernel feature space defined by whatever kernel 
-                is used with this object. 
+                This object represents a map from objects of sample_type (the kind of object
+                a kernel function operates on) to finite dimensional column vectors which
+                represent points in the kernel feature space defined by whatever kernel
+                is used with this object.
 
-                To use the empirical_kernel_map you supply it with a particular kernel and a set of 
-                basis samples.  After that you can present it with new samples and it will project 
-                them into the part of kernel feature space spanned by your basis samples.   
+                To use the empirical_kernel_map you supply it with a particular kernel and a set of
+                basis samples.  After that you can present it with new samples and it will project
+                them into the part of kernel feature space spanned by your basis samples.
                 
-                This means the empirical_kernel_map is a tool you can use to very easily kernelize 
-                any algorithm that operates on column vectors.  All you have to do is select a 
-                set of basis samples and then use the empirical_kernel_map to project all your 
+                This means the empirical_kernel_map is a tool you can use to very easily kernelize
+                any algorithm that operates on column vectors.  All you have to do is select a
+                set of basis samples and then use the empirical_kernel_map to project all your
                 data points into the part of kernel feature space spanned by those basis samples.
-                Then just run your normal algorithm on the output vectors and it will be effectively 
-                kernelized.  
+                Then just run your normal algorithm on the output vectors and it will be effectively
+                kernelized.
 
-                Regarding methods to select a set of basis samples, if you are working with only a 
-                few thousand samples then you can just use all of them as basis samples.  
-                Alternatively, the linearly_independent_subset_finder often works well for 
-                selecting a basis set.  I also find that picking a random subset typically works 
+                Regarding methods to select a set of basis samples, if you are working with only a
+                few thousand samples then you can just use all of them as basis samples.
+                Alternatively, the linearly_independent_subset_finder often works well for
+                selecting a basis set.  I also find that picking a random subset typically works
                 well.
 
 
                 The empirical kernel map is something that has been around in the kernel methods
                 literature for a long time but is seemingly not well known.  Anyway, one of the
                 best books on the subject is the following:
-                    Learning with Kernels: Support Vector Machines, Regularization, Optimization, 
+                    Learning with Kernels: Support Vector Machines, Regularization, Optimization,
                     and Beyond by Bernhard Schlkopf, Alexander J. Smola
-                The authors discuss the empirical kernel map as well as many other interesting 
+                The authors discuss the empirical kernel map as well as many other interesting
                 topics.
         !*/
 
@@ -99,7 +99,7 @@ namespace dlib
 
         struct empirical_kernel_map_error : public error;
         /*!
-            This is an exception class used to indicate a failure to create a 
+            This is an exception class used to indicate a failure to create a
             kernel map from data given by the user.
         !*/
 
@@ -134,7 +134,7 @@ namespace dlib
                 - 0 < #out_vector_size() <= basis_samples.size()
                 - #basis_size() == basis_samples.size()
                 - #get_kernel() == kernel
-                - This function constructs a map between normal sample_type objects and the 
+                - This function constructs a map between normal sample_type objects and the
                   subspace of the kernel feature space defined by the given kernel and the
                   given set of basis samples.  So after this function has been called you
                   will be able to project sample_type objects into kernel feature space
@@ -153,22 +153,22 @@ namespace dlib
         );
         /*!
             ensures
-                - #out_vector_size() == lisf.dictionary_size() 
+                - #out_vector_size() == lisf.dictionary_size()
                 - #basis_size() == lisf.dictionary_size()
                 - #get_kernel() == lisf.get_kernel()
-                - Uses the dictionary vectors from lisf as a basis set.  Thus, this function 
-                  constructs a map between normal sample_type objects and the subspace of 
-                  the kernel feature space defined by the given kernel and the given set 
-                  of basis samples.  So after this function has been called you will be 
-                  able to project sample_type objects into kernel feature space and obtain 
+                - Uses the dictionary vectors from lisf as a basis set.  Thus, this function
+                  constructs a map between normal sample_type objects and the subspace of
+                  the kernel feature space defined by the given kernel and the given set
+                  of basis samples.  So after this function has been called you will be
+                  able to project sample_type objects into kernel feature space and obtain
                   the resulting vector as a regular column matrix.
                 - The basis samples are loaded into this object in the order in which they
                   are stored in lisf.  That is:
                     - for all valid i: (*this)[i] == lisf[i]
             throws
                 - empirical_kernel_map_error
-                    This exception is thrown if we are unable to create a kernel map.  
-                    E.g.  if the lisf.size() == 0.  
+                    This exception is thrown if we are unable to create a kernel map.
+                    E.g.  if the lisf.size() == 0.
                     If this happens then this object will revert back to its initial value.
         !*/
 
@@ -207,29 +207,29 @@ namespace dlib
             requires
                 - idx < basis_size()
             ensures
-                - returns a const reference to the idx'th basis vector contained inside 
+                - returns a const reference to the idx'th basis vector contained inside
                   this object.
         !*/
 
         const matrix<scalar_type,0,1,mem_manager_type>& project (
-            const sample_type& sample 
+            const sample_type& sample
         ) const;
         /*!
             requires
                 - out_vector_size() != 0
             ensures
                 - takes the given sample and projects it into the kernel feature space
-                  of out_vector_size() dimensions defined by this kernel map and 
+                  of out_vector_size() dimensions defined by this kernel map and
                   returns the resulting vector.
                 - in more precise terms, this function returns a vector such that:
                     - The returned vector will contain out_vector_size() elements.
                     - for any sample_type object S, the following equality is approximately true:
-                        - get_kernel()(sample,S) == dot(project(sample), project(S)).  
+                        - get_kernel()(sample,S) == dot(project(sample), project(S)).
                     - The approximation error in the above equality will be zero (within rounding error)
-                      if both sample_type objects involved are within the span of the set of basis 
-                      samples given to the load() function.  If they are not then there will be some 
+                      if both sample_type objects involved are within the span of the set of basis
+                      samples given to the load() function.  If they are not then there will be some
                       approximation error.  Note that all the basis samples are always within their
-                      own span.  So the equality is always exact for the samples given to the load() 
+                      own span.  So the equality is always exact for the samples given to the load()
                       function.
         !*/
 
@@ -243,9 +243,9 @@ namespace dlib
             ensures
                 - This function returns project(samp)
                   (i.e. it returns the same thing as the above project() function)
-                - #projection_error == the square of the distance between the point samp 
-                  gets projected onto and samp's true image in kernel feature space.  
-                  That is, this value is equal to: 
+                - #projection_error == the square of the distance between the point samp
+                  gets projected onto and samp's true image in kernel feature space.
+                  That is, this value is equal to:
                     pow(convert_to_distance_function(project(samp))(samp),2)
         !*/
 
@@ -259,17 +259,17 @@ namespace dlib
                 - vect.size() == out_vector_size()
                 - out_vector_size() != 0
             ensures
-                - This function interprets the given vector as a point in the kernel feature space defined 
-                  by this empirical_kernel_map.  The return value of this function is a decision 
+                - This function interprets the given vector as a point in the kernel feature space defined
+                  by this empirical_kernel_map.  The return value of this function is a decision
                   function, DF, that represents the given vector in the following sense:
                     - for all possible sample_type objects, S, it is the case that DF(S) == dot(project(S), vect)
-                      (i.e. the returned decision function computes dot products, in kernel feature space, 
+                      (i.e. the returned decision function computes dot products, in kernel feature space,
                       between vect and any argument you give it.  Note also that this equality is exact, even
                       for sample_type objects not in the span of the basis samples.)
                     - DF.kernel_function == get_kernel()
                     - DF.b == 0
                     - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
-                      that it is possible for there to be fewer basis_vectors than basis samples given to load().  
+                      that it is possible for there to be fewer basis_vectors than basis samples given to load().
                     - DF.basis_vectors.size() == basis_size()
         !*/
 
@@ -283,25 +283,25 @@ namespace dlib
                 - vect.size() == out_vector_size()
                 - out_vector_size() != 0
             ensures
-                - This function interprets the given vector as a point in the kernel feature space defined 
-                  by this empirical_kernel_map.  The return value of this function is a distance 
+                - This function interprets the given vector as a point in the kernel feature space defined
+                  by this empirical_kernel_map.  The return value of this function is a distance
                   function, DF, that represents the given vector in the following sense:
-                    - for any sample_type object S, the following equality is approximately true: 
+                    - for any sample_type object S, the following equality is approximately true:
                         - DF(S) == length(project(S) - vect)
-                          (i.e. the returned distance function computes distances, in kernel feature space, 
+                          (i.e. the returned distance function computes distances, in kernel feature space,
                           between vect and any argument you give it. )
                     - The approximation error in the above equality will be zero (within rounding error)
-                      if S is within the span of the set of basis samples given to the load() function.  
-                      If it is not then there will be some approximation error.  Note that all the basis 
-                      samples are always within their own span.  So the equality is always exact for the 
+                      if S is within the span of the set of basis samples given to the load() function.
+                      If it is not then there will be some approximation error.  Note that all the basis
+                      samples are always within their own span.  So the equality is always exact for the
                       samples given to the load() function.  Note further that the distance computed
                       by DF(S) is always the correct distance in kernel feature space between vect and
-                      the true projection of S.  That is, the above equality is approximate only because 
+                      the true projection of S.  That is, the above equality is approximate only because
                       of potential error in the project() function, not in DF(S).
                     - DF.kernel_function == get_kernel()
-                    - DF.b == dot(vect,vect) 
+                    - DF.b == dot(vect,vect)
                     - DF.basis_vectors == these will be the basis samples given to the previous call to load().  Note
-                      that it is possible for there to be fewer basis_vectors than basis samples given to load().  
+                      that it is possible for there to be fewer basis_vectors than basis samples given to load().
                     - DF.basis_vectors.size() == basis_size()
         !*/
 
@@ -329,9 +329,9 @@ namespace dlib
                 - A point in the kernel feature space defined by the kernel get_kernel() typically
                   has different representations with respect to different empirical_kernel_maps.
                   This function lets you obtain a transformation matrix that will allow you
-                  to project between these different representations. That is, this function returns 
-                  a matrix M with the following properties:    
-                    - M maps vectors represented according to *this into the representation used by target. 
+                  to project between these different representations. That is, this function returns
+                  a matrix M with the following properties:
+                    - M maps vectors represented according to *this into the representation used by target.
                     - M.nr() == target.out_vector_size()
                     - M.nc() == this->out_vector_size()
                     - Let V be a vector of this->out_vector_size() length.  Then define two distance_functions
@@ -342,7 +342,7 @@ namespace dlib
 
                       That is, DF1 and DF2 both represent the same point in kernel feature space.  Note
                       that the above equality is only approximate.  If the vector V represents a point in
-                      kernel space that isn't in the span of the basis samples used by target then the 
+                      kernel space that isn't in the span of the basis samples used by target then the
                       equality is approximate.  However, if it is in their span then the equality will
                       be exact.  For example, if target's basis samples are a superset of the basis samples
                       used by *this then the equality will always be exact (within rounding error).
@@ -363,13 +363,13 @@ namespace dlib
                   i.e. target must contain a superset of the basis vectors contained in *this.  Moreover,
                   it must contain them in the same order.
             ensures
-                - The single argument version of get_transformation_to() allows you to project 
+                - The single argument version of get_transformation_to() allows you to project
                   vectors from one empirical_kernel_map representation to another.  This version
                   provides a somewhat different capability.  Assuming target's basis vectors form a
                   superset of *this's basis vectors then this form of get_transformation_to() allows
                   you to reuse a vector from *this ekm to speed up the projection performed by target.
                   The defining relation is given below.
-                - for any sample S: 
+                - for any sample S:
                     - target.project(S) == #tmat * this->project(S) + #partial_projection(S)
                       (this is always true to within rounding error for any S)
                 - #partial_projection.basis_vectors.size() == target.basis_vectors.size() - this->basis_vectors.size()
@@ -416,7 +416,7 @@ namespace dlib
         >
     void deserialize (
         empirical_kernel_map<kernel_type>& item,
-        std::istream& in 
+        std::istream& in
     );
     /*!
         provides serialization support for empirical_kernel_map objects

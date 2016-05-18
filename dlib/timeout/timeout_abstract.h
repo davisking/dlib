@@ -8,7 +8,7 @@
 namespace dlib
 {
 
-    class timeout 
+    class timeout
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -20,7 +20,7 @@ namespace dlib
                 connection* con = a connection from somewhere;
                 {
                     // setup a timer that will call con->shutdown() in 10 seconds
-                    timeout t(*con,&connection::shutdown,10000); 
+                    timeout t(*con,&connection::shutdown,10000);
                     // Now call read on the connection.  If this call to read() takes more
                     // than 10 seconds then the t timeout will trigger and shutdown the
                     // connection.  If read completes in less than 10 seconds then the t
@@ -44,7 +44,7 @@ namespace dlib
 
 
             THREAD SAFETY
-                All methods of this class are thread safe. 
+                All methods of this class are thread safe.
         !*/
 
     public:
@@ -59,7 +59,7 @@ namespace dlib
         /*!
             requires
                 - callback_function does not throw
-            ensures                
+            ensures
                 - does not block.
                 - #*this is properly initialized
                 - if (this object isn't destructed in ms_to_timeout milliseconds) then
@@ -72,7 +72,7 @@ namespace dlib
         template <
             typename T
             >
-        timeout (  
+        timeout (
             T& object,
             void (T::*callback_function)(),
             unsigned long ms_to_timeout
@@ -80,11 +80,11 @@ namespace dlib
         /*!
             requires
                 - callback_function does not throw
-            ensures                
+            ensures
                 - does not block.
                 - #*this is properly initialized
                 - if (this object isn't destructed in ms_to_timeout milliseconds) then
-                    - (object.*callback_function)() will be called in ms_to_timeout 
+                    - (object.*callback_function)() will be called in ms_to_timeout
                       milliseconds.
             throws
                 - std::bad_alloc
@@ -95,7 +95,7 @@ namespace dlib
             typename T,
             typename U
             >
-        timeout (  
+        timeout (
             T& object,
             void (T::*callback_function)(U callback_function_argument),
             unsigned long ms_to_timeout,
@@ -104,11 +104,11 @@ namespace dlib
         /*!
             requires
                 - callback_function does not throw
-            ensures                
+            ensures
                 - does not block.
                 - #*this is properly initialized
                 - if (this object isn't destructed in ms_to_timeout milliseconds) then
-                    - (object.*callback_function)(callback_function_argument) will be 
+                    - (object.*callback_function)(callback_function_argument) will be
                       called in ms_to_timeout milliseconds.
             throws
                 - std::bad_alloc
@@ -118,7 +118,7 @@ namespace dlib
         template <
             typename T
             >
-        timeout (  
+        timeout (
             T& object,
             int (T::*callback_function)(),
             unsigned long ms_to_timeout
@@ -126,11 +126,11 @@ namespace dlib
         /*!
             requires
                 - callback_function does not throw
-            ensures                
+            ensures
                 - does not block.
                 - #*this is properly initialized
                 - if (this object isn't destructed in ms_to_timeout milliseconds) then
-                    - (object.*callback_function)() will be called in ms_to_timeout 
+                    - (object.*callback_function)() will be called in ms_to_timeout
                       milliseconds.
             throws
                 - std::bad_alloc
@@ -141,7 +141,7 @@ namespace dlib
             typename T,
             typename U
             >
-        timeout (  
+        timeout (
             T& object,
             int (T::*callback_function)(U callback_function_argument),
             unsigned long ms_to_timeout,
@@ -150,11 +150,11 @@ namespace dlib
         /*!
             requires
                 - callback_function does not throw
-            ensures                
+            ensures
                 - does not block.
                 - #*this is properly initialized
                 - if (this object isn't destructed in ms_to_timeout milliseconds) then
-                    - (object.*callback_function)(callback_function_argument) will be 
+                    - (object.*callback_function)(callback_function_argument) will be
                       called in ms_to_timeout milliseconds.
             throws
                 - std::bad_alloc
@@ -179,7 +179,7 @@ namespace dlib
         timeout(const timeout&);        // copy constructor
         timeout& operator=(const timeout&);    // assignment operator
 
-    };    
+    };
 
 }
 

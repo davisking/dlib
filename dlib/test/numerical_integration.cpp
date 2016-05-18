@@ -3,7 +3,7 @@
 
 // This function test battery is given in:
 //
-// Test functions taken from Pedro Gonnet's dissertation at ETH: 
+// Test functions taken from Pedro Gonnet's dissertation at ETH:
 // Adaptive Quadrature Re-Revisited
 // http://e-collection.library.ethz.ch/eserv/eth:65/eth-65-02.pdf
 
@@ -13,7 +13,7 @@
 #include <dlib/numerical_integration.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
     using namespace test;
     using namespace dlib;
@@ -64,10 +64,10 @@ namespace
             m(20) = integrate_function_adapt_simp(&gg21, 0.0, 1.0, tol);
             m(21) = integrate_function_adapt_simp(&gg22, 0.0, 5.0, tol);
 
-            // Here we compare the approximated integrals against 
-            // highly accurate approximations generated either from 
-            // the exact integral values or Mathematica's NIntegrate 
-            // function using a working precision of 20. 
+            // Here we compare the approximated integrals against
+            // highly accurate approximations generated either from
+            // the exact integral values or Mathematica's NIntegrate
+            // function using a working precision of 20.
 
             DLIB_TEST(abs(m(0) - 1.7182818284590452354) < 1e-11);
             DLIB_TEST(abs(m(1) - 0.7000000000000000000) < eps);
@@ -124,7 +124,7 @@ namespace
             return 1/(pow(x,4) + pow(x,2) + 0.9);
         }
 
-        static double gg6(double x)    
+        static double gg6(double x)
         {
             return pow(x,1.5);
         }
@@ -196,7 +196,7 @@ namespace
 
         static double gg20(double x)
         {
-            return 1/cosh(20.0*(x-1.0/5.0)) + 1/cosh(400.0*(x-2.0/5.0)) 
+            return 1/cosh(20.0*(x-1.0/5.0)) + 1/cosh(400.0*(x-2.0/5.0))
                 + 1/cosh(8000.0*(x-3.0/5.0));
         }
 

@@ -18,8 +18,8 @@ namespace dlib
 {
     
     /*
-        The point of the matrix_assign() functions is to contain all the various 
-        optimizations that help the matrix assign a matrix_exp to an actual matrix 
+        The point of the matrix_assign() functions is to contain all the various
+        optimizations that help the matrix assign a matrix_exp to an actual matrix
         object quickly.
     */
 
@@ -28,7 +28,7 @@ namespace dlib
     namespace ma
     {
         // This template here controls how big a compile time sized matrix needs
-        // to be for it to get passed into the optimized versions of the 
+        // to be for it to get passed into the optimized versions of the
         // matrix_assign() function.  So small matrices are evaluated with a simple
         // loop like the ones in this file and bigger matrices may get sent to BLAS
         // routines or some other kind of optimized thing.
@@ -53,7 +53,7 @@ namespace dlib
         template < typename EXP, typename enable = void >
         struct has_column_major_layout { static const bool value = false; };
         template < typename EXP >
-        struct has_column_major_layout<EXP, typename enable_if<is_same_type<typename EXP::layout_type, column_major_layout> >::type > 
+        struct has_column_major_layout<EXP, typename enable_if<is_same_type<typename EXP::layout_type, column_major_layout> >::type >
         { static const bool value = true; };
 
 
@@ -70,7 +70,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP1, typename EXP2>
-    inline typename disable_if<ma::has_column_major_layout<EXP1> >::type  
+    inline typename disable_if<ma::has_column_major_layout<EXP1> >::type
     matrix_assign_default (
         EXP1& dest,
         const EXP2& src
@@ -96,7 +96,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP1, typename EXP2>
-    inline typename enable_if<ma::has_column_major_layout<EXP1> >::type  
+    inline typename enable_if<ma::has_column_major_layout<EXP1> >::type
     matrix_assign_default (
         EXP1& dest,
         const EXP2& src
@@ -122,7 +122,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP1, typename EXP2>
-    inline typename disable_if<ma::has_column_major_layout<EXP1> >::type  
+    inline typename disable_if<ma::has_column_major_layout<EXP1> >::type
     matrix_assign_default (
         EXP1& dest,
         const EXP2& src,
@@ -202,7 +202,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP1, typename EXP2>
-    inline typename enable_if<ma::has_column_major_layout<EXP1> >::type  
+    inline typename enable_if<ma::has_column_major_layout<EXP1> >::type
     matrix_assign_default (
         EXP1& dest,
         const EXP2& src,
@@ -283,7 +283,7 @@ namespace dlib
 
     template <
         typename matrix_dest_type,
-        typename src_exp 
+        typename src_exp
         >
     void matrix_assign_big (
         matrix_dest_type& dest,
@@ -297,7 +297,7 @@ namespace dlib
 
     template <
         typename matrix_dest_type,
-        typename src_exp 
+        typename src_exp
         >
     inline typename disable_if<ma::is_small_matrix<src_exp> >::type matrix_assign (
         matrix_dest_type& dest,
@@ -312,7 +312,7 @@ namespace dlib
             - #dest == src
     !*/
     {
-        // Call src.ref() here so that the derived type of the matrix_exp shows 
+        // Call src.ref() here so that the derived type of the matrix_exp shows
         // up so we can overload matrix_assign_big() based on various matrix expression
         // types.
         matrix_assign_big(dest,src.ref());
@@ -360,7 +360,7 @@ namespace dlib
 
     template <
         typename matrix_dest_type,
-        typename src_exp 
+        typename src_exp
         >
     inline typename enable_if_c<ma::is_small_matrix<src_exp>::value && ma::is_very_small_matrix<src_exp>::value==false >::type matrix_assign (
         matrix_dest_type& dest,
@@ -382,7 +382,7 @@ namespace dlib
 
     template <
         typename matrix_dest_type,
-        typename src_exp 
+        typename src_exp
         >
     inline typename enable_if_c<ma::is_small_matrix<src_exp>::value && ma::is_very_small_matrix<src_exp>::value==true >::type matrix_assign (
         matrix_dest_type& dest,

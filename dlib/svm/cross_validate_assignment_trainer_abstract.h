@@ -25,12 +25,12 @@ namespace dlib
         requires
             - is_assignment_problem(samples, labels)
             - if (assigner.forces_assignment()) then
-                - is_forced_assignment_problem(samples, labels) 
+                - is_forced_assignment_problem(samples, labels)
             - assignment_function == an instantiation of the dlib::assignment_function
               template or an object with a compatible interface.
         ensures
-            - Tests assigner against the given samples and labels and returns the fraction 
-              of assignments predicted correctly.  
+            - Tests assigner against the given samples and labels and returns the fraction
+              of assignments predicted correctly.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -48,13 +48,13 @@ namespace dlib
         requires
             - is_assignment_problem(samples, labels)
             - if (trainer.forces_assignment()) then
-                - is_forced_assignment_problem(samples, labels) 
+                - is_forced_assignment_problem(samples, labels)
             - 1 < folds <= samples.size()
             - trainer_type == dlib::structural_assignment_trainer or an object
               with a compatible interface.
         ensures
             - performs k-fold cross validation by using the given trainer to solve the
-              given assignment learning problem for the given number of folds.  Each fold 
+              given assignment learning problem for the given number of folds.  Each fold
               is tested using the output of the trainer and the fraction of assignments
               predicted correctly is returned.
             - The number of folds used is given by the folds argument.

@@ -1,7 +1,7 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #undef DLIB_THREADED_OBJECT_EXTENSIOn_ABSTRACT_
-#ifdef DLIB_THREADED_OBJECT_EXTENSIOn_ABSTRACT_ 
+#ifdef DLIB_THREADED_OBJECT_EXTENSIOn_ABSTRACT_
 
 #include "threads_kernel_abstract.h"
 
@@ -15,13 +15,13 @@ namespace dlib
         /*!
             INITIAL VALUE
                 - is_running() == false
-                - is_alive() == false 
+                - is_alive() == false
                 - should_respawn() == false
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a simple threaded object.  To use it you inherit
                 from it and define the thread() function.  Then when you call start()
-                it will spawn a thread that calls this->thread().  
+                it will spawn a thread that calls this->thread().
         !*/
     public:
 
@@ -33,7 +33,7 @@ namespace dlib
             throws
                 - std::bad_alloc
                 - dlib::thread_error
-                    the constructor may throw this exception if there is a problem 
+                    the constructor may throw this exception if there is a problem
                     gathering resources to create threading objects.
         !*/
 
@@ -45,7 +45,7 @@ namespace dlib
                   (i.e. in the destructor for the object you derive from this one you
                   must wait for this->thread() to end.)
             ensures
-                - all resources allocated by *this have been freed.  
+                - all resources allocated by *this have been freed.
         !*/
 
         bool is_running (
@@ -93,7 +93,7 @@ namespace dlib
                 - #should_stop() == false
             throws
                 - std::bad_alloc or dlib::thread_error
-                    If either of these exceptions are thrown then 
+                    If either of these exceptions are thrown then
                     #is_alive() == false and #is_running() == false
         !*/
 
@@ -113,9 +113,9 @@ namespace dlib
                 - is not called from this->thread()
             ensures
                 - returns true if the thread will automatically restart upon termination and
-                  false otherwise.  Note that every time a thread starts it sets should_respawn() 
+                  false otherwise.  Note that every time a thread starts it sets should_respawn()
                   back to false.  Therefore, a single call to set_respawn() can cause at most
-                  one respawn to occur. 
+                  one respawn to occur.
         !*/
 
         void restart (
@@ -129,13 +129,13 @@ namespace dlib
                 - if (is_alive()) then
                     - #should_respawn() == true
                 - else
-                    - #should_respawn() == false 
+                    - #should_respawn() == false
                 - #is_alive() == true
                 - #is_running() == true
                 - #should_stop() == false
             throws
                 - std::bad_alloc or dlib::thread_error
-                    If either of these exceptions are thrown then 
+                    If either of these exceptions are thrown then
                     #is_alive() == false and #is_running() == false
         !*/
 
@@ -167,7 +167,7 @@ namespace dlib
             requires
                 - is only called from the thread that executes this->thread()
             ensures
-                - calls to this function block until (#is_running() == true || #should_stop() == true) 
+                - calls to this function block until (#is_running() == true || #should_stop() == true)
                 - if (this thread is supposed to terminate) then
                     - returns true
                 - else

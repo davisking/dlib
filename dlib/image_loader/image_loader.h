@@ -21,14 +21,14 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class image_load_error : public dlib::error { 
+    class image_load_error : public dlib::error {
     public: image_load_error(const std::string& str) : error(EIMAGE_LOAD,str){}
     };
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void load_bmp (
         image_type& image_,
@@ -548,7 +548,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type 
+        typename image_type
         >
     void load_dng (
         image_type& image_,
@@ -766,7 +766,7 @@ namespace dlib
                 // get the compressed exponent data
                 deserialize(expbuf, in);
                 typedef entropy_decoder::kernel_2a decoder_type;
-                typedef entropy_decoder_model<256,decoder_type>::kernel_4a edm_exp_type; 
+                typedef entropy_decoder_model<256,decoder_type>::kernel_4a edm_exp_type;
                 vectorstream inexp(expbuf);
                 decoder_type decoder;
                 decoder.set_stream(inexp);
@@ -774,7 +774,7 @@ namespace dlib
                 edm_exp_type edm_exp(decoder);
                 float_details prev;
                 unsigned long i = 0;
-                // fill out the image 
+                // fill out the image
                 for (long r = 0; r < image.nr(); ++r)
                 {
                     for (long c = 0; c < image.nc(); ++c)

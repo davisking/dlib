@@ -14,7 +14,7 @@
     still exist but they don't do anything.
 
     Also note that when the stack trace is enabled it changes the DLIB_ASSERT
-    and DLIB_CASSERT macros so that they print stack traces when 
+    and DLIB_CASSERT macros so that they print stack traces when
     an assert fails.
 
     See the following example program for details:
@@ -28,7 +28,7 @@
         // like to appear in stack traces
         DLIB_STACK_TRACE;
 
-        // you may print the current stack trace as follows. 
+        // you may print the current stack trace as follows.
         std::cout << dlib::get_stack_trace() << endl;
     }
 
@@ -54,8 +54,8 @@
 
 // only setup the stack trace stuff if the asserts are enabled (which happens in debug mode
 // basically).  Also, this stuff doesn't work if you use NO_MAKEFILE
-#if defined(DLIB_ENABLE_STACK_TRACE) 
-#ifdef NO_MAKEFILE 
+#if defined(DLIB_ENABLE_STACK_TRACE)
+#ifdef NO_MAKEFILE
 #error "You can't use the dlib stack trace stuff and NO_MAKEFILE at the same time"
 #endif
 
@@ -78,7 +78,7 @@ namespace dlib
         dlib_o_out << "Stack Trace: \n" << dlib::get_stack_trace() << "\n";        \
         dlib_assert_breakpoint();                                           \
         throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib_o_out.str());      \
-    }}                                                                      
+    }}
 
 
 
@@ -103,8 +103,8 @@ namespace dlib
 #define DLIB_STACK_TRACE dlib::stack_tracer dlib_stack_tracer_object(DLIB_FUNCTION_NAME,__FILE__,__LINE__)
 
 #else // don't do anything if ENABLE_ASSERTS isn't defined
-#define DLIB_STACK_TRACE_NAMED(x) 
-#define DLIB_STACK_TRACE 
+#define DLIB_STACK_TRACE_NAMED(x)
+#define DLIB_STACK_TRACE
 
 namespace dlib
 {

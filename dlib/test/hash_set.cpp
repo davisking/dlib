@@ -10,7 +10,7 @@
 #include <dlib/hash_set.h>
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -29,9 +29,9 @@ namespace
             - hash_set is an implementation of hash_set/hash_set_kernel_abstract.h and
               is instantiated with int
         ensures
-            - runs tests on hash_set for compliance with the specs 
+            - runs tests on hash_set for compliance with the specs
     !*/
-    {        
+    {
 
 
         srand(static_cast<unsigned int>(time(0)));
@@ -305,9 +305,9 @@ namespace
                     test.add(a);
             }
 
-            count = 0; 
+            count = 0;
             while (test.move_next())
-            {                    
+            {
                 ++count;
                 if (count == 5000)
                     break;
@@ -316,7 +316,7 @@ namespace
 
             test.reset();
 
-            count = 0; 
+            count = 0;
             while (test.move_next())
             {
                 ++count;
