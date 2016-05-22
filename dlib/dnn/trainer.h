@@ -526,8 +526,7 @@ namespace dlib
             label_type pick_which_run_update;
             job_t next_job;
 
-            std::vector<std::future<double>> losses(devices.size());
-            std::vector<std::future<void>> update_futs(devices.size());
+            std::vector<dlib::future<double>> losses(devices.size());
 
             std::vector<tt::multi_device_tensor_averager> averagers;
             // An array of all the parameter tensors in the first network.  We will
@@ -535,6 +534,8 @@ namespace dlib
             // different GPUs don't go out of sync.
             std::vector<tensor*> reference_params;
             visit_layer_parameters(devices[0]->net, [&](size_t, tensor& t) { reference_params.push_back(&t); });
+
+            thread_pool tp(devices.size());
 
 
             size_t iteration = 0;
@@ -545,7 +546,7 @@ namespace dlib
                 // right version for unsupervised or supervised training based on the type
                 // of label_type.
                 for (size_t i = 0; i < devices.size(); ++i)
-                    losses[i] = std::async(std::launch::async,[&,i](){ return compute_parameter_gradients(i, next_job, pick_which_run_update); });
+                    tp.add_task_by_value([&,i](double& loss){ loss = compute_parameter_gradients(i, next_job, pick_which_run_update); }, losses[i]);
                 // aggregate loss values from all the network computations.
                 double theloss = 0;
                 for (auto&& loss : losses)
@@ -596,10 +597,9 @@ namespace dlib
 
                 // Now apply all the updates to each device.
                 for (size_t i = 0; i < devices.size(); ++i)
-                    update_futs[i] = std::async(std::launch::async, [&,i](){ if (next_job.have_data[i]) update_parameters(i); });
+                    tp.add_task_by_value([&,i](){ if (next_job.have_data[i]) update_parameters(i); });
                 // and wait for the updates to all happen.
-                for (auto&& f : update_futs)
-                    f.wait();
+                tp.wait_for_all_tasks();
 
 
                 // Evey now and then force all the parameters to be the same just to make
