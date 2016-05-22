@@ -20,29 +20,76 @@ using namespace dlib;
 
 // ----------------------------------------------------------------------------------------
 
-// Let's start by showing how you can conveniently define large networks.  The
-// most important tool for doing this are C++'s alias templates.  These let us
-// define new layer types that are combinations of a bunch of other layers.
-// These will form the building blocks for more complex networks.
+// Let's start by showing how you can conveniently define large and complex
+// networks.  The most important tool for doing this are C++'s alias templates.
+// These let us define new layer types that are combinations of a bunch of other
+// layers.  These will form the building blocks for more complex networks.
 
 // So let's begin by defining the building block of a residual network (see
 // Figure 2 in Deep Residual Learning for Image Recognition by He, Zhang, Ren,
-// and Sun).  You can see a few things in this statement.  The most obvious is
-// that we have combined a bunch of layers into the name "base_res".  You can
-// also see the use of the tag1 layer.  This layer doesn't do any computation.
-// It exists solely so other layers can refer to it.  In this case, the
-// add_prev1 layer looks for the tag1 layer and will take the tag1 output and
-// add it to the input of the add_prev1 layer.  This combination allows us to
-// implement skip and residual style networks.  We have also made base_res
-// parameterized by BN, which will let us insert different batch normalization
-// layers.
-template <template <typename> class BN, typename SUBNET> 
-using base_res  = relu<add_prev1<BN<con<8,3,3,1,1,relu<BN<con<8,3,3,1,1,tag1<SUBNET>>>>>>>>;
+// and Sun).  We are going to decompose the residual block into a few alias
+// statements.  First, we define the core block.
 
-// We also want a residual block that begins by doing downsampling.  We can
-// reuse base_res to define it like this:
-template <template <typename> class BN, typename SUBNET> 
-using base_res_down  = base_res<BN,avg_pool<1,1,2,2,SUBNET>>;
+// Here we have parameterized the "block" layer on a BN layer (nominally some
+// kind of batch normalization), the number of filter outputs N, and the stride
+// the block operates at.
+template <
+    int N, 
+    template <typename> class BN, 
+    int stride, 
+    typename SUBNET
+    > 
+using block  = BN<con<N,3,3,1,1,relu<BN<con<N,3,3,stride,stride,SUBNET>>>>>;
+
+// Next, we need to define the skip layer mechanism used in the residual network
+// paper.  They create their blocks by adding the input tensor to the output of
+// each block.  So we define an alias statement that takes a block and wraps it
+// with this skip/add structure.
+
+// Note the tag layer.  This layer doesn't do any computation.  It exists solely
+// so other layers can refer to it.  In this case, the add_prev1 layer looks for
+// the tag1 layer and will take the tag1 output and add it to the input of the
+// add_prev1 layer.  This combination allows us to implement skip and residual
+// style networks.  We have also set the block stride to 1 in this statement.
+// The significance of that is explained next.
+template <
+    template <int,template<typename>class,int,typename> class block, 
+    int N, 
+    template<typename>class BN, 
+    typename SUBNET
+    >
+using residual = add_prev1<block<N,BN,1,tag1<SUBNET>>>;
+
+// Some residual blocks do downsampling.  They do this by using a stride of 2
+// instead of 1.  However, when downsampling we need to also take care to
+// downsample the part of the network that adds the original input to the output
+// or the sizes won't make sense (the network will still run, but the results
+// aren't as good).  So here we define a downsampling version of residual.  In
+// it, we make use of the skip1 layer.  This layer simply outputs whatever is
+// output by the tag1 layer.  Therefore, the skip1 layer (there are also skip2,
+// skip3, etc. in dlib) allows you to create branching network structures.
+
+// residual_down creates a network structure like this:
+/*
+         input from SUBNET
+             /     \
+            /       \
+         block     downsample(using avg_pool)
+            \       /
+             \     /
+           add tensors (using add_prev2 which adds the output of tag2 with avg_pool's output)
+                |
+              output
+*/
+template <
+    template <int,template<typename>class,int,typename> class block, 
+    int N, 
+    template<typename>class BN, 
+    typename SUBNET
+    >
+using residual_down = add_prev2<avg_pool<2,2,2,2,skip1<tag2<block<N,BN,2,tag1<SUBNET>>>>>>;
+
+
 
 // Now we can define 4 different residual blocks we will use in this example.
 // The first two are non-downsampling residual blocks while the last two
@@ -50,10 +97,10 @@ using base_res_down  = base_res<BN,avg_pool<1,1,2,2,SUBNET>>;
 // ares_down have had the batch normalization replaced with simple affine
 // layers.  We will use the affine version of the layers when testing our
 // networks.
-template <typename SUBNET> using res       = base_res<bn_con,SUBNET>;
-template <typename SUBNET> using ares      = base_res<affine,SUBNET>;
-template <typename SUBNET> using res_down  = base_res_down<bn_con,SUBNET>;
-template <typename SUBNET> using ares_down = base_res_down<affine,SUBNET>;
+template <typename SUBNET> using res       = relu<residual<block,8,bn_con,SUBNET>>;
+template <typename SUBNET> using ares      = relu<residual<block,8,affine,SUBNET>>;
+template <typename SUBNET> using res_down  = relu<residual_down<block,8,bn_con,SUBNET>>;
+template <typename SUBNET> using ares_down = relu<residual_down<block,8,affine,SUBNET>>;
 
 
 
@@ -145,39 +192,41 @@ int main(int argc, char** argv) try
     // These print statements will output this (I've truncated it since it's
     // long, but you get the idea):
     /*
-        The pnet has 127 layers in it.
+        The pnet has 131 layers in it.
         layer<0>    loss_multiclass_log
-        layer<1>    fc       (num_outputs=10)
+        layer<1>    fc       (num_outputs=10) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
         layer<2>    avg_pool (nr=0, nc=0, stride_y=1, stride_x=1, padding_y=0, padding_x=0)
         layer<3>    prelu    (initial_param_value=0.2)
         layer<4>    add_prev
-        layer<5>    bn_con
-        layer<6>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
+        layer<5>    bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0
+        layer<6>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
         layer<7>    prelu    (initial_param_value=0.25)
-        layer<8>    bn_con
-        layer<9>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
+        layer<8>    bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0
+        layer<9>    con     (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
         layer<10>   tag1
         ...
-        layer<33>   con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
-        layer<34>   tag1
-        layer<35>   avg_pool (nr=1, nc=1, stride_y=2, stride_x=2, padding_y=0, padding_x=0)
-        layer<36>   tag4
-        layer<37>   prelu    (initial_param_value=0.3)
-        layer<38>   add_prev
-        layer<39>   bn_con
+        layer<34>   relu
+        layer<35>   bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0
+        layer<36>   con      (num_filters=8, nr=3, nc=3, stride_y=2, stride_x=2, padding_y=0, padding_x=0) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
+        layer<37>   tag1
+        layer<38>   tag4
+        layer<39>   prelu    (initial_param_value=0.3)
+        layer<40>   add_prev
+        layer<41>   bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0
         ...
-        layer<115>  con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
-        layer<116>  tag1
-        layer<117>  avg_pool (nr=1, nc=1, stride_y=2, stride_x=2, padding_y=0, padding_x=0)
         layer<118>  relu
-        layer<119>  add_prev
-        layer<120>  bn_con
-        layer<121>  con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
+        layer<119>  bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0
+        layer<120>  con      (num_filters=8, nr=3, nc=3, stride_y=2, stride_x=2, padding_y=0, padding_x=0) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
+        layer<121>  tag1
         layer<122>  relu
-        layer<123>  bn_con
-        layer<124>  con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1)
-        layer<125>  tag1
-        layer<126>  input<matrix>
+        layer<123>  add_prev
+        layer<124>  bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0
+        layer<125>  con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
+        layer<126>  relu
+        layer<127>  bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0
+        layer<128>  con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
+        layer<129>  tag1
+        layer<130>  input<matrix>
     */
 
     // Now that we know the index numbers for each layer, we can access them
@@ -195,7 +244,7 @@ int main(int argc, char** argv) try
     // parts of your network and access them by layer<tag>().  You can also
     // index relative to a tag.  So for example, to access the layer immediately
     // after tag4 you can say:
-    layer<tag4,1>(pnet); // Equivalent to layer<36+1>(pnet).
+    layer<tag4,1>(pnet); // Equivalent to layer<38+1>(pnet).
 
     // Or to access the layer 2 layers after tag4:
     layer<tag4,2>(pnet);
