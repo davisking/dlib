@@ -775,6 +775,31 @@ namespace
         cpu::affine_transform(dest2, src2, srcb2, srcc2, 2, 3, 4, 5);
         DLIB_TEST(equal(mat(dest),mat(dest2)));
 
+        cuda::affine_transform(dest, src, srcb, srcc, 2, 3, 4, 0);
+        cpu::affine_transform(dest2, src2, srcb2, srcc2, 2, 3, 4, 0);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+        cuda::affine_transform(dest, src, srcb, srcc, 2, 3, 4);
+        cpu::affine_transform(dest2, src2, srcb2, srcc2, 2, 3, 4);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+        cuda::affine_transform_range(0, dest.size(), dest, src, srcb, srcc, 2, 3, 4);
+        cpu::affine_transform_range(0, dest2.size(), dest2, src2, srcb2, srcc2, 2, 3, 4);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+        if (3 < dest.size())
+        {
+            dest = 999;
+            dest2 = 999;
+            cuda::affine_transform_range(3, dest.size()-1, dest, src, srcb, srcc, 2, 3, 4);
+            cpu::affine_transform_range(3, dest2.size()-1, dest2, src2, srcb2, srcc2, 2, 3, 4);
+            DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+            cuda::affine_transform_range(dest.size(), dest.size(), dest, src, srcb, srcc, 2, 3, 4);
+            cpu::affine_transform_range(dest2.size(), dest2.size(), dest2, src2, srcb2, srcc2, 2, 3, 4);
+            DLIB_TEST(equal(mat(dest),mat(dest2)));
+        }
+
 
         rnd.fill_uniform(dest);
         rnd.fill_uniform(src);
