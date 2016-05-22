@@ -335,6 +335,8 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void compute_adam_update (
+        size_t begin,
+        size_t end,
         tensor& s,
         tensor& m,
         tensor& v,
@@ -354,12 +356,16 @@ namespace dlib { namespace tt
             - weight_decay >= 0
             - 0 <= momentum1 < 1
             - 0 <= momentum2 < 1
+            - begin <= end <= params.size()
         ensures
             - This function implements the ADAM parameter update method described in the paper:
                 Kingma, Diederik P., and Jimmy Ba Adam. "A method for stochastic
                 optimization." International Conference on Learning Representation. 2015.
               Specifically, it implements the method shown as Algorithm 1.
             - #s is the update vector that should be added to the parameters.
+            - The function only operates in the half open range [begin,end) of the memory
+              blocks of each tensor.  E.g. to make this function run on the entire tensor
+              set begin to 0 and end to params.size().
     !*/
 
 // ----------------------------------------------------------------------------------------

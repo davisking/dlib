@@ -311,6 +311,8 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void compute_adam_update (
+        size_t begin,
+        size_t end,
         tensor& s,
         tensor& m,
         tensor& v,
@@ -324,10 +326,10 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::compute_adam_update(s, m, v, t, learning_rate, weight_decay, momentum1,
+        cuda::compute_adam_update(begin, end, s, m, v, t, learning_rate, weight_decay, momentum1,
             momentum2, params, params_grad);
 #else
-        cpu::compute_adam_update(s, m, v, t, learning_rate, weight_decay, momentum1,
+        cpu::compute_adam_update(begin, end, s, m, v, t, learning_rate, weight_decay, momentum1,
             momentum2, params, params_grad);
 #endif
     }

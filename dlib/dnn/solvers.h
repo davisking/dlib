@@ -6,6 +6,7 @@
 #include "solvers_abstract.h"
 #include "tensor.h"
 #include <iostream>
+#include "layers.h"
 
 namespace dlib
 {
@@ -48,11 +49,43 @@ namespace dlib
                 v.copy_size(params_grad);
                 v = 0;
             }
-            
-            //perform: v = momentum*mat(v) - weight_decay*learning_rate*mat(params) - learning_rate*mat(params_grad);
-            tt::affine_transform(v, v, params, params_grad, 
-                               momentum, -weight_decay*learning_rate, -learning_rate, 0);
 
+            const double lr = learning_rate*get_learning_rate_multiplier(l);
+            const double wd = weight_decay*get_weight_decay_multiplier(l);
+            
+            //perform: v = momentum*mat(v) - wd*lr*mat(params) - lr*mat(params_grad);
+            tt::affine_transform(v, v, params, params_grad, momentum, -wd*lr, -lr);
+
+            return v;
+        }
+
+        template <unsigned long N>
+        const tensor& operator() (
+            const float learning_rate,
+            const fc_<N,FC_HAS_BIAS>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, l.get_num_outputs());
+            return v;
+        }
+
+        template <
+            long _num_filters,
+            long _nr,
+            long _nc,
+            int _stride_y,
+            int _stride_x,
+            int _padding_y,
+            int _padding_x
+            >
+        const tensor& operator() (
+            const float learning_rate,
+            const con_<_num_filters,_nr,_nc,_stride_y,_stride_x,_padding_y,_padding_x>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, l.num_filters());
             return v;
         }
 
@@ -76,9 +109,49 @@ namespace dlib
         }
 
     private:
+
+        template <typename layer_type> 
+        void update_considering_bias(
+            const float learning_rate,
+            const layer_type& l,
+            const tensor& params_grad,
+            unsigned long bias_offset
+        )
+        {
+            const tensor& params = l.get_layer_params();
+
+            DLIB_CASSERT(params.size() != 0,"");
+            if (v.size() == 0)
+            {
+                v.copy_size(params_grad);
+                v = 0;
+            }
+
+            double lr = learning_rate*get_learning_rate_multiplier(l);
+            double wd = weight_decay*get_weight_decay_multiplier(l);
+            
+            //perform: v = momentum*mat(v) - wd*lr*mat(params) - lr*mat(params_grad);
+
+            if (l.get_bias_learning_rate_multiplier() == 1 && l.get_bias_weight_decay_multiplier() == 1)
+            {
+                tt::affine_transform(v, v, params, params_grad, momentum, -wd*lr, -lr);
+            }
+            else
+            {
+
+                tt::affine_transform_range(0, bias_offset, v, v, params, params_grad, momentum, -wd*lr, -lr);
+
+                // now update the biases but apply their multipliers
+                lr *= l.get_bias_learning_rate_multiplier();
+                wd *= l.get_bias_weight_decay_multiplier();
+                tt::affine_transform_range(bias_offset, v.size(), v, v, params, params_grad, momentum, -wd*lr, -lr);
+            }
+        }
+
         resizable_tensor v;
         float weight_decay;
         float momentum;
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -131,11 +204,46 @@ namespace dlib
             }
 
             ++t;
+
             
-            tt::compute_adam_update(s, m, v, t, learning_rate, weight_decay, momentum1, momentum2, params, params_grad);
+            tt::compute_adam_update(0, params.size(), s, m, v, t,
+                learning_rate*get_learning_rate_multiplier(l),
+                weight_decay*get_weight_decay_multiplier(l), 
+                momentum1, momentum2, params, params_grad);
 
             return s;
         }
+
+        template <unsigned long N>
+        const tensor& operator() (
+            const float learning_rate,
+            const fc_<N,FC_HAS_BIAS>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, l.get_num_outputs());
+            return s;
+        }
+
+        template <
+            long _num_filters,
+            long _nr,
+            long _nc,
+            int _stride_y,
+            int _stride_x,
+            int _padding_y,
+            int _padding_x
+            >
+        const tensor& operator() (
+            const float learning_rate,
+            const con_<_num_filters,_nr,_nc,_stride_y,_stride_x,_padding_y,_padding_x>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, l.num_filters());
+            return s;
+        }
+
 
         friend void serialize(const adam& item, std::ostream& out)
         {
@@ -165,6 +273,49 @@ namespace dlib
         }
 
     private:
+
+        template <typename layer_type> 
+        void update_considering_bias(
+            const float learning_rate,
+            const layer_type& l,
+            const tensor& params_grad,
+            unsigned long bias_offset
+        )
+        {
+            const tensor& params = l.get_layer_params();
+            DLIB_CASSERT(params.size() != 0,"");
+            if (v.size() == 0)
+            {
+                m.copy_size(params_grad);
+                m = 0;
+                v.copy_size(params_grad);
+                v = 0;
+                s.copy_size(params_grad);
+            }
+
+
+            ++t;
+
+            if (l.get_bias_learning_rate_multiplier() == 1 && l.get_bias_weight_decay_multiplier() == 1)
+            {
+                tt::compute_adam_update(0, params.size(), s, m, v, t,
+                    learning_rate*get_learning_rate_multiplier(l),
+                    weight_decay*get_weight_decay_multiplier(l), 
+                    momentum1, momentum2, params, params_grad);
+            }
+            else
+            {
+                tt::compute_adam_update(0, bias_offset, s, m, v, t,
+                    learning_rate*get_learning_rate_multiplier(l),
+                    weight_decay*get_weight_decay_multiplier(l), 
+                    momentum1, momentum2, params, params_grad);
+
+                tt::compute_adam_update(bias_offset, params.size(), s, m, v, t,
+                    learning_rate*get_learning_rate_multiplier(l)*l.get_bias_learning_rate_multiplier(),
+                    weight_decay*get_weight_decay_multiplier(l)*l.get_bias_weight_decay_multiplier(), 
+                    momentum1, momentum2, params, params_grad);
+            }
+        }
         resizable_tensor m;
         resizable_tensor v;
         resizable_tensor s;

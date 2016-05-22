@@ -583,7 +583,8 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
         __global__ void _cuda_compute_adam_update(
-            size_t n,
+            size_t begin,
+            size_t end,
             float* s,
             float* m,
             float* v,
@@ -600,7 +601,7 @@ namespace dlib
             //   m = momentum1*m + (1-momentum1)    *   (weight_decay*params + params_grad);
             //   v = momentum2*v + (1-momentum2)*squared(weight_decay*params + params_grad);
             //   s = -alpha*m/(sqrt(v) + eps);
-            for (auto i : grid_stride_range(0, n))
+            for (auto i : grid_stride_range(begin, end))
             {
                 float g = (weight_decay*params[i] + params_grad[i]);
                 m[i] = momentum1*m[i] + (1-momentum1)*g;
@@ -610,6 +611,8 @@ namespace dlib
         }
 
         void compute_adam_update (
+            size_t begin,
+            size_t end,
             tensor& s,
             tensor& m,
             tensor& v,
@@ -626,10 +629,11 @@ namespace dlib
                          s.size() == v.size() &&
                          s.size() == params.size() &&
                          s.size() == params_grad.size(),"");
+            DLIB_CASSERT(begin <= end && end <= params.size(),"");
             const float alpha = learning_rate*std::sqrt(1-std::pow(momentum2,t))/(1-std::pow(momentum1, t));
 
-            launch_kernel(_cuda_compute_adam_update,max_jobs(s.size()),
-                    s.size(), s.device(), m.device(), v.device(), alpha, weight_decay,
+            launch_kernel(_cuda_compute_adam_update,max_jobs(end-begin),
+                    begin, end, s.device(), m.device(), v.device(), alpha, weight_decay,
                     momentum1, momentum2, params.device(), params_grad.device());
         }
 

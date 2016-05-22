@@ -488,6 +488,8 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void compute_adam_update (
+            size_t begin,
+            size_t end,
             tensor& s,
             tensor& m,
             tensor& v,
@@ -504,6 +506,7 @@ namespace dlib
                          s.size() == v.size() &&
                          s.size() == params.size() &&
                          s.size() == params_grad.size(),"");
+            DLIB_CASSERT(begin <= end && end <= params.size(),"");
             const float eps = 1e-8;
             const float alpha = learning_rate*std::sqrt(1-std::pow(momentum2,t))/(1-std::pow(momentum1, t));
 
@@ -516,7 +519,7 @@ namespace dlib
             auto ps = s.host_write_only();
             auto pparams = params.host();
             auto ppgrad = params_grad.host();
-            for (size_t i = 0; i < params.size(); ++i)
+            for (size_t i = begin; i < end; ++i)
             {
                 float g = weight_decay*pparams[i] + ppgrad[i];
                 pm[i] = momentum1*pm[i] + (1-momentum1)*g;

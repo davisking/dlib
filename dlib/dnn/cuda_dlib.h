@@ -205,6 +205,8 @@ namespace dlib
     // ----------------------------------------------------------------------------------------
 
         void compute_adam_update (
+            size_t begin,
+            size_t end,
             tensor& s,
             tensor& m,
             tensor& v,
