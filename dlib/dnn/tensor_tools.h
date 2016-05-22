@@ -229,11 +229,56 @@ namespace dlib { namespace tt
         const float D
     );
     /*!
-        requires - dest.size()==src1.size()
+        requires 
+            - dest.size()==src1.size()
             - dest.size()==src2.size()
             - dest.size()==src3.size()
         ensures
             - #dest == A*src1 + B*src2 + C*src3 + D
+    !*/
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C
+    );
+    /*!
+        requires 
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+            - dest.size()==src3.size()
+        ensures
+            - #dest == A*src1 + B*src2 + C*src3
+    !*/
+
+    void affine_transform_range(
+        size_t begin,
+        size_t end,
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C
+    );
+    /*!
+        requires 
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+            - dest.size()==src3.size()
+            - begin <= end <= dest.size()
+        ensures
+            - This function operates much like
+              affine_transform(dest,src1,src2,src3,A,B,C,0), except that it runs over only
+              the half open range [begin,end) rather than processing the entire tensor.
+              Specifically, it does this:
+                - for i in the range [begin, end):
+                    - #dest.host()[i] == A*src1.host()[i] + B*src2.host()[i] + C*src3.host()[i]
     !*/
 
 // ----------------------------------------------------------------------------------------

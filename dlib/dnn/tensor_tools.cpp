@@ -240,6 +240,42 @@ namespace dlib { namespace tt
 #endif
     }
 
+    void affine_transform_range(
+        size_t begin,
+        size_t end,
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
+#else
+        cpu::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
+#endif
+    }
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform_range(0,dest.size(),dest,src1,src2,src3,A,B,C);
+#else
+        cpu::affine_transform_range(0,dest.size(),dest,src1,src2,src3,A,B,C);
+#endif
+    }
+
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(

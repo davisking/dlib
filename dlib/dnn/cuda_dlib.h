@@ -164,6 +164,18 @@ namespace dlib
             const float D
         );
 
+        void affine_transform_range(
+            size_t begin,
+            size_t end,
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2,
+            const tensor& src3,
+            const float A,
+            const float B,
+            const float C
+        );
+
         // Note that this function isn't in the tt:: namespace because add_scaled() is
         // called by cuda::add() so we don't need a tt:: version of add_scaled().  
         void add_scaled(

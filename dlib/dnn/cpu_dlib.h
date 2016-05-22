@@ -81,6 +81,18 @@ namespace dlib
             const float D
         );
 
+        void affine_transform_range(
+            size_t begin,
+            size_t end,
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2,
+            const tensor& src3,
+            const float A,
+            const float B,
+            const float C
+        );
+
     // -----------------------------------------------------------------------------------
 
         void affine_transform(

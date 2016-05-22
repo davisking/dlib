@@ -385,6 +385,30 @@ namespace dlib
                 d[i] = A*s1[i] + B*s2[i] + C*s3[i] + D;
         }
 
+        void affine_transform_range(
+            size_t begin,
+            size_t end,
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2,
+            const tensor& src3,
+            const float A,
+            const float B,
+            const float C
+        )
+        {
+            DLIB_CASSERT(dest.size()==src1.size(),"");
+            DLIB_CASSERT(dest.size()==src2.size(),"");
+            DLIB_CASSERT(dest.size()==src3.size(),"");
+            DLIB_CASSERT(begin <= end && end <= dest.size(),"");
+            const auto d = dest.host();
+            const auto s1 = src1.host();
+            const auto s2 = src2.host();
+            const auto s3 = src3.host();
+            for (size_t i = begin; i < end; ++i)
+                d[i] = A*s1[i] + B*s2[i] + C*s3[i];
+        }
+
     // -----------------------------------------------------------------------------------
 
         void affine_transform(
