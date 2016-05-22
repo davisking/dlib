@@ -165,13 +165,13 @@ namespace
 
         resizable_tensor running_means;
         resizable_tensor running_variances;
-        batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+        batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
         const double scale = (src.num_samples())/(src.num_samples()-1.0);
         // Turn back into biased variance estimate because that's how batch_normalize() works, so if we want to match it this is necessary.
         running_variances = mat(running_variances)/scale; 
-        batch_normalize_inference(dest2, src, gamma, beta, running_means, running_variances);
+        batch_normalize_inference(DEFAULT_BATCH_NORM_EPS,dest2, src, gamma, beta, running_means, running_variances);
         DLIB_TEST_MSG(max(abs(mat(dest2)-mat(dest))) < 1e-5, max(abs(mat(dest2)-mat(dest))));
-        cpu::batch_normalize_inference(dest3, src, gamma, beta, running_means, running_variances);
+        cpu::batch_normalize_inference(DEFAULT_BATCH_NORM_EPS,dest3, src, gamma, beta, running_means, running_variances);
         DLIB_TEST_MSG(max(abs(mat(dest3)-mat(dest))) < 1e-5, max(abs(mat(dest3)-mat(dest))));
 
 
@@ -179,7 +179,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = src.host()[idx];
                 src.host()[idx] += eps;
-                batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 src.host()[idx] = old;
                 return result;
@@ -191,7 +191,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = gamma.host()[idx];
                 gamma.host()[idx] += eps;
-                batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 gamma.host()[idx] = old;
                 return result;
@@ -203,7 +203,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = beta.host()[idx];
                 beta.host()[idx] += eps;
-                batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 beta.host()[idx] = old;
                 return result;
@@ -220,7 +220,7 @@ namespace
         gamma_grad = 8;
         beta_grad = 8;
 
-        batch_normalize_gradient(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
+        batch_normalize_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
 
         auto grad_error = compare_gradients(src_grad, grad_src);
         dlog << LINFO << "src error: " << grad_error;
@@ -250,14 +250,14 @@ namespace
 
         resizable_tensor running_means;
         resizable_tensor running_variances;
-        batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+        batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
         const double scale = (src.num_samples()*src.nr()*src.nc())/(src.num_samples()*src.nr()*src.nc()-1.0);
         // Turn back into biased variance estimate because that's how
         // batch_normalize_conv() works, so if we want to match it this is necessary.
         running_variances = mat(running_variances)/scale; 
-        batch_normalize_conv_inference(dest2, src, gamma, beta, running_means, running_variances);
+        batch_normalize_conv_inference(DEFAULT_BATCH_NORM_EPS,dest2, src, gamma, beta, running_means, running_variances);
         DLIB_TEST(max(abs(mat(dest2)-mat(dest))) < 1e-5);
-        cpu::batch_normalize_conv_inference(dest3, src, gamma, beta, running_means, running_variances);
+        cpu::batch_normalize_conv_inference(DEFAULT_BATCH_NORM_EPS,dest3, src, gamma, beta, running_means, running_variances);
         DLIB_TEST(max(abs(mat(dest3)-mat(dest))) < 1e-5);
 
 
@@ -265,7 +265,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = src.host()[idx];
                 src.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 src.host()[idx] = old;
                 return result;
@@ -277,7 +277,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = gamma.host()[idx];
                 gamma.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 gamma.host()[idx] = old;
                 return result;
@@ -289,7 +289,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = beta.host()[idx];
                 beta.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 beta.host()[idx] = old;
                 return result;
@@ -307,7 +307,7 @@ namespace
         gamma_grad = 9;
         beta_grad = 9;
 
-        batch_normalize_conv_gradient(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
+        batch_normalize_conv_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
 
 
         auto grad_error = compare_gradients(src_grad, grad_src);
@@ -888,8 +888,8 @@ namespace
         rnd.fill_uniform(src);
 
 
-        cpu::batch_normalize(dest, means, invstds, 1, running_means, running_variances, src, gamma, beta);
-        cuda::batch_normalize(dest2,means2,invstds2, 1, running_means2, running_variances2, src, gamma, beta);
+        cpu::batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, invstds, 1, running_means, running_variances, src, gamma, beta);
+        cuda::batch_normalize(DEFAULT_BATCH_NORM_EPS,dest2,means2,invstds2, 1, running_means2, running_variances2, src, gamma, beta);
 
         dlog << LINFO << "dest error:    "<< max(abs(mat(dest) -mat(dest2)));
         dlog << LINFO << "means error:   "<< max(abs(mat(means) -mat(means2)));
@@ -915,8 +915,8 @@ namespace
         rnd.fill_uniform(gradient_input);
 
 
-        cpu::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-        cuda::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
+        cpu::batch_normalize_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cuda::batch_normalize_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
 
         dlog << LINFO << "src_grad error:   " << max(abs(mat(src_grad)-mat(src_grad2)));
         dlog << LINFO << "gamma_grad error: " << max(abs(mat(gamma_grad)-mat(gamma_grad2)));
@@ -942,8 +942,8 @@ namespace
         tt::tensor_rand rnd;
         rnd.fill_uniform(src);
 
-        cpu::batch_normalize_conv(dest,means,invstds,1,running_means,running_variances, src, gamma, beta);
-        cuda::batch_normalize_conv(dest2,means2,invstds2,1,running_means2,running_variances2, src, gamma, beta);
+        cpu::batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest,means,invstds,1,running_means,running_variances, src, gamma, beta);
+        cuda::batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest2,means2,invstds2,1,running_means2,running_variances2, src, gamma, beta);
 
         dlog << LINFO << "dest error:    "<< max(abs(mat(dest) -mat(dest2)));
         dlog << LINFO << "means error:   "<< max(abs(mat(means) -mat(means2)));
@@ -967,8 +967,8 @@ namespace
         rnd.fill_uniform(gradient_input);
 
 
-        cpu::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-        cuda::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
+        cpu::batch_normalize_conv_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cuda::batch_normalize_conv_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
 
         dlog << LINFO << "src_grad error:   " << max(abs(mat(src_grad)-mat(src_grad2)));
         dlog << LINFO << "gamma_grad error: " << max(abs(mat(gamma_grad)-mat(gamma_grad2)));
