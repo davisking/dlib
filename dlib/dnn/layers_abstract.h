@@ -818,6 +818,8 @@ namespace dlib
         FC_MODE = 1    // fully connected mode
     };
 
+    const double DEFAULT_BATCH_NORM_EPS = 0.00001;
+
     template <
         layer_mode mode
         >
@@ -857,17 +859,22 @@ namespace dlib
                 - #get_running_stats_window_size() == 1000
                 - #get_learning_rate_multiplier()  == 1
                 - #get_weight_decay_multiplier()   == 0
+                - #get_eps() == tt::DEFAULT_BATCH_NORM_EPS
         !*/
 
         explicit bn_(
-            unsigned long window_size
+            unsigned long window_size,
+            double eps = tt::DEFAULT_BATCH_NORM_EPS
         );
         /*!
+            requires
+                - eps > 0
             ensures
                 - #get_mode() == mode 
                 - #get_running_stats_window_size() == window_size
                 - #get_learning_rate_multiplier()  == 1
                 - #get_weight_decay_multiplier()   == 0
+                - #get_eps() == eps
         !*/
 
         layer_mode get_mode(
@@ -884,6 +891,15 @@ namespace dlib
                   Therefore, if you are putting batch normalization after a fully connected
                   layer you should use FC_MODE.  Otherwise, if you are putting batch
                   normalization after a convolutional layer you should use CONV_MODE.
+        !*/
+
+        double get_eps(
+        ) const; 
+        /*!
+            ensures
+                - When doing batch normalization, we are dividing by the standard
+                  deviation.  This epsilon value returned by this function is added to the
+                  variance to prevent the division from dividing by zero.
         !*/
 
         unsigned long get_running_stats_window_size (

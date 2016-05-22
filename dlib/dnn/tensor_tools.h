@@ -370,9 +370,8 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    const double BATCH_NORM_EPS = 0.00001;
-
     void batch_normalize_inference (
+        const double eps,
         resizable_tensor& dest,
         const tensor& src,
         const tensor& gamma, 
@@ -382,6 +381,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - gamma.num_samples() == 1 
             - gamma.nr() == src.nr() 
             - gamma.nc() == src.nc() 
@@ -393,11 +393,12 @@ namespace dlib { namespace tt
             - Linearly transforms src as a call to batch_normalize() would if src had means
               and variances as given by running_means and running_variances.  That is, this
               function performs: 
-                dest = gamma*(src-running_means)/sqrt(running_variances+BATCH_NORM_EPS) + beta
+                dest = gamma*(src-running_means)/sqrt(running_variances+eps) + beta
               Note that it does it in a pointwise fashion over the samples in src.
     !*/
 
     void batch_normalize (
+        const double eps,
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& invstds,
@@ -410,6 +411,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - src.num_samples() > 1
             - gamma.num_samples() == 1
             - beta.num_samples() == 1
@@ -435,6 +437,7 @@ namespace dlib { namespace tt
     !*/
 
     void batch_normalize_gradient (
+        const double eps,
         const tensor& gradient_input,
         const tensor& means,
         const tensor& invstds,
@@ -446,8 +449,9 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - invstds and means should be the output of a call to
-              batch_normalize(dest,means,invstds,src,gamma,beta)
+              batch_normalize(eps,dest,means,invstds,src,gamma,beta)
             - have_same_dimensions(gradient_input, src) == true
             - have_same_dimensions(src, src_grad) == true
             - src.num_samples() > 1
@@ -461,7 +465,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(invstds, gamma) == true
         ensures
             - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-              batch_normalize(dest,means,invstds,src,gamma,beta))
+              batch_normalize(eps,dest,means,invstds,src,gamma,beta))
             - Adds the gradient of f() with respect to src to #src_grad.
             - Assigns the gradient of f() with respect to gamma to #gamma_grad.
             - Assigns the gradient of f() with respect to beta to #beta_grad.
@@ -470,6 +474,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void batch_normalize_conv_inference (
+        const double eps,
         resizable_tensor& dest,
         const tensor& src,
         const tensor& gamma, 
@@ -479,6 +484,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - gamma.num_samples() == 1 
             - gamma.nr() == 1 
             - gamma.nc() == 1 
@@ -490,12 +496,13 @@ namespace dlib { namespace tt
             - Linearly transforms src as a call to batch_normalize_conv() would if src had
               means and variances as given by running_means and running_variances.  That
               is, this function performs: 
-                dest = gamma*(src-running_means)/sqrt(running_variances+BATCH_NORM_EPS) + beta
+                dest = gamma*(src-running_means)/sqrt(running_variances+eps) + beta
               Note that it does this in a pointwise fashion over the samples, rows, and
               columns in src.
     !*/
 
     void batch_normalize_conv (
+        const double eps,
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& invstds,
@@ -508,6 +515,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - src.num_samples() > 1
             - gamma.num_samples()==gamma.nr()==gamma.nc() == 1
             - beta.num_samples() ==beta.nr() ==gamma.nc() == 1
@@ -529,19 +537,21 @@ namespace dlib { namespace tt
     !*/
 
     void batch_normalize_conv_gradient (
-            const tensor& gradient_input,
-            const tensor& means,
-            const tensor& invstds,
-            const tensor& src,
-            const tensor& gamma,
-            tensor& src_grad,
-            tensor& gamma_grad, 
-            tensor& beta_grad 
+        const double eps,
+        const tensor& gradient_input,
+        const tensor& means,
+        const tensor& invstds,
+        const tensor& src,
+        const tensor& gamma,
+        tensor& src_grad,
+        tensor& gamma_grad, 
+        tensor& beta_grad 
     );
     /*!
         requires
+            - eps > 0
             - invstds and means should be the output of a call to
-              batch_normalize_conv(dest,means,invstds,src,gamma,beta)
+              batch_normalize_conv(eps,dest,means,invstds,src,gamma,beta)
             - have_same_dimensions(gradient_input, src) == true
             - have_same_dimensions(src, src_grad) == true
             - src.num_samples() > 1
@@ -553,7 +563,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(invstds, gamma) == true
         ensures
             - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-              batch_normalize_conv(dest,means,invstds,src,gamma,beta))
+              batch_normalize_conv(eps,dest,means,invstds,src,gamma,beta))
             - Adds the gradient of f() with respect to src to #src_grad.
             - Assigns the gradient of f() with respect to gamma to #gamma_grad.
             - Assigns the gradient of f() with respect to beta to #beta_grad.

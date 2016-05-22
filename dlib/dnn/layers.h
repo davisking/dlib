@@ -650,23 +650,30 @@ namespace dlib
         FC_MODE = 1
     };
 
+    const double DEFAULT_BATCH_NORM_EPS = 0.00001;
+
     template <
         layer_mode mode
         >
     class bn_
     {
     public:
-        explicit bn_(unsigned long window_size) : 
+        explicit bn_(
+            unsigned long window_size,
+            double eps_ = DEFAULT_BATCH_NORM_EPS
+        ) : 
             num_updates(0), 
             running_stats_window_size(window_size),
             learning_rate_multiplier(1),
-            weight_decay_multiplier(0)
+            weight_decay_multiplier(0),
+            eps(eps_)
         {}
 
         bn_() : bn_(1000) {}
 
         layer_mode get_mode() const { return mode; }
         unsigned long get_running_stats_window_size () const { return running_stats_window_size; }
+        double get_eps() const { return eps; }
 
         double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
         double get_weight_decay_multiplier () const   { return weight_decay_multiplier; }
@@ -713,16 +720,16 @@ namespace dlib
                 if (num_updates <running_stats_window_size)
                     ++num_updates;
                 if (mode == FC_MODE)
-                    tt::batch_normalize(output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
+                    tt::batch_normalize(eps, output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
                 else 
-                    tt::batch_normalize_conv(output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
+                    tt::batch_normalize_conv(eps, output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
             }
             else // we are running in testing mode so we just linearly scale the input tensor.
             {
                 if (mode == FC_MODE)
-                    tt::batch_normalize_inference(output, sub.get_output(), g, b, running_means, running_variances);
+                    tt::batch_normalize_inference(eps, output, sub.get_output(), g, b, running_means, running_variances);
                 else
-                    tt::batch_normalize_conv_inference(output, sub.get_output(), g, b, running_means, running_variances);
+                    tt::batch_normalize_conv_inference(eps, output, sub.get_output(), g, b, running_means, running_variances);
             }
         } 
 
@@ -733,9 +740,9 @@ namespace dlib
             auto g_grad = gamma(params_grad, 0);
             auto b_grad = beta(params_grad, gamma.size());
             if (mode == FC_MODE)
-                tt::batch_normalize_gradient(gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
+                tt::batch_normalize_gradient(eps, gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
             else
-                tt::batch_normalize_conv_gradient(gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
+                tt::batch_normalize_conv_gradient(eps, gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -758,6 +765,7 @@ namespace dlib
             serialize(item.running_stats_window_size, out);
             serialize(item.learning_rate_multiplier, out);
             serialize(item.weight_decay_multiplier, out);
+            serialize(item.eps, out);
         }
 
         friend void deserialize(bn_& item, std::istream& in)
@@ -798,12 +806,13 @@ namespace dlib
 
                 // We also need to flip the running_variances around since the previous
                 // format saved the inverse standard deviations instead of variances.
-                item.running_variances = 1.0f/squared(mat(item.running_variances)) - tt::BATCH_NORM_EPS;
+                item.running_variances = 1.0f/squared(mat(item.running_variances)) - DEFAULT_BATCH_NORM_EPS;
             }
             else if (version == "bn_con2" || version == "bn_fc2")
             {
                 deserialize(item.learning_rate_multiplier, in);
                 deserialize(item.weight_decay_multiplier, in);
+                deserialize(item.eps, in);
             }
             else
             {
@@ -811,6 +820,8 @@ namespace dlib
                 // implicitly 1.
                 item.learning_rate_multiplier = 1;
                 item.weight_decay_multiplier = 1;
+
+                item.eps = DEFAULT_BATCH_NORM_EPS;
             }
         }
 
@@ -820,6 +831,7 @@ namespace dlib
                 out << "bn_con  ";
             else
                 out << "bn_fc   ";
+            out << " eps="<<item.eps;
             out << " learning_rate_mult="<<item.learning_rate_multiplier;
             out << " weight_decay_mult="<<item.weight_decay_multiplier;
             return out;
@@ -837,6 +849,7 @@ namespace dlib
         unsigned long running_stats_window_size;
         double learning_rate_multiplier;
         double weight_decay_multiplier;
+        double eps;
     };
 
     template <typename SUBNET>
@@ -1273,7 +1286,7 @@ namespace dlib
             auto sg = gamma(temp,0);
             auto sb = beta(temp,gamma.size());
 
-            g = pointwise_multiply(mat(sg), 1.0f/sqrt(mat(item.running_variances)+tt::BATCH_NORM_EPS));
+            g = pointwise_multiply(mat(sg), 1.0f/sqrt(mat(item.running_variances)+item.get_eps()));
             b = mat(sb) - pointwise_multiply(mat(g), mat(item.running_means));
         }
 

@@ -135,6 +135,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void batch_normalize_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -144,6 +145,7 @@ namespace dlib
         );
 
         void batch_normalize (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -156,6 +158,7 @@ namespace dlib
         );
 
         void batch_normalize_gradient(
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -169,6 +172,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void batch_normalize_conv_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -178,6 +182,7 @@ namespace dlib
         );
 
         void batch_normalize_conv (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -190,6 +195,7 @@ namespace dlib
         );
 
         void batch_normalize_conv_gradient(
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
