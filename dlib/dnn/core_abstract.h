@@ -178,7 +178,7 @@ namespace dlib
         ); 
         /*!
             requires
-                - num < size()
+                - num <= size()
             ensures
                 - returns a reference to the sub-stack S such that:
                     - S.size() == size()-num.

@@ -490,7 +490,7 @@ namespace dlib
 
         sstack pop(size_t num=1) 
         { 
-            DLIB_CASSERT(num < size(), "You can't pop more things from the stack than it has in it.");
+            DLIB_CASSERT(num <= size(), "You can't pop more things from the stack than it has in it.");
             return sstack(data+num, mysize-num);
         }
 
