@@ -28,6 +28,38 @@ namespace dlib
 
     namespace impl
     {
+        template <typename T, typename int_<decltype(&T::get_learning_rate_multiplier)>::type = 0>
+        double get_learning_rate_multiplier (
+            const T& obj,
+            special_
+        ) { return obj.get_learning_rate_multiplier(); }
+
+        template <typename T>
+        double get_learning_rate_multiplier ( const T& obj, general_) { return 1; }
+    }
+    template <typename T>
+    double get_learning_rate_multiplier(const T& obj) { return impl::get_learning_rate_multiplier(obj, special_()); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T, typename int_<decltype(&T::get_weight_decay_multiplier)>::type = 0>
+        double get_weight_decay_multiplier (
+            const T& obj,
+            special_
+        ) { return obj.get_weight_decay_multiplier(); }
+
+        template <typename T>
+        double get_weight_decay_multiplier ( const T& obj, general_) { return 1; }
+    }
+    template <typename T>
+    double get_weight_decay_multiplier(const T& obj) { return impl::get_weight_decay_multiplier(obj, special_()); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
         class repeat_input_layer 
         {
             /*!
@@ -849,8 +881,9 @@ namespace dlib
         void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
             DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
-            // Don't try to adjust the parameters if this layer doesn't have any.
-            if (params_grad.size() != 0)
+            // Don't try to adjust the parameters if this layer doesn't have any or the
+            // learning rate is disabled for this layer.
+            if (params_grad.size() != 0 && get_learning_rate_multiplier(details) != 0)
             {
                 const tensor& step = solvers.top()(learning_rate, details, static_cast<const tensor&>(params_grad));
                 tt::add(details.get_layer_params(), details.get_layer_params(), step);
@@ -1200,8 +1233,9 @@ namespace dlib
         void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
             DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
-            // Don't try to adjust the parameters if this layer doesn't have any.
-            if (params_grad.size() != 0) 
+            // Don't try to adjust the parameters if this layer doesn't have any or the
+            // learning rate is disabled for this layer.
+            if (params_grad.size() != 0 && get_learning_rate_multiplier(details) != 0) 
             {
                 const tensor& step = solvers.top()(learning_rate, details, static_cast<const tensor&>(params_grad));
                 tt::add(details.get_layer_params(), details.get_layer_params(), step);
