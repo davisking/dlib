@@ -1851,9 +1851,7 @@ namespace dlib
     public:
         typedef INPUT_LAYER subnet_type;
         typedef typename subnet_type::input_type input_type;
-        // This layer counts as a computational layer because it copies and stores the
-        // inputs.
-        const static size_t num_computational_layers = 1;
+        const static size_t num_computational_layers = 0;
         const static size_t num_layers = 2;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         static_assert(sample_expansion_factor >= 1,

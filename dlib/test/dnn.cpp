@@ -1345,6 +1345,72 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        int N, 
+        template <typename> class BN, 
+        int stride, 
+        typename SUBNET
+        > 
+    using block  = BN<con<N,3,3,1,1,relu<BN<con<N,3,3,stride,stride,SUBNET>>>>>;
+
+    template <
+        template <int,template<typename>class,int,typename> class block, 
+        int N, 
+        template<typename>class BN, 
+        typename SUBNET
+        >
+    using residual = add_prev1<block<N,BN,1,tag1<SUBNET>>>;
+
+    template <
+        template <int,template<typename>class,int,typename> class block, 
+        int N, 
+        template<typename>class BN, 
+        typename SUBNET
+        >
+    using residual_down = add_prev2<avg_pool<2,2,2,2,skip1<tag2<block<N,BN,2,tag1<SUBNET>>>>>>;
+
+
+    template <typename SUBNET> using res       = relu<residual<block,8,bn_con,SUBNET>>;
+    template <typename SUBNET> using ares      = relu<residual<block,8,affine,SUBNET>>;
+    template <typename SUBNET> using res_down  = relu<residual_down<block,8,bn_con,SUBNET>>;
+    template <typename SUBNET> using ares_down = relu<residual_down<block,8,affine,SUBNET>>;
+
+    template <typename SUBNET> 
+    using pres  = prelu<add_prev1<bn_con<con<8,3,3,1,1,prelu<bn_con<con<8,3,3,1,1,tag1<SUBNET>>>>>>>>;
+
+    void test_visit_funcions()
+    {
+        using net_type2 = loss_multiclass_log<fc<10,
+            avg_pool_everything<
+            pres<res<res<res_down< // 2 prelu layers here
+            tag4<repeat<9,pres,    // 9 groups, each containing 2 prelu layers  
+            res_down<
+            res<
+            input<matrix<unsigned char>>
+            >>>>>>>>>>>;
+
+        net_type2 pnet;
+
+        DLIB_CASSERT(pnet.num_layers == 131, pnet.num_layers);
+        DLIB_CASSERT(pnet.num_computational_layers == 109, pnet.num_computational_layers);
+
+        std::vector<bool> hit(pnet.num_computational_layers, false);
+        size_t count = 0;
+        visit_layer_parameter_gradients(pnet, [&](size_t i, tensor& ){hit[i] = true; ++count; });
+        for (auto x : hit)
+            DLIB_TEST(x);
+        DLIB_TEST(count == pnet.num_computational_layers);
+
+        count = 0;
+        std::vector<bool> hit2(pnet.num_computational_layers, false);
+        visit_layer_parameters(pnet, [&](size_t i, tensor& ){hit2[i] = true; ++count; });
+        for (auto x : hit2)
+            DLIB_TEST(x);
+        DLIB_TEST(count == pnet.num_computational_layers);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -1403,6 +1469,7 @@ namespace
             test_batch_normalize_conv();
             test_basic_tensor_ops();
             test_layers();
+            test_visit_funcions();
         }
     } a;
 
