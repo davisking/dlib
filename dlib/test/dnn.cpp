@@ -662,11 +662,11 @@ namespace
         rnd.fill_uniform(params_grad);
 
         resizable_tensor mm(m), vv(v);
-        cpu::compute_adam_update(s, mm, vv, t, 0.01, 0.001, 0.9, 0.99, params, params_grad);
+        cpu::compute_adam_update(0,params.size(),s, mm, vv, t, 0.01, 0.001, 0.9, 0.99, params, params_grad);
         matrix<float> s1 = mat(s);
         
         rnd.fill_uniform(s);
-        cuda::compute_adam_update(s, m, v, t, 0.01, 0.001, 0.9, 0.99, params, params_grad);
+        cuda::compute_adam_update(0,params.size(),s, m, v, t, 0.01, 0.001, 0.9, 0.99, params, params_grad);
         matrix<float> s2 = mat(s);
 
         DLIB_TEST_MSG(max(abs(s1-s2)) < 1e-6, max(abs(s1-s2)));
@@ -777,10 +777,6 @@ namespace
 
         cuda::affine_transform(dest, src, srcb, srcc, 2, 3, 4, 0);
         cpu::affine_transform(dest2, src2, srcb2, srcc2, 2, 3, 4, 0);
-        DLIB_TEST(equal(mat(dest),mat(dest2)));
-
-        cuda::affine_transform(dest, src, srcb, srcc, 2, 3, 4);
-        cpu::affine_transform(dest2, src2, srcb2, srcc2, 2, 3, 4);
         DLIB_TEST(equal(mat(dest),mat(dest2)));
 
         cuda::affine_transform_range(0, dest.size(), dest, src, srcb, srcc, 2, 3, 4);
