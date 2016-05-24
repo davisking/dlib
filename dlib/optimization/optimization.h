@@ -482,7 +482,7 @@ namespace dlib
             << "\n\t x_upper.size():         " << x_upper.size()
         );
         DLIB_ASSERT (
-            min(x_upper-x_lower) > 0,
+            min(x_upper-x_lower) >= 0,
             "\tdouble find_min_box_constrained()"
             << "\n\t You have to supply proper box constraints to this function."
             << "\n\r min(x_upper-x_lower): " << min(x_upper-x_lower)
@@ -610,7 +610,7 @@ namespace dlib
             << "\n\t x_upper.size():         " << x_upper.size()
         );
         DLIB_ASSERT (
-            min(x_upper-x_lower) > 0,
+            min(x_upper-x_lower) >= 0,
             "\tdouble find_max_box_constrained()"
             << "\n\t You have to supply proper box constraints to this function."
             << "\n\r min(x_upper-x_lower): " << min(x_upper-x_lower)
