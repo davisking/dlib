@@ -856,9 +856,11 @@ namespace dlib
         /*!
             ensures
                 - #get_mode() == mode
-                - #get_running_stats_window_size() == 1000
-                - #get_learning_rate_multiplier()  == 1
-                - #get_weight_decay_multiplier()   == 0
+                - #get_running_stats_window_size()      == 1000
+                - #get_learning_rate_multiplier()       == 1
+                - #get_weight_decay_multiplier()        == 0
+                - #get_bias_learning_rate_multiplier()  == 1
+                - #get_bias_weight_decay_multiplier()   == 1
                 - #get_eps() == tt::DEFAULT_BATCH_NORM_EPS
         !*/
 
@@ -871,9 +873,11 @@ namespace dlib
                 - eps > 0
             ensures
                 - #get_mode() == mode 
-                - #get_running_stats_window_size() == window_size
-                - #get_learning_rate_multiplier()  == 1
-                - #get_weight_decay_multiplier()   == 0
+                - #get_running_stats_window_size()     == window_size
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 0
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 1
                 - #get_eps() == eps
         !*/
 
@@ -951,6 +955,44 @@ namespace dlib
                 - val >= 0
             ensures
                 - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);

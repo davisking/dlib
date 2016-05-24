@@ -89,6 +89,17 @@ namespace dlib
             return v;
         }
 
+        template < layer_mode mode >
+        const tensor& operator() (
+            const float learning_rate,
+            const bn_<mode>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()/2);
+            return v;
+        }
+
         friend void serialize(const sgd& item, std::ostream& out)
         {
             serialize("sgd2", out);
@@ -241,6 +252,17 @@ namespace dlib
         )
         {
             update_considering_bias(learning_rate, l, params_grad, l.num_filters());
+            return s;
+        }
+
+        template < layer_mode mode >
+        const tensor& operator() (
+            const float learning_rate,
+            const bn_<mode>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()/2);
             return s;
         }
 

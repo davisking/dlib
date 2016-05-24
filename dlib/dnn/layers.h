@@ -666,6 +666,8 @@ namespace dlib
             running_stats_window_size(window_size),
             learning_rate_multiplier(1),
             weight_decay_multiplier(0),
+            bias_learning_rate_multiplier(1),
+            bias_weight_decay_multiplier(1),
             eps(eps_)
         {}
 
@@ -679,6 +681,11 @@ namespace dlib
         double get_weight_decay_multiplier () const   { return weight_decay_multiplier; }
         void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
         void set_weight_decay_multiplier(double val)  { weight_decay_multiplier  = val; }
+
+        double get_bias_learning_rate_multiplier () const  { return bias_learning_rate_multiplier; }
+        double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
+        void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
+        void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
 
 
         template <typename SUBNET>
@@ -765,6 +772,8 @@ namespace dlib
             serialize(item.running_stats_window_size, out);
             serialize(item.learning_rate_multiplier, out);
             serialize(item.weight_decay_multiplier, out);
+            serialize(item.bias_learning_rate_multiplier, out);
+            serialize(item.bias_weight_decay_multiplier, out);
             serialize(item.eps, out);
         }
 
@@ -812,6 +821,8 @@ namespace dlib
             {
                 deserialize(item.learning_rate_multiplier, in);
                 deserialize(item.weight_decay_multiplier, in);
+                deserialize(item.bias_learning_rate_multiplier, in);
+                deserialize(item.bias_weight_decay_multiplier, in);
                 deserialize(item.eps, in);
             }
             else
@@ -834,6 +845,8 @@ namespace dlib
             out << " eps="<<item.eps;
             out << " learning_rate_mult="<<item.learning_rate_multiplier;
             out << " weight_decay_mult="<<item.weight_decay_multiplier;
+            out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
+            out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
             return out;
         }
 
@@ -849,6 +862,8 @@ namespace dlib
         unsigned long running_stats_window_size;
         double learning_rate_multiplier;
         double weight_decay_multiplier;
+        double bias_learning_rate_multiplier;
+        double bias_weight_decay_multiplier;
         double eps;
     };
 
