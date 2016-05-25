@@ -1447,8 +1447,13 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            output.copy_size(sub.get_output());
-            tt::add(output, sub.get_output(), layer<tag>(sub).get_output());
+            auto&& t1 = sub.get_output();
+            auto&& t2 = layer<tag>(sub).get_output();
+            output.set_size(std::max(t1.num_samples(),t2.num_samples()),
+                            std::max(t1.k(),t2.k()),
+                            std::max(t1.nr(),t2.nr()),
+                            std::max(t1.nc(),t2.nc()));
+            tt::add(output, t1, t2);
         }
 
         template <typename SUBNET>

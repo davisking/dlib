@@ -1600,7 +1600,13 @@ namespace dlib
                 what layer to add to the output of the previous layer.  The result of this
                 addition is output by add_prev_.  Finally, the addition happens pointwise
                 according to 4D tensor arithmetic.  If the dimensions don't match then
-                missing elements are presumed to be equal to 0.
+                missing elements are presumed to be equal to 0.  Moreover, each dimension
+                of the output tensor is equal to the maximum dimension of either of the
+                inputs.  That is, if the tensors A and B are being added to produce C then:
+                    - C.num_samples() == max(A.num_samples(), B.num_samples())
+                    - C.k()  == max(A.k(), B.k())
+                    - C.nr() == max(A.nr(), B.nr())
+                    - C.nc() == max(A.nc(), B.nc())
         !*/
 
     public:
