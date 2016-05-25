@@ -1419,6 +1419,10 @@ namespace
         void perform_test (
         )
         {
+            // Seed the random number generator the same way every time we run the tests so
+            // they are repeatable.
+            srand(0);
+
             test_tagging();
 #ifdef DLIB_USE_CUDA
             test_conv();
