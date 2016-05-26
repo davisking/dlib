@@ -78,6 +78,15 @@ namespace dlib
                     V = momentum*V - weight_decay*learning_rate*l.get_layer_params() - learning_rate*params_grad;
                 Here V is a momentum term that is remembered by the solver from one
                 invocation of operator() to the next.  
+
+
+                Note that the actual learning rate and weight decay used by the solver are
+                multiplied by the per layer multipliers.  That is, the solver will call
+                get_learning_rate_multiplier(l) and get_weight_decay_multiplier(l) and
+                multiply these values with the nominal learning rate and weight decay,
+                respectively, to determine the values it will use during each step.  It is
+                also overloaded to allow additional learning rate multipliers to be applied
+                to fc_ and con_ bias parameters.
         !*/
     public:
 
@@ -123,6 +132,15 @@ namespace dlib
                 paper:
                     Kingma, Diederik P., and Jimmy Ba Adam. "A method for stochastic
                     optimization." International Conference on Learning Representation. 2015.
+
+
+                Note that the actual learning rate and weight decay used by the solver are
+                multiplied by the per layer multipliers.  That is, the solver will call
+                get_learning_rate_multiplier(l) and get_weight_decay_multiplier(l) and
+                multiply these values with the nominal learning rate and weight decay,
+                respectively, to determine the values it will use during each step.  It is
+                also overloaded to allow additional learning rate multipliers to be applied
+                to fc_ and con_ bias parameters.
         !*/
 
     public:

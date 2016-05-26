@@ -42,6 +42,12 @@ int main()
     try
     {
         cv::VideoCapture cap(0);
+        if (!cap.isOpened())
+        {
+            cerr << "Unable to connect to camera" << endl;
+            return 1;
+        }
+
         image_window win;
 
         // Load face detection and pose estimation models.

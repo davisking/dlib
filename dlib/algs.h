@@ -488,6 +488,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct general_ {};
+    struct special_ : general_ {};
+    template<typename> struct int_ { typedef int type; };
+
+// ----------------------------------------------------------------------------------------
+
+
     /*!A is_same_object 
 
         This is a templated function which checks if both of its arguments are actually

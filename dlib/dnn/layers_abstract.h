@@ -123,6 +123,16 @@ namespace dlib
                       allow dlib to make some layers execute in-place and therefore run a
                       little faster and use less memory.  Do not implement forward() and
                       backward().
+
+
+                It should also be noted that layers may define additional layer specific
+                fields and the solvers can use these fields as they see fit.  For example,
+                some layers define get_learning_rate_multiplier() and
+                get_weight_decay_multiplier() methods.  The solvers that come with dlib
+                look at these methods, if they exist, and adjust the learning rate or
+                weight decay for that layer according to the multiplier.  Therefore, you
+                can add these methods to your layer types if you want, or even define new
+                fields and new solvers that use those fields in some way.  
         !*/
 
     public:
@@ -367,6 +377,10 @@ namespace dlib
             ensures
                 - #get_num_outputs() == num_outputs
                 - #get_bias_mode() == bias_mode 
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
         !*/
 
         unsigned long get_num_outputs (
@@ -387,6 +401,82 @@ namespace dlib
                 - returns the bias mode which determines if this layer includes bias terms.
                   That is, if the bias mode is FC_HAS_BIAS then a different constant scalar
                   is added to each of the outputs of this layer. 
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;  
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its parameters be
+                  multiplied by get_learning_rate_multiplier().
+        !*/
+
+        double get_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its parameters be
+                  multiplied by get_weight_decay_multiplier().
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        void set_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -458,6 +548,10 @@ namespace dlib
                 - #stride_x() == _stride_x
                 - #padding_y() == _padding_y
                 - #padding_x() == _padding_x
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
         !*/
 
         long num_filters(
@@ -515,6 +609,82 @@ namespace dlib
             ensures
                 - returns the number of pixels of zero padding added to the left and right 
                   sides of the image.
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;  
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its parameters be
+                  multiplied by get_learning_rate_multiplier().
+        !*/
+
+        double get_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its parameters be
+                  multiplied by get_weight_decay_multiplier().
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        void set_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -648,6 +818,8 @@ namespace dlib
         FC_MODE = 1    // fully connected mode
     };
 
+    const double DEFAULT_BATCH_NORM_EPS = 0.00001;
+
     template <
         layer_mode mode
         >
@@ -684,16 +856,29 @@ namespace dlib
         /*!
             ensures
                 - #get_mode() == mode
-                - get_running_stats_window_size() == 1000
+                - #get_running_stats_window_size()      == 1000
+                - #get_learning_rate_multiplier()       == 1
+                - #get_weight_decay_multiplier()        == 0
+                - #get_bias_learning_rate_multiplier()  == 1
+                - #get_bias_weight_decay_multiplier()   == 1
+                - #get_eps() == tt::DEFAULT_BATCH_NORM_EPS
         !*/
 
         explicit bn_(
-            unsigned long window_size
+            unsigned long window_size,
+            double eps = tt::DEFAULT_BATCH_NORM_EPS
         );
         /*!
+            requires
+                - eps > 0
             ensures
                 - #get_mode() == mode 
-                - get_running_stats_window_size() == window_size
+                - #get_running_stats_window_size()     == window_size
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 0
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 1
+                - #get_eps() == eps
         !*/
 
         layer_mode get_mode(
@@ -712,6 +897,15 @@ namespace dlib
                   normalization after a convolutional layer you should use CONV_MODE.
         !*/
 
+        double get_eps(
+        ) const; 
+        /*!
+            ensures
+                - When doing batch normalization, we are dividing by the standard
+                  deviation.  This epsilon value returned by this function is added to the
+                  variance to prevent the division from dividing by zero.
+        !*/
+
         unsigned long get_running_stats_window_size (
         ) const; 
         /*!
@@ -723,6 +917,82 @@ namespace dlib
                   initialize an affine_ layer that is constructed from a bn_ layer.  This
                   function returns the effective number of recent samples used to compute
                   the running average.
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;  
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its parameters be
+                  multiplied by get_learning_rate_multiplier().
+        !*/
+
+        double get_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its parameters be
+                  multiplied by get_weight_decay_multiplier().
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        void set_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -1330,7 +1600,13 @@ namespace dlib
                 what layer to add to the output of the previous layer.  The result of this
                 addition is output by add_prev_.  Finally, the addition happens pointwise
                 according to 4D tensor arithmetic.  If the dimensions don't match then
-                missing elements are presumed to be equal to 0.
+                missing elements are presumed to be equal to 0.  Moreover, each dimension
+                of the output tensor is equal to the maximum dimension of either of the
+                inputs.  That is, if the tensors A and B are being added to produce C then:
+                    - C.num_samples() == max(A.num_samples(), B.num_samples())
+                    - C.k()  == max(A.k(), B.k())
+                    - C.nr() == max(A.nr(), B.nr())
+                    - C.nc() == max(A.nc(), B.nc())
         !*/
 
     public:

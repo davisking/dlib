@@ -165,13 +165,13 @@ namespace
 
         resizable_tensor running_means;
         resizable_tensor running_variances;
-        batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+        batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
         const double scale = (src.num_samples())/(src.num_samples()-1.0);
         // Turn back into biased variance estimate because that's how batch_normalize() works, so if we want to match it this is necessary.
         running_variances = mat(running_variances)/scale; 
-        batch_normalize_inference(dest2, src, gamma, beta, running_means, running_variances);
+        batch_normalize_inference(DEFAULT_BATCH_NORM_EPS,dest2, src, gamma, beta, running_means, running_variances);
         DLIB_TEST_MSG(max(abs(mat(dest2)-mat(dest))) < 1e-5, max(abs(mat(dest2)-mat(dest))));
-        cpu::batch_normalize_inference(dest3, src, gamma, beta, running_means, running_variances);
+        cpu::batch_normalize_inference(DEFAULT_BATCH_NORM_EPS,dest3, src, gamma, beta, running_means, running_variances);
         DLIB_TEST_MSG(max(abs(mat(dest3)-mat(dest))) < 1e-5, max(abs(mat(dest3)-mat(dest))));
 
 
@@ -179,7 +179,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = src.host()[idx];
                 src.host()[idx] += eps;
-                batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 src.host()[idx] = old;
                 return result;
@@ -191,7 +191,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = gamma.host()[idx];
                 gamma.host()[idx] += eps;
-                batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 gamma.host()[idx] = old;
                 return result;
@@ -203,7 +203,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = beta.host()[idx];
                 beta.host()[idx] += eps;
-                batch_normalize(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 beta.host()[idx] = old;
                 return result;
@@ -220,7 +220,7 @@ namespace
         gamma_grad = 8;
         beta_grad = 8;
 
-        batch_normalize_gradient(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
+        batch_normalize_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
 
         auto grad_error = compare_gradients(src_grad, grad_src);
         dlog << LINFO << "src error: " << grad_error;
@@ -250,14 +250,14 @@ namespace
 
         resizable_tensor running_means;
         resizable_tensor running_variances;
-        batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+        batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
         const double scale = (src.num_samples()*src.nr()*src.nc())/(src.num_samples()*src.nr()*src.nc()-1.0);
         // Turn back into biased variance estimate because that's how
         // batch_normalize_conv() works, so if we want to match it this is necessary.
         running_variances = mat(running_variances)/scale; 
-        batch_normalize_conv_inference(dest2, src, gamma, beta, running_means, running_variances);
+        batch_normalize_conv_inference(DEFAULT_BATCH_NORM_EPS,dest2, src, gamma, beta, running_means, running_variances);
         DLIB_TEST(max(abs(mat(dest2)-mat(dest))) < 1e-5);
-        cpu::batch_normalize_conv_inference(dest3, src, gamma, beta, running_means, running_variances);
+        cpu::batch_normalize_conv_inference(DEFAULT_BATCH_NORM_EPS,dest3, src, gamma, beta, running_means, running_variances);
         DLIB_TEST(max(abs(mat(dest3)-mat(dest))) < 1e-5);
 
 
@@ -265,7 +265,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = src.host()[idx];
                 src.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 src.host()[idx] = old;
                 return result;
@@ -277,7 +277,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = gamma.host()[idx];
                 gamma.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 gamma.host()[idx] = old;
                 return result;
@@ -289,7 +289,7 @@ namespace
             auto f = [&](float eps) {
                 const float old = beta.host()[idx];
                 beta.host()[idx] += eps;
-                batch_normalize_conv(dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
+                batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest, means, vars, 1, running_means, running_variances, src, gamma, beta);
                 float result = dot(gradient_input, dest);
                 beta.host()[idx] = old;
                 return result;
@@ -307,7 +307,7 @@ namespace
         gamma_grad = 9;
         beta_grad = 9;
 
-        batch_normalize_conv_gradient(gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
+        batch_normalize_conv_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, vars, src, gamma, src_grad, gamma_grad, beta_grad);
 
 
         auto grad_error = compare_gradients(src_grad, grad_src);
@@ -662,11 +662,11 @@ namespace
         rnd.fill_uniform(params_grad);
 
         resizable_tensor mm(m), vv(v);
-        cpu::compute_adam_update(s, mm, vv, t, 0.01, 0.001, 0.9, 0.99, params, params_grad);
+        cpu::compute_adam_update(0,params.size(),s, mm, vv, t, 0.01, 0.001, 0.9, 0.99, params, params_grad);
         matrix<float> s1 = mat(s);
         
         rnd.fill_uniform(s);
-        cuda::compute_adam_update(s, m, v, t, 0.01, 0.001, 0.9, 0.99, params, params_grad);
+        cuda::compute_adam_update(0,params.size(),s, m, v, t, 0.01, 0.001, 0.9, 0.99, params, params_grad);
         matrix<float> s2 = mat(s);
 
         DLIB_TEST_MSG(max(abs(s1-s2)) < 1e-6, max(abs(s1-s2)));
@@ -775,6 +775,27 @@ namespace
         cpu::affine_transform(dest2, src2, srcb2, srcc2, 2, 3, 4, 5);
         DLIB_TEST(equal(mat(dest),mat(dest2)));
 
+        cuda::affine_transform(dest, src, srcb, srcc, 2, 3, 4, 0);
+        cpu::affine_transform(dest2, src2, srcb2, srcc2, 2, 3, 4, 0);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+        cuda::affine_transform_range(0, dest.size(), dest, src, srcb, srcc, 2, 3, 4);
+        cpu::affine_transform_range(0, dest2.size(), dest2, src2, srcb2, srcc2, 2, 3, 4);
+        DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+        if (3 < dest.size())
+        {
+            dest = 999;
+            dest2 = 999;
+            cuda::affine_transform_range(3, dest.size()-1, dest, src, srcb, srcc, 2, 3, 4);
+            cpu::affine_transform_range(3, dest2.size()-1, dest2, src2, srcb2, srcc2, 2, 3, 4);
+            DLIB_TEST(equal(mat(dest),mat(dest2)));
+
+            cuda::affine_transform_range(dest.size(), dest.size(), dest, src, srcb, srcc, 2, 3, 4);
+            cpu::affine_transform_range(dest2.size(), dest2.size(), dest2, src2, srcb2, srcc2, 2, 3, 4);
+            DLIB_TEST(equal(mat(dest),mat(dest2)));
+        }
+
 
         rnd.fill_uniform(dest);
         rnd.fill_uniform(src);
@@ -863,8 +884,8 @@ namespace
         rnd.fill_uniform(src);
 
 
-        cpu::batch_normalize(dest, means, invstds, 1, running_means, running_variances, src, gamma, beta);
-        cuda::batch_normalize(dest2,means2,invstds2, 1, running_means2, running_variances2, src, gamma, beta);
+        cpu::batch_normalize(DEFAULT_BATCH_NORM_EPS,dest, means, invstds, 1, running_means, running_variances, src, gamma, beta);
+        cuda::batch_normalize(DEFAULT_BATCH_NORM_EPS,dest2,means2,invstds2, 1, running_means2, running_variances2, src, gamma, beta);
 
         dlog << LINFO << "dest error:    "<< max(abs(mat(dest) -mat(dest2)));
         dlog << LINFO << "means error:   "<< max(abs(mat(means) -mat(means2)));
@@ -890,8 +911,8 @@ namespace
         rnd.fill_uniform(gradient_input);
 
 
-        cpu::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-        cuda::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
+        cpu::batch_normalize_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cuda::batch_normalize_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
 
         dlog << LINFO << "src_grad error:   " << max(abs(mat(src_grad)-mat(src_grad2)));
         dlog << LINFO << "gamma_grad error: " << max(abs(mat(gamma_grad)-mat(gamma_grad2)));
@@ -917,8 +938,8 @@ namespace
         tt::tensor_rand rnd;
         rnd.fill_uniform(src);
 
-        cpu::batch_normalize_conv(dest,means,invstds,1,running_means,running_variances, src, gamma, beta);
-        cuda::batch_normalize_conv(dest2,means2,invstds2,1,running_means2,running_variances2, src, gamma, beta);
+        cpu::batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest,means,invstds,1,running_means,running_variances, src, gamma, beta);
+        cuda::batch_normalize_conv(DEFAULT_BATCH_NORM_EPS,dest2,means2,invstds2,1,running_means2,running_variances2, src, gamma, beta);
 
         dlog << LINFO << "dest error:    "<< max(abs(mat(dest) -mat(dest2)));
         dlog << LINFO << "means error:   "<< max(abs(mat(means) -mat(means2)));
@@ -942,8 +963,8 @@ namespace
         rnd.fill_uniform(gradient_input);
 
 
-        cpu::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
-        cuda::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
+        cpu::batch_normalize_conv_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cuda::batch_normalize_conv_gradient(DEFAULT_BATCH_NORM_EPS,gradient_input, means, invstds, src, gamma, src_grad2, gamma_grad2, beta_grad2);
 
         dlog << LINFO << "src_grad error:   " << max(abs(mat(src_grad)-mat(src_grad2)));
         dlog << LINFO << "gamma_grad error: " << max(abs(mat(gamma_grad)-mat(gamma_grad2)));
@@ -1320,6 +1341,72 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        int N, 
+        template <typename> class BN, 
+        int stride, 
+        typename SUBNET
+        > 
+    using block  = BN<con<N,3,3,1,1,relu<BN<con<N,3,3,stride,stride,SUBNET>>>>>;
+
+    template <
+        template <int,template<typename>class,int,typename> class block, 
+        int N, 
+        template<typename>class BN, 
+        typename SUBNET
+        >
+    using residual = add_prev1<block<N,BN,1,tag1<SUBNET>>>;
+
+    template <
+        template <int,template<typename>class,int,typename> class block, 
+        int N, 
+        template<typename>class BN, 
+        typename SUBNET
+        >
+    using residual_down = add_prev2<avg_pool<2,2,2,2,skip1<tag2<block<N,BN,2,tag1<SUBNET>>>>>>;
+
+
+    template <typename SUBNET> using res       = relu<residual<block,8,bn_con,SUBNET>>;
+    template <typename SUBNET> using ares      = relu<residual<block,8,affine,SUBNET>>;
+    template <typename SUBNET> using res_down  = relu<residual_down<block,8,bn_con,SUBNET>>;
+    template <typename SUBNET> using ares_down = relu<residual_down<block,8,affine,SUBNET>>;
+
+    template <typename SUBNET> 
+    using pres  = prelu<add_prev1<bn_con<con<8,3,3,1,1,prelu<bn_con<con<8,3,3,1,1,tag1<SUBNET>>>>>>>>;
+
+    void test_visit_funcions()
+    {
+        using net_type2 = loss_multiclass_log<fc<10,
+            avg_pool_everything<
+            pres<res<res<res_down< // 2 prelu layers here
+            tag4<repeat<9,pres,    // 9 groups, each containing 2 prelu layers  
+            res_down<
+            res<
+            input<matrix<unsigned char>>
+            >>>>>>>>>>>;
+
+        net_type2 pnet;
+
+        DLIB_CASSERT(pnet.num_layers == 131, pnet.num_layers);
+        DLIB_CASSERT(pnet.num_computational_layers == 109, pnet.num_computational_layers);
+
+        std::vector<bool> hit(pnet.num_computational_layers, false);
+        size_t count = 0;
+        visit_layer_parameter_gradients(pnet, [&](size_t i, tensor& ){hit[i] = true; ++count; });
+        for (auto x : hit)
+            DLIB_TEST(x);
+        DLIB_TEST(count == pnet.num_computational_layers);
+
+        count = 0;
+        std::vector<bool> hit2(pnet.num_computational_layers, false);
+        visit_layer_parameters(pnet, [&](size_t i, tensor& ){hit2[i] = true; ++count; });
+        for (auto x : hit2)
+            DLIB_TEST(x);
+        DLIB_TEST(count == pnet.num_computational_layers);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -1378,6 +1465,7 @@ namespace
             test_batch_normalize_conv();
             test_basic_tensor_ops();
             test_layers();
+            test_visit_funcions();
         }
     } a;
 

@@ -28,6 +28,38 @@ namespace dlib
 
     namespace impl
     {
+        template <typename T, typename int_<decltype(&T::get_learning_rate_multiplier)>::type = 0>
+        double get_learning_rate_multiplier (
+            const T& obj,
+            special_
+        ) { return obj.get_learning_rate_multiplier(); }
+
+        template <typename T>
+        double get_learning_rate_multiplier ( const T& obj, general_) { return 1; }
+    }
+    template <typename T>
+    double get_learning_rate_multiplier(const T& obj) { return impl::get_learning_rate_multiplier(obj, special_()); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T, typename int_<decltype(&T::get_weight_decay_multiplier)>::type = 0>
+        double get_weight_decay_multiplier (
+            const T& obj,
+            special_
+        ) { return obj.get_weight_decay_multiplier(); }
+
+        template <typename T>
+        double get_weight_decay_multiplier ( const T& obj, general_) { return 1; }
+    }
+    template <typename T>
+    double get_weight_decay_multiplier(const T& obj) { return impl::get_weight_decay_multiplier(obj, special_()); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
         class repeat_input_layer 
         {
             /*!
@@ -458,7 +490,7 @@ namespace dlib
 
         sstack pop(size_t num=1) 
         { 
-            DLIB_CASSERT(num < size(), "You can't pop more things from the stack than it has in it.");
+            DLIB_CASSERT(num <= size(), "You can't pop more things from the stack than it has in it.");
             return sstack(data+num, mysize-num);
         }
 
@@ -849,8 +881,9 @@ namespace dlib
         void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
             DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
-            // Don't try to adjust the parameters if this layer doesn't have any.
-            if (params_grad.size() != 0)
+            // Don't try to adjust the parameters if this layer doesn't have any or the
+            // learning rate is disabled for this layer.
+            if (params_grad.size() != 0 && get_learning_rate_multiplier(details) != 0)
             {
                 const tensor& step = solvers.top()(learning_rate, details, static_cast<const tensor&>(params_grad));
                 tt::add(details.get_layer_params(), details.get_layer_params(), step);
@@ -1200,8 +1233,9 @@ namespace dlib
         void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
             DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
-            // Don't try to adjust the parameters if this layer doesn't have any.
-            if (params_grad.size() != 0) 
+            // Don't try to adjust the parameters if this layer doesn't have any or the
+            // learning rate is disabled for this layer.
+            if (params_grad.size() != 0 && get_learning_rate_multiplier(details) != 0) 
             {
                 const tensor& step = solvers.top()(learning_rate, details, static_cast<const tensor&>(params_grad));
                 tt::add(details.get_layer_params(), details.get_layer_params(), step);
@@ -1817,9 +1851,7 @@ namespace dlib
     public:
         typedef INPUT_LAYER subnet_type;
         typedef typename subnet_type::input_type input_type;
-        // This layer counts as a computational layer because it copies and stores the
-        // inputs.
-        const static size_t num_computational_layers = 1;
+        const static size_t num_computational_layers = 0;
         const static size_t num_layers = 2;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         static_assert(sample_expansion_factor >= 1,

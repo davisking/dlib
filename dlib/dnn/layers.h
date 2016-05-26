@@ -42,6 +42,10 @@ namespace dlib
 
         con_(
         ) : 
+            learning_rate_multiplier(1),
+            weight_decay_multiplier(1),
+            bias_learning_rate_multiplier(1),
+            bias_weight_decay_multiplier(0),
             padding_y_(_padding_y),
             padding_x_(_padding_x)
         {}
@@ -54,12 +58,27 @@ namespace dlib
         long padding_y() const { return padding_y_; }
         long padding_x() const { return padding_x_; }
 
+        double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
+        double get_weight_decay_multiplier () const   { return weight_decay_multiplier; }
+        void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
+        void set_weight_decay_multiplier(double val)  { weight_decay_multiplier  = val; }
+
+        double get_bias_learning_rate_multiplier () const  { return bias_learning_rate_multiplier; }
+        double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
+        void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
+        void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
+
+
         con_ (
             const con_& item
         ) : 
             params(item.params),
             filters(item.filters),
             biases(item.biases),
+            learning_rate_multiplier(item.learning_rate_multiplier),
+            weight_decay_multiplier(item.weight_decay_multiplier),
+            bias_learning_rate_multiplier(item.bias_learning_rate_multiplier),
+            bias_weight_decay_multiplier(item.bias_weight_decay_multiplier),
             padding_y_(item.padding_y_),
             padding_x_(item.padding_x_)
         {
@@ -81,6 +100,10 @@ namespace dlib
             biases = item.biases;
             padding_y_ = item.padding_y_;
             padding_x_ = item.padding_x_;
+            learning_rate_multiplier = item.learning_rate_multiplier;
+            weight_decay_multiplier = item.weight_decay_multiplier;
+            bias_learning_rate_multiplier = item.bias_learning_rate_multiplier;
+            bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
             return *this;
         }
 
@@ -121,10 +144,14 @@ namespace dlib
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             conv.get_gradient_for_data (gradient_input, filters(params,0), sub.get_gradient_input());
-            auto filt = filters(params_grad,0);
-            conv.get_gradient_for_filters (gradient_input, sub.get_output(), filt);
-            auto b = biases(params_grad, filters.size());
-            tt::assign_conv_bias_gradient(b, gradient_input);
+            // no point computing the parameter gradients if they won't be used.
+            if (learning_rate_multiplier != 0)
+            {
+                auto filt = filters(params_grad,0);
+                conv.get_gradient_for_filters (gradient_input, sub.get_output(), filt);
+                auto b = biases(params_grad, filters.size());
+                tt::assign_conv_bias_gradient(b, gradient_input);
+            }
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -132,7 +159,7 @@ namespace dlib
 
         friend void serialize(const con_& item, std::ostream& out)
         {
-            serialize("con_2", out);
+            serialize("con_3", out);
             serialize(item.params, out);
             serialize(_num_filters, out);
             serialize(_nr, out);
@@ -143,6 +170,10 @@ namespace dlib
             serialize(item.padding_x_, out);
             serialize(item.filters, out);
             serialize(item.biases, out);
+            serialize(item.learning_rate_multiplier, out);
+            serialize(item.weight_decay_multiplier, out);
+            serialize(item.bias_learning_rate_multiplier, out);
+            serialize(item.bias_weight_decay_multiplier, out);
         }
 
         friend void deserialize(con_& item, std::istream& in)
@@ -167,7 +198,7 @@ namespace dlib
                 item.padding_y_ = nr/2;
                 item.padding_x_ = nc/2;
             }
-            else if (version == "con_2")
+            else if (version == "con_2" || version == "con_3")
             {
                 deserialize(item.params, in);
                 deserialize(num_filters, in);
@@ -179,6 +210,23 @@ namespace dlib
                 deserialize(item.padding_x_, in);
                 deserialize(item.filters, in);
                 deserialize(item.biases, in);
+
+                if (version == "con_3")
+                {
+                    deserialize(item.learning_rate_multiplier, in);
+                    deserialize(item.weight_decay_multiplier, in);
+                    deserialize(item.bias_learning_rate_multiplier, in);
+                    deserialize(item.bias_weight_decay_multiplier, in);
+                }
+                else
+                {
+                    // Previous versions didn't have these parameters, so they were
+                    // implicitly 1.
+                    item.learning_rate_multiplier = 1;
+                    item.weight_decay_multiplier = 1;
+                    item.bias_learning_rate_multiplier = 1;
+                    item.bias_weight_decay_multiplier = 1;
+                }
 
                 if (item.padding_y_ != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::con_");
                 if (item.padding_x_ != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::con_");
@@ -207,6 +255,10 @@ namespace dlib
                 << ", padding_y="<<item.padding_y_
                 << ", padding_x="<<item.padding_x_
                 << ")";
+            out << " learning_rate_mult="<<item.learning_rate_multiplier;
+            out << " weight_decay_mult="<<item.weight_decay_multiplier;
+            out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
+            out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
             return out;
         }
 
@@ -217,6 +269,10 @@ namespace dlib
         alias_tensor filters, biases;
 
         tt::tensor_conv conv;
+        double learning_rate_multiplier;
+        double weight_decay_multiplier;
+        double bias_learning_rate_multiplier;
+        double bias_weight_decay_multiplier;
 
         // These are here only because older versions of con (which you might encounter
         // serialized to disk) used different padding settings.
@@ -594,20 +650,43 @@ namespace dlib
         FC_MODE = 1
     };
 
+    const double DEFAULT_BATCH_NORM_EPS = 0.00001;
+
     template <
         layer_mode mode
         >
     class bn_
     {
     public:
-        bn_() : num_updates(0), running_stats_window_size(1000)
+        explicit bn_(
+            unsigned long window_size,
+            double eps_ = DEFAULT_BATCH_NORM_EPS
+        ) : 
+            num_updates(0), 
+            running_stats_window_size(window_size),
+            learning_rate_multiplier(1),
+            weight_decay_multiplier(0),
+            bias_learning_rate_multiplier(1),
+            bias_weight_decay_multiplier(1),
+            eps(eps_)
         {}
 
-        explicit bn_(unsigned long window_size) : num_updates(0), running_stats_window_size(window_size)
-        {}
+        bn_() : bn_(1000) {}
 
         layer_mode get_mode() const { return mode; }
         unsigned long get_running_stats_window_size () const { return running_stats_window_size; }
+        double get_eps() const { return eps; }
+
+        double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
+        double get_weight_decay_multiplier () const   { return weight_decay_multiplier; }
+        void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
+        void set_weight_decay_multiplier(double val)  { weight_decay_multiplier  = val; }
+
+        double get_bias_learning_rate_multiplier () const  { return bias_learning_rate_multiplier; }
+        double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
+        void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
+        void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
+
 
         template <typename SUBNET>
         void setup (const SUBNET& sub)
@@ -648,16 +727,16 @@ namespace dlib
                 if (num_updates <running_stats_window_size)
                     ++num_updates;
                 if (mode == FC_MODE)
-                    tt::batch_normalize(output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
+                    tt::batch_normalize(eps, output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
                 else 
-                    tt::batch_normalize_conv(output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
+                    tt::batch_normalize_conv(eps, output, means, invstds, decay, running_means, running_variances, sub.get_output(), g, b);
             }
             else // we are running in testing mode so we just linearly scale the input tensor.
             {
                 if (mode == FC_MODE)
-                    tt::batch_normalize_inference(output, sub.get_output(), g, b, running_means, running_variances);
+                    tt::batch_normalize_inference(eps, output, sub.get_output(), g, b, running_means, running_variances);
                 else
-                    tt::batch_normalize_conv_inference(output, sub.get_output(), g, b, running_means, running_variances);
+                    tt::batch_normalize_conv_inference(eps, output, sub.get_output(), g, b, running_means, running_variances);
             }
         } 
 
@@ -668,9 +747,9 @@ namespace dlib
             auto g_grad = gamma(params_grad, 0);
             auto b_grad = beta(params_grad, gamma.size());
             if (mode == FC_MODE)
-                tt::batch_normalize_gradient(gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
+                tt::batch_normalize_gradient(eps, gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
             else
-                tt::batch_normalize_conv_gradient(gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
+                tt::batch_normalize_conv_gradient(eps, gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad );
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -679,9 +758,9 @@ namespace dlib
         friend void serialize(const bn_& item, std::ostream& out)
         {
             if (mode == CONV_MODE)
-                serialize("bn_con", out);
+                serialize("bn_con2", out);
             else // if FC_MODE
-                serialize("bn_fc", out);
+                serialize("bn_fc2", out);
             serialize(item.params, out);
             serialize(item.gamma, out);
             serialize(item.beta, out);
@@ -691,6 +770,11 @@ namespace dlib
             serialize(item.running_variances, out);
             serialize(item.num_updates, out);
             serialize(item.running_stats_window_size, out);
+            serialize(item.learning_rate_multiplier, out);
+            serialize(item.weight_decay_multiplier, out);
+            serialize(item.bias_learning_rate_multiplier, out);
+            serialize(item.bias_weight_decay_multiplier, out);
+            serialize(item.eps, out);
         }
 
         friend void deserialize(bn_& item, std::istream& in)
@@ -701,12 +785,12 @@ namespace dlib
             {
                 if (mode == CONV_MODE) 
                 {
-                    if (version != "bn_con")
+                    if (version != "bn_con" && version != "bn_con2")
                         throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::bn_.");
                 }
                 else // must be in FC_MODE
                 {
-                    if (version != "bn_fc")
+                    if (version != "bn_fc" && version != "bn_fc2")
                         throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::bn_.");
                 }
             }
@@ -731,16 +815,38 @@ namespace dlib
 
                 // We also need to flip the running_variances around since the previous
                 // format saved the inverse standard deviations instead of variances.
-                item.running_variances = 1.0f/squared(mat(item.running_variances)) - tt::BATCH_NORM_EPS;
+                item.running_variances = 1.0f/squared(mat(item.running_variances)) - DEFAULT_BATCH_NORM_EPS;
+            }
+            else if (version == "bn_con2" || version == "bn_fc2")
+            {
+                deserialize(item.learning_rate_multiplier, in);
+                deserialize(item.weight_decay_multiplier, in);
+                deserialize(item.bias_learning_rate_multiplier, in);
+                deserialize(item.bias_weight_decay_multiplier, in);
+                deserialize(item.eps, in);
+            }
+            else
+            {
+                // Previous versions didn't have these parameters, so they were
+                // implicitly 1.
+                item.learning_rate_multiplier = 1;
+                item.weight_decay_multiplier = 1;
+
+                item.eps = DEFAULT_BATCH_NORM_EPS;
             }
         }
 
         friend std::ostream& operator<<(std::ostream& out, const bn_& item)
         {
             if (mode == CONV_MODE)
-                out << "bn_con";
+                out << "bn_con  ";
             else
-                out << "bn_fc";
+                out << "bn_fc   ";
+            out << " eps="<<item.eps;
+            out << " learning_rate_mult="<<item.learning_rate_multiplier;
+            out << " weight_decay_mult="<<item.weight_decay_multiplier;
+            out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
+            out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
             return out;
         }
 
@@ -754,6 +860,11 @@ namespace dlib
         resizable_tensor invstds, running_variances;
         unsigned long num_updates;
         unsigned long running_stats_window_size;
+        double learning_rate_multiplier;
+        double weight_decay_multiplier;
+        double bias_learning_rate_multiplier;
+        double bias_weight_decay_multiplier;
+        double eps;
     };
 
     template <typename SUBNET>
@@ -784,11 +895,24 @@ namespace dlib
         static_assert(num_outputs_ > 0, "The number of outputs from a fc_ layer must be > 0");
 
     public:
-        fc_() : num_outputs(num_outputs_), num_inputs(0)
-        {
-        }
+        fc_(num_fc_outputs o) : num_outputs(o.num_outputs), num_inputs(0),
+            learning_rate_multiplier(1),
+            weight_decay_multiplier(1),
+            bias_learning_rate_multiplier(1),
+            bias_weight_decay_multiplier(0)
+        {}
 
-        fc_(num_fc_outputs o) : num_outputs(o.num_outputs), num_inputs(0) {}
+        fc_() : fc_(num_fc_outputs(num_outputs_)) {}
+
+        double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
+        double get_weight_decay_multiplier () const   { return weight_decay_multiplier; }
+        void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
+        void set_weight_decay_multiplier(double val)  { weight_decay_multiplier  = val; }
+
+        double get_bias_learning_rate_multiplier () const  { return bias_learning_rate_multiplier; }
+        double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
+        void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
+        void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
 
         unsigned long get_num_outputs (
         ) const { return num_outputs; }
@@ -835,15 +959,19 @@ namespace dlib
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
-            // compute the gradient of the weight parameters.  
-            auto pw = weights(params_grad, 0);
-            tt::gemm(0,pw, 1,sub.get_output(),true, gradient_input,false);
-
-            if (bias_mode == FC_HAS_BIAS)
+            // no point computing the parameter gradients if they won't be used.
+            if (learning_rate_multiplier != 0)
             {
-                // compute the gradient of the bias parameters.  
-                auto pb = biases(params_grad, weights.size());
-                tt::assign_bias_gradient(pb, gradient_input);
+                // compute the gradient of the weight parameters.  
+                auto pw = weights(params_grad, 0);
+                tt::gemm(0,pw, 1,sub.get_output(),true, gradient_input,false);
+
+                if (bias_mode == FC_HAS_BIAS)
+                {
+                    // compute the gradient of the bias parameters.  
+                    auto pb = biases(params_grad, weights.size());
+                    tt::assign_bias_gradient(pb, gradient_input);
+                }
             }
 
             // compute the gradient for the data
@@ -856,20 +984,24 @@ namespace dlib
 
         friend void serialize(const fc_& item, std::ostream& out)
         {
-            serialize("fc_", out);
+            serialize("fc_2", out);
             serialize(item.num_outputs, out);
             serialize(item.num_inputs, out);
             serialize(item.params, out);
             serialize(item.weights, out);
             serialize(item.biases, out);
             serialize((int)bias_mode, out);
+            serialize(item.learning_rate_multiplier, out);
+            serialize(item.weight_decay_multiplier, out);
+            serialize(item.bias_learning_rate_multiplier, out);
+            serialize(item.bias_weight_decay_multiplier, out);
         }
 
         friend void deserialize(fc_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "fc_")
+            if (version != "fc_" && version != "fc_2")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::fc_.");
 
             deserialize(item.num_outputs, in);
@@ -880,6 +1012,22 @@ namespace dlib
             int bmode = 0;
             deserialize(bmode, in);
             if (bias_mode != (fc_bias_mode)bmode) throw serialization_error("Wrong fc_bias_mode found while deserializing dlib::fc_");
+            if (version == "fc_2")
+            {
+                deserialize(item.learning_rate_multiplier, in);
+                deserialize(item.weight_decay_multiplier, in);
+                deserialize(item.bias_learning_rate_multiplier, in);
+                deserialize(item.bias_weight_decay_multiplier, in);
+            }
+            else
+            {
+                // Previous versions didn't have these parameters, so they were
+                // implicitly 1.
+                item.learning_rate_multiplier = 1;
+                item.weight_decay_multiplier = 1;
+                item.bias_learning_rate_multiplier = 1;
+                item.bias_weight_decay_multiplier = 1;
+            }
         }
 
         friend std::ostream& operator<<(std::ostream& out, const fc_& item)
@@ -889,12 +1037,18 @@ namespace dlib
                 out << "fc\t ("
                     << "num_outputs="<<item.num_outputs
                     << ")";
+                out << " learning_rate_mult="<<item.learning_rate_multiplier;
+                out << " weight_decay_mult="<<item.weight_decay_multiplier;
+                out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
+                out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
             }
             else
             {
                 out << "fc_no_bias ("
                     << "num_outputs="<<item.num_outputs
                     << ")";
+                out << " learning_rate_mult="<<item.learning_rate_multiplier;
+                out << " weight_decay_mult="<<item.weight_decay_multiplier;
             }
             return out;
         }
@@ -905,6 +1059,10 @@ namespace dlib
         unsigned long num_inputs;
         resizable_tensor params;
         alias_tensor weights, biases;
+        double learning_rate_multiplier;
+        double weight_decay_multiplier;
+        double bias_learning_rate_multiplier;
+        double bias_weight_decay_multiplier;
     };
 
     template <
@@ -1143,7 +1301,7 @@ namespace dlib
             auto sg = gamma(temp,0);
             auto sb = beta(temp,gamma.size());
 
-            g = pointwise_multiply(mat(sg), 1.0f/sqrt(mat(item.running_variances)+tt::BATCH_NORM_EPS));
+            g = pointwise_multiply(mat(sg), 1.0f/sqrt(mat(item.running_variances)+item.get_eps()));
             b = mat(sb) - pointwise_multiply(mat(g), mat(item.running_means));
         }
 
@@ -1223,7 +1381,7 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
-            if (version == "bn_con")
+            if (version == "bn_con" || version == "bn_con2")
             {
                 // Since we can build an affine_ from a bn_ we check if that's what is in
                 // the stream and if so then just convert it right here.
@@ -1233,7 +1391,7 @@ namespace dlib
                 item = temp;
                 return;
             }
-            else if (version == "bn_fc")
+            else if (version == "bn_fc" || version == "bn_fc2")
             {
                 // Since we can build an affine_ from a bn_ we check if that's what is in
                 // the stream and if so then just convert it right here.
@@ -1289,8 +1447,13 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            output.copy_size(sub.get_output());
-            tt::add(output, sub.get_output(), layer<tag>(sub).get_output());
+            auto&& t1 = sub.get_output();
+            auto&& t2 = layer<tag>(sub).get_output();
+            output.set_size(std::max(t1.num_samples(),t2.num_samples()),
+                            std::max(t1.k(),t2.k()),
+                            std::max(t1.nr(),t2.nr()),
+                            std::max(t1.nc(),t2.nc()));
+            tt::add(output, t1, t2);
         }
 
         template <typename SUBNET>

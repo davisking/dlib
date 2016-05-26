@@ -69,6 +69,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    double get_learning_rate_multiplier(
+        const T& obj
+    ); 
+    /*!
+        ensures
+            - if (obj has a get_learning_rate_multiplier() member function) then
+                - returns obj.get_learning_rate_multiplier()
+            - else
+                - returns 1
+    !*/
+
+    template <typename T>
+    double get_weight_decay_multiplier(
+        const T& obj
+    ); 
+    /*!
+        ensures
+            - if (obj has a get_weight_decay_multiplier() member function) then
+                - returns obj.get_weight_decay_multiplier()
+            - else
+                - returns 1
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     bool dnn_prefer_fastest_algorithms(
     );
     /*!
@@ -152,7 +178,7 @@ namespace dlib
         ); 
         /*!
             requires
-                - num < size()
+                - num <= size()
             ensures
                 - returns a reference to the sub-stack S such that:
                     - S.size() == size()-num.

@@ -338,6 +338,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void batch_normalize_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -353,7 +354,8 @@ namespace dlib
                 gamma.k()  == src.k() &&
                 have_same_dimensions(gamma, beta) &&
                 have_same_dimensions(gamma, running_means) &&
-                have_same_dimensions(gamma, running_variances), 
+                have_same_dimensions(gamma, running_variances) && 
+                eps > 0, 
                 "\ngamma.num_samples(): " << gamma.num_samples() << 
                 "\ngamma.k():  " << gamma.k() << 
                 "\ngamma.nr(): " << gamma.nr() << 
@@ -372,7 +374,8 @@ namespace dlib
                 "\nrunning_variances.nc():  " << running_variances.nc() << 
                 "\nsrc.k():   " << src.k() << 
                 "\nsrc.nr():  " << src.nr() << 
-                "\nsrc.nc():  " << src.nc() 
+                "\nsrc.nc():  " << src.nc() <<
+                "\neps:  " << eps 
             );
             const float in_scale = 1;
             const float out_scale = 0;
@@ -393,10 +396,11 @@ namespace dlib
                                 beta.device(),
                                 running_means.device(),
                                 running_variances.device(),
-                                dlib::tt::BATCH_NORM_EPS));
+                                eps));
         }
 
         void batch_normalize (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -417,7 +421,8 @@ namespace dlib
                 beta.num_samples() == 1 && 
                 gamma.nr() == beta.nr() && beta.nr() == src.nr() &&
                 gamma.nc() == beta.nc() && beta.nc() == src.nc() &&
-                gamma.k()  == beta.k()  && beta.k() == src.k(), 
+                gamma.k()  == beta.k()  && beta.k() == src.k() &&
+                eps > 0, 
                 "\ngamma.num_samples(): " << gamma.num_samples() << 
                 "\ngamma.k():  " << gamma.k() << 
                 "\ngamma.nr(): " << gamma.nr() << 
@@ -428,7 +433,8 @@ namespace dlib
                 "\nbeta.nc():  " << beta.nc() << 
                 "\nsrc.k():   " << src.k() << 
                 "\nsrc.nr():  " << src.nr() << 
-                "\nsrc.nc():  " << src.nc() 
+                "\nsrc.nc():  " << src.nc() <<
+                "\neps:  " << eps 
             );
 
             const float in_scale = 1;
@@ -455,12 +461,13 @@ namespace dlib
                                 averaging_factor,
                                 running_means.device(),
                                 running_variances.device(),
-                                dlib::tt::BATCH_NORM_EPS,
+                                eps,
                                 means.device(),
                                 invstds.device()));
         }
 
         void batch_normalize_gradient(
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -480,6 +487,7 @@ namespace dlib
             DLIB_CASSERT(num == beta_grad.size(),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
+            DLIB_CASSERT(eps > 0,"");
 
             const float in_scale = 1;
             const float out_scale = 1;
@@ -503,7 +511,7 @@ namespace dlib
                                 gamma.device(),
                                 gamma_grad.device(),
                                 beta_grad.device(),
-                                dlib::tt::BATCH_NORM_EPS,
+                                eps,
                                 means.device(),
                                 invstds.device()));
         }
@@ -511,6 +519,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void batch_normalize_conv_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -526,7 +535,8 @@ namespace dlib
                 gamma.k()  == src.k() &&
                 have_same_dimensions(gamma, beta) &&
                 have_same_dimensions(gamma, running_means) &&
-                have_same_dimensions(gamma, running_variances), 
+                have_same_dimensions(gamma, running_variances) &&
+                eps > 0, 
                 "\ngamma.num_samples(): " << gamma.num_samples() << 
                 "\ngamma.k():  " << gamma.k() << 
                 "\ngamma.nr(): " << gamma.nr() << 
@@ -545,7 +555,8 @@ namespace dlib
                 "\nrunning_variances.nc():  " << running_variances.nc() << 
                 "\nsrc.k():   " << src.k() << 
                 "\nsrc.nr():  " << src.nr() << 
-                "\nsrc.nc():  " << src.nc() 
+                "\nsrc.nc():  " << src.nc() <<
+                "\neps:  " << eps 
             );
             const float in_scale = 1;
             const float out_scale = 0;
@@ -566,10 +577,11 @@ namespace dlib
                                 beta.device(),
                                 running_means.device(),
                                 running_variances.device(),
-                                dlib::tt::BATCH_NORM_EPS));
+                                eps));
         }
 
         void batch_normalize_conv (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -592,7 +604,8 @@ namespace dlib
                 beta.nr() == 1 && 
                 gamma.nc() == 1 && 
                 beta.nc() == 1 && 
-                gamma.k()  == beta.k()  && beta.k() == src.k(), 
+                gamma.k()  == beta.k()  && beta.k() == src.k() &&
+                eps > 0, 
                 "\ngamma.num_samples(): " << gamma.num_samples() << 
                 "\ngamma.k():  " << gamma.k() << 
                 "\ngamma.nr(): " << gamma.nr() << 
@@ -603,7 +616,8 @@ namespace dlib
                 "\nbeta.nc():  " << beta.nc() << 
                 "\nsrc.k():   " << src.k() << 
                 "\nsrc.nr():  " << src.nr() << 
-                "\nsrc.nc():  " << src.nc() 
+                "\nsrc.nc():  " << src.nc() <<
+                "\neps:  " << eps 
             );
             const float in_scale = 1;
             const float out_scale = 0;
@@ -629,12 +643,13 @@ namespace dlib
                                 averaging_factor,
                                 running_means.device(),
                                 running_variances.device(),
-                                dlib::tt::BATCH_NORM_EPS,
+                                eps,
                                 means.device(),
                                 invstds.device()));
         }
 
         void batch_normalize_conv_gradient(
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -653,6 +668,7 @@ namespace dlib
             DLIB_CASSERT(src.k() == beta_grad.size(),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
+            DLIB_CASSERT(eps > 0,"");
 
             const float in_scale = 1;
             const float out_scale = 1;
@@ -676,7 +692,7 @@ namespace dlib
                                 gamma.device(),
                                 gamma_grad.device(),
                                 beta_grad.device(),
-                                dlib::tt::BATCH_NORM_EPS,
+                                eps,
                                 means.device(),
                                 invstds.device()));
         }

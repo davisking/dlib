@@ -81,6 +81,18 @@ namespace dlib
             const float D
         );
 
+        void affine_transform_range(
+            size_t begin,
+            size_t end,
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2,
+            const tensor& src3,
+            const float A,
+            const float B,
+            const float C
+        );
+
     // -----------------------------------------------------------------------------------
 
         void affine_transform(
@@ -102,6 +114,8 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void compute_adam_update (
+            size_t begin,
+            size_t end,
             tensor& s,
             tensor& m,
             tensor& v,
@@ -117,6 +131,7 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void batch_normalize_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -126,6 +141,7 @@ namespace dlib
         );
 
         void batch_normalize (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -138,6 +154,7 @@ namespace dlib
         );
 
         void batch_normalize_gradient (
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -149,6 +166,7 @@ namespace dlib
         );
 
         void batch_normalize_conv_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -158,6 +176,7 @@ namespace dlib
         );
 
         void batch_normalize_conv (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -170,6 +189,7 @@ namespace dlib
         );
 
         void batch_normalize_conv_gradient (
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
