@@ -1532,12 +1532,6 @@ namespace
         }
     }
 #ifdef DLIB_USE_CUDA
-    float tensor_read_gpu(const tensor& t, long i, long k, long r, long c)
-    {
-        const float* p = t.device() + t.k() * t.nr() * t.nc() * i +
-                         t.nr() * t.nc() * k + t.nc() * r + c;
-        return *p;
-    }
     void test_copy_tensor_gpu()
     {
         using namespace dlib::tt;
@@ -1550,10 +1544,9 @@ namespace
         src1 = matrix_cast<float>(gaussian_randm(src1.num_samples(), src1.k() * src1.nr() * src1.nc(), 0));
         src2 = matrix_cast<float>(gaussian_randm(src1.num_samples(), src2.k() * src2.nr() * src2.nc(), 0));
         src3 = matrix_cast<float>(gaussian_randm(src1.num_samples(), src3.k() * src3.nr() * src3.nc(), 0));
-
-        gpu::copy_tensor(dest, 0, src1, 0,  src1.k()); //full copy src1->dest
-        gpu::copy_tensor(dest, src1.k(), src2, 0,  src2.k()); //full copy src2->dest with offset of src1
-        gpu::copy_tensor(dest, src1.k() + src2.k(), src3, 3,  3); //partial copy src3 into the rest place of dest
+        cuda::copy_tensor(dest, 0, src1, 0,  src1.k()); //full copy src1->dest
+        cuda::copy_tensor(dest, src1.k(), src2, 0,  src2.k()); //full copy src2->dest with offset of src1
+        cuda::copy_tensor(dest, src1.k() + src2.k(), src3, 3,  3); //partial copy src3 into the rest place of dest
 
 
         for (long i = 0; i < dest.num_samples(); ++i)
@@ -1564,23 +1557,23 @@ namespace
                 {
                     for (long c = 0; c < dest.nc(); ++c)
                     {
-                        float dest_value = tensor_read_gpu(dest, i, k, r, c);
+                        float dest_value = tensor_read_cpu(dest, i, k, r, c);
                         // first part is from src1
                         if (k < src1.k())
                         {
-                            float src_value = tensor_read_gpu(src1, i, k, r, c);
+                            float src_value = tensor_read_cpu(src1, i, k, r, c);
                             DLIB_TEST(src_value == dest_value);
                         }
                             // second part is from src2
                         else if (k < src1.k() + src2.k())
                         {
-                            float src_value = tensor_read_gpu(src2, i, k - src1.k(), r, c);
+                            float src_value = tensor_read_cpu(src2, i, k - src1.k(), r, c);
                             DLIB_TEST(src_value == dest_value);
                         }
                             // third part is from src3
                         else
                         {
-                            float src_value = tensor_read_gpu(src3, i, k - src1.k() - src2.k() + 3, r, c);
+                            float src_value = tensor_read_cpu(src3, i, k - src1.k() - src2.k() + 3, r, c);
                             DLIB_TEST(src_value == dest_value);
                         }
                     }
