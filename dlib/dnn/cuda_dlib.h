@@ -260,8 +260,8 @@ namespace dlib
 
         void copy_tensor(
                 tensor& dest,
-                const tensor& src,
                 size_t dest_k_offset,
+                const tensor& src,
                 size_t src_k_offset,
                 size_t count_k
         );
