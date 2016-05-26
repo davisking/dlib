@@ -22,19 +22,19 @@ using namespace dlib;
 // Inception layer has some different convolutions inside
 // Here we define blocks as convolutions with different kernel size that we will use in
 // inception layer block.
-template <typename SUBNET> using block_a1 = relu<con<4,1,1,1,1,SUBNET>>;
-template <typename SUBNET> using block_a2 = relu<con<4,3,3,1,1,relu<con<4,1,1,1,1,SUBNET>>>>;
-template <typename SUBNET> using block_a3 = relu<con<4,5,5,1,1,relu<con<4,1,1,1,1,SUBNET>>>>;
-template <typename SUBNET> using block_a4 = relu<con<4,1,1,1,1,max_pool<3,3,1,1,SUBNET>>>;
+template <typename SUBNET> using block_a1 = relu<con<10,1,1,1,1,SUBNET>>;
+template <typename SUBNET> using block_a2 = relu<con<10,3,3,1,1,relu<con<16,1,1,1,1,SUBNET>>>>;
+template <typename SUBNET> using block_a3 = relu<con<10,5,5,1,1,relu<con<16,1,1,1,1,SUBNET>>>>;
+template <typename SUBNET> using block_a4 = relu<con<10,1,1,1,1,max_pool<3,3,1,1,SUBNET>>>;
 
 // Here is inception layer definition. It uses different blocks to process input and returns combined output
 template <typename SUBNET> using incept_a = inception4<block_a1,block_a2,block_a3,block_a4, SUBNET>;
 
 // Network can have inception layers of different structure.
 // Here are blocks with different convolutions
-template <typename SUBNET> using block_b1 = relu<con<8,1,1,1,1,SUBNET>>;
-template <typename SUBNET> using block_b2 = relu<con<8,3,3,1,1,SUBNET>>;
-template <typename SUBNET> using block_b3 = relu<con<8,1,1,1,1,max_pool<3,3,1,1,SUBNET>>>;
+template <typename SUBNET> using block_b1 = relu<con<4,1,1,1,1,SUBNET>>;
+template <typename SUBNET> using block_b2 = relu<con<4,3,3,1,1,SUBNET>>;
+template <typename SUBNET> using block_b3 = relu<con<4,1,1,1,1,max_pool<3,3,1,1,SUBNET>>>;
 
 // Here is inception layer definition. It uses different blocks to process input and returns combined output
 template <typename SUBNET> using incept_b = inception3<block_b1,block_b2,block_b3,SUBNET>;
@@ -44,9 +44,9 @@ using net_type = loss_multiclass_log<
         fc<10,
         relu<fc<32,
         max_pool<2,2,2,2,incept_b<
-        max_pool<2,2,2,2,incept_a<
+        max_pool<2,2,2,2,tag1<incept_a<
         input<matrix<unsigned char>>
-        >>>>>>>>;
+        >>>>>>>>>;
 
 int main(int argc, char** argv) try
 {
@@ -68,10 +68,26 @@ int main(int argc, char** argv) try
     load_mnist_dataset(argv[1], training_images, training_labels, testing_images, testing_labels);
 
 
-    // The rest of the sample is identical to dnn_minst_ex
     // Create network of predefined type.
     net_type net;
 
+    // Now let's print the details of the pnet to the screen and inspect it.
+    cout << "The net has " << net.num_layers << " layers in it." << endl;
+    cout << net << endl;
+
+    // we can access inner layers with layer<> function:
+    // with tags
+    auto& in_b = layer<tag1>(net);
+    cout << "Found inception B layer: " << endl << in_b << endl;
+    // and we can access layers inside inceptions with itags
+    auto& in_b_1 = layer<itag1>(in_b);
+    cout << "Found inception B/1 layer: " << endl << in_b_1 << endl;
+    // or this is identical to
+    auto& in_b_1_a = layer<tag1,2>(net);
+    cout << "Found inception B/1 layer alternative way: " << endl << in_b_1_a << endl;
+
+    cout << "Traning NN..." << endl;
+    // The rest of the sample is identical to dnn_minst_ex
     // And then train it using the MNIST data.  The code below uses mini-batch stochastic
     // gradient descent with an initial learning rate of 0.01 to accomplish this.
     dnn_trainer<net_type> trainer(net);
