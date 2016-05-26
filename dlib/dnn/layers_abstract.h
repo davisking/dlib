@@ -1654,6 +1654,88 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template<
+        template<typename> class... TAG_TYPES
+        >
+    class concat_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  This layer simply concatenates the output of requiered layers
+                In particular, it copies each layer's output from TAG_TYPES into the corresponding
+                place of the result tensor, those producing combined output
+                The output of each tag layer is stored in a separate part of final output.
+                FORWARD:
+                for each (tag in TAG_TYPES)
+                    outout[i, k + tag.k(), r, c] = layer<tag>(subnet).get_output[i, k, r, c]
+
+                BACKWARD:
+                for each (tag in TAG_TYPES)
+                    layer<tag>(subnet).get_gradient_input[i, k, r, c] = input[i, k + tag.k(), r, c]
+
+                This layer can be only used with tags inside.
+                Each tagged layer should have identical num_samples, R and C size
+                The output will have K = sum(k) of tags, and the, and the output's num_samples,
+                R and C will be the same as tagged layers
+
+        !*/
+
+    public:
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+
+    template <typename SUBNET, template<typename> class... TAG_TYPES>
+    using concat = add_layer<concat_<TAG_TYPES...>, SUBNET>;
+
+    // inception layer will use tags internally. If user will use tags too,
+    // some conflicts possible
+    // to exclude them, here are new tags specially for inceptions
+    template <typename SUBNET> using itag0  = add_tag_layer< 1000 + 0, SUBNET>;
+    template <typename SUBNET> using itag1  = add_tag_layer< 1000 + 1, SUBNET>;
+    template <typename SUBNET> using itag2  = add_tag_layer< 1000 + 2, SUBNET>;
+    template <typename SUBNET> using itag3  = add_tag_layer< 1000 + 3, SUBNET>;
+    template <typename SUBNET> using itag4  = add_tag_layer< 1000 + 4, SUBNET>;
+    template <typename SUBNET> using itag5  = add_tag_layer< 1000 + 5, SUBNET>;
+    // skip to inception input
+    template <typename SUBNET> using iskip  = add_skip_layer< itag0, SUBNET>;
+
+    // here are some templates to be used for creating inception layer groups
+    template <template<typename>class B1,
+            template<typename>class B2,
+            typename SUBNET>
+    using inception2 = concat<itag1<B1<iskip< itag2<B2< itag0<SUBNET>>>>>>, itag1, itag2>;
+    template <template<typename>class B1,
+            template<typename>class B2,
+            template<typename>class B3,
+            typename SUBNET>
+    using inception3 = concat<itag1<B1<iskip< itag2<B2<iskip< itag3<B3<  itag0<SUBNET>>>>>>>>>, itag1, itag2, itag3>;
+    template <template<typename>class B1,
+            template<typename>class B2,
+            template<typename>class B3,
+            template<typename>class B4,
+            typename SUBNET>
+    using inception4 = concat<itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<  itag0<SUBNET>>>>>>>>>>>>,
+            itag1, itag2, itag3, itag4>;
+    template <template<typename>class B1,
+            template<typename>class B2,
+            template<typename>class B3,
+            template<typename>class B4,
+            template<typename>class B5,
+            typename SUBNET>
+    using inception5 = concat<itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<iskip<  itag5<B5<  itag0<SUBNET>>>>>>>>>>>>>>>,
+            itag1, itag2, itag3, itag4, itag5>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_

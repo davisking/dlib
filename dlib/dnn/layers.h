@@ -1837,6 +1837,163 @@ namespace dlib
     using softmax = add_layer<softmax_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+    namespace impl{
+        // helper classes for layer concat processing
+        template <template<typename> class... TAG_TYPES>
+        struct concat_helper_impl {
+        };
+        template <template<typename> class TAG_TYPE>
+        struct concat_helper_impl<TAG_TYPE>{
+            template<typename SUBNET>
+            static void resize_out(resizable_tensor& out, const SUBNET& sub, long sum_k)
+            {
+                auto& t = layer<TAG_TYPE>(sub).get_output();
+                out.set_size(t.num_samples(), t.k() + sum_k, t.nr(), t.nc());
+            }
+            template<typename SUBNET>
+            static void concat(tensor& out, const SUBNET& sub, size_t k_offset)
+            {
+                auto& t = layer<TAG_TYPE>(sub).get_output();
+                tt::copy_tensor(out, k_offset, t, 0, t.k());
+            }
+            template<typename SUBNET>
+            static void split(const tensor& input, SUBNET& sub, size_t k_offset)
+            {
+                auto& t = layer<TAG_TYPE>(sub).get_gradient_input();
+                tt::copy_tensor(t, 0, input, k_offset, t.k());
+            }
+        };
+        template <template<typename> class TAG_TYPE, template<typename> class... TAG_TYPES>
+        struct concat_helper_impl<TAG_TYPE, TAG_TYPES...>{
+            template<typename SUBNET>
+            static void resize_out(resizable_tensor& out, const SUBNET& sub, long sum_k)
+            {
+                auto& t = layer<TAG_TYPE>(sub).get_output();
+                concat_helper_impl<TAG_TYPES...>::resize_out(out, sub, sum_k + t.k());
+            }
+            template<typename SUBNET>
+            static void concat(tensor& out, const SUBNET& sub, size_t k_offset)
+            {
+                auto& t = layer<TAG_TYPE>(sub).get_output();
+                tt::copy_tensor(out, k_offset, t, 0, t.k());
+                k_offset += t.k();
+                concat_helper_impl<TAG_TYPES...>::concat(out, sub, k_offset);
+            }
+            template<typename SUBNET>
+            static void split(const tensor& input, SUBNET& sub, size_t k_offset)
+            {
+                auto& t = layer<TAG_TYPE>(sub).get_gradient_input();
+                tt::copy_tensor(t, 0, input, k_offset, t.k());
+                k_offset += t.k();
+                concat_helper_impl<TAG_TYPES...>::split(input, sub, k_offset);
+            }
+        };
+    }
+    // concat layer
+    template<
+        template<typename> class... TAG_TYPES
+        >
+    class concat_
+    {
+    public:
+        template <typename SUBNET>
+        void setup (const SUBNET&)
+        {
+            // do nothing
+        }
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            // the total depth of result is the sum of depths from all tags
+            impl::concat_helper_impl<TAG_TYPES...>::resize_out(output, sub, 0);
+
+            // copy output from each tag into different part result
+            impl::concat_helper_impl<TAG_TYPES...>::concat(output, sub, 0);
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor&)
+        {
+            // Gradient is splitted into parts for each tag layer
+            impl::concat_helper_impl<TAG_TYPES...>::split(gradient_input, sub, 0);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const concat_& item, std::ostream& out)
+        {
+            serialize("concat_", out);
+            serialize(sizeof...(TAG_TYPES), out);
+        }
+
+        friend void deserialize(concat_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "concat_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::concat_.");
+            size_t count_tags;
+            deserialize(count_tags, in);
+            if (count_tags != sizeof...(TAG_TYPES))
+                throw serialization_error("Invalid count of tags "+ std::to_string(count_tags) +", expecting " +
+                                          std::to_string(sizeof...(TAG_TYPES)) + " found while deserializing dlib::concat_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const concat_& item)
+        {
+            out << "concat\t ("
+                << sizeof...(TAG_TYPES)
+                << ")";
+            return out;
+        }
+
+    private:
+        resizable_tensor params; // unused
+    };
+
+
+    template <typename SUBNET, template<typename> class... TAG_TYPES>
+    using concat = add_layer<concat_<TAG_TYPES...>, SUBNET>;
+
+    // inception layer will use tags internally. If user will use tags too,
+    // some conflicts possible
+    // to exclude them, here are new tags specially for inceptions
+    template <typename SUBNET> using itag0  = add_tag_layer< 1000 + 0, SUBNET>;
+    template <typename SUBNET> using itag1  = add_tag_layer< 1000 + 1, SUBNET>;
+    template <typename SUBNET> using itag2  = add_tag_layer< 1000 + 2, SUBNET>;
+    template <typename SUBNET> using itag3  = add_tag_layer< 1000 + 3, SUBNET>;
+    template <typename SUBNET> using itag4  = add_tag_layer< 1000 + 4, SUBNET>;
+    template <typename SUBNET> using itag5  = add_tag_layer< 1000 + 5, SUBNET>;
+    // skip to inception input
+    template <typename SUBNET> using iskip  = add_skip_layer< itag0, SUBNET>;
+
+    // here are some templates to be used for creating inception layer groups
+    template <template<typename>class B1,
+            template<typename>class B2,
+            typename SUBNET>
+    using inception2 = concat<itag1<B1<iskip< itag2<B2< itag0<SUBNET>>>>>>, itag1, itag2>;
+    template <template<typename>class B1,
+            template<typename>class B2,
+            template<typename>class B3,
+            typename SUBNET>
+    using inception3 = concat<itag1<B1<iskip< itag2<B2<iskip< itag3<B3<  itag0<SUBNET>>>>>>>>>, itag1, itag2, itag3>;
+    template <template<typename>class B1,
+            template<typename>class B2,
+            template<typename>class B3,
+            template<typename>class B4,
+            typename SUBNET>
+    using inception4 = concat<itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<  itag0<SUBNET>>>>>>>>>>>>,
+            itag1, itag2, itag3, itag4>;
+    template <template<typename>class B1,
+            template<typename>class B2,
+            template<typename>class B3,
+            template<typename>class B4,
+            template<typename>class B5,
+            typename SUBNET>
+    using inception5 = concat<itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<iskip<  itag5<B5<  itag0<SUBNET>>>>>>>>>>>>>>>,
+            itag1, itag2, itag3, itag4, itag5>;
+// ----------------------------------------------------------------------------------------
 
 }
 

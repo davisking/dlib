@@ -678,26 +678,23 @@ namespace dlib { namespace tt
 #endif
     }
 
-    // ----------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
-    void concat_depth(tensor& dest, size_t sample_offset, const tensor& src)
-    {
+        void copy_tensor(
+                tensor& dest,
+                size_t dest_k_offset,
+                const tensor& src,
+                size_t src_k_offset,
+                size_t count_k
+        )
+        {
 #ifdef DLIB_USE_CUDA
-        cuda::concat_depth(dest, sample_offset, src);
+            cuda::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
 #else
-        cpu::concat_depth(dest, sample_offset, src);
+            cpu::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
 #endif
-    }
+        }
 
-    void split_depth(tensor& dest, size_t sample_offset, const tensor& src)
-    {
-#ifdef DLIB_USE_CUDA
-        cuda::split_depth(dest, sample_offset, src);
-#else
-        cpu::split_depth(dest, sample_offset, src);
-#endif
-    }
 // ----------------------------------------------------------------------------------------
 
 }}

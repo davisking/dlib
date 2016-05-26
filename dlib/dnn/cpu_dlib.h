@@ -384,19 +384,14 @@ namespace dlib
             long last_padding_x;
         };
 
-        // ----------------------------------------------------------------------------------------
-
-        void concat_depth(
-                tensor& dest,
-                size_t sample_offset,
-                const tensor& src
-        );
-
-        void split_depth(
-                tensor& dest,
-                size_t sample_offset,
-                const tensor& src
-        );
+    // -----------------------------------------------------------------------------------
+    void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+    );
     // -----------------------------------------------------------------------------------
 
     } 

@@ -15,22 +15,42 @@
 #include <dlib/dnn.h>
 #include <iostream>
 #include <dlib/data_io.h>
-#include <tuple>
 
 using namespace std;
 using namespace dlib;
 
-// Here we define inception module as described in GoogLeNet specification. The depth of each sublayer can be changed
-template<typename SUBNET>
-using inception = grp<std::tuple<con<8,1,1,1,1, group_input>,
-                                 con<8,3,3,1,1, con<8,1,1,1,1, group_input>>,
-                                 con<8,5,5,1,1, con<8,1,1,1,1, group_input>>,
-                                 con<8,1,1,1,1, max_pool<3,3,1,1, group_input>>>,
-                      SUBNET>;
+// Inception layer has some different convolutions inside
+// Here we define blocks as convolutions with different kernel size that we will use in
+// inception layer block.
+template <typename SUBNET> using block_a1 = relu<con<4,1,1,1,1,SUBNET>>;
+template <typename SUBNET> using block_a2 = relu<con<4,3,3,1,1,relu<con<4,1,1,1,1,SUBNET>>>>;
+template <typename SUBNET> using block_a3 = relu<con<4,5,5,1,1,relu<con<4,1,1,1,1,SUBNET>>>>;
+template <typename SUBNET> using block_a4 = relu<con<4,1,1,1,1,max_pool<3,3,1,1,SUBNET>>>;
+
+// Here is inception layer definition. It uses different blocks to process input and returns combined output
+template <typename SUBNET> using incept_a = inception4<block_a1,block_a2,block_a3,block_a4, SUBNET>;
+
+// Network can have inception layers of different structure.
+// Here are blocks with different convolutions
+template <typename SUBNET> using block_b1 = relu<con<8,1,1,1,1,SUBNET>>;
+template <typename SUBNET> using block_b2 = relu<con<8,3,3,1,1,SUBNET>>;
+template <typename SUBNET> using block_b3 = relu<con<8,1,1,1,1,max_pool<3,3,1,1,SUBNET>>>;
+
+// Here is inception layer definition. It uses different blocks to process input and returns combined output
+template <typename SUBNET> using incept_b = inception3<block_b1,block_b2,block_b3,SUBNET>;
+
+// and then the network type is
+using net_type = loss_multiclass_log<
+        fc<10,
+        relu<fc<32,
+        max_pool<2,2,2,2,incept_b<
+        max_pool<2,2,2,2,incept_a<
+        input<matrix<unsigned char>>
+        >>>>>>>>;
 
 int main(int argc, char** argv) try
 {
-    // This example is going to run on the MNIST dataset.  
+    // This example is going to run on the MNIST dataset.
     if (argc != 2)
     {
         cout << "This example needs the MNIST dataset to run!" << endl;
@@ -48,24 +68,9 @@ int main(int argc, char** argv) try
     load_mnist_dataset(argv[1], training_images, training_labels, testing_images, testing_labels);
 
 
-    // Create a the same network as in dnn_mnist_ex, but use inception layer insteam of convolution
-    // in the middle
-    using net_type = loss_multiclass_log<
-            fc<10,
-                    relu<fc<84,
-                            relu<fc<120,
-                                    max_pool<2,2,2,2,relu<inception<
-                                            max_pool<2,2,2,2,relu<con<6,5,5,1,1,
-                                                    input<matrix<unsigned char>>
-                                            >>>>>>>>>>>>;
-
-
-    // Create a network as defined above.  This network will produce 10 outputs
-    // because that's how we defined net_type.  However, fc layers can have the
-    // number of outputs they produce changed at runtime.
+    // The rest of the sample is identical to dnn_minst_ex
+    // Create network of predefined type.
     net_type net;
-
-    // the following training process is the same as in dnn_mnist_ex sample
 
     // And then train it using the MNIST data.  The code below uses mini-batch stochastic
     // gradient descent with an initial learning rate of 0.01 to accomplish this.
@@ -80,12 +85,12 @@ int main(int argc, char** argv) try
     // from scratch.  This is because, when the program restarts, this call to
     // set_synchronization_file() will automatically reload the settings from mnist_sync if
     // the file exists.
-    trainer.set_synchronization_file("mnist_sync", std::chrono::seconds(20));
+    trainer.set_synchronization_file("inception_sync", std::chrono::seconds(20));
     // Finally, this line begins training.  By default, it runs SGD with our specified
     // learning rate until the loss stops decreasing.  Then it reduces the learning rate by
     // a factor of 10 and continues running until the loss stops decreasing again.  It will
     // keep doing this until the learning rate has dropped below the min learning rate
-    // defined above or the maximum number of epochs as been executed (defaulted to 10000). 
+    // defined above or the maximum number of epochs as been executed (defaulted to 10000).
     trainer.train(training_images, training_labels);
 
     // At this point our net object should have learned how to classify MNIST images.  But
@@ -96,7 +101,7 @@ int main(int argc, char** argv) try
     // about that kind of transient data so that our file will be smaller.  We do this by
     // "cleaning" the network before saving it.
     net.clean();
-    serialize("mnist_network.dat") << net;
+    serialize("mnist_network_inception.dat") << net;
     // Now if we later wanted to recall the network from disk we can simply say:
     // deserialize("mnist_network.dat") >> net;
 
