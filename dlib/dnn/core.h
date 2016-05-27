@@ -536,7 +536,7 @@ namespace dlib
             subnet_wrapper(const subnet_wrapper&) = delete;
             subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
-            subnet_wrapper(T& l_) {}
+            subnet_wrapper(T& /*l_*/) {}
             // Nothing here because in this case T is one of the input layer types 
             // that doesn't have anything in it.
         };

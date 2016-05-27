@@ -11,83 +11,11 @@
 
 #include "tester.h"
 
-
-namespace dlib{
-    template <typename SUBNET> using concat_block1 = con<5,1,1,1,1,SUBNET>;
-    template <typename SUBNET> using concat_block2 = con<8,3,3,1,1,SUBNET>;
-    template <typename SUBNET> using concat_block3 = max_pool<3,3,1,1,SUBNET>;
-    template <typename SUBNET> using concat_incept = inception3<concat_block1,concat_block2,concat_block3,SUBNET>;
-
-    // this class is a friend of add_layer and can access private members
-    class dnn_tester{
-    public:
-        // tester function is a member to have access to a private x_grad member of add_layer
-        static void test_concat()
-        {
-            using namespace test;
-            using namespace std;
-            using namespace dlib::tt;
-            print_spinner();
-
-            using net_type = concat_incept<input<matrix<float>>>;
-
-            resizable_tensor data(10, 1, 111, 222);
-            data = matrix_cast<float>(gaussian_randm(data.num_samples(), data.k() * data.nr() * data.nc(), 1));
-
-            net_type net;
-
-
-            auto& out = net.forward(data);
-
-            auto& b1o = layer<itag1>(net).get_output();
-            auto& b2o = layer<itag2>(net).get_output();
-            auto& b3o = layer<itag3>(net).get_output();
-
-            resizable_tensor dest(10, 14, 111, 222);
-            copy_tensor(dest, 0, b1o, 0,  b1o.k());
-            copy_tensor(dest, b1o.k(), b2o, 0,  b2o.k());
-            copy_tensor(dest, b1o.k() + b2o.k(), b3o, 0,  b3o.k());
-
-            DLIB_TEST(dest.size() == out.size());
-            int error = memcmp(dest.host(), out.host(), dest.size());
-            DLIB_TEST(error == 0);
-
-            resizable_tensor gr(10, 14, 111, 222);
-            gr = matrix_cast<float>(gaussian_randm(gr.num_samples(), gr.k() * gr.nr() * gr.nc(), 1));
-            memcpy(net.get_gradient_input(), gr);
-
-            net.back_propagate_error(data);
-
-            auto& b1g = layer<itag1>(net).subnet().x_grad;
-            auto& b2g = layer<itag2>(net).subnet().x_grad;
-            auto& b3g = layer<itag3>(net).subnet().x_grad;
-
-            resizable_tensor g1(10, 5, 111, 222);
-            resizable_tensor g2(10, 8, 111, 222);
-            resizable_tensor g3(10, 1, 111, 222);
-
-            copy_tensor(g1, 0, gr, 0,  g1.k());
-            copy_tensor(g2, 0, gr, g1.k(), g2.k());
-            copy_tensor(g3, 0, gr, g1.k() + g2.k(), g3.k());
-            DLIB_TEST(g1.size() == b1g.size());
-            error = memcmp(g1.host(), b1g.host(), b1g.size());
-            DLIB_TEST(error == 0);
-            DLIB_TEST(g2.size() == b2g.size());
-            error = memcmp(g2.host(), b2g.host(), b2g.size());
-            DLIB_TEST(error == 0);
-            DLIB_TEST(g3.size() == b3g.size());
-            error = memcmp(g3.host(), b3g.host(), b3g.size());
-            DLIB_TEST(error == 0);
-        }
-    };
-}
-
-namespace
+namespace dlib
 {
 
-    using namespace test;
-    using namespace dlib;
     using namespace std;
+    using namespace test;
 
     logger dlog("test.dnn");
 
@@ -1258,7 +1186,7 @@ namespace
                                                         r*stride_y+y_offset,
                                                         window_width,
                                                         window_height)));
-                        float err = abs(image_plane(A,s,k)(r,c) - expected);
+                        float err = std::abs(image_plane(A,s,k)(r,c) - expected);
                         DLIB_TEST_MSG(err < 1e-5, err << "  " << expected << "  " << image_plane(A,s,k)(r,c));
                     }
                 }
@@ -1594,6 +1522,8 @@ namespace
                 "Runs tests on the deep neural network tools.")
         {}
 
+        void test_concat();
+
         void perform_test (
         )
         {
@@ -1646,10 +1576,71 @@ namespace
             test_layers();
             test_visit_funcions();
             test_copy_tensor_cpu();
-            dlib::dnn_tester::test_concat();
+            test_concat();
         }
     } a;
 
+
+    template <typename SUBNET> using concat_block1 = con<5,1,1,1,1,SUBNET>;
+    template <typename SUBNET> using concat_block2 = con<8,3,3,1,1,SUBNET>;
+    template <typename SUBNET> using concat_block3 = max_pool<3,3,1,1,SUBNET>;
+    template <typename SUBNET> using concat_incept = inception3<concat_block1,concat_block2,concat_block3,SUBNET>;
+
+    void dnn_tester::test_concat()
+    {
+        using namespace dlib::tt;
+        print_spinner();
+
+        using net_type = concat_incept<input<matrix<float>>>;
+
+        resizable_tensor data(10, 1, 111, 222);
+        data = matrix_cast<float>(gaussian_randm(data.num_samples(), data.k() * data.nr() * data.nc(), 1));
+
+        net_type net;
+
+
+        auto& out = net.forward(data);
+
+        auto& b1o = layer<itag1>(net).get_output();
+        auto& b2o = layer<itag2>(net).get_output();
+        auto& b3o = layer<itag3>(net).get_output();
+
+        resizable_tensor dest(10, 14, 111, 222);
+        copy_tensor(dest, 0, b1o, 0,  b1o.k());
+        copy_tensor(dest, b1o.k(), b2o, 0,  b2o.k());
+        copy_tensor(dest, b1o.k() + b2o.k(), b3o, 0,  b3o.k());
+
+        DLIB_TEST(dest.size() == out.size());
+        int error = memcmp(dest.host(), out.host(), dest.size());
+        DLIB_TEST(error == 0);
+
+        resizable_tensor gr(10, 14, 111, 222);
+        gr = matrix_cast<float>(gaussian_randm(gr.num_samples(), gr.k() * gr.nr() * gr.nc(), 1));
+        memcpy(net.get_gradient_input(), gr);
+
+        net.back_propagate_error(data);
+
+        auto& b1g = layer<itag1>(net).subnet().x_grad;
+        auto& b2g = layer<itag2>(net).subnet().x_grad;
+        auto& b3g = layer<itag3>(net).subnet().x_grad;
+
+        resizable_tensor g1(10, 5, 111, 222);
+        resizable_tensor g2(10, 8, 111, 222);
+        resizable_tensor g3(10, 1, 111, 222);
+
+        copy_tensor(g1, 0, gr, 0,  g1.k());
+        copy_tensor(g2, 0, gr, g1.k(), g2.k());
+        copy_tensor(g3, 0, gr, g1.k() + g2.k(), g3.k());
+        DLIB_TEST(g1.size() == b1g.size());
+        error = memcmp(g1.host(), b1g.host(), b1g.size());
+        DLIB_TEST(error == 0);
+        DLIB_TEST(g2.size() == b2g.size());
+        error = memcmp(g2.host(), b2g.host(), b2g.size());
+        DLIB_TEST(error == 0);
+        DLIB_TEST(g3.size() == b3g.size());
+        error = memcmp(g3.host(), b3g.host(), b3g.size());
+        DLIB_TEST(error == 0);
+    }
 }
 
 

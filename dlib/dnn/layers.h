@@ -1953,8 +1953,31 @@ namespace dlib
     };
 
 
-    template <typename SUBNET, template<typename> class... TAG_TYPES>
-    using concat = add_layer<concat_<TAG_TYPES...>, SUBNET>;
+    // concat layer definitions
+    template <template<typename> class TAG1, typename SUBNET>
+    using concat1 = add_layer<concat_<TAG1>, SUBNET>;
+    template <template<typename> class TAG1,
+            template<typename> class TAG2,
+            typename SUBNET>
+    using concat2 = add_layer<concat_<TAG1, TAG2>, SUBNET>;
+    template <template<typename> class TAG1,
+            template<typename> class TAG2,
+            template<typename> class TAG3,
+            typename SUBNET>
+    using concat3 = add_layer<concat_<TAG1, TAG2, TAG3>, SUBNET>;
+    template <template<typename> class TAG1,
+            template<typename> class TAG2,
+            template<typename> class TAG3,
+            template<typename> class TAG4,
+            typename SUBNET>
+    using concat4 = add_layer<concat_<TAG1, TAG2, TAG3, TAG4>, SUBNET>;
+    template <template<typename> class TAG1,
+            template<typename> class TAG2,
+            template<typename> class TAG3,
+            template<typename> class TAG4,
+            template<typename> class TAG5,
+            typename SUBNET>
+    using concat5 = add_layer<concat_<TAG1, TAG2, TAG3, TAG4, TAG5>, SUBNET>;
 
     // inception layer will use tags internally. If user will use tags too,
     // some conflicts possible
@@ -1970,29 +1993,34 @@ namespace dlib
 
     // here are some templates to be used for creating inception layer groups
     template <template<typename>class B1,
+            typename SUBNET>
+    using inception1 = concat1<itag1, itag1<B1<iskip< itag0<SUBNET>>>>>;
+    template <template<typename>class B1,
             template<typename>class B2,
             typename SUBNET>
-    using inception2 = concat<itag1<B1<iskip< itag2<B2< itag0<SUBNET>>>>>>, itag1, itag2>;
+    using inception2 = concat2<itag1, itag2, itag1<B1<iskip< itag2<B2< itag0<SUBNET>>>>>>>;
     template <template<typename>class B1,
             template<typename>class B2,
             template<typename>class B3,
             typename SUBNET>
-    using inception3 = concat<itag1<B1<iskip< itag2<B2<iskip< itag3<B3<  itag0<SUBNET>>>>>>>>>, itag1, itag2, itag3>;
+    using inception3 = concat3<itag1, itag2, itag3, itag1<B1<iskip< itag2<B2<iskip< itag3<B3<  itag0<SUBNET>>>>>>>>>>;
     template <template<typename>class B1,
             template<typename>class B2,
             template<typename>class B3,
             template<typename>class B4,
             typename SUBNET>
-    using inception4 = concat<itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<  itag0<SUBNET>>>>>>>>>>>>,
-            itag1, itag2, itag3, itag4>;
+    using inception4 = concat4<itag1, itag2, itag3, itag4,
+                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<  itag0<SUBNET>>>>>>>>>>>>
+            >;
     template <template<typename>class B1,
             template<typename>class B2,
             template<typename>class B3,
             template<typename>class B4,
             template<typename>class B5,
             typename SUBNET>
-    using inception5 = concat<itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<iskip<  itag5<B5<  itag0<SUBNET>>>>>>>>>>>>>>>,
-            itag1, itag2, itag3, itag4, itag5>;
+    using inception5 = concat5<itag1, itag2, itag3, itag4, itag5,
+                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<iskip<  itag5<B5<  itag0<SUBNET>>>>>>>>>>>>>>>
+            >;
 // ----------------------------------------------------------------------------------------
 
 }

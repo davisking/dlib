@@ -11,7 +11,6 @@
     For further reading refer http://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf
 */
 
-
 #include <dlib/dnn.h>
 #include <iostream>
 #include <dlib/data_io.h>
