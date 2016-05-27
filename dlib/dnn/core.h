@@ -648,7 +648,6 @@ namespace dlib
         friend class add_skip_layer;
         template <size_t N, template<typename> class L, typename S>
         friend class repeat;
-        friend class dnn_tester;
 
         // Allow copying networks from one to another as long as their corresponding 
         // layers can be constructed from each other.
@@ -1521,7 +1520,6 @@ namespace dlib
         friend class add_skip_layer;
         template <size_t N, template<typename> class L, typename S>
         friend class repeat;
-        friend class dnn_tester;
 
         // You wouldn't put a tag on a layer if you didn't want to access its forward
         // outputs.  So this is always true.
