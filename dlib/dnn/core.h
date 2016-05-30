@@ -536,7 +536,7 @@ namespace dlib
             subnet_wrapper(const subnet_wrapper&) = delete;
             subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
-            subnet_wrapper(T& l_) {}
+            subnet_wrapper(T& /*l_*/) {}
             // Nothing here because in this case T is one of the input layer types 
             // that doesn't have anything in it.
         };
@@ -600,7 +600,7 @@ namespace dlib
     struct is_nonloss_layer_type<add_layer<T,U>> : std::true_type {};
 
     template <typename LAYER_DETAILS, typename SUBNET>
-    class add_layer<LAYER_DETAILS,SUBNET, 
+    class add_layer<LAYER_DETAILS,SUBNET,
             typename std::enable_if<is_nonloss_layer_type<SUBNET>::value>::type>
     {
     public:

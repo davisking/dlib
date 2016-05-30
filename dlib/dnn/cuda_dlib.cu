@@ -796,7 +796,38 @@ namespace dlib
                 grad.device(), src.device(), gradient_input.device(), grad.size(),
                 param.device(), params_grad.device());
         }
+        // ----------------------------------------------------------------------------------------
 
+        void copy_tensor(
+                tensor& dest,
+                size_t dest_k_offset,
+                const tensor& src,
+                size_t src_k_offset,
+                size_t count_k
+        )
+        {
+            const size_t dest_sample_size = static_cast<size_t>(dest.nc() * dest.nr() * dest.k());
+            const size_t src_sample_size = static_cast<size_t>(src.nc() * src.nr() * src.k());
+
+            const size_t block_size = count_k * dest.nc() * dest.nr();
+
+            DLIB_CASSERT(dest.num_samples() == src.num_samples() &&
+                         dest.nc() == src.nc() && dest.nr() == src.nr(), "All sources should fit into dest tensor size");
+            DLIB_CASSERT(dest.k() - dest_k_offset >= count_k, "Not enough space in dest tensor");
+            DLIB_CASSERT(src.k() - src_k_offset >= count_k, "Not enough space in src tensor");
+
+            float* dest_p = dest.device() + dest_k_offset * dest.nc() * dest.nr();
+            const float* src_p = src.device() + src_k_offset * src.nc() * src.nr();;
+
+
+            for (unsigned long i = 0; i < src.num_samples(); ++i)
+            {
+                CHECK_CUDA(cudaMemcpy(dest_p, src_p, block_size * sizeof(float), cudaMemcpyDeviceToDevice));
+
+                dest_p += dest_sample_size;
+                src_p  += src_sample_size;
+            }
+        }
     // ----------------------------------------------------------------------------------------
 
     }

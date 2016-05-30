@@ -33,6 +33,7 @@ ENDMACRO()
 if (COMPILER_CAN_DO_CPP_11)
    add_example(dnn_mnist_ex)
    add_example(dnn_mnist_advanced_ex)
+   add_example(dnn_inception_ex)
 endif()
 
 #here we apply our macros 
