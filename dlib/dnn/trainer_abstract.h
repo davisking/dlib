@@ -73,6 +73,7 @@ namespace dlib
                 - #get_iterations_without_progress_threshold() == 2000
                 - #get_learning_rate_shrink_factor() == 0.1
                 - #get_learning_rate_schedule().size() == 0
+                - #get_train_one_step_calls() == 0
                 - if (cuda_extra_devices.size() > 0) then
                     - This object will use multiple graphics cards to run the learning
                       algorithms.  In particular, it will always use whatever device is
@@ -298,12 +299,8 @@ namespace dlib
         unsigned long long get_train_one_step_calls (
         ) const;
         /*!
-            requires
-                - training process should be done with #train_one_step()
             ensures
-                - Each #train_one_step() call increases this counter. It can be used to understand the training
-                  stage to make some additional processing like snapshotting or extra testing
-                - This value is serialized/deserialized via synchronization file
+                - returns the number of times train_one_step() has been called.
         !*/
 
         void be_verbose (
@@ -414,6 +411,7 @@ namespace dlib
                   calling this function you should call get_net() before you touch the net
                   object from the calling thread to ensure no other threads are still
                   accessing the network.
+                - #get_train_one_step_calls() == get_train_one_step_calls() + 1.
         !*/
 
         void train_one_step (
@@ -437,6 +435,7 @@ namespace dlib
                   calling this function you should call get_net() before you touch the net
                   object from the calling thread to ensure no other threads are still
                   accessing the network.
+                - #get_train_one_step_calls() == get_train_one_step_calls() + 1.
         !*/
 
         double get_average_loss (
