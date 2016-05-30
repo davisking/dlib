@@ -1718,12 +1718,15 @@ namespace dlib
     using concat5 = add_layer<concat_<TAG1, TAG2, TAG3, TAG4, TAG5>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+    
+    /*!Ainception layer definitions !*/
 
     // Now define inception layer tag types.  These layer aliases allow creating
     // the networks described in the paper: 
     //   Szegedy, Christian, et al. "Going deeper with convolutions." Proceedings of
     //   the IEEE Conference on Computer Vision and Pattern Recognition. 2015.
-    // Note that we use tag ID numbers >= 1000 to avoid conflict with user's tag layers.
+    // See the dnn_inception_ex.cpp example for a complete example of their use.  Note also
+    // that we use tag ID numbers >= 1000 to avoid conflict with user's tag layers.
     template <typename SUBNET> using itag0  = add_tag_layer< 1000 + 0, SUBNET>;
     template <typename SUBNET> using itag1  = add_tag_layer< 1000 + 1, SUBNET>;
     template <typename SUBNET> using itag2  = add_tag_layer< 1000 + 2, SUBNET>;
@@ -1747,6 +1750,7 @@ namespace dlib
               template<typename>class B3,
               typename SUBNET>
     using inception3 = concat3<itag1, itag2, itag3, itag1<B1<iskip< itag2<B2<iskip< itag3<B3<  itag0<SUBNET>>>>>>>>>>;
+
     template <template<typename>class B1,
               template<typename>class B2,
               template<typename>class B3,
