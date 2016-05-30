@@ -503,7 +503,8 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is a tensor that aliases another tensor.  That is, it doesn't
                 have its own block of memory but instead simply holds pointers to the
-                memory of another tensor object.  
+                memory of another tensor object.  It therefore allows you to efficiently
+                break a tensor into pieces and pass those pieces into functions.
         !*/
 
         // You can't default initialize this object.  You can only get instances of it from
