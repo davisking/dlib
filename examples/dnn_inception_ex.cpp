@@ -57,9 +57,9 @@ using net_type = loss_multiclass_log<
         fc<10,
         relu<fc<32,
         max_pool<2,2,2,2,incept_b<
-        max_pool<2,2,2,2,tag1<incept_a<
+        max_pool<2,2,2,2,incept_a<
         input<matrix<unsigned char>>
-        >>>>>>>>>;
+        >>>>>>>>;
 
 int main(int argc, char** argv) try
 {
