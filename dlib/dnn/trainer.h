@@ -466,6 +466,12 @@ namespace dlib
             return learning_rate_shrink;
         }
 
+        unsigned long long get_train_one_step_calls (
+        ) const
+        {
+            return train_one_step_calls;
+        }
+
     private:
 
         void record_loss(double loss)

@@ -295,6 +295,17 @@ namespace dlib
                   get_learning_rate_shrink_factor() to 1.
         !*/
 
+        unsigned long long get_train_one_step_calls (
+        ) const;
+        /*!
+            requires
+                - training process should be done with #train_one_step()
+            ensures
+                - Each #train_one_step() call increases this counter. It can be used to understand the training
+                  stage to make some additional processing like snapshotting or extra testing
+                - This value is serialized/deserialized via synchronization file
+        !*/
+
         void be_verbose (
         );
         /*!
