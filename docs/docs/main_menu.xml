@@ -187,6 +187,18 @@
             <name>Examples: C++</name>
             <sub>
                <item>
+                  <name>Deep Learning</name>
+                  <link>dnn_mnist_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Advanced</name>
+                  <link>dnn_mnist_advanced_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Inception</name>
+                  <link>dnn_inception_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Linear Model Predictive Control</name>
                   <link>mpc_ex.cpp.html</link>
                </item>

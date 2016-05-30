@@ -65,6 +65,7 @@
             </li>
             <li><b>Machine Learning Algorithms</b>
                <ul>
+                  <li><a href="ml.html#add_layer">Deep Learning</a></li>
                   <li>Conventional SMO based Support Vector Machines for <a href="ml.html#svm_nu_trainer">classification</a> 
                                                                     and  <a href="ml.html#svr_trainer">regression</a>  </li>
                   <li>Reduced-rank methods for large-scale <a href="ml.html#svm_c_ekm_trainer">classification</a>

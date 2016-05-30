@@ -34,8 +34,112 @@
 
 
          <term file="dlib/algs.h.html" name="stack_based_memory_block" include="dlib/algs.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="log1pexp" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tuple_head" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tuple_tail" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="get_learning_rate_multiplier" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="get_weight_decay_multiplier" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="randomize_parameters" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="sstack" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="make_sstack" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="repeat_group" include="dlib/dnn.h"/>
 
-         <term file="linear_algebra.html" name="mat"   include="dlib/matrix.h" />
+         <term file="dlib/dnn/core_abstract.h.html" name="add_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="add_loss_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="repeat_group" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="repeat" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="add_tag_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag1" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag2" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag3" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag4" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag5" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag6" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag7" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag8" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag9" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag10" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="add_skip_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip1" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip2" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip3" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip4" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip5" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip6" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip7" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip8" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip9" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip10" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameters" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameter_gradients" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="test_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="layer_test_results" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/core_abstract.h.html" name="dnn_prefer_fastest_algorithms" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="set_dnn_prefer_fastest_algorithms" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="set_dnn_prefer_smallest_algorithms" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/cuda_errors.h.html" name="cuda_error" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/cuda_errors.h.html" name="cudnn_error" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/cuda_errors.h.html" name="curand_error" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/cuda_errors.h.html" name="cublas_error" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="fc_bias_mode" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="FC_HAS_BIAS" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="FC_NO_BIAS" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="layer_mode" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="CONV_MODE" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="FC_MODE" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="resizable_tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="alias_tensor_instance" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="alias_tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="image_plane" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="have_same_dimensions" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/gpu_data_abstract.h.html" name="gpu_data" include="dlib/dnn.h"/>
+         <term name="memcpy">
+            <term link="dlib/dnn/tensor_abstract.h.html#memcpy" name="for tensors"   include="dlib/dnn.h" />
+            <term link="dlib/dnn/gpu_data_abstract.h.html#memcpy" name="for gpu_data"   include="dlib/dnn.h" />
+         </term>
+
+         <term file="dlib/dnn/input_abstract.h.html" name="EXAMPLE_INPUT_LAYER" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/input_abstract.h.html" name="input" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/input_abstract.h.html" name="input_rgb_image" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/trainer_abstract.h.html" name="dnn_trainer" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/loss_abstract.h.html" name="EXAMPLE_LOSS_LAYER_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_hinge_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_log_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/solvers_abstract.h.html" name="EXAMPLE_SOLVER" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/solvers_abstract.h.html" name="sgd" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/solvers_abstract.h.html" name="adam" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/layers_abstract.h.html" name="num_fc_outputs" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="EXAMPLE_COMPUTATIONAL_LAYER_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="fc_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="con_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="dropout_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="multiply_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="bn_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="affine_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="max_pool_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="avg_pool_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="relu_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="prelu_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="sig_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="htan_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="softmax_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="add_prev_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="concat_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="inception" include="dlib/dnn.h"/>
+
+         <term name="mat">
+            <term link="linear_algebra.html#mat" name="general use"   include="dlib/matrix.h" />
+            <term link="dlib/dnn/tensor_abstract.h.html#mat" name="for tensors"   include="dlib/dnn.h" />
+         </term>
          <term file="linear_algebra.html" name="matrix" include="dlib/matrix.h"/>
          <term file="linear_algebra.html" name="move_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="intersect" include="dlib/geometry.h"/>
@@ -552,6 +656,7 @@
          <term name="dot">
             <term link="dlib/matrix/matrix_utilities_abstract.h.html#dot" name="for matrix objects" include="dlib/matrix.h"/>
             <term link="dlib/svm/sparse_vector_abstract.h.html#dot" name="for sparse vectors" include="dlib/sparse_vector.h"/>
+            <term link="dlib/dnn/tensor_abstract.h.html#dot" name="for tensors" include="dlib/dnn.h"/>
          </term>
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="lowerm"             include="dlib/matrix.h"/>
