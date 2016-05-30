@@ -1719,7 +1719,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
-    /*!Ainception layer definitions !*/
+    /*!A inception layer definitions !*/
 
     // Now define inception layer tag types.  These layer aliases allow creating
     // the networks described in the paper: 
