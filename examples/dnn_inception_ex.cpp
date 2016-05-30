@@ -1,14 +1,26 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
     This is an example illustrating the use of the deep learning tools from the
-    dlib C++ Library.  I'm assuming you have already read the dnn_mnist_ex.cpp
-    example.  So in this example program I'm going to go over a number of more
-    advanced parts of the API, including:
-        - Using grp layer for constructing inception layer
+    dlib C++ Library.  I'm assuming you have already read the introductory
+    dnn_mnist_ex.cpp and dnn_mnist_advanced_ex.cpp examples.  In this example we
+    are going to show how to create inception networks. 
 
-    Inception layer is a kind of NN architecture for running sevelar convolution types
-    on the same input area and joining all convolution results into one output.
-    For further reading refer http://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf
+    An inception network is composed of inception blocks of the form:
+
+               input from SUBNET
+              /        |        \
+             /         |         \
+          block1    block2  ... blockN 
+             \         |         /
+              \        |        /
+          concatenate tensors from blocks
+                       |
+                    output
+                 
+    That is, an inception blocks runs a number of smaller networks (e.g. block1,
+    block2) and then concatenates their results.  For further reading refer to:
+    Szegedy, Christian, et al. "Going deeper with convolutions." Proceedings of
+    the IEEE Conference on Computer Vision and Pattern Recognition. 2015.
 */
 
 #include <dlib/dnn.h>
@@ -18,27 +30,29 @@
 using namespace std;
 using namespace dlib;
 
-// Inception layer has some different convolutions inside
-// Here we define blocks as convolutions with different kernel size that we will use in
+// Inception layer has some different convolutions inside.  Here we define
+// blocks as convolutions with different kernel size that we will use in
 // inception layer block.
 template <typename SUBNET> using block_a1 = relu<con<10,1,1,1,1,SUBNET>>;
 template <typename SUBNET> using block_a2 = relu<con<10,3,3,1,1,relu<con<16,1,1,1,1,SUBNET>>>>;
 template <typename SUBNET> using block_a3 = relu<con<10,5,5,1,1,relu<con<16,1,1,1,1,SUBNET>>>>;
 template <typename SUBNET> using block_a4 = relu<con<10,1,1,1,1,max_pool<3,3,1,1,SUBNET>>>;
 
-// Here is inception layer definition. It uses different blocks to process input and returns combined output
+// Here is inception layer definition. It uses different blocks to process input
+// and returns combined output.  Dlib includes a number of these inceptionN
+// layer types which are themselves created using concat layers.  
 template <typename SUBNET> using incept_a = inception4<block_a1,block_a2,block_a3,block_a4, SUBNET>;
 
-// Network can have inception layers of different structure.
-// Here are blocks with different convolutions
+// Network can have inception layers of different structure.  It will work
+// properly so long as all the sub-blocks inside a particular inception block
+// output tensors with the same number of rows and columns.
 template <typename SUBNET> using block_b1 = relu<con<4,1,1,1,1,SUBNET>>;
 template <typename SUBNET> using block_b2 = relu<con<4,3,3,1,1,SUBNET>>;
 template <typename SUBNET> using block_b3 = relu<con<4,1,1,1,1,max_pool<3,3,1,1,SUBNET>>>;
-
-// Here is inception layer definition. It uses different blocks to process input and returns combined output
 template <typename SUBNET> using incept_b = inception3<block_b1,block_b2,block_b3,SUBNET>;
 
-// and then the network type is
+// Now we can define a simple network for classifying MNIST digits.  We will
+// train and test this network in the code below.
 using net_type = loss_multiclass_log<
         fc<10,
         relu<fc<32,
@@ -67,45 +81,20 @@ int main(int argc, char** argv) try
     load_mnist_dataset(argv[1], training_images, training_labels, testing_images, testing_labels);
 
 
-    // Create network of predefined type.
+    // Make an instance of our inception network.
     net_type net;
-
-    // Now let's print the details of the pnet to the screen and inspect it.
     cout << "The net has " << net.num_layers << " layers in it." << endl;
     cout << net << endl;
 
-    // we can access inner layers with layer<> function:
-    // with tags
-    auto& in_b = layer<tag1>(net);
-    cout << "Found inception B layer: " << endl << in_b << endl;
-    // and we can access layers inside inceptions with itags
-    auto& in_b_1 = layer<itag1>(in_b);
-    cout << "Found inception B/1 layer: " << endl << in_b_1 << endl;
-    // or this is identical to
-    auto& in_b_1_a = layer<tag1,2>(net);
-    cout << "Found inception B/1 layer alternative way: " << endl << in_b_1_a << endl;
 
     cout << "Traning NN..." << endl;
-    // The rest of the sample is identical to dnn_minst_ex
-    // And then train it using the MNIST data.  The code below uses mini-batch stochastic
-    // gradient descent with an initial learning rate of 0.01 to accomplish this.
     dnn_trainer<net_type> trainer(net);
     trainer.set_learning_rate(0.01);
     trainer.set_min_learning_rate(0.00001);
     trainer.set_mini_batch_size(128);
     trainer.be_verbose();
-    // Since DNN training can take a long time, we can ask the trainer to save its state to
-    // a file named "mnist_sync" every 20 seconds.  This way, if we kill this program and
-    // start it again it will begin where it left off rather than restarting the training
-    // from scratch.  This is because, when the program restarts, this call to
-    // set_synchronization_file() will automatically reload the settings from mnist_sync if
-    // the file exists.
     trainer.set_synchronization_file("inception_sync", std::chrono::seconds(20));
-    // Finally, this line begins training.  By default, it runs SGD with our specified
-    // learning rate until the loss stops decreasing.  Then it reduces the learning rate by
-    // a factor of 10 and continues running until the loss stops decreasing again.  It will
-    // keep doing this until the learning rate has dropped below the min learning rate
-    // defined above or the maximum number of epochs as been executed (defaulted to 10000).
+    // Train the network.  This might take a few minutes...
     trainer.train(training_images, training_labels);
 
     // At this point our net object should have learned how to classify MNIST images.  But
@@ -118,7 +107,7 @@ int main(int argc, char** argv) try
     net.clean();
     serialize("mnist_network_inception.dat") << net;
     // Now if we later wanted to recall the network from disk we can simply say:
-    // deserialize("mnist_network.dat") >> net;
+    // deserialize("mnist_network_inception.dat") >> net;
 
 
     // Now let's run the training images through the network.  This statement runs all the
@@ -140,8 +129,8 @@ int main(int argc, char** argv) try
     cout << "training num_wrong: " << num_wrong << endl;
     cout << "training accuracy:  " << num_right/(double)(num_right+num_wrong) << endl;
 
-    // Let's also see if the network can correctly classify the testing images.  Since
-    // MNIST is an easy dataset, we should see at least 99% accuracy.
+    // Let's also see if the network can correctly classify the testing images.
+    // Since MNIST is an easy dataset, we should see 99% accuracy.
     predicted_labels = net(testing_images);
     num_right = 0;
     num_wrong = 0;
