@@ -1251,7 +1251,7 @@ namespace dlib { namespace tt
                 - is_same_object(dest,src) == false
             ensures
                 - performs: dest[i, k + dest_k_offset, r, c] = src[i, k + src_k_offset, r, c], where k in [0..count_k]
-                  Copies content of each sample from src in to corresponding place of sample at dst
+                  Copies content of each sample from src in to corresponding place of sample at dest.
         !*/
 
 // ----------------------------------------------------------------------------------------
