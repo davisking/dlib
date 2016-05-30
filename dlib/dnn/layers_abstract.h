@@ -1662,23 +1662,17 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  This layer simply concatenates the output of requiered layers
-                In particular, it copies each layer's output from TAG_TYPES into the corresponding
-                place of the result tensor, those producing combined output
-                The output of each tag layer is stored in a separate part of final output.
-                FORWARD:
-                for each (tag in TAG_TYPES)
-                    outout[i, k + tag.k(), r, c] = layer<tag>(subnet).get_output[i, k, r, c]
-
-                BACKWARD:
-                for each (tag in TAG_TYPES)
-                    layer<tag>(subnet).get_gradient_input[i, k, r, c] = input[i, k + tag.k(), r, c]
-
-                This layer can be only used with tags inside.
-                Each tagged layer should have identical num_samples, R and C size
-                The output will have K = sum(k) of tags, and the, and the output's num_samples,
-                R and C will be the same as tagged layers
-
+                defined above.  This layer simply concatenates the output of tagged layers.
+                Importantly, each input layer must have the same dimensions (i.e.
+                num_samples, nr, and nc) except for the k channel, which may vary.  This is
+                because the concatenation happens along the k dimension.  That is, the
+                output of this network is a tensor, OUT, that is the concatenation of the
+                tensors:
+                    for each (tag in TAG_TYPES)
+                        layer<tag>(subnet).get_output()
+                Therefore, out.num_samples(), out.nr(), and out.nc() match the dimensions
+                of the input tensors while OUT.k() is the sum of the input layer's k()
+                dimensions.
         !*/
 
     public:
@@ -1696,32 +1690,40 @@ namespace dlib
     // concat layer definitions
     template <template<typename> class TAG1, typename SUBNET>
     using concat1 = add_layer<concat_<TAG1>, SUBNET>;
+
     template <template<typename> class TAG1,
-            template<typename> class TAG2,
-            typename SUBNET>
+              template<typename> class TAG2,
+              typename SUBNET>
     using concat2 = add_layer<concat_<TAG1, TAG2>, SUBNET>;
+
     template <template<typename> class TAG1,
-            template<typename> class TAG2,
-            template<typename> class TAG3,
-            typename SUBNET>
+              template<typename> class TAG2,
+              template<typename> class TAG3,
+              typename SUBNET>
     using concat3 = add_layer<concat_<TAG1, TAG2, TAG3>, SUBNET>;
+
     template <template<typename> class TAG1,
-            template<typename> class TAG2,
-            template<typename> class TAG3,
-            template<typename> class TAG4,
-            typename SUBNET>
+              template<typename> class TAG2,
+              template<typename> class TAG3,
+              template<typename> class TAG4,
+              typename SUBNET>
     using concat4 = add_layer<concat_<TAG1, TAG2, TAG3, TAG4>, SUBNET>;
+
     template <template<typename> class TAG1,
-            template<typename> class TAG2,
-            template<typename> class TAG3,
-            template<typename> class TAG4,
-            template<typename> class TAG5,
-            typename SUBNET>
+              template<typename> class TAG2,
+              template<typename> class TAG3,
+              template<typename> class TAG4,
+              template<typename> class TAG5,
+              typename SUBNET>
     using concat5 = add_layer<concat_<TAG1, TAG2, TAG3, TAG4, TAG5>, SUBNET>;
 
-    // inception layer will use tags internally. If user will use tags too,
-    // some conflicts possible
-    // to exclude them, here are new tags specially for inceptions
+// ----------------------------------------------------------------------------------------
+
+    // Now define inception layer tag types.  These layer aliases allow creating
+    // the networks described in the paper: 
+    //   Szegedy, Christian, et al. "Going deeper with convolutions." Proceedings of
+    //   the IEEE Conference on Computer Vision and Pattern Recognition. 2015.
+    // Note that we use tag ID numbers >= 1000 to avoid conflict with user's tag layers.
     template <typename SUBNET> using itag0  = add_tag_layer< 1000 + 0, SUBNET>;
     template <typename SUBNET> using itag1  = add_tag_layer< 1000 + 1, SUBNET>;
     template <typename SUBNET> using itag2  = add_tag_layer< 1000 + 2, SUBNET>;
@@ -1732,35 +1734,35 @@ namespace dlib
     template <typename SUBNET> using iskip  = add_skip_layer< itag0, SUBNET>;
 
     // here are some templates to be used for creating inception layer groups
-    template <template<typename>class B1,
-            typename SUBNET>
+    template <template<typename>class B1, typename SUBNET>
     using inception1 = concat1<itag1, itag1<B1<iskip< itag0<SUBNET>>>>>;
+
     template <template<typename>class B1,
-            template<typename>class B2,
-            typename SUBNET>
+              template<typename>class B2,
+              typename SUBNET>
     using inception2 = concat2<itag1, itag2, itag1<B1<iskip< itag2<B2< itag0<SUBNET>>>>>>>;
+
     template <template<typename>class B1,
-            template<typename>class B2,
-            template<typename>class B3,
-            typename SUBNET>
+              template<typename>class B2,
+              template<typename>class B3,
+              typename SUBNET>
     using inception3 = concat3<itag1, itag2, itag3, itag1<B1<iskip< itag2<B2<iskip< itag3<B3<  itag0<SUBNET>>>>>>>>>>;
     template <template<typename>class B1,
-            template<typename>class B2,
-            template<typename>class B3,
-            template<typename>class B4,
-            typename SUBNET>
+              template<typename>class B2,
+              template<typename>class B3,
+              template<typename>class B4,
+              typename SUBNET>
     using inception4 = concat4<itag1, itag2, itag3, itag4,
-                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<  itag0<SUBNET>>>>>>>>>>>>
-            >;
+                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<  itag0<SUBNET>>>>>>>>>>>>>;
+
     template <template<typename>class B1,
-            template<typename>class B2,
-            template<typename>class B3,
-            template<typename>class B4,
-            template<typename>class B5,
-            typename SUBNET>
+              template<typename>class B2,
+              template<typename>class B3,
+              template<typename>class B4,
+              template<typename>class B5,
+              typename SUBNET>
     using inception5 = concat5<itag1, itag2, itag3, itag4, itag5,
-                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<iskip<  itag5<B5<  itag0<SUBNET>>>>>>>>>>>>>>>
-            >;
+                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<iskip<  itag5<B5<  itag0<SUBNET>>>>>>>>>>>>>>>>;
 
 // ----------------------------------------------------------------------------------------
 

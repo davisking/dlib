@@ -1920,7 +1920,7 @@ namespace dlib
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor&)
         {
-            // Gradient is splitted into parts for each tag layer
+            // Gradient is split into parts for each tag layer
             impl::concat_helper_impl<TAG_TYPES...>::split(gradient_input, sub, 0);
         }
 
@@ -1987,9 +1987,8 @@ namespace dlib
             typename SUBNET>
     using concat5 = add_layer<concat_<TAG1, TAG2, TAG3, TAG4, TAG5>, SUBNET>;
 
-    // inception layer will use tags internally. If user will use tags too,
-    // some conflicts possible
-    // to exclude them, here are new tags specially for inceptions
+    // inception layer will use tags internally. If user will use tags too, some conflicts
+    // possible to exclude them, here are new tags specially for inceptions
     template <typename SUBNET> using itag0  = add_tag_layer< 1000 + 0, SUBNET>;
     template <typename SUBNET> using itag1  = add_tag_layer< 1000 + 1, SUBNET>;
     template <typename SUBNET> using itag2  = add_tag_layer< 1000 + 2, SUBNET>;
@@ -2027,8 +2026,7 @@ namespace dlib
             template<typename>class B5,
             typename SUBNET>
     using inception5 = concat5<itag1, itag2, itag3, itag4, itag5,
-                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<iskip<  itag5<B5<  itag0<SUBNET>>>>>>>>>>>>>>>
-            >;
+                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<iskip<  itag5<B5<  itag0<SUBNET>>>>>>>>>>>>>>>>;
 // ----------------------------------------------------------------------------------------
 
 }
