@@ -2,6 +2,7 @@
 /build2/
 /build_clang/
 \.swp$
+\.swo$
 \.o$
 \.a$
 \.orig$
