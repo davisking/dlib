@@ -198,8 +198,8 @@ namespace dlib
         cpipe read_pipe;
         cpipe err_pipe;
         bool wait_called = false;
-        std::unique_ptr<filestreambuf> inout_buf = NULL; 
-        std::unique_ptr<filestreambuf> err_buf = NULL;
+        std::unique_ptr<filestreambuf> inout_buf; 
+        std::unique_ptr<filestreambuf> err_buf;
         int child_pid = -1;
         std::istream stderr;
     };
