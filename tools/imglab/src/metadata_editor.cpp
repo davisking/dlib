@@ -87,7 +87,6 @@ metadata_editor(
     get_display_size(screen_width, screen_height);
     set_pos((screen_width-width)/2, (screen_height-height)/2);
 
-    set_title("Image Labeler - " + metadata.name);
     show();
 } 
 
@@ -430,7 +429,7 @@ load_image(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-
+        set_title(metadata.name + ": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
@@ -458,7 +457,7 @@ load_image_and_set_size(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-
+        set_title(metadata.name + ": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {

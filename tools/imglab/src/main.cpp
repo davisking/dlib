@@ -20,7 +20,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.2";
+const char* VERSION = "1.3";
 
 
 
