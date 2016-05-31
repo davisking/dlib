@@ -2907,7 +2907,7 @@ namespace mex_binding
         {
             // do nothing, just return to matlab
         }
-        catch (dlib::error& e)
+        catch (std::exception& e)
         {
             mexErrMsgIdAndTxt("mex_function:error",
                               e.what());
