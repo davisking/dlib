@@ -1586,6 +1586,9 @@ namespace
         void perform_test (
         )
         {
+            // make the tests repeatable
+            srand(1234);
+
             test_tagging();
 #ifdef DLIB_USE_CUDA
             test_conv();
