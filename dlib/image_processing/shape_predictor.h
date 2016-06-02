@@ -80,7 +80,7 @@ namespace dlib
                 i = 0;
                 while (i < splits.size())
                 {
-                    if (feature_pixel_values[splits[i].idx1] - feature_pixel_values[splits[i].idx2] > splits[i].thresh)
+                    if ((float)feature_pixel_values[splits[i].idx1] - (float)feature_pixel_values[splits[i].idx2] > splits[i].thresh)
                         i = left_child(i);
                     else
                         i = right_child(i);
@@ -235,7 +235,7 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        template <typename image_type>
+        template <typename image_type, typename feature_type>
         void extract_feature_pixel_values (
             const image_type& img_,
             const rectangle& rect,
@@ -243,7 +243,7 @@ namespace dlib
             const matrix<float,0,1>& reference_shape,
             const std::vector<unsigned long>& reference_pixel_anchor_idx,
             const std::vector<dlib::vector<float,2> >& reference_pixel_deltas,
-            std::vector<float>& feature_pixel_values
+            std::vector<feature_type>& feature_pixel_values
         )
         /*!
             requires
@@ -449,6 +449,7 @@ namespace dlib
             _num_test_splits = 20;
             _feature_pool_region_padding = 0;
             _verbose = false;
+            _num_threads = 0;
         }
 
         unsigned long get_cascade_depth (
@@ -601,6 +602,15 @@ namespace dlib
             _verbose = false;
         }
 
+        unsigned long get_num_threads (
+        ) const { return _num_threads; }
+        void set_num_threads (
+                unsigned long num
+        )
+        {
+            _num_threads = num;
+        }
+
         template <typename image_array>
         shape_predictor train (
             const image_array& images,
@@ -657,13 +667,17 @@ namespace dlib
                 << "\n\t you can't have a part that is always set to OBJECT_PART_NOT_PRESENT."
             );
 
+            // creating thread pool
+            thread_pool tp(_num_threads);
 
-
-
+            // determining the type of features used for this type of images
+            using image_type = typename std::remove_const<typename std::remove_reference<decltype(images[0])>::type>::type;
+            using pixel_type = typename image_traits<image_type>::pixel_type;
+            typedef typename pixel_traits<pixel_type>::basic_pixel_type feature_type;
 
             rnd.set_seed(get_random_seed());
 
-            std::vector<training_sample> samples;
+            std::vector<training_sample<feature_type>> samples;
             const matrix<float,0,1> initial_shape = populate_training_sample_shapes(objects, samples);
             const std::vector<std::vector<dlib::vector<float,2> > > pixel_coordinates = randomly_sample_pixel_coordinates(initial_shape);
 
@@ -684,17 +698,16 @@ namespace dlib
 
                 // First compute the feature_pixel_values for each training sample at this
                 // level of the cascade.
-                for (unsigned long i = 0; i < samples.size(); ++i)
-                {
+                parallel_for(tp, 0, samples.size(), [&](unsigned long i){
                     extract_feature_pixel_values(images[samples[i].image_idx], samples[i].rect,
-                        samples[i].current_shape, initial_shape, anchor_idx,
-                        deltas, samples[i].feature_pixel_values);
-                }
+                                                 samples[i].current_shape, initial_shape, anchor_idx,
+                                                 deltas, samples[i].feature_pixel_values);
+                });
 
                 // Now start building the trees at this cascade level.
                 for (unsigned long i = 0; i < get_num_trees_per_cascade_level(); ++i)
                 {
-                    forests[cascade].push_back(make_regression_tree(samples, pixel_coordinates[cascade]));
+                    forests[cascade].push_back(make_regression_tree(tp, samples, pixel_coordinates[cascade]));
 
                     if (_verbose)
                     {
@@ -741,7 +754,8 @@ namespace dlib
             }
         }
 
-        struct training_sample 
+        template<typename feature_type>
+        struct training_sample
         {
             /*!
 
@@ -756,15 +770,18 @@ namespace dlib
                 - present == 0/1 mask saying which parts of target_shape are present.
                 - rect == the position of the object in the image_idx-th image.  All shape
                   coordinates are coded relative to this rectangle.
+                - diff_shape == temporary value for holding difference between current
+                  shape and target shape
             !*/
 
             unsigned long image_idx;
             rectangle rect;
             matrix<float,0,1> target_shape; 
-            matrix<float,0,1> present; 
+            matrix<float,0,1> present;
 
-            matrix<float,0,1> current_shape;  
-            std::vector<float> feature_pixel_values;
+            matrix<float,0,1> current_shape;
+            matrix<float,0,1> diff_shape;
+            std::vector<feature_type> feature_pixel_values;
 
             void swap(training_sample& item)
             {
@@ -773,12 +790,15 @@ namespace dlib
                 target_shape.swap(item.target_shape);
                 present.swap(item.present);
                 current_shape.swap(item.current_shape);
+                diff_shape.swap(item.diff_shape);
                 feature_pixel_values.swap(item.feature_pixel_values);
             }
         };
 
+        template<typename feature_type>
         impl::regression_tree make_regression_tree (
-            std::vector<training_sample>& samples,
+            thread_pool& tp,
+            std::vector<training_sample<feature_type>>& samples,
             const std::vector<dlib::vector<float,2> >& pixel_coordinates
         ) const
         {
@@ -791,19 +811,50 @@ namespace dlib
             // walk the tree in breadth first order
             const unsigned long num_split_nodes = static_cast<unsigned long>(std::pow(2.0, (double)get_tree_depth())-1);
             std::vector<matrix<float,0,1> > sums(num_split_nodes*2+1);
-            for (unsigned long i = 0; i < samples.size(); ++i)
-                sums[0] += samples[i].target_shape - samples[i].current_shape;
+            if (tp.num_threads_in_pool() > 1)
+            {
+                // Here we need to calculate shape differences and store sum of differences into sums[0]
+                // to make it I am splitting of samples into blocks, each block will be processed by
+                // separate thread, and the sum of differences of each block is stored into separate
+                // place in block_sums
 
-            for (unsigned long i = 0; i < num_split_nodes; ++i) 
+                const long chunks_per_thread = 8;
+                const long num_workers = tp.num_threads_in_pool();
+                const long num =  samples.size();
+                const long block_size = std::max(1L, num/(num_workers*chunks_per_thread));
+                std::vector<matrix<float,0,1> > block_sums((num + block_size - 1) / block_size);
+
+                parallel_for(tp, 0, samples.size(), [&](unsigned long i){
+                    auto block_pos = i / block_size;
+                    samples[i].diff_shape = samples[i].target_shape - samples[i].current_shape;
+                    block_sums[block_pos] += samples[i].diff_shape;
+                }, chunks_per_thread);
+
+                tp.wait_for_all_tasks();
+                // now calculate the total result from separate blocks
+                for (unsigned long i = 0; i < block_sums.size(); ++i)
+                    sums[0] += block_sums[i];
+            }
+            else
+            {
+                // synchronous implementation
+                for (unsigned long i = 0; i < samples.size(); ++i)
+                {
+                    samples[i].diff_shape = samples[i].target_shape - samples[i].current_shape;
+                    sums[0] += samples[i].diff_shape;
+                }
+            }
+
+            for (unsigned long i = 0; i < num_split_nodes; ++i)
             {
                 std::pair<unsigned long,unsigned long> range = parts.front();
                 parts.pop_front();
 
-                const impl::split_feature split = generate_split(samples, range.first,
+                const impl::split_feature split = generate_split(tp, samples, range.first,
                     range.second, pixel_coordinates, sums[i], sums[left_child(i)],
                     sums[right_child(i)]);
                 tree.splits.push_back(split);
-                const unsigned long mid = partition_samples(split, samples, range.first, range.second); 
+                const unsigned long mid = partition_samples(split, samples, range.first, range.second);
 
                 parts.push_back(std::make_pair(range.first, mid));
                 parts.push_back(std::make_pair(mid, range.second));
@@ -817,7 +868,7 @@ namespace dlib
             {
                 // Get the present counts for each dimension so we can divide each
                 // dimension by the number of observations we have on it to find the mean
-                // displacement in each leaf. 
+                // displacement in each leaf.
                 present_counts = 0;
                 for (unsigned long j = parts[i].first; j < parts[i].second; ++j)
                     present_counts += samples[j].present;
@@ -829,7 +880,7 @@ namespace dlib
                     tree.leaf_values[i] = zeros_matrix(samples[0].target_shape);
 
                 // now adjust the current shape based on these predictions
-                for (unsigned long j = parts[i].first; j < parts[i].second; ++j)
+                parallel_for(tp, parts[i].first, parts[i].second, [&](unsigned long j)
                 {
                     samples[j].current_shape += tree.leaf_values[i];
                     // For parts that aren't present in the training data, we just make
@@ -842,7 +893,7 @@ namespace dlib
                         if (samples[j].present(k) == 0)
                             samples[j].target_shape(k) = samples[j].current_shape(k);
                     }
-                }
+                });
             }
 
             return tree;
@@ -869,8 +920,10 @@ namespace dlib
             return feat;
         }
 
+        template<typename feature_type>
         impl::split_feature generate_split (
-            const std::vector<training_sample>& samples,
+            thread_pool& tp,
+            const std::vector<training_sample<feature_type>>& samples,
             unsigned long begin,
             unsigned long end,
             const std::vector<dlib::vector<float,2> >& pixel_coordinates,
@@ -893,23 +946,21 @@ namespace dlib
             std::vector<unsigned long> left_cnt(num_test_splits);
 
             // now compute the sums of vectors that go left for each feature
-            matrix<float,0,1> temp;
-            for (unsigned long j = begin; j < end; ++j)
-            {
-                temp = samples[j].target_shape-samples[j].current_shape;
-                for (unsigned long i = 0; i < num_test_splits; ++i)
+            parallel_for(tp, 0, num_test_splits, [&](unsigned long i){
+                for (unsigned long j = begin; j < end; ++j)
                 {
-                    if (samples[j].feature_pixel_values[feats[i].idx1] - samples[j].feature_pixel_values[feats[i].idx2] > feats[i].thresh)
+                    if ((float)samples[j].feature_pixel_values[feats[i].idx1] - (float)samples[j].feature_pixel_values[feats[i].idx2] > feats[i].thresh)
                     {
-                        left_sums[i] += temp;
+                        left_sums[i] += samples[j].diff_shape;
                         ++left_cnt[i];
                     }
                 }
-            }
+            });
 
             // now figure out which feature is the best
             double best_score = -1;
             unsigned long best_feat = 0;
+            matrix<float,0,1> temp;
             for (unsigned long i = 0; i < num_test_splits; ++i)
             {
                 // check how well the feature splits the space.
@@ -940,9 +991,10 @@ namespace dlib
             return feats[best_feat];
         }
 
+        template<typename feature_type>
         unsigned long partition_samples (
             const impl::split_feature& split,
-            std::vector<training_sample>& samples,
+            std::vector<training_sample<feature_type>>& samples,
             unsigned long begin,
             unsigned long end
         ) const
@@ -954,7 +1006,7 @@ namespace dlib
             unsigned long i = begin;
             for (unsigned long j = begin; j < end; ++j)
             {
-                if (samples[j].feature_pixel_values[split.idx1] - samples[j].feature_pixel_values[split.idx2] > split.thresh)
+                if ((float)samples[j].feature_pixel_values[split.idx1] - (float)samples[j].feature_pixel_values[split.idx2] > split.thresh)
                 {
                     samples[i].swap(samples[j]);
                     ++i;
@@ -965,9 +1017,10 @@ namespace dlib
 
 
 
+        template<typename feature_type>
         matrix<float,0,1> populate_training_sample_shapes(
             const std::vector<std::vector<full_object_detection> >& objects,
-            std::vector<training_sample>& samples
+            std::vector<training_sample<feature_type>>& samples
         ) const
         {
             samples.clear();
@@ -978,7 +1031,7 @@ namespace dlib
             {
                 for (unsigned long j = 0; j < objects[i].size(); ++j)
                 {
-                    training_sample sample;
+                    training_sample<feature_type> sample;
                     sample.image_idx = i;
                     sample.rect = objects[i][j].get_rect();
                     object_to_shape(objects[i][j], sample.target_shape, sample.present);
@@ -1095,6 +1148,7 @@ namespace dlib
         unsigned long _num_test_splits;
         double _feature_pool_region_padding;
         bool _verbose;
+        unsigned long _num_threads;
     };
 
 // ----------------------------------------------------------------------------------------
