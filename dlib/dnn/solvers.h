@@ -66,7 +66,7 @@ namespace dlib
             const tensor& params_grad
         )
         {
-            update_considering_bias(learning_rate, l, params_grad, l.get_num_outputs());
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()-l.get_num_outputs());
             return v;
         }
 
@@ -85,7 +85,7 @@ namespace dlib
             const tensor& params_grad
         )
         {
-            update_considering_bias(learning_rate, l, params_grad, l.num_filters());
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()-l.num_filters());
             return v;
         }
 
@@ -232,7 +232,7 @@ namespace dlib
             const tensor& params_grad
         )
         {
-            update_considering_bias(learning_rate, l, params_grad, l.get_num_outputs());
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()-l.get_num_outputs());
             return s;
         }
 
@@ -251,7 +251,7 @@ namespace dlib
             const tensor& params_grad
         )
         {
-            update_considering_bias(learning_rate, l, params_grad, l.num_filters());
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()-l.num_filters());
             return s;
         }
 
