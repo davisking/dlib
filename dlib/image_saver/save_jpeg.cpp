@@ -86,8 +86,8 @@ namespace dlib
         cinfo.input_components = 3;
         cinfo.in_color_space   = JCS_RGB;
         jpeg_set_defaults(&cinfo);
-        jpeg_set_quality (&cinfo, quality, true);
-        jpeg_start_compress(&cinfo, true);
+        jpeg_set_quality (&cinfo, quality, TRUE);
+        jpeg_start_compress(&cinfo, TRUE);
          
         // now write out the rows one at a time
         while (cinfo.next_scanline < cinfo.image_height) {
@@ -148,8 +148,8 @@ namespace dlib
         cinfo.input_components = 1;
         cinfo.in_color_space   = JCS_GRAYSCALE;
         jpeg_set_defaults(&cinfo);
-        jpeg_set_quality (&cinfo, quality, true);
-        jpeg_start_compress(&cinfo, true);
+        jpeg_set_quality (&cinfo, quality, TRUE);
+        jpeg_start_compress(&cinfo, TRUE);
          
         // now write out the rows one at a time
         while (cinfo.next_scanline < cinfo.image_height) {
