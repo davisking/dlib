@@ -381,7 +381,10 @@ namespace dlib
             DLIB_CASSERT(lr > 0,"");
             wait_for_thread_to_pause();
             if (learning_rate != lr)
+            {
+                steps_without_progress = 0;
                 previous_loss_values.clear();
+            }
             learning_rate = lr;
             lr_schedule.set_size(0);
         }
