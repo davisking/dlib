@@ -260,9 +260,7 @@ namespace dlib
             // them.
 #if defined(MATLAB_MEX_FILE)
             return;
-#endif
-
-
+#else
             static bool is_first_fatal_error = true;
             if (is_first_fatal_error == false)
             {
@@ -292,6 +290,7 @@ namespace dlib
                 std::set_terminate(&dlib_fatal_error_terminate);
             }
             is_first_fatal_error = false;
+#endif
         }
     };
 

@@ -93,7 +93,7 @@ namespace dlib
                 This is a tool for spawning a subprocess and communicating with it through
                 that processes standard input, output, and error.  Here is an example: 
 
-                    subprocess_stream s("/usr/bin/echo")
+                    subprocess_stream s("/usr/bin/echo");
                     s << "echo me this!";
                     string line;
                     getline(s, line);
