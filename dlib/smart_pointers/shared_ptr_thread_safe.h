@@ -407,10 +407,7 @@ namespace dlib
                 if (shared_node->del)
                     return static_cast<D*>(shared_node->del->get_deleter_void(typeid(D)));
             }
-            else
-            {
-                return 0;
-            }
+            return 0;
         }
 
         template <typename Y>
