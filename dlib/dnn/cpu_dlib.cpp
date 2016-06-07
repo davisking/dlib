@@ -284,7 +284,7 @@ namespace dlib
             for (size_t i = 0; i < grad.size(); ++i)
                 out[i] = *in++;
 
-            for (long i = 1; i < gradient_input.num_samples(); ++i)
+            for (long j = 1; j < gradient_input.num_samples(); ++j)
             {
                 for (size_t i = 0; i < grad.size(); ++i)
                     out[i] += *in++;
