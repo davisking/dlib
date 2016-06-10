@@ -667,12 +667,12 @@ namespace dlib
                 << "\n\t you can't have a part that is always set to OBJECT_PART_NOT_PRESENT."
             );
 
-            // creating thread pool
-            thread_pool tp(_num_threads);
+            // creating thread pool. if num_threads <= 1, trainer should work in caller thread
+            thread_pool tp(_num_threads > 1 ? _num_threads : 0);
 
             // determining the type of features used for this type of images
-            using image_type = typename std::remove_const<typename std::remove_reference<decltype(images[0])>::type>::type;
-            using pixel_type = typename image_traits<image_type>::pixel_type;
+            typedef typename std::remove_const<typename std::remove_reference<decltype(images[0])>::type>::type image_type;
+            typedef typename image_traits<image_type>::pixel_type pixel_type;
             typedef typename pixel_traits<pixel_type>::basic_pixel_type feature_type;
 
             rnd.set_seed(get_random_seed());
@@ -698,11 +698,12 @@ namespace dlib
 
                 // First compute the feature_pixel_values for each training sample at this
                 // level of the cascade.
-                parallel_for(tp, 0, samples.size(), [&](unsigned long i){
-                    extract_feature_pixel_values(images[samples[i].image_idx], samples[i].rect,
+                parallel_for(tp, 0, samples.size(), [&](unsigned long i)
+                {
+                    impl::extract_feature_pixel_values(images[samples[i].image_idx], samples[i].rect,
                                                  samples[i].current_shape, initial_shape, anchor_idx,
                                                  deltas, samples[i].feature_pixel_values);
-                });
+                }, 1);
 
                 // Now start building the trees at this cascade level.
                 for (unsigned long i = 0; i < get_num_trees_per_cascade_level(); ++i)
@@ -776,7 +777,7 @@ namespace dlib
 
             unsigned long image_idx;
             rectangle rect;
-            matrix<float,0,1> target_shape; 
+            matrix<float,0,1> target_shape;
             matrix<float,0,1> present;
 
             matrix<float,0,1> current_shape;
@@ -818,19 +819,22 @@ namespace dlib
                 // separate thread, and the sum of differences of each block is stored into separate
                 // place in block_sums
 
-                const long chunks_per_thread = 8;
-                const long num_workers = tp.num_threads_in_pool();
-                const long num =  samples.size();
-                const long block_size = std::max(1L, num/(num_workers*chunks_per_thread));
-                std::vector<matrix<float,0,1> > block_sums((num + block_size - 1) / block_size);
+                const unsigned long num_workers = std::max(1UL, tp.num_threads_in_pool());
+                const unsigned long num =  samples.size();
+                const unsigned long block_size = std::max(1UL, (num + num_workers - 1) / num_workers);
+                std::vector<matrix<float,0,1> > block_sums(num_workers);
 
-                parallel_for(tp, 0, samples.size(), [&](unsigned long i){
-                    auto block_pos = i / block_size;
-                    samples[i].diff_shape = samples[i].target_shape - samples[i].current_shape;
-                    block_sums[block_pos] += samples[i].diff_shape;
-                }, chunks_per_thread);
+                parallel_for(tp, 0, num_workers, [&](unsigned long block)
+                {
+                    const unsigned long block_begin = block * block_size;
+                    const unsigned long block_end =  std::min(num, block_begin + block_size);
+                    for (unsigned long i = block_begin; i < block_end; ++i)
+                    {
+                        samples[i].diff_shape = samples[i].target_shape - samples[i].current_shape;
+                        block_sums[block] += samples[i].diff_shape;
+                    }
+                }, 1);
 
-                tp.wait_for_all_tasks();
                 // now calculate the total result from separate blocks
                 for (unsigned long i = 0; i < block_sums.size(); ++i)
                     sums[0] += block_sums[i];
@@ -893,7 +897,7 @@ namespace dlib
                         if (samples[j].present(k) == 0)
                             samples[j].target_shape(k) = samples[j].current_shape(k);
                     }
-                });
+                }, 1);
             }
 
             return tree;
@@ -945,17 +949,28 @@ namespace dlib
             std::vector<matrix<float,0,1> > left_sums(num_test_splits);
             std::vector<unsigned long> left_cnt(num_test_splits);
 
+            const unsigned long num_workers = std::max(1UL, tp.num_threads_in_pool());
+            const unsigned long block_size = std::max(1UL, (num_test_splits + num_workers - 1) / num_workers);
+
             // now compute the sums of vectors that go left for each feature
-            parallel_for(tp, 0, num_test_splits, [&](unsigned long i){
+            parallel_for(tp, 0, num_workers, [&](unsigned long block)
+            {
+                const unsigned long block_begin = block * block_size;
+                const unsigned long block_end   = std::min(block_begin + block_size, num_test_splits);
+
                 for (unsigned long j = begin; j < end; ++j)
                 {
-                    if ((float)samples[j].feature_pixel_values[feats[i].idx1] - (float)samples[j].feature_pixel_values[feats[i].idx2] > feats[i].thresh)
+                    for (unsigned long i = block_begin; i < block_end; ++i)
                     {
-                        left_sums[i] += samples[j].diff_shape;
-                        ++left_cnt[i];
+                        if ((float)samples[j].feature_pixel_values[feats[i].idx1] - (float)samples[j].feature_pixel_values[feats[i].idx2] > feats[i].thresh)
+                        {
+                            left_sums[i] += samples[j].diff_shape;
+                            ++left_cnt[i];
+                        }
                     }
                 }
-            });
+
+            }, 1);
 
             // now figure out which feature is the best
             double best_score = -1;
