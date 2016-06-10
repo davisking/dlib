@@ -412,6 +412,22 @@ namespace dlib
                 - #nc() == 0
         !*/
 
+        template <typename EXP>
+        resizable_tensor(
+            const matrix_exp<EXP>& item
+        );
+        /*!
+            requires
+                - item contains float values
+            ensures
+                - #num_samples() == item.nr()
+                - #k() == item.nc()
+                - #nr() == 1
+                - #nc() == 1
+                - Assigns item to *this tensor by performing:
+                  set_ptrm(host(), num_samples(), k()*nr()*nc()) = item;
+        !*/
+
         explicit resizable_tensor(
             long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         );
@@ -469,6 +485,54 @@ namespace dlib
                 - #k() == k_
                 - #nr() == nr_
                 - #nc() == nc_
+        !*/
+
+        template <typename EXP>
+        resizable_tensor& operator= (
+            const matrix_exp<EXP>& item
+        );
+        /*!
+            requires
+                - item contains float values
+            ensures
+                - #num_samples() == item.nr()
+                - #k() == item.nc()
+                - #nr() == 1
+                - #nc() == 1
+                - Assigns item to *this tensor by performing:
+                  set_ptrm(host(), num_samples(), k()*nr()*nc()) = item;
+        !*/
+
+        template <typename EXP>
+        resizable_tensor& operator+= (
+            const matrix_exp<EXP>& item
+        );
+        /*!
+            requires
+                - item contains float values
+            ensures
+                - #num_samples() == item.nr()
+                - #k() == item.nc()
+                - #nr() == 1
+                - #nc() == 1
+                - Adds item to *this tensor by performing:
+                  set_ptrm(host(), num_samples(), k()*nr()*nc()) += item;
+        !*/
+
+        template <typename EXP>
+        resizable_tensor& operator-= (
+            const matrix_exp<EXP>& item
+        );
+        /*!
+            requires
+                - item contains float values
+            ensures
+                - #num_samples() == item.nr()
+                - #k() == item.nc()
+                - #nr() == 1
+                - #nc() == 1
+                - Subtracts item from *this tensor by performing:
+                  set_ptrm(host(), num_samples(), k()*nr()*nc()) -= item;
         !*/
     };
 

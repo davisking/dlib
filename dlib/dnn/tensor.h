@@ -267,6 +267,15 @@ namespace dlib
         )
         {}
 
+        template <typename EXP>
+        resizable_tensor(
+            const matrix_exp<EXP>& item
+        )
+        {
+            set_size(item.nr(), item.nc());
+            *this = item;
+        }
+
         explicit resizable_tensor(
             long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         ) 
@@ -319,12 +328,34 @@ namespace dlib
         }
 
         template <typename EXP>
-        resizable_tensor& operator= (const matrix_exp<EXP>& item)
+        resizable_tensor& operator= (
+            const matrix_exp<EXP>& item
+        )
         {
+            set_size(item.nr(), item.nc());
             tensor::operator=(item);
             return *this;
         }
 
+        template <typename EXP>
+        resizable_tensor& operator+= (
+            const matrix_exp<EXP>& item
+        )
+        {
+            set_size(item.nr(), item.nc());
+            tensor::operator+=(item);
+            return *this;
+        }
+
+        template <typename EXP>
+        resizable_tensor& operator-= (
+            const matrix_exp<EXP>& item
+        )
+        {
+            set_size(item.nr(), item.nc());
+            tensor::operator-=(item);
+            return *this;
+        }
 
         void set_size(
             long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
