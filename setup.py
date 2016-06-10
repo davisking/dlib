@@ -456,7 +456,42 @@ class build(_build):
         """use cmake to build and install the extension
         """
         if cmake_path is None:
-            raise DistutilsSetupError("Cannot find cmake in the path. Please specify its path with --cmake parameter.")
+            cmake_install_url = "https://cmake.org/install/"
+            message = ("You can install cmake using the instructions at " +
+                       cmake_install_url)
+            msg_pkgmanager = ("You can install cmake on {0} using "
+                              "`sudo {1} install cmake`.")
+            if sys.platform == "darwin":
+                pkgmanagers = ('brew', 'port')
+                for manager in pkgmanagers:
+                    if find_executable(manager) is not None:
+                        message = msg_pkgmanager.format('OSX', manager)
+                        break
+            elif sys.platform.startswith('linux'):
+                distname = None
+                try:
+                    import distro
+                except ImportError:
+                    import pip
+                    pip_exit = pip.main(['install', 'distro'])
+                    if pip_exit > 0:
+                        raise SystemExit('Pip was unable to install `distro`')
+                    import distro
+                distname = distro.id()
+                if distname in ('debian', 'ubuntu'):
+                    message = msg_pkgmanager.format(
+                        distname.title(), 'apt-get')
+                elif distname in ('fedora', 'centos', 'redhat'):
+                    pkgmanagers = ("dnf", "yum")
+                    for manager in pkgmanagers:
+                        if find_executable(manager) is not None:
+                            message = msg_pkgmanager.format(
+                                distname.title(), manager)
+                            break
+            raise DistutilsSetupError(
+                "Cannot find cmake, ensure it is installed and in the path.\n"
+                + message + "\n"
+                "You can also specify its path with --cmake parameter.")
 
         platform_arch = platform.architecture()[0]
         log.info("Detected Python architecture: %s" % platform_arch)
