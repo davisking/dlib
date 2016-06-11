@@ -1222,6 +1222,18 @@ namespace dlib
     template <typename SUBNET> using tag9  = add_tag_layer< 9, SUBNET>;
     template <typename SUBNET> using tag10 = add_tag_layer<10, SUBNET>;
 
+    template <template<typename SUBNET> class tag>
+    struct tag_id
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a tool for finding the numeric ID of a tag layer.  For example,
+                tag_id<tag3>::id == 3.
+        !*/
+
+        const static unsigned long id;
+    };
+
 // ----------------------------------------------------------------------------------------
 
     template <

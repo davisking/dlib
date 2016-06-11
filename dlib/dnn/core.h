@@ -414,7 +414,7 @@ namespace dlib
         {
             if (!have_same_dimensions(data_output, sub.get_output()))
                 data_output.copy_size(sub.get_output());
-            layer.forward_inplace(sub.get_output(),data_output);
+            layer.forward_inplace(sub.get_output(),static_cast<tensor&>(data_output));
         }
 
 
@@ -1378,6 +1378,12 @@ namespace dlib
     template <unsigned long ID, typename SUBNET, typename enabled=void>
     class add_tag_layer;
 
+    template <template<typename SUBNET> class tag>
+    struct tag_id
+    {
+        const static unsigned long id = tag<impl::repeat_input_layer>::id;
+    };
+
     template <unsigned long ID, typename SUBNET>
     class add_tag_layer<ID,SUBNET,
             typename std::enable_if<is_nonloss_layer_type<SUBNET>::value>::type>
@@ -1388,6 +1394,7 @@ namespace dlib
         const static size_t num_layers = subnet_type::num_layers + 1;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
+        const static unsigned long id = ID;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
@@ -1854,6 +1861,7 @@ namespace dlib
         const static size_t num_computational_layers = 0;
         const static size_t num_layers = 2;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
+        const static unsigned long id = ID;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
@@ -2526,6 +2534,7 @@ namespace dlib
         const static size_t num_layers = subnet_type::num_layers + 1;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
+        const static unsigned long id = tag_id<TAG_TYPE>::id;
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
@@ -2655,7 +2664,7 @@ namespace dlib
 
         void print (std::ostream& out, unsigned long idx, int& min_length) const
         {
-            out << "layer<" << idx << ">\t"<<impl::tensor_to_str(private_get_output(), min_length) <<"skip\n";
+            out << "layer<" << idx << ">\t"<<impl::tensor_to_str(private_get_output(), min_length) <<"skip"<<id<<"\n";
             subnet().print(out, idx+1, min_length);
         }
 

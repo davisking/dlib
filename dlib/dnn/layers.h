@@ -1435,6 +1435,8 @@ namespace dlib
     class add_prev_
     {
     public:
+        const static unsigned long id = tag_id<tag>::id;
+
         add_prev_() 
         {
         }
@@ -1483,7 +1485,7 @@ namespace dlib
 
         friend std::ostream& operator<<(std::ostream& out, const add_prev_& item)
         {
-            out << "add_prev";
+            out << "add_prev"<<id;
             return out;
         }
 
