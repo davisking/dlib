@@ -72,6 +72,7 @@
          <term file="dlib/dnn/core_abstract.h.html" name="skip9" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="skip10" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layers" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameters" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameter_gradients" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="test_layer" include="dlib/dnn.h"/>
