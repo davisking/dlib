@@ -43,7 +43,7 @@ namespace
     {
         using namespace dlib::tt;
         print_spinner();
-        resizable_tensor src(5,5), dest(5,5), gradient_input(5,5);
+        resizable_tensor src, dest, gradient_input;
         src = matrix_cast<float>(gaussian_randm(5,5, 0));
         dest = matrix_cast<float>(gaussian_randm(5,5, 1));
         gradient_input = matrix_cast<float>(gaussian_randm(5,5, 2));
@@ -79,7 +79,7 @@ namespace
     {
         using namespace dlib::tt;
         print_spinner();
-        resizable_tensor src(5,5), dest(5,5), gradient_input(5,5);
+        resizable_tensor src, dest, gradient_input;
         src = matrix_cast<float>(gaussian_randm(5,5, 0));
         dest = matrix_cast<float>(gaussian_randm(5,5, 1));
         gradient_input = matrix_cast<float>(gaussian_randm(5,5, 2));
@@ -118,8 +118,10 @@ namespace
         const long nr = 3;
         const long nc = 3;
         resizable_tensor src(5,5,nr,nr), dest(5,5,nr,nc), gradient_input(5,5,nr,nc);
-        src = matrix_cast<float>(gaussian_randm(5,5*nr*nc, 0));
-        dest = matrix_cast<float>(gaussian_randm(5,5*nr*nc, 1));
+        tt::tensor_rand rnd;
+        rnd.fill_uniform(src);
+        rnd.fill_uniform(dest);
+        // fill like this as a test of the assignment operator.
         gradient_input = matrix_cast<float>(gaussian_randm(5,5*nr*nc, 2));
 
 
@@ -153,7 +155,7 @@ namespace
     {
         using namespace dlib::tt;
         print_spinner();
-        resizable_tensor src(5,5), gamma(1,5), beta(1,5), dest, dest2, dest3, means, vars, gradient_input(5,5);
+        resizable_tensor src, gamma, beta, dest, dest2, dest3, means, vars, gradient_input;
         src = matrix_cast<float>(gaussian_randm(5,5, 0));
         gamma = matrix_cast<float>(gaussian_randm(1,5, 1));
         beta = matrix_cast<float>(gaussian_randm(1,5, 2));
@@ -238,11 +240,12 @@ namespace
     {
         using namespace dlib::tt;
         print_spinner();
-        resizable_tensor src(5,5,4,4), gamma(1,5), beta(1,5), dest, dest2, dest3, means, vars, gradient_input(5,5,4,4);
-        src = matrix_cast<float>(gaussian_randm(5,5*4*4, 0));
+        resizable_tensor src(5,5,4,4), gamma, beta, dest, dest2, dest3, means, vars, gradient_input(5,5,4,4);
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(src);
+        rnd.fill_gaussian(gradient_input);
         gamma = matrix_cast<float>(gaussian_randm(1,5, 1));
         beta = matrix_cast<float>(gaussian_randm(1,5, 2));
-        gradient_input = matrix_cast<float>(gaussian_randm(5,5*4*4, 3));
 
         gamma = 1;
         beta = 0;
@@ -351,8 +354,6 @@ namespace
         dlog << LINFO << mat(dest);
         DLIB_TEST(max(abs(truth2-mat(dest))) < 1e-5);
 
-        A.set_size(3,4);
-        B.set_size(3,4);
         A = matrix_cast<float>(gaussian_randm(3,4, 1));
         B = matrix_cast<float>(gaussian_randm(3,4, 2));
         affine_transform(dest, src, A, B);
@@ -1418,10 +1419,11 @@ namespace
         resizable_tensor src1(10, 3, 7, 15);
         resizable_tensor src2(10, 3, 7, 15);
         resizable_tensor src3(10, 9, 7, 15);
-        dest = matrix_cast<float>(gaussian_randm(dest.num_samples(), dest.k() * dest.nr() * dest.nc(), 1));
-        src1 = matrix_cast<float>(gaussian_randm(src1.num_samples(), src1.k() * src1.nr() * src1.nc(), 0));
-        src2 = matrix_cast<float>(gaussian_randm(src1.num_samples(), src2.k() * src2.nr() * src2.nc(), 0));
-        src3 = matrix_cast<float>(gaussian_randm(src1.num_samples(), src3.k() * src3.nr() * src3.nc(), 0));
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(dest);
+        rnd.fill_gaussian(src1);
+        rnd.fill_gaussian(src2);
+        rnd.fill_gaussian(src3);
 
         cpu::copy_tensor(dest, 0, src1, 0,  src1.k()); //full copy src1->dest
         cpu::copy_tensor(dest, src1.k(), src2, 0,  src2.k()); //full copy src2->dest with offset of src1
@@ -1469,10 +1471,11 @@ namespace
         resizable_tensor src1(10, 3, 7, 15);
         resizable_tensor src2(10, 3, 7, 15);
         resizable_tensor src3(10, 9, 7, 15);
-        dest = matrix_cast<float>(gaussian_randm(dest.num_samples(), dest.k() * dest.nr() * dest.nc(), 1));
-        src1 = matrix_cast<float>(gaussian_randm(src1.num_samples(), src1.k() * src1.nr() * src1.nc(), 0));
-        src2 = matrix_cast<float>(gaussian_randm(src1.num_samples(), src2.k() * src2.nr() * src2.nc(), 0));
-        src3 = matrix_cast<float>(gaussian_randm(src1.num_samples(), src3.k() * src3.nr() * src3.nc(), 0));
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(dest);
+        rnd.fill_gaussian(src1);
+        rnd.fill_gaussian(src2);
+        rnd.fill_gaussian(src3);
         cuda::copy_tensor(dest, 0, src1, 0,  src1.k()); //full copy src1->dest
         cuda::copy_tensor(dest, src1.k(), src2, 0,  src2.k()); //full copy src2->dest with offset of src1
         cuda::copy_tensor(dest, src1.k() + src2.k(), src3, 3,  3); //partial copy src3 into the rest place of dest
@@ -1525,7 +1528,8 @@ namespace
         using net_type = concat_incept<input<matrix<float>>>;
 
         resizable_tensor data(10, 1, 111, 222);
-        data = matrix_cast<float>(gaussian_randm(data.num_samples(), data.k() * data.nr() * data.nc(), 1));
+        tt::tensor_rand rnd;
+        rnd.fill_gaussian(data);
 
         net_type net;
 
@@ -1546,7 +1550,7 @@ namespace
         DLIB_TEST(error == 0);
 
         resizable_tensor gr(10, 14, 111, 222);
-        gr = matrix_cast<float>(gaussian_randm(gr.num_samples(), gr.k() * gr.nr() * gr.nc(), 1));
+        rnd.fill_gaussian(gr);
 
         resizable_tensor params;
         net.layer_details().backward(gr, net, params);
