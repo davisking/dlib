@@ -468,26 +468,30 @@ class build(_build):
                         message = msg_pkgmanager.format('OSX', manager)
                         break
             elif sys.platform.startswith('linux'):
-                distname = None
                 try:
                     import distro
-                except ImportError:
+                except ImportError as err:
                     import pip
-                    pip_exit = pip.main(['install', 'distro'])
+                    pip_exit = pip.main(['install', '-q', 'distro'])
                     if pip_exit > 0:
-                        raise SystemExit('Pip was unable to install `distro`')
-                    import distro
-                distname = distro.id()
-                if distname in ('debian', 'ubuntu'):
-                    message = msg_pkgmanager.format(
-                        distname.title(), 'apt-get')
-                elif distname in ('fedora', 'centos', 'redhat'):
-                    pkgmanagers = ("dnf", "yum")
-                    for manager in pkgmanagers:
-                        if find_executable(manager) is not None:
-                            message = msg_pkgmanager.format(
-                                distname.title(), manager)
-                            break
+                        log.debug("Unable to install `distro` to identify "
+                                  "the recommended command. Falling back "
+                                  "to default error message.")
+                        distro = err
+                    else:
+                        import distro
+                if not isinstance(distro, ImportError):
+                    distname = distro.id()
+                    if distname in ('debian', 'ubuntu'):
+                        message = msg_pkgmanager.format(
+                            distname.title(), 'apt-get')
+                    elif distname in ('fedora', 'centos', 'redhat'):
+                        pkgmanagers = ("dnf", "yum")
+                        for manager in pkgmanagers:
+                            if find_executable(manager) is not None:
+                                message = msg_pkgmanager.format(
+                                    distname.title(), manager)
+                                break
             raise DistutilsSetupError(
                 "Cannot find cmake, ensure it is installed and in the path.\n"
                 + message + "\n"
