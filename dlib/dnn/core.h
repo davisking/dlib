@@ -87,7 +87,7 @@ namespace dlib
 
             friend void serialize(const repeat_input_layer&, std::ostream&){}
             friend void deserialize(repeat_input_layer&, std::istream&){}
-            friend std::ostream& operator<<(std::ostream& out, const repeat_input_layer&) { out << "FUCK"; return out; }
+            friend std::ostream& operator<<(std::ostream& out, const repeat_input_layer&) { return out; }
         };
 
         inline std::string tensor_to_str (
