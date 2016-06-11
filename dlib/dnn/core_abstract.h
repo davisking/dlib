@@ -1226,6 +1226,9 @@ namespace dlib
     struct tag_id
     {
         /*!
+            REQUIREMENTS ON tag
+                Tag should be an add_tag_layer template such as tag1, tag2, etc.
+
             WHAT THIS OBJECT REPRESENTS
                 This is a tool for finding the numeric ID of a tag layer.  For example,
                 tag_id<tag3>::id == 3.
