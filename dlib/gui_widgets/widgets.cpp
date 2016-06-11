@@ -6592,6 +6592,7 @@ namespace dlib
             if (best_dist < 13)
             {
                 overlay_rects[best_idx].label = default_rect_label;
+                overlay_rects[best_idx].color = default_rect_color;
                 highlighted_rect = best_idx;
                 highlight_timer.stop();
                 highlight_timer.start();
