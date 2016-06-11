@@ -197,12 +197,12 @@ int main(int argc, char** argv) try
         layer<1>    fc       (num_outputs=10) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
         layer<2>    avg_pool (nr=0, nc=0, stride_y=1, stride_x=1, padding_y=0, padding_x=0)
         layer<3>    prelu    (initial_param_value=0.2)
-        layer<4>    add_prev
+        layer<4>    add_prev1
         layer<5>    bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0 bias_learning_rate_mult=1 bias_weight_decay_mult=1
         layer<6>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
         layer<7>    prelu    (initial_param_value=0.25)
         layer<8>    bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0 bias_learning_rate_mult=1 bias_weight_decay_mult=1
-        layer<9>    con     (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
+        layer<9>    con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
         layer<10>   tag1
         ...
         layer<34>   relu
@@ -211,7 +211,7 @@ int main(int argc, char** argv) try
         layer<37>   tag1
         layer<38>   tag4
         layer<39>   prelu    (initial_param_value=0.3)
-        layer<40>   add_prev
+        layer<40>   add_prev1
         layer<41>   bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0 bias_learning_rate_mult=1 bias_weight_decay_mult=1
         ...
         layer<118>  relu
@@ -219,7 +219,7 @@ int main(int argc, char** argv) try
         layer<120>  con      (num_filters=8, nr=3, nc=3, stride_y=2, stride_x=2, padding_y=0, padding_x=0) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
         layer<121>  tag1
         layer<122>  relu
-        layer<123>  add_prev
+        layer<123>  add_prev1
         layer<124>  bn_con   eps=1e-05 learning_rate_mult=1 weight_decay_mult=0 bias_learning_rate_mult=1 bias_weight_decay_mult=1
         layer<125>  con      (num_filters=8, nr=3, nc=3, stride_y=1, stride_x=1, padding_y=1, padding_x=1) learning_rate_mult=1 weight_decay_mult=1 bias_learning_rate_mult=1 bias_weight_decay_mult=0
         layer<126>  relu
