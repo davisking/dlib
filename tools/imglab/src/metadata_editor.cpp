@@ -17,6 +17,27 @@ using namespace dlib;
 
 extern const char* VERSION;
 
+rgb_alpha_pixel string_to_color(
+    const std::string& str
+)
+{
+    if (str.size() == 0)
+    {
+        return rgb_alpha_pixel(255,0,0,255);
+    }
+    else
+    {
+        // make up a random color based on the string label.
+        hsi_pixel pix;
+        pix.h = static_cast<unsigned char>(dlib::hash(str)&0xFF); 
+        pix.s = 255;
+        pix.i = 150;
+        rgb_alpha_pixel result;
+        assign_pixel(result, pix);
+        return result;
+    }
+}
+
 // ----------------------------------------------------------------------------------------
 
 metadata_editor::
@@ -407,7 +428,7 @@ std::vector<dlib::image_display::overlay_rect> get_overlays (
         temp[i].label = data.boxes[i].label;
         temp[i].parts = data.boxes[i].parts;
         temp[i].crossed_out = data.boxes[i].ignore;
-        assign_pixel(temp[i].color, rgb_pixel(255,0,0));
+        temp[i].color = string_to_color(data.boxes[i].label);
     }
     return temp;
 }
@@ -519,6 +540,7 @@ on_overlay_label_changed(
 )
 {
     display.set_default_overlay_rect_label(trim(overlay_label.text()));
+    display.set_default_overlay_rect_color(string_to_color(trim(overlay_label.text())));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -530,6 +552,7 @@ on_overlay_rect_selected(
 {
     overlay_label.set_text(orect.label);
     display.set_default_overlay_rect_label(orect.label);
+    display.set_default_overlay_rect_color(string_to_color(orect.label));
 }
 
 // ----------------------------------------------------------------------------------------
