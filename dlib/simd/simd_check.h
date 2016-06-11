@@ -73,6 +73,7 @@
     #include <immintrin.h> // AVX
 #endif
 #ifdef DLIB_HAVE_AVX2
+    #include <immintrin.h> // AVX
 //    #include <avx2intrin.h>
 #endif
 
