@@ -332,28 +332,9 @@ namespace dlib
             const matrix_exp<EXP>& item
         )
         {
-            set_size(item.nr(), item.nc());
+            if (!(num_samples() == item.nr() && k()*nr()*nc() == item.nc()))
+                set_size(item.nr(), item.nc());
             tensor::operator=(item);
-            return *this;
-        }
-
-        template <typename EXP>
-        resizable_tensor& operator+= (
-            const matrix_exp<EXP>& item
-        )
-        {
-            set_size(item.nr(), item.nc());
-            tensor::operator+=(item);
-            return *this;
-        }
-
-        template <typename EXP>
-        resizable_tensor& operator-= (
-            const matrix_exp<EXP>& item
-        )
-        {
-            set_size(item.nr(), item.nc());
-            tensor::operator-=(item);
             return *this;
         }
 

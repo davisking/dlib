@@ -495,44 +495,15 @@ namespace dlib
             requires
                 - item contains float values
             ensures
-                - #num_samples() == item.nr()
-                - #k() == item.nc()
-                - #nr() == 1
-                - #nc() == 1
+                - if (num_samples() == item.nr() && k()*nr()*nc() == item.nc()) then
+                    - the dimensions of this tensor are not changed
+                - else
+                    - #num_samples() == item.nr()
+                    - #k() == item.nc()
+                    - #nr() == 1
+                    - #nc() == 1
                 - Assigns item to *this tensor by performing:
                   set_ptrm(host(), num_samples(), k()*nr()*nc()) = item;
-        !*/
-
-        template <typename EXP>
-        resizable_tensor& operator+= (
-            const matrix_exp<EXP>& item
-        );
-        /*!
-            requires
-                - item contains float values
-            ensures
-                - #num_samples() == item.nr()
-                - #k() == item.nc()
-                - #nr() == 1
-                - #nc() == 1
-                - Adds item to *this tensor by performing:
-                  set_ptrm(host(), num_samples(), k()*nr()*nc()) += item;
-        !*/
-
-        template <typename EXP>
-        resizable_tensor& operator-= (
-            const matrix_exp<EXP>& item
-        );
-        /*!
-            requires
-                - item contains float values
-            ensures
-                - #num_samples() == item.nr()
-                - #k() == item.nc()
-                - #nr() == 1
-                - #nc() == 1
-                - Subtracts item from *this tensor by performing:
-                  set_ptrm(host(), num_samples(), k()*nr()*nc()) -= item;
         !*/
     };
 
