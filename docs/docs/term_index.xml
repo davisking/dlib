@@ -49,6 +49,7 @@
          <term file="dlib/dnn/core_abstract.h.html" name="repeat_group" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="repeat" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="add_tag_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag_id" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tag1" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tag2" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tag3" include="dlib/dnn.h"/>
