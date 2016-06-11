@@ -3200,6 +3200,57 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <size_t i, size_t num>
+        struct vl_loop
+        {
+            template <
+                typename net_type,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                visitor&& v
+            )
+            {
+                v(i, layer<i>(net));
+                vl_loop<i+1, num>::visit(net,v);
+            }
+        };
+
+        template <size_t num>
+        struct vl_loop<num,num>
+        {
+            template <
+                typename net_type,
+                typename visitor
+                >
+            static void visit(
+                net_type&,
+                visitor&& 
+            )
+            {
+                // Base case of recursion.  Don't do anything.
+            }
+        };
+
+    }
+
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers(
+        net_type& net,
+        visitor v
+    )
+    {
+        impl::vl_loop<0, net_type::num_layers>::visit(net, v);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_CORE_H_

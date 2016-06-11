@@ -1427,6 +1427,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_net_type& t)
+              That is, it must take a size_t and then any of the network types such as
+              add_layer, add_loss_layer, etc.
+        ensures
+            - Loops over all the layers in net and calls v() on them.  To be specific, this
+              function essentially performs the following:
+
+                for (size_t i = 0; i < net_type::num_layers; ++i)
+                    v(i, layer<i>(net));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     struct layer_test_results
     {
         std::string log;
