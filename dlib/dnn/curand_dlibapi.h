@@ -28,8 +28,8 @@ namespace dlib
 
             void fill_gaussian (
                 tensor& data,
-                float mean,
-                float stddev
+                float mean = 0,
+                float stddev = 1
             );
             /*!
                 requires
