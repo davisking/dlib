@@ -301,9 +301,9 @@ namespace dlib
         long nr
     )
     {
-        DLIB_ASSERT(nr > 0 , 
+        DLIB_ASSERT(nr >= 0 , 
                     "\tconst matrix_exp mat(ptr, nr)"
-                    << "\n\t nr must be bigger than 0"
+                    << "\n\t nr must be >= 0"
                     << "\n\t nr: " << nr
         );
         typedef op_pointer_to_col_vect<T> op;
@@ -409,9 +409,9 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(nr > 0 && nc > 0 , 
+        DLIB_ASSERT(nr >= 0 && nc >= 0 , 
                     "\tconst matrix_exp mat(ptr, nr, nc)"
-                    << "\n\t nr and nc must be bigger than 0"
+                    << "\n\t nr and nc must be >= 0"
                     << "\n\t nr: " << nr
                     << "\n\t nc: " << nc
         );
