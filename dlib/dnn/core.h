@@ -2448,6 +2448,55 @@ namespace dlib
                 return n.get_repeated_layer(0);
             }
         };
+
+
+
+        template <
+            unsigned int i,
+            size_t N, template<typename> class L, typename S
+        >
+        struct layer_helper<i,const repeat<N,L,S>, typename std::enable_if<(i!=0&&i>=repeat<N,L,S>::layers_in_repeated_group)>::type>
+        {
+            const static size_t layers_in_repeated_group = repeat<N,L,S>::layers_in_repeated_group;
+
+            static const repeat<N,L,S>& makeT();
+            using next_type = const typename std::remove_reference<decltype(makeT().subnet())>::type;
+            using type = const typename layer_helper<i-layers_in_repeated_group,next_type>::type;
+            static type& layer(const repeat<N,L,S>& n)
+            {
+                return layer_helper<i-layers_in_repeated_group,next_type>::layer(n.subnet());
+            }
+        };
+        template <
+            unsigned int i,
+            size_t N, template<typename> class L, typename S
+        >
+        struct layer_helper<i,const repeat<N,L,S>, typename std::enable_if<(i!=0&&i<repeat<N,L,S>::layers_in_repeated_group)>::type>
+        {
+            const static size_t layers_in_each_group = repeat<N,L,S>::layers_in_each_group;
+            typedef typename repeat<N,L,S>::repeated_layer_type repeated_layer_type;
+            using next_type = const repeated_layer_type;
+            using type = const typename layer_helper<i%layers_in_each_group,next_type>::type;
+            static type& layer(const repeat<N,L,S>& n)
+            {
+                return layer_helper<i%layers_in_each_group,next_type>::layer(n.get_repeated_layer(i/layers_in_each_group));
+            }
+        };
+        template <
+            size_t N, template<typename> class L, typename S
+        >
+        struct layer_helper<0,const repeat<N,L,S>, void>
+        {
+            typedef typename repeat<N,L,S>::repeated_layer_type repeated_layer_type;
+            using type = const repeated_layer_type;
+            static type& layer(const repeat<N,L,S>& n)
+            {
+                return n.get_repeated_layer(0);
+            }
+        };
+
+
+
         template <typename T>
         struct layer_helper<0,T,void>
         {
