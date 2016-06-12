@@ -34,12 +34,13 @@
 
 
          <term file="dlib/algs.h.html" name="stack_based_memory_block" include="dlib/algs.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="log1pexp" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="net_to_xml" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="log1pexp" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="randomize_parameters" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tuple_head" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="tuple_tail" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="get_learning_rate_multiplier" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="get_weight_decay_multiplier" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/core_abstract.h.html" name="randomize_parameters" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="sstack" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="make_sstack" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="repeat_group" include="dlib/dnn.h"/>
