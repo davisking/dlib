@@ -333,8 +333,8 @@ namespace dlib
     );
     /*!
         requires
-            - nr > 0
-            - nc > 0
+            - nr >= 0
+            - nc >= 0
             - nr*nc == t.size()
         ensures
             - returns a matrix M such that:
@@ -350,10 +350,11 @@ namespace dlib
         const tensor& t
     );
     /*!
-        requires
-            - t.size() != 0
         ensures
-            - returns mat(t, t.num_samples(), t.size()/t.num_samples())
+            - if (t.size() != 0) then
+                - returns mat(t, t.num_samples(), t.size()/t.num_samples())
+            - else
+                - returns an empty matrix.
     !*/
 
     const matrix_exp image_plane (

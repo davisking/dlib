@@ -192,9 +192,9 @@ namespace dlib
         long nc
     )
     {
-        DLIB_ASSERT(nr > 0 && nc > 0 , 
+        DLIB_ASSERT(nr >= 0 && nc >= 0 , 
                     "\tconst matrix_exp mat(tensor, nr, nc)"
-                    << "\n\t nr and nc must be bigger than 0"
+                    << "\n\t nr and nc must be >= 0"
                     << "\n\t nr: " << nr
                     << "\n\t nc: " << nc
         );
@@ -212,12 +212,10 @@ namespace dlib
         const tensor& t
     )
     {
-        DLIB_ASSERT(t.size() != 0, 
-                    "\tconst matrix_exp mat(tensor)"
-                    << "\n\t The tensor can't be empty."
-        );
-
-        return mat(t, t.num_samples(), t.size()/t.num_samples());
+        if (t.size() != 0)
+            return mat(t, t.num_samples(), t.size()/t.num_samples());
+        else
+            return mat((float*)0,0,0);
     }
 
     inline const matrix_op<op_pointer_to_mat<float> > image_plane (
