@@ -12,6 +12,7 @@
 #include "../string.h"
 #include "tensor_tools.h"
 #include "../vectorstream.h"
+#include "utilities.h"
 
 
 namespace dlib
