@@ -91,6 +91,12 @@ namespace dlib
         print a string describing this layer.
     !*/
 
+    void to_xml(const EXAMPLE_INPUT_LAYER& item, std::ostream& out);
+    /*!
+        This function is optional, but required if you want to print your networks with
+        net_to_xml().  Therefore, to_xml() prints a layer as XML.
+    !*/
+
     void serialize(const EXAMPLE_INPUT_LAYER& item, std::ostream& out);
     void deserialize(EXAMPLE_INPUT_LAYER& item, std::istream& in);
     /*!

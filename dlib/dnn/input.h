@@ -125,6 +125,11 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const input_rgb_image& item, std::ostream& out)
+        {
+            out << "<input_rgb_image r='"<<item.avg_red<<"' g='"<<item.avg_green<<"' b='"<<item.avg_blue<<"'/>";
+        }
+
     private:
         float avg_red;
         float avg_green;
@@ -213,6 +218,10 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const input& item, std::ostream& out)
+        {
+            out << "<input/>";
+        }
     };
 
 // ----------------------------------------------------------------------------------------
@@ -295,6 +304,10 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const input& item, std::ostream& out)
+        {
+            out << "<input/>";
+        }
     };
 
 // ----------------------------------------------------------------------------------------

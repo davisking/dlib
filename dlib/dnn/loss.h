@@ -106,6 +106,11 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const loss_binary_hinge_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_binary_hinge/>";
+        }
+
     };
 
     template <typename SUBNET>
@@ -213,6 +218,11 @@ namespace dlib
         {
             out << "loss_binary_log";
             return out;
+        }
+
+        friend void to_xml(const loss_binary_log_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_binary_log/>";
         }
 
     };
@@ -325,6 +335,10 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const loss_multiclass_log_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_multiclass_log/>";
+        }
 
     };
 

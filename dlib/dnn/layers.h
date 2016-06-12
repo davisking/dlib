@@ -262,6 +262,23 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const con_& item, std::ostream& out)
+        {
+            out << "<con"
+                << " num_filters='"<<_num_filters<<"'"
+                << " nr='"<<_nr<<"'"
+                << " nc='"<<_nc<<"'"
+                << " stride_y='"<<_stride_y<<"'"
+                << " stride_x='"<<_stride_x<<"'"
+                << " padding_y='"<<item.padding_y_<<"'"
+                << " padding_x='"<<item.padding_x_<<"'"
+                << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'"
+                << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'"
+                << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'"
+                << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'>\n";
+            out << mat(item.params);
+            out << "</con>";
+        }
 
     private:
 
@@ -443,6 +460,18 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const max_pool_& item, std::ostream& out)
+        {
+            out << "<max_pool"
+                << " nr='"<<_nr<<"'"
+                << " nc='"<<_nc<<"'"
+                << " stride_y='"<<_stride_y<<"'"
+                << " stride_x='"<<_stride_x<<"'"
+                << " padding_y='"<<item.padding_y_<<"'"
+                << " padding_x='"<<item.padding_x_<<"'"
+                << "/>\n";
+        }
+
 
     private:
 
@@ -618,6 +647,18 @@ namespace dlib
                 << ", padding_x="<<item.padding_x_
                 << ")";
             return out;
+        }
+
+        friend void to_xml(const avg_pool_& item, std::ostream& out)
+        {
+            out << "<avg_pool"
+                << " nr='"<<_nr<<"'"
+                << " nc='"<<_nc<<"'"
+                << " stride_y='"<<_stride_y<<"'"
+                << " stride_x='"<<_stride_x<<"'"
+                << " padding_y='"<<item.padding_y_<<"'"
+                << " padding_x='"<<item.padding_x_<<"'"
+                << "/>\n";
         }
     private:
 
@@ -850,6 +891,28 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const bn_& item, std::ostream& out)
+        {
+            if (mode==CONV_MODE)
+                out << "<bn_con";
+            else
+                out << "<bn_fc";
+
+            out << " eps='"<<item.eps<<"'";
+            out << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'";
+            out << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'";
+            out << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'";
+            out << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'";
+            out << ">\n";
+
+            out << mat(item.params);
+
+            if (mode==CONV_MODE)
+                out << "</bn_con>\n";
+            else
+                out << "</bn_fc>\n";
+        }
+
     private:
 
         friend class affine_;
@@ -1053,6 +1116,32 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const fc_& item, std::ostream& out)
+        {
+            if (bias_mode==FC_HAS_BIAS)
+            {
+                out << "<fc"
+                    << " num_outputs='"<<item.num_outputs<<"'"
+                    << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'"
+                    << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'"
+                    << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'"
+                    << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'";
+                out << ">\n";
+                out << mat(item.params);
+                out << "</fc>\n";
+            }
+            else
+            {
+                out << "<fc_no_bias"
+                    << " num_outputs='"<<item.num_outputs<<"'"
+                    << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'"
+                    << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'";
+                out << ">\n";
+                out << mat(item.params);
+                out << "</fc_no_bias>\n";
+            }
+        }
+
     private:
 
         unsigned long num_outputs;
@@ -1167,6 +1256,13 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const dropout_& item, std::ostream& out)
+        {
+            out << "<dropout"
+                << " drop_rate='"<<item.drop_rate<<"'";
+            out << "/>\n";
+        }
+
     private:
         float drop_rate;
         resizable_tensor mask;
@@ -1257,6 +1353,12 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const multiply_& item, std::ostream& out)
+        {
+            out << "<multiply"
+                << " val='"<<item.val<<"'";
+            out << "/>\n";
+        }
     private:
         float val;
         resizable_tensor params; // unused
@@ -1418,6 +1520,18 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const affine_& item, std::ostream& out)
+        {
+            out << "<affine";
+            if (item.mode==CONV_MODE)
+                out << " mode='conv'";
+            else
+                out << " mode='fc'";
+            out << ">\n";
+            out << mat(item.params);
+            out << "</affine>\n";
+        }
+
     private:
         resizable_tensor params, empty_params; 
         alias_tensor gamma, beta;
@@ -1489,6 +1603,10 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const add_prev_& item, std::ostream& out)
+        {
+            out << "<add_prev tag='"<<id<<"'/>\n";
+        }
 
     private:
         resizable_tensor params;
@@ -1573,6 +1691,10 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const relu_& /*item*/, std::ostream& out)
+        {
+            out << "<relu/>\n";
+        }
 
     private:
         resizable_tensor params;
@@ -1652,6 +1774,13 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const prelu_& item, std::ostream& out)
+        {
+            out << "<prelu initial_param_value='"<<item.initial_param_value<<"'>\n";
+            out << mat(item.params);
+            out << "</prelu>\n";
+        }
+
     private:
         resizable_tensor params;
         float initial_param_value;
@@ -1709,6 +1838,11 @@ namespace dlib
         {
             out << "sig";
             return out;
+        }
+
+        friend void to_xml(const sig_& /*item*/, std::ostream& out)
+        {
+            out << "<sig/>\n";
         }
 
 
@@ -1771,6 +1905,11 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const htan_& /*item*/, std::ostream& out)
+        {
+            out << "<htan/>\n";
+        }
+
 
     private:
         resizable_tensor params;
@@ -1831,6 +1970,11 @@ namespace dlib
             return out;
         }
 
+        friend void to_xml(const softmax_& /*item*/, std::ostream& out)
+        {
+            out << "<softmax/>\n";
+        }
+
     private:
         resizable_tensor params;
     };
@@ -1847,6 +1991,11 @@ namespace dlib
         template <template<typename> class TAG_TYPE>
         struct concat_helper_impl<TAG_TYPE>{
             constexpr static size_t tag_count() {return 1;}
+            static void list_tags(std::ostream& out) 
+            { 
+                out << tag_id<TAG_TYPE>::id; 
+            }
+
             template<typename SUBNET>
             static void resize_out(resizable_tensor& out, const SUBNET& sub, long sum_k)
             {
@@ -1870,6 +2019,11 @@ namespace dlib
         struct concat_helper_impl<TAG_TYPE, TAG_TYPES...>{
 
             constexpr static size_t tag_count() {return 1 + concat_helper_impl<TAG_TYPES...>::tag_count();}
+            static void list_tags(std::ostream& out) 
+            { 
+                out << tag_id<TAG_TYPE>::id << ","; 
+                concat_helper_impl<TAG_TYPES...>::list_tags(out);
+            }
 
             template<typename SUBNET>
             static void resize_out(resizable_tensor& out, const SUBNET& sub, long sum_k)
@@ -1901,6 +2055,8 @@ namespace dlib
         >
     class concat_
     {
+        static void list_tags(std::ostream& out) { impl::concat_helper_impl<TAG_TYPES...>::list_tags(out);};
+
     public:
         constexpr static size_t tag_count() {return impl::concat_helper_impl<TAG_TYPES...>::tag_count();};
 
@@ -1952,10 +2108,17 @@ namespace dlib
 
         friend std::ostream& operator<<(std::ostream& out, const concat_& item)
         {
-            out << "concat\t ("
-                << tag_count()
-                << ")";
+            out << "concat\t (";
+            list_tags(out);
+            out << ")";
             return out;
+        }
+
+        friend void to_xml(const concat_& item, std::ostream& out)
+        {
+            out << "<concat tags='";
+            list_tags(out);
+            out << "'/>\n";
         }
 
     private:

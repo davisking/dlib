@@ -12,6 +12,7 @@
 #include "dnn/trainer.h"
 #include "dnn/cpu_dlib.h"
 #include "dnn/tensor_tools.h"
+#include "dnn/utilities.h"
 
 #endif // DLIB_DNn_
 
