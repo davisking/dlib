@@ -8,6 +8,9 @@
 #include <iostream>
 #include <memory>
 #include <dlib/matrix.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+
 
 namespace dlib
 {
@@ -15,7 +18,7 @@ namespace dlib
 // --------------------------------------------------------------------------------------
 
     // Call dlib's serialize and deserialize by default.   The point of this version of
-    // serailize is to do something fast that normally we wouldn't do, like directly copy
+    // serialize is to do something fast that normally we wouldn't do, like directly copy
     // memory.  This is safe since this is an interprocess communication happening the same
     // machine.
     template <typename T> void interprocess_serialize ( const T& item, std::ostream& out) { serialize(item, out); } 
@@ -49,19 +52,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline void send_to_parent_process() {std::cout.flush();}
+    namespace impl{ std::ostream& get_data_ostream(); }
+
+    inline void send_to_parent_process() {impl::get_data_ostream().flush();}
     template <typename U, typename ...T>
     void send_to_parent_process(U&& arg1, T&& ...args)
     /*!
         ensures
-            - sends all the arguments to send_to_parent_process() to standard output (and
-              hence to the parent process) by serializing them with
-              interprocess_serialize().
+            - sends all the arguments to send_to_parent_process() to the parent process by
+              serializing them with interprocess_serialize().
     !*/
     {
-        interprocess_serialize(arg1, std::cout);
+        interprocess_serialize(arg1, impl::get_data_ostream());
         send_to_parent_process(std::forward<T>(args)...);
-        if (!std::cout)
+        if (!impl::get_data_ostream())
             throw dlib::error("Error sending object to parent process.");
     }
 
@@ -86,22 +90,32 @@ namespace dlib
 
     class filestreambuf;
 
-    class subprocess_stream : public std::iostream
+    class subprocess_stream 
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is a tool for spawning a subprocess and communicating with it through
-                that processes standard input, output, and error.  Here is an example: 
+                its standard input, output, and error.  Here is an example: 
 
-                    subprocess_stream s("/usr/bin/echo");
-                    s << "echo me this!";
-                    string line;
-                    getline(s, line);
-                    cout << line << endl;
-                    s.wait();
+                    subprocess_stream s("/usr/bin/some_program");
+                    s.send(obj1, obj2, obj3);
+                    s.receive(obj4, obj5);
+                    s.wait(); // wait for sub process to terminate 
 
-                That example runs echo, sends it some text, gets it back, and prints it to
-                the screen.  Then it waits for the subprocess to finish.
+                Then in the sub process you would have:
+
+                    receive_from_parent_process(obj1, obj2, obj3);
+                    // do stuff
+                    cout << "echo this text to parent cout" << endl;
+                    send_to_parent_process(obj4, obj5);
+
+
+                Additionally, if the sub process writes to its standard out then that will
+                be echoed to std::cout in the parent process.  Also, the communication of
+                send()/receive() calls between the parent and child happens all on the
+                standard input file descriptor.  So you can't really use std::cin for
+                anything inside the child process as that would interfere with
+                receive_from_parent_process() and send_to_parent_process().
         !*/
 
     public:
@@ -119,7 +133,7 @@ namespace dlib
         /*!
             ensures
                 - calls wait().  Note that the destructor never throws even though wait() can. 
-                If an exception is thrown by wait() it is just logged to std::cerr.
+                  If an exception is thrown by wait() it is just logged to std::cerr.
         !*/
 
         void wait(
@@ -147,16 +161,16 @@ namespace dlib
                   with interprocess_serialize().
         !*/
         {
-            interprocess_serialize(arg1, *this);
+            interprocess_serialize(arg1, iosub);
             send(std::forward<T>(args)...);
-            if (!this->good())
+            if (!iosub)
             {
                 std::ostringstream sout;
                 sout << stderr.rdbuf();
                 throw dlib::error("Error sending object to child process.\n" + sout.str());
             }
         }
-        void send() {this->flush();}
+        void send() {iosub.flush();}
 
         template <typename U, typename ...T>
         void receive(U&& arg1, T&& ...args)
@@ -166,9 +180,9 @@ namespace dlib
                   them with interprocess_deserialize().
         !*/
         {
-            interprocess_deserialize(arg1, *this);
+            interprocess_deserialize(arg1, iosub);
             receive(std::forward<T>(args)...);
-            if (!this->good())
+            if (!iosub)
             {
                 std::ostringstream sout;
                 sout << stderr.rdbuf();
@@ -187,21 +201,22 @@ namespace dlib
         private:
             int fd[2];
         public:
-            cpipe()  { if (pipe(fd)) throw dlib::error("Failed to create pipe"); }
+            cpipe() { if (socketpair(AF_LOCAL, SOCK_STREAM, 0, fd)) throw dlib::error("Failed to create pipe"); }
             ~cpipe() { close(); }
-            int read_fd() const { return fd[0]; }
-            int write_fd() const { return fd[1]; }
+            int parent_fd() const { return fd[0]; }
+            int child_fd() const { return fd[1]; }
             void close() { ::close(fd[0]); ::close(fd[1]); }
         };
 
-        cpipe write_pipe;
-        cpipe read_pipe;
-        cpipe err_pipe;
+        cpipe data_pipe;
+        cpipe stdout_pipe;
+        cpipe stderr_pipe;
         bool wait_called = false;
         std::unique_ptr<filestreambuf> inout_buf; 
         std::unique_ptr<filestreambuf> err_buf;
         int child_pid = -1;
         std::istream stderr;
+        std::iostream iosub;
     };
 }
 
