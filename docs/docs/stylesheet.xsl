@@ -703,6 +703,9 @@
          <xsl:apply-templates/>
        </table>
    </xsl:template>   
+   <xsl:template match="more_details">
+      <a style="float:none" class='more_details'>More Details...</a>
+   </xsl:template>   
    <xsl:template match="div">
       <div id="{@id}"><xsl:apply-templates/></div>
    </xsl:template>   
