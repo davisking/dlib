@@ -78,6 +78,8 @@ elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visu
         message(STATUS "Enabling SSE2 instructions")
         add_definitions(-DDLIB_HAVE_SSE2)
     endif()
+	# DNN module produces long type names for NN definitions - disable this warning for MSVC
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4503")
 endif()
 
 
