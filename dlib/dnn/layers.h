@@ -1984,28 +1984,8 @@ namespace dlib
     using softmax = add_layer<softmax_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
-    namespace impl{
-//        // helper classes for layer concat processing
-//        template <template<typename> class... TAG_TYPES>
-//        struct concat_helper_impl {
-//            // this specialization will be used only by MSVC
-//            constexpr static size_t tag_count() {return 0;}
-//            static void list_tags(std::ostream& out)
-//            {
-//            }
-//            template<typename SUBNET>
-//            static void resize_out(resizable_tensor&, const SUBNET&, long)
-//            {
-//            }
-//            template<typename SUBNET>
-//            static void concat(tensor&, const SUBNET&, size_t)
-//            {
-//            }
-//            template<typename SUBNET>
-//            static void split(const tensor&, SUBNET&, size_t)
-//            {
-//            }
-//        };
+    namespace impl
+    {
         template <template<typename> class TAG_TYPE, template<typename> class... TAG_TYPES>
         struct concat_helper_impl{
 
