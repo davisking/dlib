@@ -33,7 +33,6 @@
 #include <iostream>
 #include <dlib/data_io.h>
 
-
 using namespace std;
 using namespace dlib;
 
@@ -91,7 +90,7 @@ int main(int argc, char** argv) try
     // Make an instance of our inception network.
     net_type net;
     cout << "The net has " << net.num_layers << " layers in it." << endl;
-//    cout << net << endl;
+    cout << net << endl;
 
 
     cout << "Traning NN..." << endl;
