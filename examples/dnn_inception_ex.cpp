@@ -23,12 +23,6 @@
     the IEEE Conference on Computer Vision and Pattern Recognition. 2015.
 */
 
-// DNN module uses template-based network declaration that leads to very long
-// type names. Visual Studio will produce Warning C4503 in such cases
-#ifdef _MSC_VER
-#   pragma warning( disable: 4503 )
-#endif
-
 #include <dlib/dnn.h>
 #include <iostream>
 #include <dlib/data_io.h>
