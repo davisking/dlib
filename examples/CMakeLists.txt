@@ -10,10 +10,6 @@ PROJECT(examples)
 
 include(../dlib/cmake)
 
-if (POLICY CMP0054)
-    cmake_policy(SET CMP0054 NEW)
-endif()
-
 # Tell CMake to compile a program.  We do this with the ADD_EXECUTABLE()
 # statement which takes the name of the output executable and then a list of
 # .cpp files to compile.  Here each example consists of only one .cpp file but
@@ -35,13 +31,6 @@ ENDMACRO()
 
 # The deep learning toolkit requires a C++11 capable compiler.  
 if (COMPILER_CAN_DO_CPP_11)
-   # Visual Studio Specific
-   # DNN module produces long type names for NN definitions - disable this warning for MSVC
-   # And when compiling Debug mode file will be too big for normal compilation
-   if (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") 
-      message(STATUS "Enabling Visual Studio specific flags for DNN")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4503 /bigobj")
-   endif()
    add_example(dnn_mnist_ex)
    add_example(dnn_mnist_advanced_ex)
    add_example(dnn_inception_ex)
