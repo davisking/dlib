@@ -160,7 +160,7 @@ namespace dlib
 
         friend void serialize(const con_& item, std::ostream& out)
         {
-            serialize("con_3", out);
+            serialize("con_4", out);
             serialize(item.params, out);
             serialize(_num_filters, out);
             serialize(_nr, out);
@@ -186,6 +186,33 @@ namespace dlib
             long nc;
             int stride_y;
             int stride_x;
+            if (version == "con_4")
+            {
+                deserialize(item.params, in);
+                deserialize(num_filters, in);
+                deserialize(nr, in);
+                deserialize(nc, in);
+                deserialize(stride_y, in);
+                deserialize(stride_x, in);
+                deserialize(item.padding_y_, in);
+                deserialize(item.padding_x_, in);
+                deserialize(item.filters, in);
+                deserialize(item.biases, in);
+                deserialize(item.learning_rate_multiplier, in);
+                deserialize(item.weight_decay_multiplier, in);
+                deserialize(item.bias_learning_rate_multiplier, in);
+                deserialize(item.bias_weight_decay_multiplier, in);
+                if (item.padding_y_ != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::con_");
+                if (item.padding_x_ != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::con_");
+                if (num_filters != _num_filters) throw serialization_error("Wrong num_filters found while deserializing dlib::con_");
+                if (nr != _nr) throw serialization_error("Wrong nr found while deserializing dlib::con_");
+                if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::con_");
+                if (stride_y != _stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::con_");
+                if (stride_x != _stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::con_");
+                return;
+            }
+
+
             if (version == "con_")
             {
                 deserialize(item.params, in);
@@ -235,6 +262,20 @@ namespace dlib
             else
             {
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::con_.");
+            }
+
+
+            // now flip all the filters
+            alias_tensor at(_nr, _nc);
+            size_t off = 0;
+            for (int i = 0; i < item.filters.num_samples(); ++i)
+            {
+                for (int j = 0; j < item.filters.k(); ++j)
+                {
+                    auto temp = at(item.params,off);
+                    off += _nr*_nc;
+                    temp = flipud(fliplr(mat(temp)));
+                }
             }
 
             if (num_filters != _num_filters) throw serialization_error("Wrong num_filters found while deserializing dlib::con_");

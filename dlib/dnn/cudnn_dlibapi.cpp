@@ -827,7 +827,7 @@ namespace dlib
                         stride_y,
                         stride_x,
                         1, 1, // must be 1,1
-                        CUDNN_CONVOLUTION)); // could also be CUDNN_CROSS_CORRELATION
+                        CUDNN_CROSS_CORRELATION)); // could also be CUDNN_CONVOLUTION
 
                 CHECK_CUDNN(cudnnGetConvolution2dForwardOutputDim(
                         (const cudnnConvolutionDescriptor_t)conv_handle,

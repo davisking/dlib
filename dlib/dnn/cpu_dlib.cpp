@@ -1631,9 +1631,11 @@ namespace dlib
 
             // now fill in the Toeplitz output matrix for the n-th sample in data.  
             size_t cnt = 0;
-            for (long r = filter_nr-1-padding_y; r-padding_y < data.nr(); r+=stride_y)
+            const long max_r = data.nr() + padding_y-(filter_nr-1);
+            const long max_c = data.nc() + padding_x-(filter_nc-1);
+            for (long r = -padding_y; r < max_r; r+=stride_y)
             {
-                for (long c = filter_nc-1-padding_x; c-padding_x < data.nc(); c+=stride_x)
+                for (long c = -padding_x; c < max_c; c+=stride_x)
                 {
                     for (long k = 0; k < data.k(); ++k)
                     {
@@ -1642,8 +1644,8 @@ namespace dlib
                             for (long x = 0; x < filter_nc; ++x)
                             {
                                 DLIB_ASSERT(cnt < output.size(),"");
-                                long xx = c-x;
-                                long yy = r-y;
+                                long xx = c+x;
+                                long yy = r+y;
                                 if (boundary.contains(xx,yy))
                                     *t = d[(k*data.nr() + yy)*data.nc() + xx];
                                 else
@@ -1676,9 +1678,11 @@ namespace dlib
             const float* t = &output(0,0);
 
             // now fill in the Toeplitz output matrix for the n-th sample in data.  
-            for (long r = filter_nr-1-padding_y; r-padding_y < data.nr(); r+=stride_y)
+            const long max_r = data.nr() + padding_y-(filter_nr-1);
+            const long max_c = data.nc() + padding_x-(filter_nc-1);
+            for (long r = -padding_y; r < max_r; r+=stride_y)
             {
-                for (long c = filter_nc-1-padding_x; c-padding_x < data.nc(); c+=stride_x)
+                for (long c = -padding_x; c < max_c; c+=stride_x)
                 {
                     for (long k = 0; k < data.k(); ++k)
                     {
@@ -1686,8 +1690,8 @@ namespace dlib
                         {
                             for (long x = 0; x < filter_nc; ++x)
                             {
-                                long xx = c-x;
-                                long yy = r-y;
+                                long xx = c+x;
+                                long yy = r+y;
                                 if (boundary.contains(xx,yy))
                                     d[(k*data.nr() + yy)*data.nc() + xx] += *t;
                                 ++t;
