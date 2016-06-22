@@ -97,10 +97,10 @@ namespace
 
         DLIB_TEST(a.node(1).number_of_children() == 2);
         DLIB_TEST(a.node(1).number_of_parents() == 1);
-        DLIB_TEST_MSG(a.node(1).parent(0).index() == 1,"")
+        DLIB_TEST_MSG(a.node(1).parent(0).index() == 1,"");
 
-            DLIB_TEST_MSG(a.node(1).child(0).index() + a.node(1).child(1).index() == 3,"")
-            DLIB_TEST(a.node(2).number_of_children() == 0);
+        DLIB_TEST_MSG(a.node(1).child(0).index() + a.node(1).child(1).index() == 3,"");
+        DLIB_TEST(a.node(2).number_of_children() == 0);
         DLIB_TEST(a.node(2).number_of_parents() == 1);
         DLIB_TEST(a.node(2).index() == 2);
 

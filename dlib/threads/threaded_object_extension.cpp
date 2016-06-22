@@ -29,11 +29,20 @@ namespace dlib
     ~threaded_object (
     )
     {
-        DLIB_ASSERT(is_alive() == false,
-               "\tthreaded_object::~threaded_object()"
-               << "\n\tYou have let a threaded object destruct itself before terminating its thread"
-               << "\n\tthis: " << this
-        );
+        try
+        {
+            DLIB_ASSERT(is_alive() == false,
+                   "\tthreaded_object::~threaded_object()"
+                   << "\n\tYou have let a threaded object destruct itself before terminating its thread"
+                   << "\n\tthis: " << this
+            );
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+            assert(false);
+            abort();
+        }
     }
 
 // ----------------------------------------------------------------------------------------

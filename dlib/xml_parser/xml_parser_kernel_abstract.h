@@ -223,7 +223,7 @@ namespace dlib
               supplied error_handler and document_handler.
         throws
             - xml_parse_error
-                Thrown if there is a problem opening the input file.
+                Thrown if there is a problem parsing the input file.
     !*/
 
     void parse_xml (
@@ -237,7 +237,7 @@ namespace dlib
               supplied error_handler and document_handler.
         throws
             - xml_parse_error
-                Thrown if there is a problem opening the input file.
+                Thrown if there is a problem parsing the input file.
     !*/
 
     void parse_xml (
@@ -250,7 +250,7 @@ namespace dlib
               supplied error_handler.
         throws
             - xml_parse_error
-                Thrown if there is a problem opening the input file.
+                Thrown if there is a problem parsing the input file.
     !*/
 
     void parse_xml (
@@ -265,8 +265,7 @@ namespace dlib
               if a fatal parsing error is encountered.
         throws
             - xml_parse_error
-                Thrown if a fatal parsing error is encountered or if there is a problem
-                opening the input file.
+                Thrown if there is a problem parsing the input file.
     !*/
 
 // ----------------------------------------------------------------------------------------

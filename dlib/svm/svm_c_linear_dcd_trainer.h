@@ -47,7 +47,8 @@ namespace dlib
             verbose(false),
             have_bias(true),
             last_weight_1(false),
-            do_shrinking(true)
+            do_shrinking(true),
+            do_svm_l2(false)
         {
         }
 
@@ -61,7 +62,8 @@ namespace dlib
             verbose(false),
             have_bias(true),
             last_weight_1(false),
-            do_shrinking(true)
+            do_shrinking(true),
+            do_svm_l2(false)
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(0 < C_,
@@ -103,6 +105,13 @@ namespace dlib
         void enable_shrinking (
             bool enabled
         ) { do_shrinking = enabled; }
+
+        bool solving_svm_l2_problem (
+        ) const { return do_svm_l2; }
+
+        void solve_svm_l2_problem (
+            bool enabled
+        ) { do_svm_l2 = enabled; }
 
         void be_verbose (
         )
@@ -219,12 +228,17 @@ namespace dlib
         private:
 
             template <
-                typename in_sample_vector_type
+                typename in_sample_vector_type,
+                typename in_scalar_vector_type
                 >
             void init(
                 const in_sample_vector_type& x,
+                const in_scalar_vector_type& y,
                 bool have_bias_,
-                bool last_weight_1_
+                bool last_weight_1_,
+                bool do_svm_l2_,
+                scalar_type Cpos,
+                scalar_type Cneg
             )
             {
                 const long new_dims = max_index_plus_one(x);
@@ -337,6 +351,14 @@ namespace dlib
                     {
                         index.push_back(i);
                     }
+
+                    if (do_svm_l2_)
+                    {
+                        if (y(i) > 0)
+                            Q.back() += 1/(2*Cpos);
+                        else
+                            Q.back() += 1/(2*Cneg);
+                    }
                 }
 
                 if (last_weight_1)
@@ -392,6 +414,9 @@ namespace dlib
             dlib::rand rnd;
 
         public:
+
+            const std::vector<scalar_type>& get_alpha () const { return alpha; }
+
             friend void serialize(const optimizer_state& item, std::ostream& out)
             {
                 const int version = 1;
@@ -490,17 +515,21 @@ namespace dlib
             }
 #endif
 
-            state.init(x,have_bias,last_weight_1);
+            state.init(x,y,have_bias,last_weight_1,do_svm_l2,Cpos,Cneg);
 
             std::vector<scalar_type>& alpha = state.alpha;
             scalar_vector_type& w = state.w;
             std::vector<long>& index = state.index;
             const long dims = state.dims;
 
+
             unsigned long active_size = index.size();
 
             scalar_type PG_max_prev = std::numeric_limits<scalar_type>::infinity();
             scalar_type PG_min_prev = -std::numeric_limits<scalar_type>::infinity();
+
+            const scalar_type Dii_pos = 1/(2*Cpos);
+            const scalar_type Dii_neg = 1/(2*Cneg);
 
             // main loop
             for (unsigned long iter = 0; iter < max_iterations; ++iter)
@@ -521,8 +550,16 @@ namespace dlib
                 {
                     const long i = index[ii];
 
-                    const scalar_type G = y(i)*dot(w, x(i)) - 1;
+                    scalar_type G = y(i)*dot(w, x(i)) - 1;
+                    if (do_svm_l2)
+                    {
+                        if (y(i) > 0)
+                            G += Dii_pos*alpha[i];
+                        else
+                            G += Dii_neg*alpha[i];
+                    }
                     const scalar_type C = (y(i) > 0) ? Cpos : Cneg;
+                    const scalar_type U = do_svm_l2 ? std::numeric_limits<scalar_type>::infinity() : C;
 
                     scalar_type PG = 0;
                     if (alpha[i] == 0)
@@ -539,7 +576,7 @@ namespace dlib
                         if (G < 0)
                             PG = G;
                     }
-                    else if (alpha[i] == C)
+                    else if (alpha[i] == U)
                     {
                         if (G < PG_min_prev)
                         {
@@ -567,7 +604,7 @@ namespace dlib
                     if (std::abs(PG) > 1e-12)
                     {
                         const scalar_type alpha_old = alpha[i];
-                        alpha[i] = std::min(std::max(alpha[i] - G/state.Q[i], (scalar_type)0.0), C);
+                        alpha[i] = std::min(std::max(alpha[i] - G/state.Q[i], (scalar_type)0.0), U);
                         const scalar_type delta = (alpha[i]-alpha_old)*y(i);
                         add_to(w, x(i), delta);
                         if (have_bias && !last_weight_1)
@@ -595,7 +632,7 @@ namespace dlib
                     if (active_size == index.size())
                         break;
 
-                    // Turn of shrinking on the next iteration.  We will stop if the
+                    // Turn off shrinking on the next iteration.  We will stop if the
                     // tolerance is still <= eps when shrinking is off.
                     active_size = index.size();
                     PG_max_prev = std::numeric_limits<scalar_type>::infinity();
@@ -660,6 +697,7 @@ namespace dlib
         bool have_bias; // having a bias means we pretend all x vectors have an extra element which is always -1.
         bool last_weight_1;
         bool do_shrinking;
+        bool do_svm_l2;
 
     }; // end of class svm_c_linear_dcd_trainer
 

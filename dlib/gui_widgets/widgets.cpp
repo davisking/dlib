@@ -6038,8 +6038,7 @@ namespace dlib
         if (!rect_is_selected)
             return;
 
-        const rectangle valid_area = get_rect_on_screen(selected_rect);
-        const point loc = nearest_point(valid_area,last_right_click_pos);
+        const point loc = last_right_click_pos;
         
         // Transform loc from gui window space into the space used by the overlay
         // rectangles (i.e. relative to the raw image)
@@ -6569,7 +6568,7 @@ namespace dlib
         if (btn == base_window::RIGHT && rect_is_selected)
         {
             last_right_click_pos = point(x,y);
-            parts_menu.set_rect(get_rect_on_screen(selected_rect));
+            parts_menu.set_rect(rect);
             return;
         }
 
@@ -6592,6 +6591,7 @@ namespace dlib
             if (best_dist < 13)
             {
                 overlay_rects[best_idx].label = default_rect_label;
+                overlay_rects[best_idx].color = default_rect_color;
                 highlighted_rect = best_idx;
                 highlight_timer.stop();
                 highlight_timer.start();

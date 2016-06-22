@@ -99,10 +99,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(2), true_alpha(2);
+        matrix<double,0,1> alpha(2), true_alpha(2), d(3), lambda;
         alpha = C/2, C/2;
+        d = 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
@@ -136,10 +137,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(2), true_alpha(2);
+        matrix<double,0,1> alpha(2), true_alpha(2), d(3), lambda;
         alpha = C/2, C/2;
+        d = 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
@@ -173,10 +175,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(2), true_alpha(2);
+        matrix<double,0,1> alpha(2), true_alpha(2), d(3), lambda;
         alpha = C/2, C/2;
+        d = 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
@@ -211,10 +214,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(3), true_alpha(3);
+        matrix<double,0,1> alpha(3), true_alpha(3), d(3), lambda;
         alpha = C/2, C/2, 0;
+        d = 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
 
@@ -249,26 +253,23 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(2), true_alpha(2);
+        matrix<double,0,1> alpha(2), d(3), lambda;
         alpha = C/2, C/2;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 800);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
 
         dlog << LINFO << "w:     " << trans(w);
 
-        dlog << LINFO << "computed obj:      "<< compute_objective_value(w,A,b,C);
+        const double computed_obj = compute_objective_value(w,A,b,C);
         w = 0, 0, 0;
-        dlog << LINFO << "with true w obj:   "<< compute_objective_value(w,A,b,C);
+        const double true_obj = compute_objective_value(w,A,b,C);
+        dlog << LINFO << "computed obj:      "<< computed_obj;
+        dlog << LINFO << "with true w obj:   "<< true_obj;
 
-        dlog << LINFO << "alpha:      " << trans(alpha);
-        true_alpha = 0, 2;
-        dlog << LINFO << "true alpha: "<< trans(true_alpha);
-
-        dlog << LINFO << "alpha error: "<< max(abs(alpha-true_alpha));
-        DLIB_TEST(max(abs(alpha-true_alpha)) < 1e-9);
+        DLIB_TEST_MSG(abs(computed_obj - true_obj) < 1e-8, abs(computed_obj - true_obj));
     }
 
     void test_qp4_test6()
@@ -285,26 +286,24 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(3), true_alpha(3);
+        matrix<double,0,1> alpha(3), d(3), lambda;
         alpha = C/2, C/2, 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 3000);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
 
         dlog << LINFO << "w:     " << trans(w);
 
-        dlog << LINFO << "computed obj:      "<< compute_objective_value(w,A,b,C);
+
+        const double computed_obj = compute_objective_value(w,A,b,C);
         w = 0, 0, 0;
-        dlog << LINFO << "with true w obj:   "<< compute_objective_value(w,A,b,C);
+        const double true_obj = compute_objective_value(w,A,b,C);
+        dlog << LINFO << "computed obj:      "<< computed_obj;
+        dlog << LINFO << "with true w obj:   "<< true_obj;
 
-        dlog << LINFO << "alpha:      " << trans(alpha);
-        true_alpha = 2, 0, 0;
-        dlog << LINFO << "true alpha: "<< trans(true_alpha);
-
-        dlog << LINFO << "alpha error: "<< max(abs(alpha-true_alpha));
-        DLIB_TEST(max(abs(alpha-true_alpha)) < 1e-9);
+        DLIB_TEST_MSG(abs(computed_obj - true_obj) < 1e-8, abs(computed_obj - true_obj));
     }
 
     void test_qp4_test7()
@@ -327,10 +326,11 @@ namespace
 
         const double C = 2;
 
-        matrix<double,0,1> alpha(3), true_alpha(3);
+        matrix<double,0,1> alpha(3), true_alpha(3), d(3), lambda;
         alpha = C/2, C/2, 0;
+        d = 0;
 
-        solve_qp4_using_smo(A, Q, b, alpha, 1e-9, 800);
+        solve_qp4_using_smo(A, Q, b, d, alpha, lambda, 1e-9, 800);
 
         dlog << LINFO << "*******************************************************";
 

@@ -1642,7 +1642,7 @@ namespace dlib
         typename T,
         typename P
         >
-    const matrix_exp pixel_to_vector (
+    const matrix<T,pixel_traits<P>::num,1> pixel_to_vector (
         const P& pixel
     );
     /*!

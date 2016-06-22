@@ -408,6 +408,9 @@ namespace dlib
         template <typename T, long NR, long NC, typename MM>
         int get_ld (const assignable_sub_matrix<T,NR,NC,MM,column_major_layout>& m) { return m.m.nr(); }
 
+        template <typename T>
+        int get_ld (const assignable_ptr_matrix<T>& m) { return m.nc(); }
+
         template <typename T, typename MM>
         int get_ld (const matrix_op<op_array2d_to_mat<array2d<T,MM> > >& m) { return m.nc(); }
         template <typename T, typename MM>
@@ -479,6 +482,9 @@ namespace dlib
             else
                 return 1;
         }
+
+        template <typename T>
+        int get_inc (const assignable_ptr_matrix<T>& ) { return 1; }
 
         template <typename T, long NR, long NC, typename MM>
         int get_inc(const matrix_op<op_colm<matrix<T,NR,NC,MM,row_major_layout> > >& m)
@@ -588,6 +594,9 @@ namespace dlib
 
         template <typename T, long NR, long NC, typename MM, typename L>
         T* get_ptr (assignable_sub_matrix<T,NR,NC,MM,L>& m) { return &m(0,0); }
+
+        template <typename T>
+        T* get_ptr (assignable_ptr_matrix<T>& m) { return m.ptr; }
 
         template <typename T, typename MM>
         const T* get_ptr (const matrix_op<op_array2d_to_mat<array2d<T,MM> > >& m) { return &m.op.array[0][0]; }

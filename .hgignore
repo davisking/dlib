@@ -2,11 +2,13 @@
 /build2/
 /build_clang/
 \.swp$
+\.swo$
 \.o$
 \.a$
 \.orig$
 \.obj$
 \.pyc$
+^build/
 ^docs/release/
 ^docs/docs/web/
 ^docs/docs/chm/

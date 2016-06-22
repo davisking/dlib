@@ -59,7 +59,9 @@ namespace dlib
         for (long r = 0; r < v.nr(); ++r)
         {
             spec_samps.push_back(trans(rowm(v,r)));
-            spec_samps.back() /= length(spec_samps.back());
+            const double len = length(spec_samps.back());
+            if (len != 0)
+                spec_samps.back() /= len;
         }
         // Finally do the K-means clustering
         pick_initial_centers(num_clusters, centers, spec_samps);

@@ -91,19 +91,19 @@
                <name>Home</name>
                <link>http://dlib.net</link>
             </item>
-            <item>
-               <name>Dlib Blog</name>
-               <link>http://blog.dlib.net</link>
-            </item>
-            <item>
-               <name>Forums</name>
-               <link>https://sourceforge.net/p/dclib/discussion</link>
-            </item>
-            <item>
-               <name>Who uses dlib?</name>
-               <link>http://sourceforge.net/p/dclib/wiki/Known_users/</link>
-            </item>
          </web>
+         <item>
+            <name>Dlib Blog</name>
+            <link>http://blog.dlib.net</link>
+         </item>
+         <item>
+            <name>Forums</name>
+            <link>https://sourceforge.net/p/dclib/discussion</link>
+         </item>
+         <item>
+            <name>Who uses dlib?</name>
+            <link>http://sourceforge.net/p/dclib/wiki/Known_users/</link>
+         </item>
 
          <item>
             <name>Introduction</name>
@@ -186,6 +186,18 @@
          <item nolink="true">
             <name>Examples: C++</name>
             <sub>
+               <item>
+                  <name>Deep Learning</name>
+                  <link>dnn_mnist_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Advanced</name>
+                  <link>dnn_mnist_advanced_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Inception</name>
+                  <link>dnn_inception_ex.cpp.html</link>
+               </item>
                <item>
                   <name>Linear Model Predictive Control</name>
                   <link>mpc_ex.cpp.html</link>
@@ -532,7 +544,7 @@
  
       <section>
          <name>Current Release</name>
-         <item nolink="true">Version: <current_release/></item> 
+         <chm><item nolink="true">Version: <current_release/></item></chm>
          <item>
             <name>Release Notes</name>
             <link>release_notes.html</link>
@@ -546,26 +558,17 @@
 
       <web>
          <download_button>
-            <name>Download dlib</name>
+            <name><div id="dlname">Download dlib</div>
+                  <div id="dlib_version">ver.<current_release/></div>
+            </name>
             <link>http://dlib.net/files/dlib-<current_release/>.tar.bz2</link>
          </download_button>
       </web>
     </top>
 
    <bottom>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
-      <br/>
       Last Modified:<br/>
       <last_modified_date/>
-      <br/>
-      <br/>
    </bottom>
    
    </menu>

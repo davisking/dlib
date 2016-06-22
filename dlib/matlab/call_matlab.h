@@ -6,6 +6,75 @@
 
 #include <string>
 
+namespace dlib
+{
+
+// ----------------------------------------------------------------------------------------
+
+void check_for_matlab_ctrl_c();
+/*!
+    ensures
+        - If the user of MATLAB has pressed ctrl+c then this function will throw an
+          exception.
+!*/
+
+// ----------------------------------------------------------------------------------------
+
+class matlab_struct 
+{
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This object lets you interface with MATLAB structs from C++.  For example,
+            given a MATLAB struct named mystruct, you could access it's fields like this:
+                MATLAB way: mystruct.field
+                C++ way:    mystruct["field"]
+                MATLAB way: mystruct.field.subfield
+                C++ way:    mystruct["field"]["subfield"]
+
+            To get the values as C++ types you do something like this:
+                int val = mystruct["field"];
+            or 
+                int val;  
+                mystruct["field"].get(val);
+
+            See also example_mex_struct.cpp for an example that uses this part of the API.
+    !*/
+
+    class sub;
+public:
+    matlab_struct() : struct_handle(0),should_free(false) {}
+    ~matlab_struct();
+
+    const sub operator[] (const std::string& name) const;
+    sub operator[] (const std::string& name);
+    bool has_field(const std::string& name) const;
+
+    const void* release_struct_to_matlab() { const void* temp=struct_handle; struct_handle = 0; return temp; }
+    void set_struct_handle(const void* sh) { struct_handle = sh; }
+private:
+
+    class sub 
+    {
+    public:
+        sub() : struct_handle(0), field_idx(-1) {}
+
+        template <typename T> operator T() const;
+        template <typename T> void get(T& item) const; 
+        template <typename T> sub& operator= (const T& new_val);
+        const sub operator[] (const std::string& name) const;
+        sub operator[] (const std::string& name);
+        bool has_field(const std::string& name) const;
+    private:
+        friend class matlab_struct;
+        const void* struct_handle;
+        int field_idx;
+        sub& operator=(const sub&);
+    };
+    const void* struct_handle;
+    bool should_free;
+    matlab_struct& operator=(const matlab_struct&); 
+};
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -236,55 +305,164 @@ void call_matlab (
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9
     >
 void call_matlab (
     const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9
 );
 
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename T1, 
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9,
-    typename T10
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10
     >
 void call_matlab (
     const std::string& function_name,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9,
-    const T10& A10
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12& A12
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15, typename T16
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15, typename T16, typename T17
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const T17& A17
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15, typename T16, typename T17, typename T18
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const T17& A17,
+    const T18& A18
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15, typename T16, typename T17, typename T18, typename T19
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const T17& A17,
+    const T18& A18, const T19& A19
+);
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15, typename T16, typename T17, typename T18, typename T19,
+    typename T20
+    >
+void call_matlab (
+    const std::string& function_name,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const T17& A17,
+    const T18& A18, const T19& A19, const T20& A20
 );
 
 // ----------------------------------------------------------------------------------------
@@ -426,33 +604,174 @@ void call_matlab (
 }
 
 template <
-    typename T1,
-    typename T2,
-    typename T3,
-    typename T4,
-    typename T5,
-    typename T6,
-    typename T7,
-    typename T8,
-    typename T9
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9
     >
 void call_matlab (
     const function_handle& funct,
-    const T1& A1,
-    const T2& A2,
-    const T3& A3,
-    const T4& A4,
-    const T5& A5,
-    const T6& A6,
-    const T7& A7,
-    const T8& A8,
-    const T9& A9
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9
 )
 {
     call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9);
 }
 
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10);
+}
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11);
+}
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12);
+}
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13);
+}
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14);
+}
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15);
+}
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15, typename T16
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16);
+}
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15, typename T16, typename T17
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const T17& A17
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17);
+}
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15, typename T16, typename T17, typename T18
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const T17& A17,
+    const T18& A18
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18);
+}
+
+template <
+    typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename
+    T7, typename T8, typename T9, typename T10, typename T11, typename T12, typename T13,
+    typename T14, typename T15, typename T16, typename T17, typename T18, typename T19
+    >
+void call_matlab (
+    const function_handle& funct,
+    const T1& A1, const T2& A2, const T3& A3, const T4& A4, const T5& A5, const T6& A6,
+    const T7& A7, const T8& A8, const T9& A9, const T10& A10, const T11& A11, const T12&
+    A12, const T13& A13, const T14& A14, const T15& A15, const T16& A16, const T17& A17,
+    const T18& A18, const T19& A19
+)
+{
+    call_matlab("feval", funct, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19);
+}
+
 // ----------------------------------------------------------------------------------------
+
+// We define this function here so that, if you write some code that has check_for_matlab_ctrl_c()
+// sprinkled throughout it you can still compile that code outside the mex wrapper
+// environment and these calls will simply be no-ops.
+#ifndef MATLAB_MEX_FILE
+inline void check_for_matlab_ctrl_c() {}
+#endif
+
+}
 
 #endif // MIT_LL_CALL_MATLAB_H__
 

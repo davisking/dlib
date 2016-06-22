@@ -3,6 +3,10 @@
 #ifndef DLIB_ALL_SOURCe_
 #define DLIB_ALL_SOURCe_
 
+#if defined(DLIB_ALGs_) || defined(DLIB_PLATFORm_)
+#include "../dlib_basic_cpp_build_tutorial.txt"
+#endif
+
 // ISO C++ code
 #include "../base64/base64_kernel_1.cpp"
 #include "../bigint/bigint_kernel_1.cpp"
@@ -16,6 +20,13 @@
 #include "../tokenizer/tokenizer_kernel_1.cpp"
 #include "../unicode/unicode.cpp"
 #include "../data_io/image_dataset_metadata.cpp"
+#include "../data_io/mnist.cpp"
+
+// Stuff that requires C++11
+#if __cplusplus >= 201103
+#include "../dnn/cpu_dlib.cpp"
+#include "../dnn/tensor_tools.cpp"
+#endif 
 
 #ifndef DLIB_ISO_CPP_ONLY
 // Code that depends on OS specific APIs
@@ -72,6 +83,9 @@
 #endif // DLIB_NO_GUI_SUPPORT
 
 #endif // DLIB_ISO_CPP_ONLY
+
+
+#define DLIB_ALL_SOURCE_END
 
 #endif // DLIB_ALL_SOURCe_
 

@@ -29,6 +29,12 @@ MACRO(add_example name)
    TARGET_LINK_LIBRARIES(${name} dlib )
 ENDMACRO()
 
+# The deep learning toolkit requires a C++11 capable compiler.  
+if (COMPILER_CAN_DO_CPP_11)
+   add_example(dnn_mnist_ex)
+   add_example(dnn_mnist_advanced_ex)
+   add_example(dnn_inception_ex)
+endif()
 
 #here we apply our macros 
 add_example(3d_point_cloud_ex)

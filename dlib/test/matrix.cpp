@@ -433,6 +433,8 @@ namespace
                 {
                     DLIB_TEST(subm(a,1,2,2,3)(r,c) == (r+1)*a.nc() + c+2);
                     DLIB_TEST(subm(a,1,2,2,3) == subm(a,rect));
+                    DLIB_TEST(subm_clipped(a,1,2,2,3) == subm(a,rect));
+                    DLIB_TEST(subm_clipped(a,1,2,2,3) == subm_clipped(a,rect));
                 }
             }
 
@@ -686,7 +688,7 @@ namespace
             matrix<double> L = chol(m);
             DLIB_TEST(equal(L*trans(L), m));
 
-            DLIB_TEST_MSG(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "") 
+            DLIB_TEST_MSG(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "");
             DLIB_TEST(equal(round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10), identity_matrix<double>(3), 1e-10)); 
             DLIB_TEST(equal(round_zeros(inv_lower_triangular((L))*(L),1e-10) ,identity_matrix<double>(3),1e-10)); 
 
@@ -711,9 +713,9 @@ namespace
             matrix<double> L = chol(m);
             DLIB_TEST_MSG(equal(L*trans(L), m, 1e-10), L*trans(L)-m);
 
-            DLIB_TEST_MSG(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "") 
-            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*inv_lower_triangular((L))), "") 
-            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*trans(inv_upper_triangular(trans(L)))), "") 
+            DLIB_TEST_MSG(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "");
+            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*inv_lower_triangular((L))), ""); 
+            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*trans(inv_upper_triangular(trans(L)))), "");
             DLIB_TEST_MSG(equal(round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10) , identity_matrix<double>(6), 1e-10),
                          round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10)); 
             DLIB_TEST_MSG(equal(round_zeros(inv_lower_triangular((L))*(L),1e-10) ,identity_matrix<double>(6), 1e-10),
@@ -745,7 +747,7 @@ namespace
             matrix<double> L = chol(m);
             DLIB_TEST_MSG(equal(L*trans(L), m, 1e-10), L*trans(L)-m);
 
-            DLIB_TEST_MSG(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "") 
+            DLIB_TEST_MSG(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), ""); 
             DLIB_TEST_MSG(equal(round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10) , identity_matrix<double>(6), 1e-10),
                          round_zeros(inv_upper_triangular(trans(L))*trans(L),1e-10)); 
             DLIB_TEST_MSG(equal(round_zeros(inv_lower_triangular((L))*(L),1e-10) ,identity_matrix<double>(6), 1e-10),
@@ -1319,6 +1321,49 @@ namespace
             DLIB_TEST(mm(3) == 4);
         }
 
+        {
+            const long n = 5;
+            matrix<double> m1, m2, m3, truth;
+            m1 = randm(n,n);
+            m2 = randm(n,n);
+            m3 = randm(n,n);
+
+
+            truth = m1*m2;
+            m3 = mat(&m1(0,0),n,n)*mat(&m2(0,0),n,n);
+            DLIB_TEST(max(abs(truth-m3)) < 1e-13);
+            m3 = 0;
+            set_ptrm(&m3(0,0),n,n) = mat(&m1(0,0),n,n)*mat(&m2(0,0),n,n);
+            DLIB_TEST(max(abs(truth-m3)) < 1e-13);
+            set_ptrm(&m3(0,0),n,n) = m1*m2;
+            DLIB_TEST(max(abs(truth-m3)) < 1e-13);
+
+            // now make sure it deals with aliasing correctly.
+            truth = m1*m2;
+            m1 = mat(&m1(0,0),n,n)*mat(&m2(0,0),n,n);
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+            m1 = randm(n,n);
+            truth = m1*m2;
+            set_ptrm(&m1(0,0),n,n) = mat(&m1(0,0),n,n)*mat(&m2(0,0),n,n);
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+            m1 = randm(n,n);
+            truth = m1*m2;
+            set_ptrm(&m1(0,0),n,n) = m1*m2;
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+            m1 = randm(n,n);
+            truth = m1+m1*m2;
+            set_ptrm(&m1(0,0),n,n) += m1*m2;
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+            m1 = randm(n,n);
+            truth = m1-m1*m2;
+            set_ptrm(&m1(0,0),n,n) -= m1*m2;
+            DLIB_TEST(max(abs(truth-m1)) < 1e-13);
+
+        }
 
     }
 

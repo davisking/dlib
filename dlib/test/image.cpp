@@ -789,7 +789,7 @@ namespace
         border_enumerator be(get_rect(imout),rect);
         while (be.move_next())
         {
-            DLIB_TEST(imout[be.element().y()][be.element().x()] == 0)
+            DLIB_TEST(imout[be.element().y()][be.element().x()] == 0);
         }
         DLIB_TEST_MSG(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-5, max(abs(subm(mat(imout),rect) - subm(out,rect))));
 
@@ -800,7 +800,7 @@ namespace
         be = border_enumerator(get_rect(imout),rect);
         while (be.move_next())
         {
-            DLIB_TEST(imout[be.element().y()][be.element().x()] == 10)
+            DLIB_TEST(imout[be.element().y()][be.element().x()] == 10);
         }
         out += abs(xcorr_same(mat(img),filt)/2);
         DLIB_TEST(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-7);
@@ -812,7 +812,7 @@ namespace
         be = border_enumerator(get_rect(imout),rect);
         while (be.move_next())
         {
-            DLIB_TEST(imout[be.element().y()][be.element().x()] == -10)
+            DLIB_TEST(imout[be.element().y()][be.element().x()] == -10);
         }
         out += xcorr_same(mat(img),filt)/2;
         DLIB_TEST_MSG(max(abs(subm(mat(imout),rect) - subm(out,rect))) < 1e-5, max(abs(subm(mat(imout),rect) - subm(out,rect))));

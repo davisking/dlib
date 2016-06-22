@@ -17,7 +17,7 @@ namespace dlib
                 This object defines the interface a feature extractor must implement if it
                 is to be used with the process_sample and policy objects defined at the
                 bottom of this file.  Moreover, it is meant to represent the core part
-                of a model use in a reinforcement learning algorithm.
+                of a model used in a reinforcement learning algorithm.
                 
                 In particular, this object models a Q(state,action) function where
                     Q(state,action) == dot(w, PSI(state,action))

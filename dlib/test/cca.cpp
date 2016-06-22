@@ -18,6 +18,7 @@ namespace
     dlib::rand rnd;
 // ----------------------------------------------------------------------------------------
 
+    /*
     std::vector<std::map<unsigned long, double> > make_really_big_test_matrix (
     )
     {
@@ -29,6 +30,7 @@ namespace
         }
         return temp;
     }
+    */
 
     template <typename T>
     std::vector<std::map<unsigned long, T> > mat_to_sparse (
@@ -60,6 +62,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    /*
     void check_correlation (
         matrix<double> L,
         matrix<double> R,
@@ -82,6 +85,7 @@ namespace
             cout << "error: "<< A(i) - correlations(i);
         }
     }
+    */
 
 // ----------------------------------------------------------------------------------------
 
@@ -121,7 +125,7 @@ namespace
 
             const double trans_error = max(abs(L*Ltrans - R*Rtrans));
             dlog << LINFO << "trans_error: "<< trans_error;
-            DLIB_TEST(trans_error < 1e-10);
+            DLIB_TEST(trans_error < 1e-9);
         }
         {
             correlations = cca(mat_to_sparse(L), mat_to_sparse(R), Ltrans, Rtrans, min(m,n), max(n,n2)+6, 4);
@@ -135,7 +139,7 @@ namespace
             dlog << LINFO << "correlation error: "<< corr_error;
             DLIB_TEST_MSG(corr_error < 1e-13, Ltrans << "\n\n" << Rtrans);
 
-            DLIB_TEST(trans_error < 1e-10);
+            DLIB_TEST(trans_error < 1e-9);
         }
 
         dlog << LINFO << "*****************************************************";

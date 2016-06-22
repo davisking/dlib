@@ -127,7 +127,8 @@ namespace dlib
         double f0,
         double d0,
         double f1,
-        double d1
+        double d1,
+        double limit = 1
     )
     {
         const double n = 3*(f1 - f0) - 2*d0 - d1;
@@ -161,8 +162,8 @@ namespace dlib
         else
             x = x2;
 
-        // now make sure the minimum is within the allowed range of (0,1) 
-        return put_in_range(0,1,x);
+        // now make sure the minimum is within the allowed range of [0,limit] 
+        return put_in_range(0,limit,x);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -305,8 +306,10 @@ namespace dlib
         // the book Practical Methods of Optimization by R. Fletcher.   The sectioning 
         // phase is an implementation of 2.6.4 from the same book.
 
-        // tau1 > 1. Controls the alpha jump size during the search
-        const double tau1 = 9;
+        // 1 <= tau1a < tau1b. Controls the alpha jump size during the bracketing phase of
+        // the search.
+        const double tau1a = 1.4;
+        const double tau1b = 9;
 
         // it must be the case that 0 < tau2 < tau3 <= 1/2 for the algorithm to function
         // correctly but the specific values of tau2 and tau3 aren't super important.
@@ -315,7 +318,7 @@ namespace dlib
 
 
         // Stop right away and return a step size of 0 if the gradient is 0 at the starting point
-        if (std::abs(d0) < std::numeric_limits<double>::epsilon())
+        if (std::abs(d0) <= std::abs(f0)*std::numeric_limits<double>::epsilon())
             return 0;
 
         // Stop right away if the current value is good enough according to min_f
@@ -390,34 +393,34 @@ namespace dlib
                 break;
             }
 
-            if (mu <= 2*alpha - last_alpha)
+
+
+            const double temp = alpha;
+            // Pick a larger range [first, last].  We will pick the next alpha in that
+            // range.
+            double first, last;
+            if (mu > 0)
             {
-                last_alpha = alpha;
-                alpha = mu;
+                first = std::min(mu, alpha + tau1a*(alpha - last_alpha));
+                last  = std::min(mu, alpha + tau1b*(alpha - last_alpha));
             }
             else
             {
-                const double temp = alpha;
-
-                double first = 2*alpha - last_alpha;
-                double last;
-                if (mu > 0)
-                    last = std::min(mu, alpha + tau1*(alpha - last_alpha));
-                else
-                    last = std::max(mu, alpha + tau1*(alpha - last_alpha));
-
-
-                // pick a point between first and last by doing some kind of interpolation
-                if (last_alpha < alpha)
-                    alpha = last_alpha + (alpha-last_alpha)*poly_min_extrap(last_val, last_val_der, val, val_der);
-                else
-                    alpha = alpha + (last_alpha-alpha)*poly_min_extrap(val, val_der, last_val, last_val_der);
-
-                alpha = put_in_range(first,last,alpha);
-
-
-                last_alpha = temp;
+                first = std::max(mu, alpha + tau1a*(alpha - last_alpha));
+                last  = std::max(mu, alpha + tau1b*(alpha - last_alpha));
             }
+            
+
+
+            // pick a point between first and last by doing some kind of interpolation
+            if (last_alpha < alpha)
+                alpha = last_alpha + (alpha-last_alpha)*poly_min_extrap(last_val, last_val_der, val, val_der, 1e10);
+            else
+                alpha = alpha + (last_alpha-alpha)*poly_min_extrap(val, val_der, last_val, last_val_der, 1e10);
+
+            alpha = put_in_range(first,last,alpha);
+
+            last_alpha = temp;
 
             last_val = val;
             last_val_der = val_der;
@@ -449,6 +452,14 @@ namespace dlib
             {
                 return b;
             }
+
+            // If alpha has basically become zero then just stop.  Think of it like this,
+            // if we take the largest possible alpha step will the objective function
+            // change at all?  If not then there isn't any point looking for a better
+            // alpha.
+            const double max_possible_alpha = std::max(std::abs(a),std::abs(b));
+            if (std::abs(max_possible_alpha*d0) <= std::abs(f0)*std::numeric_limits<double>::epsilon())
+                return alpha;
 
 
             if (val > f0 + rho*alpha*d0 || val >= a_val)

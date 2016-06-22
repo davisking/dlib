@@ -1,5 +1,10 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
+
+#ifdef DLIB_ALL_SOURCE_END
+#include "dlib_basic_cpp_build_tutorial.txt"
+#endif
+
 #ifndef DLIB_IMAGE_TRANSFORMs_
 #define DLIB_IMAGE_TRANSFORMs_ 
 
@@ -19,6 +24,7 @@
 #include "image_transforms/interpolation.h"
 #include "image_transforms/fhog.h"
 #include "image_transforms/lbp.h"
+#include "image_transforms/random_color_transform.h"
 
 #endif // DLIB_IMAGE_TRANSFORMs_
 

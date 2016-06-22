@@ -5,6 +5,8 @@
 
 cmake_minimum_required(VERSION 2.8.4)
 
+set(BUILDING_MATLAB_MEX_FILE true)
+set(CMAKE_POSITION_INDEPENDENT_CODE True)
 
 # Find MATLAB's include directory and needed libraries 
 find_program(MATLAB_EXECUTABLE matlab PATHS
@@ -20,6 +22,14 @@ set(MATLAB_LIB_FOLDERS
    "${MATLAB_HOME}/extern/lib/win64/microsoft"
    "${MATLAB_HOME}/bin/glnxa64"
    )
+# If there is a MATLAB_HOME environment variable then look there as well.
+if (DEFINED ENV{MATLAB_HOME})
+    set(MATLAB_LIB_FOLDERS
+        "$ENV{MATLAB_HOME}/extern/lib/win64/microsoft"
+        "$ENV{MATLAB_HOME}/bin/glnxa64"
+        ${MATLAB_LIB_FOLDERS}
+    )
+endif()
 # Find the MATLAB libraries that need to get linked into the mex file
 if (WIN32)
    find_library(MATLAB_MEX_LIBRARY libmex PATHS ${MATLAB_LIB_FOLDERS} )
@@ -31,16 +41,21 @@ else()
    find_library(MATLAB_ENG_LIBRARY eng    PATHS ${MATLAB_LIB_FOLDERS} )
 endif()
 set(MATLAB_LIBRARIES ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY})
-INCLUDE_DIRECTORIES("${MATLAB_HOME}/extern/include")
+# Figure out the path to MATLAB's mex.h so we can add it to the include search path.
+find_path(mex_header_path mex.h
+    PATHS "$ENV{MATLAB_HOME}/extern/include"
+        "${MATLAB_HOME}/extern/include"
+    )
+INCLUDE_DIRECTORIES(${mex_header_path})
+
 # Determine the path to cmake_mex_wrapper file so we can add it to the include search path..
 string(REGEX REPLACE "cmake_mex_wrapper$" "" dlib_matlab_binding_path ${CMAKE_CURRENT_LIST_FILE})
 INCLUDE_DIRECTORIES("${dlib_matlab_binding_path}")
+# Also add dlib to the include search path 
+INCLUDE_DIRECTORIES(${dlib_matlab_binding_path}/../..) 
 
-# Determine the path to dlib so we can add it to the include search path.
-string(REGEX REPLACE "cmake_mex_wrapper$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
-INCLUDE_DIRECTORIES(${dlib_path}/../..)
-
-ADD_DEFINITIONS(-DMATLAB_MEX_FILE)
+include(${dlib_matlab_binding_path}/../add_global_compiler_switch.cmake)
+add_global_define(MATLAB_MEX_FILE)
 
 # Determine the path to our CMakeLists.txt file.  This is the file that
 # includeded the one you are reading right now.  So here we make it so that
@@ -53,7 +68,18 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 
 MACRO(add_mex_function name )
-   ADD_LIBRARY(${name} MODULE ${name}.cpp )
+    ADD_LIBRARY(${name} MODULE ${name}.cpp )
+    if (UNIX)
+        # Doing this prevents our mex function from exporting any symbols
+        # other than mexFunction().  This sometimes doesn't matter but sometimes
+        # avoids causing errors or otherwise bad behavior in MATLAB.
+        if (DEFINED ENV{MATLAB_HOME})
+            set_target_properties(${name} PROPERTIES LINK_FLAGS "-Wl,--version-script,$ENV{MATLAB_HOME}/extern/lib/glnxa64/mexFunction.map")
+        else()
+            set_target_properties(${name} PROPERTIES LINK_FLAGS "-Wl,--version-script,${MATLAB_HOME}/extern/lib/glnxa64/mexFunction.map")
+        endif()
+    endif()
+
     # Change the output file extension to a mex extension.
    if (WIN32)
       set_target_properties(${name} PROPERTIES SUFFIX ".mexw64")

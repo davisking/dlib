@@ -31,6 +31,13 @@ namespace dlib
                     Where prior is a user supplied vector and R(w) has the same
                     interpretation as above.
                        
+                Or it can use the elastic net regularizer:
+                    Minimize: f(w) == 0.5*(1-lasso_lambda)*length_squared(w) + lasso_lambda*sum(abs(w)) + C*R(w)
+
+                    Where lasso_lambda is a number in the range [0, 1) and controls
+                    trade-off between doing L1 and L2 regularization.  R(w) has the same
+                    interpretation as above.
+                       
 
                 Note that the stopping condition must be provided by the user
                 in the form of the optimization_status() function.
@@ -142,6 +149,13 @@ namespace dlib
                     Where prior is a user supplied vector and R(w) has the same
                     interpretation as above.
                        
+                Or it can use the elastic net regularizer:
+                    Minimize: f(w) == 0.5*(1-lasso_lambda)*length_squared(w) + lasso_lambda*sum(abs(w)) + C*R(w)
+
+                    Where lasso_lambda is a number in the range [0, 1) and controls
+                    trade-off between doing L1 and L2 regularization.  R(w) has the same
+                    interpretation as above.
+                       
 
                 For a detailed discussion you should consult the following papers
                 from the Journal of Machine Learning Research:
@@ -219,6 +233,39 @@ namespace dlib
                 - The optimization algorithm runs until problem.optimization_status() 
                   indicates it is time to stop.
                 - returns the objective value at the solution #w
+        !*/
+
+        template <
+            typename matrix_type
+            >
+        typename matrix_type::type solve_with_elastic_net (
+            const oca_problem<matrix_type>& problem,
+            matrix_type& w,
+            scalar_type lasso_lambda,
+            unsigned long force_weight_to_1 = std::numeric_limits<unsigned long>::max()
+        ) const;
+        /*!
+            requires
+                - problem.get_c() > 0
+                - problem.get_num_dimensions() > 0
+                - 0 <= lasso_lambda < 1
+            ensures
+                - Solves the given oca problem and stores the solution in #w, but uses an
+                  elastic net regularizer instead of the normal L2 regularizer.  In
+                  particular, this function solves:
+                    Minimize: f(w) == 0.5*(1-lasso_lambda)*length_squared(w) + lasso_lambda*sum(abs(w)) + C*R(w)
+                - The optimization algorithm runs until problem.optimization_status() 
+                  indicates it is time to stop.
+                - returns the objective value at the solution #w
+                - if (force_weight_to_1 < problem.get_num_dimensions()) then
+                    - The optimizer enforces the following constraints:
+                        - #w(force_weight_to_1) == 1
+                        - for all i > force_weight_to_1:
+                            - #w(i) == 0 
+                        - That is, the element in the weight vector at the index indicated
+                          by force_weight_to_1 will have a value of 1 upon completion of
+                          this function, while all subsequent elements of w will have
+                          values of 0.
         !*/
 
         void set_subproblem_epsilon (

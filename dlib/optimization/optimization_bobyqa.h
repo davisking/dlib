@@ -3360,7 +3360,7 @@ L210:
         DLIB_CASSERT(is_col_vector(x) && is_col_vector(x_lower) && is_col_vector(x_upper) &&
                     x.size() == x_lower.size() && x_lower.size() == x_upper.size() &&
                     x.size() > 1 && max_f_evals > 1,
-            "\tvoid find_min_bobyqa()"
+            "\tdouble find_min_bobyqa()"
             << "\n\t Invalid arguments have been given to this function"
             << "\n\t is_col_vector(x):       " << is_col_vector(x) 
             << "\n\t is_col_vector(x_lower): " << is_col_vector(x_lower) 
@@ -3375,7 +3375,7 @@ L210:
                     0 < rho_end && rho_end < rho_begin &&
                     min(x_upper - x_lower) > 2*rho_begin &&
                     min(x - x_lower) >= 0 && min(x_upper - x) >= 0,
-            "\tvoid find_min_bobyqa()"
+            "\tdouble find_min_bobyqa()"
             << "\n\t Invalid arguments have been given to this function"
             << "\n\t ntp in valid range: " << (x.size() + 2 <= npt && npt <= (x.size()+1)*(x.size()+2)/2)
             << "\n\t npt:                " << npt 

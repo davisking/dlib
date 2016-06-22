@@ -10,6 +10,7 @@
 #include "../is_kind.h"
 #include <iostream>
 #include "../serialize.h"
+#include "../string.h"
 
 namespace dlib
 {
@@ -37,6 +38,14 @@ namespace dlib
             ) 
             {
                 init();
+            }
+
+            rand (
+                time_t seed_value
+            )
+            {
+                init();
+                set_seed(cast_to_string(seed_value));
             }
 
             rand (

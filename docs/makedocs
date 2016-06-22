@@ -1,4 +1,5 @@
 #!/bin/bash
+. bash_helper_functions
 
 report_failure ()
 {
@@ -70,11 +71,11 @@ htmlify_cmake ()
     echo $1 >> $1.html;
     echo "</title></head><body bgcolor='white'><pre>" >> $1.html;
 
-#  line 1: make comments green
-#  line 2: add links into the add_subdirectory directives
-#  line 3: make literal quotes red
-#  line 4: make the directives show up blue
-#  line 5: make variable names show up purple
+    #  line 1: make comments green
+    #  line 2: add links into the add_subdirectory directives
+    #  line 3: make literal quotes red
+    #  line 4: make the directives show up blue
+    #  line 5: make variable names show up purple
     sed -e "s/^\([ ]*#.*\)/<font color='#009900'>\1<\/font>/" \
         -e "s/add_subdirectory\([ ]*\)(\([ ]*\)\([^ ]*\)\([ ]*\)\([^ )]*\)/add_subdirectory\1(\2\3\4<a href='\3\/CMakeLists.txt.html'>\5<\/a>/"  \
         -e "s/\"\([^\"]*\)\"/\"<font color='#CC0000'>\1<\/font>\"/g"  \
@@ -95,26 +96,15 @@ htmlify_python()
     done
 }
 
-get_short_revision_number()
-{    
-    RESULT=`hg log -r $1 | grep changeset | awk '{print $2}' | sed -e 's/:.*//'`  
-}
-
-get_last_modified_date()
-{
-    RESULT=`hg log $1 -l1 --template '{date|date}\n' | awk '{ print $2" "$3", " $5}'`
-}
 
 makedocs ()
 {
 
-    COUNTER_FILE=.current_release_number
-    MINOR_COUTNER_FILE=.current_minor_release_number
     REVNUM_FILE=.logger_revnum
 
 
 
-# figure out the short number that identifies this particular changeset
+    # figure out the short number that identifies this particular changeset
     get_short_revision_number `cat $REVNUM_FILE`
     LOGGER_REVNUM=$RESULT
 
@@ -124,22 +114,20 @@ makedocs ()
 
 
 
-# The revision number we are currently at
+    # The revision number we are currently at
     CHANGESET_ID=`hg id -i | sed -e 's/\+//'`
     get_short_revision_number $CHANGESET_ID 
     REVISION=$RESULT
 
 
-    MAJOR_NUM=`cat $COUNTER_FILE` 
-    MINOR_NUM=`cat $MINOR_COUTNER_FILE` 
     if [ "$1" = "makerel" ] 
         then
         RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
     else
-        RELEASE=${MAJOR_NUM}.`echo ${MINOR_NUM}+1|bc`-RC
+        RELEASE=${MAJOR_NUM}.${MINOR_NUM}.${PATCH_NUM}
     fi;
 
-# get XML versions of the change logs
+    # get XML versions of the change logs
     BASE_LOGGER_REVNUM=`echo $LOGGER_REVNUM - 1000 | bc`
     NEXT_LOGGER_REVNUM=`echo $LOGGER_REVNUM + 1 | bc`
     echo Getting the mercurial change logs for revisions $NEXT_LOGGER_REVNUM:$REVISION
@@ -147,20 +135,13 @@ makedocs ()
     echo Getting the mercurial change logs for revisions $BASE_LOGGER_REVNUM:$LOGGER_REVNUM
     hg log -v ../dlib ../examples ../tools ../python_examples --style=xml  -r$BASE_LOGGER_REVNUM:$LOGGER_REVNUM > docs/old_log.txt || report_failure 
 
-# grab a clean copy of the repository 
+    # grab a clean copy of the repository 
     rm -rf docs/cache
     rm -rf docs/web
     rm -rf docs/chm/docs
-    rm -rf cache.$$
-    hg archive cache.$$ || report_failure
-# put the stuff we need into the docs/cache folder
-    mkdir docs/cache
-    mv cache.$$/dlib docs/cache/
-    mv cache.$$/examples docs/cache/
-    mv cache.$$/python_examples docs/cache/
-    mv cache.$$/tools docs/cache/
-    rm -rf cache.$$
-
+    hg archive docs/cache || report_failure
+    # Don't need the docs folder in the cache, moreover, deleting it here avoids letting the makerel script include it in the dlib tar balls.
+    rm -rf docs/cache/docs
 
     echo "#ifndef DLIB_REVISION_H"           > docs/cache/dlib/revision.h
     echo "// Version: " $RELEASE            >> docs/cache/dlib/revision.h
@@ -168,6 +149,7 @@ makedocs ()
     echo "// Mercurial Revision ID: " $CHANGESET_ID >> docs/cache/dlib/revision.h
     echo "#define DLIB_MAJOR_VERSION " $MAJOR_NUM >> docs/cache/dlib/revision.h
     echo "#define DLIB_MINOR_VERSION " $MINOR_NUM >> docs/cache/dlib/revision.h
+    echo "#define DLIB_PATCH_VERSION " $PATCH_NUM >> docs/cache/dlib/revision.h
     echo "#endif"                           >> docs/cache/dlib/revision.h
 
 
@@ -231,6 +213,10 @@ makedocs ()
     cp -r docs/guipics docs/chm/docs
     cp docs/*.html docs/web
     cp docs/*.html docs/chm/docs
+    cp docs/*.css docs/web
+    cp docs/*.css docs/chm/docs
+    cp docs/*.js docs/web
+    cp docs/*.js docs/chm/docs
     cp docs/*.png docs/web
     cp docs/*.ico docs/web
     cp docs/*.png docs/chm/docs

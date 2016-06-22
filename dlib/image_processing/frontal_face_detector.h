@@ -4,7 +4,8 @@
 #define DLIB_FRONTAL_FACE_DETECTOr_Hh_
 
 #include "frontal_face_detector_abstract.h"
-#include "../image_processing.h"
+#include "../image_processing/object_detector.h"
+#include "../image_processing/scan_fhog_pyramid.h"
 #include <sstream>
 #include "../compress_stream.h"
 #include "../base64.h"

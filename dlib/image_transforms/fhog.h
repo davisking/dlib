@@ -21,16 +21,16 @@ namespace dlib
 
     namespace impl_fhog
     {
-        template <typename image_type>
+        template <typename image_type, typename T>
         inline typename dlib::enable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient (
             const int r,
             const int c,
             const image_type& img,
-            matrix<double,2,1>& grad,
-            double& len
+            matrix<T,2,1>& grad,
+            T& len
         )
         {
-            matrix<double,2,1> grad2, grad3;
+            matrix<T, 2, 1> grad2, grad3;
             // get the red gradient
             grad(0) = (int)img[r][c+1].red-(int)img[r][c-1].red; 
             grad(1) = (int)img[r+1][c].red-(int)img[r-1][c].red;
@@ -39,12 +39,12 @@ namespace dlib
             // get the green gradient
             grad2(0) = (int)img[r][c+1].green-(int)img[r][c-1].green; 
             grad2(1) = (int)img[r+1][c].green-(int)img[r-1][c].green;
-            double v2 = length_squared(grad2);
+            T v2 = length_squared(grad2);
 
             // get the blue gradient
             grad3(0) = (int)img[r][c+1].blue-(int)img[r][c-1].blue; 
             grad3(1) = (int)img[r+1][c].blue-(int)img[r-1][c].blue;
-            double v3 = length_squared(grad3);
+            T v3 = length_squared(grad3);
 
             // pick color with strongest gradient
             if (v2 > len) 
@@ -142,15 +142,148 @@ namespace dlib
             len = select(cmp,tlen,blen);
         }
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
         template <typename image_type>
+        inline typename dlib::enable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient(
+            const int r,
+            const int c,
+            const image_type& img,
+            simd8f& grad_x,
+            simd8f& grad_y,
+            simd8f& len
+            )
+        {
+            simd8i rleft((int)img[r][c - 1].red,
+                (int)img[r][c].red,
+                (int)img[r][c + 1].red,
+                (int)img[r][c + 2].red,
+                (int)img[r][c + 3].red,
+                (int)img[r][c + 4].red,
+                (int)img[r][c + 5].red,
+                (int)img[r][c + 6].red);
+            simd8i rright((int)img[r][c + 1].red,
+                (int)img[r][c + 2].red,
+                (int)img[r][c + 3].red,
+                (int)img[r][c + 4].red,
+                (int)img[r][c + 5].red,
+                (int)img[r][c + 6].red,
+                (int)img[r][c + 7].red,
+                (int)img[r][c + 8].red);
+            simd8i rtop((int)img[r - 1][c].red,
+                (int)img[r - 1][c + 1].red,
+                (int)img[r - 1][c + 2].red,
+                (int)img[r - 1][c + 3].red,
+                (int)img[r - 1][c + 4].red,
+                (int)img[r - 1][c + 5].red,
+                (int)img[r - 1][c + 6].red,
+                (int)img[r - 1][c + 7].red);
+            simd8i rbottom((int)img[r + 1][c].red,
+                (int)img[r + 1][c + 1].red,
+                (int)img[r + 1][c + 2].red,
+                (int)img[r + 1][c + 3].red,
+                (int)img[r + 1][c + 4].red,
+                (int)img[r + 1][c + 5].red,
+                (int)img[r + 1][c + 6].red,
+                (int)img[r + 1][c + 7].red);
+
+            simd8i gleft((int)img[r][c - 1].green,
+                (int)img[r][c].green,
+                (int)img[r][c + 1].green,
+                (int)img[r][c + 2].green,
+                (int)img[r][c + 3].green,
+                (int)img[r][c + 4].green,
+                (int)img[r][c + 5].green,
+                (int)img[r][c + 6].green);
+            simd8i gright((int)img[r][c + 1].green,
+                (int)img[r][c + 2].green,
+                (int)img[r][c + 3].green,
+                (int)img[r][c + 4].green,
+                (int)img[r][c + 5].green,
+                (int)img[r][c + 6].green,
+                (int)img[r][c + 7].green,
+                (int)img[r][c + 8].green);
+            simd8i gtop((int)img[r - 1][c].green,
+                (int)img[r - 1][c + 1].green,
+                (int)img[r - 1][c + 2].green,
+                (int)img[r - 1][c + 3].green,
+                (int)img[r - 1][c + 4].green,
+                (int)img[r - 1][c + 5].green,
+                (int)img[r - 1][c + 6].green,
+                (int)img[r - 1][c + 7].green);
+            simd8i gbottom((int)img[r + 1][c].green,
+                (int)img[r + 1][c + 1].green,
+                (int)img[r + 1][c + 2].green,
+                (int)img[r + 1][c + 3].green,
+                (int)img[r + 1][c + 4].green,
+                (int)img[r + 1][c + 5].green,
+                (int)img[r + 1][c + 6].green,
+                (int)img[r + 1][c + 7].green);
+
+            simd8i bleft((int)img[r][c - 1].blue,
+                (int)img[r][c].blue,
+                (int)img[r][c + 1].blue,
+                (int)img[r][c + 2].blue,
+                (int)img[r][c + 3].blue,
+                (int)img[r][c + 4].blue,
+                (int)img[r][c + 5].blue,
+                (int)img[r][c + 6].blue);
+            simd8i bright((int)img[r][c + 1].blue,
+                (int)img[r][c + 2].blue,
+                (int)img[r][c + 3].blue,
+                (int)img[r][c + 4].blue,
+                (int)img[r][c + 5].blue,
+                (int)img[r][c + 6].blue,
+                (int)img[r][c + 7].blue,
+                (int)img[r][c + 8].blue);
+            simd8i btop((int)img[r - 1][c].blue,
+                (int)img[r - 1][c + 1].blue,
+                (int)img[r - 1][c + 2].blue,
+                (int)img[r - 1][c + 3].blue,
+                (int)img[r - 1][c + 4].blue,
+                (int)img[r - 1][c + 5].blue,
+                (int)img[r - 1][c + 6].blue,
+                (int)img[r - 1][c + 7].blue);
+            simd8i bbottom((int)img[r + 1][c].blue,
+                (int)img[r + 1][c + 1].blue,
+                (int)img[r + 1][c + 2].blue,
+                (int)img[r + 1][c + 3].blue,
+                (int)img[r + 1][c + 4].blue,
+                (int)img[r + 1][c + 5].blue,
+                (int)img[r + 1][c + 6].blue,
+                (int)img[r + 1][c + 7].blue);
+
+            simd8i grad_x_red = rright - rleft;
+            simd8i grad_y_red = rbottom - rtop;
+            simd8i grad_x_green = gright - gleft;
+            simd8i grad_y_green = gbottom - gtop;
+            simd8i grad_x_blue = bright - bleft;
+            simd8i grad_y_blue = bbottom - btop;
+
+            simd8i rlen = grad_x_red*grad_x_red + grad_y_red*grad_y_red;
+            simd8i glen = grad_x_green*grad_x_green + grad_y_green*grad_y_green;
+            simd8i blen = grad_x_blue*grad_x_blue + grad_y_blue*grad_y_blue;
+
+            simd8i cmp = rlen > glen;
+            simd8i tgrad_x = select(cmp, grad_x_red, grad_x_green);
+            simd8i tgrad_y = select(cmp, grad_y_red, grad_y_green);
+            simd8i tlen = select(cmp, rlen, glen);
+
+            cmp = tlen > blen;
+            grad_x = select(cmp, tgrad_x, grad_x_blue);
+            grad_y = select(cmp, tgrad_y, grad_y_blue);
+            len = select(cmp, tlen, blen);
+        }
+        
+        // ------------------------------------------------------------------------------------
+
+        template <typename image_type, typename T>
         inline typename dlib::disable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient (
             const int r,
             const int c,
             const image_type& img,
-            matrix<double,2,1>& grad,
-            double& len
+            matrix<T, 2, 1>& grad,
+            T& len
         )
         {
             grad(0) = (int)get_pixel_intensity(img[r][c+1])-(int)get_pixel_intensity(img[r][c-1]); 
@@ -192,7 +325,59 @@ namespace dlib
             len = (grad_x*grad_x + grad_y*grad_y);
         }
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
+
+        template <typename image_type>
+        inline typename dlib::disable_if_c<pixel_traits<typename image_type::pixel_type>::rgb>::type get_gradient(
+            int r,
+            int c,
+            const image_type& img,
+            simd8f& grad_x,
+            simd8f& grad_y,
+            simd8f& len
+            )
+        {
+            simd8i left((int)get_pixel_intensity(img[r][c - 1]),
+                (int)get_pixel_intensity(img[r][c]),
+                (int)get_pixel_intensity(img[r][c + 1]),
+                (int)get_pixel_intensity(img[r][c + 2]),
+                (int)get_pixel_intensity(img[r][c + 3]),
+                (int)get_pixel_intensity(img[r][c + 4]),
+                (int)get_pixel_intensity(img[r][c + 5]),
+                (int)get_pixel_intensity(img[r][c + 6]));
+            simd8i right((int)get_pixel_intensity(img[r][c + 1]),
+                (int)get_pixel_intensity(img[r][c + 2]),
+                (int)get_pixel_intensity(img[r][c + 3]),
+                (int)get_pixel_intensity(img[r][c + 4]),
+                (int)get_pixel_intensity(img[r][c + 5]),
+                (int)get_pixel_intensity(img[r][c + 6]),
+                (int)get_pixel_intensity(img[r][c + 7]),
+                (int)get_pixel_intensity(img[r][c + 8]));
+
+            simd8i top((int)get_pixel_intensity(img[r - 1][c]),
+                (int)get_pixel_intensity(img[r - 1][c + 1]),
+                (int)get_pixel_intensity(img[r - 1][c + 2]),
+                (int)get_pixel_intensity(img[r - 1][c + 3]),
+                (int)get_pixel_intensity(img[r - 1][c + 4]),
+                (int)get_pixel_intensity(img[r - 1][c + 5]),
+                (int)get_pixel_intensity(img[r - 1][c + 6]),
+                (int)get_pixel_intensity(img[r - 1][c + 7]));
+            simd8i bottom((int)get_pixel_intensity(img[r + 1][c]),
+                (int)get_pixel_intensity(img[r + 1][c + 1]),
+                (int)get_pixel_intensity(img[r + 1][c + 2]),
+                (int)get_pixel_intensity(img[r + 1][c + 3]),
+                (int)get_pixel_intensity(img[r + 1][c + 4]),
+                (int)get_pixel_intensity(img[r + 1][c + 5]),
+                (int)get_pixel_intensity(img[r + 1][c + 6]),
+                (int)get_pixel_intensity(img[r + 1][c + 7]));
+
+            grad_x = right - left;
+            grad_y = bottom - top;
+
+            len = (grad_x*grad_x + grad_y*grad_y);
+        }
+        
+        // ------------------------------------------------------------------------------------
 
         template <typename T, typename mm1, typename mm2>
         inline void set_hog (
@@ -200,7 +385,7 @@ namespace dlib
             int o,
             int x, 
             int y,
-            const double& value
+            const float& value
         )
         {
             hog[o][y][x] = value;
@@ -255,7 +440,7 @@ namespace dlib
             int o,
             int x, 
             int y,
-            const double& value
+            const float& value
         )
         {
             hog[y][x](o) = value;
@@ -336,7 +521,7 @@ namespace dlib
 
 
             // unit vectors used to compute gradient orientation
-            matrix<double,2,1> directions[9];
+            matrix<float,2,1> directions[9];
             directions[0] =  1.0000, 0.0000; 
             directions[1] =  0.9397, 0.3420;
             directions[2] =  0.7660, 0.6428;
@@ -376,57 +561,64 @@ namespace dlib
             for (int y = 1; y < visible_nr; y++) 
             {
                 int x;
-                for (x = 1; x < visible_nc-3; x+=4) 
+                for (x = 1; x < visible_nc - 7; x += 8)
                 {
                     // v will be the length of the gradient vectors.
-                    simd4f grad_x, grad_y, v;
-                    get_gradient(y,x,img,grad_x,grad_y,v);
+                    simd8f grad_x, grad_y, v;
+                    get_gradient(y, x, img, grad_x, grad_y, v);
 
-                    float _vv[4];
+                    float _vv[8];
                     v.store(_vv);
 
                     // Now snap the gradient to one of 18 orientations
-                    simd4f best_dot = 0;
-                    simd4f best_o = 0;
-                    for (int o = 0; o < 9; o++) 
+                    simd8f best_dot = 0;
+                    simd8f best_o = 0;
+                    for (int o = 0; o < 9; o++)
                     {
-                        simd4f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
-                        simd4f_bool cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot); 
+                        simd8f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
+                        simd8f_bool cmp = dot>best_dot;
+                        best_dot = select(cmp, dot, best_dot);
                         dot *= -1;
-                        best_o = select(cmp,o,best_o);
+                        best_o = select(cmp, o, best_o);
 
-                        cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot);
-                        best_o = select(cmp,o+9,best_o);
+                        cmp = dot > best_dot;
+                        best_dot = select(cmp, dot, best_dot);
+                        best_o = select(cmp, o + 9, best_o);
                     }
 
-                    int32 _best_o[4]; simd4i(best_o).store(_best_o);
+                    int32 _best_o[8]; simd8i(best_o).store(_best_o);
 
-                    norm[y][x+0] = _vv[0];
-                    norm[y][x+1] = _vv[1];
-                    norm[y][x+2] = _vv[2];
-                    norm[y][x+3] = _vv[3];
+                    norm[y][x + 0] = _vv[0];
+                    norm[y][x + 1] = _vv[1];
+                    norm[y][x + 2] = _vv[2];
+                    norm[y][x + 3] = _vv[3];
+                    norm[y][x + 4] = _vv[4];
+                    norm[y][x + 5] = _vv[5];
+                    norm[y][x + 6] = _vv[6];
+                    norm[y][x + 7] = _vv[7];
 
-                    angle[y][x+0] = _best_o[0];
-                    angle[y][x+1] = _best_o[1];
-                    angle[y][x+2] = _best_o[2];
-                    angle[y][x+3] = _best_o[3];
-
+                    angle[y][x + 0] = _best_o[0];
+                    angle[y][x + 1] = _best_o[1];
+                    angle[y][x + 2] = _best_o[2];
+                    angle[y][x + 3] = _best_o[3];
+                    angle[y][x + 4] = _best_o[4];
+                    angle[y][x + 5] = _best_o[5];
+                    angle[y][x + 6] = _best_o[6];
+                    angle[y][x + 7] = _best_o[7];
                 }
                 // Now process the right columns that don't fit into simd registers.
                 for (; x < visible_nc; x++) 
                 {
-                    matrix<double,2,1> grad;
-                    double v;
+                    matrix<float,2,1> grad;
+                    float v;
                     get_gradient(y,x,img,grad,v);
 
                     // snap to one of 18 orientations
-                    double best_dot = 0;
+                    float best_dot = 0;
                     int best_o = 0;
                     for (int o = 0; o < 9; o++) 
                     {
-                        const double dot = dlib::dot(directions[o], grad); 
+                        const float dot = dlib::dot(directions[o], grad);
                         if (dot > best_dot) 
                         {
                             best_dot = dot;
@@ -444,7 +636,7 @@ namespace dlib
                 }
             }
 
-            const double eps = 0.0001;
+            const float eps = 0.0001;
             // compute features
             for (int y = 0; y < hog_nr; y++) 
             {
@@ -572,7 +764,7 @@ namespace dlib
             }
 
             // unit vectors used to compute gradient orientation
-            matrix<double,2,1> directions[9];
+            matrix<float,2,1> directions[9];
             directions[0] =  1.0000, 0.0000; 
             directions[1] =  0.9397, 0.3420;
             directions[2] =  0.7660, 0.6428;
@@ -586,8 +778,8 @@ namespace dlib
 
 
             // First we allocate memory for caching orientation histograms & their norms.
-            const int cells_nr = (int)((double)img.nr()/(double)cell_size + 0.5);
-            const int cells_nc = (int)((double)img.nc()/(double)cell_size + 0.5);
+            const int cells_nr = (int)((float)img.nr()/(float)cell_size + 0.5);
+            const int cells_nc = (int)((float)img.nc()/(float)cell_size + 0.5);
 
             if (cells_nr == 0 || cells_nc == 0)
             {
@@ -629,42 +821,42 @@ namespace dlib
             // First populate the gradient histograms
             for (int y = 1; y < visible_nr; y++) 
             {
-                const double yp = ((double)y+0.5)/(double)cell_size - 0.5;
+                const float yp = ((float)y+0.5)/(float)cell_size - 0.5;
                 const int iyp = (int)std::floor(yp);
-                const double vy0 = yp-iyp;
-                const double vy1 = 1.0-vy0;
+                const float vy0 = yp - iyp;
+                const float vy1 = 1.0 - vy0;
                 int x;
-                for (x = 1; x < visible_nc-3; x+=4) 
+                for (x = 1; x < visible_nc - 7; x += 8)
                 {
-                    simd4f xx(x,x+1,x+2,x+3);
+                    simd8f xx(x, x + 1, x + 2, x + 3, x + 4, x + 5, x + 6, x + 7);
                     // v will be the length of the gradient vectors.
-                    simd4f grad_x, grad_y, v;
-                    get_gradient(y,x,img,grad_x,grad_y,v);
+                    simd8f grad_x, grad_y, v;
+                    get_gradient(y, x, img, grad_x, grad_y, v);
 
                     // We will use bilinear interpolation to add into the histogram bins.
                     // So first we precompute the values needed to determine how much each
                     // pixel votes into each bin.
-                    simd4f xp = (xx+0.5)/(float)cell_size + 0.5;
-                    simd4i ixp = simd4i(xp);
-                    simd4f vx0 = xp-ixp;
-                    simd4f vx1 = 1.0f-vx0;
+                    simd8f xp = (xx + 0.5) / (float)cell_size + 0.5;
+                    simd8i ixp = simd8i(xp);
+                    simd8f vx0 = xp - ixp;
+                    simd8f vx1 = 1.0f - vx0;
 
                     v = sqrt(v);
 
                     // Now snap the gradient to one of 18 orientations
-                    simd4f best_dot = 0;
-                    simd4f best_o = 0;
-                    for (int o = 0; o < 9; o++) 
+                    simd8f best_dot = 0;
+                    simd8f best_o = 0;
+                    for (int o = 0; o < 9; o++)
                     {
-                        simd4f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
-                        simd4f_bool cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot); 
+                        simd8f dot = grad_x*directions[o](0) + grad_y*directions[o](1);
+                        simd8f_bool cmp = dot>best_dot;
+                        best_dot = select(cmp, dot, best_dot);
                         dot *= -1;
-                        best_o = select(cmp,o,best_o);
+                        best_o = select(cmp, o, best_o);
 
-                        cmp = dot>best_dot;
-                        best_dot = select(cmp,dot,best_dot);
-                        best_o = select(cmp,o+9,best_o);
+                        cmp = dot > best_dot;
+                        best_dot = select(cmp, dot, best_dot);
+                        best_o = select(cmp, o + 9, best_o);
                     }
 
 
@@ -673,51 +865,71 @@ namespace dlib
                     vx1 *= v;
                     vx0 *= v;
                     // The amounts for each bin
-                    simd4f v11 = vy1*vx1;
-                    simd4f v01 = vy0*vx1;
-                    simd4f v10 = vy1*vx0;
-                    simd4f v00 = vy0*vx0;
+                    simd8f v11 = vy1*vx1;
+                    simd8f v01 = vy0*vx1;
+                    simd8f v10 = vy1*vx0;
+                    simd8f v00 = vy0*vx0;
 
-                    int32 _best_o[4]; simd4i(best_o).store(_best_o);
-                    int32 _ixp[4];    ixp.store(_ixp);
-                    float _v11[4];    v11.store(_v11);
-                    float _v01[4];    v01.store(_v01);
-                    float _v10[4];    v10.store(_v10);
-                    float _v00[4];    v00.store(_v00);
+                    int32 _best_o[8]; simd8i(best_o).store(_best_o);
+                    int32 _ixp[8];    ixp.store(_ixp);
+                    float _v11[8];    v11.store(_v11);
+                    float _v01[8];    v01.store(_v01);
+                    float _v10[8];    v10.store(_v10);
+                    float _v00[8];    v00.store(_v00);
 
-                    hist[iyp+1]  [_ixp[0]  ](_best_o[0]) += _v11[0];
-                    hist[iyp+1+1][_ixp[0]  ](_best_o[0]) += _v01[0];
-                    hist[iyp+1]  [_ixp[0]+1](_best_o[0]) += _v10[0];
-                    hist[iyp+1+1][_ixp[0]+1](_best_o[0]) += _v00[0];
+                    hist[iyp + 1][_ixp[0]](_best_o[0]) += _v11[0];
+                    hist[iyp + 1 + 1][_ixp[0]](_best_o[0]) += _v01[0];
+                    hist[iyp + 1][_ixp[0] + 1](_best_o[0]) += _v10[0];
+                    hist[iyp + 1 + 1][_ixp[0] + 1](_best_o[0]) += _v00[0];
 
-                    hist[iyp+1]  [_ixp[1]  ](_best_o[1]) += _v11[1];
-                    hist[iyp+1+1][_ixp[1]  ](_best_o[1]) += _v01[1];
-                    hist[iyp+1]  [_ixp[1]+1](_best_o[1]) += _v10[1];
-                    hist[iyp+1+1][_ixp[1]+1](_best_o[1]) += _v00[1];
+                    hist[iyp + 1][_ixp[1]](_best_o[1]) += _v11[1];
+                    hist[iyp + 1 + 1][_ixp[1]](_best_o[1]) += _v01[1];
+                    hist[iyp + 1][_ixp[1] + 1](_best_o[1]) += _v10[1];
+                    hist[iyp + 1 + 1][_ixp[1] + 1](_best_o[1]) += _v00[1];
 
-                    hist[iyp+1]  [_ixp[2]  ](_best_o[2]) += _v11[2];
-                    hist[iyp+1+1][_ixp[2]  ](_best_o[2]) += _v01[2];
-                    hist[iyp+1]  [_ixp[2]+1](_best_o[2]) += _v10[2];
-                    hist[iyp+1+1][_ixp[2]+1](_best_o[2]) += _v00[2];
+                    hist[iyp + 1][_ixp[2]](_best_o[2]) += _v11[2];
+                    hist[iyp + 1 + 1][_ixp[2]](_best_o[2]) += _v01[2];
+                    hist[iyp + 1][_ixp[2] + 1](_best_o[2]) += _v10[2];
+                    hist[iyp + 1 + 1][_ixp[2] + 1](_best_o[2]) += _v00[2];
 
-                    hist[iyp+1]  [_ixp[3]  ](_best_o[3]) += _v11[3];
-                    hist[iyp+1+1][_ixp[3]  ](_best_o[3]) += _v01[3];
-                    hist[iyp+1]  [_ixp[3]+1](_best_o[3]) += _v10[3];
-                    hist[iyp+1+1][_ixp[3]+1](_best_o[3]) += _v00[3];
+                    hist[iyp + 1][_ixp[3]](_best_o[3]) += _v11[3];
+                    hist[iyp + 1 + 1][_ixp[3]](_best_o[3]) += _v01[3];
+                    hist[iyp + 1][_ixp[3] + 1](_best_o[3]) += _v10[3];
+                    hist[iyp + 1 + 1][_ixp[3] + 1](_best_o[3]) += _v00[3];
+
+                    hist[iyp + 1][_ixp[4]](_best_o[4]) += _v11[4];
+                    hist[iyp + 1 + 1][_ixp[4]](_best_o[4]) += _v01[4];
+                    hist[iyp + 1][_ixp[4] + 1](_best_o[4]) += _v10[4];
+                    hist[iyp + 1 + 1][_ixp[4] + 1](_best_o[4]) += _v00[4];
+
+                    hist[iyp + 1][_ixp[5]](_best_o[5]) += _v11[5];
+                    hist[iyp + 1 + 1][_ixp[5]](_best_o[5]) += _v01[5];
+                    hist[iyp + 1][_ixp[5] + 1](_best_o[5]) += _v10[5];
+                    hist[iyp + 1 + 1][_ixp[5] + 1](_best_o[5]) += _v00[5];
+
+                    hist[iyp + 1][_ixp[6]](_best_o[6]) += _v11[6];
+                    hist[iyp + 1 + 1][_ixp[6]](_best_o[6]) += _v01[6];
+                    hist[iyp + 1][_ixp[6] + 1](_best_o[6]) += _v10[6];
+                    hist[iyp + 1 + 1][_ixp[6] + 1](_best_o[6]) += _v00[6];
+
+                    hist[iyp + 1][_ixp[7]](_best_o[7]) += _v11[7];
+                    hist[iyp + 1 + 1][_ixp[7]](_best_o[7]) += _v01[7];
+                    hist[iyp + 1][_ixp[7] + 1](_best_o[7]) += _v10[7];
+                    hist[iyp + 1 + 1][_ixp[7] + 1](_best_o[7]) += _v00[7];
                 }
                 // Now process the right columns that don't fit into simd registers.
                 for (; x < visible_nc; x++) 
                 {
-                    matrix<double,2,1> grad;
-                    double v;
+                    matrix<float, 2, 1> grad;
+                    float v;
                     get_gradient(y,x,img,grad,v);
 
                     // snap to one of 18 orientations
-                    double best_dot = 0;
+                    float best_dot = 0;
                     int best_o = 0;
                     for (int o = 0; o < 9; o++) 
                     {
-                        const double dot = dlib::dot(directions[o], grad); 
+                        const float dot = dlib::dot(directions[o], grad);
                         if (dot > best_dot) 
                         {
                             best_dot = dot;
@@ -732,10 +944,10 @@ namespace dlib
 
                     v = std::sqrt(v);
                     // add to 4 histograms around pixel using bilinear interpolation
-                    const double xp = ((double)x+0.5)/(double)cell_size - 0.5;
+                    const float xp = ((double)x + 0.5) / (double)cell_size - 0.5;
                     const int ixp = (int)std::floor(xp);
-                    const double vx0 = xp-ixp;
-                    const double vx1 = 1.0-vx0;
+                    const float vx0 = xp - ixp;
+                    const float vx1 = 1.0 - vx0;
 
                     hist[iyp+1][ixp+1](best_o) += vy1*vx1*v;
                     hist[iyp+1+1][ixp+1](best_o) += vy0*vx1*v;
@@ -756,7 +968,7 @@ namespace dlib
                 }
             }
 
-            const double eps = 0.0001;
+            const float eps = 0.0001;
             // compute features
             for (int y = 0; y < hog_nr; y++) 
             {
@@ -937,7 +1149,7 @@ namespace dlib
         int filter_cols_padding = 1
     )
     {
-        matrix<double,0,1> feats;
+        matrix<double, 0, 1> feats;
         extract_fhog_features(img, feats, cell_size, filter_rows_padding, filter_cols_padding);
         return feats;
     }
@@ -1058,7 +1270,8 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog(
         const dlib::array<array2d<T,mm1>,mm2>& hog,
-        const long cell_draw_size = 15
+        const long cell_draw_size = 15,
+        const float min_response_threshold = 0.0
     )
     {
         // make sure requires clause is not broken
@@ -1084,7 +1297,7 @@ namespace dlib
                     const float val = hog[d][r/cell_draw_size][c/cell_draw_size] +
                         hog[d+mbars.size()][r/cell_draw_size][c/cell_draw_size] +
                         hog[d+mbars.size()*2][r/cell_draw_size][c/cell_draw_size];
-                    if (val > 0)
+                    if (val > min_response_threshold)
                     {
                         set_subm(himg, r, c, cell_draw_size, cell_draw_size) += val*mbars[d%mbars.size()];
                     }
@@ -1092,7 +1305,7 @@ namespace dlib
             }
         }
 
-        const double thresh = mean(himg) + 4*stddev(himg);
+        const float thresh = mean(himg) + 4 * stddev(himg);
         if (thresh != 0)
             return matrix_cast<unsigned char>(upperbound(round(himg*255/thresh),255));
         else
@@ -1106,7 +1319,8 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog (
         const std::vector<matrix<T> >& hog,
-        const long cell_draw_size = 15
+        const long cell_draw_size = 15,
+        const float min_response_threshold = 0.0
     )
     {
         // make sure requires clause is not broken
@@ -1131,7 +1345,7 @@ namespace dlib
                 }
             }
         }
-        return draw_fhog(temp,cell_draw_size);
+        return draw_fhog(temp,cell_draw_size, min_response_threshold);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1142,7 +1356,8 @@ namespace dlib
         >
     matrix<unsigned char> draw_fhog(
         const array2d<matrix<T,31,1>,mm>& hog,
-        const long cell_draw_size = 15
+        const long cell_draw_size = 15,
+        const float min_response_threshold = 0.0
     )
     {
         // make sure requires clause is not broken
@@ -1167,7 +1382,7 @@ namespace dlib
                     const float val = hog[r/cell_draw_size][c/cell_draw_size](d) +
                         hog[r/cell_draw_size][c/cell_draw_size](d+mbars.size()) +
                         hog[r/cell_draw_size][c/cell_draw_size](d+mbars.size()*2);
-                    if (val > 0)
+                    if (val > min_response_threshold)
                     {
                         set_subm(himg, r, c, cell_draw_size, cell_draw_size) += val*mbars[d%mbars.size()];
                     }
@@ -1175,7 +1390,7 @@ namespace dlib
             }
         }
 
-        const double thresh = mean(himg) + 4*stddev(himg);
+        const float thresh = mean(himg) + 4 * stddev(himg);
         if (thresh != 0)
             return matrix_cast<unsigned char>(upperbound(round(himg*255/thresh),255));
         else

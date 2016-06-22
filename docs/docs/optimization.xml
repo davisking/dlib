@@ -7,7 +7,6 @@
    <!-- ************************************************************************* -->
 
    <body>
-      <br/><br/>
 
          <p>
             This page documents library components that attempt to find the 
@@ -42,6 +41,7 @@
 
       <section>
          <name>Special Purpose Optimizers</name>
+         <item>solve_qp_box_constrained</item> 
          <item>solve_qp_using_smo</item> 
          <item>solve_qp2_using_smo</item> 
          <item>solve_qp3_using_smo</item> 
@@ -433,6 +433,26 @@ subject to the following constraint:
    <!-- ************************************************************************* -->
       
       <component>
+         <name>solve_qp_box_constrained</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_solve_qp_using_smo_abstract.h</spec_file>
+         <description>
+             This function solves the following quadratic program:
+<pre>
+   Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha + trans(b)*alpha 
+   subject to the following box constraints on alpha:
+      0 &lt;= min(alpha-lower)
+      0 &lt;= max(upper-alpha)
+   Where f is convex.  This means that Q should be positive-semidefinite.
+</pre>
+
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>solve_qp2_using_smo</name>
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_solve_qp2_using_smo_abstract.h</spec_file>
@@ -505,11 +525,12 @@ subject to the following constraint:
              This function solves the following quadratic program:
 <pre>
    Minimize: f(alpha,lambda) == 0.5*trans(alpha)*Q*alpha - trans(alpha)*b + 
-                                0.5*trans(lambda)*lambda - trans(lambda)*A*alpha
+                                0.5*trans(lambda)*lambda - trans(lambda)*A*alpha - trans(lambda)*d
    subject to the following constraints:
       sum(alpha)  == C 
-      min(alpha)  >= 0 
-      min(lambda) >= 0
+      min(alpha)  &gt;= 0 
+      min(lambda) &gt;= 0
+      max(lambda) &lt;= max_lambda 
    Where f is convex.  This means that Q should be positive-semidefinite.
 </pre>
 
@@ -742,6 +763,13 @@ Or it can alternatively solve:
    Minimize: f(w) == 0.5*||w-prior||^2 + C*R(w)
 
    Where prior is a user supplied vector and R(w) has the same
+   interpretation as above.
+
+Or it can use the elastic net regularizer:
+   Minimize: f(w) == 0.5*(1-lasso_lambda)*length_squared(w) + lasso_lambda*sum(abs(w)) + C*R(w)
+
+   Where lasso_lambda is a number in the range [0, 1) and controls
+   trade-off between doing L1 and L2 regularization.  R(w) has the same
    interpretation as above.
 </pre>
 <br/>

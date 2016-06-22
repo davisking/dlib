@@ -370,7 +370,7 @@ namespace
                 }
 
 
-                DLIB_TEST_MSG(temp2 == "","")  
+                DLIB_TEST_MSG(temp2 == "","");
             }
         }
 
@@ -395,7 +395,7 @@ namespace
             string::size_type pos = temp.find_first_not_of("e");
             temp = temp.substr(pos);
         }
-        DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"") /**/
+        DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\""); /**/
 
 
             dlog << LTRACE << 5;
@@ -403,16 +403,16 @@ namespace
         print_spinner();
 
         temp = "davis";
-        temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")
+        temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"");
 
             temp = "";
-        temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")
+        temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"");
 
             // test for each single character
             for ( int i = 0; i <= 255; ++i)
             {
                 temp = (unsigned char)i;
-                temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")                  
+                temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"");
             } 
 
         dlog << LTRACE << 6;
@@ -423,7 +423,7 @@ namespace
         {
             temp = temp + temp;
         }
-        temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")
+        temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"");
 
             dlog << LTRACE << 7;
 
@@ -437,7 +437,7 @@ namespace
                 int a = ::rand()%256;
                 temp += (unsigned char)a;                
             } 
-            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")                    
+            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\""); 
         }
 
 
@@ -457,7 +457,7 @@ namespace
                 int a = ::rand()%256;
                 temp += (unsigned char)a;                
             }               
-            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","seed: " << seed)  
+            temp = test<encoder,decoder>(temp);  DLIB_TEST_MSG(temp == "","seed: " << seed);  
         }
 
 
@@ -478,7 +478,7 @@ namespace
             string::size_type pos = temp.find_first_not_of(" ");
             temp = temp.substr(pos);
         }
-        DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"")/**/
+        DLIB_TEST_MSG(temp == "","decoded string: \"" << temp << "\"");/**/
 
 
 

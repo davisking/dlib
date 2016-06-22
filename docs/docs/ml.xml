@@ -7,28 +7,21 @@
    <!-- ************************************************************************* -->
 
    <body>
-      <br/><br/>
 
          <a href="ml_guide.svg"><img src="ml_guide.svg" width="100%"/></a>
-         <p>   
-            A major design goal of this portion of the library is to provide a highly modular and
-            simple architecture for dealing with kernel algorithms. Towards this end, dlib takes a generic
-            programming approach using C++ templates. In particular, each algorithm is parameterized
-            to allow a user to supply either one of the predefined dlib kernels (e.g. <a 
-            href="#radial_basis_kernel">RBF</a> operating
-            on <a href="linear_algebra.html#matrix">column vectors</a>), or a new 
-            <a href="using_custom_kernels_ex.cpp.html">user defined kernel</a>. 
-            Moreover, the implementations of the algorithms are totally separated from the data on 
-            which they operate. This makes the dlib implementation generic enough to operate on 
-            any kind of data, be it column vectors, images, or some other form of structured data. 
-            All that is necessary is an appropriate kernel.
-         </p>
-
-
-         <h3>Paper Describing dlib Machine Learning</h3>
+         <br/>
+         <br/>
+         <p><font style='font-size:1.4em;line-height:1.1em'>   
+            Dlib contains a wide range of machine learning algorithms.  All
+            designed to be highly modular, quick to execute, and simple to use
+            via a clean and modern C++ API.   It is used in a wide range of
+            applications including robotics, embedded devices, mobile phones, and large
+            high performance computing environments.  If you use dlib in your
+            research please cite:
+         </font></p>
          <pre>
 Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09a.pdf">Dlib-ml: A Machine Learning Toolkit</a>. 
-   <i>Journal of Machine Learning Research</i> 10, pp. 1755-1758, 2009
+   <i>Journal of Machine Learning Research</i>, 2009
 
 @Article{dlib09,
   author = {Davis E. King},
@@ -106,6 +99,147 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>svm_rank_trainer</item> 
          <item>shape_predictor_trainer</item> 
       </section>
+      <section>
+         <name>Deep Learning</name>
+
+         <item nolink="true">
+            <name>Core Tools</name>
+            <sub>
+               <item>add_layer</item>
+               <item>add_loss_layer</item>
+               <item>repeat</item>
+               <item>add_tag_layer</item>
+               <item>add_skip_layer</item>
+               <item>layer</item>
+               <item>test_layer</item>
+               <item>resizable_tensor</item>
+               <item>alias_tensor</item>
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Input Layers</name>
+            <sub>
+               <item>input</item>
+               <item>input_rgb_image</item>
+               <item>
+                  <name>EXAMPLE_INPUT_LAYER</name>
+                  <link>dlib/dnn/input_abstract.h.html#EXAMPLE_INPUT_LAYER</link>
+               </item>
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Computational Layers</name>
+            <sub>
+               <item>
+                  <name>EXAMPLE_COMPUTATIONAL_LAYER</name>
+                  <link>dlib/dnn/layers_abstract.h.html#EXAMPLE_COMPUTATIONAL_LAYER_</link>
+               </item>
+               <item>
+                  <name>fc</name>
+                  <link>dlib/dnn/layers_abstract.h.html#fc_</link>
+               </item>
+               <item>
+                  <name>con</name>
+                  <link>dlib/dnn/layers_abstract.h.html#con_</link>
+               </item>
+               <item>
+                  <name>dropout</name>
+                  <link>dlib/dnn/layers_abstract.h.html#dropout_</link>
+               </item>
+               <item>
+                  <name>multiply</name>
+                  <link>dlib/dnn/layers_abstract.h.html#multiply_</link>
+               </item>
+               <item>
+                  <name>bn</name>
+                  <link>dlib/dnn/layers_abstract.h.html#bn_</link>
+               </item>
+               <item>
+                  <name>affine</name>
+                  <link>dlib/dnn/layers_abstract.h.html#affine_</link>
+               </item>
+               <item>
+                  <name>max_pool</name>
+                  <link>dlib/dnn/layers_abstract.h.html#max_pool_</link>
+               </item>
+               <item>
+                  <name>avg_pool</name>
+                  <link>dlib/dnn/layers_abstract.h.html#avg_pool_</link>
+               </item>
+               <item>
+                  <name>relu</name>
+                  <link>dlib/dnn/layers_abstract.h.html#relu_</link>
+               </item>
+               <item>
+                  <name>concat</name>
+                  <link>dlib/dnn/layers_abstract.h.html#concat_</link>
+               </item>
+               <item>
+                  <name>prelu</name>
+                  <link>dlib/dnn/layers_abstract.h.html#prelu_</link>
+               </item>
+               <item>
+                  <name>sig</name>
+                  <link>dlib/dnn/layers_abstract.h.html#sig_</link>
+               </item>
+               <item>
+                  <name>htan</name>
+                  <link>dlib/dnn/layers_abstract.h.html#htan_</link>
+               </item>
+               <item>
+                  <name>softmax</name>
+                  <link>dlib/dnn/layers_abstract.h.html#softmax_</link>
+               </item>
+               <item>
+                  <name>add_prev</name>
+                  <link>dlib/dnn/layers_abstract.h.html#add_prev_</link>
+               </item>
+               <item>
+                  <name>inception</name>
+                  <link>dlib/dnn/layers_abstract.h.html#inception</link>
+               </item>
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Loss Layers</name>
+            <sub>
+               <item>
+                  <name>EXAMPLE_LOSS_LAYER</name>
+                  <link>dlib/dnn/loss_abstract.h.html#EXAMPLE_LOSS_LAYER_</link>
+               </item>
+               <item>
+                  <name>loss_binary_hinge</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_binary_hinge_</link>
+               </item>
+               <item>
+                  <name>loss_binary_log</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_binary_log_</link>
+               </item>
+               <item>
+                  <name>loss_multiclass_log</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_multiclass_log_</link>
+               </item>
+            </sub>
+         </item>
+         <item nolink="true">
+            <name>Solvers</name>
+            <sub>
+               <item>
+                  <name>EXAMPLE_SOLVER</name>
+                  <link>dlib/dnn/solvers_abstract.h.html#EXAMPLE_SOLVER</link>
+               </item>
+               <item>
+                  <name>sgd</name>
+                  <link>dlib/dnn/solvers_abstract.h.html#sgd</link>
+               </item>
+               <item>
+                  <name>adam</name>
+                  <link>dlib/dnn/solvers_abstract.h.html#adam</link>
+               </item>
+            </sub>
+         </item>
+      </section>
+
       <section>
          <name>Clustering</name>
          <item>pick_initial_centers</item> 
@@ -274,6 +408,233 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <components>
    
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>add_layer</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
+         <description>
+            In dlib, a deep neural network is composed of 3 main parts.  An 
+            <a href="dlib/dnn/input_abstract.h.html#EXAMPLE_INPUT_LAYER">input layer</a>, a bunch of 
+            <a href="dlib/dnn/layers_abstract.h.html#EXAMPLE_COMPUTATIONAL_LAYER_">computational layers</a>, 
+            and optionally a 
+            <a href="dlib/dnn/loss_abstract.h.html#EXAMPLE_LOSS_LAYER_">loss layer</a>.  The add_layer
+            class is the central object which adds a computational layer onto an 
+            input layer or an entire network.  Therefore, deep neural networks are created
+            by stacking many layers on top of each other using the add_layer class.
+            <p>
+               For a tutorial showing how this is accomplished see 
+               <a href="dnn_mnist_ex.cpp.html">this MNIST example</a>.
+            </p>
+         </description>
+         <examples>
+            <example>dnn_mnist_ex.cpp.html</example>
+            <example>dnn_mnist_advanced_ex.cpp.html</example>
+            <example>dnn_inception_ex.cpp.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>add_loss_layer</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
+         <description>
+            This object is a tool for stacking a <a href="dlib/dnn/loss_abstract.h.html#EXAMPLE_LOSS_LAYER_">loss layer</a> 
+            on the top of a deep neural network.
+         </description>
+         <examples>
+            <example>dnn_mnist_ex.cpp.html</example>
+            <example>dnn_mnist_advanced_ex.cpp.html</example>
+            <example>dnn_inception_ex.cpp.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>repeat</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
+         <description>
+            This object adds N copies of a computational layer onto a deep neural network. 
+            It is essentially the same as using <a href="#add_layer">add_layer</a> N times, 
+            except that it involves less typing, and for large N, will compile much faster.
+         </description>
+         <examples>
+            <example>dnn_mnist_advanced_ex.cpp.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>add_tag_layer</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
+         <description>
+            This object is a tool for tagging layers in a deep neural network.  These tags make it
+            easy to refer to the tagged layer in other parts of your code.
+            Specifically, this object adds a new layer onto a deep neural network.
+            However, this layer simply performs the identity transform.
+            This means it is a no-op and its presence does not change the
+            behavior of the network.  It exists solely to be used by <a
+            href="#add_skip_layer">add_skip_layer</a> or <a href="#layer">layer()</a> to reference a
+            particular part of a network.
+
+            <p>
+               For a tutorial showing how to use tagging see the 
+               <a href="dnn_mnist_advanced_ex.cpp.html">dnn_mnist_advanced_ex.cpp</a>
+               example program.
+            </p>
+         </description>
+         <examples>
+            <example>dnn_mnist_advanced_ex.cpp.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>add_skip_layer</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
+         <description>
+            This object adds a new layer to a deep neural network which draws its input
+            from a <a href="#add_tag_layer">tagged layer</a> rather than from
+            the immediate predecessor layer as is normally done.
+
+            <p>
+               For a tutorial showing how to use tagging see the 
+               <a href="dnn_mnist_advanced_ex.cpp.html">dnn_mnist_advanced_ex.cpp</a>
+               example program.
+            </p>
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>layer</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
+         <description>
+            This global function references a <a href="#add_tag_layer">tagged layer</a> 
+            inside a deep neural network object.
+
+            <p>
+               For a tutorial showing how to use tagging see the 
+               <a href="dnn_mnist_advanced_ex.cpp.html">dnn_mnist_advanced_ex.cpp</a>
+               example program.
+            </p>
+         </description>
+         <examples>
+            <example>dnn_mnist_advanced_ex.cpp.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>input</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
+         <description>
+            This is a simple input layer type for use in a deep neural network which
+            takes some kind of image as input and loads it into a network.
+         </description>
+         <examples>
+            <example>dnn_mnist_ex.cpp.html</example>
+            <example>dnn_mnist_advanced_ex.cpp.html</example>
+            <example>dnn_inception_ex.cpp.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>input_rgb_image</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
+         <description>
+            This is a simple input layer type for use in a deep neural network
+            which takes an RGB image as input and loads it into a network.  It
+            is very similar to the <a href="#input">input layer</a> except that
+            it allows you to subtract the average color value from each color
+            channel when converting an image to a tensor.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>test_layer</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
+         <description>
+            This is a function which tests if a layer object correctly implements
+            the <a href="dlib/dnn/layers_abstract.h.html#EXAMPLE_COMPUTATIONAL_LAYER_">documented contract</a>
+            for a computational layer in a deep neural network.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>resizable_tensor</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/tensor_abstract.h</spec_file>
+         <description>
+               This object represents a 4D array of float values, all stored contiguously
+               in memory.  Importantly, it keeps two copies of the floats, one on the host
+               CPU side and another on the GPU device side. It automatically performs the
+               necessary host/device transfers to keep these two copies of the data in
+               sync.
+
+               <p>
+                All transfers to the device happen asynchronously with respect to the
+                default CUDA stream so that CUDA kernel computations can overlap with data
+                transfers.  However, any transfers from the device to the host happen
+                synchronously in the default CUDA stream.  Therefore, you should perform
+                all your CUDA kernel launches on the default stream so that transfers back
+                to the host do not happen before the relevant computations have completed.
+               </p>
+
+               <p>
+                If DLIB_USE_CUDA is not #defined then this object will not use CUDA at all.
+                Instead, it will simply store one host side memory block of floats.  
+               </p>
+
+               <p>
+                Finally, the convention in dlib code is to interpret the tensor as a set of
+                num_samples() 3D arrays, each of dimension k() by nr() by nc().  Also,
+                while this class does not specify a memory layout, the convention is to
+                assume that indexing into an element at coordinates (sample,k,nr,nc) can be
+                accomplished via:
+                <tt>host()[((sample*t.k() + k)*t.nr() + nr)*t.nc() + nc]</tt>
+               </p>
+
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>alias_tensor</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/tensor_abstract.h</spec_file>
+         <description>
+            This object is a <a href="#resizable_tensor">tensor</a> that
+            aliases another tensor.  That is, it doesn't have its own block of
+            memory but instead simply holds pointers to the memory of another
+            tensor object.  It therefore allows you to efficiently break a tensor
+            into pieces and pass those pieces into functions.
+         </description>
+      </component>
+
    <!-- ************************************************************************* -->
 
       <component>
@@ -2118,6 +2479,17 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>rank_features_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>load_mnist_dataset</name>
+         <file>dlib/data_io.h</file>
+         <spec_file>dlib/data_io/mnist_abstract.h</spec_file>
+         <description>
+            Loads the <a href="http://yann.lecun.com/exdb/mnist/">MNIST dataset</a> from disk.
+         </description>
       </component>
       
    <!-- ************************************************************************* -->

@@ -142,13 +142,38 @@ namespace
             DLIB_TEST(counter_axpy() == 1);
             DLIB_TEST(max(abs(rv2 - 7)) == 0);
 
-
             counter_axpy() = 0;
             m2 = 1;
             m = 1;
             m2 = 2*m2 + m*5;
             DLIB_TEST(counter_axpy() == 1);
             DLIB_TEST(max(abs(m2 - 7)) == 0);
+
+
+            if (is_same_type<typename matrix_type::layout_type, row_major_layout>::value)
+            {
+                counter_axpy() = 0;
+                m2 = 1;
+                m = 1;
+                set_ptrm(&m2(0,0),m2.nr(),m2.nc()) = 2*m2 + m*5;
+                DLIB_TEST(max(abs(m2 - 7)) == 0);
+                DLIB_TEST(counter_axpy() == 1);
+
+                counter_axpy() = 0;
+                m2 = 1;
+                m = 1;
+                set_ptrm(&m2(0,0),m2.nr(),m2.nc()) = 2*mat(&m2(0,0),m2.nr(),m2.nc()) + mat(&m(0,0),m.nr(),m.nc())*5;
+                DLIB_TEST(max(abs(m2 - 7)) == 0);
+                DLIB_TEST(counter_axpy() == 1);
+
+                counter_axpy() = 0;
+                m2 = 1;
+                m = 1;
+                m2 = 2*mat(&m2(0,0),m2.nr(),m2.nc()) + mat(&m(0,0),m.nr(),m.nc())*5;
+                DLIB_TEST(max(abs(m2 - 7)) == 0);
+                DLIB_TEST(counter_axpy() == 1);
+            }
+
         }
 
 

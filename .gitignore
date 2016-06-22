@@ -4,3 +4,6 @@
 *.o
 *.so
 build
+dist
+*.egg-info/
+

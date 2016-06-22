@@ -254,6 +254,13 @@ namespace dlib
 
         void check_for_previous_fatal_errors()
         {
+            // If dlib is being use to create plugins for some other application, like
+            // MATLAB, then don't do these checks since it terminates the over arching
+            // system.  Just let the errors go to the plugin handler and it will deal with
+            // them.
+#if defined(MATLAB_MEX_FILE)
+            return;
+#else
             static bool is_first_fatal_error = true;
             if (is_first_fatal_error == false)
             {
@@ -283,6 +290,7 @@ namespace dlib
                 std::set_terminate(&dlib_fatal_error_terminate);
             }
             is_first_fatal_error = false;
+#endif
         }
     };
 

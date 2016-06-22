@@ -114,8 +114,8 @@ namespace dlib
     );
     /*!
         requires
-            - nr > 0
-            - ptr == a pointer to at least nr T objects
+            - nr >= 0
+            - ptr == a pointer to at least nr T objects (or the NULL pointer if nr==0)
         ensures
             - returns a matrix M such that:
                 - M.nr() == nr
@@ -138,9 +138,9 @@ namespace dlib
     );
     /*!
         requires
-            - nr > 0
-            - nc > 0
-            - ptr == a pointer to at least nr*nc T objects
+            - nr >= 0
+            - nc >= 0
+            - ptr == a pointer to at least nr*nc T objects (or the NULL pointer if nr*nc==0)
         ensures
             - returns a matrix M such that:
                 - M.nr() == nr

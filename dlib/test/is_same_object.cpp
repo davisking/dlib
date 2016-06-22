@@ -42,22 +42,22 @@ namespace
 
     void test_metaprog()
     {
-        DLIB_TEST(has_booya2_template<htest>::value  == true)
-        DLIB_TEST(has_booya2_template<htest2>::value == false)
+        DLIB_TEST(has_booya2_template<htest>::value  == true);
+        DLIB_TEST(has_booya2_template<htest2>::value == false);
 
 #if _MSC_VER > 1600 // there is a bug in visual studio 2010 and older that prevents this test from working
-        DLIB_TEST(has_booya_template<htest>::value  == true)
+        DLIB_TEST(has_booya_template<htest>::value  == true);
 #endif
 
-        DLIB_TEST(has_booya_template<htest2>::value == false)
+        DLIB_TEST(has_booya_template<htest2>::value == false);
 
-        DLIB_TEST(has_funct_int<htest>::value  == false)
-        DLIB_TEST(has_funct_int<htest2>::value == true)
-        DLIB_TEST(has_funct_double<htest>::value  == true)
-        DLIB_TEST(has_funct_double<htest2>::value == false)
+        DLIB_TEST(has_funct_int<htest>::value  == false);
+        DLIB_TEST(has_funct_int<htest2>::value == true);
+        DLIB_TEST(has_funct_double<htest>::value  == true);
+        DLIB_TEST(has_funct_double<htest2>::value == false);
 
-        DLIB_TEST(has_funct_f<htest>::value  == false)
-        DLIB_TEST(has_funct_f<htest2>::value == true)
+        DLIB_TEST(has_funct_f<htest>::value  == false);
+        DLIB_TEST(has_funct_f<htest2>::value == true);
     }
 
     class is_same_object_tester : public tester

@@ -11,9 +11,8 @@
     <!-- ************************************************************************* -->
 
     <body>
-        <br/><br/>
         
-        <h2>Compiling on Any Operating System Using CMake</h2>
+        <h2>Compiling C++ Example Programs on Any Operating System Using CMake</h2>
         The best way to compile a program that uses dlib is to use <a href="http://www.cmake.org">CMake</a>.  For
         example, the following commands will compile the example programs on any operating
         system:
@@ -45,16 +44,28 @@ tell CMake which one you want it to use via the -G option.
             
 
 <br/>
-<br/>
+        <h2>Compiling Dlib's Python Interface</h2>
+        <p>
+           Go to the base folder of the dlib repository and run <tt>python setup.py install</tt>.  That
+           should compile and install the dlib python API on your system. 
+        </p>
+        <p>
+           Alternatively, if you want to add more python bindings to dlib's
+           python interface then you probably want to avoid the setup.py file
+           and work directly using CMake.  In particular, dlib's python API is
+           built by the CMake project in the tools/python folder.  You build
+           this project using the usual CMake commands and when compiled it
+           outputs the dlib shared library that defines the python API for dlib.
+        </p>
 <br/>
 
 
-        <h2>Compiling Without CMake</h2>
+        <h2>Compiling C++ Examples Without CMake</h2>
 
         <p>
            In most cases, to use this library all you have to do is extract it somewhere, make
            sure the folder <i>containing</i> the dlib folder is in your include path, and
-           finally add <a href="dlib/all/source.cpp.html">dlib/all/source.cpp</a> to your
+           finally add dlib/all/source.cpp to your
            project.  It is worth noting that most of dlib is "header-only" which means that, in
            many cases, you don't actually have to build dlib/all/source.cpp into your
            application.  So if you don't get linker errors when you exclude dlib/all/source.cpp
@@ -74,13 +85,13 @@ tell CMake which one you want it to use via the -G option.
            builds correctly.
         </p>
         <p>
-           Note also that if you want to work with jpeg/png files using dlib then you will
-           need to link your program with libjpeg and/or libpng.  You also need to tell dlib 
-           about this by defining the DLIB_JPEG_SUPPORT and DLIB_PNG_SUPPORT preprocessor directives.
-           How you "link to libjpeg/libpng" varies from platform to platform.  On UNIX machines you
-           usually just add a -ljpeg or -lpng switch to your compiler (after installing the libraries).
-           On windows it's less well defined.  So dlib comes with a copy of these libraries in the dlib/external
-           folder so that you can statically compile them into your application if no system wide version 
+           Note also that if you want to work with jpeg/png/gif files using dlib then you will
+           need to link your program with libjpeg, libpng, and/or libgif.  You also need to tell dlib 
+           about this by defining the DLIB_JPEG_SUPPORT, DLIB_PNG_SUPPORT, and DLIB_GIF_SUPPORT preprocessor directives.
+           How you "link to libjpeg/libpng/libgif" varies from platform to platform.  On UNIX machines you
+           usually just add a -ljpeg, -lpng, or -lgif switch to your compiler (after installing the libraries).
+           On windows it's less well defined.  So dlib comes with a copy of libjpeg and libpng in the dlib/external
+           folder so you can statically compile them into your application if no system wide version 
            is available on your machine.  If all this talk about linking is confusing to you then
            just use CMake.  It will set this all up for you.
         </p>
@@ -138,13 +149,15 @@ sudo apt-get install libx11-dev
         </p>
 
 
-        <center><h1>Preprocessor Directives</h1></center>
+         <br/>
+        <center><h1>Miscellaneous Preprocessor Directives</h1></center>
 
          <p>
-            There are a few preprocessor directives you can supply during the build process
-            to cause the library to build in various optional ways.  By default, the
-            library will always do something reasonable, but they are listed here in the
-            event that you need to use them.
+            In addition to the preprocessor directives mentioned above, there
+            are a few more you can supply during the build process to cause the
+            library to build in various optional ways.  By default, the library
+            will always do something reasonable, but they are listed here in
+            the event that you need to use them.
          </p>
 
 

@@ -4021,9 +4021,10 @@ namespace dlib
     template <typename M1, typename M2>
     struct op_join_rows 
     {
-        op_join_rows(const M1& m1_, const M2& m2_) : m1(m1_),m2(m2_) {}
+        op_join_rows(const M1& m1_, const M2& m2_) : m1(m1_),m2(m2_),_nr(std::max(m1.nr(),m2.nr())) {}
         const M1& m1;
         const M2& m2;
+        const long _nr;
 
         template <typename T, typename U, bool selection>
         struct type_selector;
@@ -4054,7 +4055,7 @@ namespace dlib
                 return m2(r,c-m1.nc());
         }
 
-        long nr () const { return m1.nr(); }
+        long nr () const { return _nr; }
         long nc () const { return m1.nc()+m2.nc(); }
 
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
@@ -4095,9 +4096,10 @@ namespace dlib
     template <typename M1, typename M2>
     struct op_join_cols 
     {
-        op_join_cols(const M1& m1_, const M2& m2_) : m1(m1_),m2(m2_) {}
+        op_join_cols(const M1& m1_, const M2& m2_) : m1(m1_),m2(m2_),_nc(std::max(m1.nc(),m2.nc())) {}
         const M1& m1;
         const M2& m2;
+        const long _nc;
 
         template <typename T, typename U, bool selection>
         struct type_selector;
@@ -4131,7 +4133,8 @@ namespace dlib
         }
 
         long nr () const { return m1.nr()+m2.nr(); }
-        long nc () const { return m1.nc(); }
+        long nc () const { return _nc; }
+
 
         template <typename U> bool aliases               ( const matrix_exp<U>& item) const 
         { return m1.aliases(item) || m2.aliases(item); }

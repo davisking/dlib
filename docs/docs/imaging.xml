@@ -7,7 +7,6 @@
    <!-- ************************************************************************* -->
 
    <body>
-      <br/><br/>
 
          <p>
             This page documents the functionality present in this library that deals with the
@@ -245,6 +244,8 @@
          <item>zero_border_pixels</item> 
          <item>integral_image</item>
          <item>integral_image_generic</item>
+         <item>disturb_colors</item>
+         <item>random_color_transform</item>
 
       </section>
 
@@ -294,6 +295,32 @@
 
    <!-- ************************************************************************* -->
       
+      <component>
+         <name>disturb_colors</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/random_color_transform_abstract.h</spec_file>
+         <description>
+              Applies a random color transform an image.  This is done by
+              creating a <a href="#random_color_transform">random_color_transform</a> with the given parameters and then
+              transforming each pixel in the image with the resulting transform.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>random_color_transform</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/random_color_transform_abstract.h</spec_file>
+         <description>
+               This object generates a random color balancing and gamma correction
+               transform.  It then allows you to apply that specific transform to as many
+               <a href="#rgb_pixel">rgb_pixel</a> objects as you like.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
       <component>
          <name>integral_image_generic</name>
          <file>dlib/image_transforms.h</file>
@@ -1054,11 +1081,13 @@
             This global function takes a file name, looks at its extension, and 
             then loads it into an <a href="containers.html#array2d">array2d</a> of 
             <a href="dlib/pixel.h.html">pixels</a> using the appropriate image 
-            loading routine.  The supported types are BMP, PNG, JPEG, and the dlib DNG file format. 
+            loading routine.  The supported types are BMP, PNG, JPEG, GIF, and the dlib DNG file format. 
 
             <p>
-               Note that you can only load PNG and JPEG files if you link against
-               libpng and libjpeg respectively.
+               Note that you can only load PNG, JPEG, and GIF files if you link against
+               libpng, libjpeg, and libgif respectively.  You will also need to #define
+               DLIB_PNG_SUPPORT, DLIB_JPEG_SUPPORT, and DLIB_GIF_SUPPORT.  Or use CMake and
+               it will do all this for you.
             </p>
          </description>
                                  

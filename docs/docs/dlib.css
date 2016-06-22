@@ -1,0 +1,373 @@
+
+/*
+ * Overall page layout stuff.  It goes like:
+ *
+ *  ============ page_header =============
+ *  |                                    |
+ *  ============ top_content =============
+ *  |           |           |            |
+ *  | main_menu | main_text | right_menu |
+ *  |           |           |            |
+ *  ============ bottom_content ==========
+ *  |                                    |
+ *  |                  .                 |
+ *  |                  .                 |
+ *  |                  .                 |
+ *  |                                    |
+ */
+
+body 
+{
+   margin:0px;
+   background-color: #EDF3EE;
+   width:62.0em;  
+   margin-left: auto;
+   margin-right: auto;
+   font-size: 17px;
+}
+
+h1,h2,h3
+{
+   line-height:1.2;
+}
+
+#page_header {
+   height:59px;
+   text-align: left;
+   margin-top: 0.4em;
+}
+
+#top_content
+{
+   width: 100%;
+   height: 900px;
+   display: table;
+}
+#top_content > div
+{
+   display: table-cell;
+}
+#main_menu
+{
+   width: fit-content;
+   padding-bottom: 6em; /* So the menu_footer always has room. */
+}
+#main_text
+{
+   background-color: white;
+   border: 1px solid rgb(102,102,102);
+   width: 100%;
+   line-height: 1.3em;
+}
+#main_text_title
+{
+   margin-top: 10px;
+   margin-bottom: 20px;
+   text-align: center;
+   font-size: 2.1em;
+   font-weight: bold;
+}
+#main_text_body
+{
+   vertical-align: top;
+   padding-top: 1px;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+
+#right_menu
+{
+   width: fit-content;
+   min-width: 9em;
+}
+
+div.menu
+{
+   vertical-align: top;
+   position: relative;
+   background-color:#F5F5F5;
+   padding:7px; 
+   border: 1px solid rgb(102,102,102);
+}
+div.menu_top {
+}
+div.menu_footer {
+   position: absolute;
+   bottom: 10px;
+}
+
+
+#bottom_content
+{
+   line-height: 1.3em;
+}
+
+/*  ============================================================= */
+
+pre {margin:0px;}
+
+ul.tree  li { list-style: none;  margin-left:10px;} 
+ul.tree  { margin:0px; padding:0px; margin-left:5px; font-size:0.95em; }
+ul.tree  li ul { margin-left:10px; padding:0px; }
+
+li#term { list-style: none; }
+
+
+span.cpp11
+{
+   color: #008000;
+   font-family: sans-serif;
+   font-size: 0.8em;
+   margin-left: 0.3em;
+}
+
+div.include_file_more_details_wrapper
+{
+   margin-top: 1em;
+   margin-bottom: 5px;
+   overflow: auto;
+   width: 100%;
+   display: inline-block;
+}
+div.include_file
+{
+   font-size: 1.3em;
+   font-weight: bold;
+   font-family: monospace;
+
+   float: right;
+
+   padding: 0.4em;
+}
+a.more_details, a.more_details_extension 
+{
+   font-size: 1.6em;
+   font-weight: bold;
+   float: left;
+
+
+   margin: 5px;
+
+   font: 200 1.6em source-sans-pro, sans-serif;
+   text-align: center;
+   padding-left: 1.5em;
+   padding-right: 1.5em;
+   -webkit-font-smoothing: antialiased;
+   background-color: #f59820;
+   border-color: #d47c0a;
+   color: #fff;
+
+   padding: 0.2em 1.5em 0.2em;
+
+   -moz-box-shadow: 2px 2px 9px #777777; 
+   -webkit-box-shadow: 2px 2px 9px #777777;
+   box-shadow: 1px 1px 5px #777777;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+
+   transition: 320ms;
+   display: inline-block;
+
+}
+a.more_details:hover, a.more_details_extension:hover
+{
+   text-decoration: none;
+   -moz-box-shadow: 1px 1px 9px #77a777; 
+   -webkit-box-shadow: 1px 1px 9px #77a777;
+   box-shadow: 1px 1px 5px #77a777;
+   color: #ffffff;
+
+   background-color: #d5780a;
+}
+
+a.more_details_extension
+{
+   margin-top: 10px;
+   padding: 0.1em 1.0em 0.1em;
+   display: block;
+   font-size: 1.3em;
+   float: none;
+   width: 160px;
+}
+
+div.component {
+   background-color:white; 
+   border: 2px solid rgb(102,102,102); 
+   text-align:left;
+   margin-top: 1.5em;
+   padding: 0.7em;
+}
+
+div.question {
+   background-color:white; 
+   border: 2px solid rgb(102,102,102); 
+   text-align:left;
+   margin-top: 1.5em;
+   margin-bottom: 90%;
+   padding: 0.7em;
+}
+
+div.function {
+   background-color:white; 
+   border: 2px solid rgb(102,102,255); 
+   text-align:left;
+   margin-top: 0.3em;
+   padding: 0.3em;
+}
+
+div.class {
+   background-color:white; 
+   border: 2px solid rgb(255,102,102); 
+   text-align:left;
+   margin-top: 0.3em;
+   padding: 0.3em;
+}
+
+div.extension {
+   background-color:#FDFDFD; 
+   border: 1px solid rgb(102,102,102); 
+   text-align:left;
+   margin-top: 1.0em;
+   padding: 0.7em;
+}
+
+div.logb {
+   text-align:left;
+   padding: 0.0em;
+   float: left;
+   background-color:#c0c0c0; 
+   border: double ; 
+   margin: 0.5em;
+}
+
+div.name {
+   float: left;
+}
+div.line1 {
+   float:left;
+   width:100%;
+   background-color:#dfdfdf; 
+}
+div.line2 {
+   float:left;
+   width:100%;
+}
+div.inc {
+   float: right;
+}
+
+
+.code_box
+{
+   color: black;
+   margin: 1em 0.25in;
+   padding: 0.5em;
+   background: rgb(240,240,240);
+   border-top: black dotted 1px;
+   border-left: black dotted 1px;
+   border-right: black solid 2px;
+   border-bottom: black solid 2px;
+}
+
+tt 
+{
+   padding: 0.3em;
+   font-size:13px;
+   font-family: monospace;
+   background: rgb(240,240,240);
+   color: black;
+}
+
+
+
+.bdotted {border-bottom: 1px dotted}
+.bdashed {border-bottom: 1px dashed}
+.bsolid {border-bottom: 1px solid}
+.bdouble {border-bottom: 1px double}
+.bgroove {border-bottom: 1px groove}
+.bridge {border-bottom: 1px ridge}
+.binset {border-bottom: 1px inset}
+.boutset {border-bottom: 1px outset}
+
+div.row1 {
+   background-color:#dfdfdf; 
+}
+div.row2 {
+   background-color:#f2f2f2; 
+}
+
+div.typedefs {
+   margin-left: 1.5em;
+   margin-top: 0.2em;
+   border: 1px dotted;
+   width: 52em;
+}
+
+div.tdn {
+   width: 10em;
+}
+
+.fullhr {
+   clear: both;
+}
+
+
+a {
+   text-decoration: none;
+   font-family: sans-serif;
+}
+a:hover{
+   text-decoration: underline;
+}
+a.menu{
+   white-space: nowrap;
+}
+a.sub{
+   cursor: pointer;
+   margin-left:-9px;
+   color: green;
+}
+#download_button {
+   font: 200 16px source-sans-pro, sans-serif;
+   text-align: center;
+   padding-left: 1.5em;
+   padding-right: 1.5em;
+   -webkit-font-smoothing: antialiased;
+   background-color: #2098f5;
+   border-color: #0a7cd4;
+   color: #fff;
+
+   padding: 0.7em 1em 0.8em;
+
+   -moz-box-shadow: 2px 2px 9px #777777; 
+   -webkit-box-shadow: 2px 2px 9px #777777;
+   box-shadow: 1px 1px 5px #777777;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+
+   transition: 320ms;
+   display: inline-block;
+}
+#download_button:hover {
+   text-decoration: none;
+   -moz-box-shadow: 1px 1px 9px #77a777; 
+   -webkit-box-shadow: 1px 1px 9px #77a777;
+   box-shadow: 1px 1px 5px #77a777;
+   color: #ffffff;
+   background-color: #0a7cd4;
+}
+
+div {
+   display:block;
+}
+
+#dlib_version {
+   color: #fff;
+   display: block;
+   font-size: 0.8em;
+   font-weight: 400;
+   margin: 0;
+}
+

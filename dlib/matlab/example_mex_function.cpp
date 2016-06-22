@@ -24,6 +24,14 @@ using namespace std;
                 - a dlib::array2d containing any kind of scalar value.
                 - a dlib::vector containing any kind of scalar value.
                 - a dlib::point
+                - matrix_colmajor or fmatrix_colmajor
+                  These are just typedefs for matrix containing double or float and using a
+                  column major memory layout.  However, they have the special distinction
+                  of being fast to use in mex files since they sit directly on top of
+                  MATLAB's built in matrices.  That is, while other types of arguments copy
+                  a MATLAB object into themselves, the matrix_colmajor and fmatrix_colmajor
+                  do no such copy and are effectively zero overhead methods for working on
+                  MATLAB's matrices.
 
             - RGB color images
                 - dlib::array2d<dlib::rgb_pixel> can be used to represent 
@@ -49,11 +57,11 @@ using namespace std;
 // Make a function named mex_function() and put your code inside it.
 // Note that the return type should be void.  Use non-const reference
 // arguments to return outputs.  Finally, mex_function() must have no
-// more than 10 arguments.
+// more than 20 arguments.
 void mex_function (
-    const matrix<double>& x,
-    const matrix<double>& y,
-    matrix<double>& out1,
+    const matrix_colmajor& x,
+    const matrix_colmajor& y,
+    matrix_colmajor& out1,
     double& out2,
     double some_number 
 ) 

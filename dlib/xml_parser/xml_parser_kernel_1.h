@@ -1412,6 +1412,8 @@ namespace dlib
         error_handler& eh
     )
     {
+        if (!in)
+            throw xml_parse_error("Unexpected end of file during xml parsing.");
         xml_parser parser;
         parser.add_document_handler(dh);
         parser.add_error_handler(eh);
@@ -1424,6 +1426,8 @@ namespace dlib
         document_handler& dh
     )
     {
+        if (!in)
+            throw xml_parse_error("Unexpected end of file during xml parsing.");
         xml_parser parser;
         parser.add_document_handler(dh);
         parser.add_error_handler(eh);
@@ -1435,6 +1439,8 @@ namespace dlib
         error_handler& eh
     )
     {
+        if (!in)
+            throw xml_parse_error("Unexpected end of file during xml parsing.");
         xml_parser parser;
         parser.add_error_handler(eh);
         parser.parse(in);
@@ -1445,6 +1451,8 @@ namespace dlib
         document_handler& dh
     )
     {
+        if (!in)
+            throw xml_parse_error("Unexpected end of file during xml parsing.");
         xml_parser parser;
         parser.add_document_handler(dh);
         impl::default_xml_error_handler eh;

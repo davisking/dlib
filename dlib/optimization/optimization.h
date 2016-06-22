@@ -427,7 +427,7 @@ namespace dlib
         for (long i = 0; i < gradient.size(); ++i)
         {
             const double tol = eps*std::abs(x(i));
-            // if x(i) is an active bound constraint then we should set it's search
+            // If x(i) is an active bound constraint then we should set its search
             // direction such that a single step along the direction either does nothing or
             // closes the gap of size tol before hitting the bound exactly.
             if (x_lower(i)+tol >= x(i) && gradient(i) > 0)
@@ -482,7 +482,7 @@ namespace dlib
             << "\n\t x_upper.size():         " << x_upper.size()
         );
         DLIB_ASSERT (
-            min(x_upper-x_lower) > 0,
+            min(x_upper-x_lower) >= 0,
             "\tdouble find_min_box_constrained()"
             << "\n\t You have to supply proper box constraints to this function."
             << "\n\r min(x_upper-x_lower): " << min(x_upper-x_lower)
@@ -610,7 +610,7 @@ namespace dlib
             << "\n\t x_upper.size():         " << x_upper.size()
         );
         DLIB_ASSERT (
-            min(x_upper-x_lower) > 0,
+            min(x_upper-x_lower) >= 0,
             "\tdouble find_max_box_constrained()"
             << "\n\t You have to supply proper box constraints to this function."
             << "\n\r min(x_upper-x_lower): " << min(x_upper-x_lower)

@@ -49,7 +49,7 @@ namespace
 
         for (int i = -1000; i <= 1000; ++i)
         {
-            DLIB_TEST(s.peek() != EOF)
+            DLIB_TEST(s.peek() != EOF);
             char ch1 = i;
             char ch2 = s.get();
             DLIB_TEST(ch1 == ch2);
@@ -63,7 +63,7 @@ namespace
 
         for (int i = -1000+6; i <= 1000; ++i)
         {
-            DLIB_TEST(s.peek() != EOF)
+            DLIB_TEST(s.peek() != EOF);
             char ch1 = i;
             char ch2 = s.get();
             DLIB_TEST(ch1 == ch2);

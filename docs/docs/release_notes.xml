@@ -12,6 +12,122 @@
 
 <current>
 New Features:
+   - Added random_color_transform and disturb_colors().
+   - Added a constructor for seeding rand with a time_t.
+   - Added apply_random_color_offset()
+   - Made load_image() support GIF files.
+   - Added subm_clipped()
+   - load_mnist_dataset()
+   - Added an option to solve the L2-loss version of the SVM objective function for svm_c_linear_dcd_trainer.
+   - Added the option to use the elastic net regularizer to the OCA solver.
+   - Added solve_qp_box_constrained()
+   - Added unserialize.
+   - MATLAB binding stuff
+      - link to MATLAB's intel MKL when used on linux
+      - struct support, more arguments (20 now instead of 10),
+      - in place operation.  Made column major matrices directly wrap matlab
+        matrix objects when used inside mex files.  This way, if you use
+        matrix_colmajor or fmatrix_colmajor in a mex file it will not do any
+        unnecessary copying or transposing.
+      - catch ctrl+c presses in MATLAB console.
+      - DLIB_ASSERTS won't kill the matlab process, just throw an exception
+      - Made cerr print in matlab as a red warning message.
+
+
+   - C++11 only tools
+      - Added log1pexp()
+      - Added running_gradient
+      - deep learning tools
+         - dnn_trainer
+         - cuDNN v4.0
+         - auto step size adjust and stopping condition.
+      - CUDA/tensor stuff
+         - gpu_data, tensor, alias tensors
+      
+Non-Backwards Compatible Changes:
+   - Everything in dlib/matlab/call_matlab.h is now in the dlib namespace.
+
+Bug fixes:
+   - Fixed bug in 10 argument version of call_matlab() and also cleaned up a few
+   minor things.
+   - setup.py and cmake scripts work in a few more contexts.
+
+
+Other:
+   - Made cmake scripts uniformly require cmake version 2.8.4.
+   - C++11
+      - CMake scripts now enable C++11 by default
+      - Gave array2d and matrix move constructors and move assignment operators.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.18" date="Oct 28, 2015">
+New Features:
+   - Added the set_ptrm() routine for assigning dlib::matrix objects to arbitrary
+     memory blocks.
+      
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed a bug that caused cmake to not provide the correct preprocessor
+     definitions until cmake was run twice. This was causing some projects to
+     not build properly.
+
+Other:
+   - Improvements to build system:
+      - Ehsan Azarnasab contributed a setup.py so the dlib Python API can be
+        installed via the usual 'python setup.py install' command. 
+      - Séverin Lemaignan upgraded dlib's CMake scripts so they include an 
+        install target.  Now dlib can be installed system wide by executing 
+        'cmake PATH_TO_DLIB; make install'.  This also includes installing the
+        appropriate scripts for CMake's find_package(dlib) to work.
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.17" date="Aug 15, 2015">
+New Features:
+   - More clustering tools:
+      - Added bottom_up_cluster() and find_clusters_using_angular_kmeans()
+        routines.
+      - Added a --cluster option to the imglab tool.  This lets you cluster
+        objects into groups of similar appearance/pose.
+   - Improved the shape_predictor.  In particular, it can now be learned from
+     datasets where some landmarks are missing.  The shape_predictor also now
+     outputs a sparse feature vector that encodes which leafs are used on each
+     tree to make a prediction.
+      
+Non-Backwards Compatible Changes:
+   - extract_highdim_face_lbp_descriptors() produces slightly different output.
+
+Bug fixes:
+   - Fixed a minor bug in extract_highdim_face_lbp_descriptors() which was
+     pointed out by Yan Xu. One of the face locations was mistakenly used twice
+     while another was skipped. This change breaks backwards compatibility with
+     the previous feature extraction output but should slightly improve
+     accuracy of classifiers trained using these features.
+   - Fixed jet() and heatmap() so they work on empty images.
+   - The SQLite transaction object did not function correctly when compiled 
+     in a C++11 program.  Since its destructor can throw, an exception
+     specification needed to be added indicating that this was possible since
+     destructors are now noexcept by default in C++11.
+   - Fixed a bug pointed out by Ernesto Tapia that could cause matrix
+     expressions that involve sub matrix views (e.g. colm) to produce the wrong
+     results when the BLAS bindings were enabled.
+   - Added an if to avoid a possible division by zero inside spectral_cluster().
+   - Fixed a bug in parse_xml(). It failed to check if the given input stream
+     was valid before trying to parse it.
+
+Other:
+
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="18.16" date="Jun 3, 2015">
+New Features:
    - Added a linear model predictive control solver.  See the mpc_ex.cpp example
      program for details.
    - Thanks to Patrick Snape, the correlation_tracker can now be used from Python.
@@ -33,7 +149,7 @@ Other:
      resulted in improved CMake python scripts on OS X machines.
    - Improved the way overlapping points are rendered by the perspective_window.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 

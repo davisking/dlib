@@ -1,5 +1,10 @@
 // Copyright (C) 2003  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
+
+#ifdef DLIB_ALL_SOURCE_END
+#include "dlib_basic_cpp_build_tutorial.txt"
+#endif
+
 #ifndef DLIB_ALGs_
 #define DLIB_ALGs_
 
@@ -42,6 +47,9 @@
 // Disable "warning C4180: qualifier applied to function type has no meaning; ignored".
 // This warning happens often in generic code that works with functions and isn't useful.
 #pragma warning(disable : 4180)
+
+// Disable "warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)"
+#pragma warning(disable : 4290)
 
 #endif
 
@@ -479,6 +487,13 @@ namespace dlib
     };
 
 // ----------------------------------------------------------------------------------------
+
+    struct general_ {};
+    struct special_ : general_ {};
+    template<typename> struct int_ { typedef int type; };
+
+// ----------------------------------------------------------------------------------------
+
 
     /*!A is_same_object 
 

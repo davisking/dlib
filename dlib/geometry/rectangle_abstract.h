@@ -363,6 +363,16 @@ namespace dlib
             ensures
                 - returns !(*this == rect)
         !*/
+
+        bool operator< (
+            const dlib::rectangle& a,
+            const dlib::rectangle& b
+        ) const;
+        /*!
+            ensures
+                - Defines a total ordering over rectangles so they can be used in
+                  associative containers.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
@@ -787,29 +797,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-}
-
-namespace std
-{
-    /*!
-        Define std::less<rectangle> so that you can use rectangles in the associative containers.
-    !*/
-    template<>
-    struct less<dlib::rectangle> : public binary_function<dlib::rectangle,dlib::rectangle,bool>
-    {
-        inline bool operator() (const dlib::rectangle& a, const dlib::rectangle& b) const
-        { 
-            if      (a.left() < b.left()) return true;
-            else if (a.left() > b.left()) return false;
-            else if (a.top() < b.top()) return true;
-            else if (a.top() > b.top()) return false;
-            else if (a.right() < b.right()) return true;
-            else if (a.right() > b.right()) return false;
-            else if (a.bottom() < b.bottom()) return true;
-            else if (a.bottom() > b.bottom()) return false;
-            else                    return false;
-        }
-    };
 }
 
 #endif // DLIB_RECTANGLe_ABSTRACT_

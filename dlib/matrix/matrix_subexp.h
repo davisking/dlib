@@ -8,6 +8,7 @@
 #include "matrix.h"
 #include "../geometry/rectangle.h"
 #include "matrix_expressions.h"
+#include "matrix_mat.h"
 
 
 
@@ -125,6 +126,25 @@ namespace dlib
     template <
         typename EXP
         >
+    const matrix_op<op_subm<EXP> > subm_clipped (
+        const matrix_exp<EXP>& m,
+        long r, 
+        long c,
+        long nr,
+        long nc
+    )
+    {
+        rectangle box(c,r,c+nc-1,r+nr-1);
+        box = box.intersect(get_rect(m));
+        typedef op_subm<EXP> op;
+        return matrix_op<op>(op(m.ref(),box.top(),box.left(),box.height(),box.width()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
     const matrix_op<op_subm<EXP> > subm (
         const matrix_exp<EXP>& m,
         const rectangle& rect
@@ -140,6 +160,22 @@ namespace dlib
             << "\n\trect.right():  " << rect.right()
             << "\n\trect.bottom(): " << rect.bottom()
             );
+
+        typedef op_subm<EXP> op;
+        return matrix_op<op>(op(m.ref(),rect.top(),rect.left(),rect.height(),rect.width()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP
+        >
+    const matrix_op<op_subm<EXP> > subm_clipped (
+        const matrix_exp<EXP>& m,
+        rectangle rect
+    )
+    {
+        rect = rect.intersect(get_rect(m));
 
         typedef op_subm<EXP> op;
         return matrix_op<op>(op(m.ref(),rect.top(),rect.left(),rect.height(),rect.width()));
@@ -522,6 +558,197 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    class assignable_ptr_matrix
+    {
+    public:
+        typedef T type;
+        typedef row_major_layout layout_type;
+        typedef matrix<T,0,0,default_memory_manager,layout_type> matrix_type;
+
+        assignable_ptr_matrix(
+            T* ptr_,
+            long nr_,
+            long nc_
+        ) : ptr(ptr_), height(nr_), width(nc_){}
+
+        T& operator() (
+            long r,
+            long c
+        )
+        {
+            return ptr[r*width + c];
+        }
+
+        const T& operator() (
+            long r,
+            long c
+        ) const
+        {
+            return ptr[r*width + c];
+        }
+
+        long nr() const { return height; }
+        long nc() const { return width; }
+
+        template <typename EXP>
+        assignable_ptr_matrix& operator= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            // You can only assign to a set_ptrm() expression with a source matrix that
+            // contains the same type of elements as the target (i.e. you can't mix double
+            // and float types).
+            COMPILE_TIME_ASSERT((is_same_type<T, typename EXP::type>::value == true));
+
+            DLIB_ASSERT( exp.nr() == height && exp.nc() == width,
+                "\tassignable_matrix_expression set_ptrm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\twidth (target matrix):    " << width
+                << "\n\theight (target matrix):   " << height
+                );
+
+            if (exp.destructively_aliases(mat(ptr,height,width)) == false)
+            {
+                matrix_assign(*this, exp); 
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to ptr to 
+                // avoid aliasing issues during the copy
+                this->operator=(tmp(exp));
+            }
+
+            return *this;
+        }
+
+        template <typename EXP>
+        assignable_ptr_matrix& operator+= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            // You can only assign to a set_ptrm() expression with a source matrix that
+            // contains the same type of elements as the target (i.e. you can't mix double
+            // and float types).
+            COMPILE_TIME_ASSERT((is_same_type<T, typename EXP::type>::value == true));
+
+            DLIB_ASSERT( exp.nr() == height && exp.nc() == width,
+                "\tassignable_matrix_expression set_ptrm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\twidth (target matrix):    " << width
+                << "\n\theight (target matrix):   " << height
+                );
+
+            if (exp.destructively_aliases(mat(ptr,height,width)) == false)
+            {
+                matrix_assign(*this, mat(ptr,height,width)+exp); 
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to ptr to 
+                // avoid aliasing issues during the copy
+                this->operator+=(tmp(exp));
+            }
+
+            return *this;
+        }
+
+        template <typename EXP>
+        assignable_ptr_matrix& operator-= (
+            const matrix_exp<EXP>& exp
+        ) 
+        {
+            // You can only assign to a set_ptrm() expression with a source matrix that
+            // contains the same type of elements as the target (i.e. you can't mix double
+            // and float types).
+            COMPILE_TIME_ASSERT((is_same_type<T, typename EXP::type>::value == true));
+
+            DLIB_ASSERT( exp.nr() == height && exp.nc() == width,
+                "\tassignable_matrix_expression set_ptrm()"
+                << "\n\tYou have tried to assign to this object using a matrix that isn't the right size"
+                << "\n\texp.nr() (source matrix): " << exp.nr()
+                << "\n\texp.nc() (source matrix): " << exp.nc() 
+                << "\n\twidth (target matrix):    " << width
+                << "\n\theight (target matrix):   " << height
+                );
+
+            if (exp.destructively_aliases(mat(ptr,height,width)) == false)
+            {
+                matrix_assign(*this, mat(ptr,height,width)-exp); 
+            }
+            else
+            {
+                // make a temporary copy of the matrix we are going to assign to ptr to 
+                // avoid aliasing issues during the copy
+                this->operator-=(tmp(exp));
+            }
+
+            return *this;
+        }
+
+        assignable_ptr_matrix& operator= (
+            const T& value
+        )
+        {
+            const long size = width*height;
+            for (long i = 0; i < size; ++i)
+                ptr[i] = value;
+
+            return *this;
+        }
+
+        assignable_ptr_matrix& operator+= (
+            const T& value
+        )
+        {
+            const long size = width*height;
+            for (long i = 0; i < size; ++i)
+                ptr[i] += value;
+
+            return *this;
+        }
+
+        assignable_ptr_matrix& operator-= (
+            const T& value
+        )
+        {
+            const long size = width*height;
+            for (long i = 0; i < size; ++i)
+                ptr[i] -= value;
+
+            return *this;
+        }
+
+
+        T* ptr;
+        const long height;
+        const long width;
+    };
+
+
+    template <typename T>
+    assignable_ptr_matrix<T> set_ptrm (
+        T* ptr,
+        long nr,
+        long nc = 1
+    )
+    {
+        DLIB_ASSERT(nr >= 0 && nc >= 0, 
+            "\t assignable_matrix_expression set_ptrm(T* ptr, long nr, long nc)"
+            << "\n\t The dimensions can't be negative."
+            << "\n\t nr: " << nr
+            << "\n\t nc: " << nc
+            );
+
+
+        return assignable_ptr_matrix<T>(ptr,nr,nc);
+    }
+
+// ----------------------------------------------------------------------------------------
 
     template <typename T, long NR, long NC, typename mm, typename l>
     class assignable_sub_matrix

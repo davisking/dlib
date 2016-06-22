@@ -336,6 +336,30 @@ namespace dlib
                 - #aliases(*this) == true
                 - #ref().aliases(*this) == true
         !*/
+        
+        matrix(
+            const std::initializer_list<T>& l
+        );
+        /*!
+            requires
+                - This matrix is capable of having a size() == l.size().  Therefore, if
+                  NR*NC != 0 then l.size() must equal NR*NC.  Alternatively, if NR or NC is
+                  != 0 then l.size() must be a multiple of the non-zero NR or NC.
+            ensures
+                - #size() == l.size()
+                - The contents of l are enumerated and read into the matrix in row major order.
+                - if (NR != 0) then
+                    - #nr() == NR
+                    - #nc() == l.size()/NR
+                - if (NC != 0) then
+                    - #nr() == l.size()/NC
+                    - #nc() == NC
+                - if (NR*NC==0) then
+                    - #nr() == l.size()
+                    - #nc() == 1
+                - #aliases(*this) == true
+                - #ref().aliases(*this) == true
+        !*/
 
         T& operator() (
             long r, 
@@ -470,6 +494,19 @@ namespace dlib
                 - returns *this
         !*/
 
+        matrix& operator=(
+            const std::initializer_list<T>& l
+        );
+        /*!
+            requires
+                - This matrix is capable of having a size() == l.size().  Therefore, if
+                  NR*NC != 0 then l.size() must equal NR*NC.  Alternatively, if NR or NC is
+                  != 0 then l.size() must be a multiple of the non-zero NR or NC.
+            ensures
+                - Assigns the contents of l to *this by performing: matrix(l).swap(*this)
+                - returns *this
+        !*/
+
         template <typename EXP>
         matrix& operator= (
             const matrix_exp<EXP>& m
@@ -492,6 +529,10 @@ namespace dlib
         /*!
             requires
                 - matrix_exp<EXP>::type == T
+                - One of the following is true:
+                    - nr() == m.nr() && nc() == m.nc()
+                    - size() == 0
+                  (i.e. this matrix must have matching dimensions or it must be empty)
             ensures
                 - if (nr() == m.nr() && nc() == m.nc()) then
                     - #(*this) == *this + m
@@ -509,6 +550,10 @@ namespace dlib
         /*!
             requires
                 - matrix_exp<EXP>::type == T
+                - One of the following is true:
+                    - nr() == m.nr() && nc() == m.nc()
+                    - size() == 0
+                  (i.e. this matrix must have matching dimensions or it must be empty)
             ensures
                 - if (nr() == m.nr() && nc() == m.nc()) then
                     - #(*this) == *this - m
@@ -645,7 +690,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <
+    /*!A matrix_colmajor 
+        This is just a typedef of the matrix object that uses column major layout. 
+    !*/
+    typedef matrix<double,0,0,default_memory_manager,column_major_layout> matrix_colmajor;
+
+    /*!A fmatrix_colmajor 
+        This is just a typedef of the matrix object that uses column major layout. 
+    !*/
+    typedef matrix<float,0,0,default_memory_manager,column_major_layout> fmatrix_colmajor;
+
+// ----------------------------------------------------------------------------------------
+template <
         typename T,
         long NR,
         long NC,
@@ -732,6 +788,14 @@ namespace dlib
             - If there was a formatting error or something which prevents the input data
               from being parsed into a matrix then #in.fail() == true.
     !*/
+
+    /*!A csv
+        This object is used to define an io manipulator for matrix expressions.  In
+        particular, you can write statements like:
+            cout << csv << yourmatrix;
+        and have it print the matrix with commas separating each element.
+    !*/
+    some_undefined_iomnaip_type csv;
 
 // ----------------------------------------------------------------------------------------
 

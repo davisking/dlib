@@ -91,7 +91,8 @@ namespace dlib
         double f0,
         double d0,
         double f1,
-        double d1
+        double d1,
+        double limit = 1
     );
     /*!
         ensures
@@ -100,7 +101,7 @@ namespace dlib
                 - c(1) == f1
                 - derivative of c(x) at x==0 is d0
                 - derivative of c(x) at x==1 is d1
-            - returns the point in the range [0,1] that minimizes the polynomial c(x) 
+            - returns the point in the range [0,limit] that minimizes the polynomial c(x) 
     !*/
 
 // ----------------------------------------------------------------------------------------
