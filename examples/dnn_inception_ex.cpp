@@ -28,8 +28,8 @@
 #ifdef _MSC_VER
 #   pragma warning( disable: 4503 )
 #endif
-#include <dlib/dnn.h>
 
+#include <dlib/dnn.h>
 #include <iostream>
 #include <dlib/data_io.h>
 
