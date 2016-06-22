@@ -208,6 +208,8 @@ namespace dlib
         };
 
         template <typename T> struct alwaysbool { typedef bool type; };
+        // one more structure for VS 2015 UP3 support workaround
+        template <typename T> struct alwaysbool2 { typedef bool type; };
 
         resizable_tensor& rt();
 
@@ -254,7 +256,7 @@ namespace dlib
         constexpr auto has_inplace_backward(
             layer_type& layer,
             SUBNET& sub
-        ) -> typename alwaysbool<decltype(layer.backward(rt(),rt(),sub,rt()))>::type
+        ) -> typename alwaysbool2<decltype(layer.backward(rt(),rt(),sub,rt()))>::type
         {
             return false;
         }
@@ -263,7 +265,7 @@ namespace dlib
         constexpr auto has_inplace_backward(
             layer_type& layer,
             SUBNET& sub
-        ) -> typename alwaysbool<decltype(layer.backward(rt(),sub,rt()))>::type
+        ) -> typename alwaysbool2<decltype(layer.backward(rt(),sub,rt()))>::type
         {
             return false;
         }
@@ -272,7 +274,7 @@ namespace dlib
         constexpr auto has_inplace_backward(
             layer_type& layer,
             SUBNET& sub
-        ) -> typename alwaysbool<decltype(layer.backward_inplace(rt(),rt(),sub.get_gradient_input(),rt()))>::type
+        ) -> typename alwaysbool2<decltype(layer.backward_inplace(rt(),rt(),sub.get_gradient_input(),rt()))>::type
         {
             return true;
         }
@@ -281,7 +283,7 @@ namespace dlib
         constexpr auto has_inplace_backward(
             layer_type& layer,
             SUBNET& sub
-        ) -> typename alwaysbool<decltype(layer.backward_inplace(rt(),sub.get_gradient_input(),rt()))>::type
+        ) -> typename alwaysbool2<decltype(layer.backward_inplace(rt(),sub.get_gradient_input(),rt()))>::type
         {
             return true;
         }
@@ -290,7 +292,7 @@ namespace dlib
         constexpr auto is_inplace_layer(
             layer_type& layer,
             const SUBNET& sub 
-        ) -> typename alwaysbool<decltype(layer.forward(sub,rt()))>::type
+        ) -> typename alwaysbool2<decltype(layer.forward(sub,rt()))>::type
         {
             return false;
         }
@@ -1363,7 +1365,7 @@ namespace dlib
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
-        add_tag_layer() = default;
+        add_tag_layer() {};
         add_tag_layer(const add_tag_layer&) = default;
         add_tag_layer(add_tag_layer&&) = default;
         add_tag_layer& operator=(add_tag_layer&&) = default;
@@ -2552,7 +2554,7 @@ namespace dlib
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
-        add_skip_layer() = default;
+        add_skip_layer() {};
         add_skip_layer(const add_skip_layer&) = default;
         add_skip_layer(add_skip_layer&&) = default;
         add_skip_layer& operator=(add_skip_layer&&) = default;

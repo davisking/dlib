@@ -10,7 +10,6 @@
         - Accessing and configuring layers in a network
 */
 
-
 #include <dlib/dnn.h>
 #include <iostream>
 #include <dlib/data_io.h>

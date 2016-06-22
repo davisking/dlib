@@ -2025,45 +2025,15 @@ namespace dlib
     using softmax = add_layer<softmax_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
-    namespace impl{
-        // helper classes for layer concat processing
-        template <template<typename> class... TAG_TYPES>
-        struct concat_helper_impl {
-        };
-        template <template<typename> class TAG_TYPE>
-        struct concat_helper_impl<TAG_TYPE>{
-            constexpr static size_t tag_count() {return 1;}
-            static void list_tags(std::ostream& out) 
-            { 
-                out << tag_id<TAG_TYPE>::id; 
-            }
-
-            template<typename SUBNET>
-            static void resize_out(resizable_tensor& out, const SUBNET& sub, long sum_k)
-            {
-                auto& t = layer<TAG_TYPE>(sub).get_output();
-                out.set_size(t.num_samples(), t.k() + sum_k, t.nr(), t.nc());
-            }
-            template<typename SUBNET>
-            static void concat(tensor& out, const SUBNET& sub, size_t k_offset)
-            {
-                auto& t = layer<TAG_TYPE>(sub).get_output();
-                tt::copy_tensor(out, k_offset, t, 0, t.k());
-            }
-            template<typename SUBNET>
-            static void split(const tensor& input, SUBNET& sub, size_t k_offset)
-            {
-                auto& t = layer<TAG_TYPE>(sub).get_gradient_input();
-                tt::copy_tensor(t, 0, input, k_offset, t.k());
-            }
-        };
+    namespace impl
+    {
         template <template<typename> class TAG_TYPE, template<typename> class... TAG_TYPES>
-        struct concat_helper_impl<TAG_TYPE, TAG_TYPES...>{
+        struct concat_helper_impl{
 
             constexpr static size_t tag_count() {return 1 + concat_helper_impl<TAG_TYPES...>::tag_count();}
-            static void list_tags(std::ostream& out) 
-            { 
-                out << tag_id<TAG_TYPE>::id << ","; 
+            static void list_tags(std::ostream& out)
+            {
+                out << tag_id<TAG_TYPE>::id << (tag_count() > 1 ? "," : "");
                 concat_helper_impl<TAG_TYPES...>::list_tags(out);
             }
 
@@ -2088,6 +2058,33 @@ namespace dlib
                 tt::copy_tensor(t, 0, input, k_offset, t.k());
                 k_offset += t.k();
                 concat_helper_impl<TAG_TYPES...>::split(input, sub, k_offset);
+            }
+        };
+        template <template<typename> class TAG_TYPE>
+        struct concat_helper_impl<TAG_TYPE>{
+            constexpr static size_t tag_count() {return 1;}
+            static void list_tags(std::ostream& out) 
+            { 
+                out << tag_id<TAG_TYPE>::id;
+            }
+
+            template<typename SUBNET>
+            static void resize_out(resizable_tensor& out, const SUBNET& sub, long sum_k)
+            {
+                auto& t = layer<TAG_TYPE>(sub).get_output();
+                out.set_size(t.num_samples(), t.k() + sum_k, t.nr(), t.nc());
+            }
+            template<typename SUBNET>
+            static void concat(tensor& out, const SUBNET& sub, size_t k_offset)
+            {
+                auto& t = layer<TAG_TYPE>(sub).get_output();
+                tt::copy_tensor(out, k_offset, t, 0, t.k());
+            }
+            template<typename SUBNET>
+            static void split(const tensor& input, SUBNET& sub, size_t k_offset)
+            {
+                auto& t = layer<TAG_TYPE>(sub).get_gradient_input();
+                tt::copy_tensor(t, 0, input, k_offset, t.k());
             }
         };
     }
