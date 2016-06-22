@@ -1365,7 +1365,7 @@ namespace dlib
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
-        add_tag_layer() = default;
+        add_tag_layer() {};
         add_tag_layer(const add_tag_layer&) = default;
         add_tag_layer(add_tag_layer&&) = default;
         add_tag_layer& operator=(add_tag_layer&&) = default;
@@ -2554,7 +2554,7 @@ namespace dlib
         static_assert(sample_expansion_factor >= 1,
             "The input layer can't produce fewer output tensors than there are inputs.");
 
-        add_skip_layer() = default;
+        add_skip_layer() {};
         add_skip_layer(const add_skip_layer&) = default;
         add_skip_layer(add_skip_layer&&) = default;
         add_skip_layer& operator=(add_skip_layer&&) = default;
