@@ -195,6 +195,10 @@
                   <link>dnn_mnist_advanced_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Deep Learning Imagenet Classifier </name>
+                  <link>dnn_imagenet_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Deep Learning Inception</name>
                   <link>dnn_inception_ex.cpp.html</link>
                </item>

@@ -121,6 +121,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <sub>
                <item>input</item>
                <item>input_rgb_image</item>
+               <item>input_rgb_image_sized</item>
                <item>
                   <name>EXAMPLE_INPUT_LAYER</name>
                   <link>dlib/dnn/input_abstract.h.html#EXAMPLE_INPUT_LAYER</link>
@@ -433,6 +434,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_mnist_ex.cpp.html</example>
             <example>dnn_mnist_advanced_ex.cpp.html</example>
             <example>dnn_inception_ex.cpp.html</example>
+            <example>dnn_imagenet_ex.cpp.html</example>
          </examples>
       </component>
 
@@ -450,6 +452,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_mnist_ex.cpp.html</example>
             <example>dnn_mnist_advanced_ex.cpp.html</example>
             <example>dnn_inception_ex.cpp.html</example>
+            <example>dnn_imagenet_ex.cpp.html</example>
          </examples>
       </component>
 
@@ -550,6 +553,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_mnist_ex.cpp.html</example>
             <example>dnn_mnist_advanced_ex.cpp.html</example>
             <example>dnn_inception_ex.cpp.html</example>
+            <example>dnn_imagenet_ex.cpp.html</example>
          </examples>
       </component>
 
@@ -565,6 +569,18 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             is very similar to the <a href="#input">input layer</a> except that
             it allows you to subtract the average color value from each color
             channel when converting an image to a tensor.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component cpp11="true">
+         <name>input_rgb_image_sized</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
+         <description>
+            This layer has an interface and behavior identical to <a href="#input_rgb_image">input_rgb_image</a>
+            except that it requires input images to have a particular size. 
          </description>
       </component>
 

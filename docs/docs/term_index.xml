@@ -108,6 +108,7 @@
          <term file="dlib/dnn/input_abstract.h.html" name="EXAMPLE_INPUT_LAYER" include="dlib/dnn.h"/>
          <term file="dlib/dnn/input_abstract.h.html" name="input" include="dlib/dnn.h"/>
          <term file="dlib/dnn/input_abstract.h.html" name="input_rgb_image" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/input_abstract.h.html" name="input_rgb_image_sized" include="dlib/dnn.h"/>
 
          <term file="dlib/dnn/trainer_abstract.h.html" name="dnn_trainer" include="dlib/dnn.h"/>
 
