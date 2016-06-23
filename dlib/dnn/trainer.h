@@ -731,7 +731,7 @@ namespace dlib
             item.wait_for_thread_to_pause();
             int version = 0;
             deserialize(version, in);
-            if (version != 6 && version != 7)
+            if (version != 7)
                 throw serialization_error("Unexpected version found while deserializing dlib::dnn_trainer.");
 
             size_t num_layers = 0;
@@ -761,16 +761,8 @@ namespace dlib
             deserialize(item.epoch_iteration, in);
             deserialize(item.epoch_pos, in);
             deserialize(item.train_one_step_calls, in);
-            if (version == 7)
-            {
-                deserialize(item.lr_schedule, in);
-                deserialize(item.lr_schedule_pos, in);
-            }
-            else
-            {
-                item.lr_schedule.set_size(0);
-                item.lr_schedule_pos = 0;
-            }
+            deserialize(item.lr_schedule, in);
+            deserialize(item.lr_schedule_pos, in);
 
             if (item.devices.size() > 1)
             {
