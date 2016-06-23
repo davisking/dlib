@@ -4,6 +4,9 @@
     using the deep learning tools from the dlib C++ Library.  We will use the pretrained
     ResNet34 model available on the dlib website.
 
+    The ResNet34 model is from Deep Residual Learning for Image Recognition by He, Zhang,
+    Ren, and Sun.  
+
     
     These tools will use CUDA and cuDNN to drastically accelerate network
     training and testing.  CMake should automatically find them if they are
@@ -100,7 +103,9 @@ int main(int argc, char** argv) try
 {
     std::vector<string> labels;
     anet_type net;
-    // get this file from http://dlib.net/files/resnet34_1000_imagenet_classifier.dnn.bz2
+    // Get this file from http://dlib.net/files/resnet34_1000_imagenet_classifier.dnn.bz2
+    // This pretrained model has a top5 error of 7.572% on the 2012 imagenet validation
+    // dataset.
     deserialize("resnet34_1000_imagenet_classifier.dnn") >> net >> labels;
 
 
