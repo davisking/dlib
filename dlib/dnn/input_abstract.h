@@ -235,6 +235,25 @@ namespace dlib
         !*/
     };
 
+// ----------------------------------------------------------------------------------------
+
+    template <size_t NR, size_t NC=NR>
+    class input_rgb_image_sized 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This layer has an interface and behavior identical to input_rgb_image
+                except that it requires input images to have NR rows and NC columns.  This
+                is checked by a DLIB_CASSERT inside to_tensor().
+
+                You can also convert between input_rgb_image and input_rgb_image_sized by
+                copy construction or assignment.
+        !*/
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_INPUT_ABSTRACT_H_
