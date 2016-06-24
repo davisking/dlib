@@ -121,12 +121,14 @@ add_example(video_tracking_ex)
 add_example(xml_parser_ex)
 
 
-find_package(OpenCV)
+find_package(OpenCV QUIET)
 if (OpenCV_FOUND)
    include_directories(${OpenCV_INCLUDE_DIRS})
 
    ADD_EXECUTABLE(webcam_face_pose_ex webcam_face_pose_ex.cpp)
    TARGET_LINK_LIBRARIES(webcam_face_pose_ex dlib ${OpenCV_LIBS} )
+else()
+   message("OpenCV not found, so we won't build the webcam_face_pose_ex example.")
 endif()
 
 
