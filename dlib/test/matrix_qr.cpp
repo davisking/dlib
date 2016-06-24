@@ -170,10 +170,10 @@ namespace
         test_qr(3*randmat<float,2,2>());
         test_qr(3*randmat<float,4,3>());
         test_qr(3*randmat<float,4,4>());
-        test_qr(3*randmat<float,9,4>());
+        test_qr(3*randmat<float,5,4>());
 
         typedef matrix<float,0,0,default_memory_manager, column_major_layout> mat;
-        test_qr(mat(3*randmat<float>(9,4)));
+        test_qr(mat(3*randmat<float>(5,4)));
         test_qr(mat(3*randmat<float>(9,9)));
     }
 
