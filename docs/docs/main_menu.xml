@@ -96,10 +96,12 @@
             <name>Dlib Blog</name>
             <link>http://blog.dlib.net</link>
          </item>
+         <!--
          <item>
             <name>Forums</name>
             <link>https://sourceforge.net/p/dclib/discussion</link>
          </item>
+         -->
          <item>
             <name>Who uses dlib?</name>
             <link>http://sourceforge.net/p/dclib/wiki/Known_users/</link>
