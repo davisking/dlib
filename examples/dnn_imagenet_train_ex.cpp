@@ -4,7 +4,7 @@
     network used by the dnn_imagenet_ex.cpp example program.  
 
     You should be familiar with dlib's DNN module before reading this example
-    program.  So read dnn_inception_ex.cpp and dnn_introduction2_ex.cpp first.  
+    program.  So read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp first.  
 */
 
 
