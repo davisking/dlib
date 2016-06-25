@@ -132,7 +132,7 @@ struct image_info
 {
     string filename;
     string label;
-    unsigned long numeric_label;
+    long numeric_label;
 };
 
 std::vector<image_info> get_imagenet_train_listing(
