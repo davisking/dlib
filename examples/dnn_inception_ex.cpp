@@ -2,8 +2,8 @@
 /*
     This is an example illustrating the use of the deep learning tools from the
     dlib C++ Library.  I'm assuming you have already read the introductory
-    dnn_mnist_ex.cpp and dnn_mnist_advanced_ex.cpp examples.  In this example we
-    are going to show how to create inception networks. 
+    dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp examples.  In this
+    example we are going to show how to create inception networks. 
 
     An inception network is composed of inception blocks of the form:
 

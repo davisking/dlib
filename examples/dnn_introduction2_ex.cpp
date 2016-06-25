@@ -1,7 +1,7 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
     This is an example illustrating the use of the deep learning tools from the
-    dlib C++ Library.  I'm assuming you have already read the dnn_mnist_ex.cpp
+    dlib C++ Library.  I'm assuming you have already read the dnn_inception_ex.cpp 
     example.  So in this example program I'm going to go over a number of more
     advanced parts of the API, including:
         - Using multiple GPUs

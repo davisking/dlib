@@ -10,8 +10,8 @@
     about 2 weeks.  This pretrained model has a top5 error of 7.572% on the 2012
     imagenet validation dataset.
 
-    For an introduction to dlib's DNN module read the dnn_mnist_ex.cpp and
-    dnn_mnist_advanced_ex.cpp example programs.
+    For an introduction to dlib's DNN module read the dnn_introduction_ex.cpp and
+    dnn_introduction2_ex.cpp example programs.
 
     
     Finally, these tools will use CUDA and cuDNN to drastically accelerate
