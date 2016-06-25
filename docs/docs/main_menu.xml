@@ -187,15 +187,15 @@
             <name>Examples: C++</name>
             <sub>
                <item>
-                  <name>Deep Learning Introduction</name>
-                  <link>dnn_mnist_ex.cpp.html</link>
+                  <name>Deep Learning Introduction Part 1</name>
+                  <link>dnn_introduction_ex.cpp.html</link>
                </item>
                <item>
-                  <name>Deep Learning Advanced</name>
-                  <link>dnn_mnist_advanced_ex.cpp.html</link>
+                  <name>Deep Learning Introduction Part 2</name>
+                  <link>dnn_introduction2_ex.cpp.html</link>
                </item>
                <item>
-                  <name>Deep Learning Imagenet Classifier </name>
+                  <name>Deep Learning Imagenet Classifier</name>
                   <link>dnn_imagenet_ex.cpp.html</link>
                </item>
                <item>
