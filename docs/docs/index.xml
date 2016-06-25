@@ -8,10 +8,12 @@
    <body>
 
       <p>
-      Dlib is a modern C++ toolkit containing machine learning algorithms and tools
-      for creating complex software in C++ to solve real world problems.  It is used throughout industry and
-      academia and its <a href="license.html">open source licensing</a> allows you to use
-      it in any application, free of charge.
+      Dlib is a modern C++ toolkit containing machine learning algorithms and
+      tools for creating complex software in C++ to solve real world problems.
+      It is used in both industry and academia in a wide range of domains 
+      including robotics, embedded devices, mobile phones, and large high
+      performance computing environments. Dlib's <a href="license.html">open source licensing</a> 
+      allows you to use it in any application, free of charge.
       </p>
 
       <p>
