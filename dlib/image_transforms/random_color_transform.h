@@ -142,8 +142,8 @@ namespace dlib
                 rgb_pixel temp;
                 assign_pixel(temp, img[r][c]);
                 temp.red   = rtable[temp.red];
-                temp.green = rtable[temp.green];
-                temp.blue  = rtable[temp.blue];
+                temp.green = gtable[temp.green];
+                temp.blue  = btable[temp.blue];
                 assign_pixel(img[r][c], temp);
             }
         }
