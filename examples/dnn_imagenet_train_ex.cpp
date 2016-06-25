@@ -161,6 +161,7 @@ std::vector<image_info> get_imagenet_train_listing(
 }
 
 std::vector<image_info> get_imagenet_val_listing(
+    const std::string& imagenet_root_dir,
     const std::string& validation_images_file 
 )
 {
@@ -169,10 +170,9 @@ std::vector<image_info> get_imagenet_val_listing(
     std::vector<image_info> results;
     image_info temp;
     temp.numeric_label = -1;
-    string path = get_parent_directory(file(validation_images_file));
     while(fin >> label >> filename)
     {
-        temp.filename = path+"/"+filename;
+        temp.filename = imagenet_root_dir+"/"+filename;
         if (!file_exists(temp.filename))
         {
             cerr << "file doesn't exist! " << temp.filename << endl;
@@ -309,7 +309,7 @@ int main(int argc, char** argv) try
     int num_wrong_top1 = 0;
     dlib::rand rnd(time(0));
     // loop over all the imagenet validation images
-    for (auto l : get_imagenet_val_listing(argv[2]))
+    for (auto l : get_imagenet_val_listing(argv[1], argv[2]))
     {
         dlib::array<matrix<rgb_pixel>> images;
         matrix<rgb_pixel> img;
