@@ -12,6 +12,8 @@
 
 <current>
 New Features:
+   - Added find_optimal_parameters()
+   - Added elastic_net
    - Added random_color_transform and disturb_colors().
    - Added a constructor for seeding rand with a time_t.
    - Added apply_random_color_offset()
@@ -46,15 +48,20 @@ New Features:
       
 Non-Backwards Compatible Changes:
    - Everything in dlib/matlab/call_matlab.h is now in the dlib namespace.
+   - DLIB_TEST() and DLIB_TEST_MSG() macros now require you to terminate them with ;
 
 Bug fixes:
    - Fixed bug in 10 argument version of call_matlab() and also cleaned up a few
    minor things.
    - setup.py and cmake scripts work in a few more contexts.
+   - Compiler errors in visual studio 2015
+   - Fixed a bug in gaussian_blur() that caused messed up outputs when big sigma values were used on some pixel types.
+   - Fixed minor bugs in join_rows() and join_cols(). They didn't work when one of the matrices was empty.
 
 
 Other:
    - Made cmake scripts uniformly require cmake version 2.8.4.
+   - faster fHOG feature extraction / face detection
    - C++11
       - CMake scripts now enable C++11 by default
       - Gave array2d and matrix move constructors and move assignment operators.

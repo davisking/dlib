@@ -37,6 +37,7 @@
          <item>find_max_bobyqa</item> 
          <item>find_max_trust_region</item> 
          <item>find_min_trust_region</item> 
+         <item>find_optimal_parameters</item> 
       </section>
 
       <section>
@@ -58,6 +59,7 @@
          <item>find_max_factor_graph_potts</item> 
          <item>find_max_parse_cky</item> 
          <item>min_cut</item> 
+         <item>elastic_net</item> 
       </section>
 
       <section>
@@ -875,6 +877,65 @@ Or it can use the elastic net regularizer:
             <example>model_selection_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component cpp11="true">
+         <name>find_optimal_parameters</name>
+         <file>dlib/optimization/find_optimal_parameters.h</file>
+         <spec_file link="true">dlib/optimization/find_optimal_parameters_abstract.h</spec_file>
+         <description>
+            Performs a constrained minimization of a function and doesn't require derivatives from the user. 
+            This function is similar to <a href="#find_min_bobyqa">find_min_bobyqa</a> and
+            <a href="#find_min_single_variable">find_min_single_variable</a> except that it
+            allows any number of variables and never throws exceptions when the max iteration
+            limit is reached (even if it didn't converge).
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component cpp11="true">
+         <name>elastic_net</name>
+         <file>dlib/optimization/elastic_net.h</file>
+         <spec_file link="true">dlib/optimization/elastic_net_abstract.h</spec_file>
+         <description>
+                This object is a tool for solving the following optimization problem:
+
+<pre>
+   min_w:      length_squared(X*w - Y) + ridge_lambda*length_squared(w)
+   such that:  sum(abs(w)) &lt;= lasso_budget
+</pre>
+
+                <p>
+                That is, it solves the elastic net optimization problem.  This object also
+                has the special property that you can quickly obtain different solutions
+                for different settings of ridge_lambda, lasso_budget, and target Y values.
+                </p>
+
+                <p>
+                This is because a large amount of work is precomputed in the constructor.
+                The solver will also remember the previous solution and will use that to
+                warm start subsequent invocations.  Therefore, you can efficiently get
+                solutions for a wide range of regularization parameters.
+                </p>
+                
+                
+                The particular algorithm used to solve it is described in the paper:
+                <blockquote>
+                    Zhou, Quan, et al. "A reduction of the elastic net to support vector
+                    machines with an application to gpu computing." arXiv preprint
+                    arXiv:1409.1976 (2014).  APA 
+                </blockquote>
+
+                And for the SVM solver sub-component we use the algorithm from:
+                <blockquote>
+                    Hsieh, Cho-Jui, et al. "A dual coordinate descent method for large-scale
+                    linear SVM." Proceedings of the 25th international conference on Machine
+                    learning. ACM, 2008. 
+                </blockquote>
+         </description>
       </component>
 
    <!-- ************************************************************************* -->
