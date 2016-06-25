@@ -187,7 +187,7 @@
             <name>Examples: C++</name>
             <sub>
                <item>
-                  <name>Deep Learning</name>
+                  <name>Deep Learning Introduction</name>
                   <link>dnn_mnist_ex.cpp.html</link>
                </item>
                <item>
@@ -197,6 +197,10 @@
                <item>
                   <name>Deep Learning Imagenet Classifier </name>
                   <link>dnn_imagenet_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Imagenet Trainer </name>
+                  <link>dnn_imagenet_train_ex.cpp.html</link>
                </item>
                <item>
                   <name>Deep Learning Inception</name>
