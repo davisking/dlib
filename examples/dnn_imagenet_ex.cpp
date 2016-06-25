@@ -121,7 +121,11 @@ int main(int argc, char** argv) try
     anet_type net;
     deserialize("resnet34_1000_imagenet_classifier.dnn") >> net >> labels;
 
-
+    // Make a network with softmax as the final layer.  We don't have to do this
+    // if we just want to output the single best prediction, since the anet_type
+    // already does this.  But if we instead want to get the probability of each
+    // class as output we need to replace the last layer of the network with a
+    // softmax layer, which we do as follows:
     softmax<anet_type::subnet_type> snet; 
     snet.subnet() = net.subnet();
 
@@ -131,7 +135,7 @@ int main(int argc, char** argv) try
     dlib::rand rnd;
     image_window win;
 
-    // read images from the command prompt and print the top 5 best labels for each.
+    // Read images from the command prompt and print the top 5 best labels for each.
     for (int i = 1; i < argc; ++i)
     {
         load_image(img, argv[i]);
@@ -143,6 +147,7 @@ int main(int argc, char** argv) try
         matrix<float,1,1000> p = sum_rows(mat(snet(images.begin(), images.end())))/num_crops;
 
         win.set_image(img);
+        // Print the 5 most probable labels
         for (int k = 0; k < 5; ++k)
         {
             unsigned long predicted_label = index_of_max(p);
