@@ -331,7 +331,7 @@ int main(int argc, char** argv) try
         bool found_match = false;
         for (int k = 0; k < 5; ++k)
         {
-            unsigned long predicted_label = index_of_max(p);
+            long predicted_label = index_of_max(p);
             p(predicted_label) = 0;
             if (predicted_label == l.numeric_label)
             {
