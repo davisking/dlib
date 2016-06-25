@@ -111,8 +111,8 @@ int main(int argc, char** argv) try
     if (argc == 1)
     {
         cout << "Give this program image files as command line arguments.\n" << endl;
-        cout << "You will also need a copy of the file resnet34_1000_imagenet_classifier.dnn which" << endl;
-        cout << "is available at http://dlib.net/files/resnet34_1000_imagenet_classifier.dnn.bz2" << endl;
+        cout << "You will also need a copy of the file resnet34_1000_imagenet_classifier.dnn " << endl;
+        cout << "available at http://dlib.net/files/resnet34_1000_imagenet_classifier.dnn.bz2" << endl;
         cout << endl;
         return 1;
     }
