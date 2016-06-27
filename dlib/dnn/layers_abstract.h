@@ -389,6 +389,19 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier()  == 0
         !*/
 
+        fc_(
+            num_fc_outputs o
+        );
+        /*!
+            ensures
+                - #get_num_outputs() == o.num_outputs 
+                - #get_bias_mode() == bias_mode 
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
+        !*/
+
         unsigned long get_num_outputs (
         ) const; 
         /*!
