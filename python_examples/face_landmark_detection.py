@@ -18,7 +18,7 @@
 #   tools. See train_shape_predictor.py to see an example.
 #
 #   You can get the shape_predictor_68_face_landmarks.dat file from:
-#   http://sourceforge.net/projects/dclib/files/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2
+#   http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
 #
 # COMPILING/INSTALLING THE DLIB PYTHON INTERFACE
 #   You can install dlib using the command:
@@ -56,7 +56,7 @@ if len(sys.argv) != 3:
         "execute this program by running:\n"
         "    ./face_landmark_detection.py shape_predictor_68_face_landmarks.dat ../examples/faces\n"
         "You can download a trained facial shape predictor from:\n"
-        "    http://sourceforge.net/projects/dclib/files/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2")
+        "    http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2")
     exit()
 
 predictor_path = sys.argv[1]

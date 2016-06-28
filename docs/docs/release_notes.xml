@@ -12,53 +12,61 @@
 
 <current>
 New Features:
-   - Added random_color_transform and disturb_colors().
-   - Added a constructor for seeding rand with a time_t.
-   - Added apply_random_color_offset()
-   - Made load_image() support GIF files.
-   - Added subm_clipped()
-   - load_mnist_dataset()
-   - Added an option to solve the L2-loss version of the SVM objective function for svm_c_linear_dcd_trainer.
-   - Added the option to use the elastic net regularizer to the OCA solver.
-   - Added solve_qp_box_constrained()
-   - Added unserialize.
-   - MATLAB binding stuff
-      - link to MATLAB's intel MKL when used on linux
-      - struct support, more arguments (20 now instead of 10),
-      - in place operation.  Made column major matrices directly wrap matlab
+   - A deep learning toolkit using CPU and/or GPU hardware.  Some major elements
+     of this are:
+      - Clean and fully documented C++11 API
+      - Clean tutorials: see dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
+      - Uses cuDNN v5.0
+      - Multi-GPU support
+      - Automatic learning rate adjustment
+      - A pretrained 1000 class Imagenet classifier (see dnn_imagenet_ex.cpp)
+   - Optimization Tools
+      - Added find_optimal_parameters()
+      - Added elastic_net class
+      - Added the option to use the elastic net regularizer to the OCA solver.
+      - Added an option to solve the L2-loss version of the SVM objective function to svm_c_linear_dcd_trainer.
+      - Added solve_qp_box_constrained()
+   - Image Processing
+      - Added random_color_transform, disturb_colors(), and apply_random_color_offset().
+      - load_image() now supports loading GIF files.
+   - Many improvements to the MATLAB binding API  
+      - Automatically link to MATLAB's Intel MKL when used on linux.
+      - struct support
+      - mex functions can have up to 20 arguments instead of 10.
+      - In place operation.  Made column major matrices directly wrap MATLAB
         matrix objects when used inside mex files.  This way, if you use
         matrix_colmajor or fmatrix_colmajor in a mex file it will not do any
         unnecessary copying or transposing.
-      - catch ctrl+c presses in MATLAB console.
-      - DLIB_ASSERTS won't kill the matlab process, just throw an exception
-      - Made cerr print in matlab as a red warning message.
+      - Catch ctrl+c presses in MATLAB console.  Allowing early termination of mex functions.
+      - When used inside mex files, DLIB_ASSERTS won't kill the MATLAB process,
+        just throw an exception.
+      - Made cerr print in MATLAB as a red warning message.
+   - load_mnist_dataset()
+   - Added a constructor for seeding rand with a time_t.
+   - Added subm_clipped()
+   - Added unserialize.
+   - Added running_gradient
 
-
-   - C++11 only tools
-      - Added log1pexp()
-      - Added running_gradient
-      - deep learning tools
-         - dnn_trainer
-         - cuDNN v4.0
-         - auto step size adjust and stopping condition.
-      - CUDA/tensor stuff
-         - gpu_data, tensor, alias tensors
-      
 Non-Backwards Compatible Changes:
    - Everything in dlib/matlab/call_matlab.h is now in the dlib namespace.
+   - DLIB_TEST() and DLIB_TEST_MSG() macros now require you to terminate them with a ;
 
 Bug fixes:
    - Fixed bug in 10 argument version of call_matlab() and also cleaned up a few
-   minor things.
-   - setup.py and cmake scripts work in a few more contexts.
-
+     minor things.
+   - setup.py and CMake scripts work in a few more contexts.
+   - Fixed compiler errors in visual studio 2015.
+   - Fixed a bug in gaussian_blur() that caused messed up outputs when big
+     sigma values were used on some pixel types.
+   - Fixed minor bugs in join_rows() and join_cols(). They didn't work when one
+     of the matrices was empty.
 
 Other:
-   - Made cmake scripts uniformly require cmake version 2.8.4.
-   - C++11
-      - CMake scripts now enable C++11 by default
-      - Gave array2d and matrix move constructors and move assignment operators.
-
+   - Made CMake scripts uniformly require CMake version 2.8.4.
+   - Faster fHOG feature extraction / face detection
+   - CMake scripts now enable C++11 by default
+   - Gave array2d and matrix move constructors and move assignment operators.  Matrix
+     can also now be created from initializer lists.
 </current>
 
 <!-- **************************************************************************************  -->

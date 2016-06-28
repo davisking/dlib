@@ -208,9 +208,9 @@ namespace dlib
             auto ptr = data.host();
             for (auto i = ibegin; i != iend; ++i)
             {
-                for (long r = 0; r < NR; ++r)
+                for (size_t r = 0; r < NR; ++r)
                 {
-                    for (long c = 0; c < NC; ++c)
+                    for (size_t c = 0; c < NC; ++c)
                     {
                         rgb_pixel temp = (*i)(r,c);
                         auto p = ptr++;
