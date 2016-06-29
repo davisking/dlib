@@ -12,9 +12,9 @@ endif()
 
 
 # Determine the path to dlib.
-string(REGEX REPLACE "cmake$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
-include(${dlib_path}/add_global_compiler_switch.cmake)
-include(${dlib_path}/use_cpp_11.cmake)
+set(dlib_path ${CMAKE_CURRENT_LIST_DIR})
+include(${dlib_path}/cmake_utils/add_global_compiler_switch.cmake)
+include(${dlib_path}/cmake_utils/use_cpp_11.cmake)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     # By default, g++ won't warn or error if you forget to return a value in a
@@ -92,7 +92,7 @@ INCLUDE_DIRECTORIES(${dlib_path}/..)
 
 # This is really optional, but nice.  It will make sure the build mode 
 # created by cmake is always release by default.
-include(${dlib_path}/release_build_by_default)
+include(${dlib_path}/cmake_utils/release_build_by_default)
 
 
 # Don't add dlib if it's already been added to the cmake project

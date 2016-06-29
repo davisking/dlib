@@ -16,9 +16,7 @@ endif()
 # Set to false unless we find out otherwise in the code below.
 set(COMPILER_CAN_DO_CPP_11 0)
 
-# Determine the path to dlib.
-string(REGEX REPLACE "use_cpp_11.cmake$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
-include(${dlib_path}/add_global_compiler_switch.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/add_global_compiler_switch.cmake)
 
 
 # Now turn on the appropriate compiler switch to enable C++11 if you have a
@@ -44,7 +42,7 @@ if (CMAKE_VERSION VERSION_LESS "3.1.2")
       # Since we don't know what compiler this is ust try to build a c++11 project and see if it compiles.
       message(STATUS "Building a C++11 test project to see if your compiler supports C++11")
       try_compile(test_for_cpp11_worked ${PROJECT_BINARY_DIR}/cpp11_test_build 
-         ${dlib_path}/dnn/test_for_cpp11 cpp11_test)
+         ${CMAKE_CURRENT_LIST_DIR}/test_for_cpp11 cpp11_test)
       if (test_for_cpp11_worked)
          message(STATUS "C++11 activated.")
          set(COMPILER_CAN_DO_CPP_11 1)

@@ -8,8 +8,8 @@ cmake_minimum_required(VERSION 2.8.4)
 project(dlib)
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
-include(release_build_by_default)
-include(use_cpp_11.cmake)
+include(cmake_utils/release_build_by_default)
+include(cmake_utils/use_cpp_11.cmake)
 
 
 set(CPACK_PACKAGE_VERSION_MAJOR "19")
@@ -31,7 +31,7 @@ if(COMMAND cmake_policy)
    endif()
 endif()
 
-include(add_global_compiler_switch.cmake)
+include(cmake_utils/add_global_compiler_switch.cmake)
 
 
 # Make sure ENABLE_ASSERTS is defined for debug builds
@@ -424,7 +424,7 @@ if (NOT TARGET dlib)
 
       if (DLIB_USE_BLAS OR DLIB_USE_LAPACK)
          # Try to find BLAS and LAPACK 
-         include(cmake_find_blas.txt)
+         include(cmake_utils/cmake_find_blas.txt)
 
          if (DLIB_USE_BLAS)
             if (blas_found)
@@ -458,13 +458,13 @@ if (NOT TARGET dlib)
             # linux).
             list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__")
 
-            include(dnn/test_for_cudnn/find_cudnn.txt)
+            include(cmake_utils/test_for_cudnn/find_cudnn.txt)
 
             if (cudnn AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
                # make sure cuda is really working by doing a test compile
                message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
                try_compile(cuda_test_compile_worked ${PROJECT_BINARY_DIR}/cuda_test_build 
-                           ${PROJECT_SOURCE_DIR}/dnn/test_for_cuda cuda_test
+                           ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
                            CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
                                        "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
                                        "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}"
@@ -474,7 +474,7 @@ if (NOT TARGET dlib)
                else()
                   message(STATUS "Checking if you have the right version of cuDNN installed.")
                   try_compile(cudnn_test_compile_worked ${PROJECT_BINARY_DIR}/cudnn_test_build 
-                              ${PROJECT_SOURCE_DIR}/dnn/test_for_cudnn cudnn_test
+                              ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cudnn cudnn_test
                               CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
                                           "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
                                           "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}"
@@ -610,7 +610,7 @@ if (NOT TARGET dlib)
             DESTINATION ${ConfigPackageLocation})
 
        set(CONF_INSTALL_PATH "\${dlib_CMAKE_DIR}/../../../")
-       configure_file(dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
+       configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
 
        include(CMakePackageConfigHelpers)
        write_basic_package_version_file(
@@ -626,7 +626,7 @@ if (NOT TARGET dlib)
 
        ## dlib-1.pc generation and installation
 
-       configure_file("dlib.pc.in" "dlib-1.pc" @ONLY)
+       configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
            DESTINATION "${LIB_INSTALL_DIR}/pkgconfig")
 

@@ -3,7 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
 
 
 set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
-include(../../dlib/add_python_module)
+include(../../dlib/cmake_utils/add_python_module)
 
 add_definitions(-DDLIB_VERSION=${DLIB_VERSION})
 

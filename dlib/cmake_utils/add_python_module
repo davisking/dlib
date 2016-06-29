@@ -40,8 +40,7 @@ set(CMAKE_PREFIX_PATH ${PYTHON_PATH})
 # of other dll files and can be safely copied to someone elese's computer
 # and expected to run.
 if (MSVC)
-    string(REGEX REPLACE "add_python_module$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
-    include(${dlib_path}/tell_visual_studio_to_use_static_runtime.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/tell_visual_studio_to_use_static_runtime.cmake)
     add_definitions(-DBOOST_PYTHON_STATIC_LIB)
     SET(Boost_USE_STATIC_LIBS ON)
     SET(Boost_USE_MULTITHREADED ON)
@@ -130,8 +129,7 @@ else()
 endif()
 
 # include dlib so we can link against it
-string(REGEX REPLACE "add_python_module$" "" dlib_path ${CMAKE_CURRENT_LIST_FILE})
-include(${dlib_path}/cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake)
 
 
 # We put the extra _ on the end of the name just so it's possible to

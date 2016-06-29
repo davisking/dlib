@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(cuda_test)
 
-include_directories(..)
+include_directories(../../dnn)
 add_definitions(-DDLIB_USE_CUDA)
 
 find_package(CUDA 7.5 REQUIRED)
