@@ -329,5 +329,31 @@ cross_validate_trainer_threaded(trainer,
 
    <!-- ************************************************************************* -->
 
+   <questions group="DNN">
+      <question text="Why can't I use DNN module with Visual Studio?">
+         The reason for creating the dlib DNN tools is to provide a clean C++ API for
+         doing this kind of machine learning. Such an API was noticeably lacking
+         from all the other DNN libraries. DNN module is written with C++ 11 standard.
+         Unfortunately, Visual Studio does not support all C++ 11 standard requirements
+         (for the state of VS 2015 Update 3). Hopefully, future versions of Visual Studio
+         will work better.
+      </question>
+
+      <question text="Why can't change network architecture at runtime?">
+          A major design goal of this API is to let users create new loss layers, 
+          computational layers, and solvers without needing to understand or even look 
+          at the dlib internals.  A lot of the API decisions are based on what makes the
+          interface a user needs to implement for new layer creation simple, and if
+          you look at it you will find that it's far simpler than many other known 
+          DNN libraries.
+          Since it takes several days to train models, needing to recompile to change
+          the network architecture isn't a big deal.
+          DNN module is designed to work in production enviroment where you need maximal
+          possible performance and reliability.
+      </question>
+   </questions>
+
+   <!-- ************************************************************************* -->
+
 
 </doc>
