@@ -5,6 +5,8 @@
 
 #include "../matrix/matrix_abstract.h"
 #include "vector_abstract.h"
+#include "rectangle_abstract.h"
+#include "drectangle_abstract.h"
 #include <vector>
 
 namespace dlib
@@ -144,6 +146,77 @@ namespace dlib
               different location in the coordinate system.  This is not the case for a
               general affine transform which can stretch points in ways that cause, for
               example, an equilateral triangle to turn into an isosceles triangle.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class rectangle_transform
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is just a point_transform_affine wrapped up so that it can
+                transform rectangle objects.  It will take a rectangle and transform it
+                according to an affine transformation.  
+
+            THREAD SAFETY
+                It is safe for multiple threads to make concurrent accesses to this object
+                without synchronization.
+        !*/
+    public:
+
+        rectangle_transform (
+        );
+        /*!
+            ensures
+                - This object will perform the identity transform.  That is, given a rectangle 
+                  as input it will return the same rectangle as output.
+        !*/
+
+        rectangle_transform (
+            const point_transform_affine& tform
+        );
+        /*!
+            ensures
+                - #get_tform() == tform
+        !*/
+
+        drectangle operator() (
+            const drectangle& r
+        ) const;
+        /*!
+            ensures
+                - Applies the transformation get_tform() to r and returns the resulting
+                  rectangle.  If the transformation doesn't have any rotation then the
+                  transformation simply maps the corners of the rectangle according to
+                  get_tform() and returns the exact result.  However, since
+                  dlib::drectangle can't represent rotated rectangles, if there is any
+                  rotation in the affine transform we will attempt to produce the most
+                  faithful possible outputs by ensuring the output rectangle has the
+                  correct center point and that its area and aspect ratio match the correct
+                  rotated rectangle's as much as possible.
+        !*/
+
+        rectangle operator() (
+            const rectangle& r
+        ) const;
+        /*!
+            ensures
+                - returns (*this)(drectangle(r))
+        !*/
+
+        const point_transform_affine& get_tform(
+        ) const; 
+        /*!
+            ensures
+                - returns the affine transformation this object uses to transform rectangles.
+        !*/
+
+    };
+
+    void serialize   (const rectangle_transform& item, std::ostream& out);
+    void deserialize (rectangle_transform& item, std::istream& in);
+    /*!
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------
