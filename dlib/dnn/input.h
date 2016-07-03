@@ -295,6 +295,12 @@ namespace dlib
         typedef matrix<T,NR,NC,MM,L> input_type;
         const static unsigned int sample_expansion_factor = 1;
 
+        input() {}
+        input(const input&) {}
+
+        template <typename mm>
+        input(const input<array2d<T,mm>>&) {}
+
         template <typename input_iterator>
         void to_tensor (
             input_iterator ibegin,
@@ -382,6 +388,12 @@ namespace dlib
     public:
         typedef array2d<T,MM> input_type;
         const static unsigned int sample_expansion_factor = 1;
+
+        input() {}
+        input(const input&) {}
+
+        template <long NR, long NC, typename mm, typename L>
+        input(const input<matrix<T,NR,NC,mm,L>>&) {}
 
         template <typename input_iterator>
         void to_tensor (
