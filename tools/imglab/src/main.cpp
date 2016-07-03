@@ -20,7 +20,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.3";
+const char* VERSION = "1.4";
 
 
 
@@ -377,6 +377,86 @@ void rotate_dataset(const command_line_parser& parser)
 
 // ----------------------------------------------------------------------------------------
 
+int resample_dataset(const command_line_parser& parser)
+{
+    if (parser.number_of_arguments() != 1)
+    {
+        cerr << "The --resample option requires you to give one XML file on the command line." << endl;
+        return EXIT_FAILURE;
+    }
+
+    const size_t obj_size = get_option(parser,"resample",100*100); 
+    const double margin_scale = 2.5; // cropped image will be this times wider than the object.
+    const size_t image_size = obj_size*margin_scale;
+
+    dlib::image_dataset_metadata::dataset data, resampled_data;
+    resampled_data.comment = data.comment;
+    resampled_data.name = data.name + " RESAMPLED";
+
+    load_image_dataset_metadata(data, parser[0]);
+    locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
+
+    console_progress_indicator pbar(data.images.size());
+    for (unsigned long i = 0; i < data.images.size(); ++i)
+    {
+        // don't even bother loading images that don't have objects.
+        if (data.images[i].boxes.size() == 0)
+            continue;
+
+        pbar.print_status(i);
+        array2d<rgb_pixel> img, chip;
+        load_image(img, data.images[i].filename);
+
+
+        // figure out what chips we want to take from this image
+        for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+        {
+            const rectangle rect = data.images[i].boxes[j].rect;
+            if (data.images[i].boxes[j].ignore || !get_rect(img).contains(rect))
+                continue;
+
+            const rectangle crop_rect = centered_rect(rect, rect.width()*margin_scale, rect.height()*margin_scale);
+
+            // skip crops that have a lot of border pixels
+            if (get_rect(img).intersect(crop_rect).area() < crop_rect.area()*0.8)
+                continue;
+
+            const rectangle_transform tform = get_mapping_to_chip(chip_details(crop_rect, image_size));
+            extract_image_chip(img, chip_details(crop_rect, image_size), chip);
+
+            image_dataset_metadata::image dimg;
+            // Now transform the boxes to the crop and also mark them as ignored if they
+            // have already been cropped out or are outside the crop.
+            for (size_t k = 0; k < data.images[i].boxes.size(); ++k)
+            {
+                image_dataset_metadata::box box = data.images[i].boxes[k];
+                // ignore boxes outside the cropped image
+                if (crop_rect.intersect(box.rect).area() == 0)
+                    continue;
+
+                // mark boxes we include in the crop as ignored.  Also mark boxes that
+                // aren't totally within the crop as ignored.
+                if (crop_rect.contains(grow_rect(box.rect,10)))
+                    data.images[i].boxes[k].ignore = true;
+                else
+                    box.ignore = true;
+
+                box.rect = tform(box.rect);
+                dimg.boxes.push_back(box);
+            }
+            dimg.filename = data.images[i].filename + "RESAMPLED"+cast_to_string(j)+".jpg";
+
+            save_jpeg(chip,dimg.filename, 98);
+            resampled_data.images.push_back(dimg);
+        }
+    }
+
+    save_image_dataset_metadata(resampled_data, parser[0] + ".RESAMPLED.xml");
+
+    return EXIT_SUCCESS;
+}
+
+// ----------------------------------------------------------------------------------------
 
 int tile_dataset(const command_line_parser& parser)
 {
@@ -489,11 +569,13 @@ int main(int argc, char** argv)
                                   "The output is saved to an XML file prefixed with rotated_<arg>.",1);
         parser.add_option("cluster", "Cluster all the objects in an XML file into <arg> different clusters and save "
                                      "the results as cluster_###.xml and cluster_###.jpg files.",1);
+        parser.add_option("resample", "Crop out images that are centered on each object in the dataset.  Make the "
+                                      "crops so that the objects have <arg> pixels in them.",1); 
 
         parser.parse(argc, argv);
 
         const char* singles[] = {"h","c","r","l","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
-                                 "flip", "rotate", "tile", "size", "cluster"};
+                                 "flip", "rotate", "tile", "size", "cluster", "resample"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
@@ -511,6 +593,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "parts");
         parser.check_incompatible_options("c", "tile");
         parser.check_incompatible_options("c", "cluster");
+        parser.check_incompatible_options("c", "resample");
         parser.check_incompatible_options("l", "rename");
         parser.check_incompatible_options("l", "add");
         parser.check_incompatible_options("l", "parts");
@@ -522,14 +605,19 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("flip", "tile");
         parser.check_incompatible_options("rotate", "tile");
         parser.check_incompatible_options("cluster", "tile");
+        parser.check_incompatible_options("resample", "tile");
         parser.check_incompatible_options("flip", "cluster");
         parser.check_incompatible_options("rotate", "cluster");
         parser.check_incompatible_options("add", "cluster");
+        parser.check_incompatible_options("flip", "resample");
+        parser.check_incompatible_options("rotate", "resample");
+        parser.check_incompatible_options("add", "resample");
         parser.check_incompatible_options("shuffle", "tile");
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "rename");
         parser.check_incompatible_options("convert", "parts");
         parser.check_incompatible_options("convert", "cluster");
+        parser.check_incompatible_options("convert", "resample");
         parser.check_incompatible_options("rmdiff", "rename");
         parser.check_incompatible_options("rmdupes", "rename");
         parser.check_incompatible_options("rmtrunc", "rename");
@@ -538,6 +626,7 @@ int main(int argc, char** argv)
         parser.check_option_arg_range("cluster", 2, 999);
         parser.check_option_arg_range("rotate", -360, 360);
         parser.check_option_arg_range("size", 10*10, 1000*1000);
+        parser.check_option_arg_range("resample", 4, 1000*1000);
 
         if (parser.option("h"))
         {
@@ -582,6 +671,11 @@ int main(int argc, char** argv)
         if (parser.option("cluster"))
         {
             return cluster_dataset(parser);
+        }
+
+        if (parser.option("resample"))
+        {
+            return resample_dataset(parser);
         }
 
         if (parser.option("c"))
