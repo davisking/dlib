@@ -387,7 +387,7 @@ int resample_dataset(const command_line_parser& parser)
 
     const size_t obj_size = get_option(parser,"resample",100*100); 
     const double margin_scale = 2.5; // cropped image will be this times wider than the object.
-    const size_t image_size = obj_size*margin_scale;
+    const size_t image_size = obj_size*margin_scale*margin_scale;
 
     dlib::image_dataset_metadata::dataset data, resampled_data;
     resampled_data.comment = data.comment;
@@ -442,6 +442,8 @@ int resample_dataset(const command_line_parser& parser)
                     box.ignore = true;
 
                 box.rect = tform(box.rect);
+                for (auto&& p : box.parts)
+                    p.second = tform.get_tform()(p.second);
                 dimg.boxes.push_back(box);
             }
             dimg.filename = data.images[i].filename + "RESAMPLED"+cast_to_string(j)+".jpg";
