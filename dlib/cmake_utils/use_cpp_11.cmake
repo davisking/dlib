@@ -72,3 +72,17 @@ else()
    endif()
 endif()
 
+# Always enable whatever partial C++11 support we have, even if it isn't full support.
+if (NOT COMPILER_CAN_DO_CPP_11)
+   include(CheckCXXCompilerFlag)
+   CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+   CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+   if(COMPILER_SUPPORTS_CXX11)
+      message(STATUS "C++11 activated (compiler doesn't have full C++11 support).")
+      add_global_compiler_switch("-std=c++11")
+   elseif(COMPILER_SUPPORTS_CXX0X)
+      message(STATUS "C++0x activated (compiler doesn't have full C++11 support).")
+      add_global_compiler_switch("-std=c++0x")
+   endif()
+endif()
+
