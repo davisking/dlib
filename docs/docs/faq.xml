@@ -329,27 +329,48 @@ cross_validate_trainer_threaded(trainer,
 
    <!-- ************************************************************************* -->
 
-   <questions group="DNN">
+   <questions group="Deep Learning">
       <question text="Why can't I use DNN module with Visual Studio?">
-         The reason for creating the dlib DNN tools is to provide a clean C++ API for
-         doing this kind of machine learning. Such an API was noticeably lacking
-         from all the other DNN libraries. DNN module is written with C++ 11 standard.
-         Unfortunately, Visual Studio does not support all C++ 11 standard requirements
-         (for the state of VS 2015 Update 3). Hopefully, future versions of Visual Studio
-         will work better.
+         The deep learning toolkit in dlib requires a C++11 compiler.
+         Unfortunately, as of July 2016, no versions of Visual Studio fully
+         support C++11, so not all the deep learning code will compile.
+         However, all the other modules in dlib can be used in Visual Studio
+         without any trouble.
       </question>
 
-      <question text="Why can't change network architecture at runtime?">
-          A major design goal of this API is to let users create new loss layers, 
-          computational layers, and solvers without needing to understand or even look 
-          at the dlib internals.  A lot of the API decisions are based on what makes the
-          interface a user needs to implement for new layer creation simple, and if
-          you look at it you will find that it's far simpler than many other known 
-          DNN libraries.
-          Since it takes several days to train models, needing to recompile to change
-          the network architecture isn't a big deal.
-          DNN module is designed to work in production enviroment where you need maximal
-          possible performance and reliability.
+      <question text="Why can't I change the network architecture at runtime?">
+          A major design goal of this API is to let users create new loss
+          layers, computational layers, and solvers without needing to
+          understand or even look at the dlib internals.  A lot of the API
+          decisions are based on what makes the interface a user needs to
+          implement to create new layers as simple as possible.  In particular,
+          designing the API in this compile-time static way makes it simple for
+          these use cases.  
+          <p>
+             Here is an example of one problem it addresses.  Since dlib
+             exposes the entire network architecture to the C++ type system we
+             can get automatic serialization of networks.  Without this, we
+             would have to resort to the kind of hacky global layer registry
+             used in other tools that compose networks entirely at runtime.
+          </p>
+          <p>
+             Another nice feature is that we get to use C++11 alias template
+             statements to create network sub-blocks, which we can then use to easily
+             define very large networks.  There are examples of this in <a
+             href="dnn_introduction2_ex.cpp.html">this example program</a>.  It
+             should also be pointed out that it takes days or even weeks to
+             train one network.  So it isn't as if you will be writing a
+             program that loops over large numbers of networks and trains them
+             all.  This makes the time needed to recompile a program to change
+             the network irrelevant compared to the entire training time.
+             Moreover, there are plenty of compile time constructs in C++ you
+             can use to enumerate network architectures (e.g. loop
+             over filter widths) if you really wanted to do so.  
+          </p>
+          <p>
+             All that said, if you think you found a compelling use case that isn't supported
+             by the current API feel free to post a <a href="https://github.com/davisking/dlib/issues">github</a> issue.
+          </p>
       </question>
    </questions>
 
