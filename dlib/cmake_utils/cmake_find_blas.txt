@@ -253,6 +253,8 @@ elseif(WIN32 AND NOT MINGW)
         set( mkl_search_path
             "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/intel64" 
             "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64" 
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64" 
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/intel64"
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
             "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
             "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
@@ -263,6 +265,8 @@ elseif(WIN32 AND NOT MINGW)
         set( mkl_search_path
             "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/ia32" 
             "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/ia32"
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/ia32" 
+            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/ia32"
             "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
             "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/ia32"
             "C:/Program Files/Intel/Composer XE/mkl/lib/ia32"
@@ -293,7 +297,7 @@ elseif(WIN32 AND NOT MINGW)
         set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
         CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
         if (NOT HAVE_CBLAS)
-            message(STATUS "BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
+            message("BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
             set(blas_found 0)
             set(lapack_found 0)
         endif()
