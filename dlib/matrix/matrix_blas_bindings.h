@@ -44,6 +44,7 @@ namespace dlib
         #define DLIB_TEST_BLAS_BINDING_SCAL
 #endif
 
+#ifndef CBLAS_H
         extern "C"
         {
             // Here we declare the prototypes for the CBLAS calls used by the BLAS bindings below
@@ -133,6 +134,7 @@ namespace dlib
                              const void *alpha, const void *X, const int incX,
                              const void *Y, const int incY, void *A, const int lda);
         }
+#endif // if not CBLAS_H
 
     // ----------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------
