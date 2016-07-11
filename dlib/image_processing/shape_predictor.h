@@ -398,26 +398,9 @@ namespace dlib
             return full_object_detection(rect, parts);
         }
 
-        friend void serialize (const shape_predictor& item, std::ostream& out)
-        {
-            int version = 1;
-            dlib::serialize(version, out);
-            dlib::serialize(item.initial_shape, out);
-            dlib::serialize(item.forests, out);
-            dlib::serialize(item.anchor_idx, out);
-            dlib::serialize(item.deltas, out);
-        }
-        friend void deserialize (shape_predictor& item, std::istream& in)
-        {
-            int version = 0;
-            dlib::deserialize(version, in);
-            if (version != 1)
-                throw serialization_error("Unexpected version found while deserializing dlib::shape_predictor.");
-            dlib::deserialize(item.initial_shape, in);
-            dlib::deserialize(item.forests, in);
-            dlib::deserialize(item.anchor_idx, in);
-            dlib::deserialize(item.deltas, in);
-        }
+        friend void serialize (const shape_predictor& item, std::ostream& out);
+
+        friend void deserialize (shape_predictor& item, std::istream& in);
 
     private:
         matrix<float,0,1> initial_shape;
@@ -426,6 +409,27 @@ namespace dlib
         std::vector<std::vector<dlib::vector<float,2> > > deltas;
     };
 
+    void serialize (const shape_predictor& item, std::ostream& out)
+    {
+        int version = 1;
+        dlib::serialize(version, out);
+        dlib::serialize(item.initial_shape, out);
+        dlib::serialize(item.forests, out);
+        dlib::serialize(item.anchor_idx, out);
+        dlib::serialize(item.deltas, out);
+    }
+
+    void deserialize (shape_predictor& item, std::istream& in)
+    {
+        int version = 0;
+        dlib::deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::shape_predictor.");
+        dlib::deserialize(item.initial_shape, in);
+        dlib::deserialize(item.forests, in);
+        dlib::deserialize(item.anchor_idx, in);
+        dlib::deserialize(item.deltas, in);
+    }
 // ----------------------------------------------------------------------------------------
 
     class shape_predictor_trainer
