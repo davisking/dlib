@@ -398,9 +398,9 @@ namespace dlib
             return full_object_detection(rect, parts);
         }
 
-        friend inline void serialize (const shape_predictor& item, std::ostream& out);
+        friend void serialize (const shape_predictor& item, std::ostream& out);
 
-        friend inline void deserialize (shape_predictor& item, std::istream& in);
+        friend void deserialize (shape_predictor& item, std::istream& in);
 
     private:
         matrix<float,0,1> initial_shape;
@@ -409,7 +409,7 @@ namespace dlib
         std::vector<std::vector<dlib::vector<float,2> > > deltas;
     };
 
-    void serialize (const shape_predictor& item, std::ostream& out)
+    inline void serialize (const shape_predictor& item, std::ostream& out)
     {
         int version = 1;
         dlib::serialize(version, out);
@@ -419,7 +419,7 @@ namespace dlib
         dlib::serialize(item.deltas, out);
     }
 
-    void deserialize (shape_predictor& item, std::istream& in)
+    inline void deserialize (shape_predictor& item, std::istream& in)
     {
         int version = 0;
         dlib::deserialize(version, in);
