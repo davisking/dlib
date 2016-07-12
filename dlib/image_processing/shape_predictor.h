@@ -398,9 +398,9 @@ namespace dlib
             return full_object_detection(rect, parts);
         }
 
-        friend void serialize (const shape_predictor& item, std::ostream& out);
+        friend inline void serialize (const shape_predictor& item, std::ostream& out);
 
-        friend void deserialize (shape_predictor& item, std::istream& in);
+        friend inline void deserialize (shape_predictor& item, std::istream& in);
 
     private:
         matrix<float,0,1> initial_shape;
