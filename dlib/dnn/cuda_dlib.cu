@@ -565,10 +565,15 @@ namespace dlib
             DLIB_CASSERT(have_same_dimensions(dest, src),"");
             DLIB_CASSERT(
                   ((A.num_samples()==1 && B.num_samples()==1) ||
-                  (A.num_samples()==src.num_samples() && B.num_samples()==src.num_samples())) &&
+                  (A.num_samples()==src.num_samples() && B.num_samples()==src.num_samples())),"");
+            DLIB_CASSERT(
                   A.nr()==B.nr() && B.nr()==src.nr() &&
                   A.nc()==B.nc() && B.nc()==src.nc() &&
-                  A.k() ==B.k()  && B.k()==src.k(),"");
+                  A.k() ==B.k()  && B.k()==src.k(),
+                  "\nA.nr(): " << A.nr() << "\nB.nr(): " << B.nr() << "\nsrc.nr(): " << src.nr()
+                  <<"\nA.nc(): " << A.nc() << "\nB.nc(): " << B.nc() << "\nsrc.nc(): " << src.nc()
+                  <<"\nA.k(): " << A.k() << "\nB.k(): " << B.k() << "\nsrc.k(): " << src.k()
+                  );
 
             if (A.num_samples() == 1)
             {
