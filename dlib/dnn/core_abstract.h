@@ -288,10 +288,10 @@ namespace dlib
                 - #subnet()        == subnet_type(args)
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const;
         /*!
@@ -343,10 +343,10 @@ namespace dlib
                   than the input layer.
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         const tensor& operator() (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         );
         /*!
             requires
@@ -696,10 +696,10 @@ namespace dlib
                   loss layer used by this network.
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const;
         /*!
@@ -736,10 +736,10 @@ namespace dlib
                   obegin.
         !*/
 
-        template <typename input_iterator, typename label_iterator>
+        template <typename forward_iterator, typename label_iterator>
         void operator() (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             label_iterator obegin
         );
         /*!
@@ -811,10 +811,10 @@ namespace dlib
                 - This function does not update the network parameters.
         !*/
 
-        template <typename input_iterator, typename label_iterator>
+        template <typename forward_iterator, typename label_iterator>
         double compute_loss (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             label_iterator lbegin 
         );
         /*!
@@ -846,10 +846,10 @@ namespace dlib
                 - This function does not update the network parameters.
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         double compute_loss (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
         );
         /*!
             requires
@@ -885,10 +885,10 @@ namespace dlib
                 - returns compute_loss(x,lbegin)
         !*/
 
-        template <typename input_iterator, typename label_iterator>
+        template <typename forward_iterator, typename label_iterator>
         double compute_parameter_gradients (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             label_iterator lbegin
         );
         /*!
@@ -924,10 +924,10 @@ namespace dlib
                 - returns compute_loss(x)
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         double compute_parameter_gradients (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         );
         /*!
             requires

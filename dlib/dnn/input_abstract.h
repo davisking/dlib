@@ -65,10 +65,10 @@ namespace dlib
         const static unsigned int sample_expansion_factor;
         typedef whatever_type_to_tensor_expects input_type;
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const;
         /*!
@@ -123,10 +123,10 @@ namespace dlib
         const static unsigned int sample_expansion_factor = 1;
         typedef T input_type;
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const;
         /*!
@@ -210,10 +210,10 @@ namespace dlib
                 - returns the value subtracted from the blue color channel.
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const;
         /*!

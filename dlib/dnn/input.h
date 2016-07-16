@@ -58,10 +58,10 @@ namespace dlib
         float get_avg_green() const { return avg_green; }
         float get_avg_blue()  const { return avg_blue; }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
@@ -182,10 +182,10 @@ namespace dlib
         float get_avg_green() const { return avg_green; }
         float get_avg_blue()  const { return avg_blue; }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
@@ -301,10 +301,10 @@ namespace dlib
         template <typename mm>
         input(const input<array2d<T,mm>>&) {}
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
@@ -395,10 +395,10 @@ namespace dlib
         template <long NR, long NC, typename mm, typename L>
         input(const input<matrix<T,NR,NC,mm,L>>&) {}
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {

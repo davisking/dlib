@@ -75,10 +75,10 @@ namespace dlib
             typedef int input_type;
             const static unsigned int sample_expansion_factor = 1;
 
-            template <typename input_iterator>
+            template <typename forward_iterator>
             void to_tensor (
-                input_iterator ,
-                input_iterator ,
+                forward_iterator ,
+                forward_iterator ,
                 resizable_tensor& 
             ) const
             {
@@ -739,20 +739,20 @@ namespace dlib
             T&& ...args
         ) : add_layer(layer_det, args...) { }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
             subnetwork->to_tensor(ibegin,iend,data);
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         const tensor& operator() (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
@@ -1101,10 +1101,10 @@ namespace dlib
             INPUT_LAYER il
         ) : add_layer(tuple_head(layer_det),il) {}
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
@@ -1115,10 +1115,10 @@ namespace dlib
         }
 
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         const tensor& operator() (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
@@ -1385,20 +1385,20 @@ namespace dlib
         {
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
             subnetwork.to_tensor(ibegin,iend,data);
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         const tensor& operator() (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         )
         {
             return subnetwork(ibegin,iend);
@@ -1637,20 +1637,20 @@ namespace dlib
         {
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
             subnetwork.to_tensor(ibegin,iend,data);
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         const tensor& operator() (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
@@ -1866,20 +1866,20 @@ namespace dlib
             gradient_input_is_stale(true)
         {}
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
             input_layer.to_tensor(ibegin,iend,data);
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         const tensor& operator() (
-            input_iterator ibegin, 
-            input_iterator iend
+            forward_iterator ibegin, 
+            forward_iterator iend
         )
         {
             input_layer.to_tensor(ibegin,iend,cached_output);
@@ -2143,10 +2143,10 @@ namespace dlib
         {
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
@@ -2164,10 +2164,10 @@ namespace dlib
             loss.to_label(x, wsub, obegin);
         }
 
-        template <typename input_iterator, typename output_iterator>
+        template <typename forward_iterator, typename output_iterator>
         void operator() (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             output_iterator obegin
         )
         {
@@ -2208,10 +2208,10 @@ namespace dlib
             return loss.compute_loss_value_and_gradient(x, lbegin, wsub);
         }
 
-        template <typename input_iterator, typename label_iterator>
+        template <typename forward_iterator, typename label_iterator>
         double compute_loss (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             label_iterator lbegin 
         )
         {
@@ -2228,10 +2228,10 @@ namespace dlib
             return loss.compute_loss_value_and_gradient(x, wsub);
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         double compute_loss (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
@@ -2250,10 +2250,10 @@ namespace dlib
             subnetwork.back_propagate_error(x);
             return l;
         }
-        template <typename input_iterator, typename label_iterator>
+        template <typename forward_iterator, typename label_iterator>
         double compute_parameter_gradients (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             label_iterator lbegin
         )
         {
@@ -2270,10 +2270,10 @@ namespace dlib
             subnetwork.back_propagate_error(x);
             return l;
         }
-        template <typename input_iterator>
+        template <typename forward_iterator>
         double compute_parameter_gradients (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         )
         {
             to_tensor(ibegin,iend,temp_tensor);
@@ -2574,20 +2574,20 @@ namespace dlib
         {
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const
         {
             subnetwork.to_tensor(ibegin,iend,data);
         }
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         const tensor& operator() (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         )
         {
             subnetwork(ibegin,iend);
