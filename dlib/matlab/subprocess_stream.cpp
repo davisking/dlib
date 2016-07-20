@@ -434,9 +434,20 @@ namespace dlib
             stderr_pipe.close();
 
             char* argv[] = {(char*)program_name, nullptr};
-            char* envp[] = {nullptr};
+            char* cudadevs = getenv("CUDA_VISIBLE_DEVICES");
+            if (cudadevs)
+            {
+                std::string extra = std::string("CUDA_VISIBLE_DEVICES=") + cudadevs;
+                char* envp[] = {(char*)extra.c_str(), nullptr};
+                execve(argv[0], argv, envp);
+            }
+            else
+            {
+                char* envp[] = {nullptr};
+                execve(argv[0], argv, envp);
+            }
 
-            execve(argv[0], argv, envp);
+
             // If launching the child didn't work then bail immediately so the parent
             // process has no chance to get tweaked out (*cough* MATLAB *cough*).
             _Exit(1);
