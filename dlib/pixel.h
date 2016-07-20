@@ -357,7 +357,7 @@ namespace dlib
         const static bool rgb_alpha  = false;
         const static bool grayscale = false;
         const static bool hsi = false;
-        const static long num = 3;
+        enum {num = 3};
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
@@ -374,7 +374,7 @@ namespace dlib
         const static bool rgb_alpha  = false;
         const static bool grayscale = false;
         const static bool hsi = false;
-        const static long num = 3;
+        enum {num = 3};
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
@@ -391,7 +391,7 @@ namespace dlib
         const static bool rgb_alpha  = true;
         const static bool grayscale = false;
         const static bool hsi = false;
-        const static long num = 4;
+        enum {num = 4};
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
@@ -409,7 +409,7 @@ namespace dlib
         const static bool rgb_alpha  = false;
         const static bool grayscale = false;
         const static bool hsi = true;
-        const static long num = 3;
+        enum {num = 3};
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
@@ -426,7 +426,7 @@ namespace dlib
         const static bool rgb_alpha  = false;
         const static bool grayscale = true;
         const static bool hsi = false;
-        const static long num = 1;
+        enum {num = 1};
         const static bool has_alpha = false;
         typedef T basic_pixel_type;
         static basic_pixel_type min() { return std::numeric_limits<T>::min();}
@@ -457,7 +457,7 @@ namespace dlib
         const static bool rgb_alpha  = false;
         const static bool grayscale = true;
         const static bool hsi = false;
-        const static long num = 1;
+        enum {num = 1};
         const static bool has_alpha = false;
         typedef T basic_pixel_type;
         static basic_pixel_type min() { return -std::numeric_limits<T>::max();}
