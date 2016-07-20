@@ -54,7 +54,7 @@ INCLUDE_DIRECTORIES("${dlib_matlab_binding_path}")
 # Also add dlib to the include search path 
 INCLUDE_DIRECTORIES(${dlib_matlab_binding_path}/../..) 
 
-include(${dlib_matlab_binding_path}/../add_global_compiler_switch.cmake)
+include(${dlib_matlab_binding_path}/../cmake_utils/add_global_compiler_switch.cmake)
 add_global_define(MATLAB_MEX_FILE)
 
 # Determine the path to our CMakeLists.txt file.  This is the file that
