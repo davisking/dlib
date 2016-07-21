@@ -187,8 +187,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
 
         private:
@@ -257,8 +257,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
 
         private:
@@ -339,8 +339,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
 
         private:
@@ -424,8 +424,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
 
         private:
@@ -511,8 +511,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
         private:
             T* data;
@@ -634,8 +634,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
 
         private:
@@ -704,8 +704,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
 
         private:
@@ -786,8 +786,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
 
         private:
@@ -871,8 +871,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
 
         private:
@@ -938,8 +938,8 @@ namespace dlib
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
-            void _private_mark_non_persistent() {DLIB_CASSERT(false, "This function should never be called."); } 
-            bool _private_is_persistent() const { return true; }
+            void _private_mark_owned_by_matlab() {DLIB_CASSERT(false, "This function should never be called."); } 
+            bool _private_is_owned_by_matlab() const { return false; }
 #endif
 
             long nr (
@@ -981,14 +981,22 @@ namespace dlib
             const static long NC = num_cols;
 
             layout (
-            ): data(0), nr_(0), nc_(0), make_persistent(true),set_by_private_set_mxArray(false),mem(0) { }
+            ): data(0), nr_(0), nc_(0), owned_by_matlab(false),set_by_private_set_mxArray(false),mem(0) { }
 
             ~layout ()
             { 
-                if (!set_by_private_set_mxArray && mem) 
+                if (owned_by_matlab)
                 {
-                    mxDestroyArray(mem); 
-                    mem = 0;
+                    if (!set_by_private_set_mxArray && mem) 
+                    {
+                        mxDestroyArray(mem); 
+                        mem = 0;
+                        data = 0;
+                    }
+                }
+                else if (data)
+                {
+                    delete [] data;
                     data = 0;
                 }
             }
@@ -1015,9 +1023,11 @@ namespace dlib
                 mxArray* mem_
             )
             {
+                DLIB_CASSERT(mem == 0 && data == 0,"You can't call this function on an already allocated matrix.");
                 // We don't own the pointer, so make note of that so we won't try to free
                 // it.
                 set_by_private_set_mxArray = true;
+                owned_by_matlab = true;
                 mem = mem_;
                 data = mxGetPr(mem);
                 nr_ = mxGetM(mem);
@@ -1026,7 +1036,7 @@ namespace dlib
 
             mxArray* _private_release_mxArray()
             {
-                DLIB_CASSERT(!make_persistent,"");
+                DLIB_CASSERT(owned_by_matlab,"");
                 mxArray* temp = mem;
                 mem = 0;
                 set_by_private_set_mxArray = false;
@@ -1036,21 +1046,21 @@ namespace dlib
                 return temp;
             }
 
-            void _private_mark_non_persistent()
+            void _private_mark_owned_by_matlab()
             {
-                DLIB_CASSERT(mem == 0,"You can't convert a persistent matlab array to non-persistent.");
-                make_persistent = false;
+                DLIB_CASSERT(mem == 0 && data == 0,"You can't say a matrix should be owned by matlab after it's been allocated.");
+                owned_by_matlab = true;
             }
-            bool _private_is_persistent() const
+            bool _private_is_owned_by_matlab() const
             {
-                return make_persistent;
+                return owned_by_matlab;
             }
 
             void swap(
                 layout& item
             )
             {
-                std::swap(item.make_persistent,make_persistent);
+                std::swap(item.owned_by_matlab,owned_by_matlab);
                 std::swap(item.set_by_private_set_mxArray,set_by_private_set_mxArray);
                 std::swap(item.mem,mem);
                 std::swap(item.data,data);
@@ -1069,20 +1079,27 @@ namespace dlib
                 long nc
             )
             {
-                if (!set_by_private_set_mxArray && mem) 
+                if (owned_by_matlab)
                 {
-                    mxDestroyArray(mem); 
-                    mem = 0;
-                    data = 0;
-                }
-                set_by_private_set_mxArray = false;
+                    if (!set_by_private_set_mxArray && mem) 
+                    {
+                        mxDestroyArray(mem); 
+                        mem = 0;
+                        data = 0;
+                    }
+                    set_by_private_set_mxArray = false;
 
-                mem = mxCreateDoubleMatrix(nr, nc, mxREAL);
-                if (mem == 0)
-                    throw std::bad_alloc();
-                if (make_persistent)
-                    mexMakeArrayPersistent(mem);
-                data = mxGetPr(mem);
+                    mem = mxCreateDoubleMatrix(nr, nc, mxREAL);
+                    if (mem == 0)
+                        throw std::bad_alloc();
+                    data = mxGetPr(mem);
+                }
+                else
+                {
+                    if (data)
+                        delete [] data;
+                    data = new double[nr*nc];
+                }
                 nr_ = nr;
                 nc_ = nc;
             }
@@ -1091,7 +1108,7 @@ namespace dlib
             double* data;
             long nr_;
             long nc_;
-            bool make_persistent;
+            bool owned_by_matlab;
             bool set_by_private_set_mxArray;
             mxArray* mem;
         };
@@ -1107,14 +1124,22 @@ namespace dlib
             const static long NC = num_cols;
 
             layout (
-            ): data(0), nr_(0), nc_(0), make_persistent(true),set_by_private_set_mxArray(false),mem(0) { }
+            ): data(0), nr_(0), nc_(0), owned_by_matlab(false),set_by_private_set_mxArray(false),mem(0) { }
 
             ~layout ()
             { 
-                if (!set_by_private_set_mxArray && mem) 
+                if (owned_by_matlab)
                 {
-                    mxDestroyArray(mem); 
-                    mem = 0;
+                    if (!set_by_private_set_mxArray && mem) 
+                    {
+                        mxDestroyArray(mem); 
+                        mem = 0;
+                        data = 0;
+                    }
+                }
+                else if (data)
+                {
+                    delete [] data;
                     data = 0;
                 }
             }
@@ -1141,9 +1166,11 @@ namespace dlib
                 mxArray* mem_
             )
             {
+                DLIB_CASSERT(mem == 0 && data == 0,"You can't call this function on an already allocated matrix.");
                 // We don't own the pointer, so make note of that so we won't try to free
                 // it.
                 set_by_private_set_mxArray = true;
+                owned_by_matlab = true;
                 mem = mem_;
                 data = (float*)mxGetData(mem);
                 nr_ = mxGetM(mem);
@@ -1152,7 +1179,7 @@ namespace dlib
 
             mxArray* _private_release_mxArray()
             {
-                DLIB_CASSERT(!make_persistent,"");
+                DLIB_CASSERT(owned_by_matlab,"");
                 mxArray* temp = mem;
                 mem = 0;
                 set_by_private_set_mxArray = false;
@@ -1162,21 +1189,21 @@ namespace dlib
                 return temp;
             }
 
-            void _private_mark_non_persistent()
+            void _private_mark_owned_by_matlab()
             {
-                DLIB_CASSERT(mem == 0,"You can't convert a persistent matlab array to non-persistent.");
-                make_persistent = false;
+                DLIB_CASSERT(mem == 0 && data == 0,"You can't say a matrix should be owned by matlab after it's been allocated.");
+                owned_by_matlab = true;
             }
-            bool _private_is_persistent() const
+            bool _private_is_owned_by_matlab() const
             {
-                return make_persistent;
+                return owned_by_matlab;
             }
 
             void swap(
                 layout& item
             )
             {
-                std::swap(item.make_persistent,make_persistent);
+                std::swap(item.owned_by_matlab,owned_by_matlab);
                 std::swap(item.set_by_private_set_mxArray,set_by_private_set_mxArray);
                 std::swap(item.mem,mem);
                 std::swap(item.data,data);
@@ -1195,20 +1222,27 @@ namespace dlib
                 long nc
             )
             {
-                if (!set_by_private_set_mxArray && mem) 
+                if (owned_by_matlab)
                 {
-                    mxDestroyArray(mem); 
-                    mem = 0;
-                    data = 0;
-                }
-                set_by_private_set_mxArray = false;
+                    if (!set_by_private_set_mxArray && mem) 
+                    {
+                        mxDestroyArray(mem); 
+                        mem = 0;
+                        data = 0;
+                    }
+                    set_by_private_set_mxArray = false;
 
-                mem = mxCreateNumericMatrix(nr, nc, mxSINGLE_CLASS, mxREAL);
-                if (mem == 0)
-                    throw std::bad_alloc();
-                if (make_persistent)
-                    mexMakeArrayPersistent(mem);
-                data = (float*)mxGetData(mem);
+                    mem = mxCreateNumericMatrix(nr, nc, mxSINGLE_CLASS, mxREAL);
+                    if (mem == 0)
+                        throw std::bad_alloc();
+                    data = (float*)mxGetData(mem);
+                }
+                else
+                {
+                    if (data)
+                        delete [] data;
+                    data = new float[nr*nc];
+                }
                 nr_ = nr;
                 nc_ = nc;
             }
@@ -1217,7 +1251,7 @@ namespace dlib
             float* data;
             long nr_;
             long nc_;
-            bool make_persistent;
+            bool owned_by_matlab;
             bool set_by_private_set_mxArray;
             mxArray* mem;
         };

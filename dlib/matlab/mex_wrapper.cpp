@@ -1044,7 +1044,7 @@ namespace mex_binding
         matrix_colmajor& item
     )
     {
-        if(!item._private_is_persistent())
+        if(item._private_is_owned_by_matlab())
         {
             // Don't need to do a copy if it's this kind of matrix since we can just
             // pull the underlying mxArray out directly and thus avoid a copy.
@@ -1065,7 +1065,7 @@ namespace mex_binding
         fmatrix_colmajor& item
     )
     {
-        if(!item._private_is_persistent())
+        if(item._private_is_owned_by_matlab())
         {
             // Don't need to do a copy if it's this kind of matrix since we can just
             // pull the underlying mxArray out directly and thus avoid a copy.
@@ -1152,10 +1152,10 @@ namespace mex_binding
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
-    void mark_non_persistent (const T&){}
+    void mark_owned_by_matlab (const T&){}
 
-    void mark_non_persistent(matrix_colmajor& item) { item._private_mark_non_persistent(); }
-    void mark_non_persistent(fmatrix_colmajor& item) { item._private_mark_non_persistent(); }
+    void mark_owned_by_matlab(matrix_colmajor& item) { item._private_mark_owned_by_matlab(); }
+    void mark_owned_by_matlab(fmatrix_colmajor& item) { item._private_mark_owned_by_matlab(); }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1178,7 +1178,7 @@ namespace mex_binding
 
             typename basic_type<arg1_type>::type A1;
 
-            mark_non_persistent(A1);
+            mark_owned_by_matlab(A1);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1206,8 +1206,8 @@ namespace mex_binding
             typename basic_type<arg1_type>::type A1;
             typename basic_type<arg2_type>::type A2;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1239,9 +1239,9 @@ namespace mex_binding
             typename basic_type<arg2_type>::type A2;
             typename basic_type<arg3_type>::type A3;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1277,10 +1277,10 @@ namespace mex_binding
             typename basic_type<arg3_type>::type A3;
             typename basic_type<arg4_type>::type A4;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1321,11 +1321,11 @@ namespace mex_binding
             typename basic_type<arg4_type>::type A4;
             typename basic_type<arg5_type>::type A5;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1371,12 +1371,12 @@ namespace mex_binding
             typename basic_type<arg5_type>::type A5;
             typename basic_type<arg6_type>::type A6;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1426,13 +1426,13 @@ namespace mex_binding
             typename basic_type<arg6_type>::type A6;
             typename basic_type<arg7_type>::type A7;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1486,14 +1486,14 @@ namespace mex_binding
             typename basic_type<arg7_type>::type A7;
             typename basic_type<arg8_type>::type A8;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1551,15 +1551,15 @@ namespace mex_binding
             typename basic_type<arg8_type>::type A8;
             typename basic_type<arg9_type>::type A9;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1622,16 +1622,16 @@ namespace mex_binding
             typename basic_type<arg9_type>::type A9;
             typename basic_type<arg10_type>::type A10;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1696,17 +1696,17 @@ namespace mex_binding
             typename basic_type<arg10_type>::type A10;
             typename basic_type<arg11_type>::type A11;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1775,18 +1775,18 @@ namespace mex_binding
             typename basic_type<arg11_type>::type A11;
             typename basic_type<arg12_type>::type A12;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
-            mark_non_persistent(A12);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
+            mark_owned_by_matlab(A12);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1859,19 +1859,19 @@ namespace mex_binding
             typename basic_type<arg12_type>::type A12;
             typename basic_type<arg13_type>::type A13;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
-            mark_non_persistent(A12);
-            mark_non_persistent(A13);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
+            mark_owned_by_matlab(A12);
+            mark_owned_by_matlab(A13);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -1948,20 +1948,20 @@ namespace mex_binding
             typename basic_type<arg13_type>::type A13;
             typename basic_type<arg14_type>::type A14;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
-            mark_non_persistent(A12);
-            mark_non_persistent(A13);
-            mark_non_persistent(A14);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
+            mark_owned_by_matlab(A12);
+            mark_owned_by_matlab(A13);
+            mark_owned_by_matlab(A14);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -2042,21 +2042,21 @@ namespace mex_binding
             typename basic_type<arg14_type>::type A14;
             typename basic_type<arg15_type>::type A15;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
-            mark_non_persistent(A12);
-            mark_non_persistent(A13);
-            mark_non_persistent(A14);
-            mark_non_persistent(A15);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
+            mark_owned_by_matlab(A12);
+            mark_owned_by_matlab(A13);
+            mark_owned_by_matlab(A14);
+            mark_owned_by_matlab(A15);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -2141,22 +2141,22 @@ namespace mex_binding
             typename basic_type<arg15_type>::type A15;
             typename basic_type<arg16_type>::type A16;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
-            mark_non_persistent(A12);
-            mark_non_persistent(A13);
-            mark_non_persistent(A14);
-            mark_non_persistent(A15);
-            mark_non_persistent(A16);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
+            mark_owned_by_matlab(A12);
+            mark_owned_by_matlab(A13);
+            mark_owned_by_matlab(A14);
+            mark_owned_by_matlab(A15);
+            mark_owned_by_matlab(A16);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -2245,23 +2245,23 @@ namespace mex_binding
             typename basic_type<arg16_type>::type A16;
             typename basic_type<arg17_type>::type A17;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
-            mark_non_persistent(A12);
-            mark_non_persistent(A13);
-            mark_non_persistent(A14);
-            mark_non_persistent(A15);
-            mark_non_persistent(A16);
-            mark_non_persistent(A17);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
+            mark_owned_by_matlab(A12);
+            mark_owned_by_matlab(A13);
+            mark_owned_by_matlab(A14);
+            mark_owned_by_matlab(A15);
+            mark_owned_by_matlab(A16);
+            mark_owned_by_matlab(A17);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -2354,24 +2354,24 @@ namespace mex_binding
             typename basic_type<arg17_type>::type A17;
             typename basic_type<arg18_type>::type A18;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
-            mark_non_persistent(A12);
-            mark_non_persistent(A13);
-            mark_non_persistent(A14);
-            mark_non_persistent(A15);
-            mark_non_persistent(A16);
-            mark_non_persistent(A17);
-            mark_non_persistent(A18);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
+            mark_owned_by_matlab(A12);
+            mark_owned_by_matlab(A13);
+            mark_owned_by_matlab(A14);
+            mark_owned_by_matlab(A15);
+            mark_owned_by_matlab(A16);
+            mark_owned_by_matlab(A17);
+            mark_owned_by_matlab(A18);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -2468,25 +2468,25 @@ namespace mex_binding
             typename basic_type<arg18_type>::type A18;
             typename basic_type<arg19_type>::type A19;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
-            mark_non_persistent(A12);
-            mark_non_persistent(A13);
-            mark_non_persistent(A14);
-            mark_non_persistent(A15);
-            mark_non_persistent(A16);
-            mark_non_persistent(A17);
-            mark_non_persistent(A18);
-            mark_non_persistent(A19);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
+            mark_owned_by_matlab(A12);
+            mark_owned_by_matlab(A13);
+            mark_owned_by_matlab(A14);
+            mark_owned_by_matlab(A15);
+            mark_owned_by_matlab(A16);
+            mark_owned_by_matlab(A17);
+            mark_owned_by_matlab(A18);
+            mark_owned_by_matlab(A19);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
@@ -2587,26 +2587,26 @@ namespace mex_binding
             typename basic_type<arg19_type>::type A19;
             typename basic_type<arg20_type>::type A20;
 
-            mark_non_persistent(A1);
-            mark_non_persistent(A2);
-            mark_non_persistent(A3);
-            mark_non_persistent(A4);
-            mark_non_persistent(A5);
-            mark_non_persistent(A6);
-            mark_non_persistent(A7);
-            mark_non_persistent(A8);
-            mark_non_persistent(A9);
-            mark_non_persistent(A10);
-            mark_non_persistent(A11);
-            mark_non_persistent(A12);
-            mark_non_persistent(A13);
-            mark_non_persistent(A14);
-            mark_non_persistent(A15);
-            mark_non_persistent(A16);
-            mark_non_persistent(A17);
-            mark_non_persistent(A18);
-            mark_non_persistent(A19);
-            mark_non_persistent(A20);
+            mark_owned_by_matlab(A1);
+            mark_owned_by_matlab(A2);
+            mark_owned_by_matlab(A3);
+            mark_owned_by_matlab(A4);
+            mark_owned_by_matlab(A5);
+            mark_owned_by_matlab(A6);
+            mark_owned_by_matlab(A7);
+            mark_owned_by_matlab(A8);
+            mark_owned_by_matlab(A9);
+            mark_owned_by_matlab(A10);
+            mark_owned_by_matlab(A11);
+            mark_owned_by_matlab(A12);
+            mark_owned_by_matlab(A13);
+            mark_owned_by_matlab(A14);
+            mark_owned_by_matlab(A15);
+            mark_owned_by_matlab(A16);
+            mark_owned_by_matlab(A17);
+            mark_owned_by_matlab(A18);
+            mark_owned_by_matlab(A19);
+            mark_owned_by_matlab(A20);
 
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
