@@ -134,7 +134,7 @@ namespace dlib
         !*/
 
         const matrix<double,0,1>& get_predicted_next_state(
-        );
+        ) const;
         /*!
             ensures
                 - returns the estimate of the next point we will observe in the

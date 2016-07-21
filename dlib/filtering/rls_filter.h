@@ -151,7 +151,7 @@ namespace dlib
         }
 
         const matrix<double,0,1>& get_predicted_next_state(
-        )
+        ) const
         {
             return next;
         }
