@@ -406,7 +406,8 @@ int extract_chips (const command_line_parser& parser)
         cerr << "Dataset doesn't contain any non-empty and non-ignored boxes!" << endl;
         return EXIT_FAILURE;
     }
-    const double dobj_nr = std::sqrt(obj_size/rs.mean());
+    const double aspect_ratio = rs.mean();
+    const double dobj_nr = std::sqrt(obj_size/aspect_ratio);
     const double dobj_nc = obj_size/dobj_nr;
     const chip_dims cdims(std::round(dobj_nr), std::round(dobj_nc));
     
@@ -445,19 +446,56 @@ int extract_chips (const command_line_parser& parser)
 
         for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
         {
-            const rectangle rect = data.images[i].boxes[j].rect;
+            const rectangle rect = set_aspect_ratio(data.images[i].boxes[j].rect, aspect_ratio);
             used_rects.push_back(rect);
 
             if (data.images[i].boxes[j].ignore)
                 continue;
 
             chips.push_back(chip_details(rect, cdims));
+            chips.push_back(chip_details(rect, cdims, 25*pi/180));
+            chips.push_back(chip_details(rect, cdims, -25*pi/180));
         }
 
         const auto num_good_chps = chips.size();
+
+        // now grab overlapping boxes that are just off enough to be negatives
+        for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+        {
+            if (data.images[i].boxes[j].ignore)
+                continue;
+
+            const rectangle rect = set_aspect_ratio(data.images[i].boxes[j].rect, aspect_ratio);
+
+            rectangle r1 = centered_rect(rect, ceil(rect.width()*sqrt_2), ceil(rect.height()*sqrt_2));
+            rectangle r2 = centered_rect(rect, rect.width()/sqrt_2, rect.height()/sqrt_2);
+            // Corner rectangles that are inside the box.
+            rectangle r3 = rectangle(rect.tl_corner(), rect.tl_corner() + point(r2.width(),r2.height()));
+            rectangle r4 = rectangle(rect.tr_corner(), rect.tr_corner() + point(-(long)r2.width(),r2.height()));
+            rectangle r5 = rectangle(rect.bl_corner(), rect.bl_corner() + point(r2.width(),-(long)r2.height()));
+            rectangle r6 = rectangle(rect.br_corner(), rect.br_corner() + point(-(long)r2.width(),-(long)r2.height()));
+            // Corner rectangles that are outside the box.
+            rectangle r7  = rectangle(rect.tl_corner(), rect.tl_corner() + point(r1.width(),r1.height()));
+            rectangle r8  = rectangle(rect.tr_corner(), rect.tr_corner() + point(-(long)r1.width(),r1.height()));
+            rectangle r9  = rectangle(rect.bl_corner(), rect.bl_corner() + point(r1.width(),-(long)r1.height()));
+            rectangle r10 = rectangle(rect.br_corner(), rect.br_corner() + point(-(long)r1.width(),-(long)r1.height()));
+
+
+            used_rects.push_back(r1); chips.push_back(chip_details(r1, cdims)); 
+            used_rects.push_back(r2); chips.push_back(chip_details(r2, cdims)); 
+            used_rects.push_back(r3); chips.push_back(chip_details(r3, cdims)); 
+            used_rects.push_back(r4); chips.push_back(chip_details(r4, cdims)); 
+            used_rects.push_back(r5); chips.push_back(chip_details(r5, cdims)); 
+            used_rects.push_back(r6); chips.push_back(chip_details(r6, cdims)); 
+            used_rects.push_back(r7); chips.push_back(chip_details(r7, cdims)); 
+            used_rects.push_back(r8); chips.push_back(chip_details(r8, cdims)); 
+            used_rects.push_back(r9); chips.push_back(chip_details(r9, cdims)); 
+            used_rects.push_back(r10); chips.push_back(chip_details(r10, cdims)); 
+        }
+
         // Now grab some bad chips, being careful not to grab things that overlap with
         // annotated boxes in the dataset.
-        for (unsigned long j = 0; j < num_good_chps*5; ++j)
+        for (unsigned long j = 0; j < num_good_chps*6; ++j)
         {
             // pick two random points that make a box of the correct aspect ratio
             // pick a point so that our rectangle will fit within the 
@@ -471,7 +509,15 @@ int extract_chips (const command_line_parser& parser)
                 continue;
 
             used_rects.push_back(rect);
-            chips.push_back(chip_details(rect, cdims));
+            if (rnd.get_random_double() > 0.5)
+            {
+                chips.push_back(chip_details(rect, cdims));
+            }
+            else
+            {
+                double angle = (rnd.get_random_double()*2-1) * 25*pi/180;
+                chips.push_back(chip_details(rect, cdims, angle));
+            }
         }
 
         // now save these chips to disk.
@@ -507,9 +553,8 @@ int resample_dataset(const command_line_parser& parser)
         return EXIT_FAILURE;
     }
 
-    const size_t obj_size = get_option(parser,"resample",100*100); 
+    const size_t base_obj_size = get_option(parser,"resample",100*100); 
     const double margin_scale = 2.5; // cropped image will be this times wider than the object.
-    const size_t image_size = obj_size*margin_scale*margin_scale;
 
     dlib::image_dataset_metadata::dataset data, resampled_data;
     resampled_data.comment = data.comment;
@@ -517,6 +562,7 @@ int resample_dataset(const command_line_parser& parser)
 
     load_image_dataset_metadata(data, parser[0]);
     locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
+    dlib::rand rnd;
 
     console_progress_indicator pbar(data.images.size());
     for (unsigned long i = 0; i < data.images.size(); ++i)
@@ -536,6 +582,9 @@ int resample_dataset(const command_line_parser& parser)
             const rectangle rect = data.images[i].boxes[j].rect;
             if (data.images[i].boxes[j].ignore || !get_rect(img).contains(rect))
                 continue;
+
+            const size_t obj_size = base_obj_size*(rnd.get_random_double()*3.1+0.9);
+            const size_t image_size = obj_size*margin_scale*margin_scale;
 
             const rectangle crop_rect = centered_rect(rect, rect.width()*margin_scale, rect.height()*margin_scale);
 
