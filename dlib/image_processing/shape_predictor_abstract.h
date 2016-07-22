@@ -148,6 +148,7 @@ namespace dlib
                 - #get_num_test_splits() == 20
                 - #get_feature_pool_region_padding() == 0
                 - #get_random_seed() == ""
+                - #get_num_threads() == 0
                 - This object will not be verbose
         !*/
 
@@ -365,6 +366,26 @@ namespace dlib
                 - num > 0
             ensures
                 - #get_num_test_splits() == num
+        !*/
+
+        unsigned long get_num_threads (
+        ) const;
+        /*!
+            ensures
+                - When running training process, it is possible to make some parts of it parallel
+                  using CPU threads with #parallel_for() extension and creating #thread_pool internally
+                  When get_num_threads() == 0, trainer will not create threads and all processing will
+                  be done in the calling thread
+        !*/
+
+        void set_num_threads (
+            unsigned long num
+        );
+        /*!
+            requires
+                - num >= 0
+            ensures
+                - #get_num_threads() == num
         !*/
 
         void be_verbose (
