@@ -184,6 +184,7 @@ if (NOT TARGET dlib)
          threads/threads_kernel_2.cpp
          threads/threads_kernel_shared.cpp
          threads/thread_pool_extension.cpp
+         threads/async.cpp
          timer/timer.cpp
          stack_trace.cpp
          )

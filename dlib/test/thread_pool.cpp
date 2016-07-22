@@ -87,11 +87,11 @@ namespace
             add_functor f;
             for (int num_threads= 0; num_threads < 4; ++num_threads)
             {
-                future<int> a, b, c, res, d;
+                dlib::future<int> a, b, c, res, d;
                 thread_pool tp(num_threads);
                 print_spinner();
 
-                future<some_struct> obj;
+                dlib::future<some_struct> obj;
 
 
                 for (int i = 0; i < 4; ++i)

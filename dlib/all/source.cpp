@@ -26,6 +26,7 @@
 #if __cplusplus >= 201103
 #include "../dnn/cpu_dlib.cpp"
 #include "../dnn/tensor_tools.cpp"
+#include "../threads/async.cpp"
 #endif 
 
 #ifndef DLIB_ISO_CPP_ONLY

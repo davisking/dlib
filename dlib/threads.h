@@ -23,5 +23,11 @@
 #include "threads/read_write_mutex_extension.h"
 #include "threads/parallel_for_extension.h"
 
+
+// things that require C++11
+#if __cplusplus >= 201103
+#include "threads/async.h"
+#endif
+
 #endif // DLIB_THREADs_
 
