@@ -1174,8 +1174,8 @@ namespace dlib
         {
         #ifdef MATLAB_MEX_FILE
             // You can't move memory around when compiled in a matlab mex file and the
-            // different locations have different persistence settings.
-            if (data._private_is_persistent() == item.data._private_is_persistent())
+            // different locations have different ownership settings.
+            if (data._private_is_owned_by_matlab() == item.data._private_is_owned_by_matlab())
             {
                 swap(item);
             }
@@ -1195,8 +1195,8 @@ namespace dlib
         {
         #ifdef MATLAB_MEX_FILE
             // You can't move memory around when compiled in a matlab mex file and the
-            // different locations have different persistence settings.
-            if (data._private_is_persistent() == rhs.data._private_is_persistent())
+            // different locations have different ownership settings.
+            if (data._private_is_owned_by_matlab() == rhs.data._private_is_owned_by_matlab())
             {
                 swap(rhs);
             }
@@ -1343,14 +1343,14 @@ namespace dlib
             return data._private_release_mxArray();
         }
 
-        void _private_mark_non_persistent()
+        void _private_mark_owned_by_matlab()
         {
-            data._private_mark_non_persistent();
+            data._private_mark_owned_by_matlab();
         }
 
-        bool _private_is_persistent()
+        bool _private_is_owned_by_matlab()
         {
-            return data._private_is_persistent();
+            return data._private_is_owned_by_matlab();
         }
 #endif
 
