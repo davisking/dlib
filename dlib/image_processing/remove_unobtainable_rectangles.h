@@ -156,10 +156,11 @@ namespace dlib
 
     template <
         typename image_array_type,
-        typename Pyramid_type
+        typename Pyramid_type,
+        typename Feature_extractor_type
         >
     std::vector<std::vector<rectangle> > remove_unobtainable_rectangles (
-        const structural_object_detection_trainer<scan_fhog_pyramid<Pyramid_type> >& trainer,
+        const structural_object_detection_trainer<scan_fhog_pyramid<Pyramid_type,Feature_extractor_type> >& trainer,
         const image_array_type& images,
         std::vector<std::vector<rectangle> >& object_locations
     )
