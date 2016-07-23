@@ -21,6 +21,7 @@ namespace
 
     void test_async()
     {
+#if __cplusplus >= 201103
         print_spinner();
         auto v1 = dlib::async([]() { dlib::sleep(500); return 1; }).share();
         auto v2 = dlib::async([v1]() { dlib::sleep(400); return v1.get()+1; }).share();
@@ -42,6 +43,7 @@ namespace
             DLIB_TEST(e.what() == string("oops"));
         }
         DLIB_TEST(got_exception);
+#endif
     }
 
     class threads_tester : public tester
