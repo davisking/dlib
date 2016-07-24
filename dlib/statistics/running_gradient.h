@@ -154,6 +154,15 @@ namespace dlib
 
         static double normal_cfd(double value, double mean, double stddev) 
         {
+            if (stddev == 0)
+            {
+                if (value < mean)
+                    return 0;
+                else if (value > mean)
+                    return 1;
+                else
+                    return 0.5;
+            }
             value = (value-mean)/stddev;
             return 0.5 * erfc(-value / std::sqrt(2.0));
         }
