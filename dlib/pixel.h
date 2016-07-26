@@ -1241,6 +1241,18 @@ namespace dlib
             assign_pixel_helpers::assign(dest,temp);
         }
 
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::lab>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+            // convert lab value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+            // now we can just go assign the new rgb value to the
+            // hsi pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
     // -----------------------------
         // dest is an lab pixel
         template < typename P1>
@@ -1291,6 +1303,20 @@ namespace dlib
 
             // now we can just go assign the new rgb value to the
             // hsi pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::hsi>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+
+            // convert hsi value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // lab pixel
             assign_pixel_helpers::assign(dest,temp);
         }
     }
