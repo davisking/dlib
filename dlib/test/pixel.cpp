@@ -39,6 +39,7 @@ namespace
         rgb_pixel p_rgb;
         hsi_pixel p_hsi, p_hsi2;
         rgb_alpha_pixel p_rgba;
+        lab_pixel p_lab, p_lab2;
 
         assign_pixel(p_int, 0.0f);
         assign_pixel(p_float, 0.0f);
@@ -49,6 +50,7 @@ namespace
         assign_pixel(p_hsi, -4);
         assign_pixel(p_rgba, p_int);
         assign_pixel(p_gray16,0);
+        assign_pixel(p_lab,-400);
 
         DLIB_TEST(p_int == 0);
         DLIB_TEST(p_float == 0);
@@ -70,11 +72,16 @@ namespace
         DLIB_TEST(p_hsi.s == 0);
         DLIB_TEST(p_hsi.i == 0);
 
+        DLIB_TEST(p_lab.l == -128);
+        DLIB_TEST(p_lab.a == 0);
+        DLIB_TEST(p_lab.b == 0);
+
         assign_pixel(p_gray,10);
         assign_pixel(p_gray16,10);
         assign_pixel(p_rgb,10);
         assign_pixel(p_hsi,10);
         assign_pixel(p_rgba,10);
+        assign_pixel(p_lab,10);
 
         assign_pixel(p_int, -10);
         assign_pixel(p_float, -10);
@@ -100,6 +107,10 @@ namespace
         DLIB_TEST(p_hsi.s == 0);
         DLIB_TEST(p_hsi.i == 10);
 
+        DLIB_TEST(p_lab.l == 10);
+        DLIB_TEST(p_lab.a == 0);
+        DLIB_TEST(p_lab.b == 0);
+
         assign_pixel(p_gray16,12345);
         DLIB_TEST(p_gray16 == 12345);
 
@@ -115,6 +126,7 @@ namespace
         assign_pixel(p_rgb,p_rgb);
         assign_pixel(p_rgba,p_rgb);
         assign_pixel(p_hsi,p_rgb);
+        assign_pixel(p_lab,p_rgb);
 
         assign_pixel(p_float,p_rgb);
         assign_pixel(p_int,p_rgb);
@@ -139,11 +151,25 @@ namespace
         DLIB_TEST(p_hsi.s > 0);
         DLIB_TEST(p_hsi.h > 0);
 
+        DLIB_TEST(p_lab.l > 0);
+        DLIB_TEST(p_lab.a > 0);
+        DLIB_TEST(p_lab.b > 0);
+
         assign_pixel(p_rgb,0);
         DLIB_TEST(p_rgb.red == 0);
         DLIB_TEST(p_rgb.green == 0);
         DLIB_TEST(p_rgb.blue == 0);
         assign_pixel(p_rgb, p_hsi);
+
+        DLIB_TEST_MSG(p_rgb.red > 251 ,(int)p_rgb.green);
+        DLIB_TEST_MSG(p_rgb.green > 96 && p_rgb.green < 104,(int)p_rgb.green);
+        DLIB_TEST_MSG(p_rgb.blue > 47 && p_rgb.blue < 53,(int)p_rgb.green);
+
+        assign_pixel(p_rgb,0);
+        DLIB_TEST(p_rgb.red == 0);
+        DLIB_TEST(p_rgb.green == 0);
+        DLIB_TEST(p_rgb.blue == 0);
+        assign_pixel(p_rgb, p_lab);
 
         DLIB_TEST_MSG(p_rgb.red > 251 ,(int)p_rgb.green);
         DLIB_TEST_MSG(p_rgb.green > 96 && p_rgb.green < 104,(int)p_rgb.green);
@@ -162,6 +188,20 @@ namespace
         DLIB_TEST(p_hsi.h == p_hsi2.h);
         DLIB_TEST(p_hsi.s == p_hsi2.s);
         DLIB_TEST(p_hsi.i == p_hsi2.i);
+
+        assign_pixel(p_lab2, p_lab);
+        DLIB_TEST(p_lab.l == p_lab2.l);
+        DLIB_TEST(p_lab.a == p_lab2.a);
+        DLIB_TEST(p_lab.b == p_lab2.b);
+        assign_pixel(p_lab,0);
+        DLIB_TEST(p_lab.l == 0);
+        DLIB_TEST(p_lab.a == 0);
+        DLIB_TEST(p_lab.b == 0);
+        assign_pixel(p_lab, p_rgba);
+
+        DLIB_TEST(p_lab.l == p_lab2.l);
+        DLIB_TEST(p_lab.a == p_lab2.a);
+        DLIB_TEST(p_lab.b == p_lab2.b);
 
         assign_pixel(p_rgba, 100);
         assign_pixel(p_gray, 10);
@@ -191,6 +231,13 @@ namespace
         DLIB_TEST(p_hsi.h == 0);
         DLIB_TEST(p_hsi.s == 0);
         DLIB_TEST_MSG(p_hsi.i < p_hsi2.i+2 && p_hsi.i > p_hsi2.i -2,(int)p_hsi.i << "   " << (int)p_hsi2.i);
+
+        assign_pixel(p_lab, 3);
+        assign_pixel(p_lab, p_rgba);
+        assign_pixel(p_lab2, p_rgb);
+        DLIB_TEST(p_lab.a == 0);
+        DLIB_TEST(p_lab.b == 0);
+        DLIB_TEST_MSG(p_lab.l < p_lab2.l+2 && p_lab.l > p_lab2.l -2,(int)p_lab.l << "   " << (int)p_lab2.l);
 
         assign_pixel(p_rgba, 100);
         assign_pixel(p_gray, 10);
@@ -252,6 +299,10 @@ namespace
         p_hsi.s = 10;
         p_hsi.i = 11;
 
+        p_lab.l = 10;
+        p_lab.a = -9;
+        p_lab.b = 8;
+
         ostringstream sout;
         serialize(p_rgb,sout);
         serialize(p_rgba,sout);
@@ -260,6 +311,7 @@ namespace
         serialize(p_int,sout);
         serialize(p_float,sout);
         serialize(p_hsi,sout);
+        serialize(p_lab,sout);
 
         assign_pixel(p_rgb,0);
         assign_pixel(p_rgba,0);
@@ -268,6 +320,7 @@ namespace
         assign_pixel(p_int,0);
         assign_pixel(p_float,0);
         assign_pixel(p_hsi,0);
+        assign_pixel(p_lab,0);
 
         istringstream sin(sout.str());
 
@@ -278,6 +331,7 @@ namespace
         deserialize(p_int,sin);
         deserialize(p_float,sin);
         deserialize(p_hsi,sin);
+        deserialize(p_lab,sin);
 
         DLIB_TEST(p_rgb.red == 1);
         DLIB_TEST(p_rgb.green == 2);
@@ -297,9 +351,13 @@ namespace
         DLIB_TEST(p_hsi.s == 10);
         DLIB_TEST(p_hsi.i == 11);
 
+        DLIB_TEST(p_lab.l == 10);
+        DLIB_TEST(p_lab.a == -9);
+        DLIB_TEST(p_lab.b == 8);
+
         {
             matrix<double,1,1> m_gray, m_schar, m_int, m_float;
-            matrix<double,3,1> m_rgb, m_hsi;
+            matrix<double,3,1> m_rgb, m_hsi, m_lab;
 
             m_gray = pixel_to_vector<double>(p_gray);
             m_schar = pixel_to_vector<double>(p_schar);
@@ -308,6 +366,7 @@ namespace
 
             m_hsi = pixel_to_vector<double>(p_hsi);
             m_rgb = pixel_to_vector<double>(p_rgb);
+            m_lab = pixel_to_vector<double>(p_lab);
 
             DLIB_TEST(m_gray(0) == p_gray);
             DLIB_TEST(m_float(0) == p_float);
@@ -320,6 +379,9 @@ namespace
             DLIB_TEST(m_hsi(0) == p_hsi.h);
             DLIB_TEST(m_hsi(1) == p_hsi.s);
             DLIB_TEST(m_hsi(2) == p_hsi.i);
+            DLIB_TEST(m_lab(0) == p_lab.l);
+            DLIB_TEST(m_lab(1) == p_lab.a);
+            DLIB_TEST(m_lab(2) == p_lab.b);
 
             DLIB_TEST(p_rgb.red == 1);
             DLIB_TEST(p_rgb.green == 2);
@@ -339,13 +401,19 @@ namespace
             DLIB_TEST(p_hsi.s == 10);
             DLIB_TEST(p_hsi.i == 11);
 
+            DLIB_TEST(p_lab.l == 10);
+            DLIB_TEST(p_lab.a == -9);
+            DLIB_TEST(p_lab.b == 8);
+
             assign_pixel(p_gray,0);
             assign_pixel(p_hsi,0);
             assign_pixel(p_rgb,0);
+            assign_pixel(p_lab,0);
 
             vector_to_pixel(p_gray, m_gray);
             vector_to_pixel(p_hsi, m_hsi);
             vector_to_pixel(p_rgb, m_rgb);
+            vector_to_pixel(p_lab, m_lab);
 
             DLIB_TEST(p_rgb.red == 1);
             DLIB_TEST(p_rgb.green == 2);
@@ -361,6 +429,10 @@ namespace
             DLIB_TEST(p_hsi.h == 9);
             DLIB_TEST(p_hsi.s == 10);
             DLIB_TEST(p_hsi.i == 11);
+
+            DLIB_TEST(p_lab.l == 10);
+            DLIB_TEST(p_lab.a == -9);
+            DLIB_TEST(p_lab.b == 8);
         }
 
 
@@ -375,6 +447,7 @@ namespace
             rgb_pixel p_rgb;
             hsi_pixel p_hsi, p_hsi2;
             rgb_alpha_pixel p_rgba;
+            lab_pixel p_lab, p_lab2;
 
 
             assign_pixel(p_gray, 0);
@@ -384,6 +457,7 @@ namespace
             assign_pixel(p_schar, 0);
             assign_pixel(p_rgb, 0);
             assign_pixel(p_hsi, 0);
+            assign_pixel(p_lab, 0);
 
 
             assign_pixel(p_gray, 100);
@@ -456,6 +530,11 @@ namespace
             p_hsi.s = 100;
             p_hsi.i = 84;
             DLIB_TEST(get_pixel_intensity(p_hsi) == 84);
+
+            p_lab.l = 123;
+            p_lab.a = 100;
+            p_lab.b = 84;
+            DLIB_TEST(get_pixel_intensity(p_lab) == 123);
 
             p_float = 54.25;
             DLIB_TEST(get_pixel_intensity(p_float) == 54.25);
