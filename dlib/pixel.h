@@ -88,9 +88,9 @@ namespace dlib
                 - This type of pixel represents the Lab color space.
                 - num == 3
                 - has_alpha == false
-                - basic_pixel_type == signed char
-                - min() == -128
-                - max() == 127
+                - basic_pixel_type == unsigned char
+                - min() == 0
+                - max() == 255
                 - is_unsigned == false
             - else
                 - grayscale == true
@@ -214,14 +214,14 @@ namespace dlib
         ) {}
 
         lab_pixel (
-                signed char l_,
-                signed char a_,
-                signed char b_
+                unsigned char l_,
+                unsigned char a_,
+                unsigned char b_
         ) : l(l_), a(a_), b(b_) {}
 
-        signed char l;
-        signed char a;
-        signed char b;
+        unsigned char l;
+        unsigned char a;
+        unsigned char b;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -486,10 +486,10 @@ namespace dlib
         const static bool hsi = false;
         const static bool lab = true;
         const static long num = 3;
-        typedef signed char basic_pixel_type;
-        static basic_pixel_type min() { return -128;}
-        static basic_pixel_type max() { return 127;}
-        const static bool is_unsigned = false;
+        typedef unsigned char basic_pixel_type;
+        static basic_pixel_type min() { return 0;}
+        static basic_pixel_type max() { return 255;}
+        const static bool is_unsigned = true;
         const static bool has_alpha = false;
     };
 
@@ -878,6 +878,7 @@ namespace dlib
             L is between 0 and 100
             a is between -128 and 127
             b is between -128 and 127
+            RGB is between 0.0 and 1.0
         */
         inline Lab RGB2Lab(COLOUR c1)
         {
@@ -940,19 +941,20 @@ namespace dlib
                 var_Z = (7.787 * var_Z) + (16.0 / 116);
             }
 
-
-            c2.l = (116 * var_Y) - 16;
-            c2.a = 500 * (var_X - var_Y);
-            c2.b = 200 * (var_Y - var_Z);
+            //clamping
+            c2.l = max(0.0, (116.0 * var_Y) - 16);
+            c2.a = max(-128.0, min(127.0, 500.0 * (var_X - var_Y)));
+            c2.b = max(-128.0, min(127.0, 200.0 * (var_Y - var_Z)));
 
             return c2;
         }
 
         /*
-            Calculate RGB from HSL, reverse of RGB2HSL()
-            Hue is in degrees
-            Lightness is between 0 and 1
-            Saturation is between 0 and 1
+            Calculate RGB from Lab, reverse of RGB2LAb()
+            L is between 0 and 100
+            a is between -128 and 127
+            b is between -128 and 127
+            RGB is between 0.0 and 1.0
         */
         inline COLOUR Lab2RGB(Lab c1) {
             COLOUR c2;
@@ -1010,9 +1012,10 @@ namespace dlib
                 var_B = 12.92 * var_B;
             }
 
-            c2.r = var_R;
-            c2.g = var_G;
-            c2.b = var_B;
+            // clamping
+            c2.r = max(0.0, min(1.0, var_R));
+            c2.g = max(0.0, min(1.0, var_G));
+            c2.b = max(0.0, min(1.0, var_B));
 
             return (c2);
         }
@@ -1105,9 +1108,9 @@ namespace dlib
         {
             COLOUR c;
             Lab l;
-            l.l = src.l;
-            l.a = src.a;
-            l.b = src.b;
+            l.l = (src.l/255.0)*100;
+            l.a = (src.a-128.0);
+            l.b = (src.b-128.0);
             c = Lab2RGB(l);
 
             dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
@@ -1177,14 +1180,14 @@ namespace dlib
         {
             COLOUR c;
             Lab l;
-            l.l = src.l;
-            l.a = src.a;
-            l.b = src.b;
+            l.l = (src.l/255.0)*100;
+            l.a = (src.a-128.0);
+            l.b = (src.b-128.0);
             c = Lab2RGB(l);
 
-            dest.red = static_cast<unsigned char>(c.r);
-            dest.green = static_cast<unsigned char>(c.g);
-            dest.blue = static_cast<unsigned char>(c.b);
+            dest.red = static_cast<unsigned char>(c.r * 255 + 0.5);
+            dest.green = static_cast<unsigned char>(c.g * 255 + 0.5);
+            dest.blue = static_cast<unsigned char>(c.b * 255 + 0.5);
             dest.alpha = 255;
         }
     // -----------------------------
@@ -1280,14 +1283,14 @@ namespace dlib
         {
             COLOUR c1;
             Lab c2;
-            c1.r = src.red/255.0;
-            c1.g = src.green/255.0;
-            c1.b = src.blue/255.0;
+            c1.r = src.red / 255.0;
+            c1.g = src.green / 255.0;
+            c1.b = src.blue / 255.0;
             c2 = RGB2Lab(c1);
 
-            dest.l = static_cast<signed char>(c2.l + 0.5);
-            dest.a = static_cast<signed char>(c2.a + 0.5);
-            dest.b = static_cast<signed char>(c2.b + 0.5);
+            dest.l = static_cast<unsigned char>((c2.l / 100) * 255 + 0.5);
+            dest.a = static_cast<unsigned char>(c2.a + 128 + 0.5);
+            dest.b = static_cast<unsigned char>(c2.b + 128 + 0.5);
         }
 
         template < typename P1, typename P2 >
@@ -1302,7 +1305,7 @@ namespace dlib
             assign_pixel_helpers::assign(temp,src);
 
             // now we can just go assign the new rgb value to the
-            // hsi pixel
+            // lab pixel
             assign_pixel_helpers::assign(dest,temp);
         }
 
