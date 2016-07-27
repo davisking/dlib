@@ -1262,8 +1262,8 @@ namespace dlib
         typename enable_if_c<pixel_traits<P1>::lab>::type
         assign(P1& dest, const unsigned char& src)
         {
-            dest.a = 0;
-            dest.b = 0;
+            dest.a = 128;
+            dest.b = 128;
             dest.l = src;
         }
 
@@ -1272,8 +1272,8 @@ namespace dlib
         typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::grayscale>::type
         assign(P1& dest, const P2& src)
         {
-            dest.a = 0;
-            dest.b = 0;
+            dest.a = 128;
+            dest.b = 128;
             assign_pixel(dest.l, src);
         }
 
