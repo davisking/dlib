@@ -2189,10 +2189,15 @@ namespace dlib
         {
             std::vector<label_type> results(std::distance(data.begin(), data.end()));
             auto o = results.begin();
-            for (auto i = data.begin(); i < data.end(); i+=batch_size, o+=batch_size)
+            auto i = data.begin();
+            auto num_remaining = results.size();
+            while(num_remaining != 0)
             {
-                auto end = std::min(i+batch_size, data.end());
-                (*this)(i, end, o);
+                auto inc = std::min(batch_size, num_remaining);
+                (*this)(i, i+inc, o);
+                i += inc;
+                o += inc;
+                num_remaining -= inc;
             }
             return results;
         }
