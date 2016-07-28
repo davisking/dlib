@@ -39,7 +39,7 @@ if (CMAKE_VERSION VERSION_LESS "3.1.2")
          set(COMPILER_CAN_DO_CPP_11 1)
       endif()
    else()
-      # Since we don't know what compiler this is ust try to build a c++11 project and see if it compiles.
+      # Since we don't know what compiler this is just try to build a c++11 project and see if it compiles.
       message(STATUS "Building a C++11 test project to see if your compiler supports C++11")
       try_compile(test_for_cpp11_worked ${PROJECT_BINARY_DIR}/cpp11_test_build 
          ${CMAKE_CURRENT_LIST_DIR}/test_for_cpp11 cpp11_test)
