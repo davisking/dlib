@@ -52,9 +52,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl{ std::ostream& get_data_ostream(); }
+    namespace impl{ std::iostream& get_data_iostream(); }
 
-    inline void send_to_parent_process() {impl::get_data_ostream().flush();}
+    inline void send_to_parent_process() {impl::get_data_iostream().flush();}
     template <typename U, typename ...T>
     void send_to_parent_process(U&& arg1, T&& ...args)
     /*!
@@ -63,9 +63,9 @@ namespace dlib
               serializing them with interprocess_serialize().
     !*/
     {
-        interprocess_serialize(arg1, impl::get_data_ostream());
+        interprocess_serialize(arg1, impl::get_data_iostream());
         send_to_parent_process(std::forward<T>(args)...);
-        if (!impl::get_data_ostream())
+        if (!impl::get_data_iostream())
             throw dlib::error("Error sending object to parent process.");
     }
 
@@ -74,14 +74,13 @@ namespace dlib
     void receive_from_parent_process(U&& arg1, T&& ...args)
     /*!
         ensures
-            - receives all the arguments to receive_from_parent_process() from standard
-              input (and hence from the parent process) by deserializing them with
-              interprocess_deserialize().
+            - receives all the arguments to receive_from_parent_process() from the parent
+              process by deserializing them from interprocess_serialize().
     !*/
     {
-        interprocess_deserialize(arg1, std::cin);
+        interprocess_deserialize(arg1, impl::get_data_iostream());
         receive_from_parent_process(std::forward<T>(args)...);
-        if (!std::cin)
+        if (!impl::get_data_iostream())
             throw dlib::error("Error receiving object from parent process.");
     }
 
@@ -90,12 +89,12 @@ namespace dlib
 
     class filestreambuf;
 
-    class subprocess_stream 
+    class subprocess_stream : noncopyable
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This is a tool for spawning a subprocess and communicating with it through
-                its standard input, output, and error.  Here is an example: 
+                This is a tool for spawning a subprocess and communicating with it.  Here
+                is an example: 
 
                     subprocess_stream s("/usr/bin/some_program");
                     s.send(obj1, obj2, obj3);
@@ -111,11 +110,9 @@ namespace dlib
 
 
                 Additionally, if the sub process writes to its standard out then that will
-                be echoed to std::cout in the parent process.  Also, the communication of
-                send()/receive() calls between the parent and child happens all on the
-                standard input file descriptor.  So you can't really use std::cin for
-                anything inside the child process as that would interfere with
-                receive_from_parent_process() and send_to_parent_process().
+                be echoed to std::cout in the parent process.  Writing to std::cerr or
+                returning a non-zero value from main will also be noted by the parent
+                process and an appropriate exception will be thrown.
         !*/
 
     public:
@@ -140,8 +137,8 @@ namespace dlib
         );
         /*!
             ensures
-                - closes the standard input of the child process and then waits for the
-                  child to terminate.  
+                - closes the input stream to the child process and then waits for the child
+                  to terminate.  
                 - If the child returns an error (by returning != 0 from its main) or
                   outputs to its standard error then wait() throws a dlib::error() with the
                   standard error output in it.
@@ -196,7 +193,7 @@ namespace dlib
 
         void send_eof(); 
 
-        class cpipe 
+        class cpipe : noncopyable
         {
         private:
             int fd[2];
