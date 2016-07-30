@@ -36,4 +36,5 @@ TARGET_LINK_LIBRARIES(${target_name} dlib )
 INSTALL(TARGETS ${target_name}
 	RUNTIME DESTINATION bin
 	)
+INSTALL(PROGRAMS convert_imglab_paths_to_relative copy_imglab_dataset DESTINATION bin )
 

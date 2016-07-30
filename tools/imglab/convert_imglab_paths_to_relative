@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use File::Spec;
+
+die "This script converts all the file names in an imglab XML file to have paths relative to the current folder.  Call it like this:  ./convert_imglab_paths_to_relative some_file.xml" if @ARGV != 1;
+
+$file = @ARGV[0];
+open(INFO, $file) or die('Could not open file.');
+
+foreach $line (<INFO>) 
+{
+    if (index($line, 'file=\'') != -1)
+    {
+        $line =~ /file='(.*)'/; 
+        $relpath = File::Spec->abs2rel($1);
+        $line =~ s/$1/$relpath/;
+        print $line
+    }
+    else
+    {
+        print $line
+    }
+}
+
