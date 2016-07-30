@@ -20,7 +20,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.4";
+const char* VERSION = "1.5";
 
 
 
@@ -233,6 +233,23 @@ void rename_labels (
         }
     }
 
+}
+
+// ----------------------------------------------------------------------------------------
+
+void ignore_labels (
+    dlib::image_dataset_metadata::dataset& data,
+    const std::string& label
+)
+{
+    for (unsigned long i = 0; i < data.images.size(); ++i)
+    {
+        for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+        {
+            if (data.images[i].boxes[j].label == label)
+                data.images[i].boxes[j].ignore = true;
+        }
+    }
 }
 
 // ----------------------------------------------------------------------------------------
@@ -564,6 +581,10 @@ int resample_dataset(const command_line_parser& parser)
     locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
     dlib::rand rnd;
 
+    const size_t obj_size = base_obj_size;
+    const size_t image_size = std::round(std::sqrt(obj_size*margin_scale*margin_scale));
+    const chip_dims cdims(image_size, image_size);
+
     console_progress_indicator pbar(data.images.size());
     for (unsigned long i = 0; i < data.images.size(); ++i)
     {
@@ -583,17 +604,16 @@ int resample_dataset(const command_line_parser& parser)
             if (data.images[i].boxes[j].ignore || !get_rect(img).contains(rect))
                 continue;
 
-            const size_t obj_size = base_obj_size*(rnd.get_random_double()*3.1+0.9);
-            const size_t image_size = obj_size*margin_scale*margin_scale;
 
-            const rectangle crop_rect = centered_rect(rect, rect.width()*margin_scale, rect.height()*margin_scale);
+            const double rand_scale_perturb = 1 - 0.3*(rnd.get_random_double()-0.5);
+            const rectangle crop_rect = centered_rect(rect, rect.width()*margin_scale*rand_scale_perturb, rect.height()*margin_scale*rand_scale_perturb);
 
             // skip crops that have a lot of border pixels
             if (get_rect(img).intersect(crop_rect).area() < crop_rect.area()*0.8)
                 continue;
 
-            const rectangle_transform tform = get_mapping_to_chip(chip_details(crop_rect, image_size));
-            extract_image_chip(img, chip_details(crop_rect, image_size), chip);
+            const rectangle_transform tform = get_mapping_to_chip(chip_details(crop_rect, cdims));
+            extract_image_chip(img, chip_details(crop_rect, cdims), chip);
 
             image_dataset_metadata::image dimg;
             // Now transform the boxes to the crop and also mark them as ignored if they
@@ -617,9 +637,9 @@ int resample_dataset(const command_line_parser& parser)
                     p.second = tform.get_tform()(p.second);
                 dimg.boxes.push_back(box);
             }
-            dimg.filename = data.images[i].filename + "RESAMPLED"+cast_to_string(j)+".jpg";
+            dimg.filename = data.images[i].filename + "RESAMPLED"+cast_to_string(j)+".png";
 
-            save_jpeg(chip,dimg.filename, 98);
+            save_png(chip,dimg.filename);
             resampled_data.images.push_back(dimg);
         }
     }
@@ -746,6 +766,7 @@ int main(int argc, char** argv)
                                       "crops so that the objects have <arg> pixels in them.  The output is a new XML dataset.",1); 
         parser.add_option("extract-chips", "Crops out images with tight bounding boxes around each object.  Also crops out "
                                            "many background chips.  All these image chips are serialized into one big data file.  The chips will contain <arg> pixels each",1);
+        parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
 
         parser.parse(argc, argv);
 
@@ -765,12 +786,14 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "flip");
         parser.check_incompatible_options("c", "rotate");
         parser.check_incompatible_options("c", "rename");
+        parser.check_incompatible_options("c", "ignore");
         parser.check_incompatible_options("c", "parts");
         parser.check_incompatible_options("c", "tile");
         parser.check_incompatible_options("c", "cluster");
         parser.check_incompatible_options("c", "resample");
         parser.check_incompatible_options("c", "extract-chips");
         parser.check_incompatible_options("l", "rename");
+        parser.check_incompatible_options("l", "ignore");
         parser.check_incompatible_options("l", "add");
         parser.check_incompatible_options("l", "parts");
         parser.check_incompatible_options("l", "flip");
@@ -795,13 +818,17 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("shuffle", "tile");
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "rename");
+        parser.check_incompatible_options("convert", "ignore");
         parser.check_incompatible_options("convert", "parts");
         parser.check_incompatible_options("convert", "cluster");
         parser.check_incompatible_options("convert", "resample");
         parser.check_incompatible_options("convert", "extract-chips");
         parser.check_incompatible_options("rmdiff", "rename");
+        parser.check_incompatible_options("rmdiff", "ignore");
         parser.check_incompatible_options("rmdupes", "rename");
+        parser.check_incompatible_options("rmdupes", "ignore");
         parser.check_incompatible_options("rmtrunc", "rename");
+        parser.check_incompatible_options("rmtrunc", "ignore");
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
         parser.check_option_arg_range("cluster", 2, 999);
@@ -1027,6 +1054,24 @@ int main(int argc, char** argv)
                 rename_labels(data, parser.option("rename").argument(0,i), parser.option("rename").argument(1,i));
             }
             save_image_dataset_metadata(data, parser[0]);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("ignore"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --ignore option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            for (unsigned long i = 0; i < parser.option("ignore").count(); ++i)
+            {
+                ignore_labels(data, parser.option("ignore").argument());
+            }
+            save_image_dataset_metadata(data, parser[0]+".ignored.xml");
             return EXIT_SUCCESS;
         }
 
