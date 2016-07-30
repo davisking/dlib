@@ -737,6 +737,7 @@ int main(int argc, char** argv)
                                  "about <arg> pixels (default 8000).",1);
         parser.add_option("l","List all the labels in the given XML file.");
         parser.add_option("stats","List detailed statistics on the object labels in the given XML file.");
+        parser.add_option("files","List all the files in the given XML file.");
 
         parser.set_group_name("Editing/Transforming XML files");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
@@ -770,7 +771,7 @@ int main(int argc, char** argv)
 
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
+        const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
                                  "flip", "rotate", "tile", "size", "cluster", "resample", "extract-chips"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
@@ -779,6 +780,7 @@ int main(int argc, char** argv)
         const char* size_parent_ops[] = {"tile", "cluster"};
         parser.check_sub_options(size_parent_ops, "size");
         parser.check_incompatible_options("c", "l");
+        parser.check_incompatible_options("c", "files");
         parser.check_incompatible_options("c", "rmdiff");
         parser.check_incompatible_options("c", "rmdupes");
         parser.check_incompatible_options("c", "rmtrunc");
@@ -798,6 +800,12 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("l", "parts");
         parser.check_incompatible_options("l", "flip");
         parser.check_incompatible_options("l", "rotate");
+        parser.check_incompatible_options("files", "rename");
+        parser.check_incompatible_options("files", "ignore");
+        parser.check_incompatible_options("files", "add");
+        parser.check_incompatible_options("files", "parts");
+        parser.check_incompatible_options("files", "flip");
+        parser.check_incompatible_options("files", "rotate");
         parser.check_incompatible_options("add", "flip");
         parser.check_incompatible_options("add", "rotate");
         parser.check_incompatible_options("add", "tile");
@@ -817,6 +825,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("add", "extract-chips");
         parser.check_incompatible_options("shuffle", "tile");
         parser.check_incompatible_options("convert", "l");
+        parser.check_incompatible_options("convert", "files");
         parser.check_incompatible_options("convert", "rename");
         parser.check_incompatible_options("convert", "ignore");
         parser.check_incompatible_options("convert", "parts");
@@ -999,6 +1008,21 @@ int main(int argc, char** argv)
             dlib::image_dataset_metadata::dataset data;
             load_image_dataset_metadata(data, parser[0]);
             print_all_labels(data);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("files"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --files option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            for (size_t i = 0; i < data.images.size(); ++i)
+                cout << data.images[i].filename << "\n";
             return EXIT_SUCCESS;
         }
 
