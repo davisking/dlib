@@ -637,7 +637,11 @@ int resample_dataset(const command_line_parser& parser)
                     p.second = tform.get_tform()(p.second);
                 dimg.boxes.push_back(box);
             }
-            dimg.filename = data.images[i].filename + "RESAMPLED"+cast_to_string(j)+".png";
+            // Put a 64bit hash of the image data into the name to make sure there are no
+            // file name conflicts.
+            std::ostringstream sout;
+            sout << hex << murmur_hash3_128bit(&chip[0][0], chip.size()*sizeof(chip[0][0])).second;
+            dimg.filename = data.images[i].filename + "_RESAMPLED_"+sout.str()+".png";
 
             save_png(chip,dimg.filename);
             resampled_data.images.push_back(dimg);
