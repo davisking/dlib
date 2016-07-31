@@ -11,10 +11,6 @@ fi
 XML_FILE=$1
 DEST=$2
 
-if [ -d "$DEST" ]; then
-    echo "Error, $DEST directory already exists"
-    exit 1
-fi
 
 
 FILES=`imglab --files cluster_001.xml.RESAMPLED.xml | xargs perl  -e 'use File::Spec; foreach (@ARGV) {print File::Spec->abs2rel($_) . "\n"}' | sort | uniq`
