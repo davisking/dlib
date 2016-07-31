@@ -13,7 +13,7 @@ DEST=$2
 
 
 
-FILES=`imglab --files cluster_001.xml.RESAMPLED.xml | xargs perl  -e 'use File::Spec; foreach (@ARGV) {print File::Spec->abs2rel($_) . "\n"}' | sort | uniq`
+FILES=`imglab --files $XML_FILE | xargs perl  -e 'use File::Spec; foreach (@ARGV) {print File::Spec->abs2rel($_) . "\n"}' | sort | uniq`
 
 mkdir $DEST
 cp -a --parents $FILES $DEST
