@@ -253,6 +253,74 @@ namespace
         DLIB_TEST(p_rgb.green == 119);
         DLIB_TEST(p_rgb.blue == 119);
 
+        //Lab limit values test
+        //red, green, blue, yellow, black, white
+        p_lab.l = 0;
+        p_lab.a = 0;
+        p_lab.b = 0;
+        assign_pixel(p_rgb, p_lab);
+        DLIB_TEST(p_rgb.red == 0);
+        DLIB_TEST(p_rgb.green == 64);
+        DLIB_TEST(p_rgb.blue == 194);
+
+        p_lab.l = 255;
+        p_lab.a = 0;
+        p_lab.b = 0;
+        assign_pixel(p_rgb, p_lab);
+        DLIB_TEST(p_rgb.red == 0);
+        DLIB_TEST(p_rgb.green == 255);
+        DLIB_TEST(p_rgb.blue == 255);
+
+        p_lab.l = 0;
+        p_lab.a = 255;
+        p_lab.b = 0;
+
+        assign_pixel(p_rgb, p_lab);
+        DLIB_TEST(p_rgb.red == 0);
+        DLIB_TEST(p_rgb.green == 0);
+        DLIB_TEST(p_rgb.blue == 195);
+
+        p_lab.l = 0;
+        p_lab.a = 0;
+        p_lab.b = 255;
+
+        assign_pixel(p_rgb, p_lab);
+        DLIB_TEST(p_rgb.red == 0);
+        DLIB_TEST(p_rgb.green == 45);
+        DLIB_TEST(p_rgb.blue == 0);
+
+        p_lab.l = 255;
+        p_lab.a = 255;
+        p_lab.b = 0;
+        assign_pixel(p_rgb, p_lab);
+        DLIB_TEST(p_rgb.red == 255); 
+        DLIB_TEST(p_rgb.green == 139);
+        DLIB_TEST(p_rgb.blue == 255);
+
+        p_lab.l = 0;
+        p_lab.a = 255;
+        p_lab.b = 255;
+        assign_pixel(p_rgb, p_lab);
+        DLIB_TEST(p_rgb.red == 132);
+        DLIB_TEST(p_rgb.green == 0);
+        DLIB_TEST(p_rgb.blue == 0);
+
+        p_lab.l = 255;
+        p_lab.a = 0;
+        p_lab.b = 255;
+        assign_pixel(p_rgb, p_lab);
+        DLIB_TEST(p_rgb.red == 0);
+        DLIB_TEST(p_rgb.green == 255);
+        DLIB_TEST(p_rgb.blue == 0);
+
+        p_lab.l = 255;
+        p_lab.a = 255;
+        p_lab.b = 255;
+        assign_pixel(p_rgb, p_lab);
+        DLIB_TEST(p_rgb.red == 255);
+        DLIB_TEST(p_rgb.green == 70);
+        DLIB_TEST(p_rgb.blue == 0);
+
         assign_pixel(p_rgba, 100);
         assign_pixel(p_gray, 10);
         assign_pixel(p_schar, 10);
