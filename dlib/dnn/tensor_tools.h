@@ -35,6 +35,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - dest does not alias the memory of lhs or rhs
             - The dimensions of lhs and rhs must be compatible for matrix multiplication.
               In particular:
                 - Let L == trans_lhs ? trans(mat(lhs)) : mat(lhs)
