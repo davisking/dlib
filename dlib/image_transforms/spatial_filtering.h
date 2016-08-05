@@ -12,6 +12,7 @@
 #include "../geometry/border_enumerator.h"
 #include "../simd.h"
 #include <limits>
+#include "assign_image.h"
 
 namespace dlib
 {
