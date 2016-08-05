@@ -232,7 +232,7 @@ namespace dlib
             // the above box.
             double scale = std::sqrt(new_area/temp.area());
 
-            return centered_rect(center(temp), std::round(temp.width()*scale), std::round(temp.height()*scale));
+            return centered_rect(center(temp), static_cast<long>(temp.width()*scale+0.5), static_cast<long>(temp.height()*scale+0.5));
         }
 
         rectangle operator() (
