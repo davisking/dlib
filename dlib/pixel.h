@@ -84,14 +84,14 @@ namespace dlib
                 - is_unsigned == true
              - else if (lab == true) then
                 - The type T will be a struct with 3 public members of type
-                  signed char named "l" "a" and "b".
+                  unsigned char named "l" "a" and "b".
                 - This type of pixel represents the Lab color space.
                 - num == 3
                 - has_alpha == false
                 - basic_pixel_type == unsigned char
                 - min() == 0
                 - max() == 255
-                - is_unsigned == false
+                - is_unsigned == true 
             - else
                 - grayscale == true
                 - This type of pixel represents a grayscale color space.  T 

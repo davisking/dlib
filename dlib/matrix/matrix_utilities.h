@@ -2750,9 +2750,9 @@ namespace dlib
                 const M& m
         )
         {
-            pixel.l = static_cast<signed char>(m(0));
-            pixel.a = static_cast<signed char>(m(1));
-            pixel.b = static_cast<signed char>(m(2));
+            pixel.l = static_cast<unsigned char>(m(0));
+            pixel.a = static_cast<unsigned char>(m(1));
+            pixel.b = static_cast<unsigned char>(m(2));
         }
     };
 
