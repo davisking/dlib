@@ -36,7 +36,7 @@ namespace
         long p_int;
         float p_float;
         signed char p_schar;
-        rgb_pixel p_rgb;
+        rgb_pixel p_rgb,p_rgb2;
         hsi_pixel p_hsi, p_hsi2;
         rgb_alpha_pixel p_rgba;
         lab_pixel p_lab, p_lab2;
@@ -255,9 +255,9 @@ namespace
 
         //Lab limit values test
         //red, green, blue, yellow, black, white
-        p_lab.l = 0;
-        p_lab.a = 0;
-        p_lab.b = 0;
+        p_lab.l = 84;
+        p_lab.a = 164;
+        p_lab.b = 56;
         assign_pixel(p_rgb, p_lab);
         DLIB_TEST(p_rgb.red == 0);
         DLIB_TEST(p_rgb.green == 64);
@@ -320,6 +320,80 @@ namespace
         DLIB_TEST(p_rgb.red == 255);
         DLIB_TEST(p_rgb.green == 70);
         DLIB_TEST(p_rgb.blue == 0);
+
+        //RGB limit tests
+        p_rgb.red = 0;
+        p_rgb.green = 0;
+        p_rgb.blue = 0;
+        assign_pixel(p_lab, p_rgb);
+        assign_pixel(p_rgb2, p_lab);
+        DLIB_TEST(p_rgb2.red < 3);
+        DLIB_TEST(p_rgb2.green < 3);
+        DLIB_TEST(p_rgb2.blue < 3);
+
+        p_rgb.red = 255;
+        p_rgb.green = 0;
+        p_rgb.blue = 0;
+        assign_pixel(p_lab, p_rgb);
+        assign_pixel(p_rgb2, p_lab);
+        DLIB_TEST(p_rgb2.red > 252);
+        DLIB_TEST(p_rgb2.green < 3);
+        DLIB_TEST(p_rgb2.blue < 3);
+
+        p_rgb.red = 0;
+        p_rgb.green = 255;
+        p_rgb.blue = 0;
+        assign_pixel(p_lab, p_rgb);
+        assign_pixel(p_rgb2, p_lab);
+        DLIB_TEST(p_rgb2.red < 8);
+        DLIB_TEST(p_rgb2.green > 252);
+        DLIB_TEST(p_rgb2.blue < 5);
+
+        p_rgb.red = 0;
+        p_rgb.green = 0;
+        p_rgb.blue = 255;
+        assign_pixel(p_lab, p_rgb);
+        assign_pixel(p_rgb2, p_lab);
+        DLIB_TEST(p_rgb2.red < 3);
+        DLIB_TEST(p_rgb2.green < 3);
+        DLIB_TEST(p_rgb2.blue > 252);
+
+        p_rgb.red = 255;
+        p_rgb.green = 255;
+        p_rgb.blue = 0;
+        assign_pixel(p_lab, p_rgb);
+        assign_pixel(p_rgb2, p_lab);
+        DLIB_TEST(p_rgb2.red > 252);
+        DLIB_TEST(p_rgb2.green > 252);
+        DLIB_TEST(p_rgb2.blue < 9);
+
+        p_rgb.red = 0;
+        p_rgb.green = 255;
+        p_rgb.blue = 255;
+        assign_pixel(p_lab, p_rgb);
+        assign_pixel(p_rgb2, p_lab);
+        DLIB_TEST(p_rgb2.red < 5);
+        DLIB_TEST(p_rgb2.green > 252);
+        DLIB_TEST(p_rgb2.blue > 252);
+
+        p_rgb.red = 255;
+        p_rgb.green = 0;
+        p_rgb.blue = 255;
+        assign_pixel(p_lab, p_rgb);
+        assign_pixel(p_rgb2, p_lab);
+        DLIB_TEST(p_rgb2.red> 252);
+        DLIB_TEST(p_rgb2.green < 6);
+        DLIB_TEST(p_rgb2.blue > 252);
+
+        p_rgb.red = 255;
+        p_rgb.green = 255;
+        p_rgb.blue = 255;
+        assign_pixel(p_lab, p_rgb);
+        assign_pixel(p_rgb2, p_lab);
+        DLIB_TEST(p_rgb2.red > 252 );
+        DLIB_TEST(p_rgb2.green> 252);
+        DLIB_TEST(p_rgb2.blue > 252);
+
 
         assign_pixel(p_rgba, 100);
         assign_pixel(p_gray, 10);
