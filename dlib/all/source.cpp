@@ -26,7 +26,6 @@
 #if __cplusplus >= 201103
 #include "../dnn/cpu_dlib.cpp"
 #include "../dnn/tensor_tools.cpp"
-#include "../threads/async.cpp"
 #endif 
 
 #ifndef DLIB_ISO_CPP_ONLY
@@ -59,6 +58,7 @@
 #include "../threads/threads_kernel_2.cpp"
 #include "../threads/threads_kernel_shared.cpp"
 #include "../threads/thread_pool_extension.cpp"
+#include "../threads/async.cpp"
 #include "../timer/timer.cpp"
 #include "../stack_trace.cpp"
 

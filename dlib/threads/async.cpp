@@ -3,6 +3,9 @@
 #ifndef DLIB_AsYNC_CPP_
 #define DLIB_AsYNC_CPP_ 
 
+// C++11 things don't work in old versions of visual studio 
+#if !defined( _MSC_VER) ||  _MSC_VER >= 1900
+
 #include "async.h"
 #include <stdlib.h>
 #include "../string.h"
@@ -36,6 +39,8 @@ namespace dlib
 }
 
 // ----------------------------------------------------------------------------------------
+
+#endif
 
 #endif // DLIB_AsYNC_CPP_
 
