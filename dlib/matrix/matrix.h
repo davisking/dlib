@@ -16,7 +16,7 @@
 #include "matrix_assign_fwd.h"
 #include "matrix_op.h"
 #include <utility>
-#ifdef DLIB_HAS_RVALUE_REFERENCES
+#ifdef DLIB_HAS_INITIALIZER_LISTS
 #include <initializer_list>
 #endif
 
@@ -1114,7 +1114,7 @@ namespace dlib
             matrix_assign(*this, m);
         }
 
-#ifdef DLIB_HAS_RVALUE_REFERENCES
+#ifdef DLIB_HAS_INITIALIZER_LISTS
         matrix(const std::initializer_list<T>& l)
         {
             if (NR*NC != 0)
@@ -1169,7 +1169,9 @@ namespace dlib
             temp.swap(*this);
             return *this;
         }
+#endif // DLIB_HAS_INITIALIZER_LISTS
 
+#ifdef DLIB_HAS_RVALUE_REFERENCES
         matrix(matrix&& item)
         {
         #ifdef MATLAB_MEX_FILE
@@ -1210,7 +1212,7 @@ namespace dlib
         #endif
             return *this;
         }
-#endif
+#endif // DLIB_HAS_RVALUE_REFERENCES
 
         template <typename U, size_t len>
         explicit matrix (
