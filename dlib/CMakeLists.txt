@@ -457,7 +457,7 @@ if (NOT TARGET dlib)
             # Note that we add __STRICT_ANSI__ to avoid freaking out nvcc with gcc specific
             # magic in the standard C++ header files (since nvcc uses gcc headers on
             # linux).
-            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__")
+            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES")
 
             include(cmake_utils/test_for_cudnn/find_cudnn.txt)
 
