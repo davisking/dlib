@@ -897,7 +897,12 @@ namespace
         DLIB_TEST(max(abs(mat(means) -mat(means2))) < 1e-4);
         DLIB_TEST(max(abs(mat(invstds) -mat(invstds2))) < 1e-4);
         DLIB_TEST(max(abs(mat(running_means) -mat(running_means2))) < 1e-4);
-        DLIB_TEST(max(abs(mat(running_variances) -mat(running_variances2))) < 1e-4);
+        DLIB_TEST_MSG(max(abs(mat(running_variances) -mat(running_variances2))) < 1e-4,
+            mean(mat(running_variances)) 
+            << "\n" << mean(mat(running_variances2))
+            << "\n" << max(abs(mat(running_variances) -mat(running_variances2)))
+            << "\n" << mean(abs(mat(running_variances) -mat(running_variances2)))
+            );
 
 
         // now check that the gradients match as well
