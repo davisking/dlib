@@ -445,6 +445,14 @@ namespace dlib
             invstds.copy_size(means);
             running_means.copy_size(means);
             running_variances.copy_size(means);
+            // cuDNN requires that running_means and running_variances be initialized to
+            // some valid float values even if the averaging factor would have ignored
+            // them.  
+            if (averaging_factor == 1)
+            {
+                running_means = 0;
+                running_variances = 1;
+            }
 
             CHECK_CUDNN(cudnnBatchNormalizationForwardTraining(
                                 context(),
@@ -627,6 +635,14 @@ namespace dlib
             invstds.copy_size(means);
             running_means.copy_size(means);
             running_variances.copy_size(means);
+            // cuDNN requires that running_means and running_variances be initialized to
+            // some valid float values even if the averaging factor would have ignored
+            // them.  
+            if (averaging_factor == 1)
+            {
+                running_means = 0;
+                running_variances = 1;
+            }
 
             CHECK_CUDNN(cudnnBatchNormalizationForwardTraining(
                                 context(),
