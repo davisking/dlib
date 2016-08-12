@@ -1592,7 +1592,7 @@ namespace
                 "Runs tests on the deep neural network tools.")
         {}
 
-        void perform_test (
+        void run_tests (
         )
         {
             // make the tests repeatable
@@ -1648,6 +1648,17 @@ namespace
             test_visit_funcions();
             test_copy_tensor_cpu();
             test_concat();
+        }
+
+        void perform_test()
+        {
+            dlog << LINFO << "NOW RUNNING TESTS WITH set_dnn_prefer_fastest_algorithms()";
+            set_dnn_prefer_fastest_algorithms();
+            run_tests();
+
+            dlog << LINFO << "NOW RUNNING TESTS WITH set_dnn_prefer_smallest_algorithms()";
+            set_dnn_prefer_smallest_algorithms();
+            run_tests();
         }
     } a;
 }

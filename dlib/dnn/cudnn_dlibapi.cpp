@@ -917,7 +917,21 @@ namespace dlib
                         dnn_prefer_fastest_algorithms()?CUDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST:CUDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE,
                         std::numeric_limits<size_t>::max(),
                         &backward_filters_best_algo));
+                // cuDNN 5.1 has a bug that causes
+                // cudnnGetConvolutionBackwardFilterAlgorithm() to pick the winograd
+                // algorithm even for cases where cuDNN doesn't support it, leading to
+                // incorrect outputs.  So here we check if we are in a case where winograd
+                // isn't supported and manually overrule
+                // cudnnGetConvolutionBackwardFilterAlgorithm() by picking a safe
+                // algorithm.
+                if (dnn_prefer_fastest_algorithms() && 
+                    !(stride_x == 1 && stride_y == 1 && ((filters_nr==3&&filters_nc==3) || (filters_nr==5&&filters_nc==5)))
+                    )
+                {
+                    backward_filters_best_algo = CUDNN_CONVOLUTION_BWD_FILTER_ALGO_0;
+                }
                 backward_filters_algo = backward_filters_best_algo;
+
                 CHECK_CUDNN(cudnnGetConvolutionBackwardFilterWorkspaceSize( 
                         context(),
                         descriptor(data),
