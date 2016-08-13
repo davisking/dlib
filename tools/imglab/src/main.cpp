@@ -770,7 +770,7 @@ int main(int argc, char** argv)
         parser.add_option("resample", "Crop out images that are centered on each object in the dataset.  Make the "
                                       "crops so that the objects have <arg> pixels in them.  The output is a new XML dataset.",1); 
         parser.add_option("extract-chips", "Crops out images with tight bounding boxes around each object.  Also crops out "
-                                           "many background chips.  All these image chips are serialized into one big data file.  The chips will contain <arg> pixels each",1);
+                                           "many background chips.  All these image chips are serialized into one big data file.  The chips will contain <arg> pixels each.",1);
         parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
 
         parser.parse(argc, argv);
