@@ -27,3 +27,5 @@ docs/docs/python/functions.txt
 syntax: glob
 dlib/test/build64/*
 *.svm
+dlib/test/build_python
+dlib/test/test_log.txt
