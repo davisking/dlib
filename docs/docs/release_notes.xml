@@ -12,6 +12,34 @@
 
 <current>
 New Features:
+   - Support for cuDNN 5.1
+   - dlib::async() and dlib::default_thread_pool().
+   - rectangle_transform
+   - imglab tool: added --resample, --ignore, --files, and --extract-chips
+     command line options.  Also added convert_imglab_paths_to_relative and
+     copy_imglab_dataset scripts.
+   - Evgeniy Fominov made the shape_predictor trainer multi-threaded and faster.
+   - sutr90 contributed support for the CIELab color space.  See the new lab_pixel.
+
+Non-Backwards Compatible Changes:
+   - All the cmake utility scripts were moved to dlib/cmake_utils.  
+   - Code that #includes the shape_predictor can now only be compiled with
+     compilers that support C++11 lambda functions.
+
+Bug fixes:
+   - Made CMake scripts work in a wider range of environments. 
+   - Fixed compile time errors on various platforms.
+   - Fixed bad multi-threading support in the MATLAB mex wrapper.
+   - Fixed bug in cuDNN binding that could sometimes cause NaN outputs.
+   - Fixed bad convergence testing in DNN tooling for very small datasets.
+
+Other:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.0" date="Jun 25, 2016">
+New Features:
    - A deep learning toolkit using CPU and/or GPU hardware.  Some major elements
      of this are:
       - Clean and fully documented C++11 API
@@ -67,7 +95,7 @@ Other:
    - CMake scripts now enable C++11 by default
    - Gave array2d and matrix move constructors and move assignment operators.  Matrix
      can also now be created from initializer lists.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
