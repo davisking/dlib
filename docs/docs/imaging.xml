@@ -38,6 +38,9 @@
                   <ul>The <a href="#hsi_pixel">hsi_pixel</a> is a 24bit pixel which represents a point in the Hue Saturation Intensity 
                   (HSI) color space. </ul>
                </li>
+               <li><b>LAB</b>
+                  <ul>The <a href="#lab_pixel">lab_pixel</a> is a 24bit pixel which represents a point in the CIELab color space. </ul>
+               </li>
                <li><b>Grayscale</b>
                   <ul>Any built in scalar type may be used as a grayscale pixel type.  For example, unsigned char, int, double, etc.</ul>
                </li>
@@ -64,6 +67,7 @@
          <item>bgr_pixel</item>
          <item>rgb_alpha_pixel</item>
          <item>hsi_pixel</item>
+         <item>lab_pixel</item>
          <item>pixel_traits</item>
          <item>get_pixel_intensity</item> 
          <item>assign_pixel</item> 
@@ -737,7 +741,19 @@
          <file>dlib/pixel.h</file>
          <spec_file link="true">dlib/pixel.h</spec_file>
          <description>
-            This is a simple struct that represents an HSI colored graphical pixel.  
+            This is a simple struct that represents a HSI colored graphical pixel.  
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>lab_pixel</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            This is a simple struct that represents a CIELab colored graphical pixel.  
          </description>
                                  
       </component>

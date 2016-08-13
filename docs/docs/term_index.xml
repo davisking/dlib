@@ -918,6 +918,9 @@
          <term file="api.html" name="thread_specific_data"  include="dlib/threads.h"/>
          <term file="api.html" name="threaded_object"       include="dlib/threads.h"/>
          <term file="api.html" name="thread_pool"           include="dlib/threads.h"/>
+         <term file="api.html" name="async"                 include="dlib/threads.h"/>
+         <term file="api.html" name="default_thread_pool"   include="dlib/threads.h"/>
+         <term link="api.html#default_thread_pool" name="DLIB_NUM_THREADS"  />
          <term file="api.html" name="parallel_for"          include="dlib/threads.h"/>
          <term link="api.html#parallel_for" name="parallel_for_blocked" include="dlib/threads.h"/>
          <term link="api.html#parallel_for" name="parallel_for_verbose" include="dlib/threads.h"/>
@@ -1364,6 +1367,7 @@
          <term file="imaging.html" name="equalize_histogram"   include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="get_histogram"        include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="hsi_pixel"            include="dlib/pixel.h"/>
+         <term file="imaging.html" name="lab_pixel"            include="dlib/pixel.h"/>
          <term file="imaging.html" name="load_bmp"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="load_png"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="load_jpeg"            include="dlib/image_io.h"/>
