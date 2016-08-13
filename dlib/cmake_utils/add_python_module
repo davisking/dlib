@@ -52,6 +52,8 @@ set(Boost_NO_BOOST_CMAKE ON)
 if (NOT WIN32)
     set(BOOST_LIBRARYDIR ${BOOST_LIBRARYDIR} $ENV{BOOST_LIBRARYDIR}  
             /usr/lib/x86_64-linux-gnu/)
+else()
+    link_directories($ENV{BOOST_LIBRARYDIR})
 endif()
 if (PYTHON3)
     # On some systems the boost python3 module is called python-py34 so check
