@@ -24,7 +24,7 @@ cmake ..
 cmake --build . --config Release
 </code_box>
 Note that you also need to have a C++ compiler installed on your system.  There are free C++ compilers
-for most operating systems.  For example, Visual Studio Express is free on Windows and GCC is free and
+for most operating systems.  For example, Visual Studio is free on Windows and GCC is free and
 works well on Mac OS X and Linux systems.  If you have multiple compilers/IDEs installed then you can
 tell CMake which one you want it to use via the -G option.
 <p>
@@ -38,7 +38,7 @@ tell CMake which one you want it to use via the -G option.
    Finally, note that when using Visual Studio, CMake will by default generate a 32bit executable.  
    This means the programs you compile will only be able to use 2GB of RAM.  To avoid this, you need
    to tell CMake to generate a 64bit executable.  You do this by using a command like 
-   <code_box>cmake -G "Visual Studio 10 2015 Win64" ..</code_box> instead of <code_box>cmake ..</code_box>  
+   <code_box>cmake -G "Visual Studio 14 2015 Win64" ..</code_box> instead of <code_box>cmake ..</code_box>  
    You can see the list of valid arguments to <tt>-G</tt> by running <tt>cmake</tt> with no options. 
 </p>
             
@@ -129,8 +129,6 @@ sudo apt-get install libx11-dev
         <p>
             The commands for gcc on windows are the same as above but you may also have to link 
             (via the -l option) to the following libraries: gdi32, comctl32, user32, winmm, ws2_32, or imm32.
-            However, it's worth pointing out that Visual Studio Express is free and a much better choice for
-            windows development than gcc.
         </p>
 
         <h3>Compiling on Windows Using Visual Studio</h3>
