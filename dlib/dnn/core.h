@@ -73,7 +73,6 @@ namespace dlib
             !*/
         public:
             typedef int input_type;
-            const static unsigned int sample_expansion_factor = 1;
 
             template <typename forward_iterator>
             void to_tensor (
@@ -503,13 +502,15 @@ namespace dlib
             subnet_wrapper(const subnet_wrapper&) = delete;
             subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
-            subnet_wrapper(T& l_) : l(l_) {}
+            subnet_wrapper(T& l_, unsigned int sef) : l(l_),_sample_expansion_factor(sef) {}
             // Not much here because in this case T is one of the input layer types 
             // that doesn't have anything in it.
             typedef T layer_details_type;
             const layer_details_type& layer_details() const { return l; }
+            unsigned int sample_expansion_factor() const { return _sample_expansion_factor; }
         private:
             T& l;
+            unsigned int _sample_expansion_factor;
         };
 
         template <typename T>
@@ -525,7 +526,7 @@ namespace dlib
             const static size_t num_layers = T::num_layers;
             typedef typename T::layer_details_type layer_details_type;
 
-            subnet_wrapper(T& l_) : l(l_),subnetwork(l.subnet()) {}
+            subnet_wrapper(T& l_, unsigned int = 0) : l(l_),subnetwork(l.subnet(), l.sample_expansion_factor()) {}
 
             const tensor& get_output() const { return l.private_get_output(); }
             tensor& get_gradient_input() { return l.private_get_gradient_input(); }
@@ -534,6 +535,7 @@ namespace dlib
 
             const subnet_wrapper<typename T::subnet_type,false>& subnet() const { return subnetwork; }
             subnet_wrapper<typename T::subnet_type,false>& subnet() { return subnetwork; }
+            unsigned int sample_expansion_factor() const { return l.sample_expansion_factor(); }
 
         private:
             T& l;
@@ -553,7 +555,7 @@ namespace dlib
             const static size_t num_layers = T::num_layers;
             typedef typename T::layer_details_type layer_details_type;
 
-            subnet_wrapper(T& l_) : l(l_),subnetwork(l.subnet()) {}
+            subnet_wrapper(T& l_, unsigned int = 0) : l(l_),subnetwork(l.subnet(), l.sample_expansion_factor()) {}
 
             const tensor& get_output() const { return l.get_output(); }
             tensor& get_gradient_input() { return l.get_gradient_input(); }
@@ -562,6 +564,7 @@ namespace dlib
 
             const subnet_wrapper<typename T::subnet_type,false>& subnet() const { return subnetwork; }
             subnet_wrapper<typename T::subnet_type,false>& subnet() { return subnetwork; }
+            unsigned int sample_expansion_factor() const { return l.sample_expansion_factor(); }
 
         private:
             T& l;
@@ -588,7 +591,6 @@ namespace dlib
         typedef typename subnet_type::input_type input_type;
         const static size_t num_layers = subnet_type::num_layers + 1;
         const static size_t num_computational_layers = subnet_type::num_computational_layers + 1;
-        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
 
         add_layer(
         ):
@@ -882,6 +884,8 @@ namespace dlib
         const layer_details_type& layer_details() const { return details; } 
         layer_details_type& layer_details() { return details; } 
 
+        unsigned int sample_expansion_factor() const { return subnet().sample_expansion_factor(); }
+
         void clean()
         {
             x_grad.clear();
@@ -1004,17 +1008,15 @@ namespace dlib
         typedef LAYER_DETAILS layer_details_type;
         typedef INPUT_LAYER subnet_type;
         typedef typename INPUT_LAYER::input_type input_type;
-        const static unsigned int sample_expansion_factor = INPUT_LAYER::sample_expansion_factor;
         const static size_t num_layers = 2;
         const static size_t num_computational_layers = 1;
-        static_assert(sample_expansion_factor >= 1,
-            "The input layer can't produce fewer output tensors than there are inputs.");
 
         add_layer(
         ): 
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
-            get_output_and_gradient_input_disabled(false)
+            get_output_and_gradient_input_disabled(false),
+            _sample_expansion_factor(0)
         {}
 
         add_layer(const add_layer&) = default;
@@ -1044,6 +1046,7 @@ namespace dlib
             this_layer_setup_called(item.this_layer_setup_called),
             gradient_input_is_stale(item.gradient_input_is_stale),
             get_output_and_gradient_input_disabled(false),
+            _sample_expansion_factor(item._sample_expansion_factor),
             x_grad(item.x_grad),
             cached_output(item.cached_output),
             grad_final(item.grad_final)
@@ -1056,7 +1059,8 @@ namespace dlib
             details(layer_det), 
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
-            get_output_and_gradient_input_disabled(false)
+            get_output_and_gradient_input_disabled(false),
+            _sample_expansion_factor(0)
         {}
 
         add_layer(
@@ -1065,7 +1069,8 @@ namespace dlib
             input_layer(il), 
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
-            get_output_and_gradient_input_disabled(false)
+            get_output_and_gradient_input_disabled(false),
+            _sample_expansion_factor(0)
         {}
 
         add_layer(
@@ -1074,7 +1079,8 @@ namespace dlib
             details(std::move(layer_det)), 
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
-            get_output_and_gradient_input_disabled(false)
+            get_output_and_gradient_input_disabled(false),
+            _sample_expansion_factor(0)
         {}
 
         add_layer(
@@ -1085,7 +1091,8 @@ namespace dlib
             input_layer(std::move(il)),
             this_layer_setup_called(false),
             gradient_input_is_stale(true),
-            get_output_and_gradient_input_disabled(false)
+            get_output_and_gradient_input_disabled(false),
+            _sample_expansion_factor(0)
         {}
 
         add_layer(
@@ -1122,7 +1129,12 @@ namespace dlib
         {
             input_layer.to_tensor(ibegin, iend, data);
             // make sure the input layer's to_tensor() function is implemented properly.
-            DLIB_CASSERT(std::distance(ibegin,iend)*sample_expansion_factor == data.num_samples(),"");
+            DLIB_CASSERT(data.num_samples() >= std::distance(ibegin,iend), 
+            "The input layer can't produce fewer output tensors than there are inputs.");
+            DLIB_CASSERT(data.num_samples()%std::distance(ibegin,iend) == 0,
+            "The number of tensors produced by the input layer must be an integer multiple of the number of input objects.");
+
+            _sample_expansion_factor = data.num_samples()/std::distance(ibegin,iend);
             data.async_copy_to_device();
         }
 
@@ -1145,8 +1157,9 @@ namespace dlib
 
         const tensor& forward (const tensor& x)
         {
-            DLIB_CASSERT(x.num_samples()%sample_expansion_factor == 0,"");
-            subnet_wrapper wsub(x, grad_final);
+            DLIB_CASSERT(sample_expansion_factor() != 0, "You must call to_tensor() before this function can be used.");
+            DLIB_CASSERT(x.num_samples()%sample_expansion_factor() == 0,"");
+            subnet_wrapper wsub(x, grad_final, _sample_expansion_factor);
             if (!this_layer_setup_called)
             {
                 details.setup(wsub);
@@ -1199,7 +1212,7 @@ namespace dlib
                 grad_final.copy_size(x);
             grad_final = 0;  
 
-            subnet_wrapper wsub(x, grad_final);
+            subnet_wrapper wsub(x, grad_final, _sample_expansion_factor);
             params_grad.copy_size(details.get_layer_params());
             impl::call_layer_backward(details, private_get_output(),
                 gradient_input, wsub, static_cast<tensor&>(params_grad));
@@ -1233,6 +1246,8 @@ namespace dlib
         const layer_details_type& layer_details() const { return details; } 
         layer_details_type& layer_details() { return details; } 
 
+        unsigned int sample_expansion_factor() const { return _sample_expansion_factor; }
+
         void clean()
         {
             x_grad.clear();
@@ -1245,7 +1260,7 @@ namespace dlib
 
         friend void serialize(const add_layer& item, std::ostream& out)
         {
-            int version = 2;
+            int version = 3;
             serialize(version, out);
             serialize(item.input_layer, out);
             serialize(item.details, out);
@@ -1255,13 +1270,14 @@ namespace dlib
             serialize(item.x_grad, out);
             serialize(item.cached_output, out);
             serialize(item.grad_final, out);
+            serialize(item._sample_expansion_factor, out);
         }
 
         friend void deserialize(add_layer& item, std::istream& in)
         {
             int version = 0;
             deserialize(version, in);
-            if (version != 2)
+            if (!(2 <= version && version <= 3))
                 throw serialization_error("Unexpected version found while deserializing dlib::add_layer.");
             deserialize(item.input_layer, in);
             deserialize(item.details, in);
@@ -1271,6 +1287,10 @@ namespace dlib
             deserialize(item.x_grad, in);
             deserialize(item.cached_output, in);
             deserialize(item.grad_final, in);
+            if (version >= 3)
+                deserialize(item._sample_expansion_factor, in);
+            else
+                item._sample_expansion_factor = 1; // all layer types set this to 1 in older dlib versions, so that's what we put here.
         }
 
         friend std::ostream& operator<< (std::ostream& out, const add_layer& item)
@@ -1295,19 +1315,20 @@ namespace dlib
         bool this_layer_requires_forward_output(
         ) 
         {
-            subnet_wrapper wsub(grad_final, grad_final);
+            subnet_wrapper wsub(grad_final, grad_final, _sample_expansion_factor);
             return impl::backward_requires_forward_output(details, wsub);
         }
 
         class subnet_wrapper
         {
         public:
-            subnet_wrapper(const tensor& x_, resizable_tensor& grad_final_) :
-                x(x_), grad_final(grad_final_) {}
+            subnet_wrapper(const tensor& x_, resizable_tensor& grad_final_, unsigned int sef) :
+                x(x_), grad_final(grad_final_), _sample_expansion_factor(sef) {}
 
             subnet_wrapper(const subnet_wrapper&) = delete;
             subnet_wrapper& operator=(const subnet_wrapper&) = delete;
 
+            unsigned int sample_expansion_factor() const { return _sample_expansion_factor;}
             const tensor& get_output() const { return x; }
             tensor& get_gradient_input() 
             { 
@@ -1322,6 +1343,7 @@ namespace dlib
         private:
             const tensor& x;
             resizable_tensor& grad_final;
+            unsigned int _sample_expansion_factor;
         };
 
         void swap(add_layer& item)
@@ -1334,6 +1356,7 @@ namespace dlib
             std::swap(x_grad, item.x_grad); 
             std::swap(cached_output, item.cached_output); 
             std::swap(grad_final, item.grad_final); 
+            std::swap(_sample_expansion_factor, item._sample_expansion_factor); 
         }
 
         subnet_type input_layer;
@@ -1341,6 +1364,7 @@ namespace dlib
         bool this_layer_setup_called;
         bool gradient_input_is_stale;
         bool get_output_and_gradient_input_disabled;
+        mutable unsigned int _sample_expansion_factor;
         resizable_tensor x_grad; 
         resizable_tensor cached_output; 
         resizable_tensor grad_final;
@@ -1373,10 +1397,7 @@ namespace dlib
         typedef int layer_details_type; // not really used anywhere, but required by subnet_wrapper.
         const static size_t num_layers = subnet_type::num_layers + 1;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
-        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         const static unsigned long id = ID;
-        static_assert(sample_expansion_factor >= 1,
-            "The input layer can't produce fewer output tensors than there are inputs.");
 
         add_tag_layer() {};
         add_tag_layer(const add_tag_layer&) = default;
@@ -1460,6 +1481,8 @@ namespace dlib
 
         const subnet_type& subnet() const { return subnetwork; }
         subnet_type& subnet() { return subnetwork; }
+
+        unsigned int sample_expansion_factor() const { return subnet().sample_expansion_factor(); }
 
         void clean()
         {
@@ -1576,7 +1599,6 @@ namespace dlib
         const static size_t layers_in_repeated_group = layers_in_each_group*num;
         const static size_t num_layers = subnet_type::num_layers + layers_in_repeated_group;
 
-        const static unsigned int sample_expansion_factor = SUBNET::sample_expansion_factor;
 
         typedef REPEATED_LAYER<impl::repeat_input_layer> repeated_layer_type;
 
@@ -1745,6 +1767,8 @@ namespace dlib
         const subnet_type& subnet() const { return subnetwork; }
         subnet_type& subnet() { return subnetwork; }
 
+        unsigned int sample_expansion_factor() const { return subnet().sample_expansion_factor(); }
+
         void clean()
         {
             temp_tensor.clear();
@@ -1842,12 +1866,9 @@ namespace dlib
         typedef int layer_details_type; // not really used anywhere, but required by subnet_wrapper.
         const static size_t num_computational_layers = 0;
         const static size_t num_layers = 2;
-        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         const static unsigned long id = ID;
-        static_assert(sample_expansion_factor >= 1,
-            "The input layer can't produce fewer output tensors than there are inputs.");
 
-        add_tag_layer():cached_output_ptr(nullptr),gradient_input_is_stale(true) {}
+        add_tag_layer():cached_output_ptr(nullptr),gradient_input_is_stale(true),_sample_expansion_factor(0) {}
 
         add_tag_layer(const add_tag_layer&) = default;
         add_tag_layer& operator=(const add_tag_layer&) = default;
@@ -1861,7 +1882,8 @@ namespace dlib
             cached_output(item.cached_output),
             cached_output_ptr(nullptr),
             grad_final(item.grad_final),
-            gradient_input_is_stale(item.gradient_input_is_stale)
+            gradient_input_is_stale(item.gradient_input_is_stale),
+            _sample_expansion_factor(0)
         {}
 
         template <typename ...T>
@@ -1870,7 +1892,8 @@ namespace dlib
         ) : 
             input_layer(std::move(args)...),
             cached_output_ptr(nullptr),
-            gradient_input_is_stale(true)
+            gradient_input_is_stale(true),
+            _sample_expansion_factor(0)
         {
         }
 
@@ -1878,7 +1901,8 @@ namespace dlib
             std::tuple<>
         ) : 
             cached_output_ptr(nullptr),
-            gradient_input_is_stale(true)
+            gradient_input_is_stale(true),
+            _sample_expansion_factor(0)
         {}
 
         template <typename forward_iterator>
@@ -1889,7 +1913,18 @@ namespace dlib
         ) const
         {
             input_layer.to_tensor(ibegin,iend,data);
+
+            // make sure the input layer's to_tensor() function is implemented properly.
+            DLIB_CASSERT(data.num_samples() >= std::distance(ibegin,iend), 
+            "The input layer can't produce fewer output tensors than there are inputs.");
+            DLIB_CASSERT(data.num_samples()%std::distance(ibegin,iend) == 0,
+            "The number of tensors produced by the input layer must be an integer multiple of the number of input objects.");
+
+            _sample_expansion_factor = data.num_samples()/std::distance(ibegin,iend);
+            data.async_copy_to_device();
         }
+
+        unsigned int sample_expansion_factor() const { return _sample_expansion_factor; }
 
         template <typename forward_iterator>
         const tensor& operator() (
@@ -1971,25 +2006,31 @@ namespace dlib
 
         friend void serialize(const add_tag_layer& item, std::ostream& out)
         {
-            int version = 1;
+            int version = 2;
             serialize(version, out);
             serialize(item.input_layer, out);
             serialize(item.cached_output, out);
             serialize(item.grad_final, out);
             serialize(item.gradient_input_is_stale, out);
+            serialize(item._sample_expansion_factor, out);
         }
 
         friend void deserialize(add_tag_layer& item, std::istream& in)
         {
             int version = 0;
             deserialize(version, in);
-            if (version != 1)
+            if (!(1 <= version && version <= 2))
                 throw serialization_error("Unexpected version found while deserializing dlib::add_tag_layer.");
             deserialize(item.input_layer, in);
             deserialize(item.cached_output, in);
             deserialize(item.grad_final, in);
             deserialize(item.gradient_input_is_stale, in);
             item.cached_output_ptr = nullptr;
+            if (version >= 2)
+                deserialize(item._sample_expansion_factor, in);
+            else
+                item._sample_expansion_factor = 1; // all layer types set this to 1 in older dlib versions, so that's what we put here.
+                
         }
 
         friend std::ostream& operator<< (std::ostream& out, const add_tag_layer& item)
@@ -2049,6 +2090,7 @@ namespace dlib
             std::swap(cached_output_ptr, item.cached_output_ptr);
             std::swap(grad_final, item.grad_final);
             std::swap(gradient_input_is_stale, item.gradient_input_is_stale);
+            std::swap(_sample_expansion_factor, item._sample_expansion_factor);
         }
 
         subnet_type input_layer;
@@ -2056,6 +2098,7 @@ namespace dlib
         tensor* cached_output_ptr;
         resizable_tensor grad_final;
         bool gradient_input_is_stale;
+        mutable unsigned int _sample_expansion_factor;
     };
 
     template <unsigned long ID, typename U, typename E>
@@ -2107,13 +2150,10 @@ namespace dlib
         const static size_t num_layers = subnet_type::num_layers + 1;
         // Note that the loss layer doesn't count as an additional computational layer.
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
-        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         typedef typename get_loss_layer_label_type<LOSS_DETAILS>::type label_type;
 
         static_assert(is_nonloss_layer_type<SUBNET>::value, 
             "SUBNET must be of type add_layer, add_skip_layer, or add_tag_layer."); 
-        static_assert(sample_expansion_factor == LOSS_DETAILS::sample_expansion_factor,
-            "The loss layer and input layer must agree on the sample_expansion_factor.");
 
 
         add_loss_layer() {};
@@ -2167,6 +2207,8 @@ namespace dlib
         {
             subnetwork.to_tensor(ibegin,iend,data);
         }
+
+        unsigned int sample_expansion_factor() const { return subnet().sample_expansion_factor(); }
 
         template <typename output_iterator>
         void operator() (
@@ -2580,10 +2622,7 @@ namespace dlib
         typedef int layer_details_type; // not really used anywhere, but required by subnet_wrapper.
         const static size_t num_layers = subnet_type::num_layers + 1;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
-        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         const static unsigned long id = tag_id<TAG_TYPE>::id;
-        static_assert(sample_expansion_factor >= 1,
-            "The input layer can't produce fewer output tensors than there are inputs.");
 
         add_skip_layer() {};
         add_skip_layer(const add_skip_layer&) = default;
@@ -2680,6 +2719,8 @@ namespace dlib
         { 
             return subnetwork; 
         }
+
+        unsigned int sample_expansion_factor() const { return subnet().sample_expansion_factor(); }
 
         void clean()
         {

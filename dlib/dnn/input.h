@@ -32,7 +32,6 @@ namespace dlib
     {
     public:
         typedef matrix<rgb_pixel> input_type;
-        const static unsigned int sample_expansion_factor = 1;
 
         input_rgb_image (
         ) : 
@@ -154,7 +153,6 @@ namespace dlib
         static_assert(NR != 0 && NC != 0, "The input image can't be empty.");
 
         typedef matrix<rgb_pixel> input_type;
-        const static unsigned int sample_expansion_factor = 1;
 
         input_rgb_image_sized (
         ) : 
@@ -293,7 +291,6 @@ namespace dlib
     {
     public:
         typedef matrix<T,NR,NC,MM,L> input_type;
-        const static unsigned int sample_expansion_factor = 1;
 
         input() {}
         input(const input&) {}
@@ -387,7 +384,6 @@ namespace dlib
     {
     public:
         typedef array2d<T,MM> input_type;
-        const static unsigned int sample_expansion_factor = 1;
 
         input() {}
         input(const input&) {}

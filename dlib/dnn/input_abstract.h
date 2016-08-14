@@ -61,8 +61,6 @@ namespace dlib
                   allows you to easily convert between related deep neural network types.  
         !*/
 
-        // sample_expansion_factor must be > 0
-        const static unsigned int sample_expansion_factor;
         typedef whatever_type_to_tensor_expects input_type;
 
         template <typename forward_iterator>
@@ -77,12 +75,13 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - #data.num_samples()%distance(ibegin,iend) == 0. 
                   Normally you would have #data.num_samples() == distance(ibegin,iend) but
                   you can also expand the output by some integer factor so long as the loss
                   you use can deal with it correctly.
                 - The data in the ith sample of #data corresponds to the input_type object
                   *(ibegin+i/sample_expansion_factor).
+                  where sample_expansion_factor==#data.num_samples()/distance(ibegin,iend).
         !*/
     };
 
@@ -120,7 +119,6 @@ namespace dlib
         !*/
 
     public:
-        const static unsigned int sample_expansion_factor = 1;
         typedef T input_type;
 
         template <typename forward_iterator>
@@ -166,7 +164,6 @@ namespace dlib
         !*/
     public:
         typedef matrix<rgb_pixel> input_type;
-        const static unsigned int sample_expansion_factor = 1;
 
         input_rgb_image (
         );

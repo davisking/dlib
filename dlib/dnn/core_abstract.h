@@ -204,7 +204,6 @@ namespace dlib
         typedef LAYER_DETAILS layer_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
-        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         // num_computational_layers will always give the number of layers in the network
         // that transform tensors (i.e. layers defined by something that implements the
         // EXAMPLE_COMPUTATIONAL_LAYER_ interface).  This is all the layers except for
@@ -218,6 +217,7 @@ namespace dlib
         /*!
             ensures
                 - default constructs all the layers in this network.
+                - #sample_expansion_factor() == 0
         !*/
 
         add_layer(const add_layer&) = default;
@@ -240,6 +240,7 @@ namespace dlib
                   each other.
                 - #layer_details() == layer_details_type(item.layer_details())
                 - #subnet()        == subnet_type(item.subnet())
+                - #sample_expansion_factor() == item.sample_expansion_factor()
         !*/
 
         template <typename ...T, typename LD, typename ...U>
@@ -251,6 +252,7 @@ namespace dlib
             ensures
                 - #layer_details() == layer_details_type(tuple_head(layer_det))
                 - #subnet()        == subnet_type(tuple_tail(layer_det),args)
+                - #sample_expansion_factor() == 0 
         !*/
 
         template <typename ...T>
@@ -262,6 +264,7 @@ namespace dlib
             ensures
                 - #layer_details() == layer_details_type(layer_det)
                 - #subnet()        == subnet_type(args)
+                - #sample_expansion_factor() == 0 
         !*/
 
         template <typename ...T>
@@ -275,6 +278,7 @@ namespace dlib
                   args are simply passed on to the sub layers in their entirety.
                 - #layer_details() == layer_details_type()
                 - #subnet()        == subnet_type(args)
+                - #sample_expansion_factor() == 0 
         !*/
 
         template <typename ...T>
@@ -286,6 +290,7 @@ namespace dlib
             ensures
                 - #layer_details() == layer_det
                 - #subnet()        == subnet_type(args)
+                - #sample_expansion_factor() == 0 
         !*/
 
         template <typename forward_iterator>
@@ -300,13 +305,27 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - #data.num_samples()%distance(ibegin,iend) == 0. 
+                - #sample_expansion_factor() == #data.num_samples()/distance(ibegin,iend).
+                - #sample_expansion_factor() > 0
                 - The data in the ith sample of #data corresponds to the input_type object
-                  *(ibegin+i/sample_expansion_factor).
+                  *(ibegin+i/#sample_expansion_factor()).
                 - Invokes data.async_copy_to_device() so that the data begins transferring
                   to the GPU device, if present.
                 - This function is implemented by calling the to_tensor() routine defined
                   at the input layer of this network.  
+        !*/
+
+        unsigned int sample_expansion_factor (
+        ) const;
+        /*!
+            ensures
+                - When to_tensor() is invoked on this network's input layer it converts N
+                  input objects into M samples, all stored inside a resizable_tensor.  It
+                  is always the case that M is some integer multiple of N.
+                  sample_expansion_factor() returns the value of this multiplier.  To be
+                  very specific, it is always true that M==I*N where I is some integer.
+                  This integer I is what is returned by sample_expansion_factor().
         !*/
 
         const subnet_type& subnet(
@@ -379,7 +398,10 @@ namespace dlib
         );
         /*!
             requires
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
             ensures
                 - Runs x through the network and returns the results.  In particular, this
@@ -574,8 +596,6 @@ namespace dlib
             REQUIREMENTS ON LOSS_DETAILS 
                 - Must be a type that implements the EXAMPLE_LOSS_LAYER_ interface defined
                   in loss_abstract.h
-                - LOSS_DETAILS::sample_expansion_factor == SUBNET::sample_expansion_factor
-                  i.e. The loss layer and input layer must agree on the sample_expansion_factor.
 
             REQUIREMENTS ON SUBNET
                 - One of the following must be true:
@@ -599,7 +619,6 @@ namespace dlib
         typedef typename subnet_type::input_type input_type;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static size_t num_layers = subnet_type::num_layers + 1;
-        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         // If LOSS_DETAILS is an unsupervised loss then label_type==no_label_type.
         // Otherwise it is defined as follows:
         typedef typename LOSS_DETAILS::label_type label_type;
@@ -708,13 +727,27 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - #data.num_samples()%distance(ibegin,iend) == 0. 
+                - #sample_expansion_factor() == #data.num_samples()/distance(ibegin,iend).
+                - #sample_expansion_factor() > 0
                 - The data in the ith sample of #data corresponds to the input_type object
-                  *(ibegin+i/sample_expansion_factor).
+                  *(ibegin+i/sample_expansion_factor()).
                 - Invokes data.async_copy_to_device() so that the data begins transferring
                   to the GPU device, if present.
                 - This function is implemented by calling the to_tensor() routine defined
                   at the input layer of this network.  
+        !*/
+
+        unsigned int sample_expansion_factor (
+        ) const;
+        /*!
+            ensures
+                - When to_tensor() is invoked on this network's input layer it converts N
+                  input objects into M samples, all stored inside a resizable_tensor.  It
+                  is always the case that M is some integer multiple of N.
+                  sample_expansion_factor() returns the value of this multiplier.  To be
+                  very specific, it is always true that M==I*N where I is some integer.
+                  This integer I is what is returned by sample_expansion_factor().
         !*/
 
     // -------------
@@ -726,10 +759,13 @@ namespace dlib
         );
         /*!
             requires
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - obegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor label_type elements.
+                  x.num_samples()/sample_expansion_factor() label_type elements.
             ensures
                 - runs x through the network and writes the output to the range at obegin.
                 - loss_details().to_label() is used to write the network output into
@@ -799,15 +835,18 @@ namespace dlib
         );
         /*!
             requires
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor label_type elements.
+                  x.num_samples()/sample_expansion_factor() label_type elements.
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and returns the resulting loss. 
                 - for all valid k:
-                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor).
+                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor()).
                 - This function does not update the network parameters.
         !*/
 
@@ -839,7 +878,10 @@ namespace dlib
         /*!
             requires
                 - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
             ensures
                 - runs x through the network and returns the resulting loss. 
@@ -870,10 +912,13 @@ namespace dlib
         );
         /*!
             requires
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor label_type elements.
+                  x.num_samples()/sample_expansion_factor() label_type elements.
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and computes parameter and data gradients with
@@ -881,7 +926,7 @@ namespace dlib
                   updates get_final_data_gradient() and also, for each layer, the tensor
                   returned by get_parameter_gradient().
                 - for all valid k:
-                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor).
+                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor()).
                 - returns compute_loss(x,lbegin)
         !*/
 
@@ -914,7 +959,10 @@ namespace dlib
         /*!
             requires
                 - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
             ensures
                 - runs x through the network and computes parameter and data gradients with
@@ -1047,7 +1095,6 @@ namespace dlib
         typedef typename SUBNET::input_type input_type;
         const static size_t num_computational_layers = (REPEATED_LAYER<SUBNET>::num_computational_layers-SUBNET::num_computational_layers)*num + SUBNET::num_computational_layers;
         const static size_t num_layers = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
-        const static unsigned int sample_expansion_factor = SUBNET::sample_expansion_factor;
         typedef REPEATED_LAYER<an_unspecified_input_type> repeated_layer_type;
 
         template <typename T, typename ...U>

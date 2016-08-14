@@ -94,6 +94,25 @@ namespace dlib
                   implementing the EXAMPLE_COMPUTATIONAL_LAYER_ interface that defines the
                   layer's behavior.
         !*/
+
+        unsigned int sample_expansion_factor (
+        ) const;
+        /*!
+            ensures
+                - When to_tensor() is invoked on this network's input layer it converts N
+                  input objects into M samples, all stored inside a resizable_tensor.  It
+                  is always the case that M is some integer multiple of N.
+                  sample_expansion_factor() returns the value of this multiplier.  To be
+                  very specific, it is always true that M==I*N where I is some integer.
+                  This integer I is what is returned by sample_expansion_factor().
+
+                  It should be noted that computational layers likely do not care about the
+                  sample expansion factor.  It is only really of concern inside a loss
+                  layer where you need to know its value so that tensor samples can be
+                  matched against truth objects.  Moreover, in most cases the sample
+                  expansion factor is 1.
+        !*/
+
     };
 
 // ----------------------------------------------------------------------------------------

@@ -39,8 +39,6 @@ namespace dlib
 
     public:
 
-        // sample_expansion_factor must be > 0
-        const static unsigned int sample_expansion_factor;
         typedef whatever_type_you_use_for_labels label_type;
 
         EXAMPLE_LOSS_LAYER_ (
@@ -75,15 +73,15 @@ namespace dlib
                 - input_tensor was given as input to the network sub and the outputs are
                   now visible in layer<i>(sub).get_output(), for all valid i.
                 - input_tensor.num_samples() > 0
-                - input_tensor.num_samples()%sample_expansion_factor == 0.
+                - input_tensor.num_samples()%sub.sample_expansion_factor() == 0.
                 - iter == an iterator pointing to the beginning of a range of
-                  input_tensor.num_samples()/sample_expansion_factor elements.  Moreover,
+                  input_tensor.num_samples()/sub.sample_expansion_factor() elements.  Moreover,
                   they must be label_type elements.
             ensures
                 - Converts the output of the provided network to label_type objects and
                   stores the results into the range indicated by iter.  In particular, for
                   all valid i, it will be the case that:
-                    *(iter+i/sample_expansion_factor) is populated based on the output of
+                    *(iter+i/sub.sample_expansion_factor()) is populated based on the output of
                     sub and corresponds to the ith sample in input_tensor.
         !*/
 
@@ -103,15 +101,15 @@ namespace dlib
                 - input_tensor was given as input to the network sub and the outputs are
                   now visible in layer<i>(sub).get_output(), for all valid i.
                 - input_tensor.num_samples() > 0
-                - input_tensor.num_samples()%sample_expansion_factor == 0.
+                - input_tensor.num_samples()%sub.sample_expansion_factor() == 0.
                 - for all valid i:
                     - layer<i>(sub).get_gradient_input() has the same dimensions as
                       layer<i>(sub).get_output().
                 - truth == an iterator pointing to the beginning of a range of
-                  input_tensor.num_samples()/sample_expansion_factor elements.  Moreover,
+                  input_tensor.num_samples()/sub.sample_expansion_factor() elements.  Moreover,
                   they must be label_type elements.
                 - for all valid i:
-                    - *(truth+i/sample_expansion_factor) is the label of the ith sample in
+                    - *(truth+i/sub.sample_expansion_factor()) is the label of the ith sample in
                       input_tensor.
             ensures
                 - This function computes a loss function that describes how well the output
@@ -168,7 +166,6 @@ namespace dlib
         !*/
     public:
 
-        const static unsigned int sample_expansion_factor = 1;
         typedef float label_type;
 
         template <
@@ -187,6 +184,7 @@ namespace dlib
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
             and the output label is the raw score for each classified object.  If the score
             is > 0 then the classifier is predicting the +1 class, otherwise it is
             predicting the -1 class.
@@ -208,6 +206,7 @@ namespace dlib
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
                 - all values pointed to by truth are +1 or -1.
         !*/
 
@@ -234,7 +233,6 @@ namespace dlib
         !*/
     public:
 
-        const static unsigned int sample_expansion_factor = 1;
         typedef float label_type;
 
         template <
@@ -253,6 +251,7 @@ namespace dlib
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
             and the output label is the raw score for each classified object.  If the score
             is > 0 then the classifier is predicting the +1 class, otherwise it is
             predicting the -1 class.
@@ -274,6 +273,7 @@ namespace dlib
                 - sub.get_output().nc() == 1
                 - sub.get_output().k() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
                 - all values pointed to by truth are +1 or -1.
         !*/
 
@@ -305,7 +305,6 @@ namespace dlib
 
     public:
 
-        const static unsigned int sample_expansion_factor = 1;
         typedef unsigned long label_type;
 
         template <
@@ -323,6 +322,7 @@ namespace dlib
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
             and the output label is the predicted class for each classified object.  The number
             of possible output classes is sub.get_output().k().
         !*/
@@ -342,6 +342,7 @@ namespace dlib
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
                 - all values pointed to by truth are < sub.get_output().k()
         !*/
 
