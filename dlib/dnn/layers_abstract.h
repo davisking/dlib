@@ -82,6 +82,18 @@ namespace dlib
                   above, if *this was layer1 then subnet() would return the network that
                   begins with layer2.
         !*/
+
+        const layer_details_type& layer_details(
+        ) const; 
+        /*!
+            ensures
+                - returns the layer_details_type instance that defines the behavior of the
+                  layer at the top of this network.  I.e. returns the layer details that
+                  defines the behavior of the layer nearest to the network output rather
+                  than the input layer.  For computational layers, this is the object
+                  implementing the EXAMPLE_COMPUTATIONAL_LAYER_ interface that defines the
+                  layer's behavior.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------

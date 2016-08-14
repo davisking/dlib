@@ -1334,6 +1334,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename net_type>
+    auto& input_layer (
+        net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+        ensures
+            - returns the input later of the given network object.  Specifically, this
+              function is equivalent to calling:
+                layer<net_type::num_layers-1>(net);
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename net_type,
         typename visitor
