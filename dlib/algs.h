@@ -283,7 +283,7 @@ namespace dlib
             typename A,
             typename B
             >
-        bool operator> (
+        constexpr bool operator> (
             const A& a,
             const B& b
         ) { return b < a; }
@@ -294,7 +294,7 @@ namespace dlib
             typename A,
             typename B
             >
-        bool operator!= (
+        constexpr bool operator!= (
             const A& a,
             const B& b
         ) { return !(a == b); }
@@ -305,7 +305,7 @@ namespace dlib
             typename A,
             typename B
             >
-        bool operator<= (
+        constexpr bool operator<= (
             const A& a,
             const B& b
         ) { return !(b < a); }
@@ -316,7 +316,7 @@ namespace dlib
             typename A,
             typename B
             >
-        bool operator>= (
+        constexpr bool operator>= (
             const A& a,
             const B& b
         ) { return !(a < b); }
