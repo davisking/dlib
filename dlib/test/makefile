@@ -6,7 +6,7 @@ TARGET = dtest
 
 # these are the compile time flags passed to gcc
 CXXFLAGS ?= -ggdb -Wall
-CPPFLAGS ?= -DDEBUG -DDLIB_NO_GUI_SUPPORT -I../..
+CPPFLAGS ?= -std=c++11 -DDEBUG -DDLIB_NO_GUI_SUPPORT -I../..
 
 # These are the link time flags passed to gcc
 LFLAGS = -lpthread   -lnsl 
