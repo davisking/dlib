@@ -23,7 +23,7 @@ namespace dlib
     public:
         full_object_detection(
             const rectangle& rect_,
-            const std::vector<point>& parts_
+            const std::vector<dpoint>& parts_
         ) : rect(rect_), parts(parts_) {}
 
         full_object_detection(){}
@@ -36,7 +36,7 @@ namespace dlib
         rectangle& get_rect() { return rect; }
         unsigned long num_parts() const { return parts.size(); }
 
-        const point& part(
+        const dpoint& part(
             unsigned long idx
         ) const 
         { 
@@ -51,7 +51,7 @@ namespace dlib
             return parts[idx]; 
         }
 
-        point& part(
+        dpoint& part(
             unsigned long idx
         )  
         { 
@@ -93,7 +93,7 @@ namespace dlib
 
     private:
         rectangle rect;
-        std::vector<point> parts;  
+        std::vector<dpoint> parts;  
     };
 
 // ----------------------------------------------------------------------------------------

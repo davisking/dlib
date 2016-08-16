@@ -357,7 +357,7 @@ namespace dlib
 
             // convert the current_shape into a full_object_detection
             const point_transform_affine tform_to_img = unnormalizing_tform(rect);
-            std::vector<point> parts(current_shape.size()/2);
+            std::vector<dpoint> parts(current_shape.size()/2);
             for (unsigned long i = 0; i < parts.size(); ++i)
                 parts[i] = tform_to_img(location(current_shape, i));
             return full_object_detection(rect, parts);
