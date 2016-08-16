@@ -488,11 +488,11 @@ namespace dlib
         {
             const long num = src.k()*src.nr()*src.nc();
             DLIB_CASSERT(src.num_samples() > 1, "");
-            DLIB_CASSERT(num == means.size(),"");
-            DLIB_CASSERT(num == invstds.size(),"");
-            DLIB_CASSERT(num == gamma.size(),"");
-            DLIB_CASSERT(num == gamma_grad.size(),"");
-            DLIB_CASSERT(num == beta_grad.size(),"");
+            DLIB_CASSERT(num == (long)means.size(),"");
+            DLIB_CASSERT(num == (long)invstds.size(),"");
+            DLIB_CASSERT(num == (long)gamma.size(),"");
+            DLIB_CASSERT(num == (long)gamma_grad.size(),"");
+            DLIB_CASSERT(num == (long)beta_grad.size(),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
             DLIB_CASSERT(eps > 0,"");
@@ -676,12 +676,11 @@ namespace dlib
             tensor& beta_grad 
         )
         {
-            const long num = src.nr()*src.nc();
-            DLIB_CASSERT(src.k() == means.size(),"");
-            DLIB_CASSERT(src.k() == invstds.size(),"");
-            DLIB_CASSERT(src.k() == gamma.size(),"");
-            DLIB_CASSERT(src.k() == gamma_grad.size(),"");
-            DLIB_CASSERT(src.k() == beta_grad.size(),"");
+            DLIB_CASSERT(src.k() == (long)means.size(),"");
+            DLIB_CASSERT(src.k() == (long)invstds.size(),"");
+            DLIB_CASSERT(src.k() == (long)gamma.size(),"");
+            DLIB_CASSERT(src.k() == (long)gamma_grad.size(),"");
+            DLIB_CASSERT(src.k() == (long)beta_grad.size(),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
             DLIB_CASSERT(eps > 0,"");

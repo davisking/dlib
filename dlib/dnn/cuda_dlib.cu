@@ -825,7 +825,7 @@ namespace dlib
             const float* src_p = src.device() + src_k_offset * src.nc() * src.nr();;
 
 
-            for (unsigned long i = 0; i < src.num_samples(); ++i)
+            for (long i = 0; i < src.num_samples(); ++i)
             {
                 CHECK_CUDA(cudaMemcpy(dest_p, src_p, block_size * sizeof(float), cudaMemcpyDeviceToDevice));
 
