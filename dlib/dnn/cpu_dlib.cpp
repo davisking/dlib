@@ -433,7 +433,7 @@ namespace dlib
             if (A.num_samples() == 1)
             {
                 const long num = src.size()/src.num_samples();
-                for (size_t i = 0; i < src.num_samples(); ++i)
+                for (long i = 0; i < src.num_samples(); ++i)
                 {
                     for (long j = 0; j < num; ++j)
                     {
@@ -709,11 +709,11 @@ namespace dlib
 
             const long num = src.k()*src.nr()*src.nc();
             DLIB_CASSERT(src.num_samples() > 1, "");
-            DLIB_CASSERT(num == means.size(),"");
-            DLIB_CASSERT(num == invstds.size(),"");
-            DLIB_CASSERT(num == gamma.size(),"");
-            DLIB_CASSERT(num == gamma_grad.size(),"");
-            DLIB_CASSERT(num == beta_grad.size(),"");
+            DLIB_CASSERT(num == (long)means.size(),"");
+            DLIB_CASSERT(num == (long)invstds.size(),"");
+            DLIB_CASSERT(num == (long)gamma.size(),"");
+            DLIB_CASSERT(num == (long)gamma_grad.size(),"");
+            DLIB_CASSERT(num == (long)beta_grad.size(),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
             DLIB_CASSERT(eps > 0,"");
@@ -983,11 +983,11 @@ namespace dlib
 
             const long num = src.nr()*src.nc();
             DLIB_CASSERT(src.num_samples() > 1, "");
-            DLIB_CASSERT(src.k() == means.size(),"");
-            DLIB_CASSERT(src.k() == invstds.size(),"");
-            DLIB_CASSERT(src.k() == gamma.size(),"");
-            DLIB_CASSERT(src.k() == gamma_grad.size(),"");
-            DLIB_CASSERT(src.k() == beta_grad.size(),"");
+            DLIB_CASSERT(src.k() == (long)means.size(),"");
+            DLIB_CASSERT(src.k() == (long)invstds.size(),"");
+            DLIB_CASSERT(src.k() == (long)gamma.size(),"");
+            DLIB_CASSERT(src.k() == (long)gamma_grad.size(),"");
+            DLIB_CASSERT(src.k() == (long)beta_grad.size(),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
             DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
             DLIB_CASSERT(eps > 0,"");
@@ -1142,13 +1142,11 @@ namespace dlib
             // Now normalize each channel so they sum to 1.
             for (long n = 0; n < src.num_samples(); ++n)
             {
-                const auto ss = s + num*src.k()*n;
                 const auto dd = d + num*src.k()*n;
                 for (long r = 0; r < src.nr(); ++r)
                 {
                     for (long c = 0; c < src.nc(); ++c)
                     {
-                        const auto sss = ss+r*src.nc()+c;
                         const auto ddd = dd+r*src.nc()+c;
 
                         float temp = 0;
@@ -1467,7 +1465,6 @@ namespace dlib
 
 
             auto d = dest.host();
-            auto s = src.host();
             const long x_offset = window_width/2 - padding_x;
             const long y_offset = window_height/2 - padding_y;
             if (does_max_pooling())
@@ -1538,7 +1535,6 @@ namespace dlib
 
             auto gi = gradient_input.host();
             auto g = grad.host();
-            auto s = src.host();
             const long x_offset = window_width/2 - padding_x;
             const long y_offset = window_height/2 - padding_y;
             if (does_max_pooling())
@@ -1809,7 +1805,7 @@ namespace dlib
         float* dest_p = dest.host() + dest_k_offset * dest.nc() * dest.nr();
         const float* src_p = src.host() + src_k_offset * src.nc() * src.nr();
 
-        for (unsigned long i = 0; i < src.num_samples(); ++i)
+        for (long i = 0; i < src.num_samples(); ++i)
         {
             ::memcpy(dest_p, src_p, block_size * sizeof(float));
 
