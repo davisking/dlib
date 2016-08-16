@@ -1738,9 +1738,6 @@ namespace dlib
 
 
     // concat layer definitions
-    template <template<typename> class TAG1, typename SUBNET>
-    using concat1 = add_layer<concat_<TAG1>, SUBNET>;
-
     template <template<typename> class TAG1,
               template<typename> class TAG2,
               typename SUBNET>
@@ -1787,9 +1784,6 @@ namespace dlib
     template <typename SUBNET> using iskip  = add_skip_layer< itag0, SUBNET>;
 
     // here are some templates to be used for creating inception layer groups
-    template <template<typename>class B1, typename SUBNET>
-    using inception1 = concat1<itag1, itag1<B1<iskip< itag0<SUBNET>>>>>;
-
     template <template<typename>class B1,
               template<typename>class B2,
               typename SUBNET>

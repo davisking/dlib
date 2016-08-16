@@ -2039,23 +2039,24 @@ namespace dlib
 
 
     // concat layer definitions
-    template <template<typename> class TAG1, typename SUBNET>
-    using concat1 = add_layer<concat_<TAG1>, SUBNET>;
     template <template<typename> class TAG1,
             template<typename> class TAG2,
             typename SUBNET>
     using concat2 = add_layer<concat_<TAG1, TAG2>, SUBNET>;
+
     template <template<typename> class TAG1,
             template<typename> class TAG2,
             template<typename> class TAG3,
             typename SUBNET>
     using concat3 = add_layer<concat_<TAG1, TAG2, TAG3>, SUBNET>;
+
     template <template<typename> class TAG1,
             template<typename> class TAG2,
             template<typename> class TAG3,
             template<typename> class TAG4,
             typename SUBNET>
     using concat4 = add_layer<concat_<TAG1, TAG2, TAG3, TAG4>, SUBNET>;
+
     template <template<typename> class TAG1,
             template<typename> class TAG2,
             template<typename> class TAG3,
@@ -2077,25 +2078,24 @@ namespace dlib
 
     // here are some templates to be used for creating inception layer groups
     template <template<typename>class B1,
-            typename SUBNET>
-    using inception1 = concat1<itag1, itag1<B1<iskip< itag0<SUBNET>>>>>;
-    template <template<typename>class B1,
             template<typename>class B2,
             typename SUBNET>
     using inception2 = concat2<itag1, itag2, itag1<B1<iskip< itag2<B2< itag0<SUBNET>>>>>>>;
+
     template <template<typename>class B1,
             template<typename>class B2,
             template<typename>class B3,
             typename SUBNET>
     using inception3 = concat3<itag1, itag2, itag3, itag1<B1<iskip< itag2<B2<iskip< itag3<B3<  itag0<SUBNET>>>>>>>>>>;
+
     template <template<typename>class B1,
             template<typename>class B2,
             template<typename>class B3,
             template<typename>class B4,
             typename SUBNET>
     using inception4 = concat4<itag1, itag2, itag3, itag4,
-                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<  itag0<SUBNET>>>>>>>>>>>>
-            >;
+                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<  itag0<SUBNET>>>>>>>>>>>>>;
+
     template <template<typename>class B1,
             template<typename>class B2,
             template<typename>class B3,
