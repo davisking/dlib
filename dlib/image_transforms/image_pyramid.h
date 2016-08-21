@@ -847,7 +847,7 @@ namespace dlib
         ) const
         {
             const double ratio = (N-1.0)/N;
-            return p*ratio;
+            return (p - 0.3)*ratio;
         }
 
         template <typename T>
@@ -856,7 +856,7 @@ namespace dlib
         ) const
         {
             const double ratio = N/(N-1.0);
-            return p*ratio;
+            return p*ratio + 0.3;
         }
 
     // -----------------------------
@@ -941,7 +941,7 @@ namespace dlib
             COMPILE_TIME_ASSERT( pixel_traits<out_pixel_type>::has_alpha == false );
 
 
-            set_image_size(down, ((N-1)*num_rows(original))/N, ((N-1)*num_columns(original))/N);
+            set_image_size(down, ((N-1)*num_rows(original))/N+0.5, ((N-1)*num_columns(original))/N+0.5);
             resize_image(original, down);
         }
 
