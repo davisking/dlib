@@ -25,6 +25,10 @@ namespace dlib
                 If you are using some kind of image or matrix object as your input_type
                 then you can use the provided dlib::input layer defined below.  Otherwise,
                 you need to define your own custom input layer.
+
+            THREAD SAFETY
+                Input layer objects must be thread safe.  That is, multiple threads must be
+                able to make calls to a single instance at the same time. 
         !*/
     public:
 
