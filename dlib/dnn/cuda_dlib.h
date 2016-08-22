@@ -23,6 +23,13 @@ namespace dlib
         int get_num_devices (
         );
 
+        std::string get_device_name (
+            int device
+        );
+
+        void set_current_device_blocking_sync(
+        );
+
         bool can_access_peer (int device_id, int peer_device_id);
         bool can_access_peer (const tensor& device, const tensor& peer_device);
 
@@ -284,6 +291,18 @@ namespace dlib
 
         inline int get_num_devices (
         ) { return 1; }
+
+        inline std::string get_device_name (
+            int device
+        ) 
+        {
+            DLIB_CASSERT(id == 0, "dlib::cuda::set_device(id) called with an invalid device id.");
+            return "CUDA_DISABLED";
+        }
+
+        inline void set_current_device_blocking_sync(
+        ) {}
+
 
         inline bool can_access_peer (int , int )
         { return false; }

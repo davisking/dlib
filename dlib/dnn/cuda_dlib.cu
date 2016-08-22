@@ -27,6 +27,21 @@ namespace dlib
             return dev;
         }
 
+        std::string get_device_name (
+            int device
+        )
+        {
+            cudaDeviceProp props;
+            CHECK_CUDA(cudaGetDeviceProperties(&props, device));
+            return props.name;
+        }
+
+        void set_current_device_blocking_sync(
+        )
+        {
+            CHECK_CUDA(cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync));
+        }
+
         int get_num_devices (
         )
         {
