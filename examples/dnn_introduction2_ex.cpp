@@ -327,7 +327,7 @@ int main(int argc, char** argv) try
     using test_net_type = loss_multiclass_log<fc<number_of_classes,
                                 avg_pool_everything<
                                 ares<ares<ares<ares_down<
-                                repeat<9,res,
+                                repeat<9,ares,
                                 ares_down<
                                 ares<
                                 input<matrix<unsigned char>>
