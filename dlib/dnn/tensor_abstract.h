@@ -4,6 +4,7 @@
 #ifdef DLIB_DNn_TENSOR_ABSTRACT_H_
 
 #include "../matrix.h"
+#include "../any/any_abstract.h"
 
 namespace dlib
 {
@@ -185,6 +186,26 @@ namespace dlib
                   values in the data pointed to by device_write_only() are undefined and
                   you should only call device_write_only() if you are going to assign to
                   every memory location in the returned memory block.  
+        !*/
+
+        virtual const any& annotation(
+        ) const = 0;
+        /*!
+            ensures
+                - returns a const reference to the any object in this tensor.  The any
+                  object can be used to store any additional annotation you like in a
+                  tensor.  However, it should be noted that the annotation() is ignored by
+                  serialize() and therefore not saved when a tensor is serialized.
+        !*/
+
+        virtual any& annotation(
+        ) = 0;
+        /*!
+            ensures
+                - returns a non-const reference to the any object in this tensor.  The any
+                  object can be used to store any additional annotation you like in a
+                  tensor.  However, it should be noted that the annotation() is ignored by
+                  serialize() and therefore not saved when a tensor is serialized.
         !*/
 
         int device_id(
@@ -461,6 +482,7 @@ namespace dlib
                 - #k() == 0
                 - #nr() == 0
                 - #nc() == 0
+                - #annotation().is_empty() == true
         !*/
 
         void copy_size (
@@ -617,6 +639,7 @@ namespace dlib
                     - T.nc()     == nc()
                     - T.host()   == t.host()+offset
                     - T.device() == t.device()+offset
+                    - &T.annotation() == &t.annotation()
         !*/
     };
 

@@ -10,6 +10,7 @@
 #include "gpu_data.h"
 #include "../byte_orderer.h"
 #include <memory>
+#include "../any.h"
 
 namespace dlib
 {
@@ -51,6 +52,9 @@ namespace dlib
         virtual const float* device() const = 0;
         virtual float*       device() = 0;
         virtual float*       device_write_only() = 0;
+
+        virtual const any&   annotation() const = 0;
+        virtual any&         annotation() = 0;
 
         int device_id() const { return data().device_id(); }
 
@@ -283,13 +287,13 @@ namespace dlib
             set_size(n_,k_,nr_,nc_);
         }
 
-        resizable_tensor(const resizable_tensor& item) 
+        resizable_tensor(const resizable_tensor& item) : _annotation(item.annotation()) 
         {
             // TODO, do the copy with cuda?
             copy_size(item);
             std::memcpy(data_instance.host(), item.host(), data_instance.size()*sizeof(float));
         }
-        resizable_tensor(const tensor& item) 
+        resizable_tensor(const tensor& item) : _annotation(item.annotation()) 
         {
             // TODO, do the copy with cuda?
             copy_size(item);
@@ -306,10 +310,14 @@ namespace dlib
         virtual float*       device()       { return data_instance.device(); }
         virtual float*       device_write_only() { return data_instance.device_write_only(); }
 
+        virtual const any&   annotation() const { return _annotation; }
+        virtual any&         annotation() { return _annotation; }
+
         void clear(
         )
         {
             set_size(0,0,0,0);
+            _annotation.clear();
         }
 
         void copy_size (
@@ -377,6 +385,7 @@ namespace dlib
             std::swap(m_nc,   item.m_nc);
             std::swap(m_size, item.m_size);
             std::swap(data_instance, item.data_instance);
+            std::swap(_annotation, item._annotation);
 #ifdef DLIB_USE_CUDA
             std::swap(cudnn_descriptor, item.cudnn_descriptor);
 #endif
@@ -394,6 +403,7 @@ namespace dlib
 #endif 
 
         gpu_data data_instance;
+        any _annotation;
         virtual gpu_data& data() { return data_instance; }
         virtual const gpu_data& data() const { return data_instance; }
     };
@@ -470,7 +480,7 @@ namespace dlib
     class alias_tensor_instance : public tensor
     {
         alias_tensor_instance(
-        ) : data_instance(0), data_offset(0) {}
+        ) : data_instance(0), _annotation(0), data_offset(0) {}
 
     public:
         friend class alias_tensor;
@@ -495,6 +505,8 @@ namespace dlib
         virtual float*       device()       { return data_instance->device()+data_offset; }
         virtual float*       device_write_only()  { return data_instance->device()+data_offset; }
 
+        virtual const any&   annotation() const { return *_annotation; }
+        virtual any&         annotation() { return *_annotation; }
 
 #ifdef DLIB_USE_CUDA
         virtual const cuda::tensor_descriptor& get_cudnn_tensor_descriptor (
@@ -508,6 +520,7 @@ namespace dlib
         std::shared_ptr<cuda::tensor_descriptor> cudnn_descriptor;
 #endif
         gpu_data* data_instance;
+        any* _annotation;
         size_t data_offset;
         virtual gpu_data& data() { return *data_instance; }
         virtual const gpu_data& data() const { return *data_instance; }
@@ -563,6 +576,7 @@ namespace dlib
             }
 #endif
             inst.data_instance = &t.data();
+            inst._annotation   = &t.annotation();
             // Note that t might already be an aliasing tensor so we need to take that into
             // account.
             inst.data_offset = t.get_alias_offset()+offset;
