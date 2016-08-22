@@ -94,7 +94,7 @@ namespace dlib
                 int new_device_id;
                 CHECK_CUDA(cudaGetDevice(&new_device_id));
                 // make room for more devices if needed
-                if (new_device_id >= handles.size())
+                if (new_device_id >= (long)handles.size())
                     handles.resize(new_device_id+16);
 
                 // If we don't have a handle already for this device then make one
