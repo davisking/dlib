@@ -578,7 +578,7 @@ namespace dlib
         rect += rotate_point(center(rimg), rimg.tr_corner(), -angle);
         rect += rotate_point(center(rimg), rimg.bl_corner(), -angle);
         rect += rotate_point(center(rimg), rimg.br_corner(), -angle);
-        out_img.set_size(rect.height(), rect.width());
+        set_image_size(out_img, rect.height(), rect.width());
 
         const matrix<double,2,2> R = rotation_matrix(angle);
 
