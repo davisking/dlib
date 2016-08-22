@@ -700,6 +700,7 @@ namespace mex_binding
                     sout << " argument " << arg_idx+1 << " must be a matrix of logical elements.";
                     throw invalid_args_exception(sout.str());
                 }
+                DLIB_CASSERT(sizeof(mxLogical) == sizeof(bool),"logical matrices are not supported by the mex wrapper when mxLogical isn't a bool.");
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const bool*)mxGetData(prhs), nc, nr));
             }
