@@ -120,6 +120,17 @@ namespace dlib
         const const_sub_image_proxy<T>& img
     ) { return img._width_step; }
 
+    template <typename T>
+    void set_image_size(sub_image_proxy<T>& img, long rows, long cols)
+    {
+        DLIB_CASSERT(img._nr == rows && img._nc == cols, "A sub_image can't be resized."
+            << "\n\t img._nr: "<< img._nr
+            << "\n\t img._nc: "<< img._nc
+            << "\n\t rows:    "<< rows
+            << "\n\t cols:    "<< cols
+            );
+    }
+
     template <
         typename image_type
         >
