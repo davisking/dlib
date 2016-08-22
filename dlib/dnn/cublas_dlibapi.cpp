@@ -9,6 +9,7 @@
 #include "cuda_utils.h"
 
 #include <cublas_v2.h>
+#include <vector>
 
 static const char* cublas_get_error_string(cublasStatus_t s)
 {
@@ -52,34 +53,37 @@ namespace dlib
 
             cublas_context()
             {
-                CHECK_CUBLAS(cublasCreate(&handle));
-                CHECK_CUDA(cudaGetDevice(&device_id));
+                handles.resize(16);
             }
             ~cublas_context()
             {
-                cublasDestroy(handle);
+                for (auto h : handles)
+                {
+                    if (h)
+                        cublasDestroy(h);
+                }
             }
 
             cublasHandle_t get_handle (
             )  
             { 
-                // Check if the active device for the current thread changed.  If so then
-                // regenerate our cuBLAS handle so it will use the currently selected
-                // device.
                 int new_device_id;
                 CHECK_CUDA(cudaGetDevice(&new_device_id));
-                if (new_device_id != device_id)
-                {
-                    CHECK_CUBLAS(cublasDestroy(handle));
-                    CHECK_CUBLAS(cublasCreate(&handle));
-                }
-                return handle; 
+                // make room for more devices if needed
+                if (new_device_id >= handles.size())
+                    handles.resize(new_device_id+16);
+
+                // If we don't have a handle already for this device then make one
+                if (!handles[new_device_id])
+                    CHECK_CUBLAS(cublasCreate(&handles[new_device_id]));
+
+                // Finally, return the handle for the current device
+                return handles[new_device_id];
             }
 
         private:
 
-            cublasHandle_t handle;
-            int device_id;
+            std::vector<cublasHandle_t> handles;
         };
 
         static cublasHandle_t context()

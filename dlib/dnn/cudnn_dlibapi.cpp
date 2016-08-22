@@ -10,6 +10,7 @@
 #include <cudnn.h>
 #include <iostream>
 #include <string>
+#include <vector>
 #include "cuda_utils.h"
 #include "cpu_dlib.h"
 #include "cuda_dlib.h"
@@ -70,40 +71,43 @@ namespace dlib
         class cudnn_context
         {
         public:
-            // not copyable 
+            // not copyable
             cudnn_context(const cudnn_context&) = delete;
             cudnn_context& operator=(const cudnn_context&) = delete;
 
             cudnn_context()
             {
-                CHECK_CUDNN(cudnnCreate(&handle));
-                CHECK_CUDA(cudaGetDevice(&device_id));
+                handles.resize(16);
             }
-
             ~cudnn_context()
             {
-                cudnnDestroy(handle);
+                for (auto h : handles)
+                {
+                    if (h)
+                        cudnnDestroy(h);
+                }
             }
 
             cudnnHandle_t get_handle (
-            ) 
+            )  
             { 
-                // Check if the active device for the current thread changed.  If so then
-                // regenerate our cuDNN handle so it will use the currently selected
-                // device.
                 int new_device_id;
                 CHECK_CUDA(cudaGetDevice(&new_device_id));
-                if (new_device_id != device_id)
-                {
-                    CHECK_CUDNN(cudnnDestroy(handle));
-                    CHECK_CUDNN(cudnnCreate(&handle));
-                }
-                return handle; 
+                // make room for more devices if needed
+                if (new_device_id >= handles.size())
+                    handles.resize(new_device_id+16);
+
+                // If we don't have a handle already for this device then make one
+                if (!handles[new_device_id])
+                    CHECK_CUDNN(cudnnCreate(&handles[new_device_id]));
+
+                // Finally, return the handle for the current device
+                return handles[new_device_id];
             }
 
         private:
-            cudnnHandle_t handle;
-            int device_id;
+
+            std::vector<cudnnHandle_t> handles;
         };
 
         static cudnnHandle_t context()
