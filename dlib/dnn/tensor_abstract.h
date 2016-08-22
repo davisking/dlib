@@ -541,6 +541,10 @@ namespace dlib
                 have its own block of memory but instead simply holds pointers to the
                 memory of another tensor object.  It therefore allows you to efficiently
                 break a tensor into pieces and pass those pieces into functions.
+
+                An alias_tensor_instance doesn't own the resources it points to in any sense.
+                So it is important to make sure that the underlying owning tensor doesn't get
+                destructed before any alias tensors which point to it are destructed.
         !*/
 
         // You can't default initialize this object.  You can only get instances of it from
