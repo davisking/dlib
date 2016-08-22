@@ -1417,6 +1417,16 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP>
+    constexpr bool is_row_major (
+        const matrix_exp<EXP>&
+    )
+    {
+        return is_same_type<typename EXP::layout_type,row_major_layout>::value;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename EXP
         >
@@ -1427,11 +1437,24 @@ namespace dlib
         typedef typename matrix_exp<EXP>::type type;
 
         type val = 0;
-        for (long r = 0; r < m.nr(); ++r)
+        if (is_row_major(m))
+        {
+            for (long r = 0; r < m.nr(); ++r)
+            {
+                for (long c = 0; c < m.nc(); ++c)
+                {
+                    val += m(r,c);
+                }
+            }
+        }
+        else
         {
             for (long c = 0; c < m.nc(); ++c)
             {
-                val += m(r,c);
+                for (long r = 0; r < m.nr(); ++r)
+                {
+                    val += m(r,c);
+                }
             }
         }
         return val;

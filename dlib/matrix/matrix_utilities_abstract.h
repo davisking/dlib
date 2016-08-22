@@ -18,6 +18,17 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP>
+    constexpr bool is_row_major (
+        const matrix_exp<EXP>&
+    );
+    /*!
+        ensures
+            - returns true if and only if the given matrix expression uses the row_major_layout.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp diag (
         const matrix_exp& m
     );
