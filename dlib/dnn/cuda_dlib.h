@@ -296,7 +296,7 @@ namespace dlib
             int device
         ) 
         {
-            DLIB_CASSERT(id == 0, "dlib::cuda::set_device(id) called with an invalid device id.");
+            DLIB_CASSERT(device == 0, "dlib::cuda::set_device(id) called with an invalid device id.");
             return "CUDA_DISABLED";
         }
 
