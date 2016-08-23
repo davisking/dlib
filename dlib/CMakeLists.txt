@@ -22,7 +22,6 @@ if(has_parent)
    set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
 endif()
 
-set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 # Suppress cmake warnings about changes in new versions.
 if(COMMAND cmake_policy) 
    cmake_policy(SET CMP0003 NEW) 
