@@ -22,7 +22,6 @@ if(has_parent)
    set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
 endif()
 
-set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 # Suppress cmake warnings about changes in new versions.
 if(COMMAND cmake_policy) 
    cmake_policy(SET CMP0003 NEW) 
@@ -568,6 +567,11 @@ if (NOT TARGET dlib)
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
+
+   # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
+   if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
+      ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
+   endif()
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)

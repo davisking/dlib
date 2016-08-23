@@ -132,11 +132,11 @@ rgb_ycc_convert (j_compress_ptr cinfo,
 		 JDIMENSION output_row, int num_rows)
 {
   my_cconvert_ptr cconvert = (my_cconvert_ptr) cinfo->cconvert;
-  register int r, g, b;
-  register long * ctab = cconvert->rgb_ycc_tab;
-  register JSAMPROW inptr;
-  register JSAMPROW outptr0, outptr1, outptr2;
-  register JDIMENSION col;
+  int r, g, b;
+  long * ctab = cconvert->rgb_ycc_tab;
+  JSAMPROW inptr;
+  JSAMPROW outptr0, outptr1, outptr2;
+  JDIMENSION col;
   JDIMENSION num_cols = cinfo->image_width;
 
   while (--num_rows >= 0) {
@@ -188,11 +188,11 @@ rgb_gray_convert (j_compress_ptr cinfo,
 		  JDIMENSION output_row, int num_rows)
 {
   my_cconvert_ptr cconvert = (my_cconvert_ptr) cinfo->cconvert;
-  register int r, g, b;
-  register long * ctab = cconvert->rgb_ycc_tab;
-  register JSAMPROW inptr;
-  register JSAMPROW outptr;
-  register JDIMENSION col;
+  int r, g, b;
+  long * ctab = cconvert->rgb_ycc_tab;
+  JSAMPROW inptr;
+  JSAMPROW outptr;
+  JDIMENSION col;
   JDIMENSION num_cols = cinfo->image_width;
 
   while (--num_rows >= 0) {
@@ -227,11 +227,11 @@ cmyk_ycck_convert (j_compress_ptr cinfo,
 		   JDIMENSION output_row, int num_rows)
 {
   my_cconvert_ptr cconvert = (my_cconvert_ptr) cinfo->cconvert;
-  register int r, g, b;
-  register long * ctab = cconvert->rgb_ycc_tab;
-  register JSAMPROW inptr;
-  register JSAMPROW outptr0, outptr1, outptr2, outptr3;
-  register JDIMENSION col;
+  int r, g, b;
+  long * ctab = cconvert->rgb_ycc_tab;
+  JSAMPROW inptr;
+  JSAMPROW outptr0, outptr1, outptr2, outptr3;
+  JDIMENSION col;
   JDIMENSION num_cols = cinfo->image_width;
 
   while (--num_rows >= 0) {
@@ -281,9 +281,9 @@ grayscale_convert (j_compress_ptr cinfo,
 		   JSAMPARRAY input_buf, JSAMPIMAGE output_buf,
 		   JDIMENSION output_row, int num_rows)
 {
-  register JSAMPROW inptr;
-  register JSAMPROW outptr;
-  register JDIMENSION col;
+  JSAMPROW inptr;
+  JSAMPROW outptr;
+  JDIMENSION col;
   JDIMENSION num_cols = cinfo->image_width;
   int instride = cinfo->input_components;
 
@@ -310,10 +310,10 @@ null_convert (j_compress_ptr cinfo,
 	      JSAMPARRAY input_buf, JSAMPIMAGE output_buf,
 	      JDIMENSION output_row, int num_rows)
 {
-  register JSAMPROW inptr;
-  register JSAMPROW outptr;
-  register JDIMENSION col;
-  register int ci;
+  JSAMPROW inptr;
+  JSAMPROW outptr;
+  JDIMENSION col;
+  int ci;
   int nc = cinfo->num_components;
   JDIMENSION num_cols = cinfo->image_width;
 
