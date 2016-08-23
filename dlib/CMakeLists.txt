@@ -568,6 +568,11 @@ if (NOT TARGET dlib)
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
+   # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
+   if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
+      ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
+   endif()
+
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
        set (LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries (e.g. lib32 or lib64 for multilib installations)")
