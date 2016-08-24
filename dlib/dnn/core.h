@@ -3061,7 +3061,7 @@ namespace dlib
                 double reference_derivative = (dot(out2,input_grad)-dot(out3, input_grad))/(2*eps);
                 double output_derivative = params_grad.host()[i];
                 double relative_error;
-                if (reference_derivative != 0)
+                if (reference_derivative*output_derivative != 0)
                     relative_error = (reference_derivative - output_derivative)/(reference_derivative);
                 else
                     relative_error = (reference_derivative - output_derivative);
@@ -3098,7 +3098,7 @@ namespace dlib
                 double output_derivative = subnetwork.get_gradient_input_element(i);
                 output_derivative -= initial_gradient_input[i];
                 double relative_error;
-                if (reference_derivative != 0)
+                if (reference_derivative*output_derivative != 0)
                     relative_error = (reference_derivative - output_derivative)/(reference_derivative);
                 else
                     relative_error = (reference_derivative - output_derivative);
