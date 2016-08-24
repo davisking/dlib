@@ -294,7 +294,7 @@ int main(int argc, char** argv)
                 serialize("object_detector.svm") << detector;
 
                 cout << "Testing detector on training data..." << endl;
-                cout << "Test detector (precision,recall,AP): " << test_object_detection_function(detector, images, object_locations) << endl;
+                cout << "Test detector (precision,recall,AP): " << test_object_detection_function(detector, images, object_locations, ignore) << endl;
             }
             else
             {
