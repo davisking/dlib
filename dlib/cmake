@@ -25,7 +25,7 @@ endif()
 
 
 set(gcc_like_compilers GNU Clang  Intel)
-set(intel_archs x86_64 i386)
+set(intel_archs x86_64 i386 i686)
 
 # Setup some options to allow a user to enable SSE and AVX instruction use.  
 if ((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};") AND
