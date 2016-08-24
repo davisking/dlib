@@ -128,7 +128,7 @@ namespace
             w = join_cols(df.basis_vectors(0), uniform_matrix<double>(1,1,-df.b));
             true_w = 0, 1, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
-            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+            DLIB_TEST_MSG(max(abs(w-true_w)) < 1e-9, max(abs(w-true_w)));
 
 
             print_spinner();
@@ -193,7 +193,7 @@ namespace
             w = join_cols(df.basis_vectors(0), uniform_matrix<double>(1,1,-df.b));
             true_w = 1, 0, 0;
             dlog << LINFO << "error: "<< max(abs(w-true_w));
-            DLIB_TEST(max(abs(w-true_w)) < 1e-10);
+            DLIB_TEST_MSG(max(abs(w-true_w)) < 1e-9, max(abs(w-true_w)));
 
 
 
