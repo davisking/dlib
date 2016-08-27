@@ -169,7 +169,10 @@ namespace dlib
             const tensor& src
         )
         {
-            memcpy(dest.data(), src.data());
+            DLIB_CASSERT(dest.size() == src.size(), "");
+            memcpy(dest.data(), dest.get_alias_offset(),  
+                   src.data(),  src.get_alias_offset(), 
+                   src.size());
         }
 
 

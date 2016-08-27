@@ -499,6 +499,103 @@ namespace
 
         {
             resizable_tensor A, B;
+            A.set_size(11);
+            B.copy_size(A);
+
+            A = 4;
+            B = 1;
+            matrix<float> truth;
+
+
+            alias_tensor at(5);
+            A = 4;
+            A.host();
+            B.host();
+            {
+                // non-aliasing test
+                auto aA = at(A,5);
+                auto aB = at(B,5);
+                memcpy(aA, aB);
+                truth = {4,4,4,4,4,  1,1,1,1,1, 4};
+                DLIB_TEST(max(abs(mat(A)- truth)) < 1e-5);
+            }
+            {
+                // aliasing test
+                auto aA = at(A,1);
+                auto aB = at(A,6);
+                memcpy(aA, aB);
+                truth = {4,1,1,1,1,  4,1,1,1,1, 4};
+                DLIB_TEST(max(abs(mat(A)- truth)) < 1e-5);
+            }
+
+
+#ifdef DLIB_USE_CUDA
+            A = 4;
+            A.device();
+            B.host();
+            {
+                // non-aliasing test
+                auto aA = at(A,5);
+                auto aB = at(B,5);
+                memcpy(aA, aB);
+                truth = {4,4,4,4,4,  1,1,1,1,1, 4};
+                DLIB_TEST(max(abs(mat(A)- truth)) < 1e-5);
+            }
+            {
+                // aliasing test
+                auto aA = at(A,1);
+                auto aB = at(A,6);
+                memcpy(aA, aB);
+                truth = {4,1,1,1,1,  4,1,1,1,1, 4};
+                DLIB_TEST(max(abs(mat(A)- truth)) < 1e-5);
+            }
+
+
+            A = 4;
+            A.device();
+            B.device();
+            {
+                // non-aliasing test
+                auto aA = at(A,5);
+                auto aB = at(B,5);
+                memcpy(aA, aB);
+                truth = {4,4,4,4,4,  1,1,1,1,1, 4};
+                DLIB_TEST(max(abs(mat(A)- truth)) < 1e-5);
+            }
+            {
+                // aliasing test
+                auto aA = at(A,1);
+                auto aB = at(A,6);
+                memcpy(aA, aB);
+                truth = {4,1,1,1,1,  4,1,1,1,1, 4};
+                DLIB_TEST(max(abs(mat(A)- truth)) < 1e-5);
+            }
+
+            A = 4;
+            A.host();
+            B.device();
+            {
+                // non-aliasing test
+                auto aA = at(A,5);
+                auto aB = at(B,5);
+                memcpy(aA, aB);
+                truth = {4,4,4,4,4,  1,1,1,1,1, 4};
+                DLIB_TEST(max(abs(mat(A)- truth)) < 1e-5);
+            }
+            {
+                // aliasing test
+                auto aA = at(A,1);
+                auto aB = at(A,6);
+                memcpy(aA, aB);
+                truth = {4,1,1,1,1,  4,1,1,1,1, 4};
+                DLIB_TEST(max(abs(mat(A)- truth)) < 1e-5);
+            }
+
+#endif
+        }
+
+        {
+            resizable_tensor A, B;
             A.set_size(2,3,4,5);
             B.set_size(2,3,4,5);
 
