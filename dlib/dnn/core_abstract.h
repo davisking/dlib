@@ -660,7 +660,7 @@ namespace dlib
         ); 
         /*!
             ensures
-                - #loss_details() == layer_det
+                - #loss_details() == loss_details_type(layer_det)
                 - #subnet()       == subnet_type(args)
         !*/
 
@@ -671,16 +671,19 @@ namespace dlib
         );
         /*!
             ensures
-                - #loss_details() == layer_det
+                - #loss_details() == loss_details_type(layer_det)
                 - #subnet()       == subnet_type(args)
         !*/
 
         template <typename ...T>
         add_loss_layer(
-            T ...args
+            T&& ...args
         ); 
         /*!
             ensures
+                - This version of the constructor is only called if loss_details_type can't
+                  be constructed from the first thing in args.  In this case, the args are
+                  simply passed on to the sub layers in their entirety.
                 - #loss_details() == loss_details_type()
                 - #subnet()       == subnet_type(args)
         !*/

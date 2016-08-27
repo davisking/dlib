@@ -2190,11 +2190,25 @@ namespace dlib
         {
         }
 
+        template <typename T, typename ...U>
+        struct disable_forwarding_constr 
+        {
+            const static bool value = std::is_constructible<LOSS_DETAILS,T>::value;
+        };
         template <typename ...T>
+        struct disable_forwarding_constr<add_loss_layer<T...>>
+        {
+            const static bool value = true;
+        };
+
+        template <
+            typename ...T, 
+            typename = typename std::enable_if<!disable_forwarding_constr<typename std::remove_reference<T>::type...>::value>::type
+            >
         add_loss_layer(
-            T ...args
+            T&& ...args
         ) : 
-            subnetwork(std::move(args)...)
+            subnetwork(std::forward<T>(args)...)
         {
         }
 
