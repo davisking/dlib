@@ -387,7 +387,7 @@ namespace
         alias_tensor at(2,2);
         auto A0 = at(A,0);
         auto A4 = at(A,4);
-        auto A8 = at(A,8);
+        auto A8 = at(const_cast<const resizable_tensor&>(A),8);
         DLIB_TEST(mat(A0) == truth1);
         DLIB_TEST(mat(at(A,4)) == truth2);
         DLIB_TEST(mat(A8) == truth3);

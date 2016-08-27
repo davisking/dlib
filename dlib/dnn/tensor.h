@@ -479,6 +479,7 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     class alias_tensor_instance : public tensor
     {
@@ -487,6 +488,7 @@ namespace dlib
 
     public:
         friend class alias_tensor;
+        friend class alias_tensor_const_instance;
 
         alias_tensor_instance& operator= (float val)
         {
@@ -528,6 +530,23 @@ namespace dlib
         virtual gpu_data& data() { return *data_instance; }
         virtual const gpu_data& data() const { return *data_instance; }
     };
+
+// ----------------------------------------------------------------------------------------
+
+    class alias_tensor_const_instance 
+    {
+    public:
+        const tensor& get() const { return inst; }
+        operator const tensor& () { return inst; }
+
+    private:
+        alias_tensor_instance inst;
+
+        friend class alias_tensor;
+        alias_tensor_const_instance() {}
+    };
+
+// ----------------------------------------------------------------------------------------
 
     class alias_tensor 
     {
@@ -584,6 +603,16 @@ namespace dlib
             // account.
             inst.data_offset = t.get_alias_offset()+offset;
             return inst;
+        }
+
+        alias_tensor_const_instance operator() (
+            const tensor& t,
+            size_t offset
+        )
+        {
+            alias_tensor_const_instance temp;
+            temp.inst = (*this)(const_cast<tensor&>(t),offset);
+            return temp;
         }
 
     private:

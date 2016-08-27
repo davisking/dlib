@@ -575,6 +575,28 @@ namespace dlib
         ); 
     };
 
+    class alias_tensor_const_instance 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is essentially a const version of alias_tensor_instance and therefore
+                represents a tensor.  However, due to the mechanics of C++, this object
+                can't inherit from tensor.  So instead it provides a get() and an implicit
+                conversion to const tensor.
+        !*/
+
+    public:
+
+        // Methods that cast the alias to a tensor.
+        const tensor& get() const;
+        operator const tensor& (); 
+
+    private:
+        // You can't default initialize this object.  You can only get instances of it from
+        // alias_tensor::operator().
+        alias_tensor_const_instance();
+    };
+
     class alias_tensor 
     {
         /*!
@@ -629,7 +651,7 @@ namespace dlib
             requires
                 - offset+size() <= t.size()
             ensures
-                - Return a tensor that simply aliases the elements of t beginning with t's
+                - Returns a tensor that simply aliases the elements of t beginning with t's
                   offset'th element.  Specifically, this function returns an aliasing
                   tensor T such that:
                     - T.size()   == size()
@@ -640,6 +662,18 @@ namespace dlib
                     - T.host()   == t.host()+offset
                     - T.device() == t.device()+offset
                     - &T.annotation() == &t.annotation()
+        !*/
+
+        alias_tensor_const_instance operator() (
+            const tensor& t,
+            size_t offset
+        );
+        /*!
+            requires
+                - offset+size() <= t.size()
+            ensures
+                - This function is identical to the above version of operator() except that 
+                  it takes and returns const tensors instead of non-const tensors.
         !*/
     };
 
