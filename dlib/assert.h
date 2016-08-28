@@ -135,7 +135,7 @@ namespace dlib
 #define DLIB_FUNCTION_NAME "unknown function" 
 #endif
 
-#define DLIB_CASSERT(_exp,_message)                                              \
+#define DLIBM_CASSERT(_exp,_message)                                              \
     {if ( !(_exp) )                                                         \
     {                                                                       \
         dlib_assert_breakpoint();                                           \
@@ -148,12 +148,20 @@ namespace dlib
         throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib_o_out.str());      \
     }}                                                                      
 
+// Make it so the 2nd argument of DLIB_CASSERT is optional.  That is, you can call it like
+// DLIB_CASSERT(exp) or DLIB_CASSERT(exp,message).
+#define DLIBM_CASSERT_1_ARGS(exp)              DLIBM_CASSERT(exp,"")
+#define DLIBM_CASSERT_2_ARGS(exp,message)      DLIBM_CASSERT(exp,message)
+#define DLIBM_GET_3TH_ARG(arg1, arg2, arg3, ...) arg3
+#define DLIBM_CASSERT_CHOOSER(...) DLIBM_GET_3TH_ARG(__VA_ARGS__,  DLIBM_CASSERT_2_ARGS, DLIBM_CASSERT_1_ARGS)
+#define DLIB_CASSERT(...) DLIBM_CASSERT_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+
 
 #ifdef ENABLE_ASSERTS 
-    #define DLIB_ASSERT(_exp,_message) DLIB_CASSERT(_exp,_message)
+    #define DLIB_ASSERT(...) DLIB_CASSERT(__VA_ARGS__)
     #define DLIB_IF_ASSERT(exp) exp
 #else
-    #define DLIB_ASSERT(_exp,_message) {}
+    #define DLIB_ASSERT(...) {}
     #define DLIB_IF_ASSERT(exp) 
 #endif
 
