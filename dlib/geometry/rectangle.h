@@ -465,6 +465,36 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline size_t nearest_rect (
+        const std::vector<rectangle>& rects,
+        const point& p
+    )
+    {
+        DLIB_ASSERT(rects.size() > 0);
+        size_t idx = 0;
+        double best_dist = std::numeric_limits<double>::infinity();
+
+        for (size_t i = 0; i < rects.size(); ++i)
+        {
+            if (rects[i].contains(p))
+            {
+                return i;
+            }
+            else
+            {
+                double dist = (nearest_point(rects[i],p)-p).length();
+                if (dist < best_dist)
+                {
+                    best_dist = dist;
+                    idx = i;
+                }
+            }
+        }
+        return idx;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T, typename U>
     double distance_to_line (
         const std::pair<vector<T,2>,vector<T,2> >& line,
