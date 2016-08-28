@@ -422,6 +422,27 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class impossible_labeling_error : public dlib::error 
+    { 
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown by code that trains object detectors (e.g.
+                structural_svm_object_detection_problem) when they detect that the set of
+                truth boxes given to the training algorithm contains some impossible to
+                obtain outputs.  
+                
+                This kind of problem can happen when the set of image positions scanned by
+                the underlying object detection method doesn't include the truth rectangle
+                as a possible output.  Another possibility is when two truth boxes are very
+                close together and hard coded non-max suppression logic would prevent two
+                boxes in such close proximity from being output.
+        !*/
+    public: 
+        impossible_labeling_error(const std::string& msg) : dlib::error(msg) {};
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_ERROr_

@@ -17,14 +17,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class impossible_labeling_error : public dlib::error 
-    { 
-    public: 
-        impossible_labeling_error(const std::string& msg) : dlib::error(msg) {};
-    };
-
-// ----------------------------------------------------------------------------------------
-
     template <
         typename image_scanner_type,
         typename image_array_type 
