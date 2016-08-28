@@ -221,7 +221,7 @@ namespace dlib
 
     inline void memcpy (gpu_data& dest, const gpu_data& src)
     {
-        DLIB_CASSERT(dest.size() == src.size(), "");
+        DLIB_CASSERT(dest.size() == src.size());
         if (src.size() == 0 || &dest == &src)
             return;
         std::memcpy(dest.host_write_only(), src.host(), sizeof(float)*src.size());
@@ -235,8 +235,8 @@ namespace dlib
         size_t num
     )
     {
-        DLIB_CASSERT(dest_offset + num <= dest.size(), "");
-        DLIB_CASSERT(src_offset + num <= src.size(), "");
+        DLIB_CASSERT(dest_offset + num <= dest.size());
+        DLIB_CASSERT(src_offset + num <= src.size());
         if (num == 0)
             return;
         if (&dest == &src && std::max(dest_offset, src_offset) < std::min(dest_offset,src_offset)+num)

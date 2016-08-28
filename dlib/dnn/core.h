@@ -861,7 +861,7 @@ namespace dlib
         template <typename solver_type>
         void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
-            DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
+            DLIB_CASSERT(solvers.size()>=num_computational_layers);
             // Don't try to adjust the parameters if this layer doesn't have any or the
             // learning rate is disabled for this layer.
             if (params_grad.size() != 0 && get_learning_rate_multiplier(details) != 0)
@@ -1158,7 +1158,7 @@ namespace dlib
         const tensor& forward (const tensor& x)
         {
             DLIB_CASSERT(sample_expansion_factor() != 0, "You must call to_tensor() before this function can be used.");
-            DLIB_CASSERT(x.num_samples()%sample_expansion_factor() == 0,"");
+            DLIB_CASSERT(x.num_samples()%sample_expansion_factor() == 0);
             subnet_wrapper wsub(x, grad_final, _sample_expansion_factor);
             if (!this_layer_setup_called)
             {
@@ -1224,7 +1224,7 @@ namespace dlib
         template <typename solver_type>
         void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
-            DLIB_CASSERT(solvers.size()>=num_computational_layers,"");
+            DLIB_CASSERT(solvers.size()>=num_computational_layers);
             // Don't try to adjust the parameters if this layer doesn't have any or the
             // learning rate is disabled for this layer.
             if (params_grad.size() != 0 && get_learning_rate_multiplier(details) != 0) 
@@ -1615,7 +1615,7 @@ namespace dlib
             size_t i 
         ) const
         { 
-            DLIB_CASSERT(i < num_repetitions(), "");
+            DLIB_CASSERT(i < num_repetitions());
             return details[i]; 
         }
 
@@ -1623,7 +1623,7 @@ namespace dlib
             size_t i 
         ) 
         { 
-            DLIB_CASSERT(i < num_repetitions(), "");
+            DLIB_CASSERT(i < num_repetitions());
             return details[i]; 
         }
 

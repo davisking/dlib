@@ -24,11 +24,11 @@ namespace dlib
         {
             DLIB_CASSERT(dest.k() == src1.k() && src1.k() == src2.k() &&
                 dest.nr() == src1.nr() && src1.nr() == src2.nr() &&
-                dest.nc() == src1.nc() && src1.nc() == src2.nc() ,"");
+                dest.nc() == src1.nc() && src1.nc() == src2.nc() );
             const long MD = std::max(std::max(dest.num_samples(),src1.num_samples()),src2.num_samples());
             DLIB_CASSERT((dest.num_samples()==1 || dest.num_samples()==MD) &&
                 (src1.num_samples()==1 || src1.num_samples()==MD) &&
-                (src2.num_samples()==1 || src2.num_samples()==MD) ,"");
+                (src2.num_samples()==1 || src2.num_samples()==MD) );
 
             if (dest.size() == 0)
                 return;
@@ -87,7 +87,7 @@ namespace dlib
             auto s2 = src2.host();
             if (have_same_dimensions(dest,src1))
             {
-                DLIB_CASSERT(src2.num_samples() == 1 && src2.nr() == 1 && src2.nc() == 1 && src2.k() == src1.k(),"");
+                DLIB_CASSERT(src2.num_samples() == 1 && src2.nr() == 1 && src2.nc() == 1 && src2.k() == src1.k());
 
                 if (add_to)
                 {
@@ -124,8 +124,8 @@ namespace dlib
             }
             else
             {
-                DLIB_CASSERT(have_same_dimensions(src1,src2),"");
-                DLIB_CASSERT(dest.num_samples() == 1 && dest.nr() == 1 && dest.nc() == 1 && dest.k() == src1.k(),"");
+                DLIB_CASSERT(have_same_dimensions(src1,src2));
+                DLIB_CASSERT(dest.num_samples() == 1 && dest.nr() == 1 && dest.nc() == 1 && dest.k() == src1.k());
 
                 if (!add_to)
                 {
@@ -276,7 +276,7 @@ namespace dlib
                   gradient_input.k() == grad.k() &&
                   gradient_input.nr() == grad.nr() &&
                   gradient_input.nc() == grad.nc() &&
-                  gradient_input.size() > 0,"");
+                  gradient_input.size() > 0);
 
             auto out = grad.host();
             auto in = gradient_input.host();
@@ -306,7 +306,7 @@ namespace dlib
                   gradient_input.k() == grad.k() &&
                   gradient_input.size() > 0 && 
                   is_same_object(grad,gradient_input) == false
-                  ,"");
+                  );
 
             auto g = grad.host();
             auto gi = gradient_input.host();
@@ -338,7 +338,7 @@ namespace dlib
             const float B
         )
         {
-            DLIB_CASSERT(dest.size()==src.size(),"");
+            DLIB_CASSERT(dest.size()==src.size());
             const auto d = dest.host();
             const auto s = src.host();
             for (size_t i = 0; i < src.size(); ++i)
@@ -354,8 +354,8 @@ namespace dlib
             const float C
         )
         {
-            DLIB_CASSERT(dest.size()==src1.size(),"");
-            DLIB_CASSERT(dest.size()==src2.size(),"");
+            DLIB_CASSERT(dest.size()==src1.size());
+            DLIB_CASSERT(dest.size()==src2.size());
             const auto d = dest.host();
             const auto s1 = src1.host();
             const auto s2 = src2.host();
@@ -374,9 +374,9 @@ namespace dlib
             const float D
         )
         {
-            DLIB_CASSERT(dest.size()==src1.size(),"");
-            DLIB_CASSERT(dest.size()==src2.size(),"");
-            DLIB_CASSERT(dest.size()==src3.size(),"");
+            DLIB_CASSERT(dest.size()==src1.size());
+            DLIB_CASSERT(dest.size()==src2.size());
+            DLIB_CASSERT(dest.size()==src3.size());
             const auto d = dest.host();
             const auto s1 = src1.host();
             const auto s2 = src2.host();
@@ -397,10 +397,10 @@ namespace dlib
             const float C
         )
         {
-            DLIB_CASSERT(dest.size()==src1.size(),"");
-            DLIB_CASSERT(dest.size()==src2.size(),"");
-            DLIB_CASSERT(dest.size()==src3.size(),"");
-            DLIB_CASSERT(begin <= end && end <= dest.size(),"");
+            DLIB_CASSERT(dest.size()==src1.size());
+            DLIB_CASSERT(dest.size()==src2.size());
+            DLIB_CASSERT(dest.size()==src3.size());
+            DLIB_CASSERT(begin <= end && end <= dest.size());
             const auto d = dest.host();
             const auto s1 = src1.host();
             const auto s2 = src2.host();
@@ -418,13 +418,13 @@ namespace dlib
             const tensor& B
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest,src),"");
+            DLIB_CASSERT(have_same_dimensions(dest,src));
             DLIB_CASSERT(
                   ((A.num_samples()==1 && B.num_samples()==1) ||
                   (A.num_samples()==src.num_samples() && B.num_samples()==src.num_samples())) &&
                   A.nr()==B.nr() && B.nr()==src.nr() &&
                   A.nc()==B.nc() && B.nc()==src.nc() &&
-                  A.k() ==B.k()  && B.k()==src.k(),"");
+                  A.k() ==B.k()  && B.k()==src.k());
 
             auto d = dest.host();
             auto s = src.host();
@@ -459,12 +459,12 @@ namespace dlib
             const tensor& B
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest,src),"");
-            DLIB_CASSERT(have_same_dimensions(A,B),"");
+            DLIB_CASSERT(have_same_dimensions(dest,src));
+            DLIB_CASSERT(have_same_dimensions(A,B));
             DLIB_CASSERT(A.num_samples() == 1 &&
                          A.nr() == 1 &&
                          A.nc() == 1 &&
-                         A.k() == src.k(), "");
+                         A.k() == src.k());
 
             auto d = dest.host();
             auto s = src.host();
@@ -505,8 +505,8 @@ namespace dlib
             DLIB_CASSERT(s.size() == m.size() &&
                          s.size() == v.size() &&
                          s.size() == params.size() &&
-                         s.size() == params_grad.size(),"");
-            DLIB_CASSERT(begin <= end && end <= params.size(),"");
+                         s.size() == params_grad.size());
+            DLIB_CASSERT(begin <= end && end <= params.size());
             const float eps = 1e-8;
             const float alpha = learning_rate*std::sqrt(1-std::pow(momentum2,t))/(1-std::pow(momentum1, t));
 
@@ -605,8 +605,8 @@ namespace dlib
         )
         {
             DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means));
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds));
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -708,15 +708,15 @@ namespace dlib
         {
 
             const long num = src.k()*src.nr()*src.nc();
-            DLIB_CASSERT(src.num_samples() > 1, "");
-            DLIB_CASSERT(num == (long)means.size(),"");
-            DLIB_CASSERT(num == (long)invstds.size(),"");
-            DLIB_CASSERT(num == (long)gamma.size(),"");
-            DLIB_CASSERT(num == (long)gamma_grad.size(),"");
-            DLIB_CASSERT(num == (long)beta_grad.size(),"");
-            DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
-            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
-            DLIB_CASSERT(eps > 0,"");
+            DLIB_CASSERT(src.num_samples() > 1);
+            DLIB_CASSERT(num == (long)means.size());
+            DLIB_CASSERT(num == (long)invstds.size());
+            DLIB_CASSERT(num == (long)gamma.size());
+            DLIB_CASSERT(num == (long)gamma_grad.size());
+            DLIB_CASSERT(num == (long)beta_grad.size());
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src));
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
+            DLIB_CASSERT(eps > 0);
 
             beta_grad = 0;
             gamma_grad = 0;
@@ -870,8 +870,8 @@ namespace dlib
         )
         {
             DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means));
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds));
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -982,15 +982,15 @@ namespace dlib
         {
 
             const long num = src.nr()*src.nc();
-            DLIB_CASSERT(src.num_samples() > 1, "");
-            DLIB_CASSERT(src.k() == (long)means.size(),"");
-            DLIB_CASSERT(src.k() == (long)invstds.size(),"");
-            DLIB_CASSERT(src.k() == (long)gamma.size(),"");
-            DLIB_CASSERT(src.k() == (long)gamma_grad.size(),"");
-            DLIB_CASSERT(src.k() == (long)beta_grad.size(),"");
-            DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
-            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
-            DLIB_CASSERT(eps > 0,"");
+            DLIB_CASSERT(src.num_samples() > 1);
+            DLIB_CASSERT(src.k() == (long)means.size());
+            DLIB_CASSERT(src.k() == (long)invstds.size());
+            DLIB_CASSERT(src.k() == (long)gamma.size());
+            DLIB_CASSERT(src.k() == (long)gamma_grad.size());
+            DLIB_CASSERT(src.k() == (long)beta_grad.size());
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src));
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
+            DLIB_CASSERT(eps > 0);
 
             beta_grad = 0;
             gamma_grad = 0;
@@ -1093,8 +1093,8 @@ namespace dlib
             size_t idx
         )
         {
-            DLIB_CASSERT(a.size() == b.size(), "");
-            DLIB_CASSERT(idx < result.size(), "");
+            DLIB_CASSERT(a.size() == b.size());
+            DLIB_CASSERT(idx < result.size());
 
             const auto aa = a.host();
             const auto bb = b.host();
@@ -1112,7 +1112,7 @@ namespace dlib
             const tensor& src
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest,src),"");
+            DLIB_CASSERT(have_same_dimensions(dest,src));
             const auto d = dest.host();
             const auto s = src.host();
 
@@ -1165,8 +1165,8 @@ namespace dlib
             const tensor& gradient_input
         )
         {
-            DLIB_CASSERT(have_same_dimensions(grad,dest),"");
-            DLIB_CASSERT(have_same_dimensions(grad,gradient_input),"");
+            DLIB_CASSERT(have_same_dimensions(grad,dest));
+            DLIB_CASSERT(have_same_dimensions(grad,gradient_input));
             const auto d = dest.host();
             const auto g = grad.host();
             const auto in = gradient_input.host();
@@ -1305,7 +1305,7 @@ namespace dlib
             tensor& params_grad 
         )
         {
-            DLIB_CASSERT(is_same_object(grad, gradient_input) == false,"");
+            DLIB_CASSERT(is_same_object(grad, gradient_input) == false);
             const float p = param.host()[0];
             const float* gi = gradient_input.host();
             const float* s = src.host();
@@ -1391,12 +1391,12 @@ namespace dlib
             int padding_x_
         )
         {
-            DLIB_CASSERT(window_width_ > 0,"");
-            DLIB_CASSERT(window_height_ > 0,"");
-            DLIB_CASSERT(stride_y_ > 0,"");
-            DLIB_CASSERT(stride_x_ > 0,"");
-            DLIB_CASSERT(0 <= padding_y_ && padding_y_ < window_height_,"");
-            DLIB_CASSERT(0 <= padding_x_ && padding_x_ < window_width_, "");
+            DLIB_CASSERT(window_width_ > 0);
+            DLIB_CASSERT(window_height_ > 0);
+            DLIB_CASSERT(stride_y_ > 0);
+            DLIB_CASSERT(stride_x_ > 0);
+            DLIB_CASSERT(0 <= padding_y_ && padding_y_ < window_height_);
+            DLIB_CASSERT(0 <= padding_x_ && padding_x_ < window_width_);
 
             window_height = window_height_;
             window_width = window_width_;
@@ -1417,12 +1417,12 @@ namespace dlib
             int padding_x_
         )
         {
-            DLIB_CASSERT(window_width_ > 0,"");
-            DLIB_CASSERT(window_height_ > 0,"");
-            DLIB_CASSERT(stride_y_ > 0,"");
-            DLIB_CASSERT(stride_x_ > 0,"");
-            DLIB_CASSERT(0 <= padding_y_ && padding_y_ < window_height_,"");
-            DLIB_CASSERT(0 <= padding_x_ && padding_x_ < window_width_, "");
+            DLIB_CASSERT(window_width_ > 0);
+            DLIB_CASSERT(window_height_ > 0);
+            DLIB_CASSERT(stride_y_ > 0);
+            DLIB_CASSERT(stride_x_ > 0);
+            DLIB_CASSERT(0 <= padding_y_ && padding_y_ < window_height_);
+            DLIB_CASSERT(0 <= padding_x_ && padding_x_ < window_width_);
 
             window_height = window_height_;
             window_width = window_width_;
@@ -1439,12 +1439,12 @@ namespace dlib
             const tensor& src
         )
         {
-            DLIB_CASSERT(window_width > 0,"");
-            DLIB_CASSERT(window_height > 0,"");
-            DLIB_CASSERT(stride_y > 0,"");
-            DLIB_CASSERT(stride_x > 0,"");
-            DLIB_CASSERT(0 <= padding_y && padding_y < window_height,"");
-            DLIB_CASSERT(0 <= padding_x && padding_x < window_width, "");
+            DLIB_CASSERT(window_width > 0);
+            DLIB_CASSERT(window_height > 0);
+            DLIB_CASSERT(stride_y > 0);
+            DLIB_CASSERT(stride_x > 0);
+            DLIB_CASSERT(0 <= padding_y && padding_y < window_height);
+            DLIB_CASSERT(0 <= padding_x && padding_x < window_width);
             DLIB_CASSERT(window_width  <= src.nc() + 2*padding_x,
                 "Pooling windows must be small enough to fit into the padded image.");
             DLIB_CASSERT(window_height <= src.nr() + 2*padding_y,
@@ -1523,8 +1523,8 @@ namespace dlib
             tensor& grad 
         )
         {
-            DLIB_CASSERT(have_same_dimensions(gradient_input,dest),"");
-            DLIB_CASSERT(have_same_dimensions(src,grad),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input,dest));
+            DLIB_CASSERT(have_same_dimensions(src,grad));
 
 
             if (src.size() == 0)
@@ -1622,7 +1622,7 @@ namespace dlib
 
             output.set_size(out_nr*out_nc, 
                             data.k()*filter_nr*filter_nc);
-            DLIB_CASSERT(output.size() != 0,"");
+            DLIB_CASSERT(output.size() != 0);
             float* t = &output(0,0);
 
             // now fill in the Toeplitz output matrix for the n-th sample in data.  
@@ -1639,7 +1639,7 @@ namespace dlib
                         {
                             for (long x = 0; x < filter_nc; ++x)
                             {
-                                DLIB_ASSERT(cnt < output.size(),"");
+                                DLIB_ASSERT(cnt < output.size());
                                 long xx = c+x;
                                 long yy = r+y;
                                 if (boundary.contains(xx,yy))
@@ -1670,7 +1670,7 @@ namespace dlib
             const auto d = data.host() + data.k()*data.nr()*data.nc()*n;
             const rectangle boundary = get_rect(data);
 
-            DLIB_CASSERT(output.size() != 0,"");
+            DLIB_CASSERT(output.size() != 0);
             const float* t = &output(0,0);
 
             // now fill in the Toeplitz output matrix for the n-th sample in data.  
@@ -1708,12 +1708,12 @@ namespace dlib
             int padding_x
         )
         {
-            DLIB_CASSERT(is_same_object(output,data) == false,"");
-            DLIB_CASSERT(is_same_object(output,filters) == false,"");
-            DLIB_CASSERT(filters.k() == data.k(),"");
-            DLIB_CASSERT(stride_y > 0 && stride_x > 0,"");
-            DLIB_CASSERT(0 <= padding_y && padding_y < filters.nr(),"");
-            DLIB_CASSERT(0 <= padding_x && padding_x < filters.nc(),"");
+            DLIB_CASSERT(is_same_object(output,data) == false);
+            DLIB_CASSERT(is_same_object(output,filters) == false);
+            DLIB_CASSERT(filters.k() == data.k());
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0);
+            DLIB_CASSERT(0 <= padding_y && padding_y < filters.nr());
+            DLIB_CASSERT(0 <= padding_x && padding_x < filters.nc());
             DLIB_CASSERT(filters.nr() <= data.nr() + 2*padding_y,
                 "Filter windows must be small enough to fit into the padded image.");
             DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,

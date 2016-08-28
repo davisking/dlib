@@ -101,7 +101,7 @@ namespace dlib
         tensor& operator= (const matrix_exp<EXP>& item)
         {
             DLIB_CASSERT(num_samples() == item.nr() &&
-                         nr()*nc()*k() == item.nc(),"");
+                         nr()*nc()*k() == item.nc());
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
 
@@ -113,7 +113,7 @@ namespace dlib
         tensor& operator+= (const matrix_exp<EXP>& item)
         {
             DLIB_CASSERT(num_samples() == item.nr() &&
-                         nr()*nc()*k() == item.nc(),"");
+                         nr()*nc()*k() == item.nc());
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
             set_ptrm(host(), m_n, m_nr*m_nc*m_k) += item;
@@ -124,7 +124,7 @@ namespace dlib
         tensor& operator-= (const matrix_exp<EXP>& item)
         {
             DLIB_CASSERT(num_samples() == item.nr() &&
-                         nr()*nc()*k() == item.nc(),"");
+                         nr()*nc()*k() == item.nc());
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
             set_ptrm(host(), m_n, m_nr*m_nc*m_k) -= item;
@@ -137,8 +137,8 @@ namespace dlib
             const matrix_exp<EXP>& item
         )
         {
-            DLIB_CASSERT(idx < num_samples(), "");
-            DLIB_CASSERT(item.size() == nr()*nc()*k(), "");
+            DLIB_CASSERT(idx < num_samples());
+            DLIB_CASSERT(item.size() == nr()*nc()*k());
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
             set_ptrm(host()+idx*item.size(), item.nr(), item.nc()) = item;
@@ -151,8 +151,8 @@ namespace dlib
             const matrix_exp<EXP>& item
         )
         {
-            DLIB_CASSERT(idx < num_samples(), "");
-            DLIB_CASSERT(item.size() == nr()*nc()*k(), "");
+            DLIB_CASSERT(idx < num_samples());
+            DLIB_CASSERT(item.size() == nr()*nc()*k());
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
             set_ptrm(host()+idx*item.size(), item.nr(), item.nc()) += item;
@@ -169,7 +169,7 @@ namespace dlib
             const tensor& src
         )
         {
-            DLIB_CASSERT(dest.size() == src.size(), "");
+            DLIB_CASSERT(dest.size() == src.size());
             memcpy(dest.data(), dest.get_alias_offset(),  
                    src.data(),  src.get_alias_offset(), 
                    src.size());
@@ -285,7 +285,7 @@ namespace dlib
             long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         ) 
         {
-            DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0,"");
+            DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0);
 
             set_size(n_,k_,nr_,nc_);
         }
@@ -351,7 +351,7 @@ namespace dlib
             long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         )
         {
-            DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0,"");
+            DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0);
 
             m_n = n_;
             m_k = k_;
@@ -469,7 +469,7 @@ namespace dlib
         const tensor& b
     )
     {
-        DLIB_CASSERT(a.size() == b.size(), "");
+        DLIB_CASSERT(a.size() == b.size());
         const float* da = a.host();
         const float* db = b.host();
         double sum = 0;
@@ -559,7 +559,7 @@ namespace dlib
             long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         ) 
         {
-            DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0,"");
+            DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0);
 
             inst.m_n = n_;
             inst.m_k = k_;
@@ -588,7 +588,7 @@ namespace dlib
             size_t offset
         ) 
         {
-            DLIB_CASSERT(offset+size() <= t.size(),"");
+            DLIB_CASSERT(offset+size() <= t.size());
 
 #ifdef DLIB_USE_CUDA
             if (!inst.cudnn_descriptor)

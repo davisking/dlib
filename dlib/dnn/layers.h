@@ -1092,7 +1092,7 @@ namespace dlib
             drop_rate(drop_rate_),
             rnd(std::rand())
         {
-            DLIB_CASSERT(0 <= drop_rate && drop_rate <= 1,"");
+            DLIB_CASSERT(0 <= drop_rate && drop_rate <= 1);
         }
 
         // We have to add a copy constructor and assignment operator because the rnd object

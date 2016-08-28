@@ -29,13 +29,13 @@ namespace dlib
             label_iterator iter
         ) const
         {
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1,"");
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
 
             const tensor& output_tensor = sub.get_output();
             DLIB_CASSERT(output_tensor.nr() == 1 && 
                          output_tensor.nc() == 1 && 
-                         output_tensor.k() == 1,"");
-            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
+                         output_tensor.k() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
 
             const float* out_data = output_tensor.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i)
@@ -57,14 +57,14 @@ namespace dlib
             const tensor& output_tensor = sub.get_output();
             tensor& grad = sub.get_gradient_input();
 
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1,"");
-            DLIB_CASSERT(input_tensor.num_samples() != 0,"");
-            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0,"");
-            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples(),"");
-            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
             DLIB_CASSERT(output_tensor.nr() == 1 && 
                          output_tensor.nc() == 1 && 
-                         output_tensor.k() == 1,"");
+                         output_tensor.k() == 1);
 
             // The loss we output is the average loss over the mini-batch.
             const double scale = 1.0/output_tensor.num_samples();
@@ -136,13 +136,13 @@ namespace dlib
             label_iterator iter
         ) const
         {
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1,"");
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
 
             const tensor& output_tensor = sub.get_output();
             DLIB_CASSERT(output_tensor.nr() == 1 && 
                          output_tensor.nc() == 1 && 
-                         output_tensor.k() == 1,"");
-            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
+                         output_tensor.k() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
 
             const float* out_data = output_tensor.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i)
@@ -165,17 +165,17 @@ namespace dlib
             const tensor& output_tensor = sub.get_output();
             tensor& grad = sub.get_gradient_input();
 
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1,"");
-            DLIB_CASSERT(input_tensor.num_samples() != 0,"");
-            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0,"");
-            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples(),"");
-            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
             DLIB_CASSERT(output_tensor.nr() == 1 && 
                          output_tensor.nc() == 1 && 
-                         output_tensor.k() == 1,"");
+                         output_tensor.k() == 1);
             DLIB_CASSERT(grad.nr() == 1 && 
                          grad.nc() == 1 && 
-                         grad.k() == 1,"");
+                         grad.k() == 1);
 
             tt::sigmoid(grad, output_tensor);
 
@@ -253,10 +253,10 @@ namespace dlib
         ) const
         {
             const tensor& output_tensor = sub.get_output();
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1,"");
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
             DLIB_CASSERT(output_tensor.nr() == 1 && 
-                         output_tensor.nc() == 1 ,"");
-            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
+                         output_tensor.nc() == 1 );
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
 
 
             // Note that output_tensor.k() should match the number of labels.
@@ -282,15 +282,15 @@ namespace dlib
             const tensor& output_tensor = sub.get_output();
             tensor& grad = sub.get_gradient_input();
 
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1,"");
-            DLIB_CASSERT(input_tensor.num_samples() != 0,"");
-            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0,"");
-            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples(),"");
-            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples(),"");
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
             DLIB_CASSERT(output_tensor.nr() == 1 && 
-                         output_tensor.nc() == 1,"");
+                         output_tensor.nc() == 1);
             DLIB_CASSERT(grad.nr() == 1 && 
-                         grad.nc() == 1,"");
+                         grad.nc() == 1);
 
             tt::softmax(grad, output_tensor);
 

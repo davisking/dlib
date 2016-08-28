@@ -101,7 +101,7 @@ namespace dlib { namespace tt
         float stddev
     )
     {
-        DLIB_CASSERT(data.size()%2 == 0,"");
+        DLIB_CASSERT(data.size()%2 == 0);
 #ifdef DLIB_USE_CUDA
         rnd.fill_gaussian(data, mean, stddev);
 #else
@@ -135,11 +135,11 @@ namespace dlib { namespace tt
     {
         DLIB_CASSERT(dest.k() == src1.k() && src1.k() == src2.k() &&
             dest.nr() == src1.nr() && src1.nr() == src2.nr() &&
-            dest.nc() == src1.nc() && src1.nc() == src2.nc() ,"");
+            dest.nc() == src1.nc() && src1.nc() == src2.nc() );
         const long MD = std::max(std::max(dest.num_samples(),src1.num_samples()),src2.num_samples());
         DLIB_CASSERT((dest.num_samples()==1 || dest.num_samples()==MD) &&
                     (src1.num_samples()==1 || src1.num_samples()==MD) &&
-                    (src2.num_samples()==1 || src2.num_samples()==MD) ,"");
+                    (src2.num_samples()==1 || src2.num_samples()==MD) );
 #ifdef DLIB_USE_CUDA
         cuda::multiply(add_to, dest, src1, src2);
 #else

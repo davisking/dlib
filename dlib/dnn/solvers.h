@@ -43,7 +43,7 @@ namespace dlib
         {
             const tensor& params = l.get_layer_params();
 
-            DLIB_CASSERT(params.size() != 0,"");
+            DLIB_CASSERT(params.size() != 0);
             if (v.size() == 0)
             {
                 v.copy_size(params_grad);
@@ -131,7 +131,7 @@ namespace dlib
         {
             const tensor& params = l.get_layer_params();
 
-            DLIB_CASSERT(params.size() != 0,"");
+            DLIB_CASSERT(params.size() != 0);
             if (v.size() == 0)
             {
                 v.copy_size(params_grad);
@@ -204,7 +204,7 @@ namespace dlib
         )
         {
             const tensor& params = l.get_layer_params();
-            DLIB_CASSERT(params.size() != 0,"");
+            DLIB_CASSERT(params.size() != 0);
             if (v.size() == 0)
             {
                 m.copy_size(params_grad);
@@ -305,7 +305,7 @@ namespace dlib
         )
         {
             const tensor& params = l.get_layer_params();
-            DLIB_CASSERT(params.size() != 0,"");
+            DLIB_CASSERT(params.size() != 0);
             if (v.size() == 0)
             {
                 m.copy_size(params_grad);

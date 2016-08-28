@@ -173,11 +173,11 @@ namespace dlib
 
             DLIB_CASSERT(dest.k() == src1.k() && src1.k() == src2.k() &&
                 dest.nr() == src1.nr() && src1.nr() == src2.nr() &&
-                dest.nc() == src1.nc() && src1.nc() == src2.nc() ,"");
+                dest.nc() == src1.nc() && src1.nc() == src2.nc() );
             const long MD = std::max(std::max(dest.num_samples(),src1.num_samples()),src2.num_samples());
             DLIB_CASSERT((dest.num_samples()==1 || dest.num_samples()==MD) &&
                 (src1.num_samples()==1 || src1.num_samples()==MD) &&
-                (src2.num_samples()==1 || src2.num_samples()==MD) ,"");
+                (src2.num_samples()==1 || src2.num_samples()==MD) );
 
             if (dest.size() == 0)
                 return;
@@ -278,7 +278,7 @@ namespace dlib
         {
             if (have_same_dimensions(dest,src1))
             {
-                DLIB_CASSERT(src2.num_samples() == 1 && src2.nr() == 1 && src2.nc() == 1 && src2.k() == src1.k(),"");
+                DLIB_CASSERT(src2.num_samples() == 1 && src2.nr() == 1 && src2.nc() == 1 && src2.k() == src1.k());
                 if (dest.size() == 0)
                     return;
 
@@ -291,8 +291,8 @@ namespace dlib
             }
             else
             {
-                DLIB_CASSERT(have_same_dimensions(src1,src2),"");
-                DLIB_CASSERT(dest.num_samples() == 1 && dest.nr() == 1 && dest.nc() == 1 && dest.k() == src1.k(),"");
+                DLIB_CASSERT(have_same_dimensions(src1,src2));
+                DLIB_CASSERT(dest.num_samples() == 1 && dest.nr() == 1 && dest.nc() == 1 && dest.k() == src1.k());
                 if (dest.size() == 0)
                     return;
 
@@ -404,7 +404,7 @@ namespace dlib
             const float B
         )
         {
-            DLIB_CASSERT(dest.size()==src.size(),"");
+            DLIB_CASSERT(dest.size()==src.size());
             if (B != 0)
                 launch_kernel(_cuda_affine_transform1,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A, B);
             else
@@ -417,7 +417,7 @@ namespace dlib
             const float A
         )
         {
-            DLIB_CASSERT(dest.size()==src.size(),"");
+            DLIB_CASSERT(dest.size()==src.size());
             launch_kernel(_cuda_affine_transform1_0,max_jobs(dest.size()),dest.device(), src.device(), src.size(), A);
         }
 
@@ -448,8 +448,8 @@ namespace dlib
             const float C
         )
         {
-            DLIB_CASSERT(dest.size()==src1.size(),"");
-            DLIB_CASSERT(dest.size()==src2.size(),"");
+            DLIB_CASSERT(dest.size()==src1.size());
+            DLIB_CASSERT(dest.size()==src2.size());
             if (C != 0)
                 launch_kernel(_cuda_affine_transform4,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), dest.size(), A, B, C);
             else
@@ -464,8 +464,8 @@ namespace dlib
             const float B
         )
         {
-            DLIB_CASSERT(dest.size()==src1.size(),"");
-            DLIB_CASSERT(dest.size()==src2.size(),"");
+            DLIB_CASSERT(dest.size()==src1.size());
+            DLIB_CASSERT(dest.size()==src2.size());
             launch_kernel(_cuda_affine_transform4_0,max_jobs(dest.size()),dest.device(), src1.device(), src2.device(), dest.size(), A, B);
         }
 
@@ -485,7 +485,7 @@ namespace dlib
             const tensor& src
         )
         {
-            DLIB_CASSERT(dest.size()==src.size(),"");
+            DLIB_CASSERT(dest.size()==src.size());
             launch_kernel(_cuda_add_scaled,max_jobs(dest.size()),dest.device(), src.device(), dest.size(), scale);
         }
 
@@ -512,9 +512,9 @@ namespace dlib
             const float D
         )
         {
-            DLIB_CASSERT(dest.size()==src1.size(),"");
-            DLIB_CASSERT(dest.size()==src2.size(),"");
-            DLIB_CASSERT(dest.size()==src3.size(),"");
+            DLIB_CASSERT(dest.size()==src1.size());
+            DLIB_CASSERT(dest.size()==src2.size());
+            DLIB_CASSERT(dest.size()==src3.size());
             launch_kernel(_cuda_affine_transform5,max_jobs(dest.size()),dest.device(), src1.device(),
                 src2.device(), src3.device(), dest.size(), A, B, C, D);
         }
@@ -544,10 +544,10 @@ namespace dlib
             const float C
         )
         {
-            DLIB_CASSERT(dest.size()==src1.size(),"");
-            DLIB_CASSERT(dest.size()==src2.size(),"");
-            DLIB_CASSERT(dest.size()==src3.size(),"");
-            DLIB_CASSERT(begin <= end && end <= dest.size(),"");
+            DLIB_CASSERT(dest.size()==src1.size());
+            DLIB_CASSERT(dest.size()==src2.size());
+            DLIB_CASSERT(dest.size()==src3.size());
+            DLIB_CASSERT(begin <= end && end <= dest.size());
             launch_kernel(_cuda_affine_transform_range,max_jobs(end-begin),
                 dest.device(), src1.device(),
                 src2.device(), src3.device(), begin, end, A, B, C);
@@ -577,10 +577,10 @@ namespace dlib
             const tensor& B
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest, src),"");
+            DLIB_CASSERT(have_same_dimensions(dest, src));
             DLIB_CASSERT(
                   ((A.num_samples()==1 && B.num_samples()==1) ||
-                  (A.num_samples()==src.num_samples() && B.num_samples()==src.num_samples())),"");
+                  (A.num_samples()==src.num_samples() && B.num_samples()==src.num_samples())));
             DLIB_CASSERT(
                   A.nr()==B.nr() && B.nr()==src.nr() &&
                   A.nc()==B.nc() && B.nc()==src.nc() &&
@@ -648,8 +648,8 @@ namespace dlib
             DLIB_CASSERT(s.size() == m.size() &&
                          s.size() == v.size() &&
                          s.size() == params.size() &&
-                         s.size() == params_grad.size(),"");
-            DLIB_CASSERT(begin <= end && end <= params.size(),"");
+                         s.size() == params_grad.size());
+            DLIB_CASSERT(begin <= end && end <= params.size());
             const float alpha = learning_rate*std::sqrt(1-std::pow(momentum2,t))/(1-std::pow(momentum1, t));
 
             launch_kernel(_cuda_compute_adam_update,max_jobs(end-begin),
@@ -675,9 +675,9 @@ namespace dlib
             const tensor& B
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest, src),"");
-            DLIB_CASSERT(have_same_dimensions(A, B),"");
-            DLIB_CASSERT(A.num_samples() == 1 && A.nr() == 1 && A.nc() == 1 && A.k() == src.k(),"");
+            DLIB_CASSERT(have_same_dimensions(dest, src));
+            DLIB_CASSERT(have_same_dimensions(A, B));
+            DLIB_CASSERT(A.num_samples() == 1 && A.nr() == 1 && A.nc() == 1 && A.k() == src.k());
 
             launch_kernel(_cuda_affine_transform_conv,max_jobs(dest.size()),
                     dest.device(), src.device(), src.size(), A.device(), B.device(), src.nr()*src.nc(), src.k());
@@ -705,7 +705,7 @@ namespace dlib
                   gradient_input.k() == grad.k() &&
                   gradient_input.nr() == grad.nr() &&
                   gradient_input.nc() == grad.nc() &&
-                  gradient_input.size() > 0,"");
+                  gradient_input.size() > 0);
 
             launch_kernel(_add_bias_gradient,max_jobs(grad.size()),grad.device(), gradient_input.device(), grad.size(), gradient_input.size());
         }
@@ -750,8 +750,8 @@ namespace dlib
             size_t idx
         )
         {
-            DLIB_CASSERT(a.size() == b.size(), "");
-            DLIB_CASSERT(idx < result.size(), "");
+            DLIB_CASSERT(a.size() == b.size());
+            DLIB_CASSERT(idx < result.size());
 
             launch_kernel(_cuda_dot, max_jobs(a.size()), a.device(), b.device(), a.size(), result.device()+idx);
         }

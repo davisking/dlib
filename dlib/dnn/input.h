@@ -64,7 +64,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            DLIB_CASSERT(std::distance(ibegin,iend) > 0,"");
+            DLIB_CASSERT(std::distance(ibegin,iend) > 0);
             const auto nr = ibegin->nr();
             const auto nc = ibegin->nc();
             // make sure all the input matrices have the same dimensions
@@ -187,7 +187,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            DLIB_CASSERT(std::distance(ibegin,iend) > 0,"");
+            DLIB_CASSERT(std::distance(ibegin,iend) > 0);
             // make sure all input images have the correct size
             for (auto i = ibegin; i != iend; ++i)
             {
@@ -305,7 +305,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            DLIB_CASSERT(std::distance(ibegin,iend) > 0,"");
+            DLIB_CASSERT(std::distance(ibegin,iend) > 0);
             const auto nr = ibegin->nr();
             const auto nc = ibegin->nc();
             // make sure all the input matrices have the same dimensions
@@ -398,7 +398,7 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-            DLIB_CASSERT(std::distance(ibegin,iend) > 0,"");
+            DLIB_CASSERT(std::distance(ibegin,iend) > 0);
             const auto nr = ibegin->nr();
             const auto nc = ibegin->nc();
             // make sure all the input matrices have the same dimensions

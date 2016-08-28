@@ -143,7 +143,7 @@ namespace dlib
             unsigned long batch_size 
         )
         {
-            DLIB_CASSERT(batch_size > 0,"");
+            DLIB_CASSERT(batch_size > 0);
             mini_batch_size = batch_size;
         }
 
@@ -154,7 +154,7 @@ namespace dlib
             unsigned long num
         )  
         {
-            DLIB_CASSERT(num > 0,"");
+            DLIB_CASSERT(num > 0);
             max_num_epochs = num;
         }
 
@@ -183,7 +183,7 @@ namespace dlib
             const std::vector<label_type>& labels 
         )
         {
-            DLIB_CASSERT(data.size() == labels.size() && data.size() > 0, "");
+            DLIB_CASSERT(data.size() == labels.size() && data.size() > 0);
 
             if (verbose)
             {
@@ -209,7 +209,7 @@ namespace dlib
             const std::vector<input_type>& data
         )
         {
-            DLIB_CASSERT(data.size() > 0, "");
+            DLIB_CASSERT(data.size() > 0);
             if (verbose)
             {
                 using namespace std::chrono;
@@ -234,7 +234,7 @@ namespace dlib
             const std::vector<label_type>& labels 
         ) 
         {
-            DLIB_CASSERT(data.size() == labels.size() && data.size() > 0, "");
+            DLIB_CASSERT(data.size() == labels.size() && data.size() > 0);
 
             bool updated_the_network = false;
             // The reason these two loops don't initialize their counter variables but
@@ -290,7 +290,7 @@ namespace dlib
             const std::vector<input_type>& data
         ) 
         {
-            DLIB_CASSERT(data.size() > 0, "");
+            DLIB_CASSERT(data.size() > 0);
 
             const bool has_unsupervised_loss = std::is_same<no_label_type, label_type>::value; 
             static_assert(has_unsupervised_loss, 
@@ -378,7 +378,7 @@ namespace dlib
             double lr
         )
         {
-            DLIB_CASSERT(lr > 0,"");
+            DLIB_CASSERT(lr > 0);
             wait_for_thread_to_pause();
             if (learning_rate != lr)
             {
@@ -399,7 +399,7 @@ namespace dlib
             double lr
         )
         {
-            DLIB_CASSERT(lr > 0,"");
+            DLIB_CASSERT(lr > 0);
             wait_for_thread_to_pause();
             lr_schedule.set_size(0);
             min_learning_rate = lr;
@@ -416,8 +416,8 @@ namespace dlib
             const matrix_exp<EXP>& schedule
         )
         {
-            DLIB_CASSERT(schedule.size() > 0,"");
-            DLIB_CASSERT(min(schedule) > 0,"");
+            DLIB_CASSERT(schedule.size() > 0);
+            DLIB_CASSERT(min(schedule) > 0);
             set_learning_rate(schedule(0,0));
             set_min_learning_rate(min(schedule));
             set_learning_rate_shrink_factor(1);
@@ -456,7 +456,7 @@ namespace dlib
             double shrink
         )
         {
-            DLIB_CASSERT(0 < shrink && shrink <= 1,"");
+            DLIB_CASSERT(0 < shrink && shrink <= 1);
             wait_for_thread_to_pause();
             lr_schedule.set_size(0);
             learning_rate_shrink = shrink;

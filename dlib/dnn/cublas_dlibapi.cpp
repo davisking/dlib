@@ -119,25 +119,25 @@ namespace dlib
             {
                 DLIB_ASSERT( dest_nr == lhs_nc &&
                               dest_nc == rhs_nr &&
-                              lhs_nr == rhs_nc,"")
+                              lhs_nr == rhs_nc)
             }
             else if (!trans_lhs && trans_rhs)
             {
                 DLIB_ASSERT( dest_nr == lhs_nr &&
                               dest_nc == rhs_nr &&
-                              lhs_nc == rhs_nc,"")
+                              lhs_nc == rhs_nc)
             }
             else if (trans_lhs && !trans_rhs)
             {
                 DLIB_ASSERT( dest_nr == lhs_nc &&
                               dest_nc == rhs_nc &&
-                              lhs_nr == rhs_nr,"")
+                              lhs_nr == rhs_nr)
             }
             else
             {
                 DLIB_ASSERT( dest_nr == lhs_nr &&
                               dest_nc == rhs_nc &&
-                              lhs_nc == rhs_nr,"")
+                              lhs_nc == rhs_nr)
             }
 
             const int k = trans_rhs ? rhs_nc : rhs_nr;

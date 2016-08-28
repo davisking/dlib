@@ -23,7 +23,7 @@ namespace dlib
         const gpu_data& src
     )
     {
-        DLIB_CASSERT(dest.size() == src.size(), "");
+        DLIB_CASSERT(dest.size() == src.size());
         if (src.size() == 0 || &dest == &src)
             return;
 
@@ -38,8 +38,8 @@ namespace dlib
         size_t num
     )
     {
-        DLIB_CASSERT(dest_offset + num <= dest.size(), "");
-        DLIB_CASSERT(src_offset + num <= src.size(), "");
+        DLIB_CASSERT(dest_offset + num <= dest.size());
+        DLIB_CASSERT(src_offset + num <= src.size());
         if (num == 0)
             return;
 
