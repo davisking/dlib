@@ -35,7 +35,7 @@ namespace dlib
         ) { return obj.get_learning_rate_multiplier(); }
 
         template <typename T>
-        double get_learning_rate_multiplier ( const T& obj, general_) { return 1; }
+        double get_learning_rate_multiplier ( const T& , general_) { return 1; }
     }
     template <typename T>
     double get_learning_rate_multiplier(const T& obj) { return impl::get_learning_rate_multiplier(obj, special_()); }
@@ -51,7 +51,7 @@ namespace dlib
         ) { return obj.get_weight_decay_multiplier(); }
 
         template <typename T>
-        double get_weight_decay_multiplier ( const T& obj, general_) { return 1; }
+        double get_weight_decay_multiplier ( const T& , general_) { return 1; }
     }
     template <typename T>
     double get_weight_decay_multiplier(const T& obj) { return impl::get_weight_decay_multiplier(obj, special_()); }
