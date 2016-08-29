@@ -1054,6 +1054,12 @@ namespace mex_binding
             // Don't need to do a copy if it's this kind of matrix since we can just
             // pull the underlying mxArray out directly and thus avoid a copy.
             plhs = item._private_release_mxArray();
+            // If there isn't anything there because the matrix is empty then set it to an
+            // empty matrix.
+            if (!plhs)
+                plhs = mxCreateDoubleMatrix(item.nr(),
+                                            item.nc(),
+                                            mxREAL);
         }
         else
         {
@@ -1075,6 +1081,13 @@ namespace mex_binding
             // Don't need to do a copy if it's this kind of matrix since we can just
             // pull the underlying mxArray out directly and thus avoid a copy.
             plhs = item._private_release_mxArray();
+            // If there isn't anything there because the matrix is empty then set it to an
+            // empty matrix.
+            if (!plhs)
+                plhs = mxCreateNumericMatrix(item.nr(),
+                                            item.nc(),
+                                            mxSINGLE_CLASS,
+                                            mxREAL);
         }
         else
         {
