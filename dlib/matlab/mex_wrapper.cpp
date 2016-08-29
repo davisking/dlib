@@ -4862,15 +4862,15 @@ void mexFunction( int nlhs, mxArray *plhs[],
             size_t load_obj_idx = 0;
 
             cout << "classdef " << classname << " < handle\n"
-                << "   properties (Access = private)\n"
-                << "       cpp_ptr\n"
-                << "   end\n"
-                << "\n"
-                << "   methods\n"
-                << "       function this = "<<classname<<"()\n"
-                << "           this.cpp_ptr = "<<mex_filename<<"('construct');\n"
-                << "       end\n"
-                << "\n";
+                 << "    properties (Access = private)\n"
+                 << "        cpp_ptr\n"
+                 << "    end\n"
+                 << "\n"
+                 << "    methods\n"
+                 << "        function this = "<<classname<<"()\n"
+                 << "            this.cpp_ptr = "<<mex_filename<<"('construct');\n"
+                 << "        end\n"
+                 << "\n";
             for (size_t i = 0; i < methods.size(); ++i)
             {
                 if (methods[i] == "load_obj")
