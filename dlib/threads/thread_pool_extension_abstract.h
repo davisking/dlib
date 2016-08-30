@@ -225,9 +225,11 @@ namespace dlib
                 such as mutex objects. 
 
             EXCEPTIONS
-                Note that if an exception is thrown inside a task thread and 
-                is not caught then the normal rule for uncaught exceptions in
-                threads applies. That is, the application will be terminated.
+                Note that if an exception is thrown inside a task thread and is not caught
+                then the exception will be trapped inside the thread pool and rethrown at a
+                later time when someone calls one of the add task or wait member functions
+                of the thread pool.  This allows exceptions to propagate out of task threads
+                and into the calling code where they can be handled.
         !*/
 
     public:

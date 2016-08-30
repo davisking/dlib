@@ -24,7 +24,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This is a convenience function for submitting a block of jobs to a thread_pool.  
               In particular, given the half open range [begin, end), this function will
@@ -61,7 +60,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 thread_pool tp(num_threads);
@@ -82,7 +80,6 @@ namespace dlib
         requires
             - chunks_per_thread > 0
             - begin <= end
-            - funct does not throw any exceptions
         ensures
             - This is a convenience function for submitting a block of jobs to a
               thread_pool.  In particular, given the range [begin, end), this function will
@@ -117,7 +114,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 thread_pool tp(num_threads);
@@ -137,7 +133,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 parallel_for_blocked(default_thread_pool(), begin, end, funct, chunks_per_thread);
@@ -159,7 +154,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following function call:
               parallel_for_blocked(tp, begin, end, [&](long begin_sub, long end_sub) 
@@ -189,7 +183,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 thread_pool tp(num_threads);
@@ -210,7 +203,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following function call:
               parallel_for_blocked(tp, begin, end, [&](long begin_sub, long end_sub) 
@@ -238,7 +230,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 thread_pool tp(num_threads);
@@ -258,7 +249,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 parallel_for(default_thread_pool(), begin, end, funct, chunks_per_thread);
@@ -280,7 +270,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
@@ -302,7 +291,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
@@ -323,7 +311,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
@@ -344,7 +331,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
@@ -364,7 +350,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
@@ -388,7 +373,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for_blocked() routine defined
               above except that it will print messages to cout showing the progress in
@@ -410,7 +394,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for_blocked() routine defined
               above except that it will print messages to cout showing the progress in
@@ -431,7 +414,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for_blocked() routine defined
               above except that it will print messages to cout showing the progress in
@@ -452,7 +434,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for_blocked() routine defined
               above except that it will print messages to cout showing the progress in
@@ -472,7 +453,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for_blocked() routine defined
               above except that it will print messages to cout showing the progress in
