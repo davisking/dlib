@@ -4751,9 +4751,10 @@ public:
             delete i.second;
     }
 
-    uint64 create()
+    template <typename ...T>
+    uint64 create(T&& ...args)
     {
-        MEX_CLASS_NAME* item = new MEX_CLASS_NAME;
+        MEX_CLASS_NAME* item = new MEX_CLASS_NAME(std::forward<T>(args)...);
         uint64 id = (uint64)item;
         // Now generate a unique id that incorporates our seed value. The point of doing
         // this is to avoid any chance that a mex file will get unloaded and then reloaded
@@ -4834,13 +4835,14 @@ auto mex_class_methods = std::make_tuple(FOR_EACH(MEX_CLASS_ANNOTATE, MEX_CLASS_
 
 // ----------------------------------------------------------------------------------------
 
-bool is_string_construct(const mxArray* arr)
+bool is_string(const mxArray* arr, const char* str)
 {
-    if (mxIsChar(arr) && mxGetNumberOfElements(arr) == 9)
+    if (mxIsChar(arr))
     {
         char ch[20];
         DLIB_CASSERT(mxGetString(arr, ch, sizeof(ch))==0, "Unable to retrieve string");
-        return strcmp("construct",ch)==0;
+        ch[sizeof(ch)-1] = 0;// ensure NULL termination regardless of what MATLAB does.
+        return strcmp(str,ch)==0;
     }
     return false;
 }
@@ -4882,6 +4884,10 @@ void mexFunction( int nlhs, mxArray *plhs[],
                  << "    methods\n"
                  << "        function this = "<<classname<<"()\n"
                  << "            this.cpp_ptr = "<<mex_filename<<"('construct');\n"
+                 << "        end\n"
+                 << "        function copied_obj = clone(this)\n"
+                 << "            copied_obj = "<<classname<<"();\n"
+                 << "            copied_obj.cpp_ptr = "<<mex_filename<<"(this.cpp_ptr,'clone');\n"
                  << "        end\n"
                  << "\n";
             for (size_t i = 0; i < methods.size(); ++i)
@@ -4926,8 +4932,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
         else if (nrhs == 1) 
         {
             // this is a constructor call
-            if (is_string_construct(prhs[0]))
+            if (is_string(prhs[0],"construct"))
             {
+                DLIB_CASSERT(nlhs == 1, "If you want to construct a new object then you must assign the pointer to something.");
                 plhs[0] = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
                 uint64* ptr_int = (uint64*)mxGetData(plhs[0]);
                 *ptr_int = class_factory.create();
@@ -4942,20 +4949,35 @@ void mexFunction( int nlhs, mxArray *plhs[],
         else // a regular function call
         {
             DLIB_CASSERT(mxIsUint64(prhs[0]) && mxGetNumberOfElements(prhs[0])==1, "When calling a class member function the first argument must be a pointer (a UINT64 in matlab)");
-            DLIB_CASSERT(mxIsDouble(prhs[1]) && mxGetNumberOfElements(prhs[1])==1, "When calling a class member function the second argument must be a number indicating which member function");
-            const uint64 ptr_int = *((uint64*)mxGetData(prhs[0]));
-            const int funct_idx = *(mxGetPr(prhs[1]));
+            if (is_string(prhs[1], "clone"))
+            {
+                DLIB_CASSERT(nlhs == 1, "If you want to construct a new object then you must assign the pointer to something.");
+                const uint64 ptr_int = *((uint64*)mxGetData(prhs[0]));
 
-            auto num_registered_functions = std::tuple_size<decltype(mex_class_methods)>::value;
-            DLIB_CASSERT(1 <= funct_idx && funct_idx <= num_registered_functions, "Invalid function index provided.");
+                MEX_CLASS_NAME* ptr = class_factory.access(ptr_int);
 
-            MEX_CLASS_NAME* ptr = class_factory.access(ptr_int);
+                plhs[0] = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
+                uint64* ptr_int2 = (uint64*)mxGetData(plhs[0]);
+                // copy construct a new object
+                *ptr_int2 = class_factory.create(*ptr);
+            }
+            else
+            {
+                DLIB_CASSERT(mxIsDouble(prhs[1]) && mxGetNumberOfElements(prhs[1])==1, "When calling a class member function the second argument must be a number indicating which member function");
+                const uint64 ptr_int = *((uint64*)mxGetData(prhs[0]));
+                const int funct_idx = *(mxGetPr(prhs[1]));
 
-            // we used the first two arguments to decide what function to call.  So adjust nrhs
-            // and prhs so the member function never sees them.
-            mex_class_dispatch dispatch(ptr, nlhs, plhs, nrhs-2, prhs+2);
-            // now invoke the member function,  subtract 1 to convert to 0 indexing.
-            visit_at(mex_class_methods, funct_idx-1, dispatch);
+                auto num_registered_functions = std::tuple_size<decltype(mex_class_methods)>::value;
+                DLIB_CASSERT(1 <= funct_idx && funct_idx <= num_registered_functions, "Invalid function index provided.");
+
+                MEX_CLASS_NAME* ptr = class_factory.access(ptr_int);
+
+                // we used the first two arguments to decide what function to call.  So adjust nrhs
+                // and prhs so the member function never sees them.
+                mex_class_dispatch dispatch(ptr, nlhs, plhs, nrhs-2, prhs+2);
+                // now invoke the member function,  subtract 1 to convert to 0 indexing.
+                visit_at(mex_class_methods, funct_idx-1, dispatch);
+            }
         }
 #else
         mex_binding::call_mex_function(mex_function, nlhs, plhs, nrhs, prhs);
