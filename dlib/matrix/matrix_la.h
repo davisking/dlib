@@ -1595,8 +1595,8 @@ convergence:
 
         const double machine_eps = std::numeric_limits<typename EXP::type>::epsilon();
         // compute a reasonable epsilon below which we round to zero before doing the
-        // reciprocal.  Unless a non-zero tol is given then we just use tol.
-        const double eps = (tol!=0) ? tol :  machine_eps*std::max(m.nr(),m.nc())*max(w);
+        // reciprocal.  Unless a non-zero tol is given then we just use tol*max(w).
+        const double eps = (tol!=0) ? tol*max(w) :  machine_eps*std::max(m.nr(),m.nc())*max(w);
 
         // now compute the pseudoinverse
         return tmp(scale_columns(v,reciprocal(round_zeros(w,eps))))*trans(u);
