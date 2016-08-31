@@ -148,13 +148,15 @@ namespace dlib
         throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib_o_out.str());      \
     }}                                                                      
 
+// This macro is not needed if you have a real C++ compiler.  It's here to work around bugs in Visual Studio's preprocessor.  
+#define DLIB_WORKAROUND_VISUAL_STUDIO_BUGS(x) x
 // Make it so the 2nd argument of DLIB_CASSERT is optional.  That is, you can call it like
 // DLIB_CASSERT(exp) or DLIB_CASSERT(exp,message).
 #define DLIBM_CASSERT_1_ARGS(exp)              DLIBM_CASSERT(exp,"")
 #define DLIBM_CASSERT_2_ARGS(exp,message)      DLIBM_CASSERT(exp,message)
 #define DLIBM_GET_3TH_ARG(arg1, arg2, arg3, ...) arg3
-#define DLIBM_CASSERT_CHOOSER(...) DLIBM_GET_3TH_ARG(__VA_ARGS__,  DLIBM_CASSERT_2_ARGS, DLIBM_CASSERT_1_ARGS)
-#define DLIB_CASSERT(...) DLIBM_CASSERT_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define DLIBM_CASSERT_CHOOSER(...) DLIB_WORKAROUND_VISUAL_STUDIO_BUGS(DLIBM_GET_3TH_ARG(__VA_ARGS__,  DLIBM_CASSERT_2_ARGS, DLIBM_CASSERT_1_ARGS))
+#define DLIB_CASSERT(...) DLIB_WORKAROUND_VISUAL_STUDIO_BUGS(DLIBM_CASSERT_CHOOSER(__VA_ARGS__)(__VA_ARGS__))
 
 
 #ifdef ENABLE_ASSERTS 
