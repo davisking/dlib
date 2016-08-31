@@ -16,6 +16,21 @@ cd ..
 
 
 
+echo testing vc2015 >> test_log.txt
+rm -rf build_vc2015_64
+mkdir build_vc2015_64
+cd build_vc2015_64
+cmake -G "Visual Studio 14 2015 Win64" .. 
+cmake --build . --config Release || exit /B
+ping 127.0.0.1 -n 5 -w 1000 > null
+cmake --build . --config Debug || exit /B
+ping 127.0.0.1 -n 5 -w 1000 > null
+cd Release
+dtest --runall -d || exit /B
+cd ..
+cd ..
+
+
 
 
 
@@ -40,21 +55,6 @@ rm -rf build_vc2012_64
 mkdir build_vc2012_64
 cd build_vc2012_64
 cmake -G "Visual Studio 11 2012 Win64" .. 
-cmake --build . --config Release || exit /B
-ping 127.0.0.1 -n 5 -w 1000 > null
-cmake --build . --config Debug || exit /B
-ping 127.0.0.1 -n 5 -w 1000 > null
-cd Release
-dtest --runall -d || exit /B
-cd ..
-cd ..
-
-
-echo testing vc2015 >> test_log.txt
-rm -rf build_vc2015_64
-mkdir build_vc2015_64
-cd build_vc2015_64
-cmake -G "Visual Studio 14 2015 Win64" .. 
 cmake --build . --config Release || exit /B
 ping 127.0.0.1 -n 5 -w 1000 > null
 cmake --build . --config Debug || exit /B
