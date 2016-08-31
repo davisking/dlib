@@ -241,9 +241,11 @@ int main()
         // of the rosen function where both input variables were in the range
         // 0.1 to 0.8 you would do it like this:
         starting_point = 0.1, 0.1; // Start with a valid point inside the constraint box.
+        unsigned long int nb_iter = 0;
+        unsigned long int *num_iter = &nb_iter;
         find_min_box_constrained(lbfgs_search_strategy(10),  
                                  objective_delta_stop_strategy(1e-9),  
-                                 rosen, rosen_derivative, starting_point, 0.1, 0.8);
+                                 rosen, rosen_derivative, starting_point, 0.1, 0.8, num_iter);
         // Here we put the same [0.1 0.8] range constraint on each variable, however, you
         // can put different bounds on each variable by passing in column vectors of
         // constraints for the last two arguments rather than scalars.  
@@ -254,7 +256,7 @@ int main()
         starting_point = 0.1, 0.1; 
         find_min_box_constrained(bfgs_search_strategy(),  
                                  objective_delta_stop_strategy(1e-9),  
-                                 rosen, derivative(rosen), starting_point, 0.1, 0.8);
+                                 rosen, derivative(rosen), starting_point, 0.1, 0.8,num_iter);
         cout << endl << "constrained rosen solution: \n" << starting_point << endl;
 
 
