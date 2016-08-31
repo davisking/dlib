@@ -183,7 +183,22 @@ namespace dlib
             const std::vector<label_type>& labels 
         )
         {
-            DLIB_CASSERT(data.size() == labels.size() && data.size() > 0);
+            DLIB_CASSERT(data.size() == labels.size());
+
+            train_one_step(data.begin(), data.end(), labels.begin());
+        }
+
+        template <
+            typename data_iterator,
+            typename label_iterator
+            >
+        void train_one_step (
+            data_iterator dbegin, 
+            data_iterator dend,
+            label_iterator lbegin
+        )
+        {
+            DLIB_CASSERT(std::distance(dbegin, dend) > 0);
 
             if (verbose)
             {
@@ -200,7 +215,7 @@ namespace dlib
                 }
             }
             sync_to_disk();
-            send_job(data.begin(), data.end(), labels.begin());
+            send_job(dbegin, dend, lbegin);
 
             ++train_one_step_calls;
         }
@@ -209,7 +224,18 @@ namespace dlib
             const std::vector<input_type>& data
         )
         {
-            DLIB_CASSERT(data.size() > 0);
+            train_one_step(data.begin(), data.end());
+        }
+
+        template <
+            typename data_iterator
+            >
+        void train_one_step (
+            data_iterator dbegin, 
+            data_iterator dend
+        )
+        {
+            DLIB_CASSERT(std::distance(dbegin, dend) > 0);
             if (verbose)
             {
                 using namespace std::chrono;
@@ -225,7 +251,7 @@ namespace dlib
                 }
             }
             sync_to_disk();
-            send_job(data.begin(), data.end());
+            send_job(dbegin, dend);
             ++train_one_step_calls;
         }
 
