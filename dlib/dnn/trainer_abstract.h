@@ -414,6 +414,37 @@ namespace dlib
                 - #get_train_one_step_calls() == get_train_one_step_calls() + 1.
         !*/
 
+        template <
+            typename data_iterator,
+            typename label_iterator
+            >
+        void train_one_step (
+            data_iterator dbegin,
+            data_iterator dend,
+            label_iterator lbegin
+        );
+        /*!
+            requires
+                - std::advance(lbegin, std::distance(dbegin, dend) - 1) is dereferencable
+                - std::distance(dbegin, dend) > 0
+                - net_type uses a supervised loss.  
+                  i.e. net_type::label_type != no_label_type.
+            ensures
+                - Performs one stochastic gradient update step based on the mini-batch of
+                  data and labels supplied to this function.  In particular, calling
+                  train_one_step() in a loop is equivalent to calling the train() method
+                  defined above.  However, train_one_step() allows you to stream data from
+                  disk into the training process while train() requires you to first load
+                  all the training data into RAM.  Otherwise, these training methods are
+                  equivalent.
+                - You can observe the current average loss value by calling get_average_loss().
+                - The network training will happen in another thread.  Therefore, after
+                  calling this function you should call get_net() before you touch the net
+                  object from the calling thread to ensure no other threads are still
+                  accessing the network.
+                - #get_train_one_step_calls() == get_train_one_step_calls() + 1.
+        !*/
+
         void train_one_step (
             const std::vector<input_type>& data
         );
@@ -438,6 +469,34 @@ namespace dlib
                 - #get_train_one_step_calls() == get_train_one_step_calls() + 1.
         !*/
 
+        template <
+            typename data_iterator
+            >
+        void train_one_step (
+            data_iterator dbegin,
+            data_iterator dend
+        );
+        /*!
+            requires
+                - std::distance(dbegin, dend) > 0
+                - net_type uses an unsupervised loss.  
+                  i.e. net_type::label_type == no_label_type.
+            ensures
+                - Performs one stochastic gradient update step based on the mini-batch of
+                  data supplied to this function.  In particular, calling train_one_step()
+                  in a loop is equivalent to calling the train() method defined above.
+                  However, train_one_step() allows you to stream data from disk into the
+                  training process while train() requires you to first load all the
+                  training data into RAM.  Otherwise, these training methods are
+                  equivalent.
+                - You can observe the current average loss value by calling get_average_loss().
+                - The network training will happen in another thread.  Therefore, after
+                  calling this function you should call get_net() before you touch the net
+                  object from the calling thread to ensure no other threads are still
+                  accessing the network.
+                - #get_train_one_step_calls() == get_train_one_step_calls() + 1.
+        !*/
+        
         double get_average_loss (
         ) const;
         /*!
