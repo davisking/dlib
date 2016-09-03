@@ -84,11 +84,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<rectangle> >& object_locations,
         const image_dataset_file& source
     )
@@ -109,6 +108,7 @@ namespace dlib
         set_current_dir(get_parent_directory(file(source.get_filename())));
 
 
+        typedef typename array_type::value_type image_type;
 
 
         image_type img;
@@ -167,11 +167,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<rectangle> >& object_locations,
         const std::string& filename
     )
@@ -184,16 +183,16 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<full_object_detection> >& object_locations,
         const image_dataset_file& source,
         std::vector<std::string>& parts_list
     )
     {
+        typedef typename array_type::value_type image_type;
         parts_list.clear();
         images.clear();
         object_locations.clear();
@@ -287,11 +286,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<full_object_detection> >& object_locations,
         const image_dataset_file& source 
     )
@@ -303,11 +301,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type 
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<full_object_detection> >& object_locations,
         const std::string& filename
     )
