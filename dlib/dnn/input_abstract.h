@@ -153,6 +153,11 @@ namespace dlib
                   value written to the output tensor is first divided by 256.0 so that the
                   resulting outputs are all in the range [0,1].
         !*/
+
+        // Provided for compatibility with input_rgb_image_pyramid's interface
+        bool image_contained_point ( const tensor& data, const point& p) const { return get_rect(data).contains(p); }
+        drectangle tensor_space_to_image_space ( const tensor& /*data*/, drectangle r) const { return r; }
+        drectangle image_space_to_tensor_space ( const tensor& /*data*/, double /*scale*/, drectangle r ) const { return r; }
     };
 
 // ----------------------------------------------------------------------------------------
@@ -234,6 +239,12 @@ namespace dlib
                   subtracted (according to get_avg_red(), get_avg_green(), or
                   get_avg_blue()) and then is divided by 256.0.
         !*/
+
+
+        // Provided for compatibility with input_rgb_image_pyramid's interface
+        bool image_contained_point ( const tensor& data, const point& p) const { return get_rect(data).contains(p); }
+        drectangle tensor_space_to_image_space ( const tensor& /*data*/, drectangle r) const { return r; }
+        drectangle image_space_to_tensor_space ( const tensor& /*data*/, double /*scale*/, drectangle r ) const { return r; }
     };
 
 // ----------------------------------------------------------------------------------------
@@ -249,6 +260,159 @@ namespace dlib
 
                 You can also convert between input_rgb_image and input_rgb_image_sized by
                 copy construction or assignment.
+        !*/
+
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename PYRAMID_TYPE
+        >
+    class input_rgb_image_pyramid
+    {
+        /*!
+            REQUIREMENTS ON PYRAMID_TYPE
+                PYRAMID_TYPE must be an instance of the dlib::pyramid_down template.
+
+            WHAT THIS OBJECT REPRESENTS
+                This input layer works with RGB images of type matrix<rgb_pixel>.  It is
+                identical to input_rgb_image except that it outputs a tensor containing a
+                tiled image pyramid of each input image rather than a simple copy of each
+                image.  The tiled image pyramid is created using create_tiled_pyramid().
+        !*/
+
+    public:
+
+        typedef matrix<rgb_pixel> input_type;
+        typedef PYRAMID_TYPE pyramid_type;
+
+        input_rgb_image_pyramid (
+        );
+        /*!
+            ensures
+                - #get_avg_red()   == 122.782
+                - #get_avg_green() == 117.001
+                - #get_avg_blue()  == 104.298
+        !*/
+
+        input_rgb_image_pyramid (
+            float avg_red,
+            float avg_green,
+            float avg_blue
+        ); 
+        /*!
+            ensures
+                - #get_avg_red() == avg_red
+                - #get_avg_green() == avg_green
+                - #get_avg_blue() == avg_blue
+        !*/
+
+        float get_avg_red(
+        ) const;
+        /*!
+            ensures
+                - returns the value subtracted from the red color channel.
+        !*/
+
+        float get_avg_green(
+        ) const;
+        /*!
+            ensures
+                - returns the value subtracted from the green color channel.
+        !*/
+
+        float get_avg_blue(
+        ) const;
+        /*!
+            ensures
+                - returns the value subtracted from the blue color channel.
+        !*/
+
+        template <typename forward_iterator>
+        void to_tensor (
+            forward_iterator ibegin,
+            forward_iterator iend,
+            resizable_tensor& data
+        ) const;
+        /*!
+            requires
+                - [ibegin, iend) is an iterator range over input_type objects.
+                - std::distance(ibegin,iend) > 0
+                - The input range should contain images that all have the same
+                  dimensions.
+            ensures
+                - Converts the iterator range into a tensor and stores it into #data.  In
+                  particular, we will have:
+                    - #data.num_samples() == std::distance(ibegin,iend)
+                    - #data.k() == 3
+                    - Each sample in #data contains a tiled image pyramid of the
+                      corresponding input image.  The tiled pyramid is created by
+                      create_tiled_pyramid().
+                  Moreover, each color channel is normalized by having its average value
+                  subtracted (according to get_avg_red(), get_avg_green(), or
+                  get_avg_blue()) and then is divided by 256.0.
+        !*/
+
+        bool image_contained_point (
+            const tensor& data,
+            const point& p
+        ) const;
+        /*!
+            requires
+                - data is a tensor that was produced by this->to_tensor()
+            ensures
+                - Since data is a tensor that is built from a bunch of identically sized
+                  images, we can ask if those images were big enough to contain the point
+                  p.  This function returns the answer to that question.
+        !*/
+
+        drectangle image_space_to_tensor_space (
+            const tensor& data,
+            double scale,
+            drectangle r 
+        ) const;
+        /*!
+            requires
+                - data is a tensor that was produced by this->to_tensor()
+                - 0 < scale <= 1
+            ensures
+                - This function maps from to_tensor()'s input image space to its output
+                  tensor space.  Therefore, given that data is a tensor produced by
+                  to_tensor(), image_space_to_tensor_space() allows you to ask for the
+                  rectangle in data that corresponds to a rectangle in the original image
+                  space.
+
+                  Note that since the output tensor contains an image pyramid, there are
+                  multiple points in the output tensor that correspond to any input
+                  location.  So you must also specify a scale so we know what level of the
+                  pyramid is needed.  So given a rectangle r in an input image, you can
+                  ask, what rectangle in data corresponds to r when things are scale times
+                  smaller?  That rectangle is returned by this function.
+                - A scale of 1 means we don't move anywhere in the pyramid scale space relative
+                  to the input image while smaller values of scale mean we move down the
+                  pyramid.
+        !*/
+
+        drectangle tensor_space_to_image_space (
+            const tensor& data,
+            drectangle r
+        ) const;
+        /*!
+            requires
+                - data is a tensor that was produced by this->to_tensor()
+            ensures
+                - This function maps from to_tensor()'s output tensor space to its input
+                  image space.  Therefore, given that data is a tensor produced by
+                  to_tensor(), tensor_space_to_image_space() allows you to ask for the
+                  rectangle in the input image that corresponds to a rectangle in data.
+                - It should be noted that this function isn't always an inverse of
+                  image_space_to_tensor_space().  This is because you can ask
+                  image_space_to_tensor_space() for the coordinates of points outside the input
+                  image and they will be mapped to somewhere that doesn't have an inverse.
+                  But for points actually inside the input image this function performs an
+                  approximate inverse mapping.  I.e. when image_contained_point(data,center(r))==true 
+                  there is an approximate inverse.
         !*/
 
     };

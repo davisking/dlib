@@ -7,6 +7,7 @@
 #include "../matrix.h"
 #include "../array2d.h"
 #include "../pixel.h"
+#include "../image_processing.h"
 #include <sstream>
 
 
@@ -56,6 +57,10 @@ namespace dlib
         float get_avg_red()   const { return avg_red; }
         float get_avg_green() const { return avg_green; }
         float get_avg_blue()  const { return avg_blue; }
+
+        bool image_contained_point ( const tensor& data, const point& p) const { return get_rect(data).contains(p); }
+        drectangle tensor_space_to_image_space ( const tensor& /*data*/, drectangle r) const { return r; }
+        drectangle image_space_to_tensor_space ( const tensor& /*data*/, double /*scale*/, drectangle r ) const { return r; }
 
         template <typename forward_iterator>
         void to_tensor (
@@ -180,6 +185,10 @@ namespace dlib
         float get_avg_green() const { return avg_green; }
         float get_avg_blue()  const { return avg_blue; }
 
+        bool image_contained_point ( const tensor& data, const point& p) const { return get_rect(data).contains(p); }
+        drectangle tensor_space_to_image_space ( const tensor& /*data*/, drectangle r) const { return r; }
+        drectangle image_space_to_tensor_space ( const tensor& /*data*/, double /*scale*/, drectangle r ) const { return r; }
+
         template <typename forward_iterator>
         void to_tensor (
             forward_iterator ibegin,
@@ -298,6 +307,10 @@ namespace dlib
         template <typename mm>
         input(const input<array2d<T,mm>>&) {}
 
+        bool image_contained_point ( const tensor& data, const point& p) const { return get_rect(data).contains(p); }
+        drectangle tensor_space_to_image_space ( const tensor& /*data*/, drectangle r) const { return r; }
+        drectangle image_space_to_tensor_space ( const tensor& /*data*/, double /*scale*/, drectangle r ) const { return r; }
+
         template <typename forward_iterator>
         void to_tensor (
             forward_iterator ibegin,
@@ -391,6 +404,10 @@ namespace dlib
         template <long NR, long NC, typename mm, typename L>
         input(const input<matrix<T,NR,NC,mm,L>>&) {}
 
+        bool image_contained_point ( const tensor& data, const point& p) const { return get_rect(data).contains(p); }
+        drectangle tensor_space_to_image_space ( const tensor& /*data*/, drectangle r) const { return r; }
+        drectangle image_space_to_tensor_space ( const tensor& /*data*/, double /*scale*/, drectangle r ) const { return r; }
+
         template <typename forward_iterator>
         void to_tensor (
             forward_iterator ibegin,
@@ -466,6 +483,156 @@ namespace dlib
         {
             out << "<input/>";
         }
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename PYRAMID_TYPE>
+    class input_rgb_image_pyramid
+    {
+    public:
+        typedef matrix<rgb_pixel> input_type;
+        typedef PYRAMID_TYPE pyramid_type;
+
+        input_rgb_image_pyramid (
+        ) : 
+            avg_red(122.782), 
+            avg_green(117.001),
+            avg_blue(104.298) 
+        {
+        }
+
+        input_rgb_image_pyramid (
+            float avg_red_,
+            float avg_green_,
+            float avg_blue_
+        ) : avg_red(avg_red_), avg_green(avg_green_), avg_blue(avg_blue_) 
+        {}
+
+        float get_avg_red()   const { return avg_red; }
+        float get_avg_green() const { return avg_green; }
+        float get_avg_blue()  const { return avg_blue; }
+
+        bool image_contained_point (
+            const tensor& data,
+            const point& p
+        ) const
+        {
+            auto&& rects = any_cast<std::vector<rectangle>>(data.annotation());
+            DLIB_CASSERT(rects.size() > 0);
+            return rects[0].contains(p);
+        }
+
+        drectangle tensor_space_to_image_space (
+            const tensor& data,
+            drectangle r
+        ) const
+        {
+            auto&& rects = any_cast<std::vector<rectangle>>(data.annotation());
+            return tiled_pyramid_to_image<pyramid_type>(rects, r);
+        }
+
+        drectangle image_space_to_tensor_space (
+            const tensor& data,
+            double scale,
+            drectangle r 
+        ) const
+        {
+            auto&& rects = any_cast<std::vector<rectangle>>(data.annotation());
+            return image_to_tiled_pyramid<pyramid_type>(rects, scale, r);
+        }
+
+        template <typename forward_iterator>
+        void to_tensor (
+            forward_iterator ibegin,
+            forward_iterator iend,
+            resizable_tensor& data
+        ) const
+        {
+            DLIB_CASSERT(std::distance(ibegin,iend) > 0);
+            auto nr = ibegin->nr();
+            auto nc = ibegin->nc();
+            // make sure all the input matrices have the same dimensions
+            for (auto i = ibegin; i != iend; ++i)
+            {
+                DLIB_CASSERT(i->nr()==nr && i->nc()==nc,
+                    "\t input_rgb_image_pyramid::to_tensor()"
+                    << "\n\t All matrices given to to_tensor() must have the same dimensions."
+                    << "\n\t nr: " << nr
+                    << "\n\t nc: " << nc
+                    << "\n\t i->nr(): " << i->nr()
+                    << "\n\t i->nc(): " << i->nc()
+                );
+            }
+
+
+            matrix<rgb_pixel> img;
+            create_tiled_pyramid<pyramid_type>(*ibegin, img, data.annotation().get<std::vector<rectangle>>());
+            nr = img.nr();
+            nc = img.nc();
+            data.set_size(std::distance(ibegin,iend), 3, nr, nc);
+
+            const size_t offset = nr*nc;
+            auto ptr = data.host();
+            while(true)
+            {
+                for (long r = 0; r < nr; ++r)
+                {
+                    for (long c = 0; c < nc; ++c)
+                    {
+                        rgb_pixel temp = img(r,c);
+                        auto p = ptr++;
+                        *p = (temp.red-avg_red)/256.0; 
+                        p += offset;
+                        *p = (temp.green-avg_green)/256.0; 
+                        p += offset;
+                        *p = (temp.blue-avg_blue)/256.0; 
+                        p += offset;
+                    }
+                }
+                ptr += offset*(data.k()-1);
+
+                ++ibegin;
+                if (ibegin == iend)
+                    break;
+                create_tiled_pyramid<pyramid_type>(*ibegin, img, data.annotation().get<std::vector<rectangle>>());
+            }
+        }
+
+        friend void serialize(const input_rgb_image_pyramid& item, std::ostream& out)
+        {
+            serialize("input_rgb_image_pyramid", out);
+            serialize(item.avg_red, out);
+            serialize(item.avg_green, out);
+            serialize(item.avg_blue, out);
+        }
+
+        friend void deserialize(input_rgb_image_pyramid& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "input_rgb_image_pyramid")
+                throw serialization_error("Unexpected version found while deserializing dlib::input_rgb_image_pyramid.");
+            deserialize(item.avg_red, in);
+            deserialize(item.avg_green, in);
+            deserialize(item.avg_blue, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const input_rgb_image_pyramid& item)
+        {
+            out << "input_rgb_image_pyramid("<<item.avg_red<<","<<item.avg_green<<","<<item.avg_blue<<")";
+            return out;
+        }
+
+        friend void to_xml(const input_rgb_image_pyramid& item, std::ostream& out)
+        {
+            out << "<input_rgb_image_pyramid r='"<<item.avg_red<<"' g='"<<item.avg_green<<"' b='"<<item.avg_blue<<"'/>";
+        }
+
+    private:
+        float avg_red;
+        float avg_green;
+        float avg_blue;
     };
 
 // ----------------------------------------------------------------------------------------
