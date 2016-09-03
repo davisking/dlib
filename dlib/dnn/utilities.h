@@ -5,6 +5,7 @@
 
 #include "core.h"
 #include "utilities_abstract.h"
+#include "../geometry.h"
 
 namespace dlib
 {
@@ -105,6 +106,63 @@ namespace dlib
         out << "<net>\n";
         visit_layers(net, impl::visitor_net_to_xml(out));
         out << "</net>\n";
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+
+        class visitor_net_map_input_to_output
+        {
+        public:
+
+            visitor_net_map_input_to_output(point& p_) : p(p_) {}
+
+            point& p;
+
+            template<typename layer_type>
+            void operator()(size_t idx, const layer_type& net) 
+            {
+                p = net.layer_details().map_input_to_output(p);
+            }
+        };
+
+        class visitor_net_map_output_to_input
+        {
+        public:
+            visitor_net_map_output_to_input(point& p_) : p(p_) {}
+
+            point& p;
+
+            template<typename layer_type>
+            void operator()(size_t idx, const layer_type& net) 
+            {
+                p = net.layer_details().map_output_to_input(p);
+            }
+        };
+    }
+
+    template <typename net_type>
+    inline point input_tensor_to_output_tensor(
+        const net_type& net,
+        point p 
+    )
+    {
+        impl::visitor_net_map_input_to_output temp(p);
+        visit_layers_backwards_range<0,net_type::num_layers-1>(net, temp);
+        return p;
+    }
+
+    template <typename net_type>
+    inline point output_tensor_to_input_tensor(
+        const net_type& net,
+        point p  
+    )
+    {
+        impl::visitor_net_map_output_to_input temp(p);
+        visit_layers_range<0,net_type::num_layers-1>(net, temp);
+        return p;
     }
 
 // ----------------------------------------------------------------------------------------
