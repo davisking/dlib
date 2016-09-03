@@ -318,7 +318,7 @@ namespace dlib
             - This function maps from a coordinate in a tiled pyramid to the corresponding
               input image coordinate.  Therefore, it is essentially the inverse of
               image_to_tiled_pyramid().
-            - It should be noted that this function isn't an exact inverse of
+            - It should be noted that this function isn't always an inverse of
               image_to_tiled_pyramid().  This is because you can ask
               image_to_tiled_pyramid() for the coordinates of points outside the input
               image and they will be mapped to somewhere that doesn't have an inverse.  But
@@ -344,7 +344,7 @@ namespace dlib
             - This function maps from a coordinate in a tiled pyramid to the corresponding
               input image coordinate.  Therefore, it is essentially the inverse of
               image_to_tiled_pyramid().
-            - It should be noted that this function isn't an exact inverse of
+            - It should be noted that this function isn't always an inverse of
               image_to_tiled_pyramid().  This is because you can ask
               image_to_tiled_pyramid() for the coordinates of points outside the input
               image and they will be mapped to somewhere that doesn't have an inverse.  But
