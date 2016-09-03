@@ -322,8 +322,8 @@ namespace dlib
               image_to_tiled_pyramid().  This is because you can ask
               image_to_tiled_pyramid() for the coordinates of points outside the input
               image and they will be mapped to somewhere that doesn't have an inverse.  But
-              for points actually inside the image this function performs an inverse
-              mapping.
+              for points actually inside the image this function performs an approximate
+              inverse mapping.
             - Assumes pyramid_type is the pyramid class used to produce the tiled image.
     !*/
 
@@ -348,8 +348,8 @@ namespace dlib
               image_to_tiled_pyramid().  This is because you can ask
               image_to_tiled_pyramid() for the coordinates of points outside the input
               image and they will be mapped to somewhere that doesn't have an inverse.  But
-              for points actually inside the image this function performs an inverse
-              mapping.
+              for points actually inside the image this function performs an approximate
+              inverse mapping.
             - Assumes pyramid_type is the pyramid class used to produce the tiled image.
     !*/
 
