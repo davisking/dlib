@@ -3337,6 +3337,39 @@ namespace dlib
             }
         };
 
+        template <size_t i, size_t num>
+        struct vl_loop_backwards
+        {
+            template <
+                typename net_type,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                visitor&& v
+            )
+            {
+                vl_loop<i+1, num>::visit(net,v);
+                v(i, layer<i>(net));
+            }
+        };
+
+        template <size_t num>
+        struct vl_loop_backwards<num,num>
+        {
+            template <
+                typename net_type,
+                typename visitor
+                >
+            static void visit(
+                net_type&,
+                visitor&& 
+            )
+            {
+                // Base case of recursion.  Don't do anything.
+            }
+        };
+
     }
 
     template <
@@ -3349,6 +3382,50 @@ namespace dlib
     )
     {
         impl::vl_loop<0, net_type::num_layers>::visit(net, v);
+    }
+
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_backwards(
+        net_type& net,
+        visitor v
+    )
+    {
+        impl::vl_loop_backwards<0, net_type::num_layers>::visit(net, v);
+    }
+
+    template <
+        size_t begin,
+        size_t end,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_range(
+        net_type& net,
+        visitor v
+    )
+    {
+        static_assert(begin <= end, "Invalid range");
+        static_assert(end <= net_type::num_layers, "Invalid range");
+        impl::vl_loop<begin,end>::visit(net, v);
+    }
+
+    template <
+        size_t begin,
+        size_t end,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_backwards_range(
+        net_type& net,
+        visitor v
+    )
+    {
+        static_assert(begin <= end, "Invalid range");
+        static_assert(end <= net_type::num_layers, "Invalid range");
+        impl::vl_loop_backwards<begin,end>::visit(net, v);
     }
 
 // ----------------------------------------------------------------------------------------
