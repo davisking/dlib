@@ -113,6 +113,48 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct mmod_rect
+    {
+        mmod_rect() = default; 
+        mmod_rect(const rectangle& r) : rect(r) {}
+        mmod_rect(const rectangle& r, double score) : rect(r),detection_confidence(score) {}
+
+        rectangle rect;
+        double detection_confidence = 0;
+        bool ignore = false;
+
+        operator rectangle() const { return rect; }
+    };
+
+    inline mmod_rect ignored_mmod_rect(const rectangle& r)
+    {
+        mmod_rect temp(r);
+        temp.ignore = true;
+        return temp;
+    }
+
+    inline void serialize(const mmod_rect& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(version, out);
+        serialize(item.rect, out);
+        serialize(item.detection_confidence, out);
+        serialize(item.ignore, out);
+    }
+
+    inline void deserialize(mmod_rect& item, std::istream& in)
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::mmod_rect");
+        deserialize(item.rect, in);
+        deserialize(item.detection_confidence, in);
+        deserialize(item.ignore, in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_FULL_OBJECT_DeTECTION_H_

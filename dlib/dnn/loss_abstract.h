@@ -4,6 +4,7 @@
 #ifdef DLIB_DNn_LOSS_ABSTRACT_H_
 
 #include "core_abstract.h"
+#include "../image_processing/full_object_detection_abstract.h"
 
 namespace dlib
 {
@@ -350,6 +351,173 @@ namespace dlib
 
     template <typename SUBNET>
     using loss_multiclass_log = add_loss_layer<loss_multiclass_log_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    struct mmod_options
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object contains all the parameters that control the behavior of loss_binary_mmod_.
+        !*/
+
+    public:
+
+        mmod_options() = default;
+
+        // This kind of object detector is a sliding window detector.  These two parameters
+        // determine the size of the sliding window.  Since you will usually use the MMOD
+        // loss with an image pyramid the detector size determines the size of the smallest
+        // object you can detect.
+        unsigned long detector_width = 80;
+        unsigned long detector_height = 80;
+
+        // These parameters control how we penalize different kinds of mistakes.  See 
+        // Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046)
+        // for further details.
+        double loss_per_false_alarm = 1;
+        double loss_per_missed_target = 1;
+
+        // A detection must have an intersection-over-union value greater than this for us
+        // to consider it a match against a ground truth box.
+        double truth_match_iou_threshold = 0.5;
+
+        // When doing non-max suppression, we use overlaps_nms to decide if a box overlaps
+        // an already output detection and should therefore be thrown out.
+        test_box_overlap overlaps_nms = test_box_overlap(0.4);
+
+        // Any mmod_rect in the training data that has its ignore field set to true defines
+        // an "ignore zone" in an image.  Any detection from that area is totally ignored
+        // by the optimizer.  Therefore, this overlaps_ignore field defines how we decide
+        // if a box falls into an ignore zone.  You use these ignore zones if there are
+        // objects in your dataset that you are unsure if you want to detect or otherwise
+        // don't care if the detector gets them or not.  
+        test_box_overlap overlaps_ignore;
+
+        mmod_options (
+            const std::vector<std::vector<mmod_rect>>& boxes,
+            const unsigned long target_size = 6400
+        );
+        /*!
+            ensures
+                - This function tries to automatically set the MMOD options so reasonable
+                  values assuming you have a training dataset of boxes.size() images, where
+                  the ith image contains objects boxes[i] you want to detect and the
+                  objects are clearly visible when scale so that they are target_size
+                  pixels in area.
+                - In particular, this function will automatically set the detector width
+                  and height based on the average box size in boxes and the requested
+                  target_size.
+                - This function will also set the overlaps_nms tester to the most
+                  restrictive tester that doesn't reject anything in boxes.
+        !*/
+    };
+
+    void serialize(const mmod_options& item, std::ostream& out);
+    void deserialize(mmod_options& item, std::istream& in);
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_binary_mmod_ 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the Max Margin Object
+                Detection loss defined in the paper:
+                    Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046).
+               
+                This means you use this loss if you want to detect the locations of objects
+                in images.
+
+                It should also be noted that this loss layer requires an input layer that
+                defines the following functions:
+                    - image_contained_point()
+                    - tensor_space_to_image_space()
+                    - image_space_to_tensor_space()
+                A reference implementation of them and their definitions can be found in
+                the input_rgb_image_pyramid object, which is the recommended input layer to
+                be used with loss_binary_mmod_.
+        !*/
+
+    public:
+
+        typedef std::vector<mmod_rect> label_type;
+
+        loss_binary_mmod_(
+        );
+        /*!
+            ensures
+                - #get_options() == mmod_options()
+        !*/
+
+        loss_binary_mmod_(
+            mmod_options options_
+        );
+        /*!
+            ensures
+                - #get_options() == options_
+        !*/
+
+        const mmod_options& get_options (
+        ) const;
+        /*!
+            ensures
+                - returns the options object that defines the general behavior of this loss layer.
+        !*/
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter,
+            double adjust_threshold = 0
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that: 
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            Also, the output labels are std::vectors of mmod_rects where, for each mmod_rect R,
+            we have the following interpretations:
+                - R.rect == the location of an object in the image.
+                - R.detection_confidence the score for the object, the bigger the score the
+                  more confident the detector is that an object is really there.  Only
+                  objects with a detection_confidence > adjust_threshold are output.  So if
+                  you want to output more objects (that are also of less confidence) you
+                  can call to_label() with a smaller value of adjust_threshold.
+                - R.ignore == false (this value is unused by to_label()).
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
+            except it has the additional calling requirements that: 
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            Also, the loss value returned is roughly equal to the average number of
+            mistakes made per image.  This is the sum of false alarms and missed
+            detections, weighted by the loss weights for these types of mistakes specified
+            in the mmod_options.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using loss_binary_mmod = add_loss_layer<loss_binary_mmod_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

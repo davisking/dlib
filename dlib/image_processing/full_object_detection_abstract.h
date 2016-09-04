@@ -138,6 +138,45 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    struct mmod_rect
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that is used to give training data and receive detections
+                from the Max-Margin Object Detection loss layer loss_binary_mmod_ object.
+        !*/
+
+        mmod_rect() = default; 
+        mmod_rect(const rectangle& r) : rect(r) {}
+        mmod_rect(const rectangle& r, double score) : rect(r),detection_confidence(score) {}
+
+        rectangle rect;
+        double detection_confidence = 0;
+        bool ignore = false;
+
+        operator rectangle() const { return rect; }
+    };
+
+    mmod_rect ignored_mmod_rect(
+        const rectangle& r
+    );
+    /*!
+        ensures
+            - returns a mmod_rect R such that:
+                - R.rect == r
+                - R.ignore == true
+                - R.detection_confidence == 0
+    !*/
+
+    void serialize(const mmod_rect& item, std::ostream& out);
+    void deserialize(mmod_rect& item, std::istream& in);
+    /*!
+        provides serialization support
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 

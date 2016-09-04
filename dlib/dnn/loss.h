@@ -9,6 +9,7 @@
 #include "tensor_tools.h"
 #include "../geometry.h"
 #include "../image_processing/box_overlap_testing.h"
+#include "../image_processing/full_object_detection.h"
 #include <sstream>
 
 namespace dlib
@@ -356,48 +357,6 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    struct mmod_rect
-    {
-        mmod_rect() = default; 
-        mmod_rect(const rectangle& r) : rect(r) {}
-        mmod_rect(const rectangle& r, double score) : rect(r),detection_confidence(score) {}
-
-        rectangle rect;
-        double detection_confidence = 0;
-        bool ignore = false;
-
-        operator rectangle() const { return rect; }
-    };
-
-    inline mmod_rect ignored_mmod_rect(const rectangle& r)
-    {
-        mmod_rect temp(r);
-        temp.ignore = true;
-        return temp;
-    }
-
-    inline void serialize(const mmod_rect& item, std::ostream& out)
-    {
-        int version = 1;
-        serialize(version, out);
-        serialize(item.rect, out);
-        serialize(item.detection_confidence, out);
-        serialize(item.ignore, out);
-    }
-
-    inline void deserialize(mmod_rect& item, std::istream& in)
-    {
-        int version = 0;
-        deserialize(version, in);
-        if (version != 1)
-            throw serialization_error("Unexpected version found while deserializing dlib::mmod_rect");
-        deserialize(item.rect, in);
-        deserialize(item.detection_confidence, in);
-        deserialize(item.ignore, in);
-    }
-
-// ----------------------------------------------------------------------------------------
-
     struct mmod_options
     {
     public:
@@ -514,6 +473,9 @@ namespace dlib
         loss_binary_mmod_() {}
 
         loss_binary_mmod_(mmod_options options_) : options(options_) {}
+
+        const mmod_options& get_options (
+        ) const { return options; }
 
         template <
             typename SUB_TYPE,
@@ -795,7 +757,7 @@ namespace dlib
             // it means the box can't be matched by the sliding window.  But picking the
             // max causes the right error message to be selected in the logic below.
             const double scale = std::max(options.detector_width/(double)rect.width(), options.detector_height/(double)rect.height());
-            const rectangle mapped_rect = input_layer(net).layer_details().image_space_to_tensor_space(input_tensor, scale, rect);
+            const rectangle mapped_rect = input_layer(net).layer_details().image_space_to_tensor_space(input_tensor, std::min(1.0,scale), rect);
 
             // compute the detection window that we would use at this position.
             point tensor_p = center(mapped_rect);
