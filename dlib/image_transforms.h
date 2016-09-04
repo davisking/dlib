@@ -25,6 +25,7 @@
 #include "image_transforms/fhog.h"
 #include "image_transforms/lbp.h"
 #include "image_transforms/random_color_transform.h"
+#include "image_transforms/random_cropper.h"
 
 #endif // DLIB_IMAGE_TRANSFORMs_
 
