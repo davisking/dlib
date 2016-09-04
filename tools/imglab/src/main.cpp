@@ -20,7 +20,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.5";
+const char* VERSION = "1.6";
 
 
 
@@ -604,9 +604,10 @@ int resample_dataset(const command_line_parser& parser)
             if (data.images[i].boxes[j].ignore || !get_rect(img).contains(rect))
                 continue;
 
+            const auto max_dim = std::max(rect.width(), rect.height());
 
             const double rand_scale_perturb = 1 - 0.3*(rnd.get_random_double()-0.5);
-            const rectangle crop_rect = centered_rect(rect, rect.width()*margin_scale*rand_scale_perturb, rect.height()*margin_scale*rand_scale_perturb);
+            const rectangle crop_rect = centered_rect(rect, max_dim*margin_scale*rand_scale_perturb, max_dim*margin_scale*rand_scale_perturb);
 
             // skip crops that have a lot of border pixels
             if (get_rect(img).intersect(crop_rect).area() < crop_rect.area()*0.8)
