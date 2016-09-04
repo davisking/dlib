@@ -538,6 +538,7 @@ namespace dlib
             drectangle r 
         ) const
         {
+            DLIB_CASSERT(0 < scale && scale <= 1 , "scale: "<< scale);
             auto&& rects = any_cast<std::vector<rectangle>>(data.annotation());
             return image_to_tiled_pyramid<pyramid_type>(rects, scale, r);
         }
