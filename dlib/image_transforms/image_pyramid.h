@@ -974,7 +974,7 @@ namespace dlib
     template <unsigned int N>
     double pyramid_rate(const pyramid_down<N>&)
     {
-        return N/(N+1.0);
+        return (N-1.0)/N;
     }
 
 // ----------------------------------------------------------------------------------------
