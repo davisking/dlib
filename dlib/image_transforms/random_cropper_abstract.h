@@ -40,6 +40,14 @@ namespace dlib
                 - #get_background_crops_fraction() == 0.1
         !*/
 
+        void set_seed (
+            time_t seed
+        );
+        /*!
+            ensures
+                - Seeds the internal random number generator with the given seed.
+        !*/
+
         double get_background_crops_fraction (
         ) const; 
         /*!

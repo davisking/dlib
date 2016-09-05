@@ -21,7 +21,14 @@ namespace dlib
         double min_object_height = 0.25; // cropped object will be at least this fraction of the height of the image.
         double max_object_height = 0.7; // cropped object will be at most this fraction of the height of the image.
         double background_crops_fraction = 0.1;
+
+        std::mutex rnd_mutex;
+        dlib::rand rnd;
     public:
+
+        void set_seed (
+            time_t seed
+        ) { rnd = dlib::rand(seed); }
 
         double get_background_crops_fraction (
         ) const { return background_crops_fraction; }
@@ -241,8 +248,6 @@ namespace dlib
         }
 
 
-        std::mutex rnd_mutex;
-        dlib::rand rnd;
 
     };
 
