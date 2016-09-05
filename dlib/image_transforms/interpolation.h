@@ -1281,6 +1281,36 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
+        std::vector<std::vector<mmod_rect>>& objects
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( images.size() == objects.size(),
+            "\t void upsample_image_dataset()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t images.size():   " << images.size() 
+            << "\n\t objects.size():  " << objects.size() 
+            );
+
+        typename image_array_type::value_type temp;
+        pyramid_type pyr;
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            pyramid_up(images[i], temp, pyr);
+            swap(temp, images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            {
+                objects[i][j].rect = pyr.rect_up(objects[i][j].rect);
+            }
+        }
+    }
+
+    template <
+        typename pyramid_type,
+        typename image_array_type
+        >
+    void upsample_image_dataset (
+        image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
         std::vector<std::vector<rectangle> >& objects2 
     )
