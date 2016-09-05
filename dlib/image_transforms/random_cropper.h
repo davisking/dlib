@@ -3,6 +3,7 @@
 #ifndef DLIB_RaNDOM_CROPPER_H_
 #define DLIB_RaNDOM_CROPPER_H_
 
+#include "random_cropper_abstract.h"
 #include "../threads.h"
 #include <mutex>
 #include <vector>
@@ -28,6 +29,11 @@ namespace dlib
             const chip_dims& dims_
         ) { dims = dims_; }
 
+        void set_chip_dims (
+            unsigned long rows,
+            unsigned long cols
+        ) { set_chip_dims(chip_dims(rows,cols)); }
+
         bool get_randomly_flip (
         ) const { return randomly_flip; }
 
@@ -39,7 +45,7 @@ namespace dlib
         ) const { return max_rotation_degrees; }
         void set_max_rotation_degrees (
             double value
-        ) { max_rotation_degrees = value; }
+        ) { max_rotation_degrees = std::abs(value); }
 
         double get_min_object_height (
         ) const { return min_object_height; }

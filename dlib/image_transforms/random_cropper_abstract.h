@@ -54,6 +54,15 @@ namespace dlib
                 - #get_chip_dims() == dims
         !*/
 
+        void set_chip_dims (
+            unsigned long rows,
+            unsigned long cols
+        );
+        /*!
+            ensures
+                - #get_chip_dims() == chip_dims(rows,cols)
+        !*/
+
         bool get_randomly_flip (
         ) const;
         /*!
@@ -83,7 +92,7 @@ namespace dlib
         );
         /*!
             ensures
-                - #get_max_rotation_degrees() == value
+                - #get_max_rotation_degrees() == std::abs(value)
         !*/
 
         double get_min_object_height (
