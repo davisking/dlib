@@ -110,12 +110,14 @@ namespace dlib
             std::vector<mmod_rect>& crop_rects
         )
         {
-            chip_details crop_details;
+            chip_details crop_plan;
             bool should_flip_crop;
-            make_crop_plan(img, rects, crop_details, should_flip_crop);
+            make_crop_plan(img, rects, crop_plan, should_flip_crop);
 
-            extract_image_chip(img, crop_details, crop);
-            const rectangle_transform tform = get_mapping_to_chip(crop_details);
+            extract_image_chip(img, crop_plan, crop);
+            const rectangle_transform tform = get_mapping_to_chip(crop_plan);
+
+            const unsigned long min_object_height_absolute = std::round(min_object_height*crop_plan.rows);
 
             // copy rects into crop_rects and set ones that are outside the crop to ignore or
             // drop entirely as appropriate.
@@ -128,8 +130,8 @@ namespace dlib
                 // if the rect is at least partly in the crop
                 if (get_rect(crop).intersect(rect.rect).area() != 0)
                 {
-                    // set to ignore if not totally in the crop
-                    if (!get_rect(crop).contains(rect.rect))
+                    // set to ignore if not totally in the crop or if too small.
+                    if (!get_rect(crop).contains(rect.rect) || rect.rect.height() < min_object_height_absolute)
                         rect.ignore = true;
 
                     crop_rects.push_back(rect);
@@ -153,7 +155,7 @@ namespace dlib
         void make_crop_plan (
             const image_type1& img,
             const std::vector<mmod_rect>& rects,
-            chip_details& crop_details,
+            chip_details& crop_plan,
             bool& should_flip_crop
         )
         {
@@ -178,7 +180,7 @@ namespace dlib
             }
             should_flip_crop = randomly_flip && rnd.get_random_double() > 0.5;
             const double angle = rnd.get_double_in_range(-max_rotation_degrees, max_rotation_degrees)*pi/180;
-            crop_details = chip_details(crop_rect, dims, angle);
+            crop_plan = chip_details(crop_rect, dims, angle);
         }
 
         bool has_non_ignored_box (
