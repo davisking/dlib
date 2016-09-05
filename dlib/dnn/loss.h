@@ -725,7 +725,7 @@ namespace dlib
                     {
                         dpoint p = output_tensor_to_input_tensor(net, point(c,r));
                         drectangle rect = centered_drect(p, options.detector_width, options.detector_height);
-                        rect = input_layer(net).layer_details().tensor_space_to_image_space(input_tensor,rect);
+                        rect = input_layer(net).tensor_space_to_image_space(input_tensor,rect);
 
                         dets_accum.push_back(intermediate_detection(rect, score, r*output_tensor.nc() + c));
                     }
@@ -743,7 +743,7 @@ namespace dlib
         ) const 
         {
             using namespace std;
-            if (!input_layer(net).layer_details().image_contained_point(input_tensor,center(rect)))
+            if (!input_layer(net).image_contained_point(input_tensor,center(rect)))
             {
                 std::ostringstream sout;
                 sout << "Encountered a truth rectangle located at " << rect << " that is outside the image." << endl;
@@ -757,12 +757,12 @@ namespace dlib
             // it means the box can't be matched by the sliding window.  But picking the
             // max causes the right error message to be selected in the logic below.
             const double scale = std::max(options.detector_width/(double)rect.width(), options.detector_height/(double)rect.height());
-            const rectangle mapped_rect = input_layer(net).layer_details().image_space_to_tensor_space(input_tensor, std::min(1.0,scale), rect);
+            const rectangle mapped_rect = input_layer(net).image_space_to_tensor_space(input_tensor, std::min(1.0,scale), rect);
 
             // compute the detection window that we would use at this position.
             point tensor_p = center(mapped_rect);
             rectangle det_window = centered_rect(tensor_p, options.detector_width,options.detector_height);
-            det_window = input_layer(net).layer_details().tensor_space_to_image_space(input_tensor, det_window);
+            det_window = input_layer(net).tensor_space_to_image_space(input_tensor, det_window);
 
             // make sure the rect can actually be represented by the image pyramid we are
             // using.

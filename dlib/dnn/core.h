@@ -2617,12 +2617,43 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+
+    namespace dimpl
+    {
+        template <typename T>
+        T& get_input_details (
+            T& net
+        ) 
+        { 
+            return net; 
+        } 
+
+        template <typename T, bool is_first, typename enabled>
+        auto get_input_details (
+            dimpl::subnet_wrapper<T,is_first,enabled>& net
+        ) -> decltype(net.layer_details())&
+        {
+            return net.layer_details();
+        }
+
+        template <typename T, bool is_first, typename enabled>
+        auto get_input_details (
+            const dimpl::subnet_wrapper<T,is_first,enabled>& net
+        ) -> decltype(net.layer_details())&
+        {
+            return net.layer_details();
+        }
+    }
+
     template <typename net_type>
     auto input_layer (
         net_type& net
-    ) -> decltype(layer<net_type::num_layers-1>(net))&
+    ) -> decltype(dimpl::get_input_details(layer<net_type::num_layers-1>(net)))&
     {
-        return layer<net_type::num_layers-1>(net);
+        // Calling input_layer() on a subnet_wrapper is a little funny since the behavior of
+        // .subnet() returns another subnet_wrapper rather than an input details object as it
+        // does in add_layer.
+        return dimpl::get_input_details(layer<net_type::num_layers-1>(net));
     }
 
 // ----------------------------------------------------------------------------------------

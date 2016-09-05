@@ -1396,6 +1396,7 @@ namespace dlib
             - returns the input later of the given network object.  Specifically, this
               function is equivalent to calling:
                 layer<net_type::num_layers-1>(net);
+              That is, you get the input layer details object for the network.
     !*/
 
 // ----------------------------------------------------------------------------------------
