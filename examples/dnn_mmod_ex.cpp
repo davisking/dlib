@@ -154,8 +154,9 @@ int main(int argc, char** argv) try
     cropper.set_chip_dims(200, 200);
     cropper.set_min_object_height(0.2);
     dlib::rand rnd;
-    // Run the trainer until the learning rate gets small
-    while(false && trainer.get_learning_rate() >= 1e-4)
+    // Run the trainer until the learning rate gets small.  This will probably take several
+    // hours.
+    while(trainer.get_learning_rate() >= 1e-4)
     {
         cropper(150, images_train, face_boxes_train, mini_batch_samples, mini_batch_labels);
         // We can also randomly jitter the colors and that often helps a detector
