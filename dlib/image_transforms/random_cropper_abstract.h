@@ -37,6 +37,26 @@ namespace dlib
                 - #get_max_rotation_degrees() == 30
                 - #get_min_object_height() == 0.25
                 - #get_max_object_height() == 0.7
+                - #get_background_crops_fraction() == 0.1
+        !*/
+
+        double get_background_crops_fraction (
+        ) const; 
+        /*!
+            ensures
+                - When making random crops, get_background_crops_fraction() fraction of
+                  them will be from random background rather than being centered on some
+                  object in the dataset.
+        !*/
+
+        void set_background_crops_fraction (
+            double value
+        );
+        /*!
+            requires
+                - 0 <= value < 1
+            ensures
+                - #get_background_crops_fraction() == value
         !*/
 
         const chip_dims& get_chip_dims(

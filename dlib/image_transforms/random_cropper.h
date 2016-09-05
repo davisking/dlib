@@ -20,7 +20,19 @@ namespace dlib
         double max_rotation_degrees = 30;
         double min_object_height = 0.25; // cropped object will be at least this fraction of the height of the image.
         double max_object_height = 0.7; // cropped object will be at most this fraction of the height of the image.
+        double background_crops_fraction = 0.1;
     public:
+
+        double get_background_crops_fraction (
+        ) const { return background_crops_fraction; }
+
+        void set_background_crops_fraction (
+            double value
+        )
+        {
+            DLIB_CASSERT(0 <= value && value < 1);
+            background_crops_fraction = value;
+        }
 
         const chip_dims& get_chip_dims(
         ) const { return dims; }
@@ -167,7 +179,7 @@ namespace dlib
         {
             std::lock_guard<std::mutex> lock(rnd_mutex);
             rectangle crop_rect;
-            if (has_non_ignored_box(rects))
+            if (has_non_ignored_box(rects) && rnd.get_random_double() >= background_crops_fraction)
             {
                 auto rect = rects[randomly_pick_rect(rects)].rect;
                 // perturb the location of the crop by a small fraction of the object's size.
