@@ -145,7 +145,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is a simple struct that is used to give training data and receive detections
-                from the Max-Margin Object Detection loss layer loss_binary_mmod_ object.
+                from the Max-Margin Object Detection loss layer loss_mmod_ object.
         !*/
 
         mmod_rect() = default; 

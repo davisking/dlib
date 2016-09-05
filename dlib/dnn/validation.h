@@ -15,7 +15,7 @@ namespace dlib
         typename image_array_type
         >
     const matrix<double,1,3> test_object_detection_function (
-        loss_binary_mmod<SUBNET>& detector,
+        loss_mmod<SUBNET>& detector,
         const image_array_type& images,
         const std::vector<std::vector<mmod_rect>>& truth_dets,
         const test_box_overlap& overlap_tester = test_box_overlap(),

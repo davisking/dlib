@@ -14,7 +14,7 @@ namespace dlib
         typename image_array_type
         >
     const matrix<double,1,3> test_object_detection_function (
-        loss_binary_mmod<SUBNET>& detector,
+        loss_mmod<SUBNET>& detector,
         const image_array_type& images,
         const std::vector<std::vector<mmod_rect>>& truth_dets,
         const test_box_overlap& overlap_tester = test_box_overlap(),
@@ -27,7 +27,7 @@ namespace dlib
               and it must contain objects which can be accepted by detector().
         ensures
             - This function is just like the test_object_detection_function() for
-              object_detector's except it runs on CNNs that use loss_binary_mmod.
+              object_detector's except it runs on CNNs that use loss_mmod.
             - Tests the given detector against the supplied object detection problem and
               returns the precision, recall, and average precision.  Note that the task is
               to predict, for each images[i], the set of object locations given by

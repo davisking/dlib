@@ -359,7 +359,7 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object contains all the parameters that control the behavior of loss_binary_mmod_.
+                This object contains all the parameters that control the behavior of loss_mmod_.
         !*/
 
     public:
@@ -419,7 +419,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_binary_mmod_ 
+    class loss_mmod_ 
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -438,21 +438,21 @@ namespace dlib
                     - image_space_to_tensor_space()
                 A reference implementation of them and their definitions can be found in
                 the input_rgb_image_pyramid object, which is the recommended input layer to
-                be used with loss_binary_mmod_.
+                be used with loss_mmod_.
         !*/
 
     public:
 
         typedef std::vector<mmod_rect> label_type;
 
-        loss_binary_mmod_(
+        loss_mmod_(
         );
         /*!
             ensures
                 - #get_options() == mmod_options()
         !*/
 
-        loss_binary_mmod_(
+        loss_mmod_(
             mmod_options options_
         );
         /*!
@@ -517,7 +517,7 @@ namespace dlib
     };
 
     template <typename SUBNET>
-    using loss_binary_mmod = add_loss_layer<loss_binary_mmod_, SUBNET>;
+    using loss_mmod = add_loss_layer<loss_mmod_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

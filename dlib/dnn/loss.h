@@ -443,7 +443,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_binary_mmod_ 
+    class loss_mmod_ 
     {
         struct intermediate_detection
         {
@@ -470,9 +470,9 @@ namespace dlib
 
         typedef std::vector<mmod_rect> label_type;
 
-        loss_binary_mmod_() {}
+        loss_mmod_() {}
 
-        loss_binary_mmod_(mmod_options options_) : options(options_) {}
+        loss_mmod_(mmod_options options_) : options(options_) {}
 
         const mmod_options& get_options (
         ) const { return options; }
@@ -671,32 +671,32 @@ namespace dlib
         }
 
 
-        friend void serialize(const loss_binary_mmod_& item, std::ostream& out)
+        friend void serialize(const loss_mmod_& item, std::ostream& out)
         {
-            serialize("loss_binary_mmod_", out);
+            serialize("loss_mmod_", out);
             serialize(item.options, out);
         }
 
-        friend void deserialize(loss_binary_mmod_& item, std::istream& in)
+        friend void deserialize(loss_mmod_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "loss_binary_mmod_")
-                throw serialization_error("Unexpected version found while deserializing dlib::loss_binary_mmod_.");
+            if (version != "loss_mmod_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_mmod_.");
             deserialize(item.options, in);
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const loss_binary_mmod_& )
+        friend std::ostream& operator<<(std::ostream& out, const loss_mmod_& )
         {
             // TODO, add options fields
-            out << "loss_binary_mmod";
+            out << "loss_mmod";
             return out;
         }
 
-        friend void to_xml(const loss_binary_mmod_& /*item*/, std::ostream& out)
+        friend void to_xml(const loss_mmod_& /*item*/, std::ostream& out)
         {
             // TODO, add options fields
-            out << "<loss_binary_mmod/>";
+            out << "<loss_mmod/>";
         }
 
     private:
@@ -857,7 +857,7 @@ namespace dlib
     };
 
     template <typename SUBNET>
-    using loss_binary_mmod = add_loss_layer<loss_binary_mmod_, SUBNET>;
+    using loss_mmod = add_loss_layer<loss_mmod_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
