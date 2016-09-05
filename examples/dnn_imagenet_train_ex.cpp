@@ -228,6 +228,9 @@ int main(int argc, char** argv) try
     // This threshold is probably excessively large.  You could likely get good results
     // with a smaller value but if you aren't in a hurry this value will surely work well.
     trainer.set_iterations_without_progress_threshold(20000);
+    // Since the progress threshold is so large might as well set the batch normalization
+    // stats window to something big too.
+    set_all_bn_running_stats_window_sizes(net, 1000);
 
     std::vector<matrix<rgb_pixel>> samples;
     std::vector<unsigned long> labels;
