@@ -230,6 +230,20 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename array_type
+        >
+    void load_image_dataset (
+        array_type& images,
+        std::vector<std::vector<mmod_rect>>& object_locations,
+        const std::string& filename
+    )
+    {
+        load_image_dataset(images, object_locations, image_dataset_file(filename));
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 

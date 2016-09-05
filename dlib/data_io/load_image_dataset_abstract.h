@@ -181,6 +181,8 @@ namespace dlib
               (i.e. it ignores box labels and therefore loads all the boxes in the dataset)
     !*/
 
+// ----------------------------------------------------------------------------------------
+
     template <
         typename array_type
         >
@@ -201,6 +203,27 @@ namespace dlib
               mmod_rects instead of rectangles.  In this case, both ignore and non-ignore
               rectangles go into object_locations since mmod_rect has an ignore boolean
               field that records the ignored/non-ignored state of each rectangle.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename array_type 
+        >
+    void load_image_dataset (
+        array_type& images,
+        std::vector<std::vector<mmod_rect> >& object_locations,
+        const std::string& filename
+    );
+    /*!
+        requires
+            - array_type == An array of images.  This is anything with an interface that
+              looks like std::vector<some generic image type> where a "generic image" is
+              anything that implements the generic image interface defined in
+              dlib/image_processing/generic_image.h.
+        ensures
+            - performs: load_image_dataset(images, object_locations, image_dataset_file(filename));
+              (i.e. it ignores box labels and therefore loads all the boxes in the dataset)
     !*/
 
 // ----------------------------------------------------------------------------------------
