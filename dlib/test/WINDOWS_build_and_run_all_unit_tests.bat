@@ -34,38 +34,6 @@ cd ..
 
 
 
-echo testing vc2013 >> test_log.txt
-rm -rf build_vc2013_64
-mkdir build_vc2013_64
-cd build_vc2013_64
-cmake -G "Visual Studio 12 2013 Win64" .. 
-cmake --build . --config Release || exit /B
-ping 127.0.0.1 -n 5 -w 1000 > null
-cmake --build . --config Debug || exit /B
-ping 127.0.0.1 -n 5 -w 1000 > null
-cd Release
-dtest --runall -d || exit /B
-cd ..
-cd ..
-
-
-
-echo testing vc2012 >> test_log.txt
-rm -rf build_vc2012_64
-mkdir build_vc2012_64
-cd build_vc2012_64
-cmake -G "Visual Studio 11 2012 Win64" .. 
-cmake --build . --config Release || exit /B
-ping 127.0.0.1 -n 5 -w 1000 > null
-cmake --build . --config Debug || exit /B
-ping 127.0.0.1 -n 5 -w 1000 > null
-cd Release
-dtest --runall -d || exit /B
-cd ..
-cd ..
-
-
-
 del null
 type test_log.txt
 
