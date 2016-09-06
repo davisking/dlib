@@ -29,3 +29,6 @@ dlib/test/build64/*
 *.svm
 dlib/test/build_python
 dlib/test/test_log.txt
+dlib/test/build_vc2015_64/*
+dlib/test/build_vc2013_64/*
+dlib/test/build_vc2012_64/*
