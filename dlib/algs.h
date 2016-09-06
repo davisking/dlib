@@ -12,6 +12,11 @@
 
 
 #ifdef _MSC_VER
+
+#if  _MSC_VER < 1900
+#error "dlib versions newer than v19.1 use C++11 and therefore require Visual Studio 2015 or newer."
+#endif
+
 // Disable the following warnings for Visual Studio
 
 // this is to disable the "'this' : used in base member initializer list"
