@@ -94,7 +94,6 @@ if (UNIX)
         message(STATUS "Found Intel MKL BLAS/LAPACK library")
     endif()
 
-
     if (NOT found_intel_mkl)
         # Search for the needed libraries from the MKL.  This time try looking for a different
         # set of MKL files and try to link against those.
@@ -115,6 +114,14 @@ if (UNIX)
         endif()
     endif()
 
+    # Get mkl_include_dir
+    if (found_intel_mkl)
+        set(mkl_include_search_path
+            /opt/intel/mkl/include
+            /opt/intel/include
+        )
+        find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
+    endif()
 
    # try to find some other LAPACK libraries if we didn't find the MKL
    set(extra_paths
