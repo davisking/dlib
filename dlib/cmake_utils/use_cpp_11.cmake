@@ -52,15 +52,16 @@ if (CMAKE_VERSION VERSION_LESS "3.1.2")
    endif()
 else()
    # Set a flag if the compiler you are using is capable of providing C++11 features.
-   if (";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_rvalue_references;" AND
-       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_variadic_templates;" AND
-       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_lambdas;" AND
-       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_defaulted_move_initializers;" AND
-       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_delegating_constructors;" AND
-       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_thread_local;" AND
-       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_constexpr;" AND
-       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_decltype_incomplete_return_types;" AND
-       ";${CMAKE_CXX_COMPILE_FEATURES};" MATCHES ";cxx_auto_type;")
+   get_property(cxx_features GLOBAL PROPERTY CMAKE_CXX_KNOWN_FEATURES)
+   if (";${cxx_features};" MATCHES ";cxx_rvalue_references;" AND
+       ";${cxx_features};" MATCHES ";cxx_variadic_templates;" AND
+       ";${cxx_features};" MATCHES ";cxx_lambdas;" AND
+       ";${cxx_features};" MATCHES ";cxx_defaulted_move_initializers;" AND
+       ";${cxx_features};" MATCHES ";cxx_delegating_constructors;" AND
+       ";${cxx_features};" MATCHES ";cxx_thread_local;" AND
+       ";${cxx_features};" MATCHES ";cxx_constexpr;" AND
+       ";${cxx_features};" MATCHES ";cxx_decltype_incomplete_return_types;" AND
+       ";${cxx_features};" MATCHES ";cxx_auto_type;")
 
       set(COMPILER_CAN_DO_CPP_11 1)
       # Set which standard to use unless someone has already set it to something
