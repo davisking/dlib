@@ -38,6 +38,11 @@ namespace dlib
                 currently selected (i.e. the one indicated by cudaGetDevice()) when
                 dnn_trainer is constructed.  It will continue to use that device even if
                 you later change it by a call to cudaSetDevice().
+
+            EXCEPTIONS
+                If an exception is thrown by any part of the neural network during training
+                then the exception will be propagated out of the trainer to the user.
+                Moreover, the trainer instance will be unusable and should be destroyed.
         !*/
 
     public:
