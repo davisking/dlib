@@ -50,7 +50,8 @@ if (CMAKE_VERSION VERSION_LESS "3.1.2")
          message(STATUS "*** Your compiler failed to build a C++11 project, so dlib won't use C++11 features.***")
       endif()
    endif()
-else()
+elseif(NOT MSVC14)  # Visual Studio 14 reports that it supports C++11 but it really doesn't :(
+
    # Set a flag if the compiler you are using is capable of providing C++11 features.
    get_property(cxx_features GLOBAL PROPERTY CMAKE_CXX_KNOWN_FEATURES)
    if (";${cxx_features};" MATCHES ";cxx_rvalue_references;" AND
