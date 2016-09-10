@@ -567,15 +567,21 @@ namespace dlib
             }
 
 
-            matrix<rgb_pixel> img;
-            create_tiled_pyramid<pyramid_type>(*ibegin, img, data.annotation().get<std::vector<rectangle>>());
-            nr = img.nr();
-            nc = img.nc();
-            data.set_size(std::distance(ibegin,iend), 3, nr, nc);
+            std::vector<matrix<rgb_pixel>> imgs(std::distance(ibegin,iend));
+            parallel_for(0, imgs.size(), [&](long i){
+                std::vector<rectangle> rects;
+                if (i == 0)
+                    create_tiled_pyramid<pyramid_type>(ibegin[i], imgs[i], data.annotation().get<std::vector<rectangle>>());
+                else
+                    create_tiled_pyramid<pyramid_type>(ibegin[i], imgs[i], rects);
+            });
+            nr = imgs[0].nr();
+            nc = imgs[0].nc();
+            data.set_size(imgs.size(), 3, nr, nc);
 
             const size_t offset = nr*nc;
             auto ptr = data.host();
-            while(true)
+            for (auto&& img : imgs)
             {
                 for (long r = 0; r < nr; ++r)
                 {
@@ -592,11 +598,6 @@ namespace dlib
                     }
                 }
                 ptr += offset*(data.k()-1);
-
-                ++ibegin;
-                if (ibegin == iend)
-                    break;
-                create_tiled_pyramid<pyramid_type>(*ibegin, img, data.annotation().get<std::vector<rectangle>>());
             }
         }
 
