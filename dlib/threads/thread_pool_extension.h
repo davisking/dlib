@@ -505,7 +505,21 @@ namespace dlib
         ~thread_pool (
         )
         {
-            impl->shutdown_pool();
+            try
+            {
+                impl->shutdown_pool();
+            }
+            catch (std::exception& e)
+            {
+                std::cerr << "An unhandled exception was inside a dlib::thread_pool when it was destructed." << std::endl;
+                std::cerr << "It's what string is: \n" << e.what() << std::endl;
+                throw;
+            }
+            catch (...)
+            {
+                std::cerr << "An unhandled exception was inside a dlib::thread_pool when it was destructed." << std::endl;
+                throw;
+            }
         }
 
         void wait_for_task (
