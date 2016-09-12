@@ -7,7 +7,7 @@ find_path(cudnn_include cudnn.h
     PATHS /usr/local ENV CPATH
     PATH_SUFFIXES include
     )
-get_filename_component(cudnn_hint_path ${CUDA_CUBLAS_LIBRARIES} PATH)
+get_filename_component(cudnn_hint_path "${CUDA_CUBLAS_LIBRARIES}" PATH)
 find_library(cudnn cudnn
     HINTS ${cudnn_hint_path} ENV CUDNN_LIBRARY_DIR  ENV CUDNN_HOME 
     PATHS /usr/local /usr/local/cuda ENV LD_LIBRARY_PATH
