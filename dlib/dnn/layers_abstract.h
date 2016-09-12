@@ -539,6 +539,62 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier() == val
         !*/
 
+        alias_tensor_const_instance get_weights(
+        ) const;
+        /*!
+            ensures
+                - returns an alias of get_layer_params(), containing the weights matrix of
+                  the fully connected layer.
+                - #get_weights().num_samples() is the number of elements in input sample,
+                  i.e. sublayer's output's k * nc * nr.
+                - #get_bias().k() == #get_num_outputs()
+                - if get_bias_mode() == FC_HAS_BIAS:
+                    - #get_layer_params().size() == (#get_weights().size() + #get_biases().size())
+                - else:
+                    - #get_layer_params().size() == #get_weights().size()
+        !*/
+
+        alias_tensor_instance get_weights(
+        );
+        /*!
+            ensures
+                - returns an alias of get_layer_params(), containing the weights matrix of
+                  the fully connected layer.
+                - #get_weights().num_samples() is the number of elements in input sample,
+                  i.e. sublayer's output's k * nc * nr.
+                - #get_bias().k() == #get_num_outputs()
+                - if get_bias_mode() == FC_HAS_BIAS:
+                    - #get_layer_params().size() == (#get_weights().size() + #get_biases().size())
+                - else:
+                    - #get_layer_params().size() == #get_weights().size()
+        !*/
+
+        alias_tensor_const_instance get_biases(
+        ) const;
+        /*!
+            requires
+                - #get_bias_mode() == FC_HAS_BIAS
+            ensures
+                - returns an alias of get_layer_params(), containing the bias vector of
+                  the fully connected layer.
+                - #get_bias().num_samples() == 1
+                - #get_bias().k() == #get_num_outputs()
+                - #get_layer_params().size() == (#get_weights().size() + #get_biases().size())
+        !*/
+
+        alias_tensor_instance get_biases(
+        );
+        /*!
+            requires
+                - #get_bias_mode() == FC_HAS_BIAS
+            ensures
+                - returns an alias of get_layer_params(), containing the bias vector of
+                  the fully connected layer.
+                - #get_bias().num_samples() == 1
+                - #get_bias().k() == #get_num_outputs()
+                - #get_layer_params().size() == (#get_weights().size() + #get_biases().size())
+        !*/
+
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);

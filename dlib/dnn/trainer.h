@@ -20,6 +20,8 @@
 #include <cstdio>
 #include <set>
 #include <future>
+#include <exception>
+#include <mutex>
 
 namespace dlib
 {
@@ -132,6 +134,7 @@ namespace dlib
         ) const 
         { 
             wait_for_thread_to_pause();
+            propagate_exception();
             return net; 
         }
 
@@ -175,6 +178,7 @@ namespace dlib
         ) const 
         { 
             wait_for_thread_to_pause();
+            propagate_exception();
             return devices[0]->solvers; 
         }
 
@@ -689,10 +693,12 @@ namespace dlib
                 }
             }
         }
-        catch(std::exception& e)
+        catch(...)
         {
-            std::cerr << e.what() << std::endl;
-            throw;
+            // If an exception happens then permanently disable the trainer object.
+            job_pipe.disable();
+            std::lock_guard<std::mutex> lock(eptr_mutex);
+            eptr = std::current_exception();
         }
 
         void wait_for_thread_to_pause() const
@@ -873,6 +879,7 @@ namespace dlib
             label_iterator lbegin
         )
         {
+            propagate_exception();
             size_t num = std::distance(dbegin, dend);
             size_t devs = devices.size();
             job.t.resize(devs);
@@ -960,6 +967,14 @@ namespace dlib
         long lr_schedule_pos;
         unsigned long gradient_check_budget;
 
+        std::exception_ptr eptr;
+        mutable std::mutex eptr_mutex;
+        void propagate_exception() const
+        {
+            std::lock_guard<std::mutex> lock(eptr_mutex);
+            if (eptr)
+                std::rethrow_exception(eptr);
+        }
 
     };
 

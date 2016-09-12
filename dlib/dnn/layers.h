@@ -1086,6 +1086,30 @@ namespace dlib
             tt::gemm(1,sub.get_gradient_input(), 1,gradient_input,false, w,true);
         }
 
+        alias_tensor_instance get_weights()
+        {
+            return weights(params, 0);
+        }
+
+        alias_tensor_const_instance get_weights() const
+        {
+            return weights(params, 0);
+        }
+
+        alias_tensor_instance get_biases()
+        {
+            static_assert(bias_mode == FC_HAS_BIAS, "This fc_ layer doesn't have a bias vector "
+                "to be retrieved, as per template parameter 'bias_mode'.");
+            return biases(params, weights.size());
+        }
+
+        alias_tensor_const_instance get_biases() const
+        {
+            static_assert(bias_mode == FC_HAS_BIAS, "This fc_ layer doesn't have a bias vector "
+                "to be retrieved, as per template parameter 'bias_mode'.");
+            return biases(params, weights.size());
+        }
+
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
