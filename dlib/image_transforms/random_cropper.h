@@ -237,8 +237,8 @@ namespace dlib
         )
         {
             // figure out what rectangle we want to crop from the image
-            double mins = 0.466666666, maxs = 0.875;
-            auto scale = mins + rnd.get_random_double()*(maxs-mins);
+            double mins = 0.1, maxs = 0.95;
+            auto scale = rnd.get_double_in_range(mins, maxs);
             auto size = scale*std::min(img.nr(), img.nc());
             rectangle rect(size, size);
             // randomly shift the box around
