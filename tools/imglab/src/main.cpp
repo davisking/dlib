@@ -752,6 +752,7 @@ int main(int argc, char** argv)
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
                           "is defined by <arg> which should be a space separated list of parts.",1);
+        parser.add_option("rmempty","Remove all images that don't contain non-ignored annotations and save the results to a new XML file.");
         parser.add_option("rmdupes","Remove duplicate images from the dataset.  This is done by comparing "
                                     "the md5 hash of each image file and removing duplicate images. " );
         parser.add_option("rmdiff","Set the ignored flag to true for boxes marked as difficult.");
@@ -782,7 +783,7 @@ int main(int argc, char** argv)
         parser.parse(argc, argv);
 
         const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
-                                 "flip", "rotate", "tile", "size", "cluster", "resample", "extract-chips", "min-object-size"};
+                                 "flip", "rotate", "tile", "size", "cluster", "resample", "extract-chips", "min-object-size", "rmempty"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
@@ -793,6 +794,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "l");
         parser.check_incompatible_options("c", "files");
         parser.check_incompatible_options("c", "rmdiff");
+        parser.check_incompatible_options("c", "rmempty");
         parser.check_incompatible_options("c", "rmdupes");
         parser.check_incompatible_options("c", "rmtrunc");
         parser.check_incompatible_options("c", "add");
@@ -845,6 +847,8 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("convert", "extract-chips");
         parser.check_incompatible_options("rmdiff", "rename");
         parser.check_incompatible_options("rmdiff", "ignore");
+        parser.check_incompatible_options("rmempty", "ignore");
+        parser.check_incompatible_options("rmempty", "rename");
         parser.check_incompatible_options("rmdupes", "rename");
         parser.check_incompatible_options("rmdupes", "ignore");
         parser.check_incompatible_options("rmtrunc", "rename");
@@ -950,6 +954,34 @@ int main(int argc, char** argv)
                 }
             }
             save_image_dataset_metadata(data, parser[0]);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rmempty"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rmempty option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data, data2;
+            load_image_dataset_metadata(data, parser[0]);
+
+            data2 = data;
+            data2.images.clear();
+            for (unsigned long i = 0; i < data.images.size(); ++i)
+            {
+                bool has_label = false;
+                for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+                {
+                    if (!data.images[i].boxes[j].ignore)
+                        has_label = true;
+                }
+                if (has_label)
+                    data2.images.push_back(data.images[i]);
+            }
+            save_image_dataset_metadata(data2, parser[0] + ".rmempty.xml");
             return EXIT_SUCCESS;
         }
 
