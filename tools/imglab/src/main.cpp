@@ -1151,6 +1151,7 @@ int main(int argc, char** argv)
                 }
             }
             editor.wait_until_closed();
+            return EXIT_SUCCESS;
         }
 
         cout << "Invalid command, give -h to see options." << endl;
