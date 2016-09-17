@@ -602,17 +602,13 @@ int resample_dataset(const command_line_parser& parser)
         for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
         {
             const rectangle rect = data.images[i].boxes[j].rect;
-            if (data.images[i].boxes[j].ignore || !get_rect(img).contains(rect) || rect.area() < min_object_size)
+            if (data.images[i].boxes[j].ignore || rect.area() < min_object_size)
                 continue;
 
             const auto max_dim = std::max(rect.width(), rect.height());
 
             const double rand_scale_perturb = 1 - 0.3*(rnd.get_random_double()-0.5);
             const rectangle crop_rect = centered_rect(rect, max_dim*margin_scale*rand_scale_perturb, max_dim*margin_scale*rand_scale_perturb);
-
-            // skip crops that have a lot of border pixels
-            if (get_rect(img).intersect(crop_rect).area() < crop_rect.area()*0.8)
-                continue;
 
             const rectangle_transform tform = get_mapping_to_chip(chip_details(crop_rect, cdims));
             extract_image_chip(img, chip_details(crop_rect, cdims), chip);
