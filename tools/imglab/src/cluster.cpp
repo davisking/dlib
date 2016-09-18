@@ -179,10 +179,10 @@ int cluster_dataset(
         unsigned long idx = 0;
         for (unsigned long i = 0; i < data.images.size(); ++i)
         {
-            if (data.images[i].boxes.size() == 0)
-                continue;
             idata[i].first = std::numeric_limits<double>::infinity();
             idata[i].second.filename = data.images[i].filename;
+            if (data.images[i].boxes.size() == 0)
+                continue;
             for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
             {
                 idata[i].second.boxes.push_back(data.images[i].boxes[j]);
