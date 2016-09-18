@@ -570,19 +570,23 @@ int resample_dataset(const command_line_parser& parser)
         return EXIT_FAILURE;
     }
 
-    const size_t base_obj_size = get_option(parser,"resample",100*100); 
-    const double margin_scale = 2.5; // cropped image will be this times wider than the object.
+    const size_t obj_size = get_option(parser,"cropped-object-size",100*100); 
+    const double margin_scale =  get_option(parser,"crop-size",2.5); // cropped image will be this times wider than the object.
     const long min_object_size = get_option(parser,"min-object-size",1);
 
     dlib::image_dataset_metadata::dataset data, resampled_data;
-    resampled_data.comment = data.comment;
+    std::ostringstream sout;
+    sout << "\nThe --resample parameters which generated this dataset were:" << endl;
+    sout << "   cropped-object-size: "<< obj_size << endl;
+    sout << "   crop-size: "<< margin_scale << endl;
+    sout << "   min-object-size: "<< min_object_size << endl;
+    resampled_data.comment = data.comment + sout.str();
     resampled_data.name = data.name + " RESAMPLED";
 
     load_image_dataset_metadata(data, parser[0]);
     locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
     dlib::rand rnd;
 
-    const size_t obj_size = base_obj_size;
     const size_t image_size = std::round(std::sqrt(obj_size*margin_scale*margin_scale));
     const chip_dims cdims(image_size, image_size);
 
@@ -769,22 +773,30 @@ int main(int argc, char** argv)
                                   "The output is saved to an XML file prefixed with rotated_<arg>.",1);
         parser.add_option("cluster", "Cluster all the objects in an XML file into <arg> different clusters and save "
                                      "the results as cluster_###.xml and cluster_###.jpg files.",1);
-        parser.add_option("resample", "Crop out images that are centered on each object in the dataset.  Make the "
-                                      "crops so that the objects have <arg> pixels in them.  The output is a new XML dataset.",1); 
+        parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
+
+        parser.set_group_name("Cropping sub images");
+        parser.add_option("resample", "Crop out images that are centered on each object in the dataset. "
+                                      "The output is a new XML dataset."); 
+        parser.add_option("cropped-object-size", "When doing --resample, make the cropped objects contain about <arg> pixels (default 10000).",1);
         parser.add_option("min-object-size", "When doing --resample, skip objects that have fewer than <arg> pixels in them (default 1).",1);
+        parser.add_option("crop-size", "When doing --resample, the entire cropped image will be <arg> times wider than the object (default 2.5).",1); 
         parser.add_option("extract-chips", "Crops out images with tight bounding boxes around each object.  Also crops out "
                                            "many background chips.  All these image chips are serialized into one big data file.  The chips will contain <arg> pixels each.",1);
-        parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
+
+
 
         parser.parse(argc, argv);
 
         const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
-                                 "flip", "rotate", "tile", "size", "cluster", "resample", "extract-chips", "min-object-size", "rmempty"};
+                                 "flip", "rotate", "tile", "size", "cluster", "resample", "extract-chips", "min-object-size", "rmempty",
+                                 "crop-size", "cropped-object-size"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
         parser.check_sub_option("shuffle", "seed");
-        parser.check_sub_option("resample", "min-object-size");
+        const char* resample_sub_ops[] = {"min-object-size", "crop-size", "cropped-object-size"};
+        parser.check_sub_options("resample", resample_sub_ops);
         const char* size_parent_ops[] = {"tile", "cluster"};
         parser.check_sub_options(size_parent_ops, "size");
         parser.check_incompatible_options("c", "l");
@@ -854,9 +866,10 @@ int main(int argc, char** argv)
         parser.check_option_arg_range("cluster", 2, 999);
         parser.check_option_arg_range("rotate", -360, 360);
         parser.check_option_arg_range("size", 10*10, 1000*1000);
-        parser.check_option_arg_range("resample", 4, 1000*1000);
         parser.check_option_arg_range("extract-chips", 4, 1000*1000);
         parser.check_option_arg_range("min-object-size", 1, 10000*10000);
+        parser.check_option_arg_range("cropped-object-size", 4, 10000*10000);
+        parser.check_option_arg_range("crop-size", 1.0, 100.0);
 
         if (parser.option("h"))
         {
