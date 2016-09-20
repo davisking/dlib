@@ -10,6 +10,7 @@ project(dlib)
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
 include(cmake_utils/use_cpp_11.cmake)
+include(cmake_utils/set_optimizations.cmake)
 
 
 set(CPACK_PACKAGE_VERSION_MAJOR "19")
