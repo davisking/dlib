@@ -42,8 +42,8 @@ namespace dlib
             const long max_level = get_num_scale_levels()/2;
             for (unsigned long k = 0; k < get_num_scale_levels(); ++k)
             {
-                double dist = std::abs((double)k-max_level)/max_level*pi/2;
-                dist = std::min(dist, pi/2);
+                double dist = std::abs((double)k-max_level)/max_level*constants::pi/2;
+                dist = std::min(dist, constants::pi/2);
                 scale_cos_mask[k] = std::cos(dist);
             }
         }
@@ -363,8 +363,8 @@ namespace dlib
                 for (long c = 0; c < temp.nc(); ++c)
                 {
                     point delta = point(c,r)-cent;
-                    double dist = length(delta)/(size/2.0)*(pi/2);
-                    dist = std::min(dist*1.0, pi/2);
+                    double dist = length(delta)/(size/2.0)*(constants::pi/2);
+                    dist = std::min(dist*1.0, constants::pi/2);
 
                     temp(r,c) = std::cos(dist);
                 }

@@ -1060,6 +1060,7 @@ namespace dlib
             array2d<unsigned char> temp(w,w);
             for (unsigned long i = 0; i < bars.size(); ++i)
             {
+                using namespace dlib::constants;
                 assign_all_pixels(temp, 0);
                 draw_line(temp, point(w/2,0), point(w/2,w-1), 255);
                 rotate_image(temp, bars[i], i*-pi/bars.size());

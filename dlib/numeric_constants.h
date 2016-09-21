@@ -5,6 +5,8 @@
 
 namespace dlib 
 {
+namespace constants
+{
 
     // pi -- Pi
     const double pi = 3.1415926535897932385;
@@ -47,6 +49,7 @@ namespace dlib
 
     // apery -- Apery's constant
     const double apery = 1.2020569031595942854;
+}
 }
 
 #endif //DLIB_NUMERIC_CONSTANTs_H_

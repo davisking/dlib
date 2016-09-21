@@ -311,7 +311,7 @@ namespace dlib
                             double grad_y = (long)top-(long)bottom;
 
                             // obtain the angle of the gradient.  Make sure it is scaled between 0 and 1.
-                            double angle = std::max(0.0, std::atan2(grad_y, grad_x)/pi + 1)/2;
+                            double angle = std::max(0.0, std::atan2(grad_y, grad_x)/constants::pi + 1)/2;
 
 
                             if (gradient_type == hog_unsigned_gradient)

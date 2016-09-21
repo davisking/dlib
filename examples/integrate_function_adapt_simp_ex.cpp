@@ -20,6 +20,7 @@
 
 using namespace std;
 using namespace dlib;
+using namespace dlib::constants;
 
 // Here we the set of functions that we wish to integrate and comment in the domain of
 // integration.

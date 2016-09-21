@@ -12,6 +12,7 @@
 
 using namespace std;
 using namespace dlib;
+using namespace dlib::constants;
 
 // Here we define the sinc function so that we may generate sample data. We compute the mean,
 // variance, skewness, and excess kurtosis of this sample data.

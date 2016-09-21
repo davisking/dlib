@@ -911,7 +911,7 @@ namespace dlib
             set_rowm(proj,2) = trans(Z);
 
             width = num_pixels/2.0;
-            dist_scale = width/std::tan(pi/180*camera_field_of_view/2);
+            dist_scale = width/std::tan(constants::pi/180*camera_field_of_view/2);
         }
 
         vector<double> get_camera_pos()         const { return camera_pos; }
