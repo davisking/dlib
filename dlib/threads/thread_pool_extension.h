@@ -513,12 +513,16 @@ namespace dlib
             {
                 std::cerr << "An unhandled exception was inside a dlib::thread_pool when it was destructed." << std::endl;
                 std::cerr << "It's what string is: \n" << e.what() << std::endl;
-                throw;
+                using namespace std;
+                assert(false);
+                abort();
             }
             catch (...)
             {
                 std::cerr << "An unhandled exception was inside a dlib::thread_pool when it was destructed." << std::endl;
-                throw;
+                using namespace std;
+                assert(false);
+                abort();
             }
         }
 
