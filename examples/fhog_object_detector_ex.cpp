@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 
         // Now we do a little bit of pre-processing.  This is optional but for
         // this training data it improves the results.  The first thing we do is
-        // increase the size of the images by a factor of two.  We do this
+        // decrease the size of the images by a factor of two.  We do this
         // because it will allow us to detect smaller faces than otherwise would
         // be practical (since the faces are all now twice as big).  Note that,
         // in addition to resizing the images, these functions also make the
