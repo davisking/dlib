@@ -93,6 +93,18 @@ namespace dlib
                   understand what you are doing.)
         !*/
 
+        void set_state ( 
+            const matrix<double,states,1>& xb
+        ); 
+        /*!
+            ensures
+                - #get_predicted_next_state() == xb
+                - If update() is never called with a measurement
+                  #get_current_state() == get_predicted_next_state()
+            (Can be used when the initial state is known, or if the state needs to be corrected
+            before the next update())
+        !*/
+
         const matrix<double,measurements,states>& get_observation_model (
         ) const;
         /*!
