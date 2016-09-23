@@ -8,7 +8,7 @@
 # attempts to find some other BLAS and LAPACK libraries if you don't have 
 # the Intel MKL.
 #
-# Set MKL_PATH to override MKL search path if it is not installed in the 
+# Set MKL_PATH environment variable to override MKL search path if it is not installed in the 
 # usual directories.
 #
 #  blas_found        - True if BLAS is available
@@ -22,7 +22,7 @@ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 SET(blas_found 0)
 SET(lapack_found 0)
 
-option(MKL_PATH "MKL Path to override searching for MKL" "")
+set( mkl_search_path $ENV{MKL_PATH})
 
 if (UNIX)
     message(STATUS "Searching for BLAS and LAPACK")
@@ -62,9 +62,7 @@ if (UNIX)
     check_type_size( "void*" SIZE_OF_VOID_PTR)
 
     if (SIZE_OF_VOID_PTR EQUAL 8)
-        if (MKL_PATH)
-            set( mkl_search_path ${MKL_PATH})
-        else()
+        if (NOT mkl_search_path)
             set( mkl_search_path
                 /opt/intel/mkl/*/lib/em64t
                 /opt/intel/mkl/lib/intel64
@@ -74,9 +72,7 @@ if (UNIX)
         find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
         mark_as_advanced(mkl_intel)
     else()
-        if (MKL_PATH)
-            set( mkl_search_path ${MKL_PATH})
-        else()
+        if (NOT mkl_search_path)
             set( mkl_search_path
                 /opt/intel/mkl/*/lib/32
                 /opt/intel/mkl/lib/ia32
@@ -260,9 +256,7 @@ elseif(WIN32 AND NOT MINGW)
     include(CheckTypeSize)
     check_type_size( "void*" SIZE_OF_VOID_PTR)
     if (SIZE_OF_VOID_PTR EQUAL 8)
-        if (MKL_PATH)
-            set( mkl_search_path ${MKL_PATH})
-        else()
+        if (NOT mkl_search_path)
             set( mkl_search_path
                 "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/intel64" 
                 "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64" 
@@ -276,9 +270,7 @@ elseif(WIN32 AND NOT MINGW)
         endif()
         find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
     else()
-        if (MKL_PATH)
-            set( mkl_search_path ${MKL_PATH})
-        else()
+        if (NOT mkl_search_path)
             set( mkl_search_path
                 "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/ia32" 
                 "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/ia32"
