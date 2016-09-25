@@ -140,7 +140,7 @@ sudo apt-get install libx11-dev
         <p>
            Again, note that dlib will only be able to work with jpeg and png files if you link
            in libjpeg and libpng.  In Visual Studio, the easiest way to do this is to add all the
-           source files in the dlib/external folder into your project and also define the
+           libjpeg, libpng, and zlib source files in the dlib/external folder into your project and also define the
            DLIB_PNG_SUPPORT and DLIB_JPEG_SUPPORT preprocessor directives.  If you don't know
            how to configure Visual Studio then you should use CMake as shown above since it will
            take care of everything automatically.
