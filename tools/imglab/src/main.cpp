@@ -557,7 +557,7 @@ int resample_dataset(const command_line_parser& parser)
 
     const size_t obj_size = get_option(parser,"cropped-object-size",100*100); 
     const double margin_scale =  get_option(parser,"crop-size",2.5); // cropped image will be this times wider than the object.
-    const long min_object_size = get_option(parser,"min-object-size",1);
+    const unsigned long min_object_size = get_option(parser,"min-object-size",1);
 
     dlib::image_dataset_metadata::dataset data, resampled_data;
     std::ostringstream sout;
