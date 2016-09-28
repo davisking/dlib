@@ -6,6 +6,8 @@
 
 #ifdef WIN32
 
+#include <winsock2.h>
+
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_   /* Prevent inclusion of winsock.h in windows.h */
 #endif
@@ -15,7 +17,6 @@
 #include "sockets_kernel_1.h"
 
 #include <windows.h>
-#include <winsock2.h>
 
 #ifndef NI_MAXHOST
 #define NI_MAXHOST 1025
