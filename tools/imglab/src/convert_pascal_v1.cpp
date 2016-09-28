@@ -148,10 +148,9 @@ void convert_pascal_v1(
     dlib::image_dataset_metadata::image img;
 
     const std::string filename = parser.option("c").argument();
-    // make sure the file exists so we can use the get_parent_directory() command to
-    // figure out it's parent directory.
+    // make sure the file exists so we could use it as a working directory
     make_empty_file(filename);
-    const std::string parent_dir = get_parent_directory(file(filename)).full_name();
+    const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(filename)).full_name());
 
     for (unsigned long i = 0; i < parser.number_of_arguments(); ++i)
     {
@@ -160,7 +159,7 @@ void convert_pascal_v1(
             parse_annotation_file(parser[i], img, name);
 
             dataset.name = name;
-            img.filename = strip_path(figure_out_full_path_to_image(parser[i], img.filename), parent_dir);
+            img.filename = strip_path(figure_out_full_path_to_image(parser[i], img.filename), working_dir);
             dataset.images.push_back(img);
 
         }

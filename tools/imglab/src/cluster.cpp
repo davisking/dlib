@@ -140,7 +140,9 @@ int cluster_dataset(
     image_dataset_metadata::dataset data;
 
     image_dataset_metadata::load_image_dataset_metadata(data, parser[0]);
-    set_current_dir(get_parent_directory(file(parser[0])));
+    
+    const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(parser[0])).full_name());
+    set_current_dir(working_dir);
 
     const double aspect_ratio = mean_aspect_ratio(data);
 
