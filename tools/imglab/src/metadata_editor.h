@@ -12,6 +12,7 @@ class metadata_editor : public dlib::drawable_window
 {
 public:
     metadata_editor(
+        const std::string& working_dir,
         const std::string& filename_
     );
 

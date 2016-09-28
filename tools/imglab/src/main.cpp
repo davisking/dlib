@@ -39,7 +39,7 @@ void create_new_dataset (
     // make sure the file exists so we can use the get_parent_directory() command to
     // figure out it's parent directory.
     make_empty_file(filename);
-    const std::string parent_dir = get_parent_directory(file(filename));
+    const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(filename)).full_name());
 
     unsigned long depth = 0;
     if (parser.option("r"))
@@ -52,7 +52,7 @@ void create_new_dataset (
     {
         try
         {
-            const string temp = strip_path(file(parser[i]), parent_dir);
+            const string temp = strip_path(file(parser[i]), working_dir);
             meta.images.push_back(image(temp));
         }
         catch (dlib::file::file_not_found&)
@@ -66,7 +66,7 @@ void create_new_dataset (
 
             for (unsigned long j = 0; j < files.size(); ++j)
             {
-                meta.images.push_back(image(strip_path(files[j], parent_dir)));
+                meta.images.push_back(image(strip_path(files[j], working_dir)));
             }
         }
     }
@@ -283,10 +283,8 @@ void flip_dataset(const command_line_parser& parser)
     const string datasource = parser.option("flip").argument();
     load_image_dataset_metadata(metadata,datasource);
 
-    // Set the current directory to be the one that contains the
-    // metadata file. We do this because the file might contain
-    // file paths which are relative to this folder.
-    set_current_dir(get_parent_directory(file(datasource)));
+    const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(datasource)).full_name());
+    set_current_dir(working_dir);
 
     const string metadata_filename = get_parent_directory(file(datasource)).full_name() +
         directory::get_separator() + "flipped_" + file(datasource).name();
@@ -330,10 +328,8 @@ void rotate_dataset(const command_line_parser& parser)
 
     double angle = get_option(parser, "rotate", 0);
 
-    // Set the current directory to be the one that contains the
-    // metadata file. We do this because the file might contain
-    // file paths which are relative to this folder.
-    set_current_dir(get_parent_directory(file(datasource)));
+    const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(datasource)).full_name());
+    set_current_dir(working_dir);
 
     const string file_prefix = "rotated_"+ cast_to_string(angle) + "_";
     const string metadata_filename = get_parent_directory(file(datasource)).full_name() +
@@ -413,7 +409,8 @@ int extract_chips (const command_line_parser& parser)
     const double dobj_nc = obj_size/dobj_nr;
     const chip_dims cdims(std::round(dobj_nr), std::round(dobj_nc));
     
-    locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
+    const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(parser[0])).full_name());
+    locally_change_current_dir chdir(working_dir);
 
     cout << "Writing image chips to image_chips.dat.  It is a file containing serialized images" << endl;
     cout << "Written like this: " << endl;
@@ -569,7 +566,9 @@ int resample_dataset(const command_line_parser& parser)
     resampled_data.name = data.name + " RESAMPLED";
 
     load_image_dataset_metadata(data, parser[0]);
-    locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
+    const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(parser[0])).full_name());
+    locally_change_current_dir chdir(working_dir);
+
     dlib::rand rnd;
 
     const size_t image_size = std::round(std::sqrt(obj_size*margin_scale*margin_scale));
@@ -665,7 +664,9 @@ int tile_dataset(const command_line_parser& parser)
 
     dlib::image_dataset_metadata::dataset data;
     load_image_dataset_metadata(data, parser[0]);
-    locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
+    const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(parser[0])).full_name());
+    locally_change_current_dir chdir(working_dir);
+
     dlib::array<array2d<rgb_pixel> > images;
     console_progress_indicator pbar(data.images.size());
     for (unsigned long i = 0; i < data.images.size(); ++i)
@@ -759,6 +760,8 @@ int main(int argc, char** argv)
         parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
         parser.add_option("rmlabel","Remove all boxes labeled <arg> and save the results to a new XML file.",1);
         parser.add_option("rm-if-overlaps","Remove all boxes labeled <arg> if they overlap any box not labeled <arg> and save the results to a new XML file.",1);
+        parser.add_option("working-dir", "Set working directory to <arg1>. All images paths are relative to working directory. "
+                                          "Unless specififed, working directory is always set to the target's file parent directory. ",1);
 
         parser.set_group_name("Cropping sub images");
         parser.add_option("resample", "Crop out images that are centered on each object in the dataset. "
@@ -775,7 +778,7 @@ int main(int argc, char** argv)
 
         const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
                                  "flip", "rotate", "tile", "size", "cluster", "resample", "extract-chips", "min-object-size", "rmempty",
-                                 "crop-size", "cropped-object-size", "rmlabel", "rm-if-overlaps"};
+                                 "crop-size", "cropped-object-size", "rmlabel", "rm-if-overlaps", "working-dir"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
@@ -1098,7 +1101,8 @@ int main(int argc, char** argv)
             dlib::image_dataset_metadata::dataset data;
             load_image_dataset_metadata(data, parser[0]);
             {
-                locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
+                const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(parser[0])).full_name());
+                locally_change_current_dir chdir(working_dir);
                 for (unsigned long i = 0; i < data.images.size(); ++i)
                 {
                     array2d<unsigned char> img;
@@ -1219,7 +1223,8 @@ int main(int argc, char** argv)
 
         if (parser.number_of_arguments() == 1)
         {
-            metadata_editor editor(parser[0]);
+            const string working_dir = get_option(parser, "working-dir", get_parent_directory(file(parser[0])).full_name());
+            metadata_editor editor(working_dir, parser[0]);
             if (parser.option("parts"))
             {
                 std::vector<string> parts = split(parser.option("parts").argument());

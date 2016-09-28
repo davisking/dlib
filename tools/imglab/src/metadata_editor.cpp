@@ -42,6 +42,7 @@ rgb_alpha_pixel string_to_color(
 
 metadata_editor::
 metadata_editor(
+    const std::string& working_dir,
     const std::string& filename_
 ) : 
     mbar(*this),
@@ -55,10 +56,8 @@ metadata_editor(
 {
     file metadata_file(filename_);
     filename = metadata_file.full_name();
-    // Make our current directory be the one that contains the metadata file.  We 
-    // do this because that file might contain relative paths to the image files
-    // we are supposed to be loading.
-    set_current_dir(get_parent_directory(metadata_file).full_name());
+    // Set current directory to working_dir, so that we can get images by their relative path
+    set_current_dir(working_dir);
 
     load_image_dataset_metadata(metadata, filename);
 
