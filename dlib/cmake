@@ -23,6 +23,11 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     add_global_compiler_switch(-Wreturn-type)
 endif()
 
+if ("Clang" MATCHES ${CMAKE_CXX_COMPILER_ID})
+    # Increase clang's default tempalte recurision depth so the dnn examples don't error out.
+    add_definitions(-ftemplate-depth=500)
+endif()
+
 
 set(gcc_like_compilers GNU Clang  Intel)
 set(intel_archs x86_64 i386 i686)
