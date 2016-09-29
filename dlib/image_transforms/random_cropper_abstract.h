@@ -37,7 +37,7 @@ namespace dlib
                 - #get_max_rotation_degrees() == 30
                 - #get_min_object_height() == 0.25
                 - #get_max_object_height() == 0.7
-                - #get_background_crops_fraction() == 0.1
+                - #get_background_crops_fraction() == 0.5
         !*/
 
         void set_seed (

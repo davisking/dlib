@@ -20,7 +20,7 @@ namespace dlib
         double max_rotation_degrees = 30;
         double min_object_height = 0.25; // cropped object will be at least this fraction of the height of the image.
         double max_object_height = 0.7; // cropped object will be at most this fraction of the height of the image.
-        double background_crops_fraction = 0.1;
+        double background_crops_fraction = 0.5;
 
         std::mutex rnd_mutex;
         dlib::rand rnd;
