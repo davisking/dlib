@@ -13,6 +13,7 @@
 #include "tensor_tools.h"
 #include "../vectorstream.h"
 #include "utilities.h"
+#include <sstream>
 
 
 namespace dlib
@@ -221,7 +222,14 @@ namespace dlib
                 deserialize(item.bias_weight_decay_multiplier, in);
                 if (item.padding_y_ != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::con_");
                 if (item.padding_x_ != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::con_");
-                if (num_filters != _num_filters) throw serialization_error("Wrong num_filters found while deserializing dlib::con_");
+                if (num_filters != _num_filters) 
+                {
+                    std::ostringstream sout;
+                    sout << "Wrong num_filters found while deserializing dlib::con_" << std::endl;
+                    sout << "expected " << _num_filters << " but found " << num_filters << std::endl;
+                    throw serialization_error(sout.str());
+                }
+
                 if (nr != _nr) throw serialization_error("Wrong nr found while deserializing dlib::con_");
                 if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::con_");
                 if (stride_y != _stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::con_");
