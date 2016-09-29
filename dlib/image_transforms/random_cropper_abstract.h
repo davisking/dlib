@@ -174,6 +174,11 @@ namespace dlib
         /*!
             requires
                 - images.size() == rects.size()
+                - for all valid i:
+                    - images[i].size() != 0
+                - array_type is a type with an interface compatible with dlib::array or
+                  std::vector and it must in turn contain image objects that implement the
+                  interface defined in dlib/image_processing/generic_image.h 
             ensures
                 - Randomly extracts num_crops chips from images.  We also copy the object
                   metadata for each extracted crop and store it into #crop_rects.  In
@@ -195,6 +200,13 @@ namespace dlib
         /*!
             requires
                 - images.size() == rects.size()
+                - for all valid i:
+                    - images[i].size() != 0
+                - image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - array_type is a type with an interface compatible with dlib::array or
+                  std::vector and it must in turn contain image objects that implement the
+                  interface defined in dlib/image_processing/generic_image.h 
             ensures
                 - Selects a random image and creates a random crop from it.  Specifically,
                   we pick a random index IDX < images.size() and then execute 
@@ -212,6 +224,12 @@ namespace dlib
             std::vector<mmod_rect>& crop_rects
         );
         /*!
+            requires
+                - img.size() != 0
+                - image_type1 == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+                - image_type2 == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
             ensures
                 - Extracts a random crop from img and copies over the mmod_rect objects in
                   rects to #crop_rects if they are contained inside the crop.  Moreover,

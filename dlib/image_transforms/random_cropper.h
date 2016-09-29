@@ -135,6 +135,7 @@ namespace dlib
             std::vector<mmod_rect>& crop_rects
         )
         {
+            DLIB_CASSERT(num_rows(img)*num_columns(img) != 0);
             chip_details crop_plan;
             bool should_flip_crop;
             make_crop_plan(img, rects, crop_plan, should_flip_crop);
@@ -233,9 +234,10 @@ namespace dlib
 
         template <typename image_type>
         rectangle make_random_cropping_rect_resnet(
-            const image_type& img
+            const image_type& img_
         )
         {
+            const_image_view<image_type> img(img_);
             // figure out what rectangle we want to crop from the image
             double mins = 0.1, maxs = 0.95;
             auto scale = rnd.get_double_in_range(mins, maxs);
