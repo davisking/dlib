@@ -10,8 +10,10 @@ To build the dlib:
     python setup.py build
 To build and install:
     python setup.py install
-To package the wheel:
+To package the wheel (after pip installing twine and wheel):
     python setup.py bdist_wheel
+To upload the wheel to PyPi
+    twine upload dist/*.whl
 To repackage the previously built package as wheel (bypassing build):
     python setup.py bdist_wheel --repackage
 To install a develop version (egg with symbolic link):
