@@ -54,7 +54,7 @@ namespace dlib
         {
             int can_access;
             CHECK_CUDA(cudaDeviceCanAccessPeer(&can_access, device_id, peer_device_id));
-            return can_access;
+            return can_access != 0;
         }
         bool can_access_peer (const tensor& device, const tensor& peer_device)
         {

@@ -131,8 +131,8 @@ namespace dlib
 
         struct max_jobs
         {
-            max_jobs(size_t n) : num(n) {}
-            size_t num;
+            max_jobs(int n) : num(n) {}
+            int num;
         };
 
         template <typename Kernel, typename... T>

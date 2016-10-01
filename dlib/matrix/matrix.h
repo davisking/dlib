@@ -1751,7 +1751,7 @@ namespace dlib
 
             literal_assign_helper(const literal_assign_helper& item) : m(item.m), r(item.r), c(item.c), has_been_used(false) {}
             explicit literal_assign_helper(matrix* m_): m(m_), r(0), c(0),has_been_used(false) {next();}
-            ~literal_assign_helper() throw (std::exception)
+            ~literal_assign_helper() noexcept(false)
             {
                 DLIB_CASSERT(!has_been_used || r == m->nr(),
                              "You have used the matrix comma based assignment incorrectly by failing to\n"
@@ -1778,7 +1778,7 @@ namespace dlib
 
         private:
 
-            friend class matrix;
+            friend class matrix<T,num_rows,num_cols,mem_manager,layout>;
 
             void next (
             ) const
