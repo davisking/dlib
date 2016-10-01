@@ -678,10 +678,25 @@ namespace dlib
                     steps_without_progress = count_steps_without_decrease(previous_loss_values);
                     if (steps_without_progress >= iter_without_progress_thresh)
                     {
-                        // optimization has flattened out, so drop the learning rate. 
-                        learning_rate = learning_rate_shrink*learning_rate;
-                        steps_without_progress = 0;
-                        previous_loss_values.clear();
+                        // Double check that we aren't seeing decrease.  This second check
+                        // discards the top 10% largest values and checks again.  We do
+                        // this because sometimes a mini-batch might be bad and cause the
+                        // loss to suddenly jump up, making count_steps_without_decrease()
+                        // return a large number.  But if we discard the top 10% of the
+                        // values in previous_loss_values when we are robust to that kind
+                        // of noise.  Another way of looking at it, if the reason
+                        // count_steps_without_decrease() returns a large value is only
+                        // because the most recent loss values have suddenly been large,
+                        // then we shouldn't stop or lower the learning rate.  We should
+                        // keep going until whatever disturbance we hit is damped down.  
+                        steps_without_progress = count_steps_without_decrease_robust(previous_loss_values);
+                        if (steps_without_progress >= iter_without_progress_thresh)
+                        {
+                            // optimization has flattened out, so drop the learning rate. 
+                            learning_rate = learning_rate_shrink*learning_rate;
+                            steps_without_progress = 0;
+                            previous_loss_values.clear();
+                        }
                     }
                 }
                 else if (lr_schedule.size() != 0) // or use the learning rate schedule if we have one.
