@@ -8,6 +8,7 @@
 #include "../serialize.h"
 #include <cmath>
 #include "../matrix.h"
+#include <algorithm>
 
 
 namespace dlib
@@ -220,6 +221,26 @@ namespace dlib
     template <
         typename T
         > 
+    double find_upper_quantile (
+        T container,
+        double quantile
+    )
+    {
+        DLIB_CASSERT(0 <= quantile && quantile <= 1.0);
+        DLIB_CASSERT(container.size() > 0);
+
+        size_t idx_upper = std::round((container.size()-1)*(1-quantile));
+
+        std::nth_element(container.begin(), container.begin()+idx_upper, container.end());
+        auto upper_q = *(container.begin()+idx_upper);
+        return upper_q;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        > 
     size_t count_steps_without_decrease (
         const T& container,
         double probability_of_decrease = 0.51
@@ -238,6 +259,53 @@ namespace dlib
         {
             ++j;
             g.add(*i);
+            if (g.current_n() > 2)
+            {
+                // Note that this only looks backwards because we are looping over the
+                // container backwards.  So here we are really checking if the gradient isn't
+                // decreasing.
+                double prob_decreasing = g.probability_gradient_greater_than(0);
+                // If we aren't confident things are decreasing.
+                if (prob_decreasing < probability_of_decrease)
+                    count = j;
+            }
+        }
+        return count;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        > 
+    size_t count_steps_without_decrease_robust (
+        const T& container,
+        double probability_of_decrease = 0.51,
+        double quantile_discard = 0.10
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(0 <= quantile_discard && quantile_discard <= 1);
+        DLIB_ASSERT(0.5 < probability_of_decrease && probability_of_decrease < 1,
+            "\t size_t count_steps_without_decrease_robust()"
+            << "\n\t probability_of_decrease: "<< probability_of_decrease 
+        );
+
+        if (container.size() == 0)
+            return 0;
+
+        const auto quantile_thresh = find_upper_quantile(container, quantile_discard); 
+
+        running_gradient g;
+        size_t count = 0;
+        size_t j = 0;
+        for (auto i = container.rbegin(); i != container.rend(); ++i)
+        {
+            ++j;
+            // ignore values that are too large
+            if (*i <= quantile_thresh)
+                g.add(*i);
+
             if (g.current_n() > 2)
             {
                 // Note that this only looks backwards because we are looping over the
