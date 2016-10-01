@@ -940,7 +940,7 @@ namespace dlib
         FC_MODE = 1    // fully connected mode
     };
 
-    const double DEFAULT_BATCH_NORM_EPS = 0.00001;
+    const double DEFAULT_BATCH_NORM_EPS = 0.0001;
 
     template <
         layer_mode mode
