@@ -672,6 +672,13 @@ namespace
 
         }
 
+    }
+
+
+    void matrix_test2()
+    {
+        print_spinner();
+
 
         {
 
@@ -1385,6 +1392,7 @@ namespace
         )
         {
             matrix_test();
+            matrix_test2();
         }
     } a;
 
