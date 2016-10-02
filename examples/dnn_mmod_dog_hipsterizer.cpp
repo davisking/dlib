@@ -97,8 +97,8 @@ int main(int argc, char** argv) try
             auto rear = shape.part(4);
             auto reye = shape.part(5);
 
-            auto lmustache = (leye-reye)/2 + nose;
-            auto rmustache = (reye-leye)/2 + nose;
+            auto lmustache = 1.3*(leye-reye)/2 + nose;
+            auto rmustache = 1.3*(reye-leye)/2 + nose;
 
             std::vector<point> from = {2*point(176,36), 2*point(59,35)}, to = {leye, reye};
             auto tform = find_similarity_transform(from, to);
