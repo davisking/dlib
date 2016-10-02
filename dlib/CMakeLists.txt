@@ -344,6 +344,15 @@ if (NOT TARGET dlib)
                external/zlib/uncompr.c
                external/zlib/zutil.c
                )
+            if (NEON)
+               enable_language(ASM)
+               set(source_files ${source_files}
+                  external/libpng/arm/arm_init.c
+                  external/libpng/arm/filter_neon_intrinsics.c
+                  external/libpng/arm/filter_neon.S
+                  )
+               set_source_files_properties(external/libpng/arm/filter_neon.S PROPERTIES COMPILE_FLAGS "${CMAKE_ASM_FLAGS} ${CMAKE_CXX_FLAGS} -x assembler-with-cpp")
+            endif()
             set(REQUIRES_LIBS "")
          endif()
          set(source_files ${source_files}
