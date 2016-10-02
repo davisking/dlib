@@ -37,7 +37,9 @@ if (COMPILER_CAN_DO_CPP_11)
    add_example(dnn_imagenet_ex)
    add_example(dnn_imagenet_train_ex)
    add_example(dnn_mmod_ex)
+   add_example(dnn_mmod_face_detection_ex)
    add_example(random_cropper_ex)
+   add_example(dnn_mmod_dog_hipsterizer)
 endif()
 
 #here we apply our macros 
