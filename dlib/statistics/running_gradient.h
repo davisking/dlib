@@ -222,11 +222,15 @@ namespace dlib
         typename T
         > 
     double find_upper_quantile (
-        T container,
+        const T& container_,
         double quantile
     )
     {
         DLIB_CASSERT(0 <= quantile && quantile <= 1.0);
+
+        // copy container into a std::vector
+        std::vector<double> container(container_.begin(), container_.end());
+
         DLIB_CASSERT(container.size() > 0);
 
         size_t idx_upper = std::round((container.size()-1)*(1-quantile));

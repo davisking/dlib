@@ -251,7 +251,7 @@ namespace dlib
         typename T
         > 
     double find_upper_quantile (
-        T container,
+        const T& container,
         double quantile
     );
     /*!
