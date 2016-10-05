@@ -585,10 +585,10 @@ namespace dlib
                 tp.push_back(std::make_shared<thread_pool>(1));
 
 
-            size_t iteration = 0;
+            main_iteration_counter = 0;
             while(job_pipe.dequeue(next_job))
             {
-                ++iteration;
+                ++main_iteration_counter;
                 // Call compute_parameter_gradients() and update_parameters() but pick the
                 // right version for unsupervised or supervised training based on the type
                 // of label_type.
@@ -656,7 +656,7 @@ namespace dlib
                 // the different networks may be initialized differently when tensor data
                 // is first passed through them.  So this code block deals with these
                 // issues.
-                if (devices.size() > 1 && iteration%2000 == 1)
+                if (devices.size() > 1 && main_iteration_counter%2000 == 1)
                 {
                     for (size_t i = 1; i < devices.size(); ++i)
                     {
@@ -740,6 +740,9 @@ namespace dlib
             train_one_step_calls = 0;
             gradient_check_budget = 0;
             lr_schedule_pos = 0;
+
+            main_iteration_counter = 0;
+            main_iteration_counter_at_last_disk_sync = 0;
             start();
         }
 
@@ -844,19 +847,60 @@ namespace dlib
                 // compact network before saving to disk.
                 this->net.clean(); 
 
-                // save our state to a temp file
-                const std::string tempfile = sync_filename + ".tmp";
-                serialize(tempfile) << *this;
+                // if the loss has actually been going up since the last time we saved our
+                // state to disk then something has probably gone wrong in the
+                // optimization.  So in this case we do the opposite and recall the
+                // previously saved state in the hopes that the problem won't reoccur.
+                if (loss_increased_since_last_disk_sync()) 
+                {
+                    // reload from the previous sync file.  The file should exist since we
+                    // checked that main_iteration_counter_at_last_disk_sync != 0.
+                    std::ifstream fin(sync_filename, std::ios::binary);
+                    deserialize(*this, fin);
+                    if (verbose)
+                        std::cout << "Loss has been increasing, reloading saved state from " << sync_filename << std::endl;
+                }
+                else
+                {
 
-                // Now that we know the state is safely saved to disk, delete the old sync
-                // file and move the .tmp file to it.
-                std::remove(sync_filename.c_str());
-                std::rename(tempfile.c_str(), sync_filename.c_str());
+                    // save our state to a temp file
+                    const std::string tempfile = sync_filename + ".tmp";
+                    serialize(tempfile) << *this;
+
+                    // Now that we know the state is safely saved to disk, delete the old sync
+                    // file and move the .tmp file to it.
+                    std::remove(sync_filename.c_str());
+                    std::rename(tempfile.c_str(), sync_filename.c_str());
+
+                    if (verbose)
+                        std::cout << "Saved state to " << sync_filename << std::endl;
+                }
 
                 last_sync_time = std::chrono::system_clock::now();
-                if (verbose)
-                    std::cout << "Saved state to " << sync_filename << std::endl;
+                main_iteration_counter_at_last_disk_sync = main_iteration_counter;
             }
+        }
+
+        bool loss_increased_since_last_disk_sync() const
+        {
+            size_t gradient_updates_since_last_sync = main_iteration_counter - main_iteration_counter_at_last_disk_sync;
+
+            // if we haven't synced anything to disk yet then return false.
+            if (main_iteration_counter_at_last_disk_sync == 0)
+                return false;
+
+            // if we haven't seen much data yet then just say false.
+            if (gradient_updates_since_last_sync < 30 || previous_loss_values.size() < 2*gradient_updates_since_last_sync)
+                return false;
+
+            // Now look at the data since a little before the last disk sync.  We will
+            // check if the loss is getting bettor or worse.
+            running_gradient g;
+            for (size_t i = previous_loss_values.size() - 2*gradient_updates_since_last_sync; i < previous_loss_values.size(); ++i)
+                g.add(previous_loss_values[i]);
+
+            // if the loss is very likely to be increasing then return true
+            return g.probability_gradient_greater_than(0) > 0.99;
         }
 
 
@@ -990,6 +1034,10 @@ namespace dlib
             if (eptr)
                 std::rethrow_exception(eptr);
         }
+
+        // These two variables are not serialized 
+        size_t main_iteration_counter;
+        size_t main_iteration_counter_at_last_disk_sync;
 
     };
 
