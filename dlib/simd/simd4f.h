@@ -198,7 +198,7 @@ namespace dlib
 #endif
     }
     inline simd4f& operator+= (simd4f& lhs, const simd4f& rhs) 
-    { return lhs = lhs + rhs; return lhs;}
+    { return lhs = lhs + rhs; }
 
 // ----------------------------------------------------------------------------------------
 
@@ -214,7 +214,7 @@ namespace dlib
 #endif
     }
     inline simd4f& operator-= (simd4f& lhs, const simd4f& rhs) 
-    { return lhs = lhs - rhs; return lhs;}
+    { return lhs = lhs - rhs; }
 
 // ----------------------------------------------------------------------------------------
 
@@ -230,7 +230,7 @@ namespace dlib
 #endif
     }
     inline simd4f& operator*= (simd4f& lhs, const simd4f& rhs) 
-    { return lhs = lhs * rhs; return lhs;}
+    { return lhs = lhs * rhs; }
 
 // ----------------------------------------------------------------------------------------
 
@@ -246,7 +246,7 @@ namespace dlib
 #endif
     }
     inline simd4f& operator/= (simd4f& lhs, const simd4f& rhs) 
-    { return lhs = lhs / rhs; return lhs;}
+    { return lhs = lhs / rhs; }
 
 // ----------------------------------------------------------------------------------------
 
