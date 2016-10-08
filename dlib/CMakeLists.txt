@@ -458,6 +458,10 @@ if (NOT TARGET dlib)
       if (DLIB_USE_CUDA)
          find_package(CUDA 7.5)
 
+         if (CUDA_FOUND AND MSVC AND NOT CUDA_CUBLAS_LIBRARIES AND "${CMAKE_SIZEOF_VOID_P}" EQUAL "4")
+            message(WARNING "You have CUDA installed, but we can't use it unless you put visual studio in 64bit mode.")
+            set(CUDA_FOUND 0)
+         endif()
 
          if (CUDA_FOUND AND COMPILER_CAN_DO_CPP_11)
 
