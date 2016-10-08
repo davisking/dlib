@@ -1022,7 +1022,7 @@ namespace dlib
             // Figure out how far we go on the first column.  We go until the next image can
             // fit next to the previous one, which means we can double back for the second
             // column of images.
-            if (i.nc() <= img.nc()-prev_width-padding && 
+            if (i.nc() <= img.nc()-prev_width-(long)padding && 
                 (height-img.nr())*2 >= (total_height-img.nr()))
             {
                 break;
