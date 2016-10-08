@@ -44,11 +44,16 @@ if (COMPILER_CAN_DO_CPP_11)
    add_example(dnn_introduction2_ex)
    add_example(dnn_inception_ex)
    add_gui_example(dnn_imagenet_ex)
-   add_example(dnn_imagenet_train_ex)
    add_gui_example(dnn_mmod_ex)
    add_gui_example(dnn_mmod_face_detection_ex)
    add_gui_example(random_cropper_ex)
    add_gui_example(dnn_mmod_dog_hipsterizer)
+   if (NOT MSVC)
+      # Don't try to compile this program using Visual Studio since it causes the
+      # compiler to run out of RAM and to crash.  Maybe someday Visual Studio
+      # won't be broken :(
+      add_example(dnn_imagenet_train_ex)
+   endif()
 endif()
 
 #here we apply our macros 

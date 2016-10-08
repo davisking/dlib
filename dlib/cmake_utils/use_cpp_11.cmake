@@ -50,7 +50,12 @@ if (CMAKE_VERSION VERSION_LESS "3.1.2")
          message(STATUS "*** Your compiler failed to build a C++11 project, so dlib won't use C++11 features.***")
       endif()
    endif()
-elseif(NOT MSVC14)  # Visual Studio 14 reports that it supports C++11 but it really doesn't :(
+elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24215.1 ) 
+   message(STATUS "NOTE: Visual Studio didn't have good enough C++11 support until Visual Studio 2015 update 3 (v19.0.24215.1)")
+   message(STATUS "So we aren't enabling things that require full C++11 support (e.g. the deep learning tools).")
+   message(STATUS "Also, be aware that Visual Studio's version naming is confusing, in particular, there are multiple versions of 'update 3'")
+   message(STATUS "So if you are getting this message you need to update to the newer version of Visual Studio to use full C++11.")
+else()  
 
    # Set a flag if the compiler you are using is capable of providing C++11 features.
    get_property(cxx_features GLOBAL PROPERTY CMAKE_CXX_KNOWN_FEATURES)
