@@ -47,15 +47,19 @@ using block  = BN<con<N,3,3,1,1,relu<BN<con<N,3,3,stride,stride,SUBNET>>>>>;
 template <int N, typename SUBNET> using ares      = relu<residual<block,N,affine,SUBNET>>;
 template <int N, typename SUBNET> using ares_down = relu<residual_down<block,N,affine,SUBNET>>;
 
+template <typename SUBNET> using level1 = ares<512,ares<512,ares_down<512,SUBNET>>>;
+template <typename SUBNET> using level2 = ares<256,ares<256,ares<256,ares<256,ares<256,ares_down<256,SUBNET>>>>>>;
+template <typename SUBNET> using level3 = ares<128,ares<128,ares<128,ares_down<128,SUBNET>>>>;
+template <typename SUBNET> using level4 = ares<64,ares<64,ares<64,SUBNET>>>;
 
 using anet_type = loss_multiclass_log<fc<1000,avg_pool_everything<
-                            ares<512,ares<512,ares_down<512,
-                            ares<256,ares<256,ares<256,ares<256,ares<256,ares_down<256,
-                            ares<128,ares<128,ares<128,ares_down<128,
-                            ares<64,ares<64,ares<64,
+                            level1<
+                            level2<
+                            level3<
+                            level4<
                             max_pool<3,3,2,2,relu<affine<con<64,7,7,2,2,
                             input_rgb_image_sized<227>
-                            >>>>>>>>>>>>>>>>>>>>>>>;
+                            >>>>>>>>>>>;
 
 // ----------------------------------------------------------------------------------------
 
