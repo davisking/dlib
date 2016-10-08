@@ -40,25 +40,35 @@ template <int N, typename SUBNET> using ares_down = relu<residual_down<block,N,a
 
 // ----------------------------------------------------------------------------------------
 
+template <typename SUBNET> using level1 = res<512,res<512,res_down<512,SUBNET>>>;
+template <typename SUBNET> using level2 = res<256,res<256,res<256,res<256,res<256,res_down<256,SUBNET>>>>>>;
+template <typename SUBNET> using level3 = res<128,res<128,res<128,res_down<128,SUBNET>>>>;
+template <typename SUBNET> using level4 = res<64,res<64,res<64,SUBNET>>>;
+
+template <typename SUBNET> using alevel1 = ares<512,ares<512,ares_down<512,SUBNET>>>;
+template <typename SUBNET> using alevel2 = ares<256,ares<256,ares<256,ares<256,ares<256,ares_down<256,SUBNET>>>>>>;
+template <typename SUBNET> using alevel3 = ares<128,ares<128,ares<128,ares_down<128,SUBNET>>>>;
+template <typename SUBNET> using alevel4 = ares<64,ares<64,ares<64,SUBNET>>>;
+
 // training network type
 using net_type = loss_multiclass_log<fc<1000,avg_pool_everything<
-                            res<512,res<512,res_down<512,
-                            res<256,res<256,res<256,res<256,res<256,res_down<256,
-                            res<128,res<128,res<128,res_down<128,
-                            res<64,res<64,res<64,
+                            level1<
+                            level2<
+                            level3<
+                            level4<
                             max_pool<3,3,2,2,relu<bn_con<con<64,7,7,2,2,
                             input_rgb_image_sized<227>
-                            >>>>>>>>>>>>>>>>>>>>>>>;
+                            >>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
 using anet_type = loss_multiclass_log<fc<1000,avg_pool_everything<
-                            ares<512,ares<512,ares_down<512,
-                            ares<256,ares<256,ares<256,ares<256,ares<256,ares_down<256,
-                            ares<128,ares<128,ares<128,ares_down<128,
-                            ares<64,ares<64,ares<64,
+                            alevel1<
+                            alevel2<
+                            alevel3<
+                            alevel4<
                             max_pool<3,3,2,2,relu<affine<con<64,7,7,2,2,
                             input_rgb_image_sized<227>
-                            >>>>>>>>>>>>>>>>>>>>>>>;
+                            >>>>>>>>>>>;
 
 // ----------------------------------------------------------------------------------------
 
