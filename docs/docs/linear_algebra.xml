@@ -642,6 +642,7 @@
          <item>resize_rect_height</item> 
          <item>move_rect</item> 
          <item>nearest_point</item> 
+         <item>nearest_rect</item> 
          <item>distance_to_rect_edge</item> 
          <item>clip_line_to_rectangle</item> 
          <item>distance_to_line</item> 
@@ -864,6 +865,19 @@
             This function takes a <a href="#rectangle">rectangle</a> and a 
             <a href="#point">point</a> and returns the point in the given 
             rectangle that is nearest to the given point.
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>nearest_rect</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/rectangle_abstract.h</spec_file>
+         <description>        
+            This function takes a std::vector&lt;<a href="#rectangle">rectangle</a>&gt; and a 
+            <a href="#point">point</a> and identifies the rectangle that is nearest to the point.
          </description>
                                  
       </component>

@@ -209,6 +209,24 @@
                   <link>dnn_inception_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Deep Learning Face Detection</name>
+                  <link>dnn_mmod_face_detection_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Dog Hipsterizer</name>
+                  <link>dnn_mmod_dog_hipsterizer.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Max-Margin Object Detection</name>
+                  <link>dnn_mmod_ex.cpp.html</link>
+               </item>
+
+               <item>
+                  <name>Random Cropper</name>
+                  <link>random_cropper_ex.cpp.html</link>
+               </item>
+
+               <item>
                   <name>Linear Model Predictive Control</name>
                   <link>mpc_ex.cpp.html</link>
                </item>

@@ -12,6 +12,56 @@
 
 <current>
 New Features:
+   - Added annotation() to tensor so that you can associate any object you want with a tensor.
+   - Made layer_details() part of the SUBNET interface so that user defined layer details objects can access each other. Also added the input_layer() global function for accessing the input layer specifically.
+   - alias_tensor_const_instance
+   - Added box_intersection_over_union() and also renamed the class members of test_box_overlap so they are less confusing and vague.
+   - Added nearest_rect()
+   - Added pyramid_rate(), create_tiled_pyramid(), image_to_tiled_pyramid(), and tiled_pyramid_to_image().
+   - Added support for binding classes to MATLAB.
+   - Added overloads of the parallel for functions that use default_thread_pool()
+   - Added visit_layers_backwards(), visit_layers_backwards_range(), and visit_layers_range().
+   - Added input_tensor_to_output_tensor() and output_tensor_to_input_tensor() along with the mapping functions necessary at each layer to support these routines.
+   - Added input_rgb_image_pyramid
+   - Added MMOD loss layer
+   - Added random_cropper
+   - Added mmod_rect
+   - Added find_upper_quantile() and count_steps_without_decrease_robust().
+   - Added image_dataset_file::shrink_big_images(). So now load_image_dataset() can load a dataset of high resolution files into a user requested lower resolution.
+
+Non-Backwards Compatible Changes:
+   - Changed the DNN API so that sample_expansion_factor is a runtime variable rather than a compile time constant. This also removes it from the input layer interface since the DNN core infers its value at runtime, meaning users that define their own input layers don't need to specify it anymore.
+   - Changed pinv() so it interprets its tol argument relative to the largest singular value of the input matrix rather than as an absolute tolerance.
+   - C++11 is now required to use dlib.  
+   - Changed DEFAULT_BATCH_NORM_EPS from 1e-5 to 1e-4.
+
+Bug fixes:
+   - Made the relational operators constexpr so they don't accidentally cause compilation errors when they get pulled into the scope of template metaprogramming expressions.
+   - Fixed all/source.cpp not compiling in some instances.
+   - CMake scripts do a better job detecting c++11 support, CUDA, etc.
+   - Fixed a bug in --cluster where it would output xml files with empty entries if the input xml file contained unannotated images.
+   - Fixed --cluster not working with relative paths.
+
+Other:
+   - Made the thread local variables that hold the cudnn and cublas context objects not destruct and recreate themselves when you switch devices. Instead, they keep a table of context objects, for each thread and device, reusing as necessary. This prevents churn in the context objects when you are switching back and forth between devices inside a single thread.
+   - Made the message argument of the DLIB_ASSERT and DLIB_CASSERT macros optional.
+   - Made thread_pool and parallel_for propagate exceptions from task threads to calling code.
+   - Changed imglab --resample so that it never changes the aspect ratio of an image.
+   - Added --min-object-size option to imglab.
+   - Added --rmempty to imglab
+   - Added --rmlabel and --rm-if-overlaps. Also changed the behavior of --split so that it simply partitions the data and is an invertible operation.
+   - Added --sort-num-objects and cleaned up code slightly.
+   - Added get_double_in_range() to dlib::rand
+   - Added an overload of load_image_dataset() that outputs directly to mmod_rect instead of rectangle.
+   - Added set_all_bn_running_stats_window_sizes() and also changed the default batch normalization running stats window size from 1000 to 100.
+   - Made the check in dnn_trainer for convergence more robust. Previously, if we encountered a bad mini-batch that made the loss value suddenly jump up by a larger than normal value it could make the trainer think we converged. Now the test is robust to recent spikes in loss value.
+   - Made the dnn_trainer check if the loss has been increasing before it saves the state to disk. If it detects that the loss has been going up then instead of saving to disk it recalls the previously good state. This way, if we hit a bad mini-batch during training which negatively effects the model in a significant way, the dnn_trainer will automatically revert back to an earlier good state.
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.1" date="Aug 13, 2016">
+New Features:
    - Support for cuDNN 5.1
    - dlib::async() and dlib::default_thread_pool().
    - rectangle_transform
@@ -34,7 +84,7 @@ Bug fixes:
    - Fixed bad convergence testing in DNN tooling for very small datasets.
 
 Other:
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
