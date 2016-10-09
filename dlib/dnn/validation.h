@@ -3,7 +3,7 @@
 #ifndef DLIB_DNn_VALIDATION_H_
 #define DLIB_DNn_VALIDATION_H_
 
-#include "validation_abstract.h"
+#include "../svm/cross_validate_object_detection_trainer_abstract.h"
 #include "../svm/cross_validate_object_detection_trainer.h"
 #include "layers.h"
 
