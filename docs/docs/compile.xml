@@ -23,7 +23,7 @@ cd build
 cmake ..
 cmake --build . --config Release
 </code_box>
-Note that you also need to have a C++ compiler installed on your system.  There are free C++ compilers
+Note that you also need to have a C++11 compiler installed on your system.  There are free C++11 compilers
 for most operating systems.  For example, Visual Studio is free on Windows and GCC is free and
 works well on Mac OS X and Linux systems.  If you have multiple compilers/IDEs installed then you can
 tell CMake which one you want it to use via the -G option.
@@ -109,12 +109,12 @@ tell CMake which one you want it to use via the -G option.
         <h3>Compiling on Linux From Command Line</h3>
         From within the examples folder, you can compile nearly all of the examples with a single command like so:
 <code_box>
-g++ -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
+g++ -std=c++11 -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
 </code_box>
         Note that not all examples require this much work.  For example, the svm_ex.cpp example
         can be compiled with just:
 <code_box>
-g++ -O3 -I.. svm_ex.cpp
+g++ -std=c++11 -O3 -I.. svm_ex.cpp
 </code_box>
 
 On non-Linux systems like Solaris, you might have to link to other libraries.  For example, I have seen systems
@@ -131,7 +131,7 @@ sudo apt-get install libx11-dev
             (via the -l option) to the following libraries: gdi32, comctl32, user32, winmm, ws2_32, or imm32.
         </p>
 
-        <h3>Compiling on Windows Using Visual Studio</h3>
+        <h3>Compiling on Windows Using Visual Studio 2015 or Newer</h3>
         <p>
            All you need to do is create an empty console project. Then add dlib/all/source.cpp to it and add the
            folder containing the dlib folder to the #include search path.  Then you can compile any example program 

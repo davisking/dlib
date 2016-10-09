@@ -881,7 +881,7 @@ Or it can use the elastic net regularizer:
 
    <!-- ************************************************************************* -->
       
-      <component cpp11="true">
+      <component>
          <name>find_optimal_parameters</name>
          <file>dlib/optimization/find_optimal_parameters.h</file>
          <spec_file link="true">dlib/optimization/find_optimal_parameters_abstract.h</spec_file>
@@ -896,7 +896,7 @@ Or it can use the elastic net regularizer:
 
    <!-- ************************************************************************* -->
       
-      <component cpp11="true">
+      <component>
          <name>elastic_net</name>
          <file>dlib/optimization/elastic_net.h</file>
          <spec_file link="true">dlib/optimization/elastic_net_abstract.h</spec_file>

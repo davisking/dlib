@@ -418,7 +418,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>add_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -451,7 +451,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>dnn_trainer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/trainer_abstract.h</spec_file>
@@ -475,7 +475,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>add_loss_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -497,7 +497,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>repeat</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -513,7 +513,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>add_tag_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -540,7 +540,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>add_skip_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -559,7 +559,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -580,7 +580,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>input</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
@@ -599,7 +599,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>input_rgb_image</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
@@ -614,7 +614,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>input_rgb_image_sized</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
@@ -626,7 +626,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>input_rgb_image_pyramid</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
@@ -646,7 +646,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>loss_mmod_</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/loss_abstract.h</spec_file>
@@ -673,7 +673,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>test_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -686,7 +686,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>resizable_tensor</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/tensor_abstract.h</spec_file>
@@ -725,7 +725,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>alias_tensor</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/tensor_abstract.h</spec_file>

@@ -30,6 +30,10 @@
       </question>
 
       <question text="How can I use dlib in Visual Studio?">
+         <p>
+            First, note that you need a version of Visual Studio with decent
+            C++11 support.  This means you need Visual Studio 2015 or newer.
+         </p>
          There are instructions on the <a href="compile.html">How to Compile</a> page.  
          If you do not understand the instructions in the "<b>Compiling on Windows Using Visual Studio</b>" section
          or are getting errors then follow the instructions in the "<b>Compiling on Any Operating System Using CMake</b>"
@@ -357,12 +361,14 @@ cross_validate_trainer_threaded(trainer,
    <!-- ************************************************************************* -->
 
    <questions group="Deep Learning">
-      <question text="Why can't I use DNN module with Visual Studio?">
-         The deep learning toolkit in dlib requires a C++11 compiler.
-         Unfortunately, as of July 2016, no versions of Visual Studio fully
-         support C++11, so not all the deep learning code will compile.
-         However, all the other modules in dlib can be used in Visual Studio
-         without any trouble.
+      <question text="Why can't I use the DNN module with Visual Studio?">
+         You can, but you need to use Visual Studio 2015 Update 3 or newer since prior versions
+         had bad C++11 support.  To make this as confusing as possible,
+         Microsoft has released multiple different versions of "Visual Studio
+         2015 Update 3".  As of October 2016, the version available from the
+         Microsoft web page has good enough C++11 support to compile the DNN
+         tools in dlib.  So make sure you have a version no older than October
+         2016.
       </question>
 
       <question text="Why can't I change the network architecture at runtime?">

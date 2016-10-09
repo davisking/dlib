@@ -482,7 +482,7 @@
       
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>running_gradient</name>
          <file>dlib/statistics/running_gradient.h</file>
          <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
@@ -496,7 +496,7 @@
       
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>find_upper_quantile</name>
          <file>dlib/statistics/running_gradient.h</file>
          <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
@@ -510,7 +510,7 @@
       
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>count_steps_without_increase</name>
          <file>dlib/statistics/running_gradient.h</file>
          <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
@@ -526,7 +526,7 @@
       
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>count_steps_without_decrease</name>
          <file>dlib/statistics/running_gradient.h</file>
          <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
@@ -542,7 +542,7 @@
       
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>count_steps_without_decrease_robust</name>
          <file>dlib/statistics/running_gradient.h</file>
          <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
