@@ -1,6 +1,6 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
-    This mex file will create a MATLAB function called mex_example_class.  If you call it
+    This mex file will create a MATLAB function called example_mex_class.  If you call it
     with no arguments it will output the MATLAB .m code to create a MATLAB wrapper class.
     Paste that code into a .m file.  Then you will be able to work with this C++ class
     directly in MATLAB.
