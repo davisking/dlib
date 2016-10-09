@@ -38,8 +38,11 @@ MACRO(add_gui_example name)
    endif()
 ENDMACRO()
 
-# The deep learning toolkit requires a C++11 capable compiler.  
-if (COMPILER_CAN_DO_CPP_11)
+# The deep learning toolkit requires a compiler with essentially complete C++11
+# support.  However, versions of Visual Studio prior to October 2016 didn't
+# provide enough C++11 support to compile the DNN tooling, but were good enough
+# to compile the rest of dlib.  
+if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
    add_example(dnn_introduction_ex)
    add_example(dnn_introduction2_ex)
    add_example(dnn_inception_ex)

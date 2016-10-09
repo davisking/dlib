@@ -47,7 +47,7 @@ if (CMAKE_VERSION VERSION_LESS "3.1.2")
          message(STATUS "C++11 activated.")
          set(COMPILER_CAN_DO_CPP_11 1)
       else()
-         message(STATUS "*** Your compiler failed to build a C++11 project, so dlib won't use C++11 features.***")
+         message(FATAL_ERROR "*** Your compiler failed to build a C++11 project, so dlib won't use C++11 features.***")
       endif()
    endif()
 elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24215.1 ) 
@@ -55,6 +55,9 @@ elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24215.1 )
    message(STATUS "So we aren't enabling things that require full C++11 support (e.g. the deep learning tools).")
    message(STATUS "Also, be aware that Visual Studio's version naming is confusing, in particular, there are multiple versions of 'update 3'")
    message(STATUS "So if you are getting this message you need to update to the newer version of Visual Studio to use full C++11.")
+   set(USING_OLD_VISUAL_STUDIO_COMPILER 1)
+elseif(MSVC AND MSVC_VERSION VERSION_LESS 1900)
+   message(FATAL_ERROR "C++11 is required to use dlib, but the version of Visual Studio you are using is too old and doesn't support C++11.")
 else()  
 
    # Set a flag if the compiler you are using is capable of providing C++11 features.
@@ -79,7 +82,8 @@ else()
    endif()
 endif()
 
-# Always enable whatever partial C++11 support we have, even if it isn't full support.
+# Always enable whatever partial C++11 support we have, even if it isn't full
+# support, and just hope for the best.
 if (NOT COMPILER_CAN_DO_CPP_11)
    include(CheckCXXCompilerFlag)
    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
