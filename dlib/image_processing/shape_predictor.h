@@ -11,6 +11,7 @@
 #include "../pixel.h"
 #include "../console_progress_indicator.h"
 #include "../statistics.h"
+#include "../threads.h"
 #include <utility>
 
 namespace dlib
