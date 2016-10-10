@@ -994,6 +994,12 @@ namespace dlib
         DLIB_ASSERT(!is_same_object(img, out_img));
 
         rects.clear();
+        if (num_rows(img)*num_columns(img) == 0)
+        {
+            set_image_size(out_img,0,0);
+            return;
+        }
+
         const long min_height = 5;
         pyramid_type pyr;
         std::vector<matrix<rgb_pixel>> pyramid;
@@ -1032,7 +1038,7 @@ namespace dlib
         }
         height -= padding; // don't add unnecessary padding to the very right side.
 
-        out_img.set_size(height,img.nc());
+        set_image_size(out_img,height,img.nc());
         assign_all_pixels(out_img, 0);
 
         long y = 0;
