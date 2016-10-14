@@ -481,6 +481,7 @@ if (NOT TARGET dlib)
                            CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
                                        "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
                                        "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}"
+                                       "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}"
                            )
                if (NOT cuda_test_compile_worked)
                   message(STATUS "*** CUDA was found but your compiler failed to compile a simple CUDA program so dlib isn't going to use CUDA. ***")
@@ -491,6 +492,7 @@ if (NOT TARGET dlib)
                               CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
                                           "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
                                           "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}"
+                                          "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}"
                                           )
                   if (cudnn_test_compile_worked)
                      message(STATUS "Found cuDNN: " ${cudnn})
