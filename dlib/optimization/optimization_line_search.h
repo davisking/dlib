@@ -212,7 +212,7 @@ namespace dlib
         double temp = aa2*aa1*(x1-x2);
 
         // just take a guess if this happens
-        if (temp == 0)
+        if (temp == 0 || std::fpclassify(temp) == FP_SUBNORMAL)
         {
             return x1/2.0;
         }
