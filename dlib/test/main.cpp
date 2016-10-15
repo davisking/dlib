@@ -1,7 +1,7 @@
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
-
+#error Should fail to build - testing Travis CI
 #include <iostream>
 #include <fstream>
 #include <dlib/cmd_line_parser.h>
