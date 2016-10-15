@@ -45,6 +45,6 @@ script:
   - dlib/travis/build-and-test.sh
 
 
-notifications:
-  email:
-    false
+#notifications:
+#  email:
+#    false
