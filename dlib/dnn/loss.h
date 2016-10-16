@@ -861,6 +861,150 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_metric_ 
+    {
+    public:
+
+        typedef unsigned long label_type;
+
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.nr() == 1 && 
+                         output_tensor.nc() == 1);
+            DLIB_CASSERT(grad.nr() == 1 && 
+                         grad.nc() == 1);
+
+
+            const float margin = 0.5;
+
+            temp.set_size(output_tensor.num_samples(), output_tensor.num_samples());
+            grad_mul.copy_size(temp);
+
+            tt::gemm(0, temp, 1, output_tensor, false, output_tensor, true);
+
+            const double num_pairs = output_tensor.num_samples() * (output_tensor.num_samples() - 1) / 2.0;
+            // The whole objective function is multiplied by this to scale the loss
+            // relative to the number of things in the mini-batch.
+            const double scale = 1.0/num_pairs;
+
+            double loss = 0;
+
+            // loop over all the pairs of training samples and compute the loss and
+            // gradients.
+            const float* d = temp.host();
+            float* gm = grad_mul.host();
+            for (long r = 0; r < temp.num_samples(); ++r)
+            {
+                gm[r*temp.num_samples() + r] = 0;
+                const auto x_label = *(truth + r);
+                auto xx = d[r*temp.num_samples() + r];
+                for (long c = 0; c < temp.num_samples(); ++c)
+                {
+                    if (r==c)
+                        continue;
+                    const auto y_label = *(truth + c);
+                    auto yy = d[c*temp.num_samples() + c];
+                    auto xy = d[r*temp.num_samples() + c];
+
+                    // compute the distance between x and y samples.
+                    auto d2 = xx + yy - 2*xy;
+                    if (d2 <= 0)
+                        d2 = 0;
+                    else 
+                        d2 = std::sqrt(d2);
+
+                    if (x_label == y_label)
+                    {
+                        // Things with the same label should have distances < 1 between
+                        // them.  If not then we experience non-zero loss.
+                        if (d2 > 1-margin)
+                        {
+                            loss += scale*(d2 - (1-margin));
+                            gm[r*temp.num_samples() + r] += scale/d2;
+                            gm[r*temp.num_samples() + c] = -scale/d2;
+                        }
+                        else
+                        {
+                            gm[r*temp.num_samples() + c] = 0;
+                        }
+                    }
+                    else
+                    {
+                        // Things with different labels should have distances > 1 between
+                        // them.  If not then we experience non-zero loss.
+                        if (d2 < 1+margin)
+                        {
+                            loss += scale*((1+margin) - d2);
+                            gm[r*temp.num_samples() + r] -= scale/d2;
+                            gm[r*temp.num_samples() + c] = scale/d2;
+                        }
+                        else
+                        {
+                            gm[r*temp.num_samples() + c] = 0;
+                        }
+                    }
+                }
+            }
+
+
+            tt::gemm(0, grad, 1, grad_mul, false, output_tensor, false); 
+
+            return loss;
+        }
+
+        friend void serialize(const loss_metric_& , std::ostream& out)
+        {
+            serialize("loss_metric_", out);
+        }
+
+        friend void deserialize(loss_metric_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_metric_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_metric_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_metric_& )
+        {
+            out << "loss_metric";
+            return out;
+        }
+
+        friend void to_xml(const loss_metric_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_metric/>";
+        }
+
+    private:
+        // These variables are only here to avoid being reallocated over and over in
+        // compute_loss_value_and_gradient()
+        mutable resizable_tensor temp, grad_mul;
+
+    };
+
+    template <typename SUBNET>
+    using loss_metric = add_loss_layer<loss_metric_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LOSS_H_
