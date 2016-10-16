@@ -20,8 +20,9 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.6";
+const char* VERSION = "1.7";
 
+const int JPEG_QUALITY = 90;
 
 
 using namespace std;
@@ -275,6 +276,14 @@ string to_png_name (const string& filename)
     return filename.substr(0,pos) + ".png";
 }
 
+string to_jpg_name (const string& filename)
+{
+    string::size_type pos = filename.find_last_of(".");
+    if (pos == string::npos)
+        throw dlib::error("invalid filename: " + filename);
+    return filename.substr(0,pos) + ".jpg";
+}
+
 // ----------------------------------------------------------------------------------------
 
 void flip_dataset(const command_line_parser& parser)
@@ -296,11 +305,19 @@ void flip_dataset(const command_line_parser& parser)
     for (unsigned long i = 0; i < metadata.images.size(); ++i)
     {
         file f(metadata.images[i].filename);
-        const string filename = get_parent_directory(f).full_name() + directory::get_separator() + "flipped_" + to_png_name(f.name());
+        string filename = get_parent_directory(f).full_name() + directory::get_separator() + "flipped_" + to_png_name(f.name());
 
         load_image(img, metadata.images[i].filename);
         flip_image_left_right(img, temp);
-        save_png(temp, filename);
+        if (parser.option("jpg"))
+        {
+            filename = to_jpg_name(filename);
+            save_jpeg(temp, filename,JPEG_QUALITY);
+        }
+        else
+        {
+            save_png(temp, filename);
+        }
 
         for (unsigned long j = 0; j < metadata.images[i].boxes.size(); ++j)
         {
@@ -344,11 +361,19 @@ void rotate_dataset(const command_line_parser& parser)
     for (unsigned long i = 0; i < metadata.images.size(); ++i)
     {
         file f(metadata.images[i].filename);
-        const string filename = get_parent_directory(f).full_name() + directory::get_separator() + file_prefix + to_png_name(f.name());
+        string filename = get_parent_directory(f).full_name() + directory::get_separator() + file_prefix + to_png_name(f.name());
 
         load_image(img, metadata.images[i].filename);
         const point_transform_affine tran = rotate_image(img, temp, angle*pi/180);
-        save_png(temp, filename);
+        if (parser.option("jpg"))
+        {
+            filename = to_jpg_name(filename);
+            save_jpeg(temp, filename,JPEG_QUALITY);
+        }
+        else
+        {
+            save_png(temp, filename);
+        }
 
         for (unsigned long j = 0; j < metadata.images[i].boxes.size(); ++j)
         {
@@ -558,6 +583,7 @@ int resample_dataset(const command_line_parser& parser)
     const size_t obj_size = get_option(parser,"cropped-object-size",100*100); 
     const double margin_scale =  get_option(parser,"crop-size",2.5); // cropped image will be this times wider than the object.
     const unsigned long min_object_size = get_option(parser,"min-object-size",1);
+    const bool one_object_per_image = parser.option("one-object-per-image");
 
     dlib::image_dataset_metadata::dataset data, resampled_data;
     std::ostringstream sout;
@@ -614,7 +640,7 @@ int resample_dataset(const command_line_parser& parser)
 
                 // mark boxes we include in the crop as ignored.  Also mark boxes that
                 // aren't totally within the crop as ignored.
-                if (crop_rect.contains(grow_rect(box.rect,10)))
+                if (crop_rect.contains(grow_rect(box.rect,10)) && (!one_object_per_image || k==j))
                     data.images[i].boxes[k].ignore = true;
                 else
                     box.ignore = true;
@@ -633,7 +659,15 @@ int resample_dataset(const command_line_parser& parser)
             sout << hex << murmur_hash3_128bit(&chip[0][0], chip.size()*sizeof(chip[0][0])).second;
             dimg.filename = data.images[i].filename + "_RESAMPLED_"+sout.str()+".png";
 
-            save_png(chip,dimg.filename);
+            if (parser.option("jpg"))
+            {
+                dimg.filename = to_jpg_name(dimg.filename);
+                save_jpeg(chip,dimg.filename, JPEG_QUALITY);
+            }
+            else
+            {
+                save_png(chip,dimg.filename);
+            }
             resampled_data.images.push_back(dimg);
         }
     }
@@ -767,8 +801,10 @@ int main(int argc, char** argv)
         parser.add_option("cropped-object-size", "When doing --resample, make the cropped objects contain about <arg> pixels (default 10000).",1);
         parser.add_option("min-object-size", "When doing --resample, skip objects that have fewer than <arg> pixels in them (default 1).",1);
         parser.add_option("crop-size", "When doing --resample, the entire cropped image will be <arg> times wider than the object (default 2.5).",1); 
+        parser.add_option("one-object-per-image", "When doing --resample, only include one non-ignored object per image (i.e. the central object).");
         parser.add_option("extract-chips", "Crops out images with tight bounding boxes around each object.  Also crops out "
                                            "many background chips.  All these image chips are serialized into one big data file.  The chips will contain <arg> pixels each.",1);
+        parser.add_option("jpg", "When saving images to disk, write them as jpg files instead of png.");
 
 
 
@@ -776,12 +812,12 @@ int main(int argc, char** argv)
 
         const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
                                  "flip", "rotate", "tile", "size", "cluster", "resample", "extract-chips", "min-object-size", "rmempty",
-                                 "crop-size", "cropped-object-size", "rmlabel", "rm-if-overlaps", "sort-num-objects"};
+                                 "crop-size", "cropped-object-size", "rmlabel", "rm-if-overlaps", "sort-num-objects", "one-object-per-image", "jpg"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
         parser.check_sub_option("shuffle", "seed");
-        const char* resample_sub_ops[] = {"min-object-size", "crop-size", "cropped-object-size"};
+        const char* resample_sub_ops[] = {"min-object-size", "crop-size", "cropped-object-size", "one-object-per-image"};
         parser.check_sub_options("resample", resample_sub_ops);
         const char* size_parent_ops[] = {"tile", "cluster"};
         parser.check_sub_options(size_parent_ops, "size");
