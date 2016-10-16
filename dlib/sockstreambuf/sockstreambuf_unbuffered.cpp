@@ -151,7 +151,7 @@ namespace dlib
 
         while (n>0)
         {
-            int status = con.read(s,static_cast<int>(n));
+            int status = (int)con.read(s,static_cast<int>(n));
             if (status < 1)
                 break;
             n -= status;

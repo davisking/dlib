@@ -107,14 +107,14 @@ namespace dlib
                 if (cur_sum > weight)
                 {
                     left = cur_pos;
-                    right = c;
+                    right = (int)c;
                     weight = cur_sum;
                 }
 
                 if (cur_sum <= 0)
                 {
                     cur_sum = 0;
-                    cur_pos = c+1;
+                    cur_pos = (int)c+1;
                 }
 
             }

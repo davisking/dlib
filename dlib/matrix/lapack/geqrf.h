@@ -29,7 +29,7 @@ namespace dlib
                 integer info = 0;
                 DLIB_FORTRAN_ID(dgeqrf)(&m, &n, a, &lda,
                                         tau, work, &lwork, &info);
-                return info;
+                return (int)info;
             }
 
             inline int geqrf (integer m, integer n, float *a, integer lda, 
@@ -38,7 +38,7 @@ namespace dlib
                 integer info = 0;
                 DLIB_FORTRAN_ID(sgeqrf)(&m, &n, a, &lda,
                                         tau, work, &lwork, &info);
-                return info;
+                return (int)info;
             }
 
 

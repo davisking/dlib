@@ -104,7 +104,7 @@ namespace dlib
             const long height = row_pointers.size();
 
 
-            png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+            png_set_IHDR(png_ptr, info_ptr, (unsigned int)width, (unsigned int)height, bit_depth, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
             png_set_rows(png_ptr, info_ptr, &row_pointers[0]);
             png_write_png(png_ptr, info_ptr, png_transforms, NULL);
 

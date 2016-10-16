@@ -267,7 +267,7 @@ namespace dlib
     )
     {
         std::ostringstream sout;
-        sout << std::setw(width) << std::setfill('0') << i;
+        sout << std::setw((int)width) << std::setfill('0') << i;
         return sout.str();
     }
 

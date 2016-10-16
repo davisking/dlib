@@ -30,7 +30,7 @@ namespace dlib
                 integer info = 0;
                 DLIB_FORTRAN_ID(dsyev)(&jobz, &uplo, &n, a,
                                        &lda, w, work, &lwork, &info);
-                return info;
+                return (int)info;
             }
 
             inline int syev (char jobz, char uplo, integer n, float *a,
@@ -39,7 +39,7 @@ namespace dlib
                 integer info = 0;
                 DLIB_FORTRAN_ID(ssyev)(&jobz, &uplo, &n, a,
                                        &lda, w, work, &lwork, &info);
-                return info;
+                return (int)info;
             }
 
 

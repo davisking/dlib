@@ -125,7 +125,7 @@ namespace dlib
             std::streampos pos
         )
         {
-            buf.seekg(pos);
+            buf.seekg((unsigned long)pos);
             return *this;
         }
 

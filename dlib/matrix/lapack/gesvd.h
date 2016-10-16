@@ -293,7 +293,7 @@ namespace dlib
 
             // figure out how big the workspace needs to be.
             T work_size = 1;
-            int info = binding::gesvd(jobu, jobvt, m, n, &a(0,0), a.nc(),
+            int info = (int)binding::gesvd(jobu, jobvt, m, n, &a(0,0), a.nc(),
                                       &s(0,0), &u(0,0), u.nc(), &vt(0,0), vt.nc(),
                                       &work_size, -1);
 
@@ -304,7 +304,7 @@ namespace dlib
                 work.set_size(static_cast<long>(work_size), 1);
 
             // compute the actual SVD
-            info = binding::gesvd(jobu, jobvt, m, n, &a(0,0), a.nc(),
+            info = (int)binding::gesvd(jobu, jobvt, m, n, &a(0,0), a.nc(),
                                   &s(0,0), &u(0,0), u.nc(), &vt(0,0), vt.nc(),
                                   &work(0,0), work.size());
 

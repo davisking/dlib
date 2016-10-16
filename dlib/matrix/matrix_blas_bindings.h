@@ -392,7 +392,7 @@ namespace dlib
     // Helpers for determining the data pointer, LDA, and incX arguments to BLAS functions.
 
         template <typename T, long NR, long NC, typename MM>
-        int get_ld (const matrix<T,NR,NC,MM,row_major_layout>& m) { return m.nc(); }
+        int get_ld (const matrix<T,NR,NC,MM,row_major_layout>& m) { return (int)m.nc(); }
 
         template <typename T, long NR, long NC, typename MM>
         int get_ld (const matrix<T,NR,NC,MM,column_major_layout>& m) { return m.nr(); }
@@ -411,7 +411,7 @@ namespace dlib
         int get_ld (const assignable_sub_matrix<T,NR,NC,MM,column_major_layout>& m) { return m.m.nr(); }
 
         template <typename T>
-        int get_ld (const assignable_ptr_matrix<T>& m) { return m.nc(); }
+        int get_ld (const assignable_ptr_matrix<T>& m) { return (int)m.nc(); }
 
         template <typename T, typename MM>
         int get_ld (const matrix_op<op_array2d_to_mat<array2d<T,MM> > >& m) { return m.nc(); }
@@ -424,7 +424,7 @@ namespace dlib
         template <typename T>
         int get_ld (const matrix_op<op_pointer_to_col_vect<T> >& m) { return m.nc(); }
         template <typename T>
-        int get_ld (const matrix_op<op_pointer_to_mat<T> >& m) { return m.nc(); }
+        int get_ld (const matrix_op<op_pointer_to_mat<T> >& m) { return (int)m.nc(); }
 
         // --------
 
