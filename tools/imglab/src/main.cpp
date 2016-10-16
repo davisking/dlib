@@ -423,6 +423,8 @@ int resample_dataset(const command_line_parser& parser)
     sout << "   cropped-object-size: "<< obj_size << endl;
     sout << "   crop-size: "<< margin_scale << endl;
     sout << "   min-object-size: "<< min_object_size << endl;
+    if (one_object_per_image)
+        sout << "   one_object_per_image: true" << endl;
     resampled_data.comment = data.comment + sout.str();
     resampled_data.name = data.name + " RESAMPLED";
 
