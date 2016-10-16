@@ -767,7 +767,7 @@ int main(int argc, char** argv)
         parser.add_option("stats","List detailed statistics on the object labels in the given XML file.");
         parser.add_option("files","List all the files in the given XML file.");
 
-        parser.set_group_name("Editing/Transforming XML files");
+        parser.set_group_name("Editing/Transforming XML datasets");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
                           "is defined by <arg> which should be a space separated list of parts.",1);
@@ -794,6 +794,7 @@ int main(int argc, char** argv)
         parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
         parser.add_option("rmlabel","Remove all boxes labeled <arg> and save the results to a new XML file.",1);
         parser.add_option("rm-if-overlaps","Remove all boxes labeled <arg> if they overlap any box not labeled <arg> and save the results to a new XML file.",1);
+        parser.add_option("jpg", "When saving images to disk, write them as jpg files instead of png.");
 
         parser.set_group_name("Cropping sub images");
         parser.add_option("resample", "Crop out images that are centered on each object in the dataset. "
@@ -804,7 +805,6 @@ int main(int argc, char** argv)
         parser.add_option("one-object-per-image", "When doing --resample, only include one non-ignored object per image (i.e. the central object).");
         parser.add_option("extract-chips", "Crops out images with tight bounding boxes around each object.  Also crops out "
                                            "many background chips.  All these image chips are serialized into one big data file.  The chips will contain <arg> pixels each.",1);
-        parser.add_option("jpg", "When saving images to disk, write them as jpg files instead of png.");
 
 
 
