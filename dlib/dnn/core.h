@@ -81,7 +81,6 @@ namespace dlib
                 resizable_tensor& 
             ) const
             {
-                DLIB_CASSERT(false,"This function should never be called");
             }
 
             friend void serialize(const repeat_input_layer&, std::ostream&){}
@@ -1681,6 +1680,11 @@ namespace dlib
         ) const
         {
             subnetwork.to_tensor(ibegin,iend,data);
+            // call to_tensor on the networks in details just to populate the
+            // _sample_expansion_factor values in those networks.  Other than that this
+            // call is a noop.  
+            for (auto& d : details)
+                d.to_tensor(ibegin, iend, data);
         }
 
         template <typename forward_iterator>
