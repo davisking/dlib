@@ -889,6 +889,14 @@ namespace dlib
             if (main_iteration_counter_at_last_disk_sync == 0)
                 return false;
 
+            for (auto x : previous_loss_values)
+            {
+                // If we get a NaN value of loss assume things have gone horribly wrong and
+                // we should reload the state of the trainer.
+                if (std::isnan(x))
+                    return true;
+            }
+
             // if we haven't seen much data yet then just say false.
             if (gradient_updates_since_last_sync < 30 || previous_loss_values.size() < 2*gradient_updates_since_last_sync)
                 return false;
