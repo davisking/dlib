@@ -1932,6 +1932,56 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const double DEFAULT_L2_NORM_EPS = 1e-5;
+
+    class l2normalize_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  It takes tensors as input and L2 normalizes them.  In particular,
+                it has the following properties:
+                    - The output tensors from this layer have the same dimenstions as the
+                      input tensors.
+                    - If you think of each input tensor as a set of tensor::num_samples()
+                      vectors, then the output tensor contains the same vectors except they
+                      have been length normlized so that their L2 norms are all 1.  I.e. 
+                      for each vector v we will have ||v||==1.
+        !*/
+
+    public:
+
+        explicit l2normalize_(
+            double eps = tt::DEFAULT_L2_NORM_EPS
+        );
+        /*!
+            requires
+                - eps > 0
+            ensures
+                - #get_eps() == eps
+        !*/
+
+        double get_eps(
+        ) const; 
+        /*!
+            ensures
+                - When we normalize a vector we divide it by its L2 norm.  However, the
+                  get_eps() value is added to the squared norm prior to division to avoid
+                  ever dividing by zero. 
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_ABSTRACT_H_

@@ -24,6 +24,66 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void inverse_norms (
+        resizable_tensor& invnorms,
+        const tensor& data,
+        const double eps
+    );
+    /*!
+        ensures
+            - #invnorms == reciprocal(sqrt(sum_cols(squared(mat(data))) + eps))
+    !*/
+
+    void dot_prods (
+        resizable_tensor& out,
+        const tensor& lhs,
+        const tensor& rhs
+    );
+    /*!
+        requires
+            - have_same_dimensions(lhs,rhs) == true
+        ensures
+            - #out.num_samples() == lhs.num_samples()
+            - #out.k() == #out.nr() == #out.nc() == 1
+            - #out == sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+    !*/
+
+    void scale_rows (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    );
+    /*!
+        requires
+            - have_same_dimensions(out,m) == true
+            - is_vector(mat(v)) == true
+            - v.size() == m.num_samples()
+        ensures
+            - performs: out = scale_rows(mat(m),mat(v));
+    !*/
+
+    void scale_rows2 (
+        float beta, 
+        tensor& out,
+        const tensor& m1,
+        const tensor& m2,
+        const tensor& v1,
+        const tensor& v2
+    );
+    /*!
+        requires
+            - have_same_dimensions(out,m1) == true
+            - have_same_dimensions(out,m2) == true
+            - have_same_dimensions(v1,v2) == true
+            - is_vector(mat(v1)) == true
+            - v1.size() == m1.num_samples()
+        ensures
+            - performs: 
+                out = beta*out + scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void gemm (
         float beta,
         tensor& dest,

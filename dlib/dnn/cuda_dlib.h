@@ -108,6 +108,35 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void inverse_norms (
+            resizable_tensor& invnorms,
+            const tensor& data,
+            const double eps
+        );
+
+        void dot_prods (
+            resizable_tensor& out,
+            const tensor& lhs,
+            const tensor& rhs
+        );
+
+        void scale_rows (
+            tensor& out,
+            const tensor& m,
+            const tensor& v
+        );
+
+        void scale_rows2 (
+            float beta, 
+            tensor& out,
+            const tensor& m1,
+            const tensor& m2,
+            const tensor& v1,
+            const tensor& v2
+        );
+
+    // ------------------------------------------------------------------------------------
+
         void multiply (
             bool add_to,
             tensor& dest,

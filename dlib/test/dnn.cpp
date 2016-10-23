@@ -927,7 +927,6 @@ namespace
             A = dest;
             B = dest;
 
-            tensor_rand rnd;
             rnd.fill_uniform(dest);
             rnd.fill_uniform(A);
             rnd.fill_uniform(B);
@@ -959,6 +958,23 @@ namespace
 
             cuda::multiply(false, dest, A, B);
             DLIB_TEST(max(abs(mat(dest)-pointwise_multiply(AA,mat(B)))) < 1e-6); 
+        }
+
+        {
+            resizable_tensor invnorms1, invnorms2;
+            resizable_tensor data(4,5), out1, out2;
+            rnd.fill_uniform(data);
+
+            const double eps = 0.1;
+
+            invnorms2 = reciprocal(sqrt(sum_cols(squared(mat(data))) + eps));
+            tt::inverse_norms(invnorms1, data, eps);
+            DLIB_TEST(max(abs(mat(invnorms1)-mat(invnorms2))) < 1e-6);
+
+            out1.copy_size(data);
+            tt::scale_rows(out1, data, invnorms1);
+            out2 = scale_rows(mat(data), mat(invnorms1));
+            DLIB_TEST(max(abs(mat(out1)-mat(out2))) < 1e-6);
         }
     }
 
@@ -1302,6 +1318,12 @@ namespace
 
     void test_layers()
     {
+        {
+            print_spinner();
+            l2normalize_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
         {
             print_spinner();
             multiply_ l;

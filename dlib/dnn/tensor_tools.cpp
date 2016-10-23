@@ -43,6 +43,74 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void inverse_norms (
+        resizable_tensor& invnorms,
+        const tensor& data,
+        const double eps
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::inverse_norms(invnorms, data, eps);
+#else
+        invnorms = reciprocal(sqrt(sum_cols(squared(mat(data))) + eps));
+#endif
+    }
+
+    void dot_prods (
+        resizable_tensor& out,
+        const tensor& lhs,
+        const tensor& rhs
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::dot_prods(out, lhs, rhs);
+#else
+        out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+#endif
+    }
+
+    void scale_rows (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(out,m));
+
+#ifdef DLIB_USE_CUDA
+        cuda::scale_rows(out, m, v);
+#else
+        out = scale_rows(mat(m), mat(v));
+#endif
+    }
+
+    void scale_rows2 (
+        float beta, 
+        tensor& out,
+        const tensor& m1,
+        const tensor& m2,
+        const tensor& v1,
+        const tensor& v2
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(out,m1));
+        DLIB_CASSERT(have_same_dimensions(out,m2));
+        DLIB_CASSERT(have_same_dimensions(v1,v2));
+        DLIB_CASSERT(is_vector(mat(v1))); 
+        DLIB_CASSERT(v1.size() == m1.num_samples());
+
+#ifdef DLIB_USE_CUDA
+        cuda::scale_rows2(beta, out, m1, m2, v1, v2);
+#else
+        if (beta == 0)
+            out = scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+        else
+            out = beta*mat(out) + scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void gemm (
         float beta,
         tensor& dest,
