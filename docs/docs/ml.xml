@@ -146,6 +146,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                   <link>dlib/dnn/layers_abstract.h.html#con_</link>
                </item>
                <item>
+                  <name>l2normalize</name>
+                  <link>dlib/dnn/layers_abstract.h.html#l2normalize_</link>
+               </item>
+               <item>
                   <name>dropout</name>
                   <link>dlib/dnn/layers_abstract.h.html#dropout_</link>
                </item>
