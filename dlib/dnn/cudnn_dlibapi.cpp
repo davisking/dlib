@@ -30,6 +30,8 @@ static const char* cudnn_get_error_string(cudnnStatus_t s)
             return "CUDNN_STATUS_EXECUTION_FAILED";
         case CUDNN_STATUS_NOT_SUPPORTED:
             return "CUDNN_STATUS_NOT_SUPPORTED";
+        case CUDNN_STATUS_ARCH_MISMATCH:
+            return "CUDNN_STATUS_ARCH_MISMATCH: Your GPU is too old and not supported by cuDNN";
         default:
             return "A call to cuDNN failed";
     }
