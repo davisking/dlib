@@ -69,6 +69,27 @@ namespace dlib { namespace tt
 #endif
     }
 
+    void scale_columns (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(out,m));
+        DLIB_CASSERT(is_vector(v));
+        if (m.size() == 0 && v.size() == 0)
+            return;
+        DLIB_CASSERT(m.size() != 0);
+        DLIB_CASSERT(m.size()/m.num_samples() == v.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::scale_columns(out, m, v);
+#else
+        DLIB_CASSERT(false, "shouldn't be called right now");
+        out = scale_columns(mat(m), mat(v));
+#endif
+    }
+
     void scale_rows (
         tensor& out,
         const tensor& m,
@@ -76,6 +97,11 @@ namespace dlib { namespace tt
     )
     {
         DLIB_CASSERT(have_same_dimensions(out,m));
+        DLIB_CASSERT(is_vector(v));
+        if (m.size() == 0 && v.size() == 0)
+            return;
+        DLIB_CASSERT(m.size() != 0);
+        DLIB_CASSERT(m.num_samples() == v.size());
 
 #ifdef DLIB_USE_CUDA
         cuda::scale_rows(out, m, v);

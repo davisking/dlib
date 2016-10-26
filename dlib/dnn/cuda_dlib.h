@@ -120,6 +120,12 @@ namespace dlib
             const tensor& rhs
         );
 
+        void scale_columns (
+            tensor& out,
+            const tensor& m,
+            const tensor& v
+        );
+
         void scale_rows (
             tensor& out,
             const tensor& m,

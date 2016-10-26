@@ -142,7 +142,9 @@ namespace dlib
         )
         {
             invnorms.set_size(data.num_samples());
-            launch_kernel(_cuda_inverse_norms,max_jobs(data.size()), invnorms.device(), data.device(), data.num_samples(), data.size()/data.num_samples(), eps);
+            dim3 blocks(10,1);
+            dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
+            _cuda_inverse_norms<<<blocks,threads>>>(invnorms.device(), data.device(), data.num_samples(), data.size()/data.num_samples(), eps);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -174,7 +176,28 @@ namespace dlib
         )
         {
             out.set_size(lhs.num_samples());
-            launch_kernel(_cuda_dot_prods, max_jobs(lhs.size()), out.device(), lhs.device(), rhs.device(), lhs.num_samples(), lhs.size()/lhs.num_samples());
+            dim3 blocks(10,1);
+            dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
+            _cuda_dot_prods<<<blocks,threads>>>(out.device(), lhs.device(), rhs.device(), lhs.num_samples(), lhs.size()/lhs.num_samples());
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_scale_columns(float* out, const float* m, const float* v, size_t nr, size_t nc)
+        {
+            for (auto j : grid_stride_range(0, nr*nc))
+            {
+                out[j] = m[j]*v[j%nc];
+            }
+        }
+
+        void scale_columns (
+            tensor& out,
+            const tensor& m,
+            const tensor& v
+        )
+        {
+            launch_kernel(_cuda_scale_columns, max_jobs(m.size()), out.device(), m.device(), v.device(), m.num_samples(), m.size()/m.num_samples());
         }
 
     // ----------------------------------------------------------------------------------------

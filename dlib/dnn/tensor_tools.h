@@ -48,6 +48,20 @@ namespace dlib { namespace tt
             - #out == sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
     !*/
 
+    void scale_columns (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    );
+    /*!
+        requires
+            - have_same_dimensions(out,m) == true
+            - is_vector(v) == true
+            - v.size() == mat(m).nc()
+        ensures
+            - performs: out = scale_columns(mat(m),mat(v));
+    !*/
+
     void scale_rows (
         tensor& out,
         const tensor& m,
@@ -56,7 +70,7 @@ namespace dlib { namespace tt
     /*!
         requires
             - have_same_dimensions(out,m) == true
-            - is_vector(mat(v)) == true
+            - is_vector(v) == true
             - v.size() == m.num_samples()
         ensures
             - performs: out = scale_rows(mat(m),mat(v));
@@ -75,7 +89,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(out,m1) == true
             - have_same_dimensions(out,m2) == true
             - have_same_dimensions(v1,v2) == true
-            - is_vector(mat(v1)) == true
+            - is_vector(v1) == true
             - v1.size() == m1.num_samples()
         ensures
             - performs: 
