@@ -347,6 +347,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool is_vector (
+        const tensor& t
+    );
+    /*!
+        ensures
+            - returns true if and only if one of the following is true:
+                - t.size() == t.num_samples() 
+                - t.size() == t.k() 
+                - t.size() == t.nr() 
+                - t.size() == t.nc()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp mat (
         const tensor& t,
         long nr,

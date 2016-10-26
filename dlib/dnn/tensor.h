@@ -193,6 +193,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline bool is_vector (
+        const tensor& t
+    )
+    {
+        return t.size() == t.num_samples() ||
+               t.size() == t.k() ||
+               t.size() == t.nr() ||
+               t.size() == t.nc();
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline const matrix_op<op_pointer_to_mat<float> > mat (
         const tensor& t,
         long nr,
