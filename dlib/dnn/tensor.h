@@ -197,10 +197,10 @@ namespace dlib
         const tensor& t
     )
     {
-        return t.size() == t.num_samples() ||
-               t.size() == t.k() ||
-               t.size() == t.nr() ||
-               t.size() == t.nc();
+        return t.size() == (size_t)t.num_samples() ||
+               t.size() == (size_t)t.k() ||
+               t.size() == (size_t)t.nr() ||
+               t.size() == (size_t)t.nc();
     }
 
 // ----------------------------------------------------------------------------------------
