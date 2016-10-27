@@ -113,8 +113,9 @@ namespace dlib
         __global__ void _cuda_inverse_norms(float* invnorms, const float* data, size_t nr, size_t nc, const float eps)
         {
             // initialize invnorms before we begin.
-            for (auto i : grid_stride_range(0, nr))
-                invnorms[i] = eps;
+            for (auto i : grid_stride_range_y(0, nr))
+                for (auto j : grid_stride_range(0, 1))
+                    invnorms[i] = eps;
             __syncthreads();
 
             for (auto i : grid_stride_range_y(0, nr))
@@ -129,10 +130,9 @@ namespace dlib
             }
             __syncthreads();
 
-            for (auto j : grid_stride_range(0, nr))
-            {
-                invnorms[j] = 1.0/std::sqrt(invnorms[j]);
-            }
+            for (auto i : grid_stride_range_y(0, nr))
+                for (auto j : grid_stride_range(0, 1))
+                    invnorms[i] = 1.0/std::sqrt(invnorms[i]);
         }
 
         void inverse_norms (
@@ -142,7 +142,7 @@ namespace dlib
         )
         {
             invnorms.set_size(data.num_samples());
-            dim3 blocks(10,1);
+            dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
             dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
             _cuda_inverse_norms<<<blocks,threads>>>(invnorms.device(), data.device(), data.num_samples(), data.size()/data.num_samples(), eps);
         }
@@ -152,8 +152,9 @@ namespace dlib
         __global__ void _cuda_dot_prods(float* out, const float* lhs, const float* rhs, size_t nr, size_t nc)
         {
             // initialize out before we begin.
-            for (auto i : grid_stride_range(0, nr))
-                out[i] = 0;
+            for (auto i : grid_stride_range_y(0, nr))
+                for (auto j : grid_stride_range(0, 1))
+                    out[i] = 0;
             __syncthreads();
 
             for (auto i : grid_stride_range_y(0, nr))
@@ -176,7 +177,7 @@ namespace dlib
         )
         {
             out.set_size(lhs.num_samples());
-            dim3 blocks(10,1);
+            dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
             dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
             _cuda_dot_prods<<<blocks,threads>>>(out.device(), lhs.device(), rhs.device(), lhs.num_samples(), lhs.size()/lhs.num_samples());
         }
@@ -379,8 +380,9 @@ namespace dlib
         __global__ void _cuda_multiply_conv2(float* d, const float* s1, size_t n, const float* s2, size_t bs, size_t ks)
         {
             // zero initialize d before we begin.
-            for (auto i : grid_stride_range(0, ks))
-                d[i] = 0;
+            for (auto i : grid_stride_range_y(0, ks))
+                for (auto j : grid_stride_range(0, 1))
+                    d[i] = 0;
             __syncthreads();
 
             // loop over all the image planes
@@ -448,7 +450,7 @@ namespace dlib
                 if (dest.size() == 0)
                     return;
 
-                dim3 blocks(10,1);
+                dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
                 dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
                 if (add_to)
                     _cuda_multiply_conv2_add_to<<<blocks,threads>>>(
