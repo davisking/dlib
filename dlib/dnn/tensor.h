@@ -17,6 +17,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class tensor;
     namespace cuda
     {
         void set_tensor (
