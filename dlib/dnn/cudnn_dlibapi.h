@@ -89,26 +89,6 @@ namespace dlib
                   add into the dest tensor.
         !*/
 
-        void set_tensor (
-            tensor& t,
-            float value
-        );
-        /*!
-            ensures
-                - sets all elements in t equal to value.
-        !*/
-
-        void scale_tensor (
-            tensor& t,
-            float value
-        );
-        /*!
-            ensures
-                - scales all elements of t by the given value.  I.e. for all elements E in
-                  t, this function performs:
-                    - E = E*value
-        !*/
-
     // ------------------------------------------------------------------------------------
 
         void assign_conv_bias_gradient (

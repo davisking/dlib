@@ -339,6 +339,14 @@ namespace
         dlog << LINFO << mat(dest);
         matrix<float> truth1(3,4), truth2(3,4);
 
+        truth1 = 2;
+        DLIB_TEST(max(abs(truth1-mat(src))) < 1e-5);
+        src *= 2;
+        truth1 = 4;
+        DLIB_TEST(max(abs(truth1-mat(src))) < 1e-5);
+        src = 2;
+
+
         truth1 = 7;
         truth2 = 7, 10,  7,  7,
         7, 10,  7,  7,

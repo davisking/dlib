@@ -14,6 +14,22 @@
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    namespace cuda
+    {
+        void set_tensor (
+            tensor& t,
+            float value
+        );
+
+        void scale_tensor (
+            tensor& t,
+            float value
+        );
+    }
+
 // ----------------------------------------------------------------------------------------
 
     class tensor

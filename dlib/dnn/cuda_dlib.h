@@ -143,6 +143,18 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        void set_tensor (
+            tensor& t,
+            float value
+        );
+
+        void scale_tensor (
+            tensor& t,
+            float value
+        );
+
+    // ------------------------------------------------------------------------------------
+
         void multiply (
             bool add_to,
             tensor& dest,

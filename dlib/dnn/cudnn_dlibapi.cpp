@@ -289,32 +289,6 @@ namespace dlib
                                     dest.device()));
         }
 
-        void set_tensor (
-            tensor& t,
-            float value
-        )
-        {
-            if (t.size() == 0)
-                return;
-            CHECK_CUDNN(cudnnSetTensor(context(),
-                                 descriptor(t),
-                                 t.device_write_only(),
-                                 &value));
-        }
-
-        void scale_tensor (
-            tensor& t,
-            float value
-        )
-        {
-            if (t.size() == 0)
-                return;
-            CHECK_CUDNN(cudnnScaleTensor(context(),
-                                   descriptor(t),
-                                   t.device(),
-                                   &value));
-        }
-
         void assign_conv_bias_gradient (
             tensor& grad,
             const tensor& gradient_input

@@ -864,6 +864,38 @@ namespace dlib
             launch_kernel(_add_bias_gradient,max_jobs(grad.size()),grad.device(), gradient_input.device(), grad.size(), gradient_input.size());
         }
 
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _set_tensor(float* out, size_t n, const float val)
+        {
+            for (auto i : grid_stride_range(0, n))
+                out[i] = val;
+        }
+
+        void set_tensor (
+            tensor& t,
+            float value
+        )
+        {
+            launch_kernel(_set_tensor, max_jobs(t.size()), t.device(), t.size(), value);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _scale_tensor(float* out, size_t n, const float val)
+        {
+            for (auto i : grid_stride_range(0, n))
+                out[i] *= val;
+        }
+
+        void scale_tensor (
+            tensor& t,
+            float value
+        )
+        {
+            launch_kernel(_scale_tensor, max_jobs(t.size()), t.device(), t.size(), value);
+        }
+
     // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
 
