@@ -34,7 +34,7 @@ namespace
                 0                     // the number of command line arguments for this test
             )
         {
-            thetime = time(0);
+            thetime = 1407805946;// time(0);
         }
 
         time_t thetime;
