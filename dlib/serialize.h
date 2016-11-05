@@ -62,6 +62,7 @@
         - std::string
         - std::wstring
         - std::vector
+        - std::array
         - std::deque
         - std::map
         - std::set
@@ -80,6 +81,7 @@
         - std::string
         - std::wstring
         - std::vector
+        - std::array
         - std::deque
         - std::map
         - std::set
@@ -145,6 +147,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <array>
 #include <deque>
 #include <complex>
 #include <map>
@@ -1360,6 +1363,64 @@ namespace dlib
         else
         {
             throw serialization_error("Error deserializing a C style array, lengths do not match");
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        size_t N
+        >
+    inline void serialize (
+        const std::array<T,N>& array,
+        std::ostream& out
+    )
+    {
+        typedef T c_array_type[N];
+        serialize(*(const c_array_type*)array.data(), out);
+    }
+
+    template <
+        typename T,
+        size_t N
+        >
+    inline void deserialize (
+        std::array<T,N>& array,
+        std::istream& in 
+    )
+    {
+        typedef T c_array_type[N];
+        deserialize(*(c_array_type*)array.data(), in);
+    }
+
+    template <
+        typename T
+        >
+    inline void serialize (
+        const std::array<T,0>& /*array*/,
+        std::ostream& out
+    )
+    {
+        size_t N = 0;
+        serialize(N, out);
+    }
+
+    template <
+        typename T
+        >
+    inline void deserialize (
+        std::array<T,0>& /*array*/,
+        std::istream& in 
+    )
+    {
+        size_t N;
+        deserialize(N, in);
+        if (N != 0)
+        {
+            std::ostringstream sout;
+            sout << "Expected std::array of size 0 but found a size of " << N;
+            throw serialization_error(sout.str());
         }
     }
 
