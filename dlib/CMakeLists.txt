@@ -33,12 +33,18 @@ endif()
 include(cmake_utils/add_global_compiler_switch.cmake)
 
 
-# Make sure ENABLE_ASSERTS is defined for debug builds
-if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
-   set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_ASSERTS" 
-      CACHE STRING "Flags used by the compiler during C++ debug builds." 
-      FORCE)
-endif ()
+if (DLIB_IN_PROJECT_BUILD)
+   # Make sure ENABLE_ASSERTS is defined for debug builds, but only for uses
+   # who are building an application.  If they are just building dlib as a
+   # stand alone library then don't set this because it will conflict with the
+   # settings in config.h if we did.
+   if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
+      set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_ASSERTS" 
+         CACHE STRING "Flags used by the compiler during C++ debug builds." 
+         FORCE)
+   endif()
+endif()
+
 macro (toggle_preprocessor_switch option_name)
    if (${option_name})
       add_global_define(${option_name})
