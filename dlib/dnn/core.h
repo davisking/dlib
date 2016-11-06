@@ -2120,12 +2120,12 @@ namespace dlib
     {
     private:
         // We don't want anyone making these no_label_type objects.  They are here only to
-        // allow add_loss_layer::label_type and dnn_trainer::label_type to exist which avoids
-        // needing to overload add_loss_layer and dnn_trainer for supervised an unsupervised
-        // losses.  It also can be a type to use in template metaprogramming to indicate
-        // "no label".  So here we make the constructor private with the exception that
-        // add_loss_layer objects can make it (again, just to simplify add_loss_layer's
-        // implementation).
+        // allow add_loss_layer::training_label_type and dnn_trainer::training_label_type
+        // to exist which avoids needing to overload add_loss_layer and dnn_trainer for
+        // supervised an unsupervised losses.  It also can be a type to use in template
+        // metaprogramming to indicate "no label".  So here we make the constructor private
+        // with the exception that add_loss_layer objects can make it (again, just to
+        // simplify add_loss_layer's implementation).
         no_label_type(){};
         template <typename LOSS_DETAILS, typename SUBNET> friend class add_loss_layer;
         template < typename net_type, typename solver_type > friend class dnn_trainer; 
@@ -2137,14 +2137,25 @@ namespace dlib
     class add_loss_layer
     {
         template <typename T, typename enabled=void>
-        struct get_loss_layer_label_type
+        struct get_loss_layer_training_label_type
         {
             typedef no_label_type type;
         };
         template <typename T>
-        struct get_loss_layer_label_type<T,typename std::enable_if<sizeof(typename T::label_type)!=0>::type>
+        struct get_loss_layer_training_label_type<T,typename std::enable_if<sizeof(typename T::training_label_type)!=0>::type>
         {
-            typedef typename T::label_type type;
+            typedef typename T::training_label_type type;
+        };
+
+        template <typename T, typename enabled=void>
+        struct get_loss_layer_output_label_type
+        {
+            typedef no_label_type type;
+        };
+        template <typename T>
+        struct get_loss_layer_output_label_type<T,typename std::enable_if<sizeof(typename T::output_label_type)!=0>::type>
+        {
+            typedef typename T::output_label_type type;
         };
 
     public:
@@ -2154,7 +2165,8 @@ namespace dlib
         const static size_t num_layers = subnet_type::num_layers + 1;
         // Note that the loss layer doesn't count as an additional computational layer.
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
-        typedef typename get_loss_layer_label_type<LOSS_DETAILS>::type label_type;
+        typedef typename get_loss_layer_training_label_type<LOSS_DETAILS>::type training_label_type;
+        typedef typename get_loss_layer_output_label_type<LOSS_DETAILS>::type output_label_type;
 
         static_assert(is_nonloss_layer_type<SUBNET>::value, 
             "SUBNET must be of type add_layer, add_skip_layer, or add_tag_layer."); 
@@ -2250,19 +2262,19 @@ namespace dlib
             (*this)(temp_tensor, obegin);
         }
 
-        const label_type& operator() (const input_type& x)
+        const output_label_type& operator() (const input_type& x)
         {
             (*this)(&x, &x+1, &temp_label);
             return temp_label;
         }
 
         template <typename iterable_type>
-        std::vector<label_type> operator() (
+        std::vector<output_label_type> operator() (
             const iterable_type& data,
             size_t batch_size = 128
         )
         {
-            std::vector<label_type> results(std::distance(data.begin(), data.end()));
+            std::vector<output_label_type> results(std::distance(data.begin(), data.end()));
             auto o = results.begin();
             auto i = data.begin();
             auto num_remaining = results.size();
@@ -2426,7 +2438,7 @@ namespace dlib
 
         // These two objects don't logically contribute to the state of this object.  They
         // are here to prevent them from being reallocated over and over.
-        label_type temp_label;
+        output_label_type temp_label;
         resizable_tensor temp_tensor;
     };
 

@@ -21,7 +21,8 @@ namespace dlib
     {
     public:
 
-        typedef float label_type;
+        typedef float training_label_type;
+        typedef float output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -128,7 +129,8 @@ namespace dlib
     {
     public:
 
-        typedef float label_type;
+        typedef float training_label_type;
+        typedef float output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -244,7 +246,8 @@ namespace dlib
     {
     public:
 
-        typedef unsigned long label_type;
+        typedef unsigned long training_label_type;
+        typedef unsigned long output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -468,7 +471,8 @@ namespace dlib
 
     public:
 
-        typedef std::vector<mmod_rect> label_type;
+        typedef std::vector<mmod_rect> training_label_type;
+        typedef std::vector<mmod_rect> output_label_type;
 
         loss_mmod_() {}
 
@@ -494,7 +498,7 @@ namespace dlib
             DLIB_CASSERT(sub.sample_expansion_factor() == 1,  sub.sample_expansion_factor());
 
             std::vector<intermediate_detection> dets_accum;
-            label_type final_dets;
+            output_label_type final_dets;
             for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
                 tensor_to_dets(input_tensor, output_tensor, i, dets_accum, adjust_threshold, sub);
@@ -865,7 +869,7 @@ namespace dlib
     {
     public:
 
-        typedef unsigned long label_type;
+        typedef unsigned long training_label_type;
 
 
         template <

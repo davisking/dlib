@@ -30,20 +30,20 @@ namespace dlib
 
     namespace impl
     {
-        template <typename label_type>
+        template <typename training_label_type>
         struct dnn_job_t
         {
             dnn_job_t() = default;
             dnn_job_t(const dnn_job_t&) = delete;
             dnn_job_t& operator=(const dnn_job_t&) = delete;
 
-            std::vector<std::vector<label_type>> labels;
+            std::vector<std::vector<training_label_type>> labels;
             std::vector<resizable_tensor> t;
             std::vector<int> have_data;  // have_data[i] is true if there is data in labels[i] and t[i].
         };
 
-        template <typename label_type>
-        void swap(dnn_job_t<label_type>& a, dnn_job_t<label_type>& b)
+        template <typename training_label_type>
+        void swap(dnn_job_t<training_label_type>& a, dnn_job_t<training_label_type>& b)
         {
             a.labels.swap(b.labels);
             a.t.swap(b.t);
@@ -63,12 +63,12 @@ namespace dlib
         static_assert(is_loss_layer_type<net_type>::value, 
             "The last layer in a network must be a loss layer.");
 
-        typedef typename net_type::label_type label_type;
+        typedef typename net_type::training_label_type training_label_type;
         typedef typename net_type::input_type input_type;
         const static size_t num_computational_layers = net_type::num_computational_layers;
         const static size_t num_layers = net_type::num_layers;
     private:
-        typedef impl::dnn_job_t<label_type> job_t;
+        typedef impl::dnn_job_t<training_label_type> job_t;
     public:
 
         dnn_trainer() = delete;
@@ -184,7 +184,7 @@ namespace dlib
 
         void train_one_step (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
+            const std::vector<training_label_type>& labels 
         )
         {
             DLIB_CASSERT(data.size() == labels.size());
@@ -261,7 +261,7 @@ namespace dlib
 
         void train (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
+            const std::vector<training_label_type>& labels 
         ) 
         {
             DLIB_CASSERT(data.size() == labels.size() && data.size() > 0);
@@ -322,7 +322,7 @@ namespace dlib
         {
             DLIB_CASSERT(data.size() > 0);
 
-            const bool has_unsupervised_loss = std::is_same<no_label_type, label_type>::value; 
+            const bool has_unsupervised_loss = std::is_same<no_label_type, training_label_type>::value; 
             static_assert(has_unsupervised_loss, 
                 "You can only call this version of train() when using an unsupervised loss.");
 
@@ -562,7 +562,7 @@ namespace dlib
 
         void thread() try
         {
-            label_type pick_which_run_update;
+            training_label_type pick_which_run_update;
             job_t next_job;
 
             std::vector<dlib::future<double>> losses(devices.size());
@@ -591,7 +591,7 @@ namespace dlib
                 ++main_iteration_counter;
                 // Call compute_parameter_gradients() and update_parameters() but pick the
                 // right version for unsupervised or supervised training based on the type
-                // of label_type.
+                // of training_label_type.
                 for (size_t i = 0; i < devices.size(); ++i)
                     tp[i]->add_task_by_value([&,i](double& loss){ loss = compute_parameter_gradients(i, next_job, pick_which_run_update); }, losses[i]);
                 // aggregate loss values from all the network computations.
@@ -988,7 +988,7 @@ namespace dlib
             data_iterator dend
         )
         {
-            typename std::vector<label_type>::iterator nothing;
+            typename std::vector<training_label_type>::iterator nothing;
             send_job(dbegin, dend, nothing);
         }
 

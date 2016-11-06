@@ -619,9 +619,12 @@ namespace dlib
         typedef typename subnet_type::input_type input_type;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static size_t num_layers = subnet_type::num_layers + 1;
-        // If LOSS_DETAILS is an unsupervised loss then label_type==no_label_type.
+        // If LOSS_DETAILS is an unsupervised loss then training_label_type==no_label_type.
         // Otherwise it is defined as follows:
-        typedef typename LOSS_DETAILS::label_type label_type;
+        typedef typename LOSS_DETAILS::training_label_type training_label_type;
+        // Similarly, if LOSS_DETAILS doesn't provide any output conversion then
+        // output_label_type==no_label_type.
+        typedef typename LOSS_DETAILS::output_label_type output_label_type;
 
 
 
@@ -768,7 +771,7 @@ namespace dlib
                 - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - obegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor() label_type elements.
+                  x.num_samples()/sample_expansion_factor() output_label_type elements.
             ensures
                 - runs x through the network and writes the output to the range at obegin.
                 - loss_details().to_label() is used to write the network output into
@@ -786,7 +789,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
                 - obegin == iterator pointing to the start of a range of
-                  std::distance(ibegin,iend) label_type elements.
+                  std::distance(ibegin,iend) output_label_type elements.
             ensures
                 - runs [ibegin,iend) through the network and writes the output to the range
                   at obegin.
@@ -796,18 +799,18 @@ namespace dlib
 
     // -------------
 
-        const label_type& operator() (
+        const output_label_type& operator() (
             const input_type& x
         );
         /*!
             ensures
                 - runs a single object, x, through the network and returns the output.
                 - loss_details().to_label() is used to convert the network output into a
-                  label_type.
+                  output_label_type.
         !*/
 
         template <typename iterable_type>
-        std::vector<label_type> operator() (
+        std::vector<output_label_type> operator() (
             const iterable_type& data,
             size_t batch_size = 128
         );
@@ -826,7 +829,7 @@ namespace dlib
                   items.  Using a batch_size > 1 can be faster because it better exploits
                   the available hardware parallelism.
                 - loss_details().to_label() is used to convert the network output into a
-                  label_type.
+                  output_label_type.
         !*/
 
     // -------------
@@ -844,7 +847,7 @@ namespace dlib
                 - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor() label_type elements.
+                  x.num_samples()/sample_expansion_factor() training_label_type elements.
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and returns the resulting loss. 
@@ -864,7 +867,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
                 - lbegin == iterator pointing to the start of a range of
-                  std::distance(ibegin,iend) label_type elements.
+                  std::distance(ibegin,iend) training_label_type elements.
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and returns the resulting loss. 
@@ -880,7 +883,7 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - sample_expansion_factor() != 0
                   (i.e. to_tensor() must have been called to set sample_expansion_factor()
                   to something non-zero.)
@@ -898,7 +901,7 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
             ensures
@@ -921,7 +924,7 @@ namespace dlib
                 - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor() label_type elements.
+                  x.num_samples()/sample_expansion_factor() training_label_type elements.
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and computes parameter and data gradients with
@@ -944,7 +947,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
                 - lbegin == iterator pointing to the start of a range of
-                  std::distance(ibegin,iend) label_type elements.
+                  std::distance(ibegin,iend) training_label_type elements.
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and computes parameter and data
@@ -961,7 +964,7 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - sample_expansion_factor() != 0
                   (i.e. to_tensor() must have been called to set sample_expansion_factor()
                   to something non-zero.)
@@ -982,7 +985,7 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
             ensures

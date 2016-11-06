@@ -33,14 +33,16 @@ namespace dlib
 
                 Finally, note that there are two broad flavors of loss layer, supervised
                 and unsupervised.  The EXAMPLE_LOSS_LAYER_ as shown here is a supervised
-                layer.  To make an unsupervised loss you simply leave out the label_type
-                typedef, to_label(), and the truth iterator argument to
+                layer.  To make an unsupervised loss you simply leave out the
+                training_label_type typedef and the truth iterator argument to
                 compute_loss_value_and_gradient().
         !*/
 
     public:
 
-        typedef whatever_type_you_use_for_labels label_type;
+        // In most cases training_label_type and output_label_type will be the same type.
+        typedef whatever_type_you_use_for_training_labels training_label_type;
+        typedef whatever_type_you_use_for_outout_labels   output_label_type;
 
         EXAMPLE_LOSS_LAYER_ (
         );
@@ -77,9 +79,9 @@ namespace dlib
                 - input_tensor.num_samples()%sub.sample_expansion_factor() == 0.
                 - iter == an iterator pointing to the beginning of a range of
                   input_tensor.num_samples()/sub.sample_expansion_factor() elements.  Moreover,
-                  they must be label_type elements.
+                  they must be output_label_type elements.
             ensures
-                - Converts the output of the provided network to label_type objects and
+                - Converts the output of the provided network to output_label_type objects and
                   stores the results into the range indicated by iter.  In particular, for
                   all valid i, it will be the case that:
                     *(iter+i/sub.sample_expansion_factor()) is populated based on the output of
@@ -108,7 +110,7 @@ namespace dlib
                       layer<i>(sub).get_output().
                 - truth == an iterator pointing to the beginning of a range of
                   input_tensor.num_samples()/sub.sample_expansion_factor() elements.  Moreover,
-                  they must be label_type elements.
+                  they must be training_label_type elements.
                 - for all valid i:
                     - *(truth+i/sub.sample_expansion_factor()) is the label of the ith sample in
                       input_tensor.
@@ -167,7 +169,8 @@ namespace dlib
         !*/
     public:
 
-        typedef float label_type;
+        typedef float training_label_type;
+        typedef float output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -234,7 +237,8 @@ namespace dlib
         !*/
     public:
 
-        typedef float label_type;
+        typedef float training_label_type;
+        typedef float output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -306,7 +310,8 @@ namespace dlib
 
     public:
 
-        typedef unsigned long label_type;
+        typedef unsigned long training_label_type;
+        typedef unsigned long output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -443,7 +448,8 @@ namespace dlib
 
     public:
 
-        typedef std::vector<mmod_rect> label_type;
+        typedef std::vector<mmod_rect> training_label_type;
+        typedef std::vector<mmod_rect> output_label_type;
 
         loss_mmod_(
         );

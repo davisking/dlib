@@ -47,7 +47,7 @@ namespace dlib
 
     public:
 
-        typedef typename net_type::label_type label_type;
+        typedef typename net_type::training_label_type training_label_type;
         typedef typename net_type::input_type input_type;
         const static size_t num_computational_layers = net_type::num_computational_layers;
 
@@ -341,14 +341,14 @@ namespace dlib
 
         void train (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
+            const std::vector<training_label_type>& labels 
         ); 
         /*!
             requires
                 - data.size() == labels.size()
                 - data.size() > 0
                 - net_type uses a supervised loss.  
-                  i.e. net_type::label_type != no_label_type.
+                  i.e. net_type::training_label_type != no_label_type.
             ensures
                 - Trains a supervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
@@ -374,7 +374,7 @@ namespace dlib
             requires 
                 - data.size() > 0
                 - net_type uses an unsupervised loss.  
-                  i.e. net_type::label_type == no_label_type.
+                  i.e. net_type::training_label_type == no_label_type.
             ensures
                 - Trains an unsupervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
@@ -395,14 +395,14 @@ namespace dlib
 
         void train_one_step (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
+            const std::vector<training_label_type>& labels 
         );
         /*!
             requires
                 - data.size() == labels.size()
                 - data.size() > 0
                 - net_type uses a supervised loss.  
-                  i.e. net_type::label_type != no_label_type.
+                  i.e. net_type::training_label_type != no_label_type.
             ensures
                 - Performs one stochastic gradient update step based on the mini-batch of
                   data and labels supplied to this function.  In particular, calling
@@ -433,7 +433,7 @@ namespace dlib
                 - std::advance(lbegin, std::distance(dbegin, dend) - 1) is dereferencable
                 - std::distance(dbegin, dend) > 0
                 - net_type uses a supervised loss.  
-                  i.e. net_type::label_type != no_label_type.
+                  i.e. net_type::training_label_type != no_label_type.
             ensures
                 - Performs one stochastic gradient update step based on the mini-batch of
                   data and labels supplied to this function.  In particular, calling
@@ -457,7 +457,7 @@ namespace dlib
             requires
                 - data.size() > 0
                 - net_type uses an unsupervised loss.  
-                  i.e. net_type::label_type == no_label_type.
+                  i.e. net_type::training_label_type == no_label_type.
             ensures
                 - Performs one stochastic gradient update step based on the mini-batch of
                   data supplied to this function.  In particular, calling train_one_step()
@@ -485,7 +485,7 @@ namespace dlib
             requires
                 - std::distance(dbegin, dend) > 0
                 - net_type uses an unsupervised loss.  
-                  i.e. net_type::label_type == no_label_type.
+                  i.e. net_type::training_label_type == no_label_type.
             ensures
                 - Performs one stochastic gradient update step based on the mini-batch of
                   data supplied to this function.  In particular, calling train_one_step()
