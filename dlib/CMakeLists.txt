@@ -99,12 +99,21 @@ if (NOT TARGET dlib)
       set (DLIB_DISABLE_ASSERTS false)
       set (ENABLE_ASSERTS true) 
       add_global_define(ENABLE_ASSERTS)
+      remove_global_define(DLIB_DISABLE_ASSERTS)
    else()
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS true)
       set (ENABLE_ASSERTS false) 
       remove_global_define(ENABLE_ASSERTS)
+      # Never force the asserts off when doing an in project build.  Instead,
+      # let the debug/release mode setting toggle asserts on or off (or the
+      # DLIB_ENABLE_ASSERTS option obviously).  That is, even if the
+      # DLIB_ENABLE_ASSERTS option is off debug mode can still cause the
+      # asserts to turn on when using an in project build. 
+      if (NOT DLIB_IN_PROJECT_BUILD)
+         add_global_define(DLIB_DISABLE_ASSERTS)
+      endif()
    endif()
 
    if (DLIB_ISO_CPP_ONLY)
