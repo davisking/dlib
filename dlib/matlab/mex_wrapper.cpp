@@ -370,6 +370,31 @@ namespace mex_binding
 
 // -------------------------------------------------------
 
+    string escape_percent(const string& str)
+    {
+        string temp;
+        for(auto c : str)
+        {
+            if (c != '%')
+            {
+                temp += c;
+            }
+            else
+            {
+                temp += c;
+                temp += c;
+            }
+        }
+        return temp;
+    }
+
+    string escape_percent(const std::ostringstream& sout)
+    {
+        return escape_percent(sout.str());
+    }
+
+// -------------------------------------------------------
+
     template <
         typename matrix_type,
         typename EXP
@@ -386,14 +411,14 @@ namespace mex_binding
             std::ostringstream sout;
             sout << "Argument " << arg_idx+1 << " expects a matrix with " << matrix_type::NR << " rows but got one with " << src.nc();
             mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              sout.str().c_str());
+                              escape_percent(sout).c_str());
         }
         if (matrix_type::NC != 0 && matrix_type::NC != src.nr())
         {
             std::ostringstream sout;
             sout << "Argument " << arg_idx+1 << " expects a matrix with " << matrix_type::NC << " columns but got one with " << src.nr();
             mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              sout.str().c_str());
+                              escape_percent(sout).c_str());
         }
 
 
@@ -429,7 +454,7 @@ namespace mex_binding
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
         mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+                          escape_percent(sout).c_str());
     }
 
 
@@ -451,7 +476,7 @@ namespace mex_binding
             std::ostringstream sout;
             sout << "Error, input argument " << arg_idx+1 << " must be a non-negative number.";
             mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              sout.str().c_str());
+                              escape_percent(sout).c_str());
         }
         else
         {
@@ -473,7 +498,7 @@ namespace mex_binding
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
         mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+                          escape_percent(sout).c_str());
     }
 
 
@@ -500,7 +525,7 @@ namespace mex_binding
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
         mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+                          escape_percent(sout).c_str());
     }
 
 
@@ -567,7 +592,7 @@ namespace mex_binding
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
         mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+                          escape_percent(sout).c_str());
     }
 
 // -------------------------------------------------------
@@ -584,7 +609,7 @@ namespace mex_binding
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
         mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+                          escape_percent(sout).c_str());
     }
 
     template <typename MM>
@@ -2913,7 +2938,7 @@ namespace mex_binding
                 << " and " << expected_nrhs << " input arguments, got " << nrhs << ".";
 
             mexErrMsgIdAndTxt("mex_function:nrhs",
-                              sout.str().c_str());
+                              escape_percent(sout).c_str());
         }
 
         if (nlhs > expected_nlhs)
@@ -2922,7 +2947,7 @@ namespace mex_binding
             sout << "Expected at most " << expected_nlhs << " output arguments, got " << nlhs << ".";
 
             mexErrMsgIdAndTxt("mex_function:nlhs",
-                              sout.str().c_str());
+                              escape_percent(sout).c_str());
         }
 
         call_mex_function_helper<sig_traits<funct>::num_args> helper;
@@ -4988,7 +5013,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     catch (mex_binding::invalid_args_exception& e)
     {
         mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                            ("Input" + e.msg).c_str());
+                            mex_binding::escape_percent("Input" + e.msg).c_str());
     }
     catch (mex_binding::user_hit_ctrl_c& )
     {
@@ -4997,7 +5022,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     catch (std::exception& e)
     {
         mexErrMsgIdAndTxt("mex_function:error",
-                            e.what());
+                            mex_binding::escape_percent(e.what()).c_str());
     }
 
     cout << flush;
