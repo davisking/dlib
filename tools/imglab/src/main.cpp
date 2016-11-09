@@ -627,6 +627,7 @@ int main(int argc, char** argv)
                                      "the results as cluster_###.xml and cluster_###.jpg files.",1);
         parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
         parser.add_option("rmlabel","Remove all boxes labeled <arg> and save the results to a new XML file.",1);
+        parser.add_option("rm-other-labels","Remove all boxes not labeled <arg> and save the results to a new XML file.",1);
         parser.add_option("rmignore","Remove all boxes marked ignore and save the results to a new XML file.");
         parser.add_option("rm-if-overlaps","Remove all boxes labeled <arg> if they overlap any box not labeled <arg> and save the results to a new XML file.",1);
         parser.add_option("jpg", "When saving images to disk, write them as jpg files instead of png.");
@@ -645,7 +646,7 @@ int main(int argc, char** argv)
 
         const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
                                  "flip", "rotate", "tile", "size", "cluster", "resample", "min-object-size", "rmempty",
-                                 "crop-size", "cropped-object-size", "rmlabel", "rm-if-overlaps", "sort-num-objects", "one-object-per-image", "jpg", "rmignore"};
+                                 "crop-size", "cropped-object-size", "rmlabel", "rm-other-labels", "rm-if-overlaps", "sort-num-objects", "one-object-per-image", "jpg", "rmignore"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
@@ -659,6 +660,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "rmdiff");
         parser.check_incompatible_options("c", "rmempty");
         parser.check_incompatible_options("c", "rmlabel");
+        parser.check_incompatible_options("c", "rm-other-labels");
         parser.check_incompatible_options("c", "rmignore");
         parser.check_incompatible_options("c", "rm-if-overlaps");
         parser.check_incompatible_options("c", "rmdupes");
@@ -712,6 +714,8 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("rmempty", "rename");
         parser.check_incompatible_options("rmlabel", "ignore");
         parser.check_incompatible_options("rmlabel", "rename");
+        parser.check_incompatible_options("rm-other-labels", "ignore");
+        parser.check_incompatible_options("rm-other-labels", "rename");
         parser.check_incompatible_options("rmignore", "ignore");
         parser.check_incompatible_options("rmignore", "rename");
         parser.check_incompatible_options("rm-if-overlaps", "ignore");
@@ -872,6 +876,34 @@ int main(int argc, char** argv)
             }
 
             save_image_dataset_metadata(data, parser[0] + ".rmlabel-"+label+".xml");
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rm-other-labels"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rm-other-labels option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+
+            const auto label = parser.option("rm-other-labels").argument();
+
+            for (auto&& img : data.images)
+            {
+                std::vector<dlib::image_dataset_metadata::box> boxes;
+                for (auto&& b : img.boxes)
+                {
+                    if (b.label == label)
+                        boxes.push_back(b);
+                }
+                img.boxes = boxes;
+            }
+
+            save_image_dataset_metadata(data, parser[0] + ".rm-other-labels-"+label+".xml");
             return EXIT_SUCCESS;
         }
 
