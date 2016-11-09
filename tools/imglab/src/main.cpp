@@ -890,20 +890,23 @@ int main(int argc, char** argv)
             dlib::image_dataset_metadata::dataset data;
             load_image_dataset_metadata(data, parser[0]);
 
-            const auto label = parser.option("rm-other-labels").argument();
-
+            const auto labels = parser.option("rm-other-labels").argument();
+            // replace comma by dash to form the file name
+            std::string strlabels = labels;
+            std::replace(strlabels.begin(), strlabels.end(), ',', '-');
+            std::vector<string> all_labels = split(labels, ",");
             for (auto&& img : data.images)
             {
                 std::vector<dlib::image_dataset_metadata::box> boxes;
                 for (auto&& b : img.boxes)
                 {
-                    if (b.label == label)
+                    if (std::find(all_labels.begin(), all_labels.end(), b.label) != all_labels.end())
                         boxes.push_back(b);
                 }
                 img.boxes = boxes;
             }
 
-            save_image_dataset_metadata(data, parser[0] + ".rm-other-labels-"+label+".xml");
+            save_image_dataset_metadata(data, parser[0] + ".rm-other-labels-"+ strlabels +".xml");
             return EXIT_SUCCESS;
         }
 
