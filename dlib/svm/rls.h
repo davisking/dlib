@@ -102,7 +102,7 @@ namespace dlib
                 add_eye_to_inv(R, (1-forget_factor)/C);
 
             // R should always be symmetric.  This line improves numeric stability of this algorithm.
-            if (cnt%100 == 0)
+            if (cnt%10 == 0)
                 R = 0.5*(R + trans(R));
             ++cnt;
 
