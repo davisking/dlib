@@ -22,15 +22,34 @@ namespace dlib
     {
         using namespace std;
         ifstream fin1((folder_name+"/train-images-idx3-ubyte").c_str(), ios::binary);
+        if (!fin1)
+        {
+            fin1.open((folder_name + "/train-images.idx3-ubyte").c_str(), ios::binary);
+        }
+
         ifstream fin2((folder_name+"/train-labels-idx1-ubyte").c_str(), ios::binary);
+        if (!fin2)
+        {
+            fin2.open((folder_name + "/train-labels.idx1-ubyte").c_str(), ios::binary);
+        }
+
         ifstream fin3((folder_name+"/t10k-images-idx3-ubyte").c_str(), ios::binary);
+        if (!fin3)
+        {
+            fin3.open((folder_name + "/t10k-images.idx3-ubyte").c_str(), ios::binary);
+        }
+
         ifstream fin4((folder_name+"/t10k-labels-idx1-ubyte").c_str(), ios::binary);
-        if (!fin1) throw error("Unable to open file train-images-idx3-ubyte");
-        if (!fin2) throw error("Unable to open file train-labels-idx1-ubyte");
-        if (!fin3) throw error("Unable to open file t10k-images-idx3-ubyte");
-        if (!fin4) throw error("Unable to open file t10k-labels-idx1-ubyte");
+        if (!fin4)
+        {
+            fin4.open((folder_name + "/t10k-labels.idx1-ubyte").c_str(), ios::binary);
+        }
 
-
+        if (!fin1) throw error("Unable to open file train-images-idx3-ubyte or train-images.idx3-ubyte");
+        if (!fin2) throw error("Unable to open file train-labels-idx1-ubyte or train-labels.idx1-ubyte");
+        if (!fin3) throw error("Unable to open file t10k-images-idx3-ubyte or t10k-images.idx3-ubyte");
+        if (!fin4) throw error("Unable to open file t10k-labels-idx1-ubyte or t10k-labels.idx1-ubyte");
+		
         byte_orderer bo;
 
         // make sure the files have the contents we expect.
