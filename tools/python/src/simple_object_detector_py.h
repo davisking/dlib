@@ -12,8 +12,7 @@
 namespace dlib
 {
     typedef object_detector<scan_fhog_pyramid<pyramid_down<6> > > simple_object_detector;
-    typedef scan_fhog_pyramid<pyramid_down<6> > image_scanner_type;
-    
+
     inline void split_rect_detections (
         std::vector<rect_detection>& rect_detections,
         std::vector<rectangle>& rectangles,
@@ -115,7 +114,7 @@ namespace dlib
     }
 
     inline std::vector<dlib::rectangle> run_detectors_with_upscale1 (
-        std::vector<object_detector<image_scanner_type> >& detectors,
+        std::vector<simple_object_detector >& detectors,
         boost::python::object img,
         const unsigned int upsampling_amount,
         const double adjust_threshold,
@@ -238,12 +237,12 @@ namespace dlib
     {
         boost::python::tuple t;
 
-        std::vector<object_detector<image_scanner_type> > vector_detectors;
+        std::vector<simple_object_detector > vector_detectors;
         const unsigned long num_detectors = len(detectors);
         // Now copy the data into dlib based objects.
         for (unsigned long i = 0; i < num_detectors; ++i)
         {
-            vector_detectors.push_back(boost::python::extract<object_detector<image_scanner_type > >(detectors[i]));
+            vector_detectors.push_back(boost::python::extract<simple_object_detector >(detectors[i]));
         }
         
         std::vector<double> detection_confidences;
