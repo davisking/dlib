@@ -549,7 +549,11 @@ namespace dlib
                 << "\n\tthis: " << this
                 );
 
-            return covariance() / std::sqrt(variance_x()*variance_y());
+            T temp = std::sqrt(variance_x()*variance_y());
+            if (temp != 0)
+                return covariance() / temp;
+            else
+                return 0; // just say it's zero if there isn't any variance in x or y.
         }
 
         T variance_x (
