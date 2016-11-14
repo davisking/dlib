@@ -312,6 +312,7 @@ namespace
             running_stats<double> rs, rs2;
 
             running_scalar_covariance<double> rsc1, rsc2;
+            running_scalar_covariance_decayed<double> rscd1(1000000), rscd2(1000000);
 
             for (double i = 0; i < 100; ++i)
             {
@@ -320,6 +321,10 @@ namespace
                 rsc1.add(i,i);
                 rsc2.add(i,i);
                 rsc2.add(i,-i);
+
+                rscd1.add(i,i);
+                rscd2.add(i,i);
+                rscd2.add(i,-i);
             }
 
             // make sure the running_stats and running_scalar_covariance agree
@@ -333,6 +338,18 @@ namespace
 
             DLIB_TEST(std::abs(rsc1.correlation() - 1) < 1e-10);
             DLIB_TEST(std::abs(rsc2.correlation() - 0) < 1e-10);
+
+
+            const double s = 99/100.0;
+            const double ss = std::sqrt(s);;
+            DLIB_TEST_MSG(std::abs(rs.mean() - rscd1.mean_x()) < 1e-2, std::abs(rs.mean() - rscd1.mean_x()) << " " << rscd1.mean_x());
+            DLIB_TEST(std::abs(rs.mean() - rscd1.mean_y()) < 1e-2);
+            DLIB_TEST_MSG(std::abs(ss*rs.stddev() - rscd1.stddev_x()) < 1e-2, std::abs(ss*rs.stddev() - rscd1.stddev_x()));
+            DLIB_TEST(std::abs(ss*rs.stddev() - rscd1.stddev_y()) < 1e-2);
+            DLIB_TEST_MSG(std::abs(s*rs.variance() - rscd1.variance_x()) < 1e-2, std::abs(s*rs.variance() - rscd1.variance_x()));
+            DLIB_TEST(std::abs(s*rs.variance() - rscd1.variance_y()) < 1e-2);
+            DLIB_TEST(std::abs(rscd1.correlation() - 1) < 1e-2);
+            DLIB_TEST(std::abs(rscd2.correlation() - 0) < 1e-2);
 
 
 
