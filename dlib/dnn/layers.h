@@ -711,7 +711,6 @@ namespace dlib
         static_assert(_repeat_c >= 1, "The number of columns to repeat must be >= 1");
     public:
 
-
         block_upsample_(
         )
         {}
@@ -737,46 +736,21 @@ namespace dlib
             return p;
         }
 
-        block_upsample_ (
-            const block_upsample_& item
-        )
-        {
-            // this->bu is non-copyable so we have to write our own copy to avoid trying to
-            // copy it and getting an error.
-        }
-
-        block_upsample_& operator= (
-            const block_upsample_& item
-        )
-        {
-            if (this == &item)
-                return *this;
-
-            // this->bu is non-copyable so we have to write our own copy to avoid trying to
-            // copy it and getting an error.
-            return *this;
-        }
-
         template <typename SUBNET>
         void setup (const SUBNET& /*sub*/)
         {
+            bu.setup_block_upsampling(_repeat_r, _repeat_c);
         }
 
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            bu.setup_block_upsampling(_repeat_r!=0?_repeat_r:sub.get_output().nr(), 
-                                    _repeat_c!=0?_repeat_c:sub.get_output().nc());
-
             bu(output, sub.get_output());
         } 
 
         template <typename SUBNET>
         void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
-            bu.setup_block_upsampling(_repeat_r!=0?_repeat_r:sub.get_output().nr(), 
-                                    _repeat_c!=0?_repeat_c:sub.get_output().nc());
-
             bu.get_gradient(gradient_input, computed_output, sub.get_output(), sub.get_gradient_input());
         }
 

@@ -983,12 +983,9 @@ namespace dlib { namespace tt
         /*!
             WHAT THIS OBJECT REPRESENTS
                 The upsampling object is a tool for performing spatial upsampling (unpooling) over a tensor.
-                It can be configured to do block upsampling.
+                It performs block upsampling.
         !*/
     public:
-
-        upsampling(const upsampling&) = delete;
-        upsampling& operator=(const upsampling&) = delete;
 
         upsampling (
         ) = default;
@@ -1009,9 +1006,6 @@ namespace dlib { namespace tt
                   the given parameters.
         !*/
 
-        bool does_block_upsampling(
-        ) const { return impl.does_block_upsampling(); }
-
         void operator() (
             resizable_tensor& dest,
             const tensor& src
@@ -1023,12 +1017,11 @@ namespace dlib { namespace tt
             ensures
                 - #dest.num_samples() == src.num_samples()
                 - #dest.k() == src.k()
-                - #dest.nr() == src.nr() * window_height
-                - #dest.nc() == src.nc() * window_width
+                - #dest.nr() == src.nr() * repeat_height
+                - #dest.nc() == src.nc() * repeat_width
                 - for all valid s, k, r, and c:
-                    - if (does_block_upsampling()) then
-                        - for 0 <= i <= window_height, 0 <= j <= window_width:
-                            - image_plane(#dest,s,k)(r*window_height + j, c*window_width + i) == image_plane(src,s,k)(r,c)
+                    - for 0 <= i <= repeat_height, 0 <= j <= repeat_width:
+                        - image_plane(#dest,s,k)(r*repeat_height + j, c*repeat_width + i) == image_plane(src,s,k)(r,c)
         !*/
 
         void get_gradient(
@@ -1054,7 +1047,7 @@ namespace dlib { namespace tt
 
         private:
 // #ifdef DLIB_USE_CUDA
-//         cuda::pooling impl;
+//         cuda::upsampling impl;
 // #else
         cpu::upsampling impl;
 //#endif

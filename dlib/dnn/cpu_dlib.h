@@ -347,9 +347,6 @@ namespace dlib
         {
         public:
 
-            upsampling(const upsampling&) = delete;
-            upsampling& operator=(const upsampling&) = delete;
-
             upsampling (
             );
 
@@ -360,9 +357,6 @@ namespace dlib
                 int repeat_height,
                 int repeat_width
             );
-
-            bool does_block_upsampling(
-            ) const { return do_block_upsampling; }
 
             void operator() (
                 resizable_tensor& dest,
@@ -379,7 +373,6 @@ namespace dlib
         private:
             int repeat_height;
             int repeat_width;
-            bool do_block_upsampling;
         };
 
     // -----------------------------------------------------------------------------------

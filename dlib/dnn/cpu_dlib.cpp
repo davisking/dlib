@@ -1602,7 +1602,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         upsampling::upsampling (
-        ) : repeat_height(1),repeat_width(1),do_block_upsampling(true)
+        ) : repeat_height(1),repeat_width(1)
         {
         }
 
@@ -1625,7 +1625,6 @@ namespace dlib
 
             repeat_height = repeat_height_;
             repeat_width = repeat_width_;
-            do_block_upsampling = true;
         }
 
         void upsampling::
@@ -1651,25 +1650,22 @@ namespace dlib
             }
 
             auto d = dest.host();
-            if (does_block_upsampling())
+            for (long n = 0; n < dest.num_samples(); ++n)
             {
-                for (long n = 0; n < dest.num_samples(); ++n)
+                for (long k = 0; k < dest.k(); ++k)
                 {
-                    for (long k = 0; k < dest.k(); ++k)
-                    {
-                        auto simg = image_plane(src,n,k);
-                        auto dimg = d + (n*dest.k() + k)*dest.nr()*dest.nc();
+                    auto simg = image_plane(src,n,k);
+                    auto dimg = d + (n*dest.k() + k)*dest.nr()*dest.nc();
 
-                        for (long r = 0; r < src.nr(); ++r)
+                    for (long r = 0; r < src.nr(); ++r)
+                    {
+                        for (long c = 0; c < src.nc(); ++c)
                         {
-                            for (long c = 0; c < src.nc(); ++c)
+                            for (long y = 0; y < repeat_height; ++y)
                             {
-                                for (long y = 0; y < repeat_height; ++y)
+                                for (long x = 0; x < repeat_width; ++x)
                                 {
-                                    for (long x = 0; x < repeat_width; ++x)
-                                    {
-                                        dimg[(repeat_height*r + y)*dest.nc() + (repeat_width*c + x)] = simg(r*src.nc() + c);
-                                    }
+                                    dimg[(repeat_height*r + y)*dest.nc() + (repeat_width*c + x)] = simg(r*src.nc() + c);
                                 }
                             }
                         }
@@ -1695,27 +1691,24 @@ namespace dlib
 
             auto gi = gradient_input.host();
             auto g = grad.host();
-            if (does_block_upsampling())
+            for (long n = 0; n < dest.num_samples(); ++n)
             {
-                for (long n = 0; n < dest.num_samples(); ++n)
+                for (long k = 0; k < dest.k(); ++k)
                 {
-                    for (long k = 0; k < dest.k(); ++k)
-                    {
-                        auto simg = image_plane(src,n,k);
-                        auto gimg = g + (n*grad.k() + k)*grad.nr()*grad.nc();
-                        auto giimg = gi + (n*dest.k() + k)*dest.nr()*dest.nc();
-                        auto imgbox = get_rect(simg);
+                    auto simg = image_plane(src,n,k);
+                    auto gimg = g + (n*grad.k() + k)*grad.nr()*grad.nc();
+                    auto giimg = gi + (n*dest.k() + k)*dest.nr()*dest.nc();
+                    auto imgbox = get_rect(simg);
 
-                        for (long r = 0; r < src.nr(); ++r)
+                    for (long r = 0; r < src.nr(); ++r)
+                    {
+                        for (long c = 0; c < src.nc(); ++c)
                         {
-                            for (long c = 0; c < src.nc(); ++c)
+                            for (long y = 0; y < repeat_height; ++y)
                             {
-                                for (long y = 0; y < repeat_height; ++y)
+                                for (long x = 0; x < repeat_width; ++x)
                                 {
-                                    for (long x = 0; x < repeat_width; ++x)
-                                    {
-                                        gimg[r*src.nc() + c] += giimg[(repeat_height*r + y)*dest.nc() + (repeat_width*c + x)];
-                                    }
+                                    gimg[r*src.nc() + c] += giimg[(repeat_height*r + y)*dest.nc() + (repeat_width*c + x)];
                                 }
                             }
                         }
