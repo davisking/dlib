@@ -978,6 +978,90 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    class upsampling
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                The upsampling object is a tool for performing spatial upsampling (unpooling) over a tensor.
+                It can be configured to do block upsampling.
+        !*/
+    public:
+
+        upsampling(const upsampling&) = delete;
+        upsampling& operator=(const upsampling&) = delete;
+
+        upsampling (
+        ) = default;
+
+        void clear(
+        ) { impl.clear(); }
+
+        void setup_block_upsampling(
+            int repeat_height,
+            int repeat_width
+        ) { impl.setup_block_upsampling( repeat_height, repeat_width ); }
+        /*!
+            requires
+                - repeat_height >= 1
+                - repeat_width >= 1
+            ensures
+                - When you call operator() it will do block upsampling with
+                  the given parameters.
+        !*/
+
+        bool does_block_upsampling(
+        ) const { return impl.does_block_upsampling(); }
+
+        void operator() (
+            resizable_tensor& dest,
+            const tensor& src
+        ) { impl(dest, src); }
+        /*!
+            requires
+                - is_same_object(dest,src) == false
+                - setup_block_upsampling() has been called.
+            ensures
+                - #dest.num_samples() == src.num_samples()
+                - #dest.k() == src.k()
+                - #dest.nr() == src.nr() * window_height
+                - #dest.nc() == src.nc() * window_width
+                - for all valid s, k, r, and c:
+                    - if (does_block_upsampling()) then
+                        - for 0 <= i <= window_height, 0 <= j <= window_width:
+                            - image_plane(#dest,s,k)(r*window_height + j, c*window_width + i) == image_plane(src,s,k)(r,c)
+        !*/
+
+        void get_gradient(
+            const tensor& gradient_input, 
+            const tensor& dest,
+            const tensor& src,
+            tensor& grad 
+        ) { impl.get_gradient(gradient_input, dest, src, grad); }
+        /*!
+            requires
+                - have_same_dimensions(gradient_input,dest) == true
+                - have_same_dimensions(src,grad) == true
+                - dest contains the result of calling (*this)(dest,src)
+                - is_same_object(grad,gradient_input) == false
+                - is_same_object(grad,dest) == false
+                - is_same_object(grad,src) == false
+            ensures
+                - Recalling that dest is the output of (*this)(dest,src),
+                  let f(src) == dot(gradient_input,dest)
+                - Then this function computes the gradient of f() with respect to src and
+                  adds it to grad.
+        !*/
+
+        private:
+// #ifdef DLIB_USE_CUDA
+//         cuda::pooling impl;
+// #else
+        cpu::upsampling impl;
+//#endif
+    };    
+
+// ----------------------------------------------------------------------------------------
+
     void softmax (
         tensor& dest,
         const tensor& src
