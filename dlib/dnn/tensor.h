@@ -566,6 +566,8 @@ namespace dlib
         const tensor& get() const { return inst; }
         operator const tensor& () { return inst; }
 
+        alias_tensor_const_instance(const alias_tensor_instance& item) : inst(item) {}
+
     private:
         alias_tensor_instance inst;
 

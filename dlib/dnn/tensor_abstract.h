@@ -601,6 +601,9 @@ namespace dlib
 
     public:
 
+        // non-const alias tensors are convertible to const ones.
+        alias_tensor_const_instance(const alias_tensor_instance& item); 
+
         // Methods that cast the alias to a tensor.
         const tensor& get() const;
         operator const tensor& (); 
