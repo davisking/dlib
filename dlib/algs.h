@@ -18,6 +18,13 @@
     #endif
 #endif
 
+#if defined __NVCC__
+    // Disable the "statement is unreachable" message since it will go off on code that is
+    // actually reachable but just happens to not be reachable sometimes during certain
+    // template instantiations.
+    #pragma diag_suppress code_is_unreachable
+#endif
+
 
 #ifdef _MSC_VER
 
