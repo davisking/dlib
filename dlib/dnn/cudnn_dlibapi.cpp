@@ -260,7 +260,8 @@ namespace dlib
                   (have_same_dimensions(src, dest) ||
                   (src.num_samples()==1 && src.k()==dest.k() && src.nr()==1 && src.nc()==1) ||
                   (src.num_samples()==1 && src.k()==dest.k() && src.nr()==dest.nr() && src.nc()==dest.nc()) ||
-                  (src.num_samples()==1 && src.k()==1 && src.nr()==dest.nr() && src.nc()==dest.nc())) &&
+                  (src.num_samples()==1 && src.k()==1 && src.nr()==dest.nr() && src.nc()==dest.nc()) ||
+                  (src.num_samples()==dest.num_samples() && src.k()==1 && src.nr()==1 && src.nc()==1)) &&
                   is_same_object(src,dest) == false , 
                     "\n\t dest.num_samples(): " << dest.num_samples()
                     <<"\n\t dest.k():           " << dest.k()
@@ -277,6 +278,11 @@ namespace dlib
                 // Call the dlib function in this case since it's faster than the one that
                 // comes with cuDNN (at least as of cuDNN v4).
                 add_scaled(dest, alpha, src);
+                return;
+            }
+            else if (src.num_samples()==dest.num_samples() && src.k()==1 && src.nr()==1 && src.nc()==1)
+            {
+                add_cv_to_all_columns(beta, dest, alpha, src);
                 return;
             }
 

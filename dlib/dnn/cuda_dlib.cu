@@ -645,6 +645,38 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_add_cv_to_all_columns(float beta, float* dest, float alpha, const float* src, size_t size, size_t stride)
+        {
+            for (auto i : grid_stride_range(0, size))
+            {
+                dest[i] = beta*dest[i] + alpha*src[i/stride];
+            }
+        }
+
+        __global__ void _cuda_add_cv_to_all_columns_no_beta(float* dest, float alpha, const float* src, size_t size, size_t stride)
+        {
+            for (auto i : grid_stride_range(0, size))
+            {
+                dest[i] = alpha*src[i/stride];
+            }
+        }
+
+        void add_cv_to_all_columns(
+            float beta, 
+            tensor& dest, 
+            float alpha, 
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(dest.num_samples() == src.num_samples() && src.num_samples() == src.size());
+            if (beta == 0)
+                launch_kernel(_cuda_add_cv_to_all_columns_no_beta, max_jobs(dest.size()), dest.device(), alpha, src.device(), dest.size(), dest.size()/dest.num_samples());
+            else
+                launch_kernel(_cuda_add_cv_to_all_columns, max_jobs(dest.size()), beta, dest.device(), alpha, src.device(), dest.size(), dest.size()/dest.num_samples());
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         __global__ void _cuda_affine_transform5(
             float* d, const float* s1, const float* s2, const float* s3, size_t n, float A, float B, float C, float D
         )

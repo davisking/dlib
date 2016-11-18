@@ -603,6 +603,35 @@ namespace
         }
 
         {
+            resizable_tensor A(4,5), B(4);
+
+            tensor_rand rnd;
+            rnd.fill_uniform(A);
+            rnd.fill_uniform(B);
+
+            float alpha = 1.4;
+            float beta = 0.5;
+
+            matrix<float> a(mat(A)), b(mat(B));
+            for (long c = 0; c < a.nc(); ++c)
+            {
+                set_colm(a,c) = beta*colm(a,c) + alpha*b;
+            }
+
+            tt::add(beta, A, alpha, B);
+            DLIB_TEST_MSG(max(abs(mat(A)-a)) < 1e-6, max(abs(mat(A)-a)));
+
+            beta = 0;
+            for (long c = 0; c < a.nc(); ++c)
+            {
+                set_colm(a,c) = beta*colm(a,c) + alpha*b;
+            }
+
+            tt::add(beta, A, alpha, B);
+            DLIB_TEST(max(abs(mat(A)-a)) < 1e-6);
+        }
+
+        {
             resizable_tensor A, B;
             A.set_size(2,3,4,5);
             B.set_size(2,3,4,5);

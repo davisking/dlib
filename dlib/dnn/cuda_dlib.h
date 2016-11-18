@@ -238,6 +238,13 @@ namespace dlib
             const tensor& src
         );
 
+        void add_cv_to_all_columns(
+            float beta, 
+            tensor& dest, 
+            float alpha, 
+            const tensor& src
+        );
+
     // -----------------------------------------------------------------------------------
 
         void affine_transform(
