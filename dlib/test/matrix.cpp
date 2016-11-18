@@ -1064,6 +1064,28 @@ namespace
         }
 
         {
+            matrix<double> a = randm(3,4);
+            matrix<double> b = randm(3,4);
+
+            matrix<double> m1, m2;
+
+            m1 = max_pointwise(a,b);
+            m2 = min_pointwise(a,b);
+            DLIB_TEST(m1.nr() == a.nr());
+            DLIB_TEST(m1.nc() == a.nc());
+            DLIB_TEST(m2.nr() == a.nr());
+            DLIB_TEST(m2.nc() == a.nc());
+            for (long r = 0; r < a.nr(); ++r)
+            {
+                for (long c = 0; c < a.nc(); ++c)
+                {
+                    DLIB_TEST_MSG(m1(r,c) == std::max(a(r,c), b(r,c)), m1(r,c)  << " : " << a(r,c) << " " << b(r,c));
+                    DLIB_TEST(m2(r,c) == std::min(a(r,c), b(r,c)));
+                }
+            }
+        }
+
+        {
             matrix<double,4,5> m;
             set_subm(m, range(0,3), range(0,4)) = 4;
             DLIB_TEST(min(m) == max(m) && min(m) == 4);
