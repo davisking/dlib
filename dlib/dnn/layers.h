@@ -770,7 +770,7 @@ namespace dlib
             deserialize(version, in);
             long repeat_r;
             long repeat_c;
-            if (version == "max_pool_1")
+            if (version == "block_upsample_1")
             {
                 deserialize(repeat_r, in);
                 deserialize(repeat_c, in);
