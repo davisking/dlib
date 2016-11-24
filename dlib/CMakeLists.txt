@@ -451,8 +451,8 @@ if (NOT TARGET dlib)
       endif()
 
 
-      if (DLIB_USE_BLAS OR DLIB_USE_LAPACK)
-         # Try to find BLAS and LAPACK 
+      if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
+          # Try to find BLAS, LAPACK and MKL
          include(cmake_utils/cmake_find_blas.txt)
 
          if (DLIB_USE_BLAS)
@@ -472,13 +472,16 @@ if (NOT TARGET dlib)
                toggle_preprocessor_switch(DLIB_USE_LAPACK)
             endif()
          endif()
-      endif()
 
-      if (found_intel_mkl)
-         include_directories(${mkl_include_dir})
-      else()
-         set(DLIB_USE_MKL_FFT OFF CACHE STRING ${DLIB_USE_MKL_FFT_STR} FORCE )
-         toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
+         if (DLIB_USE_MKL_FFT)
+            if (found_intel_mkl)
+               set (dlib_needed_libraries ${dlib_needed_libraries} ${mkl_libraries})
+               include_directories(${mkl_include_dir})
+            else()
+               set(DLIB_USE_MKL_FFT OFF CACHE STRING ${DLIB_USE_MKL_FFT_STR} FORCE )
+               toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
+            endif()
+         endif()
       endif()
 
 
