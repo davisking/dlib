@@ -1743,45 +1743,45 @@ namespace
 
     void test_simple_linear_regression()
     {
-	::std::vector<matrix<double>> x(100);
-	::std::vector<float> y(100);
-	::std::default_random_engine generator(16);
-	::std::normal_distribution<float> distribution(0,5);
-	const float true_intercept = 50.0;
-	const float true_slope = 10.0;
-	for ( int ii = 0; ii < 100; ++ii )
-	{
-	    const double val = static_cast<double>(ii);
-	    matrix<double> tmp(1,1);
-	    tmp = val;
-	    x[ii] = tmp;
-	    y[ii] = (true_intercept + true_slope*static_cast<float>(val) + distribution(generator));
-	}
+        ::std::vector<matrix<double>> x(100);
+        ::std::vector<float> y(100);
+        ::std::default_random_engine generator(16);
+        ::std::normal_distribution<float> distribution(0,5);
+        const float true_intercept = 50.0;
+        const float true_slope = 10.0;
+        for ( int ii = 0; ii < 100; ++ii )
+        {
+            const double val = static_cast<double>(ii);
+            matrix<double> tmp(1,1);
+            tmp = val;
+            x[ii] = tmp;
+            y[ii] = (true_intercept + true_slope*static_cast<float>(val) + distribution(generator));
+        }
 
-	using net_type = loss_mean_squared<
-	    fc<
-		1, input<matrix<double>>
-		>
-	    >;
-	net_type net;
-	layer<1>(net).layer_details().set_bias_learning_rate_multiplier(300);
-	sgd defsolver;
-	dnn_trainer<net_type> trainer(net, defsolver);
-	trainer.set_learning_rate(0.00001);
-	trainer.set_mini_batch_size(50);
-	trainer.set_max_num_epochs(170);
-	trainer.train(x, y);
+        using net_type = loss_mean_squared<
+            fc<
+                1, input<matrix<double>>
+                >
+            >;
+        net_type net;
+        layer<1>(net).layer_details().set_bias_learning_rate_multiplier(300);
+        sgd defsolver;
+        dnn_trainer<net_type> trainer(net, defsolver);
+        trainer.set_learning_rate(0.00001);
+        trainer.set_mini_batch_size(50);
+        trainer.set_max_num_epochs(170);
+        trainer.train(x, y);
 
-	const float slope = layer<1>(net).layer_details().get_weights().host()[0];
-	const float slope_error = abs(true_slope - slope);
-	const float intercept = layer<1>(net).layer_details().get_biases().host()[0];
-	const float intercept_error = abs(true_intercept - intercept);
-	const float eps_slope = 0.5, eps_intercept = 1.0;
+        const float slope = layer<1>(net).layer_details().get_weights().host()[0];
+        const float slope_error = abs(true_slope - slope);
+        const float intercept = layer<1>(net).layer_details().get_biases().host()[0];
+        const float intercept_error = abs(true_intercept - intercept);
+        const float eps_slope = 0.5, eps_intercept = 1.0;
 
-	DLIB_TEST_MSG(slope_error <= eps_slope,
-		      "Expected slope = " << true_slope << " Estimated slope = " << slope << " Error limit = " << eps_slope);
-	DLIB_TEST_MSG(intercept_error <= eps_intercept,
-		      "Expected intercept = " << true_intercept << " Estimated intercept = " << intercept << " Error limit = " << eps_intercept);
+        DLIB_TEST_MSG(slope_error <= eps_slope,
+                      "Expected slope = " << true_slope << " Estimated slope = " << slope << " Error limit = " << eps_slope);
+        DLIB_TEST_MSG(intercept_error <= eps_intercept,
+                      "Expected intercept = " << true_intercept << " Estimated intercept = " << intercept << " Error limit = " << eps_intercept);
 
     }
 
@@ -1852,7 +1852,7 @@ namespace
             test_visit_funcions();
             test_copy_tensor_cpu();
             test_concat();
-	    test_simple_linear_regression();
+            test_simple_linear_regression();
         }
 
         void perform_test()
