@@ -185,6 +185,8 @@ namespace dlib
                   particular, calling this function is the same as invoking the version of
                   operator() below multiple times, except that this version of operator()
                   will use multiple CPU cores to do the processing and is therefore faster.
+                - #crops.size() == num_crops
+                - #crop_rects.size() == num_crops
         !*/
 
         template <
