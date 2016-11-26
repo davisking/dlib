@@ -289,7 +289,10 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-
+#if defined(__GNUC__) && __GNUC__ >= 6
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#endif
     template <typename T>
     bool is_combining_char(
         const T ch_
@@ -478,6 +481,9 @@ namespace dlib
         if ( ch < 0xE0100 )return false;if ( ch < 0xE01F0 )return true;
         return false;
     }
+#if defined(__GNUC__) && __GNUC__ >= 6
+#pragma GCC diagnostic pop
+#endif
 
 // ----------------------------------------------------------------------------------------
 
