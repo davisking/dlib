@@ -21,6 +21,7 @@ namespace dlib
         double min_object_height = 0.25; // cropped object will be at least this fraction of the height of the image.
         double max_object_height = 0.7; // cropped object will be at most this fraction of the height of the image.
         double background_crops_fraction = 0.5;
+        double translate_amount = 0.10;
 
         std::mutex rnd_mutex;
         dlib::rand rnd;
@@ -29,6 +30,17 @@ namespace dlib
         void set_seed (
             time_t seed
         ) { rnd = dlib::rand(seed); }
+
+        double get_translate_amount (
+        ) const { return translate_amount; }
+
+        void set_translate_amount (
+            double value
+        )  
+        { 
+            DLIB_CASSERT(0 <= value);
+            translate_amount = value;
+        }
 
         double get_background_crops_fraction (
         ) const { return background_crops_fraction; }
@@ -191,8 +203,8 @@ namespace dlib
             {
                 auto rect = rects[randomly_pick_rect(rects)].rect;
                 // perturb the location of the crop by a small fraction of the object's size.
-                const point rand_translate = dpoint(rnd.get_double_in_range(-0.1,0.1)*rect.width(), 
-                    rnd.get_double_in_range(-0.1,0.1)*rect.height());
+                const point rand_translate = dpoint(rnd.get_double_in_range(-translate_amount,translate_amount)*rect.width(), 
+                    rnd.get_double_in_range(-translate_amount,translate_amount)*rect.height());
 
                 // perturb the scale of the crop by a fraction of the object's size
                 const double rand_scale_perturb = rnd.get_double_in_range(min_object_height, max_object_height); 

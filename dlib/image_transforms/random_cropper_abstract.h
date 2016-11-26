@@ -38,6 +38,7 @@ namespace dlib
                 - #get_min_object_height() == 0.25
                 - #get_max_object_height() == 0.7
                 - #get_background_crops_fraction() == 0.5
+                - #get_translate_amount() == 0.1
         !*/
 
         void set_seed (
@@ -46,6 +47,25 @@ namespace dlib
         /*!
             ensures
                 - Seeds the internal random number generator with the given seed.
+        !*/
+
+        double get_translate_amount (
+        ) const; 
+        /*!
+            ensures
+                - When a box is cropped out, it will be randomly translated prior to
+                  cropping by #get_translate_amount()*(the box's height) up or down and
+                  #get_translate_amount()*(the box's width) left or right.
+        !*/
+
+        void set_translate_amount (
+            double value
+        );
+        /*!
+            requires
+                - value >= 0
+            ensures
+                - #get_translate_amount() == value
         !*/
 
         double get_background_crops_fraction (
