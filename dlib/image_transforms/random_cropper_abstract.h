@@ -184,6 +184,36 @@ namespace dlib
         template <
             typename array_type
             >
+        void append (
+            size_t num_crops,
+            const array_type& images,
+            const std::vector<std::vector<mmod_rect>>& rects,
+            array_type& crops,
+            std::vector<std::vector<mmod_rect>>& crop_rects
+        );
+        /*!
+            requires
+                - images.size() == rects.size()
+                - crops.size() == crop_rects.size()
+                - for all valid i:
+                    - images[i].size() != 0
+                - array_type is a type with an interface compatible with dlib::array or
+                  std::vector and it must in turn contain image objects that implement the
+                  interface defined in dlib/image_processing/generic_image.h 
+            ensures
+                - Randomly extracts num_crops chips from images and appends them to the end
+                  of crops.  We also copy the object metadata for each extracted crop and
+                  store it into #crop_rects.  In particular, calling this function is the
+                  same as making multiple calls to the version of operator() below that
+                  outputs a single crop, except that append() will use multiple CPU cores
+                  to do the processing and is therefore faster.
+                - #crops.size() == crops.size()+num_crops
+                - #crop_rects.size() == crop_rects.size()+num_crops
+        !*/
+
+        template <
+            typename array_type
+            >
         void operator() (
             size_t num_crops,
             const array_type& images,

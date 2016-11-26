@@ -110,12 +110,32 @@ namespace dlib
         )
         {
             DLIB_CASSERT(images.size() == rects.size());
-            crops.resize(num_crops);
-            crop_rects.resize(num_crops);
-            parallel_for(0, num_crops, [&](long i) {
+            crops.clear();
+            crop_rects.clear();
+            append(num_crops, images, rects, crops, crop_rects);
+        }
+
+        template <
+            typename array_type
+            >
+        void append (
+            size_t num_crops,
+            const array_type& images,
+            const std::vector<std::vector<mmod_rect>>& rects,
+            array_type& crops,
+            std::vector<std::vector<mmod_rect>>& crop_rects
+        )
+        {
+            DLIB_CASSERT(images.size() == rects.size());
+            DLIB_CASSERT(crops.size() == crop_rects.size());
+            auto original_size = crops.size();
+            crops.resize(crops.size()+num_crops);
+            crop_rects.resize(crop_rects.size()+num_crops);
+            parallel_for(original_size, original_size+num_crops, [&](long i) {
                 (*this)(images, rects, crops[i], crop_rects[i]);
             });
         }
+
 
         template <
             typename array_type,
