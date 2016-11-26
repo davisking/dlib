@@ -584,7 +584,6 @@ namespace dlib
     template <typename SUBNET>
     using loss_mean_squared = add_loss_layer<loss_mean_squared_, SUBNET>;
 
-
 }
 
 #endif // DLIB_DNn_LOSS_ABSTRACT_H_

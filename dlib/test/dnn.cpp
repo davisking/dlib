@@ -1758,11 +1758,7 @@ namespace
             y[ii] = (true_intercept + true_slope*static_cast<float>(val) + distribution(generator));
         }
 
-        using net_type = loss_mean_squared<
-            fc<
-                1, input<matrix<double>>
-                >
-            >;
+        using net_type = loss_mean_squared<fc<1, input<matrix<double>>>>;
         net_type net;
         layer<1>(net).layer_details().set_bias_learning_rate_multiplier(300);
         sgd defsolver;
