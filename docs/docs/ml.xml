@@ -262,6 +262,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>spectral_cluster</item> 
          <item>chinese_whispers</item> 
          <item>bottom_up_cluster</item> 
+         <item>segment_number_line</item> 
          <item>modularity</item> 
       </section>
       <section>
@@ -798,6 +799,21 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <spec_file link="true">dlib/clustering/bottom_up_cluster_abstract.h</spec_file>
          <description>
              This function runs a bottom up agglomerative clustering algorithm.   
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>segment_number_line</name>
+         <file>dlib/clustering.h</file>
+         <spec_file link="true">dlib/clustering/bottom_up_cluster_abstract.h</spec_file>
+         <description>
+            This routine clusters real valued scalars in essentially linear time.  
+            It uses a combination of bottom up clustering and a simple greedy scan
+            to try and find the most compact set of ranges that contain all
+            given scalar values. 
          </description>
                                  
       </component>
