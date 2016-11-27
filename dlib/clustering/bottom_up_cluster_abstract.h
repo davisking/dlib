@@ -120,6 +120,7 @@ namespace dlib
               clustering.  This routine uses a combination of bottom up clustering and a
               simple greedy scan to try and find the most compact set of ranges that
               contain all the values in x.  
+            - This routine has approximately linear runtime.
             - Every value in x will be contained inside one of the returned snl_range
               objects;
             - All returned snl_range object's will have a width() <= max_range_width and
