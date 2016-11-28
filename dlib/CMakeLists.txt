@@ -474,7 +474,7 @@ if (NOT TARGET dlib)
          endif()
 
          if (DLIB_USE_MKL_FFT)
-            if (found_intel_mkl)
+            if (found_intel_mkl AND found_intel_mkl_headers)
                set (dlib_needed_libraries ${dlib_needed_libraries} ${mkl_libraries})
                include_directories(${mkl_include_dir})
             else()
