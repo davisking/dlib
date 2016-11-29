@@ -634,6 +634,106 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T
+        >
+    class running_stats_decayed
+    {
+    public:
+
+        explicit running_stats_decayed(
+            T decay_halflife = 1000 
+        )
+        {
+            DLIB_ASSERT(decay_halflife > 0);
+
+            sum_x = 0;
+            sum_xx = 0;
+            forget = std::pow(0.5, 1/decay_halflife);
+            n = 0;
+
+            COMPILE_TIME_ASSERT ((
+                    is_same_type<float,T>::value ||
+                    is_same_type<double,T>::value ||
+                    is_same_type<long double,T>::value 
+            ));
+        }
+
+        T forget_factor (
+        ) const 
+        { 
+            return forget; 
+        }
+
+        void add (
+            const T& x
+        )
+        {
+
+            sum_xx = sum_xx*forget + x*x;
+
+            sum_x  = sum_x*forget + x;
+
+            n = n*forget + forget;
+        }
+
+        T current_n (
+        ) const
+        {
+            return n;
+        }
+
+        T mean (
+        ) const
+        {
+            if (n != 0)
+                return sum_x/n;
+            else
+                return 0;
+        }
+
+        T variance (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_stats_decayed::variance()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            T temp = 1/n * (sum_xx - sum_x*sum_x/n);
+            // make sure the variance is never negative.  This might
+            // happen due to numerical errors.
+            if (temp >= 0)
+                return temp;
+            else
+                return 0;
+        }
+
+        T stddev (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_stats_decayed::stddev()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return std::sqrt(variance());
+        }
+
+    private:
+
+        T sum_x;
+        T sum_xx;
+        T n;
+        T forget;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T, 
         typename alloc
         >
