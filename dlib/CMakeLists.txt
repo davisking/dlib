@@ -84,6 +84,8 @@ if (NOT TARGET dlib)
    set (DLIB_LINK_WITH_SQLITE3_STR
    "Disable this if you don't want to link against sqlite3" )
    #set (DLIB_USE_FFTW_STR "Disable this if you don't want to link against fftw" )
+   set (DLIB_USE_MKL_FFT_STR
+   "Disable this is you don't want to use the MKL DFTI FFT implementation" )
 
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
    toggle_preprocessor_switch(DLIB_ISO_CPP_ONLY)
@@ -125,6 +127,7 @@ if (NOT TARGET dlib)
       option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} OFF)
       option(DLIB_GIF_SUPPORT ${DLIB_GIF_SUPPORT_STR} OFF)
       #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} OFF)
+      option(DLIB_USE_MKL_FFT ${DLIB_USE_MKL_FFT_STR} OFF)
    else()
       option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} ON)
       option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
@@ -134,6 +137,7 @@ if (NOT TARGET dlib)
       option(DLIB_PNG_SUPPORT ${DLIB_PNG_SUPPORT_STR} ON)
       option(DLIB_GIF_SUPPORT ${DLIB_GIF_SUPPORT_STR} ON)
       #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} ON)
+      option(DLIB_USE_MKL_FFT ${DLIB_USE_MKL_FFT_STR} ON)
    endif()
    toggle_preprocessor_switch(DLIB_JPEG_SUPPORT)
    toggle_preprocessor_switch(DLIB_USE_BLAS)
@@ -142,6 +146,7 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_PNG_SUPPORT) 
    toggle_preprocessor_switch(DLIB_GIF_SUPPORT) 
    #toggle_preprocessor_switch(DLIB_USE_FFTW)
+   toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
 
 
    set(source_files 
@@ -446,8 +451,8 @@ if (NOT TARGET dlib)
       endif()
 
 
-      if (DLIB_USE_BLAS OR DLIB_USE_LAPACK)
-         # Try to find BLAS and LAPACK 
+      if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
+          # Try to find BLAS, LAPACK and MKL
          include(cmake_utils/cmake_find_blas.txt)
 
          if (DLIB_USE_BLAS)
@@ -465,6 +470,16 @@ if (NOT TARGET dlib)
             else()
                set(DLIB_USE_LAPACK OFF CACHE STRING ${DLIB_USE_LAPACK_STR} FORCE )
                toggle_preprocessor_switch(DLIB_USE_LAPACK)
+            endif()
+         endif()
+
+         if (DLIB_USE_MKL_FFT)
+            if (found_intel_mkl AND found_intel_mkl_headers)
+               set (dlib_needed_libraries ${dlib_needed_libraries} ${mkl_libraries})
+               include_directories(${mkl_include_dir})
+            else()
+               set(DLIB_USE_MKL_FFT OFF CACHE STRING ${DLIB_USE_MKL_FFT_STR} FORCE )
+               toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
             endif()
          endif()
       endif()
