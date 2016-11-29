@@ -22,6 +22,16 @@ if(has_parent)
    set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
 endif()
 
+set(dlib_needed_includes)
+# This macro sets include directory paths that are needed by dlib and also by
+# applications that include dlib.  So the main point of this macro is to set
+# dlib_needed_includes which will get pushed into the parent cmake scope at the
+# end of this CMakeLists.txt file.  This way, it is available to users of dlib/cmake.
+macro(add_include_directories dir)
+   include_directories(${dir})
+   set(dlib_needed_includes ${dlib_needed_includes} ${dir})
+endmacro()
+
 # Suppress cmake warnings about changes in new versions.
 if(COMMAND cmake_policy) 
    cmake_policy(SET CMP0003 NEW) 
@@ -308,7 +318,7 @@ if (NOT TARGET dlib)
       if (DLIB_GIF_SUPPORT)
          find_package(GIF QUIET)
          if (GIF_FOUND)
-            include_directories(${GIF_INCLUDE_DIR})
+            add_include_directories(${GIF_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${GIF_LIBRARY})
          else()
             set(DLIB_GIF_SUPPORT OFF CACHE STRING ${DLIB_GIF_SUPPORT_STR} FORCE )
@@ -476,7 +486,7 @@ if (NOT TARGET dlib)
          if (DLIB_USE_MKL_FFT)
             if (found_intel_mkl AND found_intel_mkl_headers)
                set (dlib_needed_libraries ${dlib_needed_libraries} ${mkl_libraries})
-               include_directories(${mkl_include_dir})
+               add_include_directories(${mkl_include_dir})
             else()
                set(DLIB_USE_MKL_FFT OFF CACHE STRING ${DLIB_USE_MKL_FFT_STR} FORCE )
                toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
@@ -569,7 +579,7 @@ if (NOT TARGET dlib)
          find_path(sqlite_path sqlite3.h)
          if (sqlite AND sqlite_path)
             get_filename_component(sqlite_path2 ${sqlite_path} PATH CACHE)
-            include_directories(${sqlite_path2})
+            add_include_directories(${sqlite_path2})
             set(dlib_needed_libraries ${dlib_needed_libraries} ${sqlite} )
          else()
             set(DLIB_LINK_WITH_SQLITE3 OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
@@ -584,7 +594,7 @@ if (NOT TARGET dlib)
          # make sure fftw3.h is in the include path
          find_path(fftw_path fftw3.h)
          if (fftw AND fftw_path)
-            include_directories(${fftw_path})
+            add_include_directories(${fftw_path})
             set(dlib_needed_libraries ${dlib_needed_libraries} ${fftw} )
          else()
             set(DLIB_USE_FFTW OFF CACHE STRING ${DLIB_USE_FFTW_STR} FORCE )
@@ -684,3 +694,10 @@ if (NOT TARGET dlib)
    endif()
 
 endif()
+
+
+# put dlib_needed_includes into the parent scope so the dlib/cmake file can use it.
+if(has_parent)
+   set(dlib_needed_includes ${dlib_needed_includes} PARENT_SCOPE)
+endif()
+

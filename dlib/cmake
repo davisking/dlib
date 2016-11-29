@@ -103,5 +103,6 @@ include(${dlib_path}/cmake_utils/release_build_by_default)
 # Don't add dlib if it's already been added to the cmake project
 if (NOT TARGET dlib)
     add_subdirectory(${dlib_path} dlib_build)
+    INCLUDE_DIRECTORIES(${dlib_needed_includes})
 endif()
 
