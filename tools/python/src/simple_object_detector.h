@@ -19,7 +19,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    typedef object_detector<scan_fhog_pyramid<pyramid_down<6> > > simple_object_detector;
+    typedef object_detector<scan_fhog_pyramid<pyramid_down<4> > > simple_object_detector;
 
 // ----------------------------------------------------------------------------------------
 
@@ -151,7 +151,7 @@ namespace dlib
         if (impl::contains_any_boxes(boxes) == false)
             throw error("Error, the training dataset does not have any labeled object boxes in it.");
 
-        typedef scan_fhog_pyramid<pyramid_down<6> > image_scanner_type; 
+        typedef scan_fhog_pyramid<pyramid_down<4> > image_scanner_type; 
         image_scanner_type scanner;
         unsigned long width, height;
         impl::pick_best_window_size(boxes, width, height, options.detection_window_size);

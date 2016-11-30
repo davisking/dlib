@@ -11,7 +11,7 @@
 
 namespace dlib
 {
-    typedef object_detector<scan_fhog_pyramid<pyramid_down<6> > > simple_object_detector;
+    typedef object_detector<scan_fhog_pyramid<pyramid_down<4> > > simple_object_detector;
 
     inline void split_rect_detections (
         std::vector<rect_detection>& rect_detections,
