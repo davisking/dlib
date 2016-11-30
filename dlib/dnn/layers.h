@@ -2164,8 +2164,8 @@ namespace dlib
             impl::concat_helper_impl<TAG_TYPES...>::split(gradient_input, sub, 0);
         }
 
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        point map_input_to_output(point p) const { return p; }
+        point map_output_to_input(point p) const { return p; }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
