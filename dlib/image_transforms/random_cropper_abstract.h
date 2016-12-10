@@ -176,7 +176,7 @@ namespace dlib
         ); 
         /*!
             requires
-                - 0 < value < 1
+                - 0 < value <= 1
             ensures
                 - #get_max_object_height() == value
         !*/
