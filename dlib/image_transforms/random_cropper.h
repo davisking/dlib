@@ -84,7 +84,7 @@ namespace dlib
             double value
         ) 
         { 
-            DLIB_CASSERT(0 < value && value <= 1);
+            DLIB_CASSERT(0 < value);
             min_object_height = value; 
         }
 
@@ -94,7 +94,7 @@ namespace dlib
             double value
         ) 
         { 
-            DLIB_CASSERT(0 < value && value <= 1);
+            DLIB_CASSERT(0 < value);
             max_object_height = value; 
         }
 

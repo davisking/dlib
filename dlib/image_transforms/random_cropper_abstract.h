@@ -149,7 +149,10 @@ namespace dlib
             ensures
                 - When a chip is extracted around an object, the chip will be sized so that
                   the object's height is at least get_min_object_height() percent of the
-                  chip height.
+                  chip height.  E.g. if the chip is HEIGHT pixels tall then the object will
+                  be at least HEIGHT*get_min_object_height() pixels tall.  This also means
+                  that if get_min_object_height() >1 then the object will be only partially
+                  visible in the crop since it will be too big to fit.  
         !*/
 
         void set_min_object_height (
@@ -157,7 +160,7 @@ namespace dlib
         );
         /*!
             requires
-                - 0 < value <= 1
+                - 0 < value 
             ensures
                 - #get_min_object_height() == value
         !*/
@@ -168,7 +171,8 @@ namespace dlib
             ensures
                 - When a chip is extracted around an object, the chip will be sized so that
                   the object's height is at most get_min_object_height() percent of the
-                  chip height.
+                  chip height.  E.g. if the chip is HEIGHT pixels tall then the object will
+                  be at most HEIGHT*get_max_object_height() pixels tall. 
         !*/
 
         void set_max_object_height (
@@ -176,7 +180,7 @@ namespace dlib
         ); 
         /*!
             requires
-                - 0 < value <= 1
+                - 0 < value 
             ensures
                 - #get_max_object_height() == value
         !*/
