@@ -85,6 +85,25 @@ namespace dlib
                     - all memory associated with *this has been released
             !*/
 
+            array(
+                array&& item
+            );
+            /*!
+                ensures
+                    - move constructs *this from item.  Therefore, the state of item is
+                      moved into *this and #item has a valid but unspecified state.
+            !*/
+
+            array& operator=(
+                array&& item
+            );
+            /*!
+                ensures
+                    - move assigns *this from item.  Therefore, the state of item is
+                      moved into *this and #item has a valid but unspecified state.
+                    - returns a reference to #*this
+            !*/
+
             void clear (
             );
             /*!

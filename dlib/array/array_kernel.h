@@ -90,6 +90,21 @@ namespace dlib
             _at_start(true)
         {}
 
+        array(
+            array&& item
+        ) : array()
+        {
+            swap(item);
+        }
+
+        array& operator=(
+            array&& item
+        )
+        {
+            swap(item);
+            return *this;
+        }
+
         explicit array (
             unsigned long new_size
         ) :
