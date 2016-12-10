@@ -1038,6 +1038,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    point_transform_affine flip_image_left_right (
+        image_type& img
+    )
+    {
+        image_type temp;
+        auto tform = flip_image_left_right(img, temp);
+        swap(temp,img);
+        return tform;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type1,
         typename image_type2
         >
