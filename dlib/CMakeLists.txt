@@ -233,6 +233,7 @@ if (NOT TARGET dlib)
             set (dlib_needed_libraries ws2_32 winmm comctl32 gdi32 imm32)
          endif()
       elseif(APPLE) ############################################################################
+         set(CMAKE_MACOSX_RPATH 1)
          if (NOT DLIB_NO_GUI_SUPPORT)
             find_package(X11 QUIET)
             if (X11_FOUND)
