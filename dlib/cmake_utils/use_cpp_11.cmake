@@ -78,6 +78,7 @@ else()
       # newer.
       if (NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 11)
          set(CMAKE_CXX_STANDARD 11)
+         set(CMAKE_CXX_STANDARD_REQUIRED YES)
          message(STATUS "C++11 activated.")
       endif()
    endif()
