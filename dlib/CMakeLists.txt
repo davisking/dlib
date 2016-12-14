@@ -506,11 +506,20 @@ if (NOT TARGET dlib)
 
          if (CUDA_FOUND AND COMPILER_CAN_DO_CPP_11)
 
+            # There is some bug in cmake that causes it to mess up the
+            # -std=c++11 option if you let it propagate it to nvcc in some
+            # cases.  So instead we disable this and manually include
+            # things from CMAKE_CXX_FLAGS in the CUDA_NVCC_FLAGS list below.
+            set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+            # Grab all the -D flags from CMAKE_CXX_FLAGS so we can pass them
+            # to nvcc.
+            string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC ${CMAKE_CXX_FLAGS})
+
             set(CUDA_HOST_COMPILATION_CPP ON)
             # Note that we add __STRICT_ANSI__ to avoid freaking out nvcc with gcc specific
             # magic in the standard C++ header files (since nvcc uses gcc headers on
             # linux).
-            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES")
+            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
 
             include(cmake_utils/test_for_cudnn/find_cudnn.txt)
 
