@@ -4897,7 +4897,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
             string classname = trim(string(DEF2STR(MEX_CLASS_NAME)), " \t()");
             std::vector<string> methods = split(trim(string(DEF2STR(MEX_CLASS_METHODS)), " \t()"), " \t,");
 
-            string mex_filename = "mex_"+classname;
+            string mex_filename = trim(string(DEF2STR(MEX_FILENAME))," \t()");
             bool has_load_obj = false;
             size_t load_obj_idx = 0;
 

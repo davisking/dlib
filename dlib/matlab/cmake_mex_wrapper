@@ -3,7 +3,7 @@
 # that additional library dependencies can be added like this: add_mex_function(name lib1 dlib libetc).
 # That is, just add more libraries after the name and they will be build into the mex file.
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.11)
 
 set(BUILDING_MATLAB_MEX_FILE true)
 set(CMAKE_POSITION_INDEPENDENT_CODE True)
@@ -69,6 +69,7 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 MACRO(add_mex_function name )
     ADD_LIBRARY(${name} MODULE ${name}.cpp )
+    target_compile_definitions(${name} PRIVATE -DMEX_FILENAME=${name})
     if (UNIX)
         # Doing this prevents our mex function from exporting any symbols
         # other than mexFunction().  This sometimes doesn't matter but sometimes
