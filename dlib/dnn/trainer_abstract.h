@@ -88,8 +88,8 @@ namespace dlib
                       cuda_extra_devices.
         !*/
 
-       net_type& get_net (
-        ) const; 
+        net_type& get_net (
+        ); 
         /*!
             ensures
                 - returns the neural network object used by this trainer.  This is the
@@ -99,6 +99,8 @@ namespace dlib
                   dnn_trainer's constructor.
                 - This function blocks until all threads inside the dnn_trainer have
                   stopped touching the net. 
+                - This function will sync the trainer state to disk if the current state 
+                  hasn't already been synced to disk since the last network modification.
         !*/
 
         const std::vector<solver_type>& get_solvers (
