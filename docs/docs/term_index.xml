@@ -125,6 +125,8 @@
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_hinge_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_log_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_metric_" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_mean_squared_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_mmod_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="mmod_options" include="dlib/dnn.h"/>
 

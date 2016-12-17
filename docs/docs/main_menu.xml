@@ -209,6 +209,14 @@
                   <link>dnn_inception_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Deep Metric Learning Introduction</name>
+                  <link>dnn_metric_learning_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Metric Learning on Images</name>
+                  <link>dnn_metric_learning_on_images_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Deep Learning Face Detection</name>
                   <link>dnn_mmod_face_detection_ex.cpp.html</link>
                </item>
