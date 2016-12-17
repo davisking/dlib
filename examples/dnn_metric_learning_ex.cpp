@@ -47,12 +47,14 @@ int main() try
     trainer.train(samples, labels);
 
 
-    auto embedded = net(samples);
+    // Run all the images through the network to get their vector embeddings.
+    std::vector<matrix<float,0,1>> embedded = net(images);
 
     for (size_t i = 0; i < embedded.size(); ++i)
         cout << "label: " << labels[i] << "\t" << trans(embedded[i]);
 
-    // now count how many pairs are correctly classified.
+    // Now, check if the embedding puts things with the same labels near each other and
+    // things with different labels far apart.
     int num_right = 0;
     int num_wrong = 0;
     for (size_t i = 0; i < embedded.size(); ++i)
@@ -61,6 +63,9 @@ int main() try
         {
             if (labels[i] == labels[j])
             {
+                // The loss_metric layer will cause things with the same label to be less
+                // than net.loss_details().get_distance_threshold() distance from each
+                // other.  So we can use that distance value as our testing threshold.
                 if (length(embedded[i]-embedded[j]) < net.loss_details().get_distance_threshold())
                     ++num_right;
                 else
@@ -68,10 +73,10 @@ int main() try
             }
             else
             {
-                if (length(embedded[i]-embedded[j]) < net.loss_details().get_distance_threshold())
-                    ++num_wrong;
-                else
+                if (length(embedded[i]-embedded[j]) >= net.loss_details().get_distance_threshold())
                     ++num_right;
+                else
+                    ++num_wrong;
             }
         }
     }
