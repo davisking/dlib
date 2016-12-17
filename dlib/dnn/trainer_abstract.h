@@ -365,6 +365,8 @@ namespace dlib
                   will pick up from the last synchronization point.  
                 - You can obtain the average loss value during the final training epoch by
                   calling get_average_loss().
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         void train (
@@ -391,6 +393,8 @@ namespace dlib
                   will pick up from the last synchronization point.  
                 - You can obtain the average loss value during the final training epoch by
                   calling get_average_loss().
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         void train_one_step (
