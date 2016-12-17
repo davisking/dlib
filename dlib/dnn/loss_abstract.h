@@ -527,6 +527,99 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_metric_ 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it allows you to learn to map objects
+                into a vector space where objects sharing the same class label are close to
+                each other while objects with different labels are far apart.   
+
+                To be specific, it optimizes the following loss function which considers
+                all pairs of objects in a mini-batch and computes a different loss depending 
+                on their respective class labels.  So if objects A1 and A2 in a mini-batch
+                share the same class label then their contribution to the loss is:
+                    max(0, length(A1-A2)-get_distance_threshold() + get_margin())
+
+                While if A1 and B1 have different class labels then their contribution to
+                the loss function is:
+                    max(0, get_distance_threshold()-length(A1-B1) + get_margin())
+
+                Therefore, this loss layer optimizes a version of the hinge loss.
+                Moreover, the loss is trying to make sure that all objects with the same
+                label are within get_distance_threshold() distance of each other.
+                Conversely, if two objects have different labels then they should be more
+                than get_distance_threshold() distance from each other in the learned
+                embedding.  So this loss function gives you a natural decision boundary for
+                deciding if two objects are from the same class.
+        !*/
+    public:
+
+        typedef unsigned long training_label_type;
+        typedef matrix<float,0,1> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that: 
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            This loss expects the network to produce a single vector (per sample) as
+            output.  This vector is the learned embedding.  Therefore, to_label() just
+            copies these output vectors from the network into the output label_iterators
+            given to this function, one for each sample in the input_tensor.
+        !*/
+
+        float get_margin() const { return 0.1; }
+        /*!
+            ensures
+                - returns the margin value used by the loss function.  See the discussion
+                  in WHAT THIS OBJECT REPRESENTS for details.
+        !*/
+
+        float get_distance_threshold() const { return 0.75; }
+        /*!
+            ensures
+                - returns the distance threshold value used by the loss function.  See the discussion
+                  in WHAT THIS OBJECT REPRESENTS for details.
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
+            except it has the additional calling requirements that: 
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_metric = add_loss_layer<loss_metric_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class loss_mean_squared_
     {
         /*!
@@ -583,6 +676,8 @@ namespace dlib
 
     template <typename SUBNET>
     using loss_mean_squared = add_loss_layer<loss_mean_squared_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
 
 }
 

@@ -900,6 +900,8 @@ namespace dlib
             }
         }
 
+        float get_margin() const { return 0.1; }
+        float get_distance_threshold() const { return 0.75; }
 
         template <
             typename const_label_iterator,
@@ -925,8 +927,8 @@ namespace dlib
                          grad.nc() == 1);
 
 
-            const float margin = 0.1;
-            const float dist_thresh = 0.75;
+            const float margin = get_margin();
+            const float dist_thresh = get_distance_threshold();
 
             temp.set_size(output_tensor.num_samples(), output_tensor.num_samples());
             grad_mul.copy_size(temp);
