@@ -534,7 +534,7 @@ namespace dlib
                 This object implements the loss layer interface defined above by
                 EXAMPLE_LOSS_LAYER_.  In particular, it allows you to learn to map objects
                 into a vector space where objects sharing the same class label are close to
-                each other while objects with different labels are far apart.   
+                each other, while objects with different labels are far apart.   
 
                 To be specific, it optimizes the following loss function which considers
                 all pairs of objects in a mini-batch and computes a different loss depending 
