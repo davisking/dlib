@@ -161,11 +161,9 @@ template <typename SUBNET> using alevel2 = ares<256,ares<256,ares<256,ares<256,a
 template <typename SUBNET> using alevel3 = ares<128,ares<128,ares<128,ares_down<128,SUBNET>>>>;
 template <typename SUBNET> using alevel4 = ares<64,ares<64,ares<64,SUBNET>>>;
 
-template <typename SUBNET> using final_pooling  = avg_pool_everything<SUBNET>;
-template <typename SUBNET> using afinal_pooling  = avg_pool_everything<SUBNET>;
 
 // training network type
-using net_type = loss_metric<fc_no_bias<128,final_pooling<
+using net_type = loss_metric<fc_no_bias<128,avg_pool_everything<
                             level1<
                             level2<
                             level3<
@@ -175,7 +173,7 @@ using net_type = loss_metric<fc_no_bias<128,final_pooling<
                             >>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
-using anet_type = loss_metric<fc_no_bias<128,afinal_pooling<
+using anet_type = loss_metric<fc_no_bias<128,avg_pool_everything<
                             alevel1<
                             alevel2<
                             alevel3<
