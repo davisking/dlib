@@ -529,12 +529,18 @@ if (NOT TARGET dlib)
             if (cudnn AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
                # make sure cuda is really working by doing a test compile
                message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
+
+               set(CUDA_TEST_CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+                                         "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
+                                         "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
+
+               if (!MSVC) # see https://github.com/davisking/dlib/issues/363
+                  list(APPEND CUDA_TEST_CMAKE_FLAGS "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
+               endif()
+
                try_compile(cuda_test_compile_worked ${PROJECT_BINARY_DIR}/cuda_test_build 
                            ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
-                           CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
-                                       "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
-                                       "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}"
-                                       "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}"
+                           CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
                            )
                if (NOT cuda_test_compile_worked)
                   message(STATUS "*** CUDA was found but your compiler failed to compile a simple CUDA program so dlib isn't going to use CUDA. ***")
@@ -542,10 +548,7 @@ if (NOT TARGET dlib)
                   message(STATUS "Checking if you have the right version of cuDNN installed.")
                   try_compile(cudnn_test_compile_worked ${PROJECT_BINARY_DIR}/cudnn_test_build 
                               ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cudnn cudnn_test
-                              CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
-                                          "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
-                                          "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}"
-                                          "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}"
+                              CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
                                           )
                   if (cudnn_test_compile_worked)
                      message(STATUS "Found cuDNN: " ${cudnn})
