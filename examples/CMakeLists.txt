@@ -43,16 +43,16 @@ ENDMACRO()
 # provide enough C++11 support to compile the DNN tooling, but were good enough
 # to compile the rest of dlib.  
 if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
+   add_example(dnn_metric_learning_on_images_ex)
+   add_example(dnn_metric_learning_ex)
    add_example(dnn_introduction_ex)
    add_example(dnn_introduction2_ex)
    add_example(dnn_inception_ex)
-   add_example(dnn_metric_learning_ex)
-   add_example(dnn_metric_learning_on_images_ex)
-   add_gui_example(dnn_imagenet_ex)
    add_gui_example(dnn_mmod_ex)
    add_gui_example(dnn_mmod_face_detection_ex)
    add_gui_example(random_cropper_ex)
    add_gui_example(dnn_mmod_dog_hipsterizer)
+   add_gui_example(dnn_imagenet_ex)
    if (NOT MSVC)
       # Don't try to compile this program using Visual Studio since it causes the
       # compiler to run out of RAM and to crash.  Maybe someday Visual Studio
