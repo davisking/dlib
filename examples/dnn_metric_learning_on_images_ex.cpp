@@ -67,7 +67,8 @@ std::vector<std::vector<string>> load_objects_list (
         for (auto img : subdir.get_files())
             imgs.push_back(img);
 
-        objects.push_back(imgs);
+        if (imgs.size() != 0)
+            objects.push_back(imgs);
     }
     return objects;
 }
