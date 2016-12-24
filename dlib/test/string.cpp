@@ -243,6 +243,13 @@ namespace
         DLIB_TEST(wv[0] == L"test");
         DLIB_TEST(wv[1] == L"string");
 
+        wstr = L"Über alle Maßen\u00A0Öttingenstraße";
+        wv = split(wstr, L" \u00A0\n\r\t");
+        DLIB_TEST(wv.size() == 4);
+        DLIB_TEST(wv[0] == L"Über");
+        DLIB_TEST(wv[1] == L"alle");
+        DLIB_TEST(wv[2] == L"Maßen");
+        DLIB_TEST(wv[3] == L"Öttingenstraße");
 
         wstr = L"test string hah";
         DLIB_TEST(split_on_first(wstr).first == L"test");
