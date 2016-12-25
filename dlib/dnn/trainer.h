@@ -648,7 +648,7 @@ namespace dlib
                     tp[i]->wait_for_all_tasks();
 
 
-                // Evey now and then force all the parameters to be the same just to make
+                // Every now and then force all the parameters to be the same just to make
                 // sure they aren't drifting apart due to any non-deterministic behavior on
                 // the GPU.  It's also important to do this on the first iteration because
                 // the different networks may be initialized differently when tensor data
