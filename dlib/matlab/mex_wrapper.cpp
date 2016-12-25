@@ -339,12 +339,6 @@ namespace mex_binding
 
     struct user_hit_ctrl_c {};
 
-    struct invalid_args_exception
-    {
-        invalid_args_exception(const std::string& msg_): msg(msg_) {}
-        std::string msg;
-    };
-
 // -------------------------------------------------------
 
     template <typename T>
@@ -410,15 +404,13 @@ namespace mex_binding
         {
             std::ostringstream sout;
             sout << "Argument " << arg_idx+1 << " expects a matrix with " << matrix_type::NR << " rows but got one with " << src.nc();
-            mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              escape_percent(sout).c_str());
+            throw invalid_args_exception(sout);
         }
         if (matrix_type::NC != 0 && matrix_type::NC != src.nr())
         {
             std::ostringstream sout;
             sout << "Argument " << arg_idx+1 << " expects a matrix with " << matrix_type::NC << " columns but got one with " << src.nr();
-            mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              escape_percent(sout).c_str());
+            throw invalid_args_exception(sout);
         }
 
 
@@ -453,8 +445,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          escape_percent(sout).c_str());
+        throw invalid_args_exception(sout);
     }
 
 
@@ -475,8 +466,7 @@ namespace mex_binding
         {
             std::ostringstream sout;
             sout << "Error, input argument " << arg_idx+1 << " must be a non-negative number.";
-            mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              escape_percent(sout).c_str());
+            throw invalid_args_exception(sout);
         }
         else
         {
@@ -497,8 +487,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          escape_percent(sout).c_str());
+        throw invalid_args_exception(sout);
     }
 
 
@@ -524,8 +513,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          escape_percent(sout).c_str());
+        throw invalid_args_exception(sout);
     }
 
 
@@ -549,14 +537,14 @@ namespace mex_binding
         if (!mxIsCell(src))
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " must be a cell array";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " must be a cell array";
+            throw invalid_args_exception(sout);
         }
         if (nr != 1 && nc != 1)
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " must be a cell array with exactly 1 row or 1 column (i.e. a row or column vector)";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " must be a cell array with exactly 1 row or 1 column (i.e. a row or column vector)";
+            throw invalid_args_exception(sout);
         }
 
         const long size = nr*nc;
@@ -572,8 +560,8 @@ namespace mex_binding
             {
                 std::ostringstream sout;
                 sout << "Error in argument " << arg_idx+1 << ": element " << i+1 << " of cell array not the expected type.\n";
-                sout << "\t" << e.msg;
-                throw invalid_args_exception(sout.str());
+                sout << "\t" << e.what();
+                throw invalid_args_exception(sout);
             }
         }
 
@@ -591,8 +579,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          escape_percent(sout).c_str());
+        throw invalid_args_exception(sout);
     }
 
 // -------------------------------------------------------
@@ -608,8 +595,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          escape_percent(sout).c_str());
+        throw invalid_args_exception(sout);
     }
 
     template <typename MM>
@@ -657,8 +643,8 @@ namespace mex_binding
                 mxGetNumberOfElements(prhs)!=1 ) 
             {
                 std::ostringstream sout;
-                sout << " argument " << arg_idx+1 << " must be a scalar";
-                throw invalid_args_exception(sout.str());
+                sout << "Input argument " << arg_idx+1 << " must be a scalar";
+                throw invalid_args_exception(sout);
             }
 
             assign_scalar(arg_idx, arg , mxGetScalar(prhs));
@@ -676,8 +662,8 @@ namespace mex_binding
                 if (!(num_dims == 3 && mxGetDimensions(prhs)[2] == 3 && mxIsUint8(prhs)))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a 3-D NxMx3 image matrix of uint8";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a 3-D NxMx3 image matrix of uint8";
+                    throw invalid_args_exception(sout);
                 }
 
                 const long rows = mxGetDimensions(prhs)[0];
@@ -689,8 +675,8 @@ namespace mex_binding
             if (num_dims != 2)
             {
                 std::ostringstream sout;
-                sout << " argument " << arg_idx+1 << " must be a 2-D matrix (got a " << num_dims << "-D matrix)";
-                throw invalid_args_exception(sout.str());
+                sout << "Input argument " << arg_idx+1 << " must be a 2-D matrix (got a " << num_dims << "-D matrix)";
+                throw invalid_args_exception(sout);
             }
 
 
@@ -699,8 +685,8 @@ namespace mex_binding
                 if (!mxIsDouble(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of doubles";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of doubles";
+                    throw invalid_args_exception(sout);
                 }
                 if (is_column_major_matrix<T>::value)
                     call_private_set_mxArray(arg, (mxArray*)prhs);
@@ -712,8 +698,8 @@ namespace mex_binding
                 if (!mxIsSingle(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of single/float";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of single/float";
+                    throw invalid_args_exception(sout);
                 }
 
                 if (is_column_major_matrix<T>::value)
@@ -726,8 +712,8 @@ namespace mex_binding
                 if (!mxIsLogical(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of logical elements.";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of logical elements.";
+                    throw invalid_args_exception(sout);
                 }
                 DLIB_CASSERT(sizeof(mxLogical) == sizeof(bool),"logical matrices are not supported by the mex wrapper when mxLogical isn't a bool.");
 
@@ -738,8 +724,8 @@ namespace mex_binding
                 if (!mxIsUint8(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of uint8";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of uint8";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const dlib::uint8*)mxGetData(prhs), nc, nr));
@@ -749,8 +735,8 @@ namespace mex_binding
                 if (!mxIsInt8(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of int8";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of int8";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const dlib::int8*)mxGetData(prhs), nc, nr));
@@ -761,8 +747,8 @@ namespace mex_binding
                 if (!mxIsInt16(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of int16";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of int16";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -773,8 +759,8 @@ namespace mex_binding
                 if (!mxIsUint16(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of uint16";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of uint16";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -786,8 +772,8 @@ namespace mex_binding
                 if (!mxIsInt32(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of int32";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of int32";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -799,8 +785,8 @@ namespace mex_binding
                 if (!mxIsUint32(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of uint32";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of uint32";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -812,8 +798,8 @@ namespace mex_binding
                 if (!mxIsUint64(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of uint64";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of uint64";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -825,16 +811,15 @@ namespace mex_binding
                 if (!mxIsInt64(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of int64";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of int64";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
             }
             else
             {
-                mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                                  "mex_function uses unsupported matrix type");
+                throw invalid_args_exception("mex_function uses unsupported matrix type");
             }
         }
         else if (is_array_type<T>::value)
@@ -847,15 +832,14 @@ namespace mex_binding
             if (!mxIsClass(prhs, "function_handle"))
             {
                 std::ostringstream sout;
-                sout << " argument " << arg_idx+1 << " must be a function handle.";
-                throw invalid_args_exception(sout.str());
+                sout << "Input argument " << arg_idx+1 << " must be a function handle.";
+                throw invalid_args_exception(sout);
             }
             assign_function_handle(arg_idx, arg, prhs);
         }
         else
         {
-            mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              "mex_function uses unsupported input argument type");
+            throw invalid_args_exception("mex_function uses unsupported input argument type");
         }
     }
 
@@ -868,11 +852,21 @@ namespace mex_binding
         if (!mxIsStruct(prhs))
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " must be a struct";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " must be a struct";
+            throw invalid_args_exception(sout);
         }
 
-        arg.set_struct_handle(prhs);
+        arg.set_struct_handle(arg_idx, prhs);
+    }
+
+
+    void validate_and_populate_arg(
+        long arg_idx,
+        const mxArray *prhs,
+        matlab_object& arg
+    )
+    {
+        arg.set_object_handle(arg_idx, prhs);
     }
 
 
@@ -885,8 +879,8 @@ namespace mex_binding
         if (!mxIsChar(prhs))
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " must be a char string";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " must be a char string";
+            throw invalid_args_exception(sout);
         }
 
         const long nr = mxGetM(prhs);
@@ -896,8 +890,8 @@ namespace mex_binding
         if (mxGetString(prhs, &arg[0], arg.size()))
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " encountered an error while calling mxGetString()";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " encountered an error while calling mxGetString()";
+            throw invalid_args_exception(sout);
         }
         arg.resize(size);
     }
@@ -1131,6 +1125,14 @@ namespace mex_binding
     )
     {
         plhs = (mxArray*)item.release_struct_to_matlab();
+    }
+
+    void assign_to_matlab(
+        mxArray*& plhs,
+        matlab_object& item
+    )
+    {
+        plhs = (mxArray*)item.release_object_to_matlab();
     }
 
     void assign_to_matlab(
@@ -2716,6 +2718,14 @@ namespace mex_binding
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T> struct is_matlab_object                         { const static bool value = false; };
+    template <>           struct is_matlab_object <matlab_object>         { const static bool value = true; };
+    template <>           struct is_matlab_object <const matlab_object>   { const static bool value = true; };
+    template <>           struct is_matlab_object <matlab_object&>        { const static bool value = true; };
+    template <>           struct is_matlab_object <const matlab_object&>  { const static bool value = true; };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename funct
         >
@@ -2929,12 +2939,36 @@ namespace mex_binding
         #endif
 
 
+        //  Arguments with type matlab_object are optional in both input and output.
+        int num_optional_inputs = 0;
+        int num_optional_outputs = 0;
+        if (is_matlab_object<typename sig_traits<funct>::arg20_type>::value) if (is_input_type<typename sig_traits<funct>::arg20_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg19_type>::value) if (is_input_type<typename sig_traits<funct>::arg19_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg18_type>::value) if (is_input_type<typename sig_traits<funct>::arg18_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg17_type>::value) if (is_input_type<typename sig_traits<funct>::arg17_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg16_type>::value) if (is_input_type<typename sig_traits<funct>::arg16_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg15_type>::value) if (is_input_type<typename sig_traits<funct>::arg15_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg14_type>::value) if (is_input_type<typename sig_traits<funct>::arg14_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg13_type>::value) if (is_input_type<typename sig_traits<funct>::arg13_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg12_type>::value) if (is_input_type<typename sig_traits<funct>::arg12_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg11_type>::value) if (is_input_type<typename sig_traits<funct>::arg11_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg10_type>::value) if (is_input_type<typename sig_traits<funct>::arg10_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg9_type>::value) if (is_input_type<typename sig_traits<funct>::arg9_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg8_type>::value) if (is_input_type<typename sig_traits<funct>::arg8_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg7_type>::value) if (is_input_type<typename sig_traits<funct>::arg7_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg6_type>::value) if (is_input_type<typename sig_traits<funct>::arg6_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg5_type>::value) if (is_input_type<typename sig_traits<funct>::arg5_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg4_type>::value) if (is_input_type<typename sig_traits<funct>::arg4_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg3_type>::value) if (is_input_type<typename sig_traits<funct>::arg3_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg2_type>::value) if (is_input_type<typename sig_traits<funct>::arg2_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg1_type>::value) if (is_input_type<typename sig_traits<funct>::arg1_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+
 
         /* check for proper number of arguments */
-        if(nrhs > expected_nrhs || nrhs < expected_nrhs - defaulted_args) 
+        if(nrhs > expected_nrhs || nrhs < expected_nrhs - defaulted_args - num_optional_inputs) 
         {
             std::ostringstream sout;
-            sout << "Expected between " << expected_nrhs-defaulted_args 
+            sout << "Expected between " << expected_nrhs-defaulted_args - num_optional_inputs 
                 << " and " << expected_nrhs << " input arguments, got " << nrhs << ".";
 
             mexErrMsgIdAndTxt("mex_function:nrhs",
@@ -3133,7 +3167,7 @@ namespace mex_binding
         catch (invalid_args_exception& e)
         {
             throw dlib::error("Error occurred calling MATLAB function '" + function_name + "' from mex file. \n"
-                              "The MATLAB function didn't return what we expected it to.  \nIn particular, return" + e.msg);
+                              "The MATLAB function didn't return what we expected it to.  \nIn particular, return" + string(e.what()));
         }
     }
 
@@ -4372,6 +4406,54 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    matlab_object::~matlab_object(
+    )
+    {
+        if (handle && should_free)
+        {
+            mxDestroyArray((mxArray*)handle);
+            handle = 0;
+        }
+    }
+
+    template <typename T> 
+    matlab_object::
+    operator T(
+    ) const
+    {
+        T item;
+        get(item);
+        return item;
+    }
+
+    template <typename T> 
+    void matlab_object::
+    get(
+        T& item
+    ) const 
+    {
+        if (handle == 0)
+            throw dlib::invalid_args_exception("An attempt was made to access an empty matlab_object.");
+
+        mex_binding::validate_and_populate_arg(arg_idx,(mxArray*)handle,item);
+    }
+
+    template <typename T> 
+    matlab_object& matlab_object::
+    operator= (
+        const T& new_val
+    )
+    {
+        mxArray* item;
+        mex_binding::assign_to_matlab(item, new_val);
+        handle = item;
+        should_free = true;
+        return *this;
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     matlab_struct::sub::operator T() const
     {
@@ -4398,7 +4480,7 @@ namespace dlib
         {
             std::ostringstream sout;
             sout << "Struct field '" << mxGetFieldNameByNumber((const mxArray*)struct_handle, field_idx) << "' can't be interpreted as the requested type."
-                << endl << e.msg;
+                << endl << e.what();
             throw dlib::error(sout.str());
         }
     }
@@ -5013,7 +5095,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     catch (mex_binding::invalid_args_exception& e)
     {
         mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                            mex_binding::escape_percent("Input" + e.msg).c_str());
+                            mex_binding::escape_percent(e.what()).c_str());
     }
     catch (mex_binding::user_hit_ctrl_c& )
     {
