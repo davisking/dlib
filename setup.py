@@ -355,7 +355,7 @@ def read_version():
     major = re.findall("set\(CPACK_PACKAGE_VERSION_MAJOR.*\"(.*)\"", open('dlib/CMakeLists.txt').read())[0]
     minor = re.findall("set\(CPACK_PACKAGE_VERSION_MINOR.*\"(.*)\"", open('dlib/CMakeLists.txt').read())[0]
     patch = re.findall("set\(CPACK_PACKAGE_VERSION_PATCH.*\"(.*)\"", open('dlib/CMakeLists.txt').read())[0]
-    return major + '.' + minor + '.' + patch 
+    return major + '.' + minor + '.' + patch
 
 
 def rmtree(name):
@@ -504,6 +504,14 @@ class build(_build):
 
         # make sure build artifacts are generated for the version of Python currently running
         cmake_extra_arch = []
+
+        if 'conda' in sys.version:
+            # to support conda distribution
+            from distutils.sysconfig import get_python_inc
+            import distutils.sysconfig as sysconfig
+            cmake_extra_arch += ['-DPYTHON_INCLUDE_DIR=' + get_python_inc()]
+            cmake_extra_arch += ['-DPYTHON_LIBRARY=' + sysconfig.get_config_var('LIBDIR')]
+
         if sys.version_info >= (3, 0):
             cmake_extra_arch += ['-DPYTHON3=yes']
 
