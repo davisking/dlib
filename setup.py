@@ -505,12 +505,10 @@ class build(_build):
         # make sure build artifacts are generated for the version of Python currently running
         cmake_extra_arch = []
 
-        if 'conda' in sys.version:
-            # to support conda distribution
-            from distutils.sysconfig import get_python_inc
-            import distutils.sysconfig as sysconfig
-            cmake_extra_arch += ['-DPYTHON_INCLUDE_DIR=' + get_python_inc()]
-            cmake_extra_arch += ['-DPYTHON_LIBRARY=' + sysconfig.get_config_var('LIBDIR')]
+        from distutils.sysconfig import get_python_inc
+        import distutils.sysconfig as sysconfig
+        cmake_extra_arch += ['-DPYTHON_INCLUDE_DIR=' + get_python_inc()]
+        cmake_extra_arch += ['-DPYTHON_LIBRARY=' + sysconfig.get_config_var('LIBDIR')]
 
         if sys.version_info >= (3, 0):
             cmake_extra_arch += ['-DPYTHON3=yes']
