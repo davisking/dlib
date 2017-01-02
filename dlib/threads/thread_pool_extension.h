@@ -411,7 +411,7 @@ namespace dlib
 
         struct task_state_type
         {
-            task_state_type() : is_being_processed(false), task_id(0), next_task_id(2), arg1(0), arg2(0) {}
+            task_state_type() : is_being_processed(false), task_id(0), next_task_id(2), arg1(0), arg2(0), eptr(nullptr) {}
 
             bool is_ready () const 
             /*!
