@@ -189,7 +189,7 @@ namespace dlib
                 task = tasks[idx];
             }
 
-            std::exception_ptr eptr;
+            std::exception_ptr eptr = nullptr;
             try
             {
                 // now do the task
