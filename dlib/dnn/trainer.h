@@ -1059,7 +1059,7 @@ namespace dlib
         long lr_schedule_pos;
         unsigned long gradient_check_budget;
 
-        std::exception_ptr eptr;
+        std::exception_ptr eptr = nullptr;
         mutable std::mutex eptr_mutex;
         void propagate_exception() const
         {
