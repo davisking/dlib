@@ -411,7 +411,7 @@ namespace dlib
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;
-        constexpr static long num = 3;
+        enum { num = 3};
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
