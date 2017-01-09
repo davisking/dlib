@@ -1120,7 +1120,7 @@ namespace
                 m4 = randm(4,4,rnd);
 
                 DLIB_TEST(max(abs(m1*inv(m1) - identity_matrix(m1))) < 1e-13);
-                DLIB_TEST(max(abs(m2*inv(m2) - identity_matrix(m2))) < 1e-13);
+                DLIB_TEST(max(abs(m2*inv(m2) - identity_matrix(m2))) < 1e-12);
                 DLIB_TEST(max(abs(m3*inv(m3) - identity_matrix(m3))) < 1e-13);
                 DLIB_TEST_MSG(max(abs(m4*inv(m4) - identity_matrix(m4))) < 1e-12, max(abs(m4*inv(m4) - identity_matrix(m4))));
             }
