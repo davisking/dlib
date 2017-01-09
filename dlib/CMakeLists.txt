@@ -519,13 +519,13 @@ if (NOT TARGET dlib)
             # -std=c++11 option if you let it propagate it to nvcc in some
             # cases.  So instead we disable this and manually include
             # things from CMAKE_CXX_FLAGS in the CUDA_NVCC_FLAGS list below.
-            if (NOT MSVC)
+            if (APPLE)
                set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+               # Grab all the -D flags from CMAKE_CXX_FLAGS so we can pass them
+               # to nvcc.
+               string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC ${CMAKE_CXX_FLAGS})
             endif()
 
-            # Grab all the -D flags from CMAKE_CXX_FLAGS so we can pass them
-            # to nvcc.
-            string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC ${CMAKE_CXX_FLAGS})
 
             set(CUDA_HOST_COMPILATION_CPP ON)
             # Note that we add __STRICT_ANSI__ to avoid freaking out nvcc with gcc specific
