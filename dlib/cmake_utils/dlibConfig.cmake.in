@@ -28,7 +28,7 @@ else()
     get_filename_component(dlib_INSTALL_PATH "@CONF_INSTALL_PATH@" REALPATH)
 endif()
 
-set(dlib_INCLUDE_DIRS "${dlib_INSTALL_PATH}/include")
+set(dlib_INCLUDE_DIRS "${dlib_INSTALL_PATH}/include" "@dlib_needed_includes@")
  
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
