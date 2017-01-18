@@ -9695,12 +9695,10 @@ static const unsigned char obj_detector_dat[] = {
 0x1b,0x81,0x3b,0x07,0x09,0x48,0x01,0xec,0xd7,0x76,0x1c,0x81,0x33
 };
 
-static const std::string obj_detector_s(reinterpret_cast<const char*>(obj_detector_dat), sizeof(obj_detector_dat));
-
 namespace dlib {
-    const std::string&
+    std::string
         get_serialized_frontal_faces()
         {
-            return obj_detector_s;
+            return std::string(reinterpret_cast<const char*>(obj_detector_dat), sizeof(obj_detector_dat));
         }
 }

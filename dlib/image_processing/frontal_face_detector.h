@@ -99,7 +99,7 @@ namespace dlib
             Train detector (precision,recall,AP):        1 0.897369 0.897369 
             singular value threshold: 0.15
     */
-    const std::string& get_serialized_frontal_faces();
+    std::string get_serialized_frontal_faces();
 
     inline frontal_face_detector get_frontal_face_detector()
     {
