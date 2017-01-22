@@ -180,14 +180,11 @@ if (NOT TARGET dlib)
          tokenizer/tokenizer_kernel_1.cpp
          unicode/unicode.cpp
          data_io/image_dataset_metadata.cpp
-         data_io/mnist.cpp)
-
-   if (COMPILER_CAN_DO_CPP_11)
-      set(source_files ${source_files}
+         data_io/mnist.cpp
          dnn/cpu_dlib.cpp
          dnn/tensor_tools.cpp
-         )
-   endif()
+	)
+
 
    if (DLIB_ISO_CPP_ONLY)
        add_library(dlib STATIC ${source_files} )
