@@ -105,7 +105,7 @@ template <typename SUBNET> using ares_down = relu<residual_down<block,8,affine,S
 
 // Now that we have these convenient aliases, we can define a residual network
 // without a lot of typing.  Note the use of a repeat layer.  This special layer
-// type allows us to type repeat<9,res<SUBNET>> instead of
+// type allows us to type repeat<9,res,SUBNET> instead of
 // res<res<res<res<res<res<res<res<res<SUBNET>>>>>>>>>.  It will also prevent
 // the compiler from complaining about super deep template nesting when creating
 // large networks.
