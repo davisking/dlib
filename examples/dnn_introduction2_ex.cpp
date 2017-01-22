@@ -303,7 +303,16 @@ int main(int argc, char** argv) try
             mini_batch_labels.push_back(training_labels[idx]);
         }
 
+        // Tell the trainer to update the network given this mini-batch
         trainer.train_one_step(mini_batch_samples, mini_batch_labels);
+
+        // You can also feed validation data into the trainer by periodically
+        // calling trainer.test_one_step(samples,labels).  Unlike train_one_step(),
+        // test_one_step() doesn't modify the network, it only computes the testing
+        // error which it records internally.  This testing error will then be print
+        // in the verbose logging and will also determine when the trainer's
+        // automatic learning rate shrinking happens.  Therefore, test_one_step()
+        // can be used to perform automatic early stopping based on held out data.   
     }
 
     // When you call train_one_step(), the trainer will do its processing in a
