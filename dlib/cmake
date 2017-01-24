@@ -48,9 +48,9 @@ if ((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};") AND
     elseif(USE_SSE2_INSTRUCTIONS)
         add_definitions(-msse2)
         message(STATUS "Enabling SSE2 instructions")
-    if(USE_VSX_INSTRUCTIONS)
-            add_definitions(-maltivec)
-            message(STATUS "Enabling VSX instructions")
+    elseif(USE_VSX_INSTRUCTIONS)
+        add_definitions(-maltivec)
+        message(STATUS "Enabling VSX instructions")
     endif()
 elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visual Studio 
     # Use SSE2 by default when using Visual Studio.
