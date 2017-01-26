@@ -3,7 +3,6 @@
 #ifndef DLIB_sIMD4I_Hh_
 #define DLIB_sIMD4I_Hh_
 
-#include "simd_check.h"
 #include "../uintn.h"
 
 namespace dlib

@@ -3,7 +3,6 @@
 #ifndef DLIB_sIMD4F_Hh_
 #define DLIB_sIMD4F_Hh_
 
-#include "simd_check.h"
 #include "simd4i.h"
 #include <cmath>
 #include <iostream>

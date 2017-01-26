@@ -3,10 +3,8 @@
 #ifndef DLIB_sIMD8F_Hh_
 #define DLIB_sIMD8F_Hh_
 
-#include "simd_check.h"
 #include "simd4f.h"
 #include "simd8i.h"
-
 
 namespace dlib
 {
