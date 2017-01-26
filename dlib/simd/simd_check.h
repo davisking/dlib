@@ -51,7 +51,7 @@
                 #define DLIB_HAVE_AVX2
             #endif
         #endif
-        #ifdef __ALTIVEC__
+        #if defined(__ALTIVEC__) && defined(__VSX__)
             #ifndef DLIB_HAVE_VSX
                 #define DLIB_HAVE_VSX
             #endif
