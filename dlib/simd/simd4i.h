@@ -57,7 +57,7 @@ namespace dlib
         typedef int32 type;
 
         inline simd4i() {}
-        inline simd4i(int32 f) { x = (vector int){f,f,f,f}; }
+        inline simd4i(int32 f) { x = vec_splat_s32(f); }
         inline simd4i(int32 r0, int32 r1, int32 r2, int32 r3)
         {
             x = (vector int){r0,r1,r2,r3};
@@ -92,18 +92,11 @@ namespace dlib
         inline unsigned int size() const { return 4; }
         inline int32 operator[](unsigned int idx) const
         {
-            int32 temp[4];
-            store(temp);
-            return temp[idx];
+            return (int32) vec_extract(x,(signed int)idx);
         }
 
     private:
         vector int x;
-
-        /* Returns amount of bytes till previous 16-byte aligned value  */
-        inline size_t getAlignOffset(const void *p) const {
-            return ((size_t) p) % 16;
-        }
     };
 #else
 
