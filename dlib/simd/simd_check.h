@@ -52,7 +52,7 @@
             #endif
         #endif
 
-		
+        
         #ifdef __ALTIVEC__
             #ifndef DLIB_HAVE_ALTIVEC
                 #define DLIB_HAVE_ALTIVEC
@@ -64,9 +64,9 @@
             #endif
         #endif
         #ifdef __POWER8_VECTOR__
-	    #ifndef DLIB_HAVE_POWER_VEC	// vector and vec_ intrinsics
-	        #define DLIB_HAVE_POWER_VEC
-	    #endif
+        #ifndef DLIB_HAVE_POWER_VEC	// vector and vec_ intrinsics
+            #define DLIB_HAVE_POWER_VEC
+        #endif
         #endif
         #ifdef __VEC__  // __VEC__ = 10206 
             #ifndef DLIB_HAVE_GCC_VECTOR
