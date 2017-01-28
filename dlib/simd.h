@@ -5,7 +5,7 @@
 
 #include "simd/simd_check.h"
 
-#ifdef DLIB_HAVE_GCC_VECTOR
+#if 1 //def DLIB_HAVE_GCC_VECTOR
 #include "simd/simd4f_vec.h"
 #include "simd/simd4i_vec.h"
 #include "simd/simd8f_vec.h"

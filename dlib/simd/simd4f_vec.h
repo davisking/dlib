@@ -31,7 +31,7 @@ namespace dlib
         
         inline simd4f& operator=(const simd4f& v) { x = v.x; return *this; }
         inline simd4f& operator=(const float& v) { *this = simd4f(v); return *this; }
-
+        
 
         inline v4f operator() () const { return x; }
         inline float operator[](unsigned int idx) const { return x[idx]; }
@@ -39,7 +39,7 @@ namespace dlib
 
         inline simd4f operator- () { return -x; }
         inline simd4f operator! () { return !x; }
-        
+/*
         inline simd4f operator+ (const simd4f& rhs) {	return (x + rhs.x) ;	}
         inline simd4f operator- (const simd4f& rhs) {	return (x - rhs.x) ;	}
         inline simd4f operator* (const simd4f& rhs) {	return (x * rhs.x) ;	}
@@ -49,7 +49,7 @@ namespace dlib
         inline simd4f& operator-= (const simd4f& rhs) { x = x - rhs.x; return *this; }
         inline simd4f& operator*= (const simd4f& rhs) { x = x * rhs.x; return *this; }
         inline simd4f& operator/= (const simd4f& rhs) { x = x / rhs.x; return *this; }
-        
+*/
         // These will always return integer type of same length //
         inline simd4i operator== (const simd4f& rhs) { return simd4i(x==rhs.x); }
         inline simd4i operator!= (const simd4f& rhs) { return simd4i(x!=rhs.x); }
@@ -62,26 +62,37 @@ namespace dlib
         
         inline void load(const float* p)  { x[0]=p[0]; x[1]=p[1]; x[2]=p[2]; x[3]=p[3]; }
         inline void store(float* p) const { p[0]=x[0]; p[1]=x[1]; p[2]=x[2]; p[3]=x[3]; }
-
-        friend std::ostream& operator<<(std::ostream& out, const simd4f& s)
-        {
-            size_t n = sizeof(s.x) / 4;
-
-            out << "(";
-            for (int i=0; i<n; i++)
-                out << s.x[i] << (((i+1)==n)?"":", ") ;
-            out << ")";
-            return out;
+        
+        
+        // truncate to 32bit integers
+        inline operator simd4i::rawarray() const 
+        { 
+            simd4i::rawarray temp;
+            temp.a[0] = (int32)x[0];
+            temp.a[1] = (int32)x[1];
+            temp.a[2] = (int32)x[2];
+            temp.a[3] = (int32)x[3];
+            return temp;
         }
     };
+    
+    inline std::ostream& operator<<(std::ostream& out, const simd4f& item)
+    {
+        out << "(" << item[0] << ", " << item[1] << ", " << item[2] << ", " << item[3] << ")";
+        return out;
+    }
     
     inline simd4f operator+ (const simd4f& lhs, const simd4f& rhs) {	return (lhs() + rhs()) ;	}
     inline simd4f operator- (const simd4f& lhs, const simd4f& rhs) {	return (lhs() - rhs()) ;	}
     inline simd4f operator* (const simd4f& lhs, const simd4f& rhs) {	return (lhs() * rhs()) ;	}
     inline simd4f operator/ (const simd4f& lhs, const simd4f& rhs) {	return (lhs() / rhs()) ;	}
     
+    inline simd4f operator+=(simd4f& lhs, const simd4f& rhs) {	lhs = lhs + rhs; return lhs;	}
+    inline simd4f operator-=(simd4f& lhs, const simd4f& rhs) {	lhs = lhs - rhs; return lhs;	}
+    inline simd4f operator*=(simd4f& lhs, const simd4f& rhs) {	lhs = lhs * rhs; return lhs;	}
+    inline simd4f operator/=(simd4f& lhs, const simd4f& rhs) {  lhs = lhs / rhs; return lhs;	}
     
-    
+
     
     inline float sum(const simd4f& v) { return v[0]+v[1]+v[2]+v[3]; }
     inline float dot(const simd4f& a, const simd4f& b) { return sum(a*b); }

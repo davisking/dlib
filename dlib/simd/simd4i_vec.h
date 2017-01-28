@@ -19,10 +19,7 @@ namespace dlib
         inline simd4i() {}
         inline simd4i(const v4i& v) : x(v) { }
         inline simd4i(const simd4i& v) : x(v.x) { }
-        inline simd4i(const simd4f& v) {
-            x[0]=v[0]; x[1]=v[1]; x[2]=v[2]; x[3]=v[3];
-        }
-        
+
         inline simd4i(int32 f) : x(((v4i){f,f,f,f})) { }
         inline simd4i(int32 r0, int32 r1, int32 r2, int32 r3)
              : x(((v4i){r0,r1,r2,r3})) { }		
@@ -38,7 +35,7 @@ namespace dlib
         inline simd4i operator- () { return -x; }
         inline simd4i operator! () { return !x; }
         
-        
+/*
         inline simd4i operator+ (const simd4i& rhs) {	return (x + rhs.x) ;	}
         inline simd4i operator- (const simd4i& rhs) {	return (x - rhs.x) ;	}
         inline simd4i operator* (const simd4i& rhs) {	return (x * rhs.x) ;	}
@@ -48,7 +45,7 @@ namespace dlib
         inline simd4i& operator-= (const simd4i& rhs) { x = x - rhs.x; return *this; }
         inline simd4i& operator*= (const simd4i& rhs) { x = x * rhs.x; return *this; }
         inline simd4i& operator/= (const simd4i& rhs) { x = x / rhs.x; return *this; }
-        
+*/
         // These will always return integer type of same length //
         inline simd4i operator== (const simd4i& rhs) { return (x==rhs.x); }
         inline simd4i operator!= (const simd4i& rhs) { return (x!=rhs.x); }
@@ -71,24 +68,31 @@ namespace dlib
         
         inline void load(const int* p)  { x[0]=p[0]; x[1]=p[1]; x[2]=p[2]; x[3]=p[3]; }
         inline void store(int* p) const { p[0]=x[0]; p[1]=x[1]; p[2]=x[2]; p[3]=x[3]; }
-
-    
-        friend std::ostream& operator<<(std::ostream& out, const simd4i& s)
+        
+        // kludge to handle simd4i( simd4f_v );
+        struct rawarray
         {
-            size_t n = sizeof(s.x) / 4;
+            int32 a[4];
+        };
+        inline simd4i(const rawarray& a) { x[0]=a.a[0]; x[1]=a.a[1]; x[2]=a.a[2]; x[3]=a.a[3]; }
 
-            out << "(";
-            for (int i=0; i<n; i++)
-                out << s.x[i] << (((i+1)==n)?"":", ") ;
-            out << ")";
-            return out;
-        }
     };
+    
+    inline std::ostream& operator<<(std::ostream& out, const simd4i& item)
+    {
+        out << "(" << item[0] << ", " << item[1] << ", " << item[2] << ", " << item[3] << ")";
+        return out;
+    }
     
     inline simd4i operator+ (const simd4i& lhs, const simd4i& rhs) {	return (lhs() + rhs()) ;	}
     inline simd4i operator- (const simd4i& lhs, const simd4i& rhs) {	return (lhs() - rhs()) ;	}
     inline simd4i operator* (const simd4i& lhs, const simd4i& rhs) {	return (lhs() * rhs()) ;	}
     inline simd4i operator/ (const simd4i& lhs, const simd4i& rhs) {	return (lhs() / rhs()) ;	}
+    
+    inline simd4i operator+=(simd4i& lhs, const simd4i& rhs) {	lhs = lhs + rhs; return lhs;	}
+    inline simd4i operator-=(simd4i& lhs, const simd4i& rhs) {	lhs = lhs - rhs; return lhs;	}
+    inline simd4i operator*=(simd4i& lhs, const simd4i& rhs) {	lhs = lhs * rhs; return lhs;	}
+    inline simd4i operator/=(simd4i& lhs, const simd4i& rhs) {  lhs = lhs / rhs; return lhs;	}
     
     inline int sum(const simd4i& v) { return v[0]+v[1]+v[2]+v[3]; }
 
