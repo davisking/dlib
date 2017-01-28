@@ -90,7 +90,7 @@ namespace dlib
         typedef float type;
 
         inline simd4f() {}
-        inline simd4f(float f) { x = (vector float){f,f,f,f}; }
+        inline simd4f(float f) { x = vec_splats(f); }
         inline simd4f(float r0, float r1, float r2, float r3) { x = (vector float){r0,r1,r2,r3} }
         inline simd4f(const vector float &val):x(val) {}
         inline simd4f(const simd4i& val):x(vec_ctf(val.get_x(),0)) {}
