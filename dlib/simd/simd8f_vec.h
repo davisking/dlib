@@ -39,17 +39,8 @@ namespace dlib
 
         inline simd8f operator- () { return -x; }
         inline simd8f operator! () { return !x; }
-/*
-        inline simd8f operator+ (const simd8f& rhs) {	return (x + rhs.x) ;	}
-        inline simd8f operator- (const simd8f& rhs) {	return (x - rhs.x) ;	}
-        inline simd8f operator* (const simd8f& rhs) {	return (x * rhs.x) ;	}
-        inline simd8f operator/ (const simd8f& rhs) {	return (x / rhs.x) ;	}
-
-        inline simd8f& operator+= (const simd8f& rhs) { x = x + rhs.x; return *this; }
-        inline simd8f& operator-= (const simd8f& rhs) { x = x - rhs.x; return *this; }
-        inline simd8f& operator*= (const simd8f& rhs) { x = x * rhs.x; return *this; }
-        inline simd8f& operator/= (const simd8f& rhs) { x = x / rhs.x; return *this; }
-*/
+ 
+       
         // These will always return integer type of same length //
         inline simd8i operator== (const simd8f& rhs) { return simd8i(x==rhs.x); }
         inline simd8i operator!= (const simd8f& rhs) { return simd8i(x!=rhs.x); }
