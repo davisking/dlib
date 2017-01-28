@@ -57,7 +57,7 @@ namespace dlib
         typedef int32 type;
 
         inline simd4i() {}
-        inline simd4i(int32 f) { x = vec_splat_s32(f); }
+        inline simd4i(int32 f) { x = vec_splats(f); }
         inline simd4i(int32 r0, int32 r1, int32 r2, int32 r3)
         {
             x = (vector int){r0,r1,r2,r3};
