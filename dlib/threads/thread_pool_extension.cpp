@@ -19,12 +19,11 @@ namespace dlib
         we_are_destructing(false)
     {
         tasks.resize(num_threads);
+        threads.resize(num_threads);
         for (unsigned long i = 0; i < num_threads; ++i)
         {
-            register_thread(*this, &thread_pool_implementation::thread);
+            threads[i] = std::thread([&](){this->thread();});
         }
-
-        start();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -60,7 +59,10 @@ namespace dlib
             task_ready_signaler.broadcast();
         }
 
-        wait();
+        // wait for all threads to terminate
+        for (auto& t : threads)
+            t.join();
+        threads.clear();
 
         // Throw any unhandled exceptions.  Since shutdown_pool() is only called in the
         // destructor this will kill the program.
