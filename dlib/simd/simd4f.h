@@ -91,7 +91,7 @@ namespace dlib
 
         inline simd4f() {}
         inline simd4f(float f) { x = vec_splats(f); }
-        inline simd4f(float r0, float r1, float r2, float r3) { x = (vector float){r0,r1,r2,r3} }
+        inline simd4f(float r0, float r1, float r2, float r3) { x = (vector float){r0,r1,r2,r3}; }
         inline simd4f(const vector float &val):x(val) {}
         inline simd4f(const simd4i& val):x(vec_ctf(val.get_x(),0)) {}
 
@@ -107,7 +107,7 @@ namespace dlib
             return *this;
         }
 
-        inline simd4f& operator=(const __m128& val)
+        inline simd4f& operator=(const vector float &val)
         {
             x = val;
             return *this;
@@ -121,18 +121,16 @@ namespace dlib
         inline vector float get_x() const { return x; }
 
         // truncate to 32bit integers
-        inline vector int operator () const { return vec_trunc(x); }
+        inline operator vector int () const { return vec_trunc(x); }
 
         inline void load_aligned(const type* ptr)  { x = vec_ld(0,ptr); }
         inline void store_aligned(type* ptr) const { vec_st(x,0,ptr); }
         inline void load(const type* ptr) {
-            const size_t offset = getAlignOffset(ptr);
-            x = vec_ld(offset, ptr - offset);
+            x = vec_vsx_ld(0,ptr);
         }
         inline void store(type* ptr) const
         {
-            const size_t offset = vsx_getAlignOffset(ptr);
-            vec_st(x,offset,ptr - offset);
+            vec_vsx_st(x,0,ptr);
         }
 
         inline unsigned int size() const { return 4; }
@@ -160,6 +158,8 @@ namespace dlib
         }
 
         inline operator vector float() const { return x; }
+	inline vector float get_x() const { return x; }
+	inline vector int get_x_trunc() const { return vec_trunc(x) ; }
 
 
     private:
@@ -327,7 +327,7 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_div_ps(lhs, rhs); 
 #elif defined(DLIB_HAVE_VSX)
-    return vec_recipdiv(lhs.get_x(),rhs.get_x());
+    return vec_div(lhs.get_x(),rhs.get_x());
 #else
         return simd4f(lhs[0]/rhs[0],
                       lhs[1]/rhs[1],
@@ -592,7 +592,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_SSE2)
         return _mm_or_ps(_mm_and_ps(cmp,a) , _mm_andnot_ps(cmp,b));
 #elif defined(DLIB_HAVE_VSX)
-        return vec_sel(a.get_x(),b_get_x(),cmp.get_x());
+        return vec_sel(a.get_x(),b.get_x(),cmp.get_x_trunc());
 #else
         return simd4f(cmp[0]?a[0]:b[0],
                       cmp[1]?a[1]:b[1],

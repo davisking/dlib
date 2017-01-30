@@ -83,7 +83,7 @@
 #endif
 
 #ifdef DLIB_HAVE_VSX
-    #include <simd_vsx.h>
+    #include "simd_vsx.h"
 #endif
 
 #endif // DLIB_SIMd_CHECK_Hh_

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 /* Returns amount of bytes till previous 16-byte aligned value  */
-inline size_t getAlignOffset(const void *p) const {
+inline size_t vsx_getAlignOffset(const void *p) {
     return ((size_t) p) % 16;
 }
 

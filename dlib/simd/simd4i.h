@@ -6,8 +6,8 @@
 #include "simd_check.h"
 #include "../uintn.h"
 
-#ifdef DLIB_HAVE_VSX
-#warning "Undefed DLIB_HAVE_VSX"
+#ifndef DLIB_HAVE_VSX
+#warning "Undefined DLIB_HAVE_VSX"
 #undef DLIB_HAVE_VSX
 #endif
 
@@ -80,13 +80,11 @@ namespace dlib
         inline void load_aligned(const type* ptr)  { x = vec_ld(0,ptr); }
         inline void store_aligned(type* ptr) const { vec_st(x,0,ptr); }
         inline void load(const type* ptr) {
-            const size_t offset = getAlignOffset(ptr);
-            x = vec_ld(offset, ptr - offset);
+            x = vec_vsx_ld(0, ptr);
         }
         inline void store(type* ptr) const
         {
-            const size_t offset = getAlignOffset(ptr);
-            vec_st(x,offset,ptr - offset);
+            vec_vsx_st(x,0,ptr);
         }
 
         inline unsigned int size() const { return 4; }
@@ -287,7 +285,7 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_xor_si128(lhs, _mm_set1_epi32(0xFFFFFFFF)); 
 #elif defined(DLIB_HAVE_VSX)
-        return vec_xor(lhs.get_x(),(vector int) {0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF});
+        return vec_xor((vector unsigned int)lhs.get_x(),(vector unsigned int) {0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF});
 #else
         return simd4i(~lhs[0],
                       ~lhs[1],
@@ -303,7 +301,7 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_sll_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #elif defined(DLIB_HAVE_VSX)
-        return vec_sl(lhs.get_x(),(vector int){rhs,rhs,rhs,rhs}});
+        return vec_sl(lhs.get_x(),vec_splats(rhs));
 #else
         return simd4i(lhs[0]<<rhs,
                       lhs[1]<<rhs,
@@ -321,7 +319,7 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_sra_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #elif defined(DLIB_HAVE_VSX)
-        return vec_sr(lhs.get_x(),(vector int){rhs,rhs,rhs,rhs}});
+        return vec_sr(lhs.get_x(),vec_splats(rhs));
 #else
         return simd4i(lhs[0]>>rhs,
                       lhs[1]>>rhs,
@@ -487,7 +485,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_SSE2)
         return ((cmp&a) | _mm_andnot_si128(cmp,b));
 #elif defined(DLIB_HAVE_VSX)
-        return vec_sel(a.get_x(),b_get_x(),cmp.get_x());
+        return vec_sel(a.get_x(),b.get_x(),cmp.get_x());
 #else
         return ((cmp&a) | (~cmp&b));
 #endif
