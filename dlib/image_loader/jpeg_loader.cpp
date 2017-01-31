@@ -62,6 +62,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool jpeg_loader::is_rgba() const
+    {
+        return (output_components_ == 4);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     struct jpeg_loader_error_mgr 
     {
         jpeg_error_mgr pub;    /* "public" fields */
@@ -123,7 +130,8 @@ namespace dlib
         output_components_ = cinfo.output_components;
 
         if (output_components_ != 1 && 
-            output_components_ != 3)
+            output_components_ != 3 &&
+            output_components_ != 4)
         {
             fclose( fp );
             jpeg_destroy_decompress(&cinfo);
