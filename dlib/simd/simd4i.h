@@ -63,6 +63,7 @@ namespace dlib
             x = (vector int){r0,r1,r2,r3};
         }
         inline simd4i(const vector int &val):x(val) {}
+        inline simd4i(const vector bool int &val):x((vector int)val) {}
 
         inline simd4i& operator=(const vector int &val)
         {
@@ -213,7 +214,7 @@ namespace dlib
                       _lhs[2]*_rhs[2],
                       _lhs[3]*_rhs[3]);
 #elif defined(DLIB_HAVE_VSX)
-        return vec_mul(lhs.get_x(),rhs.get_x());
+        return vec_cts(vec_mul(vec_ctf(lhs.get_x(),0),vec_ctf(rhs.get_x(),0)),0);
 #else
         return simd4i(lhs[0]*rhs[0],
                       lhs[1]*rhs[1],
@@ -285,7 +286,7 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_xor_si128(lhs, _mm_set1_epi32(0xFFFFFFFF)); 
 #elif defined(DLIB_HAVE_VSX)
-        return vec_xor((vector unsigned int)lhs.get_x(),(vector unsigned int) {0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF});
+        return (vector int)vec_xor((vector unsigned int)lhs.get_x(),(vector unsigned int) {0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF});
 #else
         return simd4i(~lhs[0],
                       ~lhs[1],
@@ -301,7 +302,7 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_sll_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #elif defined(DLIB_HAVE_VSX)
-        return vec_sl(lhs.get_x(),vec_splats(rhs));
+        return vec_sl(lhs.get_x(),vec_splat_u32(rhs));
 #else
         return simd4i(lhs[0]<<rhs,
                       lhs[1]<<rhs,
@@ -319,7 +320,7 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_sra_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #elif defined(DLIB_HAVE_VSX)
-        return vec_sr(lhs.get_x(),vec_splats(rhs));
+        return vec_sr(lhs.get_x(),vec_splat_u32(rhs));
 #else
         return simd4i(lhs[0]>>rhs,
                       lhs[1]>>rhs,
@@ -392,7 +393,7 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return ~(lhs > rhs); 
 #elif defined(DLIB_HAVE_VSX)
-        return vec_cmple(lhs.get_x(),rhs.get_x());
+        return ~(lhs > rhs);
 #else
         return simd4i(lhs[0]<=rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]<=rhs[1] ? 0xFFFFFFFF : 0,
@@ -485,7 +486,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_SSE2)
         return ((cmp&a) | _mm_andnot_si128(cmp,b));
 #elif defined(DLIB_HAVE_VSX)
-        return vec_sel(a.get_x(),b.get_x(),cmp.get_x());
+        return vec_sel(b.get_x(),a.get_x(),(vector unsigned int)cmp.get_x());
 #else
         return ((cmp&a) | (~cmp&b));
 #endif

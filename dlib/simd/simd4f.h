@@ -121,7 +121,7 @@ namespace dlib
         inline vector float get_x() const { return x; }
 
         // truncate to 32bit integers
-        inline operator vector int () const { return vec_trunc(x); }
+        inline operator vector int () const { return vec_cts(x,0); }
 
         inline void load_aligned(const type* ptr)  { x = vec_ld(0,ptr); }
         inline void store_aligned(type* ptr) const { vec_st(x,0,ptr); }
@@ -149,21 +149,20 @@ namespace dlib
         typedef float type;
 
         inline simd4f_bool() {}
-        inline simd4f_bool(const vector float &val):x(val) {}
+        inline simd4f_bool(const vector bool int &val):x(val) {}
 
-        inline simd4f_bool& operator=(const vector float &val)
+        inline simd4f_bool& operator=(const vector bool int &val)
         {
             x = val;
             return *this;
         }
 
-        inline operator vector float() const { return x; }
-	inline vector float get_x() const { return x; }
-	inline vector int get_x_trunc() const { return vec_trunc(x) ; }
+        inline operator vector bool int() const { return x; }
+	inline vector bool int get_x() const { return x; }
 
 
     private:
-        vector float x;
+        vector bool int x;
     };
 #else
     class simd4f
@@ -361,7 +360,7 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_cmpneq_ps(lhs, rhs); 
 #elif defined(DLIB_HAVE_VSX)
-    return vec_xor(vec_cmpeq(lhs.get_x(),rhs.get_x()),(vector int){0,0,0,0});
+        return vec_xor(vec_cmpeq(lhs.get_x(),rhs.get_x()),(vector bool int){0,0,0,0});
 #else
         return simd4f_bool(lhs[0]!=rhs[0],
                            lhs[1]!=rhs[1],
@@ -592,7 +591,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_SSE2)
         return _mm_or_ps(_mm_and_ps(cmp,a) , _mm_andnot_ps(cmp,b));
 #elif defined(DLIB_HAVE_VSX)
-        return vec_sel(a.get_x(),b.get_x(),cmp.get_x_trunc());
+        return vec_sel(b.get_x(),a.get_x(),cmp.get_x());
 #else
         return simd4f(cmp[0]?a[0]:b[0],
                       cmp[1]?a[1]:b[1],
