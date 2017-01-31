@@ -6,6 +6,12 @@
 #include "simd_check.h"
 #include "../uintn.h"
 
+#ifndef DLIB_HAVE_VSX
+#warning "Undefined DLIB_HAVE_VSX"
+#undef DLIB_HAVE_VSX
+#endif
+
+
 namespace dlib
 {
 
@@ -43,6 +49,53 @@ namespace dlib
 
     private:
         __m128i x;
+    };
+#elif defined(DLIB_HAVE_VSX)
+    class simd4i
+    {
+    public:
+        typedef int32 type;
+
+        inline simd4i() {}
+        inline simd4i(int32 f) { x = vec_splats(f); }
+        inline simd4i(int32 r0, int32 r1, int32 r2, int32 r3)
+        {
+            x = (vector int){r0,r1,r2,r3};
+        }
+        inline simd4i(const vector int &val):x(val) {}
+        inline simd4i(const vector bool int &val):x((vector int)val) {}
+
+        inline simd4i& operator=(const vector int &val)
+        {
+            x = val;
+            return *this;
+        }
+
+        inline operator vector int() const { return x; }
+	/* Getter function for x duplicated because of
+	 * Altivec vec_* functions are macros and 
+	 * can't use standard C++ type conversion provided above
+	 */
+	inline vector int get_x() const { return x; }
+
+        inline void load_aligned(const type* ptr)  { x = vec_ld(0,ptr); }
+        inline void store_aligned(type* ptr) const { vec_st(x,0,ptr); }
+        inline void load(const type* ptr) {
+            x = vec_vsx_ld(0, ptr);
+        }
+        inline void store(type* ptr) const
+        {
+            vec_vsx_st(x,0,ptr);
+        }
+
+        inline unsigned int size() const { return 4; }
+        inline int32 operator[](unsigned int idx) const
+        {
+            return (int32) vec_extract(x,(signed int)idx);
+        }
+
+    private:
+        vector int x;
     };
 #else
 
@@ -117,6 +170,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_add_epi32(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_add(lhs.get_x(),rhs.get_x());
 #else
         return simd4i(lhs[0]+rhs[0],
                       lhs[1]+rhs[1],
@@ -133,6 +188,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_sub_epi32(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_sub(lhs.get_x(),rhs.get_x());
 #else
         return simd4i(lhs[0]-rhs[0],
                       lhs[1]-rhs[1],
@@ -148,7 +205,7 @@ namespace dlib
     inline simd4i operator* (const simd4i& lhs, const simd4i& rhs) 
     { 
 #ifdef DLIB_HAVE_SSE41
-        return _mm_mullo_epi32(lhs, rhs); 
+        return _mm_mullo_epi32(lhs, rhs);
 #elif defined(DLIB_HAVE_SSE2)
         int32 _lhs[4]; lhs.store(_lhs);
         int32 _rhs[4]; rhs.store(_rhs);
@@ -156,6 +213,8 @@ namespace dlib
                       _lhs[1]*_rhs[1],
                       _lhs[2]*_rhs[2],
                       _lhs[3]*_rhs[3]);
+#elif defined(DLIB_HAVE_VSX)
+        return vec_cts(vec_mul(vec_ctf(lhs.get_x(),0),vec_ctf(rhs.get_x(),0)),0);
 #else
         return simd4i(lhs[0]*rhs[0],
                       lhs[1]*rhs[1],
@@ -171,7 +230,9 @@ namespace dlib
     inline simd4i operator& (const simd4i& lhs, const simd4i& rhs) 
     { 
 #ifdef DLIB_HAVE_SSE2
-        return _mm_and_si128(lhs, rhs); 
+        return _mm_and_si128(lhs, rhs);
+#elif defined(DLIB_HAVE_VSX)
+        return vec_and(lhs.get_x(),rhs.get_x());
 #else
         return simd4i(lhs[0]&rhs[0],
                       lhs[1]&rhs[1],
@@ -188,6 +249,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_or_si128(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_or(lhs.get_x(),rhs.get_x());
 #else
         return simd4i(lhs[0]|rhs[0],
                       lhs[1]|rhs[1],
@@ -204,6 +267,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_xor_si128(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_xor(lhs.get_x(),rhs.get_x());
 #else
         return simd4i(lhs[0]^rhs[0],
                       lhs[1]^rhs[1],
@@ -220,6 +285,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_xor_si128(lhs, _mm_set1_epi32(0xFFFFFFFF)); 
+#elif defined(DLIB_HAVE_VSX)
+        return (vector int)vec_xor((vector unsigned int)lhs.get_x(),(vector unsigned int) {0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF});
 #else
         return simd4i(~lhs[0],
                       ~lhs[1],
@@ -234,6 +301,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_sll_epi32(lhs,_mm_cvtsi32_si128(rhs));
+#elif defined(DLIB_HAVE_VSX)
+        return vec_sl(lhs.get_x(),vec_splat_u32(rhs));
 #else
         return simd4i(lhs[0]<<rhs,
                       lhs[1]<<rhs,
@@ -250,6 +319,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_sra_epi32(lhs,_mm_cvtsi32_si128(rhs));
+#elif defined(DLIB_HAVE_VSX)
+        return vec_sr(lhs.get_x(),vec_splat_u32(rhs));
 #else
         return simd4i(lhs[0]>>rhs,
                       lhs[1]>>rhs,
@@ -266,6 +337,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_cmpeq_epi32(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_cmpeq(lhs.get_x(),rhs.get_x());
 #else
         return simd4i(lhs[0]==rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]==rhs[1] ? 0xFFFFFFFF : 0,
@@ -279,6 +352,8 @@ namespace dlib
     inline simd4i operator!= (const simd4i& lhs, const simd4i& rhs) 
     { 
 #ifdef DLIB_HAVE_SSE2
+        return ~(lhs==rhs);
+#elif defined(DLIB_HAVE_VSX)
         return ~(lhs==rhs);
 #else
         return simd4i(lhs[0]!=rhs[0] ? 0xFFFFFFFF : 0,
@@ -294,6 +369,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_cmplt_epi32(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_cmplt(lhs.get_x(),rhs.get_x());
 #else
         return simd4i(lhs[0]<rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]<rhs[1] ? 0xFFFFFFFF : 0,
@@ -315,6 +392,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return ~(lhs > rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return ~(lhs > rhs);
 #else
         return simd4i(lhs[0]<=rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]<=rhs[1] ? 0xFFFFFFFF : 0,
@@ -343,6 +422,8 @@ namespace dlib
                       std::min(_lhs[1],_rhs[1]),
                       std::min(_lhs[2],_rhs[2]),
                       std::min(_lhs[3],_rhs[3]));
+#elif defined(DLIB_HAVE_VSX)
+        return vec_min(lhs.get_x(),rhs.get_x());
 #else
         return simd4i(std::min(lhs[0],rhs[0]),
                       std::min(lhs[1],rhs[1]),
@@ -364,6 +445,8 @@ namespace dlib
                       std::max(_lhs[1],_rhs[1]),
                       std::max(_lhs[2],_rhs[2]),
                       std::max(_lhs[3],_rhs[3]));
+#elif defined(DLIB_HAVE_VSX)
+        return vec_max(lhs.get_x(),rhs.get_x());
 #else
         return simd4i(std::max(lhs[0],rhs[0]),
                       std::max(lhs[1],rhs[1]),
@@ -384,6 +467,10 @@ namespace dlib
         int32 temp[4];
         item.store(temp);
         return temp[0]+temp[1]+temp[2]+temp[3];
+#elif defined(DLIB_HAVE_VSX)
+        simd4i temp = vec_add(item.get_x(),item.get_x());
+        temp = vec_add(temp.get_x(),temp.get_x());
+        return temp[0];
 #else
         return item[0]+item[1]+item[2]+item[3];
 #endif
@@ -398,6 +485,8 @@ namespace dlib
         return _mm_blendv_epi8(b,a,cmp);
 #elif defined(DLIB_HAVE_SSE2)
         return ((cmp&a) | _mm_andnot_si128(cmp,b));
+#elif defined(DLIB_HAVE_VSX)
+        return vec_sel(b.get_x(),a.get_x(),(vector unsigned int)cmp.get_x());
 #else
         return ((cmp&a) | (~cmp&b));
 #endif

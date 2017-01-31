@@ -51,6 +51,11 @@
                 #define DLIB_HAVE_AVX2
             #endif
         #endif
+        #if defined(__ALTIVEC__) && defined(__VSX__)
+            #ifndef DLIB_HAVE_VSX
+                #define DLIB_HAVE_VSX
+            #endif
+        #endif
     #endif
 #endif
 
@@ -75,6 +80,10 @@
 #ifdef DLIB_HAVE_AVX2
     #include <immintrin.h> // AVX
 //    #include <avx2intrin.h>
+#endif
+
+#ifdef DLIB_HAVE_VSX
+    #include "simd_vsx.h"
 #endif
 
 #endif // DLIB_SIMd_CHECK_Hh_
