@@ -1812,13 +1812,9 @@ namespace dlib
         ) 
         {  
             // assign the given value to every spot in this matrix
-            for (long r = 0; r < nr(); ++r)
-            {
-                for (long c = 0; c < nc(); ++c)
-                {
-                    data(r,c) = val;
-                }
-            }
+            const long size = nr()*nc();
+            for (long i = 0; i < size; ++i)
+                data(i) = val;
 
             // Now return the literal_assign_helper so that the user
             // can use the overloaded comma notation to initialize 
