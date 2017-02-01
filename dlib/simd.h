@@ -6,7 +6,7 @@
 #include "simd/simd_check.h"
 
 
-#ifndef DLIB_USE_AUTO_VECTOR
+#ifndef DLIB_HAVE_ALTIVEC
 #include "simd/simd4f.h"
 #include "simd/simd4i.h"
 #include "simd/simd8f.h"

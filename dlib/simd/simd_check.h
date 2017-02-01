@@ -51,8 +51,6 @@
                 #define DLIB_HAVE_AVX2
             #endif
         #endif
-
-        
         #ifdef __ALTIVEC__
             #ifndef DLIB_HAVE_ALTIVEC
                 #define DLIB_HAVE_ALTIVEC
@@ -74,7 +72,6 @@
 
  
 // ----------------------------------------------------------------------------------------
-
 
 
 #ifdef DLIB_HAVE_ALTIVEC
