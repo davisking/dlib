@@ -7,7 +7,6 @@
 #include "simd4f.h"
 #include "simd8i.h"
 
-
 namespace dlib
 {
 #ifdef DLIB_HAVE_AVX

@@ -83,6 +83,58 @@ namespace dlib
     private:
         __m128 x;
     };
+
+#elif defined(DLIB_HAVE_VSX)
+
+    class simd4f
+    {    
+        typedef union {
+            vector float v;
+            float x[4];
+        } v4f;
+        
+        v4f x;
+        
+    public:
+        inline simd4f() : x{0,0,0,0} {}
+        inline simd4f(const simd4f& v) : x(v.x) { }
+        inline simd4f(const vector float& v) : x{v} { }
+
+        inline simd4f(const simd4i& v) {
+            x.x[0]=v[0]; x.x[1]=v[1]; x.x[2]=v[2]; x.x[3]=v[3];
+        }
+        
+        
+        inline simd4f(float f) : x{f,f,f,f} { }
+        inline simd4f(float r0, float r1, float r2, float r3)
+             : x{r0,r1,r2,r3} { }
+
+        inline simd4f& operator=(const simd4f& v) { x = v.x; return *this; }
+        inline simd4f& operator=(const float& v) { *this = simd4f(v); return *this; }
+
+        inline vector float operator() () const { return x.v; }
+        inline float operator[](unsigned int idx) const { return x.x[idx]; }
+        
+        inline void load_aligned(const float* ptr)  { x.v = vec_ld(0, ptr); }
+        inline void store_aligned(float* ptr) const { vec_st(x.v, 0, ptr); }
+        inline void load(const float* ptr) { x.v = vec_vsx_ld(0, ptr); }
+        inline void store(float* ptr) const { vec_vsx_st(x.v, 0, ptr); }
+        
+        
+        // truncate to 32bit integers
+        inline operator simd4i::rawarray() const 
+        { 
+            simd4i::rawarray temp;
+            temp.v.x[0] = x.x[0];
+            temp.v.x[1] = x.x[1];
+            temp.v.x[2] = x.x[2];
+            temp.v.x[3] = x.x[3];
+            return temp;
+        }
+    };
+
+    typedef simd4i simd4f_bool;
+
 #else
     class simd4f
     {
@@ -190,6 +242,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_add_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_add(lhs(), rhs());
 #else
         return simd4f(lhs[0]+rhs[0],
                       lhs[1]+rhs[1],
@@ -206,6 +260,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_sub_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_sub(lhs(), rhs());
 #else
         return simd4f(lhs[0]-rhs[0],
                       lhs[1]-rhs[1],
@@ -222,6 +278,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_mul_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_mul(lhs(), rhs());
 #else
         return simd4f(lhs[0]*rhs[0],
                       lhs[1]*rhs[1],
@@ -238,6 +296,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_div_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_div(lhs(), rhs());
 #else
         return simd4f(lhs[0]/rhs[0],
                       lhs[1]/rhs[1],
@@ -254,6 +314,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_cmpeq_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_cmpeq(lhs(), rhs());
 #else
         return simd4f_bool(lhs[0]==rhs[0],
                            lhs[1]==rhs[1],
@@ -268,6 +330,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_cmpneq_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return ~(lhs==rhs);     // simd4f_bool is simd4i typedef, can use ~
 #else
         return simd4f_bool(lhs[0]!=rhs[0],
                            lhs[1]!=rhs[1],
@@ -282,6 +346,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_cmplt_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_cmplt(lhs(), rhs());
 #else
         return simd4f_bool(lhs[0]<rhs[0],
                            lhs[1]<rhs[1],
@@ -303,6 +369,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_cmple_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_cmple(lhs(), rhs());
 #else
         return simd4f_bool(lhs[0]<=rhs[0],
                            lhs[1]<=rhs[1],
@@ -324,6 +392,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_min_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_min(lhs(), rhs());
 #else
         return simd4f(std::min(lhs[0],rhs[0]),
                       std::min(lhs[1],rhs[1]),
@@ -338,6 +408,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_max_ps(lhs, rhs); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_max(lhs(), rhs());
 #else
         return simd4f(std::max(lhs[0],rhs[0]),
                       std::max(lhs[1],rhs[1]),
@@ -352,6 +424,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_rcp_ps(item); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_re(item());
 #else
         return simd4f(1.0f/item[0],
                       1.0f/item[1],
@@ -366,6 +440,8 @@ namespace dlib
     { 
 #ifdef DLIB_HAVE_SSE2
         return _mm_rsqrt_ps(item); 
+#elif defined(DLIB_HAVE_VSX)
+        return vec_rsqrt(item());
 #else
         return simd4f(1.0f/std::sqrt(item[0]),
                       1.0f/std::sqrt(item[1]),
@@ -410,6 +486,8 @@ namespace dlib
     {
 #ifdef DLIB_HAVE_SSE2
         return _mm_sqrt_ps(item);
+#elif defined(DLIB_HAVE_VSX)
+        return vec_sqrt(item());
 #else
         return simd4f(std::sqrt(item[0]),
                       std::sqrt(item[1]),
@@ -434,6 +512,8 @@ namespace dlib
         simd4f temp2;
         temp2.load(temp);
         return temp2;
+#elif defined(DLIB_HAVE_VSX)
+        return vec_ceil(item());
 #else
         return simd4f(std::ceil(item[0]),
                       std::ceil(item[1]),
@@ -458,6 +538,8 @@ namespace dlib
         simd4f temp2;
         temp2.load(temp);
         return temp2;
+#elif defined(DLIB_HAVE_VSX)
+        return vec_floor(item());
 #else
         return simd4f(std::floor(item[0]),
                       std::floor(item[1]),
