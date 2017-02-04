@@ -1083,8 +1083,8 @@ namespace dlib
     {
     public:
 
-        typedef float training_label_type;
-        typedef float output_label_type;
+        typedef matrix<float> training_label_type;
+        typedef matrix<float> output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -1101,14 +1101,14 @@ namespace dlib
             const tensor& output_tensor = sub.get_output();
 
             DLIB_CASSERT(output_tensor.nr() == 1 &&
-                         output_tensor.nc() == 1 &&
-                         output_tensor.k() == 1);
+                         output_tensor.nc() == 1)
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
 
             const float* out_data = output_tensor.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
-                *iter++ = out_data[i];
+                *iter++ = mat(out_data, output_tensor.k(), 1);
+                out_data += output_tensor.k();
             }
         }
 
@@ -1132,24 +1132,29 @@ namespace dlib
             DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
             DLIB_CASSERT(output_tensor.nr() == 1 &&
-                         output_tensor.nc() == 1 &&
-                         output_tensor.k() == 1);
+                         output_tensor.nc() == 1);
             DLIB_CASSERT(grad.nr() == 1 &&
-                         grad.nc() == 1 &&
-                         grad.k() == 1);
+                         grad.nc() == 1);
+            DLIB_CASSERT(grad.k() == output_tensor.k());
 
             // The loss we output is the average loss over the mini-batch.
             const double scale = 1.0/output_tensor.num_samples();
             double loss = 0;
             float* g = grad.host_write_only();
             const float* out_data = output_tensor.host();
+            matrix<float> ytrue;
             for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
-                const float y = *truth++;
-                const float temp1 = y - out_data[i];
-                const float temp2 = scale*temp1;
-                loss += 0.5*temp2*temp1;
-                g[i] = -temp2;
+                ytrue = *truth++;
+                for (long j = 0; j < output_tensor.k(); ++j)
+                {
+                    const float y = ytrue(j, 0);
+                    const float temp1 = y - *out_data++;
+                    const float temp2 = scale*temp1;
+                    loss += 0.5*temp2*temp1;
+                    *g = -temp2;
+                    ++g;
+                }
 
             }
             return loss;
