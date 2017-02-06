@@ -1243,6 +1243,13 @@ namespace dlib
             DLIB_CASSERT(grad.nr() == 1 &&
                          grad.nc() == 1);
             DLIB_CASSERT(grad.k() == output_tensor.k());
+            const long k = output_tensor.k();
+            for (long idx = 0; idx < output_tensor.num_samples(); ++idx)
+            {
+                const_label_iterator truth_matrix_ptr = (truth + idx);
+                DLIB_CASSERT((*truth_matrix_ptr).nr() == k &&
+                             (*truth_matrix_ptr).nc() == 1);
+            }
 
             // The loss we output is the average loss over the mini-batch.
             const double scale = 1.0/output_tensor.num_samples();
