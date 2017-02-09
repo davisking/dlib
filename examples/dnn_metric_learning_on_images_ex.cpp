@@ -14,9 +14,10 @@
     space it's very easy to do face recognition with some kind of k-nearest
     neighbor classifier.  
     
-    In this example we will use the ResNet-34 network from the dnn_imagenet_ex.cpp 
-    example to learn to map images into some vector space where pictures of
-    the same person are close and pictures of different people are far apart.  
+    In this example we will use a version of the ResNet network from the
+    dnn_imagenet_ex.cpp example to learn to map images into some vector space where
+    pictures of the same person are close and pictures of different people are far
+    apart.  
 
     You might want to read the simpler introduction to the deep metric learning
     API, dnn_metric_learning_ex.cpp, before reading this example.  You should
@@ -112,7 +113,7 @@ void load_mini_batch (
         }
     }
 
-    // You might want to do some data augmentation at this point.  Here we so some simple
+    // You might want to do some data augmentation at this point.  Here we do some simple
     // color augmentation.
     for (auto&& crop : images)
         disturb_colors(crop,rnd);
@@ -173,7 +174,7 @@ using net_type = loss_metric<fc_no_bias<128,avg_pool_everything<
                             level3<
                             level4<
                             max_pool<3,3,2,2,relu<bn_con<con<32,7,7,2,2,
-                            input_rgb_image_sized<150>
+                            input_rgb_image
                             >>>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
@@ -184,7 +185,7 @@ using anet_type = loss_metric<fc_no_bias<128,avg_pool_everything<
                             alevel3<
                             alevel4<
                             max_pool<3,3,2,2,relu<affine<con<32,7,7,2,2,
-                            input_rgb_image_sized<150>
+                            input_rgb_image
                             >>>>>>>>>>>>;
 
 // ----------------------------------------------------------------------------------------
