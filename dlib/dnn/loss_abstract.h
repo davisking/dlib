@@ -559,6 +559,27 @@ namespace dlib
         typedef unsigned long training_label_type;
         typedef matrix<float,0,1> output_label_type;
 
+        loss_metric_(
+        );
+        /*!
+            ensures
+                - #get_margin() == 0.04
+                - #get_distance_threshold() == 0.6
+        !*/
+
+        loss_metric_(
+            float margin,
+            float dist_thresh
+        );
+        /*!
+            requires
+                - margin > 0
+                - dist_thresh > 0
+            ensures
+                - #get_margin() == margin
+                - #get_distance_threshold() == dist_thresh
+        !*/
+
         template <
             typename SUB_TYPE,
             typename label_iterator
@@ -581,14 +602,14 @@ namespace dlib
             given to this function, one for each sample in the input_tensor.
         !*/
 
-        float get_margin() const { return 0.1; }
+        float get_margin() const; 
         /*!
             ensures
                 - returns the margin value used by the loss function.  See the discussion
                   in WHAT THIS OBJECT REPRESENTS for details.
         !*/
 
-        float get_distance_threshold() const { return 0.75; }
+        float get_distance_threshold() const; 
         /*!
             ensures
                 - returns the distance threshold value used by the loss function.  See the discussion
