@@ -71,6 +71,13 @@
 // Disable "warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)"
 #pragma warning(disable : 4290)
 
+
+// DNN module uses template-based network declaration that leads to very long
+// type names. Visual Studio will produce Warning C4503 in such cases. https://msdn.microsoft.com/en-us/library/074af4b6.aspx says
+// that correct binaries are still produced even when this warning happens, but linker errors from visual studio, if they occurr could be confusing.
+#pragma warning( disable: 4503 )
+
+
 #endif
 
 #ifdef __BORLANDC__
