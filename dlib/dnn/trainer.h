@@ -649,9 +649,10 @@ namespace dlib
             // We make separate thread pools with just one thread in them because we want
             // to make sure each device is always executed on the same thread.  We care
             // about this because there are thread_local context variables for some cuda
-            // components and they get regenerated when the current cuda device changes.
-            // Recreating them over and over is somewhat expensive so we want to avoid
-            // that.
+            // components and they get allocated for each combination of thread and device.
+            // So if we make sure the same device always uses the same thread this will
+            // reduce the number of contexts we allocate from num_devices*num_devices to
+            // just num_devices. 
             std::vector<std::shared_ptr<thread_pool>> tp;
             for (size_t i = 0; i < devices.size(); ++i)
                 tp.push_back(std::make_shared<thread_pool>(1));
