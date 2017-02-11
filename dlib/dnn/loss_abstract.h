@@ -553,6 +553,14 @@ namespace dlib
                 than get_distance_threshold() distance from each other in the learned
                 embedding.  So this loss function gives you a natural decision boundary for
                 deciding if two objects are from the same class.
+
+                Finally, the loss balances the number of negative pairs relative to the
+                number of positive pairs.  Therefore, if there are N pairs that share the
+                same identity in a mini-batch then the algorithm will only include the N
+                worst non-matching pairs in the loss.  That is, the algorithm performs hard
+                negative mining on the non-matching pairs.  This is important since there
+                are in general way more non-matching pairs than matching pairs.  So to
+                avoid imbalance in the loss this kind of hard negative mining is useful.
         !*/
     public:
 
