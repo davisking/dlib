@@ -33,7 +33,7 @@ using namespace std;
 
 // The next bit of code defines a ResNet network.  It's basically copied
 // and pasted from the dnn_imagenet_ex.cpp example, except we replaced the loss
-// layer with loss_metric and make the network somewhat smaller.  Go read the introductory
+// layer with loss_metric and made the network somewhat smaller.  Go read the introductory
 // dlib DNN examples to learn what all this stuff means.
 //
 // Also, the dnn_metric_learning_on_images_ex.cpp example shows how to train this network.
