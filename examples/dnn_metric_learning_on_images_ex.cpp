@@ -212,13 +212,13 @@ int main(int argc, char** argv)
 
     net_type net;
 
-    dnn_trainer<net_type> trainer(net, sgd(0.0005, 0.9));
+    dnn_trainer<net_type> trainer(net, sgd(0.0001, 0.9));
     trainer.set_learning_rate(0.1);
     trainer.be_verbose();
     trainer.set_synchronization_file("face_metric_sync", std::chrono::minutes(5));
     // I've set this to something really small to make the example terminate
     // sooner.  But when you really want to train a good model you should set
-    // this to something like 8000 so training doesn't terminate too early.
+    // this to something like 10000 so training doesn't terminate too early.
     trainer.set_iterations_without_progress_threshold(300);
 
     // If you have a lot of data then it might not be reasonable to load it all
