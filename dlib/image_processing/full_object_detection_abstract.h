@@ -104,6 +104,14 @@ namespace dlib
                   when the return value of part() is equal to OBJECT_PART_NOT_PRESENT. 
                   This is useful for modeling object parts that are not always observed.
         !*/
+
+        bool operator==(
+            const full_object_detection& rhs
+        ) const;
+        /*!
+            ensures
+                - returns true if and only if *this and rhs have identical state.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
