@@ -43,7 +43,6 @@ ENDMACRO()
 # provide enough C++11 support to compile the DNN tooling, but were good enough
 # to compile the rest of dlib.  
 if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
-   add_example(dnn_metric_learning_on_images_ex)
    add_example(dnn_metric_learning_ex)
    add_example(dnn_face_recognition_ex)
    add_example(dnn_introduction_ex)
@@ -59,6 +58,7 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
       # compiler to run out of RAM and to crash.  Maybe someday Visual Studio
       # won't be broken :(
       add_example(dnn_imagenet_train_ex)
+      add_example(dnn_metric_learning_on_images_ex)
    endif()
 endif()
 
