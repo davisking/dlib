@@ -529,6 +529,11 @@ if (NOT TARGET dlib)
             # magic in the standard C++ header files (since nvcc uses gcc headers on
             # linux).
             list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
+            if (CMAKE_POSITION_INDEPENDENT_CODE)
+               # sometimes this setting isn't propagated to NVCC, which then causes the
+               # compile to fail.  So make sure it's propagated.
+               list(APPEND CUDA_NVCC_FLAGS "-Xcompiler -fPIC")
+            endif()
 
             include(cmake_utils/test_for_cudnn/find_cudnn.txt)
 

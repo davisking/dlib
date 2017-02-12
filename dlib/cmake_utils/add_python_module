@@ -132,6 +132,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
     # does.
     add_definitions("-fPIC")
+    set(CMAKE_POSITION_INDEPENDENT_CODE True)
 else()
     set(CMAKE_POSITION_INDEPENDENT_CODE True)
 endif()
