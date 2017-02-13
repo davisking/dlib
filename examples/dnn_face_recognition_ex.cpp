@@ -140,7 +140,6 @@ int main(int argc, char** argv) try
     // creates a graph of connected faces and then uses the Chinese whispers graph clustering
     // algorithm to identify how many people there are and which faces belong to whom.
     std::vector<sample_pair> edges;
-    int possible_edges = 0;
     for (size_t i = 0; i < face_descriptors.size(); ++i)
     {
         for (size_t j = i+1; j < face_descriptors.size(); ++j)
