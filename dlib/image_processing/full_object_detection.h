@@ -101,8 +101,8 @@ namespace dlib
                 return false;
             for (size_t i = 0; i < parts.size(); ++i)
             {
-                if (parts[i] != rhs.parts[i]);
-                return false;
+                if (parts[i] != rhs.parts[i])
+                    return false;
             }
             return true;
         }
