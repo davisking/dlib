@@ -358,6 +358,157 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    double max_distance_to(
+        const std::vector<matrix<double,0,1>>& a,
+        const std::vector<matrix<double,0,1>>& b
+    )
+    {
+        double best_dist = 0;
+        for (auto&& aa : a)
+        {
+            for (auto&& bb : b)
+            {
+                double dist = length(aa-bb);
+                if (dist > best_dist)
+                    best_dist = dist;
+            }
+        }
+        return best_dist;
+    }
+
+    double min_distance_to(
+        const std::vector<matrix<double,0,1>>& a,
+        const std::vector<matrix<double,0,1>>& b
+    )
+    {
+        double best_dist = std::numeric_limits<double>::infinity();
+        for (auto&& aa : a)
+        {
+            for (auto&& bb : b)
+            {
+                double dist = length(aa-bb);
+                if (dist < best_dist)
+                    best_dist = dist;
+            }
+        }
+        return best_dist;
+    }
+
+    double min_distance_to(
+        const std::vector<matrix<double,0,1>>& s,
+        const matrix<double,0,1>& v
+    )
+    {
+        double best_dist = std::numeric_limits<double>::infinity();
+        for (auto& x : s)
+        {
+            double dist = length(v-x);
+            if (dist < best_dist)
+            {
+                best_dist = dist;
+            }
+        }
+        return best_dist;
+    }
+
+    double max_distance_to(
+        const std::vector<matrix<double,0,1>>& s,
+        const matrix<double,0,1>& v
+    )
+    {
+        double best_dist = 0;
+        for (auto& x : s)
+        {
+            double dist = length(v-x);
+            if (dist > best_dist)
+            {
+                best_dist = dist;
+            }
+        }
+        return best_dist;
+    }
+
+    void test_find_gap_between_convex_hulls()
+    {
+        print_spinner();
+        std::vector<matrix<double,0,1>> set1, set2;
+
+        const double dist_thresh = 5.47723; 
+
+        // generate two groups of points that are pairwise close within each set and
+        // pairwise far apart between each set, according to dist_thresh distance threshold.  
+        bool which = true;
+        for (size_t i = 0; i < 10000; ++i)
+        {
+            matrix<double,0,1> v = gaussian_randm(15,2,i);
+            const auto min_dist1 = min_distance_to(set1,v);
+            const auto min_dist2 = min_distance_to(set2,v);
+            const auto max_dist1 = max_distance_to(set1,v);
+            const auto max_dist2 = max_distance_to(set2,v);
+            if (which)
+            {
+                if ((set1.size()==0 || max_dist1 < dist_thresh) && min_dist2 > dist_thresh )
+                {
+                    set1.push_back(v);
+                    which = !which;
+                }
+            }
+            else
+            {
+                if ((set2.size()==0 || max_dist2 < dist_thresh) && min_dist1 > dist_thresh)
+                {
+                    set2.push_back(v);
+                    which = !which;
+                }
+            }
+        }
+
+        dlog << LINFO << "set1.size(): "<< set1.size();
+        dlog << LINFO << "set2.size(): "<< set2.size();
+
+
+        // make sure we generated the points correctly.
+        dlog << LINFO << "dist_thresh: "<< dist_thresh;
+        dlog << LINFO << "max distance between set1 and set1: "<< max_distance_to(set1,set1);
+        dlog << LINFO << "max distance between set2 and set2: "<< max_distance_to(set2,set2);
+        DLIB_TEST(max_distance_to(set1,set1) < dist_thresh);
+        DLIB_TEST(max_distance_to(set2,set2) < dist_thresh);
+        dlog << LINFO << "min distance between set2 and set1: "<< min_distance_to(set2,set1);
+        DLIB_TEST(min_distance_to(set2,set1) > dist_thresh);
+
+        
+        // It is slightly counterintuitive but true that points picked using the above procedure
+        // will have elements of their convex hulls that are much closer together than
+        // dist_thresh, even though none of the vertices of the hulls are that close
+        // together.  This is especially true in high dimensions.  So let's use this to
+        // test find_gap_between_convex_hulls().  It should be able to find a pair of
+        // points in the convex hulls of our sets that are a lot closer together than
+        // dist_thresh.
+
+        // First we need to convert the vectors to matrices.
+        matrix<double> A, B;
+        A.set_size(set1[0].size(), set1.size());
+        B.set_size(set2[0].size(), set2.size());
+        for (long c = 0; c < A.nc(); ++c)
+            set_colm(A,c) = set1[c];
+        for (long c = 0; c < B.nc(); ++c)
+            set_colm(B,c) = set2[c];
+
+        matrix<double,0,1> c1, c2;
+        find_gap_between_convex_hulls(A, B, c1, c2, 0.0001);
+        // make sure c1 and c2 are convex combinations.
+        DLIB_TEST(abs(sum(c1)-1) < 1e-8);
+        DLIB_TEST(abs(sum(c2)-1) < 1e-8);
+        DLIB_TEST(min(c1) >= 0);
+        DLIB_TEST(min(c2) >= 0);
+
+        // now test that the points found are close together.
+        dlog << LINFO << "dist: "<< length(A*c1 - B*c2);
+        DLIB_TEST(length(A*c1 - B*c2) < 4);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class opt_qp_solver_tester : public tester
     {
         /*
@@ -412,6 +563,9 @@ namespace
             dlog << LINFO << "disagreement stddev: " << rs.stddev();
             DLIB_TEST_MSG(rs.mean() < 0.001, rs.mean());
             DLIB_TEST_MSG(rs.stddev() < 0.001, rs.stddev());
+
+
+            test_find_gap_between_convex_hulls();
         }
 
         double do_the_test (

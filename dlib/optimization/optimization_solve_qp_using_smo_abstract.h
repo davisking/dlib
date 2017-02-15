@@ -164,6 +164,47 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP1,
+        typename EXP2,
+        typename T, long NRa, long NRb
+        >
+    unsigned long find_gap_between_convex_hulls (
+        const matrix_exp<EXP1>& A,
+        const matrix_exp<EXP2>& B,
+        matrix<T,NRa,1>& cA,
+        matrix<T,NRb,1>& cB,
+        const double eps,
+        const unsigned long max_iter = 1000
+    );
+    /*!
+        requires
+            - A.nr() == B.nr()
+            - A.size() != 0
+            - B.size() != 0
+            - eps > 0
+            - max_iter > 0
+        ensures
+            - If you think of A and B as sets of column vectors, then we can identify the
+              convex sets hullA and hullB, which are the convex hulls of A and B
+              respectively.  This function finds the pair of points in hullA and hullB that
+              are nearest to each other.  To be precise, this function solves the following
+              quadratic program:
+                Minimize: f(cA,cB) == length_squared(A*cA - B*cB) 
+                subject to the following constraints on cA and cB:
+                    - is_col_vector(cA) == true && cA.size() == A.nc()
+                    - is_col_vector(cB) == true && cB.size() == B.nc()
+                    - sum(cA) == 1 && min(cA) >= 0
+                    - sum(cB) == 1 && min(cB) >= 0
+            - This function uses an iterative block coordinate descent algorithm to solve
+              the QP.  It runs until either max_iter iterations have been performed or the
+              QP is solved to at least eps accuracy.
+            - returns the number of iterations performed.  If this method fails to
+              converge to eps accuracy then the number returned will be max_iter+1.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_ABSTRACT_Hh_

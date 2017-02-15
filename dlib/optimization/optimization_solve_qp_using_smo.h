@@ -553,6 +553,62 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename EXP1,
+        typename EXP2,
+        typename T, long NRa, long NRb
+        >
+    unsigned long find_gap_between_convex_hulls (
+        const matrix_exp<EXP1>& A,
+        const matrix_exp<EXP2>& B,
+        matrix<T,NRa,1>& cA,
+        matrix<T,NRb,1>& cB,
+        const double eps,
+        const unsigned long max_iter = 1000
+    )
+    {
+        DLIB_CASSERT(A.size() != 0);
+        DLIB_CASSERT(B.size() != 0);
+        DLIB_CASSERT(A.nr() == B.nr(), "The dimensionality of the points in both convex hull sets must match");
+        DLIB_CASSERT(eps > 0);
+        DLIB_CASSERT(max_iter > 0);
+
+        cA.set_size(A.nc());
+        cB.set_size(B.nc());
+
+        // initialize to the centroids of A and B respectively.
+        cA = 1.0/cA.size();
+        cB = 1.0/cB.size();
+
+
+        matrix<T> AA, BB, AB, ABb, ABa;
+
+        AA = trans(A)*A;
+        BB = trans(B)*B;
+        AB = trans(A)*B;
+
+        unsigned long iter = 0;
+        for (iter = 0; iter < max_iter; ++iter)
+        {
+            // find the convex combination of A that is nearest to B*cB
+            ABb = AB*cB;
+            const auto smo_iter1 = solve_qp_using_smo(AA, ABb, cA, eps, cA.size());
+
+            // now find the convex combination of B that is nearest to A*cA
+            ABa = trans(AB)*cA;
+            const auto smo_iter2 = solve_qp_using_smo(BB, ABa, cB, eps, cB.size());
+
+            // stop if the QP solvers failed to improve 
+            if (smo_iter1 == 1 && smo_iter2 == 1)
+                break;
+        }
+
+
+        return iter+1;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_OPTIMIZATION_SOLVE_QP_UsING_SMO_Hh_
