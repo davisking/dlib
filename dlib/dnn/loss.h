@@ -1012,6 +1012,11 @@ namespace dlib
                     else 
                         d2 = std::sqrt(d2);
 
+                    // It should be noted that the derivative of length(x-y) with respect
+                    // to the x vector is the unit vector (x-y)/length(x-y).  If you stare
+                    // at the code below long enough you will see that it's just an
+                    // application of this formula.
+
                     if (x_label == y_label)
                     {
                         // Things with the same label should have distances < dist_thresh between
