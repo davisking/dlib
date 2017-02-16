@@ -440,7 +440,7 @@ namespace
         bool which = true;
         for (size_t i = 0; i < 10000; ++i)
         {
-            matrix<double,0,1> v = gaussian_randm(15,2,i);
+            matrix<double,0,1> v = gaussian_randm(15,1,i);
             const auto min_dist1 = min_distance_to(set1,v);
             const auto min_dist2 = min_distance_to(set2,v);
             const auto max_dist1 = max_distance_to(set1,v);
