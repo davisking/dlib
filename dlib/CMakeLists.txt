@@ -183,7 +183,7 @@ if (NOT TARGET dlib)
          data_io/mnist.cpp
          dnn/cpu_dlib.cpp
          dnn/tensor_tools.cpp
-	)
+   )
 
 
    if (DLIB_ISO_CPP_ONLY)
@@ -243,6 +243,13 @@ if (NOT TARGET dlib)
          if (NOT DLIB_NO_GUI_SUPPORT)
             find_package(X11 QUIET)
             if (X11_FOUND)
+               # If both X11 and anaconda are installed, it's possible for the
+               # anaconda path to appear before /opt/X11, so we remove anaconda.
+               foreach (ITR ${X11_INCLUDE_DIR})
+                  if ("${ITR}" MATCHES "(.*)anaconda(.*)")
+                     list (REMOVE_ITEM X11_INCLUDE_DIR ${ITR})
+                  endif ()
+               endforeach(ITR)
                include_directories(${X11_INCLUDE_DIR})
                set (dlib_needed_libraries ${dlib_needed_libraries} ${X11_LIBRARIES})
             else()
