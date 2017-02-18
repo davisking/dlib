@@ -44,7 +44,7 @@ ENDMACRO()
 # to compile the rest of dlib.  
 if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
    add_example(dnn_metric_learning_ex)
-   add_example(dnn_face_recognition_ex)
+   add_gui_example(dnn_face_recognition_ex)
    add_example(dnn_introduction_ex)
    add_example(dnn_introduction2_ex)
    add_example(dnn_inception_ex)
