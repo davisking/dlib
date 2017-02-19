@@ -539,7 +539,9 @@ if (NOT TARGET dlib)
             if (CMAKE_POSITION_INDEPENDENT_CODE)
                # sometimes this setting isn't propagated to NVCC, which then causes the
                # compile to fail.  So make sure it's propagated.
-               list(APPEND CUDA_NVCC_FLAGS "-Xcompiler -fPIC")
+               if (NOT MSVC) # Visual studio doesn't have -fPIC so don't do it in that case.
+                  list(APPEND CUDA_NVCC_FLAGS "-Xcompiler -fPIC")
+               endif()
             endif()
 
             include(cmake_utils/test_for_cudnn/find_cudnn.txt)
