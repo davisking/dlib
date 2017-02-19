@@ -552,7 +552,7 @@ if (NOT TARGET dlib)
                                          "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
                                          "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
 
-               if (!MSVC) # see https://github.com/davisking/dlib/issues/363
+               if (NOT MSVC) # see https://github.com/davisking/dlib/issues/363
                   list(APPEND CUDA_TEST_CMAKE_FLAGS "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
                endif()
 
