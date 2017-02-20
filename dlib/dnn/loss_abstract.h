@@ -659,8 +659,8 @@ namespace dlib
         !*/
     public:
 
-        typedef float training_label_type;
-        typedef float output_label_type;
+        typedef matrix<float> training_label_type;
+        typedef matrix<float> output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -676,7 +676,6 @@ namespace dlib
             it has the additional calling requirements that:
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
-                - sub.get_output().k() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
             and the output label is the predicted continuous variable.
@@ -696,7 +695,6 @@ namespace dlib
             except it has the additional calling requirements that:
                 - sub.get_output().nr() == 1
                 - sub.get_output().nc() == 1
-                - sub.get_output().k() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
         !*/
