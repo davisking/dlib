@@ -713,8 +713,10 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object implements the loss layer interface defined above by
-                EXAMPLE_LOSS_LAYER_.  In particular, it implements the mean squared loss, which is
-                appropriate for regression problems.
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the mean squared loss,
+                which is appropriate for regression problems.  It is basically just like
+                loss_mean_squared_ except that it lets you define multiple outputs instead
+                of just 1.
         !*/
     public:
 
