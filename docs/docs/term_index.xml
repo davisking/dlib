@@ -127,6 +127,7 @@
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_metric_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_mean_squared_" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_mean_squared_multioutput_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_mmod_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="mmod_options" include="dlib/dnn.h"/>
 
@@ -286,6 +287,7 @@
          <term file="optimization.html" name="elastic_net"                    include="dlib/optimization/elastic_net.h"/>
          <term file="optimization.html" name="solve_qp_box_constrained"       include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp_using_smo"             include="dlib/optimization.h"/>
+         <term file="optimization.html" name="find_gap_between_convex_hulls"  include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp2_using_smo"            include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp3_using_smo"            include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp4_using_smo"            include="dlib/optimization.h"/>
@@ -390,6 +392,8 @@
          <term file="linear_algebra.html" name="find_projective_transform"     include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="rotation_matrix"           include="dlib/geometry.h"/>
          <term file="algorithms.html" name="running_stats"                 include="dlib/statistics.h"/>
+         <term file="algorithms.html" name="running_stats_decayed"                 include="dlib/statistics.h"/>
+         <term file="algorithms.html" name="running_scalar_covariance_decayed"                 include="dlib/statistics.h"/>
          <term file="algorithms.html" name="running_gradient"              include="dlib/statistics/running_gradient.h"/>
          <term file="algorithms.html" name="find_upper_quantile"           include="dlib/statistics/running_gradient.h"/>
          <term file="dlib/statistics/running_gradient_abstract.h.html" name="probability_gradient_greater_than"  include="dlib/statistics/running_gradient.h"/>
@@ -509,6 +513,8 @@
          <term file="ml.html" name="count_ranking_inversions"                       include="dlib/svm.h"/>
          <term file="ml.html" name="average_precision"                              include="dlib/statistics.h"/>
          <term file="ml.html" name="equal_error_rate"                               include="dlib/statistics.h"/>
+         <term file="ml.html" name="compute_roc_curve"                              include="dlib/statistics.h"/>
+         <term file="dlib/statistics/lda.h.html" name="roc_point"                   include="dlib/statistics.h"/>
          <term file="ml.html" name="test_ranking_function"                          include="dlib/svm.h"/>
          <term file="ml.html" name="cross_validate_ranking_trainer"                 include="dlib/svm.h"/>
          <term file="ml.html" name="svm_c_ekm_trainer"                              include="dlib/svm.h"/>
@@ -711,7 +717,11 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="reshape"            include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="squared"       include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="cubed"         include="dlib/matrix.h"/>
-         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_vector"          include="dlib/matrix.h"/>
+
+         <term name="is_vector">
+            <term link="dlib/matrix/matrix_utilities_abstract.h.html#is_vector" name="for matrix objects"          include="dlib/matrix.h"/>
+            <term link="dlib/dnn/tensor_abstract.h.html#is_vector" name="for tensor objects"          include="dlib/dnn.h"/>
+         </term>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_row_vector"      include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_col_vector"      include="dlib/matrix.h"/>
          <term name="is_finite">
@@ -757,6 +767,8 @@
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_ptrm"              include="dlib/matrix.h"/>
 
 
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="min_pointwise" include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="max_pointwise" include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointwise_multiply" include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="join_rows"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="join_cols"          include="dlib/matrix.h"/>

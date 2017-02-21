@@ -144,6 +144,7 @@
                   <li>Tools for <a href="imaging.html#object_detector">detecting objects</a> in images including
                   <a href="imaging.html#get_frontal_face_detector">frontal face detection</a> and
                    <a href="imaging.html#shape_predictor">object pose estimation</a>.</li>
+                   <li>High quality <a href="dnn_face_recognition_ex.cpp.html">face recognition</a></li>
                </ul>
             </li>
 

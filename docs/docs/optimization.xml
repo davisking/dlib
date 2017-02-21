@@ -42,6 +42,7 @@
 
       <section>
          <name>Special Purpose Optimizers</name>
+         <item>find_gap_between_convex_hulls</item> 
          <item>solve_qp_box_constrained</item> 
          <item>solve_qp_using_smo</item> 
          <item>solve_qp2_using_smo</item> 
@@ -406,6 +407,28 @@
 Minimize: f(p) == 0.5*trans(p)*B*p + trans(g)*p
 subject to the following constraint:
    length(p) &lt;= radius
+</pre>
+
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_gap_between_convex_hulls</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_solve_qp_using_smo_abstract.h</spec_file>
+         <description>
+            This function measures the position and size of the gap between two convex
+            polytopes.  In particular, it solves the following quadratic program:
+<pre>
+   Minimize: f(cA,cB) == length_squared(A*cA - B*cB) 
+   subject to the following constraints on cA and cB:
+      - is_col_vector(cA) == true &amp;&amp; cA.size() == A.nc()
+      - is_col_vector(cB) == true &amp;&amp; cB.size() == B.nc()
+      - sum(cA) == 1 &amp;&amp; min(cA) >= 0
+      - sum(cB) == 1 &amp;&amp; min(cB) >= 0
 </pre>
 
          </description>

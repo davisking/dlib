@@ -58,6 +58,8 @@
          <item>rand</item> 
          <item>median</item> 
          <item>running_stats</item> 
+         <item>running_stats_decayed</item> 
+         <item>running_scalar_covariance_decayed</item> 
          <item>running_gradient</item> 
          <item>running_scalar_covariance</item> 
          <item>mean_sign_agreement</item> 
@@ -477,6 +479,37 @@
             <example>kcentroid_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>running_stats_decayed</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object represents something that can compute the running mean and
+                variance of a stream of real numbers.  It is similar to <a href="#running_stats">running_stats</a>
+                except that it forgets about data it has seen after a certain period of
+                time.  It does this by exponentially decaying old statistics. 
+         </description>
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>running_scalar_covariance_decayed</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object represents something that can compute the running covariance of
+                a stream of real number pairs.  It is essentially the same as
+                <a href="#running_scalar_covariance">running_scalar_covariance</a> except that it forgets about data it has seen
+                after a certain period of time.  It does this by exponentially decaying old
+                statistics. 
+         </description>
       </component>
       
       
