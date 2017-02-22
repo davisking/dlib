@@ -69,7 +69,7 @@ faces_folder_path = sys.argv[3]
 # face recognition model.
 detector = dlib.get_frontal_face_detector()
 sp = dlib.shape_predictor(predictor_path)
-facerec = dlib.face_recognition_model_v1(face_rec_model_path);
+facerec = dlib.face_recognition_model_v1(face_rec_model_path)
 
 win = dlib.image_window()
 
@@ -95,7 +95,7 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
         shape = sp(img, d)
         # Draw the face landmarks on the screen so we can see what face is currently being processed.
         win.clear_overlay()
-        win.add_overlay(d);
+        win.add_overlay(d)
         win.add_overlay(shape)
 
         # Compute the 128D vector that describes the face in img identified by
@@ -103,10 +103,10 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
         # distance between them less than 0.6 then they are from the same
         # person, otherwise they are from different people.  He we just print
         # the vector to the screen.
-        face_descriptor = facerec.compute_face_descriptor(img, shape);
-        print(face_descriptor);
+        face_descriptor = facerec.compute_face_descriptor(img, shape)
+        print(face_descriptor)
         # It should also be noted that you can also call this function like this:
-        #  face_descriptor = facerec.compute_face_descriptor(img, shape, 100);
+        #  face_descriptor = facerec.compute_face_descriptor(img, shape, 100)
         # The version of the call without the 100 gets 99.13% accuracy on LFW
         # while the version with 100 gets 99.38%.  However, the 100 makes the
         # call 100x slower to execute, so choose whatever version you like.  To
