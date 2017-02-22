@@ -5,7 +5,7 @@
 
 include MANIFEST.in
 include setup.py
-include README.txt
+include README.md
 
 # sources
 recursive-include dlib **
