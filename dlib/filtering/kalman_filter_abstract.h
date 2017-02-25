@@ -98,11 +98,11 @@ namespace dlib
         ); 
         /*!
             ensures
+                - This function can be used when the initial state is known, or if the
+                  state needs to be corrected before the next update().
                 - #get_predicted_next_state() == xb
-                - If update() is never called with a measurement
-                  #get_current_state() == get_predicted_next_state()
-            (Can be used when the initial state is known, or if the state needs to be corrected
-            before the next update())
+                - If (update() hasn't been called yet) then 
+                    - #get_current_state() == xb 
         !*/
 
         const matrix<double,measurements,states>& get_observation_model (
