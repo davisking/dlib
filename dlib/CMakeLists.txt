@@ -28,7 +28,6 @@ set(dlib_needed_includes)
 # dlib_needed_includes which will get pushed into the parent cmake scope at the
 # end of this CMakeLists.txt file.  This way, it is available to users of dlib/cmake.
 macro(add_include_directories dir)
-   include_directories(${dir})
    set(dlib_needed_includes ${dlib_needed_includes} ${dir})
 endmacro()
 
@@ -647,7 +646,7 @@ if (NOT TARGET dlib)
       else()
          add_library(dlib STATIC ${source_files} )
       endif()
-      target_link_libraries(dlib ${dlib_needed_libraries} )
+      target_link_libraries(dlib PRIVATE ${dlib_needed_libraries} )
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
          if (DLIB_USE_CUDA)
             cuda_add_library(dlib_shared SHARED ${source_files} )
@@ -656,7 +655,7 @@ if (NOT TARGET dlib)
             add_library(dlib_shared SHARED ${source_files} )
             add_dependencies(dlib_shared dlib)
          endif()
-         target_link_libraries(dlib_shared ${dlib_needed_libraries} )
+         target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries} )
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
@@ -667,8 +666,16 @@ if (NOT TARGET dlib)
    endif()
 
    # Specify the include directory for CMake targets relying on dlib.
-   target_include_directories(dlib INTERFACE $<INSTALL_INTERFACE:include>)
-   target_include_directories(dlib_shared INTERFACE $<INSTALL_INTERFACE:include>)
+   target_include_directories(dlib
+                              INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                              INTERFACE $<INSTALL_INTERFACE:include>
+                              PUBLIC ${dlib_needed_includes}
+                              )
+   target_include_directories(dlib_shared
+                              INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                              INTERFACE $<INSTALL_INTERFACE:include>
+                              PUBLIC ${dlib_needed_includes}
+                              )
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
