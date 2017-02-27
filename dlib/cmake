@@ -2,7 +2,7 @@
 # It will trigger a compilation of dlib *in the project* 
 # including it
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 
 set(DLIB_IN_PROJECT_BUILD true)
 

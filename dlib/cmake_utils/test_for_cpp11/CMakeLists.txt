@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 project(cpp11_test)
 
 # Try to enable C++11

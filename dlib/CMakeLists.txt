@@ -4,7 +4,7 @@
 #
 
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 project(dlib)
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
@@ -646,7 +646,12 @@ if (NOT TARGET dlib)
       else()
          add_library(dlib STATIC ${source_files} )
       endif()
-      target_link_libraries(dlib PRIVATE ${dlib_needed_libraries} )
+      target_include_directories(dlib
+                                 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                                 INTERFACE $<INSTALL_INTERFACE:include>
+                                 PUBLIC ${dlib_needed_includes}
+                                 )
+      target_link_libraries(dlib PRIVATE ${dlib_needed_libraries})
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
          if (DLIB_USE_CUDA)
             cuda_add_library(dlib_shared SHARED ${source_files} )
@@ -655,7 +660,12 @@ if (NOT TARGET dlib)
             add_library(dlib_shared SHARED ${source_files} )
             add_dependencies(dlib_shared dlib)
          endif()
-         target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries} )
+         target_include_directories(dlib_shared
+                                    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                                    INTERFACE $<INSTALL_INTERFACE:include>
+                                    PUBLIC ${dlib_needed_includes}
+                                    )
+         target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
@@ -663,20 +673,6 @@ if (NOT TARGET dlib)
    # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
       ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
-   endif()
-
-   # Specify the include directory for CMake targets relying on dlib.
-   target_include_directories(dlib
-                              INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-                              INTERFACE $<INSTALL_INTERFACE:include>
-                              PUBLIC ${dlib_needed_includes}
-                              )
-   if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
-      target_include_directories(dlib_shared
-                                 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-                                 INTERFACE $<INSTALL_INTERFACE:include>
-                                 PUBLIC ${dlib_needed_includes}
-                                 )
    endif()
 
    # Install the library
