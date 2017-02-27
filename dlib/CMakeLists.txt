@@ -666,6 +666,10 @@ if (NOT TARGET dlib)
       ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
    endif()
 
+   # Specify the include directory for CMake targets relying on dlib.
+   target_include_directories(dlib INTERFACE $<INSTALL_INTERFACE:include>)
+   target_include_directories(dlib_shared INTERFACE $<INSTALL_INTERFACE:include>)
+
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
        set (LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries (e.g. lib32 or lib64 for multilib installations)")
