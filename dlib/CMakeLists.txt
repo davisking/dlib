@@ -22,13 +22,10 @@ if(has_parent)
    set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
 endif()
 
-# Suppress cmake warnings about changes in new versions.
-if(COMMAND cmake_policy) 
-   cmake_policy(SET CMP0003 NEW) 
-   if (POLICY CMP0054)
-      cmake_policy(SET CMP0054 NEW)
-   endif()
-endif()
+# Set only because there are old target_link_libraries() statements in the
+# FindCUDA.cmake file that comes with CMake that error out if the new behavior
+# is used.
+cmake_policy(SET CMP0023 OLD)
 
 include(cmake_utils/add_global_compiler_switch.cmake)
 
@@ -634,6 +631,9 @@ if (NOT TARGET dlib)
 
       # Tell CMake to build dlib via add_library()/cuda_add_library()
       if (DLIB_USE_CUDA)
+         # The old cuda_add_library() command doesn't support CMake's newer dependency
+         # stuff, so we have to set the include path manually still, which we do here.
+         include_directories(${dlib_needed_includes})
          cuda_add_library(dlib STATIC ${source_files} )
       else()
          add_library(dlib STATIC ${source_files} )
@@ -665,6 +665,7 @@ if (NOT TARGET dlib)
    # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
       ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
+      target_link_libraries(dlib_all_source_cpp dlib)
    endif()
 
    # Install the library
