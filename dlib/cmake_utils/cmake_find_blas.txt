@@ -26,7 +26,7 @@ SET(found_intel_mkl 0)
 SET(found_intel_mkl_headers 0)
 
 
-if (UNIX)
+if (UNIX OR MINGW)
     message(STATUS "Searching for BLAS and LAPACK")
 
     if (BUILDING_MATLAB_MEX_FILE)
