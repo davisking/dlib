@@ -671,11 +671,13 @@ if (NOT TARGET dlib)
                               INTERFACE $<INSTALL_INTERFACE:include>
                               PUBLIC ${dlib_needed_includes}
                               )
-   target_include_directories(dlib_shared
-                              INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-                              INTERFACE $<INSTALL_INTERFACE:include>
-                              PUBLIC ${dlib_needed_includes}
-                              )
+   if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
+      target_include_directories(dlib_shared
+                                 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                                 INTERFACE $<INSTALL_INTERFACE:include>
+                                 PUBLIC ${dlib_needed_includes}
+                                 )
+   endif()
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
