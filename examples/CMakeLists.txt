@@ -16,7 +16,7 @@ include(../dlib/cmake)
 # in general you will make programs that const of many .cpp files.
 ADD_EXECUTABLE(assignment_learning_ex assignment_learning_ex.cpp)
 # Then we tell it to link with dlib.
-TARGET_LINK_LIBRARIES(assignment_learning_ex dlib)
+TARGET_LINK_LIBRARIES(assignment_learning_ex dlib::dlib)
 
 
 
@@ -26,7 +26,7 @@ TARGET_LINK_LIBRARIES(assignment_learning_ex dlib)
 # your cmake projects and use the syntax shown above.
 MACRO(add_example name)
    ADD_EXECUTABLE(${name} ${name}.cpp)
-   TARGET_LINK_LIBRARIES(${name} dlib )
+   TARGET_LINK_LIBRARIES(${name} dlib::dlib )
 ENDMACRO()
 
 # if an example requires GUI, call this macro to check DLIB_NO_GUI_SUPPORT to include or exclude
@@ -154,7 +154,7 @@ else()
       include_directories(${OpenCV_INCLUDE_DIRS})
 
       ADD_EXECUTABLE(webcam_face_pose_ex webcam_face_pose_ex.cpp)
-      TARGET_LINK_LIBRARIES(webcam_face_pose_ex dlib ${OpenCV_LIBS} )
+      TARGET_LINK_LIBRARIES(webcam_face_pose_ex dlib::dlib ${OpenCV_LIBS} )
    else()
       message("OpenCV not found, so we won't build the webcam_face_pose_ex example.")
    endif()

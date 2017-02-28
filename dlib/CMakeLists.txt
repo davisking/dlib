@@ -690,7 +690,7 @@ if (NOT TARGET dlib)
        endif()
 
        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION include/dlib
-               FILES_MATCHING PATTERN "*.h"
+               FILES_MATCHING PATTERN "*.h" PATTERN "*.cmake"
                REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
 
@@ -734,3 +734,5 @@ if (NOT TARGET dlib)
    endif()
 
 endif()
+
+add_library(dlib::dlib ALIAS dlib)
