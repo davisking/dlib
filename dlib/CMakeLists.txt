@@ -734,10 +734,3 @@ if (NOT TARGET dlib)
    endif()
 
 endif()
-
-
-# put dlib_needed_includes into the parent scope so the dlib/cmake file can use it.
-if(has_parent)
-   set(dlib_needed_includes ${dlib_needed_includes} PARENT_SCOPE)
-endif()
-
