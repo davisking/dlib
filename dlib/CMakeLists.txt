@@ -523,7 +523,10 @@ if (NOT TARGET dlib)
             # Note that we add __STRICT_ANSI__ to avoid freaking out nvcc with gcc specific
             # magic in the standard C++ header files (since nvcc uses gcc headers on
             # linux).
-            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
+            list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
+            if (NOT MSVC)
+               list(APPEND CUDA_NVCC_FLAGS "-std=c++11")
+            endif()
             if (CMAKE_POSITION_INDEPENDENT_CODE)
                # sometimes this setting isn't propagated to NVCC, which then causes the
                # compile to fail.  So make sure it's propagated.
