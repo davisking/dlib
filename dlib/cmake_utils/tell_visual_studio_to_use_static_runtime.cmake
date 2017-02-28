@@ -2,7 +2,7 @@
 # Including this cmake script into your cmake project will cause visual studio
 # to build your project against the static C runtime.
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 if (POLICY CMP0054)
     cmake_policy(SET CMP0054 NEW)
 endif()

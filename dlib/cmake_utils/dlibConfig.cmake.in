@@ -38,3 +38,5 @@ endif()
 find_library(dlib_LIBRARIES dlib HINTS ${dlib_INSTALL_PATH}/lib)
 set(dlib_LIBRARIES ${dlib_LIBRARIES} "@dlib_needed_libraries@")
 set(dlib_LIBS      ${dlib_LIBRARIES} "@dlib_needed_libraries@")
+
+include(${dlib_INSTALL_PATH}/include/dlib/cmake_utils/use_cpp_11.cmake)

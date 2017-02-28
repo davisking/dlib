@@ -2,7 +2,7 @@
 # Also, it sets the COMPILER_CAN_DO_CPP_11 variable to 1 if it was successful.
 
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 
 # Don't rerun this script if its already been executed.
 if (DEFINED COMPILER_CAN_DO_CPP_11)
