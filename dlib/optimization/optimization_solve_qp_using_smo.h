@@ -415,8 +415,8 @@ namespace dlib
         const matrix_exp<EXP1>& _Q,
         const matrix_exp<EXP2>& _b,
         matrix<T,NR,NC,MM,L>& alpha,
-        matrix<T,NR,NC,MM,L>& lower,
-        matrix<T,NR,NC,MM,L>& upper,
+        const matrix<T,NR,NC,MM,L>& lower,
+        const matrix<T,NR,NC,MM,L>& upper,
         T eps,
         unsigned long max_iter
     )
