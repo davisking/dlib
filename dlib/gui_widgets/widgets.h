@@ -3593,6 +3593,7 @@ namespace dlib
         bool overlay_editing_enabled;
         timer<image_display> highlight_timer;
         unsigned long highlighted_rect;
+        bool holding_shift_key;
 
         bool moving_overlay;
         unsigned long moving_rect;
