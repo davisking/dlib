@@ -191,15 +191,13 @@ namespace dlib
             int nc 
         )
         {
-            if (n == 0 || nr == 0 || nc == 0 || k == 0)
+            if (handle)
             {
-                if (handle)
-                {
-                    cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)handle);
-                    handle = nullptr;
-                }
+                cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)handle);
+                handle = nullptr;
             }
-            else
+
+            if (n != 0 && nr != 0 && nc != 0 && k != 0)
             {
                 cudnnTensorDescriptor_t h;
                 CHECK_CUDNN(cudnnCreateTensorDescriptor(&h));
