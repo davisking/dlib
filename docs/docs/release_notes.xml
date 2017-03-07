@@ -12,6 +12,20 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+   - CMake 2.8.12 is now required to build dlib (but only if you use CMake).  
+
+Bug fixes:
+   - Fixed a slow memory leak that could occur when using cuDNN.
+
+Other:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.3" date="Feb 21, 2017">
+New Features:
    - Deep Learning
       - Added a state-of-the-art face recognition tool (99.38% accuracy on the
         LFW benchmark) with C++ and Python example programs.
@@ -68,7 +82,7 @@ Other:
      very occasionally leading to matlab crashes when mex files were unloaded.
      This also means that dlib::thread_pool construction is a little bit slower
      than it used to be.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
