@@ -10,6 +10,8 @@ set (target_name htmlify)
 
 PROJECT(${target_name})
 
+include(../../dlib/cmake)
+
 # add all the cpp files we want to compile to this list.  This tells
 # cmake that they are part of our target (which is the executable named htmlify)
 ADD_EXECUTABLE(${target_name} 
@@ -18,7 +20,6 @@ ADD_EXECUTABLE(${target_name}
    )
 
 # Tell cmake to link our target executable to dlib.
-include(../../dlib/cmake)
 TARGET_LINK_LIBRARIES(${target_name} dlib::dlib )
 
 
