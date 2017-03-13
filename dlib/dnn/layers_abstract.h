@@ -828,6 +828,216 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long _num_filters,
+        long _nr,
+        long _nc,
+        int _stride_y,
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
+        >
+    class cont_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be > 0.
+                Also, we require that:
+                    - 0 <= _padding_y && _padding_y < _nr
+                    - 0 <= _padding_x && _padding_x < _nc
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a convolution layer that takes an
+                input tensor (nominally representing an image) and convolves it with a set
+                of filters and then outputs the results. 
+
+                The dimensions of the tensors output by this layer are as follows (letting
+                IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == num_filters()
+                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
+                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
+        !*/
+
+    public:
+        cont_(
+        );
+        /*!
+            ensures
+                - #num_filters() == _num_filters
+                - #nr() == _nr
+                - #nc() == _nc
+                - #stride_y() == _stride_y
+                - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
+        !*/
+
+        long num_filters(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of filters contained in this layer.  The k dimension
+                  of the output tensors produced by this layer will be equal to the number
+                  of filters.
+        !*/
+
+        long nr(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of rows in the filters in this layer.
+        !*/
+
+        long nc(
+        ) const;
+        /*!
+            ensures
+                - returns the number of columns in the filters in this layer.
+        !*/
+
+        long stride_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the vertical stride used when convolving the filters over an
+                  image.  That is, each filter will be moved stride_y() pixels down at a
+                  time when it moves over the image.
+        !*/
+
+        long stride_x(
+        ) const;
+        /*!
+            ensures
+                - returns the horizontal stride used when convolving the filters over an
+                  image.  That is, each filter will be moved stride_x() pixels right at a
+                  time when it moves over the image.
+        !*/
+
+        long padding_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the top and bottom
+                  sides of the image.
+        !*/
+
+        long padding_x(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the left and right 
+                  sides of the image.
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;  
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its parameters be
+                  multiplied by get_learning_rate_multiplier().
+        !*/
+
+        double get_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its parameters be
+                  multiplied by get_weight_decay_multiplier().
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        void set_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+
+    };
+
+    template <
+        long num_filters,
+        long nr,
+        long nc,
+        int stride_y,
+        int stride_x,
+        typename SUBNET
+        >
+    using cont = add_layer<cont_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class dropout_
     {
         /*!

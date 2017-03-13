@@ -309,6 +309,299 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        long _num_filters,
+        long _nr,
+        long _nc,
+        int _stride_y,
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
+        >
+    class cont_
+    {
+    public:
+
+        static_assert(_num_filters > 0, "The number of filters must be > 0");
+        static_assert(_nr > 0, "The number of rows in a filter must be > 0");
+        static_assert(_nc > 0, "The number of columns in a filter must be > 0");
+        static_assert(_stride_y > 0, "The filter stride must be > 0");
+        static_assert(_stride_x > 0, "The filter stride must be > 0");
+        static_assert(0 <= _padding_y && _padding_y < _nr, "The padding must be smaller than the filter size.");
+        static_assert(0 <= _padding_x && _padding_x < _nc, "The padding must be smaller than the filter size.");
+
+        cont_(
+        ) : 
+            learning_rate_multiplier(1),
+            weight_decay_multiplier(1),
+            bias_learning_rate_multiplier(1),
+            bias_weight_decay_multiplier(0),
+            padding_y_(_padding_y),
+            padding_x_(_padding_x)
+        {
+        }
+
+        long num_filters() const { return _num_filters; }
+        long nr() const { return _nr; }
+        long nc() const { return _nc; }
+        long stride_y() const { return _stride_y; }
+        long stride_x() const { return _stride_x; }
+        long padding_y() const { return padding_y_; }
+        long padding_x() const { return padding_x_; }
+
+        double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
+        double get_weight_decay_multiplier () const   { return weight_decay_multiplier; }
+        void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
+        void set_weight_decay_multiplier(double val)  { weight_decay_multiplier  = val; }
+
+        double get_bias_learning_rate_multiplier () const  { return bias_learning_rate_multiplier; }
+        double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
+        void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
+        void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
+
+        inline point map_output_to_input (
+            point p
+        ) const
+        {
+            p.x() = (p.x()+padding_x()-nc()/2)/stride_x();
+            p.y() = (p.y()+padding_y()-nr()/2)/stride_y();
+            return p;
+        }
+
+        inline point map_input_to_output (
+            point p
+        ) const
+        {
+            p.x() = p.x()*stride_x() - padding_x() + nc()/2;
+            p.y() = p.y()*stride_y() - padding_y() + nr()/2;
+            return p;
+        }
+
+        cont_ (
+            const cont_& item
+        ) : 
+            params(item.params),
+            filters(item.filters),
+            biases(item.biases),
+            learning_rate_multiplier(item.learning_rate_multiplier),
+            weight_decay_multiplier(item.weight_decay_multiplier),
+            bias_learning_rate_multiplier(item.bias_learning_rate_multiplier),
+            bias_weight_decay_multiplier(item.bias_weight_decay_multiplier),
+            padding_y_(item.padding_y_),
+            padding_x_(item.padding_x_)
+        {
+            // this->conv is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+        }
+
+        cont_& operator= (
+            const cont_& item
+        )
+        {
+            if (this == &item)
+                return *this;
+
+            // this->conv is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+            params = item.params;
+            filters = item.filters;
+            biases = item.biases;
+            padding_y_ = item.padding_y_;
+            padding_x_ = item.padding_x_;
+            learning_rate_multiplier = item.learning_rate_multiplier;
+            weight_decay_multiplier = item.weight_decay_multiplier;
+            bias_learning_rate_multiplier = item.bias_learning_rate_multiplier;
+            bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
+            return *this;
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+            long num_inputs = _nr*_nc*sub.get_output().k();
+            long num_outputs = _num_filters;
+            // allocate params for the filters and also for the filter bias values.
+            params.set_size(num_inputs*_num_filters + _num_filters);
+
+            dlib::rand rnd(std::rand());
+            randomize_parameters(params, num_inputs+num_outputs, rnd);
+
+            filters = alias_tensor(sub.get_output().k(),_num_filters, _nr, _nc);
+            biases = alias_tensor(1,_num_filters);
+
+            // set the initial bias values to zero
+            biases(params,_num_filters) = 0;
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            auto filt = filters(params,0);
+            unsigned int gnr = _stride_y * (sub.get_output().nr() - 1) + filt.nr() - 2 * padding_y_;
+            unsigned int gnc = _stride_x * (sub.get_output().nc() - 1) + filt.nc() - 2 * padding_x_;
+            unsigned int gnsamps = sub.get_output().num_samples();
+            unsigned int gk = filt.k();
+            output.set_size(gnsamps,gk,gnr,gnc);
+            output = 0;
+            conv.setup(output,filt,_stride_y,_stride_x,padding_y_,padding_x_);
+            conv.get_gradient_for_data(sub.get_output(),filt,output);            
+            tt::add(1,output,1,biases(params,filters.size()));
+        } 
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        {
+            resizable_tensor temp;
+            temp.copy_size(sub.get_gradient_input());
+            auto filt = filters(params,0);           
+            conv(temp,gradient_input, filt);
+            tt::copy_tensor(sub.get_gradient_input(),0,temp,0,sub.get_gradient_input().k());
+            // no point computing the parameter gradients if they won't be used.
+            
+            if (learning_rate_multiplier != 0)
+            {
+                auto filt = filters(params_grad,0);                
+                conv.get_gradient_for_filters (sub.get_output(),gradient_input, filt);
+                auto b = biases(params_grad, filters.size());
+                tt::assign_conv_bias_gradient(b, gradient_input);
+            }
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const cont_& item, std::ostream& out)
+        {
+            serialize("cont_1", out);
+            serialize(item.params, out);
+            serialize(_num_filters, out);
+            serialize(_nr, out);
+            serialize(_nc, out);
+            serialize(_stride_y, out);
+            serialize(_stride_x, out);
+            serialize(item.padding_y_, out);
+            serialize(item.padding_x_, out);
+            serialize(item.filters, out);
+            serialize(item.biases, out);
+            serialize(item.learning_rate_multiplier, out);
+            serialize(item.weight_decay_multiplier, out);
+            serialize(item.bias_learning_rate_multiplier, out);
+            serialize(item.bias_weight_decay_multiplier, out);
+        }
+
+        friend void deserialize(cont_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            long num_filters;
+            long nr;
+            long nc;
+            int stride_y;
+            int stride_x;
+            if (version == "cont_1")
+            {
+                deserialize(item.params, in);
+                deserialize(num_filters, in);
+                deserialize(nr, in);
+                deserialize(nc, in);
+                deserialize(stride_y, in);
+                deserialize(stride_x, in);
+                deserialize(item.padding_y_, in);
+                deserialize(item.padding_x_, in);
+                deserialize(item.filters, in);
+                deserialize(item.biases, in);
+                deserialize(item.learning_rate_multiplier, in);
+                deserialize(item.weight_decay_multiplier, in);
+                deserialize(item.bias_learning_rate_multiplier, in);
+                deserialize(item.bias_weight_decay_multiplier, in);
+                if (item.padding_y_ != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::con_");
+                if (item.padding_x_ != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::con_");
+                if (num_filters != _num_filters) 
+                {
+                    std::ostringstream sout;
+                    sout << "Wrong num_filters found while deserializing dlib::con_" << std::endl;
+                    sout << "expected " << _num_filters << " but found " << num_filters << std::endl;
+                    throw serialization_error(sout.str());
+                }
+
+                if (nr != _nr) throw serialization_error("Wrong nr found while deserializing dlib::con_");
+                if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::con_");
+                if (stride_y != _stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::con_");
+                if (stride_x != _stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::con_");
+            }
+            else
+            {
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::con_.");
+            }
+        }
+
+
+        friend std::ostream& operator<<(std::ostream& out, const cont_& item)
+        {
+            out << "cont\t ("
+                << "num_filters="<<_num_filters
+                << ", nr="<<_nr
+                << ", nc="<<_nc
+                << ", stride_y="<<_stride_y
+                << ", stride_x="<<_stride_x
+                << ", padding_y="<<item.padding_y_
+                << ", padding_x="<<item.padding_x_
+                << ")";
+            out << " learning_rate_mult="<<item.learning_rate_multiplier;
+            out << " weight_decay_mult="<<item.weight_decay_multiplier;
+            out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
+            out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+            return out;
+        }
+
+        friend void to_xml(const cont_& item, std::ostream& out)
+        {
+            out << "<cont"
+                << " num_filters='"<<_num_filters<<"'"
+                << " nr='"<<_nr<<"'"
+                << " nc='"<<_nc<<"'"
+                << " stride_y='"<<_stride_y<<"'"
+                << " stride_x='"<<_stride_x<<"'"
+                << " padding_y='"<<item.padding_y_<<"'"
+                << " padding_x='"<<item.padding_x_<<"'"
+                << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'"
+                << " weight_decay_46mult='"<<item.weight_decay_multiplier<<"'"
+                << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'"
+                << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'>\n";
+            out << mat(item.params);
+            out << "</cont>";
+        }
+
+    private:
+
+        resizable_tensor params;
+        alias_tensor filters, biases;
+
+        tt::tensor_conv conv;
+        double learning_rate_multiplier;
+        double weight_decay_multiplier;
+        double bias_learning_rate_multiplier;
+        double bias_weight_decay_multiplier;
+
+        // These are here only because older versions of con (which you might encounter
+        // serialized to disk) used different padding settings.
+        int padding_y_;
+        int padding_x_;
+
+    };
+
+    template <
+        long num_filters,
+        long nr,
+        long nc,
+        int stride_y,
+        int stride_x,
+        typename SUBNET
+        >
+    using cont = add_layer<cont_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         long _nr,
         long _nc,
         int _stride_y,

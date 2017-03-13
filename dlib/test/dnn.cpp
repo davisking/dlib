@@ -1406,6 +1406,12 @@ namespace
         }
         {
             print_spinner();
+            cont_<3,3,3,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             con_<3,2,2,2,2> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);

@@ -848,6 +848,24 @@ namespace dlib { namespace tt
                   this gradient to filters_gradient.
         !*/
 
+        void operator() (
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters
+       )
+       {
+          impl.forward_without_setup(output,data,filters);
+       }
+
+       void setup(
+            const tensor& data,
+            const tensor& filters,
+            int stride_y,
+            int stride_x,
+            int padding_y,
+            int padding_x
+        ) {impl.setup(data,filters,stride_y,stride_x,padding_y,padding_x); }
+       
     private:
 #ifdef DLIB_USE_CUDA
         cuda::tensor_conv impl;

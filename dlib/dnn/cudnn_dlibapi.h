@@ -270,9 +270,7 @@ namespace dlib
                       and assigns this gradient to filters_gradient.
             !*/
 
-        private:
-
-            void setup(
+           void setup(
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
@@ -280,6 +278,14 @@ namespace dlib
                 int padding_y,
                 int padding_x
             );
+
+          void forward_without_setup(
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters);
+
+        private:
+
             /*!
                 requires
                     - filters.k() == data.k()

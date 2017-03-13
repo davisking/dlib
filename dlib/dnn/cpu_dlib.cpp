@@ -1699,6 +1699,28 @@ namespace dlib
             }
         }
 
+        void tensor_conv::forward_without_setup(
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters
+        )
+        {
+            DLIB_CASSERT(is_same_object(output,data) == false);
+            DLIB_CASSERT(is_same_object(output,filters) == false);
+            DLIB_CASSERT(filters.k() == data.k());
+            output.set_size(data.num_samples(),
+                            filters.num_samples(),
+                            1+(data.nr()+2*last_padding_y-filters.nr())/last_stride_y,
+                            1+(data.nc()+2*last_padding_x-filters.nc())/last_stride_x);
+
+            matrix<float> temp;
+            for (long n = 0; n < data.num_samples(); ++n)
+            {
+                img2col(temp, data, n, filters.nr(), filters.nc(), last_stride_y, last_stride_x, last_padding_y, last_padding_x);
+                output.set_sample(n, mat(filters)*trans(temp));
+            }
+        }
+
         void tensor_conv::operator() (
             resizable_tensor& output,
             const tensor& data,
@@ -1784,7 +1806,7 @@ namespace dlib
                     filters_gradient += gi*temp;
             }
         }
-    // ------------------------------------------------------------------------------------
+     // ------------------------------------------------------------------------------------
     void copy_tensor(
             tensor& dest,
             size_t dest_k_offset,
