@@ -412,8 +412,8 @@ namespace dlib
         typename T, long NR, long NC, typename MM, typename L
         >
     unsigned long solve_qp_box_constrained ( 
-        const matrix_exp<EXP1>& _Q,
-        const matrix_exp<EXP2>& _b,
+        const matrix_exp<EXP1>& Q,
+        const matrix_exp<EXP2>& b,
         matrix<T,NR,NC,MM,L>& alpha,
         const matrix<T,NR,NC,MM,L>& lower,
         const matrix<T,NR,NC,MM,L>& upper,
@@ -421,9 +421,6 @@ namespace dlib
         unsigned long max_iter
     )
     {
-        const_temp_matrix<EXP1> Q(_Q);
-        const_temp_matrix<EXP2> b(_b);
-
         // make sure requires clause is not broken
         DLIB_ASSERT(Q.nr() == Q.nc() &&
                      alpha.size() == lower.size() &&
