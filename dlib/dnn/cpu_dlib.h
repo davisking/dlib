@@ -355,14 +355,16 @@ namespace dlib
             ) {}
 
             void setup(
-                const tensor& data,
-                const tensor& filters,
+                const tensor& data,    /* not used but required for interface */
+                const tensor& filters, /* not used but required for interface */
                 int stride_y,
                 int stride_x,
                 int padding_y,
                 int padding_x
             ) 
             {
+                (void)data;    /* silence compiler */
+                (void)filters; /* silence compiler */
                 last_stride_y = stride_y;
                 last_stride_x = stride_x;
                 last_padding_y = padding_y;

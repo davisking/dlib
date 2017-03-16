@@ -454,9 +454,9 @@ namespace dlib
             temp.copy_size(sub.get_gradient_input());
             auto filt = filters(params,0);           
             conv(temp,gradient_input, filt);
-            tt::copy_tensor(sub.get_gradient_input(),0,temp,0,sub.get_gradient_input().k());
+            // need to add the new gradients on top of the previous ones
+            tt::add(1,sub.get_gradient_input(),1,temp);
             // no point computing the parameter gradients if they won't be used.
-            
             if (learning_rate_multiplier != 0)
             {
                 auto filt = filters(params_grad,0);                
@@ -582,8 +582,6 @@ namespace dlib
         double bias_learning_rate_multiplier;
         double bias_weight_decay_multiplier;
 
-        // These are here only because older versions of con (which you might encounter
-        // serialized to disk) used different padding settings.
         int padding_y_;
         int padding_x_;
 

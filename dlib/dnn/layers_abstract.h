@@ -850,16 +850,17 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  In particular, it defines a convolution layer that takes an
-                input tensor (nominally representing an image) and convolves it with a set
-                of filters and then outputs the results. 
-
+                defined above.  In particular, it defines a transposed convolution layer 
+                that takes an input tensor (nominally representing an image) and 
+                transpose convolves (deconvolves) it with a set of filters and then outputs the results. 
+                This is basically a convolutional layer with reversed forward/backward passes
+                
                 The dimensions of the tensors output by this layer are as follows (letting
                 IN be the input tensor and OUT the output tensor):
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == num_filters()
-                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
-                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
+                    - OUT.nr() == stride_y * (IN.nr() -1) + nr) - 2*padding_y
+                    - OUT.nc() == stride_x * (IN.nc() -1) + nc) - 2*padding_x
         !*/
 
     public:
