@@ -1306,7 +1306,6 @@ namespace dlib
 
 
         // Do non-max suppression
-        dets.clear();
         if (detectors.size() > 1)
             std::sort(dets_accum.rbegin(), dets_accum.rend());
         for (unsigned long i = 0; i < dets_accum.size(); ++i)
