@@ -286,7 +286,7 @@ namespace dlib
         // Hold the length for the longest edge for each node.  Initially they are all infinity.
         std::vector<double> worst_dists(samples.size(), std::numeric_limits<double>::infinity());
 
-        std::vector<sample_pair>::iterator begin_i, end_i, begin_j, end_j, itr;
+        std::vector<sample_pair>::iterator begin_i, end_i, begin_j, end_j;
         begin_i = edges.begin();
         end_i = begin_i + k;
 
