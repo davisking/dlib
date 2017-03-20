@@ -5,6 +5,8 @@
 
 #include "optimization_solve_qp_using_smo_abstract.h"
 #include "../matrix.h"
+#include <map>
+#include "../unordered_pair.h"
 
 namespace dlib
 {
@@ -545,6 +547,254 @@ namespace dlib
 
         //cout << "max_df: " << max_df << endl;
         //cout << "objective value: " << 0.5*trans(alpha)*Q*alpha + trans(b)*alpha << endl;
+        return iter+1;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T, long NR, long NC, typename MM, typename L
+        >
+    unsigned long solve_qp_box_constrained_blockdiag ( 
+        const std::vector<matrix<T,NR,NR,MM,L>>& Q_blocks,
+        const std::vector<matrix<T,NR,NC,MM,L>>& bs,
+        const std::map<unordered_pair<size_t>, matrix<T,NR,NC,MM,L>>& Q_offdiag,
+        std::vector<matrix<T,NR,NC,MM,L>>& alphas,
+        const std::vector<matrix<T,NR,NC,MM,L>>& lowers,
+        const std::vector<matrix<T,NR,NC,MM,L>>& uppers,
+        T eps,
+        unsigned long max_iter
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(Q_blocks.size() > 0);
+        DLIB_CASSERT(Q_blocks.size() == bs.size() && 
+                     Q_blocks.size() == alphas.size() &&
+                     Q_blocks.size() == lowers.size() &&
+                     Q_blocks.size() == uppers.size(),
+                   "Q_blocks.size():  "<< Q_blocks.size() << "\n" <<
+                   "bs.size():        "<< bs.size() << "\n" <<
+                   "alphas.size():    "<< alphas.size() << "\n" <<
+                   "lowers.size():    "<< lowers.size() << "\n" <<
+                   "uppers.size():    "<< uppers.size() << "\n"
+                   );
+        for (auto& Q : Q_blocks)
+        {
+            DLIB_CASSERT(Q.nr() == Q.nc(), "All the matrices in Q_blocks have the same dimensions.");
+            DLIB_CASSERT(Q.nr() == Q_blocks[0].nr() && Q.nc() == Q_blocks[0].nc(), "All the matrices in Q_blocks have the same dimensions.");
+        }
+#ifdef ENABLE_ASSERTS
+        for (size_t i = 0; i < alphas.size(); ++i)
+        {
+            DLIB_CASSERT(is_col_vector(bs[i]) && bs[i].size() == Q_blocks[0].nr(),
+                "is_col_vector(bs["<<i<<"]): " << is_col_vector(bs[i]) << "\n" <<
+                "bs["<<i<<"].size():         " << bs[i].size() << "\n" <<
+                "Q_blocks[0].nr():           " << Q_blocks[0].nr());
+
+            for (auto& Qoffdiag : Q_offdiag)
+            {
+                auto& Q_offdiag_element = Qoffdiag.second;
+                long r = Qoffdiag.first.first;
+                long c = Qoffdiag.first.second;
+                DLIB_CASSERT(is_col_vector(Q_offdiag_element) && Q_offdiag_element.size() == Q_blocks[0].nr(),
+                    "is_col_vector(Q_offdiag["<<r<<","<<c<<"]): " << is_col_vector(Q_offdiag_element) << "\n" <<
+                    "Q_offdiag["<<r<<","<<c<<"].size():         " << Q_offdiag_element.size() << "\n" <<
+                    "Q_blocks[0].nr():                  " << Q_blocks[0].nr());
+            }
+
+            DLIB_CASSERT(is_col_vector(alphas[i]) && alphas[i].size() == Q_blocks[0].nr(),
+                "is_col_vector(alphas["<<i<<"]): " << is_col_vector(alphas[i]) << "\n" <<
+                "alphas["<<i<<"].size():         " << alphas[i].size() << "\n" <<
+                "Q_blocks[0].nr():               " << Q_blocks[0].nr());
+
+            DLIB_CASSERT(is_col_vector(lowers[i]) && lowers[i].size() == Q_blocks[0].nr(),
+                "is_col_vector(lowers["<<i<<"]): " << is_col_vector(lowers[i]) << "\n" <<
+                "lowers["<<i<<"].size():         " << lowers[i].size() << "\n" <<
+                "Q_blocks[0].nr():               " << Q_blocks[0].nr());
+
+            DLIB_CASSERT(is_col_vector(uppers[i]) && uppers[i].size() == Q_blocks[0].nr(),
+                "is_col_vector(uppers["<<i<<"]): " << is_col_vector(uppers[i]) << "\n" <<
+                "uppers["<<i<<"].size():         " << uppers[i].size() << "\n" <<
+                "Q_blocks[0].nr():               " << Q_blocks[0].nr());
+
+            DLIB_CASSERT(0 <= min(alphas[i]-lowers[i]), "min(alphas["<<i<<"]-lowers["<<i<<"]): " << min(alphas[i]-lowers[i]));
+            DLIB_CASSERT(0 <= max(uppers[i]-alphas[i]), "max(uppers["<<i<<"]-alphas["<<i<<"]): " << max(uppers[i]-alphas[i]));
+        }
+        DLIB_CASSERT(eps > 0 && max_iter > 0, "eps: " << eps << "\nmax_iter: "<< max_iter);
+#endif // ENABLE_ASSERTS
+
+
+
+        // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.  
+        std::vector<matrix<T,NR,NC,MM,L>> df;// = Q*alpha + b;
+        auto compute_df = [&]()
+        {
+            df.resize(Q_blocks.size());
+            for (size_t i = 0; i < df.size(); ++i)
+                df[i] = Q_blocks[i]*alphas[i] + bs[i];
+            // Don't forget to include the Q_offdiag terms in the computation
+            for (auto& p : Q_offdiag)
+            {
+                long r = p.first.first;
+                long c = p.first.second;
+                df[r] += pointwise_multiply(p.second, alphas[c]);
+                if (r != c)
+                    df[c] += pointwise_multiply(p.second, alphas[r]);
+            }
+        };
+        compute_df();
+
+        std::vector<matrix<T,NR,NC,MM,L>> Q_diag, Q_ggd;
+        std::vector<matrix<T,NR,NC,MM,L>> QQ;// = reciprocal_max(diag(Q));
+        QQ.resize(Q_blocks.size());
+        Q_diag.resize(Q_blocks.size());
+        Q_ggd.resize(Q_blocks.size());
+
+        // We need to get an upper bound on the Lipschitz constant for this QP. Since that
+        // is just the max eigenvalue of Q we can do it using Gershgorin disks.
+        //const T lipschitz_bound = max(diag(Q) + (sum_cols(abs(Q)) - abs(diag(Q))));
+        for (size_t i = 0; i < QQ.size(); ++i)
+        {
+            auto f = Q_offdiag.find(make_unordered_pair(i,i));
+            if (f != Q_offdiag.end())
+                Q_diag[i] = diag(Q_blocks[i]) + f->second;
+            else
+                Q_diag[i] = diag(Q_blocks[i]);
+            QQ[i] = reciprocal_max(Q_diag[i]);
+
+            Q_ggd[i] = Q_diag[i] + (sum_cols(abs(Q_blocks[i]))-abs(diag(Q_blocks[i])));
+        }
+        for (auto& p : Q_offdiag)
+        {
+            long r = p.first.first;
+            long c = p.first.second;
+            if (r != c)
+            {
+                Q_ggd[r] += abs(p.second);
+                Q_ggd[c] += abs(p.second);
+            }
+        }
+        T lipschitz_bound = -std::numeric_limits<T>::infinity();
+        for (auto& x : Q_ggd)
+            lipschitz_bound = std::max(lipschitz_bound, max(x));
+
+
+        const long num_variables = alphas.size()*alphas[0].size();
+
+        // First we use a coordinate descent method to initialize alpha. 
+        double max_df = 0;
+        for (long iter = 0; iter < num_variables*2; ++iter)
+        {
+            max_df = 0;
+            long best_r =0;
+            size_t best_r2 =0;
+            // find the best alpha to optimize.
+            for (size_t r2 = 0; r2 < alphas.size(); ++r2) 
+            {
+                auto& alpha = alphas[r2];
+                auto& df_ = df[r2];
+                auto& lower = lowers[r2];
+                auto& upper = uppers[r2];
+                for (long r = 0; r < alpha.nr(); ++r)
+                {
+                    if (alpha(r) <= lower(r) && df_(r) > 0)
+                        ;//alpha(r) = lower(r);
+                    else if (alpha(r) >= upper(r) && df_(r) < 0)
+                        ;//alpha(r) = upper(r);
+                    else if (std::abs(df_(r)) > max_df)
+                    {
+                        best_r = r;
+                        best_r2 = r2;
+                        max_df = std::abs(df_(r));
+                    }
+                }
+            }
+
+            // now optimize alphas[best_r2](best_r)
+            const long r = best_r;
+            auto& alpha = alphas[best_r2];
+            auto& lower = lowers[best_r2];
+            auto& upper = uppers[best_r2];
+            auto& df_ = df[best_r2];
+            const T old_alpha = alpha(r);
+            alpha(r) = -(df_(r)-Q_diag[best_r2](r)*alpha(r))*QQ[best_r2](r);
+            if (alpha(r) < lower(r))
+                alpha(r) = lower(r);
+            else if (alpha(r) > upper(r))
+                alpha(r) = upper(r);
+
+            const T delta = old_alpha-alpha(r);
+
+            // Now update the gradient. We will perform the equivalent of: df = Q*alpha +
+            // b; except we only need to compute one column of the matrix multiply because
+            // only one element of alpha changed.
+            auto& Q = Q_blocks[best_r2];
+            for(long k = 0; k < df_.nr(); ++k)
+                df_(k) -= Q(r,k)*delta;
+            for(size_t j = 0; j < Q_blocks.size(); ++j)
+            {
+                auto f = Q_offdiag.find(make_unordered_pair(best_r2, j));
+                if (f != Q_offdiag.end())
+                    df[j](r) -= f->second(r)*delta;
+            }
+        }
+
+
+
+
+        std::vector<matrix<T,NR,NC,MM,L>> v(alphas), v_old(alphas.size());
+        for (size_t i = 0; i < v_old.size(); ++i)
+            v_old[i].set_size(alphas.size());
+        double lambda = 0;
+        unsigned long iter;
+        // Now do the main iteration block of this solver.  The coordinate descent method
+        // we used above can improve the objective rapidly in the beginning.  However,
+        // Nesterov's method has more rapid convergence once it gets going so this is what
+        // we use for the main iteration.
+        for (iter = 0; iter < max_iter; ++iter)
+        {
+            const double next_lambda = (1 + std::sqrt(1+4*lambda*lambda))/2;
+            const double gamma = (1-lambda)/next_lambda;
+            lambda = next_lambda;
+
+            v_old.swap(v);
+
+            //df = Q*alpha + b;
+            compute_df();
+
+            // now take a projected gradient step using Nesterov's method.
+            for (size_t j = 0; j < alphas.size(); ++j)
+            {
+                v[j] = clamp(alphas[j] - 1.0/lipschitz_bound * df[j], lowers[j], uppers[j]);
+                alphas[j] = clamp((1-gamma)*v[j] + gamma*v_old[j], lowers[j], uppers[j]);
+            }
+
+
+            // check for convergence every 10 iterations
+            if (iter%10 == 0)
+            {
+                max_df = 0;
+                for (size_t r2 = 0; r2 < alphas.size(); ++r2) 
+                {
+                    auto& alpha = alphas[r2];
+                    auto& df_ = df[r2];
+                    auto& lower = lowers[r2];
+                    auto& upper = uppers[r2];
+                    for (long r = 0; r < alpha.nr(); ++r)
+                    {
+                        if (alpha(r) <= lower(r) && df_(r) > 0)
+                            ;//alpha(r) = lower(r);
+                        else if (alpha(r) >= upper(r) && df_(r) < 0)
+                            ;//alpha(r) = upper(r);
+                        else if (std::abs(df_(r)) > max_df)
+                            max_df = std::abs(df_(r));
+                    }
+                }
+                if (max_df < eps)
+                    break;
+            }
+        }
+
         return iter+1;
     }
 

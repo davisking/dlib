@@ -509,6 +509,81 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_solve_qp_box_constrained_blockdiag()
+    {
+        dlib::rand rnd;
+        for (int iter = 0; iter < 50; ++iter)
+        {
+            print_spinner();
+
+            matrix<double> Q1, Q2;
+            matrix<double,0,1> b1, b2;
+
+            Q1 = randm(4,4,rnd); Q1 = Q1*trans(Q1);
+            Q2 = randm(4,4,rnd); Q2 = Q2*trans(Q2);
+            b1 = gaussian_randm(4,1, iter*2+0);
+            b2 = gaussian_randm(4,1, iter*2+1);
+
+            std::map<unordered_pair<size_t>, matrix<double,0,1>> offdiag;
+
+            if (rnd.get_random_gaussian() > 0)
+                offdiag[make_unordered_pair(0,0)] = randm(4,1,rnd);
+            if (rnd.get_random_gaussian() > 0)
+                offdiag[make_unordered_pair(1,0)] = randm(4,1,rnd);
+            if (rnd.get_random_gaussian() > 0)
+                offdiag[make_unordered_pair(1,1)] = randm(4,1,rnd);
+
+            std::vector<matrix<double>> Q_blocks = {Q1, Q2};
+            std::vector<matrix<double,0,1>> bs = {b1, b2};
+
+
+            // make the single big Q and b
+            matrix<double> Q = join_cols(join_rows(Q1, zeros_matrix(Q1)),
+                join_rows(zeros_matrix(Q2),Q2));
+            matrix<double,0,1> b = join_cols(b1,b2);
+            for (auto& p : offdiag)
+            {
+                long r = p.first.first;
+                long c = p.first.second;
+                set_subm(Q, 4*r,4*c, 4,4) += diagm(p.second);
+                if (c != r)
+                    set_subm(Q, 4*c,4*r, 4,4) += diagm(p.second);
+            }
+
+
+            matrix<double,0,1> alpha = zeros_matrix(b);
+            matrix<double,0,1> lower = -10000*ones_matrix(b);
+            matrix<double,0,1> upper = 10000*ones_matrix(b);
+
+            auto iters = solve_qp_box_constrained(Q, b, alpha, lower, upper, 1e-9, 10000);
+            dlog << LINFO << "iters: "<< iters;
+            dlog << LINFO << "alpha: " << trans(alpha);
+
+            dlog << LINFO;
+
+            std::vector<matrix<double,0,1>> alphas(2);
+            alphas[0] = zeros_matrix<double>(4,1); alphas[1] = zeros_matrix<double>(4,1);
+
+            lower = -10000*ones_matrix(alphas[0]);
+            upper = 10000*ones_matrix(alphas[0]);
+            std::vector<matrix<double,0,1>> lowers = {lower,lower}, uppers = {upper, upper};
+            auto iters2 = solve_qp_box_constrained_blockdiag(Q_blocks, bs, offdiag, alphas, lowers, uppers, 1e-9, 10000);
+            dlog << LINFO << "iters2: "<< iters2;
+            dlog << LINFO << "alpha: " << trans(join_cols(alphas[0],alphas[1]));
+
+            dlog << LINFO << "obj1: "<< 0.5*trans(alpha)*Q*alpha + trans(b)*alpha;
+            dlog << LINFO << "obj2: "<< 0.5*trans(join_cols(alphas[0],alphas[1]))*Q*join_cols(alphas[0],alphas[1]) + trans(b)*join_cols(alphas[0],alphas[1]);
+            dlog << LINFO << "obj1-obj2: "<<(0.5*trans(alpha)*Q*alpha + trans(b)*alpha) - (0.5*trans(join_cols(alphas[0],alphas[1]))*Q*join_cols(alphas[0],alphas[1]) + trans(b)*join_cols(alphas[0],alphas[1]));
+
+            DLIB_TEST_MSG(max(abs(alpha - join_cols(alphas[0], alphas[1]))) < 1e-6, max(abs(alpha - join_cols(alphas[0], alphas[1]))));
+
+            DLIB_TEST(iters == iters2);
+
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class opt_qp_solver_tester : public tester
     {
         /*
@@ -566,6 +641,7 @@ namespace
 
 
             test_find_gap_between_convex_hulls();
+            test_solve_qp_box_constrained_blockdiag();
         }
 
         double do_the_test (
