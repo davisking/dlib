@@ -286,6 +286,7 @@
          <term file="optimization.html" name="find_optimal_parameters"        include="dlib/optimization/find_optimal_parameters.h"/>
          <term file="optimization.html" name="elastic_net"                    include="dlib/optimization/elastic_net.h"/>
          <term file="optimization.html" name="solve_qp_box_constrained"       include="dlib/optimization.h"/>
+         <term file="optimization.html" name="solve_qp_box_constrained_blockdiag"       include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp_using_smo"             include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_gap_between_convex_hulls"  include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp2_using_smo"            include="dlib/optimization.h"/>

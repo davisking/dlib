@@ -44,6 +44,7 @@
          <name>Special Purpose Optimizers</name>
          <item>find_gap_between_convex_hulls</item> 
          <item>solve_qp_box_constrained</item> 
+         <item>solve_qp_box_constrained_blockdiag</item> 
          <item>solve_qp_using_smo</item> 
          <item>solve_qp2_using_smo</item> 
          <item>solve_qp3_using_smo</item> 
@@ -471,6 +472,31 @@ subject to the following constraint:
    Where f is convex.  This means that Q should be positive-semidefinite.
 </pre>
 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>solve_qp_box_constrained_blockdiag</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_solve_qp_using_smo_abstract.h</spec_file>
+         <description>
+             This function solves the following quadratic program:
+<pre>
+   Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha + trans(b)*alpha 
+   subject to the following box constraints on alpha:
+      0 &lt;= min(alpha-lower)
+      0 &lt;= max(upper-alpha)
+   Where f is convex.  This means that Q should be positive-semidefinite.
+</pre>
+            
+            So it does the same thing as <a href="#solve_qp_box_constrained">solve_qp_box_constrained</a>,
+            except it is optimized for large Q matrices with a special block
+            structure.  In particular, Q must be grouped into identically sized
+            blocks where all blocks are diagonal matrices, except those on the
+            main diagonal which can be dense. 
          </description>
                                  
       </component>
