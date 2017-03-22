@@ -390,6 +390,29 @@ namespace mex_binding
 // -------------------------------------------------------
 
     template <
+        typename matrix_type
+        >
+    typename dlib::enable_if_c<is_matrix<matrix_type>::value || is_array2d<matrix_type>::value >::type
+    clear_mat (
+        matrix_type& m
+    )  
+    {
+        m.set_size(0,0);
+    }
+
+    template <
+        typename matrix_type
+        >
+    typename dlib::disable_if_c<is_matrix<matrix_type>::value || is_array2d<matrix_type>::value >::type
+    clear_mat (
+        matrix_type& 
+    )  
+    {
+    }
+
+// -------------------------------------------------------
+
+    template <
         typename matrix_type,
         typename EXP
         >
@@ -651,6 +674,12 @@ namespace mex_binding
         }
         else if (is_matrix<T>::value || is_array2d<T>::value)
         {
+            if (prhs == NULL)
+            {
+                clear_mat(arg);
+                return;
+            }
+
             typedef typename inner_type<T>::type type;
 
             const int num_dims = mxGetNumberOfDimensions(prhs);
