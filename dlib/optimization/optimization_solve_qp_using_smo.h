@@ -581,6 +581,7 @@ namespace dlib
         for (auto& Q : Q_blocks)
         {
             DLIB_CASSERT(Q.nr() == Q.nc(), "All the matrices in Q_blocks have the same dimensions.");
+            DLIB_CASSERT(Q.size() > 0, "All the matrices in Q_blocks must be non-empty and have the same dimensions.");
             DLIB_CASSERT(Q.nr() == Q_blocks[0].nr() && Q.nc() == Q_blocks[0].nc(), "All the matrices in Q_blocks have the same dimensions.");
         }
 #ifdef ENABLE_ASSERTS

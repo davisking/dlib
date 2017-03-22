@@ -183,8 +183,8 @@ namespace dlib
         requires
             - Q_blocks.size() > 0
             - Q_blocks.size() == bs.size() == alphas.size() == lowers.size() == uppers.size()
-            - All the matrices in Q_blocks have the same dimensions.  Moreover, they are square
-              matrices.
+            - All the matrices in Q_blocks have the same dimensions.  Moreover, they are
+              non-empty square matrices.
             - All the matrices in bs, Q_offdiag, alphas, lowers, and uppers have the same
               dimensions.  Moreover, they are all column vectors.
             - Q_blocks[0].nr() == alphas[0].size()
