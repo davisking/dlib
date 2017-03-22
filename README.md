@@ -21,6 +21,11 @@ mkdir build; cd build; cmake .. -DUSE_AVX_INSTRUCTIONS=1; cmake --build .
 
 Doing so will make some things run faster.
 
+If you would like to build as fast as possible, you can install [ninja](https://ninja-build.org/) and build with ninja
+
+```bash
+mkdir build; cd build; cmake -G Ninja .. ; ninja -j 2
+```
 
 
 ## Compiling dlib Python API
