@@ -743,8 +743,6 @@ namespace dlib
 
 
         std::vector<matrix<T,NR,NC,MM,L>> v(alphas), v_old(alphas.size());
-        for (size_t i = 0; i < v_old.size(); ++i)
-            v_old[i].set_size(alphas.size());
         double lambda = 0;
         unsigned long iter;
         // Now do the main iteration block of this solver.  The coordinate descent method
