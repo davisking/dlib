@@ -551,6 +551,57 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        // Check if each vector in Q_offdiag is actually a constant times the 1s vector.
+        template <
+            typename T, long NR, long NC, typename MM, typename L
+            >
+        bool has_uniform_offdiag_vectors(
+            const std::map<unordered_pair<size_t>, matrix<T,NR,NC,MM,L>>& Q_offdiag
+        )
+        {
+            for (auto& x : Q_offdiag)
+            {
+                auto ref = x.second(0);
+                for (auto& y : x.second)
+                    if (ref != y)
+                        return false;
+            }
+            return true;
+        }
+
+        template <
+            typename T, long NR, long NC, typename MM, typename L
+            >
+        matrix<T,0,0,MM,L> compact_offdiag(
+            const size_t& num_blocks,
+            const std::map<unordered_pair<size_t>, matrix<T,NR,NC,MM,L>>& Q_offdiag
+        )
+        {
+            matrix<T,0,0,MM,L> temp;
+            // we can only compact the offdiag information if they are uniform vectors
+            if (!has_uniform_offdiag_vectors(Q_offdiag))
+                return temp;
+
+            temp.set_size(num_blocks, num_blocks);
+            temp = 0;
+
+            for (auto& x : Q_offdiag)
+            {
+                long r = x.first.first;
+                long c = x.first.second;
+                temp(r,c) = x.second(0);
+                temp(c,r) = x.second(0);
+            }
+
+            return temp;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
 
     template <
         typename T, long NR, long NC, typename MM, typename L
@@ -624,6 +675,8 @@ namespace dlib
 #endif // ENABLE_ASSERTS
 
 
+        const auto offdiag_compact = impl::compact_offdiag(Q_blocks.size(), Q_offdiag);
+        matrix<T,0,0,MM,L> temp, alphas_compact;
 
         // Compute f'(alpha) (i.e. the gradient of f(alpha)) for the current alpha.  
         std::vector<matrix<T,NR,NC,MM,L>> df;// = Q*alpha + b;
@@ -632,17 +685,40 @@ namespace dlib
             df.resize(Q_blocks.size());
             for (size_t i = 0; i < df.size(); ++i)
                 df[i] = Q_blocks[i]*alphas[i] + bs[i];
-            // Don't forget to include the Q_offdiag terms in the computation
-            for (auto& p : Q_offdiag)
+
+
+            // Don't forget to include the Q_offdiag terms in the computation.  Note that
+            // we have two options for how we can compute this part.  If Q_offdiag is
+            // uniform and can be compacted into a simple matrix and there are a lot of off
+            // diagonal entries then it's faster to do it as a matrix multiply.  Otherwise
+            // we do the more general computation.
+            if (offdiag_compact.size() != 0 && Q_offdiag.size() > Q_blocks.size()*5)
             {
-                long r = p.first.first;
-                long c = p.first.second;
-                df[r] += pointwise_multiply(p.second, alphas[c]);
-                if (r != c)
-                    df[c] += pointwise_multiply(p.second, alphas[r]);
+                // Do it as a matrix multiply (with a bit of data shuffling)
+                alphas_compact.set_size(alphas[0].size(), offdiag_compact.nr());
+                for (long c = 0; c < alphas_compact.nc(); ++c)
+                    set_colm(alphas_compact,c) = alphas[c];
+                temp = alphas_compact*offdiag_compact;
+                for (size_t i = 0; i < df.size(); ++i)
+                    df[i] += colm(temp,i);
+            }
+            else
+            {
+                // Do the fully general computation that allows for non-uniform values in
+                // the off diagonal vectors.
+                for (auto& p : Q_offdiag)
+                {
+                    long r = p.first.first;
+                    long c = p.first.second;
+                    df[r] += pointwise_multiply(p.second, alphas[c]);
+                    if (r != c)
+                        df[c] += pointwise_multiply(p.second, alphas[r]);
+                }
             }
         };
         compute_df();
+
+
 
         std::vector<matrix<T,NR,NC,MM,L>> Q_diag, Q_ggd;
         std::vector<matrix<T,NR,NC,MM,L>> QQ;// = reciprocal_max(diag(Q));

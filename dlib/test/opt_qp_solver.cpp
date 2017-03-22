@@ -584,6 +584,96 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_solve_qp_box_constrained_blockdiag_compact(dlib::rand& rnd, double percent_off_diag_present)
+    {
+        print_spinner();
+
+        dlog << LINFO << "test_solve_qp_box_constrained_blockdiag_compact(), percent_off_diag_present==" << percent_off_diag_present;
+
+        std::map<unordered_pair<size_t>, matrix<double,0,1>> offdiag;
+        std::vector<matrix<double>> Q_blocks;
+        std::vector<matrix<double,0,1>> bs;
+
+        const long num_blocks = 20;
+        const long dims = 4;
+        const double lambda = 10;
+        for (long i = 0; i < num_blocks; ++i)
+        {
+            matrix<double> Q1;
+            matrix<double,0,1> b1;
+            Q1 = randm(dims,dims,rnd); Q1 = Q1*trans(Q1);
+            b1 = gaussian_randm(dims,1, i);
+
+            Q_blocks.push_back(Q1);
+            bs.push_back(b1);
+
+            // test with some graph regularization terms
+            for (long j = 0; j < num_blocks; ++j)
+            {
+                if (rnd.get_random_double() < percent_off_diag_present)
+                {
+                    if (i==j)
+                        offdiag[make_unordered_pair(i,j)] = (num_blocks-1)*lambda*rnd.get_random_double()*ones_matrix<double>(dims,1);
+                    else
+                        offdiag[make_unordered_pair(i,j)] = -lambda*rnd.get_random_double()*ones_matrix<double>(dims,1);
+                }
+            }
+        }
+
+        // build out the dense version of the QP so we can test it against the dense solver.
+        matrix<double> Q(num_blocks*dims, num_blocks*dims); 
+        Q = 0;
+        matrix<double,0,1> b(num_blocks*dims);
+        for (long i = 0; i < num_blocks; ++i)
+        {
+            set_subm(Q,i*dims,i*dims,dims,dims) = Q_blocks[i];
+            set_subm(b,i*dims,0,dims,1) = bs[i];
+        }
+        for (auto& p : offdiag)
+        {
+            long r = p.first.first;
+            long c = p.first.second;
+            set_subm(Q, dims*r,dims*c, dims,dims) += diagm(p.second);
+            if (c != r)
+                set_subm(Q, dims*c,dims*r, dims,dims) += diagm(p.second);
+        }
+
+
+
+        matrix<double,0,1> alpha = zeros_matrix<double>(dims*num_blocks,1);
+        matrix<double,0,1> lower = -10000*ones_matrix<double>(dims*num_blocks,1);
+        matrix<double,0,1> upper = 10000*ones_matrix<double>(dims*num_blocks,1);
+
+        auto iters = solve_qp_box_constrained(Q, b, alpha, lower, upper, 1e-9, 20000);
+        dlog << LINFO << "iters: "<< iters;
+
+
+        matrix<double,0,1> init_alpha = zeros_matrix(bs[0]);
+        lower = -10000*ones_matrix(bs[0]);
+        upper = 10000*ones_matrix(bs[0]);
+
+        std::vector<matrix<double,0,1>> alphas(num_blocks, init_alpha);
+        std::vector<matrix<double,0,1>> lowers(num_blocks, lower);
+        std::vector<matrix<double,0,1>> uppers(num_blocks, upper);
+
+        auto iters2 = solve_qp_box_constrained_blockdiag(Q_blocks, bs, offdiag, alphas, lowers, uppers, 1e-9, 20000);
+        dlog << LINFO << "iters2: "<< iters2;
+
+
+        const matrix<double> refalpha = reshape(alpha, num_blocks, dims);
+
+        // now make sure the two solvers agree on the outputs.
+        for (long r = 0; r < num_blocks; ++r)
+        {
+            for (long c = 0; c < dims; ++c)
+            {
+                DLIB_TEST_MSG(std::abs(refalpha(r,c) - alphas[r](c)) < 1e-6, std::abs(refalpha(r,c) - alphas[r](c)));
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class opt_qp_solver_tester : public tester
     {
         /*
@@ -642,6 +732,15 @@ namespace
 
             test_find_gap_between_convex_hulls();
             test_solve_qp_box_constrained_blockdiag();
+
+            // try a range of off diagonal sparseness.  We do this to make sure we exercise both
+            // the compact and sparse code paths within the solver.
+            test_solve_qp_box_constrained_blockdiag_compact(rnd, 0.001);
+            test_solve_qp_box_constrained_blockdiag_compact(rnd, 0.01);
+            test_solve_qp_box_constrained_blockdiag_compact(rnd, 0.04);
+            test_solve_qp_box_constrained_blockdiag_compact(rnd, 0.10);
+            test_solve_qp_box_constrained_blockdiag_compact(rnd, 0.50);
+            test_solve_qp_box_constrained_blockdiag_compact(rnd, 1.00);
         }
 
         double do_the_test (
