@@ -234,7 +234,7 @@ if (NOT TARGET dlib)
                # If both X11 and anaconda are installed, it's possible for the
                # anaconda path to appear before /opt/X11, so we remove anaconda.
                foreach (ITR ${X11_INCLUDE_DIR})
-                  if ("${ITR}" MATCHES "(.*)anaconda(.*)")
+                  if ("${ITR}" MATCHES "(.*)(ana|mini)conda(.*)")
                      list (REMOVE_ITEM X11_INCLUDE_DIR ${ITR})
                   endif ()
                endforeach(ITR)
