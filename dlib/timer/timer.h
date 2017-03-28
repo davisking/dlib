@@ -97,6 +97,8 @@ namespace dlib
         mutex m;
 
         friend shared_ptr_thread_safe<timer_global_clock> get_global_clock();
+		friend void delete_global_clock();
+		
 
     private:
         timer_global_clock();
@@ -118,6 +120,11 @@ namespace dlib
         ensures
             - returns the global instance of the timer_global_clock object
     !*/
+	void delete_global_clock();
+	/*!
+		ensures
+			- terminates the global instance of the timer_global_clock object
+	*/
 
 // ----------------------------------------------------------------------------------------
 

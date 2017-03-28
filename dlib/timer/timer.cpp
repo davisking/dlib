@@ -180,13 +180,21 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-
-    shared_ptr_thread_safe<timer_global_clock> get_global_clock()
+	static std::atomic<shared_ptr_thread_safe<timer_global_clock> *> global_clock_ptr(nullptr);// needs this to get to the thread-safe-init global
+    
+	shared_ptr_thread_safe<timer_global_clock> get_global_clock()
     {
-        static shared_ptr_thread_safe<timer_global_clock> d(new timer_global_clock);
+        static shared_ptr_thread_safe<timer_global_clock> d(new timer_global_clock); 
+		global_clock_ptr.store( &d);// always correct, the address is static
         return d;
     }
-
+	
+	void delete_global_clock() {
+		auto got_it = global_clock_ptr.exchange(nullptr);
+		if(got_it) {
+			(*got_it).reset();
+		}
+	}
 // ----------------------------------------------------------------------------------------
 
     // do this just to make sure get_global_clock() gets called at program startup
