@@ -336,6 +336,12 @@ on_keydown (
             last_keyboard_jump_pos_update = 0;
         }
 
+        if (key == 'r' && (state&base_window::KBD_MOD_CONTROL))
+        {
+            remove_selected_images();
+        }
+
+
         return;
     }
 
@@ -571,7 +577,8 @@ display_about(
                         "by hitting the tab key. Double clicking "
                         "a rectangle selects it and the delete key removes it.  You can also mark "
                         "a rectangle as ignored by hitting the i key when it is selected.  Ignored "
-                        "rectangles are visually displayed with an X through them."
+                        "rectangles are visually displayed with an X through them.  You can remove an image "
+                        "entirely by selecting it in the list on the left and pressing ctrl+r."
                         ,0,0) << endl << endl;
 
     sout << wrap_string("It is also possible to label object parts by selecting a rectangle and "
