@@ -456,7 +456,7 @@ load_image(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-        set_title(metadata.name + ": " +metadata.images[idx].filename);
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
@@ -484,7 +484,7 @@ load_image_and_set_size(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-        set_title(metadata.name + ": " +metadata.images[idx].filename);
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
