@@ -312,7 +312,14 @@ namespace
             DLIB_TEST_MSG(h.count == 1,h.count);
 
         }
-
+        //-- verify that delete_global_clock() and get_global_clock() can be called multiple times (it's nothing we recommend, but we support it)
+        auto tgc =dlib::get_global_clock();// this is a trick to get hold of the current global clock memory
+        void *tgc_1=tgc.get();// retrieve the memory address of current clock
+        dlib::delete_global_clock();// remove(or rather dec.ref count) the global timer, at next get_global_clock a new one should be created
+        void *tgc_2 =dlib::get_global_clock().get();// retrieve the new/fresh global clock (since the old is still alive, this do have a different memory
+        tgc.reset();// release the mem of the old clock here(ref. trick above, we just got the hold of it long enough to ensure the new one got new memory location)
+        DLIB_TEST_MSG(tgc_2 != nullptr, "a new non null global clock pointer expected");
+        DLIB_TEST_MSG(tgc_1 != tgc_2,"new global clock should be different");
     }
 
 
