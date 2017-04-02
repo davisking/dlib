@@ -698,6 +698,45 @@ namespace
 
 #ifdef DLIB_USE_CUDA
 
+    void test_affine_rect()
+    {
+        dlib::rand rnd;
+
+        for (int iter = 0; iter < 20; ++iter)
+        {
+
+            long nr = 1 + rnd.get_random_32bit_number()%10;
+            long nc = 1 + rnd.get_random_32bit_number()%10;
+
+            resizable_tensor dest1(nr,nc), dest2(nr,nc), src1(nr,nc), src2(nr,nc), src3(nr,nc);
+            matrix<float> dest3;
+
+            dest1 = 1;
+            dest2 = 1;
+            dest3 = mat(dest1);
+            src1 = 2;
+            src2 = 3;
+            src3 = 4;
+
+            point p1(rnd.get_random_32bit_number()%nc, rnd.get_random_32bit_number()%nr);
+            point p2(rnd.get_random_32bit_number()%nc, rnd.get_random_32bit_number()%nr);
+            rectangle rect(p1,p2);
+
+            cuda::affine_transform(rect, dest1, src1, src2, src3, 2,3,4);
+
+            cpu::affine_transform(rect, dest2, src1, src2, src3, 2,3,4);
+
+            DLIB_TEST(mat(dest1) == mat(dest2));
+
+            set_subm(dest3,rect) = 2*subm(mat(src1),rect) + 3*subm(mat(src2),rect) + 4*subm(mat(src3),rect);
+            DLIB_TEST(dest3 == mat(dest1));
+
+            dest1 = 1;
+            tt::affine_transform(rect, dest1, src1, src2, src3, 2,3,4);
+            DLIB_TEST(dest3 == mat(dest1));
+        }
+    }
+
     void test_conv()
     {
         cuda::tensor_conv conv1;
@@ -1865,6 +1904,7 @@ namespace
 
             test_tagging();
 #ifdef DLIB_USE_CUDA
+            test_affine_rect();
             test_conv();
             test_more_ops2();
             test_more_ops(1,1);

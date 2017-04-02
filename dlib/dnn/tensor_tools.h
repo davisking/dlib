@@ -11,6 +11,7 @@
 #include "cuda_dlib.h"
 #include "../rand.h"
 #include <memory>
+#include "../geometry/rectangle.h"
 
 namespace dlib
 {
@@ -354,6 +355,34 @@ namespace dlib { namespace tt
               Specifically, it does this:
                 - for i in the range [begin, end):
                     - #dest.host()[i] == A*src1.host()[i] + B*src2.host()[i] + C*src3.host()[i]
+    !*/
+
+    void affine_transform(
+        const rectangle& rect,
+        tensor& dest, 
+        const tensor& src1, 
+        const tensor& src2, 
+        const tensor& src3, 
+        float A, 
+        float B,
+        float C
+    );
+    /*!
+        requires
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+            - dest.size()==src3.size()
+            - dest.num_samples()==src1.num_samples()
+            - dest.num_samples()==src2.num_samples()
+            - dest.num_samples()==src3.num_samples()
+            - get_rect(mat(dest)).contains(rect) == true
+              (i.e. rect must be entirely contained within dest)
+        ensures
+            - This function operates much like
+              affine_transform(dest,src1,src2,src3,A,B,C,0), except that it runs over only
+              the sub-rectangle indicated by rect.  In particular, this function is equivalent
+              to:
+                set_subm(dest,rect) = A*subm(mat(src1),rect) + B*subm(mat(src2),rect) + C*subm(mat(src3),rect)
     !*/
 
 // ----------------------------------------------------------------------------------------
