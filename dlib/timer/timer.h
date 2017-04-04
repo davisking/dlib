@@ -121,29 +121,6 @@ namespace dlib
             - returns the global instance of the timer_global_clock object
     !*/
 
-   void delete_global_clock();
-    /*!
-        ensures
-            - that the ref count hold by the global object shared ptr. is decremented
-            if there are no more references to the global_glock object, then
-            this object is deleted.
-            
-            - that the *next* call go get_global_clock() will get a new instance
-            of the timer_global_clock object
-
-        notes
-           - the purpose of this function is to provide a workaround
-           for windows process termination protocol that unfortunately
-           starts with silently killing threads, before doing the static desctructors
-           of the dynamic-libraries(.dll).
-           Since we try to handshake with the worker-thread in the destructor 
-           of the timer_global_clock,  this will give a infinite wait.
-           
-           - If you use dlib as part of a .dll, (like python extension-dll), make sure
-           that you register an at-exit function that is called *before* 
-           the windows termination process (ExitProcess-call) is done.
-        
-    */
 
 // ----------------------------------------------------------------------------------------
 

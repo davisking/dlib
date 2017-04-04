@@ -24,11 +24,42 @@ namespace dlib
     timer_global_clock::
     ~timer_global_clock()
     {
-        m.lock();
-        shutdown = true;
-        s.signal();
-        m.unlock();
-        wait();
+		// The only time this destructor is called is when 
+		//
+		// a) the process terminates
+		// b) the dynamic library(.so/.dll) is unloaded (could be a part of a))
+		// 
+		// in case of a)
+		//   windows: the process termination is especially painful, since threads are killed
+		//     before destructors of the process image .dll's are called.
+		//     Thus, for the windows platform, there is no threads running, so the only thing
+		//     to do here is just let the standard memberwise destructors run
+		//   linux: it's ok to just signal shutdown and wait for the running thread, to exit
+		//   
+		// in case of b)
+		//   windows:
+		//     if it's part of the termination process, a) applies
+		//     if its part of user doing manual load_library/unload_library
+		//     there is no (safe/robust)solution, but best practices are described here
+		// 		    https://msdn.microsoft.com/en-us/library/windows/desktop/dn633971.aspx
+		//     to support such a clean shutdown, you are required to make a call prior to
+		//     unload dll, that shutdown all the threads in the contained dll.
+		//     This could be done in this module by providing a global_delete_clock()
+		// 
+		// linux: the destructor for linux will do it's usual job regardless.
+		//
+
+		#ifndef _WIN32
+        m.lock();// at this point, we have the lock (on windows global destructor in dll, it does not matter, there is just one(this) thread)
+        shutdown = true;// signal to thread (while-loop) it's going to shutdown(regardless pre-state of shutdown)
+		if(running) 
+		{ // ok, the thread should be running, or is about to run
+			s.signal();// wake up thread, (this could lock on the windows implementation of signaller if in exit-process)
+			m.unlock();// unlock the m so the thread could execute (it reclaims the mutex when executing
+			wait();// wait for the thread to exit (in windows dll terminate, this is meaningless, threads are killed before this)
+		} else
+			m.unlock();// just for the symmetry
+		#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -180,20 +211,13 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-	static std::mutex tgc_mx;// mutex to protect init/de-init of the tgc_singleton
-    static shared_ptr_thread_safe<timer_global_clock> timer_global_clock_singleton; 
-    
 	shared_ptr_thread_safe<timer_global_clock> get_global_clock()
     {
-        std::unique_lock<std::mutex> lk(tgc_mx);// if it has been removed, then reset it with a new 
-        if (!timer_global_clock_singleton)
-                timer_global_clock_singleton.reset(new timer_global_clock);
-        return timer_global_clock_singleton;
+		static shared_ptr_thread_safe<timer_global_clock> d(new timer_global_clock);
+        return d;
     }
 	
-	void delete_global_clock() {
-        timer_global_clock_singleton.reset();
-	}
+
 // ----------------------------------------------------------------------------------------
 
     // do this just to make sure get_global_clock() gets called at program startup
