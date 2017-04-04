@@ -119,7 +119,6 @@ namespace dlib
             - returns the global instance of the timer_global_clock object
     !*/
 
-
 // ----------------------------------------------------------------------------------------
 
     template <
