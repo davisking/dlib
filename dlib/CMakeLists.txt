@@ -577,6 +577,7 @@ if (NOT TARGET dlib)
                dnn/cudnn_dlibapi.cpp
                dnn/cublas_dlibapi.cpp
                dnn/curand_dlibapi.cpp
+               dnn/cuda_data_ptr.cpp
                dnn/gpu_data.cpp
                )
             set(dlib_needed_libraries ${dlib_needed_libraries} 
