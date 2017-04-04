@@ -50,15 +50,11 @@ namespace dlib
         //
 
         #ifndef _WIN32
-        m.lock();// at this point, we have the lock (on windows global destructor in dll, it does not matter, there is just one(this) thread)
-        shutdown = true;// signal to thread (while-loop) it's going to shutdown(regardless pre-state of shutdown)
-        if(running) 
-        { // ok, the thread should be running, or is about to run
-            s.signal();// wake up thread, (this could lock on the windows implementation of signaller if in exit-process)
-            m.unlock();// unlock the m so the thread could execute (it reclaims the mutex when executing
-            wait();// wait for the thread to exit (in windows dll terminate, this is meaningless, threads are killed before this)
-        } else
-            m.unlock();// just for the symmetry
+        m.lock();
+        shutdown = true;
+        s.signal();
+        m.unlock();
+        wait();
         #endif
     }
 
