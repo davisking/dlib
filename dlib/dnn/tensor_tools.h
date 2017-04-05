@@ -6,6 +6,7 @@
 #include "tensor.h"
 #include "cudnn_dlibapi.h"
 #include "cublas_dlibapi.h"
+#include "cusolver_dlibapi.h"
 #include "curand_dlibapi.h"
 #include "cpu_dlib.h"
 #include "cuda_dlib.h"
@@ -122,6 +123,36 @@ namespace dlib { namespace tt
         ensures
             - performs: dest = alpha*L*R + beta*mat(dest)
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class inv
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a functor for doing matrix inversion on the GPU.  The only
+                reason it's an object is to avoid the reallocation of some GPU memory
+                blocks if you want to do a bunch of matrix inversions in a row.
+        !*/
+    public:
+
+        void operator() (
+            const tensor& m,
+            resizable_tensor& out
+        );
+        /*!
+            requires
+                - m.size() == m.num_samples()*m.num_samples()
+                  (i.e. mat(m) must be a square matrix)
+            ensures
+                - out == inv(mat(m));
+        !*/
+
+    private:
+#ifdef DLIB_USE_CUDA
+        cuda::inv finv;
+#endif
+    };
 
 // ----------------------------------------------------------------------------------------
 

@@ -568,14 +568,24 @@ if (NOT TARGET dlib)
                   endif()
                endif()
             endif()
+
+            # Find where cuSOLVER is since the FindCUDA cmake package doesn't
+            # bother to look for it.
+            get_filename_component(cuda_blas_path ${CUDA_CUBLAS_LIBRARIES} DIRECTORY)
+            find_library(cusolver cusolver HINTS ${cuda_blas_path})
+            # Also find OpenMP since cuSOLVER needs it.
+            find_package(OpenMP)
+            if (NOT OPENMP_FOUND)
+               message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
+            endif()
          endif()
 
-
-         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked)
+         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked AND OPENMP_FOUND)
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
                dnn/cublas_dlibapi.cpp
+               dnn/cusolver_dlibapi.cu
                dnn/curand_dlibapi.cpp
                dnn/cuda_data_ptr.cpp
                dnn/gpu_data.cpp
@@ -584,6 +594,7 @@ if (NOT TARGET dlib)
                                       ${CUDA_CUBLAS_LIBRARIES} 
                                       ${cudnn}
                                       ${CUDA_curand_LIBRARY}
+                                      ${cusolver}
                                       )
             include_directories(${cudnn_include})
          else()
@@ -648,6 +659,11 @@ if (NOT TARGET dlib)
                                  PUBLIC ${dlib_needed_includes}
                                  )
       target_link_libraries(dlib PRIVATE ${dlib_needed_libraries})
+      if (OPENMP_FOUND)
+         # Enable OpenMP
+         target_compile_options(dlib PUBLIC ${OpenMP_CXX_FLAGS}) 
+         target_link_libraries(dlib PUBLIC ${OpenMP_CXX_FLAGS}) 
+      endif()
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
          if (DLIB_USE_CUDA)
             cuda_add_library(dlib_shared SHARED ${source_files} )
@@ -662,6 +678,11 @@ if (NOT TARGET dlib)
                                     PUBLIC ${dlib_needed_includes}
                                     )
          target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
+         if (OPENMP_FOUND)
+            # Enable OpenMP
+            target_compile_options(dlib_shared PUBLIC ${OpenMP_CXX_FLAGS}) 
+            target_link_libraries(dlib_shared PUBLIC ${OpenMP_CXX_FLAGS}) 
+         endif()
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
