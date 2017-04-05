@@ -16,6 +16,8 @@
 #  lapack_libraries         - link against these to use LAPACK library 
 #  mkl_libraries            - link against these to use the MKL library
 #  mkl_include_dir          - add to the include path to use the MKL library
+#  openmp_libarires         - Set to Intel's OpenMP library if and only if we
+#                             find the MKL.
 
 # setting this makes CMake allow normal looking if else statements
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
@@ -91,11 +93,13 @@ if (UNIX OR MINGW)
         /opt/intel/include
     )
     find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
+    mark_as_advanced(mkl_include_dir)
 
     # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
     # file first since this way avoids linking bugs in some cases.
     find_library(mkl_rt mkl_rt ${mkl_search_path})
-    mark_as_advanced(  mkl_rt )
+    find_library(openmp_libarires iomp5 ${mkl_search_path}) 
+    mark_as_advanced(  mkl_rt  openmp_libarires )
     # if we found the MKL 
     if ( mkl_rt)
         set(mkl_libraries  ${mkl_rt} )

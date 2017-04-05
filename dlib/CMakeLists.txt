@@ -573,14 +573,27 @@ if (NOT TARGET dlib)
             # bother to look for it.
             get_filename_component(cuda_blas_path "${CUDA_CUBLAS_LIBRARIES}" DIRECTORY)
             find_library(cusolver cusolver HINTS ${cuda_blas_path})
-            # Also find OpenMP since cuSOLVER needs it.
-            find_package(OpenMP)
-            if (NOT OPENMP_FOUND)
-               message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
+            mark_as_advanced(cusolver)
+            # Also find OpenMP since cuSOLVER needs it.  Importantly, we only
+            # look for one to link to if our use of BLAS, specifically the
+            # Intel MKL, hasn't already decided what to use.  This is because
+            # it makes the MKL bug out if you link to another openmp lib other
+            # than Intel's when you use the MKL.
+            if (NOT openmp_libarires)
+               if (MSVC)
+                  set(openmp_libarires "") 
+               else()
+                  find_package(OpenMP)
+                  if (OPENMP_FOUND)
+                     set(openmp_libarires ${OpenMP_CXX_FLAGS}) 
+                  else()
+                     message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
+                  endif()
+               endif()
             endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked AND OPENMP_FOUND)
+         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked AND openmp_libarires)
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
@@ -595,6 +608,7 @@ if (NOT TARGET dlib)
                                       ${cudnn}
                                       ${CUDA_curand_LIBRARY}
                                       ${cusolver}
+                                      ${openmp_libarires}
                                       )
             include_directories(${cudnn_include})
          else()
@@ -659,13 +673,6 @@ if (NOT TARGET dlib)
                                  PUBLIC ${dlib_needed_includes}
                                  )
       target_link_libraries(dlib PRIVATE ${dlib_needed_libraries})
-      if (OPENMP_FOUND)
-         # Enable OpenMP
-         target_compile_options(dlib PUBLIC ${OpenMP_CXX_FLAGS}) 
-         if (NOT MSVC)
-            target_link_libraries(dlib PUBLIC ${OpenMP_CXX_FLAGS}) 
-         endif()
-      endif()
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
          if (DLIB_USE_CUDA)
             cuda_add_library(dlib_shared SHARED ${source_files} )
@@ -680,13 +687,6 @@ if (NOT TARGET dlib)
                                     PUBLIC ${dlib_needed_includes}
                                     )
          target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
-         if (OPENMP_FOUND)
-            # Enable OpenMP
-            target_compile_options(dlib_shared PUBLIC ${OpenMP_CXX_FLAGS}) 
-            if (NOT MSVC)
-               target_link_libraries(dlib_shared PUBLIC ${OpenMP_CXX_FLAGS}) 
-            endif()
-         endif()
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
