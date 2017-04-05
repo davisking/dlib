@@ -571,7 +571,7 @@ if (NOT TARGET dlib)
 
             # Find where cuSOLVER is since the FindCUDA cmake package doesn't
             # bother to look for it.
-            get_filename_component(cuda_blas_path ${CUDA_CUBLAS_LIBRARIES} DIRECTORY)
+            get_filename_component(cuda_blas_path "${CUDA_CUBLAS_LIBRARIES}" DIRECTORY)
             find_library(cusolver cusolver HINTS ${cuda_blas_path})
             # Also find OpenMP since cuSOLVER needs it.
             find_package(OpenMP)
