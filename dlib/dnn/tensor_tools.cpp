@@ -818,7 +818,7 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         finv(m,out);
 #else
-        out = dlib::inv(m);
+        out = dlib::inv(mat(m));
 #endif
     }
 
