@@ -46,12 +46,20 @@ macro (toggle_preprocessor_switch option_name)
    endif()
 endmacro()
 
+
+# Suggest asserts enabled or not. However, user can override
+# using SET(CACHE FORCE). This is ideal for in_project_builds, as this
+# preprocessor define will be adopted by the parent project.
+# The user can *always* override this setting, and is in control when needed.
+set (DLIB_ENABLE_ASSERTS_STR
+    "Enable this if you want to turn on the DLIB_ASSERT macro" )
+
 if (DLIB_IN_PROJECT_BUILD AND CMAKE_BUILD_TYPE MATCHES "Debug")
-   # Make sure ENABLE_ASSERTS is defined for debug builds, but only for uses
-   # who are building an application.  If they are just building dlib as a
-   # stand alone library then don't set this because it will conflict with the
-   # settings in config.h if we did.
-   enable_preprocessor_switch(ENABLE_ASSERTS)
+    # In Debug for in project builds, we **suggest** asserts ON.
+    option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} ON)
+else()
+    # Otherwise, we **suggest** asserts OFF.
+    option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
 endif()
 
 
@@ -77,8 +85,6 @@ if (NOT TARGET dlib)
    "Enable this if you don't want to compile any of the dlib GUI code" )
    set (DLIB_ENABLE_STACK_TRACE_STR 
    "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
-   set (DLIB_ENABLE_ASSERTS_STR 
-   "Enable this if you want to turn on the DLIB_ASSERT macro" )
    set (DLIB_USE_BLAS_STR
    "Disable this if you don't want to use a BLAS library" )
    set (DLIB_USE_LAPACK_STR
@@ -104,7 +110,8 @@ if (NOT TARGET dlib)
    option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
    toggle_preprocessor_switch(DLIB_ENABLE_STACK_TRACE)
 
-   option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
+   # Don't fiddle around with ASSERTS anymore here. Wether asserts are enabled
+   # or not is now decided by the default dlib suggestion, or by the user.
    if(DLIB_ENABLE_ASSERTS)
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
@@ -118,14 +125,7 @@ if (NOT TARGET dlib)
       set (DLIB_DISABLE_ASSERTS true)
       set (ENABLE_ASSERTS false) 
       disable_preprocessor_switch(ENABLE_ASSERTS)
-      # Never force the asserts off when doing an in project build.  Instead,
-      # let the debug/release mode setting toggle asserts on or off (or the
-      # DLIB_ENABLE_ASSERTS option obviously).  That is, even if the
-      # DLIB_ENABLE_ASSERTS option is off debug mode can still cause the
-      # asserts to turn on when using an in project build. 
-      if (NOT DLIB_IN_PROJECT_BUILD)
-         enable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
-      endif()
+      enable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
    endif()
 
    if (DLIB_ISO_CPP_ONLY)
