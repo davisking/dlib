@@ -579,21 +579,18 @@ if (NOT TARGET dlib)
             # Intel MKL, hasn't already decided what to use.  This is because
             # it makes the MKL bug out if you link to another openmp lib other
             # than Intel's when you use the MKL.
-            if (NOT openmp_libarires)
-               if (MSVC)
-                  set(openmp_libarires "") 
+            if (NOT openmp_libarires AND NOT MSVC)
+               find_package(OpenMP)
+               if (OPENMP_FOUND)
+                  set(openmp_libarires ${OpenMP_CXX_FLAGS}) 
                else()
-                  find_package(OpenMP)
-                  if (OPENMP_FOUND)
-                     set(openmp_libarires ${OpenMP_CXX_FLAGS}) 
-                  else()
-                     message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
-                  endif()
+                  message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
+                  set(CUDA_FOUND 0)
                endif()
             endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked AND openmp_libarires)
+         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked)
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
