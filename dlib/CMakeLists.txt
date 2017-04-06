@@ -125,6 +125,7 @@ if (NOT TARGET dlib)
       set (DLIB_DISABLE_ASSERTS true)
       set (ENABLE_ASSERTS false) 
       disable_preprocessor_switch(ENABLE_ASSERTS)
+      enable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
    endif()
 
    if (DLIB_ISO_CPP_ONLY)
