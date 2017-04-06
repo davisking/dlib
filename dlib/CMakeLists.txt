@@ -27,28 +27,33 @@ endif()
 # is used.
 cmake_policy(SET CMP0023 OLD)
 
-include(cmake_utils/add_global_compiler_switch.cmake)
 
+macro (enable_preprocessor_switch option_name)
+   list(APPEND active_preprocessor_switches "-D${option_name}")
+endmacro()
 
-if (DLIB_IN_PROJECT_BUILD)
+macro (disable_preprocessor_switch option_name)
+   if (active_preprocessor_switches)
+      list(REMOVE_ITEM active_preprocessor_switches "-D${option_name}")
+   endif()
+endmacro()
+
+macro (toggle_preprocessor_switch option_name)
+   if (${option_name})
+      enable_preprocessor_switch(${option_name})
+   else()
+      disable_preprocessor_switch(${option_name})
+   endif()
+endmacro()
+
+if (DLIB_IN_PROJECT_BUILD AND CMAKE_BUILD_TYPE MATCHES "Debug")
    # Make sure ENABLE_ASSERTS is defined for debug builds, but only for uses
    # who are building an application.  If they are just building dlib as a
    # stand alone library then don't set this because it will conflict with the
    # settings in config.h if we did.
-   if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
-      set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_ASSERTS" 
-         CACHE STRING "Flags used by the compiler during C++ debug builds." 
-         FORCE)
-   endif()
+   enable_preprocessor_switch(ENABLE_ASSERTS)
 endif()
 
-macro (toggle_preprocessor_switch option_name)
-   if (${option_name})
-      add_global_define(${option_name})
-   else()
-      remove_global_define(${option_name})
-   endif()
-endmacro()
 
 # Suppress superfluous randlib warnings about libdlib.a having no symbols on MacOSX.
 if (APPLE)
@@ -105,21 +110,21 @@ if (NOT TARGET dlib)
       # is installed.
       set (DLIB_DISABLE_ASSERTS false)
       set (ENABLE_ASSERTS true) 
-      add_global_define(ENABLE_ASSERTS)
-      remove_global_define(DLIB_DISABLE_ASSERTS)
+      enable_preprocessor_switch(ENABLE_ASSERTS)
+      disable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
    else()
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS true)
       set (ENABLE_ASSERTS false) 
-      remove_global_define(ENABLE_ASSERTS)
+      disable_preprocessor_switch(ENABLE_ASSERTS)
       # Never force the asserts off when doing an in project build.  Instead,
       # let the debug/release mode setting toggle asserts on or off (or the
       # DLIB_ENABLE_ASSERTS option obviously).  That is, even if the
       # DLIB_ENABLE_ASSERTS option is off debug mode can still cause the
       # asserts to turn on when using an in project build. 
       if (NOT DLIB_IN_PROJECT_BUILD)
-         add_global_define(DLIB_DISABLE_ASSERTS)
+         enable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
       endif()
    endif()
 
@@ -265,7 +270,7 @@ if (NOT TARGET dlib)
                message(" *** You can download XQuartz from: http://xquartz.macosforge.org/landing/ ***")
                message(" *****************************************************************************")
                set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
-               add_global_define(DLIB_NO_GUI_SUPPORT)
+               enable_preprocessor_switch(DLIB_NO_GUI_SUPPORT)
             endif()
          endif()
 
@@ -295,7 +300,7 @@ if (NOT TARGET dlib)
                message(" *** On Ubuntu run: sudo apt-get install libx11-dev                        ***")
                message(" *****************************************************************************")
                set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
-               add_global_define(DLIB_NO_GUI_SUPPORT)
+               enable_preprocessor_switch(DLIB_NO_GUI_SUPPORT)
             endif()
          endif()
 
@@ -524,6 +529,7 @@ if (NOT TARGET dlib)
             # magic in the standard C++ header files (since nvcc uses gcc headers on
             # linux).
             list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
+            list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
             if (NOT MSVC)
                list(APPEND CUDA_NVCC_FLAGS "-std=c++11")
             endif()
@@ -670,6 +676,11 @@ if (NOT TARGET dlib)
                                  PUBLIC ${dlib_needed_includes}
                                  )
       target_link_libraries(dlib PRIVATE ${dlib_needed_libraries})
+      if (DLIB_IN_PROJECT_BUILD)
+         target_compile_options(dlib PUBLIC ${active_preprocessor_switches})
+      else()
+         target_compile_options(dlib PRIVATE ${active_preprocessor_switches})
+      endif()
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
          if (DLIB_USE_CUDA)
             cuda_add_library(dlib_shared SHARED ${source_files} )
@@ -684,6 +695,7 @@ if (NOT TARGET dlib)
                                     PUBLIC ${dlib_needed_includes}
                                     )
          target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
+         target_compile_options(dlib_shared PRIVATE ${active_preprocessor_switches})
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
@@ -692,6 +704,7 @@ if (NOT TARGET dlib)
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
       ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
       target_link_libraries(dlib_all_source_cpp dlib)
+      target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
    endif()
 
    # Install the library
