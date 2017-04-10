@@ -6,11 +6,13 @@
 #include "tensor.h"
 #include "cudnn_dlibapi.h"
 #include "cublas_dlibapi.h"
+#include "cusolver_dlibapi.h"
 #include "curand_dlibapi.h"
 #include "cpu_dlib.h"
 #include "cuda_dlib.h"
 #include "../rand.h"
 #include <memory>
+#include "../geometry/rectangle.h"
 
 namespace dlib
 {
@@ -121,6 +123,36 @@ namespace dlib { namespace tt
         ensures
             - performs: dest = alpha*L*R + beta*mat(dest)
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class inv
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a functor for doing matrix inversion on the GPU.  The only
+                reason it's an object is to avoid the reallocation of some GPU memory
+                blocks if you want to do a bunch of matrix inversions in a row.
+        !*/
+    public:
+
+        void operator() (
+            const tensor& m,
+            resizable_tensor& out
+        );
+        /*!
+            requires
+                - m.size() == m.num_samples()*m.num_samples()
+                  (i.e. mat(m) must be a square matrix)
+            ensures
+                - out == inv(mat(m));
+        !*/
+
+    private:
+#ifdef DLIB_USE_CUDA
+        cuda::inv finv;
+#endif
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -354,6 +386,34 @@ namespace dlib { namespace tt
               Specifically, it does this:
                 - for i in the range [begin, end):
                     - #dest.host()[i] == A*src1.host()[i] + B*src2.host()[i] + C*src3.host()[i]
+    !*/
+
+    void affine_transform(
+        const rectangle& rect,
+        tensor& dest, 
+        const tensor& src1, 
+        const tensor& src2, 
+        const tensor& src3, 
+        float A, 
+        float B,
+        float C
+    );
+    /*!
+        requires
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+            - dest.size()==src3.size()
+            - dest.num_samples()==src1.num_samples()
+            - dest.num_samples()==src2.num_samples()
+            - dest.num_samples()==src3.num_samples()
+            - get_rect(mat(dest)).contains(rect) == true
+              (i.e. rect must be entirely contained within dest)
+        ensures
+            - This function operates much like
+              affine_transform(dest,src1,src2,src3,A,B,C,0), except that it runs over only
+              the sub-rectangle indicated by rect.  In particular, this function is equivalent
+              to:
+                set_subm(dest,rect) = A*subm(mat(src1),rect) + B*subm(mat(src2),rect) + C*subm(mat(src3),rect)
     !*/
 
 // ----------------------------------------------------------------------------------------

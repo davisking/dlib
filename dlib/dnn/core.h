@@ -3396,7 +3396,7 @@ namespace dlib
                 visitor&& v
             )
             {
-                vl_loop<i+1, num>::visit(net,v);
+                vl_loop_backwards<i+1, num>::visit(net,v);
                 v(i, layer<i>(net));
             }
         };

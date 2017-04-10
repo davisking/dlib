@@ -820,6 +820,16 @@ namespace dlib
                                                  filters.nc()));
 
                 CHECK_CUDNN(cudnnCreateConvolutionDescriptor((cudnnConvolutionDescriptor_t*)&conv_handle));
+#if CUDNN_MAJOR >= 6
+                CHECK_CUDNN(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
+                        padding_y, // vertical padding
+                        padding_x, // horizontal padding
+                        stride_y,
+                        stride_x,
+                        1, 1, // must be 1,1
+                        CUDNN_CROSS_CORRELATION,
+                        CUDNN_DATA_FLOAT)); // could also be CUDNN_CONVOLUTION
+#else
                 CHECK_CUDNN(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
                         padding_y, // vertical padding
                         padding_x, // horizontal padding
@@ -827,6 +837,7 @@ namespace dlib
                         stride_x,
                         1, 1, // must be 1,1
                         CUDNN_CROSS_CORRELATION)); // could also be CUDNN_CONVOLUTION
+#endif
 
                 CHECK_CUDNN(cudnnGetConvolution2dForwardOutputDim(
                         (const cudnnConvolutionDescriptor_t)conv_handle,

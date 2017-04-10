@@ -8,6 +8,9 @@ cmake_minimum_required(VERSION 2.8.11)
 set(BUILDING_MATLAB_MEX_FILE true)
 set(CMAKE_POSITION_INDEPENDENT_CODE True)
 
+# Trying to use cuda with matlab hasn't worked well, so just disable it.
+SET(DLIB_USE_CUDA OFF CACHE BOOL "" FORCE)
+
 # Find MATLAB's include directory and needed libraries 
 find_program(MATLAB_EXECUTABLE matlab PATHS
         "C:/Program Files/MATLAB/*/bin"

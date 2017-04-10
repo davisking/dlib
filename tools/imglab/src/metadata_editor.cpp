@@ -336,6 +336,12 @@ on_keydown (
             last_keyboard_jump_pos_update = 0;
         }
 
+        if (key == 'd' && (state&base_window::KBD_MOD_ALT))
+        {
+            remove_selected_images();
+        }
+
+
         return;
     }
 
@@ -450,7 +456,7 @@ load_image(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-        set_title(metadata.name + ": " +metadata.images[idx].filename);
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
@@ -478,7 +484,7 @@ load_image_and_set_size(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-        set_title(metadata.name + ": " +metadata.images[idx].filename);
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
@@ -571,7 +577,8 @@ display_about(
                         "by hitting the tab key. Double clicking "
                         "a rectangle selects it and the delete key removes it.  You can also mark "
                         "a rectangle as ignored by hitting the i key when it is selected.  Ignored "
-                        "rectangles are visually displayed with an X through them."
+                        "rectangles are visually displayed with an X through them.  You can remove an image "
+                        "entirely by selecting it in the list on the left and pressing alt+d."
                         ,0,0) << endl << endl;
 
     sout << wrap_string("It is also possible to label object parts by selecting a rectangle and "

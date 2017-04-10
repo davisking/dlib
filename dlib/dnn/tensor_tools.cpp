@@ -354,6 +354,24 @@ namespace dlib { namespace tt
     }
 
     void affine_transform(
+        const rectangle& rect,
+        tensor& dest, 
+        const tensor& src1, 
+        const tensor& src2, 
+        const tensor& src3, 
+        float A, 
+        float B,
+        float C
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform(rect, dest,src1,src2,src3,A,B,C);
+#else
+        cpu::affine_transform(rect, dest,src1,src2,src3,A,B,C);
+#endif
+    }
+
+    void affine_transform(
         tensor& dest,
         const tensor& src1,
         const tensor& src2,
@@ -774,20 +792,35 @@ namespace dlib { namespace tt
 
 // ------------------------------------------------------------------------------------
 
-        void copy_tensor(
-                tensor& dest,
-                size_t dest_k_offset,
-                const tensor& src,
-                size_t src_k_offset,
-                size_t count_k
-        )
-        {
+    void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+    )
+    {
 #ifdef DLIB_USE_CUDA
-            cuda::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+        cuda::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
 #else
-            cpu::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+        cpu::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
 #endif
-        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void inv::
+    operator() (
+        const tensor& m,
+        resizable_tensor& out
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        finv(m,out);
+#else
+        out = dlib::inv(mat(m));
+#endif
+    }
 
 // ----------------------------------------------------------------------------------------
 

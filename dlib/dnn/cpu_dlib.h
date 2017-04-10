@@ -7,6 +7,7 @@
 // and cudnn_dlibapi.h
 
 #include "tensor.h"
+#include "../geometry/rectangle.h"
 
 namespace dlib
 {
@@ -109,6 +110,19 @@ namespace dlib
             const tensor& src,
             const tensor& A,
             const tensor& B
+        );
+
+    // -----------------------------------------------------------------------------------
+
+        void affine_transform(
+            const rectangle& rect,
+            tensor& dest, 
+            const tensor& src1, 
+            const tensor& src2, 
+            const tensor& src3, 
+            float A, 
+            float B,
+            float C
         );
 
     // -----------------------------------------------------------------------------------

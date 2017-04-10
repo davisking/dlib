@@ -486,6 +486,46 @@ namespace dlib
             }
         }
 
+    // ----------------------------------------------------------------------------------------
+
+        void affine_transform(
+            const rectangle& rect,
+            tensor& dest, 
+            const tensor& src1, 
+            const tensor& src2, 
+            const tensor& src3, 
+            float A, 
+            float B,
+            float C
+        )
+        {
+            DLIB_CASSERT(dest.size() == src1.size());
+            DLIB_CASSERT(dest.size() == src2.size());
+            DLIB_CASSERT(dest.size() == src3.size());
+            DLIB_CASSERT(dest.num_samples() == src1.num_samples());
+            DLIB_CASSERT(dest.num_samples() == src2.num_samples());
+            DLIB_CASSERT(dest.num_samples() == src3.num_samples());
+            DLIB_CASSERT(rectangle(0,0, dest.size()/dest.num_samples()-1, dest.num_samples()-1).contains(rect));
+
+
+            auto d = dest.host();
+            auto s1 = src1.host();
+            auto s2 = src2.host();
+            auto s3 = src3.host();
+
+            const auto nc = dest.size()/dest.num_samples();
+
+            for (long r = rect.top(); r <= rect.bottom(); ++r)
+            {
+                for (long c = rect.left(); c <= rect.right(); ++c)
+                {
+                    auto idx = r*nc + c;
+                    d[idx] = s1[idx]*A + s2[idx]*B + s3[idx]*C;
+                }
+            }
+
+        }
+
     // -----------------------------------------------------------------------------------
 
         void compute_adam_update (

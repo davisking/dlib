@@ -319,8 +319,8 @@ namespace dlib
                         ptype temp = temp_img[r-2][c] + 
                                     temp_img[r-1][c]*4 +  
                                     temp_img[r  ][c]*6 +  
-                                    temp_img[r-1][c]*4 +  
-                                    temp_img[r-2][c];  
+                                    temp_img[r+1][c]*4 +  
+                                    temp_img[r+2][c];  
 
                         assign_pixel(down[dr][c],temp/256);
                     }
@@ -443,18 +443,18 @@ namespace dlib
                         temp.red = temp_img[r-2][c].red + 
                                 temp_img[r-1][c].red*4 +  
                                 temp_img[r  ][c].red*6 +  
-                                temp_img[r-1][c].red*4 +  
-                                temp_img[r-2][c].red;  
+                                temp_img[r+1][c].red*4 +  
+                                temp_img[r+2][c].red;  
                         temp.green = temp_img[r-2][c].green + 
                                     temp_img[r-1][c].green*4 +  
                                     temp_img[r  ][c].green*6 +  
-                                    temp_img[r-1][c].green*4 +  
-                                    temp_img[r-2][c].green;  
+                                    temp_img[r+1][c].green*4 +  
+                                    temp_img[r+2][c].green;  
                         temp.blue = temp_img[r-2][c].blue + 
                                     temp_img[r-1][c].blue*4 +  
                                     temp_img[r  ][c].blue*6 +  
-                                    temp_img[r-1][c].blue*4 +  
-                                    temp_img[r-2][c].blue;  
+                                    temp_img[r+1][c].blue*4 +  
+                                    temp_img[r+2][c].blue;  
 
                         down[dr][c].red = temp.red/256;
                         down[dr][c].green = temp.green/256;

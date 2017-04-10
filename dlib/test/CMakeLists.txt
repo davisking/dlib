@@ -174,7 +174,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 
-TARGET_LINK_LIBRARIES(${target_name} dlib )
+TARGET_LINK_LIBRARIES(${target_name} dlib::dlib )
 
 
 if (NOT DLIB_NO_GUI_SUPPORT)

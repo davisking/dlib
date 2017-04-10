@@ -27,28 +27,26 @@ endif()
 # is used.
 cmake_policy(SET CMP0023 OLD)
 
-include(cmake_utils/add_global_compiler_switch.cmake)
 
+macro (enable_preprocessor_switch option_name)
+   list(APPEND active_preprocessor_switches "-D${option_name}")
+endmacro()
 
-if (DLIB_IN_PROJECT_BUILD)
-   # Make sure ENABLE_ASSERTS is defined for debug builds, but only for uses
-   # who are building an application.  If they are just building dlib as a
-   # stand alone library then don't set this because it will conflict with the
-   # settings in config.h if we did.
-   if (NOT CMAKE_CXX_FLAGS_DEBUG MATCHES "-DENABLE_ASSERTS")
-      set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_ASSERTS" 
-         CACHE STRING "Flags used by the compiler during C++ debug builds." 
-         FORCE)
+macro (disable_preprocessor_switch option_name)
+   if (active_preprocessor_switches)
+      list(REMOVE_ITEM active_preprocessor_switches "-D${option_name}")
    endif()
-endif()
+endmacro()
 
 macro (toggle_preprocessor_switch option_name)
    if (${option_name})
-      add_global_define(${option_name})
+      enable_preprocessor_switch(${option_name})
    else()
-      remove_global_define(${option_name})
+      disable_preprocessor_switch(${option_name})
    endif()
 endmacro()
+
+
 
 # Suppress superfluous randlib warnings about libdlib.a having no symbols on MacOSX.
 if (APPLE)
@@ -72,8 +70,6 @@ if (NOT TARGET dlib)
    "Enable this if you don't want to compile any of the dlib GUI code" )
    set (DLIB_ENABLE_STACK_TRACE_STR 
    "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
-   set (DLIB_ENABLE_ASSERTS_STR 
-   "Enable this if you want to turn on the DLIB_ASSERT macro" )
    set (DLIB_USE_BLAS_STR
    "Disable this if you don't want to use a BLAS library" )
    set (DLIB_USE_LAPACK_STR
@@ -91,7 +87,11 @@ if (NOT TARGET dlib)
    #set (DLIB_USE_FFTW_STR "Disable this if you don't want to link against fftw" )
    set (DLIB_USE_MKL_FFT_STR
    "Disable this is you don't want to use the MKL DFTI FFT implementation" )
+   set (DLIB_ENABLE_ASSERTS_STR
+   "Enable this if you want to turn on the DLIB_ASSERT macro" )
 
+
+   option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
    option(DLIB_ISO_CPP_ONLY ${DLIB_ISO_CPP_ONLY_STR} OFF)
    toggle_preprocessor_switch(DLIB_ISO_CPP_ONLY)
    option(DLIB_NO_GUI_SUPPORT ${DLIB_NO_GUI_SUPPORT_STR} OFF)
@@ -99,27 +99,32 @@ if (NOT TARGET dlib)
    option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
    toggle_preprocessor_switch(DLIB_ENABLE_STACK_TRACE)
 
-   option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
    if(DLIB_ENABLE_ASSERTS)
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS false)
       set (ENABLE_ASSERTS true) 
-      add_global_define(ENABLE_ASSERTS)
-      remove_global_define(DLIB_DISABLE_ASSERTS)
+      enable_preprocessor_switch(ENABLE_ASSERTS)
+      disable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
    else()
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS true)
       set (ENABLE_ASSERTS false) 
-      remove_global_define(ENABLE_ASSERTS)
-      # Never force the asserts off when doing an in project build.  Instead,
-      # let the debug/release mode setting toggle asserts on or off (or the
-      # DLIB_ENABLE_ASSERTS option obviously).  That is, even if the
-      # DLIB_ENABLE_ASSERTS option is off debug mode can still cause the
-      # asserts to turn on when using an in project build. 
+      disable_preprocessor_switch(ENABLE_ASSERTS)
+      # Never force the asserts off when doing an in project build.  The only
+      # time this matters is when using visual studio.  The visual studio IDE
+      # has a drop down that lets the user select either release or debug
+      # builds.  The DLIB_ASSERT macro is setup to enable/disable automatically
+      # based on this drop down (via preprocessor magic).  However, if
+      # DLIB_DISABLE_ASSERTS is defined it permanently disables asserts no
+      # matter what, which would defeat the visual studio drop down.  So here
+      # we make a point to not do that kind of severe disabling when in a
+      # project build.  It should also be pointed out that DLIB_DISABLE_ASSERTS
+      # is only needed when building and installing dlib as a separately
+      # installed library.  It doesn't matter when doing an in project build. 
       if (NOT DLIB_IN_PROJECT_BUILD)
-         add_global_define(DLIB_DISABLE_ASSERTS)
+         enable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
       endif()
    endif()
 
@@ -234,7 +239,7 @@ if (NOT TARGET dlib)
                # If both X11 and anaconda are installed, it's possible for the
                # anaconda path to appear before /opt/X11, so we remove anaconda.
                foreach (ITR ${X11_INCLUDE_DIR})
-                  if ("${ITR}" MATCHES "(.*)anaconda(.*)")
+                  if ("${ITR}" MATCHES "(.*)(ana|mini)conda(.*)")
                      list (REMOVE_ITEM X11_INCLUDE_DIR ${ITR})
                   endif ()
                endforeach(ITR)
@@ -265,7 +270,7 @@ if (NOT TARGET dlib)
                message(" *** You can download XQuartz from: http://xquartz.macosforge.org/landing/ ***")
                message(" *****************************************************************************")
                set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
-               add_global_define(DLIB_NO_GUI_SUPPORT)
+               enable_preprocessor_switch(DLIB_NO_GUI_SUPPORT)
             endif()
          endif()
 
@@ -295,7 +300,7 @@ if (NOT TARGET dlib)
                message(" *** On Ubuntu run: sudo apt-get install libx11-dev                        ***")
                message(" *****************************************************************************")
                set(DLIB_NO_GUI_SUPPORT ON CACHE STRING ${DLIB_NO_GUI_SUPPORT_STR} FORCE )
-               add_global_define(DLIB_NO_GUI_SUPPORT)
+               enable_preprocessor_switch(DLIB_NO_GUI_SUPPORT)
             endif()
          endif()
 
@@ -524,6 +529,7 @@ if (NOT TARGET dlib)
             # magic in the standard C++ header files (since nvcc uses gcc headers on
             # linux).
             list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-D__STRICT_ANSI__;-D_MWAITXINTRIN_H_INCLUDED;-D_FORCE_INLINES;${FLAGS_FOR_NVCC}")
+            list(APPEND CUDA_NVCC_FLAGS ${active_preprocessor_switches})
             if (NOT MSVC)
                list(APPEND CUDA_NVCC_FLAGS "-std=c++11")
             endif()
@@ -568,21 +574,44 @@ if (NOT TARGET dlib)
                   endif()
                endif()
             endif()
-         endif()
 
+            # Find where cuSOLVER is since the FindCUDA cmake package doesn't
+            # bother to look for it.
+            get_filename_component(cuda_blas_path "${CUDA_CUBLAS_LIBRARIES}" DIRECTORY)
+            find_library(cusolver cusolver HINTS ${cuda_blas_path})
+            mark_as_advanced(cusolver)
+            # Also find OpenMP since cuSOLVER needs it.  Importantly, we only
+            # look for one to link to if our use of BLAS, specifically the
+            # Intel MKL, hasn't already decided what to use.  This is because
+            # it makes the MKL bug out if you link to another openmp lib other
+            # than Intel's when you use the MKL.
+            if (NOT openmp_libarires AND NOT MSVC)
+               find_package(OpenMP)
+               if (OPENMP_FOUND)
+                  set(openmp_libarires ${OpenMP_CXX_FLAGS}) 
+               else()
+                  message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
+                  set(CUDA_FOUND 0)
+               endif()
+            endif()
+         endif()
 
          if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked)
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
                dnn/cublas_dlibapi.cpp
+               dnn/cusolver_dlibapi.cu
                dnn/curand_dlibapi.cpp
+               dnn/cuda_data_ptr.cpp
                dnn/gpu_data.cpp
                )
             set(dlib_needed_libraries ${dlib_needed_libraries} 
                                       ${CUDA_CUBLAS_LIBRARIES} 
                                       ${cudnn}
                                       ${CUDA_curand_LIBRARY}
+                                      ${cusolver}
+                                      ${openmp_libarires}
                                       )
             include_directories(${cudnn_include})
          else()
@@ -647,6 +676,11 @@ if (NOT TARGET dlib)
                                  PUBLIC ${dlib_needed_includes}
                                  )
       target_link_libraries(dlib PRIVATE ${dlib_needed_libraries})
+      if (DLIB_IN_PROJECT_BUILD)
+         target_compile_options(dlib PUBLIC ${active_preprocessor_switches})
+      else()
+         target_compile_options(dlib PRIVATE ${active_preprocessor_switches})
+      endif()
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
          if (DLIB_USE_CUDA)
             cuda_add_library(dlib_shared SHARED ${source_files} )
@@ -661,6 +695,7 @@ if (NOT TARGET dlib)
                                     PUBLIC ${dlib_needed_includes}
                                     )
          target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
+         target_compile_options(dlib_shared PRIVATE ${active_preprocessor_switches})
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
@@ -669,6 +704,7 @@ if (NOT TARGET dlib)
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
       ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
       target_link_libraries(dlib_all_source_cpp dlib)
+      target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
    endif()
 
    # Install the library
