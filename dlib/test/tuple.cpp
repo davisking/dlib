@@ -18,7 +18,7 @@ namespace
 
     logger dlog("test.tuple");
 
-    struct nil 
+    struct s_nil
     {
         template <typename T>
         void operator() (
@@ -122,10 +122,10 @@ namespace
             b = a;
 
             inc i;
-            nil n;
+            s_nil n;
             a.for_each(inc());
             a.for_each(i);
-            const_cast<const T&>(a).for_each(nil());
+            const_cast<const T&>(a).for_each(s_nil());
             const_cast<const T&>(a).for_each(n);
 
             DLIB_TEST(a.get<0>() == b.get<0>()+2);
@@ -145,7 +145,7 @@ namespace
             a.for_index(i,0);
             a.for_index(inc(),1);
             const_cast<const T&>(a).for_index(n,2);
-            const_cast<const T&>(a).for_index(nil(),0);
+            const_cast<const T&>(a).for_index(s_nil(),0);
 
             DLIB_TEST(a.get<0>() == b.get<0>()+1);
             DLIB_TEST(a.get<1>() == b.get<1>()+1);
