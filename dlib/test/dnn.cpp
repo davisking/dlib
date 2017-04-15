@@ -8,6 +8,7 @@
 #include <ctime>
 #include <vector>
 #include <random>
+#include <numeric>
 #include "../dnn.h"
 
 #include "tester.h"
@@ -1887,6 +1888,119 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_multiclass_matrixoutput()
+    {
+        // "Semantic segmentation" - see https://github.com/davisking/dlib/issues/288
+
+        constexpr int input_height = 5;
+        constexpr int input_width = 7;
+        constexpr int output_height = input_height;
+        constexpr int output_width = input_width;
+        const int num_samples = 1000;
+        const int num_classes = 6;
+        const double noise_probability = 0.05;
+
+        ::std::default_random_engine generator(16);
+        ::std::bernoulli_distribution noise_occurrence(noise_probability);
+        ::std::uniform_int_distribution<unsigned long> noisy_label(0, num_classes - 1);
+
+        ::std::vector<matrix<double>> x(num_samples);
+        ::std::vector<matrix<unsigned long>> y(num_samples);
+
+        ::std::vector<int> truth_histogram(num_classes);
+
+        matrix<double> xtmp(input_height, input_width);
+        matrix<unsigned long> ytmp(output_height, output_width);
+
+        // The function to be learned.
+        const auto ground_truth = [num_classes](const matrix<double>& x, int row, int column) {
+            double sum = 0.0;
+            const int first_column = std::max(0, column - 1);
+            const int last_column = std::min(static_cast<int>(x.nc() - 1), column + 1);
+            for (int c = first_column; c <= last_column; ++c) {
+                sum += x(row, c);
+            }
+            DLIB_TEST(sum < num_classes);
+            return static_cast<unsigned long>(sum);
+        };
+
+        for ( int ii = 0; ii < num_samples; ++ii ) {
+            for ( int jj = 0; jj < input_height; ++jj ) {
+                for ( int kk = 0; kk < input_width; ++kk ) {
+                    // Generate numbers between 0 and 2.
+                    double value = static_cast<double>(ii + jj + kk) / 10.0;
+                    value -= (static_cast<int>(value) / 2) * 2;
+                    DLIB_TEST(value >= 0.0 && value < 2.0);
+                    xtmp(jj, kk) = value;
+                }
+            }
+            x[ii] = xtmp;
+
+            for ( int jj = 0; jj < output_height; ++jj ) {
+                for ( int kk = 0; kk < output_width; ++kk ) {
+                    unsigned long truth = ground_truth(x[ii], jj, kk);
+                    DLIB_TEST(truth < num_classes);
+                    ++truth_histogram[truth];
+                    if (noise_occurrence(generator)) {
+                        ytmp(jj, kk) = noisy_label(generator);
+                    }
+                    else {
+                        ytmp(jj, kk) = truth;
+                    }
+                }
+            }
+
+            y[ii] = ytmp;
+        }
+
+        const int num_total_elements = num_samples * output_height * output_width;
+
+        { // Require a reasonably balanced truth histogram in order to make sure that a trivial classifier is not enough
+            const int required_min_histogram_value = static_cast<int>(::std::ceil(num_total_elements / num_classes * 0.375));
+            for (auto histogram_value : truth_histogram) {
+                DLIB_TEST_MSG(histogram_value >= required_min_histogram_value,
+                              "Histogram value = " << histogram_value << ", required = " << required_min_histogram_value);
+            }
+        }
+
+        using net_type = loss_multiclass_log_matrixoutput<bn_con<con<num_classes,1,input_width,1,1,input<matrix<double>>>>>;
+        net_type net;
+        sgd defsolver(0,0.9);
+        dnn_trainer<net_type> trainer(net, defsolver);
+        trainer.set_learning_rate(1e-3);
+        trainer.set_min_learning_rate(1e-4);
+        trainer.set_mini_batch_size(50);
+        trainer.set_max_num_epochs(50);
+        trainer.train(x, y);
+
+        const ::std::vector<matrix<unsigned long>> predictions = net(x);
+
+        int num_correct = 0;
+
+        for ( int ii = 0; ii < num_samples; ++ii ) {
+            const matrix<unsigned long>& prediction = predictions[ii];
+            DLIB_TEST(prediction.nr() == output_height);
+            DLIB_TEST(prediction.nc() == output_width);
+            for ( int jj = 0; jj < output_height; ++jj )
+                for ( int kk = 0; kk < output_width; ++kk )
+                    if ( prediction(jj, kk) == ground_truth(x[ii], jj, kk) )
+                        ++num_correct;
+        }
+
+        // First some sanity checks.
+        const int num_correct_max = num_total_elements;
+        DLIB_TEST(num_correct_max == ::std::accumulate(truth_histogram.begin(), truth_histogram.end(), 0));
+        DLIB_TEST_MSG(num_correct <= num_correct_max,
+                      "Number of correctly classified elements = " << num_correct << ", max = " << num_correct_max);
+
+        // This is the real test, verifying that we have actually learned something.
+        const int num_correct_required = static_cast<int>(::std::ceil(0.9 * num_correct_max));
+        DLIB_TEST_MSG(num_correct >= num_correct_required,
+                      "Number of correctly classified elements = " << num_correct << ", required = " << num_correct_required);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -1955,6 +2069,7 @@ namespace
             test_concat();
             test_simple_linear_regression();
             test_multioutput_linear_regression();
+            test_multiclass_matrixoutput();
         }
 
         void perform_test()
