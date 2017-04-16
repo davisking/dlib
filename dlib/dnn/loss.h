@@ -1341,17 +1341,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    // In semantic segmentation, 65535 classes ought to be enough for anybody.
+    typedef unsigned short matrixoutput_label_t;
+
     // In semantic segmentation, if you don't know the ground-truth of some pixel,
     // set the label of that pixel to this value. When you do so, the pixel will be
     // ignored when computing gradients.
-    static const unsigned long label_to_ignore = std::numeric_limits<unsigned long>::max();
+    static const matrixoutput_label_t label_to_ignore = std::numeric_limits<matrixoutput_label_t>::max();
 
     class loss_multiclass_log_matrixoutput_
     {
     public:
 
-        typedef matrix<unsigned long> training_label_type;
-        typedef matrix<unsigned long> output_label_type;
+        typedef matrix<matrixoutput_label_t> training_label_type;
+        typedef matrix<matrixoutput_label_t> output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -1368,18 +1371,19 @@ namespace dlib
             const tensor& output_tensor = sub.get_output();
 
             DLIB_CASSERT(output_tensor.k() >= 1); // Note that output_tensor.k() should match the number of labels.
+            DLIB_CASSERT(output_tensor.k() < std::numeric_limits<matrixoutput_label_t>::max());
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
 
             const float* const out_data = output_tensor.host();
 
             // The index of the largest output for each element is the label.
             const auto find_label = [&](long sample, long r, long c) {
-                long label = 0;
+                matrixoutput_label_t label = 0;
                 float max_value = out_data[tensor_index(output_tensor, sample, r, c, 0)];
                 for (long k = 1; k < output_tensor.k(); ++k) {
                     const float value = out_data[tensor_index(output_tensor, sample, r, c, k)];
                     if (value > max_value) {
-                        label = k;
+                        label = static_cast<matrixoutput_label_t>(k);
                         max_value = value;
                     }
                 }
@@ -1387,7 +1391,7 @@ namespace dlib
             };
 
             for (long i = 0; i < output_tensor.num_samples(); ++i, ++iter) {
-                *iter = matrix<unsigned long>(output_tensor.nr(), output_tensor.nc());
+                *iter = matrix<matrixoutput_label_t>(output_tensor.nr(), output_tensor.nc());
                 for (long r = 0; r < output_tensor.nr(); ++r) {
                     for (long c = 0; c < output_tensor.nc(); ++c) {
                         // The index of the largest output for this element is the label.
@@ -1416,6 +1420,7 @@ namespace dlib
             DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
             DLIB_CASSERT(output_tensor.k() >= 1);
+            DLIB_CASSERT(output_tensor.k() < std::numeric_limits<matrixoutput_label_t>::max());
             DLIB_CASSERT(output_tensor.nr() == grad.nr() &&
                          output_tensor.nc() == grad.nc() &&
                          output_tensor.k() == grad.k());
@@ -1438,7 +1443,7 @@ namespace dlib
                 {
                     for (long c = 0; c < output_tensor.nc(); ++c)
                     {
-                        const unsigned long y = truth->operator()(r, c);
+                        const matrixoutput_label_t y = truth->operator()(r, c);
                         // The network must produce a number of outputs that is equal to the number
                         // of labels when using this type of loss.
                         DLIB_CASSERT(static_cast<long>(y) < output_tensor.k() || y == label_to_ignore,
@@ -1446,14 +1451,14 @@ namespace dlib
                         for (long k = 0; k < output_tensor.k(); ++k)
                         {
                             const size_t idx = tensor_index(output_tensor, i, r, c, k);
-                            if (y == label_to_ignore)
-                            {
-                                g[idx] = 0.0;
-                            }
-                            else if (k == y)
+                            if (k == y)
                             {
                                 loss += scale*-std::log(g[idx]);
                                 g[idx] = scale*(g[idx] - 1);
+                            }
+                            else if (y == label_to_ignore)
+                            {
+                                g[idx] = 0.f;
                             }
                             else
                             {

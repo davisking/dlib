@@ -1904,15 +1904,15 @@ namespace
         ::std::default_random_engine generator(16);
         ::std::bernoulli_distribution ignore(ignore_probability);
         ::std::bernoulli_distribution noise_occurrence(noise_probability);
-        ::std::uniform_int_distribution<unsigned long> noisy_label(0, num_classes - 1);
+        ::std::uniform_int_distribution<matrixoutput_label_t> noisy_label(0, num_classes - 1);
 
         ::std::vector<matrix<double>> x(num_samples);
-        ::std::vector<matrix<unsigned long>> y(num_samples);
+        ::std::vector<matrix<matrixoutput_label_t>> y(num_samples);
 
         ::std::vector<int> truth_histogram(num_classes);
 
         matrix<double> xtmp(input_height, input_width);
-        matrix<unsigned long> ytmp(output_height, output_width);
+        matrix<matrixoutput_label_t> ytmp(output_height, output_width);
 
         // The function to be learned.
         const auto ground_truth = [num_classes](const matrix<double>& x, int row, int column) {
@@ -1923,7 +1923,7 @@ namespace
                 sum += x(row, c);
             }
             DLIB_TEST(sum < num_classes);
-            return static_cast<unsigned long>(sum);
+            return static_cast<matrixoutput_label_t>(sum);
         };
 
         for ( int ii = 0; ii < num_samples; ++ii ) {
@@ -1940,7 +1940,7 @@ namespace
 
             for ( int jj = 0; jj < output_height; ++jj ) {
                 for ( int kk = 0; kk < output_width; ++kk ) {
-                    unsigned long truth = ground_truth(x[ii], jj, kk);
+                    matrixoutput_label_t truth = ground_truth(x[ii], jj, kk);
                     DLIB_TEST(truth < num_classes);
                     ++truth_histogram[truth];
                     if (ignore(generator)) {
@@ -1978,12 +1978,12 @@ namespace
         trainer.set_max_num_epochs(170);
         trainer.train(x, y);
 
-        const ::std::vector<matrix<unsigned long>> predictions = net(x);
+        const ::std::vector<matrix<matrixoutput_label_t>> predictions = net(x);
 
         int num_correct = 0;
 
         for ( int ii = 0; ii < num_samples; ++ii ) {
-            const matrix<unsigned long>& prediction = predictions[ii];
+            const matrix<matrixoutput_label_t>& prediction = predictions[ii];
             DLIB_TEST(prediction.nr() == output_height);
             DLIB_TEST(prediction.nc() == output_width);
             for ( int jj = 0; jj < output_height; ++jj )

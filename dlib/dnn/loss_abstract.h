@@ -769,6 +769,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    // In semantic segmentation, 65535 classes ought to be enough for anybody.
+    typedef unsigned short matrixoutput_label_t;
+
     class loss_multiclass_log_matrixoutput_
     {
         /*!
@@ -783,8 +786,8 @@ namespace dlib
         !*/
     public:
 
-        typedef matrix<unsigned long> training_label_type;
-        typedef matrix<unsigned long> output_label_type;
+        typedef matrix<matrixoutput_label_t> training_label_type;
+        typedef matrix<matrixoutput_label_t> output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -818,7 +821,7 @@ namespace dlib
             except it has the additional calling requirements that:
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
-                - all values pointed to by truth are < sub.get_output().k() (or std::numeric_limits<unsigned long>::max() to ignore)
+                - all values pointed to by truth are < sub.get_output().k() (or std::numeric_limits<matrixoutput_label_t>::max() to ignore)
         !*/
 
     };
