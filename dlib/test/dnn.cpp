@@ -1972,8 +1972,8 @@ namespace
         net_type net;
         sgd defsolver(0,0.9);
         dnn_trainer<net_type> trainer(net, defsolver);
-        trainer.set_learning_rate(1e-3);
-        trainer.set_min_learning_rate(1e-4);
+        trainer.set_learning_rate(0.1);
+        trainer.set_min_learning_rate(0.01);
         trainer.set_mini_batch_size(50);
         trainer.set_max_num_epochs(170);
         trainer.train(x, y);
