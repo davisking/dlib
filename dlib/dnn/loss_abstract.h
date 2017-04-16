@@ -818,7 +818,7 @@ namespace dlib
             except it has the additional calling requirements that:
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
-                - all values pointed to by truth are < sub.get_output().k()
+                - all values pointed to by truth are < sub.get_output().k() (or std::numeric_limits<unsigned long>::max() to ignore)
         !*/
 
     };

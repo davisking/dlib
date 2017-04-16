@@ -1341,6 +1341,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    // In semantic segmentation, if you don't know the ground-truth of some pixel,
+    // set the label of that pixel to this value. When you do so, the pixel will be
+    // ignored when computing gradients.
+    static const unsigned long label_to_ignore = std::numeric_limits<unsigned long>::max();
+
     class loss_multiclass_log_matrixoutput_
     {
     public:
@@ -1436,11 +1441,16 @@ namespace dlib
                         const unsigned long y = truth->operator()(r, c);
                         // The network must produce a number of outputs that is equal to the number
                         // of labels when using this type of loss.
-                        DLIB_CASSERT(static_cast<long>(y) < output_tensor.k(), "y: " << y << ", output_tensor.k(): " << output_tensor.k());
+                        DLIB_CASSERT(static_cast<long>(y) < output_tensor.k() || y == label_to_ignore,
+                                        "y: " << y << ", output_tensor.k(): " << output_tensor.k());
                         for (long k = 0; k < output_tensor.k(); ++k)
                         {
                             const size_t idx = tensor_index(output_tensor, i, r, c, k);
-                            if (k == y)
+                            if (y == label_to_ignore)
+                            {
+                                g[idx] = 0.0;
+                            }
+                            else if (k == y)
                             {
                                 loss += scale*-std::log(g[idx]);
                                 g[idx] = scale*(g[idx] - 1);

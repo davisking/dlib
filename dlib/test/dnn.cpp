@@ -1898,9 +1898,11 @@ namespace
         constexpr int output_width = input_width;
         const int num_samples = 1000;
         const int num_classes = 6;
+        const double ignore_probability = 0.5;
         const double noise_probability = 0.05;
 
         ::std::default_random_engine generator(16);
+        ::std::bernoulli_distribution ignore(ignore_probability);
         ::std::bernoulli_distribution noise_occurrence(noise_probability);
         ::std::uniform_int_distribution<unsigned long> noisy_label(0, num_classes - 1);
 
@@ -1941,7 +1943,10 @@ namespace
                     unsigned long truth = ground_truth(x[ii], jj, kk);
                     DLIB_TEST(truth < num_classes);
                     ++truth_histogram[truth];
-                    if (noise_occurrence(generator)) {
+                    if (ignore(generator)) {
+                        ytmp(jj, kk) = label_to_ignore;
+                    }
+                    else if (noise_occurrence(generator)) {
                         ytmp(jj, kk) = noisy_label(generator);
                     }
                     else {
@@ -1970,7 +1975,7 @@ namespace
         trainer.set_learning_rate(1e-3);
         trainer.set_min_learning_rate(1e-4);
         trainer.set_mini_batch_size(50);
-        trainer.set_max_num_epochs(50);
+        trainer.set_max_num_epochs(170);
         trainer.train(x, y);
 
         const ::std::vector<matrix<unsigned long>> predictions = net(x);
