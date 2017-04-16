@@ -742,8 +742,6 @@ if (NOT TARGET dlib)
        configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 
-       install(FILES "LICENSE.txt" DESTINATION ${CMAKE_INSTALL_DOCDIR})
-
        ## Config.cmake generation and installation
 
        set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
