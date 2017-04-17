@@ -1349,7 +1349,7 @@ namespace dlib
     // ignored when computing gradients.
     static const matrixoutput_label_t label_to_ignore = std::numeric_limits<matrixoutput_label_t>::max();
 
-    class loss_multiclass_log_matrixoutput_
+    class loss_multiclass_log_per_pixel_
     {
     public:
 
@@ -1471,28 +1471,28 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_multiclass_log_matrixoutput_& , std::ostream& out)
+        friend void serialize(const loss_multiclass_log_per_pixel_& , std::ostream& out)
         {
-            serialize("loss_multiclass_log_matrixoutput_", out);
+            serialize("loss_multiclass_log_per_pixel_", out);
         }
 
-        friend void deserialize(loss_multiclass_log_matrixoutput_& , std::istream& in)
+        friend void deserialize(loss_multiclass_log_per_pixel_& , std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "loss_multiclass_log_matrixoutput_")
+            if (version != "loss_multiclass_log_per_pixel_")
                 throw serialization_error("Unexpected version found while deserializing dlib::loss_multiclass_log_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const loss_multiclass_log_matrixoutput_& )
+        friend std::ostream& operator<<(std::ostream& out, const loss_multiclass_log_per_pixel_& )
         {
-            out << "loss_multiclass_log_matrixoutput";
+            out << "loss_multiclass_log_per_pixel";
             return out;
         }
 
-        friend void to_xml(const loss_multiclass_log_matrixoutput_& /*item*/, std::ostream& out)
+        friend void to_xml(const loss_multiclass_log_per_pixel_& /*item*/, std::ostream& out)
         {
-            out << "<loss_multiclass_log_matrixoutput/>";
+            out << "<loss_multiclass_log_per_pixel/>";
         }
 
     private:
@@ -1505,7 +1505,7 @@ namespace dlib
     };
 
     template <typename SUBNET>
-    using loss_multiclass_log_matrixoutput = add_loss_layer<loss_multiclass_log_matrixoutput_, SUBNET>;
+    using loss_multiclass_log_per_pixel = add_loss_layer<loss_multiclass_log_per_pixel_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

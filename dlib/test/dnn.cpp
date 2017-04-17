@@ -1888,7 +1888,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    void test_multiclass_matrixoutput()
+    void test_multiclass_per_pixel()
     {
         // "Semantic segmentation" - see https://github.com/davisking/dlib/issues/288
 
@@ -1968,7 +1968,7 @@ namespace
             }
         }
 
-        using net_type = loss_multiclass_log_matrixoutput<bn_con<con<num_classes,1,input_width,1,1,input<matrix<double>>>>>;
+        using net_type = loss_multiclass_log_per_pixel<bn_con<con<num_classes,1,input_width,1,1,input<matrix<double>>>>>;
         net_type net;
         sgd defsolver(0,0.9);
         dnn_trainer<net_type> trainer(net, defsolver);
@@ -2074,7 +2074,7 @@ namespace
             test_concat();
             test_simple_linear_regression();
             test_multioutput_linear_regression();
-            test_multiclass_matrixoutput();
+            test_multiclass_per_pixel();
         }
 
         void perform_test()

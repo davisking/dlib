@@ -772,7 +772,7 @@ namespace dlib
     // In semantic segmentation, 65535 classes ought to be enough for anybody.
     typedef unsigned short matrixoutput_label_t;
 
-    class loss_multiclass_log_matrixoutput_
+    class loss_multiclass_log_per_pixel_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -827,7 +827,7 @@ namespace dlib
     };
 
     template <typename SUBNET>
-    using loss_multiclass_log_matrixoutput = add_loss_layer<loss_multiclass_log_matrixoutput_, SUBNET>;
+    using loss_multiclass_log_per_pixel = add_loss_layer<loss_multiclass_log_per_pixel_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
