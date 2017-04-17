@@ -1391,7 +1391,7 @@ namespace dlib
             };
 
             for (long i = 0; i < output_tensor.num_samples(); ++i, ++iter) {
-                *iter = matrix<matrixoutput_label_t>(output_tensor.nr(), output_tensor.nc());
+                iter->set_size(output_tensor.nr(), output_tensor.nc());
                 for (long r = 0; r < output_tensor.nr(); ++r) {
                     for (long c = 0; c < output_tensor.nc(); ++c) {
                         // The index of the largest output for this element is the label.
