@@ -1888,9 +1888,225 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    void test_multiclass_per_pixel()
+    void test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task()
+    {
+        print_spinner();
+
+        constexpr uint16_t num_classes = 7;
+        constexpr uint16_t true_label = num_classes / 2;
+
+        ::std::vector<matrix<float>> x({ matrix<float,1,1>({ 1 }) });
+        ::std::vector<matrix<uint16_t>> y({ matrix<uint16_t,1,1>({ true_label }) });
+
+        using net_type = loss_multiclass_log_per_pixel<con<num_classes,1,1,1,1,input<matrix<float>>>>;
+        net_type net;
+
+        dnn_trainer<net_type> trainer(net, sgd(0,0));
+        trainer.set_learning_rate(1e7);
+        trainer.set_max_num_epochs(1);
+        trainer.train(x, y);
+
+        const tensor& learned_params = layer<1>(net).layer_details().get_layer_params();
+        const float* learned_params_data = learned_params.host();
+
+        for (int is_bias = 0; is_bias <= 1; ++is_bias) {
+            for (uint16_t k = 0; k < num_classes; ++k) {
+                size_t index = k + is_bias * num_classes;
+                DLIB_CASSERT(index < learned_params.size());
+                if (k == true_label) {
+                    DLIB_TEST(learned_params_data[index] > 1e5);
+                }
+                else {
+                    DLIB_TEST(learned_params_data[index] < -1e5);
+                }
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------------------------
+
+    void test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task()
+    {
+        print_spinner();
+
+        constexpr int input_height = 35;
+        constexpr int input_width = 27;
+        constexpr int output_height = input_height;
+        constexpr int output_width = input_width;
+        constexpr int num_samples = 7;
+        constexpr int num_classes = 5;
+
+        ::std::vector<matrix<float>> x(num_samples);
+        ::std::vector<matrix<uint16_t>> y(num_samples);
+
+        matrix<float> xtmp(input_height, input_width);
+        matrix<uint16_t> ytmp(output_height, output_width);
+
+        ::std::default_random_engine generator(16);
+        ::std::bernoulli_distribution coinflip(0.5);
+
+        using filter_type = con<num_classes,1,1,1,1,input<matrix<float>>>;
+
+        // Define a "truth" filter
+        filter_type truth_filter;
+        truth_filter(xtmp); // Set up the convolutional layer
+
+        // Generate training data
+        for (int ii = 0; ii < num_samples; ++ii) {
+            // Generate random inputs x
+            for (int jj = 0; jj < input_height; ++jj)
+                for (int kk = 0; kk < input_width; ++kk)
+                    xtmp(jj, kk) = coinflip(generator) ? 1.f : -1.f;
+            x[ii] = xtmp;
+
+            // Generate target output y by applying the truth filter on x
+            const tensor& output = truth_filter(xtmp);
+            const float* const out_data = output.host();
+
+            const auto out_element = [&](int row, int column, int k) {
+                return out_data[(k * output.nr() + row) * output.nc() + column];
+            };
+
+            for (int jj = 0; jj < output_height; ++jj) {
+                for (int kk = 0; kk < output_width; ++kk) {
+                    uint16_t label = 0;
+                    float max_value = out_element(jj, kk, 0);
+                    for (long k = 1; k < num_classes; ++k) {
+                        const float value = out_element(jj, kk, k);
+                        if (value > max_value) {
+                            label = static_cast<uint16_t>(k);
+                            max_value = value;
+                        }
+                    }
+                    ytmp(jj, kk) = label;
+                }
+            }
+            y[ii] = ytmp;
+        }
+
+        using net_type = loss_multiclass_log_per_pixel<filter_type>;
+        net_type net;
+
+        dnn_trainer<net_type> trainer(net, sgd(0,0));
+        trainer.set_learning_rate(1e6);
+        trainer.set_max_num_epochs(1);
+        trainer.train(x, y);
+
+        // Feed forward the training samples.
+        resizable_tensor temp_tensor;
+        net.subnet().to_tensor(&x[0], &x[0] + num_samples, temp_tensor);
+        net.subnet().forward(temp_tensor);
+        const dimpl::subnet_wrapper<filter_type> wsub(net.subnet());
+        const tensor& output_tensor = wsub.get_output();
+        const float* const out_data = output_tensor.host();
+
+        // Let's have a look at the activations before softmax. They should be pretty high
+        // (in terms of absolute value), because the learning task is trivial.
+        for (int ii = 0; ii < num_samples; ++ii) {
+            for (int jj = 0; jj < output_height; ++jj) {
+                for (int kk = 0; kk < output_width; ++kk) {
+                    const uint16_t true_label = y[ii](jj, kk);
+
+                    for (long k = 0; k < num_classes; ++k) {
+                        const size_t index = ((ii * output_tensor.k() + k) * output_tensor.nr() + jj) * output_tensor.nc() + kk;
+                        DLIB_CASSERT(index < output_tensor.size());
+
+                        if (k == true_label) {
+                            DLIB_TEST_MSG(out_data[index] > 1e4, "");
+                        }
+                        else {
+                            DLIB_TEST_MSG(out_data[index] < -1e4, "");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_loss_multiclass_per_pixel_outputs_on_trivial_task()
+    {
+        print_spinner();
+
+        constexpr int input_height = 7;
+        constexpr int input_width = 5;
+        constexpr int output_height = input_height;
+        constexpr int output_width = input_width;
+        constexpr int num_samples = 7;
+        constexpr int num_classes = 5;
+        constexpr int filter_height = 3;
+        constexpr int filter_width = 3;
+
+        ::std::vector<matrix<float>> x(num_samples);
+        ::std::vector<matrix<uint16_t>> y(num_samples);
+
+        matrix<float> xtmp(input_height, input_width);
+        matrix<uint16_t> ytmp(output_height, output_width);
+
+        ::std::default_random_engine generator(16);
+        ::std::bernoulli_distribution coinflip(0.5);
+
+        using filter_type = con<num_classes, filter_height, filter_width, 1, 1, input<matrix<float>>>;
+
+        // Define a "truth" filter
+        filter_type truth_filter;
+        truth_filter(xtmp); // Set up the convolutional layer
+
+        // Generate training data
+        for (int ii = 0; ii < num_samples; ++ii) {
+            // Generate random inputs x
+            for (int jj = 0; jj < input_height; ++jj)
+                for (int kk = 0; kk < input_width; ++kk)
+                    xtmp(jj, kk) = coinflip(generator) ? 1.f : -1.f;
+            x[ii] = xtmp;
+
+            // Generate target output y by applying the truth filter on x
+            const tensor& output = truth_filter(xtmp);
+            const float* const out_data = output.host();
+
+            const auto out_element = [&](int row, int column, int k) {
+                return out_data[(k * output.nr() + row) * output.nc() + column];
+            };
+
+            for (int jj = 0; jj < output_height; ++jj) {
+                for (int kk = 0; kk < output_width; ++kk) {
+                    uint16_t label = 0;
+                    float max_value = out_element(jj, kk, 0);
+                    for (long k = 1; k < num_classes; ++k) {
+                        const float value = out_element(jj, kk, k);
+                        if (value > max_value) {
+                            label = static_cast<uint16_t>(k);
+                            max_value = value;
+                        }
+                    }
+                    ytmp(jj, kk) = label;
+                }
+            }
+            y[ii] = ytmp;
+        }
+
+        using net_type = loss_multiclass_log_per_pixel<filter_type>;
+        net_type net;
+
+        dnn_trainer<net_type> trainer(net, sgd(0, 0.9));
+        trainer.set_learning_rate(1);
+        trainer.set_max_num_epochs(100);
+        trainer.train(x, y);
+
+        // The learning task is separable, so the net should have no problem
+        // getting all the outputs right.
+        DLIB_TEST(net(x) == y);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore()
     {
         // "Semantic segmentation" - see https://github.com/davisking/dlib/issues/288
+        // Test learning when some pixels are to be ignored, etc.
+
+        print_spinner();
 
         constexpr int input_height = 5;
         constexpr int input_width = 7;
@@ -2074,7 +2290,10 @@ namespace
             test_concat();
             test_simple_linear_regression();
             test_multioutput_linear_regression();
-            test_multiclass_per_pixel();
+            test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task();
+            test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task();
+            test_loss_multiclass_per_pixel_outputs_on_trivial_task();
+            test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
         }
 
         void perform_test()
