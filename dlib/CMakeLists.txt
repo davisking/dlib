@@ -7,6 +7,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(dlib)
 
+# Adhere to GNU filesystem layout conventions
+include(GNUInstallDirs)
+
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
 include(cmake_utils/use_cpp_11.cmake)
@@ -709,7 +712,6 @@ if (NOT TARGET dlib)
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
-       set (LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries (e.g. lib32 or lib64 for multilib installations)")
        cmake_minimum_required(VERSION 2.8.8)
        if(UNIX)
            set_target_properties(dlib_shared PROPERTIES
@@ -717,34 +719,32 @@ if (NOT TARGET dlib)
                                         VERSION ${VERSION})
            install(TARGETS dlib dlib_shared
                    EXPORT dlib 
-                   RUNTIME DESTINATION bin # Windows (including cygwin) considers .dll to be runtime artifacts
-                   LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
-                   ARCHIVE DESTINATION "${LIB_INSTALL_DIR}")
+                   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows (including cygwin) considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
        else()
            install(TARGETS dlib
                    EXPORT dlib 
-                   RUNTIME DESTINATION bin # Windows considers .dll to be runtime artifacts
-                   LIBRARY DESTINATION lib
-                   ARCHIVE DESTINATION lib)
+                   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
        endif()
 
-       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION include/dlib
+       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
                FILES_MATCHING PATTERN "*.h" PATTERN "*.cmake"
                REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
 
        configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
        # overwrite config.h with the configured one
-       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION include/dlib)
+       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 
        configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
-       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION include/dlib)
-
-       install(FILES "LICENSE.txt" DESTINATION share/doc/dlib)
+       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 
        ## Config.cmake generation and installation
 
-       set(ConfigPackageLocation "${LIB_INSTALL_DIR}/cmake/dlib")
+       set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
        install(EXPORT dlib
             NAMESPACE dlib::
             DESTINATION ${ConfigPackageLocation})
@@ -768,7 +768,7 @@ if (NOT TARGET dlib)
 
        configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
-           DESTINATION "${LIB_INSTALL_DIR}/pkgconfig")
+           DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
    endif()
 
