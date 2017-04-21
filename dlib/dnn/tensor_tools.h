@@ -99,6 +99,45 @@ namespace dlib { namespace tt
     !*/
 
 // ----------------------------------------------------------------------------------------
+    
+    void exp (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - dest.size() == src.size()
+        ensures
+            - performs: dest = exp(mat(src))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void log (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - dest.size() == src.size()
+        ensures
+            - performs: dest = log(mat(src))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void log10 (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - dest.size() == src.size()
+        ensures
+            - performs: dest = log10(mat(src))
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
     void gemm (
         float beta,

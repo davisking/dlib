@@ -261,6 +261,57 @@ namespace dlib
             }
         }
 
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_exp(float* dest, const float* src, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+                dest[i] = ::exp(src[i]);
+        }
+
+        void exp (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_ASSERT(dest.size() == src.size());
+            launch_kernel(_cuda_exp, max_jobs(src.size()), dest.device(), src.device(), src.size());
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_log(float* dest, const float* src, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+                dest[i] = ::log(src[i]);
+        }
+
+        void log (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_ASSERT(dest.size() == src.size());
+            launch_kernel(_cuda_log, max_jobs(src.size()), dest.device(), src.device(), src.size());
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_log10(float* dest, const float* src, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+                dest[i] = ::log10(src[i]);
+        }
+
+        void log10 (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_ASSERT(dest.size() == src.size());
+            launch_kernel(_cuda_log10, max_jobs(src.size()), dest.device(), src.device(), src.size());
+        }
+
     // -----------------------------------------------------------------------------------
 
         __global__ void _cuda_multiply1(float* d, const float* s1, const float* s2, size_t n)
@@ -1085,7 +1136,8 @@ namespace dlib
                 grad.device(), src.device(), gradient_input.device(), grad.size(),
                 param.device(), params_grad.device());
         }
-        // ----------------------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------------------
 
         void copy_tensor(
                 tensor& dest,
@@ -1117,6 +1169,7 @@ namespace dlib
                 src_p  += src_sample_size;
             }
         }
+
     // ----------------------------------------------------------------------------------------
 
     }
