@@ -1368,27 +1368,28 @@ namespace dlib { namespace tt
 
         resizable_tensor accum_buffer;
     };
-    // ----------------------------------------------------------------------------------------
 
-        void copy_tensor(
-                tensor& dest,
-                size_t dest_k_offset,
-                const tensor& src,
-                size_t src_k_offset,
-                size_t count_k
-        );
-        /*!
-            requires
-                - dest.nc() == src.nc()
-                - dest.nr() == src.nr()
-                - dest.num_samples() == src.num_samples()
-                - dest.k() - dest_k_offset >= count_k
-                - src.k() - src_k_offset >= count_k
-                - is_same_object(dest,src) == false
-            ensures
-                - performs: dest[i, k + dest_k_offset, r, c] = src[i, k + src_k_offset, r, c], where k in [0..count_k]
-                  Copies content of each sample from src in to corresponding place of sample at dest.
-        !*/
+// ----------------------------------------------------------------------------------------
+
+    void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+    );
+    /*!
+        requires
+            - dest.nc() == src.nc()
+            - dest.nr() == src.nr()
+            - dest.num_samples() == src.num_samples()
+            - dest.k() - dest_k_offset >= count_k
+            - src.k() - src_k_offset >= count_k
+            - is_same_object(dest,src) == false
+        ensures
+            - performs: dest[i, k + dest_k_offset, r, c] = src[i, k + src_k_offset, r, c], where k in [0..count_k]
+              Copies content of each sample from src in to corresponding place of sample at dest.
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
