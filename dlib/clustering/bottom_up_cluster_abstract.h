@@ -9,6 +9,31 @@ namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
+    struct bu_cluster
+    {
+        long left;
+        long right;
+        long id;
+        std::vector<long> orig;
+    };
+    /*!  WHAT THIS OBJECT REPRESENTS:
+            This object represents:
+                - a datapoint, or
+                - a union of datapoints, or
+                - a union of unions of datapoints
+                from the dissimilarity matrix 'dists' which is used to track how the datapoints got clustered.
+
+            - id is the identifier for this data point or cluster
+            - left and right is the id of the datapoints or clusters that this node has merged (-1 for just datapoints)
+            - orig contains all merged datapoints that this cluster contains
+    !*/
+
+    std::ostream& operator<< (std::ostream& out, const bu_cluster& cluster);
+    /*!
+        ensures
+            - prints item to out in the form [id,left,right, [id,id,id]].
+    !*/
+
 
     template <
         typename EXP
@@ -17,7 +42,8 @@ namespace dlib
         const matrix_exp<EXP>& dists,
         std::vector<unsigned long>& labels,
         unsigned long min_num_clusters,
-        double max_dist = std::numeric_limits<double>::infinity()
+        double max_dist = std::numeric_limits<double>::infinity(),
+        std::vector<bu_cluster>& history = {};
     );
     /*!
         requires
@@ -26,7 +52,7 @@ namespace dlib
             - dists == trans(dists)
               (l.e. dists should be symmetric)
         ensures
-            - Runs a bottom up agglomerative clustering algorithm.   
+            - Runs a bottom up agglomerative clustering algorithm.
             - Interprets dists as a matrix that gives the distances between dists.nr()
               items.  In particular, we take dists(i,j) to be the distance between the ith
               and jth element of some set.  This function clusters the elements of this set
@@ -34,12 +60,17 @@ namespace dlib
               elements).  Additionally, within each cluster, the maximum pairwise distance
               between any two cluster elements is <= max_dist.
             - returns the number of clusters found.
+            - optionally returns the clustering history.
+                - To track history, pass an initialized vector of size dists.nr(), such that history.size() == dists.nr()
+                - The result is the dendrogram of the bottom-up clustering, saved in history
+                - for i < dists.nr(): the original datapoints
+                - for i >= dists.nr(): merged datapoints
             - #labels.size() == dists.nr()
             - for all valid i:
                 - #labels[i] == the cluster ID of the node with index i (i.e. the node
-                  corresponding to the distances dists(i,*)).  
+                  corresponding to the distances dists(i,*)).
                 - 0 <= #labels[i] < the number of clusters found
-                  (i.e. cluster IDs are assigned contiguously and start at 0) 
+                  (i.e. cluster IDs are assigned contiguously and start at 0)
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -66,20 +97,20 @@ namespace dlib
         );
         /*!
             ensures
-                - #lower == val 
-                - #upper == val 
+                - #lower == val
+                - #upper == val
         !*/
 
         snl_range(
-            double l, 
+            double l,
             double u
         );
         /*!
             requires
                 - l <= u
             ensures
-                - #lower == l 
-                - #upper == u 
+                - #lower == l
+                - #upper == u
         !*/
 
         double lower;
@@ -119,7 +150,7 @@ namespace dlib
             - Finds a clustering of the values in x and returns the ranges that define the
               clustering.  This routine uses a combination of bottom up clustering and a
               simple greedy scan to try and find the most compact set of ranges that
-              contain all the values in x.  
+              contain all the values in x.
             - This routine has approximately linear runtime.
             - Every value in x will be contained inside one of the returned snl_range
               objects;
