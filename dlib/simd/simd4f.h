@@ -427,10 +427,8 @@ namespace dlib
     {
 #ifdef DLIB_HAVE_SSE2
         return _mm_cmpneq_ps(lhs, rhs);
-#elif defined(DLIB_HAVE_VSX)
+#elif defined(DLIB_HAVE_VSX) || defined(DLIB_HAVE_NEON)
         return ~(lhs==rhs);     // simd4f_bool is simd4i typedef, can use ~
-#elif defined(DLIB_HAVE_NEON1)
-        return vsubq_u32(vdupq_n_u32(0x1), vceqq_f32(lhs, rhs));
 #else
         return simd4f_bool(lhs[0]!=rhs[0],
                            lhs[1]!=rhs[1],
@@ -533,7 +531,7 @@ namespace dlib
         return _mm_rcp_ps(item);
 #elif defined(DLIB_HAVE_VSX)
         return vec_re(item());
-#elif defined(DLIB_HAVE_NEON1)
+#elif defined(DLIB_HAVE_NEON)
         float32x4_t estimate  = vrecpeq_f32(item);
         estimate  = vmulq_f32(vrecpsq_f32(estimate , item), estimate );
         estimate  = vmulq_f32(vrecpsq_f32(estimate , item), estimate );
@@ -690,11 +688,9 @@ namespace dlib
 #elif defined(DLIB_HAVE_SSE2)
         return _mm_or_ps(_mm_and_ps(cmp,a) , _mm_andnot_ps(cmp,b));
 #elif defined(DLIB_HAVE_NEON)
-        // required cmp to have true_value == -1
         return vbslq_f32(cmp, a, b);
-
 #else
-	        return simd4f(cmp[0]?a[0]:b[0],
+        return simd4f(cmp[0]?a[0]:b[0],
                       cmp[1]?a[1]:b[1],
                       cmp[2]?a[2]:b[2],
                       cmp[3]?a[3]:b[3]);

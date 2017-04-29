@@ -336,7 +336,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_xor(lhs(), vec_splats(~0));
 #elif defined(DLIB_HAVE_NEON)
-        return veorq_s32(lhs, vdupq_n_s32(0xFFFFFFFF));
+        return vmvnq_s32(lhs);
 #else
         return simd4i(~lhs[0],
                       ~lhs[1],
@@ -353,12 +353,8 @@ namespace dlib
         return _mm_sll_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #elif defined(DLIB_HAVE_VSX)
         return vec_sl(lhs(), vec_splats((uint32_t)rhs));         
-#elif defined(DLIB_HAVE_NEON)//todo: NEON
-        int32 _lhs[4]; lhs.store(_lhs);
-        return simd4i(_lhs[0]<<rhs,
-                      _lhs[1]<<rhs,
-                      _lhs[2]<<rhs,
-                      _lhs[3]<<rhs);
+#elif defined(DLIB_HAVE_NEON)
+        return vshlq_s32(lhs, simd4i(rhs));
 #else
         return simd4i(lhs[0]<<rhs,
                       lhs[1]<<rhs,
@@ -377,12 +373,8 @@ namespace dlib
         return _mm_sra_epi32(lhs,_mm_cvtsi32_si128(rhs));
 #elif defined(DLIB_HAVE_VSX)
         return vec_sr(lhs(), vec_splats((uint32_t)rhs)); 
-#elif defined(DLIB_HAVE_NEON)//todo: NEON
-        int32 _lhs[4]; lhs.store(_lhs);
-        return simd4i(_lhs[0]>>rhs,
-                      _lhs[1]>>rhs,
-                      _lhs[2]>>rhs,
-                      _lhs[3]>>rhs);
+#elif defined(DLIB_HAVE_NEON)
+        return vshrq_s32(lhs, simd4i(rhs));
 #else
         return simd4i(lhs[0]>>rhs,
                       lhs[1]>>rhs,
@@ -402,7 +394,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_cmpeq(lhs(), rhs());
 #elif defined(DLIB_HAVE_NEON)
-        return (int32x4_t)vceqq_s32(lhs,rhs);
+        return vceqq_s32(lhs,rhs);
 #else
         return simd4i(lhs[0]==rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]==rhs[1] ? 0xFFFFFFFF : 0,
@@ -434,7 +426,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_cmplt(lhs(), rhs());
 #elif defined(DLIB_HAVE_NEON)
-        return (int32x4_t)vcltq_s32(lhs, rhs);
+        return vcltq_s32(lhs, rhs);
 #else
         return simd4i(lhs[0]<rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]<rhs[1] ? 0xFFFFFFFF : 0,
@@ -454,8 +446,10 @@ namespace dlib
 
     inline simd4i operator<= (const simd4i& lhs, const simd4i& rhs) 
     { 
-#if defined DLIB_HAVE_SSE2 || defined(DLIB_HAVE_NEON)
+#if defined DLIB_HAVE_SSE2
         return ~(lhs > rhs); 
+#elif defined(DLIB_HAVE_NEON)
+        return vcleq_s32(lhs, rhs);
 #else
         return simd4i(lhs[0]<=rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]<=rhs[1] ? 0xFFFFFFFF : 0,
@@ -530,10 +524,8 @@ namespace dlib
         temp = _mm_hadd_epi32(temp,temp);
         return _mm_cvtsi128_si32(temp);
 #elif defined(DLIB_HAVE_SSE2)
-        int32 temp[4];
-        item.store(temp);
-        return temp[0]+temp[1]+temp[2]+temp[3];
-        //todo: NEON
+        int32x2_t r = vadd_s32(vget_high_s32(item), vget_low_s32(item));
+        return vget_lane_s32(vpadd_s32(r, r), 0);
 #else
         return item[0]+item[1]+item[2]+item[3];
 #endif
@@ -550,7 +542,9 @@ namespace dlib
         return ((cmp&a) | _mm_andnot_si128(cmp,b));
 #elif defined(DLIB_HAVE_VSX)
         return vec_sel(b(), a(), cmp.to_bool());
-#else//todo: NEON
+#elif defined(DLIB_HAVE_NEON)
+        return vbslq_s32(cmp, a, b);
+#else
         return ((cmp&a) | (~cmp&b));
 #endif
     }
