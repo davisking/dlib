@@ -105,6 +105,7 @@ namespace dlib
             x = vld1q_s32(data);
         }
         inline simd4i(const int32x4_t& val):x(val) {}
+        inline simd4i(const uint32x4_t& val):x((int32x4_t)val) {}
 
         inline simd4i& operator=(const int32x4_t& val)
         {
@@ -113,6 +114,7 @@ namespace dlib
         }
 
         inline operator int32x4_t() const { return x; }
+        inline operator uint32x4_t() const { return (uint32x4_t)x; }
 
         inline void load_aligned(const type* ptr)  { x = vld1q_s32(ptr); }
         inline void store_aligned(type* ptr) const { vst1q_s32(ptr, x); }
@@ -374,7 +376,11 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_sr(lhs(), vec_splats((uint32_t)rhs)); 
 #elif defined(DLIB_HAVE_NEON)
-        return vshrq_s32(lhs, simd4i(rhs));
+        int32 _lhs[4]; lhs.store(_lhs);
+        return simd4i(_lhs[0]>>rhs,
+                      _lhs[1]>>rhs,
+                      _lhs[2]>>rhs,
+                      _lhs[3]>>rhs);
 #else
         return simd4i(lhs[0]>>rhs,
                       lhs[1]>>rhs,
@@ -394,7 +400,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_cmpeq(lhs(), rhs());
 #elif defined(DLIB_HAVE_NEON)
-        return vceqq_s32(lhs,rhs);
+        return (int32x4_t)vceqq_s32(lhs,rhs);
 #else
         return simd4i(lhs[0]==rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]==rhs[1] ? 0xFFFFFFFF : 0,
@@ -426,7 +432,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_cmplt(lhs(), rhs());
 #elif defined(DLIB_HAVE_NEON)
-        return vcltq_s32(lhs, rhs);
+        return (int32x4_t)vcltq_s32(lhs, rhs);
 #else
         return simd4i(lhs[0]<rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]<rhs[1] ? 0xFFFFFFFF : 0,
@@ -449,7 +455,7 @@ namespace dlib
 #if defined DLIB_HAVE_SSE2
         return ~(lhs > rhs); 
 #elif defined(DLIB_HAVE_NEON)
-        return vcleq_s32(lhs, rhs);
+        return (int32x4_t)vcleq_s32(lhs, rhs);
 #else
         return simd4i(lhs[0]<=rhs[0] ? 0xFFFFFFFF : 0,
                       lhs[1]<=rhs[1] ? 0xFFFFFFFF : 0,
@@ -481,7 +487,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_min(lhs(), rhs());
 #elif defined(DLIB_HAVE_NEON)
-        return vminq_s32(lhs, rhs);
+        return (int32x4_t)vminq_s32(lhs, rhs);
 #else
         return simd4i(std::min(lhs[0],rhs[0]),
                       std::min(lhs[1],rhs[1]),

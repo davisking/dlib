@@ -192,32 +192,8 @@ namespace dlib
         float32x4_t x;
     };
 
-    class simd4f_bool
-    {
-    public:
-        typedef float type;
 
-        inline simd4f_bool() {}
-        inline simd4f_bool(const uint32x4_t& val):x(val) {}
-        inline simd4f_bool(uint32_t r0,  uint32_t r1, uint32_t r2, uint32_t r3)
-        {
-            uint32_t __attribute__ ((aligned (16))) data[4] = { r0, r1, r2, r3 };
-            x = vld1q_u32(data);
-        }
-
-        inline simd4f_bool& operator=(const uint32x4_t& val)
-        {
-            x = val;
-            return *this;
-        }
-
-        inline operator uint32x4_t() const { return x; }
-
-
-    private:
-        uint32x4_t x;
-    };
-
+    typedef simd4i simd4f_bool;
 #else
     class simd4f
     {
@@ -295,6 +271,7 @@ namespace dlib
         float x[4];
     };
 
+
     class simd4f_bool
     {
     public:
@@ -307,6 +284,7 @@ namespace dlib
     private:
         bool x[4];
     };
+
 #endif
 
 // ----------------------------------------------------------------------------------------
