@@ -453,8 +453,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline simd4i operator<= (const simd4i& lhs, const simd4i& rhs) 
-    { //todo: VSX ?
-#ifdef DLIB_HAVE_SSE2 || defined(DLIB_HAVE_NEON)
+    { 
+#if defined DLIB_HAVE_SSE2 || defined(DLIB_HAVE_NEON)
         return ~(lhs > rhs); 
 #else
         return simd4i(lhs[0]<=rhs[0] ? 0xFFFFFFFF : 0,
