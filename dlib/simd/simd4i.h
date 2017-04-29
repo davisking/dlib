@@ -452,7 +452,7 @@ namespace dlib
 
     inline simd4i operator<= (const simd4i& lhs, const simd4i& rhs) 
     { 
-#if defined DLIB_HAVE_SSE2
+#ifdef DLIB_HAVE_SSE2
         return ~(lhs > rhs); 
 #elif defined(DLIB_HAVE_NEON)
         return (int32x4_t)vcleq_s32(lhs, rhs);
@@ -530,6 +530,10 @@ namespace dlib
         temp = _mm_hadd_epi32(temp,temp);
         return _mm_cvtsi128_si32(temp);
 #elif defined(DLIB_HAVE_SSE2)
+        int32 temp[4];
+        item.store(temp);
+        return temp[0]+temp[1]+temp[2]+temp[3];
+#elif defined(DLIB_HAVE_NEON)
         int32x2_t r = vadd_s32(vget_high_s32(item), vget_low_s32(item));
         return vget_lane_s32(vpadd_s32(r, r), 0);
 #else
