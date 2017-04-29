@@ -529,6 +529,8 @@ namespace dlib
 #ifdef DLIB_HAVE_SSE2
         return _mm_rsqrt_ps(item);
 #elif defined(DLIB_HAVE_VSX)
+        return vec_rsqrt(item());
+#elif defined(DLIB_HAVE_NEON)
         float32x4_t estimate = vrsqrteq_f32(v);
         simd4f estimate2 = vmulq_f32(estimate, v);
         estimate = vmulq_f32(estimate, vrsqrtsq_f32(estimate2, estimate));
