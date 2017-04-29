@@ -618,7 +618,7 @@ namespace dlib
 
         // normalize sqrt(0)=0
         uint32x4_t zcomp = vceqq_f32(vdupq_n_f32(0), item);
-        float32x4_t rcorr = vbslq_f32(zcomp, zero, res3);
+        float32x4_t rcorr = vbslq_f32(zcomp, item, res3);
         return rcorr;
 #else
         return simd4f(std::sqrt(item[0]),
