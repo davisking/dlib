@@ -607,17 +607,6 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_sqrt(item());
 #elif defined(DLIB_HAVE_NEON)
-//    float32x4_t sqrt_reciprocal = vrsqrteq_f32(item);
-//    float32x4_t result2 = item * vrsqrtsq_f32(item * sqrt_reciprocal, sqrt_reciprocal) * sqrt_reciprocal;
-
-//        float32x4_t reciprocal1 = vrsqrteq_f32(item);
-//        float32x4_t result = vrecpeq_f32(reciprocal1);
-
-//    simd4f res_slow(std::sqrt(item[0]),
-//                      std::sqrt(item[1]),
-//                      std::sqrt(item[2]),
-//                      std::sqrt(item[3]));
-
         float32x4_t q_step_0 = vrsqrteq_f32(item);
         float32x4_t q_step_parm0 = vmulq_f32(item, q_step_0);
         float32x4_t q_step_result0 = vrsqrtsq_f32(q_step_parm0, q_step_0);
@@ -627,29 +616,10 @@ namespace dlib
         float32x4_t q_step_2 = vmulq_f32(q_step_1, q_step_result1);
         float32x4_t res3 = vmulq_f32(item, q_step_2);
 
-        float32x4_t zero = vdupq_n_f32(0);
-        uint32x4_t zcomp = vceqq_f32(zero, item);
+        // normalize sqrt(0)=0
+        uint32x4_t zcomp = vceqq_f32(vdupq_n_f32(0), item);
         float32x4_t rcorr = vbslq_f32(zcomp, zero, res3);
-//    float d = sum(res_slow - result);
-//    if (d)
-//        std::cout << "SQRT(" << item << ") = " << result << " correct: " << res_slow 
-//                  << "res2: " << rcorr
-//                  << "res3: " << q_step_parm0
-
-//        << std::endl;
-return rcorr;
-/*
-        float32x4_t q_step_0 = vrsqrteq_f32(item);
-        float32x4_t q_step_parm0 = vmulq_f32(item, q_step_0);
-        float32x4_t q_step_result0 = vrsqrtsq_f32(q_step_parm0, q_step_0);
-        float32x4_t q_step_1 = vmulq_f32(q_step_0, q_step_result0);
-        float32x4_t q_step_parm1 = vmulq_f32(item, q_step_1);
-        float32x4_t q_step_result1 = vrsqrtsq_f32(q_step_parm1, q_step_1);
-        float32x4_t q_step_2 = vmulq_f32(q_step_1, q_step_result1);
-        return vmulq_f32(item, q_step_2);
-*/
-//return sq;
-//        return vmulq_f32(item, reciprocal);
+        return rcorr;
 #else
         return simd4f(std::sqrt(item[0]),
                       std::sqrt(item[1]),
@@ -720,8 +690,7 @@ return rcorr;
 #elif defined(DLIB_HAVE_SSE2)
         return _mm_or_ps(_mm_and_ps(cmp,a) , _mm_andnot_ps(cmp,b));
 #elif defined(DLIB_HAVE_NEON)
-
-//        uint32x4_t cmp_a = vsubq_u32(vdupq_n_u32(0x0), cmp);
+        // required cmp to have true_value == -1
         return vbslq_f32(cmp, a, b);
 
 #else
