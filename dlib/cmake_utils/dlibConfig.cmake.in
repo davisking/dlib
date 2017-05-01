@@ -28,7 +28,7 @@ else()
     get_filename_component(dlib_INSTALL_PATH "@CMAKE_INSTALL_PREFIX@" REALPATH)
 endif()
 
-set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@/dlib" "@dlib_needed_includes@")
+set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@" "@dlib_needed_includes@")
  
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
