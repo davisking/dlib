@@ -60,6 +60,7 @@ target_link_libraries(assignment_learning_ex dlib::dlib)
 # these commands from within the directory containing this CMakeLists.txt
 # file:
 #   mkdir build
+#   cd build
 #   cmake ..
 #   cmake --build . --config Release
 #
