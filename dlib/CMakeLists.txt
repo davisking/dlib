@@ -749,7 +749,6 @@ if (NOT TARGET dlib)
             NAMESPACE dlib::
             DESTINATION ${ConfigPackageLocation})
 
-       set(CONF_INSTALL_PATH "\${dlib_CMAKE_DIR}/../../../")
        configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
 
        include(CMakePackageConfigHelpers)
