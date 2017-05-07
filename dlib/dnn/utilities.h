@@ -6,6 +6,7 @@
 #include "core.h"
 #include "utilities_abstract.h"
 #include "../geometry.h"
+#include <fstream>
 
 namespace dlib
 {
@@ -109,6 +110,16 @@ namespace dlib
         out << "</net>\n";
         // restore the original stream precision.
         out.precision(old_precision);
+    }
+
+    template <typename net_type>
+    void net_to_xml (
+        const net_type& net,
+        const std::string& filename
+    )
+    {
+        std::ofstream fout(filename);
+        net_to_xml(net, fout);
     }
 
 // ----------------------------------------------------------------------------------------
