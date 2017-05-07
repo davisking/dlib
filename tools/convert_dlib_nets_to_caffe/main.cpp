@@ -175,6 +175,17 @@ void convert_dlib_xml_to_cafffe_python_code(
             fout << "    n." << i->caffe_layer_name() << " = L.ReLU(n." << find_input_layer_caffe_name(i);
             fout << ");\n";
         }
+        else if (i->detail_name == "sig")
+        {
+            fout << "    n." << i->caffe_layer_name() << " = L.Sigmoid(n." << find_input_layer_caffe_name(i);
+            fout << ");\n";
+        }
+        else if (i->detail_name == "prelu")
+        {
+            fout << "    n." << i->caffe_layer_name() << " = L.PReLU(n." << find_input_layer_caffe_name(i);
+            fout << ", channel_shared=True"; 
+            fout << ");\n";
+        }
         else if (i->detail_name == "max_pool")
         {
             fout << "    n." << i->caffe_layer_name() << " = L.Pooling(n." << find_input_layer_caffe_name(i);
@@ -284,9 +295,10 @@ void convert_dlib_xml_to_cafffe_python_code(
     fout << "    net.save(weights_file);\n\n";
 
 
-    // -------------------------
-    // -------------------------
 
+    // -----------------------------------------------------------------------------------
+    //  The next block of code outputs python code that populates all the filter weights.
+    // -----------------------------------------------------------------------------------
 
     fout << "def set_network_weights(net):\n";
     fout << "    # populate network parameters\n";
@@ -353,6 +365,15 @@ void convert_dlib_xml_to_cafffe_python_code(
             fout << "    p = "; print_as_np_array(fout,beta); fout << ";\n";
             fout << "    p.shape = net.params['"<<i->caffe_layer_name()<<"'][1].data.shape;\n";
             fout << "    net.params['"<<i->caffe_layer_name()<<"'][1].data[:] = p;\n";
+        }
+        else if (i->detail_name == "prelu")
+        {
+            const double param = i->params(0);
+
+            // main filter weights
+            fout << "    tmp = net.params['"<<i->caffe_layer_name()<<"'][0].data.view();\n";
+            fout << "    tmp.shape = 1;\n";
+            fout << "    tmp[0] = "<<param<<";\n";
         }
     }
 
