@@ -104,7 +104,7 @@ void print_as_np_array(std::ostream& out, const matrix_exp<EXP>& m)
 
 // ----------------------------------------------------------------------------------------
 
-void convert_dlib_xml_to_cafffe_python_code(
+void convert_dlib_xml_to_caffe_python_code(
     const string& xml_filename
 )
 {
@@ -400,7 +400,7 @@ int main(int argc, char** argv) try
     }
 
     for (int i = 1; i < argc; ++i)
-        convert_dlib_xml_to_cafffe_python_code(argv[i]);
+        convert_dlib_xml_to_caffe_python_code(argv[i]);
 
     return 0;
 }
