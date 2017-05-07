@@ -103,9 +103,12 @@ namespace dlib
         std::ostream& out
     )
     {
+        auto old_precision = out.precision(9);
         out << "<net>\n";
         visit_layers(net, impl::visitor_net_to_xml(out));
         out << "</net>\n";
+        // restore the original stream precision.
+        out.precision(old_precision);
     }
 
 // ----------------------------------------------------------------------------------------
