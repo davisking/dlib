@@ -253,19 +253,18 @@ void convert_dlib_xml_to_cafffe_python_code(
         else if (i->detail_name == "bn_con" || i->detail_name == "bn_fc")
         {
             throw dlib::error("Conversion from dlib's batch norm layers to caffe's isn't supported.  Instead, "
-                "you should put your network into 'test mode' by switching batch norm layers to affine layers.");
+                "you should put your dlib network into 'test mode' by switching batch norm layers to affine layers. "
+                "Then you can convert that 'test mode' network to caffe.");
         }
         else if (i->detail_name == "affine_con")
         {
             fout << "    n." << i->caffe_layer_name() << " = L.Scale(n." << find_input_layer_caffe_name(i);
-            fout << ", axis=1";
             fout << ", bias_term=True";
             fout << ");\n";
         }
         else if (i->detail_name == "affine_fc")
         {
             fout << "    n." << i->caffe_layer_name() << " = L.Scale(n." << find_input_layer_caffe_name(i);
-            fout << ", axis=3";
             fout << ", bias_term=True";
             fout << ");\n";
         }
