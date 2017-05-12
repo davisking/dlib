@@ -3,21 +3,21 @@
 #ifndef DLIB_SVm_THREADED_
 #define DLIB_SVm_THREADED_
 
-#include "svm_threaded_abstract.h"
-#include "svm.h"
 #include <cmath>
+#include <iostream>
 #include <limits>
 #include <sstream>
+#include <vector>
+
+#include "svm_threaded_abstract.h"
+#include "svm.h"
 #include "../matrix.h"
 #include "../algs.h"
 #include "../serialize.h"
 #include "function.h"
 #include "kernel.h"
 #include "../threads.h"
-#include <vector>
-#include "../smart_pointers.h"
 #include "../pipe.h"
-#include <iostream>
 
 namespace dlib
 {

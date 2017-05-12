@@ -4,7 +4,6 @@
 #define DLIB_AnY_TRAINER_H_
 
 #include "any.h"
-#include "../smart_pointers.h"
 
 #include "any_decision_function.h"
 

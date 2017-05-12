@@ -19,7 +19,7 @@
 #include "../sequence.h"
 #include "../dir_nav.h"
 #include "../queue.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "style.h"
 #include "../string.h"
 #include "../misc_api.h"

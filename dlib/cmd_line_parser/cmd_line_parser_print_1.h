@@ -10,7 +10,7 @@
 #include <string>
 #include <sstream>
 #include <map>
-#include "../smart_pointers.h"
+#include <memory>
 
 namespace dlib
 {
@@ -105,7 +105,7 @@ namespace dlib
             // Make a separate ostringstream for each option group.  We are going to write
             // the output for each group to a separate ostringstream so that we can keep
             // them grouped together in the final output.
-            std::map<string,shared_ptr<ostringstream> > groups;
+            std::map<string,std::shared_ptr<ostringstream> > groups;
             this->reset();
             while(this->move_next())
             {
@@ -173,7 +173,7 @@ namespace dlib
                 out << _dT(ct,"Options:");
 
             // Now print everything out
-            typename std::map<string,shared_ptr<ostringstream> >::iterator i;
+            typename std::map<string,std::shared_ptr<ostringstream> >::iterator i;
             for (i = groups.begin(); i != groups.end(); ++i)
             {
                 // print the group name if we have one

@@ -4,7 +4,7 @@
 #define DLIB_PNG_IMPORT
 
 #include "png_loader_abstract.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "image_loader.h"
 #include "../pixel.h"
 #include "../dir_nav.h"

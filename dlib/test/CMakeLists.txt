@@ -125,7 +125,6 @@ set (tests
    set.cpp
    sldf.cpp
    sliding_buffer.cpp
-   smart_pointers.cpp
    sockets2.cpp
    sockets.cpp
    sockstreambuf.cpp

@@ -11,7 +11,7 @@
 #include "../algs.h"
 #include "../set.h"
 #include "../logger.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 
 
 namespace dlib

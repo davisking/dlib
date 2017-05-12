@@ -6,7 +6,7 @@
 #include <string>
 #include "../sockets.h"
 #include "sockets_extensions_abstract.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include <iosfwd>
 
 namespace dlib

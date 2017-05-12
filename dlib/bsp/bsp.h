@@ -6,13 +6,14 @@
 #include "bsp_abstract.h"
 #include "../sockets.h"
 #include "../array.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "../sockstreambuf.h"
 #include "../string.h"
 #include "../serialize.h"
 #include "../map.h"
 #include "../ref.h"
 #include "../vectorstream.h"
+#include <memory>
 #include <queue>
 #include <vector>
 
@@ -207,7 +208,7 @@ namespace dlib
 
         struct msg_data
         {
-            shared_ptr<std::vector<char> > data;
+            std::shared_ptr<std::vector<char> > data;
             unsigned long sender_id;
             char msg_type;
             dlib::uint64 epoch;
@@ -420,7 +421,7 @@ namespace dlib
         )
         {
             unsigned long id;
-            shared_ptr<std::vector<char> > temp;
+            std::shared_ptr<std::vector<char> > temp;
             if (receive_data(temp,id))
                 throw dlib::socket_error("Call to bsp_context::receive() got an unexpected message.");
         }
@@ -459,7 +460,7 @@ namespace dlib
             unsigned long& sending_node_id
         ) 
         {
-            shared_ptr<std::vector<char> > temp;
+            std::shared_ptr<std::vector<char> > temp;
             if (receive_data(temp, sending_node_id))
             {
                 vectorstream sin(*temp);
@@ -496,7 +497,7 @@ namespace dlib
         !*/
 
         bool receive_data (
-            shared_ptr<std::vector<char> >& item,
+            std::shared_ptr<std::vector<char> >& item,
             unsigned long& sending_node_id
         );
 

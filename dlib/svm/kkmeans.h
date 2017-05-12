@@ -12,7 +12,7 @@
 #include "kcentroid.h"
 #include "kkmeans_abstract.h"
 #include "../noncopyable.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include <vector>
 
 namespace dlib

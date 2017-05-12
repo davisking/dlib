@@ -4,6 +4,7 @@
 #define DLIB_THREAD_POOl_CPPh_ 
 
 #include "thread_pool_extension.h"
+#include <memory>
 
 namespace dlib
 {
@@ -287,7 +288,7 @@ namespace dlib
     uint64 thread_pool_implementation::
     add_task_internal (
         const bfp_type& bfp,
-        shared_ptr<function_object_copy>& item
+        std::shared_ptr<function_object_copy>& item
     )
     {
         auto_mutex M(m);
