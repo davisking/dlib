@@ -4,6 +4,7 @@
 #define DLIB_BSP_CPph_
 
 #include "bsp.h"
+#include <memory>
 #include <stack>
 
 // ----------------------------------------------------------------------------------------
@@ -330,7 +331,7 @@ namespace dlib
 
     bool bsp_context::
     receive_data (
-        shared_ptr<std::vector<char> >& item,
+        std::shared_ptr<std::vector<char> >& item,
         unsigned long& sending_node_id
     ) 
     {
