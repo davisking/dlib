@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include "../matrix.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "optimization_bobyqa_abstract.h"
 #include "optimization.h"
 

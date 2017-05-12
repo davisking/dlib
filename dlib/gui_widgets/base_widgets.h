@@ -17,7 +17,7 @@
 #include "../image_transforms/assign_image.h"
 #include "../array.h" 
 #include "style.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "../unicode.h"
 #include <cctype>
 #include "../any.h"

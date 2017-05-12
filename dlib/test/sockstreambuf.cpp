@@ -10,7 +10,7 @@
 #include <dlib/misc_api.h>
 #include <dlib/sockstreambuf.h>
 #include <vector>
-#include <dlib/smart_pointers.h>
+#include <dlib/smart_pointers/scoped_ptr.h>
 
 #include "tester.h"
 

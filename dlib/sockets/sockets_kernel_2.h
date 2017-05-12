@@ -32,7 +32,7 @@
 
 #include "../threads.h"
 #include "../algs.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 
 
 

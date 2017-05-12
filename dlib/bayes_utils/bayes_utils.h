@@ -5,6 +5,10 @@
 
 #include "bayes_utils_abstract.h"
 
+#include <algorithm>
+#include <ctime>
+#include <vector>
+
 #include "../string.h"
 #include "../map.h"
 #include "../matrix.h"
@@ -13,11 +17,8 @@
 #include "../set.h"
 #include "../algs.h"
 #include "../noncopyable.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "../graph.h"
-#include <vector>
-#include <algorithm>
-#include <ctime>
 
 namespace dlib
 {

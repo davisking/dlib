@@ -13,7 +13,7 @@
 #include "../assert.h"
 #include "../uintn.h"
 #include "../map.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "../member_function_pointer.h"
 #include <streambuf>
 #include <vector>

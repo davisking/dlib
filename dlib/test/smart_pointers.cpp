@@ -5,7 +5,7 @@
 // from CMakeLists.txt. Including this test will pull legacy smart_pointers.h
 // code which is uncompilable on C++17 compilers
 
-#include <dlib/legacy_smart_pointers.h>
+#include <dlib/smart_pointers.h>
 #include <sstream>
 #include <string>
 #include <cstdlib>

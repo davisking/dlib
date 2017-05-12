@@ -7,7 +7,7 @@
 #include "threads_kernel.h"
 #include "auto_mutex_extension.h"
 #include "threaded_object_extension.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 
 namespace dlib
 {

@@ -6,7 +6,7 @@
 #include "bsp_abstract.h"
 #include "../sockets.h"
 #include "../array.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "../sockstreambuf.h"
 #include "../string.h"
 #include "../serialize.h"

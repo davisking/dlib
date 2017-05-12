@@ -7,7 +7,7 @@
 #include <string>
 #include "../pipe.h"
 #include "../threads.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "../serialize.h"
 #include "../sockets.h"
 #include "../sockstreambuf.h"

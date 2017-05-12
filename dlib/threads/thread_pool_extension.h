@@ -12,7 +12,6 @@
 #include "../uintn.h"
 #include "../array.h"
 #include "../smart_pointers_thread_safe.h"
-#include "../smart_pointers.h"
 #include <exception>
 #include <thread>
 #include <memory>

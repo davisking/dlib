@@ -27,7 +27,7 @@
 #include <dlib/directed_graph.h>
 #include <dlib/string.h>
 #include <dlib/bayes_utils.h>
-#include <dlib/smart_pointers.h>
+#include <dlib/smart_pointers/scoped_ptr.h>
 #include <dlib/set.h>
 #include <dlib/graph_utils.h>
 #include <dlib/stl_checked.h>

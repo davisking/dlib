@@ -4,7 +4,7 @@
 #define DLIB_AnY_H_
 
 #include "any_abstract.h"
-#include "../smart_pointers.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include <typeinfo>
 
 namespace dlib
