@@ -3,12 +3,13 @@
 #ifndef DLIB_GRAPH_KERNEl_1_
 #define DLIB_GRAPH_KERNEl_1_
 
+#include <memory>
+#include <vector>
+
 #include "../serialize.h"
 #include "../noncopyable.h"
 #include "../std_allocator.h"
-#include "../smart_pointers.h"
 #include "../algs.h"
-#include <vector>
 #include "graph_kernel_abstract.h"
 #include "../is_kind.h"
 
@@ -291,16 +292,16 @@ namespace dlib
         private:
             friend class graph_kernel_1;
             typedef std_allocator<node_type*,mem_manager> alloc_type;
-            typedef std_allocator<shared_ptr<E>,mem_manager> alloc_edge_type;
+            typedef std_allocator<std::shared_ptr<E>,mem_manager> alloc_edge_type;
             std::vector<node_type*,alloc_type> neighbors;
-            std::vector<shared_ptr<E>,alloc_edge_type> edges;
+            std::vector<std::shared_ptr<E>,alloc_edge_type> edges;
             unsigned long idx;
         };
 
     private:
 
-        typedef std_allocator<shared_ptr<node_type>,mem_manager> alloc_type;
-        typedef std::vector<shared_ptr<node_type>, alloc_type> vector_type;
+        typedef std_allocator<std::shared_ptr<node_type>,mem_manager> alloc_type;
+        typedef std::vector<std::shared_ptr<node_type>, alloc_type> vector_type;
         vector_type nodes;
     };
 
@@ -506,7 +507,7 @@ namespace dlib
 
             n1.neighbors.push_back(&n2);
 
-            shared_ptr<E> e(new E);
+            std::shared_ptr<E> e(new E);
             n1.edges.push_back(e);
 
             // don't add this twice if this is an edge from node_index1 back to itself
@@ -571,7 +572,7 @@ namespace dlib
     {
         try
         {
-            shared_ptr<node_type> n(new node_type);
+            std::shared_ptr<node_type> n(new node_type);
             n->idx = nodes.size();
             nodes.push_back(n);
             return n->idx;
