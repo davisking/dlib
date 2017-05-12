@@ -1,18 +1,17 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+// This is a legacy test for old dlib smart pointers which is excluded
+// from CMakeLists.txt. Including this test will pull legacy smart_pointers.h
+// code which is uncompilable on C++17 compilers
 
-#include <dlib/smart_pointers.h>
+#include <dlib/legacy_smart_pointers.h>
 #include <sstream>
 #include <string>
 #include <cstdlib>
 #include <ctime>
 
 #include "tester.h"
-
-// This is a legacy test for old dlib smart pointers which is excluded
-// from CMakeLists.txt. Including this test will pull legacy smart_pointers.h
-// code which is uncompilable on C++17 compilers
 
 // Don't warn about auto_ptr 
 #if (defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || (__GNUC__ > 4))) || \
