@@ -289,7 +289,7 @@ namespace
         matrix<double,0,1> alpha(3), d(3), lambda;
         alpha = C/2, C/2, 0;
 
-        solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 3000);
+        unsigned long iters = solve_qp4_using_smo(A, tmp(trans(A)*A), b, d, alpha, lambda, 1e-9, 3000);
         matrix<double,0,1> w = lowerbound(-A*alpha, 0);
 
         dlog << LINFO << "*******************************************************";
@@ -303,7 +303,10 @@ namespace
         dlog << LINFO << "computed obj:      "<< computed_obj;
         dlog << LINFO << "with true w obj:   "<< true_obj;
 
-        DLIB_TEST_MSG(abs(computed_obj - true_obj) < 1e-8, abs(computed_obj - true_obj));
+        DLIB_TEST_MSG(abs(computed_obj - true_obj) < 1e-8, 
+            "computed_obj: "<< computed_obj << "  true_obj: " << true_obj << "  delta: "<<  abs(computed_obj - true_obj)
+            << "  iters: " << iters
+            );
     }
 
     void test_qp4_test7()
