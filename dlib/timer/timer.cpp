@@ -208,9 +208,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    shared_ptr_thread_safe<timer_global_clock> get_global_clock()
+    std::shared_ptr<timer_global_clock> get_global_clock()
     {
-        static shared_ptr_thread_safe<timer_global_clock> d(new timer_global_clock);
+        static std::shared_ptr<timer_global_clock> d(new timer_global_clock);
         return d;
     }
 

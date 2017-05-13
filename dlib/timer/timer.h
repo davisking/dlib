@@ -3,13 +3,14 @@
 #ifndef DLIB_TIMEr_Hh_
 #define DLIB_TIMEr_Hh_
 
+#include <memory>
+
 #include "../threads.h"
 #include "../algs.h"
 #include "../misc_api.h"
 #include "timer_abstract.h"
 #include "../uintn.h"
 #include "../binary_search_tree.h"
-#include "../smart_pointers_thread_safe.h"
 #include "timer_heavy.h"
 
 namespace dlib
@@ -96,7 +97,7 @@ namespace dlib
 
         mutex m;
 
-        friend shared_ptr_thread_safe<timer_global_clock> get_global_clock();
+        friend std::shared_ptr<timer_global_clock> get_global_clock();
 
     private:
         timer_global_clock();
@@ -113,7 +114,7 @@ namespace dlib
                 - spawns timer tasks as is appropriate
         !*/
     };
-    shared_ptr_thread_safe<timer_global_clock> get_global_clock();
+    std::shared_ptr<timer_global_clock> get_global_clock();
     /*!
         ensures
             - returns the global instance of the timer_global_clock object
@@ -209,7 +210,7 @@ namespace dlib
         // data members
         T& ao;
         const af_type af;
-        shared_ptr_thread_safe<timer_global_clock> gc;
+        std::shared_ptr<timer_global_clock> gc;
 
         // restricted functions
         timer(const timer&);        // copy constructor

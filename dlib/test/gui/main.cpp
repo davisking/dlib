@@ -1,18 +1,21 @@
+#include <fstream>
+#include <iostream>
+#include <memory>
+#include <sstream>
+#include <string>
+
 #include "dlib/image_io.h"
 #include "dlib/array2d.h"
 #include "dlib/gui_core.h"
 #include "dlib/assert.h"
 #include "dlib/misc_api.h"
-#include <string>
+
 #include "dlib/image_transforms.h"
 
 #include "dlib/timer.h"
 
 #include "dlib/gui_widgets.h"
 #include "dlib/queue.h"
-#include <sstream>
-#include <iostream>
-#include <fstream>
 
 using namespace dlib;
 using namespace std;
@@ -444,7 +447,7 @@ public:
     {
         bool use_bdf_fonts = false;
 
-        shared_ptr_thread_safe<bdf_font> f(new bdf_font);
+        std::shared_ptr<bdf_font> f(new bdf_font);
         
         if (use_bdf_fonts)
         {

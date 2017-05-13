@@ -4,6 +4,8 @@
 #ifndef DLIB_BASE_WIDGETs_
 #define DLIB_BASE_WIDGETs_
 
+#include <memory>
+
 #include "base_widgets_abstract.h"
 #include "drawable.h"
 #include "../gui_core.h"
@@ -586,7 +588,7 @@ namespace dlib
         class tooltip_window : public base_window 
         {
         public:
-            tooltip_window (const shared_ptr_thread_safe<font>& f) : base_window(false,true), pad(3), mfont(f)
+            tooltip_window (const std::shared_ptr<font>& f) : base_window(false,true), pad(3), mfont(f)
             {
             }
 
@@ -594,7 +596,7 @@ namespace dlib
             rectangle rect_all;
             rectangle rect_text;
             const unsigned long pad;
-            const shared_ptr_thread_safe<font> mfont;
+            const std::shared_ptr<font> mfont;
             
             void set_text (
                 const std::string& str
@@ -777,7 +779,7 @@ namespace dlib
         ) const;
 
         void set_main_font (
-            const shared_ptr_thread_safe<font>& f
+            const std::shared_ptr<font>& f
         );
 
         void show (
@@ -1623,7 +1625,7 @@ namespace dlib
 
     private:
         dlib::ustring text;
-        const shared_ptr_thread_safe<font> f;
+        const std::shared_ptr<font> f;
         any_function<void()> action;
         unichar hotkey;
         point underline_p1;
@@ -1801,7 +1803,7 @@ namespace dlib
 
     private:
         dlib::ustring text;
-        const shared_ptr_thread_safe<font> f;
+        const std::shared_ptr<font> f;
         any_function<void()> action;
         unichar hotkey;
         point underline_p1;
