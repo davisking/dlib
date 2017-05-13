@@ -3,6 +3,10 @@
 #ifndef DLIB_THREAD_POOl_Hh_
 #define DLIB_THREAD_POOl_Hh_ 
 
+#include <exception>
+#include <memory>
+#include <thread>
+
 #include "thread_pool_extension_abstract.h"
 #include "multithreaded_object_extension.h"
 #include "../member_function_pointer.h"
@@ -11,10 +15,6 @@
 #include "auto_mutex_extension.h"
 #include "../uintn.h"
 #include "../array.h"
-#include "../smart_pointers_thread_safe.h"
-#include <exception>
-#include <thread>
-#include <memory>
 
 namespace dlib
 {
@@ -88,7 +88,7 @@ namespace dlib
         inline void wait () const;
 
         mutable uint64 task_id;
-        mutable shared_ptr_thread_safe<thread_pool_implementation> tp;
+        mutable std::shared_ptr<thread_pool_implementation> tp;
 
         T var;
     };
@@ -489,7 +489,7 @@ namespace dlib
     class thread_pool 
     {
         /*!
-            This object is just a shell that holds a shared_ptr_thread_safe 
+            This object is just a shell that holds a std::shared_ptr 
             to the real thread_pool_implementation object.  The reason for doing
             it this way is so that we can allow any mixture of destruction orders
             between thread_pool objects and futures.  Whoever gets destroyed
@@ -1355,7 +1355,7 @@ namespace dlib
 
     private:
 
-        shared_ptr_thread_safe<thread_pool_implementation> impl;
+        std::shared_ptr<thread_pool_implementation> impl;
 
         // restricted functions
         thread_pool(thread_pool&);        // copy constructor
