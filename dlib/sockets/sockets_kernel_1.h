@@ -12,7 +12,6 @@
 #include "../algs.h"
 #include <string>
 #include "../threads.h"
-#include "../smart_pointers.h"
 #include "../uintn.h"
 
 
