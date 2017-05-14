@@ -24,7 +24,6 @@
 #include "../sequence.h"
 #include "../dir_nav.h"
 #include "../queue.h"
-#include "../smart_pointers/scoped_ptr.h"
 #include "style.h"
 #include "../string.h"
 #include "../misc_api.h"
@@ -293,7 +292,7 @@ namespace dlib
         any_function<void()> event_handler;
         any_function<void(toggle_button&)> event_handler_self;
 
-        scoped_ptr<toggle_button_style> style;
+        std::unique_ptr<toggle_button_style> style;
 
     protected:
 
@@ -656,7 +655,7 @@ namespace dlib
         any_function<void()> enter_key_handler;
         any_function<void()> focus_lost_handler;
 
-        scoped_ptr<text_field_style> style;
+        std::unique_ptr<text_field_style> style;
 
         timer<text_field> t;
 
@@ -1052,7 +1051,7 @@ namespace dlib
         any_function<void()> enter_key_handler;
         any_function<void()> focus_lost_handler;
 
-        scoped_ptr<text_box_style> style;
+        std::unique_ptr<text_box_style> style;
 
         timer<text_box> t;
 
@@ -1829,7 +1828,7 @@ namespace dlib
         any_function<void(unsigned long)> single_click_event_handler;
         unsigned long last_selected;
 
-        scoped_ptr<list_box_style> style;
+        std::unique_ptr<list_box_style> style;
 
         // restricted functions
         list_box(list_box&);        // copy constructor
@@ -1928,7 +1927,7 @@ namespace dlib
             int cur_dir;
 
             any_function<void(const std::string&)> event_handler;
-            sequence<scoped_ptr<toggle_button> >::kernel_2a_c sob;
+            sequence<std::unique_ptr<toggle_button> >::kernel_2a_c sob;
         };
     }
 

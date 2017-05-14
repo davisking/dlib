@@ -1,11 +1,13 @@
 // Copyright (C) 2008  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include <algorithm>
+#include <memory>
+
 #include "tester.h"
 #include <dlib/sockets.h>
 #include <dlib/threads.h>
 #include <dlib/array.h>
-#include <algorithm>
 
 // This is called an unnamed-namespace and it has the effect of making everything 
 // inside this file "private" so that everything you declare will have static linkage.  
@@ -39,7 +41,7 @@ namespace
         {
             try
             {
-                scoped_ptr<connection> con(connect("127.0.0.1", port_num));
+                std::unique_ptr<connection> con(connect("127.0.0.1", port_num));
 
                 // Send a copy of the data down the connection so we can test our the read() function
                 // that uses timeouts in the main thread.
@@ -63,7 +65,7 @@ namespace
         {
             try
             {
-                scoped_ptr<connection> con(connect("127.0.0.1", port_num));
+                std::unique_ptr<connection> con(connect("127.0.0.1", port_num));
 
                 // just do nothing until the connection closes
                 char ch;
@@ -120,17 +122,17 @@ namespace
             dlog << LINFO << "data block size: " << data_to_send.size();
 
 
-            scoped_ptr<listener> list;
+            std::unique_ptr<listener> list;
             DLIB_TEST(create_listener(list, port_num, "127.0.0.1") == 0);
-            DLIB_TEST(list);
+            DLIB_TEST(bool(list));
 
             // kick off the sending threads
             start();
 
 
-            dlib::array<scoped_ptr<connection> > cons;
+            dlib::array<std::unique_ptr<connection> > cons;
             std::vector<long> bytes_received(6,0);
-            scoped_ptr<connection> con_temp;
+            std::unique_ptr<connection> con_temp;
             
             // accept the 6 connections we should get
             for (int i = 0; i < 6; ++i)

@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <ctime>
+#include <memory>
 #include <vector>
 
 #include "../string.h"
@@ -17,7 +18,6 @@
 #include "../set.h"
 #include "../algs.h"
 #include "../noncopyable.h"
-#include "../smart_pointers/scoped_ptr.h"
 #include "../graph.h"
 
 namespace dlib
@@ -1660,7 +1660,7 @@ namespace dlib
 
     private:
 
-        scoped_ptr<bayesian_network_join_tree_helpers::bnjt> impl;
+        std::unique_ptr<bayesian_network_join_tree_helpers::bnjt> impl;
         unsigned long num_nodes;
 
     };

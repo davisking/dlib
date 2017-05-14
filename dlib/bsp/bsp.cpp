@@ -25,7 +25,7 @@ namespace dlib
             cons.clear();
             for (unsigned long i = 0; i < hosts.size(); ++i)
             {
-                scoped_ptr<bsp_con> con(new bsp_con(hosts[i]));
+                std::unique_ptr<bsp_con> con(new bsp_con(hosts[i]));
                 dlib::serialize(node_id, con->stream); // tell the other end our node_id
                 unsigned long id = i+1;
                 cons.add(id, con);
@@ -44,7 +44,7 @@ namespace dlib
             {
                 try
                 {
-                    scoped_ptr<bsp_con> con(new bsp_con(hosts[i].addr));
+                    std::unique_ptr<bsp_con> con(new bsp_con(hosts[i].addr));
                     dlib::serialize(node_id, con->stream); // tell the other end our node_id
                     con->stream.flush();
                     unsigned long id = hosts[i].node_id;
@@ -317,7 +317,7 @@ namespace dlib
         _cons.reset();
         while (_cons.move_next())
         {
-            scoped_ptr<thread_function> ptr(new thread_function(&impl2::read_thread,
+            std::unique_ptr<thread_function> ptr(new thread_function(&impl2::read_thread,
                                                                 _cons.element().value().get(),
                                                                 _node_id,
                                                                 _cons.element().key(),

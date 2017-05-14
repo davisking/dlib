@@ -154,10 +154,10 @@ namespace dlib
             thecon->shutdown();
         }
 
-        scoped_ptr<timeout> con_timeout;
+        std::unique_ptr<timeout> con_timeout;
         rmutex class_mutex; 
         std::shared_ptr<connection> con;
-        scoped_ptr<sockstreambuf> buf;
+        std::unique_ptr<sockstreambuf> buf;
 
     };
 
