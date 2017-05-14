@@ -3,11 +3,13 @@
 #ifndef DLIB_SOCKETS_EXTENSIONs_
 #define DLIB_SOCKETS_EXTENSIONs_
 
+#include <iosfwd>
+#include <memory>
 #include <string>
+
 #include "../sockets.h"
 #include "sockets_extensions_abstract.h"
-#include "../smart_pointers/scoped_ptr.h"
-#include <iosfwd>
+
 
 namespace dlib
 {
@@ -132,7 +134,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void close_gracefully (
-        scoped_ptr<connection>& con,
+        std::unique_ptr<connection>& con,
         unsigned long timeout = 500
     );
 

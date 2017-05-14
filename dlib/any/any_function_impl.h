@@ -166,7 +166,7 @@ struct Tbase
 {
     virtual ~Tbase() {}
     virtual result_type evaluate () const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -177,7 +177,7 @@ struct Tbase<T (A1)>
 {
     virtual ~Tbase() {}
     virtual T evaluate ( A1) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -188,7 +188,7 @@ struct Tbase<T (A1,A2)>
 {
     virtual ~Tbase() {}
     virtual T evaluate (A1,A2) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -199,7 +199,7 @@ struct Tbase<T (A1,A2,A3)>
 {
     virtual ~Tbase() {}
     virtual T evaluate (A1,A2,A3) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -211,7 +211,7 @@ struct Tbase<T (A1,A2,A3,A4)>
 {
     virtual ~Tbase() {}
     virtual T evaluate (A1,A2,A3,A4) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -223,7 +223,7 @@ struct Tbase<T (A1,A2,A3,A4,A5)>
 {
     virtual ~Tbase() {}
     virtual T evaluate (A1,A2,A3,A4,A5) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -235,7 +235,7 @@ struct Tbase<T (A1,A2,A3,A4,A5,A6)>
 {
     virtual ~Tbase() {}
     virtual T evaluate (A1,A2,A3,A4,A5,A6) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -248,7 +248,7 @@ struct Tbase<T (A1,A2,A3,A4,A5,A6,A7)>
 {
     virtual ~Tbase() {}
     virtual T evaluate (A1,A2,A3,A4,A5,A6,A7) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -261,7 +261,7 @@ struct Tbase<T (A1,A2,A3,A4,A5,A6,A7,A8)>
 {
     virtual ~Tbase() {}
     virtual T evaluate (A1,A2,A3,A4,A5,A6,A7,A8) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -274,7 +274,7 @@ struct Tbase<T (A1,A2,A3,A4,A5,A6,A7,A8,A9)>
 {
     virtual ~Tbase() {}
     virtual T evaluate (A1,A2,A3,A4,A5,A6,A7,A8,A9) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 template <
@@ -288,7 +288,7 @@ struct Tbase<T (A1,A2,A3,A4,A5,A6,A7,A8,A9,A10)>
 {
     virtual ~Tbase() {}
     virtual T evaluate (A1,A2,A3,A4,A5,A6,A7,A8,A9,A10) const = 0;
-    virtual void copy_to ( scoped_ptr<Tbase>& dest) const = 0;
+    virtual void copy_to ( std::unique_ptr<Tbase>& dest) const = 0;
 };
 
 typedef Tbase<function_type> base;
@@ -318,7 +318,7 @@ static typename disable_if<is_function<T>,const T&>::type deref (const U& item) 
     typename funct_type<T>::type item;                      \
     derived() {}                                            \
     derived(const T& val) : item(copy(val)) {}              \
-    virtual void copy_to ( scoped_ptr<base>& dest) const    \
+    virtual void copy_to ( std::unique_ptr<base>& dest) const    \
     { dest.reset(new derived(deref<T>(item))); }
 
 template <typename T, typename FT>
@@ -508,7 +508,7 @@ struct derived<T,result_type (A1,A2,A3,A4,A5,A6,A7,A8,A9,A10)> : public base
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 };
 
-scoped_ptr<base> data;
+std::unique_ptr<base> data;
 
 #undef DLIB_ANY_FUNCTION_DERIVED_BOILERPLATE
 

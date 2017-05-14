@@ -3002,7 +3002,7 @@ namespace dlib
             const std::string old_path = path;
             const long old_cur_dir = cur_dir;
 
-            scoped_ptr<toggle_button> new_btn(new toggle_button(*this));
+            std::unique_ptr<toggle_button> new_btn(new toggle_button(*this));
             new_btn->set_name(folder_name);
             new_btn->set_click_handler(*this,&box_win::on_path_button_click);
 
@@ -3011,7 +3011,7 @@ namespace dlib
             {
                 while (sob.size() > (unsigned long)(cur_dir+1))
                 {
-                    scoped_ptr<toggle_button> junk;
+                    std::unique_ptr<toggle_button> junk;
                     sob.remove(cur_dir+1,junk);
                 }
             }

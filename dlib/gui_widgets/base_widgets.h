@@ -4,6 +4,7 @@
 #ifndef DLIB_BASE_WIDGETs_
 #define DLIB_BASE_WIDGETs_
 
+#include <cctype>
 #include <memory>
 
 #include "base_widgets_abstract.h"
@@ -19,9 +20,7 @@
 #include "../image_transforms/assign_image.h"
 #include "../array.h" 
 #include "style.h"
-#include "../smart_pointers/scoped_ptr.h"
 #include "../unicode.h"
-#include <cctype>
 #include "../any.h"
 
 
@@ -696,7 +695,7 @@ namespace dlib
 
         };
         friend struct data;
-        scoped_ptr<data> stuff;
+        std::unique_ptr<data> stuff;
 
 
 
@@ -954,7 +953,7 @@ namespace dlib
         any_function<void(button&)> button_down_handler_self;
         any_function<void(bool,button&)> button_up_handler_self;
 
-        scoped_ptr<button_style> style;
+        std::unique_ptr<button_style> style;
 
     protected:
 
@@ -1417,7 +1416,7 @@ namespace dlib
         timer<scroll_bar> top_filler_timer;
         timer<scroll_bar> bottom_filler_timer;
         long delayed_pos;
-        scoped_ptr<scroll_bar_style> style;
+        std::unique_ptr<scroll_bar_style> style;
 
         // restricted functions
         scroll_bar(scroll_bar&);        // copy constructor
@@ -1927,7 +1926,7 @@ namespace dlib
         {
             auto_mutex M(wm);
             bool t = true;
-            scoped_ptr<menu_item> item(new menu_item_type(new_item));
+            std::unique_ptr<menu_item> item(new menu_item_type(new_item));
             items.push_back(item);
             item_enabled.push_back(t);
 
@@ -2137,7 +2136,7 @@ namespace dlib
         rectangle win_rect; 
         unsigned long left_width;    
         unsigned long middle_width;    
-        array<scoped_ptr<menu_item> > items;
+        array<std::unique_ptr<menu_item> > items;
         array<bool> item_enabled;
         array<rectangle> left_rects;
         array<rectangle> middle_rects;
@@ -2358,7 +2357,7 @@ namespace dlib
         scroll_bar vsb;
         scroll_bar hsb;
 
-        scoped_ptr<scrollable_region_style> style;
+        std::unique_ptr<scrollable_region_style> style;
 
         // restricted functions
         zoomable_region(zoomable_region&);        // copy constructor
@@ -2578,7 +2577,7 @@ namespace dlib
         bool mouse_drag_enabled_;
         bool user_is_dragging_mouse;
         point drag_origin;
-        scoped_ptr<scrollable_region_style> style;
+        std::unique_ptr<scrollable_region_style> style;
 
     };
 

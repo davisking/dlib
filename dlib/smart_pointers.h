@@ -13,9 +13,19 @@
 #pragma GCC warning "smart_pointers.h is included which will fail to compile under C++17"
 #endif
 
-#include "smart_pointers/scoped_ptr.h"
+#include <memory>
+
 #include "smart_pointers/shared_ptr.h"
 #include "smart_pointers/weak_ptr.h"
+
+namespace dlib {
+  // Template alias for compatibility with clients using old dlib::scoped_ptr
+  // Old scoped_ptr implementation is removed completely
+  
+  template <class T, class Deleter = std::default_delete<T> >
+  using scoped_ptr = std::unique_ptr<T, Deleter>;
+
+}
 
 #endif // DLIB_SMART_POINTERs_H_ 
 

@@ -332,7 +332,7 @@ namespace dlib
         };
 
 
-        scoped_ptr<base> the_problem;
+        std::unique_ptr<base> the_problem;
     };
 
 // ----------------------------------------------------------------------------------------
