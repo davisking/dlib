@@ -7,12 +7,7 @@ build_script:
   - mkdir %APPVEYOR_BUILD_FOLDER%\build_test
   - cd %APPVEYOR_BUILD_FOLDER%\build_test
   - cmake -G "Visual Studio 14 2015 Win64" ../dlib/test
-  - cmake --build . --config %CONFIGURATION% --target dtest -- /m /verbosity:minimal
-  # build examples
-  - mkdir %APPVEYOR_BUILD_FOLDER%\build_examples
-  - cd %APPVEYOR_BUILD_FOLDER%\build_examples
-  - cmake -G "Visual Studio 14 2015 Win64" ../examples
-  - cmake --build . --config %CONFIGURATION% -- /m /verbosity:minimal
+  - cmake --build . --config %CONFIGURATION% 
 
 test_script:
   # run test
