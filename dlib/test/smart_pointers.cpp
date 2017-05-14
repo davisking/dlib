@@ -98,37 +98,37 @@ namespace
 
             DLIB_TEST_MSG(counter == 2,counter);
 
-            DLIB_TEST(p1);
-            DLIB_TEST(p2);
+            DLIB_TEST(bool(p1));
+            DLIB_TEST(bool(p2));
 
             DLIB_TEST_MSG(counter == 2,counter);
             p1.reset();
             DLIB_TEST_MSG(counter == 1,counter);
-            DLIB_TEST(!p1);
-            DLIB_TEST(p2);
+            DLIB_TEST(!bool(p1));
+            DLIB_TEST(bool(p2));
             p1.reset(new derived);
             DLIB_TEST_MSG(counter == 2,counter);
-            DLIB_TEST(p1);
+            DLIB_TEST(bool(p1));
 
 
             DLIB_TEST_MSG(counter == 2,counter);
             p2.reset();
             DLIB_TEST_MSG(counter == 1,counter);
-            DLIB_TEST(!p2);
+            DLIB_TEST(!bool(p2));
             derived* d = new derived;
             p2.reset(d);
             DLIB_TEST(p2.get() == d);
             DLIB_TEST_MSG(counter == 2,counter);
-            DLIB_TEST(p2);
-            DLIB_TEST(!p3);
+            DLIB_TEST(bool(p2));
+            DLIB_TEST(!bool(p3));
             p2->num = 9;
             swap(p2,p3);
-            DLIB_TEST(!p2);
-            DLIB_TEST(p3);
+            DLIB_TEST(!bool(p2));
+            DLIB_TEST(bool(p3));
             DLIB_TEST(p3->num == 9);
             p2.swap(p3);
-            DLIB_TEST(p2);
-            DLIB_TEST(!p3);
+            DLIB_TEST(bool(p2));
+            DLIB_TEST(!bool(p3));
             DLIB_TEST(p2->num == 9);
 
 
