@@ -8,6 +8,7 @@
 #include <string>
 
 #include "../sockets.h"
+#include "../smart_pointers/scoped_ptr.h"
 #include "sockets_extensions_abstract.h"
 
 
