@@ -294,6 +294,8 @@ namespace
 
         dlog << LINFO << "*******************************************************";
 
+        dlog << LINFO << "alpha: " << trans(alpha);
+        dlog << LINFO << "lambda: " << trans(lambda);
         dlog << LINFO << "w:     " << trans(w);
 
 
@@ -306,6 +308,8 @@ namespace
         DLIB_TEST_MSG(abs(computed_obj - true_obj) < 1e-8, 
             "computed_obj: "<< computed_obj << "  true_obj: " << true_obj << "  delta: "<<  abs(computed_obj - true_obj)
             << "  iters: " << iters
+            << "\n  alpha: " << trans(alpha) 
+            << "   lambda: " << trans(lambda) 
             );
     }
 
