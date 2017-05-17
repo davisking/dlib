@@ -458,6 +458,8 @@ namespace
         cout << "   KKT gap:     "<< big-little << endl;
         cout << "   iter:        "<< iter+1 << endl;
         cout << "   eps:         "<< eps << endl;
+        cout << "   alpha:       "<< trans(alpha);
+        cout << "   lambda:      "<< trans(lambda);
 
 
         return iter+1;
@@ -489,6 +491,10 @@ namespace
         dlog << LINFO << "lambda: " << trans(lambda);
         dlog << LINFO << "w:     " << trans(w);
 
+        cout << "   outside solve_qp4_using_smo_local(): " << endl;
+        cout << "   w:           "<< trans(w);
+        cout << "   alpha:       "<< trans(alpha);
+        cout << "   lambda:      "<< trans(lambda);
 
         const double computed_obj = compute_objective_value(w,A,b,C);
         w = 0, 0, 0;
