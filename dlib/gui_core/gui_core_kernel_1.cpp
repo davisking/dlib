@@ -1938,13 +1938,11 @@ namespace dlib
         if (has_been_destroyed == true)
             return;
 
-        POINT p;
-        p.x = 0;
-        p.y = 0;
-        ClientToScreen(hwnd,&p);
+        RECT rcWnd;
+        GetWindowRect(hwnd,&rcWnd);
 
-        x_ = p.x;
-        y_ = p.y;
+        x_ = rcWnd.left;
+        y_ = rcWnd.top;
     }
 
 // ----------------------------------------------------------------------------------------
