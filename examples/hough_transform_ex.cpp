@@ -15,6 +15,7 @@
 #include <dlib/image_transforms.h>
 
 using namespace dlib;
+using namespace dlib::constants;
 
 int main()
 {

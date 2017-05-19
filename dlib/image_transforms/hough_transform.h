@@ -38,6 +38,7 @@ namespace dlib
             const double scale = 1<<16;
             for (unsigned long t = 0; t < size_; ++t)
             {
+                using namespace dlib::constants;
                 double theta = t*pi/even_size;
 
                 cos_theta[t] = scale*std::cos(theta)/sqrt_2;
@@ -86,8 +87,8 @@ namespace dlib
             const vect cent = center(box);
             double theta = p.x()-cent.x();
             double radius = p.y()-cent.y();
-            theta = theta*pi/even_size;
-            radius = radius*sqrt_2 + 0.5;
+            theta = theta*constants::pi/even_size;
+            radius = radius*constants::sqrt_2 + 0.5;
 
             // now make a line segment on the line.
             vect v1 = cent + vect(size()+1000,0) + vect(0,radius);

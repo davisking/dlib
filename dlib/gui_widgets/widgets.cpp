@@ -5934,7 +5934,7 @@ namespace dlib
             last = cur;
 
             const vector<double> radius = tform.get_camera_pos()-tform.get_camera_looking_at();
-            delta *= 2*pi*length(radius)/600.0;
+            delta *= 2*constants::pi*length(radius)/600.0;
             vector<double> tangent_x = tform.get_camera_up_direction().cross(radius).normalize();
             vector<double> tangent_y = radius.cross(tangent_x).normalize();
             vector<double> new_pos = tform.get_camera_pos() + tangent_x*delta.x() + tangent_y*-delta.y(); 
@@ -5957,7 +5957,7 @@ namespace dlib
             last = cur;
 
             const vector<double> radius = tform.get_camera_pos()-tform.get_camera_looking_at();
-            delta *= 2*pi*length(radius)/600.0;
+            delta *= 2*constants::pi*length(radius)/600.0;
             vector<double> tangent_x = tform.get_camera_up_direction().cross(radius).normalize();
             vector<double> tangent_y = radius.cross(tangent_x).normalize();
 

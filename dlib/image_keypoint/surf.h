@@ -87,7 +87,7 @@ namespace dlib
             << "\n\t center:        " << center 
             << "\n\t scale:         " << scale 
         );
-
+        using namespace dlib::constants;
 
         std::vector<double> ang;
         std::vector<dlib::vector<double,2> > samples;
