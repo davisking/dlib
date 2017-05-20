@@ -127,6 +127,7 @@ void convert_dlib_xml_to_caffe_python_code(
     fout << "batch_size = 1;" << endl;
     if (layers.back().detail_name == "input_rgb_image")
     {
+        cout << "WARNING: The source dlib network didn't commit to a specific input tensor size, we are using a default size of 28x28x1 which is appropriate for MNIST input.  But if you are using different inputs you will need to edit the auto-generated python script to tell it your input size." << endl;
         fout << "input_nr = 28; #WARNING, the source dlib network didn't commit to a specific input size, so we put 28 here as a default.  It might not be the right value." << endl;
         fout << "input_nc = 28; #WARNING, the source dlib network didn't commit to a specific input size, so we put 28 here as a default.  It might not be the right value." << endl;
         fout << "input_k = 3;" << endl;
@@ -139,6 +140,7 @@ void convert_dlib_xml_to_caffe_python_code(
     }
     else if (layers.back().detail_name == "input")
     {
+        cout << "WARNING: The source dlib network didn't commit to a specific input tensor size, we are using a default size of 28x28x1 which is appropriate for MNIST input.  But if you are using different inputs you will need to edit the auto-generated python script to tell it your input size." << endl;
         fout << "input_nr = 28; #WARNING, the source dlib network didn't commit to a specific input size, so we put 28 here as a default.  It might not be the right value." << endl;
         fout << "input_nc = 28; #WARNING, the source dlib network didn't commit to a specific input size, so we put 28 here as a default.  It might not be the right value." << endl;
         fout << "input_k = 1;" << endl;
@@ -220,11 +222,6 @@ void convert_dlib_xml_to_caffe_python_code(
             {
                 fout << ", kernel_w=" << i->attribute("nc");
                 fout << ", kernel_h=" << i->attribute("nr");
-            }
-            if (i->attribute("padding_x") != 0 || i->attribute("padding_y") != 0)
-            {
-                throw dlib::error("dlib and caffe implement pooling with non-zero padding differently, so you can't convert a "
-                    "network with such pooling layers.");
             }
 
             fout << ", stride_w=" << i->attribute("stride_x");
