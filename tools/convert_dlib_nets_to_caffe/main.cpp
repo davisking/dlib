@@ -143,9 +143,9 @@ void convert_dlib_xml_to_caffe_python_code(
         fout << "input_num_rows = " << layers.back().attribute("nr") << ";" << endl;
         fout << "input_num_cols = " << layers.back().attribute("nc") << ";" << endl;
         if (NR != layers.back().attribute("nr"))
-            throw dlib::error("The dlib model requires input tensors with NUM_ROWS=="+to_string(layers.back().attribute("nr"))+", but the dtoc command line specified NUM_ROWS=="+to_string(NR));
+            throw dlib::error("The dlib model requires input tensors with NUM_ROWS=="+to_string((long)layers.back().attribute("nr"))+", but the dtoc command line specified NUM_ROWS=="+to_string(NR));
         if (NC != layers.back().attribute("nc"))
-            throw dlib::error("The dlib model requires input tensors with NUM_COLUMNS=="+to_string(layers.back().attribute("nc"))+", but the dtoc command line specified NUM_COLUMNS=="+to_string(NC));
+            throw dlib::error("The dlib model requires input tensors with NUM_COLUMNS=="+to_string((long)layers.back().attribute("nc"))+", but the dtoc command line specified NUM_COLUMNS=="+to_string(NC));
         if (K != 3)
             throw dlib::error("The dlib model requires input tensors with NUM_CHANNELS==3, but the dtoc command line specified NUM_CHANNELS=="+to_string(K));
     }
