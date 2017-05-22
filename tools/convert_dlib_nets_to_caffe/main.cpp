@@ -105,7 +105,11 @@ void print_as_np_array(std::ostream& out, const matrix_exp<EXP>& m)
 // ----------------------------------------------------------------------------------------
 
 void convert_dlib_xml_to_caffe_python_code(
-    const string& xml_filename
+    const string& xml_filename,
+    const long N,
+    const long K,
+    const long NR,
+    const long NC
 )
 {
     const string out_filename = left_substr(xml_filename,".") + "_dlib_to_caffe_model.py";
@@ -124,26 +128,34 @@ void convert_dlib_xml_to_caffe_python_code(
 
     // dlib nets don't commit to a batch size, so just use 1 as the default
     fout << "\n# Input tensor dimensions" << endl;
-    fout << "batch_size = 1;" << endl;
+    fout << "input_batch_size = " << N << ";" << endl;
     if (layers.back().detail_name == "input_rgb_image")
     {
-        cout << "WARNING: The source dlib network didn't commit to a specific input tensor size, we are using a default size of 28x28x1 which is appropriate for MNIST input.  But if you are using different inputs you will need to edit the auto-generated python script to tell it your input size." << endl;
-        fout << "input_nr = 28; #WARNING, the source dlib network didn't commit to a specific input size, so we put 28 here as a default.  It might not be the right value." << endl;
-        fout << "input_nc = 28; #WARNING, the source dlib network didn't commit to a specific input size, so we put 28 here as a default.  It might not be the right value." << endl;
-        fout << "input_k = 3;" << endl;
+        fout << "input_num_channels = 3;" << endl;
+        fout << "input_num_rows = "<<NR<<";" << endl;
+        fout << "input_num_cols = "<<NC<<";" << endl;
+        if (K != 3)
+            throw dlib::error("The dlib model requires input tensors with NUM_CHANNELS==3, but the dtoc command line specified NUM_CHANNELS=="+to_string(K));
     }
     else if (layers.back().detail_name == "input_rgb_image_sized")
     {
-        fout << "input_nr = " << layers.back().attribute("nr") << ";" << endl;
-        fout << "input_nc = " << layers.back().attribute("nc") << ";" << endl;
-        fout << "input_k = 3;" << endl;
+        fout << "input_num_channels = 3;" << endl;
+        fout << "input_num_rows = " << layers.back().attribute("nr") << ";" << endl;
+        fout << "input_num_cols = " << layers.back().attribute("nc") << ";" << endl;
+        if (NR != layers.back().attribute("nr"))
+            throw dlib::error("The dlib model requires input tensors with NUM_ROWS=="+to_string(layers.back().attribute("nr"))+", but the dtoc command line specified NUM_ROWS=="+to_string(NR));
+        if (NC != layers.back().attribute("nc"))
+            throw dlib::error("The dlib model requires input tensors with NUM_COLUMNS=="+to_string(layers.back().attribute("nc"))+", but the dtoc command line specified NUM_COLUMNS=="+to_string(NC));
+        if (K != 3)
+            throw dlib::error("The dlib model requires input tensors with NUM_CHANNELS==3, but the dtoc command line specified NUM_CHANNELS=="+to_string(K));
     }
     else if (layers.back().detail_name == "input")
     {
-        cout << "WARNING: The source dlib network didn't commit to a specific input tensor size, we are using a default size of 28x28x1 which is appropriate for MNIST input.  But if you are using different inputs you will need to edit the auto-generated python script to tell it your input size." << endl;
-        fout << "input_nr = 28; #WARNING, the source dlib network didn't commit to a specific input size, so we put 28 here as a default.  It might not be the right value." << endl;
-        fout << "input_nc = 28; #WARNING, the source dlib network didn't commit to a specific input size, so we put 28 here as a default.  It might not be the right value." << endl;
-        fout << "input_k = 1;" << endl;
+        fout << "input_num_channels = 1;" << endl;
+        fout << "input_num_rows = "<<NR<<";" << endl;
+        fout << "input_num_cols = "<<NC<<";" << endl;
+        if (K != 1)
+            throw dlib::error("The dlib model requires input tensors with NUM_CHANNELS==1, but the dtoc command line specified NUM_CHANNELS=="+to_string(K));
     }
     else
     {
@@ -173,7 +185,7 @@ void convert_dlib_xml_to_caffe_python_code(
     fout << "    # For reference, the only \"documentation\" about caffe layer parameters seems to be this page:\n";
     fout << "    # https://github.com/BVLC/caffe/blob/master/src/caffe/proto/caffe.proto\n" << endl;
     fout << "    n = caffe.NetSpec(); " << endl;
-    fout << "    n.data,n.label = L.MemoryData(batch_size=batch_size, channels=input_k, height=input_nr, width=input_nc, ntop=2)" << endl;
+    fout << "    n.data,n.label = L.MemoryData(batch_size=input_batch_size, channels=input_num_channels, height=input_num_rows, width=input_num_cols, ntop=2)" << endl;
     // iterate the layers starting with the input layer
     for (auto i = layers.rbegin(); i != layers.rend(); ++i)
     {
@@ -389,15 +401,24 @@ void convert_dlib_xml_to_caffe_python_code(
 
 int main(int argc, char** argv) try
 {
-    if (argc == 1)
+    if (argc != 6)
     {
-        cout << "Give this program an xml file generated by dlib::net_to_xml() and it will" << endl;
-        cout << "convert it into a python file that outputs a caffe model containing the dlib model." << endl;
+        cout << "To use this program, give it an xml file generated by dlib::net_to_xml() " << endl;
+        cout << "and then 4 numbers that indicate the input tensor size.  It will convert " << endl;
+        cout << "the xml file into a python file that outputs a caffe model containing the dlib model." << endl;
+        cout << "For example, you might run this program like this: " << endl;
+        cout << "   ./dtoc lenet.xml 1 1 28 28" << endl;
+        cout << "would convert the lenet.xml model into a caffe model with an input tensor of shape(1,1,28,28)" << endl;
+        cout << "where the shape values are (num samples in batch, num channels, num rows, num columns)." << endl;
         return 0;
     }
 
-    for (int i = 1; i < argc; ++i)
-        convert_dlib_xml_to_caffe_python_code(argv[i]);
+    const long N = sa = argv[2];
+    const long K = sa = argv[3];
+    const long NR = sa = argv[4];
+    const long NC = sa = argv[5];
+
+    convert_dlib_xml_to_caffe_python_code(argv[1], N, K, NR, NC);
 
     return 0;
 }
