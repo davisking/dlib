@@ -77,6 +77,7 @@
          <term file="dlib/dnn/core_abstract.h.html" name="layer" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="input_layer" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layers" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layers_until_tag" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameters" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameter_gradients" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layers_backwards" include="dlib/dnn.h"/>
