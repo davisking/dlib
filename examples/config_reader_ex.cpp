@@ -8,6 +8,7 @@
     prints out the values of various fields in the file.
 */
 
+#error Should fail to build - testing Travis CI
 
 #include <dlib/config_reader.h>
 #include <iostream>
