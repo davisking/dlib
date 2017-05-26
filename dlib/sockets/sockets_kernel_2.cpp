@@ -461,7 +461,7 @@ namespace dlib
         // setup a timeval structure
         timeval time_to_wait;
         time_to_wait.tv_sec = static_cast<long>(timeout/1000);
-        time_to_wait.tv_usec = static_cast<long>((timeout%1000)*1000);
+        time_to_wait.tv_usec = (int)static_cast<long>((timeout%1000)*1000);
 
         // wait on select
         int status = select(connection_socket+1,&read_set,0,0,&time_to_wait);
@@ -573,7 +573,7 @@ namespace dlib
 
                 // setup a timeval structure
                 time_to_wait.tv_sec = static_cast<long>(timeout/1000);
-                time_to_wait.tv_usec = static_cast<long>((timeout%1000)*1000);
+                time_to_wait.tv_usec = (int)static_cast<long>((timeout%1000)*1000);
 
                 // wait on select
                 int status = select(listening_socket+1,&read_set,0,0,&time_to_wait);

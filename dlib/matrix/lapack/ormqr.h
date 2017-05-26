@@ -34,7 +34,7 @@ namespace dlib
                 DLIB_FORTRAN_ID(dormqr)(&side, &trans, &m, &n,
                                         &k, a, &lda, tau,
                                         c_, &ldc, work, &lwork, &info);
-                return info;
+                return (int)info;
             }
 
             inline int ormqr (char side, char trans, integer m, integer n, 
@@ -45,7 +45,7 @@ namespace dlib
                 DLIB_FORTRAN_ID(sormqr)(&side, &trans, &m, &n,
                                         &k, a, &lda, tau,
                                         c_, &ldc, work, &lwork, &info);
-                return info;
+                return (int)info;
             }
 
 

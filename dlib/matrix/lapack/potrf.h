@@ -26,14 +26,14 @@ namespace dlib
             {
                 integer info = 0;
                 DLIB_FORTRAN_ID(dpotrf)(&uplo, &n, a, &lda, &info);
-                return info;
+                return (int)info;
             }
 
             inline int potrf (char uplo, integer n, float *a, integer lda)
             {
                 integer info = 0;
                 DLIB_FORTRAN_ID(spotrf)(&uplo, &n, a, &lda, &info);
-                return info;
+                return (int)info;
             }
 
         }

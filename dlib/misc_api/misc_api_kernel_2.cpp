@@ -35,7 +35,7 @@ namespace dlib
             ::usleep(milliseconds*1000);
         }
 #else
-        ::usleep(milliseconds*1000);
+        ::usleep((unsigned int)milliseconds*1000);
 #endif
     }
 

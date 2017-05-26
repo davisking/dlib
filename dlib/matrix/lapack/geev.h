@@ -36,7 +36,7 @@ namespace dlib
                                        &lda, wr, wi, vl, 
                                        &ldvl, vr, &ldvr, work,
                                        &lwork, &info);
-                return info;
+                return (int)info;
             }
 
             inline int geev (char jobvl, char jobvr, integer n, float *a, 
@@ -49,7 +49,7 @@ namespace dlib
                                        &lda, wr, wi, vl, 
                                        &ldvl, vr, &ldvr, work,
                                        &lwork, &info);
-                return info;
+                return (int)info;
             }
 
 

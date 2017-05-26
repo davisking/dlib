@@ -60,7 +60,7 @@ namespace dlib
         {
             std::memcpy(pptr(),s,static_cast<size_t>(space_left));
             s += space_left;
-            pbump(space_left);
+            pbump((int)space_left);
             std::streamsize num_left = num - space_left;
 
             if (flush_out_buffer() == EOF)
@@ -72,7 +72,7 @@ namespace dlib
             if (num_left < out_buffer_size)
             {
                 std::memcpy(pptr(),s,static_cast<size_t>(num_left));
-                pbump(num_left);
+                pbump((int)num_left);
                 return num;
             }
             else
@@ -118,7 +118,7 @@ namespace dlib
             }
         }
 
-        int num = con.read(in_buffer+max_putback, in_buffer_size-max_putback);
+        int num = (int)con.read(in_buffer+max_putback, in_buffer_size-max_putback);
         if (num <= 0)
         {
             // an error occurred or the connection is over which is EOF

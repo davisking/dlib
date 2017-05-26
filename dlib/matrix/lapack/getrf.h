@@ -27,7 +27,7 @@ namespace dlib
             {
                 integer info = 0;
                 DLIB_FORTRAN_ID(dgetrf)(&m, &n, a, &lda, ipiv, &info);
-                return info;
+                return (int)info;
             }
 
             inline int getrf (integer m, integer n, float *a, 
@@ -35,7 +35,7 @@ namespace dlib
             {
                 integer info = 0;
                 DLIB_FORTRAN_ID(sgetrf)(&m, &n, a, &lda, ipiv, &info);
-                return info;
+                return (int)info;
             }
 
 

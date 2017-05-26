@@ -163,7 +163,7 @@ namespace dlib
         bool error = false; // becomes true if one of the connections returns an error
         while (true)
         {
-            status = a.read(buf,sizeof(buf));
+            status = (int)a.read(buf,sizeof(buf));
             // if there was an error reading from the socket
             if (status == OTHER_ERROR)
             {
@@ -183,7 +183,7 @@ namespace dlib
                 break;            
             }
 
-            status = b.write(buf,status);
+            status = (int)b.write(buf,status);
             // if there was an error writing to the socket then break
             if (status == OTHER_ERROR)
             {
@@ -291,7 +291,7 @@ namespace dlib
         bool error = false;
         while (true)
         {
-            status = b.read(buf,sizeof(buf));
+            status = (int)b.read(buf,sizeof(buf));
             // if there was an error reading from the socket
             if (status == OTHER_ERROR)
             {
@@ -313,7 +313,7 @@ namespace dlib
             }
 
 
-            status = a.write(buf,status);
+            status = (int)a.write(buf,status);
             // if there was an error writing to the socket then break
             if (status == OTHER_ERROR)
             {

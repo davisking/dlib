@@ -419,7 +419,7 @@ namespace dlib
                    
 
 
-                    target = coder.get_target(total_count);
+                    target = coder.get_target((unsigned int)total_count);
 
                     // find either the symbol we are looking for or the 
                     // end of the context set
@@ -453,7 +453,7 @@ namespace dlib
 
                         symbol = n->symbol;
             
-                        coder.decode(low_count,high_count);
+                        coder.decode((unsigned int)low_count,(unsigned int)high_count);
                         c = n->count += 8;
                         t = temp->total += 8;
 
@@ -500,7 +500,7 @@ namespace dlib
                         n->next = new_node;
 
                         // get the escape code
-                        coder.decode(high_count,total_count);
+                        coder.decode((unsigned int)high_count,(unsigned int)total_count);
                     }
                         
                 } 
@@ -550,7 +550,7 @@ namespace dlib
                 // so we can just take care of that here.
                 target = coder.get_target(alphabet_size);
                 new_node->parent_context = root;
-                coder.decode(target,target+1);
+                coder.decode((unsigned int)target,(unsigned int)target+1);
                 symbol = target;
 
                 if (cur == 0)

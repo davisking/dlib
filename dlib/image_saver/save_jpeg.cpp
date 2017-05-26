@@ -82,8 +82,8 @@ namespace dlib
         jpeg_create_compress(&cinfo);
         jpeg_stdio_dest(&cinfo, outfile);
          
-        cinfo.image_width      = img.nc();
-        cinfo.image_height     = img.nr();
+        cinfo.image_width      = (unsigned int)img.nc();
+        cinfo.image_height     = (unsigned int)img.nr();
         cinfo.input_components = 3;
         cinfo.in_color_space   = JCS_RGB;
         jpeg_set_defaults(&cinfo);
@@ -144,8 +144,8 @@ namespace dlib
         jpeg_create_compress(&cinfo);
         jpeg_stdio_dest(&cinfo, outfile);
          
-        cinfo.image_width      = img.nc();
-        cinfo.image_height     = img.nr();
+        cinfo.image_width      = (unsigned int)img.nc();
+        cinfo.image_height     = (unsigned int)img.nr();
         cinfo.input_components = 1;
         cinfo.in_color_space   = JCS_GRAYSCALE;
         jpeg_set_defaults(&cinfo);

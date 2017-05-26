@@ -467,7 +467,7 @@ namespace dlib
         std::streambuf& inputbuf = *input.rdbuf();
         while(!at_end)
         {
-            int num = inputbuf.sgetn(reinterpret_cast<char*>(temp),64);
+            int num = (int)inputbuf.sgetn(reinterpret_cast<char*>(temp),64);
             len += num;
 
             // if we hit the end of the stream then pad and add length

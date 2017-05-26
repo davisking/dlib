@@ -39,7 +39,7 @@ namespace dlib
                                         &iu, &abstol, m, w,
                                         z, &ldz, isuppz, work,
                                         &lwork, iwork, &liwork, &info);
-                return info;
+                return (int)info;
             }
 
             inline int syevr (char jobz, char range, char uplo, integer n, 
@@ -54,7 +54,7 @@ namespace dlib
                                         &iu, &abstol, m, w,
                                         z, &ldz, isuppz, work,
                                         &lwork, iwork, &liwork, &info);
-                return info;
+                return (int)info;
             }
 
         }
