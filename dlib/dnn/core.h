@@ -3477,6 +3477,71 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <size_t i, unsigned long tag_id>
+        struct vl_until_tag
+        {
+            template <
+                typename net_type,
+                typename next_net_type,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                next_net_type& next_net,
+                visitor&& v
+            )
+            {
+                v(next_net);
+                vl_until_tag<i+1,tag_id>::visit(net,layer<i+1>(net),v);
+            }
+
+            template <
+                typename net_type,
+                typename SUBNET,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                const add_tag_layer<tag_id,SUBNET>& next_net,
+                visitor&& v
+            )
+            {
+                v(next_net);
+            }
+
+            template <
+                typename net_type,
+                typename SUBNET,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                add_tag_layer<tag_id,SUBNET>& next_net,
+                visitor&& v
+            )
+            {
+                v(next_net);
+            }
+        };
+    }
+
+    template <
+        unsigned long tag_id,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_until_tag(
+        net_type& net,
+        visitor v
+    )
+    {
+        impl::vl_until_tag<0,tag_id>::visit(net, net, v);
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_CORE_H_
