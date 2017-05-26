@@ -6,4 +6,5 @@
 build
 dist
 *.egg-info/
+*.cbp
 
