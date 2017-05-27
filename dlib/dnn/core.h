@@ -60,11 +60,12 @@ namespace dlib
 
     namespace impl
     {
-        template <typename T, typename int_<decltype(&T::clean)>::type = 0>
-        void call_clean_method_if_exists (
+        // The reason we return an int for this version rather than doing the more straight forward thing (like we do above) is to avoid a bug in visual studio 2015.
+        template <typename T>
+        auto call_clean_method_if_exists (
             T& obj,
             special_
-        ) { obj.clean(); }
+        ) -> typename int_<decltype(&T::clean)>::type { obj.clean();  return 0;  }
 
         template <typename T>
         void call_clean_method_if_exists (T& , general_) {}
