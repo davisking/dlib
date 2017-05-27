@@ -562,6 +562,8 @@ namespace dlib
                   clean().  The purpose of clean() is to compact the network object prior
                   to saving it to disk so that it takes up less space and the IO is
                   quicker.
+                - This also calls the .clean() method on any layer details objects that 
+                  define a .clean() method.
         !*/
 
     };

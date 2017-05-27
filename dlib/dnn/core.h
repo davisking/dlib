@@ -60,6 +60,26 @@ namespace dlib
 
     namespace impl
     {
+        template <typename T, typename int_<decltype(&T::clean)>::type = 0>
+        void call_clean_method_if_exists (
+            T& obj,
+            special_
+        ) { obj.clean(); }
+
+        template <typename T>
+        void call_clean_method_if_exists (T& , general_) {}
+    }
+    template <typename T>
+    void call_clean_method_if_exists(T& obj) { impl::call_clean_method_if_exists(obj, special_()); }
+    /*!
+        ensures
+            - calls obj.clean() if obj has a .clean() method.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
         class repeat_input_layer 
         {
             /*!
@@ -893,6 +913,7 @@ namespace dlib
             temp_tensor.clear();
             gradient_input_is_stale = true;
             subnetwork->clean();
+            call_clean_method_if_exists(details);
         }
 
         friend void serialize(const add_layer& item, std::ostream& out)
@@ -1255,6 +1276,7 @@ namespace dlib
             params_grad.clear();
             temp_tensor.clear();
             gradient_input_is_stale = true;
+            call_clean_method_if_exists(details);
         }
 
         friend void serialize(const add_layer& item, std::ostream& out)
