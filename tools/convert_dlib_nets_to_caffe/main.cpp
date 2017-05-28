@@ -120,6 +120,90 @@ void print_as_np_array(std::ostream& out, const matrix_exp<EXP>& m)
 
 // ----------------------------------------------------------------------------------------
 
+template <typename iterator>
+void compute_caffe_padding_size_for_pooling_layer(
+    const iterator& i,
+    long& pad_x,
+    long& pad_y
+)
+/*!
+    requires
+        - i is a reverse iterator pointing to a layer in the list of layers produced by parse_dlib_xml().
+        - i is not an input layer.
+    ensures
+        - Caffe is funny about how it computes the output sizes from pooling layers.
+          Rather than using the normal formula for output row/column sizes used by all the
+          other layers (and what dlib uses everywhere), 
+            floor((bottom_size + 2*pad - kernel_size) / stride) + 1
+          it instead uses:
+            ceil((bottom_size + 2*pad - kernel_size) / stride) + 1
+
+          These are the same except when the stride!=1.  In that case we need to figure out
+          how to change the padding value so that the output size of the caffe padding
+          layer will match the output size of the dlib padding layer.   That is what this
+          function does.
+!*/
+{
+    const long dlib_output_nr = i->output_tensor_shape(2);
+    const long dlib_output_nc = i->output_tensor_shape(3);
+    const long bottom_nr = find_input_layer(i).output_tensor_shape(2);
+    const long bottom_nc = find_input_layer(i).output_tensor_shape(3);
+    const long padding_x = (long)i->attribute("padding_x");
+    const long padding_y = (long)i->attribute("padding_y");
+    const long stride_x = (long)i->attribute("stride_x");
+    const long stride_y = (long)i->attribute("stride_y");
+    long kernel_w = i->attribute("nc");
+    long kernel_h = i->attribute("nr");
+
+    if (kernel_w == 0)
+        kernel_w = bottom_nc;
+    if (kernel_h == 0)
+        kernel_h = bottom_nr;
+
+    
+    // The correct padding for caffe could be anything in the range [0,padding_x].  So
+    // check what gives the correct output size and use that.
+    for (pad_x = 0; pad_x <= padding_x; ++pad_x)
+    {
+        long caffe_out_size = ceil((bottom_nc + 2.0*pad_x - kernel_w)/(double)stride_x) + 1;
+        if (caffe_out_size == dlib_output_nc)
+            break;
+    }
+    if (pad_x == padding_x+1)
+    {
+        std::ostringstream sout;
+        sout << "No conversion between dlib pooling layer parameters and caffe pooling layer parameters found for layer " << to_string(i->idx) << endl;
+        sout << "dlib_output_nc: " << dlib_output_nc << endl;
+        sout << "bottom_nc:      " << bottom_nc << endl;
+        sout << "padding_x:      " << padding_x << endl;
+        sout << "stride_x:       " << stride_x << endl;
+        sout << "kernel_w:       " << kernel_w << endl;
+        sout << "pad_x:          " << pad_x << endl;
+        throw dlib::error(sout.str());
+    }
+
+    for (pad_y = 0; pad_y <= padding_y; ++pad_y)
+    {
+        long caffe_out_size = ceil((bottom_nr + 2.0*pad_y - kernel_h)/(double)stride_y) + 1;
+        if (caffe_out_size == dlib_output_nr)
+            break;
+    }
+    if (pad_y == padding_y+1)
+    {
+        std::ostringstream sout;
+        sout << "No conversion between dlib pooling layer parameters and caffe pooling layer parameters found for layer " << to_string(i->idx) << endl;
+        sout << "dlib_output_nr: " << dlib_output_nr << endl;
+        sout << "bottom_nr:      " << bottom_nr << endl;
+        sout << "padding_y:      " << padding_y << endl;
+        sout << "stride_y:       " << stride_y << endl;
+        sout << "kernel_h:       " << kernel_h << endl;
+        sout << "pad_y:          " << pad_y << endl;
+        throw dlib::error(sout.str());
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
 void convert_dlib_xml_to_caffe_python_code(
     const string& xml_filename,
     const long N,
@@ -255,8 +339,10 @@ void convert_dlib_xml_to_caffe_python_code(
 
             fout << ", stride_w=" << i->attribute("stride_x");
             fout << ", stride_h=" << i->attribute("stride_y");
-            fout << ", pad_w=" << i->attribute("padding_x");
-            fout << ", pad_h=" << i->attribute("padding_y");
+            long pad_x, pad_y;
+            compute_caffe_padding_size_for_pooling_layer(i, pad_x, pad_y);
+            fout << ", pad_w=" << pad_x;
+            fout << ", pad_h=" << pad_y;
             fout << ");\n";
         }
         else if (i->detail_name == "avg_pool")
@@ -280,8 +366,10 @@ void convert_dlib_xml_to_caffe_python_code(
 
             fout << ", stride_w=" << i->attribute("stride_x");
             fout << ", stride_h=" << i->attribute("stride_y");
-            fout << ", pad_w=" << i->attribute("padding_x");
-            fout << ", pad_h=" << i->attribute("padding_y");
+            long pad_x, pad_y;
+            compute_caffe_padding_size_for_pooling_layer(i, pad_x, pad_y);
+            fout << ", pad_w=" << pad_x;
+            fout << ", pad_h=" << pad_y;
             fout << ");\n";
         }
         else if (i->detail_name == "fc")
@@ -650,9 +738,16 @@ void compute_output_tensor_shapes(const matrix<long,4,1>& input_tensor_shape, st
                 long stride_y = i->attribute("stride_y");
                 long padding_x = i->attribute("padding_x");
                 long padding_y = i->attribute("padding_y");
-                long nr = 1+(input_shape(2) + 2*padding_y - filter_nr)/stride_y;
-                long nc = 1+(input_shape(3) + 2*padding_x - filter_nc)/stride_x;
-                i->output_tensor_shape = {input_shape(0), input_shape(1), nr, nc};
+                if (filter_nc != 0)
+                {
+                    long nr = 1+(input_shape(2) + 2*padding_y - filter_nr)/stride_y;
+                    long nc = 1+(input_shape(3) + 2*padding_x - filter_nc)/stride_x;
+                    i->output_tensor_shape = {input_shape(0), input_shape(1), nr, nc};
+                }
+                else // if we are filtering the whole input down to one thing
+                {
+                    i->output_tensor_shape = {input_shape(0), input_shape(1), 1, 1};
+                }
             }
             else if (i->detail_name == "add_prev")
             {
