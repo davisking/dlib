@@ -105,7 +105,6 @@ namespace dlib
             x = vld1q_s32(data);
         }
         inline simd4i(const int32x4_t& val):x(val) {}
-        inline simd4i(const uint32x4_t& val):x((int32x4_t)val) {}
 
         inline simd4i& operator=(const int32x4_t& val)
         {
