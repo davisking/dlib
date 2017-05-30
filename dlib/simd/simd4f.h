@@ -390,7 +390,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_cmpeq(lhs(), rhs());
 #elif defined(DLIB_HAVE_NEON)
-        return vceqq_f32(lhs, rhs);
+        return (int32x4_t)vceqq_f32(lhs, rhs);
 #else
         return simd4f_bool(lhs[0]==rhs[0],
                            lhs[1]==rhs[1],
@@ -424,7 +424,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_cmplt(lhs(), rhs());
 #elif defined(DLIB_HAVE_NEON)
-        return vcltq_f32(lhs, rhs);
+        return (int32x4_t)vcltq_f32(lhs, rhs);
 #else
         return simd4f_bool(lhs[0]<rhs[0],
                            lhs[1]<rhs[1],
@@ -449,7 +449,7 @@ namespace dlib
 #elif defined(DLIB_HAVE_VSX)
         return vec_cmple(lhs(), rhs());
 #elif defined(DLIB_HAVE_NEON)
-        return vcleq_f32(lhs, rhs);
+        return (int32x4_t)vcleq_f32(lhs, rhs);
 #else
         return simd4f_bool(lhs[0]<=rhs[0],
                            lhs[1]<=rhs[1],
