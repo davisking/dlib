@@ -170,6 +170,7 @@
          <term file="linear_algebra.html" name="resize_rect_height" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="centered_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="set_aspect_ratio" include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="set_rect_area" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="center" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="nearest_point" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="nearest_rect" include="dlib/geometry.h"/>
