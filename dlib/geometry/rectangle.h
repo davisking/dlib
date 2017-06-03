@@ -728,6 +728,29 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline rectangle set_rect_area (
+        const rectangle& rect,
+        unsigned long area
+    )
+    {
+        DLIB_ASSERT(area > 0);
+
+        if (rect.area() == 0)
+        {
+            // In this case we will make the output rectangle a square with the requested
+            // area.
+            unsigned long scale = std::round(std::sqrt(area));
+            return centered_rect(rect, scale, scale);
+        }
+        else
+        {
+            double scale = std::sqrt(area/(double)rect.area());
+            return centered_rect(rect, (long)std::round(rect.width()*scale), (long)std::round(rect.height()*scale));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline rectangle set_aspect_ratio (
         const rectangle& rect,
         double ratio
