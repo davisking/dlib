@@ -25,7 +25,7 @@ struct layer
 
     string detail_name; // The name of the tag inside the layer tag. e.g. fc, con, max_pool, input_rgb_image.
     std::map<string,double> attributes;
-    matrix<double> params;
+    matrix<float> params;
     long tag_id = -1;   // If this isn't -1 then it means this layer was tagged, e.g. wrapped with tag2<> giving tag_id==2
     long skip_id = -1;  // If this isn't -1 then it means this layer draws its inputs from
                         // the most recent layer with tag_id==skip_id rather than its immediate predecessor. 
@@ -106,17 +106,6 @@ string find_layer_caffe_name (
 
 template <typename iterator>
 string find_input_layer_caffe_name (iterator i) { return find_input_layer(i).caffe_layer_name(); }
-
-// ----------------------------------------------------------------------------------------
-
-template <typename EXP>
-void print_as_np_array(std::ostream& out, const matrix_exp<EXP>& m)
-{
-    out << "np.array([";
-    for (auto x : m)
-        out << x << ",";
-    out << "], dtype='float32')";
-}
 
 // ----------------------------------------------------------------------------------------
 
@@ -213,7 +202,9 @@ void convert_dlib_xml_to_caffe_python_code(
 )
 {
     const string out_filename = left_substr(xml_filename,".") + "_dlib_to_caffe_model.py";
-    cout << "Writing model to " << out_filename << endl;
+    const string out_weights_filename = left_substr(xml_filename,".") + "_dlib_to_caffe_model.weights";
+    cout << "Writing python part of model to " << out_filename << endl;
+    cout << "Writing weights part of model to " << out_weights_filename << endl;
     ofstream fout(out_filename);
     fout.precision(9);
     const auto layers = parse_dlib_xml({N,K,NR,NC}, xml_filename);
@@ -472,8 +463,10 @@ void convert_dlib_xml_to_caffe_python_code(
     //  The next block of code outputs python code that populates all the filter weights.
     // -----------------------------------------------------------------------------------
 
+    ofstream fweights(out_weights_filename, ios::binary);
     fout << "def set_network_weights(net):\n";
     fout << "    # populate network parameters\n";
+    fout << "    f = open('"<<out_weights_filename<<"', 'rb');\n";
     // iterate the layers starting with the input layer
     for (auto i = layers.rbegin(); i != layers.rend(); ++i)
     {
@@ -485,56 +478,63 @@ void convert_dlib_xml_to_caffe_python_code(
         if (i->detail_name == "con")
         {
             const long num_filters = i->attribute("num_filters");
-            matrix<double> weights = trans(rowm(i->params,range(0,i->params.size()-num_filters-1)));
-            matrix<double> biases  = trans(rowm(i->params,range(i->params.size()-num_filters, i->params.size()-1)));
+            matrix<float> weights = trans(rowm(i->params,range(0,i->params.size()-num_filters-1)));
+            matrix<float> biases  = trans(rowm(i->params,range(i->params.size()-num_filters, i->params.size()-1)));
+            fweights.write((char*)&weights(0,0), weights.size()*sizeof(float));
+            fweights.write((char*)&biases(0,0), biases.size()*sizeof(float));
 
             // main filter weights
-            fout << "    p = "; print_as_np_array(fout,weights); fout << ";\n";
+            fout << "    p = np.fromfile(f, dtype='float32', count="<<weights.size()<<");\n"; 
             fout << "    p.shape = net.params['"<<i->caffe_layer_name()<<"'][0].data.shape;\n";
             fout << "    net.params['"<<i->caffe_layer_name()<<"'][0].data[:] = p;\n";
 
             // biases
-            fout << "    p = "; print_as_np_array(fout,biases); fout << ";\n";
+            fout << "    p = np.fromfile(f, dtype='float32', count="<<biases.size()<<");\n"; 
             fout << "    p.shape = net.params['"<<i->caffe_layer_name()<<"'][1].data.shape;\n";
             fout << "    net.params['"<<i->caffe_layer_name()<<"'][1].data[:] = p;\n";
         }
         else if (i->detail_name == "fc")
         {
-            matrix<double> weights = trans(rowm(i->params, range(0,i->params.nr()-2))); 
-            matrix<double> biases  = rowm(i->params, i->params.nr()-1); 
+            matrix<float> weights = trans(rowm(i->params, range(0,i->params.nr()-2))); 
+            matrix<float> biases  = rowm(i->params, i->params.nr()-1); 
+            fweights.write((char*)&weights(0,0), weights.size()*sizeof(float));
+            fweights.write((char*)&biases(0,0), biases.size()*sizeof(float));
 
             // main filter weights
-            fout << "    p = "; print_as_np_array(fout,weights); fout << ";\n";
+            fout << "    p = np.fromfile(f, dtype='float32', count="<<weights.size()<<");\n"; 
             fout << "    p.shape = net.params['"<<i->caffe_layer_name()<<"'][0].data.shape;\n";
             fout << "    net.params['"<<i->caffe_layer_name()<<"'][0].data[:] = p;\n";
 
             // biases
-            fout << "    p = "; print_as_np_array(fout,biases); fout << ";\n";
+            fout << "    p = np.fromfile(f, dtype='float32', count="<<biases.size()<<");\n"; 
             fout << "    p.shape = net.params['"<<i->caffe_layer_name()<<"'][1].data.shape;\n";
             fout << "    net.params['"<<i->caffe_layer_name()<<"'][1].data[:] = p;\n";
         }
         else if (i->detail_name == "fc_no_bias")
         {
-            matrix<double> weights = trans(i->params); 
+            matrix<float> weights = trans(i->params); 
+            fweights.write((char*)&weights(0,0), weights.size()*sizeof(float));
 
             // main filter weights
-            fout << "    p = "; print_as_np_array(fout,weights); fout << ";\n";
+            fout << "    p = np.fromfile(f, dtype='float32', count="<<weights.size()<<");\n"; 
             fout << "    p.shape = net.params['"<<i->caffe_layer_name()<<"'][0].data.shape;\n";
             fout << "    net.params['"<<i->caffe_layer_name()<<"'][0].data[:] = p;\n";
         }
         else if (i->detail_name == "affine_con" || i->detail_name == "affine_fc")
         {
             const long dims = i->params.size()/2;
-            matrix<double> gamma = trans(rowm(i->params,range(0,dims-1)));
-            matrix<double> beta  = trans(rowm(i->params,range(dims, 2*dims-1)));
+            matrix<float> gamma = trans(rowm(i->params,range(0,dims-1)));
+            matrix<float> beta  = trans(rowm(i->params,range(dims, 2*dims-1)));
+            fweights.write((char*)&gamma(0,0), gamma.size()*sizeof(float));
+            fweights.write((char*)&beta(0,0), beta.size()*sizeof(float));
 
             // set gamma weights
-            fout << "    p = "; print_as_np_array(fout,gamma); fout << ";\n";
+            fout << "    p = np.fromfile(f, dtype='float32', count="<<gamma.size()<<");\n"; 
             fout << "    p.shape = net.params['"<<i->caffe_layer_name()<<"'][0].data.shape;\n";
             fout << "    net.params['"<<i->caffe_layer_name()<<"'][0].data[:] = p;\n";
 
             // set beta weights 
-            fout << "    p = "; print_as_np_array(fout,beta); fout << ";\n";
+            fout << "    p = np.fromfile(f, dtype='float32', count="<<beta.size()<<");\n"; 
             fout << "    p.shape = net.params['"<<i->caffe_layer_name()<<"'][1].data.shape;\n";
             fout << "    net.params['"<<i->caffe_layer_name()<<"'][1].data[:] = p;\n";
         }
