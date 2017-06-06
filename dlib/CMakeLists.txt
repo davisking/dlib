@@ -600,7 +600,7 @@ if (NOT TARGET dlib)
             endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked)
+         if (CUDA_FOUND AND cudnn AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
