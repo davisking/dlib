@@ -44,6 +44,28 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct bu_cluster
+    {
+        long id;
+        long left;
+        long right;
+        std::vector<long> orig;
+    };
+
+    inline std::ostream& operator<< (std::ostream& out, const bu_cluster& c)
+    {
+        out << "["<<c.id<<","<<c.left<<","<<c.right<<",[";
+        for (auto iter = c.orig.begin(); iter != c.orig.end(); iter++) {
+          out << *iter;
+          if (iter != c.orig.end() - 1)
+            out << ", ";
+        }
+        out <<"]]";
+        return out;
+    }
+
+    static std::vector<bu_cluster> history_;
+
     template <
         typename EXP
         >
@@ -51,17 +73,18 @@ namespace dlib
         const matrix_exp<EXP>& dists_,
         std::vector<unsigned long>& labels,
         unsigned long min_num_clusters,
-        double max_dist = std::numeric_limits<double>::infinity()
+        double max_dist = std::numeric_limits<double>::infinity(),
+        std::vector<bu_cluster>& history = history_
     )
     {
         matrix<double> dists = matrix_cast<double>(dists_);
         // make sure requires clause is not broken
-        DLIB_CASSERT(dists.nr() == dists.nc() && min_num_clusters > 0, 
+        DLIB_CASSERT(dists.nr() == dists.nc() && min_num_clusters > 0,
             "\t unsigned long bottom_up_cluster()"
             << "\n\t Invalid inputs were given to this function."
-            << "\n\t dists.nr(): " << dists.nr() 
-            << "\n\t dists.nc(): " << dists.nc() 
-            << "\n\t min_num_clusters: " << min_num_clusters 
+            << "\n\t dists.nr(): " << dists.nr()
+            << "\n\t dists.nc(): " << dists.nc()
+            << "\n\t min_num_clusters: " << min_num_clusters
             );
 
         using namespace buc_impl;
@@ -72,6 +95,29 @@ namespace dlib
         if (labels.size() == 0)
             return 0;
 
+        std::vector<long> alias;
+        bool track_history = history.size();
+        if (track_history) {
+            DLIB_CASSERT((long)history.size() == dists.nr(),
+            "\t unsigned long bottom_up_cluster()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t history.size() != dists.nr() " << history.size()
+            << "\n\t history.size(): " << history.size()
+            << "\n\t dists.nr(): " << dists.nr()
+            );
+
+            alias.resize(dists.nr());
+
+            for (size_t i = 0; i < history.size(); i++) {
+                bu_cluster bc;
+                bc.id = i;
+                bc.left = -1; bc.right = -1;
+                bc.orig.push_back(i);
+                history[i] = bc;
+                alias[i] = i;
+            }
+        }
+
         // push all the edges in the graph into a priority queue so the best edges to merge
         // come first.
         std::priority_queue<sample_pair, std::vector<sample_pair>, compare_dist> que;
@@ -80,6 +126,7 @@ namespace dlib
                 que.push(sample_pair(r,c,dists(r,c)));
 
         // Now start merging nodes.
+        long i = 0;
         for (unsigned long iter = min_num_clusters; iter < sets.size(); ++iter)
         {
             // find the next best thing to merge.
@@ -102,12 +149,26 @@ namespace dlib
                 que.pop();
             }
 
-
             // now merge these sets if the best distance is small enough
             if (best_dist > max_dist)
                 break;
+
             unsigned long news = sets.merge_sets(a,b);
             unsigned long olds = (news==a)?b:a;
+
+            if (track_history) {
+                bu_cluster bc;
+                bc.orig.insert(bc.orig.begin(), history[alias[news]].orig.begin(), history[alias[news]].orig.end());
+                bc.orig.insert(bc.orig.end(), history[alias[olds]].orig.begin(), history[alias[olds]].orig.end());
+                bc.left = alias[news];
+                bc.right = alias[olds];
+
+                alias[news] = dists.nr() + i;
+                bc.id = alias[news];
+                history.push_back(bc);
+                ++i;
+            }
+
             merge_sets(dists, news, olds);
         }
 
@@ -125,7 +186,6 @@ namespace dlib
             }
             labels[r] = relabel[l];
         }
-
 
         return relabel.size();
     }
