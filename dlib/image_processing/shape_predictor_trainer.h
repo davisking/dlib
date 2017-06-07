@@ -400,7 +400,7 @@ namespace dlib
             if (tp.num_threads_in_pool() > 1)
             {
                 // Here we need to calculate shape differences and store sum of differences into sums[0]
-                // to make it I am splitting of samples into blocks, each block will be processed by
+                // to make it. I am splitting samples into blocks, each block will be processed by
                 // separate thread, and the sum of differences of each block is stored into separate
                 // place in block_sums
 
@@ -719,7 +719,7 @@ namespace dlib
         ) const
         {
             const double padding = get_feature_pool_region_padding();
-            // Figure figure out the bounds on the object shapes.  We will sample uniformly
+            // Figure out the bounds on the object shapes.  We will sample uniformly
             // from this box.
             matrix<float> temp = reshape(initial_shape, initial_shape.size()/2, 2);
             const double min_x = min(colm(temp,0))-padding;
