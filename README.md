@@ -2,7 +2,38 @@
 
 Dlib is a modern C++ toolkit containing machine learning algorithms and tools for creating complex software in C++ to solve real world problems. See [http://dlib.net](http://dlib.net) for the main project documentation and API reference.
 
+Some common questions are answered in [FAQ](http://dlib.net/faq.html). The best way to get support is using [StackOverflow](http://stackoverflow.com/questions/tagged/dlib).
 
+## Installing dlib as a shared library into your system
+
+Dlib is designed to be compiled with [CMake](https://cmake.org/). After cloning dlib from git or downloading it's sources, go into dlib folder and type:
+
+```bash
+mkdir build
+cd build
+cmake .. 
+cmake --build . --target install
+```
+
+On some Linux systems last command should be run as `sudo` to get access to /usr/local folder:
+```
+sudo cmake --build . --target install
+```
+
+## Using dlib in your project
+After dlib is installed in your system, you can now use it with CMake like this:
+```CMake
+cmake_minimum_required(VERSION 2.8.4)
+find_package(dlib REQUIRED)
+
+include_directories(${dlib_INCLUDE_DIRS})
+link_directories(${DLIB_LIBRARY_DIRS})
+
+add_executable(dlibsample dlibsample.cpp)
+target_link_libraries(dlibsample ${dlib_LIBRARIES})
+```
+
+Some additional ways to compile and use dlib are described in [Documentation](http://dlib.net/compile.html)
 
 ## Compiling dlib C++ example programs
 
