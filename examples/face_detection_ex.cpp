@@ -40,6 +40,7 @@
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/gui_widgets.h>
 #include <dlib/image_io.h>
+#include <dlib/timing.h>
 #include <iostream>
 
 using namespace dlib;
@@ -77,9 +78,13 @@ int main(int argc, char** argv)
             // process a larger image.
             pyramid_up(img);
 
+            // Start measuring face detector processing time
+            timing::start(1, "Internal face detector time");
             // Now tell the face detector to give us a list of bounding boxes
             // around all the faces it can find in the image.
             std::vector<rectangle> dets = detector(img);
+            // Stop measuring face detector processing time
+            timing::stop(1);
 
             cout << "Number of faces detected: " << dets.size() << endl;
             // Now we show the image on the screen and the face detections as
@@ -91,6 +96,10 @@ int main(int argc, char** argv)
             cout << "Hit enter to process the next image..." << endl;
             cin.get();
         }
+        // Print timing report
+        timing::print();
+        cout << "All done. Hit enter to close..." << endl;
+        cin.get();
     }
     catch (exception& e)
     {
