@@ -456,7 +456,8 @@ namespace dlib
         const funct_der& der, 
         T& x,
         const matrix_exp<EXP1>& x_lower,
-        const matrix_exp<EXP2>& x_upper
+        const matrix_exp<EXP2>& x_upper,
+        unsigned long int* num_iter = 0
     )
     {
         /*
@@ -504,6 +505,7 @@ namespace dlib
         const double gap_eps = 1e-8;
 
         double last_alpha = 1;
+        unsigned long int loops_counter = 0;
         while(stop_strategy.should_continue_search(x, f_value, g))
         {
             s = search_strategy.get_next_direction(x, f_value, zero_bounded_variables(gap_eps, g, x, g, x_lower, x_upper));
@@ -534,7 +536,11 @@ namespace dlib
                 throw error("The objective function generated non-finite outputs");
             if (!is_finite(g))
                 throw error("The objective function generated non-finite outputs");
+
+            ++loops_counter;
         }
+        if((bool)num_iter)
+            *num_iter = loops_counter;
 
         return f_value;
     }
@@ -555,7 +561,8 @@ namespace dlib
         const funct_der& der, 
         T& x,
         double x_lower,
-        double x_upper
+        double x_upper,
+        unsigned long int* num_iter = 0
     )
     {
         // The starting point (i.e. x) must be a column vector.  
@@ -568,7 +575,8 @@ namespace dlib
                                         der,
                                         x,
                                         uniform_matrix<scalar_type>(x.size(),1,x_lower),
-                                        uniform_matrix<scalar_type>(x.size(),1,x_upper) );
+                                        uniform_matrix<scalar_type>(x.size(),1,x_upper),
+                                        num_iter );
     }
 
 // ----------------------------------------------------------------------------------------
@@ -589,7 +597,8 @@ namespace dlib
         const funct_der& der, 
         T& x,
         const matrix_exp<EXP1>& x_lower,
-        const matrix_exp<EXP2>& x_upper
+        const matrix_exp<EXP2>& x_upper,
+        unsigned long int* num_iter = 0
     )
     {
         // make sure the requires clause is not violated
@@ -635,6 +644,7 @@ namespace dlib
         const double gap_eps = 1e-8;
 
         double last_alpha = 1;
+        unsigned long int loops_counter = 0;
         while(stop_strategy.should_continue_search(x, f_value, g))
         {
             s = search_strategy.get_next_direction(x, f_value, zero_bounded_variables(gap_eps, g, x, g, x_lower, x_upper));
@@ -669,8 +679,10 @@ namespace dlib
                 throw error("The objective function generated non-finite outputs");
             if (!is_finite(g))
                 throw error("The objective function generated non-finite outputs");
+            ++loops_counter;
         }
-
+        if((bool)num_iter)
+            *num_iter = loops_counter;
         return -f_value;
     }
 
@@ -690,7 +702,8 @@ namespace dlib
         const funct_der& der, 
         T& x,
         double x_lower,
-        double x_upper
+        double x_upper,
+        unsigned long int* num_iter = 0
     )
     {
         // The starting point (i.e. x) must be a column vector.  
@@ -703,7 +716,8 @@ namespace dlib
                                         der,
                                         x,
                                         uniform_matrix<scalar_type>(x.size(),1,x_lower),
-                                        uniform_matrix<scalar_type>(x.size(),1,x_upper) );
+                                        uniform_matrix<scalar_type>(x.size(),1,x_upper),
+                                        num_iter);
     }
 
 // ----------------------------------------------------------------------------------------
