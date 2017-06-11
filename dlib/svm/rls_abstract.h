@@ -37,7 +37,8 @@ namespace dlib
 
         explicit rls(
             double forget_factor,
-            double C = 1000
+            double C = 1000,
+            bool apply_forget_factor_to_C = false
         );
         /*!
             requires
@@ -47,6 +48,7 @@ namespace dlib
                 - #get_w().size() == 0
                 - #get_c() == C
                 - #get_forget_factor() == forget_factor
+                - #should_apply_forget_factor_to_C() == apply_forget_factor_to_C
         !*/
 
         rls(
@@ -56,6 +58,7 @@ namespace dlib
                 - #get_w().size() == 0
                 - #get_c() == 1000
                 - #get_forget_factor() == 1
+                - #should_apply_forget_factor_to_C() == false
         !*/
 
         double get_c(
@@ -80,6 +83,18 @@ namespace dlib
                   zero the faster old examples are forgotten.
         !*/
 
+        bool should_apply_forget_factor_to_C (
+        ) const;
+        /*!
+            ensures
+                - If this function returns false then it means we are optimizing the
+                  objective function discussed in the WHAT THIS OBJECT REPRESENTS section
+                  above. However, if it returns true then we will allow the forget factor
+                  (get_forget_factor()) to be applied to the C value which causes the
+                  algorithm to slowly increase C and convert into a textbook version of RLS
+                  without regularization.   The main reason you might want to do this is
+                  because it can make the algorithm run significantly faster.
+        !*/
 
         template <typename EXP>
         void train (

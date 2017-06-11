@@ -71,11 +71,13 @@ for f in sys.argv[1:]:
 
 # Finally, if you really want to you can ask the detector to tell you the score
 # for each detection.  The score is bigger for more confident detections.
+# The third argument to run is an optional adjustment to the detection threshold,
+# where a negative value will return more detections and a positive value fewer.
 # Also, the idx tells you which of the face sub-detectors matched.  This can be
 # used to broadly identify faces in different orientations.
 if (len(sys.argv[1:]) > 0):
     img = io.imread(sys.argv[1])
-    dets, scores, idx = detector.run(img, 1)
+    dets, scores, idx = detector.run(img, 1, -1)
     for i, d in enumerate(dets):
         print("Detection {}, score: {}, face_type:{}".format(
             d, scores[i], idx[i]))

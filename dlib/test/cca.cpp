@@ -125,7 +125,7 @@ namespace
 
             const double trans_error = max(abs(L*Ltrans - R*Rtrans));
             dlog << LINFO << "trans_error: "<< trans_error;
-            DLIB_TEST(trans_error < 1e-10);
+            DLIB_TEST(trans_error < 1e-9);
         }
         {
             correlations = cca(mat_to_sparse(L), mat_to_sparse(R), Ltrans, Rtrans, min(m,n), max(n,n2)+6, 4);
@@ -139,7 +139,7 @@ namespace
             dlog << LINFO << "correlation error: "<< corr_error;
             DLIB_TEST_MSG(corr_error < 1e-13, Ltrans << "\n\n" << Rtrans);
 
-            DLIB_TEST(trans_error < 1e-10);
+            DLIB_TEST(trans_error < 2e-9);
         }
 
         dlog << LINFO << "*****************************************************";

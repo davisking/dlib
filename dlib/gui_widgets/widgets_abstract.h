@@ -2351,8 +2351,9 @@ namespace dlib
                 on the part.  If you want to move any rectangle or an object part then
                 shift+right click and drag it.
                 
-                Finally, if you hold Ctrl and left click an overlay rectangle it will 
-                change its label to get_default_overlay_rect_label().
+                Finally, if you hold Ctrl and left click an overlay rectangle it will
+                change its label to get_default_overlay_rect_label() and color to
+                get_default_overlay_rect_color().
 
                 The image is drawn such that:
                     - the pixel img[0][0] is the upper left corner of the image.

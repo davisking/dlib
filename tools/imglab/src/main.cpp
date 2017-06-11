@@ -20,8 +20,9 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.2";
+const char* VERSION = "1.9";
 
+const int JPEG_QUALITY = 90;
 
 
 using namespace std;
@@ -98,7 +99,7 @@ int split_dataset (
 
     for (unsigned long i = 0; i < data.images.size(); ++i)
     {
-        dlib::image_dataset_metadata::image temp = data.images[i];
+        auto&& temp = data.images[i];
 
         bool has_the_label = false;
         // check for the label we are looking for
@@ -112,24 +113,9 @@ int split_dataset (
         }
 
         if (has_the_label)
-        {
-            std::vector<dlib::image_dataset_metadata::box> boxes;
-            // remove other labels
-            for (unsigned long j = 0; j < temp.boxes.size(); ++j)
-            {
-                if (temp.boxes[j].label == label)
-                {
-                    // put only the boxes with the label we want into boxes
-                    boxes.push_back(temp.boxes[j]);
-                }
-            }
-            temp.boxes = boxes;
             data_with.images.push_back(temp);
-        }
         else
-        {
             data_without.images.push_back(temp);
-        }
     }
 
 
@@ -237,6 +223,23 @@ void rename_labels (
 
 // ----------------------------------------------------------------------------------------
 
+void ignore_labels (
+    dlib::image_dataset_metadata::dataset& data,
+    const std::string& label
+)
+{
+    for (unsigned long i = 0; i < data.images.size(); ++i)
+    {
+        for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+        {
+            if (data.images[i].boxes[j].label == label)
+                data.images[i].boxes[j].ignore = true;
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
 void merge_metadata_files (
     const command_line_parser& parser
 )
@@ -273,6 +276,14 @@ string to_png_name (const string& filename)
     return filename.substr(0,pos) + ".png";
 }
 
+string to_jpg_name (const string& filename)
+{
+    string::size_type pos = filename.find_last_of(".");
+    if (pos == string::npos)
+        throw dlib::error("invalid filename: " + filename);
+    return filename.substr(0,pos) + ".jpg";
+}
+
 // ----------------------------------------------------------------------------------------
 
 void flip_dataset(const command_line_parser& parser)
@@ -294,11 +305,19 @@ void flip_dataset(const command_line_parser& parser)
     for (unsigned long i = 0; i < metadata.images.size(); ++i)
     {
         file f(metadata.images[i].filename);
-        const string filename = get_parent_directory(f).full_name() + directory::get_separator() + "flipped_" + to_png_name(f.name());
+        string filename = get_parent_directory(f).full_name() + directory::get_separator() + "flipped_" + to_png_name(f.name());
 
         load_image(img, metadata.images[i].filename);
         flip_image_left_right(img, temp);
-        save_png(temp, filename);
+        if (parser.option("jpg"))
+        {
+            filename = to_jpg_name(filename);
+            save_jpeg(temp, filename,JPEG_QUALITY);
+        }
+        else
+        {
+            save_png(temp, filename);
+        }
 
         for (unsigned long j = 0; j < metadata.images[i].boxes.size(); ++j)
         {
@@ -342,11 +361,19 @@ void rotate_dataset(const command_line_parser& parser)
     for (unsigned long i = 0; i < metadata.images.size(); ++i)
     {
         file f(metadata.images[i].filename);
-        const string filename = get_parent_directory(f).full_name() + directory::get_separator() + file_prefix + to_png_name(f.name());
+        string filename = get_parent_directory(f).full_name() + directory::get_separator() + file_prefix + to_png_name(f.name());
 
         load_image(img, metadata.images[i].filename);
         const point_transform_affine tran = rotate_image(img, temp, angle*pi/180);
-        save_png(temp, filename);
+        if (parser.option("jpg"))
+        {
+            filename = to_jpg_name(filename);
+            save_jpeg(temp, filename,JPEG_QUALITY);
+        }
+        else
+        {
+            save_png(temp, filename);
+        }
 
         for (unsigned long j = 0; j < metadata.images[i].boxes.size(); ++j)
         {
@@ -377,6 +404,114 @@ void rotate_dataset(const command_line_parser& parser)
 
 // ----------------------------------------------------------------------------------------
 
+int resample_dataset(const command_line_parser& parser)
+{
+    if (parser.number_of_arguments() != 1)
+    {
+        cerr << "The --resample option requires you to give one XML file on the command line." << endl;
+        return EXIT_FAILURE;
+    }
+
+    const size_t obj_size = get_option(parser,"cropped-object-size",100*100); 
+    const double margin_scale =  get_option(parser,"crop-size",2.5); // cropped image will be this times wider than the object.
+    const unsigned long min_object_size = get_option(parser,"min-object-size",1);
+    const bool one_object_per_image = parser.option("one-object-per-image");
+
+    dlib::image_dataset_metadata::dataset data, resampled_data;
+    std::ostringstream sout;
+    sout << "\nThe --resample parameters which generated this dataset were:" << endl;
+    sout << "   cropped-object-size: "<< obj_size << endl;
+    sout << "   crop-size: "<< margin_scale << endl;
+    sout << "   min-object-size: "<< min_object_size << endl;
+    if (one_object_per_image)
+        sout << "   one_object_per_image: true" << endl;
+    resampled_data.comment = data.comment + sout.str();
+    resampled_data.name = data.name + " RESAMPLED";
+
+    load_image_dataset_metadata(data, parser[0]);
+    locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
+    dlib::rand rnd;
+
+    const size_t image_size = std::round(std::sqrt(obj_size*margin_scale*margin_scale));
+    const chip_dims cdims(image_size, image_size);
+
+    console_progress_indicator pbar(data.images.size());
+    for (unsigned long i = 0; i < data.images.size(); ++i)
+    {
+        // don't even bother loading images that don't have objects.
+        if (data.images[i].boxes.size() == 0)
+            continue;
+
+        pbar.print_status(i);
+        array2d<rgb_pixel> img, chip;
+        load_image(img, data.images[i].filename);
+
+
+        // figure out what chips we want to take from this image
+        for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+        {
+            const rectangle rect = data.images[i].boxes[j].rect;
+            if (data.images[i].boxes[j].ignore || rect.area() < min_object_size)
+                continue;
+
+            const auto max_dim = std::max(rect.width(), rect.height());
+
+            const double rand_scale_perturb = 1 - 0.3*(rnd.get_random_double()-0.5);
+            const rectangle crop_rect = centered_rect(rect, max_dim*margin_scale*rand_scale_perturb, max_dim*margin_scale*rand_scale_perturb);
+
+            const rectangle_transform tform = get_mapping_to_chip(chip_details(crop_rect, cdims));
+            extract_image_chip(img, chip_details(crop_rect, cdims), chip);
+
+            image_dataset_metadata::image dimg;
+            // Now transform the boxes to the crop and also mark them as ignored if they
+            // have already been cropped out or are outside the crop.
+            for (size_t k = 0; k < data.images[i].boxes.size(); ++k)
+            {
+                image_dataset_metadata::box box = data.images[i].boxes[k];
+                // ignore boxes outside the cropped image
+                if (crop_rect.intersect(box.rect).area() == 0)
+                    continue;
+
+                // mark boxes we include in the crop as ignored.  Also mark boxes that
+                // aren't totally within the crop as ignored.
+                if (crop_rect.contains(grow_rect(box.rect,10)) && (!one_object_per_image || k==j))
+                    data.images[i].boxes[k].ignore = true;
+                else
+                    box.ignore = true;
+
+                if (box.rect.area() < min_object_size)
+                    box.ignore = true;
+
+                box.rect = tform(box.rect);
+                for (auto&& p : box.parts)
+                    p.second = tform.get_tform()(p.second);
+                dimg.boxes.push_back(box);
+            }
+            // Put a 64bit hash of the image data into the name to make sure there are no
+            // file name conflicts.
+            std::ostringstream sout;
+            sout << hex << murmur_hash3_128bit(&chip[0][0], chip.size()*sizeof(chip[0][0])).second;
+            dimg.filename = data.images[i].filename + "_RESAMPLED_"+sout.str()+".png";
+
+            if (parser.option("jpg"))
+            {
+                dimg.filename = to_jpg_name(dimg.filename);
+                save_jpeg(chip,dimg.filename, JPEG_QUALITY);
+            }
+            else
+            {
+                save_png(chip,dimg.filename);
+            }
+            resampled_data.images.push_back(dimg);
+        }
+    }
+
+    save_image_dataset_metadata(resampled_data, parser[0] + ".RESAMPLED.xml");
+
+    return EXIT_SUCCESS;
+}
+
+// ----------------------------------------------------------------------------------------
 
 int tile_dataset(const command_line_parser& parser)
 {
@@ -464,21 +599,22 @@ int main(int argc, char** argv)
                                  "about <arg> pixels (default 8000).",1);
         parser.add_option("l","List all the labels in the given XML file.");
         parser.add_option("stats","List detailed statistics on the object labels in the given XML file.");
+        parser.add_option("files","List all the files in the given XML file.");
 
-        parser.set_group_name("Editing/Transforming XML files");
+        parser.set_group_name("Editing/Transforming XML datasets");
         parser.add_option("rename", "Rename all labels of <arg1> to <arg2>.",2);
         parser.add_option("parts","The display will allow image parts to be labeled.  The set of allowable parts "
                           "is defined by <arg> which should be a space separated list of parts.",1);
+        parser.add_option("rmempty","Remove all images that don't contain non-ignored annotations and save the results to a new XML file.");
         parser.add_option("rmdupes","Remove duplicate images from the dataset.  This is done by comparing "
                                     "the md5 hash of each image file and removing duplicate images. " );
         parser.add_option("rmdiff","Set the ignored flag to true for boxes marked as difficult.");
         parser.add_option("rmtrunc","Set the ignored flag to true for boxes that are partially outside the image.");
-        parser.add_option("shuffle","Randomly shuffle the order of the images listed in file <arg>.");
+        parser.add_option("sort-num-objects","Sort the images listed an XML file so images with many objects are listed first.");
+        parser.add_option("shuffle","Randomly shuffle the order of the images listed in an XML file.");
         parser.add_option("seed", "When using --shuffle, set the random seed to the string <arg>.",1);
         parser.add_option("split", "Split the contents of an XML file into two separate files.  One containing the "
-            "images with objects labeled <arg> and another file with all the other images.  Additionally, the file "
-            "containing the <arg> labeled objects will not contain any other labels other than <arg>. "
-            "That is, the images in the first file are stripped of all labels other than the <arg> labels.",1);
+            "images with objects labeled <arg> and another file with all the other images. ",1);
         parser.add_option("add", "Add the image metadata from <arg1> into <arg2>.  If any of the image "
                                  "tags are in both files then the ones in <arg2> are deleted and replaced with the "
                                  "image tags from <arg1>.  The results are saved into merged.xml and neither <arg1> or "
@@ -489,55 +625,113 @@ int main(int argc, char** argv)
                                   "The output is saved to an XML file prefixed with rotated_<arg>.",1);
         parser.add_option("cluster", "Cluster all the objects in an XML file into <arg> different clusters and save "
                                      "the results as cluster_###.xml and cluster_###.jpg files.",1);
+        parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
+        parser.add_option("rmlabel","Remove all boxes labeled <arg> and save the results to a new XML file.",1);
+        parser.add_option("rm-other-labels","Remove all boxes not labeled <arg> and save the results to a new XML file.",1);
+        parser.add_option("rmignore","Remove all boxes marked ignore and save the results to a new XML file.");
+        parser.add_option("rm-if-overlaps","Remove all boxes labeled <arg> if they overlap any box not labeled <arg> and save the results to a new XML file.",1);
+        parser.add_option("jpg", "When saving images to disk, write them as jpg files instead of png.");
+
+        parser.set_group_name("Cropping sub images");
+        parser.add_option("resample", "Crop out images that are centered on each object in the dataset. "
+                                      "The output is a new XML dataset."); 
+        parser.add_option("cropped-object-size", "When doing --resample, make the cropped objects contain about <arg> pixels (default 10000).",1);
+        parser.add_option("min-object-size", "When doing --resample, skip objects that have fewer than <arg> pixels in them (default 1).",1);
+        parser.add_option("crop-size", "When doing --resample, the entire cropped image will be <arg> times wider than the object (default 2.5).",1); 
+        parser.add_option("one-object-per-image", "When doing --resample, only include one non-ignored object per image (i.e. the central object).");
+
+
 
         parser.parse(argc, argv);
 
-        const char* singles[] = {"h","c","r","l","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
-                                 "flip", "rotate", "tile", "size", "cluster"};
+        const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
+                                 "flip", "rotate", "tile", "size", "cluster", "resample", "min-object-size", "rmempty",
+                                 "crop-size", "cropped-object-size", "rmlabel", "rm-other-labels", "rm-if-overlaps", "sort-num-objects", "one-object-per-image", "jpg", "rmignore"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
         parser.check_sub_option("shuffle", "seed");
+        const char* resample_sub_ops[] = {"min-object-size", "crop-size", "cropped-object-size", "one-object-per-image"};
+        parser.check_sub_options("resample", resample_sub_ops);
         const char* size_parent_ops[] = {"tile", "cluster"};
         parser.check_sub_options(size_parent_ops, "size");
         parser.check_incompatible_options("c", "l");
+        parser.check_incompatible_options("c", "files");
         parser.check_incompatible_options("c", "rmdiff");
+        parser.check_incompatible_options("c", "rmempty");
+        parser.check_incompatible_options("c", "rmlabel");
+        parser.check_incompatible_options("c", "rm-other-labels");
+        parser.check_incompatible_options("c", "rmignore");
+        parser.check_incompatible_options("c", "rm-if-overlaps");
         parser.check_incompatible_options("c", "rmdupes");
         parser.check_incompatible_options("c", "rmtrunc");
         parser.check_incompatible_options("c", "add");
         parser.check_incompatible_options("c", "flip");
         parser.check_incompatible_options("c", "rotate");
         parser.check_incompatible_options("c", "rename");
+        parser.check_incompatible_options("c", "ignore");
         parser.check_incompatible_options("c", "parts");
         parser.check_incompatible_options("c", "tile");
         parser.check_incompatible_options("c", "cluster");
+        parser.check_incompatible_options("c", "resample");
         parser.check_incompatible_options("l", "rename");
+        parser.check_incompatible_options("l", "ignore");
         parser.check_incompatible_options("l", "add");
         parser.check_incompatible_options("l", "parts");
         parser.check_incompatible_options("l", "flip");
         parser.check_incompatible_options("l", "rotate");
+        parser.check_incompatible_options("files", "rename");
+        parser.check_incompatible_options("files", "ignore");
+        parser.check_incompatible_options("files", "add");
+        parser.check_incompatible_options("files", "parts");
+        parser.check_incompatible_options("files", "flip");
+        parser.check_incompatible_options("files", "rotate");
         parser.check_incompatible_options("add", "flip");
         parser.check_incompatible_options("add", "rotate");
         parser.check_incompatible_options("add", "tile");
         parser.check_incompatible_options("flip", "tile");
         parser.check_incompatible_options("rotate", "tile");
         parser.check_incompatible_options("cluster", "tile");
+        parser.check_incompatible_options("resample", "tile");
         parser.check_incompatible_options("flip", "cluster");
         parser.check_incompatible_options("rotate", "cluster");
         parser.check_incompatible_options("add", "cluster");
+        parser.check_incompatible_options("flip", "resample");
+        parser.check_incompatible_options("rotate", "resample");
+        parser.check_incompatible_options("add", "resample");
         parser.check_incompatible_options("shuffle", "tile");
+        parser.check_incompatible_options("sort-num-objects", "tile");
         parser.check_incompatible_options("convert", "l");
+        parser.check_incompatible_options("convert", "files");
         parser.check_incompatible_options("convert", "rename");
+        parser.check_incompatible_options("convert", "ignore");
         parser.check_incompatible_options("convert", "parts");
         parser.check_incompatible_options("convert", "cluster");
+        parser.check_incompatible_options("convert", "resample");
         parser.check_incompatible_options("rmdiff", "rename");
+        parser.check_incompatible_options("rmdiff", "ignore");
+        parser.check_incompatible_options("rmempty", "ignore");
+        parser.check_incompatible_options("rmempty", "rename");
+        parser.check_incompatible_options("rmlabel", "ignore");
+        parser.check_incompatible_options("rmlabel", "rename");
+        parser.check_incompatible_options("rm-other-labels", "ignore");
+        parser.check_incompatible_options("rm-other-labels", "rename");
+        parser.check_incompatible_options("rmignore", "ignore");
+        parser.check_incompatible_options("rmignore", "rename");
+        parser.check_incompatible_options("rm-if-overlaps", "ignore");
+        parser.check_incompatible_options("rm-if-overlaps", "rename");
         parser.check_incompatible_options("rmdupes", "rename");
+        parser.check_incompatible_options("rmdupes", "ignore");
         parser.check_incompatible_options("rmtrunc", "rename");
+        parser.check_incompatible_options("rmtrunc", "ignore");
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
         parser.check_option_arg_range("cluster", 2, 999);
         parser.check_option_arg_range("rotate", -360, 360);
         parser.check_option_arg_range("size", 10*10, 1000*1000);
+        parser.check_option_arg_range("min-object-size", 1, 10000*10000);
+        parser.check_option_arg_range("cropped-object-size", 4, 10000*10000);
+        parser.check_option_arg_range("crop-size", 1.0, 100.0);
 
         if (parser.option("h"))
         {
@@ -584,6 +778,11 @@ int main(int argc, char** argv)
             return cluster_dataset(parser);
         }
 
+        if (parser.option("resample"))
+        {
+            return resample_dataset(parser);
+        }
+
         if (parser.option("c"))
         {
             if (parser.option("convert"))
@@ -621,6 +820,165 @@ int main(int argc, char** argv)
                 }
             }
             save_image_dataset_metadata(data, parser[0]);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rmempty"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rmempty option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data, data2;
+            load_image_dataset_metadata(data, parser[0]);
+
+            data2 = data;
+            data2.images.clear();
+            for (unsigned long i = 0; i < data.images.size(); ++i)
+            {
+                bool has_label = false;
+                for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
+                {
+                    if (!data.images[i].boxes[j].ignore)
+                        has_label = true;
+                }
+                if (has_label)
+                    data2.images.push_back(data.images[i]);
+            }
+            save_image_dataset_metadata(data2, parser[0] + ".rmempty.xml");
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rmlabel"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rmlabel option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+
+            const auto label = parser.option("rmlabel").argument();
+
+            for (auto&& img : data.images)
+            {
+                std::vector<dlib::image_dataset_metadata::box> boxes;
+                for (auto&& b : img.boxes)
+                {
+                    if (b.label != label)
+                        boxes.push_back(b);
+                }
+                img.boxes = boxes;
+            }
+
+            save_image_dataset_metadata(data, parser[0] + ".rmlabel-"+label+".xml");
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rm-other-labels"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rm-other-labels option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+
+            const auto labels = parser.option("rm-other-labels").argument();
+            // replace comma by dash to form the file name
+            std::string strlabels = labels;
+            std::replace(strlabels.begin(), strlabels.end(), ',', '-');
+            std::vector<string> all_labels = split(labels, ",");
+            for (auto&& img : data.images)
+            {
+                std::vector<dlib::image_dataset_metadata::box> boxes;
+                for (auto&& b : img.boxes)
+                {
+                    if (std::find(all_labels.begin(), all_labels.end(), b.label) != all_labels.end())
+                        boxes.push_back(b);
+                }
+                img.boxes = boxes;
+            }
+
+            save_image_dataset_metadata(data, parser[0] + ".rm-other-labels-"+ strlabels +".xml");
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rmignore"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rmignore option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+
+            for (auto&& img : data.images)
+            {
+                std::vector<dlib::image_dataset_metadata::box> boxes;
+                for (auto&& b : img.boxes)
+                {
+                    if (!b.ignore)
+                        boxes.push_back(b);
+                }
+                img.boxes = boxes;
+            }
+
+            save_image_dataset_metadata(data, parser[0] + ".rmignore.xml");
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("rm-if-overlaps"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --rm-if-overlaps option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+
+            const auto label = parser.option("rm-if-overlaps").argument();
+
+            test_box_overlap overlaps(0.5);
+
+            for (auto&& img : data.images)
+            {
+                std::vector<dlib::image_dataset_metadata::box> boxes;
+                for (auto&& b : img.boxes)
+                {
+                    if (b.label != label)
+                    {
+                        boxes.push_back(b);
+                    }
+                    else
+                    {
+                        bool has_overlap = false;
+                        for (auto&& b2 : img.boxes)
+                        {
+                            if (b2.label != label && overlaps(b2.rect, b.rect))
+                            {
+                                has_overlap = true;
+                                break;
+                            }
+                        }
+                        if (!has_overlap)
+                            boxes.push_back(b);
+                    }
+                }
+                img.boxes = boxes;
+            }
+
+            save_image_dataset_metadata(data, parser[0] + ".rm-if-overlaps-"+label+".xml");
             return EXIT_SUCCESS;
         }
 
@@ -694,6 +1052,21 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
 
+        if (parser.option("files"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --files option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            for (size_t i = 0; i < data.images.size(); ++i)
+                cout << data.images[i].filename << "\n";
+            return EXIT_SUCCESS;
+        }
+
         if (parser.option("split"))
         {
             return split_dataset(parser);
@@ -703,7 +1076,7 @@ int main(int argc, char** argv)
         {
             if (parser.number_of_arguments() != 1)
             {
-                cerr << "The -shuffle option requires you to give one XML file on the command line." << endl;
+                cerr << "The --shuffle option requires you to give one XML file on the command line." << endl;
                 return EXIT_FAILURE;
             }
 
@@ -713,6 +1086,22 @@ int main(int argc, char** argv)
             const string seed = get_option(parser, "seed", default_seed);
             dlib::rand rnd(seed);
             randomize_samples(data.images, rnd);
+            save_image_dataset_metadata(data, parser[0]);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("sort-num-objects"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --sort-num-objects option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            std::sort(data.images.rbegin(),  data.images.rend(), 
+                [](const image_dataset_metadata::image& a, const image_dataset_metadata::image& b) { return a.boxes.size() < b.boxes.size(); });
             save_image_dataset_metadata(data, parser[0]);
             return EXIT_SUCCESS;
         }
@@ -749,6 +1138,24 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
 
+        if (parser.option("ignore"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --ignore option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            for (unsigned long i = 0; i < parser.option("ignore").count(); ++i)
+            {
+                ignore_labels(data, parser.option("ignore").argument());
+            }
+            save_image_dataset_metadata(data, parser[0]+".ignored.xml");
+            return EXIT_SUCCESS;
+        }
+
         if (parser.number_of_arguments() == 1)
         {
             metadata_editor editor(parser[0]);
@@ -761,7 +1168,11 @@ int main(int argc, char** argv)
                 }
             }
             editor.wait_until_closed();
+            return EXIT_SUCCESS;
         }
+
+        cout << "Invalid command, give -h to see options." << endl;
+        return EXIT_FAILURE;
     }
     catch (exception& e)
     {

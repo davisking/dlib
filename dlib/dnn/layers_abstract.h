@@ -82,6 +82,37 @@ namespace dlib
                   above, if *this was layer1 then subnet() would return the network that
                   begins with layer2.
         !*/
+
+        const layer_details_type& layer_details(
+        ) const; 
+        /*!
+            ensures
+                - returns the layer_details_type instance that defines the behavior of the
+                  layer at the top of this network.  I.e. returns the layer details that
+                  defines the behavior of the layer nearest to the network output rather
+                  than the input layer.  For computational layers, this is the object
+                  implementing the EXAMPLE_COMPUTATIONAL_LAYER_ interface that defines the
+                  layer's behavior.
+        !*/
+
+        unsigned int sample_expansion_factor (
+        ) const;
+        /*!
+            ensures
+                - When to_tensor() is invoked on this network's input layer it converts N
+                  input objects into M samples, all stored inside a resizable_tensor.  It
+                  is always the case that M is some integer multiple of N.
+                  sample_expansion_factor() returns the value of this multiplier.  To be
+                  very specific, it is always true that M==I*N where I is some integer.
+                  This integer I is what is returned by sample_expansion_factor().
+
+                  It should be noted that computational layers likely do not care about the
+                  sample expansion factor.  It is only really of concern inside a loss
+                  layer where you need to know its value so that tensor samples can be
+                  matched against truth objects.  Moreover, in most cases the sample
+                  expansion factor is 1.
+        !*/
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -123,6 +154,16 @@ namespace dlib
                       allow dlib to make some layers execute in-place and therefore run a
                       little faster and use less memory.  Do not implement forward() and
                       backward().
+
+
+                It should also be noted that layers may define additional layer specific
+                fields and the solvers can use these fields as they see fit.  For example,
+                some layers define get_learning_rate_multiplier() and
+                get_weight_decay_multiplier() methods.  The solvers that come with dlib
+                look at these methods, if they exist, and adjust the learning rate or
+                weight decay for that layer according to the multiplier.  Therefore, you
+                can add these methods to your layer types if you want, or even define new
+                fields and new solvers that use those fields in some way.  
         !*/
 
     public:
@@ -287,7 +328,10 @@ namespace dlib
                       to data_input. 
                   Finally, backward_inplace() outputs these gradients by performing:
                     - params_grad = PARAMETER_GRADIENT 
-                    - data_grad = DATA_GRADIENT
+                    - if (is_same_object(gradient_input, data_grad)) then
+                        - data_grad = DATA_GRADIENT
+                    - else
+                        - data_grad += DATA_GRADIENT
         !*/
 
         const tensor& get_layer_params(
@@ -304,11 +348,41 @@ namespace dlib
                 - returns the parameters that define the behavior of forward().
         !*/
 
+
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
+        /*!
+            These two functions are optional.  If provided, they should map between
+            (column,row) coordinates in input and output tensors of forward().  Providing
+            these functions allows you to use global utility functions like
+            input_tensor_to_output_tensor().
+        !*/
+
+        void clean (
+        );
+        /*!
+            Implementing this function is optional.  If you don't need it then you don't
+            have to provide a clean().  But if you do provide it then it must behave as
+            follows:
+
+            ensures
+                - calling clean() Causes this object to forget about everything except its
+                  parameters.  This is useful if your layer caches information between
+                  forward and backward passes and you want to clean out that cache
+                  information before saving the network to disk.  
+        !*/
+
     };
 
     std::ostream& operator<<(std::ostream& out, const EXAMPLE_COMPUTATIONAL_LAYER_& item);
     /*!
         print a string describing this layer.
+    !*/
+
+    void to_xml(const EXAMPLE_COMPUTATIONAL_LAYER_& item, std::ostream& out);
+    /*!
+        This function is optional, but required if you want to print your networks with
+        net_to_xml().  Therefore, to_xml() prints a layer as XML.
     !*/
 
     void serialize(const EXAMPLE_COMPUTATIONAL_LAYER_& item, std::ostream& out);
@@ -364,6 +438,23 @@ namespace dlib
             ensures
                 - #get_num_outputs() == num_outputs
                 - #get_bias_mode() == bias_mode 
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
+        !*/
+
+        fc_(
+            num_fc_outputs o
+        );
+        /*!
+            ensures
+                - #get_num_outputs() == o.num_outputs 
+                - #get_bias_mode() == bias_mode 
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
         !*/
 
         unsigned long get_num_outputs (
@@ -384,6 +475,138 @@ namespace dlib
                 - returns the bias mode which determines if this layer includes bias terms.
                   That is, if the bias mode is FC_HAS_BIAS then a different constant scalar
                   is added to each of the outputs of this layer. 
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;  
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its parameters be
+                  multiplied by get_learning_rate_multiplier().
+        !*/
+
+        double get_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its parameters be
+                  multiplied by get_weight_decay_multiplier().
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        void set_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
+        !*/
+
+        alias_tensor_const_instance get_weights(
+        ) const;
+        /*!
+            ensures
+                - returns an alias of get_layer_params(), containing the weights matrix of
+                  the fully connected layer.
+                - #get_weights().num_samples() is the number of elements in input sample,
+                  i.e. sublayer's output's k * nc * nr.
+                - #get_bias().k() == #get_num_outputs()
+                - if get_bias_mode() == FC_HAS_BIAS:
+                    - #get_layer_params().size() == (#get_weights().size() + #get_biases().size())
+                - else:
+                    - #get_layer_params().size() == #get_weights().size()
+        !*/
+
+        alias_tensor_instance get_weights(
+        );
+        /*!
+            ensures
+                - returns an alias of get_layer_params(), containing the weights matrix of
+                  the fully connected layer.
+                - #get_weights().num_samples() is the number of elements in input sample,
+                  i.e. sublayer's output's k * nc * nr.
+                - #get_bias().k() == #get_num_outputs()
+                - if get_bias_mode() == FC_HAS_BIAS:
+                    - #get_layer_params().size() == (#get_weights().size() + #get_biases().size())
+                - else:
+                    - #get_layer_params().size() == #get_weights().size()
+        !*/
+
+        alias_tensor_const_instance get_biases(
+        ) const;
+        /*!
+            requires
+                - #get_bias_mode() == FC_HAS_BIAS
+            ensures
+                - returns an alias of get_layer_params(), containing the bias vector of
+                  the fully connected layer.
+                - #get_bias().num_samples() == 1
+                - #get_bias().k() == #get_num_outputs()
+                - #get_layer_params().size() == (#get_weights().size() + #get_biases().size())
+        !*/
+
+        alias_tensor_instance get_biases(
+        );
+        /*!
+            requires
+                - #get_bias_mode() == FC_HAS_BIAS
+            ensures
+                - returns an alias of get_layer_params(), containing the bias vector of
+                  the fully connected layer.
+                - #get_bias().num_samples() == 1
+                - #get_bias().k() == #get_num_outputs()
+                - #get_layer_params().size() == (#get_weights().size() + #get_biases().size())
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -416,13 +639,18 @@ namespace dlib
         long _nr,
         long _nc,
         int _stride_y,
-        int _stride_x
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
         >
     class con_
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
                 All of them must be > 0.
+                Also, we require that:
+                    - 0 <= _padding_y && _padding_y < _nr
+                    - 0 <= _padding_x && _padding_x < _nc
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -434,8 +662,8 @@ namespace dlib
                 IN be the input tensor and OUT the output tensor):
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == num_filters()
-                    - OUT.nr() == 1+(IN.nr()-nr()%2)/stride_y()
-                    - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
+                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
+                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
         !*/
 
     public:
@@ -448,6 +676,12 @@ namespace dlib
                 - #nc() == _nc
                 - #stride_y() == _stride_y
                 - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
         !*/
 
         long num_filters(
@@ -491,9 +725,103 @@ namespace dlib
                   time when it moves over the image.
         !*/
 
+        long padding_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the top and bottom
+                  sides of the image.
+        !*/
+
+        long padding_x(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the left and right 
+                  sides of the image.
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;  
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its parameters be
+                  multiplied by get_learning_rate_multiplier().
+        !*/
+
+        double get_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its parameters be
+                  multiplied by get_weight_decay_multiplier().
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        void set_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
+        !*/
+
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -552,6 +880,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -604,6 +934,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -621,6 +953,8 @@ namespace dlib
         CONV_MODE = 0, // convolutional mode
         FC_MODE = 1    // fully connected mode
     };
+
+    const double DEFAULT_BATCH_NORM_EPS = 0.0001;
 
     template <
         layer_mode mode
@@ -658,16 +992,30 @@ namespace dlib
         /*!
             ensures
                 - #get_mode() == mode
-                - get_running_stats_window_size() == 1000
+                - #get_running_stats_window_size()      == 100
+                - #get_learning_rate_multiplier()       == 1
+                - #get_weight_decay_multiplier()        == 0
+                - #get_bias_learning_rate_multiplier()  == 1
+                - #get_bias_weight_decay_multiplier()   == 1
+                - #get_eps() == tt::DEFAULT_BATCH_NORM_EPS
         !*/
 
         explicit bn_(
-            unsigned long window_size
+            unsigned long window_size,
+            double eps = tt::DEFAULT_BATCH_NORM_EPS
         );
         /*!
+            requires
+                - eps > 0
+                - window_size > 0
             ensures
                 - #get_mode() == mode 
-                - get_running_stats_window_size() == window_size
+                - #get_running_stats_window_size()     == window_size
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 0
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 1
+                - #get_eps() == eps
         !*/
 
         layer_mode get_mode(
@@ -686,6 +1034,15 @@ namespace dlib
                   normalization after a convolutional layer you should use CONV_MODE.
         !*/
 
+        double get_eps(
+        ) const; 
+        /*!
+            ensures
+                - When doing batch normalization, we are dividing by the standard
+                  deviation.  This epsilon value returned by this function is added to the
+                  variance to prevent the division from dividing by zero.
+        !*/
+
         unsigned long get_running_stats_window_size (
         ) const; 
         /*!
@@ -699,9 +1056,97 @@ namespace dlib
                   the running average.
         !*/
 
+        void set_running_stats_window_size (
+            unsigned long new_window_size
+        );
+        /*!
+            requires
+                - new_window_size > 0
+            ensures
+                - #get_running_stats_window_size() == new_window_size
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;  
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its parameters be
+                  multiplied by get_learning_rate_multiplier().
+        !*/
+
+        double get_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its parameters be
+                  multiplied by get_weight_decay_multiplier().
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        void set_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
+        !*/
+
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -713,6 +1158,23 @@ namespace dlib
     using bn_con = add_layer<bn_<CONV_MODE>, SUBNET>;
     template <typename SUBNET>
     using bn_fc = add_layer<bn_<FC_MODE>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename net_type>
+    void set_all_bn_running_stats_window_sizes (
+        const net_type& net,
+        unsigned long new_window_size
+    );
+    /*!
+        requires
+            - new_window_size > 0
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+        ensures
+            - Sets the get_running_stats_window_size() field of all bn_ layers in net to
+              new_window_size.
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -793,6 +1255,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -813,13 +1277,28 @@ namespace dlib
         long _nr,
         long _nc,
         int _stride_y,
-        int _stride_x
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
         >
     class max_pool_
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
-                All of them must be > 0.
+                - _nr >= 0
+                - _nc >= 0
+                - _stride_y > 0
+                - _stride_x > 0
+                - _padding_y >= 0
+                - _padding_x >= 0
+                - if (_nr != 0) then
+                    - _padding_y < _nr
+                - else
+                    - _padding_y == 0
+                - if (_nc != 0) then
+                    - _padding_x < _nr
+                - else
+                    - _padding_x == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -828,18 +1307,21 @@ namespace dlib
                 images in an input tensor and outputting, for each channel, the maximum
                 element within the window.  
 
-                To be precise, if we call the input tensor IN and the output tensor OUT,
-                then OUT is defined as follows:
+                If _nr == 0 then it means the filter size covers all the rows in the input
+                tensor, similarly for the _nc parameter.  To be precise, if we call the
+                input tensor IN and the output tensor OUT, then OUT is defined as follows:
+                    - let FILT_NR == (nr()==0) ? IN.nr() : nr()
+                    - let FILT_NC == (nc()==0) ? IN.nc() : nc()
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == IN.k()
-                    - OUT.nr() == 1+(IN.nr()-nr()%2)/stride_y()
-                    - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
+                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - FILT_NR)/stride_y()
+                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - FILT_NC)/stride_x()
                     - for all valid s, k, r, and c:
                         - image_plane(OUT,s,k)(r,c) == max(subm_clipped(image_plane(IN,s,k),
-                                                                        r*stride_y(),
-                                                                        c*stride_x(),
-                                                                        nr(),
-                                                                        nc()))
+                                                                  centered_rect(x*stride_x() + FILT_NC/2 - padding_x(),
+                                                                                y*stride_y() + FILT_NR/2 - padding_y(),
+                                                                                FILT_NC,
+                                                                                FILT_NR)))
         !*/
 
     public:
@@ -852,20 +1334,24 @@ namespace dlib
                 - #nc() == _nc
                 - #stride_y() == _stride_y
                 - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
         !*/
 
         long nr(
         ) const; 
         /*!
             ensures
-                - returns the number of rows in the max pooling window.
+                - returns the number of rows in the pooling window or 0 if the window size
+                  is "the entire input tensor".
         !*/
 
         long nc(
         ) const;
         /*!
             ensures
-                - returns the number of columns in the max pooling window.
+                - returns the number of rows in the pooling window or 0 if the window size
+                  is "the entire input tensor".
         !*/
 
         long stride_y(
@@ -886,9 +1372,27 @@ namespace dlib
                   at a time when it moves over the image.
         !*/
 
+        long padding_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the top and bottom
+                  sides of the image.
+        !*/
+
+        long padding_x(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the left and right 
+                  sides of the image.
+        !*/
+
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -907,19 +1411,39 @@ namespace dlib
         >
     using max_pool = add_layer<max_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
 
+    template <
+        typename SUBNET
+        >
+    using max_pool_everything = add_layer<max_pool_<0,0,1,1>, SUBNET>;
+
 // ----------------------------------------------------------------------------------------
 
     template <
         long _nr,
         long _nc,
         int _stride_y,
-        int _stride_x
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
         >
     class avg_pool_
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
-                All of them must be > 0.
+                - _nr >= 0
+                - _nc >= 0
+                - _stride_y > 0
+                - _stride_x > 0
+                - _padding_y >= 0
+                - _padding_x >= 0
+                - if (_nr != 0) then
+                    - _padding_y < _nr
+                - else
+                    - _padding_y == 0
+                - if (_nc != 0) then
+                    - _padding_x < _nr
+                - else
+                    - _padding_x == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -928,18 +1452,21 @@ namespace dlib
                 over the images in an input tensor and outputting, for each channel, the
                 average element within the window.  
 
-                To be precise, if we call the input tensor IN and the output tensor OUT,
-                then OUT is defined as follows:
+                If _nr == 0 then it means the filter size covers all the rows in the input
+                tensor, similarly for the _nc parameter.  To be precise, if we call the
+                input tensor IN and the output tensor OUT, then OUT is defined as follows:
+                    - let FILT_NR == (nr()==0) ? IN.nr() : nr()
+                    - let FILT_NC == (nc()==0) ? IN.nc() : nc()
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == IN.k()
-                    - OUT.nr() == 1+(IN.nr()-nr()%2)/stride_y()
-                    - OUT.nc() == 1+(IN.nc()-nc()%2)/stride_x()
+                    - OUT.nr() == 1+(IN.nr() + 2*padding_y() - FILT_NR)/stride_y()
+                    - OUT.nc() == 1+(IN.nc() + 2*padding_x() - FILT_NC)/stride_x()
                     - for all valid s, k, r, and c:
                         - image_plane(OUT,s,k)(r,c) == mean(subm_clipped(image_plane(IN,s,k),
-                                                                        r*stride_y(),
-                                                                        c*stride_x(),
-                                                                        nr(),
-                                                                        nc()))
+                                                                  centered_rect(x*stride_x() + FILT_NC/2 - padding_x(),
+                                                                                y*stride_y() + FILT_NR/2 - padding_y(),
+                                                                                FILT_NC,
+                                                                                FILT_NR)))
         !*/
 
     public:
@@ -952,20 +1479,24 @@ namespace dlib
                 - #nc() == _nc
                 - #stride_y() == _stride_y
                 - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
         !*/
 
         long nr(
         ) const; 
         /*!
             ensures
-                - returns the number of rows in the pooling window.
+                - returns the number of rows in the pooling window or 0 if the window size
+                  is "the entire input tensor".
         !*/
 
         long nc(
         ) const;
         /*!
             ensures
-                - returns the number of columns in the pooling window.
+                - returns the number of rows in the pooling window or 0 if the window size
+                  is "the entire input tensor".
         !*/
 
         long stride_y(
@@ -986,9 +1517,27 @@ namespace dlib
                   at a time when it moves over the image.
         !*/
 
+        long padding_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the top and bottom
+                  sides of the image.
+        !*/
+
+        long padding_x(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the left and right 
+                  sides of the image.
+        !*/
+
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1007,6 +1556,11 @@ namespace dlib
         typename SUBNET
         >
     using avg_pool = add_layer<avg_pool_<nr,nc,stride_y,stride_x>, SUBNET>;
+
+    template <
+        typename SUBNET
+        >
+    using avg_pool_everything = add_layer<avg_pool_<0,0,1,1>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -1029,6 +1583,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1082,6 +1638,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1113,6 +1671,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1146,6 +1706,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1218,7 +1780,13 @@ namespace dlib
                 what layer to add to the output of the previous layer.  The result of this
                 addition is output by add_prev_.  Finally, the addition happens pointwise
                 according to 4D tensor arithmetic.  If the dimensions don't match then
-                missing elements are presumed to be equal to 0.
+                missing elements are presumed to be equal to 0.  Moreover, each dimension
+                of the output tensor is equal to the maximum dimension of either of the
+                inputs.  That is, if the tensors A and B are being added to produce C then:
+                    - C.num_samples() == max(A.num_samples(), B.num_samples())
+                    - C.k()  == max(A.k(), B.k())
+                    - C.nr() == max(A.nr(), B.nr())
+                    - C.nc() == max(A.nc(), B.nc())
         !*/
 
     public:
@@ -1263,6 +1831,168 @@ namespace dlib
     using add_prev8_  = add_prev_<tag8>;
     using add_prev9_  = add_prev_<tag9>;
     using add_prev10_ = add_prev_<tag10>;
+
+// ----------------------------------------------------------------------------------------
+
+    template<
+        template<typename> class... TAG_TYPES
+        >
+    class concat_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  This layer simply concatenates the output of tagged layers.
+                Importantly, each input layer must have the same dimensions (i.e.
+                num_samples, nr, and nc) except for the k channel, which may vary.  This is
+                because the concatenation happens along the k dimension.  That is, the
+                output of this network is a tensor, OUT, that is the concatenation of the
+                tensors:
+                    for each (tag in TAG_TYPES)
+                        layer<tag>(subnet).get_output()
+                Therefore, out.num_samples(), out.nr(), and out.nc() match the dimensions
+                of the input tensors while OUT.k() is the sum of the input layer's k()
+                dimensions.
+        !*/
+
+    public:
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+
+    // concat layer definitions
+    template <template<typename> class TAG1,
+              template<typename> class TAG2,
+              typename SUBNET>
+    using concat2 = add_layer<concat_<TAG1, TAG2>, SUBNET>;
+
+    template <template<typename> class TAG1,
+              template<typename> class TAG2,
+              template<typename> class TAG3,
+              typename SUBNET>
+    using concat3 = add_layer<concat_<TAG1, TAG2, TAG3>, SUBNET>;
+
+    template <template<typename> class TAG1,
+              template<typename> class TAG2,
+              template<typename> class TAG3,
+              template<typename> class TAG4,
+              typename SUBNET>
+    using concat4 = add_layer<concat_<TAG1, TAG2, TAG3, TAG4>, SUBNET>;
+
+    template <template<typename> class TAG1,
+              template<typename> class TAG2,
+              template<typename> class TAG3,
+              template<typename> class TAG4,
+              template<typename> class TAG5,
+              typename SUBNET>
+    using concat5 = add_layer<concat_<TAG1, TAG2, TAG3, TAG4, TAG5>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+    
+    /*!A inception layer definitions !*/
+
+    // Now define inception layer tag types.  These layer aliases allow creating
+    // the networks described in the paper: 
+    //   Szegedy, Christian, et al. "Going deeper with convolutions." Proceedings of
+    //   the IEEE Conference on Computer Vision and Pattern Recognition. 2015.
+    // See the dnn_inception_ex.cpp example for a complete example of their use.  Note also
+    // that we use tag ID numbers >= 1000 to avoid conflict with user's tag layers.
+    template <typename SUBNET> using itag0  = add_tag_layer< 1000 + 0, SUBNET>;
+    template <typename SUBNET> using itag1  = add_tag_layer< 1000 + 1, SUBNET>;
+    template <typename SUBNET> using itag2  = add_tag_layer< 1000 + 2, SUBNET>;
+    template <typename SUBNET> using itag3  = add_tag_layer< 1000 + 3, SUBNET>;
+    template <typename SUBNET> using itag4  = add_tag_layer< 1000 + 4, SUBNET>;
+    template <typename SUBNET> using itag5  = add_tag_layer< 1000 + 5, SUBNET>;
+    // skip to inception input
+    template <typename SUBNET> using iskip  = add_skip_layer< itag0, SUBNET>;
+
+    // here are some templates to be used for creating inception layer groups
+    template <template<typename>class B1,
+              template<typename>class B2,
+              typename SUBNET>
+    using inception2 = concat2<itag1, itag2, itag1<B1<iskip< itag2<B2< itag0<SUBNET>>>>>>>;
+
+    template <template<typename>class B1,
+              template<typename>class B2,
+              template<typename>class B3,
+              typename SUBNET>
+    using inception3 = concat3<itag1, itag2, itag3, itag1<B1<iskip< itag2<B2<iskip< itag3<B3<  itag0<SUBNET>>>>>>>>>>;
+
+    template <template<typename>class B1,
+              template<typename>class B2,
+              template<typename>class B3,
+              template<typename>class B4,
+              typename SUBNET>
+    using inception4 = concat4<itag1, itag2, itag3, itag4,
+                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<  itag0<SUBNET>>>>>>>>>>>>>;
+
+    template <template<typename>class B1,
+              template<typename>class B2,
+              template<typename>class B3,
+              template<typename>class B4,
+              template<typename>class B5,
+              typename SUBNET>
+    using inception5 = concat5<itag1, itag2, itag3, itag4, itag5,
+                itag1<B1<iskip< itag2<B2<iskip< itag3<B3<iskip<  itag4<B4<iskip<  itag5<B5<  itag0<SUBNET>>>>>>>>>>>>>>>>;
+
+// ----------------------------------------------------------------------------------------
+
+    const double DEFAULT_L2_NORM_EPS = 1e-5;
+
+    class l2normalize_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  It takes tensors as input and L2 normalizes them.  In particular,
+                it has the following properties:
+                    - The output tensors from this layer have the same dimenstions as the
+                      input tensors.
+                    - If you think of each input tensor as a set of tensor::num_samples()
+                      vectors, then the output tensor contains the same vectors except they
+                      have been length normlized so that their L2 norms are all 1.  I.e. 
+                      for each vector v we will have ||v||==1.
+        !*/
+
+    public:
+
+        explicit l2normalize_(
+            double eps = tt::DEFAULT_L2_NORM_EPS
+        );
+        /*!
+            requires
+                - eps > 0
+            ensures
+                - #get_eps() == eps
+        !*/
+
+        double get_eps(
+        ) const; 
+        /*!
+            ensures
+                - When we normalize a vector we divide it by its L2 norm.  However, the
+                  get_eps() value is added to the squared norm prior to division to avoid
+                  ever dividing by zero. 
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
 
 // ----------------------------------------------------------------------------------------
 

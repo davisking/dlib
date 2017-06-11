@@ -616,6 +616,35 @@ namespace
         DLIB_TEST(c.size() == 0);
     }
 
+    void test_std_array (
+    )
+    {
+        std::array<int,5> a, b;
+
+        a = {1, 2, 3, 4, 5};
+
+        ostringstream sout;
+        dlib::serialize(a, sout);
+        istringstream sin(sout.str());
+
+        dlib::deserialize(b, sin);
+
+
+        DLIB_TEST(a.size() == b.size());
+        DLIB_TEST(a.size() == 5);
+        for (unsigned long i = 0; i < a.size(); ++i)
+        {
+            DLIB_TEST(a[i] == b[i]);
+        }
+
+        std::array<int,0> aa, bb;
+        sout.str("");
+        dlib::serialize(aa, sout);
+        sin.str(sout.str());
+        dlib::deserialize(bb, sin);
+        DLIB_TEST(bb.size() == 0);
+    }
+
     void test_vector_bool (
     )
     {
@@ -1020,6 +1049,7 @@ namespace
             test_vector_bool();
             test_array2d_and_matrix_serialization();
             test_strings();
+            test_std_array();
         }
     } a;
 

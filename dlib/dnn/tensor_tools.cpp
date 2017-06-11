@@ -43,6 +43,148 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void inverse_norms (
+        resizable_tensor& invnorms,
+        const tensor& data,
+        const double eps
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::inverse_norms(invnorms, data, eps);
+#else
+        invnorms = reciprocal(sqrt(sum_cols(squared(mat(data))) + eps));
+#endif
+    }
+
+    void dot_prods (
+        resizable_tensor& out,
+        const tensor& lhs,
+        const tensor& rhs
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::dot_prods(out, lhs, rhs);
+#else
+        out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+#endif
+    }
+
+    void scale_columns (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(out,m));
+        DLIB_CASSERT(is_vector(v));
+        if (m.size() == 0 && v.size() == 0)
+            return;
+        DLIB_CASSERT(m.size() != 0);
+        DLIB_CASSERT(m.size()/m.num_samples() == v.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::scale_columns(out, m, v);
+#else
+        DLIB_CASSERT(false, "shouldn't be called right now");
+        out = scale_columns(mat(m), mat(v));
+#endif
+    }
+
+    void scale_rows (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(out,m));
+        DLIB_CASSERT(is_vector(v));
+        if (m.size() == 0 && v.size() == 0)
+            return;
+        DLIB_CASSERT(m.size() != 0);
+        DLIB_CASSERT(m.num_samples() == v.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::scale_rows(out, m, v);
+#else
+        out = scale_rows(mat(m), mat(v));
+#endif
+    }
+
+    void scale_rows2 (
+        float beta, 
+        tensor& out,
+        const tensor& m1,
+        const tensor& m2,
+        const tensor& v1,
+        const tensor& v2
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(out,m1));
+        DLIB_CASSERT(have_same_dimensions(out,m2));
+        DLIB_CASSERT(have_same_dimensions(v1,v2));
+        DLIB_CASSERT(is_vector(mat(v1))); 
+        DLIB_CASSERT(v1.size() == m1.num_samples());
+
+#ifdef DLIB_USE_CUDA
+        cuda::scale_rows2(beta, out, m1, m2, v1, v2);
+#else
+        if (beta == 0)
+            out = scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+        else
+            out = beta*mat(out) + scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void exp (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::exp(dest,src);
+#else
+        dest = exp(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void log (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::log(dest,src);
+#else
+        dest = log(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void log10 (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::log10(dest,src);
+#else
+        dest = log10(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void gemm (
         float beta,
         tensor& dest,
@@ -101,7 +243,7 @@ namespace dlib { namespace tt
         float stddev
     )
     {
-        DLIB_CASSERT(data.size()%2 == 0,"");
+        DLIB_CASSERT(data.size()%2 == 0);
 #ifdef DLIB_USE_CUDA
         rnd.fill_gaussian(data, mean, stddev);
 #else
@@ -127,6 +269,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void multiply (
+        bool add_to,
         tensor& dest,
         const tensor& src1,
         const tensor& src2
@@ -134,29 +277,30 @@ namespace dlib { namespace tt
     {
         DLIB_CASSERT(dest.k() == src1.k() && src1.k() == src2.k() &&
             dest.nr() == src1.nr() && src1.nr() == src2.nr() &&
-            dest.nc() == src1.nc() && src1.nc() == src2.nc() ,"");
+            dest.nc() == src1.nc() && src1.nc() == src2.nc() );
         const long MD = std::max(std::max(dest.num_samples(),src1.num_samples()),src2.num_samples());
         DLIB_CASSERT((dest.num_samples()==1 || dest.num_samples()==MD) &&
                     (src1.num_samples()==1 || src1.num_samples()==MD) &&
-                    (src2.num_samples()==1 || src2.num_samples()==MD) ,"");
+                    (src2.num_samples()==1 || src2.num_samples()==MD) );
 #ifdef DLIB_USE_CUDA
-        cuda::multiply(dest, src1, src2);
+        cuda::multiply(add_to, dest, src1, src2);
 #else
-        cpu::multiply(dest, src1, src2);
+        cpu::multiply(add_to, dest, src1, src2);
 #endif
 
     }
 
     void multiply_conv (
+        bool add_to,
         tensor& dest,
         const tensor& src1,
         const tensor& src2
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::multiply_conv(dest, src1, src2);
+        cuda::multiply_conv(add_to, dest, src1, src2);
 #else
-        cpu::multiply_conv(dest, src1, src2);
+        cpu::multiply_conv(add_to, dest, src1, src2);
 #endif
     }
 
@@ -173,6 +317,19 @@ namespace dlib { namespace tt
         cuda::affine_transform(dest,src,A,B);
 #else
         cpu::affine_transform(dest,src,A,B);
+#endif
+    }
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src,
+        const float A
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform(dest,src,A);
+#else
+        cpu::affine_transform(dest,src,A,0);
 #endif
     }
 
@@ -196,6 +353,21 @@ namespace dlib { namespace tt
         tensor& dest,
         const tensor& src1,
         const tensor& src2,
+        const float A,
+        const float B
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform(dest,src1,src2,A,B);
+#else
+        cpu::affine_transform(dest,src1,src2,A,B,0);
+#endif
+    }
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
         const tensor& src3,
         const float A,
         const float B,
@@ -207,6 +379,60 @@ namespace dlib { namespace tt
         cuda::affine_transform(dest,src1,src2,src3,A,B,C,D);
 #else
         cpu::affine_transform(dest,src1,src2,src3,A,B,C,D);
+#endif
+    }
+
+    void affine_transform_range(
+        size_t begin,
+        size_t end,
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
+#else
+        cpu::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
+#endif
+    }
+
+    void affine_transform(
+        const rectangle& rect,
+        tensor& dest, 
+        const tensor& src1, 
+        const tensor& src2, 
+        const tensor& src3, 
+        float A, 
+        float B,
+        float C
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform(rect, dest,src1,src2,src3,A,B,C);
+#else
+        cpu::affine_transform(rect, dest,src1,src2,src3,A,B,C);
+#endif
+    }
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform_range(0,dest.size(),dest,src1,src2,src3,A,B,C);
+#else
+        cpu::affine_transform_range(0,dest.size(),dest,src1,src2,src3,A,B,C);
 #endif
     }
 
@@ -245,6 +471,8 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void compute_adam_update (
+        size_t begin,
+        size_t end,
         tensor& s,
         tensor& m,
         tensor& v,
@@ -258,10 +486,10 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::compute_adam_update(s, m, v, t, learning_rate, weight_decay, momentum1,
+        cuda::compute_adam_update(begin, end, s, m, v, t, learning_rate, weight_decay, momentum1,
             momentum2, params, params_grad);
 #else
-        cpu::compute_adam_update(s, m, v, t, learning_rate, weight_decay, momentum1,
+        cpu::compute_adam_update(begin, end, s, m, v, t, learning_rate, weight_decay, momentum1,
             momentum2, params, params_grad);
 #endif
     }
@@ -269,6 +497,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void batch_normalize_inference (
+        const double eps,
         resizable_tensor& dest,
         const tensor& src,
         const tensor& gamma, 
@@ -278,13 +507,14 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_inference(dest,src,gamma,beta,running_means,running_variances);
+        cuda::batch_normalize_inference(eps,dest,src,gamma,beta,running_means,running_variances);
 #else
-        cpu::batch_normalize_inference(dest,src,gamma,beta,running_means,running_variances);
+        cpu::batch_normalize_inference(eps,dest,src,gamma,beta,running_means,running_variances);
 #endif
     }
 
     void batch_normalize (
+        const double eps,
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& vars,
@@ -297,13 +527,14 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize(dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
+        cuda::batch_normalize(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
 #else
-        cpu::batch_normalize(dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
+        cpu::batch_normalize(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
 #endif
     }
 
     void batch_normalize_gradient (
+        const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -316,15 +547,16 @@ namespace dlib { namespace tt
     {
              
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cuda::batch_normalize_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
 #else
-        cpu::batch_normalize_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cpu::batch_normalize_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
 #endif
     }
 
 // ----------------------------------------------------------------------------------------
 
     void batch_normalize_conv_inference (
+        const double eps,
         resizable_tensor& dest,
         const tensor& src,
         const tensor& gamma, 
@@ -334,13 +566,14 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv_inference(dest,src,gamma,beta,running_means,running_variances);
+        cuda::batch_normalize_conv_inference(eps,dest,src,gamma,beta,running_means,running_variances);
 #else
-        cpu::batch_normalize_conv_inference(dest,src,gamma,beta,running_means,running_variances);
+        cpu::batch_normalize_conv_inference(eps,dest,src,gamma,beta,running_means,running_variances);
 #endif
     }
 
     void batch_normalize_conv (
+        const double eps,
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& vars,
@@ -353,28 +586,29 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv(dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
+        cuda::batch_normalize_conv(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
 #else
-        cpu::batch_normalize_conv(dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
+        cpu::batch_normalize_conv(eps,dest,means,vars,averaging_factor,running_means,running_variances,src,gamma,beta);
 #endif
     }
 
     void batch_normalize_conv_gradient (
-            const tensor& gradient_input,
-            const tensor& means,
-            const tensor& invstds,
-            const tensor& src,
-            const tensor& gamma,
-            tensor& src_grad,
-            tensor& gamma_grad, 
-            tensor& beta_grad 
+        const double eps,
+        const tensor& gradient_input,
+        const tensor& means,
+        const tensor& invstds,
+        const tensor& src,
+        const tensor& gamma,
+        tensor& src_grad,
+        tensor& gamma_grad, 
+        tensor& beta_grad 
     )
     {
              
 #ifdef DLIB_USE_CUDA
-        cuda::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cuda::batch_normalize_conv_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
 #else
-        cpu::batch_normalize_conv_gradient(gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
+        cpu::batch_normalize_conv_gradient(eps,gradient_input, means, invstds, src, gamma, src_grad, gamma_grad, beta_grad);
 #endif
     }
 
@@ -601,6 +835,38 @@ namespace dlib { namespace tt
         cuda::tanh_gradient(grad, dest, gradient_input);
 #else
         cpu::tanh_gradient(grad, dest, gradient_input);
+#endif
+    }
+
+// ------------------------------------------------------------------------------------
+
+    void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+#else
+        cpu::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void inv::
+    operator() (
+        const tensor& m,
+        resizable_tensor& out
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        finv(m,out);
+#else
+        out = dlib::inv(mat(m));
 #endif
     }
 

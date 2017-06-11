@@ -4,6 +4,7 @@
 #ifdef DLIB_DNn_TENSOR_ABSTRACT_H_
 
 #include "../matrix.h"
+#include "../any/any_abstract.h"
 
 namespace dlib
 {
@@ -187,6 +188,35 @@ namespace dlib
                   every memory location in the returned memory block.  
         !*/
 
+        virtual const any& annotation(
+        ) const = 0;
+        /*!
+            ensures
+                - returns a const reference to the any object in this tensor.  The any
+                  object can be used to store any additional annotation you like in a
+                  tensor.  However, it should be noted that the annotation() is ignored by
+                  serialize() and therefore not saved when a tensor is serialized.
+        !*/
+
+        virtual any& annotation(
+        ) = 0;
+        /*!
+            ensures
+                - returns a non-const reference to the any object in this tensor.  The any
+                  object can be used to store any additional annotation you like in a
+                  tensor.  However, it should be noted that the annotation() is ignored by
+                  serialize() and therefore not saved when a tensor is serialized.
+        !*/
+
+        int device_id(
+        ) const; 
+        /*!
+            ensures
+                - returns the ID of the CUDA device that allocated this memory. I.e. the
+                  number returned by cudaGetDevice() when the memory was allocated.
+                - If CUDA is not being used then this function always returns 0.
+        !*/
+
         tensor& operator= (
             float val
         );
@@ -312,6 +342,21 @@ namespace dlib
               and dest then the copy will happen entirely on the device side.
             - It doesn't matter what GPU device is selected by cudaSetDevice().  You can
               always copy tensor objects to and from each other regardless.
+            - This function blocks until the copy has completed.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    bool is_vector (
+        const tensor& t
+    );
+    /*!
+        ensures
+            - returns true if and only if one of the following is true:
+                - t.size() == t.num_samples() 
+                - t.size() == t.k() 
+                - t.size() == t.nr() 
+                - t.size() == t.nc()
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -323,8 +368,8 @@ namespace dlib
     );
     /*!
         requires
-            - nr > 0
-            - nc > 0
+            - nr >= 0
+            - nc >= 0
             - nr*nc == t.size()
         ensures
             - returns a matrix M such that:
@@ -340,10 +385,11 @@ namespace dlib
         const tensor& t
     );
     /*!
-        requires
-            - t.size() != 0
         ensures
-            - returns mat(t, t.num_samples(), t.size()/t.num_samples())
+            - if (t.size() != 0) then
+                - returns mat(t, t.num_samples(), t.size()/t.num_samples())
+            - else
+                - returns an empty matrix.
     !*/
 
     const matrix_exp image_plane (
@@ -402,6 +448,22 @@ namespace dlib
                 - #nc() == 0
         !*/
 
+        template <typename EXP>
+        resizable_tensor(
+            const matrix_exp<EXP>& item
+        );
+        /*!
+            requires
+                - item contains float values
+            ensures
+                - #num_samples() == item.nr()
+                - #k() == item.nc()
+                - #nr() == 1
+                - #nc() == 1
+                - Assigns item to *this tensor by performing:
+                  set_ptrm(host(), num_samples(), k()*nr()*nc()) = item;
+        !*/
+
         explicit resizable_tensor(
             long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
         );
@@ -434,6 +496,7 @@ namespace dlib
                 - #k() == 0
                 - #nr() == 0
                 - #nc() == 0
+                - #annotation().is_empty() == true
         !*/
 
         void copy_size (
@@ -459,6 +522,25 @@ namespace dlib
                 - #k() == k_
                 - #nr() == nr_
                 - #nc() == nc_
+        !*/
+
+        template <typename EXP>
+        resizable_tensor& operator= (
+            const matrix_exp<EXP>& item
+        );
+        /*!
+            requires
+                - item contains float values
+            ensures
+                - if (num_samples() == item.nr() && k()*nr()*nc() == item.nc()) then
+                    - the dimensions of this tensor are not changed
+                - else
+                    - #num_samples() == item.nr()
+                    - #k() == item.nc()
+                    - #nr() == 1
+                    - #nc() == 1
+                - Assigns item to *this tensor by performing:
+                  set_ptrm(host(), num_samples(), k()*nr()*nc()) = item;
         !*/
     };
 
@@ -493,13 +575,43 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object is a tensor that aliases another tensor.  That is, it doesn't
                 have its own block of memory but instead simply holds pointers to the
-                memory of another tensor object.  
+                memory of another tensor object.  It therefore allows you to efficiently
+                break a tensor into pieces and pass those pieces into functions.
+
+                An alias_tensor_instance doesn't own the resources it points to in any sense.
+                So it is important to make sure that the underlying owning tensor doesn't get
+                destructed before any alias tensors which point to it are destructed.
         !*/
 
         // You can't default initialize this object.  You can only get instances of it from
         // alias_tensor::operator().
         alias_tensor_instance(
         ); 
+    };
+
+    class alias_tensor_const_instance 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is essentially a const version of alias_tensor_instance and therefore
+                represents a tensor.  However, due to the mechanics of C++, this object
+                can't inherit from tensor.  So instead it provides a get() and an implicit
+                conversion to const tensor.
+        !*/
+
+    public:
+
+        // non-const alias tensors are convertible to const ones.
+        alias_tensor_const_instance(const alias_tensor_instance& item); 
+
+        // Methods that cast the alias to a tensor.
+        const tensor& get() const;
+        operator const tensor& (); 
+
+    private:
+        // You can't default initialize this object.  You can only get instances of it from
+        // alias_tensor::operator().
+        alias_tensor_const_instance();
     };
 
     class alias_tensor 
@@ -551,12 +663,12 @@ namespace dlib
         alias_tensor_instance operator() (
             tensor& t,
             size_t offset
-        );
+        ) const;
         /*!
             requires
                 - offset+size() <= t.size()
             ensures
-                - Return a tensor that simply aliases the elements of t beginning with t's
+                - Returns a tensor that simply aliases the elements of t beginning with t's
                   offset'th element.  Specifically, this function returns an aliasing
                   tensor T such that:
                     - T.size()   == size()
@@ -566,6 +678,19 @@ namespace dlib
                     - T.nc()     == nc()
                     - T.host()   == t.host()+offset
                     - T.device() == t.device()+offset
+                    - &T.annotation() == &t.annotation()
+        !*/
+
+        alias_tensor_const_instance operator() (
+            const tensor& t,
+            size_t offset
+        ) const;
+        /*!
+            requires
+                - offset+size() <= t.size()
+            ensures
+                - This function is identical to the above version of operator() except that 
+                  it takes and returns const tensors instead of non-const tensors.
         !*/
     };
 

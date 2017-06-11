@@ -215,7 +215,7 @@
                instead.</h3>
                <ul><p>
                   You should not be calling new and delete in your own code.  You should instead
-                  be using objects like the std::vector, <a href="containers.html#scoped_ptr">scoped_ptr</a>,
+                  be using objects like the std::vector, std::shared_ptr,
                   or any number of other objects that manage resources such as memory for you.  If you want
                   an array use std::vector (or the checked <a href="containers.html#std_vector_c">std_vector_c</a>).
                   If you want to make a lookup table use a <a href="containers.html#map">map</a>.  If you want
@@ -234,7 +234,7 @@
                   to use the <a href="api.html#auto_mutex">auto_mutex</a> which will lock a mutex and automatically
                   unlock it for you.   Or suppose you have made a TCP <a href="api.html#sockets">connection</a> 
                   to another machine and you want to be certain the resources associated with that connection 
-                  are always released.  You can easily accomplish this with RAII by using the scoped_ptr as
+                  are always released.  You can easily accomplish this with RAII by using the std::unique_ptr as
                   shown in <a href="sockstreambuf_ex.cpp.html">this</a> example program.
                </p>
                <p>
@@ -271,7 +271,7 @@ double compute_sum_of_array_elements(const std::vector&lt;double&gt;&amp; array)
                </p>
                <p>
                   If you absolutely need pointer semantics then you can usually use a smart pointer like
-                  <a href="containers.html#scoped_ptr">scoped_ptr</a> or <a href="containers.html#shared_ptr">shared_ptr</a>.
+                  std::unique_ptr or std::shared_ptr.
                   If that still isn't good enough for you and you <i>really</i> need to use a normal C style pointer
                   then isolate your pointers inside a class or function so that they are contained in a small area of the code.  
                   However, in practice the container classes in dlib and the STL are more than sufficient in nearly 

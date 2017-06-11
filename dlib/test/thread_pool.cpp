@@ -87,11 +87,11 @@ namespace
             add_functor f;
             for (int num_threads= 0; num_threads < 4; ++num_threads)
             {
-                future<int> a, b, c, res, d;
+                dlib::future<int> a, b, c, res, d;
                 thread_pool tp(num_threads);
                 print_spinner();
 
-                future<some_struct> obj;
+                dlib::future<some_struct> obj;
 
 
                 for (int i = 0; i < 4; ++i)
@@ -368,6 +368,39 @@ namespace
                     DLIB_TEST(c == 3);
                     DLIB_TEST(d == 4);
                 }
+
+
+                tp.wait_for_all_tasks();
+
+                // make sure exception propagation from tasks works correctly.
+                auto f_throws = []() { throw dlib::error("test exception");};
+                bool got_exception = false;
+                try
+                {
+                    tp.add_task_by_value(f_throws);
+                    tp.wait_for_all_tasks();
+                }
+                catch(dlib::error& e)
+                {
+                    DLIB_TEST(e.info == "test exception");
+                    got_exception = true;
+                }
+                DLIB_TEST(got_exception);
+
+                dlib::future<int> aa;
+                auto f_throws2 = [](int& a) { a = 1; throw dlib::error("test exception");};
+                got_exception = false;
+                try
+                {
+                    tp.add_task(f_throws2, aa);
+                    aa.get();
+                }
+                catch(dlib::error& e)
+                {
+                    DLIB_TEST(e.info == "test exception");
+                    got_exception = true;
+                }
+                DLIB_TEST(got_exception);
 
             }
         }

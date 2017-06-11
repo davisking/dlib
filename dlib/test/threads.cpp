@@ -19,6 +19,33 @@ namespace
 
     logger dlog("test.threads");
 
+    void test_async()
+    {
+#if __cplusplus >= 201103
+        print_spinner();
+        auto v1 = dlib::async([]() { dlib::sleep(500); return 1; }).share();
+        auto v2 = dlib::async([v1]() { dlib::sleep(400); return v1.get()+1; }).share();
+        auto v3 = dlib::async([v2](int a) { dlib::sleep(300); return v2.get()+a; },2).share();
+        auto v4 = dlib::async([v3]() { dlib::sleep(200); return v3.get()+1; });
+
+        DLIB_TEST(v4.get() == 5);
+
+        print_spinner();
+        auto except = dlib::async([](){ dlib::sleep(300); throw error("oops"); });
+        bool got_exception = false;
+        try
+        {
+            except.get();
+        }
+        catch (error&e)
+        {
+            got_exception = true;
+            DLIB_TEST(e.what() == string("oops"));
+        }
+        DLIB_TEST(got_exception);
+#endif
+    }
+
     class threads_tester : public tester
     {
     public:
@@ -66,6 +93,8 @@ namespace
 
 
             DLIB_TEST(!failure);
+
+            test_async();
         }
 
         void thread_end_handler (
@@ -117,6 +146,7 @@ namespace
                 }
             }
             dlog << LTRACE << "ending of thread num " << num;
+
 
         }
     } a;

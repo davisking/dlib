@@ -37,11 +37,14 @@
          <item>find_max_bobyqa</item> 
          <item>find_max_trust_region</item> 
          <item>find_min_trust_region</item> 
+         <item>find_optimal_parameters</item> 
       </section>
 
       <section>
          <name>Special Purpose Optimizers</name>
+         <item>find_gap_between_convex_hulls</item> 
          <item>solve_qp_box_constrained</item> 
+         <item>solve_qp_box_constrained_blockdiag</item> 
          <item>solve_qp_using_smo</item> 
          <item>solve_qp2_using_smo</item> 
          <item>solve_qp3_using_smo</item> 
@@ -58,6 +61,7 @@
          <item>find_max_factor_graph_potts</item> 
          <item>find_max_parse_cky</item> 
          <item>min_cut</item> 
+         <item>elastic_net</item> 
       </section>
 
       <section>
@@ -413,6 +417,28 @@ subject to the following constraint:
    <!-- ************************************************************************* -->
       
       <component>
+         <name>find_gap_between_convex_hulls</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_solve_qp_using_smo_abstract.h</spec_file>
+         <description>
+            This function measures the position and size of the gap between two convex
+            polytopes.  In particular, it solves the following quadratic program:
+<pre>
+   Minimize: f(cA,cB) == length_squared(A*cA - B*cB) 
+   subject to the following constraints on cA and cB:
+      - is_col_vector(cA) == true &amp;&amp; cA.size() == A.nc()
+      - is_col_vector(cB) == true &amp;&amp; cB.size() == B.nc()
+      - sum(cA) == 1 &amp;&amp; min(cA) >= 0
+      - sum(cB) == 1 &amp;&amp; min(cB) >= 0
+</pre>
+
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>solve_qp_using_smo</name>
          <file>dlib/optimization.h</file>
          <spec_file link="true">dlib/optimization/optimization_solve_qp_using_smo_abstract.h</spec_file>
@@ -446,6 +472,31 @@ subject to the following constraint:
    Where f is convex.  This means that Q should be positive-semidefinite.
 </pre>
 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>solve_qp_box_constrained_blockdiag</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/optimization_solve_qp_using_smo_abstract.h</spec_file>
+         <description>
+             This function solves the following quadratic program:
+<pre>
+   Minimize: f(alpha) == 0.5*trans(alpha)*Q*alpha + trans(b)*alpha 
+   subject to the following box constraints on alpha:
+      0 &lt;= min(alpha-lower)
+      0 &lt;= max(upper-alpha)
+   Where f is convex.  This means that Q should be positive-semidefinite.
+</pre>
+            
+            So it does the same thing as <a href="#solve_qp_box_constrained">solve_qp_box_constrained</a>,
+            except it is optimized for large Q matrices with a special block
+            structure.  In particular, Q must be grouped into identically sized
+            blocks where all blocks are diagonal matrices, except those on the
+            main diagonal which can be dense. 
          </description>
                                  
       </component>
@@ -875,6 +926,65 @@ Or it can use the elastic net regularizer:
             <example>model_selection_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_optimal_parameters</name>
+         <file>dlib/optimization/find_optimal_parameters.h</file>
+         <spec_file link="true">dlib/optimization/find_optimal_parameters_abstract.h</spec_file>
+         <description>
+            Performs a constrained minimization of a function and doesn't require derivatives from the user. 
+            This function is similar to <a href="#find_min_bobyqa">find_min_bobyqa</a> and
+            <a href="#find_min_single_variable">find_min_single_variable</a> except that it
+            allows any number of variables and never throws exceptions when the max iteration
+            limit is reached (even if it didn't converge).
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>elastic_net</name>
+         <file>dlib/optimization/elastic_net.h</file>
+         <spec_file link="true">dlib/optimization/elastic_net_abstract.h</spec_file>
+         <description>
+                This object is a tool for solving the following optimization problem:
+
+<pre>
+   min_w:      length_squared(X*w - Y) + ridge_lambda*length_squared(w)
+   such that:  sum(abs(w)) &lt;= lasso_budget
+</pre>
+
+                <p>
+                That is, it solves the elastic net optimization problem.  This object also
+                has the special property that you can quickly obtain different solutions
+                for different settings of ridge_lambda, lasso_budget, and target Y values.
+                </p>
+
+                <p>
+                This is because a large amount of work is precomputed in the constructor.
+                The solver will also remember the previous solution and will use that to
+                warm start subsequent invocations.  Therefore, you can efficiently get
+                solutions for a wide range of regularization parameters.
+                </p>
+                
+                
+                The particular algorithm used to solve it is described in the paper:
+                <blockquote>
+                    Zhou, Quan, et al. "A reduction of the elastic net to support vector
+                    machines with an application to gpu computing." arXiv preprint
+                    arXiv:1409.1976 (2014).  APA 
+                </blockquote>
+
+                And for the SVM solver sub-component we use the algorithm from:
+                <blockquote>
+                    Hsieh, Cho-Jui, et al. "A dual coordinate descent method for large-scale
+                    linear SVM." Proceedings of the 25th international conference on Machine
+                    learning. ACM, 2008. 
+                </blockquote>
+         </description>
       </component>
 
    <!-- ************************************************************************* -->

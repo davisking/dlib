@@ -17,6 +17,27 @@ using namespace dlib;
 
 extern const char* VERSION;
 
+rgb_alpha_pixel string_to_color(
+    const std::string& str
+)
+{
+    if (str.size() == 0)
+    {
+        return rgb_alpha_pixel(255,0,0,255);
+    }
+    else
+    {
+        // make up a random color based on the string label.
+        hsi_pixel pix;
+        pix.h = static_cast<unsigned char>(dlib::hash(str)&0xFF); 
+        pix.s = 255;
+        pix.i = 150;
+        rgb_alpha_pixel result;
+        assign_pixel(result, pix);
+        return result;
+    }
+}
+
 // ----------------------------------------------------------------------------------------
 
 metadata_editor::
@@ -87,7 +108,6 @@ metadata_editor(
     get_display_size(screen_width, screen_height);
     set_pos((screen_width-width)/2, (screen_height-height)/2);
 
-    set_title("Image Labeler - " + metadata.name);
     show();
 } 
 
@@ -316,6 +336,12 @@ on_keydown (
             last_keyboard_jump_pos_update = 0;
         }
 
+        if (key == 'd' && (state&base_window::KBD_MOD_ALT))
+        {
+            remove_selected_images();
+        }
+
+
         return;
     }
 
@@ -408,7 +434,7 @@ std::vector<dlib::image_display::overlay_rect> get_overlays (
         temp[i].label = data.boxes[i].label;
         temp[i].parts = data.boxes[i].parts;
         temp[i].crossed_out = data.boxes[i].ignore;
-        assign_pixel(temp[i].color, rgb_pixel(255,0,0));
+        temp[i].color = string_to_color(data.boxes[i].label);
     }
     return temp;
 }
@@ -430,7 +456,7 @@ load_image(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
@@ -458,7 +484,7 @@ load_image_and_set_size(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
@@ -520,6 +546,7 @@ on_overlay_label_changed(
 )
 {
     display.set_default_overlay_rect_label(trim(overlay_label.text()));
+    display.set_default_overlay_rect_color(string_to_color(trim(overlay_label.text())));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -531,6 +558,7 @@ on_overlay_rect_selected(
 {
     overlay_label.set_text(orect.label);
     display.set_default_overlay_rect_label(orect.label);
+    display.set_default_overlay_rect_color(string_to_color(orect.label));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -549,7 +577,8 @@ display_about(
                         "by hitting the tab key. Double clicking "
                         "a rectangle selects it and the delete key removes it.  You can also mark "
                         "a rectangle as ignored by hitting the i key when it is selected.  Ignored "
-                        "rectangles are visually displayed with an X through them."
+                        "rectangles are visually displayed with an X through them.  You can remove an image "
+                        "entirely by selecting it in the list on the left and pressing alt+d."
                         ,0,0) << endl << endl;
 
     sout << wrap_string("It is also possible to label object parts by selecting a rectangle and "

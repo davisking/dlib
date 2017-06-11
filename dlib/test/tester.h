@@ -17,10 +17,10 @@
 #endif
 
 
-#define DLIB_TEST(_exp) check_test(_exp, __LINE__, __FILE__, #_exp);
+#define DLIB_TEST(_exp) check_test(bool(_exp), __LINE__, __FILE__, #_exp)
 
 #define DLIB_TEST_MSG(_exp,_message)                                        \
-    {increment_test_count(); if ( !(_exp) )                                 \
+    do{increment_test_count(); if ( !(_exp) )                                 \
     {                                                                       \
         std::ostringstream dlib_o_out;                                       \
         dlib_o_out << "\n\nError occurred at line " << __LINE__ << ".\n";    \
@@ -28,7 +28,7 @@
         dlib_o_out << "Failing expression was " << #_exp << ".\n";           \
         dlib_o_out << _message << "\n";                                      \
         throw dlib::error(dlib_o_out.str());                                 \
-    }}
+    }}while(0)
 
 namespace test
 {

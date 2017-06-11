@@ -327,7 +327,7 @@
          <div class="component"  >
       
          <a href="#top"><font size='2'><center>[top]</center></font></a>
-         <h1 style="margin:0px;"><xsl:value-of select="name"/> <xsl:if test="@cpp11 = 'true'"><span class='cpp11'>(C++11)</span></xsl:if>
+         <h1 style="margin:0px;"><xsl:value-of select="name"/> 
          </h1>
          <BR/>
          <BR/>
@@ -702,6 +702,9 @@
       <table>
          <xsl:apply-templates/>
        </table>
+   </xsl:template>   
+   <xsl:template match="more_details">
+      <a style="float:none" class='more_details'>More Details...</a>
    </xsl:template>   
    <xsl:template match="div">
       <div id="{@id}"><xsl:apply-templates/></div>

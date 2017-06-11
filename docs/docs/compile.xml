@@ -23,8 +23,8 @@ cd build
 cmake ..
 cmake --build . --config Release
 </code_box>
-Note that you also need to have a C++ compiler installed on your system.  There are free C++ compilers
-for most operating systems.  For example, Visual Studio Express is free on Windows and GCC is free and
+Note that you also need to have a C++11 compiler installed on your system.  There are free C++11 compilers
+for most operating systems.  For example, Visual Studio is free on Windows and GCC is free and
 works well on Mac OS X and Linux systems.  If you have multiple compilers/IDEs installed then you can
 tell CMake which one you want it to use via the -G option.
 <p>
@@ -38,7 +38,7 @@ tell CMake which one you want it to use via the -G option.
    Finally, note that when using Visual Studio, CMake will by default generate a 32bit executable.  
    This means the programs you compile will only be able to use 2GB of RAM.  To avoid this, you need
    to tell CMake to generate a 64bit executable.  You do this by using a command like 
-   <code_box>cmake -G "Visual Studio 10 2010 Win64" ..</code_box> instead of <code_box>cmake ..</code_box>  
+   <code_box>cmake -G "Visual Studio 14 2015 Win64" ..</code_box> instead of <code_box>cmake ..</code_box>  
    You can see the list of valid arguments to <tt>-G</tt> by running <tt>cmake</tt> with no options. 
 </p>
             
@@ -109,12 +109,12 @@ tell CMake which one you want it to use via the -G option.
         <h3>Compiling on Linux From Command Line</h3>
         From within the examples folder, you can compile nearly all of the examples with a single command like so:
 <code_box>
-g++ -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
+g++ -std=c++11 -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
 </code_box>
         Note that not all examples require this much work.  For example, the svm_ex.cpp example
         can be compiled with just:
 <code_box>
-g++ -O3 -I.. svm_ex.cpp
+g++ -std=c++11 -O3 -I.. svm_ex.cpp
 </code_box>
 
 On non-Linux systems like Solaris, you might have to link to other libraries.  For example, I have seen systems
@@ -129,11 +129,9 @@ sudo apt-get install libx11-dev
         <p>
             The commands for gcc on windows are the same as above but you may also have to link 
             (via the -l option) to the following libraries: gdi32, comctl32, user32, winmm, ws2_32, or imm32.
-            However, it's worth pointing out that Visual Studio Express is free and a much better choice for
-            windows development than gcc.
         </p>
 
-        <h3>Compiling on Windows Using Visual Studio</h3>
+        <h3>Compiling on Windows Using Visual Studio 2015 or Newer</h3>
         <p>
            All you need to do is create an empty console project. Then add dlib/all/source.cpp to it and add the
            folder containing the dlib folder to the #include search path.  Then you can compile any example program 
@@ -142,7 +140,7 @@ sudo apt-get install libx11-dev
         <p>
            Again, note that dlib will only be able to work with jpeg and png files if you link
            in libjpeg and libpng.  In Visual Studio, the easiest way to do this is to add all the
-           source files in the dlib/external folder into your project and also define the
+           libjpeg, libpng, and zlib source files in the dlib/external folder into your project and also define the
            DLIB_PNG_SUPPORT and DLIB_JPEG_SUPPORT preprocessor directives.  If you don't know
            how to configure Visual Studio then you should use CMake as shown above since it will
            take care of everything automatically.

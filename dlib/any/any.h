@@ -4,7 +4,9 @@
 #define DLIB_AnY_H_
 
 #include "any_abstract.h"
-#include "../smart_pointers.h"
+#include "../algs.h"
+
+#include <memory>
 #include <typeinfo>
 
 namespace dlib
@@ -136,7 +138,7 @@ namespace dlib
             virtual ~base() {}
 
             virtual void copy_to (
-                scoped_ptr<base>& dest
+                std::unique_ptr<base>& dest
             ) const = 0;
         };
 
@@ -148,14 +150,14 @@ namespace dlib
             derived(const T& val) : item(val) {}
 
             virtual void copy_to (
-                scoped_ptr<base>& dest
+                std::unique_ptr<base>& dest
             ) const
             {
                 dest.reset(new derived<T>(item));
             }
         };
 
-        scoped_ptr<base> data;
+        std::unique_ptr<base> data;
     };
 
 // ----------------------------------------------------------------------------------------

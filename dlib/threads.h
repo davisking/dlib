@@ -22,6 +22,7 @@
 #include "threads/thread_pool_extension.h"
 #include "threads/read_write_mutex_extension.h"
 #include "threads/parallel_for_extension.h"
+#include "threads/async.h"
 
 #endif // DLIB_THREADs_
 

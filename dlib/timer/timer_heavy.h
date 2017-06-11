@@ -48,7 +48,7 @@ namespace dlib
                     - there is a thread running
                 - if (is_running()) then
                     - next_time_to_run == the time when the next execution of the action
-                      function should occurr.  (the time is given by ts.get_timestamp())
+                      function should occur.  (the time is given by ts.get_timestamp())
 
                 - stop_running is used to tell the thread to quit.  If it is
                   set to true then the thread should end.

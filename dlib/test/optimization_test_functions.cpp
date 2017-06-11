@@ -378,7 +378,7 @@ namespace dlib
                 h(0,3) = h(0,3) + 8.0E+00 * f1 * f2 * df1dx1 * df2dx4;
 
                 h(1,0) = h(1,0) + 12.0E+00 * pow(f1,2) * df1dx2 * df1dx1 + 4.0E+00 * pow(f2,2) * df1dx2 * df1dx1;
-                h(1,1) = h(1,1) + 12.0E+00 * pow(f1,2) * df1dx2 * df1dx2 + 4.0E+00 * pow(f2,2) * df1dx2 * df1dx1;
+                h(1,1) = h(1,1) + 12.0E+00 * pow(f1,2) * df1dx2 * df1dx2 + 4.0E+00 * pow(f2,2) * df1dx2 * df1dx2;
                 h(1,2) = h(1,2) + 8.0E+00 * f1 * f2 * df1dx2 * df2dx3;
                 h(1,3) = h(1,3) + 8.0E+00 * f1 * f2 * df1dx2 * df2dx4;
 

@@ -18,6 +18,17 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    template <typename EXP>
+    constexpr bool is_row_major (
+        const matrix_exp<EXP>&
+    );
+    /*!
+        ensures
+            - returns true if and only if the given matrix expression uses the row_major_layout.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp diag (
         const matrix_exp& m
     );
@@ -1352,6 +1363,25 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp min_pointwise (
+        const matrix_exp& a,
+        const matrix_exp& b 
+    );
+    /*!
+        requires
+            - a.nr() == b.nr()
+            - a.nc() == b.nc()
+            - a and b both contain the same type of element 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in a and b.
+                - R has the same dimensions as a and b. 
+                - for all valid r and c:
+                  R(r,c) == std::min(a(r,c), b(r,c))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp::type max (
         const matrix_exp& m
     );
@@ -1362,6 +1392,25 @@ namespace dlib
             - returns the value of the biggest element of m.  If m contains complex
               elements then the element returned is the one with the largest norm
               according to std::norm().
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    const matrix_exp max_pointwise (
+        const matrix_exp& a,
+        const matrix_exp& b 
+    );
+    /*!
+        requires
+            - a.nr() == b.nr()
+            - a.nc() == b.nc()
+            - a and b both contain the same type of element 
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in a and b.
+                - R has the same dimensions as a and b. 
+                - for all valid r and c:
+                  R(r,c) == std::max(a(r,c), b(r,c))
     !*/
 
 // ----------------------------------------------------------------------------------------

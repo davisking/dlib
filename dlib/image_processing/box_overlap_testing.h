@@ -12,25 +12,49 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double box_intersection_over_union (
+        const drectangle& a,
+        const drectangle& b
+    ) 
+    {
+        const double inner = a.intersect(b).area();
+        if (inner == 0)
+            return 0;
+        const double outer = (a+b).area();
+        return inner/outer;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline double box_intersection_over_union (
+        const rectangle& a,
+        const rectangle& b
+    ) 
+    {
+        return box_intersection_over_union(drectangle(a),drectangle(b));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class test_box_overlap
     {
     public:
         test_box_overlap (
-        ) : match_thresh(0.5), overlap_thresh(1.0)
+        ) : iou_thresh(0.5), percent_covered_thresh(1.0)
         {}
 
         explicit test_box_overlap (
-            double match_thresh_,
-            double overlap_thresh_ = 1.0
-        ) : match_thresh(match_thresh_), overlap_thresh(overlap_thresh_) 
+            double iou_thresh_,
+            double percent_covered_thresh_ = 1.0
+        ) : iou_thresh(iou_thresh_), percent_covered_thresh(percent_covered_thresh_) 
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(0 <= match_thresh && match_thresh <= 1  &&
-                        0 <= overlap_thresh && overlap_thresh <= 1,
-                "\t test_box_overlap::test_box_overlap(match_thresh, overlap_thresh)"
+            DLIB_ASSERT(0 <= iou_thresh && iou_thresh <= 1  &&
+                        0 <= percent_covered_thresh && percent_covered_thresh <= 1,
+                "\t test_box_overlap::test_box_overlap(iou_thresh, percent_covered_thresh)"
                 << "\n\t Invalid inputs were given to this function "
-                << "\n\t match_thresh:   " << match_thresh
-                << "\n\t overlap_thresh: " << overlap_thresh
+                << "\n\t iou_thresh:   " << iou_thresh
+                << "\n\t percent_covered_thresh: " << percent_covered_thresh
                 << "\n\t this: " << this
                 );
 
@@ -46,29 +70,29 @@ namespace dlib
                 return false;
 
             const double outer = (a+b).area();
-            if (inner/outer > match_thresh || 
-                inner/a.area() > overlap_thresh || 
-                inner/b.area() > overlap_thresh)
+            if (inner/outer > iou_thresh || 
+                inner/a.area() > percent_covered_thresh || 
+                inner/b.area() > percent_covered_thresh)
                 return true;
             else
                 return false;
         }
 
-        double get_overlap_thresh (
+        double get_percent_covered_thresh (
         ) const
         {
-            return overlap_thresh;
+            return percent_covered_thresh;
         }
 
-        double get_match_thresh (
+        double get_iou_thresh (
         ) const
         {
-            return match_thresh;
+            return iou_thresh;
         }
 
     private:
-        double match_thresh;
-        double overlap_thresh;
+        double iou_thresh;
+        double percent_covered_thresh;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -78,8 +102,8 @@ namespace dlib
         std::ostream& out
     )
     {
-        serialize(item.get_match_thresh(), out);
-        serialize(item.get_overlap_thresh(), out);
+        serialize(item.get_iou_thresh(), out);
+        serialize(item.get_percent_covered_thresh(), out);
     }
 
     inline void deserialize (
@@ -87,10 +111,10 @@ namespace dlib
         std::istream& in 
     )
     {
-        double overlap_thresh, match_thresh;
-        deserialize(match_thresh, in);
-        deserialize(overlap_thresh, in);
-        item = test_box_overlap(match_thresh, overlap_thresh);
+        double percent_covered_thresh, iou_thresh;
+        deserialize(iou_thresh, in);
+        deserialize(percent_covered_thresh, in);
+        item = test_box_overlap(iou_thresh, percent_covered_thresh);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -99,8 +123,8 @@ namespace dlib
         const std::vector<std::vector<rectangle> >& rects
     )
     {
-        double max_overlap = 0;
-        double max_match_score = 0;
+        double max_pcov = 0;
+        double max_iou_score = 0;
         for (unsigned long i = 0; i < rects.size(); ++i)
         {
             for (unsigned long j = 0; j < rects[i].size(); ++j)
@@ -109,29 +133,29 @@ namespace dlib
                 {
                     const rectangle a = rects[i][j];
                     const rectangle b = rects[i][k];
-                    const double match_score = (a.intersect(b)).area()/(double)(a+b).area();
-                    const double overlap_a   = (a.intersect(b)).area()/(double)(a).area();
-                    const double overlap_b   = (a.intersect(b)).area()/(double)(b).area();
+                    const double iou_score = (a.intersect(b)).area()/(double)(a+b).area();
+                    const double pcov_a   = (a.intersect(b)).area()/(double)(a).area();
+                    const double pcov_b   = (a.intersect(b)).area()/(double)(b).area();
 
-                    if (match_score > max_match_score)
-                        max_match_score = match_score;
+                    if (iou_score > max_iou_score)
+                        max_iou_score = iou_score;
 
-                    if (overlap_a > max_overlap)
-                        max_overlap = overlap_a;
-                    if (overlap_b > max_overlap)
-                        max_overlap = overlap_b;
+                    if (pcov_a > max_pcov)
+                        max_pcov = pcov_a;
+                    if (pcov_b > max_pcov)
+                        max_pcov = pcov_b;
                 }
             }
         }
 
         // Relax these thresholds very slightly.  We do this because on some systems the
-        // boxes that generated the max values erroneously trigger a box overlap match
-        // even though their overlap and match values are *equal* to the thresholds but not
-        // greater.  That is, sometimes when double values get moved around they change
+        // boxes that generated the max values erroneously trigger a box overlap iou even
+        // though their percent covered and iou values are *equal* to the thresholds but
+        // not greater.  That is, sometimes when double values get moved around they change
         // their values slightly, so this avoids the problems that can create.
-        max_match_score = std::min(1.0000001*max_match_score, 1.0);
-        max_overlap     = std::min(1.0000001*max_overlap,     1.0);
-        return test_box_overlap(max_match_score, max_overlap);
+        max_iou_score = std::min(1.0000001*max_iou_score, 1.0);
+        max_pcov     = std::min(1.0000001*max_pcov,     1.0);
+        return test_box_overlap(max_iou_score, max_pcov);
     }
 
 // ----------------------------------------------------------------------------------------

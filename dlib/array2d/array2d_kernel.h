@@ -72,7 +72,7 @@ namespace dlib
                         - (*this)[x] == data[x]
             !*/
 
-            friend class array2d;
+            friend class array2d<T,mem_manager>;
             friend class row_helper;
 
         public:

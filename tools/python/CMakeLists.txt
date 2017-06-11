@@ -1,9 +1,9 @@
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
 
 set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
-include(../../dlib/add_python_module)
+include(../../dlib/cmake_utils/add_python_module)
 
 add_definitions(-DDLIB_VERSION=${DLIB_VERSION})
 
@@ -25,6 +25,7 @@ set(python_srcs
    src/object_detection.cpp
    src/shape_predictor.cpp
    src/correlation_tracker.cpp
+   src/face_recognition.cpp
 )
 
 # Only add the GUI module if requested

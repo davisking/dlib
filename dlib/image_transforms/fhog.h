@@ -11,8 +11,7 @@
 #include "assign_image.h"
 #include "draw.h"
 #include "interpolation.h"
-#include "../simd/simd4i.h"
-#include "../simd/simd4f.h"
+#include "../simd.h"
 
 namespace dlib
 {
@@ -385,7 +384,7 @@ namespace dlib
             int o,
             int x, 
             int y,
-            const T& value
+            const float& value
         )
         {
             hog[o][y][x] = value;
@@ -440,7 +439,7 @@ namespace dlib
             int o,
             int x, 
             int y,
-            const T& value
+            const float& value
         )
         {
             hog[y][x](o) = value;
@@ -1142,14 +1141,14 @@ namespace dlib
     template <
         typename image_type
         >
-    matrix<float,0,1> extract_fhog_features(
+    matrix<double,0,1> extract_fhog_features(
         const image_type& img, 
         int cell_size = 8,
         int filter_rows_padding = 1,
         int filter_cols_padding = 1
     )
     {
-        matrix<float, 0, 1> feats;
+        matrix<double, 0, 1> feats;
         extract_fhog_features(img, feats, cell_size, filter_rows_padding, filter_cols_padding);
         return feats;
     }

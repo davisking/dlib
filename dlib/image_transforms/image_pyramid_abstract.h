@@ -197,6 +197,164 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        unsigned int N
+        >
+    double pyramid_rate(
+        const pyramid_down<N>& pyr
+    );
+    /*!
+        ensures
+            - returns (N-1.0)/N
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type,
+        typename image_type1,
+        typename image_type2
+        >
+    void create_tiled_pyramid (
+        const image_type1& img,
+        image_type2& out_img,
+        std::vector<rectangle>& rects,
+        const unsigned long padding = 10
+    );
+    /*!
+        requires
+            - pyramid_type == one of the dlib::pyramid_down template instances defined above.
+            - is_same_object(img, out_img) == false
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - for both pixel types P in the input and output images, we require:
+                - pixel_traits<P>::has_alpha == false
+        ensures
+            - Creates an image pyramid from the input image img.  The pyramid is made using
+              pyramid_type.  The highest resolution image is img and then all further
+              pyramid levels are generated from pyramid_type's downsampling.  The entire
+              resulting pyramid is packed into a single image and stored in out_img.
+            - When packing pyramid levels into out_img, there will be padding pixels of
+              space between each sub-image.
+            - The resulting pyramid will be composed of #rects.size() images packed into
+              out_img.  Moreover, #rects[i] is the location inside out_img of the i-th
+              pyramid level. 
+            - #rects.size() > 0
+            - #rects[0] == get_rect(img).  I.e. the first rectangle is the highest
+              resolution pyramid layer.  Subsequent elements of #rects correspond to
+              smaller and smaller pyramid layers inside out_img.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type
+        >
+    dpoint image_to_tiled_pyramid (
+        const std::vector<rectangle>& rects,
+        double scale,
+        dpoint p
+    );
+    /*!
+        requires
+            - pyramid_type == one of the dlib::pyramid_down template instances defined above.
+            - 0 < scale <= 1
+            - rects.size() > 0
+        ensures
+            - The function create_tiled_pyramid() converts an image, img, to a "tiled
+              pyramid" called out_img.  It also outputs a vector of rectangles, rect, that
+              show where each pyramid layer appears in out_img.   Therefore,
+              image_to_tiled_pyramid() allows you to map from coordinates in img (i.e. p)
+              to coordinates in the tiled pyramid out_img, when given the rects metadata.  
+
+              So given a point p in img, you can ask, what coordinate in out_img
+              corresponds to img[p.y()][p.x()] when things are scale times smaller?  This
+              new coordinate is a location in out_img and is what is returned by this
+              function.
+            - A scale of 1 means we don't move anywhere in the pyramid scale space relative
+              to the input image while smaller values of scale mean we move down the
+              pyramid.
+            - Assumes pyramid_type is the pyramid class used to produce the tiled image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type
+        >
+    drectangle image_to_tiled_pyramid (
+        const std::vector<rectangle>& rects,
+        double scale,
+        drectangle r
+    );
+    /*!
+        requires
+            - pyramid_type == one of the dlib::pyramid_down template instances defined above.
+            - 0 < scale <= 1
+            - rects.size() > 0
+        ensures
+            - This function maps from input image space to tiled pyramid coordinate space
+              just as the above image_to_tiled_pyramid() does, except it operates on
+              rectangle objects instead of points.
+            - Assumes pyramid_type is the pyramid class used to produce the tiled image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type
+        >
+    dpoint tiled_pyramid_to_image (
+        const std::vector<rectangle>& rects,
+        dpoint p
+    );
+    /*!
+        requires
+            - pyramid_type == one of the dlib::pyramid_down template instances defined above.
+            - rects.size() > 0
+        ensures
+            - This function maps from a coordinate in a tiled pyramid to the corresponding
+              input image coordinate.  Therefore, it is essentially the inverse of
+              image_to_tiled_pyramid().
+            - It should be noted that this function isn't always an inverse of
+              image_to_tiled_pyramid().  This is because you can ask
+              image_to_tiled_pyramid() for the coordinates of points outside the input
+              image and they will be mapped to somewhere that doesn't have an inverse.  But
+              for points actually inside the image this function performs an approximate
+              inverse mapping.
+            - Assumes pyramid_type is the pyramid class used to produce the tiled image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type
+        >
+    drectangle tiled_pyramid_to_image (
+        const std::vector<rectangle>& rects,
+        drectangle r 
+    );
+    /*!
+        requires
+            - pyramid_type == one of the dlib::pyramid_down template instances defined above.
+            - rects.size() > 0
+        ensures
+            - This function maps from a coordinate in a tiled pyramid to the corresponding
+              input image coordinate.  Therefore, it is essentially the inverse of
+              image_to_tiled_pyramid().
+            - It should be noted that this function isn't always an inverse of
+              image_to_tiled_pyramid().  This is because you can ask
+              image_to_tiled_pyramid() for the coordinates of points outside the input
+              image and they will be mapped to somewhere that doesn't have an inverse.  But
+              for points actually inside the image this function performs an approximate
+              inverse mapping.
+            - Assumes pyramid_type is the pyramid class used to produce the tiled image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_IMAGE_PYRaMID_ABSTRACT_Hh_

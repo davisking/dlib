@@ -58,6 +58,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+// handle the differences in API between libgif v5 and older.
+#if defined(GIFLIB_MAJOR) && GIFLIB_MAJOR >= 5
+#define DLIB_GIFLIB_HANDLE_DIFF_VERSIONS ,0
+#else
+#define DLIB_GIFLIB_HANDLE_DIFF_VERSIONS 
+#endif
+
     template <typename image_type>
     void load_image (
         image_type& image,
@@ -79,7 +86,7 @@ namespace dlib
             case image_file_type::GIF: 
             {
                 image_view<image_type> img(image);
-                GifFileType* gif = DGifOpenFileName(file_name.c_str());
+                GifFileType* gif = DGifOpenFileName(file_name.c_str() DLIB_GIFLIB_HANDLE_DIFF_VERSIONS);
                 try
                 {
                     if (gif == 0) throw image_load_error("Couldn't open file " + file_name);
@@ -141,12 +148,12 @@ namespace dlib
                             }
                         }
                     }
-                    DGifCloseFile(gif);
+                    DGifCloseFile(gif DLIB_GIFLIB_HANDLE_DIFF_VERSIONS);
                 }
                 catch(...)
                 {
                     if (gif)
-                        DGifCloseFile(gif);
+                        DGifCloseFile(gif DLIB_GIFLIB_HANDLE_DIFF_VERSIONS);
                     throw;
                 }
                 return;

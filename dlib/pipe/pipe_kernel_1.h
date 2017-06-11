@@ -119,6 +119,10 @@ namespace dlib
             T& item
         );
 
+        bool enqueue (
+            T&& item
+        ) { return enqueue(item); }
+
         bool dequeue (
             T& item
         );
@@ -127,6 +131,11 @@ namespace dlib
             T& item,
             unsigned long timeout
         );
+
+        bool enqueue_or_timeout (
+            T&& item,
+            unsigned long timeout
+        ) { return enqueue_or_timeout(item,timeout); }
 
         bool dequeue_or_timeout (
             T& item,

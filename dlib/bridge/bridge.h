@@ -3,17 +3,19 @@
 #ifndef DLIB_BRIDGe_Hh_
 #define DLIB_BRIDGe_Hh_
 
-#include "bridge_abstract.h"
+#include <iostream>
+#include <memory>
 #include <string>
+
+#include "bridge_abstract.h"
 #include "../pipe.h"
 #include "../threads.h"
-#include "../smart_pointers.h"
 #include "../serialize.h"
 #include "../sockets.h"
 #include "../sockstreambuf.h"
 #include "../logger.h"
 #include "../algs.h"
-#include <iostream>
+
 
 namespace dlib
 {
@@ -141,7 +143,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl
+    namespace impl_brns
     {
         class impl_bridge_base
         {
@@ -545,8 +547,8 @@ namespace dlib
             signaler s;
             bool receive_thread_active;
             bool transmit_thread_active;
-            scoped_ptr<connection> con;
-            scoped_ptr<listener> list;
+            std::unique_ptr<connection> con;
+            std::unique_ptr<listener> list;
             const unsigned short port;
             const std::string ip;
             transmit_pipe_type* const transmit_pipe;
@@ -594,26 +596,26 @@ namespace dlib
             listen_on_port network_parameters,
             bridge_transmit_decoration<T> transmit_pipe,
             bridge_receive_decoration<R> receive_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl_brns::impl_bridge<T,R>(network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
 
         template < typename T, typename R >
         void reconfigure (
             listen_on_port network_parameters,
             bridge_receive_decoration<R> receive_pipe,
             bridge_transmit_decoration<T> transmit_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl_brns::impl_bridge<T,R>(network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
 
         template < typename T >
         void reconfigure (
             listen_on_port network_parameters,
             bridge_transmit_decoration<T> transmit_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,T>(network_parameters.port, &transmit_pipe.p, 0)); }
+        ) { pimpl.reset(); pimpl.reset(new impl_brns::impl_bridge<T,T>(network_parameters.port, &transmit_pipe.p, 0)); }
 
         template < typename R >
         void reconfigure (
             listen_on_port network_parameters,
             bridge_receive_decoration<R> receive_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<R,R>(network_parameters.port, 0, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl_brns::impl_bridge<R,R>(network_parameters.port, 0, &receive_pipe.p)); }
 
 
 
@@ -623,26 +625,26 @@ namespace dlib
             connect_to_ip_and_port network_parameters,
             bridge_transmit_decoration<T> transmit_pipe,
             bridge_receive_decoration<R> receive_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_parameters.ip, network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl_brns::impl_bridge<T,R>(network_parameters.ip, network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
 
         template < typename T, typename R >
         void reconfigure (
             connect_to_ip_and_port network_parameters,
             bridge_receive_decoration<R> receive_pipe,
             bridge_transmit_decoration<T> transmit_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,R>(network_parameters.ip, network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl_brns::impl_bridge<T,R>(network_parameters.ip, network_parameters.port, &transmit_pipe.p, &receive_pipe.p)); }
 
         template < typename R >
         void reconfigure (
             connect_to_ip_and_port network_parameters,
             bridge_receive_decoration<R> receive_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<R,R>(network_parameters.ip, network_parameters.port, 0, &receive_pipe.p)); }
+        ) { pimpl.reset(); pimpl.reset(new impl_brns::impl_bridge<R,R>(network_parameters.ip, network_parameters.port, 0, &receive_pipe.p)); }
 
         template < typename T >
         void reconfigure (
             connect_to_ip_and_port network_parameters,
             bridge_transmit_decoration<T> transmit_pipe
-        ) { pimpl.reset(); pimpl.reset(new impl::impl_bridge<T,T>(network_parameters.ip, network_parameters.port, &transmit_pipe.p, 0)); }
+        ) { pimpl.reset(); pimpl.reset(new impl_brns::impl_bridge<T,T>(network_parameters.ip, network_parameters.port, &transmit_pipe.p, 0)); }
 
 
         bridge_status get_bridge_status (
@@ -656,7 +658,7 @@ namespace dlib
 
     private:
 
-        scoped_ptr<impl::impl_bridge_base> pimpl;
+        std::unique_ptr<impl_brns::impl_bridge_base> pimpl;
     };
 
 // ---------------------------------------------------------------------------------------- 

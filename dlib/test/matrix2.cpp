@@ -409,7 +409,7 @@ namespace
         DLIB_TEST(abs(det(dm7) - det(m7)) < 1e-14);
         DLIB_TEST(abs(min(dm7) - min(m7)) < 1e-14);
         DLIB_TEST(abs(max(dm7) - max(m7)) < 1e-14);
-        DLIB_TEST_MSG(abs(sum(dm7) - sum(m7)) < 1e-14,sum(dm7) - sum(m7));
+        DLIB_TEST_MSG(abs(sum(dm7) - sum(m7)) < 1e-13,sum(dm7) - sum(m7));
         DLIB_TEST(abs(prod(dm7) -prod(m7)) < 1e-14);
         DLIB_TEST(equal(diag(dm7) , diag(m7)));
         DLIB_TEST(equal(trans(dm7) , trans(m7)));
@@ -1120,9 +1120,9 @@ namespace
                 m4 = randm(4,4,rnd);
 
                 DLIB_TEST(max(abs(m1*inv(m1) - identity_matrix(m1))) < 1e-13);
-                DLIB_TEST(max(abs(m2*inv(m2) - identity_matrix(m2))) < 1e-13);
+                DLIB_TEST(max(abs(m2*inv(m2) - identity_matrix(m2))) < 1e-12);
                 DLIB_TEST(max(abs(m3*inv(m3) - identity_matrix(m3))) < 1e-13);
-                DLIB_TEST(max(abs(m4*inv(m4) - identity_matrix(m4))) < 1e-13);
+                DLIB_TEST_MSG(max(abs(m4*inv(m4) - identity_matrix(m4))) < 1e-12, max(abs(m4*inv(m4) - identity_matrix(m4))));
             }
         }
 

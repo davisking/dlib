@@ -8,26 +8,19 @@
    <body>
 
       <p>
-
-      Dlib is a modern C++ toolkit containing machine learning algorithms and tools
-      for creating complex software in C++ to solve real world problems.
-
-      It is open source software and licensed
-      under the <a href="license.html">Boost Software License</a>.
-
-      The <a href="intro.html">introduction</a> contains everything you need to know to get
-      started using the library.  However, if after consulting the documentation, you have any questions, comments,
-      or complaints feel free to post in the  
-      <a href='http://sourceforge.net/p/dclib/discussion'>forums</a>.
-
-      
+      Dlib is a modern C++ toolkit containing machine learning algorithms and
+      tools for creating complex software in C++ to solve real world problems.
+      It is used in both industry and academia in a wide range of domains 
+      including robotics, embedded devices, mobile phones, and large high
+      performance computing environments. Dlib's <a href="license.html">open source licensing</a> 
+      allows you to use it in any application, free of charge.
       </p>
 
-      <chm>
-         <p>
-            For updates to this project see <a href="http://dlib.net">dlib.net</a>.
-         </p>
-      </chm>
+      <p>
+         To follow or participate in the development of dlib subscribe to <a href="https://github.com/davisking/dlib">dlib on github</a>.
+         Also be sure to read the <a href="howto_contribute.html">how to contribute</a> page if you intend to 
+         submit code to the project.
+      </p>
 
       <br/>
 
@@ -65,6 +58,7 @@
             </li>
             <li><b>Machine Learning Algorithms</b>
                <ul>
+                  <li><a href="ml.html#add_layer">Deep Learning</a></li>
                   <li>Conventional SMO based Support Vector Machines for <a href="ml.html#svm_nu_trainer">classification</a> 
                                                                     and  <a href="ml.html#svr_trainer">regression</a>  </li>
                   <li>Reduced-rank methods for large-scale <a href="ml.html#svm_c_ekm_trainer">classification</a>
@@ -150,6 +144,7 @@
                   <li>Tools for <a href="imaging.html#object_detector">detecting objects</a> in images including
                   <a href="imaging.html#get_frontal_face_detector">frontal face detection</a> and
                    <a href="imaging.html#shape_predictor">object pose estimation</a>.</li>
+                   <li>High quality <a href="dnn_face_recognition_ex.cpp.html">face recognition</a></li>
                </ul>
             </li>
 

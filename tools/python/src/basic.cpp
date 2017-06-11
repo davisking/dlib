@@ -189,7 +189,8 @@ void bind_basic_types()
         .def_pickle(serialize_pickle<range_type>());
 
     class_<range_iter>("_range_iter")
-        .def("next", &range_iter::next);
+        .def("next", &range_iter::next)
+        .def("__next__", &range_iter::next);
 
     {
     typedef std::vector<std::pair<unsigned long, unsigned long> > type;

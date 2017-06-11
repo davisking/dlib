@@ -3,10 +3,13 @@
 # that additional library dependencies can be added like this: add_mex_function(name lib1 dlib libetc).
 # That is, just add more libraries after the name and they will be build into the mex file.
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.11)
 
 set(BUILDING_MATLAB_MEX_FILE true)
 set(CMAKE_POSITION_INDEPENDENT_CODE True)
+
+# Trying to use cuda with matlab hasn't worked well, so just disable it.
+SET(DLIB_USE_CUDA OFF CACHE BOOL "" FORCE)
 
 # Find MATLAB's include directory and needed libraries 
 find_program(MATLAB_EXECUTABLE matlab PATHS
@@ -54,7 +57,7 @@ INCLUDE_DIRECTORIES("${dlib_matlab_binding_path}")
 # Also add dlib to the include search path 
 INCLUDE_DIRECTORIES(${dlib_matlab_binding_path}/../..) 
 
-include(${dlib_matlab_binding_path}/../add_global_compiler_switch.cmake)
+include(${dlib_matlab_binding_path}/../cmake_utils/add_global_compiler_switch.cmake)
 add_global_define(MATLAB_MEX_FILE)
 
 # Determine the path to our CMakeLists.txt file.  This is the file that
@@ -69,6 +72,7 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 MACRO(add_mex_function name )
     ADD_LIBRARY(${name} MODULE ${name}.cpp )
+    target_compile_definitions(${name} PRIVATE -DMEX_FILENAME=${name})
     if (UNIX)
         # Doing this prevents our mex function from exporting any symbols
         # other than mexFunction().  This sometimes doesn't matter but sometimes

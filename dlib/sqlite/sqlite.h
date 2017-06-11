@@ -6,12 +6,14 @@
 #include "sqlite_abstract.h"
 
 #include <iostream>
+#include <limits>
+#include <memory>
 #include <vector>
+
 #include "../algs.h"
 #include <sqlite3.h>
-#include "../smart_pointers.h"
 #include "../serialize.h"
-#include <limits>
+
 
 // --------------------------------------------------------------------------------------------
 
@@ -105,7 +107,7 @@ namespace dlib
         friend class statement;
 
         std::string filename;
-        shared_ptr<sqlite3> db;
+        std::shared_ptr<sqlite3> db;
     };
 
 // --------------------------------------------------------------------------------------------
@@ -593,7 +595,7 @@ namespace dlib
         int step_status;
         bool at_first_step;
 
-        shared_ptr<sqlite3> db;
+        std::shared_ptr<sqlite3> db;
         sqlite3_stmt* stmt;
         std::string sql_string;
     };

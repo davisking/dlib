@@ -104,6 +104,14 @@ namespace dlib
                   when the return value of part() is equal to OBJECT_PART_NOT_PRESENT. 
                   This is useful for modeling object parts that are not always observed.
         !*/
+
+        bool operator==(
+            const full_object_detection& rhs
+        ) const;
+        /*!
+            ensures
+                - returns true if and only if *this and rhs have identical state.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
@@ -135,6 +143,45 @@ namespace dlib
               That is, returns true if and only if, for all valid i, the following is
               always true:
                 obj.get_rect().contains(obj.part(i)) == true || obj.part(i) == OBJECT_PART_NOT_PRESENT
+    !*/
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    struct mmod_rect
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that is used to give training data and receive detections
+                from the Max-Margin Object Detection loss layer loss_mmod_ object.
+        !*/
+
+        mmod_rect() = default; 
+        mmod_rect(const rectangle& r) : rect(r) {}
+        mmod_rect(const rectangle& r, double score) : rect(r),detection_confidence(score) {}
+
+        rectangle rect;
+        double detection_confidence = 0;
+        bool ignore = false;
+
+        operator rectangle() const { return rect; }
+    };
+
+    mmod_rect ignored_mmod_rect(
+        const rectangle& r
+    );
+    /*!
+        ensures
+            - returns a mmod_rect R such that:
+                - R.rect == r
+                - R.ignore == true
+                - R.detection_confidence == 0
+    !*/
+
+    void serialize(const mmod_rect& item, std::ostream& out);
+    void deserialize(mmod_rect& item, std::istream& in);
+    /*!
+        provides serialization support
     !*/
 
 // ----------------------------------------------------------------------------------------

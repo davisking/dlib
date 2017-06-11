@@ -443,6 +443,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    point_transform_affine flip_image_left_right (
+        image_type& img
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+        ensures
+            - This function is identical to the above version of flip_image_left_right()
+              except that it operates in-place.
+            - #img.nr() == img.nr()
+            - #img.nc() == img.nc()
+            - #img == a copy of img which has been flipped from left to right.  
+              (i.e. it is flipped as if viewed though a mirror)
+            - returns a transformation object that maps points in img into their
+              corresponding location in #img.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_array_type,
         typename T
         >
@@ -633,6 +656,33 @@ namespace dlib
     void upsample_image_dataset (
         image_array_type& images,
         std::vector<std::vector<rectangle> >& objects
+    );
+    /*!
+        requires
+            - image_array_type == a dlib::array or std::vector of image objects that each
+              implement the interface defined in dlib/image_processing/generic_image.h 
+            - images.size() == objects.size()
+        ensures
+            - This function replaces each image in images with an upsampled version of that
+              image.  Each image is upsampled using pyramid_up() and the given
+              pyramid_type.  Therefore, #images[i] will contain the larger upsampled
+              version of images[i].  It also adjusts all the rectangles in objects so that
+              they still bound the same visual objects in each image.
+            - #images.size() == image.size()
+            - #objects.size() == objects.size()
+            - for all valid i:
+                #objects[i].size() == objects[i].size()
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename pyramid_type,
+        typename image_array_type
+        >
+    void upsample_image_dataset (
+        image_array_type& images,
+        std::vector<std::vector<mmod_rect>>& objects
     );
     /*!
         requires

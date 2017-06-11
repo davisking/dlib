@@ -120,7 +120,7 @@ namespace
             T true_eval = assignment_cost(cost, assign);
             assign = max_cost_assignment(cost);
             DLIB_TEST(assignment_cost(cost,assign) == true_eval);
-            assign = max_cost_assignment(matrix_cast<char>(cost));
+            assign = max_cost_assignment(matrix_cast<signed char>(cost));
             DLIB_TEST(assignment_cost(cost,assign) == true_eval);
 
 

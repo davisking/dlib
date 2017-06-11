@@ -36,6 +36,7 @@ namespace dlib
                   This means that, initially, all boxes will be loaded.  Therefore, for all
                   possible boxes B we have:
                     - #should_load_box(B) == true
+                - #box_area_thresh() == infinity
         !*/
 
         const std::string& get_filename(
@@ -115,24 +116,45 @@ namespace dlib
                         - returns false
         !*/
 
+        image_dataset_file shrink_big_images(
+            double new_box_area_thresh = 150*150
+        ) const;
+        /*!
+            ensures
+                - returns a copy of *this that is identical in all respects to *this except
+                  that #box_area_thresh() == new_box_area_thresh
+        !*/
+
+        double box_area_thresh(
+        ) const;
+        /*!
+            ensures
+                - If the smallest non-ignored rectangle in an image has an area greater
+                  than box_area_thresh() then we will shrink the image until the area of
+                  the box is about equal to box_area_thresh().  This is useful if you have
+                  a dataset containing very high resolution images and you don't want to
+                  load it in its native high resolution.  Setting the box_area_thresh()
+                  allows you to control the resolution of the loaded images.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type 
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<rectangle> >& object_locations,
         const image_dataset_file& source
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename image_type::type> is defined  
+            - array_type == An array of images.  This is anything with an interface that
+              looks like std::vector<some generic image type> where a "generic image" is
+              anything that implements the generic image interface defined in
+              dlib/image_processing/generic_image.h.
         ensures
             - This routine loads the images and their associated object boxes from the
               image metadata file indicated by source.get_filename().  This metadata file
@@ -162,20 +184,66 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type 
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<rectangle> >& object_locations,
         const std::string& filename
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename image_type::type> is defined  
+            - array_type == An array of images.  This is anything with an interface that
+              looks like std::vector<some generic image type> where a "generic image" is
+              anything that implements the generic image interface defined in
+              dlib/image_processing/generic_image.h.
         ensures
             - performs: return load_image_dataset(images, object_locations, image_dataset_file(filename));
+              (i.e. it ignores box labels and therefore loads all the boxes in the dataset)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename array_type
+        >
+    void load_image_dataset (
+        array_type& images,
+        std::vector<std::vector<mmod_rect> >& object_locations,
+        const image_dataset_file& source
+    );
+    /*!
+        requires
+            - array_type == An array of images.  This is anything with an interface that
+              looks like std::vector<some generic image type> where a "generic image" is
+              anything that implements the generic image interface defined in
+              dlib/image_processing/generic_image.h.
+        ensures
+            - This function has essentially the same behavior as the above
+              load_image_dataset() routines, except here we out put to a vector of
+              mmod_rects instead of rectangles.  In this case, both ignore and non-ignore
+              rectangles go into object_locations since mmod_rect has an ignore boolean
+              field that records the ignored/non-ignored state of each rectangle.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename array_type 
+        >
+    void load_image_dataset (
+        array_type& images,
+        std::vector<std::vector<mmod_rect> >& object_locations,
+        const std::string& filename
+    );
+    /*!
+        requires
+            - array_type == An array of images.  This is anything with an interface that
+              looks like std::vector<some generic image type> where a "generic image" is
+              anything that implements the generic image interface defined in
+              dlib/image_processing/generic_image.h.
+        ensures
+            - performs: load_image_dataset(images, object_locations, image_dataset_file(filename));
               (i.e. it ignores box labels and therefore loads all the boxes in the dataset)
     !*/
 
@@ -183,19 +251,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<full_object_detection> >& object_locations,
         const image_dataset_file& source,
         std::vector<std::string>& parts_list
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename image_type::type> is defined  
+            - array_type == An array of images.  This is anything with an interface that
+              looks like std::vector<some generic image type> where a "generic image" is
+              anything that implements the generic image interface defined in
+              dlib/image_processing/generic_image.h.
         ensures
             - This routine loads the images and their associated object locations from the
               image metadata file indicated by source.get_filename().  This metadata file
@@ -237,18 +306,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type 
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<full_object_detection> >& object_locations,
         const image_dataset_file& source 
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename image_type::type> is defined  
+            - array_type == An array of images.  This is anything with an interface that
+              looks like std::vector<some generic image type> where a "generic image" is
+              anything that implements the generic image interface defined in
+              dlib/image_processing/generic_image.h.
         ensures
             - performs: return load_image_dataset(images, object_locations, source, parts_list);
               (i.e. this function simply calls the above function and discards the output
@@ -259,18 +329,19 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type, 
-        typename MM
+        typename array_type 
         >
     std::vector<std::vector<rectangle> > load_image_dataset (
-        array<image_type,MM>& images,
+        array_type& images,
         std::vector<std::vector<full_object_detection> >& object_locations,
         const std::string& filename
     );
     /*!
         requires
-            - image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename image_type::type> is defined  
+            - array_type == An array of images.  This is anything with an interface that
+              looks like std::vector<some generic image type> where a "generic image" is
+              anything that implements the generic image interface defined in
+              dlib/image_processing/generic_image.h.
         ensures
             - performs: return load_image_dataset(images, object_locations, image_dataset_file(filename));
               (i.e. it ignores box labels and therefore loads all the boxes in the dataset)

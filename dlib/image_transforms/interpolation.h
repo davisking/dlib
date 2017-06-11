@@ -120,6 +120,17 @@ namespace dlib
         const const_sub_image_proxy<T>& img
     ) { return img._width_step; }
 
+    template <typename T>
+    void set_image_size(sub_image_proxy<T>& img, long rows, long cols)
+    {
+        DLIB_CASSERT(img._nr == rows && img._nc == cols, "A sub_image can't be resized."
+            << "\n\t img._nr: "<< img._nr
+            << "\n\t img._nc: "<< img._nc
+            << "\n\t rows:    "<< rows
+            << "\n\t cols:    "<< cols
+            );
+    }
+
     template <
         typename image_type
         >
@@ -567,7 +578,7 @@ namespace dlib
         rect += rotate_point(center(rimg), rimg.tr_corner(), -angle);
         rect += rotate_point(center(rimg), rimg.bl_corner(), -angle);
         rect += rotate_point(center(rimg), rimg.br_corner(), -angle);
-        out_img.set_size(rect.height(), rect.width());
+        set_image_size(out_img, rect.height(), rect.width());
 
         const matrix<double,2,2> R = rotation_matrix(angle);
 
@@ -1027,6 +1038,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    point_transform_affine flip_image_left_right (
+        image_type& img
+    )
+    {
+        image_type temp;
+        auto tform = flip_image_left_right(img, temp);
+        swap(temp,img);
+        return tform;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type1,
         typename image_type2
         >
@@ -1260,6 +1286,36 @@ namespace dlib
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
                 objects[i][j] = pyr.rect_up(objects[i][j]);
+            }
+        }
+    }
+
+    template <
+        typename pyramid_type,
+        typename image_array_type
+        >
+    void upsample_image_dataset (
+        image_array_type& images,
+        std::vector<std::vector<mmod_rect>>& objects
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( images.size() == objects.size(),
+            "\t void upsample_image_dataset()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t images.size():   " << images.size() 
+            << "\n\t objects.size():  " << objects.size() 
+            );
+
+        typename image_array_type::value_type temp;
+        pyramid_type pyr;
+        for (unsigned long i = 0; i < images.size(); ++i)
+        {
+            pyramid_up(images[i], temp, pyr);
+            swap(temp, images[i]);
+            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            {
+                objects[i][j].rect = pyr.rect_up(objects[i][j].rect);
             }
         }
     }

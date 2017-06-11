@@ -4,7 +4,7 @@ to train an object detector (e.g. a face detector) since it allows you to
 easily create the needed training dataset.   
 
 You can compile imglab with the following commands:
-    cd dclib/tools/imglab
+    cd dlib/tools/imglab
     mkdir build
     cd build
     cmake ..

@@ -39,7 +39,7 @@ std::vector<std::vector<double> > get_interocular_distances (
 // ----------------------------------------------------------------------------------------
 
 int main(int argc, char** argv)
-{  
+{
     try
     {
         // In this example we are going to train a shape_predictor based on the
@@ -108,6 +108,9 @@ int main(int argc, char** argv)
         trainer.set_nu(0.05);
         trainer.set_tree_depth(2);
 
+        // some parts of training process can be parallelized.
+        // Trainer will use this count of threads when possible
+        trainer.set_num_threads(2);
 
         // Tell the trainer to print status messages to the console so we can
         // see how long the training will take.

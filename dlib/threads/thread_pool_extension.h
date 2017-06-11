@@ -3,6 +3,10 @@
 #ifndef DLIB_THREAD_POOl_Hh_
 #define DLIB_THREAD_POOl_Hh_ 
 
+#include <exception>
+#include <memory>
+#include <thread>
+
 #include "thread_pool_extension_abstract.h"
 #include "multithreaded_object_extension.h"
 #include "../member_function_pointer.h"
@@ -11,8 +15,6 @@
 #include "auto_mutex_extension.h"
 #include "../uintn.h"
 #include "../array.h"
-#include "../smart_pointers_thread_safe.h"
-#include "../smart_pointers.h"
 
 namespace dlib
 {
@@ -86,7 +88,7 @@ namespace dlib
         inline void wait () const;
 
         mutable uint64 task_id;
-        mutable shared_ptr_thread_safe<thread_pool_implementation> tp;
+        mutable std::shared_ptr<thread_pool_implementation> tp;
 
         T var;
     };
@@ -125,7 +127,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class thread_pool_implementation : private multithreaded_object
+    class thread_pool_implementation 
     {
         /*!
             CONVENTION
@@ -312,7 +314,7 @@ namespace dlib
 
         uint64 add_task_internal (
             const bfp_type& bfp,
-            shared_ptr<function_object_copy>& item
+            std::shared_ptr<function_object_copy>& item
         );
         /*!
             ensures
@@ -324,7 +326,7 @@ namespace dlib
 
         uint64 add_task_internal (
             const bfp_type& bfp
-        ) { shared_ptr<function_object_copy> temp; return add_task_internal(bfp, temp); }
+        ) { std::shared_ptr<function_object_copy> temp; return add_task_internal(bfp, temp); }
         /*!
             ensures
                 - adds a task to call the given bfp object.
@@ -410,7 +412,7 @@ namespace dlib
 
         struct task_state_type
         {
-            task_state_type() : is_being_processed(false), task_id(0), next_task_id(2), arg1(0), arg2(0) {}
+            task_state_type() : is_being_processed(false), task_id(0), next_task_id(2), arg1(0), arg2(0), eptr(nullptr) {}
 
             bool is_ready () const 
             /*!
@@ -450,7 +452,18 @@ namespace dlib
             member_function_pointer<long,long> mfp2;
             bfp_type bfp;
 
-            shared_ptr<function_object_copy> function_copy;
+            std::shared_ptr<function_object_copy> function_copy;
+            mutable std::exception_ptr eptr; // non-null if the task threw an exception
+
+            void propagate_exception() const
+            {
+                if (eptr)
+                {
+                    auto tmp = eptr;
+                    eptr = nullptr;
+                    std::rethrow_exception(tmp);
+                }
+            }
 
         };
 
@@ -461,6 +474,8 @@ namespace dlib
         signaler task_done_signaler;
         signaler task_ready_signaler;
         bool we_are_destructing;
+
+        std::vector<std::thread> threads;
 
         // restricted functions
         thread_pool_implementation(thread_pool_implementation&);        // copy constructor
@@ -474,7 +489,7 @@ namespace dlib
     class thread_pool 
     {
         /*!
-            This object is just a shell that holds a shared_ptr_thread_safe 
+            This object is just a shell that holds a std::shared_ptr 
             to the real thread_pool_implementation object.  The reason for doing
             it this way is so that we can allow any mixture of destruction orders
             between thread_pool objects and futures.  Whoever gets destroyed
@@ -493,7 +508,25 @@ namespace dlib
         ~thread_pool (
         )
         {
-            impl->shutdown_pool();
+            try
+            {
+                impl->shutdown_pool();
+            }
+            catch (std::exception& e)
+            {
+                std::cerr << "An unhandled exception was inside a dlib::thread_pool when it was destructed." << std::endl;
+                std::cerr << "It's what string is: \n" << e.what() << std::endl;
+                using namespace std;
+                assert(false);
+                abort();
+            }
+            catch (...)
+            {
+                std::cerr << "An unhandled exception was inside a dlib::thread_pool when it was destructed." << std::endl;
+                using namespace std;
+                assert(false);
+                abort();
+            }
         }
 
         void wait_for_task (
@@ -563,7 +596,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<F>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<F>(function_object);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
 
             bfp_type temp;
@@ -594,7 +627,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<const T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<const T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item,funct);
@@ -611,7 +644,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item,funct);
@@ -660,7 +693,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<F>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<F>(function_object);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, arg1.get());
@@ -698,7 +731,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item,funct,arg1.get());
@@ -737,7 +770,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<const T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<const T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item,funct,arg1.get());
@@ -798,7 +831,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<F>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<F>(function_object);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, arg1.get(), arg2.get());
@@ -844,7 +877,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, funct, arg1.get(), arg2.get());
@@ -890,7 +923,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<const T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<const T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, funct, arg1.get(), arg2.get());
@@ -961,7 +994,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<F>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<F>(function_object);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, arg1.get(), arg2.get(), arg3.get());
@@ -1015,7 +1048,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, funct, arg1.get(), arg2.get(), arg3.get());
@@ -1069,7 +1102,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<const T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<const T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, funct, arg1.get(), arg2.get(), arg3.get());
@@ -1150,7 +1183,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<F>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<F>(function_object);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, arg1.get(), arg2.get(), arg3.get(), arg4.get());
@@ -1212,7 +1245,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
@@ -1274,7 +1307,7 @@ namespace dlib
         { 
             thread_pool_implementation::function_object_copy_instance<const T>* ptr = 0;
             ptr = new thread_pool_implementation::function_object_copy_instance<const T>(obj);
-            shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
+            std::shared_ptr<thread_pool_implementation::function_object_copy> function_copy(ptr);
 
             bfp_type temp;
             temp.set(ptr->item, funct, arg1.get(), arg2.get(), arg3.get(), arg4.get());
@@ -1322,7 +1355,7 @@ namespace dlib
 
     private:
 
-        shared_ptr_thread_safe<thread_pool_implementation> impl;
+        std::shared_ptr<thread_pool_implementation> impl;
 
         // restricted functions
         thread_pool(thread_pool&);        // copy constructor

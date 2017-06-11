@@ -16,7 +16,7 @@ echo Testing environment for needed release building utilities
 
 #flip -h 		> /dev/null || return_error "flip";
 unix2dos -h 		&> /dev/null || return_error "unix2dos";
-wine --help 	       &> /dev/null || return_error "wine";
+#wine --help 	       &> /dev/null || return_error "wine";
 
 
 echo All needed utilities found 

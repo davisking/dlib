@@ -165,7 +165,7 @@ void bind_shape_predictors()
 "requires \n\
     - rect: dlib rectangle \n\
     - parts: list of dlib points")
-        .add_property("rect", &full_obj_det_get_rect, "The bounding box of the parts.")
+        .add_property("rect", &full_obj_det_get_rect, "Bounding box from the underlying detector. Parts can be outside box if appropriate.")
         .add_property("num_parts", &full_obj_det_num_parts, "The number of parts of the object.")
         .def("part", &full_obj_det_part, (arg("idx")), "A single part of the object as a dlib point.")
         .def("parts", &full_obj_det_parts, "A vector of dlib points representing all of the parts.")

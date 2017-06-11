@@ -34,8 +34,132 @@
 
 
          <term file="dlib/algs.h.html" name="stack_based_memory_block" include="dlib/algs.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="net_to_xml" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="log1pexp" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="randomize_parameters" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="input_tensor_to_output_tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/utilities_abstract.h.html" name="output_tensor_to_input_tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tuple_head" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tuple_tail" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="get_learning_rate_multiplier" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="get_weight_decay_multiplier" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="sstack" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="make_sstack" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="repeat_group" include="dlib/dnn.h"/>
 
-         <term file="linear_algebra.html" name="mat"   include="dlib/matrix.h" />
+         <term file="ml.html" name="add_layer" include="dlib/dnn.h"/>
+         <term file="ml.html" name="add_loss_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="repeat_group" include="dlib/dnn.h"/>
+         <term file="ml.html" name="repeat" include="dlib/dnn.h"/>
+         <term file="ml.html" name="add_tag_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag_id" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag1" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag2" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag3" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag4" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag5" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag6" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag7" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag8" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag9" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="tag10" include="dlib/dnn.h"/>
+         <term file="ml.html" name="add_skip_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip1" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip2" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip3" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip4" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip5" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip6" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip7" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip8" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip9" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="skip10" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="input_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layers" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layers_until_tag" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameters" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameter_gradients" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layers_backwards" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layers_backwards_range" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layers_range" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="test_layer" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="layer_test_results" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/core_abstract.h.html" name="dnn_prefer_fastest_algorithms" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="set_dnn_prefer_fastest_algorithms" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="set_dnn_prefer_smallest_algorithms" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/cuda_errors.h.html" name="cuda_error" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/cuda_errors.h.html" name="cudnn_error" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/cuda_errors.h.html" name="curand_error" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/cuda_errors.h.html" name="cublas_error" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="fc_bias_mode" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="FC_HAS_BIAS" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="FC_NO_BIAS" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="layer_mode" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="CONV_MODE" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="FC_MODE" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="set_all_bn_running_stats_window_sizes" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="resizable_tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="alias_tensor_instance" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="alias_tensor_const_instance" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="alias_tensor" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="image_plane" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/tensor_abstract.h.html" name="have_same_dimensions" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/gpu_data_abstract.h.html" name="gpu_data" include="dlib/dnn.h"/>
+         <term name="memcpy">
+            <term link="dlib/dnn/tensor_abstract.h.html#memcpy" name="for tensors"   include="dlib/dnn.h" />
+            <term link="dlib/dnn/gpu_data_abstract.h.html#memcpy" name="for gpu_data"   include="dlib/dnn.h" />
+         </term>
+
+         <term file="dlib/dnn/input_abstract.h.html" name="EXAMPLE_INPUT_LAYER" include="dlib/dnn.h"/>
+         <term file="ml.html" name="input" include="dlib/dnn.h"/>
+         <term file="ml.html" name="input_rgb_image" include="dlib/dnn.h"/>
+         <term file="ml.html" name="input_rgb_image_sized" include="dlib/dnn.h"/>
+         <term file="ml.html" name="input_rgb_image_pyramid" include="dlib/dnn.h"/>
+
+         <term file="ml.html" name="dnn_trainer" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/loss_abstract.h.html" name="EXAMPLE_LOSS_LAYER_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_hinge_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_log_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_metric_" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_mean_squared_" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_mean_squared_multioutput_" include="dlib/dnn.h"/>
+         <term file="ml.html" name="loss_mmod_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="mmod_options" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/solvers_abstract.h.html" name="EXAMPLE_SOLVER" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/solvers_abstract.h.html" name="sgd" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/solvers_abstract.h.html" name="adam" include="dlib/dnn.h"/>
+
+         <term file="dlib/dnn/layers_abstract.h.html" name="num_fc_outputs" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="EXAMPLE_COMPUTATIONAL_LAYER_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="fc_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="con_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="l2normalize_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="dropout_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="multiply_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="bn_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="affine_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="max_pool_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="avg_pool_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="relu_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="prelu_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="sig_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="htan_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="softmax_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="add_prev_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="concat_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="inception" include="dlib/dnn.h"/>
+
+         <term name="mat">
+            <term link="linear_algebra.html#mat" name="general use"   include="dlib/matrix.h" />
+            <term link="dlib/dnn/tensor_abstract.h.html#mat" name="for tensors"   include="dlib/dnn.h" />
+         </term>
          <term file="linear_algebra.html" name="matrix" include="dlib/matrix.h"/>
          <term file="linear_algebra.html" name="move_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="intersect" include="dlib/geometry.h"/>
@@ -46,8 +170,10 @@
          <term file="linear_algebra.html" name="resize_rect_height" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="centered_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="set_aspect_ratio" include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="set_rect_area" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="center" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="nearest_point" include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="nearest_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="distance_to_rect_edge" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="distance_to_line" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="clip_line_to_rectangle" include="dlib/geometry.h"/>
@@ -58,6 +184,12 @@
          <term file="algorithms.html" name="kalman_filter"  include="dlib/filtering.h"/>
          <term file="algorithms.html" name="rls_filter"     include="dlib/filtering.h"/>
 
+         <term file="dlib/error.h.html" name="error_type"      include="dlib/error.h"/>
+         <term file="dlib/error.h.html" name="error"           include="dlib/error.h"/>
+         <term file="dlib/error.h.html" name="fatal_error"     include="dlib/error.h"/>
+         <term file="dlib/error.h.html" name="thread_error"    include="dlib/error.h"/>
+         <term file="dlib/error.h.html" name="socket_error"    include="dlib/error.h"/>
+         <term file="dlib/error.h.html" name="impossible_labeling_error"    include="dlib/error.h"/>
 
          <term file="dlib/optimization/optimization_abstract.h.html" name="central_differences"    include="dlib/optimization.h"/>
          <term file="dlib/optimization/optimization_abstract.h.html" name="line_search_funct"      include="dlib/optimization.h"/>
@@ -153,8 +285,12 @@
          <term file="optimization.html" name="find_min_single_variable"       include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min_using_approximate_derivatives" include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min_bobyqa"                include="dlib/optimization.h"/>
+         <term file="optimization.html" name="find_optimal_parameters"        include="dlib/optimization/find_optimal_parameters.h"/>
+         <term file="optimization.html" name="elastic_net"                    include="dlib/optimization/elastic_net.h"/>
          <term file="optimization.html" name="solve_qp_box_constrained"       include="dlib/optimization.h"/>
+         <term file="optimization.html" name="solve_qp_box_constrained_blockdiag"       include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp_using_smo"             include="dlib/optimization.h"/>
+         <term file="optimization.html" name="find_gap_between_convex_hulls"  include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp2_using_smo"            include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp3_using_smo"            include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp4_using_smo"            include="dlib/optimization.h"/>
@@ -246,6 +382,7 @@
          <term file="linear_algebra.html" name="point_rotator"             include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform"           include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform_affine"    include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="rectangle_transform"       include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="camera_transform"          include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform_affine3d"  include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="rotate_around_x"           include="dlib/geometry.h"/>
@@ -258,9 +395,15 @@
          <term file="linear_algebra.html" name="find_projective_transform"     include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="rotation_matrix"           include="dlib/geometry.h"/>
          <term file="algorithms.html" name="running_stats"                 include="dlib/statistics.h"/>
+         <term file="algorithms.html" name="running_stats_decayed"                 include="dlib/statistics.h"/>
+         <term file="algorithms.html" name="running_scalar_covariance_decayed"                 include="dlib/statistics.h"/>
          <term file="algorithms.html" name="running_gradient"              include="dlib/statistics/running_gradient.h"/>
+         <term file="algorithms.html" name="find_upper_quantile"           include="dlib/statistics/running_gradient.h"/>
          <term file="dlib/statistics/running_gradient_abstract.h.html" name="probability_gradient_greater_than"  include="dlib/statistics/running_gradient.h"/>
          <term file="dlib/statistics/running_gradient_abstract.h.html" name="probability_gradient_less_than"  include="dlib/statistics/running_gradient.h"/>
+         <term file="algorithms.html" name="count_steps_without_decrease_robust"  include="dlib/statistics/running_gradient.h"/>
+         <term file="algorithms.html" name="count_steps_without_decrease"  include="dlib/statistics/running_gradient.h"/>
+         <term file="algorithms.html" name="count_steps_without_increase"  include="dlib/statistics/running_gradient.h"/>
          <term file="algorithms.html" name="running_scalar_covariance"     include="dlib/statistics.h"/>
          <term file="algorithms.html" name="mean_sign_agreement"           include="dlib/statistics.h"/>
          <term file="algorithms.html" name="correlation"                   include="dlib/statistics.h"/>
@@ -373,6 +516,8 @@
          <term file="ml.html" name="count_ranking_inversions"                       include="dlib/svm.h"/>
          <term file="ml.html" name="average_precision"                              include="dlib/statistics.h"/>
          <term file="ml.html" name="equal_error_rate"                               include="dlib/statistics.h"/>
+         <term file="ml.html" name="compute_roc_curve"                              include="dlib/statistics.h"/>
+         <term file="dlib/statistics/lda.h.html" name="roc_point"                   include="dlib/statistics.h"/>
          <term file="ml.html" name="test_ranking_function"                          include="dlib/svm.h"/>
          <term file="ml.html" name="cross_validate_ranking_trainer"                 include="dlib/svm.h"/>
          <term file="ml.html" name="svm_c_ekm_trainer"                              include="dlib/svm.h"/>
@@ -435,6 +580,8 @@
          <term file="ml.html" name="spectral_cluster"                               include="dlib/clustering.h"/>
          <term file="ml.html" name="chinese_whispers"                               include="dlib/clustering.h"/>
          <term file="ml.html" name="bottom_up_cluster"                               include="dlib/clustering.h"/>
+         <term file="ml.html" name="segment_number_line"                            include="dlib/clustering.h"/>
+         <term file="dlib/clustering/bottom_up_cluster_abstract.h.html" name="snl_range"  include="dlib/clustering.h"/>
          <term file="ml.html" name="modularity"                                     include="dlib/clustering.h"/>
          <term file="ml.html" name="pick_initial_centers"                           include="dlib/clustering.h"/>
          <term file="ml.html" name="rank_features"                                  include="dlib/svm.h"/>
@@ -552,6 +699,7 @@
          <term name="dot">
             <term link="dlib/matrix/matrix_utilities_abstract.h.html#dot" name="for matrix objects" include="dlib/matrix.h"/>
             <term link="dlib/svm/sparse_vector_abstract.h.html#dot" name="for sparse vectors" include="dlib/sparse_vector.h"/>
+            <term link="dlib/dnn/tensor_abstract.h.html#dot" name="for tensors" include="dlib/dnn.h"/>
          </term>
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="lowerm"             include="dlib/matrix.h"/>
@@ -572,7 +720,11 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="reshape"            include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="squared"       include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_math_functions_abstract.h.html" name="cubed"         include="dlib/matrix.h"/>
-         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_vector"          include="dlib/matrix.h"/>
+
+         <term name="is_vector">
+            <term link="dlib/matrix/matrix_utilities_abstract.h.html#is_vector" name="for matrix objects"          include="dlib/matrix.h"/>
+            <term link="dlib/dnn/tensor_abstract.h.html#is_vector" name="for tensor objects"          include="dlib/dnn.h"/>
+         </term>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_row_vector"      include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_col_vector"      include="dlib/matrix.h"/>
          <term name="is_finite">
@@ -618,6 +770,8 @@
          <term file="dlib/matrix/matrix_subexp_abstract.h.html" name="set_ptrm"              include="dlib/matrix.h"/>
 
 
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="min_pointwise" include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="max_pointwise" include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="pointwise_multiply" include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="join_rows"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="join_cols"          include="dlib/matrix.h"/>
@@ -656,6 +810,7 @@
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="index_of_max"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="index_of_min"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="sum"                   include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_row_major"          include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="sum_rows"              include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="sum_cols"              include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="prod"                  include="dlib/matrix.h"/>
@@ -678,11 +833,8 @@
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="has_unsigned_keys"  include="dlib/sparse_vector.h"/>
 
          <term file="containers.html" name="remover"                 include="dlib/interfaces/remover.h"/>
-         <term file="containers.html" name="scoped_ptr"              include="dlib/smart_pointers.h"/>
          <term file="containers.html" name="set"                     include="dlib/set.h"/>
-         <term file="containers.html" name="shared_ptr"              include="dlib/smart_pointers.h"/>
          <term file="containers.html" name="stack"                   include="dlib/stack.h"/>
-         <term file="containers.html" name="weak_ptr"                include="dlib/smart_pointers.h"/>
          <term file="containers.html" name="any"                     include="dlib/any.h"/>
          <term file="containers.html" name="any_function"            include="dlib/any.h"/>
          <term file="containers.html" name="any_trainer"             include="dlib/any.h"/>
@@ -806,6 +958,9 @@
          <term file="api.html" name="thread_specific_data"  include="dlib/threads.h"/>
          <term file="api.html" name="threaded_object"       include="dlib/threads.h"/>
          <term file="api.html" name="thread_pool"           include="dlib/threads.h"/>
+         <term file="api.html" name="async"                 include="dlib/threads.h"/>
+         <term file="api.html" name="default_thread_pool"   include="dlib/threads.h"/>
+         <term link="api.html#default_thread_pool" name="DLIB_NUM_THREADS"  />
          <term file="api.html" name="parallel_for"          include="dlib/threads.h"/>
          <term link="api.html#parallel_for" name="parallel_for_blocked" include="dlib/threads.h"/>
          <term link="api.html#parallel_for" name="parallel_for_verbose" include="dlib/threads.h"/>
@@ -1200,7 +1355,6 @@
          <term file="containers.html" name="reference_counter"          include="dlib/reference_counter.h"/>
 
          <term file="containers.html" name="sequence"                   include="dlib/sequence.h"/>
-         <term file="containers.html" name="shared_ptr_thread_safe"     include="dlib/smart_pointers_thread_safe.h"/>
          <term file="containers.html" name="sliding_buffer"             include="dlib/sliding_buffer.h"/>
          <term file="containers.html" name="circular_buffer"            include="dlib/sliding_buffer.h"/>
          <term file="containers.html" name="static_map"                 include="dlib/static_map.h"/>
@@ -1252,6 +1406,7 @@
          <term file="imaging.html" name="equalize_histogram"   include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="get_histogram"        include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="hsi_pixel"            include="dlib/pixel.h"/>
+         <term file="imaging.html" name="lab_pixel"            include="dlib/pixel.h"/>
          <term file="imaging.html" name="load_bmp"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="load_png"             include="dlib/image_io.h"/>
          <term file="imaging.html" name="load_jpeg"            include="dlib/image_io.h"/>
@@ -1286,6 +1441,10 @@
          <term file="imaging.html" name="separable_3x3_filter_block_rgb"         include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="pyramid_down"               include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="pyramid_disable"            include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="create_tiled_pyramid"            include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="pyramid_rate"               include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="image_to_tiled_pyramid"               include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="tiled_pyramid_to_image"               include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="threshold_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="auto_threshold_image"       include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="png_loader"                 include="dlib/image_io.h"/>
@@ -1298,6 +1457,7 @@
          <term file="imaging.html" name="rotate_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="resize_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="extract_image_chips"     include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="random_cropper"          include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="sub_image"               include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="sub_image_proxy"     include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="extract_image_chip"     include="dlib/image_transforms.h"/>
@@ -1364,6 +1524,7 @@
          <term file="dlib/image_processing/generic_image.h.html" name="make_image_view"   include="dlib/image_processing.h"/>
 
          <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="overlaps_any_box"        include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="box_intersection_over_union"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="test_box_overlap"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="remove_unobtainable_rectangles"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="get_frontal_face_detector"         include="dlib/image_processing/frontal_face_detector.h"/>
@@ -1372,6 +1533,7 @@
          <term file="dlib/image_processing/object_detector_abstract.h.html" name="rect_detection"        include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/object_detector_abstract.h.html" name="full_detection"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="full_object_detection"   include="dlib/image_processing.h"/>
+         <term file="imaging.html" name="mmod_rect"   include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/full_object_detection_abstract.h.html" name="all_parts_in_rect" include="dlib/image_processing.h"/>
 
          <term file="imaging.html" name="scan_image_movable_parts" include="dlib/image_processing.h"/>

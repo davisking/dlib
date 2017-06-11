@@ -112,15 +112,6 @@ ul.tree  li ul { margin-left:10px; padding:0px; }
 
 li#term { list-style: none; }
 
-
-span.cpp11
-{
-   color: #008000;
-   font-family: sans-serif;
-   font-size: 0.8em;
-   margin-left: 0.3em;
-}
-
 div.include_file_more_details_wrapper
 {
    margin-top: 1em;

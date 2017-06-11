@@ -12,54 +12,255 @@
 
 <current>
 New Features:
-   - Added random_color_transform and disturb_colors().
-   - Added a constructor for seeding rand with a time_t.
-   - Added apply_random_color_offset()
-   - Made load_image() support GIF files.
-   - Added subm_clipped()
-   - load_mnist_dataset()
-   - Added an option to solve the L2-loss version of the SVM objective function for svm_c_linear_dcd_trainer.
-   - Added the option to use the elastic net regularizer to the OCA solver.
-   - Added solve_qp_box_constrained()
-   - Added unserialize.
-   - MATLAB binding stuff
-      - link to MATLAB's intel MKL when used on linux
-      - struct support, more arguments (20 now instead of 10),
-      - in place operation.  Made column major matrices directly wrap matlab
+
+Non-Backwards Compatible Changes:
+   - CMake 2.8.12 is now required to build dlib (but only if you use CMake).  
+
+Bug fixes:
+   - Fixed a slow memory leak that could occur when using cuDNN.
+
+Other:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.3" date="Feb 21, 2017">
+New Features:
+   - Deep Learning
+      - Added a state-of-the-art face recognition tool (99.38% accuracy on the
+        LFW benchmark) with C++ and Python example programs.
+      - Added these new loss layer types: loss_metric_, loss_mean_squared_, and
+        loss_mean_squared_multioutput_.
+      - Added the l2normalize_ computational layer.
+      - Added test_one_step() to the dnn_trainer. This allows you to do
+        automatic early stopping based on observing the loss on held out data.
+      - Made the dnn_trainer automatically reload from the last good state if a
+        loss of NaN is encountered.
+      - Made alias_tensor usable when it is const.
+   - Dlib's simd classes will now use PowerPC VSX instructions.  This makes the
+     HOG based object detector faster on PowerPC machines.
+   - Added compute_roc_curve()
+   - Added find_gap_between_convex_hulls()
+   - Added serialization support for std::array.
+   - Added running_scalar_covariance_decayed object
+   - Added running_stats_decayed object
+   - Added min_pointwise() and max_pointwise().
+   - Added a 1D clustering routine: segment_number_line().
+   - Added Intel MKL FFT bindings.
+   - Added matlab_object to the mex wrapper. Now you can have parameters that
+     are arbitrary matlab objects.
+   - Added support for loading of RGBA JPEG images
+
+Non-Backwards Compatible Changes:
+   - Changed the loss layer interface to use two typedefs, output_label_type
+     and training_label_type instead of a single label_type. This way, the label
+     type used for training can be distinct from the type output by the network.
+     This change breaks backwards compatibility with the previous API.
+
+Bug fixes:
+   - Fixed compiler warnings and errors on newer compilers.
+   - Fixed a bug in the repeat layer that caused it to throw exceptions in some
+     cases.
+   - Fixed matlab crashing if an error message from a mex file used the %
+     character, since that is interpreted by matlab as part of an eventual
+     printf() code.
+   - Fixed compile time error in random_subset_selector::swap()
+   - Fixed missing implementation of map_input_to_output() and
+     map_output_to_input() in the concat_ layer.
+   - Made the dnn_trainer's detection and backtracking from situations with
+     increasing loss more robust. Now it will never get into a situation where it
+     backtracks over and over. Instead, it will only backtrack a few times in a
+     row before just letting SGD run unimpeded.
+
+Other:
+   - Usability improvements to DNN API.
+   - Improved C++11 detection, especially on OS X.
+   - Made dlib::thread_pool use std::thread and join on the threads in
+     thread_pool's destructor. The previous implementation used dlib's global
+     thread pooling to allocate threads to dlib::thread_pool, however, this
+     sometimes caused annoying behavior when used as part of a MATLAB mex file,
+     very occasionally leading to matlab crashes when mex files were unloaded.
+     This also means that dlib::thread_pool construction is a little bit slower
+     than it used to be.
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.2" date="Oct 10, 2016">
+New Features:
+   - Updates to the deep learning API:
+      - Added tools for making convolutional neural network based object detectors.  See
+        dnn_mmod_ex.cpp example program.
+      - Added annotation() to tensor so you can associate any object you want with a tensor.
+      - Made layer_details() part of the SUBNET interface so that user defined layer
+        details objects can access each other. Also added the input_layer() global function
+        for accessing the input layer specifically.
+      - alias_tensor can now create aliases of const tensors.
+      - Added set_all_bn_running_stats_window_sizes().
+      - Added visit_layers_backwards(), visit_layers_backwards_range(), and
+        visit_layers_range().
+      - Computational layers can now optionally define map_input_to_output() and
+        map_output_to_input() member functions.  If all layers of a network provide these
+        functions then the new global functions input_tensor_to_output_tensor() and
+        output_tensor_to_input_tensor() can be used to map between the network's input and
+        output tensor coordinates.  This is important for fully convolutional object
+        detectors since they need to map between the image space and final feature space.
+        These new functions are important for tools like the new MMOD detector.
+      - Added input_rgb_image_pyramid.
+   - Image Processing
+      - The imglab command line tool has these new options: --min-object-size, --rmempty,
+        --rmlabel, --rm-if-overlaps, and --sort-num-objects.  I also changed the behavior of
+        --split so that it simply partitions the data and is an invertible operation.
+      - Added mmod_rect
+      - Added an overload of load_image_dataset() that outputs directly to mmod_rect
+        instead of rectangle.
+      - Added image_dataset_file::shrink_big_images(). So now load_image_dataset() can load
+        a dataset of high resolution files at a user requested lower resolution.
+      - Added box_intersection_over_union().
+      - Added create_tiled_pyramid(), image_to_tiled_pyramid(), and tiled_pyramid_to_image().
+      - Added random_cropper
+   - Upgraded dlib's mex wrapper tooling to enable easy binding of C++ classes to MATLAB
+     objects. 
+   - Added nearest_rect()
+   - Added find_upper_quantile()
+   - Added count_steps_without_decrease_robust().
+   - Added get_double_in_range() to dlib::rand.
+
+Non-Backwards Compatible Changes:
+   - C++11 is now required to use dlib.  
+   - Changed pinv() so it interprets its tol argument relative to the largest singular
+     value of the input matrix rather than as an absolute tolerance.  This should generally
+     improve results, but could change the output in some cases.
+   - Renamed the class members of test_box_overlap so they are less confusing.
+   - Updates to the deep learning API:
+      - Changed the DNN API so that sample_expansion_factor is a runtime variable rather
+        than a compile time constant. This also removes it from the input layer interface
+        since the DNN core now infers its value at runtime. Therefore, users that define their
+        own input layers don't need to specify it anymore.
+      - Changed DEFAULT_BATCH_NORM_EPS from 1e-5 to 1e-4.
+      - Changed the default batch normalization running stats window from 1000 to 100.
+
+Bug fixes:
+   - Made the relational operators constexpr so they don't accidentally cause compilation
+     errors when they get pulled into the scope of template metaprogramming expressions.
+   - Fixed all/source.cpp not compiling in some instances.
+   - CMake scripts now do a better job detecting things like C++11 support, the presence of
+     CUDA, and other system specific details that could cause the build to fail if not
+     properly configured.
+   - Fixed a bug in imglab's --cluster option where it would output xml files with empty
+     entries if the input xml file contained unannotated images.
+   - Fixed imglab's --cluster option not working with relative paths.
+
+Other:
+   - Made the thread local variables that hold the cudnn and cublas context objects not
+     destruct and recreate themselves when you switch devices.  Instead, they keep a table
+     of context objects, for each thread and device, reusing as necessary. This prevents
+     churn in the context objects when you are switching back and forth between devices
+     inside a single thread, making things run more efficiently for some CUDA based
+     workflows.
+   - Made the message argument of the DLIB_ASSERT and DLIB_CASSERT macros optional.
+   - Made thread_pool and parallel_for propagate exceptions from task threads to calling
+     code rather than killing the application if a task thread throws.
+   - Changed imglab --resample so that it never changes the aspect ratio of an image.
+   - Made the check in dnn_trainer for convergence more robust. Previously, if we
+     encountered a bad mini-batch that made the loss value suddenly jump up by a larger than
+     normal value it could make the trainer think we converged. Now the test is robust to
+     transient spikes in loss value.  Additionally, the dnn_trainer will now check if the
+     loss has been increasing before it saves the state to disk. If it detects that the loss
+     has been going up then instead of saving to disk it recalls the previously good state.
+     This way, if we hit a really bad mini-batch during training which negatively effects
+     the model in a significant way, the dnn_trainer will automatically revert back to an
+     earlier good state.
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.1" date="Aug 13, 2016">
+New Features:
+   - Support for cuDNN 5.1
+   - dlib::async() and dlib::default_thread_pool().
+   - rectangle_transform
+   - imglab tool: added --resample, --ignore, --files, and --extract-chips
+     command line options.  Also added convert_imglab_paths_to_relative and
+     copy_imglab_dataset scripts.
+   - Evgeniy Fominov made the shape_predictor trainer multi-threaded and faster.
+   - sutr90 contributed support for the CIELab color space.  See the new lab_pixel.
+
+Non-Backwards Compatible Changes:
+   - All the cmake utility scripts were moved to dlib/cmake_utils.  
+   - Code that #includes the shape_predictor can now only be compiled with
+     compilers that support C++11 lambda functions.
+
+Bug fixes:
+   - Made CMake scripts work in a wider range of environments. 
+   - Fixed compile time errors on various platforms.
+   - Fixed bad multi-threading support in the MATLAB mex wrapper.
+   - Fixed bug in cuDNN binding that could sometimes cause NaN outputs.
+   - Fixed bad convergence testing in DNN tooling for very small datasets.
+
+Other:
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.0" date="Jun 25, 2016">
+New Features:
+   - A deep learning toolkit using CPU and/or GPU hardware.  Some major elements
+     of this are:
+      - Clean and fully documented C++11 API
+      - Clean tutorials: see dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
+      - Uses cuDNN v5.0
+      - Multi-GPU support
+      - Automatic learning rate adjustment
+      - A pretrained 1000 class Imagenet classifier (see dnn_imagenet_ex.cpp)
+   - Optimization Tools
+      - Added find_optimal_parameters()
+      - Added elastic_net class
+      - Added the option to use the elastic net regularizer to the OCA solver.
+      - Added an option to solve the L2-loss version of the SVM objective function to svm_c_linear_dcd_trainer.
+      - Added solve_qp_box_constrained()
+   - Image Processing
+      - Added random_color_transform, disturb_colors(), and apply_random_color_offset().
+      - load_image() now supports loading GIF files.
+   - Many improvements to the MATLAB binding API  
+      - Automatically link to MATLAB's Intel MKL when used on linux.
+      - struct support
+      - mex functions can have up to 20 arguments instead of 10.
+      - In place operation.  Made column major matrices directly wrap MATLAB
         matrix objects when used inside mex files.  This way, if you use
         matrix_colmajor or fmatrix_colmajor in a mex file it will not do any
         unnecessary copying or transposing.
-      - catch ctrl+c presses in MATLAB console.
-      - DLIB_ASSERTS won't kill the matlab process, just throw an exception
-      - Made cerr print in matlab as a red warning message.
+      - Catch ctrl+c presses in MATLAB console.  Allowing early termination of mex functions.
+      - When used inside mex files, DLIB_ASSERTS won't kill the MATLAB process,
+        just throw an exception.
+      - Made cerr print in MATLAB as a red warning message.
+   - load_mnist_dataset()
+   - Added a constructor for seeding rand with a time_t.
+   - Added subm_clipped()
+   - Added unserialize.
+   - Added running_gradient
 
-
-   - C++11 only tools
-      - Added log1pexp()
-      - Added running_gradient
-      - deep learning tools
-         - dnn_trainer
-         - cuDNN v4.0
-         - auto step size adjust and stopping condition.
-      - CUDA/tensor stuff
-         - gpu_data, tensor, alias tensors
-      
 Non-Backwards Compatible Changes:
    - Everything in dlib/matlab/call_matlab.h is now in the dlib namespace.
+   - DLIB_TEST() and DLIB_TEST_MSG() macros now require you to terminate them with a ;
 
 Bug fixes:
    - Fixed bug in 10 argument version of call_matlab() and also cleaned up a few
-   minor things.
-   - setup.py and cmake scripts work in a few more contexts.
-
+     minor things.
+   - setup.py and CMake scripts work in a few more contexts.
+   - Fixed compiler errors in visual studio 2015.
+   - Fixed a bug in gaussian_blur() that caused messed up outputs when big
+     sigma values were used on some pixel types.
+   - Fixed minor bugs in join_rows() and join_cols(). They didn't work when one
+     of the matrices was empty.
 
 Other:
-   - Made cmake scripts uniformly require cmake version 2.8.4.
-   - C++11
-      - CMake scripts now enable C++11 by default
-      - Gave array2d and matrix move constructors and move assignment operators.
-
-</current>
+   - Made CMake scripts uniformly require CMake version 2.8.4.
+   - Faster fHOG feature extraction / face detection
+   - CMake scripts now enable C++11 by default
+   - Gave array2d and matrix move constructors and move assignment operators.  Matrix
+     can also now be created from initializer lists.
+</old>
 
 <!-- **************************************************************************************  -->
 

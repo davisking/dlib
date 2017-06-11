@@ -36,25 +36,19 @@ void print(const std::vector<int>& vect)
 
 void example_using_regular_non_parallel_loops();
 void example_using_lambda_functions();
-void example_without_using_lambda_functions();
 
 // ----------------------------------------------------------------------------------------
 
 int main()
 {
-    // We have 3 examples, each contained in a separate function.  Each example performs
-    // exactly the same computation, however, the second two examples do so using parallel
-    // for loops.  So the first example is here to show you what we are doing in terms of
-    // classical non-parallel for loops.  Then the next two examples will illustrate two
-    // ways to parallelize for loops in C++.  The first, and simplest way, uses C++11
-    // lambda functions.  However, since lambda functions are a relatively recent addition
-    // to C++ we also show how to write parallel for loops without using lambda functions.
-    // This way, users who don't yet have access to a current C++ compiler can learn to
-    // write parallel for loops as well.
+    // We have 2 examples, each contained in a separate function.  Both examples perform
+    // exactly the same computation, however, the second does so using parallel for loops.
+    // The first example is here to show you what we are doing in terms of classical
+    // non-parallel for loops.  The other example will illustrate how to parallelize the
+    // for loops in C++11. 
 
     example_using_regular_non_parallel_loops();
     example_using_lambda_functions();
-    example_without_using_lambda_functions();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -107,22 +101,18 @@ void example_using_regular_non_parallel_loops()
 
 void example_using_lambda_functions()
 {
-// Change the next line to #if 1 if your compiler supports the new C++11 lambda functions. 
-#if 0
     cout << "\nExample using parallel for loops\n" << endl;
-
-    // This variable should be set to the number of processing cores on your computer since
-    // it determines the amount of parallelism in the for loop.  
-    const unsigned long num_threads = 10;
 
     std::vector<int> vect;
 
     vect.assign(10, -1);
-    parallel_for(num_threads, 0, vect.size(), [&](long i){
+    parallel_for(0, vect.size(), [&](long i){
         // The i variable is the loop counter as in a normal for loop.  So we simply need
         // to place the body of the for loop right here and we get the same behavior.  The
-        // range for the for loop is determined by the 2nd and 3rd arguments to
-        // parallel_for().
+        // range for the for loop is determined by the 1nd and 2rd arguments to
+        // parallel_for().  This way of calling parallel_for() will use a number of threads
+        // that is appropriate for your hardware.  See the parallel_for() documentation for
+        // other options.
         vect[i] = i;
         dlib::sleep(1000);
     });
@@ -131,7 +121,7 @@ void example_using_lambda_functions()
 
     // Assign only part of the elements in vect.
     vect.assign(10, -1);
-    parallel_for(num_threads, 1, 5, [&](long i){
+    parallel_for(1, 5, [&](long i){
         vect[i] = i;
         dlib::sleep(1000);
     });
@@ -150,7 +140,7 @@ void example_using_lambda_functions()
     int sum = 0;
     dlib::mutex m;
     vect.assign(10, 2);
-    parallel_for(num_threads, 0, vect.size(), [&](long i){
+    parallel_for(0, vect.size(), [&](long i){
         // The sleep statements still execute in parallel.  
         dlib::sleep(1000);
 
@@ -162,74 +152,6 @@ void example_using_lambda_functions()
     });
 
     cout << "sum: "<< sum << endl;
-
-#endif
-}
-
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-//    The rest of this example program shows how to create parallel for loops without
-//    using lambda functions.  So the first thing we do is explicitly create function
-//    objects equivalent to the lambda functions we used.  Then we call parallel_for() 
-//    as done above.
-// ----------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------
-
-struct function_object
-{
-    function_object( std::vector<int>& vect_ ) : vect(vect_) {}
-
-    std::vector<int>& vect;
-
-    void operator() (long i) const
-    {
-        vect[i] = i;
-        dlib::sleep(1000); 
-    }
-};
-
-struct function_object_sum
-{
-    function_object_sum( const std::vector<int>& vect_, int& sum_ ) : vect(vect_), sum(sum_) {}
-
-    const std::vector<int>& vect;
-    int& sum;
-    dlib::mutex m;
-
-    void operator() (long i) const
-    {
-        dlib::sleep(1000); 
-        auto_mutex lock(m);
-        sum += vect[i];
-    }
-};
-
-void example_without_using_lambda_functions()
-{
-    // Again, note that this function does exactly the same thing as
-    // example_using_regular_non_parallel_loops() and example_using_lambda_functions().
-
-    cout << "\nExample using parallel for loops and no lambda functions\n" << endl;
-
-    const unsigned long num_threads = 10;
-    std::vector<int> vect;
-
-
-    vect.assign(10, -1); 
-    parallel_for(num_threads, 0, vect.size(), function_object(vect));
-    print(vect);
-
-
-    vect.assign(10, -1);
-    parallel_for(num_threads, 1, 5, function_object(vect));
-    print(vect);
-
-
-    int sum = 0;
-    vect.assign(10, 2);
-    function_object_sum funct(vect, sum);
-    parallel_for(num_threads, 0, vect.size(), funct);
-    cout << "sum: " << sum << endl;
 }
 
 // ----------------------------------------------------------------------------------------

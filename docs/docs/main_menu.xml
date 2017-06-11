@@ -96,10 +96,12 @@
             <name>Dlib Blog</name>
             <link>http://blog.dlib.net</link>
          </item>
+         <!--
          <item>
             <name>Forums</name>
             <link>https://sourceforge.net/p/dclib/discussion</link>
          </item>
+         -->
          <item>
             <name>Who uses dlib?</name>
             <link>http://sourceforge.net/p/dclib/wiki/Known_users/</link>
@@ -150,7 +152,11 @@
                   <link>face_landmark_detection.py.html</link>
                </item>
                <item>
-                  <name>find candidate object locations</name>
+                  <name>Face Recognition</name>
+                  <link>face_recognition.py.html</link>
+               </item>
+               <item>
+                  <name>Find Candidate Object Locations</name>
                   <link>find_candidate_object_locations.py.html</link>
                </item>
                <item>
@@ -186,6 +192,56 @@
          <item nolink="true">
             <name>Examples: C++</name>
             <sub>
+               <item>
+                  <name>Deep Learning Introduction Part 1</name>
+                  <link>dnn_introduction_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Introduction Part 2</name>
+                  <link>dnn_introduction2_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Imagenet Classifier</name>
+                  <link>dnn_imagenet_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Imagenet Trainer </name>
+                  <link>dnn_imagenet_train_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Inception</name>
+                  <link>dnn_inception_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Metric Learning Introduction</name>
+                  <link>dnn_metric_learning_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Metric Learning on Images</name>
+                  <link>dnn_metric_learning_on_images_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Face Recognition</name>
+                  <link>dnn_face_recognition_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Face Detection</name>
+                  <link>dnn_mmod_face_detection_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Dog Hipsterizer</name>
+                  <link>dnn_mmod_dog_hipsterizer.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Max-Margin Object Detection</name>
+                  <link>dnn_mmod_ex.cpp.html</link>
+               </item>
+
+               <item>
+                  <name>Random Cropper</name>
+                  <link>random_cropper_ex.cpp.html</link>
+               </item>
+
                <item>
                   <name>Linear Model Predictive Control</name>
                   <link>mpc_ex.cpp.html</link>

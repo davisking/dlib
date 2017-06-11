@@ -225,9 +225,11 @@ namespace dlib
                 such as mutex objects. 
 
             EXCEPTIONS
-                Note that if an exception is thrown inside a task thread and 
-                is not caught then the normal rule for uncaught exceptions in
-                threads applies. That is, the application will be terminated.
+                Note that if an exception is thrown inside a task thread and is not caught
+                then the exception will be trapped inside the thread pool and rethrown at a
+                later time when someone calls one of the add task or wait member functions
+                of the thread pool.  This allows exceptions to propagate out of task threads
+                and into the calling code where they can be handled.
         !*/
 
     public:
@@ -249,6 +251,10 @@ namespace dlib
         /*!
             ensures
                 - blocks until all tasks in the pool have finished.
+                - If one of the threads has generated an exception but it hasn't yet been
+                  rethrown to the caller (e.g. by calling wait_for_all_tasks()) then the
+                  program will be terminated.  So make sure you handle all the possible
+                  exceptions from your tasks.
         !*/
 
         bool is_task_thread (

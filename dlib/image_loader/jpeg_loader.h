@@ -3,12 +3,12 @@
 #ifndef DLIB_JPEG_IMPORT
 #define DLIB_JPEG_IMPORT
 
+#include <vector>
+
 #include "jpeg_loader_abstract.h"
-#include "../smart_pointers.h"
 #include "image_loader.h"
 #include "../pixel.h"
 #include "../dir_nav.h"
-#include <vector>
 
 namespace dlib
 {
@@ -23,6 +23,7 @@ namespace dlib
 
         bool is_gray() const;
         bool is_rgb() const;
+        bool is_rgba() const;
 
         template<typename T>
         void get_image( T& t_) const
@@ -37,7 +38,6 @@ namespace dlib
             COMPILE_TIME_ASSERT(sizeof(T) == 0);
 #endif
             image_view<T> t(t_);
-
             t.set_size( height_, width_ );
             for ( unsigned n = 0; n < height_;n++ )
             {
@@ -47,6 +47,14 @@ namespace dlib
                     if ( is_gray() )
                     {
                         unsigned char p = v[m];
+                        assign_pixel( t[n][m], p );
+                    }
+                    else if ( is_rgba() ) {
+                        rgb_alpha_pixel p;
+                        p.red = v[m*4];
+                        p.green = v[m*4+1];
+                        p.blue = v[m*4+2];
+                        p.alpha = v[m*4+3];
                         assign_pixel( t[n][m], p );
                     }
                     else // if ( is_rgb() )

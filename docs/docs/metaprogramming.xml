@@ -630,8 +630,11 @@
          <spec_file>dlib/assert.h</spec_file>
          <description>
       <p>
-            This is a macro function for debugging.  Its form is <tt>DLIB_ASSERT(condition that should be 
-            true,error message)</tt>.  If the condition is false DLIB_ASSERT throws an exception of type 
+            This is a macro function for debugging.  Its form is 
+<code_box>DLIB_ASSERT(condition that should be true, error message)</code_box> 
+or you can omit the error message and call it like:
+<code_box>DLIB_ASSERT(condition that should be true)</code_box>
+            If the condition is false DLIB_ASSERT throws an exception of type 
             dlib::fatal_error with fatal_error::type == EBROKEN_ASSERT.  An error message detailing
             the nature of the problem is stored in the member variable info which is of type std::string.  
             Look in the following file for more details.  The exception classes are defined 

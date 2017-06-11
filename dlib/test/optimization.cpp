@@ -372,7 +372,7 @@ namespace
                         uniform_matrix<double>(x.size(),1,-1e100),
                         uniform_matrix<double>(x.size(),1,1e100),
                         (max(abs(x))+1)/10,
-                        1e-7,
+                        1e-8,
                         10000);
         DLIB_TEST_MSG(dlib::equal(x,opt, 1e-3),opt-x);
         DLIB_TEST(approx_equal(val , powell(x)));
@@ -1151,8 +1151,8 @@ namespace
         dlog << LINFO << "mean brown gradient: " << rs.mean();
         dlog << LINFO << "max brown gradient:  " << rs.max();
         dlog << LINFO << "min brown gradient:  " << rs.min();
-        DLIB_TEST(rs.mean() < 1e-5);
-        DLIB_TEST(rs.max() < 1e-2);
+        DLIB_TEST(rs.mean() < 4e-5);
+        DLIB_TEST_MSG(rs.max() < 3e-2, rs.max());
         DLIB_TEST(rs.min() < 1e-10);
 
         dlog << LINFO << "test find_max_box_constrained() on neg_rosen";

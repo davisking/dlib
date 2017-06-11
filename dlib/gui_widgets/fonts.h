@@ -4,16 +4,17 @@
 #ifndef DLIB_FONTs_
 #define DLIB_FONTs_
 
+#include <memory>
+#include <string>
+
 #include "fonts_abstract.h"
 #include "../gui_core.h"
-#include <string>
 #include "../algs.h"
 #include "../serialize.h"
 #include "../unicode.h"
 #include "../array.h"
 #include "../array2d.h"
 #include "../threads.h"
-#include "../smart_pointers_thread_safe.h"
 
 namespace dlib
 {
@@ -483,7 +484,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const shared_ptr_thread_safe<font> get_native_font ();
+    const std::shared_ptr<font> get_native_font ();
 
 // ----------------------------------------------------------------------------------------
 
@@ -500,11 +501,11 @@ namespace dlib
 
 
     public:
-        static const shared_ptr_thread_safe<font>& get_font (
+        static const std::shared_ptr<font>& get_font (
         )
         {        
             static mutex m;
-            static shared_ptr_thread_safe<font> f;
+            static std::shared_ptr<font> f;
             auto_mutex M(m);
             if (f.get() == 0)
                 f.reset(new default_font);

@@ -93,6 +93,18 @@ namespace dlib
                   understand what you are doing.)
         !*/
 
+        void set_state ( 
+            const matrix<double,states,1>& xb
+        ); 
+        /*!
+            ensures
+                - This function can be used when the initial state is known, or if the
+                  state needs to be corrected before the next update().
+                - #get_predicted_next_state() == xb
+                - If (update() hasn't been called yet) then 
+                    - #get_current_state() == xb 
+        !*/
+
         const matrix<double,measurements,states>& get_observation_model (
         ) const;
         /*!

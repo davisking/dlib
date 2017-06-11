@@ -31,14 +31,26 @@
 #   if __has_feature(cxx_rvalue_references)
 #       define DLIB_HAS_RVALUE_REFERENCES
 #   endif
+#   if __has_feature(cxx_generalized_initializers)
+#       define DLIB_HAS_INITIALIZER_LISTS
+#   endif
 #elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && defined(__GXX_EXPERIMENTAL_CXX0X__) 
+#   define DLIB_HAS_RVALUE_REFERENCES
+#   define DLIB_HAS_INITIALIZER_LISTS
+#elif defined(_MSC_VER) && _MSC_VER >= 1800
+#   define DLIB_HAS_INITIALIZER_LISTS
 #   define DLIB_HAS_RVALUE_REFERENCES
 #elif defined(_MSC_VER) && _MSC_VER >= 1600
 #   define DLIB_HAS_RVALUE_REFERENCES
 #elif defined(__INTEL_COMPILER) && defined(BOOST_INTEL_STDCXX0X)
 #   define DLIB_HAS_RVALUE_REFERENCES
+#   define DLIB_HAS_INITIALIZER_LISTS
 #endif
 
+#if defined(__APPLE__) && defined(__GNUC_LIBSTD__) && ((__GNUC_LIBSTD__-0) * 100 + __GNUC_LIBSTD_MINOR__-0 <= 402)
+ // Apple has not updated libstdc++ in some time and anything under 4.02 does not have <initializer_list> for sure.
+#   undef DLIB_HAS_INITIALIZER_LISTS
+#endif
 
 // figure out if the compiler has static_assert. 
 #if defined(__clang__) 
@@ -127,7 +139,7 @@ namespace dlib
 #define DLIB_FUNCTION_NAME "unknown function" 
 #endif
 
-#define DLIB_CASSERT(_exp,_message)                                              \
+#define DLIBM_CASSERT(_exp,_message)                                              \
     {if ( !(_exp) )                                                         \
     {                                                                       \
         dlib_assert_breakpoint();                                           \
@@ -140,12 +152,22 @@ namespace dlib
         throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib_o_out.str());      \
     }}                                                                      
 
+// This macro is not needed if you have a real C++ compiler.  It's here to work around bugs in Visual Studio's preprocessor.  
+#define DLIB_WORKAROUND_VISUAL_STUDIO_BUGS(x) x
+// Make it so the 2nd argument of DLIB_CASSERT is optional.  That is, you can call it like
+// DLIB_CASSERT(exp) or DLIB_CASSERT(exp,message).
+#define DLIBM_CASSERT_1_ARGS(exp)              DLIBM_CASSERT(exp,"")
+#define DLIBM_CASSERT_2_ARGS(exp,message)      DLIBM_CASSERT(exp,message)
+#define DLIBM_GET_3TH_ARG(arg1, arg2, arg3, ...) arg3
+#define DLIBM_CASSERT_CHOOSER(...) DLIB_WORKAROUND_VISUAL_STUDIO_BUGS(DLIBM_GET_3TH_ARG(__VA_ARGS__,  DLIBM_CASSERT_2_ARGS, DLIBM_CASSERT_1_ARGS))
+#define DLIB_CASSERT(...) DLIB_WORKAROUND_VISUAL_STUDIO_BUGS(DLIBM_CASSERT_CHOOSER(__VA_ARGS__)(__VA_ARGS__))
+
 
 #ifdef ENABLE_ASSERTS 
-    #define DLIB_ASSERT(_exp,_message) DLIB_CASSERT(_exp,_message)
+    #define DLIB_ASSERT(...) DLIB_CASSERT(__VA_ARGS__)
     #define DLIB_IF_ASSERT(exp) exp
 #else
-    #define DLIB_ASSERT(_exp,_message) {}
+    #define DLIB_ASSERT(...) {}
     #define DLIB_IF_ASSERT(exp) 
 #endif
 

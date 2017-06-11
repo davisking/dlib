@@ -38,6 +38,9 @@
                   <ul>The <a href="#hsi_pixel">hsi_pixel</a> is a 24bit pixel which represents a point in the Hue Saturation Intensity 
                   (HSI) color space. </ul>
                </li>
+               <li><b>LAB</b>
+                  <ul>The <a href="#lab_pixel">lab_pixel</a> is a 24bit pixel which represents a point in the CIELab color space. </ul>
+               </li>
                <li><b>Grayscale</b>
                   <ul>Any built in scalar type may be used as a grayscale pixel type.  For example, unsigned char, int, double, etc.</ul>
                </li>
@@ -64,6 +67,7 @@
          <item>bgr_pixel</item>
          <item>rgb_alpha_pixel</item>
          <item>hsi_pixel</item>
+         <item>lab_pixel</item>
          <item>pixel_traits</item>
          <item>get_pixel_intensity</item> 
          <item>assign_pixel</item> 
@@ -91,6 +95,7 @@
          <item>object_detector</item>
          <item>evaluate_detectors</item>
          <item>full_object_detection</item>
+         <item>mmod_rect</item>
          <item>scan_image</item>
          <item>scan_image_movable_parts</item>
          <item>find_points_above_thresh</item>
@@ -198,6 +203,7 @@
          <item>pyramid_up</item> 
          <item>pyramid_down</item> 
          <item>pyramid_disable</item> 
+         <item>create_tiled_pyramid</item> 
 
          <item>interpolate_nearest_neighbor</item> 
          <item>interpolate_bilinear</item> 
@@ -213,6 +219,7 @@
          <item>flip_image_dataset_left_right</item> 
          <item>rotate_image_dataset</item> 
          <item>extract_image_chips</item> 
+         <item>random_cropper</item> 
          <item>sub_image</item> 
       </section>
 
@@ -449,7 +456,7 @@
                 you take an image of a human face as input and are expected to identify the
                 locations of important facial landmarks such as the corners of the mouth
                 and eyes, tip of the nose, and so forth.  For example, here is the output
-                of dlib's <a href="http://sourceforge.net/projects/dclib/files/dlib/v18.10/shape_predictor_68_face_landmarks.dat.bz2">68-face-landmark shape_predictor</a> on an image from the HELEN dataset: <br/><br/>
+                of dlib's <a href="http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2">68-face-landmark shape_predictor</a> on an image from the HELEN dataset: <br/><br/>
 
                 <img src='face_landmarking_example.png'/>
                 <br/><br/>
@@ -737,7 +744,19 @@
          <file>dlib/pixel.h</file>
          <spec_file link="true">dlib/pixel.h</spec_file>
          <description>
-            This is a simple struct that represents an HSI colored graphical pixel.  
+            This is a simple struct that represents a HSI colored graphical pixel.  
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>lab_pixel</name>
+         <file>dlib/pixel.h</file>
+         <spec_file link="true">dlib/pixel.h</spec_file>
+         <description>
+            This is a simple struct that represents a CIELab colored graphical pixel.  
          </description>
                                  
       </component>
@@ -1543,6 +1562,30 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>create_tiled_pyramid</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
+         <description>        
+            This function creates an image pyramid and packs the entire pyramid into 
+            one big image.  It does this by tiling the different pyramid layers together
+            and outputting the result.  Here is an example:
+            <br/>
+            <img src='tiled_pyramid_example.jpg'/>
+            <br/>
+            
+            Also, you can use the 
+            <a href="dlib/image_transforms/image_pyramid_abstract.h.html#image_to_tiled_pyramid">image_to_tiled_pyramid()</a>
+            and 
+            <a href="dlib/image_transforms/image_pyramid_abstract.h.html#image_to_tiled_pyramid">tiled_pyramid_to_image()</a> routines
+            to convert between the input image coordinate space and the tiled pyramid
+            coordinate space.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>pyramid_down</name>
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/image_pyramid_abstract.h</spec_file>
@@ -1670,6 +1713,24 @@
               sub-windows, storing each into its own image.  It also allows the user to
               specify the scale and rotation for the chip.
          </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>random_cropper</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/random_cropper_abstract.h</spec_file>
+         <description>        
+            This object is a tool for extracting random crops of objects from a set of
+            images.  The crops are randomly jittered in scale, translation, and
+            rotation but more or less centered on objects specified by <a href="#mmod_rect">mmod_rect</a>
+            objects.
+         </description>
+         <examples>
+            <example>random_cropper_ex.cpp.html</example>
+            <example>dnn_mmod_ex.cpp.html</example>
+         </examples>
       </component>
 
    <!-- ************************************************************************* -->
@@ -2144,6 +2205,19 @@
          <description>        
                 This object represents the location of an object in an image along with the
                 positions of each of its constituent parts.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>mmod_rect</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/full_object_detection_abstract.h</spec_file>
+         <description>        
+                This is a simple struct that is used to give training data and receive detections
+                from the <a href="ml.html#loss_mmod_">Max-Margin Object Detection loss layer</a>.
          </description>
                                  
       </component>

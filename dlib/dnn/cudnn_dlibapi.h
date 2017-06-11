@@ -89,26 +89,6 @@ namespace dlib
                   add into the dest tensor.
         !*/
 
-        void set_tensor (
-            tensor& t,
-            float value
-        );
-        /*!
-            ensures
-                - sets all elements in t equal to value.
-        !*/
-
-        void scale_tensor (
-            tensor& t,
-            float value
-        );
-        /*!
-            ensures
-                - scales all elements of t by the given value.  I.e. for all elements E in
-                  t, this function performs:
-                    - E = E*value
-        !*/
-
     // ------------------------------------------------------------------------------------
 
         void assign_conv_bias_gradient (
@@ -135,6 +115,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void batch_normalize_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -144,6 +125,7 @@ namespace dlib
         );
 
         void batch_normalize (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -156,6 +138,7 @@ namespace dlib
         );
 
         void batch_normalize_gradient(
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -169,6 +152,7 @@ namespace dlib
     // ------------------------------------------------------------------------------------
 
         void batch_normalize_conv_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -178,6 +162,7 @@ namespace dlib
         );
 
         void batch_normalize_conv (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -190,6 +175,7 @@ namespace dlib
         );
 
         void batch_normalize_conv_gradient(
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -221,12 +207,16 @@ namespace dlib
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
             /*!
                 requires
                     - stride_y > 0
                     - stride_x > 0
+                    - 0 <= padding_y < filters.nr()
+                    - 0 <= padding_x < filters.nc()
                     - is_same_object(output,data) == false
                     - is_same_object(output,filters) == false
                 ensures
@@ -286,18 +276,24 @@ namespace dlib
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
             /*!
                 requires
                     - filters.k() == data.k()
                     - stride_y > 0
                     - stride_x > 0
+                    - 0 <= padding_y < filters.nr()
+                    - 0 <= padding_x < filters.nc()
             !*/
 
             // These variables record the type of data given to the last call to setup().
             int stride_y;
             int stride_x;
+            int padding_y;
+            int padding_x;
             long data_num_samples, data_k, data_nr, data_nc;
             long filters_num_samples, filters_k, filters_nr, filters_nc;
 
@@ -346,14 +342,18 @@ namespace dlib
                 int window_height,
                 int window_width,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
 
             void setup_avg_pooling(
                 int window_height,
                 int window_width,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
 
             bool does_max_pooling(
@@ -378,6 +378,8 @@ namespace dlib
                 int window_width,
                 int stride_y,
                 int stride_x,
+                int padding_y,
+                int padding_x,
                 int pooling_mode
             );
 
@@ -386,6 +388,8 @@ namespace dlib
             int window_width;
             int stride_y;
             int stride_x;
+            int padding_y;
+            int padding_x;
             bool do_max_pooling;
         };
 

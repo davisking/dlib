@@ -77,7 +77,7 @@ namespace
                 
                 // small error possible due to rounding and different optimization options
                 DLIB_TEST(res_diff <= 1);
-                DLIB_TEST(rect_confidence >= 0.98);
+                DLIB_TEST(rect_confidence >= 0.97);
                 print_spinner();
             }
         }

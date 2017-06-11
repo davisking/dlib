@@ -8,6 +8,7 @@
 #include "../matrix.h"
 #include "../array2d.h"
 #include "../image_transforms/assign_image.h"
+#include "../image_transforms/interpolation.h"
 
 
 namespace dlib

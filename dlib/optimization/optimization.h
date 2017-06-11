@@ -42,7 +42,7 @@ namespace dlib
                 e(i) = old_val - eps;
                 const double delta_minus = f(e);
 
-                der(i) = (delta_plus - delta_minus)/(2*eps);
+                der(i) = (delta_plus - delta_minus)/((old_val+eps)-(old_val-eps)); 
 
                 // and finally restore the old value of this element
                 e(i) = old_val;
@@ -68,7 +68,7 @@ namespace dlib
                 e(i) = old_val - eps;
                 const double delta_minus = f(item,e);
 
-                der(i) = (delta_plus - delta_minus)/(2*eps);
+                der(i) = (delta_plus - delta_minus)/((old_val+eps)-(old_val-eps)); 
 
                 // and finally restore the old value of this element
                 e(i) = old_val;
@@ -80,7 +80,7 @@ namespace dlib
 
         double operator()(const double& x) const
         {
-            return (f(x+eps)-f(x-eps))/(2*eps);
+            return (f(x+eps)-f(x-eps))/((x+eps)-(x-eps));
         }
 
     private:
@@ -482,7 +482,7 @@ namespace dlib
             << "\n\t x_upper.size():         " << x_upper.size()
         );
         DLIB_ASSERT (
-            min(x_upper-x_lower) > 0,
+            min(x_upper-x_lower) >= 0,
             "\tdouble find_min_box_constrained()"
             << "\n\t You have to supply proper box constraints to this function."
             << "\n\r min(x_upper-x_lower): " << min(x_upper-x_lower)
@@ -610,7 +610,7 @@ namespace dlib
             << "\n\t x_upper.size():         " << x_upper.size()
         );
         DLIB_ASSERT (
-            min(x_upper-x_lower) > 0,
+            min(x_upper-x_lower) >= 0,
             "\tdouble find_max_box_constrained()"
             << "\n\t You have to supply proper box constraints to this function."
             << "\n\r min(x_upper-x_lower): " << min(x_upper-x_lower)

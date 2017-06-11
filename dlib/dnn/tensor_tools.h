@@ -6,10 +6,13 @@
 #include "tensor.h"
 #include "cudnn_dlibapi.h"
 #include "cublas_dlibapi.h"
+#include "cusolver_dlibapi.h"
 #include "curand_dlibapi.h"
 #include "cpu_dlib.h"
 #include "cuda_dlib.h"
 #include "../rand.h"
+#include <memory>
+#include "../geometry/rectangle.h"
 
 namespace dlib
 {
@@ -20,6 +23,119 @@ namespace dlib
 
 namespace dlib { namespace tt
 {
+
+// ----------------------------------------------------------------------------------------
+
+    void inverse_norms (
+        resizable_tensor& invnorms,
+        const tensor& data,
+        const double eps
+    );
+    /*!
+        ensures
+            - #invnorms == reciprocal(sqrt(sum_cols(squared(mat(data))) + eps))
+    !*/
+
+    void dot_prods (
+        resizable_tensor& out,
+        const tensor& lhs,
+        const tensor& rhs
+    );
+    /*!
+        requires
+            - have_same_dimensions(lhs,rhs) == true
+        ensures
+            - #out.num_samples() == lhs.num_samples()
+            - #out.k() == #out.nr() == #out.nc() == 1
+            - #out == sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+    !*/
+
+    void scale_columns (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    );
+    /*!
+        requires
+            - have_same_dimensions(out,m) == true
+            - is_vector(v) == true
+            - v.size() == mat(m).nc()
+        ensures
+            - performs: out = scale_columns(mat(m),mat(v));
+    !*/
+
+    void scale_rows (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    );
+    /*!
+        requires
+            - have_same_dimensions(out,m) == true
+            - is_vector(v) == true
+            - v.size() == m.num_samples()
+        ensures
+            - performs: out = scale_rows(mat(m),mat(v));
+    !*/
+
+    void scale_rows2 (
+        float beta, 
+        tensor& out,
+        const tensor& m1,
+        const tensor& m2,
+        const tensor& v1,
+        const tensor& v2
+    );
+    /*!
+        requires
+            - have_same_dimensions(out,m1) == true
+            - have_same_dimensions(out,m2) == true
+            - have_same_dimensions(v1,v2) == true
+            - is_vector(v1) == true
+            - v1.size() == m1.num_samples()
+        ensures
+            - performs: 
+                out = beta*out + scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+    
+    void exp (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - dest.size() == src.size()
+        ensures
+            - performs: dest = exp(mat(src))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void log (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - dest.size() == src.size()
+        ensures
+            - performs: dest = log(mat(src))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void log10 (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - dest.size() == src.size()
+        ensures
+            - performs: dest = log10(mat(src))
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -34,6 +150,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - dest does not alias the memory of lhs or rhs
             - The dimensions of lhs and rhs must be compatible for matrix multiplication.
               In particular:
                 - Let L == trans_lhs ? trans(mat(lhs)) : mat(lhs)
@@ -45,6 +162,36 @@ namespace dlib { namespace tt
         ensures
             - performs: dest = alpha*L*R + beta*mat(dest)
     !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class inv
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a functor for doing matrix inversion on the GPU.  The only
+                reason it's an object is to avoid the reallocation of some GPU memory
+                blocks if you want to do a bunch of matrix inversions in a row.
+        !*/
+    public:
+
+        void operator() (
+            const tensor& m,
+            resizable_tensor& out
+        );
+        /*!
+            requires
+                - m.size() == m.num_samples()*m.num_samples()
+                  (i.e. mat(m) must be a square matrix)
+            ensures
+                - out == inv(mat(m));
+        !*/
+
+    private:
+#ifdef DLIB_USE_CUDA
+        cuda::inv finv;
+#endif
+    };
 
 // ----------------------------------------------------------------------------------------
 
@@ -71,8 +218,8 @@ namespace dlib { namespace tt
 
         void fill_gaussian (
             tensor& data,
-            float mean,
-            float stddev
+            float mean = 0,
+            float stddev = 1
         );
         /*!
             requires
@@ -100,6 +247,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void multiply (
+        bool add_to,
         tensor& dest,
         const tensor& src1,
         const tensor& src2
@@ -123,9 +271,12 @@ namespace dlib { namespace tt
               Second, if dest.num_samples()==1, then after the pointwise multiplication of
               src1 with src2, the result has its samples summed to produce an output tensor
               with num_samples()==1 which is then assigned to #dest.
+            - if (add_to) then
+                - Instead of assigning the result to dest, this function adds the result to dest.
     !*/
 
     void multiply_conv (
+        bool add_to,
         tensor& dest,
         const tensor& src1,
         const tensor& src2
@@ -151,6 +302,8 @@ namespace dlib { namespace tt
                     #dest(n,k,r,c) == src1(n,k,r,c)*src2(k)
                 - else
                     #dest(k) == sum over {n,r,c} of src1(n,k,r,c)*src2(n,k,r,c)
+            - if (add_to) then
+                - Instead of assigning the result to dest, this function adds the result to dest.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -170,6 +323,18 @@ namespace dlib { namespace tt
 
     void affine_transform(
         tensor& dest,
+        const tensor& src,
+        const float A
+    );
+    /*!
+        requires
+            - dest.size()==src.size()
+        ensures
+            - #dest == A*src 
+    !*/
+
+    void affine_transform(
+        tensor& dest,
         const tensor& src1,
         const tensor& src2,
         const float A,
@@ -181,7 +346,22 @@ namespace dlib { namespace tt
             - dest.size()==src1.size()
             - dest.size()==src2.size()
         ensures
-            - #dest == A*src1 + src2*B + C
+            - #dest == A*src1 + B*src2 + C
+    !*/
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const float A,
+        const float B
+    );
+    /*!
+        requires
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+        ensures
+            - #dest == A*src1 + B*src2
     !*/
 
     void affine_transform(
@@ -195,12 +375,84 @@ namespace dlib { namespace tt
         const float D
     );
     /*!
-        requires
+        requires 
             - dest.size()==src1.size()
             - dest.size()==src2.size()
             - dest.size()==src3.size()
         ensures
-            - #dest == A*src1 + src2*B + src3*C + D
+            - #dest == A*src1 + B*src2 + C*src3 + D
+    !*/
+
+    void affine_transform(
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C
+    );
+    /*!
+        requires 
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+            - dest.size()==src3.size()
+        ensures
+            - #dest == A*src1 + B*src2 + C*src3
+    !*/
+
+    void affine_transform_range(
+        size_t begin,
+        size_t end,
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2,
+        const tensor& src3,
+        const float A,
+        const float B,
+        const float C
+    );
+    /*!
+        requires 
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+            - dest.size()==src3.size()
+            - begin <= end <= dest.size()
+        ensures
+            - This function operates much like
+              affine_transform(dest,src1,src2,src3,A,B,C,0), except that it runs over only
+              the half open range [begin,end) rather than processing the entire tensor.
+              Specifically, it does this:
+                - for i in the range [begin, end):
+                    - #dest.host()[i] == A*src1.host()[i] + B*src2.host()[i] + C*src3.host()[i]
+    !*/
+
+    void affine_transform(
+        const rectangle& rect,
+        tensor& dest, 
+        const tensor& src1, 
+        const tensor& src2, 
+        const tensor& src3, 
+        float A, 
+        float B,
+        float C
+    );
+    /*!
+        requires
+            - dest.size()==src1.size()
+            - dest.size()==src2.size()
+            - dest.size()==src3.size()
+            - dest.num_samples()==src1.num_samples()
+            - dest.num_samples()==src2.num_samples()
+            - dest.num_samples()==src3.num_samples()
+            - get_rect(mat(dest)).contains(rect) == true
+              (i.e. rect must be entirely contained within dest)
+        ensures
+            - This function operates much like
+              affine_transform(dest,src1,src2,src3,A,B,C,0), except that it runs over only
+              the sub-rectangle indicated by rect.  In particular, this function is equivalent
+              to:
+                set_subm(dest,rect) = A*subm(mat(src1),rect) + B*subm(mat(src2),rect) + C*subm(mat(src3),rect)
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -257,6 +509,8 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void compute_adam_update (
+        size_t begin,
+        size_t end,
         tensor& s,
         tensor& m,
         tensor& v,
@@ -276,19 +530,22 @@ namespace dlib { namespace tt
             - weight_decay >= 0
             - 0 <= momentum1 < 1
             - 0 <= momentum2 < 1
+            - begin <= end <= params.size()
         ensures
             - This function implements the ADAM parameter update method described in the paper:
                 Kingma, Diederik P., and Jimmy Ba Adam. "A method for stochastic
                 optimization." International Conference on Learning Representation. 2015.
               Specifically, it implements the method shown as Algorithm 1.
             - #s is the update vector that should be added to the parameters.
+            - The function only operates in the half open range [begin,end) of the memory
+              blocks of each tensor.  E.g. to make this function run on the entire tensor
+              set begin to 0 and end to params.size().
     !*/
 
 // ----------------------------------------------------------------------------------------
 
-    const double BATCH_NORM_EPS = 0.00001;
-
     void batch_normalize_inference (
+        const double eps,
         resizable_tensor& dest,
         const tensor& src,
         const tensor& gamma, 
@@ -298,6 +555,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - gamma.num_samples() == 1 
             - gamma.nr() == src.nr() 
             - gamma.nc() == src.nc() 
@@ -309,11 +567,12 @@ namespace dlib { namespace tt
             - Linearly transforms src as a call to batch_normalize() would if src had means
               and variances as given by running_means and running_variances.  That is, this
               function performs: 
-                dest = gamma*(src-running_means)/sqrt(running_variances+BATCH_NORM_EPS) + beta
+                dest = gamma*(src-running_means)/sqrt(running_variances+eps) + beta
               Note that it does it in a pointwise fashion over the samples in src.
     !*/
 
     void batch_normalize (
+        const double eps,
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& invstds,
@@ -326,6 +585,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - src.num_samples() > 1
             - gamma.num_samples() == 1
             - beta.num_samples() == 1
@@ -351,6 +611,7 @@ namespace dlib { namespace tt
     !*/
 
     void batch_normalize_gradient (
+        const double eps,
         const tensor& gradient_input,
         const tensor& means,
         const tensor& invstds,
@@ -362,8 +623,9 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - invstds and means should be the output of a call to
-              batch_normalize(dest,means,invstds,src,gamma,beta)
+              batch_normalize(eps,dest,means,invstds,src,gamma,beta)
             - have_same_dimensions(gradient_input, src) == true
             - have_same_dimensions(src, src_grad) == true
             - src.num_samples() > 1
@@ -377,7 +639,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(invstds, gamma) == true
         ensures
             - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-              batch_normalize(dest,means,invstds,src,gamma,beta))
+              batch_normalize(eps,dest,means,invstds,src,gamma,beta))
             - Adds the gradient of f() with respect to src to #src_grad.
             - Assigns the gradient of f() with respect to gamma to #gamma_grad.
             - Assigns the gradient of f() with respect to beta to #beta_grad.
@@ -386,6 +648,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void batch_normalize_conv_inference (
+        const double eps,
         resizable_tensor& dest,
         const tensor& src,
         const tensor& gamma, 
@@ -395,6 +658,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - gamma.num_samples() == 1 
             - gamma.nr() == 1 
             - gamma.nc() == 1 
@@ -406,12 +670,13 @@ namespace dlib { namespace tt
             - Linearly transforms src as a call to batch_normalize_conv() would if src had
               means and variances as given by running_means and running_variances.  That
               is, this function performs: 
-                dest = gamma*(src-running_means)/sqrt(running_variances+BATCH_NORM_EPS) + beta
+                dest = gamma*(src-running_means)/sqrt(running_variances+eps) + beta
               Note that it does this in a pointwise fashion over the samples, rows, and
               columns in src.
     !*/
 
     void batch_normalize_conv (
+        const double eps,
         resizable_tensor& dest,
         resizable_tensor& means,
         resizable_tensor& invstds,
@@ -424,6 +689,7 @@ namespace dlib { namespace tt
     );
     /*!
         requires
+            - eps > 0
             - src.num_samples() > 1
             - gamma.num_samples()==gamma.nr()==gamma.nc() == 1
             - beta.num_samples() ==beta.nr() ==gamma.nc() == 1
@@ -445,19 +711,21 @@ namespace dlib { namespace tt
     !*/
 
     void batch_normalize_conv_gradient (
-            const tensor& gradient_input,
-            const tensor& means,
-            const tensor& invstds,
-            const tensor& src,
-            const tensor& gamma,
-            tensor& src_grad,
-            tensor& gamma_grad, 
-            tensor& beta_grad 
+        const double eps,
+        const tensor& gradient_input,
+        const tensor& means,
+        const tensor& invstds,
+        const tensor& src,
+        const tensor& gamma,
+        tensor& src_grad,
+        tensor& gamma_grad, 
+        tensor& beta_grad 
     );
     /*!
         requires
+            - eps > 0
             - invstds and means should be the output of a call to
-              batch_normalize_conv(dest,means,invstds,src,gamma,beta)
+              batch_normalize_conv(eps,dest,means,invstds,src,gamma,beta)
             - have_same_dimensions(gradient_input, src) == true
             - have_same_dimensions(src, src_grad) == true
             - src.num_samples() > 1
@@ -469,7 +737,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(invstds, gamma) == true
         ensures
             - Let f(src,gamma,beta) == dot(gradient_input, dest output of
-              batch_normalize_conv(dest,means,invstds,src,gamma,beta))
+              batch_normalize_conv(eps,dest,means,invstds,src,gamma,beta))
             - Adds the gradient of f() with respect to src to #src_grad.
             - Assigns the gradient of f() with respect to gamma to #gamma_grad.
             - Assigns the gradient of f() with respect to beta to #beta_grad.
@@ -524,6 +792,7 @@ namespace dlib { namespace tt
                 - src.num_samples()==1 && src.k()==dest.k() && src.nr()==1 && src.nc()==1
                 - src.num_samples()==1 && src.k()==dest.k() && src.nr()==dest.nr() && src.nc()==dest.nc()
                 - src.num_samples()==1 && src.k()==1 && src.nr()==dest.nr() && src.nc()==dest.nc()
+                - src.num_samples()==dest.num_samples() && src.k()==1 && src.nr()==1 && src.nc()==1
             - is_same_object(src,dest) == false
         ensures
             - performs: dest = beta*dest + alpha*src
@@ -612,22 +881,28 @@ namespace dlib { namespace tt
             const tensor& data,
             const tensor& filters,
             int stride_y,
-            int stride_x
-        ) { impl(output,data,filters,stride_y,stride_x); }
+            int stride_x,
+            int padding_y,
+            int padding_x
+        ) { impl(output,data,filters,stride_y,stride_x,padding_y,padding_x); }
         /*!
             requires
                 - stride_y > 0
                 - stride_x > 0
+                - 0 <= padding_y < filters.nr()
+                - 0 <= padding_x < filters.nc()
                 - is_same_object(output,data) == false
                 - is_same_object(output,filters) == false
                 - filters.k() == data.k()
+                - filters.nr() <= src.nr() + 2*padding_y
+                - filters.nc() <= src.nc() + 2*padding_x
             ensures
                 - convolves filters over data.  
                 - filters contains filters.num_samples() filters. 
                 - #output.num_samples() == data.num_samples()
                 - #output.k() == filters.num_samples()
-                - #output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y
-                - #output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x
+                - #output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
+                - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
         !*/
 
         void get_gradient_for_data (
@@ -705,14 +980,18 @@ namespace dlib { namespace tt
             int window_height,
             int window_width,
             int stride_y,
-            int stride_x
-        ) { impl.setup_max_pooling(window_height, window_width, stride_y, stride_x); }
+            int stride_x,
+            int padding_y,
+            int padding_x
+        ) { impl.setup_max_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x); }
         /*!
             requires
                 - window_height > 0
                 - window_width > 0
                 - stride_y > 0
                 - stride_x > 0
+                - 0 <= padding_y < window_height
+                - 0 <= padding_x < window_width
             ensures
                 - When you call operator() it will do max pooling with the given
                   parameters.
@@ -722,14 +1001,18 @@ namespace dlib { namespace tt
             int window_height,
             int window_width,
             int stride_y,
-            int stride_x
-        ) { impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x); }
+            int stride_x,
+            int padding_y,
+            int padding_x
+        ) { impl.setup_avg_pooling(window_height, window_width, stride_y, stride_x, padding_y, padding_x); }
         /*!
             requires
                 - window_height > 0
                 - window_width > 0
                 - stride_y > 0
                 - stride_x > 0
+                - 0 <= padding_y < window_height
+                - 0 <= padding_x < window_width
             ensures
                 - When you call operator() it will do average pooling with the given
                   parameters.
@@ -746,24 +1029,22 @@ namespace dlib { namespace tt
             requires
                 - is_same_object(dest,src) == false
                 - either setup_max_pooling() or setup_avg_pooling() has been called.
+                - window_width  <= src.nc() + 2*padding_x
+                - window_height <= src.nr() + 2*padding_y
             ensures
                 - #dest.num_samples() == src.num_samples()
                 - #dest.k() == src.k()
-                - #dest.nr() == 1+(src.nr()-window_height%2)/stride_y
-                - #dest.nc() == 1+(src.nc()-window_width%2)/stride_x
+                - #dest.nr() == 1 + (src.nr() + 2*padding_y - window_height)/stride_y
+                - #dest.nc() == 1 + (src.nc() + 2*padding_x - window_width)/stride_x
+                - WINDOW == centered_rect(x*stride_x + window_width/2 - padding_x,
+                                          y*stride_y + window_height/2 - padding_y,
+                                          window_width,
+                                          window_height)
                 - for all valid s, k, r, and c:
                     - if (does_max_pooling()) then
-                        - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),
-                                                                      centered_rect(c*stride_x,
-                                                                                    r*stride_y,
-                                                                                    window_width,
-                                                                                    window_height)))
+                        - image_plane(#dest,s,k)(r,c) == max(subm_clipped(image_plane(src,s,k),WINDOW(c,r)))
                     - else
-                        - image_plane(#dest,s,k)(r,c) == mean(subm_clipped(image_plane(src,s,k),
-                                                                      centered_rect(c*stride_x,
-                                                                                    r*stride_y,
-                                                                                    window_width,
-                                                                                    window_height)))
+                        - image_plane(#dest,s,k)(r,c) == mean(subm_clipped(image_plane(src,s,k),WINDOW(c,r)))
         !*/
 
         void get_gradient(
@@ -826,11 +1107,13 @@ namespace dlib { namespace tt
         requires
             - have_same_dimensions(dest,gradient_input) == true 
             - have_same_dimensions(dest,grad) == true 
-            - is_same_object(grad, dest)==false
         ensures
             - We interpret dest as the output of softmax(dest,SRC) for some SRC tensor.
-              Then let f(SRC) == dot(gradient_input,dest) Then this function computes the
-              gradient of f() with respect to SRC and adds it to grad.
+              Then let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+              is_same_object(grad,gradient_input)==true then the output is assigned to
+              grad, replacing its previous contents.  Otherwise the output is added to
+              grad.
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
     !*/
@@ -860,12 +1143,13 @@ namespace dlib { namespace tt
         requires
             - have_same_dimensions(dest,gradient_input) == true 
             - have_same_dimensions(dest,grad) == true 
-            - is_same_object(grad,dest) == false
         ensures
             - Recalling that dest is the output of sigmoid(dest,SRC) for some SRC tensor,
-              let f(SRC) == dot(gradient_input,dest)
-            - Then this function computes the gradient of f() with respect to SRC and
-              assigns it to grad.
+              let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+              is_same_object(grad,gradient_input)==true then the output is assigned to
+              grad, replacing its previous contents.  Otherwise the output is added to
+              grad.
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
     !*/
@@ -895,12 +1179,13 @@ namespace dlib { namespace tt
         requires
             - have_same_dimensions(dest,gradient_input) == true 
             - have_same_dimensions(dest,grad) == true 
-            - is_same_object(grad,dest) == false
         ensures
             - Recalling that dest is the output of relu(dest,SRC) for some SRC tensor,
-              let f(SRC) == dot(gradient_input,dest)
-            - Then this function computes the gradient of f() with respect to SRC and
-              assigns it to grad.
+              let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+              is_same_object(grad,gradient_input)==true then the output is assigned to
+              grad, replacing its previous contents.  Otherwise the output is added to
+              grad.
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
     !*/
@@ -939,6 +1224,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(grad,gradient_input) == true 
             - param.size() == 1
             - params_grad.size() == 1
+            - is_same_object(grad, gradient_input) == false
         ensures
             - Recalling that dest is the output of prelu(dest,src,param) let 
               f(src,param) == dot(gradient_input,dest)
@@ -972,14 +1258,176 @@ namespace dlib { namespace tt
         requires
             - have_same_dimensions(dest,gradient_input) == true 
             - have_same_dimensions(dest,grad) == true 
-            - is_same_object(grad,dest) == false
         ensures
             - Recalling that dest is the output of tanh(dest,SRC) for some SRC tensor,
-              let f(SRC) == dot(gradient_input,dest)
-            - Then this function computes the gradient of f() with respect to SRC and
-              assigns it to grad.
+              let f(SRC) == dot(gradient_input,dest).  Then this function computes the
+              gradient of f() with respect to SRC and stores it to grad.  Moreover, if
+              is_same_object(grad,gradient_input)==true then the output is assigned to
+              grad, replacing its previous contents.  Otherwise the output is added to
+              grad.
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class multi_device_tensor_averager
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a tool for very quickly averaging a bunch of tensors
+                together.
+        !*/
+    public:
+
+        multi_device_tensor_averager(const multi_device_tensor_averager&) = delete;
+        multi_device_tensor_averager& operator=(const multi_device_tensor_averager&) = delete;
+
+        multi_device_tensor_averager() = default;
+
+        void set(
+            std::vector<tensor*> items
+        )
+        /*!
+            requires
+                - All the tensors in items are the same size
+            ensures
+                - When you call average() we will average the tensors in items.
+                - It's important that the tensors already be allocated to their devices
+                  before you call set().  This is because set() will setup the types of
+                  between device transfers now and use them when you call average().  
+        !*/
+        {
+            using namespace ::dlib::cuda;
+            accessible_groups.clear();
+            epa.clear();
+            if (items.size() < 1)
+                return;
+
+            scale = 1.0/items.size();
+
+            // split item into groups of accessible devices
+            std::vector<tensor*> group, unused;
+            while(items.size() > 0)
+            {
+                group.push_back(items[0]);
+                for(size_t i = 1; i < items.size(); ++i)
+                {
+                    if (can_access_peer(*items[0], *items[i]))
+                        group.push_back(items[i]);
+                    else
+                        unused.push_back(items[i]);
+                }
+                accessible_groups.push_back(group);
+                unused.swap(items);
+                unused.clear();
+                group.clear();
+            }
+            for (auto&& g : accessible_groups)
+            {
+                for (size_t i = 1; i < g.size(); ++i)
+                {
+                    epa.emplace_back(new enable_peer_access(*g[0], *g[i]));
+                }
+            }
+        }
+
+        size_t num_device_groups(
+        ) const { return accessible_groups.size(); }
+        /*!
+            ensures
+                - The devices given to set() are grouped together when they can directly
+                  access each other using GPUDirect.  This function returns the number of
+                  such groups.  For example, if all devices can directly access each other
+                  then the number of groups is 1.
+        !*/
+
+        void average()
+        /*!
+            requires
+                - All the devices have stopped writing to the tensors given to set().  So
+                  you should probably call cudaDeviceSynchronize() on each of the relevant
+                  devices before calling average().
+            ensures
+                - Computes the average of all the tensors given to set() and then sets them
+                  all equal to the average.
+        !*/
+        {
+            using namespace ::dlib::cuda;
+
+
+            // First we average things within each group
+            for (auto&& g : accessible_groups)
+            {
+                raii_set_device set_dev(*g[0]);
+                if (g.size() == 1)
+                    tt::affine_transform(*g[0], *g[0], scale);
+                else 
+                    tt::affine_transform(*g[0], *g[0], *g[1], scale, scale);
+
+                for (size_t i = 2; i < g.size(); ++i)
+                    tt::affine_transform(*g[0], *g[0], *g[i], 1, scale);
+            }
+
+            if (accessible_groups.size() > 1)
+            {
+                tensor& total_avg = *accessible_groups[0][0];
+                raii_set_device set_dev(total_avg);
+                accum_buffer.copy_size(total_avg);
+                // now we need to average things across groups
+                for (size_t i = 1; i < accessible_groups.size(); ++i)
+                {
+                    memcpy(accum_buffer, *accessible_groups[i][0]);
+                    tt::add(total_avg, total_avg, accum_buffer);
+                }
+
+                // Now total_avg has the final average in it.  So we need to send
+                // copies of it back to each of the groups.
+                for (size_t i = 1; i < accessible_groups.size(); ++i)
+                {
+                    memcpy(*accessible_groups[i][0], total_avg);
+                }
+            }
+
+
+            // Now propagate averages back out to each element using point to point
+            // communication inside a group.
+            for (auto&& g : accessible_groups)
+            {
+                raii_set_device set_dev(*g[0]);
+                for (size_t i = 1; i < g.size(); ++i)
+                    memcpy(*g[i], *g[0]); 
+            }
+        }
+
+    private:
+        std::vector<std::unique_ptr<::dlib::cuda::enable_peer_access>> epa;
+        std::vector<std::vector<tensor*>> accessible_groups;
+        float scale;
+
+        resizable_tensor accum_buffer;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+    );
+    /*!
+        requires
+            - dest.nc() == src.nc()
+            - dest.nr() == src.nr()
+            - dest.num_samples() == src.num_samples()
+            - dest.k() - dest_k_offset >= count_k
+            - src.k() - src_k_offset >= count_k
+            - is_same_object(dest,src) == false
+        ensures
+            - performs: dest[i, k + dest_k_offset, r, c] = src[i, k + src_k_offset, r, c], where k in [0..count_k]
+              Copies content of each sample from src in to corresponding place of sample at dest.
     !*/
 
 // ----------------------------------------------------------------------------------------

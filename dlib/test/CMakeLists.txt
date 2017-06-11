@@ -3,11 +3,14 @@
 # information about it at http://www.cmake.org
 #
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 
 # create a variable called target_name and set it to the string "dtest"
 set (target_name dtest)
 PROJECT(${target_name})
+
+# compile the dlib/all/source.cpp file into its own object just to make sure it compiles
+set(DLIB_TEST_COMPILE_ALL_SOURCE_CPP ON)
 
 include(../cmake)
 
@@ -122,7 +125,6 @@ set (tests
    set.cpp
    sldf.cpp
    sliding_buffer.cpp
-   smart_pointers.cpp
    sockets2.cpp
    sockets.cpp
    sockstreambuf.cpp
@@ -171,12 +173,13 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 
-TARGET_LINK_LIBRARIES(${target_name} dlib )
+TARGET_LINK_LIBRARIES(${target_name} dlib::dlib )
 
 
 if (NOT DLIB_NO_GUI_SUPPORT)
    add_subdirectory(gui)
    add_subdirectory(examples)
+   add_subdirectory(tools)
 endif()
 
 

@@ -643,6 +643,8 @@
                      <item>auto_unlock_readonly</item>
                      <item>threaded_object</item>
                      <item>thread_pool</item>
+                     <item>async</item>
+                     <item>default_thread_pool</item>
                      <item>parallel_for</item>
                      <item>   
                         <name>future</name>
@@ -1122,6 +1124,30 @@
                <examples>
                   <example>thread_pool_ex.cpp.html</example>
                </examples>
+            </extension>
+
+            <extension>
+               <name>default_thread_pool</name>
+               <spec_file link="true">dlib/threads/async_abstract.h</spec_file>
+               <description> 
+                  This function returns a reference to a global <a href="#thread_pool">thread_pool</a>.  If the DLIB_NUM_THREADS
+                  environment variable is set to an integer then the thread pool will contain
+                  DLIB_NUM_THREADS threads, otherwise it will contain
+                  std::thread::hardware_concurrency() threads.
+               </description> 
+            </extension>
+
+            <extension>
+               <name>async</name>
+               <spec_file link="true">dlib/threads/async_abstract.h</spec_file>
+               <description> 
+                  This function behaves just like std::async()
+                  except that instead of spawning a new thread to process each task it submits
+                  the task to a <a href="#thread_pool">dlib::thread_pool</a>.  Therefore, dlib::async() is
+                  guaranteed to use a bounded number of threads unlike std::async().  This also
+                  means that calls to dlib::async() will block if there aren't any free threads
+                  in the thread pool.
+               </description> 
             </extension>
 
             <extension>

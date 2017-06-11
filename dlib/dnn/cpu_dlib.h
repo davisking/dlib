@@ -7,6 +7,7 @@
 // and cudnn_dlibapi.h
 
 #include "tensor.h"
+#include "../geometry/rectangle.h"
 
 namespace dlib
 {
@@ -16,12 +17,14 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void multiply (
+            bool add_to,
             tensor& dest,
             const tensor& src1,
             const tensor& src2
         );
 
         void multiply_conv (
+            bool add_to,
             tensor& dest,
             const tensor& src1,
             const tensor& src2
@@ -79,6 +82,18 @@ namespace dlib
             const float D
         );
 
+        void affine_transform_range(
+            size_t begin,
+            size_t end,
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2,
+            const tensor& src3,
+            const float A,
+            const float B,
+            const float C
+        );
+
     // -----------------------------------------------------------------------------------
 
         void affine_transform(
@@ -99,7 +114,22 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void affine_transform(
+            const rectangle& rect,
+            tensor& dest, 
+            const tensor& src1, 
+            const tensor& src2, 
+            const tensor& src3, 
+            float A, 
+            float B,
+            float C
+        );
+
+    // -----------------------------------------------------------------------------------
+
         void compute_adam_update (
+            size_t begin,
+            size_t end,
             tensor& s,
             tensor& m,
             tensor& v,
@@ -115,6 +145,7 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void batch_normalize_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -124,6 +155,7 @@ namespace dlib
         );
 
         void batch_normalize (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -136,6 +168,7 @@ namespace dlib
         );
 
         void batch_normalize_gradient (
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -147,6 +180,7 @@ namespace dlib
         );
 
         void batch_normalize_conv_inference (
+            const double eps,
             resizable_tensor& dest,
             const tensor& src,
             const tensor& gamma, 
@@ -156,6 +190,7 @@ namespace dlib
         );
 
         void batch_normalize_conv (
+            const double eps,
             resizable_tensor& dest,
             resizable_tensor& means,
             resizable_tensor& invstds,
@@ -168,6 +203,7 @@ namespace dlib
         );
 
         void batch_normalize_conv_gradient (
+            const double eps,
             const tensor& gradient_input,
             const tensor& means,
             const tensor& invstds,
@@ -279,14 +315,18 @@ namespace dlib
                 int window_height,
                 int window_width,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
 
             void setup_avg_pooling(
                 int window_height,
                 int window_width,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
 
             bool does_max_pooling(
@@ -309,6 +349,8 @@ namespace dlib
             int window_width;
             int stride_y;
             int stride_x;
+            int padding_y;
+            int padding_x;
             bool do_max_pooling;
 
         };
@@ -331,7 +373,9 @@ namespace dlib
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
-                int stride_x
+                int stride_x,
+                int padding_y,
+                int padding_x
             );
 
             void get_gradient_for_data (
@@ -350,7 +394,19 @@ namespace dlib
 
             long last_stride_y;
             long last_stride_x;
+            long last_padding_y;
+            long last_padding_x;
         };
+
+    // -----------------------------------------------------------------------------------
+
+        void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+        );
 
     // -----------------------------------------------------------------------------------
 

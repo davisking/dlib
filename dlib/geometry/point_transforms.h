@@ -9,6 +9,7 @@
 #include "../matrix.h"
 #include "../matrix/matrix_la.h"
 #include "../optimization/optimization.h"
+#include "rectangle.h"
 #include <vector>
 
 namespace dlib
@@ -188,6 +189,74 @@ namespace dlib
     private:
         matrix<double,2,2> m;
         dlib::vector<double,2> b;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class rectangle_transform
+    {
+    public:
+
+        rectangle_transform (
+        )
+        {
+        }
+
+        rectangle_transform (
+            const point_transform_affine& tform_
+        ) :tform(tform_)
+        {
+        }
+
+        drectangle operator() (
+            const drectangle& r
+        ) const
+        {
+            dpoint tl = r.tl_corner();
+            dpoint tr = r.tr_corner();
+            dpoint bl = r.bl_corner();
+            dpoint br = r.br_corner();
+            // The new rectangle wouold ideally have this area if we could actually rotrate
+            // the box.
+            double new_area = length(tform(tl)-tform(tr))*length(tform(tl)-tform(bl));
+
+            // But if we rotate the coners of the rectangle and then find the rectangle
+            // that contains them we get this, which might have a much larger area than we
+            // want.
+            drectangle temp;
+            temp += tform(tl);
+            temp += tform(tr);
+            temp += tform(bl);
+            temp += tform(br);
+            // so we adjust the area to match the target area and have the same center as
+            // the above box.
+            double scale = std::sqrt(new_area/temp.area());
+
+            return centered_rect(center(temp), static_cast<long>(temp.width()*scale+0.5), static_cast<long>(temp.height()*scale+0.5));
+        }
+
+        rectangle operator() (
+            const rectangle& r
+        ) const
+        {
+            return (*this)(drectangle(r));
+        }
+
+        const point_transform_affine& get_tform(
+        ) const { return tform; }
+
+        inline friend void serialize (const rectangle_transform& item, std::ostream& out)
+        {
+            serialize(item.tform, out);
+        }
+
+        inline friend void deserialize (rectangle_transform& item, std::istream& in)
+        {
+            deserialize(item.tform, in);
+        }
+
+    private:
+        point_transform_affine tform;
     };
 
 // ----------------------------------------------------------------------------------------

@@ -17,14 +17,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class impossible_labeling_error : public dlib::error 
-    { 
-    public: 
-        impossible_labeling_error(const std::string& msg) : dlib::error(msg) {};
-    };
-
-// ----------------------------------------------------------------------------------------
-
     template <
         typename image_scanner_type,
         typename image_array_type 
@@ -345,7 +337,7 @@ namespace dlib
                 // if hit truth rect
                 if (truth_match > match_eps)
                 {
-                    // if this is the first time we have seen a detect which hit truth_object_detections[truth.second]
+                    // if this is the first time we have seen a detect which hit truth_object_detections[idx][truth.second]
                     const double score = dets[i].first - thresh;
                     if (hit_truth_table[truth.second] == false)
                     {

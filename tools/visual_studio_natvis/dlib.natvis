@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <!-- dlib matrix debugger visualization in Visual Studio-->
+  <!-- Johannes Huber, SAFEmine Part of Hexagon -->
+  <!-- no warranty -->
+
+  <!-- general dlib::matrix fixed size-->
+   <Type Name="dlib::matrix&lt;*,*,*,*&gt;">
+   <DisplayString>{{ size= &lt;{$T2}&gt; x &lt;{$T3}&gt; }}</DisplayString>
+   <Expand>
+      <ArrayItems>
+         <Size>$T2 * $T3</Size>
+         <ValuePointer>($T1*)data.data</ValuePointer>
+      </ArrayItems>
+   </Expand>
+  </Type>
+
+  <!-- general dlib::matrix fixed rows-->
+  <Type Name="dlib::matrix&lt;*,0,*,*&gt;">
+   <DisplayString>{{ size={data.nr_} x &lt;{$T2}&gt; }}</DisplayString>
+   <Expand>
+      <ArrayItems Condition="data.data != 0">
+         <Size>data.nr_ * $T2</Size>
+         <ValuePointer>($T1*)data.data</ValuePointer>
+      </ArrayItems>
+   </Expand>
+  </Type>
+
+  <!-- general dlib::matrix fixed cols-->
+  <Type Name="dlib::matrix&lt;*,*,0,*&gt;">
+   <DisplayString>{{ size= &lt;{$T2}&gt; x {data.nc_} }}</DisplayString>
+   <Expand>
+      <ArrayItems Condition="data.data != 0">
+         <Size>$T2 * data.nc_</Size>
+         <ValuePointer>($T1*)data.data</ValuePointer>
+      </ArrayItems>
+   </Expand>
+  </Type>
+
+  <!-- general dlib::matrix dynamic size-->
+  <Type Name="dlib::matrix&lt;*,0,0,*&gt;">
+   <DisplayString>{{ size= {data.nc_} x {data.nc_} }}</DisplayString>
+   <Expand>
+      <ArrayItems Condition="data.data != 0">
+         <Size>data.nr_*data.nc_</Size>
+         <ValuePointer>($T1*)data.data</ValuePointer>
+      </ArrayItems>
+   </Expand>
+  </Type>
+
+</AutoVisualizer>

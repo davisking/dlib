@@ -16,7 +16,7 @@
 #include "matrix_assign_fwd.h"
 #include "matrix_op.h"
 #include <utility>
-#ifdef DLIB_HAS_RVALUE_REFERENCES
+#ifdef DLIB_HAS_INITIALIZER_LISTS
 #include <initializer_list>
 #endif
 
@@ -1114,7 +1114,7 @@ namespace dlib
             matrix_assign(*this, m);
         }
 
-#ifdef DLIB_HAS_RVALUE_REFERENCES
+#ifdef DLIB_HAS_INITIALIZER_LISTS
         matrix(const std::initializer_list<T>& l)
         {
             if (NR*NC != 0)
@@ -1169,13 +1169,15 @@ namespace dlib
             temp.swap(*this);
             return *this;
         }
+#endif // DLIB_HAS_INITIALIZER_LISTS
 
+#ifdef DLIB_HAS_RVALUE_REFERENCES
         matrix(matrix&& item)
         {
         #ifdef MATLAB_MEX_FILE
             // You can't move memory around when compiled in a matlab mex file and the
-            // different locations have different persistence settings.
-            if (data._private_is_persistent() == item.data._private_is_persistent())
+            // different locations have different ownership settings.
+            if (data._private_is_owned_by_matlab() == item.data._private_is_owned_by_matlab())
             {
                 swap(item);
             }
@@ -1195,8 +1197,8 @@ namespace dlib
         {
         #ifdef MATLAB_MEX_FILE
             // You can't move memory around when compiled in a matlab mex file and the
-            // different locations have different persistence settings.
-            if (data._private_is_persistent() == rhs.data._private_is_persistent())
+            // different locations have different ownership settings.
+            if (data._private_is_owned_by_matlab() == rhs.data._private_is_owned_by_matlab())
             {
                 swap(rhs);
             }
@@ -1210,7 +1212,7 @@ namespace dlib
         #endif
             return *this;
         }
-#endif
+#endif // DLIB_HAS_RVALUE_REFERENCES
 
         template <typename U, size_t len>
         explicit matrix (
@@ -1343,14 +1345,14 @@ namespace dlib
             return data._private_release_mxArray();
         }
 
-        void _private_mark_non_persistent()
+        void _private_mark_owned_by_matlab()
         {
-            data._private_mark_non_persistent();
+            data._private_mark_owned_by_matlab();
         }
 
-        bool _private_is_persistent()
+        bool _private_is_owned_by_matlab()
         {
-            return data._private_is_persistent();
+            return data._private_is_owned_by_matlab();
         }
 #endif
 
@@ -1749,7 +1751,7 @@ namespace dlib
 
             literal_assign_helper(const literal_assign_helper& item) : m(item.m), r(item.r), c(item.c), has_been_used(false) {}
             explicit literal_assign_helper(matrix* m_): m(m_), r(0), c(0),has_been_used(false) {next();}
-            ~literal_assign_helper() throw (std::exception)
+            ~literal_assign_helper() noexcept(false)
             {
                 DLIB_CASSERT(!has_been_used || r == m->nr(),
                              "You have used the matrix comma based assignment incorrectly by failing to\n"
@@ -1776,7 +1778,7 @@ namespace dlib
 
         private:
 
-            friend class matrix;
+            friend class matrix<T,num_rows,num_cols,mem_manager,layout>;
 
             void next (
             ) const
@@ -1810,13 +1812,9 @@ namespace dlib
         ) 
         {  
             // assign the given value to every spot in this matrix
-            for (long r = 0; r < nr(); ++r)
-            {
-                for (long c = 0; c < nc(); ++c)
-                {
-                    data(r,c) = val;
-                }
-            }
+            const long size = nr()*nc();
+            for (long i = 0; i < size; ++i)
+                data(i) = val;
 
             // Now return the literal_assign_helper so that the user
             // can use the overloaded comma notation to initialize 

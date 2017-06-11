@@ -297,7 +297,7 @@ namespace dlib
             - is_col_vector(x_upper) == true
             - x.size() == x_lower.size() == x_upper.size()
               (i.e. x, x_lower, and x_upper need to all be column vectors of the same dimensionality)
-            - min(x_upper-x_lower) > 0
+            - min(x_upper-x_lower) >= 0
               (i.e. x_upper must contain upper bounds relative to x_lower)
         ensures
             - Performs a box constrained minimization of the function f() using the given
@@ -391,7 +391,7 @@ namespace dlib
             - is_col_vector(x_upper) == true
             - x.size() == x_lower.size() == x_upper.size()
               (i.e. x, x_lower, and x_upper need to all be column vectors of the same dimensionality)
-            - min(x_upper-x_lower) > 0
+            - min(x_upper-x_lower) >= 0
               (i.e. x_upper must contain upper bounds relative to x_lower)
         ensures
             - Performs a box constrained maximization of the function f() using the given

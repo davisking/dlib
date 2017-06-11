@@ -80,6 +80,12 @@ namespace dlib
                         fout << " ignore='" << b.ignore << "'";
                     if (b.angle != 0)
                         fout << " angle='" << b.angle << "'";
+                    if (b.age != 0)
+                        fout << " age='" << b.age << "'";
+                    if (b.gender == FEMALE)
+                        fout << " gender='female'";
+                    else if (b.gender == MALE)
+                        fout << " gender='male'";
                     if (b.pose != 0)
                         fout << " pose='" << b.pose << "'";
                     if (b.detection_score != 0)
@@ -196,6 +202,18 @@ namespace dlib
                         if (atts.is_in_list("occluded"))  temp_box.occluded  = sa = atts["occluded"];
                         if (atts.is_in_list("ignore"))  temp_box.ignore  = sa = atts["ignore"];
                         if (atts.is_in_list("angle"))  temp_box.angle  = sa = atts["angle"];
+                        if (atts.is_in_list("age"))  temp_box.age  = sa = atts["age"];
+                        if (atts.is_in_list("gender"))  
+                        {
+                            if (atts["gender"] == "male")
+                                temp_box.gender = MALE;
+                            else if (atts["gender"] == "female")
+                                temp_box.gender = FEMALE;
+                            else if (atts["gender"] == "unknown")
+                                temp_box.gender = UNKNOWN;
+                            else
+                                throw dlib::error("Invalid gender string in box attribute.");
+                        }
                         if (atts.is_in_list("pose"))  temp_box.pose  = sa = atts["pose"];
                         if (atts.is_in_list("detection_score"))  temp_box.detection_score  = sa = atts["detection_score"];
 

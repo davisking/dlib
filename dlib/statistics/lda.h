@@ -182,6 +182,55 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct roc_point
+    {
+        double true_positive_rate;
+        double false_positive_rate;
+        double detection_threshold;
+    };
+
+    inline std::vector<roc_point> compute_roc_curve (
+        const std::vector<double>& true_detections,
+        const std::vector<double>& false_detections 
+    )
+    {
+        DLIB_CASSERT(true_detections.size() != 0);
+        DLIB_CASSERT(false_detections.size() != 0);
+
+        std::vector<std::pair<double,int> > temp;
+        temp.reserve(true_detections.size()+false_detections.size());
+        for (unsigned long i = 0; i < true_detections.size(); ++i)
+            temp.push_back(std::make_pair(true_detections[i], +1));
+        for (unsigned long i = 0; i < false_detections.size(); ++i)
+            temp.push_back(std::make_pair(false_detections[i], -1));
+
+        std::sort(temp.rbegin(), temp.rend());
+
+
+        std::vector<roc_point> roc_curve;
+        roc_curve.reserve(temp.size());
+
+        double num_false_included = 0;
+        double num_true_included = 0;
+        for (unsigned long i = 0; i < temp.size(); ++i)
+        {
+            if (temp[i].second > 0)
+                num_true_included++;
+            else
+                num_false_included++;
+
+            roc_point p;
+            p.true_positive_rate = num_true_included/true_detections.size();
+            p.false_positive_rate = num_false_included/false_detections.size();
+            p.detection_threshold = temp[i].first;
+            roc_curve.push_back(p);
+        }
+
+        return roc_curve;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_LDA_Hh_

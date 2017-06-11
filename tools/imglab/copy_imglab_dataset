@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ "$#" -ne 2 ]; then
+    echo "This script copies an imglab XML file and its associated images to a new folder."
+    echo "Notably, it will avoid copying unnecessary images."
+    echo "Call this script like this:"
+    echo "   ./copy_dataset some_file.xml dest_dir"
+    exit 1
+fi
+
+XML_FILE=$1
+DEST=$2
+
+
+
+mkdir -p $DEST
+
+# Get the list of files we need to copy, then build the cp statements with 1000 files at most in each statement, then tell bash to run them all.
+imglab --files $XML_FILE | xargs perl  -e 'use File::Spec; foreach (@ARGV) {print File::Spec->abs2rel($_) . "\n"}' | sort | uniq | xargs -L1000 echo | xargs  -I{} echo cp -a --parents {} $DEST | bash
+
+convert_imglab_paths_to_relative $XML_FILE > $DEST/$(basename $XML_FILE)
+

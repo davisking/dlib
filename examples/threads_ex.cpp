@@ -35,7 +35,7 @@ signaler count_signaler(count_mutex);  // This is a signaler we will use to sign
                                        // unlock count_mutex for you. 
 
 
-void thread (void*)
+void test_thread (void*)
 {
     // just sleep for a second
     dlib::sleep(1000);
@@ -65,7 +65,7 @@ int main()
         // Create some threads.  This 0 we are passing in here is the argument that gets 
         // passed to the thread function (a void pointer) but we aren't using it in this 
         // example program so i'm just using 0.
-        create_new_thread(thread,0);
+        create_new_thread(test_thread,0);
     }
     cout << "Done creating threads, now we wait for them to end" << endl;
 

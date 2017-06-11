@@ -16,23 +16,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void randomize_parameters (
-        tensor& params,
-        unsigned long num_inputs_and_outputs,
-        dlib::rand& rnd
-    );
-    /*!
-        ensures
-            - This function assigns random values into params based on the given random
-              number generator.  In particular, it uses the parameter initialization method
-              of formula 16 from the paper "Understanding the difficulty of training deep
-              feedforward neural networks" by Xavier Glorot and Yoshua Bengio.
-            - It is assumed that the total number of inputs and outputs from the layer is
-              num_inputs_and_outputs.  That is, you should set num_inputs_and_outputs to
-              the sum of the dimensionalities of the vectors going into and out of the
-              layer that uses params as its parameters.
-    !*/
-
     template <
         typename... T 
         >
@@ -58,13 +41,30 @@ namespace dlib
               a non-std::tuple object is found.
     !*/
 
-    double log1pexp(
-        double x
-    );
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    double get_learning_rate_multiplier(
+        const T& obj
+    ); 
     /*!
         ensures
-            - returns log(1+exp(x))
-              (except computes it using a numerically accurate method)
+            - if (obj has a get_learning_rate_multiplier() member function) then
+                - returns obj.get_learning_rate_multiplier()
+            - else
+                - returns 1
+    !*/
+
+    template <typename T>
+    double get_weight_decay_multiplier(
+        const T& obj
+    ); 
+    /*!
+        ensures
+            - if (obj has a get_weight_decay_multiplier() member function) then
+                - returns obj.get_weight_decay_multiplier()
+            - else
+                - returns 1
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ namespace dlib
         ); 
         /*!
             requires
-                - num < size()
+                - num <= size()
             ensures
                 - returns a reference to the sub-stack S such that:
                     - S.size() == size()-num.
@@ -204,7 +204,6 @@ namespace dlib
         typedef LAYER_DETAILS layer_details_type;
         typedef SUBNET subnet_type;
         typedef typename subnet_type::input_type input_type;
-        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
         // num_computational_layers will always give the number of layers in the network
         // that transform tensors (i.e. layers defined by something that implements the
         // EXAMPLE_COMPUTATIONAL_LAYER_ interface).  This is all the layers except for
@@ -218,6 +217,7 @@ namespace dlib
         /*!
             ensures
                 - default constructs all the layers in this network.
+                - #sample_expansion_factor() == 0
         !*/
 
         add_layer(const add_layer&) = default;
@@ -240,6 +240,7 @@ namespace dlib
                   each other.
                 - #layer_details() == layer_details_type(item.layer_details())
                 - #subnet()        == subnet_type(item.subnet())
+                - #sample_expansion_factor() == item.sample_expansion_factor()
         !*/
 
         template <typename ...T, typename LD, typename ...U>
@@ -251,6 +252,7 @@ namespace dlib
             ensures
                 - #layer_details() == layer_details_type(tuple_head(layer_det))
                 - #subnet()        == subnet_type(tuple_tail(layer_det),args)
+                - #sample_expansion_factor() == 0 
         !*/
 
         template <typename ...T>
@@ -262,6 +264,7 @@ namespace dlib
             ensures
                 - #layer_details() == layer_details_type(layer_det)
                 - #subnet()        == subnet_type(args)
+                - #sample_expansion_factor() == 0 
         !*/
 
         template <typename ...T>
@@ -275,6 +278,7 @@ namespace dlib
                   args are simply passed on to the sub layers in their entirety.
                 - #layer_details() == layer_details_type()
                 - #subnet()        == subnet_type(args)
+                - #sample_expansion_factor() == 0 
         !*/
 
         template <typename ...T>
@@ -286,12 +290,13 @@ namespace dlib
             ensures
                 - #layer_details() == layer_det
                 - #subnet()        == subnet_type(args)
+                - #sample_expansion_factor() == 0 
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const;
         /*!
@@ -300,13 +305,27 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - #data.num_samples()%distance(ibegin,iend) == 0. 
+                - #sample_expansion_factor() == #data.num_samples()/distance(ibegin,iend).
+                - #sample_expansion_factor() > 0
                 - The data in the ith sample of #data corresponds to the input_type object
-                  *(ibegin+i/sample_expansion_factor).
+                  *(ibegin+i/#sample_expansion_factor()).
                 - Invokes data.async_copy_to_device() so that the data begins transferring
                   to the GPU device, if present.
                 - This function is implemented by calling the to_tensor() routine defined
                   at the input layer of this network.  
+        !*/
+
+        unsigned int sample_expansion_factor (
+        ) const;
+        /*!
+            ensures
+                - When to_tensor() is invoked on this network's input layer it converts N
+                  input objects into M samples, all stored inside a resizable_tensor.  It
+                  is always the case that M is some integer multiple of N.
+                  sample_expansion_factor() returns the value of this multiplier.  To be
+                  very specific, it is always true that M==I*N where I is some integer.
+                  This integer I is what is returned by sample_expansion_factor().
         !*/
 
         const subnet_type& subnet(
@@ -343,10 +362,10 @@ namespace dlib
                   than the input layer.
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         const tensor& operator() (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         );
         /*!
             requires
@@ -379,7 +398,10 @@ namespace dlib
         );
         /*!
             requires
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
             ensures
                 - Runs x through the network and returns the results.  In particular, this
@@ -506,7 +528,7 @@ namespace dlib
         template <typename solver_type>
         void update_parameters(
             sstack<solver_type> solvers, 
-            double step_size
+            double learning_rate
         );
         /*!
             requires
@@ -517,13 +539,14 @@ namespace dlib
                   if you want to call update_parameters() on some other neural network
                   object then you must NOT reuse the same solvers object.
                 - solvers.size() >= num_computational_layers
-                - 0 < step_size <= 1
+                - 0 < learning_rate <= 1
             ensures
                 - Updates all the parameters in the network.  In particular, we pass each
                   layer's parameter gradient (i.e. the tensor returned by the layer's
                   get_parameter_gradient() member) through that layer's corresponding
-                  solver object.  This produces a parameter delta vector and we add
-                  step_size times that vector to the layer's parameters.
+                  solver object.  This produces a parameter delta vector which we add to
+                  the layer's parameters.
+                - The solvers use the given learning rate.
         !*/
 
         void clean(
@@ -539,6 +562,8 @@ namespace dlib
                   clean().  The purpose of clean() is to compact the network object prior
                   to saving it to disk so that it takes up less space and the IO is
                   quicker.
+                - This also calls the .clean() method on any layer details objects that 
+                  define a .clean() method.
         !*/
 
     };
@@ -573,8 +598,6 @@ namespace dlib
             REQUIREMENTS ON LOSS_DETAILS 
                 - Must be a type that implements the EXAMPLE_LOSS_LAYER_ interface defined
                   in loss_abstract.h
-                - LOSS_DETAILS::sample_expansion_factor == SUBNET::sample_expansion_factor
-                  i.e. The loss layer and input layer must agree on the sample_expansion_factor.
 
             REQUIREMENTS ON SUBNET
                 - One of the following must be true:
@@ -598,10 +621,12 @@ namespace dlib
         typedef typename subnet_type::input_type input_type;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static size_t num_layers = subnet_type::num_layers + 1;
-        const static unsigned int sample_expansion_factor = subnet_type::sample_expansion_factor;
-        // If LOSS_DETAILS is an unsupervised loss then label_type==no_label_type.
+        // If LOSS_DETAILS is an unsupervised loss then training_label_type==no_label_type.
         // Otherwise it is defined as follows:
-        typedef typename LOSS_DETAILS::label_type label_type;
+        typedef typename LOSS_DETAILS::training_label_type training_label_type;
+        // Similarly, if LOSS_DETAILS doesn't provide any output conversion then
+        // output_label_type==no_label_type.
+        typedef typename LOSS_DETAILS::output_label_type output_label_type;
 
 
 
@@ -640,7 +665,7 @@ namespace dlib
         ); 
         /*!
             ensures
-                - #loss_details() == layer_det
+                - #loss_details() == loss_details_type(layer_det)
                 - #subnet()       == subnet_type(args)
         !*/
 
@@ -651,16 +676,19 @@ namespace dlib
         );
         /*!
             ensures
-                - #loss_details() == layer_det
+                - #loss_details() == loss_details_type(layer_det)
                 - #subnet()       == subnet_type(args)
         !*/
 
         template <typename ...T>
         add_loss_layer(
-            T ...args
+            T&& ...args
         ); 
         /*!
             ensures
+                - This version of the constructor is only called if loss_details_type can't
+                  be constructed from the first thing in args.  In this case, the args are
+                  simply passed on to the sub layers in their entirety.
                 - #loss_details() == loss_details_type()
                 - #subnet()       == subnet_type(args)
         !*/
@@ -695,10 +723,10 @@ namespace dlib
                   loss layer used by this network.
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         void to_tensor (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             resizable_tensor& data
         ) const;
         /*!
@@ -707,13 +735,27 @@ namespace dlib
                 - std::distance(ibegin,iend) > 0
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.
-                - #data.num_samples() == distance(ibegin,iend)*sample_expansion_factor. 
+                - #data.num_samples()%distance(ibegin,iend) == 0. 
+                - #sample_expansion_factor() == #data.num_samples()/distance(ibegin,iend).
+                - #sample_expansion_factor() > 0
                 - The data in the ith sample of #data corresponds to the input_type object
-                  *(ibegin+i/sample_expansion_factor).
+                  *(ibegin+i/sample_expansion_factor()).
                 - Invokes data.async_copy_to_device() so that the data begins transferring
                   to the GPU device, if present.
                 - This function is implemented by calling the to_tensor() routine defined
                   at the input layer of this network.  
+        !*/
+
+        unsigned int sample_expansion_factor (
+        ) const;
+        /*!
+            ensures
+                - When to_tensor() is invoked on this network's input layer it converts N
+                  input objects into M samples, all stored inside a resizable_tensor.  It
+                  is always the case that M is some integer multiple of N.
+                  sample_expansion_factor() returns the value of this multiplier.  To be
+                  very specific, it is always true that M==I*N where I is some integer.
+                  This integer I is what is returned by sample_expansion_factor().
         !*/
 
     // -------------
@@ -725,20 +767,23 @@ namespace dlib
         );
         /*!
             requires
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - obegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor label_type elements.
+                  x.num_samples()/sample_expansion_factor() output_label_type elements.
             ensures
                 - runs x through the network and writes the output to the range at obegin.
                 - loss_details().to_label() is used to write the network output into
                   obegin.
         !*/
 
-        template <typename input_iterator, typename label_iterator>
+        template <typename forward_iterator, typename label_iterator>
         void operator() (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             label_iterator obegin
         );
         /*!
@@ -746,7 +791,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
                 - obegin == iterator pointing to the start of a range of
-                  std::distance(ibegin,iend) label_type elements.
+                  std::distance(ibegin,iend) output_label_type elements.
             ensures
                 - runs [ibegin,iend) through the network and writes the output to the range
                   at obegin.
@@ -756,18 +801,18 @@ namespace dlib
 
     // -------------
 
-        const label_type& operator() (
+        const output_label_type& operator() (
             const input_type& x
         );
         /*!
             ensures
                 - runs a single object, x, through the network and returns the output.
                 - loss_details().to_label() is used to convert the network output into a
-                  label_type.
+                  output_label_type.
         !*/
 
         template <typename iterable_type>
-        std::vector<label_type> operator() (
+        std::vector<output_label_type> operator() (
             const iterable_type& data,
             size_t batch_size = 128
         );
@@ -786,7 +831,7 @@ namespace dlib
                   items.  Using a batch_size > 1 can be faster because it better exploits
                   the available hardware parallelism.
                 - loss_details().to_label() is used to convert the network output into a
-                  label_type.
+                  output_label_type.
         !*/
 
     // -------------
@@ -798,22 +843,25 @@ namespace dlib
         );
         /*!
             requires
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor label_type elements.
+                  x.num_samples()/sample_expansion_factor() training_label_type elements.
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and returns the resulting loss. 
                 - for all valid k:
-                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor).
+                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor()).
                 - This function does not update the network parameters.
         !*/
 
-        template <typename input_iterator, typename label_iterator>
+        template <typename forward_iterator, typename label_iterator>
         double compute_loss (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             label_iterator lbegin 
         );
         /*!
@@ -821,7 +869,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
                 - lbegin == iterator pointing to the start of a range of
-                  std::distance(ibegin,iend) label_type elements.
+                  std::distance(ibegin,iend) training_label_type elements.
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and returns the resulting loss. 
@@ -837,22 +885,25 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
-                - x.num_samples()%sample_expansion_factor == 0
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
             ensures
                 - runs x through the network and returns the resulting loss. 
                 - This function does not update the network parameters.
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         double compute_loss (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
             ensures
@@ -869,10 +920,13 @@ namespace dlib
         );
         /*!
             requires
-                - x.num_samples()%sample_expansion_factor == 0
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor label_type elements.
+                  x.num_samples()/sample_expansion_factor() training_label_type elements.
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and computes parameter and data gradients with
@@ -880,14 +934,14 @@ namespace dlib
                   updates get_final_data_gradient() and also, for each layer, the tensor
                   returned by get_parameter_gradient().
                 - for all valid k:
-                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor).
+                    - the expected label of the kth sample in x is *(lbegin+k/sample_expansion_factor()).
                 - returns compute_loss(x,lbegin)
         !*/
 
-        template <typename input_iterator, typename label_iterator>
+        template <typename forward_iterator, typename label_iterator>
         double compute_parameter_gradients (
-            input_iterator ibegin,
-            input_iterator iend,
+            forward_iterator ibegin,
+            forward_iterator iend,
             label_iterator lbegin
         );
         /*!
@@ -895,7 +949,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
                 - lbegin == iterator pointing to the start of a range of
-                  std::distance(ibegin,iend) label_type elements.
+                  std::distance(ibegin,iend) training_label_type elements.
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and computes parameter and data
@@ -912,8 +966,11 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
-                - x.num_samples()%sample_expansion_factor == 0
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
+                - sample_expansion_factor() != 0
+                  (i.e. to_tensor() must have been called to set sample_expansion_factor()
+                  to something non-zero.)
+                - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
             ensures
                 - runs x through the network and computes parameter and data gradients with
@@ -923,14 +980,14 @@ namespace dlib
                 - returns compute_loss(x)
         !*/
 
-        template <typename input_iterator>
+        template <typename forward_iterator>
         double compute_parameter_gradients (
-            input_iterator ibegin,
-            input_iterator iend
+            forward_iterator ibegin,
+            forward_iterator iend
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
             ensures
@@ -944,7 +1001,7 @@ namespace dlib
         template <typename solver_type>
         void update_parameters (
             sstack<solver_type> solvers,
-            double step_size
+            double learning_rate
         );
         /*!
             requires
@@ -955,13 +1012,14 @@ namespace dlib
                   is, if you want to call update_parameters() on some other neural network
                   object then you must NOT reuse the same solvers object.
                 - solvers.size() >= num_computational_layers
-                - 0 < step_size <= 1
+                - 0 < learning_rate <= 1
             ensures
                 - Updates all the parameters in the network.  In particular, we pass each
                   layer's parameter gradient (i.e. the tensor returned by the layer's
                   get_parameter_gradient() member) through that layer's corresponding
-                  solver object.  This produces a parameter delta vector and we add
-                  step_size times that vector to the layer's parameters.
+                  solver object.  This produces a parameter delta vector which we add to
+                  the layer's parameters.
+                - The solvers use the given learning rate.
         !*/
 
     // -------------
@@ -1045,7 +1103,6 @@ namespace dlib
         typedef typename SUBNET::input_type input_type;
         const static size_t num_computational_layers = (REPEATED_LAYER<SUBNET>::num_computational_layers-SUBNET::num_computational_layers)*num + SUBNET::num_computational_layers;
         const static size_t num_layers = (REPEATED_LAYER<SUBNET>::num_layers-SUBNET::num_layers)*num + SUBNET::num_layers;
-        const static unsigned int sample_expansion_factor = SUBNET::sample_expansion_factor;
         typedef REPEATED_LAYER<an_unspecified_input_type> repeated_layer_type;
 
         template <typename T, typename ...U>
@@ -1194,6 +1251,21 @@ namespace dlib
     template <typename SUBNET> using tag9  = add_tag_layer< 9, SUBNET>;
     template <typename SUBNET> using tag10 = add_tag_layer<10, SUBNET>;
 
+    template <template<typename SUBNET> class tag>
+    struct tag_id
+    {
+        /*!
+            REQUIREMENTS ON tag
+                Tag should be an add_tag_layer template such as tag1, tag2, etc.
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a tool for finding the numeric ID of a tag layer.  For example,
+                tag_id<tag3>::id == 3.
+        !*/
+
+        const static unsigned long id;
+    };
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -1317,6 +1389,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename net_type>
+    auto& input_layer (
+        net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+        ensures
+            - returns the input later of the given network object.  Specifically, this
+              function is equivalent to calling:
+                layer<net_type::num_layers-1>(net);
+              That is, you get the input layer details object for the network.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename net_type,
         typename visitor
@@ -1380,6 +1469,147 @@ namespace dlib
                     }
                 }
             - When v() is called, the first argument is always < net_type::num_computational_layers.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_net_type& t)
+              That is, it must take a size_t and then any of the network types such as
+              add_layer, add_loss_layer, etc.
+        ensures
+            - Loops over all the layers in net and calls v() on them.  To be specific, this
+              function essentially performs the following:
+
+                for (size_t i = 0; i < net_type::num_layers; ++i)
+                    v(i, layer<i>(net));
+    !*/
+
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_backwards(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_net_type& t)
+              That is, it must take a size_t and then any of the network types such as
+              add_layer, add_loss_layer, etc.
+        ensures
+            - Loops over all the layers in net and calls v() on them.  The loop happens in
+              the reverse order of visit_layers().  To be specific, this function
+              essentially performs the following:
+
+                for (size_t i = net_type::num_layers; i != 0; --i)
+                    v(i-1, layer<i-1>(net));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        size_t begin,
+        size_t end,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_range(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_net_type& t)
+              That is, it must take a size_t and then any of the network types such as
+              add_layer, add_loss_layer, etc.
+            - begin <= end <= net_type::num_layers
+        ensures
+            - Loops over the layers in the range [begin,end) in net and calls v() on them.
+              The loop happens in the reverse order of visit_layers().  To be specific,
+              this function essentially performs the following:
+
+                for (size_t i = begin; i < end; ++i)
+                    v(i, layer<i>(net));
+    !*/
+
+    template <
+        size_t begin,
+        size_t end,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_backwards_range(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_net_type& t)
+              That is, it must take a size_t and then any of the network types such as
+              add_layer, add_loss_layer, etc.
+            - begin <= end <= net_type::num_layers
+        ensures
+            - Loops over the layers in the range [begin,end) in net and calls v() on them.
+              The loop happens in the reverse order of visit_layers_range().  To be specific,
+              this function essentially performs the following:
+
+                for (size_t i = end; i != begin; --i)
+                    v(i-1, layer<i-1>(net));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        unsigned long tag_id,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_until_tag(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(any_net_type& t)
+              That is, it must take any of the network types such as add_layer,
+              add_loss_layer, etc.
+        ensures
+            - Loops over all the layers in net beginning with layer<0>(net) and going until
+              a tag layer with an ID of tag_id is encountered.  To be specific, this
+              function essentially performs the following:
+
+                size_t i = 0;
+                while(layer<i>(net) isn't an add_tag_layer with ID == tag_id) {
+                    v(layer<i>(net));
+                    ++i;
+                }
+                v(layer<i>(net));  // also visits the tag layer itself at the very end.
     !*/
 
 // ----------------------------------------------------------------------------------------

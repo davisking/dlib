@@ -36,6 +36,7 @@ namespace dlib
             - bool rgb
             - bool rgb_alpha
             - bool hsi
+            - bool lab
 
             - bool has_alpha
 
@@ -47,7 +48,7 @@ namespace dlib
             - is_unsigned
 
         The above public constants are subject to the following constraints:
-            - only one of grayscale, rgb, rgb_alpha, or hsi is true
+            - only one of grayscale, rgb, rgb_alpha, hsi or lab is true
             - if (rgb == true) then
                 - The type T will be a struct with 3 public members of type 
                   unsigned char named "red" "green" and "blue".  
@@ -81,6 +82,16 @@ namespace dlib
                 - min() == 0 
                 - max() == 255
                 - is_unsigned == true
+             - else if (lab == true) then
+                - The type T will be a struct with 3 public members of type
+                  unsigned char named "l" "a" and "b".
+                - This type of pixel represents the Lab color space.
+                - num == 3
+                - has_alpha == false
+                - basic_pixel_type == unsigned char
+                - min() == 0
+                - max() == 255
+                - is_unsigned == true 
             - else
                 - grayscale == true
                 - This type of pixel represents a grayscale color space.  T 
@@ -189,6 +200,28 @@ namespace dlib
         unsigned char h;
         unsigned char s;
         unsigned char i;
+    };
+    // ----------------------------------------------------------------------------------------
+
+    struct lab_pixel
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an Lab colored graphical pixel.
+        !*/
+
+        lab_pixel (
+        ) {}
+
+        lab_pixel (
+                unsigned char l_,
+                unsigned char a_,
+                unsigned char b_
+        ) : l(l_), a(a_), b(b_) {}
+
+        unsigned char l;
+        unsigned char a;
+        unsigned char b;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -340,6 +373,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline void serialize (
+            const lab_pixel& item,
+            std::ostream& out
+    );
+    /*!
+        provides serialization support for the lab_pixel struct
+    !*/
+
+
+// ----------------------------------------------------------------------------------------
+
     inline void deserialize (
         hsi_pixel& item, 
         std::istream& in
@@ -347,22 +391,32 @@ namespace dlib
     /*!
         provides deserialization support for the hsi_pixel struct
     !*/
+// ----------------------------------------------------------------------------------------
+
+    inline void deserialize (
+            lab_pixel& item,
+            std::istream& in
+    );
+    /*!
+        provides deserialization support for the lab_pixel struct
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <>
     struct pixel_traits<rgb_pixel>
     {
-        const static bool rgb  = true;
-        const static bool rgb_alpha  = false;
-        const static bool grayscale = false;
-        const static bool hsi = false;
-        const static long num = 3;
+        constexpr static bool rgb  = true;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static bool lab = false;
+        enum { num = 3};
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
-        const static bool is_unsigned = true;
-        const static bool has_alpha = false;
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = false;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -370,16 +424,17 @@ namespace dlib
     template <>
     struct pixel_traits<bgr_pixel>
     {
-        const static bool rgb  = true;
-        const static bool rgb_alpha  = false;
-        const static bool grayscale = false;
-        const static bool hsi = false;
-        const static long num = 3;
+        constexpr static bool rgb  = true;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static bool lab = false;
+        constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
-        const static bool is_unsigned = true;
-        const static bool has_alpha = false;
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = false;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -387,16 +442,17 @@ namespace dlib
     template <>
     struct pixel_traits<rgb_alpha_pixel>
     {
-        const static bool rgb  = false;
-        const static bool rgb_alpha  = true;
-        const static bool grayscale = false;
-        const static bool hsi = false;
-        const static long num = 4;
+        constexpr static bool rgb  = false;
+        constexpr static bool rgb_alpha  = true;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static bool lab = false;
+        constexpr static long num = 4;
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
-        const static bool is_unsigned = true;
-        const static bool has_alpha = true;
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = true;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -405,16 +461,36 @@ namespace dlib
     template <>
     struct pixel_traits<hsi_pixel>
     {
-        const static bool rgb  = false;
-        const static bool rgb_alpha  = false;
-        const static bool grayscale = false;
-        const static bool hsi = true;
-        const static long num = 3;
+        constexpr static bool rgb  = false;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = true;
+        constexpr static bool lab = false;
+        constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
-        const static bool is_unsigned = true;
-        const static bool has_alpha = false;
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = false;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+
+    template <>
+    struct pixel_traits<lab_pixel>
+    {
+        constexpr static bool rgb  = false;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static bool lab = true;
+        constexpr static long num = 3;
+        typedef unsigned char basic_pixel_type;
+        static basic_pixel_type min() { return 0;}
+        static basic_pixel_type max() { return 255;}
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = false;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -422,16 +498,17 @@ namespace dlib
     template <typename T>
     struct grayscale_pixel_traits
     {
-        const static bool rgb  = false;
-        const static bool rgb_alpha  = false;
-        const static bool grayscale = true;
-        const static bool hsi = false;
-        const static long num = 1;
-        const static bool has_alpha = false;
+        constexpr static bool rgb  = false;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = true;
+        constexpr static bool hsi = false;
+        constexpr static bool lab = false;
+        constexpr static long num = 1;
+        constexpr static bool has_alpha = false;
         typedef T basic_pixel_type;
         static basic_pixel_type min() { return std::numeric_limits<T>::min();}
         static basic_pixel_type max() { return std::numeric_limits<T>::max();}
-        const static bool is_unsigned = is_unsigned_type<T>::value;
+        constexpr static bool is_unsigned = is_unsigned_type<T>::value;
     };
 
     template <> struct pixel_traits<unsigned char>  : public grayscale_pixel_traits<unsigned char> {};
@@ -453,16 +530,17 @@ namespace dlib
     template <typename T>
     struct float_grayscale_pixel_traits
     {
-        const static bool rgb  = false;
-        const static bool rgb_alpha  = false;
-        const static bool grayscale = true;
-        const static bool hsi = false;
-        const static long num = 1;
-        const static bool has_alpha = false;
+        constexpr static bool rgb  = false;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = true;
+        constexpr static bool hsi = false;
+        constexpr static bool lab = false;
+        constexpr static long num = 1;
+        constexpr static bool has_alpha = false;
         typedef T basic_pixel_type;
         static basic_pixel_type min() { return -std::numeric_limits<T>::max();}
         static basic_pixel_type max() { return std::numeric_limits<T>::max();}
-        const static bool is_unsigned = false;
+        constexpr static bool is_unsigned = false;
     };
 
     template <> struct pixel_traits<float>          : public float_grayscale_pixel_traits<float> {};
@@ -615,6 +693,15 @@ namespace dlib
             dest.i = src.i; 
         }
 
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::lab>::type
+        assign(P1& dest, const P2& src)
+        {
+            dest.l = src.l;
+            dest.a = src.a;
+            dest.b = src.b;
+        }
+
     // -----------------------------
         // dest is a grayscale
 
@@ -671,6 +758,13 @@ namespace dlib
         assign(P1& dest, const P2& src) 
         { 
             assign_pixel(dest, src.i);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::lab>::type
+        assign(P1& dest, const P2& src)
+        {
+            assign_pixel(dest, src.l);
         }
 
 
@@ -771,6 +865,161 @@ namespace dlib
             return(c2);
         }
 
+        // -----------------------------
+
+        struct Lab
+        {
+            double l;
+            double a;
+            double b;
+        };
+        /*
+            Calculate Lab from RGB
+            L is between 0 and 100
+            a is between -128 and 127
+            b is between -128 and 127
+            RGB is between 0.0 and 1.0
+        */
+        inline Lab RGB2Lab(COLOUR c1)
+        {
+            Lab c2;
+            using namespace std;
+
+            double var_R = c1.r;
+            double var_G = c1.g;
+            double var_B = c1.b;
+
+            if (var_R > 0.04045) {
+                var_R = pow(((var_R + 0.055) / 1.055), 2.4);
+            } else {
+                var_R = var_R / 12.92;
+            }
+
+            if (var_G > 0.04045) {
+                var_G = pow(((var_G + 0.055) / 1.055), 2.4);
+            } else {
+                var_G = var_G / 12.92;
+            }
+
+            if (var_B > 0.04045) {
+                var_B = pow(((var_B + 0.055) / 1.055), 2.4);
+            } else {
+                var_B = var_B / 12.92;
+            }
+
+            var_R = var_R * 100;
+            var_G = var_G * 100;
+            var_B = var_B * 100;
+
+//Observer. = 2°, Illuminant = D65
+            double X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
+            double Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
+            double Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+
+            double var_X = X / 95.047;
+            double var_Y = Y / 100.000;
+            double var_Z = Z / 108.883;
+
+            if (var_X > 0.008856) {
+                var_X = pow(var_X, (1.0 / 3));
+            }
+            else {
+                var_X = (7.787 * var_X) + (16.0 / 116);
+            }
+
+            if (var_Y > 0.008856) {
+                var_Y = pow(var_Y, (1.0 / 3));
+            }
+            else {
+                var_Y = (7.787 * var_Y) + (16.0 / 116);
+            }
+
+            if (var_Z > 0.008856) {
+                var_Z = pow(var_Z, (1.0 / 3));
+            }
+            else {
+                var_Z = (7.787 * var_Z) + (16.0 / 116);
+            }
+
+            //clamping
+            c2.l = max(0.0, (116.0 * var_Y) - 16);
+            c2.a = max(-128.0, min(127.0, 500.0 * (var_X - var_Y)));
+            c2.b = max(-128.0, min(127.0, 200.0 * (var_Y - var_Z)));
+
+            return c2;
+        }
+
+        /*
+            Calculate RGB from Lab, reverse of RGB2LAb()
+            L is between 0 and 100
+            a is between -128 and 127
+            b is between -128 and 127
+            RGB is between 0.0 and 1.0
+        */
+        inline COLOUR Lab2RGB(Lab c1) {
+            COLOUR c2;
+            using namespace std;
+
+            double var_Y = (c1.l + 16) / 116.0;
+            double var_X = (c1.a / 500.0) + var_Y;
+            double var_Z = var_Y - (c1.b / 200);
+
+            if (pow(var_Y, 3) > 0.008856) {
+                var_Y = pow(var_Y, 3);
+            } else {
+                var_Y = (var_Y - 16.0 / 116) / 7.787;
+            }
+
+            if (pow(var_X, 3) > 0.008856) {
+                var_X = pow(var_X, 3);
+            } else {
+                var_X = (var_X - 16.0 / 116) / 7.787;
+            }
+
+            if (pow(var_Z, 3) > 0.008856) {
+                var_Z = pow(var_Z, 3);
+            } else {
+                var_Z = (var_Z - 16.0 / 116) / 7.787;
+            }
+
+            double X = var_X * 95.047;
+            double Y = var_Y * 100.000;
+            double Z = var_Z * 108.883;
+
+            var_X = X / 100.0;
+            var_Y = Y / 100.0;
+            var_Z = Z / 100.0;
+
+            double var_R = var_X * 3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
+            double var_G = var_X * -0.9689 + var_Y * 1.8758 + var_Z * 0.0415;
+            double var_B = var_X * 0.0557 + var_Y * -0.2040 + var_Z * 1.0570;
+
+            if (var_R > 0.0031308) {
+                var_R = 1.055 * pow(var_R, (1 / 2.4)) - 0.055;
+            } else {
+                var_R = 12.92 * var_R;
+            }
+
+            if (var_G > 0.0031308) {
+                var_G = 1.055 * pow(var_G, (1 / 2.4)) - 0.055;
+            } else {
+                var_G = 12.92 * var_G;
+            }
+
+            if (var_B > 0.0031308) {
+                var_B = 1.055 * pow(var_B, (1 / 2.4)) - 0.055;
+            } else {
+                var_B = 12.92 * var_B;
+            }
+
+            // clamping
+            c2.r = max(0.0, min(1.0, var_R));
+            c2.g = max(0.0, min(1.0, var_G));
+            c2.b = max(0.0, min(1.0, var_B));
+
+            return (c2);
+        }
+
 
     // -----------------------------
         // dest is a color rgb_pixel
@@ -853,6 +1102,23 @@ namespace dlib
             dest.blue = static_cast<unsigned char>(c.b*255.0 + 0.5);
         }
 
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::lab>::type
+        assign(P1& dest, const P2& src)
+        {
+            COLOUR c;
+            Lab l;
+            l.l = (src.l/255.0)*100;
+            l.a = (src.a-128.0);
+            l.b = (src.b-128.0);
+            c = Lab2RGB(l);
+
+            dest.red = static_cast<unsigned char>(c.r*255.0 + 0.5);
+            dest.green = static_cast<unsigned char>(c.g*255.0 + 0.5);
+            dest.blue = static_cast<unsigned char>(c.b*255.0 + 0.5);
+        }
+
+
     // -----------------------------
     // dest is a color rgb_alpha_pixel
 
@@ -908,6 +1174,22 @@ namespace dlib
             dest.alpha = 255;
         }
 
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::lab>::type
+        assign(P1& dest, const P2& src)
+        {
+            COLOUR c;
+            Lab l;
+            l.l = (src.l/255.0)*100;
+            l.a = (src.a-128.0);
+            l.b = (src.b-128.0);
+            c = Lab2RGB(l);
+
+            dest.red = static_cast<unsigned char>(c.r * 255 + 0.5);
+            dest.green = static_cast<unsigned char>(c.g * 255 + 0.5);
+            dest.blue = static_cast<unsigned char>(c.b * 255 + 0.5);
+            dest.alpha = 255;
+        }
     // -----------------------------
         // dest is an hsi pixel
 
@@ -962,6 +1244,84 @@ namespace dlib
             assign_pixel_helpers::assign(dest,temp);
         }
 
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::lab>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+            // convert lab value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+            // now we can just go assign the new rgb value to the
+            // hsi pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+    // -----------------------------
+        // dest is an lab pixel
+        template < typename P1>
+        typename enable_if_c<pixel_traits<P1>::lab>::type
+        assign(P1& dest, const unsigned char& src)
+        {
+            dest.a = 128;
+            dest.b = 128;
+            dest.l = src;
+        }
+
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::grayscale>::type
+        assign(P1& dest, const P2& src)
+        {
+            dest.a = 128;
+            dest.b = 128;
+            assign_pixel(dest.l, src);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::rgb>::type
+        assign(P1& dest, const P2& src)
+        {
+            COLOUR c1;
+            Lab c2;
+            c1.r = src.red / 255.0;
+            c1.g = src.green / 255.0;
+            c1.b = src.blue / 255.0;
+            c2 = RGB2Lab(c1);
+
+            dest.l = static_cast<unsigned char>((c2.l / 100) * 255 + 0.5);
+            dest.a = static_cast<unsigned char>(c2.a + 128 + 0.5);
+            dest.b = static_cast<unsigned char>(c2.b + 128 + 0.5);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::rgb_alpha>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+            // convert target lab pixel to rgb
+            assign_pixel_helpers::assign(temp,dest);
+
+            // now assign the rgb_alpha value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // lab pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::hsi>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+
+            // convert hsi value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // lab pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
     }
 
     // -----------------------------
@@ -990,7 +1350,7 @@ namespace dlib
         typename P,
         typename T
         >
-    inline typename enable_if_c<pixel_traits<P>::grayscale == false&&
+    inline typename enable_if_c<pixel_traits<P>::grayscale == false &&
                                 pixel_traits<P>::has_alpha>::type assign_pixel_intensity_helper (
         P& dest,
         const T& new_intensity
@@ -1011,7 +1371,7 @@ namespace dlib
         typename P,
         typename T
         >
-    inline typename enable_if_c<pixel_traits<P>::grayscale == false&&
+    inline typename enable_if_c<pixel_traits<P>::grayscale == false &&
                                 pixel_traits<P>::has_alpha == false>::type assign_pixel_intensity_helper (
         P& dest,
         const T& new_intensity
@@ -1240,6 +1600,44 @@ namespace dlib
         catch (serialization_error& e)
         {
             throw serialization_error(e.info + "\n   while deserializing object of type hsi_pixel"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void serialize (
+            const lab_pixel& item,
+            std::ostream& out
+    )
+    {
+        try
+        {
+            serialize(item.l,out);
+            serialize(item.a,out);
+            serialize(item.b,out);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type lab_pixel");
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void deserialize (
+            lab_pixel& item,
+            std::istream& in
+    )
+    {
+        try
+        {
+            deserialize(item.l,in);
+            deserialize(item.a,in);
+            deserialize(item.b,in);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type lab_pixel");
         }
     }
 

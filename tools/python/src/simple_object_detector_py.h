@@ -37,6 +37,7 @@ namespace dlib
         dlib::simple_object_detector& detector,
         boost::python::object img,
         const unsigned int upsampling_amount,
+        const double adjust_threshold,
         std::vector<double>& detection_confidences,
         std::vector<double>& weight_indices
     )
@@ -51,7 +52,7 @@ namespace dlib
             array2d<unsigned char> temp;
             if (upsampling_amount == 0)
             {
-                detector(numpy_gray_image(img), rect_detections, 0.0);
+                detector(numpy_gray_image(img), rect_detections, adjust_threshold);
                 split_rect_detections(rect_detections, rectangles,
                                       detection_confidences, weight_indices);
                 return rectangles;
@@ -66,7 +67,7 @@ namespace dlib
                     pyramid_up(temp);
                 }
 
-                detector(temp, rect_detections, 0.0);
+                detector(temp, rect_detections, adjust_threshold);
                 for (unsigned long i = 0; i < rect_detections.size(); ++i)
                     rect_detections[i].rect = pyr.rect_down(rect_detections[i].rect,
                                                             upsampling_amount);
@@ -81,7 +82,7 @@ namespace dlib
             array2d<rgb_pixel> temp;
             if (upsampling_amount == 0)
             {
-                detector(numpy_rgb_image(img), rect_detections, 0.0);
+                detector(numpy_rgb_image(img), rect_detections, adjust_threshold);
                 split_rect_detections(rect_detections, rectangles,
                                       detection_confidences, weight_indices);
                 return rectangles;
@@ -96,7 +97,87 @@ namespace dlib
                     pyramid_up(temp);
                 }
 
-                detector(temp, rect_detections, 0.0);
+                detector(temp, rect_detections, adjust_threshold);
+                for (unsigned long i = 0; i < rect_detections.size(); ++i)
+                    rect_detections[i].rect = pyr.rect_down(rect_detections[i].rect,
+                                                            upsampling_amount);
+                split_rect_detections(rect_detections, rectangles,
+                                      detection_confidences, weight_indices);
+
+                return rectangles;
+            }
+        }
+        else
+        {
+            throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
+        }
+    }
+
+    inline std::vector<dlib::rectangle> run_detectors_with_upscale1 (
+        std::vector<simple_object_detector >& detectors,
+        boost::python::object img,
+        const unsigned int upsampling_amount,
+        const double adjust_threshold,
+        std::vector<double>& detection_confidences,
+        std::vector<double>& weight_indices
+    )
+    {
+        pyramid_down<2> pyr;
+
+        std::vector<rectangle> rectangles;
+        std::vector<rect_detection> rect_detections;
+
+        if (is_gray_python_image(img))
+        {
+            array2d<unsigned char> temp;
+            if (upsampling_amount == 0)
+            {
+                evaluate_detectors(detectors, numpy_gray_image(img), rect_detections, adjust_threshold);
+                split_rect_detections(rect_detections, rectangles,
+                                      detection_confidences, weight_indices);
+                return rectangles;
+            }
+            else
+            {
+                pyramid_up(numpy_gray_image(img), temp, pyr);
+                unsigned int levels = upsampling_amount-1;
+                while (levels > 0)
+                {
+                    levels--;
+                    pyramid_up(temp);
+                }
+
+                evaluate_detectors(detectors, temp, rect_detections, adjust_threshold);
+                for (unsigned long i = 0; i < rect_detections.size(); ++i)
+                    rect_detections[i].rect = pyr.rect_down(rect_detections[i].rect,
+                                                            upsampling_amount);
+                split_rect_detections(rect_detections, rectangles,
+                                      detection_confidences, weight_indices);
+
+                return rectangles;
+            }
+        }
+        else if (is_rgb_python_image(img))
+        {
+            array2d<rgb_pixel> temp;
+            if (upsampling_amount == 0)
+            {
+                evaluate_detectors(detectors, numpy_rgb_image(img), rect_detections, adjust_threshold);
+                split_rect_detections(rect_detections, rectangles,
+                                      detection_confidences, weight_indices);
+                return rectangles;
+            }
+            else
+            {
+                pyramid_up(numpy_rgb_image(img), temp, pyr);
+                unsigned int levels = upsampling_amount-1;
+                while (levels > 0)
+                {
+                    levels--;
+                    pyramid_up(temp);
+                }
+
+                evaluate_detectors(detectors, temp, rect_detections, adjust_threshold);
                 for (unsigned long i = 0; i < rect_detections.size(); ++i)
                     rect_detections[i].rect = pyr.rect_down(rect_detections[i].rect,
                                                             upsampling_amount);
@@ -116,19 +197,23 @@ namespace dlib
         dlib::simple_object_detector& detector,
         boost::python::object img,
         const unsigned int upsampling_amount
+
     )
     {
         std::vector<double> detection_confidences;
         std::vector<double> weight_indices;
+        const double adjust_threshold = 0.0;
 
         return run_detector_with_upscale1(detector, img, upsampling_amount,
+                                          adjust_threshold,
                                           detection_confidences, weight_indices);
     }
 
     inline boost::python::tuple run_rect_detector (
         dlib::simple_object_detector& detector,
         boost::python::object img,
-        const unsigned int upsampling_amount)
+        const unsigned int upsampling_amount,
+        const double adjust_threshold)
     {
         boost::python::tuple t;
 
@@ -137,11 +222,42 @@ namespace dlib
         std::vector<rectangle> rectangles;
 
         rectangles = run_detector_with_upscale1(detector, img, upsampling_amount,
+                                                adjust_threshold,
                                                 detection_confidences, weight_indices);
 
         return boost::python::make_tuple(rectangles,
                                          detection_confidences, weight_indices);
     }
+
+    inline boost::python::tuple run_multiple_rect_detectors (
+        boost::python::list& detectors,
+        boost::python::object img,
+        const unsigned int upsampling_amount,
+        const double adjust_threshold)
+    {
+        boost::python::tuple t;
+
+        std::vector<simple_object_detector > vector_detectors;
+        const unsigned long num_detectors = len(detectors);
+        // Now copy the data into dlib based objects.
+        for (unsigned long i = 0; i < num_detectors; ++i)
+        {
+            vector_detectors.push_back(boost::python::extract<simple_object_detector >(detectors[i]));
+        }
+        
+        std::vector<double> detection_confidences;
+        std::vector<double> weight_indices;
+        std::vector<rectangle> rectangles;
+
+        rectangles = run_detectors_with_upscale1(vector_detectors, img, upsampling_amount,
+                                                adjust_threshold,
+                                                detection_confidences, weight_indices);
+
+        return boost::python::make_tuple(rectangles,
+                                         detection_confidences, weight_indices);
+    }
+
+
 
     struct simple_object_detector_py
     {
