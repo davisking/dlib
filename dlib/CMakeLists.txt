@@ -236,7 +236,7 @@ if (NOT TARGET dlib)
                add_global_define(DLIB_NO_GUI_SUPPORT)
             else()
                # check whether brew cask xquartz is installed; if so, disable GUI support
-               find_path (BREW_XQUARTZ $(brew --prefix)/local/Caskroom/xquartz)
+               find_path (BREW_XQUARTZ $(brew --prefix)/Caskroom/xquartz)
                if (BREW_XQUARTZ)
 	    	         message(" *****************************************************************************")
 	    	         message(" *** DLIB GUI SUPPORT DISABLED BECAUSE X11 DEVELOPMENT LIBRARIES CONFLICT  ***")
