@@ -267,7 +267,6 @@ int main(int argc, char** argv) try
     //dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999), {0,1});
 
     trainer.be_verbose();
-    trainer.set_synchronization_file("mnist_resnet_sync", std::chrono::seconds(100));
     // While the trainer is running it keeps an eye on the training error.  If
     // it looks like the error hasn't decreased for the last 2000 iterations it
     // will automatically reduce the learning rate by 0.1.  You can change these
@@ -277,6 +276,7 @@ int main(int argc, char** argv) try
     trainer.set_learning_rate_shrink_factor(0.1);
     // The learning rate will start at 1e-3.
     trainer.set_learning_rate(1e-3);
+    trainer.set_synchronization_file("mnist_resnet_sync", std::chrono::seconds(100));
 
 
     // Now, what if your training dataset is so big it doesn't fit in RAM?  You

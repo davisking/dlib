@@ -77,6 +77,7 @@
          <term file="dlib/dnn/core_abstract.h.html" name="layer" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="input_layer" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layers" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/core_abstract.h.html" name="visit_layers_until_tag" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameters" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layer_parameter_gradients" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="visit_layers_backwards" include="dlib/dnn.h"/>
@@ -169,6 +170,7 @@
          <term file="linear_algebra.html" name="resize_rect_height" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="centered_rect" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="set_aspect_ratio" include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="set_rect_area" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="center" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="nearest_point" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="nearest_rect" include="dlib/geometry.h"/>
@@ -831,11 +833,8 @@
          <term file="dlib/svm/sparse_vector_abstract.h.html" name="has_unsigned_keys"  include="dlib/sparse_vector.h"/>
 
          <term file="containers.html" name="remover"                 include="dlib/interfaces/remover.h"/>
-         <term file="containers.html" name="scoped_ptr"              include="dlib/smart_pointers.h"/>
          <term file="containers.html" name="set"                     include="dlib/set.h"/>
-         <term file="containers.html" name="shared_ptr"              include="dlib/smart_pointers.h"/>
          <term file="containers.html" name="stack"                   include="dlib/stack.h"/>
-         <term file="containers.html" name="weak_ptr"                include="dlib/smart_pointers.h"/>
          <term file="containers.html" name="any"                     include="dlib/any.h"/>
          <term file="containers.html" name="any_function"            include="dlib/any.h"/>
          <term file="containers.html" name="any_trainer"             include="dlib/any.h"/>
@@ -1356,7 +1355,6 @@
          <term file="containers.html" name="reference_counter"          include="dlib/reference_counter.h"/>
 
          <term file="containers.html" name="sequence"                   include="dlib/sequence.h"/>
-         <term file="containers.html" name="shared_ptr_thread_safe"     include="dlib/smart_pointers_thread_safe.h"/>
          <term file="containers.html" name="sliding_buffer"             include="dlib/sliding_buffer.h"/>
          <term file="containers.html" name="circular_buffer"            include="dlib/sliding_buffer.h"/>
          <term file="containers.html" name="static_map"                 include="dlib/static_map.h"/>

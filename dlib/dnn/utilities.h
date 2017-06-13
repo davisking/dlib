@@ -6,6 +6,7 @@
 #include "core.h"
 #include "utilities_abstract.h"
 #include "../geometry.h"
+#include <fstream>
 
 namespace dlib
 {
@@ -103,9 +104,22 @@ namespace dlib
         std::ostream& out
     )
     {
+        auto old_precision = out.precision(9);
         out << "<net>\n";
         visit_layers(net, impl::visitor_net_to_xml(out));
         out << "</net>\n";
+        // restore the original stream precision.
+        out.precision(old_precision);
+    }
+
+    template <typename net_type>
+    void net_to_xml (
+        const net_type& net,
+        const std::string& filename
+    )
+    {
+        std::ofstream fout(filename);
+        net_to_xml(net, fout);
     }
 
 // ----------------------------------------------------------------------------------------

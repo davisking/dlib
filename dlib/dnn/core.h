@@ -60,6 +60,27 @@ namespace dlib
 
     namespace impl
     {
+        // The reason we return an int for this version rather than doing the more straight forward thing (like we do above) is to avoid a bug in visual studio 2015.
+        template <typename T>
+        auto call_clean_method_if_exists (
+            T& obj,
+            special_
+        ) -> typename int_<decltype(&T::clean)>::type { obj.clean();  return 0;  }
+
+        template <typename T>
+        void call_clean_method_if_exists (T& , general_) {}
+    }
+    template <typename T>
+    void call_clean_method_if_exists(T& obj) { impl::call_clean_method_if_exists(obj, special_()); }
+    /*!
+        ensures
+            - calls obj.clean() if obj has a .clean() method.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
         class repeat_input_layer 
         {
             /*!
@@ -893,6 +914,7 @@ namespace dlib
             temp_tensor.clear();
             gradient_input_is_stale = true;
             subnetwork->clean();
+            call_clean_method_if_exists(details);
         }
 
         friend void serialize(const add_layer& item, std::ostream& out)
@@ -1255,6 +1277,7 @@ namespace dlib
             params_grad.clear();
             temp_tensor.clear();
             gradient_input_is_stale = true;
+            call_clean_method_if_exists(details);
         }
 
         friend void serialize(const add_layer& item, std::ostream& out)
@@ -3473,6 +3496,71 @@ namespace dlib
         static_assert(begin <= end, "Invalid range");
         static_assert(end <= net_type::num_layers, "Invalid range");
         impl::vl_loop_backwards<begin,end>::visit(net, v);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <size_t i, unsigned long tag_id>
+        struct vl_until_tag
+        {
+            template <
+                typename net_type,
+                typename next_net_type,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                next_net_type& next_net,
+                visitor&& v
+            )
+            {
+                v(next_net);
+                vl_until_tag<i+1,tag_id>::visit(net,layer<i+1>(net),v);
+            }
+
+            template <
+                typename net_type,
+                typename SUBNET,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                const add_tag_layer<tag_id,SUBNET>& next_net,
+                visitor&& v
+            )
+            {
+                v(next_net);
+            }
+
+            template <
+                typename net_type,
+                typename SUBNET,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                add_tag_layer<tag_id,SUBNET>& next_net,
+                visitor&& v
+            )
+            {
+                v(next_net);
+            }
+        };
+    }
+
+    template <
+        unsigned long tag_id,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_until_tag(
+        net_type& net,
+        visitor v
+    )
+    {
+        impl::vl_until_tag<0,tag_id>::visit(net, net, v);
     }
 
 // ----------------------------------------------------------------------------------------

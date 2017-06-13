@@ -91,6 +91,17 @@ namespace dlib
             CHECK_CURAND(curandGenerateUniform((curandGenerator_t)handle, data.device(), data.size()));
         }
 
+        void curand_generator::
+        fill (
+            cuda_data_ptr<unsigned int>& data
+        )
+        {
+            if (data.size() == 0)
+                return;
+
+            CHECK_CURAND(curandGenerate((curandGenerator_t)handle, data, data.size()));
+        }
+
     // -----------------------------------------------------------------------------------
 
     }  

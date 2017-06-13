@@ -137,6 +137,54 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void exp (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::exp(dest,src);
+#else
+        dest = exp(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void log (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::log(dest,src);
+#else
+        dest = log(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void log10 (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::log10(dest,src);
+#else
+        dest = log10(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void gemm (
         float beta,
         tensor& dest,

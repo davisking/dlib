@@ -4,6 +4,8 @@
 #ifndef DLIB_DRAWABLe_
 #define DLIB_DRAWABLe_
 
+#include <memory>
+
 #include "drawable_abstract.h"
 #include "../gui_core.h"
 #include "../set.h"
@@ -344,7 +346,7 @@ namespace dlib
         }
 
         virtual void set_main_font (
-            const shared_ptr_thread_safe<font>& f
+            const std::shared_ptr<font>& f
         )
         {
             auto_mutex M(m);
@@ -352,7 +354,7 @@ namespace dlib
             parent.invalidate_rectangle(rect);
         }
 
-        const shared_ptr_thread_safe<font> main_font (
+        const std::shared_ptr<font> main_font (
         ) const
         {
             auto_mutex M(m);
@@ -420,7 +422,7 @@ namespace dlib
         bool enabled;
         const long& lastx;
         const long& lasty;
-        shared_ptr_thread_safe<font> mfont;
+        std::shared_ptr<font> mfont;
 
         
         void enable_events (

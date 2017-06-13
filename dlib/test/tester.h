@@ -17,7 +17,7 @@
 #endif
 
 
-#define DLIB_TEST(_exp) check_test(_exp, __LINE__, __FILE__, #_exp)
+#define DLIB_TEST(_exp) check_test(bool(_exp), __LINE__, __FILE__, #_exp)
 
 #define DLIB_TEST_MSG(_exp,_message)                                        \
     do{increment_test_count(); if ( !(_exp) )                                 \

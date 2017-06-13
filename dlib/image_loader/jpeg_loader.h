@@ -3,12 +3,12 @@
 #ifndef DLIB_JPEG_IMPORT
 #define DLIB_JPEG_IMPORT
 
+#include <vector>
+
 #include "jpeg_loader_abstract.h"
-#include "../smart_pointers.h"
 #include "image_loader.h"
 #include "../pixel.h"
 #include "../dir_nav.h"
-#include <vector>
 
 namespace dlib
 {

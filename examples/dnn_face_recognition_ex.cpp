@@ -19,10 +19,10 @@
     dnn_metric_learning_on_images_ex.cpp examples.
 */
 
+#include <dlib/dnn.h>
 #include <dlib/gui_widgets.h>
 #include <dlib/clustering.h>
 #include <dlib/string.h>
-#include <dlib/dnn.h>
 #include <dlib/image_io.h>
 #include <dlib/image_processing/frontal_face_detector.h>
 
@@ -42,6 +42,7 @@ using namespace std;
 // mini-batches were made larger (35x15 instead of 5x5), the iterations without progress
 // was set to 10000, the jittering you can see below in jitter_image() was used during
 // training, and the training dataset consisted of about 3 million images instead of 55.
+// Also, the input layer was locked to images of size 150.
 template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
 using residual = add_prev1<block<N,BN,1,tag1<SUBNET>>>;
 

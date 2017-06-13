@@ -5,6 +5,11 @@
 
 #include "bayes_utils_abstract.h"
 
+#include <algorithm>
+#include <ctime>
+#include <memory>
+#include <vector>
+
 #include "../string.h"
 #include "../map.h"
 #include "../matrix.h"
@@ -13,11 +18,7 @@
 #include "../set.h"
 #include "../algs.h"
 #include "../noncopyable.h"
-#include "../smart_pointers.h"
 #include "../graph.h"
-#include <vector>
-#include <algorithm>
-#include <ctime>
 
 namespace dlib
 {
@@ -1659,7 +1660,7 @@ namespace dlib
 
     private:
 
-        scoped_ptr<bayesian_network_join_tree_helpers::bnjt> impl;
+        std::unique_ptr<bayesian_network_join_tree_helpers::bnjt> impl;
         unsigned long num_nodes;
 
     };

@@ -1606,6 +1606,12 @@ namespace dlib
             deserialize(item.mask, in);
         }
 
+        void clean(
+        ) 
+        {
+            mask.clear();
+        }
+
         friend std::ostream& operator<<(std::ostream& out, const dropout_& item)
         {
             out << "dropout\t ("
@@ -1886,14 +1892,17 @@ namespace dlib
 
         friend void to_xml(const affine_& item, std::ostream& out)
         {
-            out << "<affine";
             if (item.mode==CONV_MODE)
-                out << " mode='conv'";
+                out << "<affine_con>\n";
             else
-                out << " mode='fc'";
-            out << ">\n";
+                out << "<affine_fc>\n";
+
             out << mat(item.params);
-            out << "</affine>\n";
+
+            if (item.mode==CONV_MODE)
+                out << "</affine_con>\n";
+            else
+                out << "</affine_fc>\n";
         }
 
     private:

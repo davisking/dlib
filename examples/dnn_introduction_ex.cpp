@@ -157,6 +157,11 @@ int main(int argc, char** argv) try
     cout << "testing num_wrong: " << num_wrong << endl;
     cout << "testing accuracy:  " << num_right/(double)(num_right+num_wrong) << endl;
 
+
+    // Finally, you can also save network parameters to XML files if you want to do
+    // something with the network in another tool.  For example, you could use dlib's
+    // tools/convert_dlib_nets_to_caffe to convert the network to a caffe model.
+    net_to_xml(net, "lenet.xml");
 }
 catch(std::exception& e)
 {

@@ -692,6 +692,36 @@ namespace
             cpu::add(2, AA, 3, BB);
             DLIB_TEST_MSG(max(abs(mat(A)-mat(AA) )) < 1e-6, max(abs(mat(A)-mat(AA) )));
         }
+
+        {
+            print_spinner();
+            resizable_tensor dest1(123,456), dest2(123,456);
+            resizable_tensor src1(123,456), src2(123,456);
+
+            tt::tensor_rand rnd;
+
+            rnd.fill_uniform(src1); tt::affine_transform(src1, src1, 1, 2); src2 = src1;  // random in range [2, 3]
+            dest1 = exp(mat(src1));
+            tt::exp(dest2, src2);
+            tt::exp(src2, src2); // should work in place
+            DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2))) < 1e-5, max(abs(mat(dest1)-mat(dest2))));
+            DLIB_TEST(max(abs(mat(dest1)-mat(src2))) < 1e-5);
+
+            rnd.fill_uniform(src1); tt::affine_transform(src1, src1, 1, 2); src2 = src1;  // random in range [2, 3]
+            dest1 = log(mat(src1));
+            tt::log(dest2, src2);
+            tt::log(src2, src2); // should work in place
+            DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-5);
+            DLIB_TEST(max(abs(mat(dest1)-mat(src2))) < 1e-5);
+
+            rnd.fill_uniform(src1); tt::affine_transform(src1, src1, 1, 2); src2 = src1;  // random in range [2, 3]
+            dest1 = log10(mat(src1));
+            tt::log10(dest2, src2);
+            tt::log10(src2, src2); // should work in place
+            DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-5);
+            DLIB_TEST(max(abs(mat(dest1)-mat(src2))) < 1e-5);
+
+        }
     }
 
 // ----------------------------------------------------------------------------------------

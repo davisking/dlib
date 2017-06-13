@@ -358,6 +358,20 @@ namespace dlib
             input_tensor_to_output_tensor().
         !*/
 
+        void clean (
+        );
+        /*!
+            Implementing this function is optional.  If you don't need it then you don't
+            have to provide a clean().  But if you do provide it then it must behave as
+            follows:
+
+            ensures
+                - calling clean() Causes this object to forget about everything except its
+                  parameters.  This is useful if your layer caches information between
+                  forward and backward passes and you want to clean out that cache
+                  information before saving the network to disk.  
+        !*/
+
     };
 
     std::ostream& operator<<(std::ostream& out, const EXAMPLE_COMPUTATIONAL_LAYER_& item);

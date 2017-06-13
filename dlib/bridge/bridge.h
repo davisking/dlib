@@ -3,17 +3,19 @@
 #ifndef DLIB_BRIDGe_Hh_
 #define DLIB_BRIDGe_Hh_
 
-#include "bridge_abstract.h"
+#include <iostream>
+#include <memory>
 #include <string>
+
+#include "bridge_abstract.h"
 #include "../pipe.h"
 #include "../threads.h"
-#include "../smart_pointers.h"
 #include "../serialize.h"
 #include "../sockets.h"
 #include "../sockstreambuf.h"
 #include "../logger.h"
 #include "../algs.h"
-#include <iostream>
+
 
 namespace dlib
 {
@@ -545,8 +547,8 @@ namespace dlib
             signaler s;
             bool receive_thread_active;
             bool transmit_thread_active;
-            scoped_ptr<connection> con;
-            scoped_ptr<listener> list;
+            std::unique_ptr<connection> con;
+            std::unique_ptr<listener> list;
             const unsigned short port;
             const std::string ip;
             transmit_pipe_type* const transmit_pipe;
@@ -656,7 +658,7 @@ namespace dlib
 
     private:
 
-        scoped_ptr<impl_brns::impl_bridge_base> pimpl;
+        std::unique_ptr<impl_brns::impl_bridge_base> pimpl;
     };
 
 // ---------------------------------------------------------------------------------------- 

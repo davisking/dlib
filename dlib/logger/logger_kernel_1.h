@@ -3,20 +3,21 @@
 #ifndef DLIB_LOGGER_KERNEl_1_
 #define DLIB_LOGGER_KERNEl_1_
 
+#include <limits>
+#include <memory>
+#include <cstring>
+#include <streambuf>
+#include <vector>
+
 #include "../threads.h"
 #include "../misc_api.h"
 #include "../set.h"
 #include "logger_kernel_abstract.h"
-#include <limits>
-#include <cstring>
 #include "../algs.h"
 #include "../assert.h"
 #include "../uintn.h"
 #include "../map.h"
-#include "../smart_pointers.h"
 #include "../member_function_pointer.h"
-#include <streambuf>
-#include <vector>
 
 namespace dlib
 {
@@ -445,7 +446,7 @@ namespace dlib
                 level_container ();
 
                 log_level val;
-                map<std::string,scoped_ptr<level_container> >::kernel_1b_c table;
+                map<std::string,std::unique_ptr<level_container> >::kernel_1b_c table;
             } level_table;
 
             const log_level level (
@@ -473,7 +474,7 @@ namespace dlib
             struct auto_flush_container
             {
                 bool val;
-                map<std::string,scoped_ptr<auto_flush_container> >::kernel_1b_c table;
+                map<std::string,std::unique_ptr<auto_flush_container> >::kernel_1b_c table;
             } auto_flush_table;
 
             bool auto_flush (
@@ -501,7 +502,7 @@ namespace dlib
             struct output_streambuf_container
             {
                 std::streambuf* val;
-                map<std::string,scoped_ptr<output_streambuf_container> >::kernel_1b_c table;
+                map<std::string,std::unique_ptr<output_streambuf_container> >::kernel_1b_c table;
             } streambuf_table;
 
             std::streambuf* output_streambuf (
@@ -542,7 +543,7 @@ namespace dlib
             struct output_hook_container
             {
                 hook_mfp val;
-                map<std::string,scoped_ptr<output_hook_container> >::kernel_1b_c table;
+                map<std::string,std::unique_ptr<output_hook_container> >::kernel_1b_c table;
             } hook_table;
 
             hook_mfp output_hook (
@@ -570,7 +571,7 @@ namespace dlib
             struct logger_header_container
             {
                 print_header_type val;
-                map<std::string,scoped_ptr<logger_header_container> >::kernel_1b_c table;
+                map<std::string,std::unique_ptr<logger_header_container> >::kernel_1b_c table;
             } header_table;
 
             print_header_type logger_header (

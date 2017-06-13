@@ -142,6 +142,21 @@ namespace dlib
             const tensor& v2
         );
 
+        void exp (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void log (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void log10 (
+            tensor& dest,
+            const tensor& src
+        );
+
     // ------------------------------------------------------------------------------------
 
         void set_tensor (
