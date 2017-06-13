@@ -976,6 +976,48 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    class tensor_upsample
+    {
+    public:
+        tensor_upsample(const tensor_upsample&) = delete;
+        tensor_upsample& operator=(const tensor_upsample&) = delete;
+
+        tensor_upsample() {}
+
+       
+        void forward(
+            resizable_tensor& output,
+            const tensor& data,
+            int scale_y,
+            int scale_x,
+            unsigned char method
+        ) 
+        {
+            impl.forward(output,data,scale_y,scale_x,method); 
+        }
+
+        void backward (
+            tensor& output,            
+            const tensor& data, 
+            int scale_y,
+            int scale_x,
+            unsigned char method
+        ) 
+        {
+            impl.backward(output,data,scale_y,scale_x,method); 
+        }
+
+  
+    private:
+#ifdef DLIB_USE_CUDA
+        cuda::tensor_upsample impl;
+#else
+        cpu::tensor_upsample impl;
+#endif
+
+    };
+// ----------------------------------------------------------------------------------------
+
     class pooling
     {
         /*!

@@ -767,6 +767,53 @@ namespace
         }
     }
 
+    void test_upsample()
+    {
+        cpu::tensor_upsample up2;
+        cuda::tensor_upsample up;
+        dlib::rand prnd;
+        resizable_tensor data(prnd.get_random_32bit_number()%5+1,
+                prnd.get_random_32bit_number()%5+1,
+                prnd.get_random_32bit_number()%25+1,
+                prnd.get_random_32bit_number()%25+1);
+
+        resizable_tensor output1(data.num_samples(),data.k(),data.nr()*2,data.nc()*2);
+        resizable_tensor output2;
+        output2.copy_size(output1);
+        tt::tensor_rand rnd;
+        rnd.fill_uniform(data);
+        up.forward(output1,data,2,2,0);
+        up2.forward(output2,data,2,2,0);
+        dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
+        DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2))));
+        up.forward(output1,data,2,2,1);
+        up2.forward(output2,data,2,2,1);
+        dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
+        DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2))));
+        up.forward(output1,data,2,2,2);
+        up2.forward(output2,data,2,2,2);
+        dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
+        DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2))));
+        
+        resizable_tensor gradient1,gradient2;        
+        gradient1.copy_size(data);
+        gradient2.copy_size(data);
+        gradient1 = 0;
+        gradient2 = 0;
+        up.backward(gradient1,output1,2,2,0);
+        up2.backward(gradient2,output2,2,2,0);        
+        dlog << LINFO << "backward error: "<< max(abs(mat(gradient1)-mat(gradient2)));
+        DLIB_TEST_MSG(max(abs(mat(gradient1)-mat(gradient2))) < 1e-3, max(abs(mat(gradient1)-mat(gradient2))));
+        up.backward(gradient1,output1,2,2,1);
+        up2.backward(gradient2,output2,2,2,1);        
+        dlog << LINFO << "backward error: "<< max(abs(mat(gradient1)-mat(gradient2)));
+        DLIB_TEST_MSG(max(abs(mat(gradient1)-mat(gradient2))) < 1e-3, max(abs(mat(gradient1)-mat(gradient2))));
+        up.backward(gradient1,output1,2,2,2);
+        up2.backward(gradient2,output2,2,2,2);        
+        dlog << LINFO << "backward error: "<< max(abs(mat(gradient1)-mat(gradient2)));
+        DLIB_TEST_MSG(max(abs(mat(gradient1)-mat(gradient2))) < 1e-3, max(abs(mat(gradient1)-mat(gradient2))));
+    }
+
     void test_conv()
     {
         cuda::tensor_conv conv1;
@@ -1954,6 +2001,7 @@ namespace
 #ifdef DLIB_USE_CUDA
             test_affine_rect();
             test_conv();
+            test_upsample();
             test_more_ops2();
             test_more_ops(1,1);
             test_more_ops(3,4);

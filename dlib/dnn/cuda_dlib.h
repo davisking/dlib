@@ -353,6 +353,38 @@ namespace dlib
                 size_t src_k_offset,
                 size_t count_k
         );
+
+       class tensor_upsample
+        {
+        public:
+            tensor_upsample(const tensor_upsample&) = delete;
+            tensor_upsample& operator=(const tensor_upsample&) = delete;
+
+            tensor_upsample();
+
+            ~tensor_upsample (
+            );
+
+            void forward(
+                resizable_tensor& output,
+                const tensor& data,
+                int scale_y,
+                int scale_x,
+                unsigned char method
+            );
+
+            void backward (
+                tensor& output,            
+                const tensor& data, 
+                int scale_y,
+                int scale_x,
+                unsigned char method
+            ); 
+
+
+        private:
+
+        };
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

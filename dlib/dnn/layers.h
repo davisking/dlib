@@ -597,6 +597,167 @@ namespace dlib
         >
     using cont = add_layer<cont_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
 
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        int _scale_y,
+        int _scale_x,
+        unsigned char _method
+        >
+    class upsample_
+    {
+    public:
+
+        static_assert(_scale_y > 0, "The scale factor must be > 0");
+        static_assert(_scale_x > 0, "The scale factor must be > 0");
+        static_assert(0 <= _method && _method < 3, "The method must be between 0 and 2");
+
+        upsample_(
+        )  
+        {
+        }
+
+        long scale_y() const { return _scale_y; }
+        long scale_x() const { return _scale_x; }
+        unsigned char method() const { return _method; }
+
+
+        inline point map_output_to_input (
+            point p
+        ) const
+        {
+            p.x() = (p.x()/scale_x());
+            p.y() = (p.y()/scale_y());
+            return p;
+        }
+
+        inline point map_input_to_output (
+            point p
+        ) const
+        {
+            p.x() = p.x()*scale_x();
+            p.y() = p.y()*scale_y();
+            return p;
+        }
+
+        upsample_ (
+            const upsample_& item
+        )  
+        {
+            (void)item;
+            // this->conv is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+        }
+
+        upsample_& operator= (
+            const upsample_& item
+        )
+        {
+            if (this == &item)
+                return *this;
+
+            // this->conv is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+            return *this;
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+            (void)sub;
+            params.set_size(0);
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            unsigned int gnr = _scale_y * sub.get_output().nr();
+            unsigned int gnc = _scale_x * sub.get_output().nc();
+            unsigned int gnsamps = sub.get_output().num_samples();
+            unsigned int gk = sub.get_output().k();
+            output.set_size(gnsamps,gk,gnr,gnc);
+            output = 0;
+            ups.forward(output,sub.get_output(),_scale_y,_scale_x,_method);
+        } 
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        {
+            (void)params_grad;
+            ups.backward(sub.get_gradient_input(),gradient_input,_scale_y,_scale_x,_method);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const upsample_& item, std::ostream& out)
+        {
+            serialize("upsample_1", out);
+            serialize(item.params, out);
+            serialize(_scale_y, out);
+            serialize(_scale_x, out);
+            serialize(_method,out);
+        }
+
+        friend void deserialize(upsample_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            int scale_y;
+            int scale_x;
+            unsigned char method;
+            if (version == "upsample_1")
+            {
+                deserialize(item.params, in);
+                deserialize(scale_y, in);
+                deserialize(scale_x, in);
+                deserialize(method,in);
+                if (scale_y != _scale_y) throw serialization_error("Wrong scale_y found while deserializing dlib::upsample_");
+                if (scale_x != _scale_x) throw serialization_error("Wrong scale_x found while deserializing dlib::upsample_");
+            }
+            else
+            {
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::upsample_.");
+            }
+        }
+
+
+        friend std::ostream& operator<<(std::ostream& out, const upsample_& item)
+        {
+            out << "upsample\t ("
+                << "scale_y="<<_scale_y
+                << ", scale_x="<<_scale_x
+                << ", method="<<_method
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const upsample_& item, std::ostream& out)
+        {
+            out << "<upsample"
+                << " scale_y='"<<_scale_y<<"'"
+                << " scale_x='"<<_scale_x<<"'"
+                << " method='>\n"<<_method<<"'";
+            out << mat(item.params);
+            out << "</upsample>";
+        }
+
+    private:
+
+        resizable_tensor params;
+
+        tt::tensor_upsample ups;
+    };
+
+    template <
+        int scale_y,
+        int scale_x,
+        unsigned char method,
+        typename SUBNET
+        >
+    using upsample = add_layer<upsample_<scale_y,scale_x,method>, SUBNET>;
+
 // ----------------------------------------------------------------------------------------
 
     template <
