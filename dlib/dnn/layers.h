@@ -761,6 +761,170 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        int _padding_y,
+        int _padding_x,
+        unsigned char _method
+        >
+    class spatialpadding_
+    {
+    public:
+
+        static_assert(_padding_y > 0, "The padding must be > 0");
+        static_assert(_padding_x > 0, "The padding must be > 0");
+        static_assert(0 <= _method && _method < 3, "The method must be between 0 and 2");
+
+        spatialpadding_(
+        )  
+        {
+        }
+
+        long padding_y() const { return _padding_y; }
+        long padding_x() const { return _padding_x; }
+        unsigned char method() const { return _method; }
+
+
+        inline point map_output_to_input (
+            point p
+        ) const
+        {
+            p.x() = p.x() + 2 * padding_x();
+            p.y() = p.y() + 2 * padding_y();
+            return p;
+        }
+
+        inline point map_input_to_output (
+            point p
+        ) const
+        {
+            p.x() = p.x() - 2 * padding_x();
+            p.y() = p.y() - 2 * padding_y();
+            return p;
+        }
+
+        spatialpadding_ (
+            const spatialpadding_& item
+        )  
+        {
+            (void)item;
+            // this->conv is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+        }
+
+        spatialpadding_& operator= (
+            const spatialpadding_& item
+        )
+        {
+            if (this == &item)
+                return *this;
+
+            // this->conv is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+            return *this;
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+            (void)sub;
+            params.set_size(0);
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            unsigned int gnr = sub.get_output().nr() + 2 * padding_y();
+            unsigned int gnc = sub.get_output().nc() + 2 * padding_x();
+            unsigned int gnsamps = sub.get_output().num_samples();
+            unsigned int gk = sub.get_output().k();
+            output.set_size(gnsamps,gk,gnr,gnc);
+            output = 0;
+            pad.forward(output,sub.get_output(),_padding_y,_padding_x,_method);
+        } 
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        {
+            (void)params_grad;
+            resizable_tensor temp;
+            temp.copy_size(sub.get_gradient_input());
+            pad.backward(temp,gradient_input,_padding_y,_padding_x,_method);
+            tt::add(1,sub.get_gradient_input(),1,temp);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const spatialpadding_& item, std::ostream& out)
+        {
+            serialize("spatialpadding_1", out);
+            serialize(item.params, out);
+            serialize(_padding_y, out);
+            serialize(_padding_x, out);
+            serialize(_method,out);
+        }
+
+        friend void deserialize(spatialpadding_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            int padding_y;
+            int padding_x;
+            unsigned char method;
+            if (version == "spatialpadding_1")
+            {
+                deserialize(item.params, in);
+                deserialize(padding_y, in);
+                deserialize(padding_x, in);
+                deserialize(method,in);
+                if (padding_y != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::spatialpadding_");
+                if (padding_x != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::spatialpadding_");
+            }
+            else
+            {
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::spatialpadding_.");
+            }
+        }
+
+
+        friend std::ostream& operator<<(std::ostream& out, const spatialpadding_& item)
+        {
+            out << "spatialpadding\t ("
+                << "padding_y="<<_padding_y
+                << ", padding_x="<<_padding_x
+                << ", method="<<_method
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const spatialpadding_& item, std::ostream& out)
+        {
+            out << "<spatialpadding"
+                << " padding_y='"<<_padding_y<<"'"
+                << " padding_x='"<<_padding_x<<"'"
+                << " method='>\n"<<_method<<"'";
+            out << mat(item.params);
+            out << "</spatialpadding>";
+        }
+
+    private:
+
+        resizable_tensor params;
+
+        tt::tensor_padding pad;
+    };
+
+    template <
+        int padding_y,
+        int padding_x,
+        unsigned char method,
+        typename SUBNET
+        >
+    using spatialpadding = add_layer<spatialpadding_<padding_y,padding_x,method>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+
+    template <
         long _nr,
         long _nc,
         int _stride_y,

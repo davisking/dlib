@@ -385,6 +385,38 @@ namespace dlib
         private:
 
         };
+
+        class tensor_padding
+        {
+        public:
+            tensor_padding(const tensor_padding&) = delete;
+            tensor_padding& operator=(const tensor_padding&) = delete;
+
+            tensor_padding();
+
+            ~tensor_padding (
+            );
+
+            void forward(
+                resizable_tensor& output,
+                const tensor& data,
+                int padding_y,
+                int padding_x,
+                unsigned char method
+            );
+
+            void backward (
+                tensor& output,            
+                const tensor& data, 
+                int padding_y,
+                int padding_x,
+                unsigned char method
+            ); 
+
+
+        private:
+
+        };
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

@@ -1018,6 +1018,48 @@ namespace dlib { namespace tt
     };
 // ----------------------------------------------------------------------------------------
 
+    class tensor_padding
+    {
+    public:
+        tensor_padding(const tensor_padding&) = delete;
+        tensor_padding& operator=(const tensor_padding&) = delete;
+
+        tensor_padding() {}
+
+       
+        void forward(
+            resizable_tensor& output,
+            const tensor& data,
+            int padding_y,
+            int padding_x,
+            unsigned char method
+        ) 
+        {
+            impl.forward(output,data,padding_y,padding_x,method); 
+        }
+
+        void backward (
+            tensor& output,            
+            const tensor& data, 
+            int padding_y,
+            int padding_x,
+            unsigned char method
+        ) 
+        {
+            impl.backward(output,data,padding_y,padding_x,method); 
+        }
+
+  
+    private:
+#ifdef DLIB_USE_CUDA
+        cuda::tensor_padding impl;
+#else
+        cpu::tensor_padding impl;
+#endif
+
+    };
+// ----------------------------------------------------------------------------------------
+
     class pooling
     {
         /*!

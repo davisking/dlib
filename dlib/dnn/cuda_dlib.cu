@@ -12,6 +12,9 @@ namespace dlib
 
        const unsigned char UPSAMPLE_POINT = 1;
        const unsigned char UPSAMPLE_LINEAR = 2;
+
+       const unsigned char PADDING_REFLECTION = 1;
+       const unsigned char PADDING_REPLICATION = 2;
     // -----------------------------------------------------------------------------------
 
         void set_device (
@@ -1438,6 +1441,212 @@ namespace dlib
         }
 
     // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_padrefl(float* out, const float* in, 
+                                         size_t nr, 
+                                         size_t nr2,
+                                         size_t nc, 
+                                         size_t nc2,
+                                         size_t padding_y,
+                                         size_t padding_x)
+        {
+
+            for (auto r : grid_stride_range_y(0, nr))
+            {
+                auto r2 = r;               
+                if (r2 < padding_y) 
+                    r2 = padding_y - r - 1;
+                else
+                    r2 = r - padding_y;
+                if (r2 > nr2 -1)
+                    r2 = nr2 - 1 - (r2 - nr2); 
+
+                for (auto c : grid_stride_range(0, nc))
+                {
+                    auto c2 = c;
+                    if (c2 < padding_x) 
+                        c2 = padding_x - c - 1;
+                    else
+                        c2 = c - padding_x;
+                    if (c2 > nc2 -1)
+                        c2 = nc2 - 1 - (c2 - nc2); 
+                    auto i = r * nc + c;                    
+                    auto j = r2 * nc2 + c2;                    
+                    out[i] = in[j];
+                }
+            }
+        }
+
+        __global__ void _cuda_padedge(float* out, const float* in, 
+                                      size_t nr, 
+                                      size_t nr2,
+                                      size_t nc, 
+                                      size_t nc2,
+                                      size_t padding_y,
+                                      size_t padding_x)
+        {
+
+            for (auto r : grid_stride_range_y(0, nr))
+            {
+                auto r2 = r;               
+                if (r2 < padding_y) 
+                    r2 = 0;
+                else
+                    r2 = r - padding_y;
+                if (r2 > nr2 -1)
+                    r2 = nr2 - 1; 
+
+                for (auto c : grid_stride_range(0, nc))
+                {
+                    auto c2 = c;
+                    if (c2 < padding_x) 
+                        c2 = 0;
+                    else
+                        c2 = c - padding_x;
+                    if (c2 > nc2-1)
+                        c2 = nc2 - 1; 
+                    auto i = r * nc + c;                    
+                    auto j = r2 * nc2 + c2;                    
+                    out[i] = in[j];
+                }
+            }
+        }
+
+        __global__ void _cuda_copy_block(float* out, const float* in, 
+                                         size_t nr, 
+                                         size_t nc, 
+                                         size_t nc2,
+                                         size_t padding_y,
+                                         size_t padding_x)
+        {
+
+            for (auto r : grid_stride_range_y(0, nr))
+            {
+                for (auto c : grid_stride_range(0, nc))
+                {
+                    auto i = (r + padding_y) * nc2 + (c + padding_x);                    
+                    auto j = r * nc + c;                    
+                    out[i] = in[j];
+                }
+            }
+        }
+
+        __global__ void _cuda_copy_block_reverse(float* out, const float* in, 
+                                                 size_t nr, 
+                                                 size_t nc, 
+                                                 size_t nc2,
+                                                 size_t padding_y,
+                                                 size_t padding_x)
+        {
+
+            for (auto r : grid_stride_range_y(0, nr))
+            {
+                for (auto c : grid_stride_range(0, nc))
+                {
+                    auto i = r * nc + c;                    
+                    auto j = (r + padding_y) * nc2 + (c + padding_x);                    
+                    out[i] = in[j];
+                }
+            }
+        }
+
+        tensor_padding::
+        tensor_padding(
+        )  
+        {
+        }
+
+
+        tensor_padding::
+        ~tensor_padding (
+        )
+        {
+        }
+        
+        void tensor_padding::forward(
+            resizable_tensor& output,
+            const tensor& data,
+            int padding_y,
+            int padding_x,
+            unsigned char method
+        )
+        {
+            DLIB_CASSERT(output.num_samples() == data.num_samples());
+            DLIB_CASSERT(output.k() == data.k());
+            output = 0;
+            dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
+            dim3 threads(32,32);
+            switch(method)
+            {
+                case PADDING_REFLECTION:
+                {
+                    for (long n = 0; n < data.num_samples(); n++)
+                    {
+                        for (long k = 0; k < data.k(); k++)
+                        {
+                            float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
+                            const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
+                            _cuda_padrefl<<<blocks,threads>>>(dest_p,src_p,output.nr(),data.nr(),
+                                                                 output.nc(),data.nc(),padding_y,padding_x);       
+                        }
+                    }
+                }
+                break;
+                case PADDING_REPLICATION:
+                {
+                    for (long n = 0; n < data.num_samples(); n++)
+                    {
+                        for (long k = 0; k < data.k(); k++)
+                        {
+                            float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
+                            const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
+                            _cuda_padedge<<<blocks,threads>>>(dest_p,src_p,output.nr(), data.nr(),
+                                                              output.nc(),data.nc(),padding_y,padding_x);       
+
+                        }
+                    }
+                }
+                break;                
+                default:
+                {
+                    for (long n = 0; n < data.num_samples(); n++)
+                    {
+                        for (long k = 0; k < data.k(); k++)
+                        {
+                            float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
+                            const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
+                            _cuda_copy_block<<<blocks,threads>>>(dest_p,src_p,data.nr(),
+                                                                 data.nc(),output.nc(),padding_y,padding_x);       
+                        }
+                    }  
+                }
+            }
+        }
+
+        void tensor_padding::backward (
+                tensor& output,            
+                const tensor& data, 
+                int padding_y,
+                int padding_x,
+                unsigned char method
+            )
+        {
+            DLIB_CASSERT(output.num_samples() == data.num_samples());
+            DLIB_CASSERT(output.k() == data.k());
+            dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
+            dim3 threads(32,32);
+            for (long n = 0; n < data.num_samples(); n++)
+            {
+                for (long k = 0; k < data.k(); k++)
+                {
+                    float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
+                    const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
+                    _cuda_copy_block_reverse<<<blocks,threads>>>(dest_p,src_p,output.nr(),
+                                                                 output.nc(),data.nc(),padding_y,padding_x);       
+
+                }
+            }
+        }
     }
 }
 
