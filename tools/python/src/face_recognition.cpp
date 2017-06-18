@@ -30,9 +30,9 @@ public:
         cropper = make_shared<random_cropper>();
         cropper->set_chip_dims(150,150);
         cropper->set_randomly_flip(true);
-        cropper->set_max_object_height(0.99999);
+        cropper->set_max_object_size(0.99999);
         cropper->set_background_crops_fraction(0);
-        cropper->set_min_object_height(0.97);
+        cropper->set_min_object_size(0.97);
         cropper->set_translate_amount(0.02);
         cropper->set_max_rotation_degrees(3);
     }
