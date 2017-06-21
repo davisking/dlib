@@ -5063,9 +5063,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
                     << "            this = "<<classname<<"(); \n"
                     << "            this.load_obj(in); \n"
                     << "        end          \n"
-                    << "    end \n"
-                    << "end \n";
+                    << "    end \n";
             }
+            cout << "end \n";
         }
         else if (nrhs == 1) 
         {
