@@ -950,63 +950,10 @@ namespace dlib
             clear();
         }
 
-        void tensor_conv::forward_without_setup(
-            resizable_tensor& output,
-            const tensor& data,
-            const tensor& filters
-        )
-        {
-            DLIB_CASSERT(is_same_object(output,data) == false);
-            DLIB_CASSERT(is_same_object(output,filters) == false);
-            DLIB_CASSERT(filters.k() == data.k());
-            DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
-                "Filter windows must be small enough to fit into the padded image."
-                << "\n\t filters.nc(): " << filters.nc() 
-                << "\n\t data.nc():  " << data.nc() 
-                << "\n\t padding_x: " << padding_x 
-                );
-            DLIB_CASSERT(filters.nr() <= data.nr() + 2*padding_y,
-                "Filter windows must be small enough to fit into the padded image."
-                << "\n\t filters.nr(): " << filters.nr() 
-                << "\n\t data.nr():  " << data.nr() 
-                << "\n\t padding_y: " << padding_y 
-                );
-            output.set_size(out_num_samples, out_k, out_nr, out_nc);
-
-            DLIB_ASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
-            DLIB_ASSERT(output.k() == filters.num_samples());
-            DLIB_ASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y);
-            DLIB_ASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x);
-
-
-
-            const float alpha = 1;
-            const float beta = 0;
-            CHECK_CUDNN(cudnnConvolutionForward(
-                    context(),
-                    &alpha,
-                    descriptor(data),
-                    data.device(),
-                    (const cudnnFilterDescriptor_t)filter_handle,
-                    filters.device(),
-                    (const cudnnConvolutionDescriptor_t)conv_handle,
-                    (cudnnConvolutionFwdAlgo_t)forward_algo,
-                    forward_workspace,
-                    forward_workspace_size_in_bytes,
-                    &beta,
-                    descriptor(output),
-                    output.device()));
-
-        }
-
         void tensor_conv::operator() (
             resizable_tensor& output,
             const tensor& data,
-            const tensor& filters,
-            int stride_y,
-            int stride_x,
-            int padding_y,
-            int padding_x
+            const tensor& filters
         )
         {
             DLIB_CASSERT(is_same_object(output,data) == false);
@@ -1026,8 +973,6 @@ namespace dlib
                 << "\n\t padding_y: " << padding_y 
                 );
 
-
-            setup(data,filters,stride_y,stride_x,padding_y,padding_x);
 
             output.set_size(out_num_samples, out_k, out_nr, out_nc);
 

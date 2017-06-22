@@ -205,11 +205,7 @@ namespace dlib
             void operator() (
                 resizable_tensor& output,
                 const tensor& data,
-                const tensor& filters,
-                int stride_y,
-                int stride_x,
-                int padding_y,
-                int padding_x
+                const tensor& filters
             );
             /*!
                 requires
@@ -278,11 +274,6 @@ namespace dlib
                 int padding_y,
                 int padding_x
             );
-
-          void forward_without_setup(
-            resizable_tensor& output,
-            const tensor& data,
-            const tensor& filters);
 
         private:
 

@@ -805,8 +805,10 @@ namespace
                 padding_y = (filters.nr()-data.nr()+1)/2;
             if (!(filters.nc() <= data.nc() + 2*padding_x))
                 padding_x = (filters.nc()-data.nc()+1)/2;
-            conv1(output1, data, filters, stride_y,stride_x, padding_y, padding_x);
-            conv2(output2, data, filters, stride_y,stride_x, padding_y, padding_x);
+            conv1.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
+            conv1(output1, data, filters);
+            conv2.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
+            conv2(output2, data, filters);
             dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
             DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2)))
                  <<"\n\t padding_y: "<< padding_y 
