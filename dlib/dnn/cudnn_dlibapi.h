@@ -205,11 +205,7 @@ namespace dlib
             void operator() (
                 resizable_tensor& output,
                 const tensor& data,
-                const tensor& filters,
-                int stride_y,
-                int stride_x,
-                int padding_y,
-                int padding_x
+                const tensor& filters
             );
             /*!
                 requires
@@ -270,9 +266,7 @@ namespace dlib
                       and assigns this gradient to filters_gradient.
             !*/
 
-        private:
-
-            void setup(
+           void setup(
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
@@ -280,6 +274,9 @@ namespace dlib
                 int padding_y,
                 int padding_x
             );
+
+        private:
+
             /*!
                 requires
                     - filters.k() == data.k()

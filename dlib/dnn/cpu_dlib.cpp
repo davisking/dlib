@@ -1739,43 +1739,32 @@ namespace dlib
             }
         }
 
+
         void tensor_conv::operator() (
             resizable_tensor& output,
             const tensor& data,
-            const tensor& filters,
-            int stride_y,
-            int stride_x,
-            int padding_y,
-            int padding_x
+            const tensor& filters
         )
         {
             DLIB_CASSERT(is_same_object(output,data) == false);
             DLIB_CASSERT(is_same_object(output,filters) == false);
             DLIB_CASSERT(filters.k() == data.k());
-            DLIB_CASSERT(stride_y > 0 && stride_x > 0);
-            DLIB_CASSERT(0 <= padding_y && padding_y < filters.nr());
-            DLIB_CASSERT(0 <= padding_x && padding_x < filters.nc());
-            DLIB_CASSERT(filters.nr() <= data.nr() + 2*padding_y,
+            DLIB_CASSERT(filters.nr() <= data.nr() + 2*last_padding_y,
                 "Filter windows must be small enough to fit into the padded image.");
-            DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
+            DLIB_CASSERT(filters.nc() <= data.nc() + 2*last_padding_x,
                 "Filter windows must be small enough to fit into the padded image.");
 
             output.set_size(data.num_samples(),
                             filters.num_samples(),
-                            1+(data.nr()+2*padding_y-filters.nr())/stride_y,
-                            1+(data.nc()+2*padding_x-filters.nc())/stride_x);
+                            1+(data.nr()+2*last_padding_y-filters.nr())/last_stride_y,
+                            1+(data.nc()+2*last_padding_x-filters.nc())/last_stride_x);
 
             matrix<float> temp;
             for (long n = 0; n < data.num_samples(); ++n)
             {
-                img2col(temp, data, n, filters.nr(), filters.nc(), stride_y, stride_x, padding_y, padding_x);
+                img2col(temp, data, n, filters.nr(), filters.nc(), last_stride_y, last_stride_x, last_padding_y, last_padding_x);
                 output.set_sample(n, mat(filters)*trans(temp));
             }
-
-            last_stride_y = stride_y;
-            last_stride_x = stride_x;
-            last_padding_y = padding_y;
-            last_padding_x = padding_x;
         }
 
     // ------------------------------------------------------------------------------------
@@ -1824,7 +1813,7 @@ namespace dlib
                     filters_gradient += gi*temp;
             }
         }
-    // ------------------------------------------------------------------------------------
+     // ------------------------------------------------------------------------------------
     void copy_tensor(
             tensor& dest,
             size_t dest_k_offset,

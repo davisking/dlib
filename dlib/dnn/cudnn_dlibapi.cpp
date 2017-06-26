@@ -953,11 +953,7 @@ namespace dlib
         void tensor_conv::operator() (
             resizable_tensor& output,
             const tensor& data,
-            const tensor& filters,
-            int stride_y,
-            int stride_x,
-            int padding_y,
-            int padding_x
+            const tensor& filters
         )
         {
             DLIB_CASSERT(is_same_object(output,data) == false);
@@ -977,8 +973,6 @@ namespace dlib
                 << "\n\t padding_y: " << padding_y 
                 );
 
-
-            setup(data,filters,stride_y,stride_x,padding_y,padding_x);
 
             output.set_size(out_num_samples, out_k, out_nr, out_nc);
 
