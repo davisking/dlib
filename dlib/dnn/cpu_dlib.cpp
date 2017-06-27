@@ -1739,9 +1739,24 @@ namespace dlib
             }
         }
 
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters
+        )
+        {
+            DLIB_CASSERT(last_stride_y > 0 && last_stride_x > 0, "You must call setup() before calling this function.");
+            output.set_size(data.num_samples(),
+                            filters.num_samples(),
+                            1+(data.nr()+2*last_padding_y-filters.nr())/last_stride_y,
+                            1+(data.nc()+2*last_padding_x-filters.nc())/last_stride_x);
+            (*this)(add_to_output, static_cast<tensor&>(output),data,filters);
+        }
 
         void tensor_conv::operator() (
-            resizable_tensor& output,
+            const bool add_to_output,
+            tensor& output,
             const tensor& data,
             const tensor& filters
         )
@@ -1749,21 +1764,27 @@ namespace dlib
             DLIB_CASSERT(is_same_object(output,data) == false);
             DLIB_CASSERT(is_same_object(output,filters) == false);
             DLIB_CASSERT(filters.k() == data.k());
+            DLIB_CASSERT(last_stride_y > 0 && last_stride_x > 0, "You must call setup() before calling this function.");
             DLIB_CASSERT(filters.nr() <= data.nr() + 2*last_padding_y,
                 "Filter windows must be small enough to fit into the padded image.");
             DLIB_CASSERT(filters.nc() <= data.nc() + 2*last_padding_x,
                 "Filter windows must be small enough to fit into the padded image.");
 
-            output.set_size(data.num_samples(),
-                            filters.num_samples(),
-                            1+(data.nr()+2*last_padding_y-filters.nr())/last_stride_y,
-                            1+(data.nc()+2*last_padding_x-filters.nc())/last_stride_x);
+            DLIB_CASSERT(output.num_samples() == data.num_samples());
+            DLIB_CASSERT(output.k() == filters.num_samples());
+            DLIB_CASSERT(output.nr() == 1+(data.nr()+2*last_padding_y-filters.nr())/last_stride_y);
+            DLIB_CASSERT(output.nc() == 1+(data.nc()+2*last_padding_x-filters.nc())/last_stride_x);
+
 
             matrix<float> temp;
             for (long n = 0; n < data.num_samples(); ++n)
             {
                 img2col(temp, data, n, filters.nr(), filters.nc(), last_stride_y, last_stride_x, last_padding_y, last_padding_x);
-                output.set_sample(n, mat(filters)*trans(temp));
+
+                if (add_to_output)
+                    output.add_to_sample(n, mat(filters)*trans(temp));
+                else 
+                    output.set_sample(n, mat(filters)*trans(temp));
             }
         }
 
@@ -1771,12 +1792,15 @@ namespace dlib
 
         void tensor_conv::
         get_gradient_for_data (
+            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& filters,
             tensor& data_gradient
         )
         {
             matrix<float> temp;
+            if (!add_to_output)
+                data_gradient = 0;
             for (long n = 0; n < gradient_input.num_samples(); ++n)
             {
                 auto gi = mat(gradient_input.host()+gradient_input.k()*gradient_input.nr()*gradient_input.nc()*n,
@@ -1793,6 +1817,7 @@ namespace dlib
 
         void tensor_conv::
         get_gradient_for_filters (
+            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& data,
             tensor& filters_gradient
@@ -1808,9 +1833,16 @@ namespace dlib
 
                 img2col(temp, data, n, filters_gradient.nr(), filters_gradient.nc(), last_stride_y, last_stride_x, last_padding_y, last_padding_x);
                 if (n == 0)
-                    filters_gradient = gi*temp;
+                {
+                    if (add_to_output)
+                        filters_gradient += gi*temp;
+                    else
+                        filters_gradient = gi*temp;
+                }
                 else
+                {
                     filters_gradient += gi*temp;
+                }
             }
         }
      // ------------------------------------------------------------------------------------

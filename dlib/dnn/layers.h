@@ -142,6 +142,7 @@ namespace dlib
 
             // set the initial bias values to zero
             biases(params,filters.size()) = 0;
+
         }
 
         template <typename SUBNET>
@@ -153,8 +154,7 @@ namespace dlib
                        _stride_x,
                        padding_y_,
                        padding_x_);
-            
-            conv(output,
+            conv(false, output,
                 sub.get_output(),
                 filters(params,0));
 
@@ -164,12 +164,12 @@ namespace dlib
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
-            conv.get_gradient_for_data (gradient_input, filters(params,0), sub.get_gradient_input());
+            conv.get_gradient_for_data (true, gradient_input, filters(params,0), sub.get_gradient_input());
             // no point computing the parameter gradients if they won't be used.
             if (learning_rate_multiplier != 0)
             {
                 auto filt = filters(params_grad,0);
-                conv.get_gradient_for_filters (gradient_input, sub.get_output(), filt);
+                conv.get_gradient_for_filters (false, gradient_input, sub.get_output(), filt);
                 auto b = biases(params_grad, filters.size());
                 tt::assign_conv_bias_gradient(b, gradient_input);
             }
@@ -443,26 +443,21 @@ namespace dlib
             unsigned int gnsamps = sub.get_output().num_samples();
             unsigned int gk = filt.k();
             output.set_size(gnsamps,gk,gnr,gnc);
-            output = 0;
             conv.setup(output,filt,_stride_y,_stride_x,padding_y_,padding_x_);
-            conv.get_gradient_for_data(sub.get_output(),filt,output);            
+            conv.get_gradient_for_data(false, sub.get_output(),filt,output);            
             tt::add(1,output,1,biases(params,filters.size()));
         } 
 
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
-            resizable_tensor temp;
-            temp.copy_size(sub.get_gradient_input());
             auto filt = filters(params,0);           
-            conv(temp,gradient_input, filt);
-            // need to add the new gradients on top of the previous ones
-            tt::add(1,sub.get_gradient_input(),1,temp);
+            conv(true, sub.get_gradient_input(),gradient_input, filt);
             // no point computing the parameter gradients if they won't be used.
             if (learning_rate_multiplier != 0)
             {
                 auto filt = filters(params_grad,0);                
-                conv.get_gradient_for_filters (sub.get_output(),gradient_input, filt);
+                conv.get_gradient_for_filters (false, sub.get_output(),gradient_input, filt);
                 auto b = biases(params_grad, filters.size());
                 tt::assign_conv_bias_gradient(b, gradient_input);
             }
@@ -566,7 +561,7 @@ namespace dlib
                 << " padding_y='"<<item.padding_y_<<"'"
                 << " padding_x='"<<item.padding_x_<<"'"
                 << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'"
-                << " weight_decay_46mult='"<<item.weight_decay_multiplier<<"'"
+                << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'"
                 << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'"
                 << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'>\n";
             out << mat(item.params);

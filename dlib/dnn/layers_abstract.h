@@ -864,17 +864,21 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  In particular, it defines a transposed convolution layer 
-                that takes an input tensor (nominally representing an image) and 
-                transpose convolves (deconvolves) it with a set of filters and then outputs the results. 
-                This is basically a convolutional layer with reversed forward/backward passes
+                defined above.  In particular, it defines a transposed convolution layer
+                that takes an input tensor and transpose convolves (sometimes called
+                "deconvolution") it with a set of filters and then outputs the results. 
+
+                This is essentially a convolutional layer that allows fractional strides.
+                Therefore, you can make output tensors that are larger than the input
+                tensors using this layer type. 
+
                 
                 The dimensions of the tensors output by this layer are as follows (letting
                 IN be the input tensor and OUT the output tensor):
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == num_filters()
-                    - OUT.nr() == stride_y * (IN.nr() -1) + nr) - 2*padding_y
-                    - OUT.nc() == stride_x * (IN.nc() -1) + nc) - 2*padding_x
+                    - OUT.nr() == stride_y()*(IN.nr()-1) + nr() - 2*padding_y()
+                    - OUT.nc() == stride_x()*(IN.nc()-1) + nc() - 2*padding_x()
         !*/
 
     public:
@@ -923,8 +927,8 @@ namespace dlib
         /*!
             ensures
                 - returns the vertical stride used when convolving the filters over an
-                  image.  That is, each filter will be moved stride_y() pixels down at a
-                  time when it moves over the image.
+                  image.  That is, each filter will be moved 1.0/stride_y() pixels down at
+                  a time when it moves over the image.
         !*/
 
         long stride_x(
@@ -932,8 +936,8 @@ namespace dlib
         /*!
             ensures
                 - returns the horizontal stride used when convolving the filters over an
-                  image.  That is, each filter will be moved stride_x() pixels right at a
-                  time when it moves over the image.
+                  image.  That is, each filter will be moved 1.0/stride_x() pixels right at
+                  a time when it moves over the image.
         !*/
 
         long padding_y(

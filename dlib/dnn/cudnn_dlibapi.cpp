@@ -951,7 +951,21 @@ namespace dlib
         }
 
         void tensor_conv::operator() (
+            const bool add_to_output,
             resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters
+        )
+        {
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
+
+            output.set_size(out_num_samples, out_k, out_nr, out_nc);
+            (*this)(add_to_output, static_cast<tensor&>(output), data, filters);
+        }
+
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            tensor& output,
             const tensor& data,
             const tensor& filters
         )
@@ -959,7 +973,7 @@ namespace dlib
             DLIB_CASSERT(is_same_object(output,data) == false);
             DLIB_CASSERT(is_same_object(output,filters) == false);
             DLIB_CASSERT(filters.k() == data.k());
-            DLIB_CASSERT(stride_y > 0 && stride_x > 0);
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
             DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
                 "Filter windows must be small enough to fit into the padded image."
                 << "\n\t filters.nc(): " << filters.nc() 
@@ -974,17 +988,15 @@ namespace dlib
                 );
 
 
-            output.set_size(out_num_samples, out_k, out_nr, out_nc);
-
-            DLIB_ASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
-            DLIB_ASSERT(output.k() == filters.num_samples());
-            DLIB_ASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y);
-            DLIB_ASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x);
+            DLIB_CASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
+            DLIB_CASSERT(output.k() == filters.num_samples());
+            DLIB_CASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y);
+            DLIB_CASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x);
 
 
 
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = add_to_output ? 1 : 0;
             CHECK_CUDNN(cudnnConvolutionForward(
                     context(),
                     &alpha,
@@ -1002,13 +1014,14 @@ namespace dlib
         }
 
         void tensor_conv::get_gradient_for_data (
+            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& filters,
             tensor& data_gradient
         )
         {
             const float alpha = 1;
-            const float beta = 1;
+            const float beta = add_to_output ? 1 : 0;
 
 
             CHECK_CUDNN(cudnnConvolutionBackwardData(context(),
@@ -1028,13 +1041,14 @@ namespace dlib
 
         void tensor_conv::
         get_gradient_for_filters (
+            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& data,
             tensor& filters_gradient
         )
         {
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = add_to_output ? 1 : 0;
             CHECK_CUDNN(cudnnConvolutionBackwardFilter(context(),
                                                     &alpha,
                                                     descriptor(data),
