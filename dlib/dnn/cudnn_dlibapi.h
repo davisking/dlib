@@ -203,76 +203,34 @@ namespace dlib
             );
 
             void operator() (
+                const bool add_to_output,
+                tensor& output,
+                const tensor& data,
+                const tensor& filters
+            );
+
+            void operator() (
+                const bool add_to_output,
                 resizable_tensor& output,
                 const tensor& data,
-                const tensor& filters,
-                int stride_y,
-                int stride_x,
-                int padding_y,
-                int padding_x
+                const tensor& filters
             );
-            /*!
-                requires
-                    - stride_y > 0
-                    - stride_x > 0
-                    - 0 <= padding_y < filters.nr()
-                    - 0 <= padding_x < filters.nc()
-                    - is_same_object(output,data) == false
-                    - is_same_object(output,filters) == false
-                ensures
-                    - convolves filters over data.  
-                    - filters contains filters.num_samples() filters. 
-                    - #output.num_samples() == data.num_samples()
-                    - #output.k() == filters.num_samples()
-                    - #output.nr() == 1+(data.nr()-filters.nr()%2)/stride_y
-                    - #output.nc() == 1+(data.nc()-filters.nc()%2)/stride_x
-            !*/
 
             void get_gradient_for_data (
+                const bool add_to_output,
                 const tensor& gradient_input, 
                 const tensor& filters,
                 tensor& data_gradient
             );
-            /*!
-                requires
-                    - filters has the same dimensions as the filters object give to the 
-                      last call to operator().
-                    - data_gradient has the same dimensions as the data object give to the
-                      last call to operator().
-                    - gradient_input has the same dimensions as the output of operator().
-                    - is_same_object(data_gradient,filters) == false
-                    - is_same_object(data_gradient,gradient_input) == false
-                ensures
-                    - let OUT be the output of (*this)(OUT,data,filters).
-                    - let f(data,filters) == dot(OUT, gradient_input)
-                    - This function finds the gradient of f() with respect to data
-                      and adds this gradient to data_gradient.
-            !*/
 
             void get_gradient_for_filters (
+                const bool add_to_output,
                 const tensor& gradient_input, 
                 const tensor& data,
                 tensor& filters_gradient
             );
-            /*!
-                requires
-                    - filters_gradient has the same dimensions as the filters object give
-                      to the last call to operator().
-                    - data has the same dimensions as the data object give to the last call
-                      to operator().
-                    - gradient_input has the same dimensions as the output of operator().
-                    - is_same_object(filters_gradient,data) == false
-                    - is_same_object(filters_gradient,gradient_input) == false
-                ensures
-                    - let OUT be the output of (*this)(OUT,data,filters).
-                    - let f(data,filters) == dot(OUT, gradient_input)
-                    - This function finds the gradient of f() with respect to filters 
-                      and assigns this gradient to filters_gradient.
-            !*/
 
-        private:
-
-            void setup(
+           void setup(
                 const tensor& data,
                 const tensor& filters,
                 int stride_y,
@@ -280,14 +238,8 @@ namespace dlib
                 int padding_y,
                 int padding_x
             );
-            /*!
-                requires
-                    - filters.k() == data.k()
-                    - stride_y > 0
-                    - stride_x > 0
-                    - 0 <= padding_y < filters.nr()
-                    - 0 <= padding_x < filters.nc()
-            !*/
+
+        private:
 
             // These variables record the type of data given to the last call to setup().
             int stride_y;
