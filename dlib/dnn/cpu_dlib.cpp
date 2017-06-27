@@ -1636,8 +1636,127 @@ namespace dlib
                     }
                 }
             }
-
         }
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
+        upsampling::upsampling (
+        ) : repeat_height(1),repeat_width(1)
+        {
+        }
+
+        void upsampling::
+        clear(
+        )
+        {
+            repeat_height = 1;
+            repeat_width = 1;
+        }
+
+        void upsampling::
+        setup_block_upsampling(
+            int repeat_height_,
+            int repeat_width_
+        )
+        {
+            DLIB_CASSERT(repeat_width_ > 0);
+            DLIB_CASSERT(repeat_height_ > 0);
+
+            repeat_height = repeat_height_;
+            repeat_width = repeat_width_;
+        }
+
+        void upsampling::
+        operator() (
+            resizable_tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(repeat_width > 0);
+            DLIB_CASSERT(repeat_height > 0);
+
+            dest.set_size(
+                 src.num_samples(),
+                 src.k(),
+                 src.nr()*repeat_height,
+                 src.nc()*repeat_width
+                );
+
+            if (src.size() == 0)
+            {
+                dest = 0;
+                return;
+            }
+
+            auto d = dest.host();
+            for (long n = 0; n < dest.num_samples(); ++n)
+            {
+                for (long k = 0; k < dest.k(); ++k)
+                {
+                    auto simg = image_plane(src,n,k);
+                    auto dimg = d + (n*dest.k() + k)*dest.nr()*dest.nc();
+
+                    for (long r = 0; r < src.nr(); ++r)
+                    {
+                        for (long c = 0; c < src.nc(); ++c)
+                        {
+                            for (long y = 0; y < repeat_height; ++y)
+                            {
+                                for (long x = 0; x < repeat_width; ++x)
+                                {
+                                    dimg[(repeat_height*r + y)*dest.nc() + (repeat_width*c + x)] = simg(r*src.nc() + c);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void upsampling::get_gradient(
+            const tensor& gradient_input, 
+            const tensor& dest,
+            const tensor& src,
+            tensor& grad 
+        )
+        {
+            DLIB_CASSERT(have_same_dimensions(gradient_input,dest));
+            DLIB_CASSERT(have_same_dimensions(src,grad));
+
+            if (src.size() == 0)
+            {
+                return;
+            }
+
+            auto gi = gradient_input.host();
+            auto g = grad.host();
+            for (long n = 0; n < dest.num_samples(); ++n)
+            {
+                for (long k = 0; k < dest.k(); ++k)
+                {
+                    auto simg = image_plane(src,n,k);
+                    auto gimg = g + (n*grad.k() + k)*grad.nr()*grad.nc();
+                    auto giimg = gi + (n*dest.k() + k)*dest.nr()*dest.nc();
+                    auto imgbox = get_rect(simg);
+
+                    for (long r = 0; r < src.nr(); ++r)
+                    {
+                        for (long c = 0; c < src.nc(); ++c)
+                        {
+                            for (long y = 0; y < repeat_height; ++y)
+                            {
+                                for (long x = 0; x < repeat_width; ++x)
+                                {
+                                    gimg[r*src.nc() + c] += giimg[(repeat_height*r + y)*dest.nc() + (repeat_width*c + x)];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }        
 
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

@@ -989,6 +989,123 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _repeat_r,
+        long _repeat_c
+        >
+    class block_upsample_
+    {
+        static_assert(_repeat_r >= 1, "The number of rows to repeat must be >= 1");
+        static_assert(_repeat_c >= 1, "The number of columns to repeat must be >= 1");
+    public:
+
+        block_upsample_(
+        )
+        {}
+
+        long repeat_r() const { return _repeat_r; }
+        long repeat_c() const { return _repeat_c; }
+
+        inline point map_input_to_output (
+            point p
+        ) const
+        {
+            p.x() = p.x()*repeat_c();
+            p.y() = p.y()*repeat_r();
+            return p;
+        }
+
+        inline point map_output_to_input (
+            point p
+        ) const
+        {
+            p.x() = p.x()/repeat_c();
+            p.y() = p.y()/repeat_r();
+            return p;
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+            bu.setup_block_upsampling(_repeat_r, _repeat_c);
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            bu(output, sub.get_output());
+        } 
+
+        template <typename SUBNET>
+        void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            bu.get_gradient(gradient_input, computed_output, sub.get_output(), sub.get_gradient_input());
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const block_upsample_& item, std::ostream& out)
+        {
+            serialize("block_upsample_1", out);
+            serialize(_repeat_r, out);
+            serialize(_repeat_c, out);
+        }
+
+        friend void deserialize(block_upsample_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            long repeat_r;
+            long repeat_c;
+            if (version == "block_upsample_1")
+            {
+                deserialize(repeat_r, in);
+                deserialize(repeat_c, in);
+            }
+            else
+            {
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::block_upsample_.");
+            }
+
+            if (_repeat_r != repeat_r) throw serialization_error("Wrong repeat_r found while deserializing dlib::block_upsample_");
+            if (_repeat_c != repeat_c) throw serialization_error("Wrong repeat_c found while deserializing dlib::block_upsample_");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const block_upsample_& item)
+        {
+            out << "block_upsample ("
+                << "repeat_r="<<_repeat_r
+                << ", repeat_c="<<_repeat_c
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const block_upsample_& item, std::ostream& out)
+        {
+            out << "<block_upsample"
+                << " repeat_r='"<<_repeat_r<<"'"
+                << " repeat_c='"<<_repeat_c<<"'"
+                << "/>\n";
+        }
+
+
+    private:
+
+
+        tt::upsampling bu;
+        resizable_tensor params;
+    };
+
+    template <
+        long repeat_r,
+        long repeat_c,
+        typename SUBNET
+        >
+    using block_upsample = add_layer<block_upsample_<repeat_r,repeat_c>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     enum layer_mode
     {
         CONV_MODE = 0,

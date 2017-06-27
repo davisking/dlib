@@ -355,6 +355,40 @@ namespace dlib
 
         };
 
+        // -----------------------------------------------------------------------------------
+
+        class upsampling
+        {
+        public:
+
+            upsampling (
+            );
+
+            void clear(
+            );
+
+            void setup_block_upsampling(
+                int repeat_height,
+                int repeat_width
+            );
+
+            void operator() (
+                resizable_tensor& dest,
+                const tensor& src
+            );
+
+            void get_gradient(
+                const tensor& gradient_input, 
+                const tensor& dest,
+                const tensor& src,
+                tensor& grad 
+            );
+
+        private:
+            int repeat_height;
+            int repeat_width;
+        };
+
     // -----------------------------------------------------------------------------------
 
         class tensor_conv
