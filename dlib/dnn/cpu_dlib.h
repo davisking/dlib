@@ -378,36 +378,38 @@ namespace dlib
             ) 
             {
                 (void)data;    /* silence compiler */
-                (void)filters; /* silence compiler */
+                DLIB_CASSERT(stride_y > 0 && stride_x > 0);
+                DLIB_CASSERT(0 <= padding_y && padding_y < filters.nr());
+                DLIB_CASSERT(0 <= padding_x && padding_x < filters.nc());
                 last_stride_y = stride_y;
                 last_stride_x = stride_x;
                 last_padding_y = padding_y;
                 last_padding_x = padding_x;            
             }
 
-            void forward_without_setup(
+             void operator() (
+                const bool add_to_output,
                 resizable_tensor& output,
                 const tensor& data,
                 const tensor& filters
             );
 
-            void operator() (
-                resizable_tensor& output,
+             void operator() (
+                const bool add_to_output,
+                tensor& output,
                 const tensor& data,
-                const tensor& filters,
-                int stride_y,
-                int stride_x,
-                int padding_y,
-                int padding_x
+                const tensor& filters
             );
 
             void get_gradient_for_data (
+                const bool add_to_output,
                 const tensor& gradient_input, 
                 const tensor& filters,
                 tensor& data_gradient
             );
 
             void get_gradient_for_filters (
+                const bool add_to_output,
                 const tensor& gradient_input, 
                 const tensor& data,
                 tensor& filters_gradient
@@ -415,10 +417,10 @@ namespace dlib
 
         private:
 
-            long last_stride_y;
-            long last_stride_x;
-            long last_padding_y;
-            long last_padding_x;
+            long last_stride_y = 0;
+            long last_stride_x = 0;
+            long last_padding_y = 0;
+            long last_padding_x = 0;
         };
 
     // -----------------------------------------------------------------------------------

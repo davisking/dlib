@@ -45,8 +45,8 @@ int main(int argc, char** argv) try
     // make the objects in the crops have a min and max size of such and such".
     // You do that by calling these two functions.  Here we are saying we want the
     // objects in our crops to be between 0.2*400 and 0.8*400 pixels in height.
-    cropper.set_min_object_height(0.2);
-    cropper.set_max_object_height(0.8);
+    cropper.set_min_object_size(0.2);
+    cropper.set_max_object_size(0.8);
     // The cropper can also randomly mirror and rotate crops, which we ask it to
     // perform as well.
     cropper.set_randomly_flip(true);

@@ -152,7 +152,7 @@ int main(int argc, char** argv) try
     std::vector<std::vector<mmod_rect>> mini_batch_labels; 
     random_cropper cropper;
     cropper.set_chip_dims(200, 200);
-    cropper.set_min_object_height(0.2);
+    cropper.set_min_object_size(0.2);
     dlib::rand rnd;
     // Run the trainer until the learning rate gets small.  This will probably take several
     // hours.

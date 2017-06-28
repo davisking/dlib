@@ -3199,7 +3199,7 @@ namespace dlib
                 }
             }
 
-        } // end for (int iter = 0; iter < 5; ++iter)
+        } // end for (int iter = 0; iter < 10; ++iter)
 
         if (rs_params.mean() > 0.003)
         {
