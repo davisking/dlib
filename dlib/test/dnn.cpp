@@ -1971,6 +1971,149 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    int get_convolution_output_dimension(int input_dimension, int filter_size, int padding, int stride) {
+        return (input_dimension - filter_size + 2 * padding) / stride + 1;
+    }
+
+    int get_convolution_input_dimension(int output_dimension, int filter_size, int padding, int stride) {
+        return (output_dimension - 1) * stride + filter_size - 2 * padding;
+    }
+
+    void test_loss_multiclass_per_pixel_equals_plain_loss_and_separate_calls()
+    {
+        print_spinner();
+
+        constexpr int train_output_height = 1;
+        constexpr int train_output_width = 1;
+        constexpr int filter_height = 3;
+        constexpr int filter_width = 5;
+        constexpr int stride_y = 2;
+        constexpr int stride_x = 3;
+        constexpr int num_samples = 5;
+        constexpr int num_classes = 5;
+        constexpr int test_input_height = 25;
+        constexpr int test_input_width = 33;
+
+        ::std::vector<matrix<float>> train_x(num_samples);
+        ::std::vector<matrix<float>> test_x(num_samples);
+        ::std::vector<matrix<uint16_t>> y1(num_samples);
+        ::std::vector<unsigned long> y2(num_samples);
+
+        ::std::default_random_engine generator(16);
+        ::std::bernoulli_distribution coinflip(0.5);
+
+        using filter_type = con<num_classes, filter_height, filter_width, stride_y, stride_x, input<matrix<float>>>;
+
+        // Define a "truth" filter
+        filter_type truth_filter;
+
+        const int padding_y = truth_filter.layer_details().padding_y();
+        const int padding_x = truth_filter.layer_details().padding_x();
+
+        const int train_input_height = get_convolution_input_dimension(train_output_height, filter_height, padding_y, stride_y);
+        const int train_input_width = get_convolution_input_dimension(train_output_width, filter_width, padding_x, stride_x);
+
+        const int test_output_height = get_convolution_output_dimension(test_input_height, filter_height, padding_y, stride_y);
+        const int test_output_width = get_convolution_output_dimension(test_input_width, filter_width, padding_x, stride_x);
+
+        truth_filter(matrix<float>(train_input_height, train_input_width)); // Set up the convolutional layer
+
+        // Generate training and test data
+        for (int ii = 0; ii < num_samples; ++ii) {
+            // Generate random inputs x
+            const auto generate_x = [&coinflip, &generator](int height, int width) {
+                matrix<float> temp(height, width);
+                for (int i = 0; i < height; ++i)
+                    for (int j = 0; j < width; ++j)
+                        temp(i, j) = coinflip(generator) ? 1.f : -1.f;
+                return temp;
+            };
+
+            train_x[ii] = generate_x(train_input_height, train_input_width);
+            test_x[ii] = generate_x(test_input_height, test_input_width);
+
+            // Generate target output y by applying the truth filter on the training x
+            const tensor& output = truth_filter(train_x[ii]);
+
+            DLIB_TEST(output.nr() == train_output_height);
+            DLIB_TEST(output.nc() == train_output_width);
+
+            const float* const out_data = output.host();
+
+            const auto out_element = [&](int row, int column, int k) {
+                return out_data[(k * output.nr() + row) * output.nc() + column];
+            };
+
+            matrix<uint16_t> ytmp(train_output_height, train_output_width);
+
+            for (int jj = 0; jj < train_output_height; ++jj) {
+                for (int kk = 0; kk < train_output_width; ++kk) {
+                    uint16_t label = 0;
+                    float max_value = out_element(jj, kk, 0);
+                    for (long k = 1; k < num_classes; ++k) {
+                        const float value = out_element(jj, kk, k);
+                        if (value > max_value) {
+                            label = static_cast<uint16_t>(k);
+                            max_value = value;
+                        }
+                    }
+                    ytmp(jj, kk) = label;
+                }
+            }
+            y1[ii] = ytmp;
+            y2[ii] = ytmp(0, 0);
+        }
+
+        using net1_type = loss_multiclass_log_per_pixel<filter_type>;
+        net1_type net1;
+
+        using net2_type = loss_multiclass_log<filter_type>;
+        net2_type net2;
+
+        const double weight_decay = 0;
+        const double momentum = 0.9;
+        const double learning_rate = 1;
+        const int max_num_epochs = 100;
+
+        // Train net with loss per pixel
+        dnn_trainer<net1_type> trainer1(net1, sgd(weight_decay, momentum));
+        trainer1.set_learning_rate(learning_rate);
+        trainer1.set_max_num_epochs(max_num_epochs);
+        trainer1.train(train_x, y1);
+
+        // Train net with plain loss
+        dnn_trainer<net2_type> trainer2(net2, sgd(weight_decay, momentum));
+        trainer2.set_learning_rate(learning_rate);
+        trainer2.set_max_num_epochs(max_num_epochs);
+        trainer2.train(train_x, y2);
+
+        // The outputs of the two networks should match.
+        const auto out1 = net1(test_x);
+
+        for (int ii = 0; ii < num_samples; ++ii) {
+            DLIB_TEST(out1[ii].nr() == test_output_height);
+            DLIB_TEST(out1[ii].nc() == test_output_width);
+
+            for (int jj = 0; jj < test_output_height; ++jj) {
+                for (int kk = 0; kk < test_output_width; ++kk) {
+                    matrix<float> xtmp(train_input_height, train_input_width);
+                    for (int mm = 0; mm < train_input_height; ++mm) {
+                        for (int nn = 0; nn < train_input_width; ++nn) {
+                            xtmp(mm, nn) = test_x[ii](jj * stride_y + mm, kk * stride_x + nn);
+                        }
+                    }
+
+                    const uint16_t output1 = out1[ii](jj, kk);
+                    const unsigned long output2 = net2(xtmp);
+
+                    DLIB_TEST(output1 == output2);
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task()
     {
         print_spinner();
@@ -2006,7 +2149,7 @@ namespace
         }
     }
 
-    // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
     void test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task()
     {
@@ -2373,6 +2516,7 @@ namespace
             test_concat();
             test_simple_linear_regression();
             test_multioutput_linear_regression();
+            test_loss_multiclass_per_pixel_equals_plain_loss_and_separate_calls();
             test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_outputs_on_trivial_task();
