@@ -11,7 +11,18 @@
 
 #include "dnn/tensor.h"
 #include "dnn/input.h"
+
+// Problem:    Visual Studio's vcpkgsrv.exe constantly uses a single CPU core,
+//             apparently never finishing whatever it's trying to do. Moreover,
+//             this issue prevents some operations like switching from Debug to
+//             Release (and vice versa) in the IDE. (Your mileage may vary.)
+// Workaround: Keep manually killing the vcpkgsrv.exe process.
+// Solution:   Disable IntelliSense for some files. Which files? Unfortunately
+//             this seems to be a trial-and-error process.
+#ifndef __INTELLISENSE__
 #include "dnn/layers.h"
+#endif // __INTELLISENSE__
+
 #include "dnn/loss.h"
 #include "dnn/core.h"
 #include "dnn/solvers.h"
