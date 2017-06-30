@@ -412,6 +412,16 @@ namespace dlib
 
 
             overlaps_nms = find_tight_overlap_tester(temp);
+            // Relax the non-max-suppression a little so that it doesn't accidentally make
+            // it impossible for the detector to output boxes matching the training data.
+            // This could be a problem with the tightest possible nms test since there is
+            // some small variability in how boxes get positioned between the training data
+            // and the coordinate system used by the detector when it runs.  So relaxing it
+            // here takes care of that.
+            double relax_amount = 0.10;
+            auto iou_thresh = std::min(1.0, overlaps_nms.get_iou_thresh()+relax_amount);
+            auto percent_covered_thresh = std::min(1.0, overlaps_nms.get_percent_covered_thresh()+relax_amount);
+            overlaps_nms = test_box_overlap(iou_thresh, percent_covered_thresh);
         }
     };
 

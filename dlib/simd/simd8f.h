@@ -42,6 +42,11 @@ namespace dlib
         inline void store(type* ptr)         const { _mm256_storeu_ps(ptr, x); }
 
         inline simd8f& operator=(const simd8i& rhs) { *this = simd8f(rhs); return *this; }
+        inline simd8f& operator=(const float& val)
+        {
+            x = simd8f(val);
+            return *this;
+        }
 
         inline unsigned int size() const { return 8; }
         inline float operator[](unsigned int idx) const 

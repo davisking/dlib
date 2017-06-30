@@ -693,6 +693,36 @@ namespace
             cpu::add(2, AA, 3, BB);
             DLIB_TEST_MSG(max(abs(mat(A)-mat(AA) )) < 1e-6, max(abs(mat(A)-mat(AA) )));
         }
+
+        {
+            print_spinner();
+            resizable_tensor dest1(123,456), dest2(123,456);
+            resizable_tensor src1(123,456), src2(123,456);
+
+            tt::tensor_rand rnd;
+
+            rnd.fill_uniform(src1); tt::affine_transform(src1, src1, 1, 2); src2 = src1;  // random in range [2, 3]
+            dest1 = exp(mat(src1));
+            tt::exp(dest2, src2);
+            tt::exp(src2, src2); // should work in place
+            DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2))) < 1e-5, max(abs(mat(dest1)-mat(dest2))));
+            DLIB_TEST(max(abs(mat(dest1)-mat(src2))) < 1e-5);
+
+            rnd.fill_uniform(src1); tt::affine_transform(src1, src1, 1, 2); src2 = src1;  // random in range [2, 3]
+            dest1 = log(mat(src1));
+            tt::log(dest2, src2);
+            tt::log(src2, src2); // should work in place
+            DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-5);
+            DLIB_TEST(max(abs(mat(dest1)-mat(src2))) < 1e-5);
+
+            rnd.fill_uniform(src1); tt::affine_transform(src1, src1, 1, 2); src2 = src1;  // random in range [2, 3]
+            dest1 = log10(mat(src1));
+            tt::log10(dest2, src2);
+            tt::log10(src2, src2); // should work in place
+            DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-5);
+            DLIB_TEST(max(abs(mat(dest1)-mat(src2))) < 1e-5);
+
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -776,8 +806,18 @@ namespace
                 padding_y = (filters.nr()-data.nr()+1)/2;
             if (!(filters.nc() <= data.nc() + 2*padding_x))
                 padding_x = (filters.nc()-data.nc()+1)/2;
-            conv1(output1, data, filters, stride_y,stride_x, padding_y, padding_x);
-            conv2(output2, data, filters, stride_y,stride_x, padding_y, padding_x);
+            conv1.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
+            conv1(false, output1, data, filters);
+            conv2.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
+            conv2(false, output2, data, filters);
+            dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
+            DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2)))
+                 <<"\n\t padding_y: "<< padding_y 
+                 <<"\n\t padding_x: "<< padding_x 
+                 );
+
+            conv1(true, output1, data, filters);
+            conv2(true, output2, data, filters);
             dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
             DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2)))
                  <<"\n\t padding_y: "<< padding_y 
@@ -795,8 +835,14 @@ namespace
             data_gradient1 = 1;
             data_gradient2 = 1;
 
-            conv1.get_gradient_for_data(gi, filters, data_gradient1);
-            conv2.get_gradient_for_data(gi, filters, data_gradient2);
+            conv1.get_gradient_for_data(true, gi, filters, data_gradient1);
+            conv2.get_gradient_for_data(true, gi, filters, data_gradient2);
+
+            dlog << LINFO << "data gradient error: "<< max(abs(mat(data_gradient1)-mat(data_gradient2)));
+            DLIB_TEST(max(abs(mat(data_gradient1)-mat(data_gradient2))) < 1e-3);
+
+            conv1.get_gradient_for_data(false, gi, filters, data_gradient1);
+            conv2.get_gradient_for_data(false, gi, filters, data_gradient2);
 
             dlog << LINFO << "data gradient error: "<< max(abs(mat(data_gradient1)-mat(data_gradient2)));
             DLIB_TEST(max(abs(mat(data_gradient1)-mat(data_gradient2))) < 1e-3);
@@ -811,8 +857,15 @@ namespace
             filter_gradient1 = 1;
             filter_gradient2 = 1;
 
-            conv1.get_gradient_for_filters(gi, data, filter_gradient1);
-            conv2.get_gradient_for_filters(gi, data, filter_gradient2);
+            conv1.get_gradient_for_filters(false, gi, data, filter_gradient1);
+            conv2.get_gradient_for_filters(false, gi, data, filter_gradient2);
+
+            dlog << LINFO << "filter gradient error: "<< max(abs(mat(filter_gradient1)-mat(filter_gradient2)));
+            DLIB_TEST_MSG(max(abs(mat(filter_gradient1)-mat(filter_gradient2))) < 1e-3, max(abs(mat(filter_gradient1)-mat(filter_gradient2))));
+
+
+            conv1.get_gradient_for_filters(true, gi, data, filter_gradient1);
+            conv2.get_gradient_for_filters(true, gi, data, filter_gradient2);
 
             dlog << LINFO << "filter gradient error: "<< max(abs(mat(filter_gradient1)-mat(filter_gradient2)));
             DLIB_TEST_MSG(max(abs(mat(filter_gradient1)-mat(filter_gradient2))) < 1e-3, max(abs(mat(filter_gradient1)-mat(filter_gradient2))));
@@ -1441,6 +1494,36 @@ namespace
         {
             print_spinner();
             bn_<FC_MODE> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,3,3,2,2,0,0> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,3,3,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,3,3,1,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,3,3,1,1,0,0> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,2,2,2,2> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }

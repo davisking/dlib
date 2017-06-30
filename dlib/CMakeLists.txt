@@ -7,6 +7,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(dlib)
 
+# Adhere to GNU filesystem layout conventions
+include(GNUInstallDirs)
+
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
 include(cmake_utils/use_cpp_11.cmake)
@@ -178,6 +181,9 @@ if (NOT TARGET dlib)
    )
 
 
+   set(dlib_needed_libraries)
+   set(dlib_needed_includes)
+
    if (DLIB_ISO_CPP_ONLY)
        add_library(dlib STATIC ${source_files} )
        if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
@@ -216,8 +222,6 @@ if (NOT TARGET dlib)
          stack_trace.cpp
          )
 
-      set(dlib_needed_libraries)
-      set(dlib_needed_includes)
       if(UNIX)
          set(CMAKE_THREAD_PREFER_PTHREAD ON)
          find_package(Threads REQUIRED)
@@ -596,7 +600,7 @@ if (NOT TARGET dlib)
             endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND cudnn_include AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked)
+         if (CUDA_FOUND AND cudnn AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
@@ -670,17 +674,6 @@ if (NOT TARGET dlib)
       else()
          add_library(dlib STATIC ${source_files} )
       endif()
-      target_include_directories(dlib
-                                 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-                                 INTERFACE $<INSTALL_INTERFACE:include>
-                                 PUBLIC ${dlib_needed_includes}
-                                 )
-      target_link_libraries(dlib PRIVATE ${dlib_needed_libraries})
-      if (DLIB_IN_PROJECT_BUILD)
-         target_compile_options(dlib PUBLIC ${active_preprocessor_switches})
-      else()
-         target_compile_options(dlib PRIVATE ${active_preprocessor_switches})
-      endif()
       if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
          if (DLIB_USE_CUDA)
             cuda_add_library(dlib_shared SHARED ${source_files} )
@@ -689,16 +682,32 @@ if (NOT TARGET dlib)
             add_library(dlib_shared SHARED ${source_files} )
             add_dependencies(dlib_shared dlib)
          endif()
-         target_include_directories(dlib_shared
-                                    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-                                    INTERFACE $<INSTALL_INTERFACE:include>
-                                    PUBLIC ${dlib_needed_includes}
-                                    )
-         target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
-         target_compile_options(dlib_shared PRIVATE ${active_preprocessor_switches})
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
+
+
+   target_include_directories(dlib
+                              INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                              INTERFACE $<INSTALL_INTERFACE:include>
+                              PUBLIC ${dlib_needed_includes}
+                              )
+   target_link_libraries(dlib PRIVATE ${dlib_needed_libraries})
+   if (DLIB_IN_PROJECT_BUILD)
+      target_compile_options(dlib PUBLIC ${active_preprocessor_switches})
+   else()
+      target_compile_options(dlib PRIVATE ${active_preprocessor_switches})
+   endif()
+   if (UNIX AND NOT DLIB_IN_PROJECT_BUILD)
+      target_include_directories(dlib_shared
+                                 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                                 INTERFACE $<INSTALL_INTERFACE:include>
+                                 PUBLIC ${dlib_needed_includes}
+                                 )
+      target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
+      target_compile_options(dlib_shared PRIVATE ${active_preprocessor_switches})
+   endif()
+
 
    # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
@@ -709,7 +718,6 @@ if (NOT TARGET dlib)
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
-       set (LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries (e.g. lib32 or lib64 for multilib installations)")
        cmake_minimum_required(VERSION 2.8.8)
        if(UNIX)
            set_target_properties(dlib_shared PROPERTIES
@@ -717,39 +725,36 @@ if (NOT TARGET dlib)
                                         VERSION ${VERSION})
            install(TARGETS dlib dlib_shared
                    EXPORT dlib 
-                   RUNTIME DESTINATION bin # Windows (including cygwin) considers .dll to be runtime artifacts
-                   LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
-                   ARCHIVE DESTINATION "${LIB_INSTALL_DIR}")
+                   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows (including cygwin) considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
        else()
            install(TARGETS dlib
                    EXPORT dlib 
-                   RUNTIME DESTINATION bin # Windows considers .dll to be runtime artifacts
-                   LIBRARY DESTINATION lib
-                   ARCHIVE DESTINATION lib)
+                   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
+                   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
        endif()
 
-       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION include/dlib
+       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
                FILES_MATCHING PATTERN "*.h" PATTERN "*.cmake"
                REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
 
        configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
        # overwrite config.h with the configured one
-       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION include/dlib)
+       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 
        configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
-       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION include/dlib)
-
-       install(FILES "LICENSE.txt" DESTINATION share/doc/dlib)
+       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 
        ## Config.cmake generation and installation
 
-       set(ConfigPackageLocation "${LIB_INSTALL_DIR}/cmake/dlib")
+       set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
        install(EXPORT dlib
             NAMESPACE dlib::
             DESTINATION ${ConfigPackageLocation})
 
-       set(CONF_INSTALL_PATH "\${dlib_CMAKE_DIR}/../../../")
        configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
 
        include(CMakePackageConfigHelpers)
@@ -768,7 +773,7 @@ if (NOT TARGET dlib)
 
        configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
-           DESTINATION "${LIB_INSTALL_DIR}/pkgconfig")
+           DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
    endif()
 

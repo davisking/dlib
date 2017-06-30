@@ -2,10 +2,12 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 
-#include <sstream>
-#include <string>
 #include <cstdlib>
 #include <ctime>
+#include <memory>
+#include <sstream>
+#include <string>
+
 #include <dlib/sockets.h>
 #include <dlib/server.h>
 #include <dlib/misc_api.h>
@@ -118,7 +120,7 @@ namespace  {
                 }
 
                 int status;
-                scoped_ptr<connection> con;
+                std::unique_ptr<connection> con;
                 string hostname;
                 string ip;
                 status = get_local_hostname(hostname);

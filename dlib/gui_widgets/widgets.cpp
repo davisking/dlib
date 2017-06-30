@@ -3,8 +3,10 @@
 #ifndef DLIB_WIDGETs_CPP_
 #define DLIB_WIDGETs_CPP_
 
-#include "widgets.h"
 #include <algorithm>
+#include <memory>
+
+#include "widgets.h"
 #include "../string.h"
 
 namespace dlib
@@ -160,7 +162,7 @@ namespace dlib
 
     void toggle_button::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -309,7 +311,7 @@ namespace dlib
 
     void label::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -638,7 +640,7 @@ namespace dlib
 
     void text_field::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -1745,7 +1747,7 @@ namespace dlib
 
     void tabbed_display::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -1887,7 +1889,7 @@ namespace dlib
 
     void named_rectangle::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -2065,7 +2067,7 @@ namespace dlib
 
     void mouse_tracker::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -2270,7 +2272,7 @@ namespace dlib
     template <typename S>
     void list_box<S>::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -3000,7 +3002,7 @@ namespace dlib
             const std::string old_path = path;
             const long old_cur_dir = cur_dir;
 
-            scoped_ptr<toggle_button> new_btn(new toggle_button(*this));
+            std::unique_ptr<toggle_button> new_btn(new toggle_button(*this));
             new_btn->set_name(folder_name);
             new_btn->set_click_handler(*this,&box_win::on_path_button_click);
 
@@ -3009,7 +3011,7 @@ namespace dlib
             {
                 while (sob.size() > (unsigned long)(cur_dir+1))
                 {
-                    scoped_ptr<toggle_button> junk;
+                    std::unique_ptr<toggle_button> junk;
                     sob.remove(cur_dir+1,junk);
                 }
             }
@@ -3300,7 +3302,7 @@ namespace dlib
 
     void menu_bar::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -4916,7 +4918,7 @@ namespace dlib
 
     void text_box::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);

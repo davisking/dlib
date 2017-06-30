@@ -8,24 +8,25 @@
 
 #include "gui_core_kernel_2.h"
 
+#include <cmath>
+#include <cstring>
+#include <iostream>
+#include <vector>
+#include <set>
 
+#include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xlocale.h>
 #include <X11/XKBlib.h>
+
 #include <poll.h>
-#include <iostream>
+
 #include "../assert.h"
 #include "../queue.h"
-#include <cstring>
-#include <cmath>
-#include <X11/Xatom.h>
 #include "../sync_extension.h"
 #include "../logger.h"
-#include <vector>
-#include <set>
-#include "../smart_pointers_thread_safe.h"
 
 namespace dlib
 {
@@ -49,9 +50,9 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        const shared_ptr_thread_safe<dlib::mutex>& global_mutex()
+        const std::shared_ptr<dlib::mutex>& global_mutex()
         {
-            static shared_ptr_thread_safe<dlib::mutex> m(new dlib::mutex);
+            static std::shared_ptr<dlib::mutex> m(new dlib::mutex);
             return m;
         }
 
@@ -95,7 +96,7 @@ namespace dlib
             queue_of_user_events user_events;
             queue_of_user_events user_events_temp;
 
-            shared_ptr_thread_safe<dlib::mutex> reference_to_global_mutex;
+            std::shared_ptr<dlib::mutex> reference_to_global_mutex;
 
             event_handler_thread(
             ) :
@@ -315,7 +316,7 @@ namespace dlib
             Time last_click_time;
             XIC xic;
             XFontSet fs;
-            shared_ptr_thread_safe<event_handler_thread> globals;
+            std::shared_ptr<event_handler_thread> globals;
         };
 
         // Do all this just to make sure global_mutex() is initialized at program start
@@ -324,10 +325,10 @@ namespace dlib
         struct call_global_mutex { call_global_mutex() { global_mutex(); } };
         static call_global_mutex call_global_mutex_instance;
 
-        const shared_ptr_thread_safe<event_handler_thread>& global_data()
+        const std::shared_ptr<event_handler_thread>& global_data()
         {
             auto_mutex M(*global_mutex());
-            static shared_ptr_thread_safe<event_handler_thread> p;
+            static std::shared_ptr<event_handler_thread> p;
             if (p.get() == 0)
                 p.reset(new event_handler_thread());
             return p;
@@ -1356,7 +1357,7 @@ namespace dlib
     {
         using namespace gui_core_kernel_2_globals;
 
-        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+        std::shared_ptr<event_handler_thread> globals(global_data());
 
         auto_mutex M(globals->window_table.get_mutex());
         globals->clipboard = str.c_str();
@@ -1405,7 +1406,7 @@ namespace dlib
     )
     {
         using namespace gui_core_kernel_2_globals;
-        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+        std::shared_ptr<event_handler_thread> globals(global_data());
 
         auto_mutex M(globals->window_table.get_mutex());
         str.clear();
@@ -1495,7 +1496,7 @@ namespace dlib
             void*
         )
         {
-            shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+            std::shared_ptr<event_handler_thread> globals(global_data());
             auto_mutex M(globals->window_table.get_mutex());
 
             globals->user_events.lock();
@@ -1536,7 +1537,7 @@ namespace dlib
         e.p = p;
         e.i = i;
         {
-            shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+            std::shared_ptr<event_handler_thread> globals(global_data());
             auto_mutex M(globals->user_events.get_mutex());
             globals->user_events.enqueue(e);
 

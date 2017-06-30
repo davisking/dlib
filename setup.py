@@ -23,6 +23,7 @@ To exclude/include certain options in the cmake config use --yes and --no:
     --yes DLIB_NO_GUI_SUPPORT: will set -DDLIB_NO_GUI_SUPPORT=yes
     --no DLIB_NO_GUI_SUPPORT: will set -DDLIB_NO_GUI_SUPPORT=no
 Additional options:
+    --compiler-flags: pass flags onto the compiler, e.g. --compiler-flag "-Os -Wall" passes -Os -Wall onto GCC.
     --debug: makes a debug build
     --cmake: path to specific cmake executable
     --G or -G: name of a build system generator (equivalent of passing -G "name" to cmake)
@@ -79,6 +80,8 @@ def _get_options():
     for opt_idx, arg in enumerate(argv):
         if opt_key == 'cmake':
             _cmake_path = arg
+        elif opt_key == 'compiler-flags':
+            _cmake_extra.append('-DCMAKE_CXX_FLAGS={arg}'.format(arg=arg.strip()))
         elif opt_key == 'yes':
             _cmake_extra.append('-D{arg}=yes'.format(arg=arg.strip()))
         elif opt_key == 'no':
@@ -107,7 +110,7 @@ def _get_options():
             opt_key = opt
             sys.argv.remove(arg)
             continue
-        elif opt in ['yes', 'no']:
+        elif opt in ['yes', 'no', 'compiler-flags']:
             opt_key = opt
             sys.argv.remove(arg)
             continue

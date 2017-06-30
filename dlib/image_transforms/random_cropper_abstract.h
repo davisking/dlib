@@ -35,8 +35,8 @@ namespace dlib
                 - #get_chip_dims() == chip_dims(300,300)
                 - #get_randomly_flip() == true
                 - #get_max_rotation_degrees() == 30
-                - #get_min_object_height() == 0.25
-                - #get_max_object_height() == 0.7
+                - #get_min_object_size() == 0.25
+                - #get_max_object_size() == 0.7
                 - #get_background_crops_fraction() == 0.5
                 - #get_translate_amount() == 0.1
         !*/
@@ -143,46 +143,48 @@ namespace dlib
                 - #get_max_rotation_degrees() == std::abs(value)
         !*/
 
-        double get_min_object_height (
+        double get_min_object_size (
         ) const;
         /*!
             ensures
                 - When a chip is extracted around an object, the chip will be sized so that
-                  the object's height is at least get_min_object_height() * 100 percent of the
-                  chip height.  E.g. if the chip is HEIGHT pixels tall then the object will
-                  be at least HEIGHT*get_min_object_height() pixels tall.  This also means
-                  that if get_min_object_height() >1 then the object will be only partially
+                  at least one of the object's height or width are >= get_min_object_size() *
+                  the chip's height and width, respectively.  E.g. if the chip is 640x480
+                  pixels in size then the object will be at least 480*get_min_object_size()
+                  pixels tall or 640*get_min_object_size() pixels wide.  This also means
+                  that if get_min_object_size() >1 then the object will only be partially
                   visible in the crop since it will be too big to fit.  
         !*/
 
-        void set_min_object_height (
+        void set_min_object_size (
             double value
         );
         /*!
             requires
                 - 0 < value 
             ensures
-                - #get_min_object_height() == value
+                - #get_min_object_size() == value
         !*/
 
-        double get_max_object_height (
+        double get_max_object_size (
         ) const; 
         /*!
             ensures
                 - When a chip is extracted around an object, the chip will be sized so that
-                  the object's height is at most get_max_object_height() * 100 percent of the
-                  chip height.  E.g. if the chip is HEIGHT pixels tall then the object will
-                  be at most HEIGHT*get_max_object_height() pixels tall. 
+                  both the object's height and width are at most get_max_object_size() *
+                  the chip's height and width, respectively.  E.g. if the chip is 640x480
+                  pixels in size then the object will be at most 480*get_max_object_size()
+                  pixels tall and 640*get_max_object_size() pixels wide. 
         !*/
 
-        void set_max_object_height (
+        void set_max_object_size (
             double value
         ); 
         /*!
             requires
                 - 0 < value 
             ensures
-                - #get_max_object_height() == value
+                - #get_max_object_size() == value
         !*/
 
         template <

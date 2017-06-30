@@ -20,7 +20,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.9";
+const char* VERSION = "1.10";
 
 const int JPEG_QUALITY = 90;
 

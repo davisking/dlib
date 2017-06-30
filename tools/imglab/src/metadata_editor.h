@@ -58,6 +58,7 @@ private:
 
     unsigned long keyboard_jump_pos;
     time_t last_keyboard_jump_pos_update;
+    bool display_equialized_image = false;
 };
 
 // ----------------------------------------------------------------------------------------

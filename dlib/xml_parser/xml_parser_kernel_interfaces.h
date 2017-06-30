@@ -6,9 +6,23 @@
 #include <string>
 #include "../interfaces/enumerable.h"
 #include "../interfaces/map_pair.h"
+#include "../error.h"
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+    class xml_attribute_list_error : public dlib::error 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an exception object thrown by attribute_list objects if you try to
+                access a non-existent attribute.
+        !*/
+    public:
+        xml_attribute_list_error(const std::string& msg) : dlib::error(msg){}
+    };
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -43,11 +57,12 @@ namespace dlib
             const std::string& key
         ) const =0;
         /*!
-            requires
-                - is_in_list(key) == true
             ensures
-                - returns a const reference to the value associated with the 
-                  attribute named key.
+                if (is_in_list(key) == true) then
+                    - returns a const reference to the value associated with the attribute
+                      named key.
+                - else
+                    - throws xml_attribute_list_error
         !*/
 
     protected:

@@ -3,10 +3,11 @@
 #ifndef DLIB_BASE_WIDGETs_CPP_
 #define DLIB_BASE_WIDGETs_CPP_
 
+#include <iostream>
+#include <memory>
+
 #include "base_widgets.h"
 #include "../assert.h"
-#include <iostream>
-
 
 namespace dlib
 {
@@ -133,7 +134,7 @@ namespace dlib
 
     void button::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);

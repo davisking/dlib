@@ -47,7 +47,7 @@ namespace dlib
         }
 
         sockstreambuf (
-            const scoped_ptr<connection>& con_
+            const std::unique_ptr<connection>& con_
         ) :
             con(*con_),
             out_buffer(0),

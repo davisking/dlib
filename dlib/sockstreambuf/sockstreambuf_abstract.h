@@ -4,7 +4,9 @@
 #ifdef DLIB_SOCKSTREAMBUF_ABSTRACT_
 
 #include <iosfwd>
+#include <memory>
 #include <streambuf>
+
 #include "../sockets/sockets_kernel_abstract.h"
 
 namespace dlib
@@ -60,7 +62,7 @@ namespace dlib
         !*/
 
         sockstreambuf (
-            const scoped_ptr<connection>& con
+            const std::unique_ptr<connection>& con
         );
         /*!
             requires
