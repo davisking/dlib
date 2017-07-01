@@ -834,6 +834,49 @@ namespace dlib
                   output_label_type.
         !*/
 
+        template <typename ...T>
+        const output_label_type& process (
+            const input_type& x, 
+            T&& ...args
+        );
+        /*!
+            ensures
+                - This function is just like (*this)(x), i.e. it runs a single object, x,
+                  through the network and returns the output.  But we additionally pass the 
+                  given args to loss_details().to_label() as the 4th argument (or more,
+                  depending on how many things are in args) when converting the network
+                  output to an output_label_type.  This is useful, for instance, with loss
+                  layers like loss_mmod_ which has an optional adjust_threshold argument to
+                  to_label() that adjusts the detection threshold.  Therefore, for such
+                  networks you could call them like: net.process(some_image, -0.5), and -0.5
+                  would be passed so the adjust_threshold argument of to_tensor().
+        !*/
+
+        template <typename iterable_type, typename ...T>
+        std::vector<output_label_type> process_batch (
+            const iterable_type& data, 
+            size_t batch_size = 128, 
+            T&& ...args
+        );
+        /*!
+            requires
+                - batch_size > 0
+                - data must have a .begin() and .end() that supply iterators over a
+                  sequence of input_type elements.  E.g. data could have a type of
+                  std::vector<input_type>
+            ensures
+                - This function is just like (*this)(data,batch_size), i.e. it runs a
+                  bunch of objects through the network and returns the outputs.  But we
+                  additionally pass the given args to loss_details().to_label() as the 4th
+                  argument (or more, depending on how many things are in args) when
+                  converting the network output to output_label_types.  This is useful,
+                  for instance, with loss layers like loss_mmod_ which has an optional
+                  adjust_threshold argument to to_label() that adjusts the detection
+                  threshold.  Therefore, for such networks you could call them like:
+                  net.process_batch(std::vector<image_type>({some_image, another_image}), 128, -0.5), 
+                  and -0.5 would be passed so the adjust_threshold argument of to_tensor().
+        !*/
+
     // -------------
 
         template <typename label_iterator>
