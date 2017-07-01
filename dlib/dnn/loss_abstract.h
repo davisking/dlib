@@ -800,6 +800,66 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_multiclass_log_per_pixel_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the multiclass logistic
+                regression loss (e.g. negative log-likelihood loss), which is appropriate
+                for multiclass classification problems.  It is basically just like
+                loss_multiclass_log_ except that it lets you define matrix output instead
+                of scalar.  It should be useful, for example, in semantic segmentation where
+                we want to classify each pixel of an image.
+        !*/
+    public:
+
+        // In semantic segmentation, 65535 classes ought to be enough for anybody.
+        typedef matrix<uint16_t> training_label_type;
+        typedef matrix<uint16_t> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output label is the predicted class for each classified element.  The number
+            of possible output classes is sub.get_output().k().
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+                - all values pointed to by truth are < sub.get_output().k() (or std::numeric_limits<uint16_t>::max() to ignore)
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_multiclass_log_per_pixel = add_loss_layer<loss_multiclass_log_per_pixel_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LOSS_ABSTRACT_H_
