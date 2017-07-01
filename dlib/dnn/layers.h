@@ -55,9 +55,9 @@ namespace dlib
             weight_decay_multiplier(1),
             bias_learning_rate_multiplier(1),
             bias_weight_decay_multiplier(0),
+            num_filters_(o.num_outputs),
             padding_y_(_padding_y),
-            padding_x_(_padding_x),
-            num_filters_(o.num_outputs)
+            padding_x_(_padding_x)
         {
             DLIB_CASSERT(num_filters_ > 0);
         }

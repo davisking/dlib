@@ -647,7 +647,7 @@ namespace dlib
         ) const
         {
             const tensor& output_tensor = sub.get_output();
-            DLIB_CASSERT(output_tensor.k() == options.detector_windows.size());
+            DLIB_CASSERT(output_tensor.k() == (long)options.detector_windows.size());
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
             DLIB_CASSERT(sub.sample_expansion_factor() == 1,  sub.sample_expansion_factor());
 
@@ -688,7 +688,7 @@ namespace dlib
             DLIB_CASSERT(sub.sample_expansion_factor() == 1);
             DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
-            DLIB_CASSERT(output_tensor.k() == options.detector_windows.size());
+            DLIB_CASSERT(output_tensor.k() == (long)options.detector_windows.size());
 
 
 
@@ -877,7 +877,7 @@ namespace dlib
         ) const
         {
             DLIB_CASSERT(net.sample_expansion_factor() == 1,net.sample_expansion_factor());
-            DLIB_CASSERT(output_tensor.k() == options.detector_windows.size());
+            DLIB_CASSERT(output_tensor.k() == (long)options.detector_windows.size());
             const float* out_data = output_tensor.host() + output_tensor.k()*output_tensor.nr()*output_tensor.nc()*i;
             // scan the final layer and output the positive scoring locations
             dets_accum.clear();
@@ -910,7 +910,6 @@ namespace dlib
 
             // Figure out which detection window in options.detector_windows has the most
             // similar aspect ratio to rect.
-            const double aspect_ratio  = rect.width()/(double)rect.height();
             size_t best_i = 0;
             double best_ratio_diff = -std::numeric_limits<double>::infinity();
             for (size_t i = 0; i < options.detector_windows.size(); ++i)
