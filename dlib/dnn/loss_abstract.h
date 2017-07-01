@@ -369,14 +369,25 @@ namespace dlib
 
     public:
 
+        struct detector_window_size
+        {
+            detector_window_size() = default; 
+            detector_window_size(unsigned long w, unsigned long h) : width(w), height(h) {}
+
+            unsigned long width = 0;
+            unsigned long height = 0;
+
+            friend inline void serialize(const detector_window_size& item, std::ostream& out);
+            friend inline void deserialize(detector_window_size& item, std::istream& in);
+        };
+
         mmod_options() = default;
 
-        // This kind of object detector is a sliding window detector.  These two parameters
-        // determine the size of the sliding window.  Since you will usually use the MMOD
-        // loss with an image pyramid the detector size determines the size of the smallest
-        // object you can detect.
-        unsigned long detector_width = 80;
-        unsigned long detector_height = 80;
+        // This kind of object detector is a sliding window detector.  The detector_windows
+        // field determines how many sliding windows we will use and what the shape of each
+        // window is.  Since you will usually use the MMOD loss with an image pyramid, the
+        // detector sizes also determine the size of the smallest object you can detect.
+        std::vector<detector_window_size> detector_windows;
 
         // These parameters control how we penalize different kinds of mistakes.  See 
         // Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046)
@@ -402,18 +413,38 @@ namespace dlib
 
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,
-            const unsigned long target_size = 6400
+            const unsigned long target_size,      
+            const unsigned long min_target_size,   
+            const double min_detector_window_overlap_iou = 0.75
         );
         /*!
+            requires
+                - 0 < min_target_size <= target_size
+                - 0.5 < min_detector_window_overlap_iou < 1
             ensures
-                - This function tries to automatically set the MMOD options so reasonable
-                  values assuming you have a training dataset of boxes.size() images, where
-                  the ith image contains objects boxes[i] you want to detect and the
-                  objects are clearly visible when scale so that they are target_size
-                  pixels in area.
-                - In particular, this function will automatically set the detector width
-                  and height based on the average box size in boxes and the requested
-                  target_size.
+                - This function tries to automatically set the MMOD options to reasonable
+                  values, assuming you have a training dataset of boxes.size() images, where
+                  the ith image contains objects boxes[i] you want to detect.
+                - The most important thing this function does is decide what detector
+                  windows should be used.  This is done by finding a set of detector
+                  windows that are sized such that:
+                    - When slid over an image pyramid, each box in boxes will have an
+                      intersection-over-union with one of the detector windows of at least
+                      min_detector_window_overlap_iou.  That is, we will make sure that
+                      each box in boxes could potentially be detected by one of the
+                      detector windows.  This essentially comes down to picking detector
+                      windows with aspect ratios similar to the aspect ratios in boxes.
+                    - The longest edge of each detector window is target_size pixels in
+                      length, unless the window's shortest side would be less than
+                      min_target_size pixels in length.  In this case the shortest side
+                      will be set to min_target_size length, and the other side sized to
+                      preserve the aspect ratio of the window.  
+                  This means that, target_size and min_target_size control the size of the
+                  detector windows, while the aspect ratios of the detector windows are
+                  automatically determined by the contents of boxes.  It should also be
+                  emphasized that the detector isn't going to be able to detect objects
+                  smaller than any of the detector windows.  So consider that when setting
+                  these sizes.
                 - This function will also set the overlaps_nms tester to the most
                   restrictive tester that doesn't reject anything in boxes.
         !*/
