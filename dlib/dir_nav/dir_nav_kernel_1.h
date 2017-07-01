@@ -40,11 +40,13 @@ namespace dlib
                 state.name        == name()
                 state.full_name   == full_name()
                 state.file_size   == size()
+                state.last_modified == last_modified()
 
             CONVENTION
                 state.name        == name()
                 state.full_name   == full_name()
                 state.file_size   == size()
+                state.last_modified == last_modified()
 
         !*/
 
