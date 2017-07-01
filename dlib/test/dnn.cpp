@@ -2243,7 +2243,7 @@ namespace
                     DLIB_TEST(truth < num_classes);
                     ++truth_histogram[truth];
                     if (ignore(generator)) {
-                        ytmp(jj, kk) = label_to_ignore;
+                        ytmp(jj, kk) = loss_multiclass_log_per_pixel_::label_to_ignore;
                     }
                     else if (noise_occurrence(generator)) {
                         ytmp(jj, kk) = noisy_label(generator);

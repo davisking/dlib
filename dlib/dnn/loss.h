@@ -1531,14 +1531,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    // In semantic segmentation, if you don't know the ground-truth of some pixel,
-    // set the label of that pixel to this value. When you do so, the pixel will be
-    // ignored when computing gradients.
-    static const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
-
     class loss_multiclass_log_per_pixel_
     {
     public:
+
+        // In semantic segmentation, if you don't know the ground-truth of some pixel,
+        // set the label of that pixel to this value. When you do so, the pixel will be
+        // ignored when computing gradients.
+        static const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
+
 
         // In semantic segmentation, 65535 classes ought to be enough for anybody.
         typedef matrix<uint16_t> training_label_type;
@@ -1565,12 +1566,15 @@ namespace dlib
             const float* const out_data = output_tensor.host();
 
             // The index of the largest output for each element is the label.
-            const auto find_label = [&](long sample, long r, long c) {
+            const auto find_label = [&](long sample, long r, long c) 
+            {
                 uint16_t label = 0;
                 float max_value = out_data[tensor_index(output_tensor, sample, r, c, 0)];
-                for (long k = 1; k < output_tensor.k(); ++k) {
+                for (long k = 1; k < output_tensor.k(); ++k) 
+                {
                     const float value = out_data[tensor_index(output_tensor, sample, r, c, k)];
-                    if (value > max_value) {
+                    if (value > max_value) 
+                    {
                         label = static_cast<uint16_t>(k);
                         max_value = value;
                     }
@@ -1578,10 +1582,13 @@ namespace dlib
                 return label;
             };
 
-            for (long i = 0; i < output_tensor.num_samples(); ++i, ++iter) {
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++iter) 
+            {
                 iter->set_size(output_tensor.nr(), output_tensor.nc());
-                for (long r = 0; r < output_tensor.nr(); ++r) {
-                    for (long c = 0; c < output_tensor.nc(); ++c) {
+                for (long r = 0; r < output_tensor.nr(); ++r) 
+                {
+                    for (long c = 0; c < output_tensor.nc(); ++c) 
+                    {
                         // The index of the largest output for this element is the label.
                         iter->operator()(r, c) = find_label(i, r, c);
                     }

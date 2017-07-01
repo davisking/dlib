@@ -808,11 +808,16 @@ namespace dlib
                 EXAMPLE_LOSS_LAYER_.  In particular, it implements the multiclass logistic
                 regression loss (e.g. negative log-likelihood loss), which is appropriate
                 for multiclass classification problems.  It is basically just like
-                loss_multiclass_log_ except that it lets you define matrix output instead
-                of scalar.  It should be useful, for example, in semantic segmentation where
-                we want to classify each pixel of an image.
+                loss_multiclass_log_ except that it lets you define matrix outputs instead
+                of scalar outputs.  It should be useful, for example, in semantic
+                segmentation where we want to classify each pixel of an image.
         !*/
     public:
+
+        // In semantic segmentation, if you don't know the ground-truth of some pixel,
+        // set the label of that pixel to this value. When you do so, the pixel will be
+        // ignored when computing gradients.
+        static const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
 
         // In semantic segmentation, 65535 classes ought to be enough for anybody.
         typedef matrix<uint16_t> training_label_type;
@@ -850,7 +855,7 @@ namespace dlib
             except it has the additional calling requirements that:
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
-                - all values pointed to by truth are < sub.get_output().k() (or std::numeric_limits<uint16_t>::max() to ignore)
+                - all values pointed to by truth are < sub.get_output().k() or are equal to label_to_ignore.
         !*/
 
     };
