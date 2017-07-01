@@ -21,6 +21,7 @@
 #include "../stl_checked.h"
 #include "../enable_if.h"
 #include "../queue.h"
+#include <chrono>
 
 namespace dlib
 {
@@ -54,6 +55,7 @@ namespace dlib
             uint64 file_size;
             std::string name;
             std::string full_name;
+            std::chrono::time_point<std::chrono::system_clock> last_modified;
         };
 
 
@@ -66,12 +68,14 @@ namespace dlib
             const std::string& name,
             const std::string& full_name,
             const uint64 file_size,
+            const std::chrono::time_point<std::chrono::system_clock>& last_modified,
             private_constructor
         )
         {
             state.file_size = file_size;
             state.name = name;
             state.full_name = full_name;
+            state.last_modified = last_modified;
         }
 
 
@@ -106,6 +110,9 @@ namespace dlib
 
         inline uint64 size (
         ) const { return state.file_size; }
+
+        inline std::chrono::time_point<std::chrono::system_clock> last_modified (
+        ) const { return state.last_modified; }
 
         bool operator == (
             const file& rhs
@@ -413,8 +420,15 @@ namespace dlib
                     uint64 file_size = data.nFileSizeHigh;                                   
                     file_size <<= 32;
                     file_size |= data.nFileSizeLow;
+
+                    ULARGE_INTEGER ull;
+                    ull.LowPart = data.ftLastWriteTime.dwLowDateTime;
+                    ull.HighPart = data.ftLastWriteTime.dwHighDateTime;
+                    std::chrono::nanoseconds epoch(100 * (ull.QuadPart - 116444736000000000));
+                    auto last_modified = std::chrono::time_point<std::chrono::system_clock>(std::chrono::duration_cast<std::chrono::system_clock::duration>(epoch));
+                    
                     // this is a file so add it to the queue
-                    file temp(data.cFileName,path+data.cFileName,file_size, private_constructor());
+                    file temp(data.cFileName,path+data.cFileName,file_size, last_modified, private_constructor());
                     files.enqueue(temp);
                 }
 
