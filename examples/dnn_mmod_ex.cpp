@@ -142,6 +142,8 @@ int main(int argc, char** argv) try
 
     // Now we are ready to create our network and trainer.  
     net_type net(options);
+    // The MMOD loss requires that the number of filters in the final network layer equal
+    // options.detector_windows.size().  So we set that here as well.
     net.subnet().layer_details().set_num_filters(options.detector_windows.size());
     dnn_trainer<net_type> trainer(net);
     trainer.set_learning_rate(0.1);
