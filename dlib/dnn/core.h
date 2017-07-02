@@ -2302,7 +2302,7 @@ namespace dlib
         }
 
         template <typename iterable_type, typename ...T>
-        std::vector<output_label_type> process_batch (const iterable_type& data, size_t batch_size = 128, T&& ...args)
+        std::vector<output_label_type> process_batch (const iterable_type& data, size_t batch_size, T&& ...args)
         {
             std::vector<output_label_type> results(std::distance(data.begin(), data.end()));
             auto o = results.begin();
