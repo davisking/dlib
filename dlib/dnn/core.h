@@ -2291,6 +2291,38 @@ namespace dlib
             return temp_label;
         }
 
+        template <typename ...T>
+        const output_label_type& process (const input_type& x, T&& ...args)
+        {
+            to_tensor(&x,&x+1,temp_tensor);
+            subnetwork.forward(temp_tensor);
+            const dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
+            loss.to_label(temp_tensor, wsub, &temp_label, std::forward<T>(args)...);
+            return temp_label;
+        }
+
+        template <typename iterable_type, typename ...T>
+        std::vector<output_label_type> process_batch (const iterable_type& data, size_t batch_size = 128, T&& ...args)
+        {
+            std::vector<output_label_type> results(std::distance(data.begin(), data.end()));
+            auto o = results.begin();
+            auto i = data.begin();
+            auto num_remaining = results.size();
+            while(num_remaining != 0)
+            {
+                auto inc = std::min(batch_size, num_remaining);
+                to_tensor(i,i+inc,temp_tensor);
+                subnetwork.forward(temp_tensor);
+                const dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
+                loss.to_label(temp_tensor, wsub, o, std::forward<T>(args)...);
+
+                i += inc;
+                o += inc;
+                num_remaining -= inc;
+            }
+            return results;
+        }
+
         template <typename iterable_type>
         std::vector<output_label_type> operator() (
             const iterable_type& data,

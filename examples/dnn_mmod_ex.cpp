@@ -131,13 +131,18 @@ int main(int argc, char** argv) try
     // pick a good sliding window width and height.  It will also automatically set the
     // non-max-suppression parameters to something reasonable.  For further details see the
     // mmod_options documentation.
-    mmod_options options(face_boxes_train, 40*40);
-    cout << "detection window width,height:      " << options.detector_width << "," << options.detector_height << endl;
+    mmod_options options(face_boxes_train, 40,40);
+    // The detector will automatically decide to use multiple sliding windows if needed.
+    // For the face data, only one is needed however.
+    cout << "num detector windows: "<< options.detector_windows.size() << endl;
+    for (auto& w : options.detector_windows)
+        cout << "detector window width by height: " << w.width << " x " << w.height << endl;
     cout << "overlap NMS IOU thresh:             " << options.overlaps_nms.get_iou_thresh() << endl;
     cout << "overlap NMS percent covered thresh: " << options.overlaps_nms.get_percent_covered_thresh() << endl;
 
     // Now we are ready to create our network and trainer.  
     net_type net(options);
+    net.subnet().layer_details().set_num_filters(options.detector_windows.size());
     dnn_trainer<net_type> trainer(net);
     trainer.set_learning_rate(0.1);
     trainer.be_verbose();

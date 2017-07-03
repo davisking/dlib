@@ -137,6 +137,7 @@
          <term file="dlib/dnn/solvers_abstract.h.html" name="adam" include="dlib/dnn.h"/>
 
          <term file="dlib/dnn/layers_abstract.h.html" name="num_fc_outputs" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="num_con_outputs" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="EXAMPLE_COMPUTATIONAL_LAYER_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="fc_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="con_" include="dlib/dnn.h"/>

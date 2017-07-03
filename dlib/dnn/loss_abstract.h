@@ -369,14 +369,25 @@ namespace dlib
 
     public:
 
+        struct detector_window_size
+        {
+            detector_window_size() = default; 
+            detector_window_size(unsigned long w, unsigned long h) : width(w), height(h) {}
+
+            unsigned long width = 0;
+            unsigned long height = 0;
+
+            friend inline void serialize(const detector_window_size& item, std::ostream& out);
+            friend inline void deserialize(detector_window_size& item, std::istream& in);
+        };
+
         mmod_options() = default;
 
-        // This kind of object detector is a sliding window detector.  These two parameters
-        // determine the size of the sliding window.  Since you will usually use the MMOD
-        // loss with an image pyramid the detector size determines the size of the smallest
-        // object you can detect.
-        unsigned long detector_width = 80;
-        unsigned long detector_height = 80;
+        // This kind of object detector is a sliding window detector.  The detector_windows
+        // field determines how many sliding windows we will use and what the shape of each
+        // window is.  Since you will usually use the MMOD loss with an image pyramid, the
+        // detector sizes also determine the size of the smallest object you can detect.
+        std::vector<detector_window_size> detector_windows;
 
         // These parameters control how we penalize different kinds of mistakes.  See 
         // Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046)
@@ -402,18 +413,38 @@ namespace dlib
 
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,
-            const unsigned long target_size = 6400
+            const unsigned long target_size,      
+            const unsigned long min_target_size,   
+            const double min_detector_window_overlap_iou = 0.75
         );
         /*!
+            requires
+                - 0 < min_target_size <= target_size
+                - 0.5 < min_detector_window_overlap_iou < 1
             ensures
-                - This function tries to automatically set the MMOD options so reasonable
-                  values assuming you have a training dataset of boxes.size() images, where
-                  the ith image contains objects boxes[i] you want to detect and the
-                  objects are clearly visible when scale so that they are target_size
-                  pixels in area.
-                - In particular, this function will automatically set the detector width
-                  and height based on the average box size in boxes and the requested
-                  target_size.
+                - This function tries to automatically set the MMOD options to reasonable
+                  values, assuming you have a training dataset of boxes.size() images, where
+                  the ith image contains objects boxes[i] you want to detect.
+                - The most important thing this function does is decide what detector
+                  windows should be used.  This is done by finding a set of detector
+                  windows that are sized such that:
+                    - When slid over an image pyramid, each box in boxes will have an
+                      intersection-over-union with one of the detector windows of at least
+                      min_detector_window_overlap_iou.  That is, we will make sure that
+                      each box in boxes could potentially be detected by one of the
+                      detector windows.  This essentially comes down to picking detector
+                      windows with aspect ratios similar to the aspect ratios in boxes.
+                    - The longest edge of each detector window is target_size pixels in
+                      length, unless the window's shortest side would be less than
+                      min_target_size pixels in length.  In this case the shortest side
+                      will be set to min_target_size length, and the other side sized to
+                      preserve the aspect ratio of the window.  
+                  This means that, target_size and min_target_size control the size of the
+                  detector windows, while the aspect ratios of the detector windows are
+                  automatically determined by the contents of boxes.  It should also be
+                  emphasized that the detector isn't going to be able to detect objects
+                  smaller than any of the detector windows.  So consider that when setting
+                  these sizes.
                 - This function will also set the overlaps_nms tester to the most
                   restrictive tester that doesn't reject anything in boxes.
         !*/
@@ -766,6 +797,71 @@ namespace dlib
 
     template <typename SUBNET>
     using loss_mean_squared_multioutput = add_loss_layer<loss_mean_squared_multioutput_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_multiclass_log_per_pixel_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the multiclass logistic
+                regression loss (e.g. negative log-likelihood loss), which is appropriate
+                for multiclass classification problems.  It is basically just like
+                loss_multiclass_log_ except that it lets you define matrix outputs instead
+                of scalar outputs.  It should be useful, for example, in semantic
+                segmentation where we want to classify each pixel of an image.
+        !*/
+    public:
+
+        // In semantic segmentation, if you don't know the ground-truth of some pixel,
+        // set the label of that pixel to this value. When you do so, the pixel will be
+        // ignored when computing gradients.
+        static const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
+
+        // In semantic segmentation, 65535 classes ought to be enough for anybody.
+        typedef matrix<uint16_t> training_label_type;
+        typedef matrix<uint16_t> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output label is the predicted class for each classified element.  The number
+            of possible output classes is sub.get_output().k().
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+                - all values pointed to by truth are < sub.get_output().k() or are equal to label_to_ignore.
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_multiclass_log_per_pixel = add_loss_layer<loss_multiclass_log_per_pixel_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
