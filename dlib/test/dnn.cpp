@@ -13,6 +13,8 @@
 
 #include "tester.h"
 
+#ifndef __INTELLISENSE__
+
 namespace
 {
 
@@ -1603,8 +1605,6 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-#ifndef __INTELLISENSE__
-
     template <unsigned long n, typename SUBNET> using rcon = max_pool<2,2,2,2,relu<bn_con<con<n,5,5,1,1,SUBNET>>>>;
     template <unsigned long n, typename SUBNET> using rfc = relu<bn_fc<fc<n,SUBNET>>>;
 
@@ -1691,8 +1691,6 @@ namespace
             DLIB_TEST(x);
         DLIB_TEST(count == pnet.num_computational_layers);
     }
-
-#endif // __INTELLISENSE__
 
     float tensor_read_cpu(const tensor& t, long i, long k, long r, long c)
     {
@@ -1804,8 +1802,6 @@ namespace
     }
 #endif//DLIB_USE_CUDA
 
-#ifndef __INTELLISENSE__
-
     template <typename SUBNET> using concat_block1 = con<5,1,1,1,1,SUBNET>;
     template <typename SUBNET> using concat_block2 = con<8,3,3,1,1,SUBNET>;
     template <typename SUBNET> using concat_block3 = max_pool<3,3,1,1,SUBNET>;
@@ -1867,8 +1863,6 @@ namespace
         error = memcmp(g3.host(), b3g.host(), b3g.size());
         DLIB_TEST(error == 0);
     }
-
-#endif // __INTELLISENSE__
 
 // ----------------------------------------------------------------------------------------
 
@@ -2400,4 +2394,5 @@ namespace
     } a;
 }
 
+#endif // __INTELLISENSE__
 
