@@ -1626,6 +1626,8 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+#ifndef __INTELLISENSE__
+
     template <
         int N, 
         template <typename> class BN, 
@@ -1689,6 +1691,8 @@ namespace
             DLIB_TEST(x);
         DLIB_TEST(count == pnet.num_computational_layers);
     }
+
+#endif // __INTELLISENSE__
 
     float tensor_read_cpu(const tensor& t, long i, long k, long r, long c)
     {
