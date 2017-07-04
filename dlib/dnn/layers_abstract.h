@@ -1094,6 +1094,60 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        int scale_y, 
+        int scale_x 
+        >
+    class upsample_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be >= 1.
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it allows you to upsample a layer using
+                bilinear interpolation.  To be very specific, it upsamples each of the
+                channels in an input tensor.  Therefore, if IN is the input tensor to this
+                layer and OUT the output tensor, then we will have:
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == IN.k() 
+                    - OUT.nr() == IN.nr()*scale_y
+                    - OUT.nc() == IN.nr()*scale_x
+                    - for all valid i,k:  image_plane(OUT,i,k) is a copy of
+                      image_plane(IN,i,k) that has been bilinearly interpolated to fit into
+                      the shape of image_plane(OUT,i,k).
+        !*/
+    public:
+
+        upsample_(
+        );
+        /*!
+            ensures
+                - This object has no state, so the constructor does nothing, aside from
+                  providing default constructability.
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        int scale,
+        typename SUBNET
+        >
+    using upsample = add_layer<upsample_<scale,scale>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class dropout_
     {
         /*!
