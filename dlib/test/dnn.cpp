@@ -13,6 +13,8 @@
 
 #include "tester.h"
 
+#ifndef __INTELLISENSE__
+
 namespace
 {
 
@@ -2482,4 +2484,5 @@ namespace
     } a;
 }
 
+#endif // __INTELLISENSE__
 
