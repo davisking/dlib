@@ -1352,6 +1352,41 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void resize_bilinear (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+        ensures
+            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
+              that has been bilinearly interpolated to fit into the shape of
+              image_plane(dest,i,k).
+    !*/
+
+    void resize_bilinear_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    );
+    /*!
+        requires
+            - is_same_object(grad, gradient_input)==false
+            - gradient_input.num_samples() == grad.num_samples()
+            - gradient_input.k() == grad.k()
+        ensures
+            - Suppose that DEST is the output of resize_bilinear(DEST,SRC) for some SRC
+              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
+              the gradient of f() with respect to SRC and adds it to grad.   It should be
+              noted that we don't need to know the contents of DEST to compute this
+              gradient.  All that matters is that gradient_input have the same dimensions
+              as DEST.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     class multi_device_tensor_averager
     {
         /*!

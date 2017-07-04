@@ -2305,6 +2305,69 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_tensor_resize_bilienar(long samps, long k, long nr, long nc,  long onr, long onc)
+    {
+        resizable_tensor img(samps,k,nr,nc);
+        resizable_tensor out(samps,k,onr,onc);
+        resizable_tensor out2(samps,k,onr,onc);
+
+        dlib::rand rnd;
+        for (int iter = 0; iter < 10; ++iter)
+        {
+            print_spinner();
+
+            const size_t idx = rnd.get_random_64bit_number()%img.size();
+
+            img = 1;
+            img.host()[idx] = 2;
+            cpu::resize_bilinear(out, img);
+#ifdef DLIB_USE_CUDA
+            cuda::resize_bilinear(out2, img);
+            DLIB_CASSERT(max(abs(mat(out)-mat(out2))) < 1e-5);
+#endif
+
+            resizable_tensor gradient_input;
+            gradient_input.copy_size(out);
+            tt::tensor_rand rnd;
+            rnd.fill_uniform(gradient_input);
+
+            const float h = 1e-2;
+
+            img.host()[idx] = 2;
+            cpu::resize_bilinear(out, img);
+            float f1 = dot(out, gradient_input); 
+
+            img.host()[idx] = 2+h;
+            cpu::resize_bilinear(out, img);
+            float f2 = dot(out, gradient_input); 
+
+            const float numerical_grad = (f2-f1)/h;
+            dlog << LINFO << "numerical grad: " << numerical_grad;
+
+
+            resizable_tensor grad, grad2;
+            grad.copy_size(img);
+            grad = 0.1;
+            grad2.copy_size(img);
+            grad2 = 0.1;
+
+            cpu::resize_bilinear_gradient(grad2, gradient_input);
+            dlog << LINFO << "analytic grad: "<< grad2.host()[idx]-0.1;
+            DLIB_CASSERT(std::abs(numerical_grad - grad2.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad2.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+
+#ifdef DLIB_USE_CUDA
+            cuda::resize_bilinear_gradient(grad, gradient_input);
+            dlog << LINFO << "analytic grad: "<< grad.host()[idx]-0.1;
+            DLIB_CASSERT(std::abs(numerical_grad - grad.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+            DLIB_CASSERT(max(abs(mat(grad)-mat(grad2))) < 1e-5);
+#endif
+
+        }
+    }
+
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -2337,6 +2400,9 @@ namespace
             compare_adam();
             test_copy_tensor_gpu();
 #endif
+            test_tensor_resize_bilienar(2, 3, 6,6, 11, 11);
+            test_tensor_resize_bilienar(2, 3, 6,6, 3, 4);
+            test_tensor_resize_bilienar(2, 3, 5,6, 12, 21);
             test_max_pool(1,1,2,3,0,0);
             test_max_pool(3,3,1,1,0,0);
             test_max_pool(3,3,2,2,0,0);
