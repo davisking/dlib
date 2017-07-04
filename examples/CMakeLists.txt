@@ -121,12 +121,18 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
    add_gui_example(random_cropper_ex)
    add_gui_example(dnn_mmod_dog_hipsterizer)
    add_gui_example(dnn_imagenet_ex)
+   add_gui_example(dnn_semantic_segmentation_ex)
+   add_example(dnn_semantic_segmentation_train_ex)
    if (NOT MSVC)
       # Don't try to compile this program using Visual Studio since it causes the
       # compiler to run out of RAM and to crash.  Maybe someday Visual Studio
       # won't be broken :(
+	  # (NB: While the 32-bit compiler launched by the IDE will run out of memory,
+	  #  running a 64-bit MSBuild.exe on the Command Prompt seems to work fine.
+	  #  It does take quite a while to build these examples, though!)
       add_example(dnn_imagenet_train_ex)
       add_example(dnn_metric_learning_on_images_ex)
+      #add_example(dnn_semantic_segmentation_train_ex)
    endif()
 endif()
 
