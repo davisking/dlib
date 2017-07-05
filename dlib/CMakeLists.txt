@@ -387,8 +387,8 @@ if (NOT TARGET dlib)
                )
 
             include(cmake_utils/check_if_neon_available.cmake)
-            if (NEON OR COMPILER_ON_ARM_NEON)
-               message ("NEON will be used for libpng.")
+            if (ARM_NEON_IS_AVAILABLE)
+               message (STATUS "NEON instructions will be used for libpng.")
                enable_language(ASM)
                set(source_files ${source_files}
                   external/libpng/arm/arm_init.c
