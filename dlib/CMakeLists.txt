@@ -385,7 +385,10 @@ if (NOT TARGET dlib)
                external/zlib/uncompr.c
                external/zlib/zutil.c
                )
-            if (NEON)
+
+            include(cmake_utils/check_if_neon_available.cmake)
+            if (NEON OR COMPILER_ON_ARM_NEON)
+               message ("NEON will be used for libpng.")
                enable_language(ASM)
                set(source_files ${source_files}
                   external/libpng/arm/arm_init.c
