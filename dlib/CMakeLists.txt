@@ -386,10 +386,8 @@ if (NOT TARGET dlib)
                external/zlib/zutil.c
                )
 
-            include(cmake_utils/use_arm_neon.cmake)
-            include(CheckCXXCompilerFlag)
-            CHECK_CXX_COMPILER_FLAG("-mfpu=neon" NEON_DEFINED)
-            if (NEON OR NEON_DEFINED OR COMPILER_ON_ARM_NEON)
+            include(cmake_utils/check_if_neon_available.cmake)
+            if (NEON OR COMPILER_ON_ARM_NEON)
                message ("NEON will be used for libpng.")
                enable_language(ASM)
                set(source_files ${source_files}
