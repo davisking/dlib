@@ -2397,8 +2397,8 @@ namespace
             dnn_trainer<net_type> trainer(net, defsolver);
             trainer.set_learning_rate(0.1);
             trainer.set_min_learning_rate(0.01);
-            trainer.set_mini_batch_size(50);
-            trainer.set_max_num_epochs(50);
+            trainer.set_mini_batch_size(10);
+            trainer.set_max_num_epochs(10);
             trainer.train(x, y_weighted);
 
             const ::std::vector<matrix<uint16_t>> predictions = net(x);
