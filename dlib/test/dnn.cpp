@@ -2385,8 +2385,8 @@ namespace
                         const uint16_t label = y[ii](jj, kk);
                         const float weight
                             = label == weighted_class
-                            ? num_classes
-                            : 1.f / num_classes;
+                            ? 1.1f
+                            : 0.9f;
                         y_weighted[ii](jj, kk) = weighted_label(label, weight);
                     }
                 }
