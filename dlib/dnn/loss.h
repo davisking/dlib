@@ -1549,11 +1549,11 @@ namespace dlib
             typename SUB_TYPE,
             typename label_iterator
             >
-        void to_label (
+        static void to_label (
             const tensor& input_tensor,
             const SUB_TYPE& sub,
             label_iterator iter
-        ) const
+        )
         {
             DLIB_CASSERT(sub.sample_expansion_factor() == 1);
 
@@ -1727,56 +1727,17 @@ namespace dlib
         typedef matrix<weighted_label> training_label_type;
         typedef matrix<uint16_t> output_label_type;
 
-        // This function is identical to loss_multiclass_log_per_pixel_::to_label.
         template <
             typename SUB_TYPE,
             typename label_iterator
             >
-        void to_label (
+        static void to_label (
             const tensor& input_tensor,
             const SUB_TYPE& sub,
             label_iterator iter
-        ) const
+        )
         {
-            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
-
-            const tensor& output_tensor = sub.get_output();
-
-            DLIB_CASSERT(output_tensor.k() >= 1); // Note that output_tensor.k() should match the number of labels.
-            DLIB_CASSERT(output_tensor.k() < std::numeric_limits<uint16_t>::max());
-            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
-
-            const float* const out_data = output_tensor.host();
-
-            // The index of the largest output for each element is the label.
-            const auto find_label = [&](long sample, long r, long c) 
-            {
-                uint16_t label = 0;
-                float max_value = out_data[tensor_index(output_tensor, sample, r, c, 0)];
-                for (long k = 1; k < output_tensor.k(); ++k) 
-                {
-                    const float value = out_data[tensor_index(output_tensor, sample, r, c, k)];
-                    if (value > max_value) 
-                    {
-                        label = static_cast<uint16_t>(k);
-                        max_value = value;
-                    }
-                }
-                return label;
-            };
-
-            for (long i = 0; i < output_tensor.num_samples(); ++i, ++iter) 
-            {
-                iter->set_size(output_tensor.nr(), output_tensor.nc());
-                for (long r = 0; r < output_tensor.nr(); ++r) 
-                {
-                    for (long c = 0; c < output_tensor.nc(); ++c) 
-                    {
-                        // The index of the largest output for this element is the label.
-                        iter->operator()(r, c) = find_label(i, r, c);
-                    }
-                }
-            }
+            loss_multiclass_log_per_pixel_::to_label(input_tensor, sub, iter);
         }
 
         template <
