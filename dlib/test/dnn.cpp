@@ -2331,7 +2331,102 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    void test_tensor_resize_bilienar(long samps, long k, long nr, long nc,  long onr, long onc)
+    void test_loss_multiclass_per_pixel_weighted()
+    {
+        // Train with pixel-specific weights
+
+        print_spinner();
+
+        constexpr int input_height = 5;
+        constexpr int input_width = 7;
+        constexpr int output_height = input_height;
+        constexpr int output_width = input_width;
+        const int num_samples = 1000;
+        const int num_classes = 6;
+
+        ::std::default_random_engine generator(16);
+        ::std::uniform_real_distribution<double> u01(0.0, 1.0);
+        ::std::uniform_int_distribution<uint16_t> noisy_label(0, num_classes - 1);
+
+        ::std::vector<matrix<double>> x(num_samples);
+        ::std::vector<matrix<uint16_t>> y(num_samples);
+
+        matrix<double> xtmp(input_height, input_width);
+        matrix<uint16_t> ytmp(output_height, output_width);
+
+        // Generate input data
+        for (int ii = 0; ii < num_samples; ++ii) {
+            for (int jj = 0; jj < input_height; ++jj) {
+                for (int kk = 0; kk < input_width; ++kk) {
+                    xtmp(jj, kk) = u01(generator);
+                    ytmp(jj, kk) = noisy_label(generator);
+                }
+            }
+            x[ii] = xtmp;
+            y[ii] = ytmp;
+        }
+
+        using net_type = loss_multiclass_log_per_pixel_weighted<con<num_classes,1,1,1,1,input<matrix<double>>>>;
+        using weighted_label = loss_multiclass_log_per_pixel_weighted_::weighted_label;
+
+        ::std::vector<matrix<weighted_label>> y_weighted(num_samples);
+
+        for (int weighted_class = 0; weighted_class < num_classes; ++weighted_class) {
+
+            print_spinner();
+
+            // Assign weights
+            for (int ii = 0; ii < num_samples; ++ii) {
+                if (weighted_class == 0) {
+                    y_weighted[ii].set_size(input_height, input_width);
+                }
+                for (int jj = 0; jj < input_height; ++jj) {
+                    for (int kk = 0; kk < input_width; ++kk) {
+                        const uint16_t label = y[ii](jj, kk);
+                        const float weight
+                            = label == weighted_class
+                            ? 1.1f
+                            : 0.9f;
+                        y_weighted[ii](jj, kk) = weighted_label(label, weight);
+                    }
+                }
+            }
+
+            net_type net;
+            sgd defsolver(0,0.9);
+            dnn_trainer<net_type> trainer(net, defsolver);
+            trainer.set_learning_rate(0.1);
+            trainer.set_min_learning_rate(0.01);
+            trainer.set_mini_batch_size(10);
+            trainer.set_max_num_epochs(10);
+            trainer.train(x, y_weighted);
+
+            const ::std::vector<matrix<uint16_t>> predictions = net(x);
+
+            int num_weighted_class = 0;
+            int num_not_weighted_class = 0;
+
+            for ( int ii = 0; ii < num_samples; ++ii ) {
+                const matrix<uint16_t>& prediction = predictions[ii];
+                DLIB_TEST(prediction.nr() == output_height);
+                DLIB_TEST(prediction.nc() == output_width);
+                for ( int jj = 0; jj < output_height; ++jj )
+                    for ( int kk = 0; kk < output_width; ++kk )
+                        if ( prediction(jj, kk) == weighted_class )
+                            ++num_weighted_class;
+                        else 
+                            ++num_not_weighted_class;
+            }
+
+            DLIB_TEST_MSG(num_weighted_class > num_not_weighted_class,
+                          "The weighted class (" << weighted_class << ") does not dominate: "
+                          << num_weighted_class << " <= " << num_not_weighted_class);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_tensor_resize_bilinear(long samps, long k, long nr, long nc,  long onr, long onc)
     {
         resizable_tensor img(samps,k,nr,nc);
         resizable_tensor out(samps,k,onr,onc);
@@ -2426,9 +2521,9 @@ namespace
             compare_adam();
             test_copy_tensor_gpu();
 #endif
-            test_tensor_resize_bilienar(2, 3, 6,6, 11, 11);
-            test_tensor_resize_bilienar(2, 3, 6,6, 3, 4);
-            test_tensor_resize_bilienar(2, 3, 5,6, 12, 21);
+            test_tensor_resize_bilinear(2, 3, 6,6, 11, 11);
+            test_tensor_resize_bilinear(2, 3, 6,6, 3, 4);
+            test_tensor_resize_bilinear(2, 3, 5,6, 12, 21);
             test_max_pool(1,1,2,3,0,0);
             test_max_pool(3,3,1,1,0,0);
             test_max_pool(3,3,2,2,0,0);
@@ -2469,6 +2564,7 @@ namespace
             test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_outputs_on_trivial_task();
             test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
+            test_loss_multiclass_per_pixel_weighted();
         }
 
         void perform_test()
