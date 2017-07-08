@@ -236,7 +236,7 @@ namespace dlib
                         sout << "the truth labels for an image contain rectangles which overlap according to the ";
                         sout << "test_box_overlap object supplied for non-max suppression.  To resolve this, you ";
                         sout << "either need to relax the test_box_overlap object so it doesn't mark these rectangles as ";
-                        sout << "overlapping or adjust the truth rectangles. ";
+                        sout << "overlapping or adjust the truth rectangles in your training dataset. ";
 
                         // make sure the above string fits nicely into a command prompt window.
                         string temp = sout.str();
@@ -266,14 +266,15 @@ namespace dlib
                     ostringstream sout;
                     sout << "An impossible set of object labels was detected.  This is happening because ";
                     sout << "none of the object locations checked by the supplied image scanner is a close ";
-                    sout << "enough match to one of the truth boxes.  To resolve this you need to either lower the match_eps ";
-                    sout << "or adjust the settings of the image scanner so that it hits this truth box.  ";
-                    sout << "Or you could adjust the ";
-                    sout << "offending truth rectangle so it can be matched by the current image scanner.  Also, if you ";
-                    sout << "are using the scan_image_pyramid object then you could try using a finer image pyramid ";
-                    sout << "or adding more detection templates.  E.g. if one of ";
-                    sout << "your existing detection templates has a matching width/height ratio and smaller area ";
-                    sout << "than the offending rectangle then a finer image pyramid would probably help.";
+                    sout << "enough match to one of the truth boxes in your training dataset.  To resolve this ";
+                    sout << "you need to either lower the match_eps, adjust the settings of the image scanner ";
+                    sout << "so that it is capable of hitting this truth box, or adjust the offending truth rectangle so it ";
+                    sout << "can be matched by the current image scanner.  Also, if you ";
+                    sout << "are using the scan_fhog_pyramid object then you could try using a finer image pyramid.  ";
+                    sout << "Additionally, the scan_fhog_pyramid scans a fixed aspect ratio box across the image when it ";
+                    sout << "searches for objects.  So if you are getting this error and you are using the scan_fhog_pyramid, ";
+                    sout << "it's very likely the problem is that your training dataset contains truth rectangles of widely ";
+                    sout << "varying aspect ratios.  The solution is to make sure your training boxes all have about the same aspect ratio. ";
 
 
                     // make sure the above string fits nicely into a command prompt window.

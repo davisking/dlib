@@ -1549,11 +1549,11 @@ namespace dlib
             typename SUB_TYPE,
             typename label_iterator
             >
-        void to_label (
+        static void to_label (
             const tensor& input_tensor,
             const SUB_TYPE& sub,
             label_iterator iter
-        ) const
+        )
         {
             DLIB_CASSERT(sub.sample_expansion_factor() == 1);
 
@@ -1678,7 +1678,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "loss_multiclass_log_per_pixel_")
-                throw serialization_error("Unexpected version found while deserializing dlib::loss_multiclass_log_.");
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_multiclass_log_per_pixel_.");
         }
 
         friend std::ostream& operator<<(std::ostream& out, const loss_multiclass_log_per_pixel_& )
@@ -1703,6 +1703,148 @@ namespace dlib
 
     template <typename SUBNET>
     using loss_multiclass_log_per_pixel = add_loss_layer<loss_multiclass_log_per_pixel_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_multiclass_log_per_pixel_weighted_
+    {
+    public:
+
+        struct weighted_label
+        {
+            weighted_label()
+            {}
+
+            weighted_label(uint16_t label, float weight = 1.f)
+                : label(label), weight(weight)
+            {}
+
+            // In semantic segmentation, 65536 classes ought to be enough for anybody.
+            uint16_t label = 0;
+            float weight = 1.f;
+        };
+
+        typedef matrix<weighted_label> training_label_type;
+        typedef matrix<uint16_t> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        static void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        )
+        {
+            loss_multiclass_log_per_pixel_::to_label(input_tensor, sub, iter);
+        }
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.k() >= 1);
+            DLIB_CASSERT(output_tensor.k() < std::numeric_limits<uint16_t>::max());
+            DLIB_CASSERT(output_tensor.nr() == grad.nr() &&
+                         output_tensor.nc() == grad.nc() &&
+                         output_tensor.k() == grad.k());
+            for (long idx = 0; idx < output_tensor.num_samples(); ++idx)
+            {
+                const_label_iterator truth_matrix_ptr = (truth + idx);
+                DLIB_CASSERT(truth_matrix_ptr->nr() == output_tensor.nr() &&
+                             truth_matrix_ptr->nc() == output_tensor.nc(),
+                             "truth size = " << truth_matrix_ptr->nr() << " x " << truth_matrix_ptr->nc() << ", "
+                             "output size = " << output_tensor.nr() << " x " << output_tensor.nc());
+            }
+
+            tt::softmax(grad, output_tensor);
+
+            // The loss we output is the weighted average loss over the mini-batch, and also over each element of the matrix output.
+            const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
+            double loss = 0;
+            float* const g = grad.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
+            {
+                for (long r = 0; r < output_tensor.nr(); ++r)
+                {
+                    for (long c = 0; c < output_tensor.nc(); ++c)
+                    {
+                        const weighted_label& weighted_label = truth->operator()(r, c);
+                        const uint16_t y = weighted_label.label;
+                        const float weight = weighted_label.weight;
+                        // The network must produce a number of outputs that is equal to the number
+                        // of labels when using this type of loss.
+                        DLIB_CASSERT(static_cast<long>(y) < output_tensor.k() || weight == 0.f,
+                                        "y: " << y << ", output_tensor.k(): " << output_tensor.k());
+                        for (long k = 0; k < output_tensor.k(); ++k)
+                        {
+                            const size_t idx = tensor_index(output_tensor, i, r, c, k);
+                            if (k == y)
+                            {
+                                loss += weight*scale*-std::log(g[idx]);
+                                g[idx] = weight*scale*(g[idx] - 1);
+                            }
+                            else
+                            {
+                                g[idx] = weight*scale*g[idx];
+                            }
+                        }
+                    }
+                }
+            }
+            return loss;
+        }
+
+        friend void serialize(const loss_multiclass_log_per_pixel_weighted_& , std::ostream& out)
+        {
+            serialize("loss_multiclass_log_per_pixel_weighted_", out);
+        }
+
+        friend void deserialize(loss_multiclass_log_per_pixel_weighted_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_multiclass_log_per_pixel_weighted_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_multiclass_log_per_pixel_weighted_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_multiclass_log_per_pixel_weighted_& )
+        {
+            out << "loss_multiclass_log_per_pixel_weighted";
+            return out;
+        }
+
+        friend void to_xml(const loss_multiclass_log_per_pixel_weighted_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_multiclass_log_per_pixel_weighted/>";
+        }
+
+    private:
+        static size_t tensor_index(const tensor& t, long sample, long row, long column, long k)
+        {
+            // See: https://github.com/davisking/dlib/blob/4dfeb7e186dd1bf6ac91273509f687293bd4230a/dlib/dnn/tensor_abstract.h#L38
+            return ((sample * t.k() + k) * t.nr() + row) * t.nc() + column;
+        }
+
+    };
+
+    template <typename SUBNET>
+    using loss_multiclass_log_per_pixel_weighted = add_loss_layer<loss_multiclass_log_per_pixel_weighted_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
