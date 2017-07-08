@@ -127,9 +127,12 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
       # Don't try to compile this program using Visual Studio since it causes the
       # compiler to run out of RAM and to crash.  Maybe someday Visual Studio
       # won't be broken :(
-	  # (NB: While the 32-bit compiler launched by the IDE will run out of memory,
-	  #  running a 64-bit MSBuild.exe on the Command Prompt seems to work fine.
-	  #  It does take quite a while to build these examples, though!)
+      # (NB: While the 32-bit compiler launched by the IDE will run out of memory,
+      #  running a 64-bit MSBuild.exe on the Command Prompt seems to work fine.
+      #  It does take quite a while to build these examples, though!
+      #  Note that you may additionally need to set Debug Information Format to
+      #  C7 compatible (/Z7), in case you get compiler error "cannot update
+      #  program database".)
       add_example(dnn_imagenet_train_ex)
       add_example(dnn_metric_learning_on_images_ex)
       #add_example(dnn_semantic_segmentation_train_ex)
