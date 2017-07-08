@@ -1706,6 +1706,138 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_mean_squared_per_pixel_
+    {
+    public:
+
+        typedef matrix<float> training_label_type;
+        typedef matrix<float> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+
+            const tensor& output_tensor = sub.get_output();
+
+            DLIB_CASSERT(output_tensor.k() == 1, "output k = " << output_tensor.k());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            const float* out_data = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++iter)
+            {
+                iter->set_size(output_tensor.nr(), output_tensor.nc());
+                for (long r = 0; r < output_tensor.nr(); ++r)
+                {
+                    for (long c = 0; c < output_tensor.nc(); ++c)
+                    {
+                        iter->operator()(r, c) = out_data[tensor_index(output_tensor, i, r, c, 0)];
+                    }
+                }
+            }
+        }
+
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples() % sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.k() >= 1);
+            DLIB_CASSERT(output_tensor.k() < std::numeric_limits<uint16_t>::max());
+            DLIB_CASSERT(output_tensor.nr() == grad.nr() &&
+                output_tensor.nc() == grad.nc() &&
+                output_tensor.k() == grad.k());
+            for (long idx = 0; idx < output_tensor.num_samples(); ++idx)
+            {
+                const_label_iterator truth_matrix_ptr = (truth + idx);
+                DLIB_CASSERT(truth_matrix_ptr->nr() == output_tensor.nr() &&
+                    truth_matrix_ptr->nc() == output_tensor.nc(),
+                    "truth size = " << truth_matrix_ptr->nr() << " x " << truth_matrix_ptr->nc() << ", "
+                    "output size = " << output_tensor.nr() << " x " << output_tensor.nc());
+            }
+
+            // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
+            const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
+            double loss = 0;
+            float* const g = grad.host();
+            const float* out_data = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
+            {
+                for (long r = 0; r < output_tensor.nr(); ++r)
+                {
+                    for (long c = 0; c < output_tensor.nc(); ++c)
+                    {
+                        const float y = truth->operator()(r, c);
+                        const size_t idx = tensor_index(output_tensor, i, r, c, 0);
+                        const float temp1 = y - out_data[idx];
+                        const float temp2 = scale*temp1;
+                        loss += 0.5*temp2*temp1;
+                        g[idx] = -temp2;
+                    }
+                }
+            }
+            return loss;
+        }
+
+        friend void serialize(const loss_mean_squared_per_pixel_& , std::ostream& out)
+        {
+            serialize("loss_mean_squared_per_pixel_", out);
+        }
+
+        friend void deserialize(loss_mean_squared_per_pixel_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_mean_squared_per_pixel_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_mean_squared_per_pixel_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_mean_squared_per_pixel_& )
+        {
+            out << "loss_mean_squared_per_pixel";
+            return out;
+        }
+
+        friend void to_xml(const loss_mean_squared_per_pixel_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_mean_squared_per_pixel/>";
+        }
+
+    private:
+        static size_t tensor_index(const tensor& t, long sample, long row, long column, long k)
+        {
+            // See: https://github.com/davisking/dlib/blob/4dfeb7e186dd1bf6ac91273509f687293bd4230a/dlib/dnn/tensor_abstract.h#L38
+            return ((sample * t.k() + k) * t.nr() + row) * t.nc() + column;
+        }
+    };
+
+    template <typename SUBNET>
+    using loss_mean_squared_per_pixel = add_loss_layer<loss_mean_squared_per_pixel_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+
 }
 
 #endif // DLIB_DNn_LOSS_H_
