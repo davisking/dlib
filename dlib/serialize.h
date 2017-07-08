@@ -1523,51 +1523,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class proxy_serialize_ostream
-    {
-    public:
-        explicit proxy_serialize_ostream (
-            std::ostream& out
-        ) : out(out)
-        {}
-
-        template <typename T>
-        inline proxy_serialize_ostream& operator<<(const T& item)
-        {
-            serialize(item, out);
-            return *this;
-        }
-
-    private:
-        std::ostream& out;
-    };
-
-    class proxy_deserialize_istream
-    {
-    public:
-        explicit proxy_deserialize_istream (
-            std::istream& in
-        ) : in(in)
-        {}
-
-        template <typename T>
-        inline proxy_deserialize_istream& operator>>(T& item)
-        {
-            deserialize(item, in);
-            return *this;
-        }
-
-    private:
-        std::istream& in;
-    };
-
-    inline proxy_serialize_ostream serialize(std::ostream& out)
-    { return proxy_serialize_ostream(out); }
-    inline proxy_deserialize_istream deserialize(std::istream& in)
-    { return proxy_deserialize_istream(in); }
-
-// ----------------------------------------------------------------------------------------
-
 }
 
 // forward declare the MessageLite object so we can reference it below.
