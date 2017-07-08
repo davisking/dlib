@@ -82,6 +82,9 @@ namespace dlib
             unsigned long num
         )const;
 
+        bool has_blocked_dequeues (
+        ) const;
+
         void enable (
         );
 
@@ -664,6 +667,18 @@ namespace dlib
             unblock_sig.broadcast();
 
         --unblock_sig_waiters;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    bool pipe<T>::
+    has_blocked_dequeues () const
+    {
+        auto_mutex M(m);
+        return pipe_size == 0 && dequeue_waiters > 0;
     }
 
 // ----------------------------------------------------------------------------------------

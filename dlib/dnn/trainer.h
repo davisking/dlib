@@ -564,6 +564,11 @@ namespace dlib
             return train_one_step_calls;
         }
 
+        bool is_training() const
+        {
+            return !job_pipe.has_blocked_dequeues();
+        }
+
     private:
 
         void record_test_loss(double loss)
