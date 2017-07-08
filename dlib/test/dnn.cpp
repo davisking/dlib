@@ -2487,6 +2487,20 @@ namespace
     }
 
 
+    void test_serialization()
+    {
+        print_spinner();
+
+        using net_type = loss_mean_squared<fc<1, input<matrix<double>>>>;
+        net_type net, net2;
+
+        std::ostringstream out;
+        serialize(net, out);
+        const std::string serialized = out.str();
+        std::istringstream in(serialized);
+        dlib::deserialize(net2, in);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     class dnn_tester : public tester
@@ -2565,6 +2579,7 @@ namespace
             test_loss_multiclass_per_pixel_outputs_on_trivial_task();
             test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
             test_loss_multiclass_per_pixel_weighted();
+            test_serialization();
         }
 
         void perform_test()
