@@ -2493,24 +2493,11 @@ namespace
         using net_type = loss_mean_squared<fc<1, input<matrix<double>>>>;
         net_type net, net2;
 
-#if 1
-        // At least on MSVC, this fails with compiler error:
-        // "C2665: 'dlib::serialize': none of the 46 overloads could convert all the argument types"
-        {
-            std::ostringstream out;
-            dlib::serialize(net, out);
-            const std::string serialized = out.str();
-            std::istringstream in(serialized);
-            dlib::deserialize(net2, in);
-        }
-#endif
-
-        // This at least compiles (with #692):
         std::ostringstream out;
-        dlib::serialize(out) << net;
+        dlib::serialize(net, out);
         const std::string serialized = out.str();
         std::istringstream in(serialized);
-        dlib::deserialize(in) >> net2;
+        dlib::deserialize(net2, in);
     }
 
 // ----------------------------------------------------------------------------------------
