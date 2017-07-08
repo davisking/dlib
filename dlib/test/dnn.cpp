@@ -2486,6 +2486,19 @@ namespace
         }
     }
 
+    void test_serialization()
+    {
+        print_spinner();
+
+        using net_type = loss_mean_squared<fc<1, input<matrix<double>>>>;
+        net_type net, net2;
+
+        std::ostringstream out;
+        dlib::serialize(net, out);
+        const std::string serialized = out.str();
+        std::istringstream in(serialized);
+        dlib::deserialize(net2, in);
+    }
 
     void test_serialization()
     {
