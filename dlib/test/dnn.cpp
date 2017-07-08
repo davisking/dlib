@@ -2493,7 +2493,7 @@ namespace
         using net_type = loss_mean_squared<fc<1, input<matrix<double>>>>;
         net_type net, net2;
 
-#if 0
+#if 1
         // At least on MSVC, this fails with compiler error:
         // "C2665: 'dlib::serialize': none of the 46 overloads could convert all the argument types"
         {
