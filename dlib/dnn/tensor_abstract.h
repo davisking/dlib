@@ -134,7 +134,7 @@ namespace dlib
                   calling host().
         !*/
 
-        float float* host_write_only(
+        virtual float* host_write_only(
         ) = 0;
         /*!
             ensures
@@ -174,7 +174,7 @@ namespace dlib
                   host() will perform a device to host transfer.
         !*/
 
-        float float* device_write_only(
+        virtual float* device_write_only(
         ) = 0;
         /*!
             requires
