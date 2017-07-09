@@ -1997,6 +1997,76 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_simple_autoencoder()
+    {
+        const int output_width = 5;
+        const int output_height = 5;
+        const int num_samples = 100;
+        ::std::vector<matrix<float>> x(num_samples);
+        ::std::default_random_engine generator(16);
+        ::std::uniform_int_distribution<int> distribution(0,3);
+
+        matrix<float> tmp(output_width, output_height);
+        for (int i = 0; i < num_samples; ++i)
+        {
+            const int model = distribution(generator);
+
+            for (int r = 0; r < output_height; ++r)
+                for (int c = 0; c < output_width; ++c)
+                    switch (model) {
+                    case 0: tmp(r, c) = r / output_height;
+                    case 1: tmp(r, c) = c / output_width;
+                    case 2: tmp(r, c) = 1.0 - r / output_height;
+                    case 3: tmp(r, c) = 1.0 - c / output_width;
+                    }
+
+            x[i] = tmp;
+        }
+
+        using net_type = loss_mean_squared_per_pixel<
+                            relu<cont<1,output_height,output_width,2,2,
+                            relu<con<2,output_height,output_width,2,2,
+                            input<matrix<float>>>>>>>;
+        net_type net;
+
+        const auto autoencoder_error = [&x, &net, &output_height, &output_width]()
+        {
+            const auto y = net(x);
+            double error = 0.0;
+            for (int i = 0; i < x.size(); ++i)
+                for (int r = 0; r < output_height; ++r)
+                    for (int c = 0; c < output_width; ++c)
+                        error += fabs(y[i](r, c) - x[i](r, c));
+
+            return error / (x.size() * output_height * output_width);
+        };
+
+        // The autoencoder can't be very good before it's been trained
+        // (or at least the probability should be super low - in fact
+        // the error ought to be much higher than 0.01)
+        const double error_before = autoencoder_error();
+        DLIB_TEST_MSG(error_before > 0.01, "Autoencoder error before training = " << error_before);
+
+        // Make sure there's an information bottleneck, as intended
+        const auto& output3 = dlib::layer<3>(net).get_output();
+        DLIB_TEST(output3.num_samples() == num_samples);
+        DLIB_TEST(output3.nr() == 1);
+        DLIB_TEST(output3.nc() == 1);
+        DLIB_TEST(output3.k() == 2);
+
+        sgd defsolver(0,0.9);
+        dnn_trainer<net_type> trainer(net, defsolver);
+        trainer.set_learning_rate(0.1);
+        trainer.set_max_num_epochs(1000);
+        trainer.train(x, x);
+
+        // Now we should have learned everything there is to it
+        const double error_after = autoencoder_error();
+        DLIB_TEST_MSG(error_after < 1e-10, "Autoencoder error after training = " << error_after);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task()
     {
         print_spinner();
@@ -2574,6 +2644,7 @@ namespace
             test_concat();
             test_simple_linear_regression();
             test_multioutput_linear_regression();
+            test_simple_autoencoder();
             test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_outputs_on_trivial_task();
