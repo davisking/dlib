@@ -1425,6 +1425,7 @@ namespace dlib
                 break;
                 default:
                 {
+                    launch_kernel(_set_tensor, max_jobs(output.size()), output.device(), output.size(), 0.0f);
                     for (long n = 0; n < data.num_samples(); n++)
                     {
                         for (long k = 0; k < data.k(); k++)
@@ -1545,7 +1546,7 @@ namespace dlib
                 {
                     auto i = r * nc + c;                    
                     auto j = (r + padding_y) * nc2 + (c + padding_x);                    
-                    out[i] = in[j];
+                    out[i] += in[j];
                 }
             }
         }
@@ -1609,6 +1610,7 @@ namespace dlib
                 break;                
                 default:
                 {
+                    launch_kernel(_set_tensor, max_jobs(output.size()), output.device(), output.size(), 0.0f);
                     for (long n = 0; n < data.num_samples(); n++)
                     {
                         for (long k = 0; k < data.k(); k++)

@@ -1645,6 +1645,36 @@ namespace
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
+        {
+            print_spinner();
+            upsample_<2,2,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<3,3,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            spatialpadding_<3,3,0> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            spatialpadding_<5,5,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            spatialpadding_<2,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
     }
 
 // ----------------------------------------------------------------------------------------

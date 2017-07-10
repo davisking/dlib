@@ -2072,7 +2072,7 @@ namespace dlib
                           {
                               for (long c = 0; c < data.nc(); c++)
                               {
-                                  dstPlane[r * output.nc() + c] = srcPlane((r + padding_y) *data.nc()+(c + padding_x));
+                                  dstPlane[r * output.nc() + c] += srcPlane((r + padding_y) *data.nc()+(c + padding_x));
                               }
                           }
                        }

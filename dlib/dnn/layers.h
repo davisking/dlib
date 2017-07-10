@@ -600,7 +600,7 @@ namespace dlib
     template <
         int _scale_y,
         int _scale_x,
-        unsigned char _method
+        unsigned short _method
         >
     class upsample_
     {
@@ -643,7 +643,7 @@ namespace dlib
         )  
         {
             (void)item;
-            // this->conv is non-copyable and basically stateless, so we have to write our
+            // this->upsample_ is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
         }
 
@@ -654,7 +654,7 @@ namespace dlib
             if (this == &item)
                 return *this;
 
-            // this->conv is non-copyable and basically stateless, so we have to write our
+            // this->upsample_ is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
             return *this;
         }
@@ -674,7 +674,6 @@ namespace dlib
             unsigned int gnsamps = sub.get_output().num_samples();
             unsigned int gk = sub.get_output().k();
             output.set_size(gnsamps,gk,gnr,gnc);
-            output = 0;
             ups.forward(output,sub.get_output(),_scale_y,_scale_x,_method);
         } 
 
@@ -750,7 +749,7 @@ namespace dlib
     template <
         int scale_y,
         int scale_x,
-        unsigned char method,
+        unsigned short method,
         typename SUBNET
         >
     using upsample = add_layer<upsample_<scale_y,scale_x,method>, SUBNET>;
@@ -760,7 +759,7 @@ namespace dlib
     template <
         int _padding_y,
         int _padding_x,
-        unsigned char _method
+        unsigned short _method
         >
     class spatialpadding_
     {
@@ -803,7 +802,7 @@ namespace dlib
         )  
         {
             (void)item;
-            // this->conv is non-copyable and basically stateless, so we have to write our
+            // this->spatialpadding_ is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
         }
 
@@ -814,7 +813,7 @@ namespace dlib
             if (this == &item)
                 return *this;
 
-            // this->conv is non-copyable and basically stateless, so we have to write our
+            // this->spatialpadding_ is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
             return *this;
         }
@@ -834,7 +833,6 @@ namespace dlib
             unsigned int gnsamps = sub.get_output().num_samples();
             unsigned int gk = sub.get_output().k();
             output.set_size(gnsamps,gk,gnr,gnc);
-            output = 0;
             pad.forward(output,sub.get_output(),_padding_y,_padding_x,_method);
         } 
 
@@ -842,10 +840,7 @@ namespace dlib
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             (void)params_grad;
-            resizable_tensor temp;
-            temp.copy_size(sub.get_gradient_input());
-            pad.backward(temp,gradient_input,_padding_y,_padding_x,_method);
-            tt::add(1,sub.get_gradient_input(),1,temp);
+            pad.backward(sub.get_gradient_input(),gradient_input,_padding_y,_padding_x,_method);
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -913,7 +908,7 @@ namespace dlib
     template <
         int padding_y,
         int padding_x,
-        unsigned char method,
+        unsigned short method,
         typename SUBNET
         >
     using spatialpadding = add_layer<spatialpadding_<padding_y,padding_x,method>, SUBNET>;
