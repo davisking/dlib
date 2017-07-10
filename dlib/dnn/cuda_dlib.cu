@@ -10,9 +10,6 @@ namespace dlib
     namespace cuda 
     {
 
-       const unsigned char UPSAMPLE_POINT = 1;
-       const unsigned char UPSAMPLE_LINEAR = 2;
-
        const unsigned char PADDING_REFLECTION = 1;
        const unsigned char PADDING_REPLICATION = 2;
     // -----------------------------------------------------------------------------------
@@ -1144,6 +1141,290 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_resize_bilinear(size_t dsize, size_t dchan_size, size_t dnc, float* d, 
+                                              size_t schan_size, int snr, int snc, const float* s, 
+                                              const float x_scale, const float y_scale)
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::floor(y));
+                const int bottom = ::min(top+1, snr-1);
+                const float tb_frac = y - top;
+
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::floor(x));
+                const int right  = ::min(left+1, snc-1);
+                const float lr_frac = x - left;
+
+                float tl = s[sidx+top*snc+left];
+                float tr = s[sidx+top*snc+right];
+                float bl = s[sidx+bottom*snc+left];
+                float br = s[sidx+bottom*snc+right];
+
+                float temp = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
+                    tb_frac*((1-lr_frac)*bl + lr_frac*br);
+
+                d[i] = temp;
+            }
+        }
+
+        void resize_bilinear (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(is_same_object(dest, src)==false);
+            DLIB_CASSERT(dest.num_samples() == src.num_samples());
+            DLIB_CASSERT(dest.k() == src.k());
+
+            if (dest.size() == 0 || src.size() == 0)
+                return;
+
+            const float x_scale = (src.nc()-1)/(float)std::max<long>((dest.nc()-1),1);
+            const float y_scale = (src.nr()-1)/(float)std::max<long>((dest.nr()-1),1);
+
+            launch_kernel(_cuda_resize_bilinear, 
+                    dest.size(), dest.nr()*dest.nc(), dest.nc(), dest.device(),
+                    src.nr()*src.nc(), src.nr(), src.nc(), src.device(),
+                    x_scale, y_scale);
+        }
+
+        __global__ void _cuda_resize_bilinear_gradient(size_t dsize, size_t dchan_size, size_t dnc, const float* d, 
+                                              size_t schan_size, int snr, int snc, float* s, 
+                                              const float x_scale, const float y_scale)
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+                const float tmp = d[i];
+
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::floor(y));
+                const int bottom = ::min(top+1, snr-1);
+                const float tb_frac = y - top;
+
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::floor(x));
+                const int right  = ::min(left+1, snc-1);
+                const float lr_frac = x - left;
+
+
+                atomicAdd(s+sidx+top*snc+left,     tmp*(1-tb_frac)*(1-lr_frac));
+                atomicAdd(s+sidx+top*snc+right,    tmp*(1-tb_frac)*(lr_frac));
+                atomicAdd(s+sidx+bottom*snc+left,  tmp*(tb_frac)*(1-lr_frac));
+                atomicAdd(s+sidx+bottom*snc+right, tmp*(tb_frac)*(lr_frac));
+            }
+        }
+
+        void resize_bilinear_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
+            DLIB_CASSERT(gradient_input.num_samples() == grad.num_samples());
+            DLIB_CASSERT(gradient_input.k() == grad.k());
+
+            if (grad.size() == 0 || gradient_input.size() == 0)
+                return;
+
+            const float x_scale = (grad.nc()-1)/(float)std::max<long>((gradient_input.nc()-1),1);
+            const float y_scale = (grad.nr()-1)/(float)std::max<long>((gradient_input.nr()-1),1);
+
+            launch_kernel(_cuda_resize_bilinear_gradient, 
+                    gradient_input.size(), gradient_input.nr()*gradient_input.nc(), gradient_input.nc(), gradient_input.device(),
+                    grad.nr()*grad.nc(), grad.nr(), grad.nc(), grad.device(),
+                    x_scale, y_scale);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_resize_nn(size_t dsize, size_t dchan_size, size_t dnc, float* d, 
+                                        size_t schan_size, int snr, int snc, const float* s, 
+                                        const float x_scale, const float y_scale)
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::round(y));
+
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::round(x));
+
+                d[i] = s[sidx+top*snc+left];
+            }
+        }
+
+        void resize_nn (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(is_same_object(dest, src)==false);
+            DLIB_CASSERT(dest.num_samples() == src.num_samples());
+            DLIB_CASSERT(dest.k() == src.k());
+
+            if (dest.size() == 0 || src.size() == 0)
+                return;
+
+            const float x_scale = (src.nc()-1)/(float)std::max<long>((dest.nc()-1),1);
+            const float y_scale = (src.nr()-1)/(float)std::max<long>((dest.nr()-1),1);
+
+            launch_kernel(_cuda_resize_nn, 
+                    dest.size(), dest.nr()*dest.nc(), dest.nc(), dest.device(),
+                    src.nr()*src.nc(), src.nr(), src.nc(), src.device(),
+                    x_scale, y_scale);
+        }
+
+        __global__ void _cuda_resize_nn_gradient(size_t dsize, size_t dchan_size, size_t dnc, const float* d, 
+                                              size_t schan_size, int snr, int snc, float* s, 
+                                              const float x_scale, const float y_scale)
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+                const float tmp = d[i];
+
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::round(y));
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::round(x));
+                atomicAdd(s+sidx+top*snc+left, tmp);
+            }
+        }
+
+        void resize_nn_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
+            DLIB_CASSERT(gradient_input.num_samples() == grad.num_samples());
+            DLIB_CASSERT(gradient_input.k() == grad.k());
+
+            if (grad.size() == 0 || gradient_input.size() == 0)
+                return;
+
+            const float x_scale = (grad.nc()-1)/(float)std::max<long>((gradient_input.nc()-1),1);
+            const float y_scale = (grad.nr()-1)/(float)std::max<long>((gradient_input.nr()-1),1);
+
+            launch_kernel(_cuda_resize_nn_gradient, 
+                    gradient_input.size(), gradient_input.nr()*gradient_input.nc(), gradient_input.nc(), gradient_input.device(),
+                    grad.nr()*grad.nc(), grad.nr(), grad.nc(), grad.device(),
+                    x_scale, y_scale);
+        }
+
+
+        __global__ void _cuda_resize_with_zeroes(size_t dsize, size_t dchan_size, size_t dnc, float* d, 
+                                        size_t schan_size, int snr, int snc, const float* s, 
+                                        const float x_scale, const float y_scale)
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::floor(y));
+
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::floor(x));
+
+                d[i] = (x-left < 1E-06 && y-top < 1E-06 ? s[sidx+top*snc+left] : 0.0f);
+            }
+        }
+
+        void resize_fill_with_zeroes (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(is_same_object(dest, src)==false);
+            DLIB_CASSERT(dest.num_samples() == src.num_samples());
+            DLIB_CASSERT(dest.k() == src.k());
+
+            if (dest.size() == 0 || src.size() == 0)
+                return;
+
+            const float x_scale = (src.nc())/(float)std::max<long>((dest.nc()),1);
+            const float y_scale = (src.nr())/(float)std::max<long>((dest.nr()),1);
+
+            launch_kernel(_cuda_resize_with_zeroes, 
+                    dest.size(), dest.nr()*dest.nc(), dest.nc(), dest.device(),
+                    src.nr()*src.nc(), src.nr(), src.nc(), src.device(),
+                    x_scale, y_scale);
+        }
+
+        __global__ void _cuda_resize_with_zeroes_gradient(size_t dsize, size_t dchan_size, size_t dnc, const float* d, 
+                                              size_t schan_size, int snr, int snc, float* s, 
+                                              const float x_scale, const float y_scale)
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+                const float tmp = d[i];
+
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::floor(y));
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::floor(x));
+                if (y-top < 1E-06 && x-left < 1E-06)
+                    atomicAdd(s+sidx+top*snc+left, tmp);
+            }
+        }
+
+        void resize_fill_with_zeroes_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
+            DLIB_CASSERT(gradient_input.num_samples() == grad.num_samples());
+            DLIB_CASSERT(gradient_input.k() == grad.k());
+
+            if (grad.size() == 0 || gradient_input.size() == 0)
+                return;
+
+            const float x_scale = (grad.nc())/(float)std::max<long>((gradient_input.nc()),1);
+            const float y_scale = (grad.nr())/(float)std::max<long>((gradient_input.nr()),1);
+
+            launch_kernel(_cuda_resize_with_zeroes_gradient, 
+                    gradient_input.size(), gradient_input.nr()*gradient_input.nc(), gradient_input.nc(), gradient_input.device(),
+                    grad.nr()*grad.nc(), grad.nr(), grad.nc(), grad.device(),
+                    x_scale, y_scale);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         void copy_tensor(
                 tensor& dest,
                 size_t dest_k_offset,
@@ -1175,271 +1456,6 @@ namespace dlib
             }
         }
 
-    // ----------------------------------------------------------------------------------------
-
-        __global__ void _cuda_nn_upsample(float* out, const float* in, size_t nr, 
-                                          size_t nc, 
-                                          size_t nc2,
-                                          size_t scale_y, 
-                                          size_t scale_x)
-        {
-
-            for (auto r : grid_stride_range_y(0, nr))
-            {
-                for (auto c : grid_stride_range(0, nc))
-                {
-                    auto i = r * nc + c;                    
-                    auto j = (r / scale_y) * nc2 + c/scale_x;                    
-                    out[i] = in[j];
-                }
-            }
-        }
-
-        __global__ void _cuda_bilinear_upsample(float* out, const float* in, size_t nr, 
-                                                size_t nc, 
-                                                size_t nr2,                                                
-                                                size_t nc2,
-                                                size_t scale_y, 
-                                                size_t scale_x)
-        {
-
-            for (auto r : grid_stride_range_y(0, nr))
-            {
-                auto srcR = r/scale_y;
-                auto srcP = in + srcR * nc2;
-                auto srcP2 = in + (srcR + 1 < nr2-1 ? srcR+1 : nr2-1) * nc2;
-                float yWeight = float(r)/float(scale_y)-(int)(r/scale_y);                
-                for (auto c : grid_stride_range(0, nc))
-                {
-                    auto i = r * nc + c;
-                    float xWeight =  float(c)/float(scale_x)-(int)(c/scale_x);                                        
-                    auto j0 = c/scale_x;
-                    auto j1 = (j0+1 < nc2-1 ? j0+1 : nc2-1); 
-                    out[i] = (1.0-yWeight) * ((1.0-xWeight) * srcP[j0] + xWeight * srcP[j1]) +
-                                     yWeight * ((1.0-xWeight) * srcP2[j0] + xWeight * srcP2[j1]);
-
-                }
-            }
-        }
-
-        __global__ void _cuda_zeros_upsample(float* out, const float* in, size_t nr, 
-                                             size_t nc, 
-                                             size_t nc2,
-                                             size_t scale_y, 
-                                             size_t scale_x)
-        {
-
-            for (auto r : grid_stride_range_y(0, nr))
-            {
-                for (auto c : grid_stride_range(0, nc))
-                {
-                    auto i = r * scale_y * nc2 + c * scale_x;                    
-                    auto j = r * nc + c;                    
-                    out[i] = in[j];
-                }
-            }
-        }
-
-        __global__ void _cuda_nn_downsample(float* out, const float* in, size_t nr, 
-                                            size_t nc, 
-                                            size_t nc2,
-                                            size_t scale_y, 
-                                            size_t scale_x)
-        {
-
-            for (auto r : grid_stride_range_y(0, nr))
-            {
-                for (auto c : grid_stride_range(0, nc))
-                {
-                    auto i = r * nc + c;
-                    for (auto y = 0; y < scale_y; y++)
-                        for (auto x = 0; x < scale_x; x++)
-                        {
-                            auto j = (r * scale_y + y) * nc2 + c * scale_x + x;                           
-                            out[i] += in[j];                    
-                        }
-                }
-            }
-        }
-
-        __global__ void _cuda_zeros_downsample(float* out, const float* in, size_t nr, 
-                                               size_t nc, 
-                                               size_t nc2,
-                                               size_t scale_y, 
-                                               size_t scale_x)
-        {
-
-            for (auto r : grid_stride_range_y(0, nr))
-            {
-                for (auto c : grid_stride_range(0, nc))
-                {
-                    auto i = r * nc + c;
-                    auto j = r * scale_y * nc2 + c * scale_x;                           
-                    out[i] += in[j];                    
-                }
-            }
-        }
-
-        __global__ void _cuda_bilinear_downsample(float* out, const float* in, size_t nr, 
-                                                  size_t nc, 
-                                                  size_t nc2,
-                                                  size_t scale_y, 
-                                                  size_t scale_x)
-        {
-
-            for (auto r : grid_stride_range_y(0, nr))
-            {
-                for (auto c : grid_stride_range(0, nc))
-                {
-                    auto i = r * nc + c;
-                    for (auto y = 0; y < scale_y; y++)
-                    {
-                        float yWeight = 1.0f - float(y)/float(scale_y);                        
-                        for (auto x = 0; x < scale_x; x++)
-                        {
-                            float xWeight = 1.0f - float(x)/float(scale_x);
-                            auto j = (r * scale_y + y) * nc2 + c * scale_x + x;                           
-                            out[i] += yWeight * xWeight * in[j];                    
-                        }
-                    }
-                }
-            }
-        }
-        tensor_upsample::
-        tensor_upsample(
-        )  
-        {
-        }
-
-
-        tensor_upsample::
-        ~tensor_upsample (
-        )
-        {
-        }
-        
-        void tensor_upsample::forward(
-            resizable_tensor& output,
-            const tensor& data,
-            int scale_y,
-            int scale_x,
-            unsigned char method
-        )
-        {
-            DLIB_CASSERT(output.num_samples() == data.num_samples());
-            DLIB_CASSERT(output.k() == data.k());
-            output = 0;
-            dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
-            dim3 threads(32,32);
-            switch(method)
-            {
-                case UPSAMPLE_POINT:
-                {
-                    for (long n = 0; n < data.num_samples(); n++)
-                    {
-                        for (long k = 0; k < data.k(); k++)
-                        {
-                            float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
-                            const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
-                            _cuda_nn_upsample<<<blocks,threads>>>(dest_p,src_p,output.nr(),
-                                                                  output.nc(),data.nc(),scale_y,scale_x);       
-                        }
-                    }
-                }
-                break;
-                case UPSAMPLE_LINEAR:
-                {
-                    for (long n = 0; n < data.num_samples(); n++)
-                    {
-                        for (long k = 0; k < data.k(); k++)
-                        {
-                            float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
-                            const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
-                            _cuda_bilinear_upsample<<<blocks,threads>>>(dest_p,src_p,output.nr(),
-                                                                        output.nc(),data.nr(),data.nc(),
-                                                                        scale_y,scale_x);       
-
-                        }
-                    }
-                }
-                break;                
-                default:
-                {
-                    for (long n = 0; n < data.num_samples(); n++)
-                    {
-                        for (long k = 0; k < data.k(); k++)
-                        {
-                            float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
-                            const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
-                            _cuda_zeros_upsample<<<blocks,threads>>>(dest_p,src_p,data.nr(),
-                                                                     data.nc(),output.nc(),scale_y,scale_x);       
-                        }
-                    }  
-                }
-            }
-        }
-
-        void tensor_upsample::backward (
-                tensor& output,            
-                const tensor& data, 
-                int scale_y,
-                int scale_x,
-                unsigned char method
-            )
-        {
-            DLIB_CASSERT(output.num_samples() == data.num_samples());
-            DLIB_CASSERT(output.k() == data.k());
-            dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
-            dim3 threads(32,32);
-            switch(method)
-            {
-                case UPSAMPLE_POINT:
-                {
-                    for (long n = 0; n < data.num_samples(); n++)
-                    {
-                        for (long k = 0; k < data.k(); k++)
-                        {
-                            float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
-                            const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
-                            _cuda_nn_downsample<<<blocks,threads>>>(dest_p,src_p,output.nr(),
-                                                                    output.nc(),data.nc(),scale_y,scale_x);       
-
-                        }
-                    }
-                }
-                break;
-                case UPSAMPLE_LINEAR:
-                {
-                    for (long n = 0; n < data.num_samples(); n++)
-                    {
-                        for (long k = 0; k < data.k(); k++)
-                        {
-                            float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
-                            const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
-                            _cuda_bilinear_downsample<<<blocks,threads>>>(dest_p,src_p,output.nr(),
-                                                                          output.nc(),data.nc(),scale_y,scale_x);       
-
-                        }
-                    }
-                }
-                break;
-                default:
-                {
-                    launch_kernel(_set_tensor, max_jobs(output.size()), output.device(), output.size(), 0.0f);
-                    for (long n = 0; n < data.num_samples(); n++)
-                    {
-                        for (long k = 0; k < data.k(); k++)
-                        {
-                            float* dest_p = output.device() + ((n * data.k() + k) * output.nc() * output.nr());
-                            const float* src_p = data.device() + ((n * data.k() + k) * data.nc() * data.nr());
-                            _cuda_zeros_downsample<<<blocks,threads>>>(dest_p,src_p,output.nr(),
-                                                                      output.nc(),data.nc(),scale_y,scale_x);       
-
-                        }
-                    }
-                }
-            }
-        }
 
     // ----------------------------------------------------------------------------------------
 

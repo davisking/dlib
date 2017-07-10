@@ -7,6 +7,7 @@
 #include <vector>
 #include "../uintn.h"
 #include "../algs.h"
+#include <chrono>
 
 namespace dlib
 {
@@ -137,6 +138,13 @@ namespace dlib
         /*!
             ensures
                 - returns the size of this file in bytes.
+        !*/
+
+        std::chrono::time_point<std::chrono::system_clock> last_modified (
+        ) const;
+        /*!
+            ensures
+                - returns the time the file was last modified.
         !*/
 
         operator std::string (

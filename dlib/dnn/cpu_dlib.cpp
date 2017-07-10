@@ -13,9 +13,6 @@ namespace dlib
     namespace cpu 
     {
 
-       const unsigned char UPSAMPLE_POINT = 1;
-       const unsigned char UPSAMPLE_LINEAR = 2;
-
        const unsigned char PADDING_REFLECTION = 1;
        const unsigned char PADDING_REPLICATION = 2;
     // -----------------------------------------------------------------------------------
@@ -1406,6 +1403,269 @@ namespace dlib
             }
         }
 
+    // ----------------------------------------------------------------------------------------
+
+        void resize_bilinear (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(is_same_object(dest, src)==false);
+            DLIB_CASSERT(dest.num_samples() == src.num_samples());
+            DLIB_CASSERT(dest.k() == src.k());
+
+            if (dest.size() == 0 || src.size() == 0)
+                return;
+
+            const float* s = src.host();
+            float* d = dest.host();
+            const float x_scale = (src.nc()-1)/(float)std::max<long>((dest.nc()-1),1);
+            const float y_scale = (src.nr()-1)/(float)std::max<long>((dest.nr()-1),1);
+            for (long samp = 0; samp < dest.num_samples(); ++samp)
+            {
+                for (long k = 0; k < dest.k(); ++k)
+                {
+                    for (long r = 0; r < dest.nr(); ++r)
+                    {
+                        const float y = r*y_scale;
+                        const long top    = static_cast<long>(std::floor(y));
+                        const long bottom = std::min(top+1, src.nr()-1);
+                        const float tb_frac = y - top;
+                        for (long c = 0; c < dest.nc(); ++c)
+                        {
+                            const float x = c*x_scale;
+                            const long left   = static_cast<long>(std::floor(x));
+                            const long right  = std::min(left+1, src.nc()-1);
+                            const float lr_frac = x - left;
+
+                            float tl = s[top*src.nc()+left];
+                            float tr = s[top*src.nc()+right];
+                            float bl = s[bottom*src.nc()+left];
+                            float br = s[bottom*src.nc()+right];
+
+                            float temp = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
+                                tb_frac*((1-lr_frac)*bl + lr_frac*br);
+
+                            d[r*dest.nc()+c] = temp;
+                        }
+                    }
+
+                    d += dest.nr()*dest.nc();
+                    s += src.nr()*src.nc();
+                }
+            }
+        }
+
+        void resize_bilinear_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
+            DLIB_CASSERT(gradient_input.num_samples() == grad.num_samples());
+            DLIB_CASSERT(gradient_input.k() == grad.k());
+
+            if (gradient_input.size() == 0 || grad.size() == 0)
+                return;
+
+            const float* gi = gradient_input.host();
+            float* g = grad.host();
+            const float x_scale = (grad.nc()-1)/(float)std::max<long>((gradient_input.nc()-1),1);
+            const float y_scale = (grad.nr()-1)/(float)std::max<long>((gradient_input.nr()-1),1);
+            for (long samp = 0; samp < gradient_input.num_samples(); ++samp)
+            {
+                for (long k = 0; k < gradient_input.k(); ++k)
+                {
+                    for (long r = 0; r < gradient_input.nr(); ++r)
+                    {
+                        const float y = r*y_scale;
+                        const long top    = static_cast<long>(std::floor(y));
+                        const long bottom = std::min(top+1, grad.nr()-1);
+                        const float tb_frac = y - top;
+                        for (long c = 0; c < gradient_input.nc(); ++c)
+                        {
+                            const float x = c*x_scale;
+                            const long left   = static_cast<long>(std::floor(x));
+                            const long right  = std::min(left+1, grad.nc()-1);
+                            const float lr_frac = x - left;
+
+                            const float tmp = gi[r*gradient_input.nc()+c];
+
+                            g[top*grad.nc()+left]     += tmp*(1-tb_frac)*(1-lr_frac);
+                            g[top*grad.nc()+right]    += tmp*(1-tb_frac)*(lr_frac);
+                            g[bottom*grad.nc()+left]  += tmp*(tb_frac)*(1-lr_frac);
+                            g[bottom*grad.nc()+right] += tmp*(tb_frac)*(lr_frac);
+                        }
+                    }
+
+                    g += grad.nr()*grad.nc();
+                    gi += gradient_input.nr()*gradient_input.nc();
+                }
+            }
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        void resize_nn (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(is_same_object(dest, src)==false);
+            DLIB_CASSERT(dest.num_samples() == src.num_samples());
+            DLIB_CASSERT(dest.k() == src.k());
+
+            if (dest.size() == 0 || src.size() == 0)
+                return;
+
+            const float* s = src.host();
+            float* d = dest.host();
+            const float x_scale = (src.nc()-1)/(float)std::max<long>((dest.nc()-1),1);
+            const float y_scale = (src.nr()-1)/(float)std::max<long>((dest.nr()-1),1);
+            for (long samp = 0; samp < dest.num_samples(); ++samp)
+            {
+                for (long k = 0; k < dest.k(); ++k)
+                {
+                    for (long r = 0; r < dest.nr(); ++r)
+                    {
+                        const float y = r*y_scale;
+                        const long top    = static_cast<long>(std::round(y));
+                        for (long c = 0; c < dest.nc(); ++c)
+                        {
+                            const float x = c*x_scale;
+                            const long left   = static_cast<long>(std::round(x));
+                            d[r*dest.nc()+c] = s[top*src.nc()+left];
+                        }
+                    }
+
+                    d += dest.nr()*dest.nc();
+                    s += src.nr()*src.nc();
+                }
+            }
+        }
+
+        void resize_fill_with_zeroes (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(is_same_object(dest, src)==false);
+            DLIB_CASSERT(dest.num_samples() == src.num_samples());
+            DLIB_CASSERT(dest.k() == src.k());
+
+            if (dest.size() == 0 || src.size() == 0)
+                return;
+
+            const float* s = src.host();
+            float* d = dest.host();
+            const float x_scale = (src.nc())/(float)std::max<long>((dest.nc()),1);
+            const float y_scale = (src.nr())/(float)std::max<long>((dest.nr()),1);
+            for (long samp = 0; samp < dest.num_samples(); ++samp)
+            {
+                for (long k = 0; k < dest.k(); ++k)
+                {
+                    for (long r = 0; r < dest.nr(); ++r)
+                    {
+                        const float y = r*y_scale;
+                        const long top    = static_cast<long>(std::floor(y));
+                        for (long c = 0; c < dest.nc(); ++c)
+                        {
+                            const float x = c*x_scale;
+                            const long left   = static_cast<long>(std::floor(x));
+                            if (x-left < 1E-06 && y-top < 1E-06)
+                                d[r*dest.nc()+c] = s[top*src.nc()+left];
+                            else
+                                d[r*dest.nc()+c] = 0.0f;
+                        }
+                    }
+
+                    d += dest.nr()*dest.nc();
+                    s += src.nr()*src.nc();
+                }
+            }
+        }
+
+        void resize_nn_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
+            DLIB_CASSERT(gradient_input.num_samples() == grad.num_samples());
+            DLIB_CASSERT(gradient_input.k() == grad.k());
+
+            if (gradient_input.size() == 0 || grad.size() == 0)
+                return;
+
+            const float* gi = gradient_input.host();
+            float* g = grad.host();
+            const float x_scale = (grad.nc()-1)/(float)std::max<long>((gradient_input.nc()-1),1);
+            const float y_scale = (grad.nr()-1)/(float)std::max<long>((gradient_input.nr()-1),1);
+            for (long samp = 0; samp < gradient_input.num_samples(); ++samp)
+            {
+                for (long k = 0; k < gradient_input.k(); ++k)
+                {
+                    for (long r = 0; r < gradient_input.nr(); ++r)
+                    {
+                        const float y = r*y_scale;
+                        const long top    = static_cast<long>(std::round(y));
+                        for (long c = 0; c < gradient_input.nc(); ++c)
+                        {
+                            const float x = c*x_scale;
+                            const long left   = static_cast<long>(std::round(x));
+
+                            const float tmp = gi[r*gradient_input.nc()+c];
+
+                            g[top*grad.nc()+left]     += gi[r*gradient_input.nc()+c];
+                        }
+                    }
+
+                    g += grad.nr()*grad.nc();
+                    gi += gradient_input.nr()*gradient_input.nc();
+                }
+            }
+        }
+
+        void resize_fill_with_zeroes_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
+            DLIB_CASSERT(gradient_input.num_samples() == grad.num_samples());
+            DLIB_CASSERT(gradient_input.k() == grad.k());
+
+            if (gradient_input.size() == 0 || grad.size() == 0)
+                return;
+
+            const float* gi = gradient_input.host();
+            float* g = grad.host();
+            const float x_scale = (grad.nc())/(float)std::max<long>((gradient_input.nc()),1);
+            const float y_scale = (grad.nr())/(float)std::max<long>((gradient_input.nr()),1);
+            for (long samp = 0; samp < gradient_input.num_samples(); ++samp)
+            {
+                for (long k = 0; k < gradient_input.k(); ++k)
+                {
+                    for (long r = 0; r < gradient_input.nr(); ++r)
+                    {
+                        const float y = r*y_scale;
+                        const long top    = static_cast<long>(std::floor(y));
+                        for (long c = 0; c < gradient_input.nc(); ++c)
+                        {
+                            const float x = c*x_scale;
+                            const long left   = static_cast<long>(std::floor(x));
+
+                            const float tmp = gi[r*gradient_input.nc()+c];
+                            if (y-top < 1E-06 || x-left < 1E-06)
+                                g[top*grad.nc()+left]     += gi[r*gradient_input.nc()+c];
+                        }
+                    }
+
+                    g += grad.nr()*grad.nc();
+                    gi += gradient_input.nr()*gradient_input.nc();
+                }
+            }
+        }
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
@@ -1851,199 +2111,7 @@ namespace dlib
             }
         }
      // ------------------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------------------
-
- 
-        void tensor_upsample::backward(
-            tensor& output,
-            const tensor& data,
-            int scale_y,
-            int scale_x,
-            unsigned char method
-        )
-        {
-            DLIB_CASSERT(is_same_object(output,data) == false);
-            DLIB_CASSERT(output.k() == data.k());
-            DLIB_CASSERT(output.num_samples() == data.num_samples());
-            auto d = output.host();
-            switch(method)
-            {
-                case UPSAMPLE_POINT:
-                {
-                    for (long n = 0; n < data.num_samples(); ++n)
-                    {
-                        for (long k = 0; k < data.k(); k++)
-                        {
-                            auto srcPlane = image_plane(data,n,k);
-                            auto dstPlane = d + (n * output.k() + k)*output.nr()*output.nc();
-                            for (long r = 0; r < output.nr(); r++)
-                            {
-                                for (long c = 0; c < output.nc(); c++)
-                                {
-                                    for (int y=0; y < scale_y;  y++)
-                                        for (int x = 0; x < scale_x; x++)
-                                            dstPlane[r * output.nc() + c] +=
-                                                   srcPlane((r*scale_y+y) * data.nc() + (c*scale_x+x));
-                                }
-                            }
-                        }
-                    }
-                }
-                break;
-                case UPSAMPLE_LINEAR:
-                {
-                    for (long n = 0; n < data.num_samples(); ++n)
-                    {
-                        for (long k = 0; k < data.k(); k++)
-                        {
-                            auto srcPlane = image_plane(data,n,k);
-                            auto dstPlane = d + (n * output.k() + k)*output.nr()*output.nc();
-                            for (long r = 0; r < output.nr(); r++)
-                            {
-                                for (long c = 0; c < output.nc(); c++)
-                                {
-                                    for (int y=0; y < scale_y;  y++)
-                                    {
-                                        float yWeight = 1.0f - float(y) / float(scale_y);
-                                        for (int x = 0; x < scale_x; x++)
-                                        {
-                                            float xWeight = 1.0f - float(x)/float(scale_x);
-                                            dstPlane[r * output.nc() + c] += yWeight * xWeight *
-                                                   srcPlane((r*scale_y+y) * data.nc() + (c*scale_x+x));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }            
-                }
-                break;
-                default:
-                {
-                    for (long n = 0; n < data.num_samples(); ++n)
-                    {
-                        for (long k = 0; k < data.k(); k++)
-                        {
-                            auto srcPlane = image_plane(data,n,k);
-                            auto dstPlane = d + (n * output.k() + k)*output.nr()*output.nc();
-                            for (long r = 0; r < output.nr(); r++)
-                               for (long c = 0; c < output.nc(); c++)
-                               {
-                                    dstPlane[r * output.nc() + c] +=
-                                      srcPlane(r*scale_y*data.nc() + c * scale_x);
-                               }
-                        }
-                    }
-                }
-            }
-        }
- 
-    // ------------------------------------------------------------------------------------
-
-        void tensor_upsample::forward(
-            resizable_tensor& output,
-            const tensor& data,
-            int scale_y,
-            int scale_x,
-            unsigned char method
-        )
-        {
-           DLIB_CASSERT(is_same_object(output,data) == false); 
-           DLIB_CASSERT(output.k() == data.k());
-           DLIB_CASSERT(output.num_samples() == data.num_samples());      
-           output = 0;           
-           auto d = output.host();
-           
-           switch(method)
-           {
-               case UPSAMPLE_POINT:
-               {
-                   // need to treat each sample individual
-                   for (long n = 0; n < data.num_samples(); ++n)
-                   {
-                       for (long k = 0; k < data.k(); k++)
-                       {
-                          auto srcPlane = image_plane(data,n,k);
-                          auto dstPlane = d + (n*output.k() + k)*output.nr()*output.nc();                  
-                          for (long r = 0; r < output.nr(); r++)
-                          {
-                              long srcR = r / scale_y;
-                              for (long c = 0; c < output.nc(); c++)
-                              {
-                                  long srcC = c / scale_x;
-                                  dstPlane[r * output.nc() + c] = srcPlane(srcR*data.nc()+srcC);
-                              }
-                          }
-                       }
-                   }
-               }
-               break;
-               case UPSAMPLE_LINEAR:
-               {
-                   // need to treat each sample individual
-                   for (long n = 0; n < data.num_samples(); ++n)
-                   {
-                       for (long k = 0; k < data.k(); k++)
-                       {
-                          auto srcPlane = image_plane(data,n,k);
-                          auto dstPlane = d + (n*output.k() + k)*output.nr()*output.nc();                  
-                          for (long r = 0; r < output.nr(); r++)
-                          {
-                              float yWeight = float(r)/float(scale_y)-(int)(r/scale_y);
-                              long srcR = r / scale_y;
-                              long srcRn = srcR+1;
-
-                              if (srcRn > data.nr()-1)
-                                   srcRn = data.nr()-1;
-
-                              for (long c = 0; c < output.nc(); c++)
-                              {
-                                  float xWeight =  float(c)/float(scale_x)-(int)(c/scale_x);
-                                  long srcC = c / scale_x;
-                                  long srcCn = srcC+1;
-                                  if (srcCn > data.nc()-1)
-                                      srcCn = data.nc()-1;
-                                  float value0 = srcPlane(srcR*data.nc()+srcC);
-                                  float value1 = srcPlane(srcR*data.nc()+srcCn);
-                                  float value2 = srcPlane(srcRn*data.nc()+srcC);
-                                  float value3 = srcPlane(srcRn*data.nc()+srcCn);
-                                  dstPlane[r * output.nc() + c] = 
-                                    (1.0-yWeight) * ((1.0-xWeight) * value0 + xWeight * value1) +
-                                     yWeight * ((1.0-xWeight) * value2 + xWeight * value3);                            
-                              }
-                          }
-                       }
-                   }
-               }
-               break;
-               default:
-               {
-                   // need to treat each sample individual
-                   for (long n = 0; n < data.num_samples(); ++n)
-                   {
-                       for (long k = 0; k < data.k(); k++)
-                       {
-                           auto srcPlane = image_plane(data,n,k);
-                           auto dstPlane = d + (n*output.k() + k)*output.nr()*output.nc();
-                           for (long r = 0; r < data.nr(); r++)
-                           {
-                               long destR = r * scale_y;
-                               for (long c = 0; c < data.nc(); c++)
-                               {
-                                   long destC = c * scale_x;
-                                   dstPlane[destR * output.nc() + destC] = srcPlane(r*data.nc()+c);
-                               }
-                           }                  
-                       }
-                   }
-               }
-           }
-       }
-
-    // ------------------------------------------------------------------------------------
-
-    // ------------------------------------------------------------------------------------
+     // ------------------------------------------------------------------------------------
 
         void tensor_padding::backward(
             tensor& output,

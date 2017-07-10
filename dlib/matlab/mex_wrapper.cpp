@@ -3050,12 +3050,12 @@ namespace mex_binding
             int num = static_cast<int>(pptr()-pbase());
             if (num != 0)
             {
+                check_for_matlab_ctrl_c();
+
                 buf[num] = 0; // null terminate the string
                 mexPrintf("%s",&buf[0]);
                 mexEvalString("drawnow"); // flush print to screen
                 pbump(-num);
-
-                check_for_matlab_ctrl_c();
             }
             return 0;
         }
@@ -3108,12 +3108,12 @@ namespace mex_binding
             int num = static_cast<int>(pptr()-pbase());
             if (num != 0)
             {
+                check_for_matlab_ctrl_c();
+
                 buf[num] = 0; // null terminate the string
                 mexWarnMsgTxt(&buf[0]);
                 mexEvalString("drawnow"); // flush print to screen
                 pbump(-num);
-
-                check_for_matlab_ctrl_c();
             }
             return 0;
         }
@@ -5063,9 +5063,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
                     << "            this = "<<classname<<"(); \n"
                     << "            this.load_obj(in); \n"
                     << "        end          \n"
-                    << "    end \n"
-                    << "end \n";
+                    << "    end \n";
             }
+            cout << "end \n";
         }
         else if (nrhs == 1) 
         {

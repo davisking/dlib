@@ -634,6 +634,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct num_con_outputs
+    {
+        num_con_outputs(unsigned long n) : num_outputs(n) {}
+        unsigned long num_outputs;
+    };
+
     template <
         long _num_filters,
         long _nr,
@@ -684,6 +690,24 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier()  == 0
         !*/
 
+        con_(
+            num_con_outputs o
+        );
+        /*!
+            ensures
+                - #num_filters() == o.num_outputs 
+                - #nr() == _nr
+                - #nc() == _nc
+                - #stride_y() == _stride_y
+                - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
+        !*/
+
         long num_filters(
         ) const; 
         /*!
@@ -691,6 +715,19 @@ namespace dlib
                 - returns the number of filters contained in this layer.  The k dimension
                   of the output tensors produced by this layer will be equal to the number
                   of filters.
+        !*/
+
+        void set_num_filters(
+            long num
+        );
+        /*!
+            requires
+                - num > 0
+                - get_layer_params().size() == 0
+                  (i.e. You can't change the number of filters in con_ if the parameter
+                  tensor has already been allocated.)
+            ensures
+                - #num_filters() == num
         !*/
 
         long nr(
@@ -1239,6 +1276,60 @@ namespace dlib
         typename SUBNET
         >
     using spatialpadding = add_layer<spatialpadding_<padding_y,padding_x,method>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        int scale_y, 
+        int scale_x 
+        >
+    class upsample_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be >= 1.
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it allows you to upsample a layer using
+                bilinear interpolation.  To be very specific, it upsamples each of the
+                channels in an input tensor.  Therefore, if IN is the input tensor to this
+                layer and OUT the output tensor, then we will have:
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == IN.k() 
+                    - OUT.nr() == IN.nr()*scale_y
+                    - OUT.nc() == IN.nr()*scale_x
+                    - for all valid i,k:  image_plane(OUT,i,k) is a copy of
+                      image_plane(IN,i,k) that has been bilinearly interpolated to fit into
+                      the shape of image_plane(OUT,i,k).
+        !*/
+    public:
+
+        upsample_(
+        );
+        /*!
+            ensures
+                - This object has no state, so the constructor does nothing, aside from
+                  providing default constructability.
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        int scale,
+        typename SUBNET
+        >
+    using upsample = add_layer<upsample_<scale,scale>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

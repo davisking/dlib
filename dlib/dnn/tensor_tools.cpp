@@ -838,6 +838,82 @@ namespace dlib { namespace tt
 #endif
     }
 
+// ----------------------------------------------------------------------------------------
+
+    void resize_bilinear (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_bilinear(dest,src);
+#else
+        cpu::resize_bilinear(dest,src);
+#endif
+    }
+
+    void resize_bilinear_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_bilinear_gradient(grad,gradient_input);
+#else
+        cpu::resize_bilinear_gradient(grad,gradient_input);
+#endif
+    }
+
+// ------------------------------------------------------------------------------------
+
+    void resize_nn (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_nn(dest,src);
+#else
+        cpu::resize_nn(dest,src);
+#endif
+    }
+
+    void resize_nn_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_nn_gradient(grad,gradient_input);
+#else
+        cpu::resize_nn_gradient(grad,gradient_input);
+#endif
+    }
+
+    void resize_fill_zeroes (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_fill_with_zeroes(dest,src);
+#else
+        cpu::resize_fill_with_zeroes(dest,src);
+#endif
+    }
+
+    void resize_fill_zeroes_gradient (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_fill_with_zeroes_gradient(dest,src);
+#else
+        cpu::resize_fill_with_zeroes_gradient(dest,src);
+#endif
+    }
+
 // ------------------------------------------------------------------------------------
 
     void copy_tensor(

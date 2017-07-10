@@ -296,6 +296,38 @@ namespace dlib
             const tensor& gradient_input
         );
 
+    // ----------------------------------------------------------------------------------------
+
+        void resize_bilinear (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void resize_bilinear_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
+
+        void resize_nn (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void resize_nn_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
+
+        void resize_fill_with_zeroes (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void resize_fill_with_zeroes_gradient (
+            tensor& dest,
+            const tensor& src
+        );
+
     // -----------------------------------------------------------------------------------
 
         class pooling
@@ -421,36 +453,6 @@ namespace dlib
             long last_stride_x = 0;
             long last_padding_y = 0;
             long last_padding_x = 0;
-        };
-
-    // -----------------------------------------------------------------------------------
-
-        class tensor_upsample
-        {
-        public:
-            tensor_upsample(const tensor_upsample&) = delete;
-            tensor_upsample& operator=(const tensor_upsample&) = delete;
-
-            tensor_upsample() {}
-
-            void forward(
-                resizable_tensor& output,
-                const tensor& data,
-                int scale_y,
-                int scale_x,
-                unsigned char method
-            );
-
-            void backward (
-                tensor& output,            
-                const tensor& data, 
-                int scale_y,
-                int scale_x,
-                unsigned char method
-            );
- 
-        private:
-
         };
 
     // -----------------------------------------------------------------------------------

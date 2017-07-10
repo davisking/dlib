@@ -33,9 +33,9 @@ namespace dlib
                 Finally, the convention in dlib code is to interpret the tensor as a set of
                 num_samples() 3D arrays, each of dimension k() by nr() by nc().  Also,
                 while this class does not specify a memory layout, the convention is to
-                assume that indexing into an element at coordinates (sample,k,nr,nc) can be
+                assume that indexing into an element at coordinates (sample,k,r,c) can be
                 accomplished via:
-                    host()[((sample*t.k() + k)*t.nr() + nr)*t.nc() + nc]
+                    host()[((sample*t.k() + k)*t.nr() + r)*t.nc() + c]
 
             THREAD SAFETY
                 Instances of this object are not thread-safe.  So don't touch one from
@@ -134,7 +134,7 @@ namespace dlib
                   calling host().
         !*/
 
-        float float* host_write_only(
+        virtual float* host_write_only(
         ) = 0;
         /*!
             ensures
@@ -174,7 +174,7 @@ namespace dlib
                   host() will perform a device to host transfer.
         !*/
 
-        float float* device_write_only(
+        virtual float* device_write_only(
         ) = 0;
         /*!
             requires

@@ -346,45 +346,48 @@ namespace dlib
             tensor& params_grad 
         );
 
-        void copy_tensor(
-                tensor& dest,
-                size_t dest_k_offset,
-                const tensor& src,
-                size_t src_k_offset,
-                size_t count_k
+
+    // ----------------------------------------------------------------------------------------
+
+        void resize_bilinear (
+            tensor& dest,
+            const tensor& src
         );
 
-       class tensor_upsample
-        {
-        public:
-            tensor_upsample(const tensor_upsample&) = delete;
-            tensor_upsample& operator=(const tensor_upsample&) = delete;
+        void resize_bilinear_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
 
-            tensor_upsample();
+        void resize_nn (
+            tensor& dest,
+            const tensor& src
+        );
 
-            ~tensor_upsample (
-            );
+        void resize_nn_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
 
-            void forward(
-                resizable_tensor& output,
-                const tensor& data,
-                int scale_y,
-                int scale_x,
-                unsigned char method
-            );
+        void resize_fill_with_zeroes (
+            tensor& dest,
+            const tensor& src
+        );
 
-            void backward (
-                tensor& output,            
-                const tensor& data, 
-                int scale_y,
-                int scale_x,
-                unsigned char method
-            ); 
+        void resize_fill_with_zeroes_gradient (
+            tensor& dest,
+            const tensor& src
+        );
 
+    // ----------------------------------------------------------------------------------------
 
-        private:
-
-        };
+        void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+        );
 
         class tensor_padding
         {
@@ -417,6 +420,7 @@ namespace dlib
         private:
 
         };
+
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

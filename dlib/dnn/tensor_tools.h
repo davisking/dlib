@@ -1039,48 +1039,6 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    class tensor_upsample
-    {
-    public:
-        tensor_upsample(const tensor_upsample&) = delete;
-        tensor_upsample& operator=(const tensor_upsample&) = delete;
-
-        tensor_upsample() {}
-
-       
-        void forward(
-            resizable_tensor& output,
-            const tensor& data,
-            int scale_y,
-            int scale_x,
-            unsigned char method
-        ) 
-        {
-            impl.forward(output,data,scale_y,scale_x,method); 
-        }
-
-        void backward (
-            tensor& output,            
-            const tensor& data, 
-            int scale_y,
-            int scale_x,
-            unsigned char method
-        ) 
-        {
-            impl.backward(output,data,scale_y,scale_x,method); 
-        }
-
-  
-    private:
-#ifdef DLIB_USE_CUDA
-        cuda::tensor_upsample impl;
-#else
-        cpu::tensor_upsample impl;
-#endif
-
-    };
-// ----------------------------------------------------------------------------------------
-
     class tensor_padding
     {
     public:
@@ -1432,6 +1390,109 @@ namespace dlib { namespace tt
               grad.
             - This function supports in-place operation, i.e. having
               is_same_object(grad, gradient_input)==true
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void resize_bilinear (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+        ensures
+            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
+              that has been bilinearly interpolated to fit into the shape of
+              image_plane(dest,i,k).
+    !*/
+
+    void resize_bilinear_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    );
+    /*!
+        requires
+            - is_same_object(grad, gradient_input)==false
+            - gradient_input.num_samples() == grad.num_samples()
+            - gradient_input.k() == grad.k()
+        ensures
+            - Suppose that DEST is the output of resize_bilinear(DEST,SRC) for some SRC
+              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
+              the gradient of f() with respect to SRC and adds it to grad.   It should be
+              noted that we don't need to know the contents of DEST to compute this
+              gradient.  All that matters is that gradient_input have the same dimensions
+              as DEST.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void resize_nn (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+        ensures
+            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
+              that uses the nearest neighbour to fit into the shape of
+              image_plane(dest,i,k).
+    !*/
+
+    void resize_nn_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    );
+    /*!
+        requires
+            - is_same_object(grad, gradient_input)==false
+            - gradient_input.num_samples() == grad.num_samples()
+            - gradient_input.k() == grad.k()
+        ensures
+            - Suppose that DEST is the output of resize_nn(DEST,SRC) for some SRC
+              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
+              the gradient of f() with respect to SRC and adds it to grad.   It should be
+              noted that we don't need to know the contents of DEST to compute this
+              gradient.  All that matters is that gradient_input have the same dimensions
+              as DEST.
+    !*/
+
+    void resize_fill_zeroes (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+        ensures
+            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
+              that fill the gaps with zeros
+              image_plane(dest,i,k).
+    !*/
+
+    void resize_fill_zeroes_gradient (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(grad, gradient_input)==false
+            - gradient_input.num_samples() == grad.num_samples()
+            - gradient_input.k() == grad.k()
+        ensures
+            - Suppose that DEST is the output of resize_fill_zeroes(DEST,SRC) for some SRC
+              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
+              the gradient of f() with respect to SRC and adds it to grad.   It should be
+              noted that we don't need to know the contents of DEST to compute this
+              gradient.  All that matters is that gradient_input have the same dimensions
+              as DEST.
     !*/
 
 // ----------------------------------------------------------------------------------------

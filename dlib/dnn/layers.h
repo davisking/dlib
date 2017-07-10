@@ -21,6 +21,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct num_con_outputs
+    {
+        num_con_outputs(unsigned long n) : num_outputs(n) {}
+        unsigned long num_outputs;
+    };
+
     template <
         long _num_filters,
         long _nr,
@@ -43,22 +49,36 @@ namespace dlib
         static_assert(0 <= _padding_x && _padding_x < _nc, "The padding must be smaller than the filter size.");
 
         con_(
+            num_con_outputs o
         ) : 
             learning_rate_multiplier(1),
             weight_decay_multiplier(1),
             bias_learning_rate_multiplier(1),
             bias_weight_decay_multiplier(0),
+            num_filters_(o.num_outputs),
             padding_y_(_padding_y),
             padding_x_(_padding_x)
-        {}
+        {
+            DLIB_CASSERT(num_filters_ > 0);
+        }
 
-        long num_filters() const { return _num_filters; }
+        con_() : con_(num_con_outputs(_num_filters)) {}
+
+        long num_filters() const { return num_filters_; }
         long nr() const { return _nr; }
         long nc() const { return _nc; }
         long stride_y() const { return _stride_y; }
         long stride_x() const { return _stride_x; }
         long padding_y() const { return padding_y_; }
         long padding_x() const { return padding_x_; }
+
+        void set_num_filters(long num) 
+        {
+            DLIB_CASSERT(num > 0);
+            DLIB_CASSERT(get_layer_params().size() == 0, 
+                "You can't change the number of filters in con_ if the parameter tensor has already been allocated.");
+            num_filters_ = num;
+        }
 
         double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
         double get_weight_decay_multiplier () const   { return weight_decay_multiplier; }
@@ -98,6 +118,7 @@ namespace dlib
             weight_decay_multiplier(item.weight_decay_multiplier),
             bias_learning_rate_multiplier(item.bias_learning_rate_multiplier),
             bias_weight_decay_multiplier(item.bias_weight_decay_multiplier),
+            num_filters_(item.num_filters_),
             padding_y_(item.padding_y_),
             padding_x_(item.padding_x_)
         {
@@ -123,6 +144,7 @@ namespace dlib
             weight_decay_multiplier = item.weight_decay_multiplier;
             bias_learning_rate_multiplier = item.bias_learning_rate_multiplier;
             bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
+            num_filters_ = item.num_filters_;
             return *this;
         }
 
@@ -130,15 +152,15 @@ namespace dlib
         void setup (const SUBNET& sub)
         {
             long num_inputs = _nr*_nc*sub.get_output().k();
-            long num_outputs = _num_filters;
+            long num_outputs = num_filters_;
             // allocate params for the filters and also for the filter bias values.
-            params.set_size(num_inputs*_num_filters + _num_filters);
+            params.set_size(num_inputs*num_filters_ + num_filters_);
 
             dlib::rand rnd(std::rand());
             randomize_parameters(params, num_inputs+num_outputs, rnd);
 
-            filters = alias_tensor(_num_filters, sub.get_output().k(), _nr, _nc);
-            biases = alias_tensor(1,_num_filters);
+            filters = alias_tensor(num_filters_, sub.get_output().k(), _nr, _nc);
+            biases = alias_tensor(1,num_filters_);
 
             // set the initial bias values to zero
             biases(params,filters.size()) = 0;
@@ -182,7 +204,7 @@ namespace dlib
         {
             serialize("con_4", out);
             serialize(item.params, out);
-            serialize(_num_filters, out);
+            serialize(item.num_filters_, out);
             serialize(_nr, out);
             serialize(_nc, out);
             serialize(_stride_y, out);
@@ -201,7 +223,6 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
-            long num_filters;
             long nr;
             long nc;
             int stride_y;
@@ -209,7 +230,7 @@ namespace dlib
             if (version == "con_4")
             {
                 deserialize(item.params, in);
-                deserialize(num_filters, in);
+                deserialize(item.num_filters_, in);
                 deserialize(nr, in);
                 deserialize(nc, in);
                 deserialize(stride_y, in);
@@ -224,14 +245,6 @@ namespace dlib
                 deserialize(item.bias_weight_decay_multiplier, in);
                 if (item.padding_y_ != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::con_");
                 if (item.padding_x_ != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::con_");
-                if (num_filters != _num_filters) 
-                {
-                    std::ostringstream sout;
-                    sout << "Wrong num_filters found while deserializing dlib::con_" << std::endl;
-                    sout << "expected " << _num_filters << " but found " << num_filters << std::endl;
-                    throw serialization_error(sout.str());
-                }
-
                 if (nr != _nr) throw serialization_error("Wrong nr found while deserializing dlib::con_");
                 if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::con_");
                 if (stride_y != _stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::con_");
@@ -247,7 +260,7 @@ namespace dlib
         friend std::ostream& operator<<(std::ostream& out, const con_& item)
         {
             out << "con\t ("
-                << "num_filters="<<_num_filters
+                << "num_filters="<<item.num_filters_
                 << ", nr="<<_nr
                 << ", nc="<<_nc
                 << ", stride_y="<<_stride_y
@@ -265,7 +278,7 @@ namespace dlib
         friend void to_xml(const con_& item, std::ostream& out)
         {
             out << "<con"
-                << " num_filters='"<<_num_filters<<"'"
+                << " num_filters='"<<item.num_filters_<<"'"
                 << " nr='"<<_nr<<"'"
                 << " nc='"<<_nc<<"'"
                 << " stride_y='"<<_stride_y<<"'"
@@ -290,6 +303,7 @@ namespace dlib
         double weight_decay_multiplier;
         double bias_learning_rate_multiplier;
         double bias_weight_decay_multiplier;
+        long num_filters_;
 
         // These are here only because older versions of con (which you might encounter
         // serialized to disk) used different padding settings.
@@ -610,78 +624,59 @@ namespace dlib
         static_assert(_scale_x > 0, "The scale factor must be > 0");
         static_assert(0 <= _method && _method < 3, "The method must be between 0 and 2");
 
-        upsample_(
-        )  
+        upsample_() 
         {
-        }
-
-        long scale_y() const { return _scale_y; }
-        long scale_x() const { return _scale_x; }
-        unsigned char method() const { return _method; }
-
-
-        inline point map_output_to_input (
-            point p
-        ) const
-        {
-            p.x() = (p.x()/scale_x());
-            p.y() = (p.y()/scale_y());
-            return p;
-        }
-
-        inline point map_input_to_output (
-            point p
-        ) const
-        {
-            p.x() = p.x()*scale_x();
-            p.y() = p.y()*scale_y();
-            return p;
-        }
-
-        upsample_ (
-            const upsample_& item
-        )  
-        {
-            (void)item;
-            // this->upsample_ is non-copyable and basically stateless, so we have to write our
-            // own copy to avoid trying to copy it and getting an error.
-        }
-
-        upsample_& operator= (
-            const upsample_& item
-        )
-        {
-            if (this == &item)
-                return *this;
-
-            // this->upsample_ is non-copyable and basically stateless, so we have to write our
-            // own copy to avoid trying to copy it and getting an error.
-            return *this;
         }
 
         template <typename SUBNET>
-        void setup (const SUBNET& sub)
+        void setup (const SUBNET& /*sub*/)
         {
-            (void)sub;
-            params.set_size(0);
         }
 
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            unsigned int gnr = _scale_y * sub.get_output().nr();
-            unsigned int gnc = _scale_x * sub.get_output().nc();
-            unsigned int gnsamps = sub.get_output().num_samples();
-            unsigned int gk = sub.get_output().k();
-            output.set_size(gnsamps,gk,gnr,gnc);
-            ups.forward(output,sub.get_output(),_scale_y,_scale_x,_method);
+            output.set_size(
+                sub.get_output().num_samples(),
+                sub.get_output().k(),
+                _scale_y*sub.get_output().nr(),
+                _scale_x*sub.get_output().nc());
+            switch(_method)
+            {
+                case 0: tt::resize_fill_zeroes(output, sub.get_output());
+                break;
+                case 1: tt::resize_nn(output, sub.get_output());                
+                break;
+                case 2: tt::resize_bilinear(output, sub.get_output());
+                break;
+            }
         } 
 
         template <typename SUBNET>
-        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
-            (void)params_grad;
-            ups.backward(sub.get_gradient_input(),gradient_input,_scale_y,_scale_x,_method);
+            switch(_method)
+            {        
+                case 0 : tt::resize_fill_zeroes_gradient(sub.get_gradient_input(),gradient_input);
+                break; 
+                case 1 : tt::resize_nn_gradient(sub.get_gradient_input(), gradient_input);
+                break;
+                case 2 : tt::resize_bilinear_gradient(sub.get_gradient_input(), gradient_input);
+                break;
+            }  
+        }
+
+        inline point map_input_to_output (point p) const 
+        { 
+            p.x() = p.x()*_scale_x;
+            p.y() = p.y()*_scale_y;
+            return p; 
+        }
+        inline point map_output_to_input (point p) const 
+        { 
+            p.x() = p.x()/_scale_x;
+            p.y() = p.y()/_scale_y;
+            return p; 
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -690,7 +685,6 @@ namespace dlib
         friend void serialize(const upsample_& item, std::ostream& out)
         {
             serialize("upsample_1", out);
-            serialize(item.params, out);
             serialize(_scale_y, out);
             serialize(_scale_x, out);
             serialize(_method,out);
@@ -702,10 +696,9 @@ namespace dlib
             deserialize(version, in);
             int scale_y;
             int scale_x;
-            unsigned char method;
+            unsigned short method;
             if (version == "upsample_1")
             {
-                deserialize(item.params, in);
                 deserialize(scale_y, in);
                 deserialize(scale_x, in);
                 deserialize(method,in);
@@ -717,6 +710,7 @@ namespace dlib
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::upsample_.");
             }
         }
+
 
 
         friend std::ostream& operator<<(std::ostream& out, const upsample_& item)
@@ -739,12 +733,14 @@ namespace dlib
             out << "</upsample>";
         }
 
+        long scale_y() const { return _scale_y; }
+        long scale_x() const { return _scale_x; }
+        unsigned char method() const { return _method; }
+
     private:
-
         resizable_tensor params;
-
-        tt::tensor_upsample ups;
     };
+
 
     template <
         int scale_y,
@@ -754,6 +750,7 @@ namespace dlib
         >
     using upsample = add_layer<upsample_<scale_y,scale_x,method>, SUBNET>;
 
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -914,7 +911,6 @@ namespace dlib
     using spatialpadding = add_layer<spatialpadding_<padding_y,padding_x,method>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
-
 
     template <
         long _nr,
