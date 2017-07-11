@@ -15,4 +15,7 @@ if [ "$VARIANT" = "examples" ]; then
   ../cmake/bin/cmake --build . -- -j 2
 fi
 
-cd ..
+if [ "$VARIANT" = "python-api" ]; then
+  ../cmake/bin/cmake ../tools/python -DCMAKE_BUILD_TYPE=Release
+  ../cmake/bin/cmake --build . -- -j 2
+fi
