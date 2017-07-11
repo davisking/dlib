@@ -42,7 +42,7 @@ matrix:
           sources: 
             - ubuntu-toolchain-r-test
           packages: 
-            - libboost-python-dev
+            - libboost-python1.55-dev
             - *gcc5_pkgs
           
 cache:
