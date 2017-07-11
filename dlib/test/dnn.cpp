@@ -8,9 +8,12 @@
 #include <ctime>
 #include <vector>
 #include <random>
+#include <numeric>
 #include "../dnn.h"
 
 #include "tester.h"
+
+#ifndef __INTELLISENSE__
 
 namespace
 {
@@ -805,8 +808,18 @@ namespace
                 padding_y = (filters.nr()-data.nr()+1)/2;
             if (!(filters.nc() <= data.nc() + 2*padding_x))
                 padding_x = (filters.nc()-data.nc()+1)/2;
-            conv1(output1, data, filters, stride_y,stride_x, padding_y, padding_x);
-            conv2(output2, data, filters, stride_y,stride_x, padding_y, padding_x);
+            conv1.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
+            conv1(false, output1, data, filters);
+            conv2.setup(data,filters,stride_y,stride_x,padding_y,padding_x);
+            conv2(false, output2, data, filters);
+            dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
+            DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2)))
+                 <<"\n\t padding_y: "<< padding_y 
+                 <<"\n\t padding_x: "<< padding_x 
+                 );
+
+            conv1(true, output1, data, filters);
+            conv2(true, output2, data, filters);
             dlog << LINFO << "forward error: "<< max(abs(mat(output1)-mat(output2)));
             DLIB_TEST_MSG(max(abs(mat(output1)-mat(output2))) < 1e-3, max(abs(mat(output1)-mat(output2)))
                  <<"\n\t padding_y: "<< padding_y 
@@ -824,8 +837,14 @@ namespace
             data_gradient1 = 1;
             data_gradient2 = 1;
 
-            conv1.get_gradient_for_data(gi, filters, data_gradient1);
-            conv2.get_gradient_for_data(gi, filters, data_gradient2);
+            conv1.get_gradient_for_data(true, gi, filters, data_gradient1);
+            conv2.get_gradient_for_data(true, gi, filters, data_gradient2);
+
+            dlog << LINFO << "data gradient error: "<< max(abs(mat(data_gradient1)-mat(data_gradient2)));
+            DLIB_TEST(max(abs(mat(data_gradient1)-mat(data_gradient2))) < 1e-3);
+
+            conv1.get_gradient_for_data(false, gi, filters, data_gradient1);
+            conv2.get_gradient_for_data(false, gi, filters, data_gradient2);
 
             dlog << LINFO << "data gradient error: "<< max(abs(mat(data_gradient1)-mat(data_gradient2)));
             DLIB_TEST(max(abs(mat(data_gradient1)-mat(data_gradient2))) < 1e-3);
@@ -840,8 +859,15 @@ namespace
             filter_gradient1 = 1;
             filter_gradient2 = 1;
 
-            conv1.get_gradient_for_filters(gi, data, filter_gradient1);
-            conv2.get_gradient_for_filters(gi, data, filter_gradient2);
+            conv1.get_gradient_for_filters(false, gi, data, filter_gradient1);
+            conv2.get_gradient_for_filters(false, gi, data, filter_gradient2);
+
+            dlog << LINFO << "filter gradient error: "<< max(abs(mat(filter_gradient1)-mat(filter_gradient2)));
+            DLIB_TEST_MSG(max(abs(mat(filter_gradient1)-mat(filter_gradient2))) < 1e-3, max(abs(mat(filter_gradient1)-mat(filter_gradient2))));
+
+
+            conv1.get_gradient_for_filters(true, gi, data, filter_gradient1);
+            conv2.get_gradient_for_filters(true, gi, data, filter_gradient2);
 
             dlog << LINFO << "filter gradient error: "<< max(abs(mat(filter_gradient1)-mat(filter_gradient2)));
             DLIB_TEST_MSG(max(abs(mat(filter_gradient1)-mat(filter_gradient2))) < 1e-3, max(abs(mat(filter_gradient1)-mat(filter_gradient2))));
@@ -1427,6 +1453,30 @@ namespace
     {
         {
             print_spinner();
+            upsample_<1,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<2,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<3,3> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             l2normalize_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
@@ -1470,6 +1520,36 @@ namespace
         {
             print_spinner();
             bn_<FC_MODE> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,3,3,2,2,0,0> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,3,3,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,3,3,1,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,3,3,1,1,0,0> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            cont_<3,2,2,2,2> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
@@ -1917,6 +1997,512 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task()
+    {
+        print_spinner();
+
+        constexpr uint16_t num_classes = 7;
+        constexpr uint16_t true_label = num_classes / 2;
+
+        ::std::vector<matrix<float>> x({ matrix<float,1,1>({ 1 }) });
+        ::std::vector<matrix<uint16_t>> y({ matrix<uint16_t,1,1>({ true_label }) });
+
+        using net_type = loss_multiclass_log_per_pixel<con<num_classes,1,1,1,1,input<matrix<float>>>>;
+        net_type net;
+
+        dnn_trainer<net_type> trainer(net, sgd(0,0));
+        trainer.set_learning_rate(1e7);
+        trainer.set_max_num_epochs(1);
+        trainer.train(x, y);
+
+        const tensor& learned_params = layer<1>(net).layer_details().get_layer_params();
+        const float* learned_params_data = learned_params.host();
+
+        for (int is_bias = 0; is_bias <= 1; ++is_bias) {
+            for (uint16_t k = 0; k < num_classes; ++k) {
+                size_t index = k + is_bias * num_classes;
+                DLIB_CASSERT(index < learned_params.size());
+                if (k == true_label) {
+                    DLIB_TEST(learned_params_data[index] > 1e5);
+                }
+                else {
+                    DLIB_TEST(learned_params_data[index] < -1e5);
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task()
+    {
+        print_spinner();
+
+        constexpr int input_height = 35;
+        constexpr int input_width = 27;
+        constexpr int output_height = input_height;
+        constexpr int output_width = input_width;
+        constexpr int num_samples = 7;
+        constexpr int num_classes = 5;
+
+        ::std::vector<matrix<float>> x(num_samples);
+        ::std::vector<matrix<uint16_t>> y(num_samples);
+
+        matrix<float> xtmp(input_height, input_width);
+        matrix<uint16_t> ytmp(output_height, output_width);
+
+        ::std::default_random_engine generator(16);
+        ::std::bernoulli_distribution coinflip(0.5);
+
+        using filter_type = con<num_classes,1,1,1,1,input<matrix<float>>>;
+
+        // Define a "truth" filter
+        filter_type truth_filter;
+        truth_filter(xtmp); // Set up the convolutional layer
+
+        // Generate training data
+        for (int ii = 0; ii < num_samples; ++ii) {
+            // Generate random inputs x
+            for (int jj = 0; jj < input_height; ++jj)
+                for (int kk = 0; kk < input_width; ++kk)
+                    xtmp(jj, kk) = coinflip(generator) ? 1.f : -1.f;
+            x[ii] = xtmp;
+
+            // Generate target output y by applying the truth filter on x
+            const tensor& output = truth_filter(xtmp);
+            const float* const out_data = output.host();
+
+            const auto out_element = [&](int row, int column, int k) {
+                return out_data[(k * output.nr() + row) * output.nc() + column];
+            };
+
+            for (int jj = 0; jj < output_height; ++jj) {
+                for (int kk = 0; kk < output_width; ++kk) {
+                    uint16_t label = 0;
+                    float max_value = out_element(jj, kk, 0);
+                    for (long k = 1; k < num_classes; ++k) {
+                        const float value = out_element(jj, kk, k);
+                        if (value > max_value) {
+                            label = static_cast<uint16_t>(k);
+                            max_value = value;
+                        }
+                    }
+                    ytmp(jj, kk) = label;
+                }
+            }
+            y[ii] = ytmp;
+        }
+
+        using net_type = loss_multiclass_log_per_pixel<filter_type>;
+        net_type net;
+
+        dnn_trainer<net_type> trainer(net, sgd(0,0));
+        trainer.set_learning_rate(1e6);
+        trainer.set_max_num_epochs(1);
+        trainer.train(x, y);
+
+        // Feed forward the training samples.
+        resizable_tensor temp_tensor;
+        net.subnet().to_tensor(&x[0], &x[0] + num_samples, temp_tensor);
+        net.subnet().forward(temp_tensor);
+        const dimpl::subnet_wrapper<filter_type> wsub(net.subnet());
+        const tensor& output_tensor = wsub.get_output();
+        const float* const out_data = output_tensor.host();
+
+        // Let's have a look at the activations before softmax. They should be pretty high
+        // (in terms of absolute value), because the learning task is trivial.
+        for (int ii = 0; ii < num_samples; ++ii) {
+            for (int jj = 0; jj < output_height; ++jj) {
+                for (int kk = 0; kk < output_width; ++kk) {
+                    const uint16_t true_label = y[ii](jj, kk);
+
+                    for (long k = 0; k < num_classes; ++k) {
+                        const size_t index = ((ii * output_tensor.k() + k) * output_tensor.nr() + jj) * output_tensor.nc() + kk;
+                        DLIB_CASSERT(index < output_tensor.size());
+
+                        if (k == true_label) {
+                            DLIB_TEST_MSG(out_data[index] > 1e4, "");
+                        }
+                        else {
+                            DLIB_TEST_MSG(out_data[index] < -1e4, "");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_loss_multiclass_per_pixel_outputs_on_trivial_task()
+    {
+        print_spinner();
+
+        constexpr int input_height = 7;
+        constexpr int input_width = 5;
+        constexpr int output_height = input_height;
+        constexpr int output_width = input_width;
+        constexpr int num_samples = 7;
+        constexpr int num_classes = 5;
+        constexpr int filter_height = 3;
+        constexpr int filter_width = 3;
+
+        ::std::vector<matrix<float>> x(num_samples);
+        ::std::vector<matrix<uint16_t>> y(num_samples);
+
+        matrix<float> xtmp(input_height, input_width);
+        matrix<uint16_t> ytmp(output_height, output_width);
+
+        ::std::default_random_engine generator(16);
+        ::std::bernoulli_distribution coinflip(0.5);
+
+        using filter_type = con<num_classes, filter_height, filter_width, 1, 1, input<matrix<float>>>;
+
+        // Define a "truth" filter
+        filter_type truth_filter;
+        truth_filter(xtmp); // Set up the convolutional layer
+
+        // Generate training data
+        for (int ii = 0; ii < num_samples; ++ii) {
+            // Generate random inputs x
+            for (int jj = 0; jj < input_height; ++jj)
+                for (int kk = 0; kk < input_width; ++kk)
+                    xtmp(jj, kk) = coinflip(generator) ? 1.f : -1.f;
+            x[ii] = xtmp;
+
+            // Generate target output y by applying the truth filter on x
+            const tensor& output = truth_filter(xtmp);
+            const float* const out_data = output.host();
+
+            const auto out_element = [&](int row, int column, int k) {
+                return out_data[(k * output.nr() + row) * output.nc() + column];
+            };
+
+            for (int jj = 0; jj < output_height; ++jj) {
+                for (int kk = 0; kk < output_width; ++kk) {
+                    uint16_t label = 0;
+                    float max_value = out_element(jj, kk, 0);
+                    for (long k = 1; k < num_classes; ++k) {
+                        const float value = out_element(jj, kk, k);
+                        if (value > max_value) {
+                            label = static_cast<uint16_t>(k);
+                            max_value = value;
+                        }
+                    }
+                    ytmp(jj, kk) = label;
+                }
+            }
+            y[ii] = ytmp;
+        }
+
+        using net_type = loss_multiclass_log_per_pixel<filter_type>;
+        net_type net;
+
+        dnn_trainer<net_type> trainer(net, sgd(0, 0.9));
+        trainer.set_learning_rate(1);
+        trainer.set_max_num_epochs(2000);
+        trainer.train(x, y);
+
+        // The learning task is separable, so the net should have no problem
+        // getting all the outputs right.
+        DLIB_TEST(net(x) == y);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore()
+    {
+        // "Semantic segmentation" - see https://github.com/davisking/dlib/issues/288
+        // Test learning when some pixels are to be ignored, etc.
+
+        print_spinner();
+
+        constexpr int input_height = 5;
+        constexpr int input_width = 7;
+        constexpr int output_height = input_height;
+        constexpr int output_width = input_width;
+        const int num_samples = 1000;
+        const int num_classes = 6;
+        const double ignore_probability = 0.5;
+        const double noise_probability = 0.05;
+
+        ::std::default_random_engine generator(16);
+        ::std::bernoulli_distribution ignore(ignore_probability);
+        ::std::bernoulli_distribution noise_occurrence(noise_probability);
+        ::std::uniform_int_distribution<uint16_t> noisy_label(0, num_classes - 1);
+
+        ::std::vector<matrix<double>> x(num_samples);
+        ::std::vector<matrix<uint16_t>> y(num_samples);
+
+        ::std::vector<int> truth_histogram(num_classes);
+
+        matrix<double> xtmp(input_height, input_width);
+        matrix<uint16_t> ytmp(output_height, output_width);
+
+        // The function to be learned.
+        const auto ground_truth = [num_classes](const matrix<double>& x, int row, int column) {
+            double sum = 0.0;
+            const int first_column = std::max(0, column - 1);
+            const int last_column = std::min(static_cast<int>(x.nc() - 1), column + 1);
+            for (int c = first_column; c <= last_column; ++c) {
+                sum += x(row, c);
+            }
+            DLIB_TEST(sum < num_classes);
+            return static_cast<uint16_t>(sum);
+        };
+
+        for ( int ii = 0; ii < num_samples; ++ii ) {
+            for ( int jj = 0; jj < input_height; ++jj ) {
+                for ( int kk = 0; kk < input_width; ++kk ) {
+                    // Generate numbers between 0 and 2.
+                    double value = static_cast<double>(ii + jj + kk) / 10.0;
+                    value -= (static_cast<int>(value) / 2) * 2;
+                    DLIB_TEST(value >= 0.0 && value < 2.0);
+                    xtmp(jj, kk) = value;
+                }
+            }
+            x[ii] = xtmp;
+
+            for ( int jj = 0; jj < output_height; ++jj ) {
+                for ( int kk = 0; kk < output_width; ++kk ) {
+                    uint16_t truth = ground_truth(x[ii], jj, kk);
+                    DLIB_TEST(truth < num_classes);
+                    ++truth_histogram[truth];
+                    if (ignore(generator)) {
+                        ytmp(jj, kk) = loss_multiclass_log_per_pixel_::label_to_ignore;
+                    }
+                    else if (noise_occurrence(generator)) {
+                        ytmp(jj, kk) = noisy_label(generator);
+                    }
+                    else {
+                        ytmp(jj, kk) = truth;
+                    }
+                }
+            }
+
+            y[ii] = ytmp;
+        }
+
+        const int num_total_elements = num_samples * output_height * output_width;
+
+        { // Require a reasonably balanced truth histogram in order to make sure that a trivial classifier is not enough
+            const int required_min_histogram_value = static_cast<int>(::std::ceil(num_total_elements / num_classes * 0.375));
+            for (auto histogram_value : truth_histogram) {
+                DLIB_TEST_MSG(histogram_value >= required_min_histogram_value,
+                              "Histogram value = " << histogram_value << ", required = " << required_min_histogram_value);
+            }
+        }
+
+        using net_type = loss_multiclass_log_per_pixel<bn_con<con<num_classes,1,input_width,1,1,input<matrix<double>>>>>;
+        net_type net;
+        sgd defsolver(0,0.9);
+        dnn_trainer<net_type> trainer(net, defsolver);
+        trainer.set_learning_rate(0.1);
+        trainer.set_min_learning_rate(0.01);
+        trainer.set_mini_batch_size(50);
+        trainer.set_max_num_epochs(170);
+        trainer.train(x, y);
+
+        const ::std::vector<matrix<uint16_t>> predictions = net(x);
+
+        int num_correct = 0;
+
+        for ( int ii = 0; ii < num_samples; ++ii ) {
+            const matrix<uint16_t>& prediction = predictions[ii];
+            DLIB_TEST(prediction.nr() == output_height);
+            DLIB_TEST(prediction.nc() == output_width);
+            for ( int jj = 0; jj < output_height; ++jj )
+                for ( int kk = 0; kk < output_width; ++kk )
+                    if ( prediction(jj, kk) == ground_truth(x[ii], jj, kk) )
+                        ++num_correct;
+        }
+
+        // First some sanity checks.
+        const int num_correct_max = num_total_elements;
+        DLIB_TEST(num_correct_max == ::std::accumulate(truth_histogram.begin(), truth_histogram.end(), 0));
+        DLIB_TEST_MSG(num_correct <= num_correct_max,
+                      "Number of correctly classified elements = " << num_correct << ", max = " << num_correct_max);
+
+        // This is the real test, verifying that we have actually learned something.
+        const int num_correct_required = static_cast<int>(::std::ceil(0.9 * num_correct_max));
+        DLIB_TEST_MSG(num_correct >= num_correct_required,
+                      "Number of correctly classified elements = " << num_correct << ", required = " << num_correct_required);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_loss_multiclass_per_pixel_weighted()
+    {
+        // Train with pixel-specific weights
+
+        print_spinner();
+
+        constexpr int input_height = 5;
+        constexpr int input_width = 7;
+        constexpr int output_height = input_height;
+        constexpr int output_width = input_width;
+        const int num_samples = 1000;
+        const int num_classes = 6;
+
+        ::std::default_random_engine generator(16);
+        ::std::uniform_real_distribution<double> u01(0.0, 1.0);
+        ::std::uniform_int_distribution<uint16_t> noisy_label(0, num_classes - 1);
+
+        ::std::vector<matrix<double>> x(num_samples);
+        ::std::vector<matrix<uint16_t>> y(num_samples);
+
+        matrix<double> xtmp(input_height, input_width);
+        matrix<uint16_t> ytmp(output_height, output_width);
+
+        // Generate input data
+        for (int ii = 0; ii < num_samples; ++ii) {
+            for (int jj = 0; jj < input_height; ++jj) {
+                for (int kk = 0; kk < input_width; ++kk) {
+                    xtmp(jj, kk) = u01(generator);
+                    ytmp(jj, kk) = noisy_label(generator);
+                }
+            }
+            x[ii] = xtmp;
+            y[ii] = ytmp;
+        }
+
+        using net_type = loss_multiclass_log_per_pixel_weighted<con<num_classes,1,1,1,1,input<matrix<double>>>>;
+        using weighted_label = loss_multiclass_log_per_pixel_weighted_::weighted_label;
+
+        ::std::vector<matrix<weighted_label>> y_weighted(num_samples);
+
+        for (int weighted_class = 0; weighted_class < num_classes; ++weighted_class) {
+
+            print_spinner();
+
+            // Assign weights
+            for (int ii = 0; ii < num_samples; ++ii) {
+                if (weighted_class == 0) {
+                    y_weighted[ii].set_size(input_height, input_width);
+                }
+                for (int jj = 0; jj < input_height; ++jj) {
+                    for (int kk = 0; kk < input_width; ++kk) {
+                        const uint16_t label = y[ii](jj, kk);
+                        const float weight
+                            = label == weighted_class
+                            ? 1.1f
+                            : 0.9f;
+                        y_weighted[ii](jj, kk) = weighted_label(label, weight);
+                    }
+                }
+            }
+
+            net_type net;
+            sgd defsolver(0,0.9);
+            dnn_trainer<net_type> trainer(net, defsolver);
+            trainer.set_learning_rate(0.1);
+            trainer.set_min_learning_rate(0.01);
+            trainer.set_mini_batch_size(10);
+            trainer.set_max_num_epochs(10);
+            trainer.train(x, y_weighted);
+
+            const ::std::vector<matrix<uint16_t>> predictions = net(x);
+
+            int num_weighted_class = 0;
+            int num_not_weighted_class = 0;
+
+            for ( int ii = 0; ii < num_samples; ++ii ) {
+                const matrix<uint16_t>& prediction = predictions[ii];
+                DLIB_TEST(prediction.nr() == output_height);
+                DLIB_TEST(prediction.nc() == output_width);
+                for ( int jj = 0; jj < output_height; ++jj )
+                    for ( int kk = 0; kk < output_width; ++kk )
+                        if ( prediction(jj, kk) == weighted_class )
+                            ++num_weighted_class;
+                        else 
+                            ++num_not_weighted_class;
+            }
+
+            DLIB_TEST_MSG(num_weighted_class > num_not_weighted_class,
+                          "The weighted class (" << weighted_class << ") does not dominate: "
+                          << num_weighted_class << " <= " << num_not_weighted_class);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_tensor_resize_bilinear(long samps, long k, long nr, long nc,  long onr, long onc)
+    {
+        resizable_tensor img(samps,k,nr,nc);
+        resizable_tensor out(samps,k,onr,onc);
+        resizable_tensor out2(samps,k,onr,onc);
+
+        dlib::rand rnd;
+        for (int iter = 0; iter < 10; ++iter)
+        {
+            print_spinner();
+
+            const size_t idx = rnd.get_random_64bit_number()%img.size();
+
+            img = 1;
+            img.host()[idx] = 2;
+            cpu::resize_bilinear(out, img);
+#ifdef DLIB_USE_CUDA
+            cuda::resize_bilinear(out2, img);
+            DLIB_CASSERT(max(abs(mat(out)-mat(out2))) < 1e-5);
+#endif
+
+            resizable_tensor gradient_input;
+            gradient_input.copy_size(out);
+            tt::tensor_rand rnd;
+            rnd.fill_uniform(gradient_input);
+
+            const float h = 1e-2;
+
+            img.host()[idx] = 2;
+            cpu::resize_bilinear(out, img);
+            float f1 = dot(out, gradient_input); 
+
+            img.host()[idx] = 2+h;
+            cpu::resize_bilinear(out, img);
+            float f2 = dot(out, gradient_input); 
+
+            const float numerical_grad = (f2-f1)/h;
+            dlog << LINFO << "numerical grad: " << numerical_grad;
+
+
+            resizable_tensor grad, grad2;
+            grad.copy_size(img);
+            grad = 0.1;
+            grad2.copy_size(img);
+            grad2 = 0.1;
+
+            cpu::resize_bilinear_gradient(grad2, gradient_input);
+            dlog << LINFO << "analytic grad: "<< grad2.host()[idx]-0.1;
+            DLIB_CASSERT(std::abs(numerical_grad - grad2.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad2.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+
+#ifdef DLIB_USE_CUDA
+            cuda::resize_bilinear_gradient(grad, gradient_input);
+            dlog << LINFO << "analytic grad: "<< grad.host()[idx]-0.1;
+            DLIB_CASSERT(std::abs(numerical_grad - grad.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+            DLIB_CASSERT(max(abs(mat(grad)-mat(grad2))) < 1e-5);
+#endif
+
+        }
+    }
+
+
+    void test_serialization()
+    {
+        print_spinner();
+
+        using net_type = loss_mean_squared<fc<1, input<matrix<double>>>>;
+        net_type net, net2;
+
+        std::ostringstream out;
+        serialize(net, out);
+        const std::string serialized = out.str();
+        std::istringstream in(serialized);
+        dlib::deserialize(net2, in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -1949,6 +2535,9 @@ namespace
             compare_adam();
             test_copy_tensor_gpu();
 #endif
+            test_tensor_resize_bilinear(2, 3, 6,6, 11, 11);
+            test_tensor_resize_bilinear(2, 3, 6,6, 3, 4);
+            test_tensor_resize_bilinear(2, 3, 5,6, 12, 21);
             test_max_pool(1,1,2,3,0,0);
             test_max_pool(3,3,1,1,0,0);
             test_max_pool(3,3,2,2,0,0);
@@ -1985,6 +2574,12 @@ namespace
             test_concat();
             test_simple_linear_regression();
             test_multioutput_linear_regression();
+            test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task();
+            test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task();
+            test_loss_multiclass_per_pixel_outputs_on_trivial_task();
+            test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
+            test_loss_multiclass_per_pixel_weighted();
+            test_serialization();
         }
 
         void perform_test()
@@ -2000,4 +2595,5 @@ namespace
     } a;
 }
 
+#endif // __INTELLISENSE__
 

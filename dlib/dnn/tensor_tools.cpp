@@ -838,6 +838,32 @@ namespace dlib { namespace tt
 #endif
     }
 
+// ----------------------------------------------------------------------------------------
+
+    void resize_bilinear (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_bilinear(dest,src);
+#else
+        cpu::resize_bilinear(dest,src);
+#endif
+    }
+
+    void resize_bilinear_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_bilinear_gradient(grad,gradient_input);
+#else
+        cpu::resize_bilinear_gradient(grad,gradient_input);
+#endif
+    }
+
 // ------------------------------------------------------------------------------------
 
     void copy_tensor(

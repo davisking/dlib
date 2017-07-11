@@ -336,10 +336,17 @@ namespace dlib
                   train_one_step(), this object will save its entire state, including the
                   state of get_net(), to disk in the file named filename every
                   time_between_syncs seconds.
-                - if the filename file already exists then the state of this trainer will
+                - If the filename file already exists then the state of this trainer will
                   be loaded from that file by this call to set_synchronization_file().
                   This allows you to resume a training session which was previously
                   interrupted.
+                - It should be noted that when saving, the trainer will alternate between
+                  saving to a file called filename and another file called filename+"_".
+                  We do this because it's possible that your computer might crash (not
+                  because of dlib, just in general) before the data is safely saved to
+                  disk.  This way, you will always have a backup file if the write to disk
+                  gets corrupted or is incomplete.  Moreover, when loading, we will always
+                  load from the newest of the two possible files.
         !*/
 
         void train (
