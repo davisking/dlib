@@ -41,6 +41,7 @@ matrix:
         apt:
           sources: 
             - ubuntu-toolchain-r-test
+            - boost-latest
           packages: 
             - libboost-python1.55-dev
             - *gcc5_pkgs
