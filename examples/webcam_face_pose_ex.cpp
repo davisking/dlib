@@ -60,7 +60,10 @@ int main()
         {
             // Grab a frame
             cv::Mat temp;
-            cap >> temp;
+            if (!cap.read(temp))
+            {
+                break;
+            }
             // Turn OpenCV's Mat into something dlib can deal with.  Note that this just
             // wraps the Mat object, it doesn't copy anything.  So cimg is only valid as
             // long as temp is valid.  Also don't do anything to temp that would cause it
