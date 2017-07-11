@@ -4,6 +4,7 @@
 #define DLIB_THREAD_POOl_CPPh_ 
 
 #include "thread_pool_extension.h"
+#include <memory>
 
 namespace dlib
 {
@@ -19,12 +20,11 @@ namespace dlib
         we_are_destructing(false)
     {
         tasks.resize(num_threads);
+        threads.resize(num_threads);
         for (unsigned long i = 0; i < num_threads; ++i)
         {
-            register_thread(*this, &thread_pool_implementation::thread);
+            threads[i] = std::thread([&](){this->thread();});
         }
-
-        start();
     }
 
 // ----------------------------------------------------------------------------------------
@@ -60,7 +60,10 @@ namespace dlib
             task_ready_signaler.broadcast();
         }
 
-        wait();
+        // wait for all threads to terminate
+        for (auto& t : threads)
+            t.join();
+        threads.clear();
 
         // Throw any unhandled exceptions.  Since shutdown_pool() is only called in the
         // destructor this will kill the program.
@@ -189,7 +192,7 @@ namespace dlib
                 task = tasks[idx];
             }
 
-            std::exception_ptr eptr;
+            std::exception_ptr eptr = nullptr;
             try
             {
                 // now do the task
@@ -285,7 +288,7 @@ namespace dlib
     uint64 thread_pool_implementation::
     add_task_internal (
         const bfp_type& bfp,
-        shared_ptr<function_object_copy>& item
+        std::shared_ptr<function_object_copy>& item
     )
     {
         auto_mutex M(m);

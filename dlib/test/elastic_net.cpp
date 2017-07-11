@@ -109,7 +109,7 @@ namespace
                 results = basic_elastic_net(X, Y, ridge_lambda, lasso_budget*s, eps);
                 results2 = solver(ridge_lambda, lasso_budget*s);
                 dlog << LINFO << "error: "<< max(abs(results - results2));
-                DLIB_TEST(max(abs(results - results2) < 1e-3));
+                DLIB_TEST(max(abs(results - results2)) < 1e-3);
             }
         }
     } a;

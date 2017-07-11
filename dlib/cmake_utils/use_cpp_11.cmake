@@ -2,7 +2,7 @@
 # Also, it sets the COMPILER_CAN_DO_CPP_11 variable to 1 if it was successful.
 
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 
 # Don't rerun this script if its already been executed.
 if (DEFINED COMPILER_CAN_DO_CPP_11)
@@ -21,6 +21,19 @@ include(${CMAKE_CURRENT_LIST_DIR}/add_global_compiler_switch.cmake)
 if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
    message(FATAL_ERROR "C++11 is required to use dlib, but the version of Visual Studio you are using is too old and doesn't support C++11.  You need Visual Studio 2015 or newer. ")
 endif()
+
+macro(test_compiler_for_cpp11)
+   message(STATUS "Building a C++11 test project to see if your compiler supports C++11")
+   try_compile(test_for_cpp11_worked ${PROJECT_BINARY_DIR}/cpp11_test_build 
+      ${CMAKE_CURRENT_LIST_DIR}/test_for_cpp11 cpp11_test)
+   if (test_for_cpp11_worked)
+      message(STATUS "C++11 activated.")
+      set(COMPILER_CAN_DO_CPP_11 1)
+   else()
+      set(COMPILER_CAN_DO_CPP_11 0)
+      message(STATUS "********** Your compiler failed to build a C++11 project.  C++11 is required to use all parts of dlib! **********")
+   endif()
+endmacro()
 
 # Now turn on the appropriate compiler switch to enable C++11 if you have a
 # C++11 compiler.  In CMake 3.1 there is a simple flag you can set, but earlier
@@ -43,15 +56,7 @@ if (CMAKE_VERSION VERSION_LESS "3.1.2")
       endif()
    else()
       # Since we don't know what compiler this is just try to build a c++11 project and see if it compiles.
-      message(STATUS "Building a C++11 test project to see if your compiler supports C++11")
-      try_compile(test_for_cpp11_worked ${PROJECT_BINARY_DIR}/cpp11_test_build 
-         ${CMAKE_CURRENT_LIST_DIR}/test_for_cpp11 cpp11_test)
-      if (test_for_cpp11_worked)
-         message(STATUS "C++11 activated.")
-         set(COMPILER_CAN_DO_CPP_11 1)
-      else()
-         message(FATAL_ERROR "*** Your compiler failed to build a C++11 project, so dlib won't use C++11 features.***")
-      endif()
+      test_compiler_for_cpp11()
    endif()
 elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24215.1 ) 
    message(STATUS "NOTE: Visual Studio didn't have good enough C++11 support until Visual Studio 2015 update 3 (v19.0.24215.1)")
@@ -78,7 +83,15 @@ else()
       # newer.
       if (NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 11)
          set(CMAKE_CXX_STANDARD 11)
-         message(STATUS "C++11 activated.")
+         set(CMAKE_CXX_STANDARD_REQUIRED YES)
+         if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+            # Sometimes clang will lie and report that it supports C++11 when
+            # really it doesn't support thread_local.  So check for that.
+            test_compiler_for_cpp11()
+            add_global_compiler_switch("-std=c++11")
+         else()
+            message(STATUS "C++11 activated.")
+         endif()
       endif()
    endif()
 endif()

@@ -36,6 +36,15 @@ namespace dlib
         void set_process_noise     ( const matrix<double,states,states>& Q_) { Q = Q_; }
         void set_measurement_noise ( const matrix<double,measurements,measurements>& R_) { R = R_; }
         void set_estimation_error_covariance( const matrix<double,states,states>& P_) { P = P_; }
+        void set_state             ( const matrix<double,states,1>& xb_) 
+        {
+            xb = xb_;
+            if (!got_first_meas) 
+            {
+                x = xb_;
+                got_first_meas = true;
+            }
+        }
 
         const matrix<double,measurements,states>& get_observation_model (
         ) const { return H; }

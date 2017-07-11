@@ -8,6 +8,9 @@
 #include "../hash.h"
 #include "../algs.h"
 
+#ifdef DLIB_USE_MKL_FFT
+#include <mkl_dfti.h>
+#endif
 
 // No using FFTW until it becomes thread safe!
 #if 0
@@ -614,6 +617,206 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+#ifdef DLIB_USE_MKL_FFT
+
+#define DLIB_DFTI_CHECK_STATUS(s) \
+    if((s) != 0 && !DftiErrorClass((s), DFTI_NO_ERROR)) \
+    { \
+        throw dlib::error(DftiErrorMessage((s))); \
+    }
+
+    template < long NR, long NC, typename MM, typename L >
+    matrix<std::complex<double>,NR,NC,MM,L> call_mkl_fft(
+        const matrix<std::complex<double>,NR,NC,MM,L>& data,
+        bool do_backward_fft)
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t matrix fft(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
+            );
+
+        if (data.size() == 0)
+            return data;
+
+        DFTI_DESCRIPTOR_HANDLE h;
+        MKL_LONG status;
+
+        if (data.nr() == 1 || data.nc() == 1)
+        {
+            status = DftiCreateDescriptor(&h, DFTI_DOUBLE, DFTI_COMPLEX, 1, data.size());
+            DLIB_DFTI_CHECK_STATUS(status);
+        }
+        else
+        {
+            MKL_LONG size[2];
+            size[0] = data.nr();
+            size[1] = data.nc();
+
+            status = DftiCreateDescriptor(&h, DFTI_DOUBLE, DFTI_COMPLEX, 2, size);
+            DLIB_DFTI_CHECK_STATUS(status);
+
+            MKL_LONG strides[3];
+            strides[0] = 0;
+            strides[1] = size[1];
+            strides[2] = 1;
+
+            status = DftiSetValue(h, DFTI_INPUT_STRIDES, strides);
+            DLIB_DFTI_CHECK_STATUS(status);
+            status = DftiSetValue(h, DFTI_OUTPUT_STRIDES, strides);
+            DLIB_DFTI_CHECK_STATUS(status);
+        }
+
+        status = DftiSetValue(h, DFTI_PLACEMENT, DFTI_NOT_INPLACE);
+        DLIB_DFTI_CHECK_STATUS(status);
+
+        // Unless we use sequential mode, the fft results are not correct.
+        status = DftiSetValue(h, DFTI_THREAD_LIMIT, 1);
+        DLIB_DFTI_CHECK_STATUS(status);
+
+        status = DftiCommitDescriptor(h);
+        DLIB_DFTI_CHECK_STATUS(status);
+
+        matrix<std::complex<double>,NR,NC,MM,L> out(data.nr(), data.nc());
+
+        if (do_backward_fft)
+            status = DftiComputeBackward(h, (void *)(&data(0, 0)), &out(0,0));
+        else
+            status = DftiComputeForward(h, (void *)(&data(0, 0)), &out(0,0));
+        DLIB_DFTI_CHECK_STATUS(status);
+
+        status = DftiFreeDescriptor(&h);
+        DLIB_DFTI_CHECK_STATUS(status);
+
+        return out;
+    }
+
+    template < long NR, long NC, typename MM, typename L >
+    void call_mkl_fft_inplace(
+        matrix<std::complex<double>,NR,NC,MM,L>& data,
+        bool do_backward_fft
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t void ifft_inplace(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
+            );
+
+        if (data.size() == 0)
+            return;
+
+        DFTI_DESCRIPTOR_HANDLE h;
+        MKL_LONG status;
+
+        if (data.nr() == 1 || data.nc() == 1)
+        {
+            status = DftiCreateDescriptor(&h, DFTI_DOUBLE, DFTI_COMPLEX, 1, data.size());
+            DLIB_DFTI_CHECK_STATUS(status);
+        }
+        else
+        {
+            MKL_LONG size[2];
+            size[0] = data.nr();
+            size[1] = data.nc();
+
+            status = DftiCreateDescriptor(&h, DFTI_DOUBLE, DFTI_COMPLEX, 2, size);
+            DLIB_DFTI_CHECK_STATUS(status);
+
+            MKL_LONG strides[3];
+            strides[0] = 0;
+            strides[1] = size[1];
+            strides[2] = 1;
+
+            status = DftiSetValue(h, DFTI_INPUT_STRIDES, strides);
+            DLIB_DFTI_CHECK_STATUS(status);
+        }
+
+        // Unless we use sequential mode, the fft results are not correct.
+        status = DftiSetValue(h, DFTI_THREAD_LIMIT, 1);
+        DLIB_DFTI_CHECK_STATUS(status);
+
+        status = DftiCommitDescriptor(h);
+        DLIB_DFTI_CHECK_STATUS(status);
+
+        if (do_backward_fft)
+            status = DftiComputeBackward(h, &data(0, 0));
+        else
+            status = DftiComputeForward(h, &data(0, 0));
+        DLIB_DFTI_CHECK_STATUS(status);
+
+        status = DftiFreeDescriptor(&h);
+        DLIB_DFTI_CHECK_STATUS(status);
+
+        return;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    // Call the MKL DFTI implementation in these cases 
+
+    inline matrix<std::complex<double>,0,1> fft (const matrix<std::complex<double>,0,1>& data)
+    {
+        return call_mkl_fft(data, false);
+    }
+    inline matrix<std::complex<double>,0,1> ifft(const matrix<std::complex<double>,0,1>& data)
+    {
+        return call_mkl_fft(data, true) / data.size();
+    }
+    inline matrix<std::complex<double>,1,0> fft (const matrix<std::complex<double>,1,0>& data)
+    {
+        return call_mkl_fft(data, false);
+    }
+    inline matrix<std::complex<double>,1,0> ifft(const matrix<std::complex<double>,1,0>& data)
+    {
+        return call_mkl_fft(data, true) / data.size();
+    }
+    inline matrix<std::complex<double> > fft (const matrix<std::complex<double> >& data)
+    {
+        return call_mkl_fft(data, false);
+    }
+    inline matrix<std::complex<double> > ifft(const matrix<std::complex<double> >& data)
+    {
+        return call_mkl_fft(data, true) / data.size();
+    }
+
+    inline void fft_inplace (matrix<std::complex<double>,0,1>& data)
+    {
+        call_mkl_fft_inplace(data, false);
+    }
+    inline void ifft_inplace(matrix<std::complex<double>,0,1>& data)
+    {
+        call_mkl_fft_inplace(data, true);
+    }
+    inline void fft_inplace (matrix<std::complex<double>,1,0>& data)
+    {
+        call_mkl_fft_inplace(data, false);
+    }
+    inline void ifft_inplace(matrix<std::complex<double>,1,0>& data)
+    {
+        call_mkl_fft_inplace(data, true);
+    }
+
+    inline void fft_inplace (matrix<std::complex<double> >& data)
+    {
+        call_mkl_fft_inplace(data, false);
+    }
+    inline void ifft_inplace(matrix<std::complex<double> >& data)
+    {
+        call_mkl_fft_inplace(data, true);
+    }
+
+#endif // DLIB_USE_MKL_FFT
+
+// ----------------------------------------------------------------------------------------
 }
 
 #endif // DLIB_FFt_Hh_

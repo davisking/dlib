@@ -5,13 +5,14 @@
 
 #include "server_kernel_abstract.h"
 
+#include <memory>
+#include <string>
+
 #include "../threads.h"
 #include "../sockets.h"
-#include <string>
 #include "../algs.h"
 #include "../set.h"
 #include "../logger.h"
-#include "../smart_pointers.h"
 
 
 namespace dlib
@@ -209,8 +210,8 @@ namespace dlib
             int max_connections;
             mutex max_connections_mutex;
             signaler thread_count_zero;
-            scoped_ptr<thread_function> async_start_thread;
-            scoped_ptr<listener> sock;
+            std::unique_ptr<thread_function> async_start_thread;
+            std::unique_ptr<listener> sock;
             unsigned long graceful_close_timeout;
 
 

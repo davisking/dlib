@@ -358,6 +358,20 @@ namespace dlib
             input_tensor_to_output_tensor().
         !*/
 
+        void clean (
+        );
+        /*!
+            Implementing this function is optional.  If you don't need it then you don't
+            have to provide a clean().  But if you do provide it then it must behave as
+            follows:
+
+            ensures
+                - calling clean() Causes this object to forget about everything except its
+                  parameters.  This is useful if your layer caches information between
+                  forward and backward passes and you want to clean out that cache
+                  information before saving the network to disk.  
+        !*/
+
     };
 
     std::ostream& operator<<(std::ostream& out, const EXAMPLE_COMPUTATIONAL_LAYER_& item);
@@ -620,6 +634,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct num_con_outputs
+    {
+        num_con_outputs(unsigned long n) : num_outputs(n) {}
+        unsigned long num_outputs;
+    };
+
     template <
         long _num_filters,
         long _nr,
@@ -670,6 +690,24 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier()  == 0
         !*/
 
+        con_(
+            num_con_outputs o
+        );
+        /*!
+            ensures
+                - #num_filters() == o.num_outputs 
+                - #nr() == _nr
+                - #nc() == _nc
+                - #stride_y() == _stride_y
+                - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
+        !*/
+
         long num_filters(
         ) const; 
         /*!
@@ -677,6 +715,19 @@ namespace dlib
                 - returns the number of filters contained in this layer.  The k dimension
                   of the output tensors produced by this layer will be equal to the number
                   of filters.
+        !*/
+
+        void set_num_filters(
+            long num
+        );
+        /*!
+            requires
+                - num > 0
+                - get_layer_params().size() == 0
+                  (i.e. You can't change the number of filters in con_ if the parameter
+                  tensor has already been allocated.)
+            ensures
+                - #num_filters() == num
         !*/
 
         long nr(
@@ -825,6 +876,275 @@ namespace dlib
         typename SUBNET
         >
     using con = add_layer<con_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long _num_filters,
+        long _nr,
+        long _nc,
+        int _stride_y,
+        int _stride_x,
+        int _padding_y = _stride_y!=1? 0 : _nr/2,
+        int _padding_x = _stride_x!=1? 0 : _nc/2
+        >
+    class cont_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be > 0.
+                Also, we require that:
+                    - 0 <= _padding_y && _padding_y < _nr
+                    - 0 <= _padding_x && _padding_x < _nc
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a transposed convolution layer
+                that takes an input tensor and transpose convolves (sometimes called
+                "deconvolution") it with a set of filters and then outputs the results. 
+
+                This is essentially a convolutional layer that allows fractional strides.
+                Therefore, you can make output tensors that are larger than the input
+                tensors using this layer type. 
+
+                
+                The dimensions of the tensors output by this layer are as follows (letting
+                IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == num_filters()
+                    - OUT.nr() == stride_y()*(IN.nr()-1) + nr() - 2*padding_y()
+                    - OUT.nc() == stride_x()*(IN.nc()-1) + nc() - 2*padding_x()
+        !*/
+
+    public:
+        cont_(
+        );
+        /*!
+            ensures
+                - #num_filters() == _num_filters
+                - #nr() == _nr
+                - #nc() == _nc
+                - #stride_y() == _stride_y
+                - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
+        !*/
+
+        long num_filters(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of filters contained in this layer.  The k dimension
+                  of the output tensors produced by this layer will be equal to the number
+                  of filters.
+        !*/
+
+        long nr(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of rows in the filters in this layer.
+        !*/
+
+        long nc(
+        ) const;
+        /*!
+            ensures
+                - returns the number of columns in the filters in this layer.
+        !*/
+
+        long stride_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the vertical stride used when convolving the filters over an
+                  image.  That is, each filter will be moved 1.0/stride_y() pixels down at
+                  a time when it moves over the image.
+        !*/
+
+        long stride_x(
+        ) const;
+        /*!
+            ensures
+                - returns the horizontal stride used when convolving the filters over an
+                  image.  That is, each filter will be moved 1.0/stride_x() pixels right at
+                  a time when it moves over the image.
+        !*/
+
+        long padding_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the top and bottom
+                  sides of the image.
+        !*/
+
+        long padding_x(
+        ) const; 
+        /*!
+            ensures
+                - returns the number of pixels of zero padding added to the left and right 
+                  sides of the image.
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;  
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its parameters be
+                  multiplied by get_learning_rate_multiplier().
+        !*/
+
+        double get_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its parameters be
+                  multiplied by get_weight_decay_multiplier().
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        void set_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+
+    };
+
+    template <
+        long num_filters,
+        long nr,
+        long nc,
+        int stride_y,
+        int stride_x,
+        typename SUBNET
+        >
+    using cont = add_layer<cont_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        int scale_y, 
+        int scale_x 
+        >
+    class upsample_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be >= 1.
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it allows you to upsample a layer using
+                bilinear interpolation.  To be very specific, it upsamples each of the
+                channels in an input tensor.  Therefore, if IN is the input tensor to this
+                layer and OUT the output tensor, then we will have:
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == IN.k() 
+                    - OUT.nr() == IN.nr()*scale_y
+                    - OUT.nc() == IN.nr()*scale_x
+                    - for all valid i,k:  image_plane(OUT,i,k) is a copy of
+                      image_plane(IN,i,k) that has been bilinearly interpolated to fit into
+                      the shape of image_plane(OUT,i,k).
+        !*/
+    public:
+
+        upsample_(
+        );
+        /*!
+            ensures
+                - This object has no state, so the constructor does nothing, aside from
+                  providing default constructability.
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        int scale,
+        typename SUBNET
+        >
+    using upsample = add_layer<upsample_<scale,scale>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

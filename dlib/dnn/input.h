@@ -365,12 +365,12 @@ namespace dlib
 
         }
 
-        friend void serialize(const input& item, std::ostream& out)
+        friend void serialize(const input& /*item*/, std::ostream& out)
         {
             serialize("input<matrix>", out);
         }
 
-        friend void deserialize(input& item, std::istream& in)
+        friend void deserialize(input& /*item*/, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
@@ -378,13 +378,13 @@ namespace dlib
                 throw serialization_error("Unexpected version found while deserializing dlib::input.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const input& item)
+        friend std::ostream& operator<<(std::ostream& out, const input& /*item*/)
         {
             out << "input<matrix>";
             return out;
         }
 
-        friend void to_xml(const input& item, std::ostream& out)
+        friend void to_xml(const input& /*item*/, std::ostream& out)
         {
             out << "<input/>";
         }

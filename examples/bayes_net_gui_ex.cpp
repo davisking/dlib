@@ -21,13 +21,14 @@
     examples and want to see a more in-depth example then by all means, continue reading. :)
 */
 
-#include <dlib/gui_widgets.h>
+#include <memory>
 #include <sstream>
 #include <string>
+
+#include <dlib/gui_widgets.h>
 #include <dlib/directed_graph.h>
 #include <dlib/string.h>
 #include <dlib/bayes_utils.h>
-#include <dlib/smart_pointers.h>
 #include <dlib/set.h>
 #include <dlib/graph_utils.h>
 #include <dlib/stl_checked.h>
@@ -123,7 +124,7 @@ private:
     widget_group cpt_group;
     widget_group ppt_group;
 
-    scoped_ptr<bayesian_network_join_tree> solution;
+    std::unique_ptr<bayesian_network_join_tree> solution;
     join_tree_type join_tree;
     // The std_vector_c is an object identical to the std::vector except that it checks
     // all its preconditions and throws a dlib::fatal_error if they are violated.

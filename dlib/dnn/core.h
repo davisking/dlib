@@ -60,6 +60,27 @@ namespace dlib
 
     namespace impl
     {
+        // The reason we return an int for this version rather than doing the more straight forward thing (like we do above) is to avoid a bug in visual studio 2015.
+        template <typename T>
+        auto call_clean_method_if_exists (
+            T& obj,
+            special_
+        ) -> typename int_<decltype(&T::clean)>::type { obj.clean();  return 0;  }
+
+        template <typename T>
+        void call_clean_method_if_exists (T& , general_) {}
+    }
+    template <typename T>
+    void call_clean_method_if_exists(T& obj) { impl::call_clean_method_if_exists(obj, special_()); }
+    /*!
+        ensures
+            - calls obj.clean() if obj has a .clean() method.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
         class repeat_input_layer 
         {
             /*!
@@ -576,6 +597,10 @@ namespace dlib
     template <typename LAYER_DETAILS, typename SUBNET, typename enabled = void>
     class add_layer;
 
+    template <typename LAYER_DETAILS, typename SUBNET, typename enabled>
+    void serialize(const add_layer<LAYER_DETAILS,SUBNET,enabled>& item, std::ostream& out);
+    template <typename LAYER_DETAILS, typename SUBNET, typename enabled>
+    void deserialize(add_layer<LAYER_DETAILS,SUBNET,enabled>& item, std::istream& in);
 
     template <typename T, typename U>
     struct is_nonloss_layer_type<add_layer<T,U>> : std::true_type {};
@@ -893,6 +918,7 @@ namespace dlib
             temp_tensor.clear();
             gradient_input_is_stale = true;
             subnetwork->clean();
+            call_clean_method_if_exists(details);
         }
 
         friend void serialize(const add_layer& item, std::ostream& out)
@@ -1255,6 +1281,7 @@ namespace dlib
             params_grad.clear();
             temp_tensor.clear();
             gradient_input_is_stale = true;
+            call_clean_method_if_exists(details);
         }
 
         friend void serialize(const add_layer& item, std::ostream& out)
@@ -2268,6 +2295,38 @@ namespace dlib
             return temp_label;
         }
 
+        template <typename ...T>
+        const output_label_type& process (const input_type& x, T&& ...args)
+        {
+            to_tensor(&x,&x+1,temp_tensor);
+            subnetwork.forward(temp_tensor);
+            const dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
+            loss.to_label(temp_tensor, wsub, &temp_label, std::forward<T>(args)...);
+            return temp_label;
+        }
+
+        template <typename iterable_type, typename ...T>
+        std::vector<output_label_type> process_batch (const iterable_type& data, size_t batch_size, T&& ...args)
+        {
+            std::vector<output_label_type> results(std::distance(data.begin(), data.end()));
+            auto o = results.begin();
+            auto i = data.begin();
+            auto num_remaining = results.size();
+            while(num_remaining != 0)
+            {
+                auto inc = std::min(batch_size, num_remaining);
+                to_tensor(i,i+inc,temp_tensor);
+                subnetwork.forward(temp_tensor);
+                const dimpl::subnet_wrapper<subnet_type> wsub(subnetwork);
+                loss.to_label(temp_tensor, wsub, o, std::forward<T>(args)...);
+
+                i += inc;
+                o += inc;
+                num_remaining -= inc;
+            }
+            return results;
+        }
+
         template <typename iterable_type>
         std::vector<output_label_type> operator() (
             const iterable_type& data,
@@ -2393,23 +2452,10 @@ namespace dlib
             subnetwork.clean();
         }
 
-        friend void serialize(const add_loss_layer& item, std::ostream& out)
-        {
-            int version = 1;
-            serialize(version, out);
-            serialize(item.loss, out);
-            serialize(item.subnetwork, out);
-        }
-
-        friend void deserialize(add_loss_layer& item, std::istream& in)
-        {
-            int version = 0;
-            deserialize(version, in);
-            if (version != 1)
-                throw serialization_error("Unexpected version found while deserializing dlib::add_loss_layer.");
-            deserialize(item.loss, in);
-            deserialize(item.subnetwork, in);
-        }
+        template <typename T, typename U>
+        friend void serialize(const add_loss_layer<T,U>& item, std::ostream& out);
+        template <typename T, typename U>
+        friend void deserialize(add_loss_layer<T,U>& item, std::istream& in);
 
         friend std::ostream& operator<< (std::ostream& out, const add_loss_layer& item)
         {
@@ -2441,6 +2487,26 @@ namespace dlib
         output_label_type temp_label;
         resizable_tensor temp_tensor;
     };
+
+    template <typename LOSS_DETAILS, typename SUBNET>
+    void serialize(const add_loss_layer<LOSS_DETAILS,SUBNET>& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(version, out);
+        serialize(item.loss, out);
+        serialize(item.subnetwork, out);
+    }
+
+    template <typename LOSS_DETAILS, typename SUBNET>
+    void deserialize(add_loss_layer<LOSS_DETAILS,SUBNET>& item, std::istream& in)
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::add_loss_layer.");
+        deserialize(item.loss, in);
+        deserialize(item.subnetwork, in);
+    }
 
 
     template <typename T, typename U>
@@ -3176,7 +3242,7 @@ namespace dlib
                 }
             }
 
-        } // end for (int iter = 0; iter < 5; ++iter)
+        } // end for (int iter = 0; iter < 10; ++iter)
 
         if (rs_params.mean() > 0.003)
         {
@@ -3396,7 +3462,7 @@ namespace dlib
                 visitor&& v
             )
             {
-                vl_loop<i+1, num>::visit(net,v);
+                vl_loop_backwards<i+1, num>::visit(net,v);
                 v(i, layer<i>(net));
             }
         };
@@ -3473,6 +3539,71 @@ namespace dlib
         static_assert(begin <= end, "Invalid range");
         static_assert(end <= net_type::num_layers, "Invalid range");
         impl::vl_loop_backwards<begin,end>::visit(net, v);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <size_t i, unsigned long tag_id>
+        struct vl_until_tag
+        {
+            template <
+                typename net_type,
+                typename next_net_type,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                next_net_type& next_net,
+                visitor&& v
+            )
+            {
+                v(next_net);
+                vl_until_tag<i+1,tag_id>::visit(net,layer<i+1>(net),v);
+            }
+
+            template <
+                typename net_type,
+                typename SUBNET,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                const add_tag_layer<tag_id,SUBNET>& next_net,
+                visitor&& v
+            )
+            {
+                v(next_net);
+            }
+
+            template <
+                typename net_type,
+                typename SUBNET,
+                typename visitor
+                >
+            static void visit(
+                net_type& net,
+                add_tag_layer<tag_id,SUBNET>& next_net,
+                visitor&& v
+            )
+            {
+                v(next_net);
+            }
+        };
+    }
+
+    template <
+        unsigned long tag_id,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_until_tag(
+        net_type& net,
+        visitor v
+    )
+    {
+        impl::vl_until_tag<0,tag_id>::visit(net, net, v);
     }
 
 // ----------------------------------------------------------------------------------------

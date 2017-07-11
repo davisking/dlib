@@ -2,15 +2,15 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 
+#include <cstdlib>
 #include <sstream>
 #include <string>
-#include <cstdlib>
+#include <vector>
+
 #include <ctime>
 #include <dlib/sockets.h>
 #include <dlib/misc_api.h>
 #include <dlib/sockstreambuf.h>
-#include <vector>
-#include <dlib/smart_pointers.h>
 
 #include "tester.h"
 
@@ -143,7 +143,7 @@ namespace
         }
 
         // make sure con gets deleted
-        scoped_ptr<connection> del_con(con);
+        std::unique_ptr<connection> del_con(con);
 
         ssb buf(con);
         istream in(&buf);

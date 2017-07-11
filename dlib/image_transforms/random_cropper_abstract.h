@@ -35,9 +35,10 @@ namespace dlib
                 - #get_chip_dims() == chip_dims(300,300)
                 - #get_randomly_flip() == true
                 - #get_max_rotation_degrees() == 30
-                - #get_min_object_height() == 0.25
-                - #get_max_object_height() == 0.7
+                - #get_min_object_size() == 0.25
+                - #get_max_object_size() == 0.7
                 - #get_background_crops_fraction() == 0.5
+                - #get_translate_amount() == 0.1
         !*/
 
         void set_seed (
@@ -46,6 +47,25 @@ namespace dlib
         /*!
             ensures
                 - Seeds the internal random number generator with the given seed.
+        !*/
+
+        double get_translate_amount (
+        ) const; 
+        /*!
+            ensures
+                - When a box is cropped out, it will be randomly translated prior to
+                  cropping by #get_translate_amount()*(the box's height) up or down and
+                  #get_translate_amount()*(the box's width) left or right.
+        !*/
+
+        void set_translate_amount (
+            double value
+        );
+        /*!
+            requires
+                - value >= 0
+            ensures
+                - #get_translate_amount() == value
         !*/
 
         double get_background_crops_fraction (
@@ -123,42 +143,78 @@ namespace dlib
                 - #get_max_rotation_degrees() == std::abs(value)
         !*/
 
-        double get_min_object_height (
+        double get_min_object_size (
         ) const;
         /*!
             ensures
                 - When a chip is extracted around an object, the chip will be sized so that
-                  the object's height is at least get_min_object_height() percent of the
-                  chip height.
+                  at least one of the object's height or width are >= get_min_object_size() *
+                  the chip's height and width, respectively.  E.g. if the chip is 640x480
+                  pixels in size then the object will be at least 480*get_min_object_size()
+                  pixels tall or 640*get_min_object_size() pixels wide.  This also means
+                  that if get_min_object_size() >1 then the object will only be partially
+                  visible in the crop since it will be too big to fit.  
         !*/
 
-        void set_min_object_height (
+        void set_min_object_size (
             double value
         );
         /*!
             requires
-                - 0 < value < 1
+                - 0 < value 
             ensures
-                - #get_min_object_height() == value
+                - #get_min_object_size() == value
         !*/
 
-        double get_max_object_height (
+        double get_max_object_size (
         ) const; 
         /*!
             ensures
                 - When a chip is extracted around an object, the chip will be sized so that
-                  the object's height is at most get_min_object_height() percent of the
-                  chip height.
+                  both the object's height and width are at most get_max_object_size() *
+                  the chip's height and width, respectively.  E.g. if the chip is 640x480
+                  pixels in size then the object will be at most 480*get_max_object_size()
+                  pixels tall and 640*get_max_object_size() pixels wide. 
         !*/
 
-        void set_max_object_height (
+        void set_max_object_size (
             double value
         ); 
         /*!
             requires
-                - 0 < value < 1
+                - 0 < value 
             ensures
-                - #get_max_object_height() == value
+                - #get_max_object_size() == value
+        !*/
+
+        template <
+            typename array_type
+            >
+        void append (
+            size_t num_crops,
+            const array_type& images,
+            const std::vector<std::vector<mmod_rect>>& rects,
+            array_type& crops,
+            std::vector<std::vector<mmod_rect>>& crop_rects
+        );
+        /*!
+            requires
+                - images.size() == rects.size()
+                - crops.size() == crop_rects.size()
+                - for all valid i:
+                    - images[i].size() != 0
+                - array_type is a type with an interface compatible with dlib::array or
+                  std::vector and it must in turn contain image objects that implement the
+                  interface defined in dlib/image_processing/generic_image.h 
+            ensures
+                - Randomly extracts num_crops chips from images and appends them to the end
+                  of crops.  We also copy the object metadata for each extracted crop and
+                  store it into #crop_rects.  In particular, calling this function is the
+                  same as making multiple calls to the version of operator() below that
+                  outputs a single crop, except that append() will use multiple CPU cores
+                  to do the processing and is therefore faster.
+                - #crops.size() == crops.size()+num_crops
+                - #crop_rects.size() == crop_rects.size()+num_crops
         !*/
 
         template <
@@ -185,6 +241,8 @@ namespace dlib
                   particular, calling this function is the same as invoking the version of
                   operator() below multiple times, except that this version of operator()
                   will use multiple CPU cores to do the processing and is therefore faster.
+                - #crops.size() == num_crops
+                - #crop_rects.size() == num_crops
         !*/
 
         template <

@@ -443,6 +443,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    point_transform_affine flip_image_left_right (
+        image_type& img
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+        ensures
+            - This function is identical to the above version of flip_image_left_right()
+              except that it operates in-place.
+            - #img.nr() == img.nr()
+            - #img.nc() == img.nc()
+            - #img == a copy of img which has been flipped from left to right.  
+              (i.e. it is flipped as if viewed though a mirror)
+            - returns a transformation object that maps points in img into their
+              corresponding location in #img.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_array_type,
         typename T
         >

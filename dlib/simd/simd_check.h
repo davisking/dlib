@@ -51,11 +51,36 @@
                 #define DLIB_HAVE_AVX2
             #endif
         #endif
+        #ifdef __ALTIVEC__
+            #ifndef DLIB_HAVE_ALTIVEC
+                #define DLIB_HAVE_ALTIVEC
+            #endif
+        #endif
+        #ifdef __VSX__
+            #ifndef DLIB_HAVE_VSX
+                #define DLIB_HAVE_VSX
+            #endif
+        #endif
+        #ifdef __VEC__ // __VEC__ = 10206
+            #ifndef DLIB_HAVE_POWER_VEC	// vector and vec_ intrinsics
+                #define DLIB_HAVE_POWER_VEC
+            #endif
+        #endif
+        #ifdef __ARM_NEON
+            #ifndef DLIB_HAVE_NEON
+                #define DLIB_HAVE_NEON
+            #endif
+        #endif
     #endif
 #endif
 
  
 // ----------------------------------------------------------------------------------------
+
+
+#ifdef DLIB_HAVE_ALTIVEC
+#include <altivec.h>
+#endif
 
 #ifdef DLIB_HAVE_SSE2
     #include <xmmintrin.h>
@@ -76,6 +101,10 @@
     #include <immintrin.h> // AVX
 //    #include <avx2intrin.h>
 #endif
+#ifdef DLIB_HAVE_NEON
+    #include <arm_neon.h> // ARM NEON
+#endif
+
 
 #endif // DLIB_SIMd_CHECK_Hh_
 

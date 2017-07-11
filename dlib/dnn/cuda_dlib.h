@@ -5,6 +5,7 @@
 
 
 #include "tensor.h"
+#include "../geometry/rectangle.h"
 
 namespace dlib
 {
@@ -141,6 +142,21 @@ namespace dlib
             const tensor& v2
         );
 
+        void exp (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void log (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void log10 (
+            tensor& dest,
+            const tensor& src
+        );
+
     // ------------------------------------------------------------------------------------
 
         void set_tensor (
@@ -230,11 +246,29 @@ namespace dlib
             const float C
         );
 
+        void affine_transform(
+            const rectangle& rect,
+            tensor& dest, 
+            const tensor& src1, 
+            const tensor& src2, 
+            const tensor& src3, 
+            float A, 
+            float B,
+            float C
+        );
+
         // Note that this function isn't in the tt:: namespace because add_scaled() is
         // called by cuda::add() so we don't need a tt:: version of add_scaled().  
         void add_scaled(
             tensor& dest,
             const float scale,
+            const tensor& src
+        );
+
+        void add_cv_to_all_columns(
+            float beta, 
+            tensor& dest, 
+            float alpha, 
             const tensor& src
         );
 
@@ -312,13 +346,29 @@ namespace dlib
             tensor& params_grad 
         );
 
-        void copy_tensor(
-                tensor& dest,
-                size_t dest_k_offset,
-                const tensor& src,
-                size_t src_k_offset,
-                size_t count_k
+
+    // ----------------------------------------------------------------------------------------
+
+        void resize_bilinear (
+            tensor& dest,
+            const tensor& src
         );
+
+        void resize_bilinear_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
+
+    // ----------------------------------------------------------------------------------------
+
+        void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+        );
+
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

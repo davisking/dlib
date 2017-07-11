@@ -1,0 +1,15 @@
+version: "{build}"
+
+configuration: Release
+
+build_script:
+  # build test
+  - mkdir %APPVEYOR_BUILD_FOLDER%\build_test
+  - cd %APPVEYOR_BUILD_FOLDER%\build_test
+  - cmake -G "Visual Studio 14 2015 Win64" ../dlib/test
+  - cmake --build . --config %CONFIGURATION% 
+
+test_script:
+  # run test
+  - cd %APPVEYOR_BUILD_FOLDER%\build_test\%CONFIGURATION%
+  - dtest --runall

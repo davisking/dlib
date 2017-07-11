@@ -191,15 +191,13 @@ namespace dlib
             int nc 
         )
         {
-            if (n == 0 || nr == 0 || nc == 0 || k == 0)
+            if (handle)
             {
-                if (handle)
-                {
-                    cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)handle);
-                    handle = nullptr;
-                }
+                cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)handle);
+                handle = nullptr;
             }
-            else
+
+            if (n != 0 && nr != 0 && nc != 0 && k != 0)
             {
                 cudnnTensorDescriptor_t h;
                 CHECK_CUDNN(cudnnCreateTensorDescriptor(&h));
@@ -260,7 +258,8 @@ namespace dlib
                   (have_same_dimensions(src, dest) ||
                   (src.num_samples()==1 && src.k()==dest.k() && src.nr()==1 && src.nc()==1) ||
                   (src.num_samples()==1 && src.k()==dest.k() && src.nr()==dest.nr() && src.nc()==dest.nc()) ||
-                  (src.num_samples()==1 && src.k()==1 && src.nr()==dest.nr() && src.nc()==dest.nc())) &&
+                  (src.num_samples()==1 && src.k()==1 && src.nr()==dest.nr() && src.nc()==dest.nc()) ||
+                  (src.num_samples()==dest.num_samples() && src.k()==1 && src.nr()==1 && src.nc()==1)) &&
                   is_same_object(src,dest) == false , 
                     "\n\t dest.num_samples(): " << dest.num_samples()
                     <<"\n\t dest.k():           " << dest.k()
@@ -277,6 +276,11 @@ namespace dlib
                 // Call the dlib function in this case since it's faster than the one that
                 // comes with cuDNN (at least as of cuDNN v4).
                 add_scaled(dest, alpha, src);
+                return;
+            }
+            else if (src.num_samples()==dest.num_samples() && src.k()==1 && src.nr()==1 && src.nc()==1)
+            {
+                add_cv_to_all_columns(beta, dest, alpha, src);
                 return;
             }
 
@@ -816,6 +820,16 @@ namespace dlib
                                                  filters.nc()));
 
                 CHECK_CUDNN(cudnnCreateConvolutionDescriptor((cudnnConvolutionDescriptor_t*)&conv_handle));
+#if CUDNN_MAJOR >= 6
+                CHECK_CUDNN(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
+                        padding_y, // vertical padding
+                        padding_x, // horizontal padding
+                        stride_y,
+                        stride_x,
+                        1, 1, // must be 1,1
+                        CUDNN_CROSS_CORRELATION,
+                        CUDNN_DATA_FLOAT)); // could also be CUDNN_CONVOLUTION
+#else
                 CHECK_CUDNN(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
                         padding_y, // vertical padding
                         padding_x, // horizontal padding
@@ -823,6 +837,7 @@ namespace dlib
                         stride_x,
                         1, 1, // must be 1,1
                         CUDNN_CROSS_CORRELATION)); // could also be CUDNN_CONVOLUTION
+#endif
 
                 CHECK_CUDNN(cudnnGetConvolution2dForwardOutputDim(
                         (const cudnnConvolutionDescriptor_t)conv_handle,
@@ -936,19 +951,29 @@ namespace dlib
         }
 
         void tensor_conv::operator() (
+            const bool add_to_output,
             resizable_tensor& output,
             const tensor& data,
-            const tensor& filters,
-            int stride_y,
-            int stride_x,
-            int padding_y,
-            int padding_x
+            const tensor& filters
+        )
+        {
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
+
+            output.set_size(out_num_samples, out_k, out_nr, out_nc);
+            (*this)(add_to_output, static_cast<tensor&>(output), data, filters);
+        }
+
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            tensor& output,
+            const tensor& data,
+            const tensor& filters
         )
         {
             DLIB_CASSERT(is_same_object(output,data) == false);
             DLIB_CASSERT(is_same_object(output,filters) == false);
             DLIB_CASSERT(filters.k() == data.k());
-            DLIB_CASSERT(stride_y > 0 && stride_x > 0);
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
             DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
                 "Filter windows must be small enough to fit into the padded image."
                 << "\n\t filters.nc(): " << filters.nc() 
@@ -963,19 +988,15 @@ namespace dlib
                 );
 
 
-            setup(data,filters,stride_y,stride_x,padding_y,padding_x);
-
-            output.set_size(out_num_samples, out_k, out_nr, out_nc);
-
-            DLIB_ASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
-            DLIB_ASSERT(output.k() == filters.num_samples());
-            DLIB_ASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y);
-            DLIB_ASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x);
+            DLIB_CASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
+            DLIB_CASSERT(output.k() == filters.num_samples());
+            DLIB_CASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y);
+            DLIB_CASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x);
 
 
 
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = add_to_output ? 1 : 0;
             CHECK_CUDNN(cudnnConvolutionForward(
                     context(),
                     &alpha,
@@ -993,13 +1014,14 @@ namespace dlib
         }
 
         void tensor_conv::get_gradient_for_data (
+            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& filters,
             tensor& data_gradient
         )
         {
             const float alpha = 1;
-            const float beta = 1;
+            const float beta = add_to_output ? 1 : 0;
 
 
             CHECK_CUDNN(cudnnConvolutionBackwardData(context(),
@@ -1019,13 +1041,14 @@ namespace dlib
 
         void tensor_conv::
         get_gradient_for_filters (
+            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& data,
             tensor& filters_gradient
         )
         {
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = add_to_output ? 1 : 0;
             CHECK_CUDNN(cudnnConvolutionBackwardFilter(context(),
                                                     &alpha,
                                                     descriptor(data),

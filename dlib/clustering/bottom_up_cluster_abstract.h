@@ -43,6 +43,91 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    struct snl_range
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents an interval on the real number line.  It is used
+                to store the outputs of the segment_number_line() routine defined below.
+        !*/
+
+        snl_range(
+        );
+        /*!
+            ensures
+                - #lower == 0
+                - #upper == 0
+        !*/
+
+        snl_range(
+            double val
+        );
+        /*!
+            ensures
+                - #lower == val 
+                - #upper == val 
+        !*/
+
+        snl_range(
+            double l, 
+            double u
+        );
+        /*!
+            requires
+                - l <= u
+            ensures
+                - #lower == l 
+                - #upper == u 
+        !*/
+
+        double lower;
+        double upper;
+
+        double width(
+        ) const { return upper-lower; }
+        /*!
+            ensures
+                - returns the width of this interval on the number line.
+        !*/
+
+        bool operator<(const snl_range& item) const { return lower < item.lower; }
+        /*!
+            ensures
+                - provides a total ordering of snl_range objects assuming they are
+                  non-overlapping.
+        !*/
+    };
+
+    std::ostream& operator<< (std::ostream& out, const snl_range& item );
+    /*!
+        ensures
+            - prints item to out in the form [lower,upper].
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    std::vector<snl_range> segment_number_line (
+        const std::vector<double>& x,
+        const double max_range_width
+    );
+    /*!
+        requires
+            - max_range_width >= 0
+        ensures
+            - Finds a clustering of the values in x and returns the ranges that define the
+              clustering.  This routine uses a combination of bottom up clustering and a
+              simple greedy scan to try and find the most compact set of ranges that
+              contain all the values in x.  
+            - This routine has approximately linear runtime.
+            - Every value in x will be contained inside one of the returned snl_range
+              objects;
+            - All returned snl_range object's will have a width() <= max_range_width and
+              will also be non-overlapping.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 

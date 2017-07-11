@@ -46,6 +46,10 @@ using namespace std;
             - Types corresponding to a MATLAB cell array
                 - a std::vector or dlib::array containing any of the above 
                   types of objects or std::vector or dlib::array objects.
+
+            - matlab_struct and matlab_object.  These are special types defined in the
+              call_matlab.h file and correspond to matlab structs and arbitrary matlab
+              objects respectively.
 !*/
 
 

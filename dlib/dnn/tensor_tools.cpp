@@ -137,6 +137,54 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void exp (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::exp(dest,src);
+#else
+        dest = exp(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void log (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::log(dest,src);
+#else
+        dest = log(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void log10 (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::log10(dest,src);
+#else
+        dest = log10(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void gemm (
         float beta,
         tensor& dest,
@@ -350,6 +398,24 @@ namespace dlib { namespace tt
         cuda::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
 #else
         cpu::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
+#endif
+    }
+
+    void affine_transform(
+        const rectangle& rect,
+        tensor& dest, 
+        const tensor& src1, 
+        const tensor& src2, 
+        const tensor& src3, 
+        float A, 
+        float B,
+        float C
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform(rect, dest,src1,src2,src3,A,B,C);
+#else
+        cpu::affine_transform(rect, dest,src1,src2,src3,A,B,C);
 #endif
     }
 
@@ -772,22 +838,63 @@ namespace dlib { namespace tt
 #endif
     }
 
+// ----------------------------------------------------------------------------------------
+
+    void resize_bilinear (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_bilinear(dest,src);
+#else
+        cpu::resize_bilinear(dest,src);
+#endif
+    }
+
+    void resize_bilinear_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_bilinear_gradient(grad,gradient_input);
+#else
+        cpu::resize_bilinear_gradient(grad,gradient_input);
+#endif
+    }
+
 // ------------------------------------------------------------------------------------
 
-        void copy_tensor(
-                tensor& dest,
-                size_t dest_k_offset,
-                const tensor& src,
-                size_t src_k_offset,
-                size_t count_k
-        )
-        {
+    void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+    )
+    {
 #ifdef DLIB_USE_CUDA
-            cuda::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+        cuda::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
 #else
-            cpu::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+        cpu::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
 #endif
-        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void inv::
+    operator() (
+        const tensor& m,
+        resizable_tensor& out
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        finv(m,out);
+#else
+        out = dlib::inv(mat(m));
+#endif
+    }
 
 // ----------------------------------------------------------------------------------------
 

@@ -5,11 +5,13 @@
 
 #include "fonts.h"
 
-#include "../serialize.h"
+#include <fstream>
+#include <memory>
 #include <sstream>
+
+#include "../serialize.h"
 #include "../base64.h"
 #include "../compress_stream.h"
-#include <fstream>
 #include "../tokenizer.h"
 #include "nativefont.h"
    
@@ -657,7 +659,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const shared_ptr_thread_safe<font> get_native_font (
+    const std::shared_ptr<font> get_native_font (
     )
     {
         return nativefont::native_font::get_font();

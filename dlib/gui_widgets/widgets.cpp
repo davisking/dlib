@@ -3,8 +3,10 @@
 #ifndef DLIB_WIDGETs_CPP_
 #define DLIB_WIDGETs_CPP_
 
-#include "widgets.h"
 #include <algorithm>
+#include <memory>
+
+#include "widgets.h"
 #include "../string.h"
 
 namespace dlib
@@ -160,7 +162,7 @@ namespace dlib
 
     void toggle_button::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -309,7 +311,7 @@ namespace dlib
 
     void label::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -638,7 +640,7 @@ namespace dlib
 
     void text_field::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -1745,7 +1747,7 @@ namespace dlib
 
     void tabbed_display::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -1887,7 +1889,7 @@ namespace dlib
 
     void named_rectangle::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -2065,7 +2067,7 @@ namespace dlib
 
     void mouse_tracker::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -2270,7 +2272,7 @@ namespace dlib
     template <typename S>
     void list_box<S>::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -3000,7 +3002,7 @@ namespace dlib
             const std::string old_path = path;
             const long old_cur_dir = cur_dir;
 
-            scoped_ptr<toggle_button> new_btn(new toggle_button(*this));
+            std::unique_ptr<toggle_button> new_btn(new toggle_button(*this));
             new_btn->set_name(folder_name);
             new_btn->set_click_handler(*this,&box_win::on_path_button_click);
 
@@ -3009,7 +3011,7 @@ namespace dlib
             {
                 while (sob.size() > (unsigned long)(cur_dir+1))
                 {
-                    scoped_ptr<toggle_button> junk;
+                    std::unique_ptr<toggle_button> junk;
                     sob.remove(cur_dir+1,junk);
                 }
             }
@@ -3300,7 +3302,7 @@ namespace dlib
 
     void menu_bar::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -4916,7 +4918,7 @@ namespace dlib
 
     void text_box::
     set_main_font (
-        const shared_ptr_thread_safe<font>& f
+        const std::shared_ptr<font>& f
     )
     {
         auto_mutex M(m);
@@ -6012,7 +6014,8 @@ namespace dlib
         part_width(15), // width part circles are drawn on the screen
         overlay_editing_enabled(true),
         highlight_timer(*this, &image_display::timer_event_unhighlight_rect),
-        highlighted_rect(std::numeric_limits<unsigned long>::max())
+        highlighted_rect(std::numeric_limits<unsigned long>::max()),
+        holding_shift_key(false)
     { 
         enable_mouse_drag();
 
@@ -6250,14 +6253,24 @@ namespace dlib
         const point origin(total_rect().tl_corner());
         
         // draw the image on the screen
+        const double scale = zoom_out_scale/(double)zoom_in_scale;
         const rectangle img_area = total_rect().intersect(area);
         for (long row = img_area.top(); row <= img_area.bottom(); ++row)
         {
+            const long rc = row-c.top();
+            const long rimg = (row-origin.y())*scale;
             for (long col = img_area.left(); col <= img_area.right(); ++col)
             {
-                assign_pixel(c[row-c.top()][col-c.left()], 
-                             img[(row-origin.y())*zoom_out_scale/zoom_in_scale][(col-origin.x())*zoom_out_scale/zoom_in_scale]);
+                assign_pixel(c[rc][col-c.left()], 
+                             img[rimg][(col-origin.x())*scale]);
             }
+        }
+
+        // draw the mouse cross-hairs
+        if (holding_shift_key && total_rect().contains(lastx,lasty) )
+        {
+            draw_line(c, point(lastx,-10000), point(lastx,100000),rgb_pixel(255,255,0), area);
+            draw_line(c, point(-10000,lasty), point(100000,lasty),rgb_pixel(255,255,0), area);
         }
 
         // now draw all the overlay rectangles
@@ -6393,6 +6406,20 @@ namespace dlib
     {
         scrollable_region::on_keydown(key,is_printable, state);
 
+        if (!is_printable && key==base_window::KEY_SHIFT)
+        {
+            if (!holding_shift_key)
+            {
+                holding_shift_key = true;
+                parent.invalidate_rectangle(rect);
+            }
+        }
+        else if (holding_shift_key)
+        {
+            holding_shift_key = false;
+            parent.invalidate_rectangle(rect);
+        }
+
         if (!is_printable && !hidden && enabled && rect_is_selected && 
             (key == base_window::KEY_BACKSPACE || key == base_window::KEY_DELETE))
         {
@@ -6458,6 +6485,16 @@ namespace dlib
     )
     {
         scrollable_region::on_mouse_down(btn, state, x, y, is_double_click);
+
+        if (state&base_window::SHIFT)
+        {
+            holding_shift_key = true;
+        }
+        else if (holding_shift_key)
+        {
+            holding_shift_key = false;
+            parent.invalidate_rectangle(rect);
+        }
 
         if (rect.contains(x,y) == false || hidden || !enabled)
             return;
@@ -6757,6 +6794,16 @@ namespace dlib
     {
         scrollable_region::on_mouse_up(btn,state,x,y);
 
+        if (state&base_window::SHIFT)
+        {
+            holding_shift_key = true;
+        }
+        else if (holding_shift_key)
+        {
+            holding_shift_key = false;
+            parent.invalidate_rectangle(rect);
+        }
+
         if (drawing_rect && btn == base_window::LEFT && (state&base_window::SHIFT) &&
             !hidden && enabled)
         {
@@ -6816,6 +6863,17 @@ namespace dlib
     )
     {
         scrollable_region::on_mouse_move(state,x,y);
+
+        if (enabled && !hidden)
+        {
+            if (holding_shift_key)
+                parent.invalidate_rectangle(rect);
+
+            if (state&base_window::SHIFT)
+                holding_shift_key = true;
+            else if (holding_shift_key)
+                holding_shift_key = false;
+        }
 
         if (drawing_rect)
         {

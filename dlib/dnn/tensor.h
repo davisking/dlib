@@ -566,6 +566,8 @@ namespace dlib
         const tensor& get() const { return inst; }
         operator const tensor& () { return inst; }
 
+        alias_tensor_const_instance(const alias_tensor_instance& item) : inst(item) {}
+
     private:
         alias_tensor_instance inst;
 
@@ -613,7 +615,7 @@ namespace dlib
         alias_tensor_instance operator() (
             tensor& t,
             size_t offset
-        ) 
+        ) const
         {
             DLIB_CASSERT(offset+size() <= t.size());
 
@@ -635,7 +637,7 @@ namespace dlib
         alias_tensor_const_instance operator() (
             const tensor& t,
             size_t offset
-        )
+        ) const
         {
             alias_tensor_const_instance temp;
             temp.inst = (*this)(const_cast<tensor&>(t),offset);
@@ -643,7 +645,7 @@ namespace dlib
         }
 
     private:
-        alias_tensor_instance inst;
+        mutable alias_tensor_instance inst;
     };
 
     inline void serialize(const alias_tensor& item, std::ostream& out)

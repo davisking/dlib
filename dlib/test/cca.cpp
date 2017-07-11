@@ -139,7 +139,7 @@ namespace
             dlog << LINFO << "correlation error: "<< corr_error;
             DLIB_TEST_MSG(corr_error < 1e-13, Ltrans << "\n\n" << Rtrans);
 
-            DLIB_TEST(trans_error < 1e-9);
+            DLIB_TEST(trans_error < 2e-9);
         }
 
         dlog << LINFO << "*****************************************************";

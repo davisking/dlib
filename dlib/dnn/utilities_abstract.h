@@ -56,6 +56,21 @@ namespace dlib
               stream.
     !*/
 
+    template <typename net_type>
+    void net_to_xml (
+        const net_type& net,
+        const std::string& filename
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - All layers in the net must provide to_xml() functions.
+        ensures
+            - This function is just like the above net_to_xml(), except it writes to a file
+              rather than an ostream.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>

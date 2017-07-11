@@ -152,7 +152,11 @@
                   <link>face_landmark_detection.py.html</link>
                </item>
                <item>
-                  <name>find candidate object locations</name>
+                  <name>Face Recognition</name>
+                  <link>face_recognition.py.html</link>
+               </item>
+               <item>
+                  <name>Find Candidate Object Locations</name>
                   <link>find_candidate_object_locations.py.html</link>
                </item>
                <item>
@@ -207,6 +211,18 @@
                <item>
                   <name>Deep Learning Inception</name>
                   <link>dnn_inception_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Metric Learning Introduction</name>
+                  <link>dnn_metric_learning_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Metric Learning on Images</name>
+                  <link>dnn_metric_learning_on_images_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Face Recognition</name>
+                  <link>dnn_face_recognition_ex.cpp.html</link>
                </item>
                <item>
                   <name>Deep Learning Face Detection</name>

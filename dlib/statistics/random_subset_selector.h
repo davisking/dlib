@@ -170,7 +170,7 @@ namespace dlib
             random_subset_selector& a
         )
         {
-            a.swap(a.items);
+            items.swap(a.items);
             std::swap(_max_size, a._max_size);
             std::swap(count, a.count);
             rnd.swap(a.rnd);

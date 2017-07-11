@@ -76,6 +76,41 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct roc_point
+    {
+        double true_positive_rate;
+        double false_positive_rate;
+        double detection_threshold;
+    };
+
+    std::vector<roc_point> compute_roc_curve (
+        const std::vector<double>& true_detections,
+        const std::vector<double>& false_detections 
+    );
+    /*!
+        requires
+            - true_detections.size() != 0
+            - false_detections.size() != 0
+        ensures
+            - This function computes the ROC curve (receiver operating characteristic)
+              curve of the given data.  Therefore, we interpret true_detections as
+              containing detection scores for a bunch of true detections and
+              false_detections as detection scores from a bunch of false detections.  A
+              perfect detector would always give higher scores to true detections than to
+              false detections, resulting in a true positive rate of 1 and a false positive
+              rate of 0, for some appropriate detection threshold.
+            - Returns an array, ROC, such that:
+                - ROC.size() == true_detections.size()+false_detections.size()
+                - for all valid i:
+                    - If you were to accept all detections with a score >= ROC[i].detection_threshold 
+                      then you would obtain a true positive rate of ROC[i].true_positive_rate and a 
+                      false positive rate of ROC[i].false_positive_rate.
+                - ROC is ordered such that low detection rates come first.  That is, the
+                  curve is swept from a high detection threshold to a low threshold.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_LDA_ABSTRACT_Hh_

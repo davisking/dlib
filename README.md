@@ -21,7 +21,9 @@ mkdir build; cd build; cmake .. -DUSE_AVX_INSTRUCTIONS=1; cmake --build .
 
 Doing so will make some things run faster.
 
+## Compiling your own C++ programs that use dlib
 
+The examples folder has a [CMake tutorial](https://github.com/davisking/dlib/blob/master/examples/CMakeLists.txt) that tells you what to do.  There are also additional instructions on the [dlib web site](http://dlib.net/compile.html).
 
 ## Compiling dlib Python API
 
@@ -37,7 +39,7 @@ or type
 python setup.py install --yes USE_AVX_INSTRUCTIONS
 ```
 
-if you have a CPU that supports AVX instructions, since this makes some things run faster.
+if you have a CPU that supports AVX instructions, since this makes some things run faster.  Note that you need to have boost-python installed to compile the Python API.
 
 
 

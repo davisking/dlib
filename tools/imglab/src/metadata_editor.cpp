@@ -9,6 +9,7 @@
 #include <dlib/image_io.h>
 #include <dlib/array2d.h>
 #include <dlib/pixel.h>
+#include <dlib/image_transforms.h>
 #include <sstream>
 #include <ctime>
 
@@ -336,6 +337,18 @@ on_keydown (
             last_keyboard_jump_pos_update = 0;
         }
 
+        if (key == 'd' && (state&base_window::KBD_MOD_ALT))
+        {
+            remove_selected_images();
+        }
+
+        if (key == 'e' && !overlay_label.has_input_focus())
+        {
+            display_equialized_image = !display_equialized_image;
+            select_image(image_pos);
+        }
+
+
         return;
     }
 
@@ -450,13 +463,15 @@ load_image(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-        set_title(metadata.name + ": " +metadata.images[idx].filename);
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
         message_box("Error loading image", e.what());
     }
 
+    if (display_equialized_image)
+        equalize_histogram(img);
     display.set_image(img);
     display.add_overlay(get_overlays(metadata.images[idx]));
 }
@@ -478,7 +493,7 @@ load_image_and_set_size(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-        set_title(metadata.name + ": " +metadata.images[idx].filename);
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
@@ -503,6 +518,8 @@ load_image_and_set_size(
     set_size(needed_width, needed_height);
 
 
+    if (display_equialized_image)
+        equalize_histogram(img);
     display.set_image(img);
     display.add_overlay(get_overlays(metadata.images[idx]));
 }
@@ -571,7 +588,8 @@ display_about(
                         "by hitting the tab key. Double clicking "
                         "a rectangle selects it and the delete key removes it.  You can also mark "
                         "a rectangle as ignored by hitting the i key when it is selected.  Ignored "
-                        "rectangles are visually displayed with an X through them."
+                        "rectangles are visually displayed with an X through them.  You can remove an image "
+                        "entirely by selecting it in the list on the left and pressing alt+d."
                         ,0,0) << endl << endl;
 
     sout << wrap_string("It is also possible to label object parts by selecting a rectangle and "
@@ -586,7 +604,11 @@ display_about(
                         "Holding shift + right click and then dragging allows you to move things around. "
                         "Holding ctrl and pressing the up or down keyboard keys will propagate "
                         "rectangle labels from one image to the next and also skip empty images. " 
-                        "Finally, typing a number on the keyboard will jump you to a specific image.",0,0) << endl;
+                        "Finally, typing a number on the keyboard will jump you to a specific image.",0,0) << endl << endl;
+
+    sout << wrap_string("You can also toggle image histogram equalization by pressing the e key."
+                        ,0,0) << endl;
+
 
     message_box("About Image Labeler",sout.str());
 }

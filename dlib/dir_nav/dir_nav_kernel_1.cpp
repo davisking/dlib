@@ -66,6 +66,12 @@ namespace dlib
             temp |= data.nFileSizeLow;
             state.file_size = temp;
             FindClose(ffind);
+
+            ULARGE_INTEGER ull;
+            ull.LowPart = data.ftLastWriteTime.dwLowDateTime;
+            ull.HighPart = data.ftLastWriteTime.dwHighDateTime;
+            std::chrono::nanoseconds epoch(100 * (ull.QuadPart - 116444736000000000));            
+            state.last_modified = std::chrono::time_point<std::chrono::system_clock>(std::chrono::duration_cast<std::chrono::system_clock::duration>(epoch));
         } 
 
     }

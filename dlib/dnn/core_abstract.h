@@ -562,6 +562,8 @@ namespace dlib
                   clean().  The purpose of clean() is to compact the network object prior
                   to saving it to disk so that it takes up less space and the IO is
                   quicker.
+                - This also calls the .clean() method on any layer details objects that 
+                  define a .clean() method.
         !*/
 
     };
@@ -830,6 +832,49 @@ namespace dlib
                   the available hardware parallelism.
                 - loss_details().to_label() is used to convert the network output into a
                   output_label_type.
+        !*/
+
+        template <typename ...T>
+        const output_label_type& process (
+            const input_type& x, 
+            T&& ...args
+        );
+        /*!
+            ensures
+                - This function is just like (*this)(x), i.e. it runs a single object, x,
+                  through the network and returns the output.  But we additionally pass the 
+                  given args to loss_details().to_label() as the 4th argument (or more,
+                  depending on how many things are in args) when converting the network
+                  output to an output_label_type.  This is useful, for instance, with loss
+                  layers like loss_mmod_ which has an optional adjust_threshold argument to
+                  to_label() that adjusts the detection threshold.  Therefore, for such
+                  networks you could call them like: net.process(some_image, -0.5), and -0.5
+                  would be passed so the adjust_threshold argument of to_tensor().
+        !*/
+
+        template <typename iterable_type, typename ...T>
+        std::vector<output_label_type> process_batch (
+            const iterable_type& data, 
+            size_t batch_size, 
+            T&& ...args
+        );
+        /*!
+            requires
+                - batch_size > 0
+                - data must have a .begin() and .end() that supply iterators over a
+                  sequence of input_type elements.  E.g. data could have a type of
+                  std::vector<input_type>
+            ensures
+                - This function is just like (*this)(data,batch_size), i.e. it runs a
+                  bunch of objects through the network and returns the outputs.  But we
+                  additionally pass the given args to loss_details().to_label() as the 4th
+                  argument (or more, depending on how many things are in args) when
+                  converting the network output to output_label_types.  This is useful,
+                  for instance, with loss layers like loss_mmod_ which has an optional
+                  adjust_threshold argument to to_label() that adjusts the detection
+                  threshold.  Therefore, for such networks you could call them like:
+                  net.process_batch(std::vector<image_type>({some_image, another_image}), 128, -0.5), 
+                  and -0.5 would be passed so the adjust_threshold argument of to_tensor().
         !*/
 
     // -------------
@@ -1576,6 +1621,38 @@ namespace dlib
 
                 for (size_t i = end; i != begin; --i)
                     v(i-1, layer<i-1>(net));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        unsigned long tag_id,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_until_tag(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(any_net_type& t)
+              That is, it must take any of the network types such as add_layer,
+              add_loss_layer, etc.
+        ensures
+            - Loops over all the layers in net beginning with layer<0>(net) and going until
+              a tag layer with an ID of tag_id is encountered.  To be specific, this
+              function essentially performs the following:
+
+                size_t i = 0;
+                while(layer<i>(net) isn't an add_tag_layer with ID == tag_id) {
+                    v(layer<i>(net));
+                    ++i;
+                }
+                v(layer<i>(net));  // also visits the tag layer itself at the very end.
     !*/
 
 // ----------------------------------------------------------------------------------------

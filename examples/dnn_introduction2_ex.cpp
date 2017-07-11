@@ -105,7 +105,7 @@ template <typename SUBNET> using ares_down = relu<residual_down<block,8,affine,S
 
 // Now that we have these convenient aliases, we can define a residual network
 // without a lot of typing.  Note the use of a repeat layer.  This special layer
-// type allows us to type repeat<9,res<SUBNET>> instead of
+// type allows us to type repeat<9,res,SUBNET> instead of
 // res<res<res<res<res<res<res<res<res<SUBNET>>>>>>>>>.  It will also prevent
 // the compiler from complaining about super deep template nesting when creating
 // large networks.
@@ -267,7 +267,6 @@ int main(int argc, char** argv) try
     //dnn_trainer<net_type,adam> trainer(net,adam(0.0005, 0.9, 0.999), {0,1});
 
     trainer.be_verbose();
-    trainer.set_synchronization_file("mnist_resnet_sync", std::chrono::seconds(100));
     // While the trainer is running it keeps an eye on the training error.  If
     // it looks like the error hasn't decreased for the last 2000 iterations it
     // will automatically reduce the learning rate by 0.1.  You can change these
@@ -277,6 +276,7 @@ int main(int argc, char** argv) try
     trainer.set_learning_rate_shrink_factor(0.1);
     // The learning rate will start at 1e-3.
     trainer.set_learning_rate(1e-3);
+    trainer.set_synchronization_file("mnist_resnet_sync", std::chrono::seconds(100));
 
 
     // Now, what if your training dataset is so big it doesn't fit in RAM?  You
@@ -303,7 +303,16 @@ int main(int argc, char** argv) try
             mini_batch_labels.push_back(training_labels[idx]);
         }
 
+        // Tell the trainer to update the network given this mini-batch
         trainer.train_one_step(mini_batch_samples, mini_batch_labels);
+
+        // You can also feed validation data into the trainer by periodically
+        // calling trainer.test_one_step(samples,labels).  Unlike train_one_step(),
+        // test_one_step() doesn't modify the network, it only computes the testing
+        // error which it records internally.  This testing error will then be print
+        // in the verbose logging and will also determine when the trainer's
+        // automatic learning rate shrinking happens.  Therefore, test_one_step()
+        // can be used to perform automatic early stopping based on held out data.   
     }
 
     // When you call train_one_step(), the trainer will do its processing in a

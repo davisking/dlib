@@ -68,6 +68,7 @@ if (PYTHON3)
     if (NOT Boost_FOUND)
         FIND_PACKAGE(Boost 1.41.0 COMPONENTS python)
     endif()
+    set(Python_ADDITIONAL_VERSIONS 3.5 3.6)
     FIND_PACKAGE(PythonLibs 3.4 REQUIRED)
 else()
     FIND_PACKAGE(Boost 1.41.0 COMPONENTS python)
@@ -132,6 +133,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
     # does.
     add_definitions("-fPIC")
+    set(CMAKE_POSITION_INDEPENDENT_CODE True)
 else()
     set(CMAKE_POSITION_INDEPENDENT_CODE True)
 endif()
@@ -146,7 +148,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../cmake)
 # output name is set to what the user asked for (i.e. no _).
 macro(add_python_module module_name module_sources )
    ADD_LIBRARY(${module_name}_ SHARED ${module_sources} ${ARGN} )
-   TARGET_LINK_LIBRARIES(${module_name}_ ${Boost_LIBRARIES} ${PYTHON_LIBRARIES}  dlib)
+   TARGET_LINK_LIBRARIES(${module_name}_ ${Boost_LIBRARIES} ${PYTHON_LIBRARIES}  dlib::dlib)
    if(WIN32 AND NOT CYGWIN)
       SET_TARGET_PROPERTIES( ${module_name}_
          PROPERTIES

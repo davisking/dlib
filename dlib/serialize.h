@@ -151,6 +151,7 @@
 #include <deque>
 #include <complex>
 #include <map>
+#include <memory>
 #include <set>
 #include <limits>
 #include "uintn.h"
@@ -160,7 +161,6 @@
 #include "unicode.h"
 #include "byte_orderer.h"
 #include "float_details.h"
-#include "smart_pointers/shared_ptr.h"
 
 namespace dlib
 {
@@ -1490,7 +1490,7 @@ namespace dlib
         }
 
     private:
-        shared_ptr<std::ofstream> fout;
+        std::shared_ptr<std::ofstream> fout;
     };
 
     class proxy_deserialize 
@@ -1513,7 +1513,7 @@ namespace dlib
         }
 
     private:
-        shared_ptr<std::ifstream> fin;
+        std::shared_ptr<std::ifstream> fin;
     };
 
     inline proxy_serialize serialize(const std::string& filename)

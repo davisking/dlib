@@ -18,6 +18,13 @@
     #endif
 #endif
 
+#if defined __NVCC__
+    // Disable the "statement is unreachable" message since it will go off on code that is
+    // actually reachable but just happens to not be reachable sometimes during certain
+    // template instantiations.
+    #pragma diag_suppress code_is_unreachable
+#endif
+
 
 #ifdef _MSC_VER
 
@@ -63,6 +70,13 @@
 
 // Disable "warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)"
 #pragma warning(disable : 4290)
+
+
+// DNN module uses template-based network declaration that leads to very long
+// type names. Visual Studio will produce Warning C4503 in such cases. https://msdn.microsoft.com/en-us/library/074af4b6.aspx says
+// that correct binaries are still produced even when this warning happens, but linker errors from visual studio, if they occurr could be confusing.
+#pragma warning( disable: 4503 )
+
 
 #endif
 

@@ -11,6 +11,10 @@
 
 #include <cuda_runtime.h>
 #include <sstream>
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <type_traits>
 
 
 // Check the return value of a call to the CUDA runtime for an error condition.

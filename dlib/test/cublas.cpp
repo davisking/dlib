@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-#include "../dnn/cublas_dlibapi.h"
+#include "../dnn/tensor_tools.h"
 
 #include "tester.h"
 
@@ -25,6 +25,26 @@ namespace
     logger dlog("test.cublas");
 
 
+    void test_inv()
+    {
+        tt::tensor_rand rnd;
+        dlib::tt::inv tinv;
+        dlib::cuda::inv cinv;
+        resizable_tensor minv1, minv2;
+        for (int n = 1; n < 20; ++n)
+        {
+            print_spinner();
+            resizable_tensor m(n,n);
+            rnd.fill_uniform(m);
+
+            tinv(m, minv1);
+            cinv(m, minv2);
+            matrix<float> mref = inv(mat(m));
+            DLIB_TEST_MSG(mean(abs(mref-mat(minv1)))/mean(abs(mref)) < 1e-5, mean(abs(mref-mat(minv1)))/mean(abs(mref)) <<"  n: " << n);
+            DLIB_TEST_MSG(mean(abs(mref-mat(minv2)))/mean(abs(mref)) < 1e-5, mean(abs(mref-mat(minv2)))/mean(abs(mref)) <<"  n: " << n);
+        }
+    }
+
 
     class cublas_tester : public tester
     {
@@ -38,6 +58,7 @@ namespace
         void perform_test (
         )
         {
+            test_inv();
             {
                 resizable_tensor a(4,3), b(3,4), c(3,3);
 

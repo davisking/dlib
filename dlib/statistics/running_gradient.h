@@ -165,7 +165,7 @@ namespace dlib
                     return 0.5;
             }
             value = (value-mean)/stddev;
-            return 0.5 * erfc(-value / std::sqrt(2.0));
+            return 0.5 * std::erfc(-value / std::sqrt(2.0));
         }
 
         double n;

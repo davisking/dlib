@@ -12,6 +12,82 @@
 
 <current>
 New Features:
+
+Non-Backwards Compatible Changes:
+   - CMake 2.8.12 is now required to build dlib (but only if you use CMake).  
+
+Bug fixes:
+   - Fixed a slow memory leak that could occur when using cuDNN.
+
+Other:
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.3" date="Feb 21, 2017">
+New Features:
+   - Deep Learning
+      - Added a state-of-the-art face recognition tool (99.38% accuracy on the
+        LFW benchmark) with C++ and Python example programs.
+      - Added these new loss layer types: loss_metric_, loss_mean_squared_, and
+        loss_mean_squared_multioutput_.
+      - Added the l2normalize_ computational layer.
+      - Added test_one_step() to the dnn_trainer. This allows you to do
+        automatic early stopping based on observing the loss on held out data.
+      - Made the dnn_trainer automatically reload from the last good state if a
+        loss of NaN is encountered.
+      - Made alias_tensor usable when it is const.
+   - Dlib's simd classes will now use PowerPC VSX instructions.  This makes the
+     HOG based object detector faster on PowerPC machines.
+   - Added compute_roc_curve()
+   - Added find_gap_between_convex_hulls()
+   - Added serialization support for std::array.
+   - Added running_scalar_covariance_decayed object
+   - Added running_stats_decayed object
+   - Added min_pointwise() and max_pointwise().
+   - Added a 1D clustering routine: segment_number_line().
+   - Added Intel MKL FFT bindings.
+   - Added matlab_object to the mex wrapper. Now you can have parameters that
+     are arbitrary matlab objects.
+   - Added support for loading of RGBA JPEG images
+
+Non-Backwards Compatible Changes:
+   - Changed the loss layer interface to use two typedefs, output_label_type
+     and training_label_type instead of a single label_type. This way, the label
+     type used for training can be distinct from the type output by the network.
+     This change breaks backwards compatibility with the previous API.
+
+Bug fixes:
+   - Fixed compiler warnings and errors on newer compilers.
+   - Fixed a bug in the repeat layer that caused it to throw exceptions in some
+     cases.
+   - Fixed matlab crashing if an error message from a mex file used the %
+     character, since that is interpreted by matlab as part of an eventual
+     printf() code.
+   - Fixed compile time error in random_subset_selector::swap()
+   - Fixed missing implementation of map_input_to_output() and
+     map_output_to_input() in the concat_ layer.
+   - Made the dnn_trainer's detection and backtracking from situations with
+     increasing loss more robust. Now it will never get into a situation where it
+     backtracks over and over. Instead, it will only backtrack a few times in a
+     row before just letting SGD run unimpeded.
+
+Other:
+   - Usability improvements to DNN API.
+   - Improved C++11 detection, especially on OS X.
+   - Made dlib::thread_pool use std::thread and join on the threads in
+     thread_pool's destructor. The previous implementation used dlib's global
+     thread pooling to allocate threads to dlib::thread_pool, however, this
+     sometimes caused annoying behavior when used as part of a MATLAB mex file,
+     very occasionally leading to matlab crashes when mex files were unloaded.
+     This also means that dlib::thread_pool construction is a little bit slower
+     than it used to be.
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.2" date="Oct 10, 2016">
+New Features:
    - Updates to the deep learning API:
       - Added tools for making convolutional neural network based object detectors.  See
         dnn_mmod_ex.cpp example program.
@@ -95,7 +171,7 @@ Other:
      This way, if we hit a really bad mini-batch during training which negatively effects
      the model in a significant way, the dnn_trainer will automatically revert back to an
      earlier good state.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 

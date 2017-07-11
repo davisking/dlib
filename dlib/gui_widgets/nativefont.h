@@ -7,10 +7,10 @@
 
 #include "../gui_widgets.h"
 #include "../unicode.h"
-#include "../smart_pointers_thread_safe.h"
 #include "../uintn.h"
 
 #include <map>
+#include <memory>
 
 #include <stdio.h>
 #include <string.h>
@@ -546,10 +546,10 @@ namespace nativefont
             return (*this)[ch].width() > 0;
         }
 
-        static const dlib::shared_ptr_thread_safe<font>& get_font (
+        static const std::shared_ptr<font>& get_font (
         )
         {
-            static dlib::shared_ptr_thread_safe<font> f(new native_font);
+            static std::shared_ptr<font> f(new native_font);
             return f;
         }
 

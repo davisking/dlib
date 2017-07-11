@@ -2,7 +2,7 @@
 # It will trigger a compilation of dlib *in the project* 
 # including it
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 
 set(DLIB_IN_PROJECT_BUILD true)
 
@@ -30,11 +30,12 @@ endif()
 
 
 set(gcc_like_compilers GNU Clang  Intel)
-set(intel_archs x86_64 i386 i686)
+set(intel_archs x86_64 i386 i686 AMD64 x86)
+
 
 # Setup some options to allow a user to enable SSE and AVX instruction use.  
-if ((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};") AND
-    (";${intel_archs};"        MATCHES ";${CMAKE_SYSTEM_PROCESSOR};"))
+if ((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};")  AND
+    (";${intel_archs};"        MATCHES ";${CMAKE_SYSTEM_PROCESSOR};") AND NOT USE_AUTO_VECTOR)
     option(USE_SSE2_INSTRUCTIONS "Compile your program with SSE2 instructions" OFF)
     option(USE_SSE4_INSTRUCTIONS "Compile your program with SSE4 instructions" OFF)
     option(USE_AVX_INSTRUCTIONS  "Compile your program with AVX instructions"  OFF)
@@ -92,10 +93,7 @@ elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visu
 endif()
 
 
-# Add folder containing dlib to the include search path.
-INCLUDE_DIRECTORIES(${dlib_path}/..)
-
-# This is really optional, but nice.  It will make sure the build mode 
+# This is really optional, but nice.  It will make sure the build mode
 # created by cmake is always release by default.
 include(${dlib_path}/cmake_utils/release_build_by_default)
 

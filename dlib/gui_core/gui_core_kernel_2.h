@@ -140,16 +140,16 @@ namespace dlib
     template <>
     struct pixel_traits<canvas::pixel>
     {
-        const static bool rgb  = true;
-        const static bool rgb_alpha  = false;
-        const static bool grayscale = false;
-        const static bool hsi = false;
-        const static long num = 3;
+        constexpr static bool rgb  = true;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
-        const static bool is_unsigned = true;
-        const static bool has_alpha = false;
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = false;
     };
 
 // -----------------

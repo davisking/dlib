@@ -316,6 +316,84 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename M1, typename M2>
+    struct op_binary_min : basic_op_mm<M1,M2>
+    {
+        op_binary_min( const M1& m1_, const M2& m2_) : basic_op_mm<M1,M2>(m1_,m2_){}
+
+        typedef typename M1::type type;
+        typedef const type const_ret_type;
+        const static long cost = M1::cost + M2::cost + 1;
+
+        const_ret_type apply ( long r, long c) const
+        { return std::min(this->m1(r,c),this->m2(r,c)); }
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    inline const matrix_op<op_binary_min<EXP1,EXP2> > min_pointwise (
+        const matrix_exp<EXP1>& a,
+        const matrix_exp<EXP2>& b 
+    )
+    {
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+        COMPILE_TIME_ASSERT(EXP1::NR == EXP2::NR || EXP1::NR == 0 || EXP2::NR == 0);
+        COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || EXP1::NC == 0 || EXP2::NC == 0);
+        DLIB_ASSERT(a.nr() == b.nr() &&
+               a.nc() == b.nc(), 
+            "\t const matrix_exp min_pointwise(const matrix_exp& a, const matrix_exp& b)"
+            << "\n\ta.nr(): " << a.nr()
+            << "\n\ta.nc(): " << a.nc() 
+            << "\n\tb.nr(): " << b.nr()
+            << "\n\tb.nc(): " << b.nc() 
+            );
+        typedef op_binary_min<EXP1,EXP2> op;
+        return matrix_op<op>(op(a.ref(),b.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename M1, typename M2>
+    struct op_binary_max : basic_op_mm<M1,M2>
+    {
+        op_binary_max( const M1& m1_, const M2& m2_) : basic_op_mm<M1,M2>(m1_,m2_){}
+
+        typedef typename M1::type type;
+        typedef const type const_ret_type;
+        const static long cost = M1::cost + M2::cost + 1;
+
+        const_ret_type apply ( long r, long c) const
+        { return std::max(this->m1(r,c),this->m2(r,c)); }
+    };
+
+    template <
+        typename EXP1,
+        typename EXP2
+        >
+    inline const matrix_op<op_binary_max<EXP1,EXP2> > max_pointwise (
+        const matrix_exp<EXP1>& a,
+        const matrix_exp<EXP2>& b 
+    )
+    {
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type,typename EXP2::type>::value == true));
+        COMPILE_TIME_ASSERT(EXP1::NR == EXP2::NR || EXP1::NR == 0 || EXP2::NR == 0);
+        COMPILE_TIME_ASSERT(EXP1::NC == EXP2::NC || EXP1::NC == 0 || EXP2::NC == 0);
+        DLIB_ASSERT(a.nr() == b.nr() &&
+               a.nc() == b.nc(), 
+            "\t const matrix_exp max_pointwise(const matrix_exp& a, const matrix_exp& b)"
+            << "\n\ta.nr(): " << a.nr()
+            << "\n\ta.nc(): " << a.nc() 
+            << "\n\tb.nr(): " << b.nr()
+            << "\n\tb.nc(): " << b.nc() 
+            );
+        typedef op_binary_max<EXP1,EXP2> op;
+        return matrix_op<op>(op(a.ref(),b.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename EXP
         >

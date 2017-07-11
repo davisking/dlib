@@ -4,17 +4,19 @@
 #define DLIB_BsP_Hh_
 
 #include "bsp_abstract.h"
+
+#include <memory>
+#include <queue>
+#include <vector>
+
 #include "../sockets.h"
 #include "../array.h"
-#include "../smart_pointers.h"
 #include "../sockstreambuf.h"
 #include "../string.h"
 #include "../serialize.h"
 #include "../map.h"
 #include "../ref.h"
 #include "../vectorstream.h"
-#include <queue>
-#include <vector>
 
 namespace dlib
 {
@@ -41,7 +43,7 @@ namespace dlib
             }
 
             bsp_con(
-               scoped_ptr<connection>& conptr 
+               std::unique_ptr<connection>& conptr 
             ) : 
                 buf(conptr),
                 stream(&buf),
@@ -53,13 +55,13 @@ namespace dlib
                 con->disable_nagle();
             }
 
-            scoped_ptr<connection> con;
+            std::unique_ptr<connection> con;
             sockstreambuf buf;
             std::iostream stream;
             bool terminated;
         };
 
-        typedef dlib::map<unsigned long, scoped_ptr<bsp_con> >::kernel_1a_c map_id_to_con;
+        typedef dlib::map<unsigned long, std::unique_ptr<bsp_con> >::kernel_1a_c map_id_to_con;
 
         void connect_all (
             map_id_to_con& cons,
@@ -134,7 +136,7 @@ namespace dlib
         )
         {
             cons.clear();
-            scoped_ptr<listener> list;
+            std::unique_ptr<listener> list;
             const int status = create_listener(list, port);
             if (status == PORTINUSE)
             {
@@ -148,13 +150,13 @@ namespace dlib
 
             port_notify_function(list->get_listening_port());
 
-            scoped_ptr<connection> con;
+            std::unique_ptr<connection> con;
             if (list->accept(con))
             {
                 throw socket_error("Error occurred while accepting new connection");
             }
 
-            scoped_ptr<bsp_con> temp(new bsp_con(con));
+            std::unique_ptr<bsp_con> temp(new bsp_con(con));
 
             unsigned long remote_node_id;
             dlib::deserialize(remote_node_id, temp->stream);
@@ -197,7 +199,7 @@ namespace dlib
             while (cons2.size() > 0)
             {
                 unsigned long id;
-                scoped_ptr<bsp_con> temp;
+                std::unique_ptr<bsp_con> temp;
                 cons2.remove_any(id,temp);
                 cons.add(id,temp);
             }
@@ -207,7 +209,7 @@ namespace dlib
 
         struct msg_data
         {
-            shared_ptr<std::vector<char> > data;
+            std::shared_ptr<std::vector<char> > data;
             unsigned long sender_id;
             char msg_type;
             dlib::uint64 epoch;
@@ -420,7 +422,7 @@ namespace dlib
         )
         {
             unsigned long id;
-            shared_ptr<std::vector<char> > temp;
+            std::shared_ptr<std::vector<char> > temp;
             if (receive_data(temp,id))
                 throw dlib::socket_error("Call to bsp_context::receive() got an unexpected message.");
         }
@@ -459,7 +461,7 @@ namespace dlib
             unsigned long& sending_node_id
         ) 
         {
-            shared_ptr<std::vector<char> > temp;
+            std::shared_ptr<std::vector<char> > temp;
             if (receive_data(temp, sending_node_id))
             {
                 vectorstream sin(*temp);
@@ -496,7 +498,7 @@ namespace dlib
         !*/
 
         bool receive_data (
-            shared_ptr<std::vector<char> >& item,
+            std::shared_ptr<std::vector<char> >& item,
             unsigned long& sending_node_id
         );
 
@@ -533,7 +535,7 @@ namespace dlib
 
         impl1::map_id_to_con& _cons;
         const unsigned long _node_id;
-        array<scoped_ptr<thread_function> > threads;
+        array<std::unique_ptr<thread_function> > threads;
 
     // -----------------------------------
 

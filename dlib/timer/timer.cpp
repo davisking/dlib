@@ -24,11 +24,38 @@ namespace dlib
     timer_global_clock::
     ~timer_global_clock()
     {
+        // The only time this destructor is called is when 
+        //
+        // a) the process terminates
+        // b) the dynamic library(.so/.dll) is unloaded (could be a part of a))
+        // 
+        // in case of a)
+        //   windows: the process termination is especially painful, since threads are killed
+        //     before destructors of the process image .dll's are called.
+        //     Thus, for the windows platform, there is no threads running, so the only thing
+        //     to do here is just let the standard memberwise destructors run
+        //   linux: it's ok to just signal shutdown and wait for the running thread, to exit
+        //   
+        // in case of b)
+        //   windows:
+        //     if it's part of the termination process, a) applies
+        //     if its part of user doing manual load_library/unload_library
+        //     there is no (safe/robust)solution, but best practices are described here
+        //          https://msdn.microsoft.com/en-us/library/windows/desktop/dn633971.aspx
+        //     to support such a clean shutdown, you are required to make a call prior to
+        //     unload dll, that shutdown all the threads in the contained dll.
+        //     This could be done in this module by providing a global_delete_clock()
+        // 
+        // linux: the destructor for linux will do it's usual job regardless.
+        //
+
+        #ifndef _WIN32
         m.lock();
         shutdown = true;
         s.signal();
         m.unlock();
         wait();
+        #endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -181,9 +208,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    shared_ptr_thread_safe<timer_global_clock> get_global_clock()
+    std::shared_ptr<timer_global_clock> get_global_clock()
     {
-        static shared_ptr_thread_safe<timer_global_clock> d(new timer_global_clock);
+        static std::shared_ptr<timer_global_clock> d(new timer_global_clock);
         return d;
     }
 

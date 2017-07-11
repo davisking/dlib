@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 project(cudnn_test)
 include(../use_cpp_11.cmake)
 
@@ -10,6 +10,7 @@ add_definitions(-DDLIB_USE_CUDA)
 
 include(find_cudnn.txt)
 
-include_directories(${cudnn_include})
-
-cuda_add_library(cudnn_test STATIC ../../dnn/cudnn_dlibapi.cpp ${cudnn} )
+if (cudnn_include AND cudnn)
+   include_directories(${cudnn_include})
+   cuda_add_library(cudnn_test STATIC ../../dnn/cudnn_dlibapi.cpp ${cudnn} )
+endif()
