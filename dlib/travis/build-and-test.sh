@@ -17,10 +17,7 @@ fi
 
 if [ "$VARIANT" = "python-api" ]; then
   ../cmake/bin/cmake ../tools/python -DCMAKE_BUILD_TYPE=Release
-  ../cmake/bin/cmake --build . -- -j 2
+  ../cmake/bin/cmake --build . --target install -- -j 2
 
-  echo "!!!!!!! NOW BUILD VIA SETUP.PY !!!!!!!"
-  cd ..
-  export PATH="cmake/bin:$PATH"
-  python setup.py build
+  ../python_examples/svm_rank.py
 fi
