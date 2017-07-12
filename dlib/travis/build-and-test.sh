@@ -21,5 +21,6 @@ if [ "$VARIANT" = "python-api" ]; then
 
   echo "!!!!!!! NOW BUILD VIA SETUP.PY !!!!!!!"
   cd ..
+  PATH="cmake/bin:$PATH"
   python setup.py build
 fi
