@@ -1999,6 +1999,8 @@ namespace
 
     void test_simple_autoencoder()
     {
+        print_spinner();
+
         const int output_width = 5;
         const int output_height = 5;
         const int num_samples = 100;
@@ -2014,10 +2016,11 @@ namespace
             for (int r = 0; r < output_height; ++r)
                 for (int c = 0; c < output_width; ++c)
                     switch (model) {
-                    case 0: tmp(r, c) = r / output_height;
-                    case 1: tmp(r, c) = c / output_width;
-                    case 2: tmp(r, c) = 1.0 - r / output_height;
-                    case 3: tmp(r, c) = 1.0 - c / output_width;
+                    case 0: tmp(r, c) = r / output_height; break;
+                    case 1: tmp(r, c) = c / output_width; break;
+                    case 2: tmp(r, c) = 1.0 - r / output_height; break;
+                    case 3: tmp(r, c) = 1.0 - c / output_width; break;
+                    default: DLIB_TEST_MSG(false, "Invalid model: " << model << " (should be between 0 and 3)");
                     }
 
             x[i] = tmp;
@@ -2025,8 +2028,9 @@ namespace
 
         using net_type = loss_mean_squared_per_pixel<
                             relu<cont<1,output_height,output_width,2,2,
-                            relu<con<2,output_height,output_width,2,2,
-                            input<matrix<float>>>>>>>;
+                            relu<con<4,2,2,2,2,
+                            relu<con<8,3,3,2,2,
+                            input<matrix<float>>>>>>>>>;
         net_type net;
 
         const auto autoencoder_error = [&x, &net, &output_height, &output_width]()
@@ -2049,10 +2053,9 @@ namespace
 
         // Make sure there's an information bottleneck, as intended
         const auto& output3 = dlib::layer<3>(net).get_output();
-        DLIB_TEST(output3.num_samples() == num_samples);
         DLIB_TEST(output3.nr() == 1);
         DLIB_TEST(output3.nc() == 1);
-        DLIB_TEST(output3.k() == 2);
+        DLIB_TEST(output3.k() == 4);
 
         sgd defsolver(0,0.9);
         dnn_trainer<net_type> trainer(net, defsolver);
@@ -2062,7 +2065,7 @@ namespace
 
         // Now we should have learned everything there is to it
         const double error_after = autoencoder_error();
-        DLIB_TEST_MSG(error_after < 1e-10, "Autoencoder error after training = " << error_after);
+        DLIB_TEST_MSG(error_after < 1e-7, "Autoencoder error after training = " << error_after);
     }
 
 // ----------------------------------------------------------------------------------------
