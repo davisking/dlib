@@ -1569,10 +1569,10 @@ namespace dlib
             const auto find_label = [&](long sample, long r, long c) 
             {
                 uint16_t label = 0;
-                float max_value = out_data[tensor_index(output_tensor, sample, r, c, 0)];
+                float max_value = out_data[tensor_index(output_tensor, sample, 0, r, c)];
                 for (long k = 1; k < output_tensor.k(); ++k) 
                 {
-                    const float value = out_data[tensor_index(output_tensor, sample, r, c, k)];
+                    const float value = out_data[tensor_index(output_tensor, sample, k, r, c)];
                     if (value > max_value) 
                     {
                         label = static_cast<uint16_t>(k);
@@ -1647,7 +1647,7 @@ namespace dlib
                                         "y: " << y << ", output_tensor.k(): " << output_tensor.k());
                         for (long k = 0; k < output_tensor.k(); ++k)
                         {
-                            const size_t idx = tensor_index(output_tensor, i, r, c, k);
+                            const size_t idx = tensor_index(output_tensor, i, k, r, c);
                             if (k == y)
                             {
                                 loss += scale*-std::log(g[idx]);
@@ -1693,7 +1693,7 @@ namespace dlib
         }
 
     private:
-        static size_t tensor_index(const tensor& t, long sample, long row, long column, long k)
+        static size_t tensor_index(const tensor& t, long sample, long k, long row, long column)
         {
             // See: https://github.com/davisking/dlib/blob/4dfeb7e186dd1bf6ac91273509f687293bd4230a/dlib/dnn/tensor_abstract.h#L38
             return ((sample * t.k() + k) * t.nr() + row) * t.nc() + column;
@@ -1793,7 +1793,7 @@ namespace dlib
                                         "y: " << y << ", output_tensor.k(): " << output_tensor.k());
                         for (long k = 0; k < output_tensor.k(); ++k)
                         {
-                            const size_t idx = tensor_index(output_tensor, i, r, c, k);
+                            const size_t idx = tensor_index(output_tensor, i, k, r, c);
                             if (k == y)
                             {
                                 loss += weight*scale*-std::log(g[idx]);
@@ -1835,7 +1835,7 @@ namespace dlib
         }
 
     private:
-        static size_t tensor_index(const tensor& t, long sample, long row, long column, long k)
+        static size_t tensor_index(const tensor& t, long sample, long k, long row, long column)
         {
             // See: https://github.com/davisking/dlib/blob/4dfeb7e186dd1bf6ac91273509f687293bd4230a/dlib/dnn/tensor_abstract.h#L38
             return ((sample * t.k() + k) * t.nr() + row) * t.nc() + column;
@@ -1880,7 +1880,7 @@ namespace dlib
                 {
                     for (long c = 0; c < output_tensor.nc(); ++c)
                     {
-                        iter->operator()(r, c) = out_data[tensor_index(output_tensor, i, r, c, 0)];
+                        iter->operator()(r, c) = out_data[tensor_index(output_tensor, i, 0, r, c)];
                     }
                 }
             }
@@ -1931,7 +1931,7 @@ namespace dlib
                     for (long c = 0; c < output_tensor.nc(); ++c)
                     {
                         const float y = truth->operator()(r, c);
-                        const size_t idx = tensor_index(output_tensor, i, r, c, 0);
+                        const size_t idx = tensor_index(output_tensor, i, 0, r, c);
                         const float temp1 = y - out_data[idx];
                         const float temp2 = scale*temp1;
                         loss += 0.5*temp2*temp1;
@@ -1967,7 +1967,7 @@ namespace dlib
         }
 
     private:
-        static size_t tensor_index(const tensor& t, long sample, long row, long column, long k)
+        static size_t tensor_index(const tensor& t, long sample, long k, long row, long column)
         {
             // See: https://github.com/davisking/dlib/blob/4dfeb7e186dd1bf6ac91273509f687293bd4230a/dlib/dnn/tensor_abstract.h#L38
             return ((sample * t.k() + k) * t.nr() + row) * t.nc() + column;
