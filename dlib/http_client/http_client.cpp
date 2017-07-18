@@ -15,7 +15,7 @@
 namespace dlib
 {
 
-    typedef dlib::shared_ptr<dlib::timeout> timeout_ptr;
+    typedef std::shared_ptr<dlib::timeout> timeout_ptr;
 
 
 #ifdef _MSC_VER
@@ -454,9 +454,11 @@ namespace dlib
                 for (stringmap::const_iterator si = ci->second.begin(); si != ci->second.end(); ++si)
                 {
                     std::ifstream in(si->second.c_str());
+					std::string file_content((std::istreambuf_iterator<char>(in)),
+                                    std::istreambuf_iterator<char>());
                     postBody << "--" << mime_boundary << "\r\n"
                         "Content-Disposition: form-data; name=\"" << ci->first << "\"; filename=\"" << get_basename(si->second) << "\"\r\n\r\n"
-                        << in << "\r\n";
+                        << file_content << "\r\n";
                 }
             }
 
