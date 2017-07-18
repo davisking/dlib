@@ -454,11 +454,9 @@ namespace dlib
                 for (stringmap::const_iterator si = ci->second.begin(); si != ci->second.end(); ++si)
                 {
                     std::ifstream in(si->second.c_str());
-					std::string file_content((std::istreambuf_iterator<char>(in)),
-                                    std::istreambuf_iterator<char>());
                     postBody << "--" << mime_boundary << "\r\n"
                         "Content-Disposition: form-data; name=\"" << ci->first << "\"; filename=\"" << get_basename(si->second) << "\"\r\n\r\n"
-                        << file_content << "\r\n";
+                        << in.rdbuf() << "\r\n";
                 }
             }
 
