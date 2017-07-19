@@ -912,7 +912,9 @@ namespace dlib
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This object represents the predicted class label of a single pixel,
-                    together with an associated confidence score.
+                    together with an associated confidence score. Note that you may want
+                    to employ a softmax layer, to make the reported scores represent
+                    probabilities.
             !*/
 
             scored_label();
