@@ -10,6 +10,7 @@
 #include <dlib/array2d.h>
 #include <dlib/pixel.h>
 #include <dlib/image_transforms.h>
+#include <dlib/image_processing.h>
 #include <sstream>
 #include <ctime>
 
@@ -232,6 +233,31 @@ on_window_resized(
 
 // ----------------------------------------------------------------------------------------
 
+void propagate_boxes(
+    dlib::image_dataset_metadata::dataset& data,
+    unsigned long prev,
+    unsigned long next
+)
+{
+    if (prev == next || next >= data.images.size())
+        return;
+
+    array2d<rgb_pixel> img1, img2;
+    dlib::load_image(img1, data.images[prev].filename);
+    dlib::load_image(img2, data.images[next].filename);
+    for (unsigned long i = 0; i < data.images[prev].boxes.size(); ++i)
+    {
+        correlation_tracker tracker;
+        tracker.start_track(img1, data.images[prev].boxes[i].rect);
+        tracker.update(img2);
+        dlib::image_dataset_metadata::box box = data.images[prev].boxes[i];
+        box.rect = tracker.get_position();
+        data.images[next].boxes.push_back(box);
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
 void propagate_labels(
     const std::string& label,
     dlib::image_dataset_metadata::dataset& data,
@@ -354,7 +380,18 @@ on_keydown (
 
     if (key == base_window::KEY_UP)
     {
-        if (state&base_window::KBD_MOD_CONTROL)
+        if ((state&KBD_MOD_CONTROL) && (state&KBD_MOD_SHIFT))
+        {
+            // Don't do anything if there are no boxes in the current image.
+            if (metadata.images[image_pos].boxes.size() == 0)
+                return;
+            // Also don't do anything if there *are* boxes in the next image.
+            if (image_pos > 1 && metadata.images[image_pos-1].boxes.size() != 0)
+                return;
+
+            propagate_boxes(metadata, image_pos, image_pos-1);
+        }
+        else if (state&base_window::KBD_MOD_CONTROL)
         {
             // If the label we are supposed to propagate doesn't exist in the current image
             // then don't advance.
@@ -371,7 +408,18 @@ on_keydown (
     }
     else if (key == base_window::KEY_DOWN)
     {
-        if (state&base_window::KBD_MOD_CONTROL)
+        if ((state&KBD_MOD_CONTROL) && (state&KBD_MOD_SHIFT))
+        {
+            // Don't do anything if there are no boxes in the current image.
+            if (metadata.images[image_pos].boxes.size() == 0)
+                return;
+            // Also don't do anything if there *are* boxes in the next image.
+            if (image_pos+1 < metadata.images.size() && metadata.images[image_pos+1].boxes.size() != 0)
+                return;
+
+            propagate_boxes(metadata, image_pos, image_pos+1);
+        }
+        else if (state&base_window::KBD_MOD_CONTROL)
         {
             // If the label we are supposed to propagate doesn't exist in the current image
             // then don't advance.
@@ -604,6 +652,8 @@ display_about(
                         "Holding shift + right click and then dragging allows you to move things around. "
                         "Holding ctrl and pressing the up or down keyboard keys will propagate "
                         "rectangle labels from one image to the next and also skip empty images. " 
+                        "Similarly, holding ctrl+shift will propagate entire boxes via a visual tracking " 
+                        "algorithm from one image to the next. "
                         "Finally, typing a number on the keyboard will jump you to a specific image.",0,0) << endl << endl;
 
     sout << wrap_string("You can also toggle image histogram equalization by pressing the e key."

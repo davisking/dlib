@@ -20,7 +20,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.10";
+const char* VERSION = "1.11";
 
 const int JPEG_QUALITY = 90;
 
@@ -611,6 +611,7 @@ int main(int argc, char** argv)
         parser.add_option("rmdiff","Set the ignored flag to true for boxes marked as difficult.");
         parser.add_option("rmtrunc","Set the ignored flag to true for boxes that are partially outside the image.");
         parser.add_option("sort-num-objects","Sort the images listed an XML file so images with many objects are listed first.");
+        parser.add_option("sort","Alphabetically sort the images in an XML file.");
         parser.add_option("shuffle","Randomly shuffle the order of the images listed in an XML file.");
         parser.add_option("seed", "When using --shuffle, set the random seed to the string <arg>.",1);
         parser.add_option("split", "Split the contents of an XML file into two separate files.  One containing the "
@@ -646,7 +647,8 @@ int main(int argc, char** argv)
 
         const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
                                  "flip", "rotate", "tile", "size", "cluster", "resample", "min-object-size", "rmempty",
-                                 "crop-size", "cropped-object-size", "rmlabel", "rm-other-labels", "rm-if-overlaps", "sort-num-objects", "one-object-per-image", "jpg", "rmignore"};
+                                 "crop-size", "cropped-object-size", "rmlabel", "rm-other-labels", "rm-if-overlaps", "sort-num-objects", 
+                                 "one-object-per-image", "jpg", "rmignore", "sort"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
@@ -701,6 +703,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("add", "resample");
         parser.check_incompatible_options("shuffle", "tile");
         parser.check_incompatible_options("sort-num-objects", "tile");
+        parser.check_incompatible_options("sort", "tile");
         parser.check_incompatible_options("convert", "l");
         parser.check_incompatible_options("convert", "files");
         parser.check_incompatible_options("convert", "rename");
@@ -1102,6 +1105,22 @@ int main(int argc, char** argv)
             load_image_dataset_metadata(data, parser[0]);
             std::sort(data.images.rbegin(),  data.images.rend(), 
                 [](const image_dataset_metadata::image& a, const image_dataset_metadata::image& b) { return a.boxes.size() < b.boxes.size(); });
+            save_image_dataset_metadata(data, parser[0]);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("sort"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --sort option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset data;
+            load_image_dataset_metadata(data, parser[0]);
+            std::sort(data.images.begin(),  data.images.end(), 
+                [](const image_dataset_metadata::image& a, const image_dataset_metadata::image& b) { return a.filename < b.filename; });
             save_image_dataset_metadata(data, parser[0]);
             return EXIT_SUCCESS;
         }
