@@ -1724,8 +1724,26 @@ namespace dlib
             float weight = 1.f;
         };
 
+        struct scored_label
+        {
+            scored_label()
+            {}
+
+            scored_label(uint16_t label, float score = std::numeric_limits<float>::quiet_NaN())
+                : label(label), score(score)
+            {}
+
+            operator uint16_t () const
+            {
+                return label;
+            }
+
+            uint16_t label = std::numeric_limits<uint16_t>::max();
+            float score = std::numeric_limits<float>::quiet_NaN();
+        };
+
         typedef matrix<weighted_label> training_label_type;
-        typedef matrix<uint16_t> output_label_type;
+        typedef matrix<scored_label> output_label_type;
 
         template <
             typename SUB_TYPE,
@@ -1737,7 +1755,45 @@ namespace dlib
             label_iterator iter
         )
         {
-            loss_multiclass_log_per_pixel_::to_label(input_tensor, sub, iter);
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+
+            const tensor& output_tensor = sub.get_output();
+
+            DLIB_CASSERT(output_tensor.k() >= 1); // Note that output_tensor.k() should match the number of labels.
+            DLIB_CASSERT(output_tensor.k() < std::numeric_limits<uint16_t>::max());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            const float* const out_data = output_tensor.host();
+
+            // The index of the largest output for each element is the label.
+            const auto find_label = [&](long sample, long r, long c)
+            {
+                scored_label scored_label(0, out_data[tensor_index(output_tensor, sample, 0, r, c)]);
+
+                for (long k = 1; k < output_tensor.k(); ++k)
+                {
+                    const float score = out_data[tensor_index(output_tensor, sample, k, r, c)];
+                    if (score > scored_label.score)
+                    {
+                        scored_label.label = static_cast<uint16_t>(k);
+                        scored_label.score = score;
+                    }
+                }
+                return scored_label;
+            };
+
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++iter)
+            {
+                iter->set_size(output_tensor.nr(), output_tensor.nc());
+                for (long r = 0; r < output_tensor.nr(); ++r)
+                {
+                    for (long c = 0; c < output_tensor.nc(); ++c)
+                    {
+                        // The index of the largest output for this element is the label.
+                        iter->operator()(r, c) = find_label(i, r, c);
+                    }
+                }
+            }
         }
 
         template <

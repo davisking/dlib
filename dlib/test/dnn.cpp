@@ -2475,13 +2475,13 @@ namespace
             trainer.set_max_num_epochs(10);
             trainer.train(x, y_weighted);
 
-            const ::std::vector<matrix<uint16_t>> predictions = net(x);
+            const auto predictions = net(x);
 
             int num_weighted_class = 0;
             int num_not_weighted_class = 0;
 
             for ( int ii = 0; ii < num_samples; ++ii ) {
-                const matrix<uint16_t>& prediction = predictions[ii];
+                const auto& prediction = predictions[ii];
                 DLIB_TEST(prediction.nr() == output_height);
                 DLIB_TEST(prediction.nc() == output_width);
                 for ( int jj = 0; jj < output_height; ++jj )
