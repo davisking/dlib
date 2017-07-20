@@ -95,22 +95,21 @@ using residual = dlib::add_prev1<block<N,BN,1,dlib::tag1<SUBNET>>>;
 template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
 using residual_down = dlib::add_prev2<dlib::avg_pool<2,2,2,2,dlib::skip1<dlib::tag2<block<N,BN,2,dlib::tag1<SUBNET>>>>>>;
 
+template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
+using residual_up = dlib::add_prev2<dlib::cont<N,2,2,2,2,dlib::skip1<dlib::tag2<blockt<N,BN,2,dlib::tag1<SUBNET>>>>>>;
+
 template <int N, template <typename> class BN, int stride, typename SUBNET> 
 using block  = BN<dlib::con<N,3,3,1,1, dlib::relu<BN<dlib::con<N,3,3,stride,stride,SUBNET>>>>>;
 
+template <int N, template <typename> class BN, int stride, typename SUBNET>
+using blockt = BN<dlib::cont<N,3,3,1,1,dlib::relu<BN<dlib::cont<N,3,3,stride,stride,SUBNET>>>>>;
 
 template <int N, typename SUBNET> using res       = dlib::relu<residual<block,N,dlib::bn_con,SUBNET>>;
 template <int N, typename SUBNET> using ares      = dlib::relu<residual<block,N,dlib::affine,SUBNET>>;
 template <int N, typename SUBNET> using res_down  = dlib::relu<residual_down<block,N,dlib::bn_con,SUBNET>>;
 template <int N, typename SUBNET> using ares_down = dlib::relu<residual_down<block,N,dlib::affine,SUBNET>>;
-
-// ----------------------------------------------------------------------------------------
-
-template <int N, template <typename> class BN, int stride, typename SUBNET> 
-using blockt = BN<dlib::cont<N,3,3,1,1,dlib::relu<BN<dlib::cont<N,3,3,stride,stride,SUBNET>>>>>;
-
-template <int N, typename SUBNET> using transp = dlib::relu<blockt<N,dlib::bn_con,2,SUBNET>>;
-template <int N, typename SUBNET> using atransp = dlib::relu<blockt<N,dlib::affine,2,SUBNET>>;
+template <int N, typename SUBNET> using res_up    = dlib::relu<residual_up<block,N,dlib::bn_con,SUBNET>>;
+template <int N, typename SUBNET> using ares_up   = dlib::relu<residual_up<block,N,dlib::affine,SUBNET>>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -124,15 +123,15 @@ template <typename SUBNET> using alevel2 = ares<32,ares<32,ares<32,ares<32,ares<
 template <typename SUBNET> using alevel3 = ares<32,ares<32,ares<32,ares_down<32,SUBNET>>>>;
 template <typename SUBNET> using alevel4 = ares<32,ares<32,ares<32,SUBNET>>>;
 
-template <typename SUBNET> using level1t = transp<32, SUBNET>;
-template <typename SUBNET> using level2t = transp<32, SUBNET>;
-template <typename SUBNET> using level3t = transp<32, SUBNET>;
-template <typename SUBNET> using level4t = transp<32, SUBNET>;
+template <typename SUBNET> using level1t = res<32, res<32, res_up<32, SUBNET>>>;
+template <typename SUBNET> using level2t = res<32, res<32, res<32, res<32, res<32, res_up<32, SUBNET>>>>>>;
+template <typename SUBNET> using level3t = res<32, res<32, res<32, res_up<32, SUBNET>>>>;
+template <typename SUBNET> using level4t = res<32, res<32, res_up<32, SUBNET>>>;
 
-template <typename SUBNET> using alevel1t = atransp<32, SUBNET>;
-template <typename SUBNET> using alevel2t = atransp<32, SUBNET>;
-template <typename SUBNET> using alevel3t = atransp<32,SUBNET>;
-template <typename SUBNET> using alevel4t = atransp<32,SUBNET>;
+template <typename SUBNET> using alevel1t = ares<32, ares<32, ares_up<32, SUBNET>>>;
+template <typename SUBNET> using alevel2t = ares<32, ares<32, ares<32, ares<32, ares<32, ares_up<32, SUBNET>>>>>>;
+template <typename SUBNET> using alevel3t = ares<32, ares<32, ares<32, ares_up<32, SUBNET>>>>;
+template <typename SUBNET> using alevel4t = ares<32, ares<32, ares_up<32, SUBNET>>>;
 
 // training network type
 using net_type = dlib::loss_multiclass_log_per_pixel<

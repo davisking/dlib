@@ -242,7 +242,7 @@ int main(int argc, char** argv) try
     // important to be sure to feed the GPU fast enough to keep it busy.  Using multiple
     // thread for this kind of data preparation helps us do that.  Each thread puts the
     // crops into the data queue.
-    dlib::pipe<training_sample> data(100);
+    dlib::pipe<training_sample> data(200);
     auto f = [&data, &listing](time_t seed)
     {
         dlib::rand rnd(time(0)+seed);
@@ -272,9 +272,9 @@ int main(int argc, char** argv) try
         samples.clear();
         labels.clear();
 
-        // make a 80 image mini-batch
+        // make a 50 image mini-batch
         training_sample temp;
-        while(samples.size() < 80)
+        while(samples.size() < 50)
         {
             data.dequeue(temp);
 
