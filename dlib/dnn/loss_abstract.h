@@ -907,8 +907,31 @@ namespace dlib
             float weight = 1.f;
         };
 
+        struct scored_label
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents the predicted class label of a single pixel,
+                    together with an associated confidence score. Note that you may want
+                    to employ a softmax layer, to make the reported scores represent
+                    probabilities.
+            !*/
+
+            scored_label();
+            scored_label(uint16_t label, float score = std::numeric_limits<float>::quiet_nan());
+
+            // Returns the predicted label. Provided mainly for backward compatibility.
+            operator uint16_t () const;
+
+            // The predicted label.
+            uint16_t label = std::numeric_limits<uint16_t>::max();
+
+            // The higher the score, the more confident the network is about the label.
+            float score = std::numeric_limits<float>::quiet_nan();
+        };
+
         typedef matrix<weighted_label> training_label_type;
-        typedef matrix<uint16_t> output_label_type;
+        typedef matrix<scored_label> output_label_type;
 
         template <
             typename SUB_TYPE,
