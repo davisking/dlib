@@ -117,7 +117,55 @@ namespace dlib
             thread_local cudnn_context c;
             return c.get_handle();
         }
+    // ------------------------------------------------------------------------------------
 
+        class cudnn_device_buffer
+        {
+        public:
+            // not copyable
+            cudnn_device_buffer(const cudnn_device_buffer&) = delete;
+            cudnn_device_buffer& operator=(const cudnn_device_buffer&) = delete;
+
+            cudnn_device_buffer()
+            {
+                buffers.resize(16);
+            }
+            ~cudnn_device_buffer()
+            {
+            }
+
+            std::shared_ptr<resizable_cuda_buffer> get_buffer (
+            )
+            {
+                int new_device_id;
+                CHECK_CUDA(cudaGetDevice(&new_device_id));
+                // make room for more devices if needed
+                if (new_device_id >= (long)buffers.size())
+                    buffers.resize(new_device_id+16);
+
+                // If we don't have a buffer already for this device then make one
+                std::shared_ptr<resizable_cuda_buffer> buff = buffers[new_device_id].lock();
+                if (!buff)
+                {
+                    buff = std::make_shared<resizable_cuda_buffer>();
+                    buffers[new_device_id] = buff;
+                }
+
+                // Finally, return the buffer for the current device
+                return buff;
+            }
+
+        private:
+
+            std::vector<std::weak_ptr<resizable_cuda_buffer>> buffers;
+        };
+
+
+        static std::shared_ptr<resizable_cuda_buffer> device_global_buffer()
+        {
+            thread_local cudnn_device_buffer buffer;
+            return buffer.get_buffer();
+        }
     // ------------------------------------------------------------------------------------
 
         class cudnn_activation_descriptor
@@ -705,14 +753,8 @@ namespace dlib
             filter_handle(nullptr),
             conv_handle(nullptr),
             forward_algo(0),
-            forward_workspace_size_in_bytes(0),
-            forward_workspace(nullptr),
             backward_data_algo(0),
-            backward_data_workspace_size_in_bytes(0),
-            backward_data_workspace(nullptr),
-            backward_filters_algo(0),
-            backward_filters_workspace_size_in_bytes(0),
-            backward_filters_workspace(nullptr)
+            backward_filters_algo(0)
         {
             clear();
         }
@@ -732,24 +774,6 @@ namespace dlib
             out_nr = 0;
             out_nc = 0;
 
-            if (forward_workspace)
-                cudaFree(forward_workspace);
-            forward_workspace = nullptr;
-            forward_algo = 0;
-            forward_workspace_size_in_bytes = 0;
-
-            if (backward_data_workspace)
-                cudaFree(backward_data_workspace);
-            backward_data_workspace = nullptr;
-            backward_data_algo = 0;
-            backward_data_workspace_size_in_bytes = 0;
-
-            if (backward_filters_workspace)
-                cudaFree(backward_filters_workspace);
-            backward_filters_workspace = nullptr;
-            backward_filters_algo = 0;
-            backward_filters_workspace_size_in_bytes = 0;
-
             stride_y = 0;
             stride_x = 0;
             padding_y = 0;
@@ -762,6 +786,16 @@ namespace dlib
             filters_k = 0;
             filters_nr = 0;
             filters_nc = 0;
+
+            forward_algo = 0;
+            backward_data_algo = 0;
+            backward_filters_algo = 0;
+
+            forward_workspace_size_in_bytes = 0;
+            backward_data_workspace_size_in_bytes = 0;
+            backward_filters_workspace_size_in_bytes = 0;
+
+            workspace.reset();
         }
 
         void tensor_conv::
@@ -872,8 +906,6 @@ namespace dlib
                         descriptor(dest_desc),
                         forward_best_algo,
                         &forward_workspace_size_in_bytes));
-                CHECK_CUDA(cudaMalloc(&forward_workspace, forward_workspace_size_in_bytes));
-
 
                 // Pick which backward data algorithm we will use and allocate the
                 // necessary workspace buffer.
@@ -888,7 +920,8 @@ namespace dlib
                         std::numeric_limits<size_t>::max(),
                         &backward_data_best_algo));
                 backward_data_algo = backward_data_best_algo;
-                CHECK_CUDNN(cudnnGetConvolutionBackwardDataWorkspaceSize( 
+
+                CHECK_CUDNN(cudnnGetConvolutionBackwardDataWorkspaceSize(
                         context(),
                         (const cudnnFilterDescriptor_t)filter_handle,
                         descriptor(dest_desc),
@@ -896,8 +929,6 @@ namespace dlib
                         descriptor(data),
                         backward_data_best_algo,
                         &backward_data_workspace_size_in_bytes));
-                CHECK_CUDA(cudaMalloc(&backward_data_workspace, backward_data_workspace_size_in_bytes));
-
 
                 // Pick which backward filters algorithm we will use and allocate the
                 // necessary workspace buffer.
@@ -934,7 +965,8 @@ namespace dlib
                         (const cudnnFilterDescriptor_t)filter_handle,
                         backward_filters_best_algo,
                         &backward_filters_workspace_size_in_bytes));
-                CHECK_CUDA(cudaMalloc(&backward_filters_workspace, backward_filters_workspace_size_in_bytes));
+
+                workspace = device_global_buffer();
             }
             catch(...)
             {
@@ -997,6 +1029,7 @@ namespace dlib
 
             const float alpha = 1;
             const float beta = add_to_output ? 1 : 0;
+
             CHECK_CUDNN(cudnnConvolutionForward(
                     context(),
                     &alpha,
@@ -1006,7 +1039,7 @@ namespace dlib
                     filters.device(),
                     (const cudnnConvolutionDescriptor_t)conv_handle,
                     (cudnnConvolutionFwdAlgo_t)forward_algo,
-                    forward_workspace,
+                    workspace->get(forward_workspace_size_in_bytes),
                     forward_workspace_size_in_bytes,
                     &beta,
                     descriptor(output),
@@ -1032,7 +1065,7 @@ namespace dlib
                                                   gradient_input.device(),
                                                   (const cudnnConvolutionDescriptor_t)conv_handle,
                                                   (cudnnConvolutionBwdDataAlgo_t)backward_data_algo,
-                                                  backward_data_workspace,
+                                                  workspace->get(backward_data_workspace_size_in_bytes),
                                                   backward_data_workspace_size_in_bytes,
                                                   &beta,
                                                   descriptor(data_gradient),
@@ -1057,7 +1090,7 @@ namespace dlib
                                                     gradient_input.device(),
                                                     (const cudnnConvolutionDescriptor_t)conv_handle,
                                                     (cudnnConvolutionBwdFilterAlgo_t)backward_filters_algo,
-                                                    backward_filters_workspace,
+                                                    workspace->get(backward_filters_workspace_size_in_bytes),
                                                     backward_filters_workspace_size_in_bytes,
                                                     &beta,
                                                     (const cudnnFilterDescriptor_t)filter_handle,
@@ -1482,8 +1515,7 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
-
-    } 
+    }
 }
 
 #endif // DLIB_USE_CUDA

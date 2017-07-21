@@ -149,6 +149,32 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        class resizable_cuda_buffer
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is a block of memory on a CUDA device that will be automatically
+                    resized if requestes size is larger than allocated
+            !*/
+        public:
+            cuda_data_void_ptr get(size_t size)
+            /*!
+                ensures
+                    - This object will return the buffer of requested size of larger
+                    - buffer.size() >= size
+            !*/
+            {
+                if (buffer.size() < size)
+                {
+                    buffer.reset();
+                    buffer = cuda_data_void_ptr(size);
+                }
+                return buffer;
+            }
+        private:
+            cuda_data_void_ptr buffer;
+        };
+
     }
 }
 

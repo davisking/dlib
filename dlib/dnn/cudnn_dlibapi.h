@@ -1,4 +1,4 @@
-// Copyright (C) 2015  Davis E. King (davis@dlib.net)
+﻿// Copyright (C) 2015  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_DNN_CuDNN_H_
 #define DLIB_DNN_CuDNN_H_
@@ -6,6 +6,8 @@
 #ifdef DLIB_USE_CUDA
 
 #include "cuda_errors.h"
+#include <memory>
+#include "cuda_data_ptr.h"
 
 namespace dlib
 {
@@ -63,7 +65,7 @@ namespace dlib
             void* handle;
         };
 
-    // ------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------
 
         void add(
             float beta,
@@ -260,16 +262,13 @@ namespace dlib
             int out_nc;
 
             int forward_algo;
-            size_t forward_workspace_size_in_bytes;
-            void* forward_workspace;
-
             int backward_data_algo;
-            size_t backward_data_workspace_size_in_bytes;
-            void* backward_data_workspace;
-
             int backward_filters_algo;
+
+            size_t forward_workspace_size_in_bytes;
+            size_t backward_data_workspace_size_in_bytes;
             size_t backward_filters_workspace_size_in_bytes;
-            void* backward_filters_workspace;
+            std::shared_ptr<resizable_cuda_buffer> workspace;
         };
 
     // ------------------------------------------------------------------------------------
@@ -489,6 +488,8 @@ namespace dlib
                 - This function supports in-place operation, i.e. having
                   is_same_object(grad, gradient_input)==true
         !*/
+
+
 
     // ------------------------------------------------------------------------------------
 
