@@ -149,7 +149,7 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        class resizable_buffer
+        class resizable_cuda_buffer
         {
             /*!
                 WHAT THIS OBJECT REPRESENTS

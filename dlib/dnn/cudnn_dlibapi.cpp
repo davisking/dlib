@@ -117,17 +117,54 @@ namespace dlib
             thread_local cudnn_context c;
             return c.get_handle();
         }
+    // ------------------------------------------------------------------------------------
 
-        static std::shared_ptr<resizable_buffer> device_global_buffer()
+        class cudnn_device_buffer
         {
-            thread_local std::weak_ptr<resizable_buffer> weak_buff;
-            std::shared_ptr<resizable_buffer> buff = weak_buff.lock();
-            if (!buff)
+        public:
+            // not copyable
+            cudnn_device_buffer(const cudnn_context&) = delete;
+            cudnn_device_buffer& operator=(const cudnn_context&) = delete;
+
+            cudnn_device_buffer()
             {
-                buff = std::make_shared<resizable_buffer>();
-                weak_buff = buff;
+                buffers.resize(16);
             }
-            return buff;
+            ~cudnn_device_buffer()
+            {
+            }
+
+            std::shared_ptr<resizable_cuda_buffer> get_buffer (
+            )
+            {
+                int new_device_id;
+                CHECK_CUDA(cudaGetDevice(&new_device_id));
+                // make room for more devices if needed
+                if (new_device_id >= (long)buffers.size())
+                    buffers.resize(new_device_id+16);
+
+                // If we don't have a buffer already for this device then make one
+                std::shared_ptr<resizable_cuda_buffer> buff = buffers[new_device_id].lock();
+                if (!buff)
+                {
+                    buff = std::make_shared<resizable_cuda_buffer>();
+                    buffers[new_device_id] = buff;
+                }
+
+                // Finally, return the buffer for the current device
+                return buff;
+            }
+
+        private:
+
+            std::vector<std::weak_ptr<resizable_cuda_buffer>> buffers;
+        };
+
+
+        static std::shared_ptr<resizable_cuda_buffer> device_global_buffer()
+        {
+            thread_local cudnn_device_buffer buffer;
+            return buffer.get_buffer();
         }
     // ------------------------------------------------------------------------------------
 

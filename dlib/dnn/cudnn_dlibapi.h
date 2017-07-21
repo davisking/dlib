@@ -268,7 +268,7 @@ namespace dlib
             size_t forward_workspace_size_in_bytes;
             size_t backward_data_workspace_size_in_bytes;
             size_t backward_filters_workspace_size_in_bytes;
-            std::shared_ptr<resizable_buffer> workspace;
+            std::shared_ptr<resizable_cuda_buffer> workspace;
         };
 
     // ------------------------------------------------------------------------------------
