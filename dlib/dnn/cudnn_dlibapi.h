@@ -7,6 +7,7 @@
 
 #include "cuda_errors.h"
 #include <memory>
+#include "cuda_data_ptr.h"
 
 namespace dlib
 {
@@ -62,45 +63,6 @@ namespace dlib
             void swap(tensor_descriptor& item) { std::swap(handle, item.handle); }
 
             void* handle;
-        };
-
-        // ------------------------------------------------------------------------------------
-
-        class cudnn_shared_workspace
-        {
-            /*!
-                Some cuDNN algorithms require temporarry memory blocks for processing.
-                This class represents such memory block that can be reused by many
-                cuDNN algorithms from same thread
-            !*/
-
-        public:
-            // not copyable
-            cudnn_shared_workspace(const cudnn_shared_workspace&) = delete;
-            cudnn_shared_workspace& operator=(const cudnn_shared_workspace&) = delete;
-            // but is movable
-            cudnn_shared_workspace(cudnn_shared_workspace&& item) { swap(item); }
-            cudnn_shared_workspace& operator=(cudnn_shared_workspace&& item) { swap(item); return *this; }
-
-            cudnn_shared_workspace();
-            ~cudnn_shared_workspace(){}
-
-            void set_size(size_t size);
-            size_t get_size() const {return size;}
-            void* get();
-
-            void clear() {set_size(0);}
-        private:
-
-            void swap(cudnn_shared_workspace& item) { std::swap(ptr, item.ptr), std::swap(size, item.size); }
-
-            static size_t &reserved_size();
-            static void reserve(size_t size);
-            static std::shared_ptr<void*> allocate();
-            static void release_cuda_ptr(void** ptr);
-
-            std::shared_ptr<void*> ptr;
-            size_t size = 0;
         };
 
         // ------------------------------------------------------------------------------------
@@ -300,13 +262,13 @@ namespace dlib
             int out_nc;
 
             int forward_algo;
-            cudnn_shared_workspace forward_workspace;
-
             int backward_data_algo;
-            cudnn_shared_workspace backward_data_workspace;
-
             int backward_filters_algo;
-            cudnn_shared_workspace backward_filters_workspace;
+
+            size_t forward_workspace_size_in_bytes;
+            size_t backward_data_workspace_size_in_bytes;
+            size_t backward_filters_workspace_size_in_bytes;
+            std::shared_ptr<resizable_buffer> workspace;
         };
 
     // ------------------------------------------------------------------------------------
