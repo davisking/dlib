@@ -123,8 +123,8 @@ namespace dlib
         {
         public:
             // not copyable
-            cudnn_device_buffer(const cudnn_context&) = delete;
-            cudnn_device_buffer& operator=(const cudnn_context&) = delete;
+            cudnn_device_buffer(const cudnn_device_buffer&) = delete;
+            cudnn_device_buffer& operator=(const cudnn_device_buffer&) = delete;
 
             cudnn_device_buffer()
             {
