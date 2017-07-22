@@ -13,6 +13,8 @@
 #include <png.h>
 #include "../string.h"
 #include "../byte_orderer.h"
+#include <sstream>
+#include <cstring>
 
 namespace dlib
 {
@@ -133,7 +135,16 @@ namespace dlib
         if ( ld_->png_ptr_ == NULL )
         {
             fclose( fp );
-            throw image_load_error(std::string("png_loader: parse error in file ") + filename);
+            std::ostringstream sout;
+            sout << "Error, unable to allocate png structure while opening file " << filename << std::endl;
+            const char* runtime_version = png_get_header_ver(NULL);
+            if (runtime_version && std::strcmp(PNG_LIBPNG_VER_STRING, runtime_version) != 0)
+            {
+                sout << "This is happening because you compiled against one version of libpng, but then linked to another." << std::endl;
+                sout << "Compiled against libpng version:   " << PNG_LIBPNG_VER_STRING << std::endl;
+                sout << "Linking to this version of libpng: " << runtime_version << std::endl;
+            }
+            throw image_load_error(sout.str());
         }
         ld_->info_ptr_ = png_create_info_struct( ld_->png_ptr_ );
         if ( ld_->info_ptr_ == NULL )
