@@ -1656,7 +1656,7 @@ namespace dlib
                             const long left   = static_cast<long>(std::floor(x));
 
                             const float tmp = gi[r*gradient_input.nc()+c];
-                            if (y-top < 1E-06 || x-left < 1E-06)
+                            if (y-top < 1E-06 && x-left < 1E-06)
                                 g[top*grad.nc()+left]     += gi[r*gradient_input.nc()+c];
                         }
                     }
