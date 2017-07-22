@@ -1657,7 +1657,7 @@ namespace dlib
 
                             const float tmp = gi[r*gradient_input.nc()+c];
                             if (y-top < 1E-06 && x-left < 1E-06)
-                                g[top*grad.nc()+left]     += gi[r*gradient_input.nc()+c];
+                                g[top*grad.nc()+left]     += tmp;
                         }
                     }
 
