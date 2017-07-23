@@ -230,7 +230,7 @@ int main(int argc, char** argv) try
     trainer.set_learning_rate(initial_learning_rate);
     trainer.set_synchronization_file("pascal_voc2012_trainer_state_file.dat", std::chrono::minutes(10));
     // This threshold is probably excessively large.
-    trainer.set_iterations_without_progress_threshold(20000);
+    trainer.set_iterations_without_progress_threshold(5000);
     // Since the progress threshold is so large might as well set the batch normalization
     // stats window to something big too.
     set_all_bn_running_stats_window_sizes(net, 1000);
