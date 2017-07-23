@@ -89,6 +89,12 @@ const Voc2012class& find_voc2012_class(Predicate predicate)
 
 #ifndef __INTELLISENSE__
 
+template <int N, template <typename> class BN, int stride, typename SUBNET>
+using block = BN<dlib::con<N, 3, 3, 1, 1, dlib::relu<BN<dlib::con<N, 3, 3, stride, stride, SUBNET>>>>>;
+
+template <int N, template <typename> class BN, int stride, typename SUBNET>
+using blockt = BN<dlib::cont<N, 3, 3, 1, 1, dlib::relu<BN<dlib::cont<N, 3, 3, stride, stride, SUBNET>>>>>;
+
 template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
 using residual = dlib::add_prev1<block<N,BN,1,dlib::tag1<SUBNET>>>;
 
@@ -97,12 +103,6 @@ using residual_down = dlib::add_prev2<dlib::avg_pool<2,2,2,2,dlib::skip1<dlib::t
 
 template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
 using residual_up = dlib::add_prev2<dlib::cont<N,2,2,2,2,dlib::skip1<dlib::tag2<blockt<N,BN,2,dlib::tag1<SUBNET>>>>>>;
-
-template <int N, template <typename> class BN, int stride, typename SUBNET> 
-using block  = BN<dlib::con<N,3,3,1,1, dlib::relu<BN<dlib::con<N,3,3,stride,stride,SUBNET>>>>>;
-
-template <int N, template <typename> class BN, int stride, typename SUBNET>
-using blockt = BN<dlib::cont<N,3,3,1,1,dlib::relu<BN<dlib::cont<N,3,3,stride,stride,SUBNET>>>>>;
 
 template <int N, typename SUBNET> using res       = dlib::relu<residual<block,N,dlib::bn_con,SUBNET>>;
 template <int N, typename SUBNET> using ares      = dlib::relu<residual<block,N,dlib::affine,SUBNET>>;
