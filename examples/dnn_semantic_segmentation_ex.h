@@ -113,24 +113,24 @@ template <int N, typename SUBNET> using ares_up   = dlib::relu<residual_up<block
 
 // ----------------------------------------------------------------------------------------
 
-template <typename SUBNET> using level1 = res<32,res<32,res_down<32,SUBNET>>>;
-template <typename SUBNET> using level2 = res<32,res<32,res<32,res<32,res<32,res_down<32,SUBNET>>>>>>;
-template <typename SUBNET> using level3 = res<32,res<32,res<32,res_down<32,SUBNET>>>>;
+template <typename SUBNET> using level1 = res<128,res<128,res_down<128,SUBNET>>>;
+template <typename SUBNET> using level2 = res<96,res<96,res<96,res<96,res<96,res_down<96,SUBNET>>>>>>;
+template <typename SUBNET> using level3 = res<64,res<64,res<64,res_down<64,SUBNET>>>>;
 template <typename SUBNET> using level4 = res<32,res<32,res<32,SUBNET>>>;
 
-template <typename SUBNET> using alevel1 = ares<32,ares<32,ares_down<32,SUBNET>>>;
-template <typename SUBNET> using alevel2 = ares<32,ares<32,ares<32,ares<32,ares<32,ares_down<32,SUBNET>>>>>>;
-template <typename SUBNET> using alevel3 = ares<32,ares<32,ares<32,ares_down<32,SUBNET>>>>;
+template <typename SUBNET> using alevel1 = ares<128,ares<128,ares_down<128,SUBNET>>>;
+template <typename SUBNET> using alevel2 = ares<96,ares<96,ares<96,ares<96,ares<96,ares_down<96,SUBNET>>>>>>;
+template <typename SUBNET> using alevel3 = ares<64,ares<64,ares<64,ares_down<64,SUBNET>>>>;
 template <typename SUBNET> using alevel4 = ares<32,ares<32,ares<32,SUBNET>>>;
 
-template <typename SUBNET> using level1t = res<32, res<32, res_up<32, SUBNET>>>;
-template <typename SUBNET> using level2t = res<32, res<32, res<32, res<32, res<32, res_up<32, SUBNET>>>>>>;
-template <typename SUBNET> using level3t = res<32, res<32, res<32, res_up<32, SUBNET>>>>;
+template <typename SUBNET> using level1t = res<128, res<128, res_up<128, SUBNET>>>;
+template <typename SUBNET> using level2t = res<96, res<96, res<96, res<96, res<96, res_up<96, SUBNET>>>>>>;
+template <typename SUBNET> using level3t = res<64, res<64, res<64, res_up<64, SUBNET>>>>;
 template <typename SUBNET> using level4t = res<32, res<32, res_up<32, SUBNET>>>;
 
-template <typename SUBNET> using alevel1t = ares<32, ares<32, ares_up<32, SUBNET>>>;
-template <typename SUBNET> using alevel2t = ares<32, ares<32, ares<32, ares<32, ares<32, ares_up<32, SUBNET>>>>>>;
-template <typename SUBNET> using alevel3t = ares<32, ares<32, ares<32, ares_up<32, SUBNET>>>>;
+template <typename SUBNET> using alevel1t = ares<128, ares<128, ares_up<128, SUBNET>>>;
+template <typename SUBNET> using alevel2t = ares<96, ares<96, ares<96, ares<96, ares<96, ares_up<96, SUBNET>>>>>>;
+template <typename SUBNET> using alevel3t = ares<64, ares<64, ares<64, ares_up<64, SUBNET>>>>;
 template <typename SUBNET> using alevel4t = ares<32, ares<32, ares_up<32, SUBNET>>>;
 
 // training network type
