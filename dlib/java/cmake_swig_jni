@@ -2,7 +2,7 @@
 # it by defining some CMake variables and then include(cmake_swig_jni).  You
 # would make a CMakeLists.txt file that looks like the following:
 #
-#   cmake_minimum_required (VERSION 2.8.4)
+#   cmake_minimum_required (VERSION 2.8.12)
 #   project (example)
 #   set(java_package_name "org.mycompany")
 #   set(source_files
