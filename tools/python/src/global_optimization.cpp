@@ -2,67 +2,65 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include <dlib/python.h>
-#include <boost/shared_ptr.hpp>
 #include <dlib/global_optimization.h>
 #include <dlib/matrix.h>
 
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
-
+namespace py = pybind11;
 
 // ----------------------------------------------------------------------------------------
 
 std::vector<bool> list_to_bool_vector(
-    const boost::python::list& l
+    const py::list& l
 )
 {
     std::vector<bool> result(len(l));
     for (long i = 0; i < result.size(); ++i)
     {
-        result[i] = extract<bool>(l[i]);
+        result[i] = l[i].cast<bool>();
         cout << "bool val: " << result[i] << endl;
     }
     return result;
 }
 
 matrix<double,0,1> list_to_mat(
-    const boost::python::list& l
+    const py::list& l
 )
 {
     matrix<double,0,1> result(len(l));
     for (long i = 0; i < result.size(); ++i)
-        result(i) = extract<double>(l[i]);
+        result(i) = l[i].cast<double>();
     return result;
 }
 
-boost::python::list mat_to_list (
+py::list mat_to_list (
     const matrix<double,0,1>& m
 )
 {
-    boost::python::list l;
+    py::list l;
     for (long i = 0; i < m.size(); ++i)
         l.append(m(i));
     return l;
 }
 
-size_t num_function_arguments(object f)
+size_t num_function_arguments(py::object f)
 {
     if (hasattr(f,"func_code"))
-        return boost::python::extract<std::size_t>(f.attr("func_code").attr("co_argcount"));
+        return f.attr("func_code").attr("co_argcount").cast<std::size_t>();
     else
-        return boost::python::extract<std::size_t>(f.attr("__code__").attr("co_argcount"));
+        return f.attr("__code__").attr("co_argcount").cast<std::size_t>();
 }
 
-double call_func(object f, const matrix<double,0,1>& args)
+double call_func(py::object f, const matrix<double,0,1>& args)
 {
     const auto num = num_function_arguments(f);
     DLIB_CASSERT(num == args.size(), 
         "The function being optimized takes a number of arguments that doesn't agree with the size of the bounds lists you provided to find_max_global()");
     DLIB_CASSERT(0 < num && num < 15, "Functions being optimized must take between 1 and 15 scalar arguments.");
 
-#define CALL_WITH_N_ARGS(N) case N: return extract<double>(dlib::gopt_impl::_cwv(f,args,typename make_compile_time_integer_range<N>::type())); 
+#define CALL_WITH_N_ARGS(N) case N: return dlib::gopt_impl::_cwv(f,args,typename make_compile_time_integer_range<N>::type()).cast<double>(); 
     switch (num)
     {
         CALL_WITH_N_ARGS(1)
@@ -89,11 +87,11 @@ double call_func(object f, const matrix<double,0,1>& args)
 
 // ----------------------------------------------------------------------------------------
 
-boost::python::tuple py_find_max_global (
-    object f,
-    boost::python::list bound1,
-    boost::python::list bound2,
-    boost::python::list is_integer_variable,
+py::tuple py_find_max_global (
+    py::object f,
+    py::list bound1,
+    py::list bound2,
+    py::list is_integer_variable,
     unsigned long num_function_calls,
     double solver_epsilon = 0
 )
@@ -110,13 +108,13 @@ boost::python::tuple py_find_max_global (
         list_to_bool_vector(is_integer_variable), max_function_calls(num_function_calls),
         solver_epsilon);
 
-    return boost::python::make_tuple(mat_to_list(result.x),result.y);
+    return py::make_tuple(mat_to_list(result.x),result.y);
 }
 
-boost::python::tuple py_find_max_global2 (
-    object f,
-    boost::python::list bound1,
-    boost::python::list bound2,
+py::tuple py_find_max_global2 (
+    py::object f,
+    py::list bound1,
+    py::list bound2,
     unsigned long num_function_calls,
     double solver_epsilon = 0
 )
@@ -130,16 +128,16 @@ boost::python::tuple py_find_max_global2 (
 
     auto result = find_max_global(func, list_to_mat(bound1), list_to_mat(bound2), max_function_calls(num_function_calls), solver_epsilon);
 
-    return boost::python::make_tuple(mat_to_list(result.x),result.y);
+    return py::make_tuple(mat_to_list(result.x),result.y);
 }
 
 // ----------------------------------------------------------------------------------------
 
-boost::python::tuple py_find_min_global (
-    object f,
-    boost::python::list bound1,
-    boost::python::list bound2,
-    boost::python::list is_integer_variable,
+py::tuple py_find_min_global (
+    py::object f,
+    py::list bound1,
+    py::list bound2,
+    py::list is_integer_variable,
     unsigned long num_function_calls,
     double solver_epsilon = 0
 )
@@ -156,13 +154,13 @@ boost::python::tuple py_find_min_global (
         list_to_bool_vector(is_integer_variable), max_function_calls(num_function_calls),
         solver_epsilon);
 
-    return boost::python::make_tuple(mat_to_list(result.x),result.y);
+    return py::make_tuple(mat_to_list(result.x),result.y);
 }
 
-boost::python::tuple py_find_min_global2 (
-    object f,
-    boost::python::list bound1,
-    boost::python::list bound2,
+py::tuple py_find_min_global2 (
+    py::object f,
+    py::list bound1,
+    py::list bound2,
     unsigned long num_function_calls,
     double solver_epsilon = 0
 )
@@ -176,12 +174,12 @@ boost::python::tuple py_find_min_global2 (
 
     auto result = find_min_global(func, list_to_mat(bound1), list_to_mat(bound2), max_function_calls(num_function_calls), solver_epsilon);
 
-    return boost::python::make_tuple(mat_to_list(result.x),result.y);
+    return py::make_tuple(mat_to_list(result.x),result.y);
 }
 
 // ----------------------------------------------------------------------------------------
 
-void bind_global_optimization()
+void bind_global_optimization(py::module& m)
 {
     /*!
         requires
@@ -232,9 +230,8 @@ void bind_global_optimization()
               supplied functions.  In most cases, it improves the efficiency of the
               optimizer.
     !*/
-    using boost::python::arg;
     {
-    def("find_max_global", &py_find_max_global, 
+    m.def("find_max_global", &py_find_max_global, 
 "requires \n\
     - len(bound1) == len(bound2) == len(is_integer_variable) \n\
     - for all valid i: bound1[i] != bound2[i] \n\
@@ -283,31 +280,31 @@ ensures \n\
       supplied functions.  In most cases, it improves the efficiency of the \n\
       optimizer." 
         , 
-	(arg("f"), arg("bound1"), arg("bound2"), arg("is_integer_variable"), arg("num_function_calls"), arg("solver_epsilon")=0)
+	py::arg("f"), py::arg("bound1"), py::arg("bound2"), py::arg("is_integer_variable"), py::arg("num_function_calls"), py::arg("solver_epsilon")=0
     );
     }
 
     {
-    def("find_max_global", &py_find_max_global2, 
+    m.def("find_max_global", &py_find_max_global2, 
         "This function simply calls the other version of find_max_global() with is_integer_variable set to False for all variables.", 
-	(arg("f"), arg("bound1"), arg("bound2"), arg("num_function_calls"), arg("solver_epsilon")=0)
+	py::arg("f"), py::arg("bound1"), py::arg("bound2"), py::arg("num_function_calls"), py::arg("solver_epsilon")=0
     );
     }
 
 
 
     {
-    def("find_min_global", &py_find_min_global, 
+    m.def("find_min_global", &py_find_min_global, 
       "This function is just like find_max_global(), except it performs minimization rather than maximization." 
         , 
-	(arg("f"), arg("bound1"), arg("bound2"), arg("is_integer_variable"), arg("num_function_calls"), arg("solver_epsilon")=0)
+	py::arg("f"), py::arg("bound1"), py::arg("bound2"), py::arg("is_integer_variable"), py::arg("num_function_calls"), py::arg("solver_epsilon")=0
     );
     }
 
     {
-    def("find_min_global", &py_find_min_global2, 
+    m.def("find_min_global", &py_find_min_global2, 
         "This function simply calls the other version of find_min_global() with is_integer_variable set to False for all variables.", 
-	(arg("f"), arg("bound1"), arg("bound2"), arg("num_function_calls"), arg("solver_epsilon")=0)
+	py::arg("f"), py::arg("bound1"), py::arg("bound2"), py::arg("num_function_calls"), py::arg("solver_epsilon")=0
     );
     }
 

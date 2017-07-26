@@ -2,13 +2,12 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include <dlib/python.h>
-#include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
 #include <dlib/string.h>
-#include <boost/python/args.hpp>
+#include <pybind11/pybind11.h>
 
 using namespace dlib;
-using namespace boost::python;
+namespace py = pybind11;
 using std::string;
 using std::ostringstream;
 
@@ -34,60 +33,59 @@ string matrix_double__str__(matrix<double>& c)
     return trim(sout.str());
 }
 
-boost::shared_ptr<matrix<double> > make_matrix_from_size(long nr, long nc)
+std::shared_ptr<matrix<double> > make_matrix_from_size(long nr, long nc)
 {
     if (nr < 0 || nc < 0)
     {
-        PyErr_SetString( PyExc_IndexError, "Input dimensions can't be negative." 
-        );                                            
-        boost::python::throw_error_already_set();   
+        PyErr_SetString( PyExc_IndexError, "Input dimensions can't be negative."
+        );
+        throw py::error_already_set();
     }
-    boost::shared_ptr<matrix<double> > temp(new matrix<double>(nr,nc));
+    auto temp = std::make_shared<matrix<double>>(nr,nc);
     *temp = 0;
     return temp;
 }
 
 
-boost::shared_ptr<matrix<double> > from_object(object obj)
+std::shared_ptr<matrix<double> > from_object(py::object obj)
 {
-    tuple s = extract<tuple>(obj.attr("shape"));
+    py::tuple s = obj.attr("shape").cast<py::tuple>();
     if (len(s) != 2)
     {
-        PyErr_SetString( PyExc_IndexError, "Input must be a matrix or some kind of 2D array." 
-        );                                            
-        boost::python::throw_error_already_set();   
+        PyErr_SetString( PyExc_IndexError, "Input must be a matrix or some kind of 2D array."
+        );
+        throw py::error_already_set();
     }
 
-    const long nr = extract<long>(s[0]);
-    const long nc = extract<long>(s[1]);
-    boost::shared_ptr<matrix<double> > temp(new matrix<double>(nr,nc));
+    const long nr = s[0].cast<long>();
+    const long nc = s[1].cast<long>();
+    auto temp = std::make_shared<matrix<double>>(nr,nc);
     for ( long r = 0; r < nr; ++r)
     {
         for (long c = 0; c < nc; ++c)
         {
-            (*temp)(r,c) = extract<double>(obj[make_tuple(r,c)]);
+            (*temp)(r,c) = obj[py::make_tuple(r,c)].cast<double>();
         }
     }
     return temp;
 }
 
-boost::shared_ptr<matrix<double> > from_list(list l)
+std::shared_ptr<matrix<double> > from_list(py::list l)
 {
-    const long nr = len(l);
-    if (extract<list>(l[0]).check())
+    const long nr = py::len(l);
+    if (py::isinstance<py::list>(l[0]))
     {
-        const long nc = len(l[0]);
+        const long nc = py::len(l[0]);
         // make sure all the other rows have the same length
         for (long r = 1; r < nr; ++r)
-            pyassert(len(l[r]) == nc, "All rows of a matrix must have the same number of columns.");
+            pyassert(py::len(l[r]) == nc, "All rows of a matrix must have the same number of columns.");
 
-
-        boost::shared_ptr<matrix<double> > temp(new matrix<double>(nr,nc));
+        auto temp = std::make_shared<matrix<double>>(nr,nc);
         for ( long r = 0; r < nr; ++r)
         {
             for (long c = 0; c < nc; ++c)
             {
-                (*temp)(r,c) = extract<double>(l[r][c]);
+                (*temp)(r,c) = l[r].cast<py::list>()[c].cast<double>();
             }
         }
         return temp;
@@ -95,10 +93,10 @@ boost::shared_ptr<matrix<double> > from_list(list l)
     else
     {
         // In this case we treat it like a column vector
-        boost::shared_ptr<matrix<double> > temp(new matrix<double>(nr,1));
+        auto temp = std::make_shared<matrix<double>>(nr,1);
         for ( long r = 0; r < nr; ++r)
         {
-            (*temp)(r) = extract<double>(l[r]);
+            (*temp)(r) = l[r].cast<double>();
         }
         return temp;
     }
@@ -123,9 +121,9 @@ void mat_row__setitem__(mat_row& c, long p, double val)
         p = c.size + p; // negative index
     }
     if (p > c.size-1) {
-        PyErr_SetString( PyExc_IndexError, "3 index out of range" 
-        );                                            
-        boost::python::throw_error_already_set();   
+        PyErr_SetString( PyExc_IndexError, "3 index out of range"
+        );
+        throw py::error_already_set();
     }
     c.data[p] = val;
 }
@@ -156,9 +154,9 @@ double mat_row__getitem__(mat_row& m, long r)
         r = m.size + r; // negative index
     }
     if (r > m.size-1 || r < 0) {
-        PyErr_SetString( PyExc_IndexError, "1 index out of range" 
-        );                                            
-        boost::python::throw_error_already_set();   
+        PyErr_SetString( PyExc_IndexError, "1 index out of range"
+        );
+        throw py::error_already_set();
     }
     return m.data[r];
 }
@@ -170,40 +168,41 @@ mat_row matrix_double__getitem__(matrix<double>& m, long r)
     }
     if (r > m.nr()-1 || r < 0) {
         PyErr_SetString( PyExc_IndexError, (string("2 index out of range, got ") + cast_to_string(r)).c_str()
-        );                                            
-        boost::python::throw_error_already_set();   
+        );
+        throw py::error_already_set();
     }
     return mat_row(&m(r,0),m.nc());
 }
 
 
-tuple get_matrix_size(matrix<double>& m)
+py::tuple get_matrix_size(matrix<double>& m)
 {
-    return make_tuple(m.nr(), m.nc());
+    return py::make_tuple(m.nr(), m.nc());
 }
 
-void bind_matrix()
+void bind_matrix(py::module& m)
 {
-    class_<mat_row>("_row")
+    py::class_<mat_row>(m, "_row")
         .def("__len__", &mat_row__len__)
         .def("__repr__", &mat_row__repr__)
         .def("__str__", &mat_row__str__)
         .def("__setitem__", &mat_row__setitem__)
         .def("__getitem__", &mat_row__getitem__);
 
-    class_<matrix<double> >("matrix", "This object represents a dense 2D matrix of floating point numbers."
-        "Moreover, it binds directly to the C++ type dlib::matrix<double>.", init<>())
-        .def("__init__", make_constructor(&make_matrix_from_size))
-        .def("set_size", &matrix_set_size, (arg("rows"), arg("cols")), "Set the size of the matrix to the given number of rows and columns.")
-        .def("__init__", make_constructor(&from_object))
-        .def("__init__", make_constructor(&from_list))
+    py::class_<matrix<double>, std::shared_ptr<matrix<double>>>(m, "matrix",
+        "This object represents a dense 2D matrix of floating point numbers."
+        "Moreover, it binds directly to the C++ type dlib::matrix<double>.")
+        .def(py::init<>())
+        .def(py::init(&from_list))
+        .def(py::init(&from_object))
+        .def(py::init(&make_matrix_from_size))
+        .def("set_size", &matrix_set_size, py::arg("rows"), py::arg("cols"), "Set the size of the matrix to the given number of rows and columns.")
         .def("__repr__", &matrix_double__repr__)
         .def("__str__", &matrix_double__str__)
         .def("nr", &matrix<double>::nr, "Return the number of rows in the matrix.")
         .def("nc", &matrix<double>::nc, "Return the number of columns in the matrix.")
         .def("__len__", &matrix_double__len__)
-        .def("__getitem__", &matrix_double__getitem__, with_custodian_and_ward_postcall<0,1>())
-        .add_property("shape", &get_matrix_size)
-        .def_pickle(serialize_pickle<matrix<double> >());
+        .def("__getitem__", &matrix_double__getitem__, py::keep_alive<0,1>())
+        .def_property_readonly("shape", &get_matrix_size)
+        .def(py::pickle(&getstate<matrix<double>>, &setstate<matrix<double>>));
 }
-

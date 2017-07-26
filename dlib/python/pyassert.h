@@ -3,14 +3,15 @@
 #ifndef DLIB_PYaSSERT_Hh_
 #define DLIB_PYaSSERT_Hh_
 
-#include <boost/python.hpp>
+#include <pybind11/pybind11.h>
 
 #define pyassert(_exp,_message)                                             \
     {if ( !(_exp) )                                                         \
     {                                                                       \
+        namespace py = pybind11;                                            \
         PyErr_SetString( PyExc_ValueError, _message );                      \
-        boost::python::throw_error_already_set();                           \
-    }}                                                                      
+        throw py::error_already_set();                                      \
+    }}
 
 #endif // DLIB_PYaSSERT_Hh_
 

@@ -1,7 +1,6 @@
 #ifndef DLIB_NO_GUI_SUPPORT
 
 #include <dlib/python.h>
-#include <boost/python/args.hpp>
 #include <dlib/geometry.h>
 #include <dlib/image_processing/frontal_face_detector.h>
 #include <dlib/image_processing/render_face_detections.h>
@@ -10,7 +9,8 @@
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
+
+namespace py = pybind11;
 
 // ----------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ void image_window_set_image_simple_detector_py (
 
 void image_window_set_image (
     image_window& win,
-    object img
+    py::object img
 )
 {
     if (is_gray_python_image(img))
@@ -73,16 +73,16 @@ void add_overlay_parts (
     win.add_overlay(render_face_detections(detection, color));
 }
 
-boost::shared_ptr<image_window> make_image_window_from_image(object img)
+std::shared_ptr<image_window> make_image_window_from_image(py::object img)
 {
-    boost::shared_ptr<image_window> win(new image_window);
+    auto win = std::make_shared<image_window>();
     image_window_set_image(*win, img);
     return win;
 }
 
-boost::shared_ptr<image_window> make_image_window_from_image_and_title(object img, const string& title)
+std::shared_ptr<image_window> make_image_window_from_image_and_title(py::object img, const string& title)
 {
-    boost::shared_ptr<image_window> win(new image_window);
+    auto win = std::make_shared<image_window>();
     image_window_set_image(*win, img);
     win->set_title(title);
     return win;
@@ -90,35 +90,35 @@ boost::shared_ptr<image_window> make_image_window_from_image_and_title(object im
 
 // ----------------------------------------------------------------------------------------
 
-void bind_gui()
+void bind_gui(py::module& m)
 {
-    using boost::python::arg;
     {
     typedef image_window type;
     typedef void (image_window::*set_title_funct)(const std::string&);
     typedef void (image_window::*add_overlay_funct)(const std::vector<rectangle>& r, rgb_pixel p);
-    class_<type,boost::noncopyable>("image_window",
+    py::class_<type, std::shared_ptr<type>>(m, "image_window",
         "This is a GUI window capable of showing images on the screen.")
-        .def("__init__", make_constructor(&make_image_window_from_image),
+        .def(py::init())
+        .def(py::init(&make_image_window_from_image),
             "Create an image window that displays the given numpy image.")
-        .def("__init__", make_constructor(&make_image_window_from_image_and_title),
+        .def(py::init(&make_image_window_from_image_and_title),
             "Create an image window that displays the given numpy image and also has the given title.")
-        .def("set_image", image_window_set_image, arg("image"),
+        .def("set_image", image_window_set_image_simple_detector_py, py::arg("detector"),
+            "Make the image_window display the given HOG detector's filters.")
+        .def("set_image", image_window_set_image_fhog_detector, py::arg("detector"),
+            "Make the image_window display the given HOG detector's filters.")
+        .def("set_image", image_window_set_image, py::arg("image"),
             "Make the image_window display the given image.")
-        .def("set_image", image_window_set_image_fhog_detector, arg("detector"),
-            "Make the image_window display the given HOG detector's filters.")
-        .def("set_image", image_window_set_image_simple_detector_py, arg("detector"),
-            "Make the image_window display the given HOG detector's filters.")
-        .def("set_title", (set_title_funct)&type::set_title, arg("title"),
+        .def("set_title", (set_title_funct)&type::set_title, py::arg("title"),
             "Set the title of the window to the given value.")
         .def("clear_overlay", &type::clear_overlay, "Remove all overlays from the image_window.")
-        .def("add_overlay", (add_overlay_funct)&type::add_overlay<rgb_pixel>, (arg("rectangles"), arg("color")=rgb_pixel(255, 0, 0)),
+        .def("add_overlay", (add_overlay_funct)&type::add_overlay<rgb_pixel>, py::arg("rectangles"), py::arg("color")=rgb_pixel(255, 0, 0),
             "Add a list of rectangles to the image_window. They will be displayed as red boxes by default, but the color can be passed.")
-        .def("add_overlay", add_overlay_rect, (arg("rectangle"), arg("color")=rgb_pixel(255, 0, 0)),
+        .def("add_overlay", add_overlay_rect, py::arg("rectangle"), py::arg("color")=rgb_pixel(255, 0, 0),
             "Add a rectangle to the image_window.  It will be displayed as a red box by default, but the color can be passed.")
-        .def("add_overlay", add_overlay_drect, (arg("rectangle"), arg("color")=rgb_pixel(255, 0, 0)),
+        .def("add_overlay", add_overlay_drect, py::arg("rectangle"), py::arg("color")=rgb_pixel(255, 0, 0),
             "Add a rectangle to the image_window.  It will be displayed as a red box by default, but the color can be passed.")
-        .def("add_overlay", add_overlay_parts, (arg("detection"), arg("color")=rgb_pixel(0, 0, 255)),
+        .def("add_overlay", add_overlay_parts, py::arg("detection"), py::arg("color")=rgb_pixel(0, 0, 255),
             "Add full_object_detection parts to the image window. They will be displayed as blue lines by default, but the color can be passed.")
         .def("wait_until_closed", &type::wait_until_closed,
             "This function blocks until the window is closed.");

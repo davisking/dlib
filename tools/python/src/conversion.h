@@ -8,10 +8,11 @@
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
+
+namespace py = pybind11;
 
 template <typename dest_image_type>
-void pyimage_to_dlib_image(object img, dest_image_type& image)
+void pyimage_to_dlib_image(py::object img, dest_image_type& image)
 {
     if (is_gray_python_image(img))
         assign_image(image, numpy_gray_image(img));
@@ -23,21 +24,27 @@ void pyimage_to_dlib_image(object img, dest_image_type& image)
 
 template <typename image_array, typename param_type>
 void images_and_nested_params_to_dlib(
-        const object& pyimages,
-        const object& pyparams,
+        const py::object& pyimages,
+        const py::object& pyparams,
         image_array& images,
         std::vector<std::vector<param_type> >& params
 )
 {
-    const unsigned long num_images = len(pyimages);
     // Now copy the data into dlib based objects.
-    for (unsigned long i = 0; i < num_images; ++i)
-    {
-        const unsigned long num_params = len(pyparams[i]);
-        for (unsigned long j = 0; j < num_params; ++j)
-            params[i].push_back(extract<param_type>(pyparams[i][j]));
+    py::iterator image_it = pyimages.begin();
+    py::iterator params_it = pyparams.begin();
 
-        pyimage_to_dlib_image(pyimages[i], images[i]);
+    for (unsigned long image_idx = 0;
+         image_it != pyimages.end()
+           && params_it != pyparams.end();
+         ++image_it, ++params_it, ++image_idx)
+    {
+        for (py::iterator param_it = params_it->begin();
+             param_it != params_it->end();
+             ++param_it)
+          params[image_idx].push_back(param_it->cast<param_type>());
+
+        pyimage_to_dlib_image(image_it->cast<py::object>(), images[image_idx]);
     }
 }
 

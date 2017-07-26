@@ -4,34 +4,43 @@
 #include <dlib/matrix.h>
 #include <sstream>
 #include <string>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <boost/python/suite/indexing/map_indexing_suite.hpp>
-#include <boost/python/suite/indexing/indexing_suite.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <dlib/string.h>
+#include <pybind11/stl_bind.h>
 
 using namespace std;
 using namespace dlib;
-using namespace boost::python;
+namespace py = pybind11;
 
+PYBIND11_MAKE_OPAQUE(std::vector<double>);
 
-boost::shared_ptr<std::vector<double> > array_from_object(object obj)
+typedef std::vector<matrix<double,0,1>> column_vectors;
+PYBIND11_MAKE_OPAQUE(column_vectors);
+PYBIND11_MAKE_OPAQUE(std::vector<column_vectors>);
+
+typedef pair<unsigned long,unsigned long> ulong_pair;
+PYBIND11_MAKE_OPAQUE(ulong_pair);
+PYBIND11_MAKE_OPAQUE(std::vector<ulong_pair>);
+PYBIND11_MAKE_OPAQUE(std::vector<std::vector<ulong_pair>>);
+
+typedef pair<unsigned long,double> ulong_double_pair;
+PYBIND11_MAKE_OPAQUE(ulong_double_pair);
+PYBIND11_MAKE_OPAQUE(std::vector<ulong_double_pair>);
+PYBIND11_MAKE_OPAQUE(std::vector<std::vector<ulong_double_pair>>);
+PYBIND11_MAKE_OPAQUE(std::vector<std::vector<std::vector<ulong_double_pair> > >);
+
+std::shared_ptr<std::vector<double> > array_from_object(py::object obj)
 {
-    extract<long> thesize(obj);
-    if (thesize.check())
-    {
-        long nr = thesize;
-        boost::shared_ptr<std::vector<double> > temp(new std::vector<double>(nr));
-        return temp;
-    }
-    else
-    {
-        const long nr = len(obj);
-        boost::shared_ptr<std::vector<double> > temp(new std::vector<double>(nr));
+    try {
+        long nr = obj.cast<long>();
+        return std::make_shared<std::vector<double>>(nr);
+    } catch (py::cast_error &e) {
+        py::list li = obj.cast<py::list>();
+        const long nr = len(li);
+        auto temp = std::make_shared<std::vector<double>>(nr);
         for ( long r = 0; r < nr; ++r)
         {
-            (*temp)[r] = extract<double>(obj[r]);
+            (*temp)[r] = li[r].cast<double>();
         }
         return temp;
     }
@@ -91,8 +100,7 @@ struct range_iter
         else
         {
             PyErr_SetString(PyExc_StopIteration, "No more data.");
-            boost::python::throw_error_already_set();
-            return 0;
+            throw py::error_already_set();
         }
     }
 };
@@ -149,78 +157,91 @@ unsigned long range_len(const std::pair<unsigned long, unsigned long>& r)
 template <typename T>
 void resize(T& v, unsigned long n) { v.resize(n); }
 
-void bind_basic_types() 
+void bind_basic_types(py::module& m)
 {
-    class_<std::vector<double> >("array", "This object represents a 1D array of floating point numbers. "
-        "Moreover, it binds directly to the C++ type std::vector<double>.", init<>() 
-        )
-        .def(vector_indexing_suite<std::vector<double> >())
-        .def("__init__", make_constructor(&array_from_object))
+    {
+    typedef double item_type;
+    typedef std::vector<item_type> type;
+    typedef std::shared_ptr<type> type_ptr;
+    py::bind_vector<type, type_ptr >(m, "array", "This object represents a 1D array of floating point numbers. "
+        "Moreover, it binds directly to the C++ type std::vector<double>.")
+        .def(py::init(&array_from_object))
         .def("__str__", array__str__)
         .def("__repr__", array__repr__)
-        .def("clear", &std::vector<double>::clear)
-        .def("resize", resize<std::vector<double> >)
-        .def_pickle(serialize_pickle<std::vector<double> >());
-
-    class_<std::vector<matrix<double,0,1> > >("vectors", "This object is an array of vector objects.")
-        .def(vector_indexing_suite<std::vector<matrix<double,0,1> > >())
-        .def("clear", &std::vector<matrix<double,0,1> >::clear)
-        .def("resize", resize<std::vector<matrix<double,0,1> > >)
-        .def_pickle(serialize_pickle<std::vector<matrix<double,0,1> > >());
-
-    {
-    typedef std::vector<std::vector<matrix<double,0,1> > > type;
-    class_<type>("vectorss", "This object is an array of arrays of vector objects.")
-        .def(vector_indexing_suite<type>())
         .def("clear", &type::clear)
         .def("resize", resize<type>)
-        .def_pickle(serialize_pickle<type>());
+        .def("extend", extend_vector_with_python_list<item_type>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
+
+    {
+    typedef matrix<double,0,1> item_type;
+    typedef std::vector<item_type > type;
+    py::bind_vector<type>(m, "vectors", "This object is an array of vector objects.")
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def("extend", extend_vector_with_python_list<item_type>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
+
+    {
+    typedef std::vector<matrix<double,0,1> > item_type;
+    typedef std::vector<item_type > type;
+    py::bind_vector<type>(m, "vectorss", "This object is an array of arrays of vector objects.")
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def("extend", extend_vector_with_python_list<item_type>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 
     typedef pair<unsigned long,unsigned long> range_type;
-    class_<range_type>("range", "This object is used to represent a range of elements in an array.", init<>() )
-        .def(init<unsigned long,unsigned long>())
+    py::class_<range_type>(m, "range", "This object is used to represent a range of elements in an array.")
+        .def(py::init<unsigned long,unsigned long>())
         .def_readwrite("begin",&range_type::first, "The index of the first element in the range.  This is represented using an unsigned integer.")
         .def_readwrite("end",&range_type::second, "One past the index of the last element in the range.  This is represented using an unsigned integer.")
         .def("__str__", range__str__)
         .def("__repr__", range__repr__)
         .def("__iter__", &make_range_iterator)
         .def("__len__", &range_len)
-        .def_pickle(serialize_pickle<range_type>());
+        .def(py::pickle(&getstate<range_type>, &setstate<range_type>));
 
-    class_<range_iter>("_range_iter")
+    py::class_<range_iter>(m, "_range_iter")
         .def("next", &range_iter::next)
         .def("__next__", &range_iter::next);
 
     {
-    typedef std::vector<std::pair<unsigned long, unsigned long> > type;
-    class_<type>("ranges", "This object is an array of range objects.")
-        .def(vector_indexing_suite<type>())
+    typedef std::pair<unsigned long, unsigned long> item_type;
+    typedef std::vector<item_type > type;
+    py::bind_vector<type>(m, "ranges", "This object is an array of range objects.")
         .def("clear", &type::clear)
         .def("resize", resize<type>)
-        .def_pickle(serialize_pickle<type>());
+        .def("extend", extend_vector_with_python_list<item_type>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 
     {
-    typedef std::vector<std::vector<std::pair<unsigned long, unsigned long> > > type;
-    class_<type>("rangess", "This object is an array of arrays of range objects.")
-        .def(vector_indexing_suite<type>())
+    typedef std::vector<std::pair<unsigned long, unsigned long> > item_type;
+    typedef std::vector<item_type > type;
+    py::bind_vector<type>(m, "rangess", "This object is an array of arrays of range objects.")
         .def("clear", &type::clear)
         .def("resize", resize<type>)
-        .def_pickle(serialize_pickle<type>());
+        .def("extend", extend_vector_with_python_list<item_type>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 
 
     typedef pair<unsigned long,double> pair_type;
-    class_<pair_type>("pair", "This object is used to represent the elements of a sparse_vector.", init<>() )
-        .def(init<unsigned long,double>())
+    py::class_<pair_type>(m, "pair", "This object is used to represent the elements of a sparse_vector.")
+        .def(py::init<unsigned long,double>())
         .def_readwrite("first",&pair_type::first, "This field represents the index/dimension number.")
         .def_readwrite("second",&pair_type::second, "This field contains the value in a vector at dimension specified by the first field.")
         .def("__str__", pair__str__)
         .def("__repr__", pair__repr__)
-        .def_pickle(serialize_pickle<pair_type>());
+        .def(py::pickle(&getstate<pair_type>, &setstate<pair_type>));
 
-    class_<std::vector<pair_type> >("sparse_vector", 
+    {
+    typedef std::vector<pair_type> type;
+    py::bind_vector<type>(m, "sparse_vector",
 "This object represents the mathematical idea of a sparse column vector.  It is    \n\
 simply an array of dlib.pair objects, each representing an index/value pair in    \n\
 the vector.  Any elements of the vector which are missing are implicitly set to    \n\
@@ -233,29 +254,34 @@ not be duplicates.  However, some functions work with \"unsorted\" sparse    \n\
 vectors.  These are dlib.sparse_vector objects that have either duplicate    \n\
 entries or non-sorted index values.  Note further that you can convert an    \n\
 \"unsorted\" sparse_vector into a properly sorted sparse vector by calling    \n\
-dlib.make_sparse_vector() on it.   " 
+dlib.make_sparse_vector() on it.   "
         )
-        .def(vector_indexing_suite<std::vector<pair_type> >())
         .def("__str__", sparse_vector__str__)
         .def("__repr__", sparse_vector__repr__)
-        .def("clear", &std::vector<pair_type >::clear)
-        .def("resize", resize<std::vector<pair_type > >)
-        .def_pickle(serialize_pickle<std::vector<pair_type> >());
-
-    class_<std::vector<std::vector<pair_type> > >("sparse_vectors", "This object is an array of sparse_vector objects.")
-        .def(vector_indexing_suite<std::vector<std::vector<pair_type> > >())
-        .def("clear", &std::vector<std::vector<pair_type> >::clear)
-        .def("resize", resize<std::vector<std::vector<pair_type> > >)
-        .def_pickle(serialize_pickle<std::vector<std::vector<pair_type> > >());
-
-    {
-    typedef std::vector<std::vector<std::vector<pair_type> > > type;
-    class_<type>("sparse_vectorss", "This object is an array of arrays of sparse_vector objects.")
-        .def(vector_indexing_suite<type>())
         .def("clear", &type::clear)
         .def("resize", resize<type>)
-        .def_pickle(serialize_pickle<type>());
+        .def("extend", extend_vector_with_python_list<pair_type>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 
+    {
+    typedef std::vector<pair_type> item_type;
+    typedef std::vector<item_type > type;
+    py::bind_vector<type>(m, "sparse_vectors", "This object is an array of sparse_vector objects.")
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def("extend", extend_vector_with_python_list<item_type>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
+
+    {
+    typedef std::vector<std::vector<pair_type> > item_type;
+    typedef std::vector<item_type > type;
+    py::bind_vector<type>(m, "sparse_vectorss", "This object is an array of arrays of sparse_vector objects.")
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def("extend", extend_vector_with_python_list<item_type>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
 }
 

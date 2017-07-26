@@ -1,63 +1,65 @@
 // Copyright (C) 2015 Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
-#include <boost/python.hpp>
+#include <pybind11/pybind11.h>
 
-void bind_matrix();
-void bind_vector();
-void bind_svm_c_trainer();
-void bind_decision_functions();
-void bind_basic_types();
-void bind_other();
-void bind_svm_rank_trainer();
-void bind_cca();
-void bind_sequence_segmenter();
-void bind_svm_struct();
-void bind_image_classes();
-void bind_rectangles();
-void bind_object_detection();
-void bind_shape_predictors();
-void bind_correlation_tracker();
-void bind_face_recognition();
-void bind_cnn_face_detection();
-void bind_global_optimization();
-void bind_numpy_returns();
+namespace py = pybind11;
+
+void bind_matrix(py::module& m);
+void bind_vector(py::module& m);
+void bind_svm_c_trainer(py::module& m);
+void bind_decision_functions(py::module& m);
+void bind_basic_types(py::module& m);
+void bind_other(py::module& m);
+void bind_svm_rank_trainer(py::module& m);
+void bind_cca(py::module& m);
+void bind_sequence_segmenter(py::module& m);
+void bind_svm_struct(py::module& m);
+void bind_image_classes(py::module& m);
+void bind_rectangles(py::module& m);
+void bind_object_detection(py::module& m);
+void bind_shape_predictors(py::module& m);
+void bind_correlation_tracker(py::module& m);
+void bind_face_recognition(py::module& m);
+void bind_cnn_face_detection(py::module& m);
+void bind_global_optimization(py::module& m);
+void bind_numpy_returns(py::module& m);
 
 #ifndef DLIB_NO_GUI_SUPPORT
-void bind_gui();
+void bind_gui(py::module& m);
 #endif
 
-BOOST_PYTHON_MODULE(dlib)
+PYBIND11_MODULE(dlib, m)
 {
     // Disable printing of the C++ function signature in the python __doc__ string
     // since it is full of huge amounts of template clutter.
-    boost::python::docstring_options options(true,true,false);
+    py::options options;
+    options.disable_function_signatures();
 
 #define DLIB_QUOTE_STRING(x) DLIB_QUOTE_STRING2(x)
 #define DLIB_QUOTE_STRING2(x) #x
+    m.attr("__version__") = DLIB_QUOTE_STRING(DLIB_VERSION);
 
-    boost::python::scope().attr("__version__") = DLIB_QUOTE_STRING(DLIB_VERSION);
-
-    bind_matrix();
-    bind_vector();
-    bind_svm_c_trainer();
-    bind_decision_functions();
-    bind_basic_types();
-    bind_other();
-    bind_svm_rank_trainer();
-    bind_cca();
-    bind_sequence_segmenter();
-    bind_svm_struct();
-    bind_image_classes();
-    bind_rectangles();
-    bind_object_detection();
-    bind_shape_predictors();
-    bind_correlation_tracker();
-    bind_face_recognition();
-    bind_cnn_face_detection();
-    bind_global_optimization();
-    bind_numpy_returns();
+    bind_matrix(m);
+    bind_vector(m);
+    bind_svm_c_trainer(m);
+    bind_decision_functions(m);
+    bind_basic_types(m);
+    bind_other(m);
+    bind_svm_rank_trainer(m);
+    bind_cca(m);
+    bind_sequence_segmenter(m);
+    bind_svm_struct(m);
+    bind_image_classes(m);
+    bind_rectangles(m);
+    bind_object_detection(m);
+    bind_shape_predictors(m);
+    bind_correlation_tracker(m);
+    bind_face_recognition(m);
+    bind_cnn_face_detection(m);
+    bind_global_optimization(m);
+    bind_numpy_returns(m);
 #ifndef DLIB_NO_GUI_SUPPORT
-    bind_gui();
+    bind_gui(m);
 #endif
 }

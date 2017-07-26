@@ -1,12 +1,13 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
-
 set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
 # Make DLIB_ASSERT statements not abort the python interpreter, but just return an error.
 add_definitions(-DDLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
 
+# TODO: remove redundancies between add_python_module and pybind11
 include(../../dlib/cmake_utils/add_python_module)
+add_subdirectory(../../dlib/external/pybind11 ./pybind11_build)
 
 # Test for numpy
 find_package(PythonInterp)
@@ -62,6 +63,11 @@ if(NOT ${DLIB_NO_GUI_SUPPORT})
    list(APPEND python_srcs src/gui.cpp)
 endif()
 
+# pybind11 expects hidded visibility default
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+# TODO: remove redundancies between add_python_module and pybind11
+include_directories(../../dlib/external/pybind11/include)
+# pybind11_add_module(dlib ${python_srcs})
 add_python_module(dlib ${python_srcs})
 
 # When you run "make install" we will copy the compiled dlib.so (or dlib.pyd)

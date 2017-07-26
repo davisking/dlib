@@ -16,7 +16,7 @@ class numpy_gray_image
 public:
 
     numpy_gray_image() : _data(0), _nr(0), _nc(0) {}
-    numpy_gray_image (boost::python::object& img) 
+    numpy_gray_image (py::object& img) 
     {
         long shape[2];
         get_numpy_ndarray_parts(img, _data, _contig_buf, shape);
@@ -49,7 +49,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-inline bool is_gray_python_image (boost::python::object& img)
+inline bool is_gray_python_image (py::object& img)
 {
     try
     {
@@ -70,7 +70,7 @@ class numpy_rgb_image
 public:
 
     numpy_rgb_image() : _data(0), _nr(0), _nc(0) {}
-    numpy_rgb_image (boost::python::object& img) 
+    numpy_rgb_image (py::object& img) 
     {
         long shape[3];
         get_numpy_ndarray_parts(img, _data, _contig_buf, shape);
@@ -107,7 +107,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 
-inline bool is_rgb_python_image (boost::python::object& img)
+inline bool is_rgb_python_image (py::object& img)
 {
     try
     {

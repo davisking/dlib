@@ -1,5 +1,4 @@
 #include <dlib/python.h>
-#include <boost/python/args.hpp>
 #include "dlib/pixel.h"
 #include <dlib/image_transforms.h>
 
@@ -10,11 +9,12 @@ dlib::rand rnd_jitter;
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
+
+namespace py = pybind11;
 
 // ----------------------------------------------------------------------------------------
 
-boost::python::list get_jitter_images(object img, size_t num_jitters = 1, bool disturb_colors = false)
+py::list get_jitter_images(py::object img, size_t num_jitters = 1, bool disturb_colors = false)
 {
     if (!is_rgb_python_image(img))
         throw dlib::error("Unsupported image type, must be RGB image.");
@@ -24,7 +24,7 @@ boost::python::list get_jitter_images(object img, size_t num_jitters = 1, bool d
     assign_image(img_mat, numpy_rgb_image(img));
 
     // The top level list (containing 1 or more images) to return to python
-    boost::python::list jitter_list;
+    py::list jitter_list;
 
     size_t rows = num_rows(img_mat);
     size_t cols = num_columns(img_mat);
@@ -43,20 +43,18 @@ boost::python::list get_jitter_images(object img, size_t num_jitters = 1, bool d
         npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject*) arr);
         memcpy(outdata, image_data(crop), rows * width_step(crop));
                 
-        boost::python::handle<> handle(arr);
+        py::handle handle(arr);
         // Append image to jittered image list
-        jitter_list.append(object(handle));
+        jitter_list.append(handle);
     }
            
     return jitter_list;
 }
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(get_jitter_images_with_defaults, get_jitter_images, 1, 3)
-
 // ----------------------------------------------------------------------------------------
 
-boost::python::list get_face_chips (
-    object img,
+py::list get_face_chips (
+    py::object img,
     const std::vector<full_object_detection>& faces,
     size_t size = 150,
     float padding = 0.25
@@ -69,7 +67,7 @@ boost::python::list get_face_chips (
         throw dlib::error("No face were specified in the faces array.");
     }
 
-    boost::python::list chips_list;
+    py::list chips_list;
 
     std::vector<chip_details> dets;
     for (auto& f : faces)
@@ -88,16 +86,16 @@ boost::python::list get_face_chips (
         PyObject *arr = PyArray_SimpleNew(3, dims, NPY_UINT8);
         npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject*) arr);
         memcpy(outdata, image_data(chip), rows * width_step(chip));
-        boost::python::handle<> handle(arr);
+        py::handle handle(arr);
 
         // Append image to chips list
-        chips_list.append(object(handle));
+        chips_list.append(handle);
     }
     return chips_list;
 }
 
-object get_face_chip (
-    object img,
+py::object get_face_chip (
+    py::object img,
     const full_object_detection& face,
     size_t size = 150,
     float padding = 0.25
@@ -115,13 +113,9 @@ object get_face_chip (
     PyObject *arr = PyArray_SimpleNew(3, dims, NPY_UINT8);
     npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject *) arr);
     memcpy(outdata, image_data(chip), num_rows(chip) * width_step(chip));
-    boost::python::handle<> handle(arr);
-    return object(handle);
+    py::handle handle(arr);
+    return handle.cast<py::object>();
 }
-
-BOOST_PYTHON_FUNCTION_OVERLOADS(get_face_chip_with_defaults, get_face_chip, 2, 4)
-BOOST_PYTHON_FUNCTION_OVERLOADS(get_face_chips_with_defaults, get_face_chips, 2, 4)
-
 
 // ----------------------------------------------------------------------------------------
 
@@ -140,25 +134,24 @@ DLIB_NUMPY_IMPORT_ARRAY_RETURN_TYPE import_numpy_stuff()
     DLIB_NUMPY_IMPORT_RETURN;
 }
 
-void bind_numpy_returns()
+void bind_numpy_returns(py::module &m)
 {
-    using boost::python::arg;
     import_numpy_stuff();
 
-    def("jitter_image", &get_jitter_images, get_jitter_images_with_defaults(
+    m.def("jitter_image", &get_jitter_images, 
     "Takes an image and returns a list of jittered images."
     "The returned list contains num_jitters images (default is 1)."
     "If disturb_colors is set to True, the colors of the image are disturbed (default is False)", 
-    (arg("img"), arg("num_jitters"), arg("disturb_colors"))
-    ));
+    py::arg("img"), py::arg("num_jitters")=1, py::arg("disturb_colors")=false
+    );
 
-    def("get_face_chip", &get_face_chip, get_face_chip_with_defaults(
+    m.def("get_face_chip", &get_face_chip, 
 	"Takes an image and a full_object_detection that references a face in that image and returns the face as a Numpy array representing the image.  The face will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.", 
-	(arg("img"), arg("face"), arg("size"), arg("padding"))
-    ));
+	py::arg("img"), py::arg("face"), py::arg("size")=150, py::arg("padding")=0.25
+    );
 
-    def("get_face_chips", &get_face_chips, get_face_chips_with_defaults(
+    m.def("get_face_chips", &get_face_chips, 
 	"Takes an image and a full_object_detections object that reference faces in that image and returns the faces as a list of Numpy arrays representing the image.  The faces will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.",
-	(arg("img"), arg("faces"), arg("size"), arg("padding"))
-    ));
+	py::arg("img"), py::arg("faces"), py::arg("size")=150, py::arg("padding")=0.25
+    );
 }

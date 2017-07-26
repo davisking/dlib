@@ -2,23 +2,24 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include <dlib/python.h>
-#include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
-#include <boost/python/slice.hpp>
 #include <dlib/geometry/vector.h>
 #include <dlib/dnn.h>
 #include <dlib/image_transforms.h>
 #include "indexing.h"
 #include <dlib/image_io.h>
 #include <dlib/clustering.h>
+#include <pybind11/stl_bind.h>
 
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
+
+namespace py = pybind11;
+
+PYBIND11_MAKE_OPAQUE(std::vector<full_object_detection>);
 
 typedef matrix<double,0,1> cv;
-
 
 class face_recognition_model_v1
 {
@@ -31,7 +32,7 @@ public:
     }
 
     matrix<double,0,1> compute_face_descriptor (
-        object img,
+        py::object img,
         const full_object_detection& face,
         const int num_jitters
     )
@@ -41,7 +42,7 @@ public:
     }
 
     std::vector<matrix<double,0,1>> compute_face_descriptors (
-        object img,
+        py::object img,
         const std::vector<full_object_detection>& faces,
         const int num_jitters
     )
@@ -128,12 +129,12 @@ private:
 
 // ----------------------------------------------------------------------------------------
 
-boost::python::list chinese_whispers_clustering(boost::python::list descriptors, float threshold)
+py::list chinese_whispers_clustering(py::list descriptors, float threshold)
 {
     DLIB_CASSERT(threshold > 0);
-    boost::python::list clusters;
+    py::list clusters;
 
-    size_t num_descriptors = len(descriptors);
+    size_t num_descriptors = py::len(descriptors);
 
     // This next bit of code creates a graph of connected objects and then uses the Chinese
     // whispers graph clustering algorithm to identify how many objects there are and which
@@ -144,8 +145,8 @@ boost::python::list chinese_whispers_clustering(boost::python::list descriptors,
     {
         for (size_t j = i; j < num_descriptors; ++j)
         {
-            matrix<double,0,1>& first_descriptor = boost::python::extract<matrix<double,0,1>&>(descriptors[i]);
-            matrix<double,0,1>& second_descriptor = boost::python::extract<matrix<double,0,1>&>(descriptors[j]);
+            matrix<double,0,1>& first_descriptor = descriptors[i].cast<matrix<double,0,1>&>();
+            matrix<double,0,1>& second_descriptor = descriptors[j].cast<matrix<double,0,1>&>();
 
             if (length(first_descriptor-second_descriptor) < threshold)
                 edges.push_back(sample_pair(i,j));
@@ -160,7 +161,7 @@ boost::python::list chinese_whispers_clustering(boost::python::list descriptors,
 }
 
 void save_face_chips (
-    object img,
+    py::object img,
     const std::vector<full_object_detection>& faces,
     const std::string& chip_filename,
     size_t size = 150,
@@ -194,7 +195,7 @@ void save_face_chips (
 }
 
 void save_face_chip (
-    object img,
+    py::object img,
     const full_object_detection& face,
     const std::string& chip_filename,
     size_t size = 150,
@@ -206,43 +207,39 @@ void save_face_chip (
     return;
 }
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(save_face_chip_with_defaults, save_face_chip, 3, 5)
-BOOST_PYTHON_FUNCTION_OVERLOADS(save_face_chips_with_defaults, save_face_chips, 3, 5)
-
-void bind_face_recognition()
+void bind_face_recognition(py::module &m)
 {
-    using boost::python::arg;
     {
-    class_<face_recognition_model_v1>("face_recognition_model_v1", "This object maps human faces into 128D vectors where pictures of the same person are mapped near to each other and pictures of different people are mapped far apart.  The constructor loads the face recognition model from a file. The model file is available here: http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2", init<std::string>())
-        .def("compute_face_descriptor", &face_recognition_model_v1::compute_face_descriptor, (arg("img"),arg("face"),arg("num_jitters")=0),
+    py::class_<face_recognition_model_v1>(m, "face_recognition_model_v1", "This object maps human faces into 128D vectors where pictures of the same person are mapped near to each other and pictures of different people are mapped far apart.  The constructor loads the face recognition model from a file. The model file is available here: http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2")
+        .def(py::init<std::string>())
+        .def("compute_face_descriptor", &face_recognition_model_v1::compute_face_descriptor, py::arg("img"),py::arg("face"),py::arg("num_jitters")=0,
             "Takes an image and a full_object_detection that references a face in that image and converts it into a 128D face descriptor. "
             "If num_jitters>1 then each face will be randomly jittered slightly num_jitters times, each run through the 128D projection, and the average used as the face descriptor."
             )
-        .def("compute_face_descriptor", &face_recognition_model_v1::compute_face_descriptors, (arg("img"),arg("faces"),arg("num_jitters")=0),
+        .def("compute_face_descriptor", &face_recognition_model_v1::compute_face_descriptors, py::arg("img"),py::arg("faces"),py::arg("num_jitters")=0,
             "Takes an image and an array of full_object_detections that reference faces in that image and converts them into 128D face descriptors.  "
             "If num_jitters>1 then each face will be randomly jittered slightly num_jitters times, each run through the 128D projection, and the average used as the face descriptor."
             );
     }
 
-    def("save_face_chip", &save_face_chip, save_face_chip_with_defaults(
+    m.def("save_face_chip", &save_face_chip, 
 	"Takes an image and a full_object_detection that references a face in that image and saves the face with the specified file name prefix.  The face will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.", 
-	(arg("img"), arg("face"), arg("chip_filename"), arg("size"), arg("padding"))
-    ));
-    def("save_face_chips", &save_face_chips, save_face_chips_with_defaults(
+	py::arg("img"), py::arg("face"), py::arg("chip_filename"), py::arg("size")=150, py::arg("padding")=0.25
+    );
+    m.def("save_face_chips", &save_face_chips, 
 	"Takes an image and a full_object_detections object that reference faces in that image and saves the faces with the specified file name prefix.  The faces will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.",
-	(arg("img"), arg("faces"), arg("chip_filename"), arg("size"), arg("padding"))
-    ));
-    def("chinese_whispers_clustering", &chinese_whispers_clustering, (arg("descriptors"), arg("threshold")),
+          py::arg("img"), py::arg("faces"), py::arg("chip_filename"), py::arg("size")=150, py::arg("padding")=0.25
+    );
+    m.def("chinese_whispers_clustering", &chinese_whispers_clustering, py::arg("descriptors"), py::arg("threshold"),
         "Takes a list of descriptors and returns a list that contains a label for each descriptor. Clustering is done using dlib::chinese_whispers."
         );
-
-    {   
+    {
     typedef std::vector<full_object_detection> type;
-    class_<type>("full_object_detections", "An array of full_object_detection objects.")
-        .def(vector_indexing_suite<type>())
+    py::bind_vector<type>(m, "full_object_detections", "An array of full_object_detection objects.")
         .def("clear", &type::clear)
         .def("resize", resize<type>)
-        .def_pickle(serialize_pickle<type>());
+        .def("extend", extend_vector_with_python_list<full_object_detection>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 }
 
