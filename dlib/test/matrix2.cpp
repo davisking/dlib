@@ -379,23 +379,23 @@ namespace
             u = 2,2.2;
 
             out = 2, 2.2;
-            DLIB_TEST(equal(clamp(x, l, u) , out));
+            DLIB_TEST(equal(dlib::clamp(x, l, u) , out));
             out = 3, 2.2;
-            DLIB_TEST(!equal(clamp(x, l, u) , out));
+            DLIB_TEST(!equal(dlib::clamp(x, l, u) , out));
             out = 2, 4.2;
-            DLIB_TEST(!equal(clamp(x, l, u) , out));
+            DLIB_TEST(!equal(dlib::clamp(x, l, u) , out));
 
             x = 1.5, 1.5;
             out = x;
-            DLIB_TEST(equal(clamp(x, l, u) , out));
+            DLIB_TEST(equal(dlib::clamp(x, l, u) , out));
 
             x = 0.5, 1.5;
             out = 1, 1.5;
-            DLIB_TEST(equal(clamp(x, l, u) , out));
+            DLIB_TEST(equal(dlib::clamp(x, l, u) , out));
 
             x = 1.5, 0.5;
             out = 1.5, 1.0;
-            DLIB_TEST(equal(clamp(x, l, u) , out));
+            DLIB_TEST(equal(dlib::clamp(x, l, u) , out));
 
         }
 
