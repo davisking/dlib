@@ -1039,6 +1039,48 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    class tensor_padding
+    {
+    public:
+        tensor_padding(const tensor_padding&) = delete;
+        tensor_padding& operator=(const tensor_padding&) = delete;
+
+        tensor_padding() {}
+
+       
+        void forward(
+            resizable_tensor& output,
+            const tensor& data,
+            int padding_y,
+            int padding_x,
+            unsigned char method
+        ) 
+        {
+            impl.forward(output,data,padding_y,padding_x,method); 
+        }
+
+        void backward (
+            tensor& output,            
+            const tensor& data, 
+            int padding_y,
+            int padding_x,
+            unsigned char method
+        ) 
+        {
+            impl.backward(output,data,padding_y,padding_x,method); 
+        }
+
+  
+    private:
+#ifdef DLIB_USE_CUDA
+        cuda::tensor_padding impl;
+#else
+        cpu::tensor_padding impl;
+#endif
+
+    };
+// ----------------------------------------------------------------------------------------
+
     class pooling
     {
         /*!
@@ -1378,6 +1420,74 @@ namespace dlib { namespace tt
             - gradient_input.k() == grad.k()
         ensures
             - Suppose that DEST is the output of resize_bilinear(DEST,SRC) for some SRC
+              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
+              the gradient of f() with respect to SRC and adds it to grad.   It should be
+              noted that we don't need to know the contents of DEST to compute this
+              gradient.  All that matters is that gradient_input have the same dimensions
+              as DEST.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    void resize_nn (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+        ensures
+            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
+              that uses the nearest neighbour to fit into the shape of
+              image_plane(dest,i,k).
+    !*/
+
+    void resize_nn_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    );
+    /*!
+        requires
+            - is_same_object(grad, gradient_input)==false
+            - gradient_input.num_samples() == grad.num_samples()
+            - gradient_input.k() == grad.k()
+        ensures
+            - Suppose that DEST is the output of resize_nn(DEST,SRC) for some SRC
+              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
+              the gradient of f() with respect to SRC and adds it to grad.   It should be
+              noted that we don't need to know the contents of DEST to compute this
+              gradient.  All that matters is that gradient_input have the same dimensions
+              as DEST.
+    !*/
+
+    void resize_fill_zeroes (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+        ensures
+            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
+              that fill the gaps with zeros
+              image_plane(dest,i,k).
+    !*/
+
+    void resize_fill_zeroes_gradient (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - is_same_object(grad, gradient_input)==false
+            - gradient_input.num_samples() == grad.num_samples()
+            - gradient_input.k() == grad.k()
+        ensures
+            - Suppose that DEST is the output of resize_fill_zeroes(DEST,SRC) for some SRC
               tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
               the gradient of f() with respect to SRC and adds it to grad.   It should be
               noted that we don't need to know the contents of DEST to compute this

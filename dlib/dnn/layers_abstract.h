@@ -1092,6 +1092,191 @@ namespace dlib
         >
     using cont = add_layer<cont_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
 
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        int _scale_y,
+        int _scale_x,
+        unsigned char _method
+        >
+    class upsample_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be > 0.
+                Also, we require that:
+                    - 0 <= _method && _method < 3
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines an upsampling layer 
+                that takes an input tensor (nominally representing an image) and 
+                upsamples the individual channel in the tensor by the corresponding 
+                scale factors. There are three different methods provided
+                
+                0 - Fill the new entries in the tensor with 0s (zero padding)
+                1 - Nearest neighbour filter fill the new entries in the tensor with the closest 
+                    neighbour source value
+                2 - Bilinear filter. Fill the new entries in the tensor via bilinear filtering
+                    of the four closest neighbours from the source tensor
+
+                The dimensions of the tensors output by this layer are as follows (letting
+                IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == IN.k()
+                    - OUT.nr() == IN.nr() * scale_y
+                    - OUT.nc() == IN.nc() * scale_x
+        !*/
+
+
+    public:
+        upsample_(
+        );
+        /*!
+            ensures
+                - #scale_y == _scale_y
+                - #scale_x() == _scale_x
+                - #method == _method
+        !*/
+
+
+        long scale_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the vertical scale factor
+        !*/
+
+        long scale_x(
+        ) const;
+        /*!
+            ensures
+                - returns the horizontal scale factor
+        !*/
+
+        unsigned char method() const;
+        /*!
+            ensures
+                - returns the upsampling method used
+        !*/
+
+        
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+
+    };
+
+    template <
+        int scale_y,
+        int scale_x,
+        unsigned char method,
+        typename SUBNET
+        >
+    using upsample = add_layer<upsample_<scale_y,scale_x,method>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        int _padding_y,
+        int _padding_x,
+        unsigned char _method
+        >
+    class spatialpadding_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be > 0.
+                Also, we require that:
+                    - 0 <= _method && _method < 3
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a spatial padding layer 
+                that takes an input tensor (nominally representing an image) and 
+                padds the tensor by the corresponding in different ways. 
+                There are three different methods provided
+                
+                0 - Reflection acts like a mirror padding so the border gets reflected, e.g.
+                    in a 1D case assume we have an original 1D tensor of 1,2,3, a reflection
+                    padding of two will make it a new tensor of 2,1,1,2,3,3,2
+
+                1 - Replication pads the border with the border value of the tensor, e.g.
+                    in a 1D case assume we have an original 1D tensor of 1,2,3 a replication
+                    padding of two will make it a new tensor of 1,1,1,2,3,3,3
+
+                2 - Zero filled padding
+
+                The dimensions of the tensors output by this layer are as follows (letting
+                IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == IN.k()
+                    - OUT.nr() == IN.nr() + 2 * padding_y
+                    - OUT.nc() == IN.nc() * 2 * padding_x
+        !*/
+
+
+    public:
+        spatialpadding_(
+        );
+        /*!
+            ensures
+                - #scale_y == _scale_y
+                - #scale_x() == _scale_x
+                - #method == _method
+        !*/
+
+
+        long padding_y(
+        ) const; 
+        /*!
+            ensures
+                - returns the vertical scale factor
+        !*/
+
+        long padding_x(
+        ) const;
+        /*!
+            ensures
+                - returns the horizontal scale factor
+        !*/
+
+        unsigned char method() const;
+        /*!
+            ensures
+                - returns the upsampling method used
+        !*/
+
+        
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        point map_input_to_output(point p) const;
+        point map_output_to_input(point p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+
+    };
+
+    template <
+        int padding_y,
+        int padding_x,
+        unsigned char method,
+        typename SUBNET
+        >
+    using spatialpadding = add_layer<spatialpadding_<padding_y,padding_x,method>, SUBNET>;
+
 // ----------------------------------------------------------------------------------------
 
     template <

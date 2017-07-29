@@ -1453,25 +1453,73 @@ namespace
     {
         {
             print_spinner();
-            upsample_<1,1> l;
+            upsample_<1,1,0> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
         {
             print_spinner();
-            upsample_<2,1> l;
+            upsample_<2,1,0> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
         {
             print_spinner();
-            upsample_<2,2> l;
+            upsample_<2,2,0> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
         {
             print_spinner();
-            upsample_<3,3> l;
+            upsample_<3,3,0> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<1,1,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<2,1,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<2,2,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<3,3,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<1,1,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<2,1,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<2,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<3,3,2> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }

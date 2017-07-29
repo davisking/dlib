@@ -359,6 +359,26 @@ namespace dlib
             const tensor& gradient_input
         );
 
+        void resize_nn (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void resize_nn_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
+
+        void resize_fill_with_zeroes (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void resize_fill_with_zeroes_gradient (
+            tensor& dest,
+            const tensor& src
+        );
+
     // ----------------------------------------------------------------------------------------
 
         void copy_tensor(
@@ -368,6 +388,38 @@ namespace dlib
             size_t src_k_offset,
             size_t count_k
         );
+
+        class tensor_padding
+        {
+        public:
+            tensor_padding(const tensor_padding&) = delete;
+            tensor_padding& operator=(const tensor_padding&) = delete;
+
+            tensor_padding();
+
+            ~tensor_padding (
+            );
+
+            void forward(
+                resizable_tensor& output,
+                const tensor& data,
+                int padding_y,
+                int padding_x,
+                unsigned char method
+            );
+
+            void backward (
+                tensor& output,            
+                const tensor& data, 
+                int padding_y,
+                int padding_x,
+                unsigned char method
+            ); 
+
+
+        private:
+
+        };
 
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

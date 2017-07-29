@@ -608,17 +608,21 @@ namespace dlib
         >
     using cont = add_layer<cont_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
 
+
 // ----------------------------------------------------------------------------------------
 
     template <
-        int scale_y, 
-        int scale_x 
+        int _scale_y,
+        int _scale_x,
+        unsigned short _method
         >
     class upsample_
     {
     public:
-        static_assert(scale_y >= 1, "upsampling scale factor can't be less than 1.");
-        static_assert(scale_x >= 1, "upsampling scale factor can't be less than 1.");
+
+        static_assert(_scale_y > 0, "The scale factor must be > 0");
+        static_assert(_scale_x > 0, "The scale factor must be > 0");
+        static_assert(0 <= _method && _method < 3, "The method must be between 0 and 2");
 
         upsample_() 
         {
@@ -635,80 +639,276 @@ namespace dlib
             output.set_size(
                 sub.get_output().num_samples(),
                 sub.get_output().k(),
-                scale_y*sub.get_output().nr(),
-                scale_x*sub.get_output().nc());
-            tt::resize_bilinear(output, sub.get_output());
+                _scale_y*sub.get_output().nr(),
+                _scale_x*sub.get_output().nc());
+            switch(_method)
+            {
+                case 0: tt::resize_fill_zeroes(output, sub.get_output());
+                break;
+                case 1: tt::resize_nn(output, sub.get_output());                
+                break;
+                case 2: tt::resize_bilinear(output, sub.get_output());
+                break;
+            }
         } 
 
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
-            tt::resize_bilinear_gradient(sub.get_gradient_input(), gradient_input);
+            switch(_method)
+            {        
+                case 0 : tt::resize_fill_zeroes_gradient(sub.get_gradient_input(),gradient_input);
+                break; 
+                case 1 : tt::resize_nn_gradient(sub.get_gradient_input(), gradient_input);
+                break;
+                case 2 : tt::resize_bilinear_gradient(sub.get_gradient_input(), gradient_input);
+                break;
+            }  
         }
 
         inline point map_input_to_output (point p) const 
         { 
-            p.x() = p.x()*scale_x;
-            p.y() = p.y()*scale_y;
+            p.x() = p.x()*_scale_x;
+            p.y() = p.y()*_scale_y;
             return p; 
         }
         inline point map_output_to_input (point p) const 
         { 
-            p.x() = p.x()/scale_x;
-            p.y() = p.y()/scale_y;
+            p.x() = p.x()/_scale_x;
+            p.y() = p.y()/_scale_y;
             return p; 
         }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const upsample_& , std::ostream& out)
+        friend void serialize(const upsample_& item, std::ostream& out)
         {
-            serialize("upsample_", out);
-            serialize(scale_y, out);
-            serialize(scale_x, out);
+            serialize("upsample_1", out);
+            serialize(_scale_y, out);
+            serialize(_scale_x, out);
+            serialize(_method,out);
         }
 
-        friend void deserialize(upsample_& , std::istream& in)
+        friend void deserialize(upsample_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "upsample_")
+            int scale_y;
+            int scale_x;
+            unsigned short method;
+            if (version == "upsample_1")
+            {
+                deserialize(scale_y, in);
+                deserialize(scale_x, in);
+                deserialize(method,in);
+                if (scale_y != _scale_y) throw serialization_error("Wrong scale_y found while deserializing dlib::upsample_");
+                if (scale_x != _scale_x) throw serialization_error("Wrong scale_x found while deserializing dlib::upsample_");
+            }
+            else
+            {
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::upsample_.");
-
-            int _scale_y;
-            int _scale_x;
-            deserialize(_scale_y, in);
-            deserialize(_scale_x, in);
-            if (_scale_y != scale_y || _scale_x != scale_x)
-                throw serialization_error("Wrong scale found while deserializing dlib::upsample_");
+            }
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const upsample_& )
+
+
+        friend std::ostream& operator<<(std::ostream& out, const upsample_& item)
         {
             out << "upsample\t ("
-                << "scale_y="<<scale_y
-                << ", scale_x="<<scale_x
+                << "scale_y="<<_scale_y
+                << ", scale_x="<<_scale_x
+                << ", method="<<_method
                 << ")";
             return out;
         }
 
-        friend void to_xml(const upsample_& /*item*/, std::ostream& out)
+        friend void to_xml(const upsample_& item, std::ostream& out)
         {
             out << "<upsample"
-                << " scale_y='"<<scale_y<<"'"
-                << " scale_x='"<<scale_x<<"'/>\n";
+                << " scale_y='"<<_scale_y<<"'"
+                << " scale_x='"<<_scale_x<<"'"
+                << " method='>\n"<<_method<<"'";
+            out << mat(item.params);
+            out << "</upsample>";
         }
+
+        long scale_y() const { return _scale_y; }
+        long scale_x() const { return _scale_x; }
+        unsigned char method() const { return _method; }
 
     private:
         resizable_tensor params;
     };
 
+
     template <
-        int scale,
+        int scale_y,
+        int scale_x,
+        unsigned short method,
         typename SUBNET
         >
-    using upsample = add_layer<upsample_<scale,scale>, SUBNET>;
+    using upsample = add_layer<upsample_<scale_y,scale_x,method>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <
+        int _padding_y,
+        int _padding_x,
+        unsigned short _method
+        >
+    class spatialpadding_
+    {
+    public:
+
+        static_assert(_padding_y > 0, "The padding must be > 0");
+        static_assert(_padding_x > 0, "The padding must be > 0");
+        static_assert(0 <= _method && _method < 3, "The method must be between 0 and 2");
+
+        spatialpadding_(
+        )  
+        {
+        }
+
+        long padding_y() const { return _padding_y; }
+        long padding_x() const { return _padding_x; }
+        unsigned char method() const { return _method; }
+
+
+        inline point map_output_to_input (
+            point p
+        ) const
+        {
+            p.x() = p.x() + 2 * padding_x();
+            p.y() = p.y() + 2 * padding_y();
+            return p;
+        }
+
+        inline point map_input_to_output (
+            point p
+        ) const
+        {
+            p.x() = p.x() - 2 * padding_x();
+            p.y() = p.y() - 2 * padding_y();
+            return p;
+        }
+
+        spatialpadding_ (
+            const spatialpadding_& item
+        )  
+        {
+            (void)item;
+            // this->spatialpadding_ is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+        }
+
+        spatialpadding_& operator= (
+            const spatialpadding_& item
+        )
+        {
+            if (this == &item)
+                return *this;
+
+            // this->spatialpadding_ is non-copyable and basically stateless, so we have to write our
+            // own copy to avoid trying to copy it and getting an error.
+            return *this;
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+            (void)sub;
+            params.set_size(0);
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            unsigned int gnr = sub.get_output().nr() + 2 * padding_y();
+            unsigned int gnc = sub.get_output().nc() + 2 * padding_x();
+            unsigned int gnsamps = sub.get_output().num_samples();
+            unsigned int gk = sub.get_output().k();
+            output.set_size(gnsamps,gk,gnr,gnc);
+            pad.forward(output,sub.get_output(),_padding_y,_padding_x,_method);
+        } 
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        {
+            (void)params_grad;
+            pad.backward(sub.get_gradient_input(),gradient_input,_padding_y,_padding_x,_method);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const spatialpadding_& item, std::ostream& out)
+        {
+            serialize("spatialpadding_1", out);
+            serialize(item.params, out);
+            serialize(_padding_y, out);
+            serialize(_padding_x, out);
+            serialize(_method,out);
+        }
+
+        friend void deserialize(spatialpadding_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            int padding_y;
+            int padding_x;
+            unsigned char method;
+            if (version == "spatialpadding_1")
+            {
+                deserialize(item.params, in);
+                deserialize(padding_y, in);
+                deserialize(padding_x, in);
+                deserialize(method,in);
+                if (padding_y != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::spatialpadding_");
+                if (padding_x != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::spatialpadding_");
+            }
+            else
+            {
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::spatialpadding_.");
+            }
+        }
+
+
+        friend std::ostream& operator<<(std::ostream& out, const spatialpadding_& item)
+        {
+            out << "spatialpadding\t ("
+                << "padding_y="<<_padding_y
+                << ", padding_x="<<_padding_x
+                << ", method="<<_method
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const spatialpadding_& item, std::ostream& out)
+        {
+            out << "<spatialpadding"
+                << " padding_y='"<<_padding_y<<"'"
+                << " padding_x='"<<_padding_x<<"'"
+                << " method='>\n"<<_method<<"'";
+            out << mat(item.params);
+            out << "</spatialpadding>";
+        }
+
+    private:
+
+        resizable_tensor params;
+
+        tt::tensor_padding pad;
+    };
+
+    template <
+        int padding_y,
+        int padding_x,
+        unsigned short method,
+        typename SUBNET
+        >
+    using spatialpadding = add_layer<spatialpadding_<padding_y,padding_x,method>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
