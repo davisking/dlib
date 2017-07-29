@@ -527,7 +527,7 @@ namespace dlib
                 last_alpha = alpha;
 
             // Take the search step indicated by the above line search
-            x = clamp(x + alpha*s, x_lower, x_upper);
+            x = dlib::clamp(x + alpha*s, x_lower, x_upper);
             g = der(x);
 
             if (!is_finite(f_value))
@@ -658,7 +658,7 @@ namespace dlib
                 last_alpha = alpha;
 
             // Take the search step indicated by the above line search
-            x = clamp(x + alpha*s, x_lower, x_upper);
+            x = dlib::clamp(x + alpha*s, x_lower, x_upper);
             g = -der(x);
 
             // Don't forget to negate the output from the line search since it is  from the
