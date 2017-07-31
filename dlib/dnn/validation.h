@@ -19,7 +19,8 @@ namespace dlib
         const image_array_type& images,
         const std::vector<std::vector<mmod_rect>>& truth_dets,
         const test_box_overlap& overlap_tester = test_box_overlap(),
-        const double adjust_threshold = 0
+        const double adjust_threshold = 0,
+        const test_box_overlap& overlaps_ignore_tester = test_box_overlap()
     )
     {
         // make sure requires clause is not broken
@@ -62,7 +63,7 @@ namespace dlib
             for (auto&& b : hits)
                 boxes.push_back(std::make_pair(b.detection_confidence, b.rect));
 
-            correct_hits += impl::number_of_truth_hits(truth_boxes, ignore, boxes, overlap_tester, all_dets, missing_detections);
+            correct_hits += impl::number_of_truth_hits(truth_boxes, ignore, boxes, overlap_tester, all_dets, missing_detections, overlaps_ignore_tester);
             total_true_targets += truth_boxes.size();
         }
 

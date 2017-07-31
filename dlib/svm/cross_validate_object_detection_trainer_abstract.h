@@ -142,7 +142,8 @@ namespace dlib
         const image_array_type& images,
         const std::vector<std::vector<mmod_rect>>& truth_dets,
         const test_box_overlap& overlap_tester = test_box_overlap(),
-        const double adjust_threshold = 0
+        const double adjust_threshold = 0,
+        const test_box_overlap& overlaps_ignore_tester = test_box_overlap()
     );
     /*!
         requires
@@ -159,7 +160,7 @@ namespace dlib
               truth_dets[i] that are marked ignore are ignored.  That is, detections
               matching an ignore box do not count as a false alarm and similarly if any
               ignored box in truth_dets goes undetected it does not count as a missed
-              detection.  
+              detection.   To test if a box overlaps an ignore box, we use overlaps_ignore_tester.
             - In particular, returns a matrix M such that:  
                 - M(0) == the precision of the detector object.  This is a number
                   in the range [0,1] which measures the fraction of detector outputs

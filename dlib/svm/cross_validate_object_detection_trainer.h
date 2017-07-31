@@ -25,7 +25,8 @@ namespace dlib
             const std::vector<std::pair<double,rectangle> >& boxes,
             const test_box_overlap& overlap_tester,
             std::vector<std::pair<double,bool> >& all_dets,
-            unsigned long& missing_detections 
+            unsigned long& missing_detections,
+            const test_box_overlap& overlaps_ignore_tester 
         )
         /*!
             ensures
@@ -74,13 +75,25 @@ namespace dlib
             for (unsigned long i = 0; i < boxes.size(); ++i)
             {
                 // only out put boxes if they match a truth box or are not ignored.
-                if (used[i] || !overlaps_any_box(overlap_tester, ignore, boxes[i].second))
+                if (used[i] || !overlaps_any_box(overlaps_ignore_tester, ignore, boxes[i].second))
                 {
                     all_dets.push_back(std::make_pair(boxes[i].first, used[i]));
                 }
             }
 
             return count;
+        }
+
+        inline unsigned long number_of_truth_hits (
+            const std::vector<full_object_detection>& truth_boxes,
+            const std::vector<rectangle>& ignore,
+            const std::vector<std::pair<double,rectangle> >& boxes,
+            const test_box_overlap& overlap_tester,
+            std::vector<std::pair<double,bool> >& all_dets,
+            unsigned long& missing_detections
+        )
+        {
+            return number_of_truth_hits(truth_boxes, ignore, boxes, overlap_tester, all_dets, missing_detections, overlap_tester);
         }
 
     // ------------------------------------------------------------------------------------
