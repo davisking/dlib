@@ -108,6 +108,8 @@ namespace dlib
                 - for all valid i:
                     - layer<i>(sub).get_gradient_input() has the same dimensions as
                       layer<i>(sub).get_output().
+                    - layer<i>(sub).get_gradient_input() contains all zeros (i.e.
+                      initially, all input gradients are 0).
                 - truth == an iterator pointing to the beginning of a range of
                   input_tensor.num_samples()/sub.sample_expansion_factor() elements.  Moreover,
                   they must be training_label_type elements.
@@ -124,6 +126,9 @@ namespace dlib
                   assignments, for all valid i: 
                     - layer<i>(sub).get_gradient_input() = the gradient of
                       L(input_tensor,truth,sub) with respect to layer<i>(sub).get_output().
+                      Note that, since get_gradient_input() is zero initialized, you don't
+                      have to write gradient information to layers that have a zero
+                      loss gradient.
                 - returns L(input_tensor,truth,sub)
         !*/
     };
