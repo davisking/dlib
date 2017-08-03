@@ -99,7 +99,7 @@
     Note that you can deserialize an integer value to any integral type (except for a 
     char type) if its value will fit into the target integer type.  I.e.  the types 
     short, int, long, unsigned short, unsigned int, unsigned long, and dlib::uint64 
-    can all receive serialized data from each other so long as the actual serizlied 
+    can all receive serialized data from each other so long as the actual serialized 
     value fits within the receiving integral type's range.
 
     Also note that for any container to be serializable the type of object it contains 
