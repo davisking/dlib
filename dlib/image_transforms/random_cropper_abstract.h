@@ -297,6 +297,19 @@ namespace dlib
         !*/
     };
 
+// ----------------------------------------------------------------------------------------
+
+    std::ostream& operator<< (
+        std::ostream& out,
+        const random_cropper& item
+    );
+    /*!
+        ensures
+            - Prints the state of all the parameters of item to out.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RaNDOM_CROPPER_ABSTRACT_H_

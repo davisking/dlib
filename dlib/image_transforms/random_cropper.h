@@ -286,6 +286,28 @@ namespace dlib
 
     };
 
+// ----------------------------------------------------------------------------------------
+
+    inline std::ostream& operator<< (
+        std::ostream& out,
+        const random_cropper& item
+    )
+    {
+        using std::endl;
+        out << "random_cropper details: " << endl;
+        out << "  chip_dims.rows:            " << item.get_chip_dims().rows << endl;
+        out << "  chip_dims.cols:            " << item.get_chip_dims().cols << endl;
+        out << "  randomly_flip:             " << std::boolalpha << item.get_randomly_flip() << endl;
+        out << "  max_rotation_degrees:      " << item.get_max_rotation_degrees() << endl;
+        out << "  min_object_size:           " << item.get_min_object_size() << endl;
+        out << "  max_object_size:           " << item.get_max_object_size() << endl;
+        out << "  background_crops_fraction: " << item.get_background_crops_fraction() << endl;
+        out << "  translate_amount:          " << item.get_translate_amount() << endl;
+        return out;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_RaNDOM_CROPPER_H_
