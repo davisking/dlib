@@ -119,6 +119,12 @@ namespace dlib
             deserialize(item.momentum, in);
         }
 
+        friend std::ostream& operator<< (std::ostream& out, const sgd& item)
+        {
+            out << "sgd: weight_decay="<<item.get_weight_decay() << ", momentum="<<item.get_momentum(); 
+            return out;
+        }
+
     private:
 
         template <typename layer_type> 
@@ -292,6 +298,12 @@ namespace dlib
             deserialize(item.momentum1, in);
             deserialize(item.momentum2, in);
             deserialize(item.t, in);
+        }
+
+        friend std::ostream& operator<< (std::ostream& out, const adam& item)
+        {
+            out << "adam: weight_decay="<<item.get_weight_decay() << ", momentum1="<<item.get_momentum1() << ", momentum2="<<item.get_momentum2(); 
+            return out;
         }
 
     private:
