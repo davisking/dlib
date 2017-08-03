@@ -23,6 +23,7 @@
 #include <exception>
 #include <mutex>
 #include "../dir_nav.h"
+#include "../md5.h"
 
 namespace dlib
 {
@@ -263,7 +264,7 @@ namespace dlib
             sync_to_disk();
             send_job(true, dbegin, dend, lbegin);
 
-            ++train_one_step_calls;
+            ++test_one_step_calls;
         }
 
         void test_one_step (
@@ -285,7 +286,7 @@ namespace dlib
             print_periodic_verbose_status();
             sync_to_disk();
             send_job(true, dbegin, dend);
-            ++train_one_step_calls;
+            ++test_one_step_calls;
         }
 
         void train (
@@ -413,6 +414,12 @@ namespace dlib
             std::ifstream fin(newest_syncfile(), std::ios::binary);
             if (fin)
                 deserialize(*this, fin);
+        }
+
+        const std::string& get_synchronization_file (
+        )
+        {
+            return sync_filename;
         }
 
         double get_average_loss (
@@ -562,6 +569,12 @@ namespace dlib
         ) const
         {
             return train_one_step_calls;
+        }
+
+        unsigned long long get_test_one_step_calls (
+        ) const
+        {
+            return test_one_step_calls;
         }
 
     private:
@@ -849,6 +862,7 @@ namespace dlib
             epoch_iteration = 0;
             epoch_pos = 0;
             train_one_step_calls = 0;
+            test_one_step_calls = 0;
             gradient_check_budget = 0;
             lr_schedule_pos = 0;
 
@@ -869,7 +883,7 @@ namespace dlib
         friend void serialize(const dnn_trainer& item, std::ostream& out)
         {
             item.wait_for_thread_to_pause();
-            int version = 8;
+            int version = 9;
             serialize(version, out);
 
             size_t nl = dnn_trainer::num_layers;
@@ -889,6 +903,7 @@ namespace dlib
             serialize(item.epoch_iteration, out);
             serialize(item.epoch_pos, out);
             serialize(item.train_one_step_calls, out);
+            serialize(item.test_one_step_calls, out);
             serialize(item.lr_schedule, out);
             serialize(item.lr_schedule_pos, out);
             serialize(item.test_iter_without_progress_thresh.load(), out);
@@ -901,7 +916,7 @@ namespace dlib
             item.wait_for_thread_to_pause();
             int version = 0;
             deserialize(version, in);
-            if (version != 8)
+            if (version != 9)
                 throw serialization_error("Unexpected version found while deserializing dlib::dnn_trainer.");
 
             size_t num_layers = 0;
@@ -931,6 +946,7 @@ namespace dlib
             deserialize(item.epoch_iteration, in);
             deserialize(item.epoch_pos, in);
             deserialize(item.train_one_step_calls, in);
+            deserialize(item.test_one_step_calls, in);
             deserialize(item.lr_schedule, in);
             deserialize(item.lr_schedule_pos, in);
             deserialize(ltemp, in); item.test_iter_without_progress_thresh = ltemp;
@@ -1220,6 +1236,7 @@ namespace dlib
         size_t epoch_pos;
         std::chrono::time_point<std::chrono::system_clock> last_time;
         unsigned long long train_one_step_calls;
+        unsigned long long test_one_step_calls;
         matrix<double,0,1> lr_schedule;
         long lr_schedule_pos;
         unsigned long gradient_check_budget;
@@ -1243,6 +1260,41 @@ namespace dlib
 
         bool sync_file_reloaded;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename net_type, 
+        typename solver_type 
+        >
+    std::ostream& operator<< (
+        std::ostream& out,
+        dnn_trainer<net_type,solver_type>& trainer
+    )
+    {
+        using std::endl;
+        out << "dnn_trainer details: \n";
+        out << "  net_type::num_layers:  " << net_type::num_layers << endl;
+        out << "  net architecture hash: " << md5(cast_to_string(trainer.get_net())) << endl;
+        out << "  loss: " << trainer.get_net().loss_details() << endl;
+
+        out << "  synchronization file:                       " << trainer.get_synchronization_file() << endl;
+        out << "  trainer.get_solvers()[0]:                   " << trainer.get_solvers()[0] << endl;
+        auto sched = trainer.get_learning_rate_schedule();
+        if (sched.size() != 0)
+        {
+            out << "  using explicit user-supplied learning rate schedule" << endl;
+        }
+        else
+        {
+            out << "  learning rate:                              "<< trainer.get_learning_rate() << endl;
+            out << "  learning rate shrink factor:                "<< trainer.get_learning_rate_shrink_factor() << endl;
+            out << "  min learning rate:                          "<< trainer.get_min_learning_rate() << endl;
+            out << "  iterations without progress threshold:      "<< trainer.get_iterations_without_progress_threshold() << endl;
+            out << "  test iterations without progress threshold: "<< trainer.get_test_iterations_without_progress_threshold() << endl;
+        }
+        return out;
+    }
 
 // ----------------------------------------------------------------------------------------
 
