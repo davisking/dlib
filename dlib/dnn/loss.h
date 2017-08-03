@@ -881,10 +881,26 @@ namespace dlib
             deserialize(item.options, in);
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const loss_mmod_& )
+        friend std::ostream& operator<<(std::ostream& out, const loss_mmod_& item)
         {
-            // TODO, add options fields
-            out << "loss_mmod";
+            out << "loss_mmod\t (";
+
+            out << "detector_windows:(";
+            auto& opts = item.options;
+            for (size_t i = 0; i < opts.detector_windows.size(); ++i)
+            {
+                out << opts.detector_windows[i].width << "x" << opts.detector_windows[i].height;
+                if (i+1 < opts.detector_windows.size())
+                    out << ",";
+            }
+            out << ")";
+            out << ", loss per FA:" << opts.loss_per_false_alarm;
+            out << ", loss per miss:" << opts.loss_per_missed_target;
+            out << ", truth match IOU thresh:" << opts.truth_match_iou_threshold;
+            out << ", overlaps_nms:("<<opts.overlaps_nms.get_iou_thresh()<<","<<opts.overlaps_nms.get_percent_covered_thresh()<<")";
+            out << ", overlaps_ignore:("<<opts.overlaps_ignore.get_iou_thresh()<<","<<opts.overlaps_ignore.get_percent_covered_thresh()<<")";
+
+            out << ")";
             return out;
         }
 
