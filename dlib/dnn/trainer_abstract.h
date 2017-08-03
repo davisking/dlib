@@ -230,15 +230,15 @@ namespace dlib
                     - This trainer will use an explicit learning rate schedule defined by
                       the learning rate values in get_learning_rate_schedule().  For
                       example, if get_learning_rate_schedule() returned {0.1, 0.09, 0.08,
-                      0.07, 0.6} then the first training mini-batch would use a learning
+                      0.07, 0.06} then the first training mini-batch would use a learning
                       rate of 0.1, then the next training mini-batch uses 0.09, and then
                       0.8, and so on until the end of the schedule is reached.  
                       
                       If you continue to run training after the end of the schedule has
                       been reached then the learning rate will be fixed to 0.99 times the
                       final value.  So in our example, eventually the learning rate would
-                      be fixed to 0.99*0.6.  This allows you to test if we have reached the
-                      end of the schedule by checking if get_learning_rate() >= 0.6.
+                      be fixed to 0.99*0.06.  This allows you to test if we have reached the
+                      end of the schedule by checking if get_learning_rate() >= 0.06.
         !*/
 
         unsigned long get_steps_without_progress (
