@@ -466,14 +466,22 @@ namespace dlib
             // some small variability in how boxes get positioned between the training data
             // and the coordinate system used by the detector when it runs.  So relaxing it
             // here takes care of that.
-            const double relax_amount = 0.05;
-            auto iou_thresh = std::min(1.0, overlaps_nms.get_iou_thresh()+relax_amount);
-            auto percent_covered_thresh = std::min(1.0, overlaps_nms.get_percent_covered_thresh()+relax_amount);
+            auto iou_thresh             = advance_toward_1(overlaps_nms.get_iou_thresh());
+            auto percent_covered_thresh = advance_toward_1(overlaps_nms.get_percent_covered_thresh());
             overlaps_nms = test_box_overlap(iou_thresh, percent_covered_thresh);
         }
 
 
     private:
+
+        static double advance_toward_1 (
+            double val
+        )
+        {
+            if (val < 1)
+                val += (1-val)*0.1;
+            return val;
+        }
 
         static size_t count_overlaps (
             const std::vector<rectangle>& rects,
