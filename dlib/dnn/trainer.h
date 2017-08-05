@@ -1275,6 +1275,12 @@ namespace dlib
         using std::endl;
         out << "dnn_trainer details: \n";
         out << "  net_type::num_layers:  " << net_type::num_layers << endl;
+        // figure out how big the net is in MB.
+        std::ostringstream sout;
+        net_type temp = trainer.get_net(); // make a copy so that we can clean it without mutating the trainer's net.
+        temp.clean();
+        serialize(temp, sout);
+        out << "  net size: " << sout.str().size()/1024.0/1024.0 << "MB" << endl;
         out << "  net architecture hash: " << md5(cast_to_string(trainer.get_net())) << endl;
         out << "  loss: " << trainer.get_net().loss_details() << endl;
 
