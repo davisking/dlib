@@ -193,6 +193,12 @@ int main(int argc, char** argv) try
     // testing data.
     cout << "testing results:  " << test_object_detection_function(net, images_test, face_boxes_test) << endl;
 
+
+    // If you are running many experiments, it's also useful to log the settings used
+    // during the training experiment.  This statement will print the settings we used to
+    // the screen.
+    cout << trainer << cropper << endl;
+
     // Now lets run the detector on the testing images and look at the outputs.  
     image_window win;
     for (auto&& img : images_test)
