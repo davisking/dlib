@@ -1281,7 +1281,9 @@ namespace dlib
         temp.clean();
         serialize(temp, sout);
         out << "  net size: " << sout.str().size()/1024.0/1024.0 << "MB" << endl;
-        out << "  net architecture hash: " << md5(cast_to_string(trainer.get_net())) << endl;
+        // Don't include the loss params in the hash since we print them on the next line.
+        // They also aren't really part of the "architecture" of the network.
+        out << "  net architecture hash: " << md5(cast_to_string(trainer.get_net().subnet())) << endl;
         out << "  loss: " << trainer.get_net().loss_details() << endl;
 
         out << "  synchronization file:                       " << trainer.get_synchronization_file() << endl;
