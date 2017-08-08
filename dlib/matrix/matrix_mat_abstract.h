@@ -159,6 +159,35 @@ namespace dlib
         typename T
         >
     const matrix_exp mat (
+        const T* ptr,
+        long nr,
+        long nc,
+        long stride
+    );
+    /*!
+        requires
+            - nr >= 0
+            - nc >= 0
+            - stride > 0
+            - ptr == a pointer to at least (nr-1)*stride+nc T objects (or the NULL pointer if nr*nc==0)
+        ensures
+            - returns a matrix M such that:
+                - M.nr() == nr
+                - m.nc() == nc 
+                - for all valid r and c:
+                  M(r,c) == ptr[r*stride + c]
+                  (i.e. the pointer is interpreted as a matrix laid out in memory
+                  in row major order, with a row stride of the given stride amount.)
+            - Note that the returned matrix doesn't take "ownership" of
+              the pointer and thus will not delete or free it.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    const matrix_exp mat (
         const ::arma::Mat<T>& m
     );
     /*!

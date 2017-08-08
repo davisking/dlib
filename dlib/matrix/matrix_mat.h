@@ -319,11 +319,19 @@ namespace dlib
             const T* ptr_,
             const long nr_,
             const long nc_ 
-        ) : ptr(ptr_), rows(nr_), cols(nc_){}
+        ) : ptr(ptr_), rows(nr_), cols(nc_), stride(nc_){}
+
+        op_pointer_to_mat(
+            const T* ptr_,
+            const long nr_,
+            const long nc_,
+            const long stride_
+        ) : ptr(ptr_), rows(nr_), cols(nc_), stride(stride_){}
 
         const T* ptr;
         const long rows;
         const long cols;
+        const long stride;
 
         const static long cost = 1;
         const static long NR = 0;
@@ -333,7 +341,7 @@ namespace dlib
         typedef default_memory_manager mem_manager_type;
         typedef row_major_layout layout_type;
 
-        const_ret_type apply (long r, long c) const { return ptr[r*cols + c]; }
+        const_ret_type apply (long r, long c) const { return ptr[r*stride + c]; }
 
         long nr () const { return rows; }
         long nc () const { return cols; }
@@ -417,6 +425,27 @@ namespace dlib
         );
         typedef op_pointer_to_mat<T> op;
         return matrix_op<op>(op(ptr,nr,nc));
+    }
+
+    template <
+        typename T
+        >
+    const matrix_op<op_pointer_to_mat<T> > mat (
+        const T* ptr,
+        long nr,
+        long nc,
+        long stride
+    )
+    {
+        DLIB_ASSERT(nr >= 0 && nc >= 0 && stride > 0 , 
+                    "\tconst matrix_exp mat(ptr, nr, nc, stride)"
+                    << "\n\t nr and nc must be >= 0 while stride > 0"
+                    << "\n\t nr: " << nr
+                    << "\n\t nc: " << nc
+                    << "\n\t stride: " << stride
+        );
+        typedef op_pointer_to_mat<T> op;
+        return matrix_op<op>(op(ptr,nr,nc,stride));
     }
 
 // ----------------------------------------------------------------------------------------
