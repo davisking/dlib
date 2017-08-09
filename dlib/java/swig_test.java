@@ -69,6 +69,14 @@ public class swig_test
         }
     }
 
+    public static void assertIsEqual(int val1, int val2)
+    {
+        if (val1 != val2)
+        {
+            throw new RuntimeException("Test failed " + val1 + " should be equal to " + val2);
+        }
+    }
+
     public static double sum(double[] arr)
     {
         double s = 0;
@@ -231,6 +239,13 @@ public class swig_test
                 zero(arr); global.assign_crit(arr);
                 assertIs28(sum(arr));
                 assertIs28(global.sum_crit(arr));
+            }
+        }
+        {
+            int[] a = global.make_an_array(4);
+            for (int i = 0; i < a.length; ++i)
+            {
+                assertIsEqual(a[i], i);
             }
         }
 
