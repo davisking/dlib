@@ -163,14 +163,7 @@ FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/swig.i
     }
 
     %pragma(java) jniclasscode=%{
-    static {
-        try {
-            System.loadLibrary(\"${output_library_name}\");
-        } catch (UnsatisfiedLinkError e) {
-        System.err.println(\"Native code library failed to load. \\n\" + e);
-        System.exit(1);
-        }
-    }
+    static { System.loadLibrary(\"${output_library_name}\"); }
     %}
 
     %include \"swig_api.h\"
