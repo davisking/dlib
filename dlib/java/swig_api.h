@@ -12,9 +12,9 @@
 // function arguments.  You do this by putting this pair of include statements in your
 // swig_api.h file.  Then after that you can use the java::array, java::array_view, and
 // java::array_view_crit classes.  
-#include "java_array.h"
+#include <dlib/java/java_array.h>
 #ifdef SWIG
-%include "java_array.h"
+%include <dlib/java/java_array.h>
 #endif
 
 

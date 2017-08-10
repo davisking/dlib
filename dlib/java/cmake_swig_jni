@@ -14,7 +14,7 @@
 #   ### can do that by setting additional_link_libraries.  Here is an example of
 #   ### linking to dlib:
 #   include(../../dlib/dlib/cmake)
-#   set(additional_link_libraries dlib)
+#   set(additional_link_libraries dlib::dlib)
 #
 #   ### Tell swig to put the output files into the parent folder of your CMakeLists.txt 
 #   ### file when you run make install.
@@ -40,7 +40,7 @@
 ################################################################################
 ################################################################################
 
-cmake_minimum_required (VERSION 2.8.4)
+cmake_minimum_required (VERSION 2.8.12)
 
 # This block of code tries to figure out what the JAVA_HOME environment
 # variable should be by looking at the folder that contains the java
@@ -108,11 +108,14 @@ if (UNIX)
     add_global_switch(-fPIC)
 endif()
 
+set(dlib_root_path ${CMAKE_CURRENT_LIST_DIR}/../../)
 
 string(REGEX REPLACE "\\." "/" package_path ${java_package_name})
 string(REGEX REPLACE "\\..*" "" package_root_name ${java_package_name})
 
-set(CMAKE_SWIG_FLAGS -package ${java_package_name})
+include_directories(${dlib_root_path})
+
+set(CMAKE_SWIG_FLAGS -package ${java_package_name} -I${dlib_root_path})
 set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/lib/java_src/${package_path})
 
 set(output_library_name ${PROJECT_NAME})

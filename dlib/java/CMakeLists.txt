@@ -14,7 +14,7 @@ include_directories(
 
 # Additional dependencies
 #include(../../dlib/cmake)
-#set(additional_link_libraries dlib)
+#set(additional_link_libraries dlib::dlib)
 
 # Tell swig to put the output files (the shared library and .jar) into the local folder.
 set(install_target_output_folder .)
