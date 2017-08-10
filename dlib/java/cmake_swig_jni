@@ -189,7 +189,12 @@ set(clean_files
     )
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${clean_files}")
 
-# Compile the java files into a jar file and stick it in the lib folder.
+# Compile the java files into a jar file and stick it in the lib folder.  Also, one problem
+# with this cmake setup is that it doesn't know that modifications to swig_api.h mean that
+# swig.i is invalidated and thus swig needs to be rerun.  So here we also touch swig.i
+# every time we build to make it always out of date and force swig to run on each build,
+# thus avoiding the stale swig outputs problem that would otherwise irritate people who
+# modify something and attempt to rebuild.
 add_custom_command(TARGET ${output_library_name} 
    POST_BUILD
    COMMAND cmake -E echo "compiling Java files..."
@@ -197,6 +202,7 @@ add_custom_command(TARGET ${output_library_name}
    COMMAND ${Java_JAVAC_EXECUTABLE} ${CMAKE_SWIG_OUTDIR}/*.java -d "${CMAKE_CURRENT_BINARY_DIR}/intermediate_files_compiled"
    COMMAND cmake -E echo "Making jar file..."
    COMMAND ${Java_JAR_EXECUTABLE} cvf "${CMAKE_CURRENT_BINARY_DIR}/lib/${PROJECT_NAME}.jar" -C "${CMAKE_CURRENT_BINARY_DIR}/intermediate_files_compiled" ${package_root_name}
+   COMMAND cmake -E touch swig.i
    )
 
 
