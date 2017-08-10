@@ -404,7 +404,7 @@ private:
     %typemap(jstype)      (array<type>)  "java_type[]"
     %typemap(jni)         (array<type>)  tostring(j##java_type##Array)
     %typemap(javain)      (array<type>)  "$javainput"
-    %typemap(in)          (array<type>)  { $1 = array<type>($input); }
+    %typemap(in)          (array<type>)  { $1 = java::array<type>($input); }
     %typemap(javaout)     (array<type>)  {return $jnicall; }   
     %typemap(out)         (array<type>)  {jresult = result;}
 
@@ -413,14 +413,14 @@ private:
     %typemap(jni)         (array<type>&)  tostring(j##java_type##Array)
     %typemap(javain)      (array<type>&)  "$javainput"
     %typemap(arginit)     (array<type>&) { $1 = &temp$argnum; }
-    %typemap(in)          (array<type>&) (array<type> temp) { *($1) = array<type>($input); }
+    %typemap(in)          (array<type>&) (java::array<type> temp) { *($1) = java::array<type>($input); }
 
     %typemap(jtype)       (const array<type>&)  "java_type[]"
     %typemap(jstype)      (const array<type>&)  "java_type[]"
     %typemap(jni)         (const array<type>&)  tostring(j##java_type##Array)
     %typemap(javain)      (const array<type>&)  "$javainput"
     %typemap(arginit)     (const array<type>&) { $1 = &temp$argnum; }
-    %typemap(in)          (const array<type>&) (array<type> temp) { *($1) = array<type>($input); }
+    %typemap(in)          (const array<type>&) (java::array<type> temp) { *($1) = java::array<type>($input); }
 %enddef
 define_javaObjectRef_converion(int16_t,short)
 define_javaObjectRef_converion(int32_t,int)
@@ -552,14 +552,14 @@ template <> class array_view_crit<double>  : public array_view_crit_base<double,
     %typemap(jni)         (array_view<type>&)  tostring(j##java_type##Array)
     %typemap(javain)      (array_view<type>&)  "$javainput"
     %typemap(arginit)     (array_view<type>&)  { $1 = &temp$argnum; }
-    %typemap(in)          (array_view<type>&) (array_view<type> temp)  { $1->reset(jenv, $input, true); }
+    %typemap(in)          (array_view<type>&) (java::array_view<type> temp)  { $1->reset(jenv, $input, true); }
 
     %typemap(jtype)       (const array_view<type>&)  "java_type[]"
     %typemap(jstype)      (const array_view<type>&)  "java_type[]"
     %typemap(jni)         (const array_view<type>&)  tostring(j##java_type##Array)
     %typemap(javain)      (const array_view<type>&)  "$javainput"
     %typemap(arginit)     (const array_view<type>&)  { $1 = &temp$argnum; }
-    %typemap(in)          (const array_view<type>&) (array_view<type> temp)  { $1->reset(jenv, $input, false); }
+    %typemap(in)          (const array_view<type>&) (java::array_view<type> temp)  { $1->reset(jenv, $input, false); }
 %enddef
 define_array_converion(int16_t,short)
 define_array_converion(int32_t,int)
@@ -577,14 +577,14 @@ define_array_converion(double,double)
     %typemap(jni)         (array_view_crit<type>&)  tostring(j##java_type##Array)
     %typemap(javain)      (array_view_crit<type>&)  "$javainput"
     %typemap(arginit)     (array_view_crit<type>&)  { $1 = &temp$argnum; }
-    %typemap(in)          (array_view_crit<type>&) (array_view_crit<type> temp)  { $1->reset(jenv, $input, true); }
+    %typemap(in)          (array_view_crit<type>&) (java::array_view_crit<type> temp)  { $1->reset(jenv, $input, true); }
 
     %typemap(jtype)       (const array_view_crit<type>&)  "java_type[]"
     %typemap(jstype)      (const array_view_crit<type>&)  "java_type[]"
     %typemap(jni)         (const array_view_crit<type>&)  tostring(j##java_type##Array)
     %typemap(javain)      (const array_view_crit<type>&)  "$javainput"
     %typemap(arginit)     (const array_view_crit<type>&)  { $1 = &temp$argnum; }
-    %typemap(in)          (const array_view_crit<type>&) (array_view_crit<type> temp)  { $1->reset(jenv, $input, false); }
+    %typemap(in)          (const array_view_crit<type>&) (java::array_view_crit<type> temp)  { $1->reset(jenv, $input, false); }
 %enddef
 define_array_crit_converion(int16_t,short)
 define_array_crit_converion(int32_t,int)
