@@ -793,7 +793,7 @@ namespace dlib
                         // So we didn't hit this truth box.  Is that because there is
                         // another, different truth box, that overlaps it according to NMS?
                         const std::pair<double,unsigned int> hittruth = find_best_match(*truth, (*truth)[i], i);
-                        if (hittruth.second == i)
+                        if (hittruth.second == i || (*truth)[hittruth.second].ignore)
                             continue;
                         rectangle best_matching_truth_box = (*truth)[hittruth.second];
                         if (options.overlaps_nms(best_matching_truth_box, (*truth)[i]))
@@ -806,7 +806,8 @@ namespace dlib
                             g[idx] = 0;
                             std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << (*truth)[i].rect;
                             std::cout << " that is suppressed by non-max-suppression ";
-                            std::cout << "because it is overlapped by another truth rectangle located at " << best_matching_truth_box << "." << std::endl;
+                            std::cout << "because it is overlapped by another truth rectangle located at " << best_matching_truth_box 
+                                      << " (IoU:"<< box_intersection_over_union(best_matching_truth_box,(*truth)[i]) <<")." << std::endl;
                         }
                     }
                 }
