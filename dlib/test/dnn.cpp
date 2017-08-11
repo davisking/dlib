@@ -904,6 +904,64 @@ namespace
         DLIB_TEST_MSG(max(abs(mat(v)-mat(vv))) < 1e-6, max(abs(mat(v)-mat(vv))));
     }
 
+    void test_multiply_zero_padded()
+    {
+        print_spinner();
+        dlib::rand rnd;
+        tt::tensor_rand trnd;
+        for (int iter = 0; iter < 300; ++iter)
+        {
+            resizable_tensor dest1(rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1);
+            resizable_tensor dest2;
+            dest2.copy_size(dest1);
+            resizable_tensor src1(rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1);
+            resizable_tensor src2(rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1,
+                                  rnd.get_random_32bit_number()%4+1);
+
+            trnd.fill_uniform(dest1);
+            trnd.fill_uniform(dest2);
+            trnd.fill_uniform(src1);
+            trnd.fill_uniform(src2);
+            cpu::multiply_zero_padded(false, dest1, src1, src2);
+            cuda::multiply_zero_padded(false, dest2, src1, src2);
+            DLIB_TEST(max(abs(mat(dest1) - mat(dest2))) < 1e-5);
+
+            cpu::multiply_zero_padded(true, dest1, src1, src2);
+            cuda::multiply_zero_padded(true, dest2, src1, src2);
+            DLIB_TEST(max(abs(mat(dest1) - mat(dest2))) < 1e-5);
+        }
+
+        // make sure we have a test for the case where all tensors have the same
+        // dimensions.
+        resizable_tensor dest1(3,4,5,6);
+        resizable_tensor dest2;
+        resizable_tensor src1;
+        resizable_tensor src2;
+        dest2.copy_size(dest1);
+        src1.copy_size(dest1);
+        src2.copy_size(dest1);
+
+        trnd.fill_uniform(dest1);
+        trnd.fill_uniform(dest2);
+        trnd.fill_uniform(src1);
+        trnd.fill_uniform(src2);
+        cpu::multiply_zero_padded(false, dest1, src1, src2);
+        cuda::multiply_zero_padded(false, dest2, src1, src2);
+        DLIB_TEST(max(abs(mat(dest1) - mat(dest2))) < 1e-5);
+
+        cpu::multiply_zero_padded(true, dest1, src1, src2);
+        cuda::multiply_zero_padded(true, dest2, src1, src2);
+        DLIB_TEST(max(abs(mat(dest1) - mat(dest2))) < 1e-5);
+    }
+
     void test_add()
     {
         print_spinner();
@@ -2606,6 +2664,7 @@ namespace
             compare_bn_gpu_and_cpu();
             compare_bn_conv_gpu_and_cpu();
             test_add();
+            test_multiply_zero_padded();
             compare_adam();
             test_copy_tensor_gpu();
 #endif

@@ -306,6 +306,23 @@ namespace dlib { namespace tt
                 - Instead of assigning the result to dest, this function adds the result to dest.
     !*/
 
+    void multiply_zero_padded (
+        bool add_to,
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    );
+    /*!
+        ensures
+            - if (add_to) then
+                - performs: dest += src1 * src2
+            - else
+                - performs: dest = src1 * src2
+            - In either case, the multiplication happens pointwise according to 4D tensor
+              arithmetic.  If the dimensions don't match then missing elements are presumed
+              to be equal to 0.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(

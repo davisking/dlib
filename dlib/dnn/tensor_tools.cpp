@@ -304,6 +304,20 @@ namespace dlib { namespace tt
 #endif
     }
 
+    void multiply_zero_padded (
+        bool add_to,
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::multiply_zero_padded(add_to, dest, src1, src2);
+#else
+        cpu::multiply_zero_padded(add_to, dest, src1, src2);
+#endif
+    }
+
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(
