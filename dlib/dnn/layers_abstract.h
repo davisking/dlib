@@ -2140,6 +2140,78 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        template<typename> class tag
+        >
+    class mult_prev_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  This layer simply multiplies the output of two previous
+                layers.  In particular, it multiplies the tensor from its immediate
+                predecessor layer, sub.get_output(), with the tensor from a deeper layer,
+                layer<tag>(sub).get_output().
+
+                Therefore, you supply a tag via mult_prev_'s template argument that tells
+                it what layer to multiply with the output of the previous layer.  The
+                result of this multiplication is output by mult_prev_.  Finally, the
+                multiplication happens pointwise according to 4D tensor arithmetic.  If the
+                dimensions don't match then missing elements are presumed to be equal to 0.
+                Moreover, each dimension of the output tensor is equal to the maximum
+                dimension of either of the inputs.  That is, if the tensors A and B are
+                being multiplied to produce C then:
+                    - C.num_samples() == max(A.num_samples(), B.num_samples())
+                    - C.k()  == max(A.k(), B.k())
+                    - C.nr() == max(A.nr(), B.nr())
+                    - C.nc() == max(A.nc(), B.nc())
+        !*/
+
+    public:
+        mult_prev_(
+        ); 
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using mult_prev = add_layer<mult_prev_<tag>, SUBNET>;
+
+    // Here we add some convenient aliases for using mult_prev_ with the tag layers. 
+    template <typename SUBNET> using mult_prev1  = mult_prev<tag1, SUBNET>;
+    template <typename SUBNET> using mult_prev2  = mult_prev<tag2, SUBNET>;
+    template <typename SUBNET> using mult_prev3  = mult_prev<tag3, SUBNET>;
+    template <typename SUBNET> using mult_prev4  = mult_prev<tag4, SUBNET>;
+    template <typename SUBNET> using mult_prev5  = mult_prev<tag5, SUBNET>;
+    template <typename SUBNET> using mult_prev6  = mult_prev<tag6, SUBNET>;
+    template <typename SUBNET> using mult_prev7  = mult_prev<tag7, SUBNET>;
+    template <typename SUBNET> using mult_prev8  = mult_prev<tag8, SUBNET>;
+    template <typename SUBNET> using mult_prev9  = mult_prev<tag9, SUBNET>;
+    template <typename SUBNET> using mult_prev10 = mult_prev<tag10, SUBNET>;
+    using mult_prev1_  = mult_prev_<tag1>;
+    using mult_prev2_  = mult_prev_<tag2>;
+    using mult_prev3_  = mult_prev_<tag3>;
+    using mult_prev4_  = mult_prev_<tag4>;
+    using mult_prev5_  = mult_prev_<tag5>;
+    using mult_prev6_  = mult_prev_<tag6>;
+    using mult_prev7_  = mult_prev_<tag7>;
+    using mult_prev8_  = mult_prev_<tag8>;
+    using mult_prev9_  = mult_prev_<tag9>;
+    using mult_prev10_ = mult_prev_<tag10>;
+
+// ----------------------------------------------------------------------------------------
+
     template<
         template<typename> class... TAG_TYPES
         >

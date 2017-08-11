@@ -2128,6 +2128,107 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        template<typename> class tag
+        >
+    class mult_prev_
+    {
+    public:
+        const static unsigned long id = tag_id<tag>::id;
+
+        mult_prev_() 
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            auto&& t1 = sub.get_output();
+            auto&& t2 = layer<tag>(sub).get_output();
+            output.set_size(std::max(t1.num_samples(),t2.num_samples()),
+                            std::max(t1.k(),t2.k()),
+                            std::max(t1.nr(),t2.nr()),
+                            std::max(t1.nc(),t2.nc()));
+            tt::multiply_zero_padded(false, output, t1, t2);
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            auto&& t1 = sub.get_output();
+            auto&& t2 = layer<tag>(sub).get_output();
+            // The gradient just flows backwards to the two layers that forward()
+            // multiplied together.
+            tt::multiply_zero_padded(true, sub.get_gradient_input(), t2, gradient_input);
+            tt::multiply_zero_padded(true, layer<tag>(sub).get_gradient_input(), t1, gradient_input);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const mult_prev_& , std::ostream& out)
+        {
+            serialize("mult_prev_", out);
+        }
+
+        friend void deserialize(mult_prev_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "mult_prev_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::mult_prev_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const mult_prev_& item)
+        {
+            out << "mult_prev"<<id;
+            return out;
+        }
+
+        friend void to_xml(const mult_prev_& item, std::ostream& out)
+        {
+            out << "<mult_prev tag='"<<id<<"'/>\n";
+        }
+
+    private:
+        resizable_tensor params;
+    };
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using mult_prev = add_layer<mult_prev_<tag>, SUBNET>;
+
+    template <typename SUBNET> using mult_prev1  = mult_prev<tag1, SUBNET>;
+    template <typename SUBNET> using mult_prev2  = mult_prev<tag2, SUBNET>;
+    template <typename SUBNET> using mult_prev3  = mult_prev<tag3, SUBNET>;
+    template <typename SUBNET> using mult_prev4  = mult_prev<tag4, SUBNET>;
+    template <typename SUBNET> using mult_prev5  = mult_prev<tag5, SUBNET>;
+    template <typename SUBNET> using mult_prev6  = mult_prev<tag6, SUBNET>;
+    template <typename SUBNET> using mult_prev7  = mult_prev<tag7, SUBNET>;
+    template <typename SUBNET> using mult_prev8  = mult_prev<tag8, SUBNET>;
+    template <typename SUBNET> using mult_prev9  = mult_prev<tag9, SUBNET>;
+    template <typename SUBNET> using mult_prev10 = mult_prev<tag10, SUBNET>;
+
+    using mult_prev1_  = mult_prev_<tag1>;
+    using mult_prev2_  = mult_prev_<tag2>;
+    using mult_prev3_  = mult_prev_<tag3>;
+    using mult_prev4_  = mult_prev_<tag4>;
+    using mult_prev5_  = mult_prev_<tag5>;
+    using mult_prev6_  = mult_prev_<tag6>;
+    using mult_prev7_  = mult_prev_<tag7>;
+    using mult_prev8_  = mult_prev_<tag8>;
+    using mult_prev9_  = mult_prev_<tag9>;
+    using mult_prev10_ = mult_prev_<tag10>;
+
+// ----------------------------------------------------------------------------------------
+
     class relu_
     {
     public:

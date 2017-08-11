@@ -1992,6 +1992,49 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_simple_linear_regression_with_mult_prev()
+    {
+        print_spinner();
+        const int num_samples = 1000;
+        ::std::vector<matrix<double>> x(num_samples);
+        ::std::vector<float> y(num_samples);
+        const float true_slope = 2.0;
+        for ( int ii = 0; ii < num_samples; ++ii )
+        {
+            const double val = static_cast<double>(ii-500)/100;
+            matrix<double> tmp(1,1);
+            tmp = val;
+            x[ii] = tmp;
+            y[ii] = ( true_slope*static_cast<float>(val*val));
+        }
+
+        randomize_samples(x,y);
+
+        using net_type = loss_mean_squared<fc<1, mult_prev1<fc<2,tag1<fc<2,input<matrix<double>>>>>>>>;
+        net_type net;
+        sgd defsolver(0,0.9);
+        dnn_trainer<net_type> trainer(net, defsolver);
+        trainer.set_learning_rate(1e-5);
+        trainer.set_min_learning_rate(1e-11);
+        trainer.set_mini_batch_size(50);
+        trainer.set_max_num_epochs(300);
+        trainer.train(x, y);
+
+        running_stats<double> rs;
+        for (size_t i = 0; i < x.size(); ++i)
+        {
+            double val = y[i];
+            double out = net(x[i]);
+            rs.add(std::abs(val-out));
+        }
+        dlog << LINFO << "rs.mean(): " << rs.mean();
+        dlog << LINFO << "rs.stddev(): " << rs.stddev();
+        dlog << LINFO << "rs.max(): " << rs.max();
+        DLIB_TEST(rs.mean() < 0.1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_multioutput_linear_regression()
     {
         const int num_outputs = 2;
@@ -2706,6 +2749,7 @@ namespace
             test_copy_tensor_cpu();
             test_concat();
             test_simple_linear_regression();
+            test_simple_linear_regression_with_mult_prev();
             test_multioutput_linear_regression();
             test_simple_autoencoder();
             test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task();
