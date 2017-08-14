@@ -89,6 +89,25 @@ namespace dlib
             return v;
         }
 
+        template <
+            long _num_filters,
+            long _nr,
+            long _nc,
+            int _stride_y,
+            int _stride_x,
+            int _padding_y,
+            int _padding_x
+            >
+        const tensor& operator() (
+            const float learning_rate,
+            const cont_<_num_filters,_nr,_nc,_stride_y,_stride_x,_padding_y,_padding_x>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()-l.num_filters());
+            return v;
+        }
+
         template < layer_mode mode >
         const tensor& operator() (
             const float learning_rate,
@@ -254,6 +273,25 @@ namespace dlib
         const tensor& operator() (
             const float learning_rate,
             const con_<_num_filters,_nr,_nc,_stride_y,_stride_x,_padding_y,_padding_x>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()-l.num_filters());
+            return s;
+        }
+
+        template <
+            long _num_filters,
+            long _nr,
+            long _nc,
+            int _stride_y,
+            int _stride_x,
+            int _padding_y,
+            int _padding_x
+            >
+        const tensor& operator() (
+            const float learning_rate,
+            const cont_<_num_filters,_nr,_nc,_stride_y,_stride_x,_padding_y,_padding_x>& l,
             const tensor& params_grad
         )
         {
