@@ -2885,6 +2885,122 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        long _offset,
+        long _k,
+        long _nr,
+        long _nc
+        >
+    class extract_
+    {
+        static_assert(_offset >= 0, "The offset must be >= 0.");
+        static_assert(_k > 0,  "The number of channels must be > 0.");
+        static_assert(_nr > 0, "The number of rows must be > 0.");
+        static_assert(_nc > 0, "The number of columns must be > 0.");
+    public:
+        extract_(
+        )  
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+            DLIB_CASSERT(sub.get_output().size() >= sub.get_output().num_samples()*(_offset+_k*_nr*_nc), 
+                "The tensor we are trying to extract from the input tensor is too big to fit into the input tensor.");
+
+            aout = alias_tensor(sub.get_output().num_samples(), _k*_nr*_nc);
+            ain = alias_tensor(sub.get_output().num_samples(),  sub.get_output().size()/sub.get_output().num_samples());
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            output.set_size(sub.get_output().num_samples(), _k, _nr, _nc);
+            auto out = aout(output,0);
+            auto in = ain(sub.get_output(),0);
+            tt::copy_tensor(false, out, 0, in, _offset, _k*_nr*_nc);
+        } 
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            auto out = ain(sub.get_gradient_input(),0);
+            auto in = aout(gradient_input,0);
+            tt::copy_tensor(true, out, _offset, in, 0, _k*_nr*_nc);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const extract_& item, std::ostream& out)
+        {
+            serialize("extract_", out);
+            serialize(_offset, out);
+            serialize(_k, out);
+            serialize(_nr, out);
+            serialize(_nc, out);
+        }
+
+        friend void deserialize(extract_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "extract_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::extract_.");
+
+            long offset;
+            long k;
+            long nr;
+            long nc;
+            deserialize(offset, in);
+            deserialize(k, in);
+            deserialize(nr, in);
+            deserialize(nc, in);
+
+            if (offset != _offset) throw serialization_error("Wrong offset found while deserializing dlib::extract_");
+            if (k != _k)   throw serialization_error("Wrong k found while deserializing dlib::extract_");
+            if (nr != _nr) throw serialization_error("Wrong nr found while deserializing dlib::extract_");
+            if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::extract_");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const extract_& item)
+        {
+            out << "extract\t ("
+                << "offset="<<_offset
+                << ", k="<<_k
+                << ", nr="<<_nr
+                << ", nc="<<_nc
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const extract_& item, std::ostream& out)
+        {
+            out << "<extract";
+            out << " offset='"<<_offset<<"'";
+            out << " k='"<<_k<<"'";
+            out << " nr='"<<_nr<<"'";
+            out << " nc='"<<_nc<<"'";
+            out << "/>\n";
+        }
+    private:
+        alias_tensor aout, ain;
+
+        resizable_tensor params; // unused
+    };
+
+    template <
+        long offset,
+        long k,
+        long nr,
+        long nc,
+        typename SUBNET
+        >
+    using extract = add_layer<extract_<offset,k,nr,nc>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LAYERS_H_

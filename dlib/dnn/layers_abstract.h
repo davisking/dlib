@@ -879,8 +879,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------------------
-
     template <
         long _num_filters,
         long _nr,
@@ -2333,11 +2331,11 @@ namespace dlib
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  It takes tensors as input and L2 normalizes them.  In particular,
                 it has the following properties:
-                    - The output tensors from this layer have the same dimenstions as the
+                    - The output tensors from this layer have the same dimensions as the
                       input tensors.
                     - If you think of each input tensor as a set of tensor::num_samples()
                       vectors, then the output tensor contains the same vectors except they
-                      have been length normlized so that their L2 norms are all 1.  I.e. 
+                      have been length normalized so that their L2 norms are all 1.  I.e. 
                       for each vector v we will have ||v||==1.
         !*/
 
@@ -2371,6 +2369,71 @@ namespace dlib
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long _offset,
+        long _k,
+        long _nr,
+        long _nc
+        >
+    class extract_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                - 0 <= _offset
+                - 0 < _k
+                - 0 < _nr
+                - 0 < _nc
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, the output of this layer is simply a copy of
+                the input tensor.  However, you can configure the extract layer to output
+                only some subset of the input tensor and also to reshape it.  Therefore,
+                the dimensions of the tensors output by this layer are as follows (letting
+                IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == _k 
+                    - OUT.nr() == _nr 
+                    - OUT.nc() == _nc 
+
+                So the output will always have the same number of samples as the input, but
+                within each sample (the k,nr,nc part) we will copy only a subset of the
+                values.  Moreover, the _offset parameter controls which part of each sample
+                we take.  To be very precise, we will have:
+                    - let IN_SIZE   = IN.k()*IN.nr()*IN.nc()
+                    - let OUT_SIZE  = _k*_nr*_nc 
+                    - for i in range[0,IN.num_samples()) and j in range[0,OUT_SIZE):
+                        - OUT.host()[i*OUT_SIZE+j] == IN.host()[i*IN_SIZE+_offset+j]
+
+
+                Finally, all this means that the input tensor to this layer must have a big
+                enough size to accommodate taking a _k*_nr*_nc slice from each of its
+                samples.  
+        !*/
+
+    public:
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        long offset,
+        long k,
+        long nr,
+        long nc,
+        typename SUBNET
+        >
+    using extract = add_layer<extract_<offset,k,nr,nc>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
