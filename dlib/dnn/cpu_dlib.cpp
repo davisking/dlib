@@ -2023,6 +2023,7 @@ namespace dlib
      // ------------------------------------------------------------------------------------
 
         void copy_tensor(
+            bool add_to,
             tensor& dest,
             size_t dest_k_offset,
             const tensor& src,
@@ -2045,7 +2046,15 @@ namespace dlib
 
             for (long i = 0; i < src.num_samples(); ++i)
             {
-                ::memcpy(dest_p, src_p, block_size * sizeof(float));
+                if (add_to)
+                {
+                    for (size_t j = 0; j < block_size; ++j)
+                        dest_p[j] += src_p[j];
+                }
+                else
+                {
+                    ::memcpy(dest_p, src_p, block_size * sizeof(float));
+                }
 
                 dest_p += dest_sample_size;
                 src_p  += src_sample_size;

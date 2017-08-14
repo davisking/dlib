@@ -2604,7 +2604,7 @@ namespace dlib
             static void concat(tensor& out, const SUBNET& sub, size_t k_offset)
             {
                 auto& t = layer<TAG_TYPE>(sub).get_output();
-                tt::copy_tensor(out, k_offset, t, 0, t.k());
+                tt::copy_tensor(false, out, k_offset, t, 0, t.k());
                 k_offset += t.k();
                 concat_helper_impl<TAG_TYPES...>::concat(out, sub, k_offset);
             }
@@ -2612,7 +2612,7 @@ namespace dlib
             static void split(const tensor& input, SUBNET& sub, size_t k_offset)
             {
                 auto& t = layer<TAG_TYPE>(sub).get_gradient_input();
-                tt::copy_tensor(t, 0, input, k_offset, t.k());
+                tt::copy_tensor(true, t, 0, input, k_offset, t.k());
                 k_offset += t.k();
                 concat_helper_impl<TAG_TYPES...>::split(input, sub, k_offset);
             }
@@ -2635,13 +2635,13 @@ namespace dlib
             static void concat(tensor& out, const SUBNET& sub, size_t k_offset)
             {
                 auto& t = layer<TAG_TYPE>(sub).get_output();
-                tt::copy_tensor(out, k_offset, t, 0, t.k());
+                tt::copy_tensor(false, out, k_offset, t, 0, t.k());
             }
             template<typename SUBNET>
             static void split(const tensor& input, SUBNET& sub, size_t k_offset)
             {
                 auto& t = layer<TAG_TYPE>(sub).get_gradient_input();
-                tt::copy_tensor(t, 0, input, k_offset, t.k());
+                tt::copy_tensor(true, t, 0, input, k_offset, t.k());
             }
         };
     }

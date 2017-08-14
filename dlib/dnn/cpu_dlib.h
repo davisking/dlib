@@ -445,6 +445,7 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void copy_tensor(
+            bool add_to,
             tensor& dest,
             size_t dest_k_offset,
             const tensor& src,

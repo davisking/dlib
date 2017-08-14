@@ -1794,9 +1794,9 @@ namespace
         rnd.fill_gaussian(src2);
         rnd.fill_gaussian(src3);
 
-        cpu::copy_tensor(dest, 0, src1, 0,  src1.k()); //full copy src1->dest
-        cpu::copy_tensor(dest, src1.k(), src2, 0,  src2.k()); //full copy src2->dest with offset of src1
-        cpu::copy_tensor(dest, src1.k() + src2.k(), src3, 3,  3); //partial copy src3 into the rest place of dest
+        cpu::copy_tensor(false, dest, 0, src1, 0,  src1.k()); //full copy src1->dest
+        cpu::copy_tensor(false, dest, src1.k(), src2, 0,  src2.k()); //full copy src2->dest with offset of src1
+        cpu::copy_tensor(false, dest, src1.k() + src2.k(), src3, 3,  3); //partial copy src3 into the rest place of dest
 
 
         for (long i = 0; i < dest.num_samples(); ++i)
@@ -1845,9 +1845,9 @@ namespace
         rnd.fill_gaussian(src1);
         rnd.fill_gaussian(src2);
         rnd.fill_gaussian(src3);
-        cuda::copy_tensor(dest, 0, src1, 0,  src1.k()); //full copy src1->dest
-        cuda::copy_tensor(dest, src1.k(), src2, 0,  src2.k()); //full copy src2->dest with offset of src1
-        cuda::copy_tensor(dest, src1.k() + src2.k(), src3, 3,  3); //partial copy src3 into the rest place of dest
+        cuda::copy_tensor(false, dest, 0, src1, 0,  src1.k()); //full copy src1->dest
+        cuda::copy_tensor(false, dest, src1.k(), src2, 0,  src2.k()); //full copy src2->dest with offset of src1
+        cuda::copy_tensor(false, dest, src1.k() + src2.k(), src3, 3,  3); //partial copy src3 into the rest place of dest
 
 
         for (long i = 0; i < dest.num_samples(); ++i)
@@ -1910,9 +1910,9 @@ namespace
         auto& b3o = layer<itag3>(net).get_output();
 
         resizable_tensor dest(10, 14, 111, 222);
-        copy_tensor(dest, 0, b1o, 0,  b1o.k());
-        copy_tensor(dest, b1o.k(), b2o, 0,  b2o.k());
-        copy_tensor(dest, b1o.k() + b2o.k(), b3o, 0,  b3o.k());
+        copy_tensor(false, dest, 0, b1o, 0,  b1o.k());
+        copy_tensor(false, dest, b1o.k(), b2o, 0,  b2o.k());
+        copy_tensor(false, dest, b1o.k() + b2o.k(), b3o, 0,  b3o.k());
 
         DLIB_TEST(dest.size() == out.size());
         int error = memcmp(dest.host(), out.host(), dest.size());
@@ -1932,9 +1932,9 @@ namespace
         resizable_tensor g2(10, 8, 111, 222);
         resizable_tensor g3(10, 1, 111, 222);
 
-        copy_tensor(g1, 0, gr, 0,  g1.k());
-        copy_tensor(g2, 0, gr, g1.k(), g2.k());
-        copy_tensor(g3, 0, gr, g1.k() + g2.k(), g3.k());
+        copy_tensor(false, g1, 0, gr, 0,  g1.k());
+        copy_tensor(false, g2, 0, gr, g1.k(), g2.k());
+        copy_tensor(false, g3, 0, gr, g1.k() + g2.k(), g3.k());
         DLIB_TEST(g1.size() == b1g.size());
         error = memcmp(g1.host(), b1g.host(), b1g.size());
         DLIB_TEST(error == 0);

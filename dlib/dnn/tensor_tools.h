@@ -1544,6 +1544,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void copy_tensor(
+            bool add_to,
             tensor& dest,
             size_t dest_k_offset,
             const tensor& src,
@@ -1560,8 +1561,12 @@ namespace dlib { namespace tt
             - is_same_object(dest,src) == false
             - The memory areas of src and dest do not overlap.
         ensures
-            - performs: dest[i, k + dest_k_offset, r, c] = src[i, k + src_k_offset, r, c], where k in [0..count_k]
-              Copies content of each sample from src in to corresponding place of sample at dest.
+            - if (add_to) then
+                - performs: dest[i, k + dest_k_offset, r, c] += src[i, k + src_k_offset, r, c], where k in [0..count_k]
+                  i.e., adds content of each sample from src in to corresponding place of sample at dest.
+            - else
+                - performs: dest[i, k + dest_k_offset, r, c]  = src[i, k + src_k_offset, r, c], where k in [0..count_k]
+                  i.e., copies content of each sample from src in to corresponding place of sample at dest.
     !*/
 
 // ----------------------------------------------------------------------------------------

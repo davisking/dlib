@@ -1377,12 +1377,33 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_copy_tensor_add_to (float* dest, size_t size,  const float* src,  size_t dest_stride, size_t src_stride, size_t block_size)
+        {
+            for(auto i : grid_stride_range(0, size)) 
+            {
+                size_t blk = i/block_size;
+                size_t j = i%block_size;
+                dest[blk*dest_stride + j] += src[blk*src_stride + j];
+            }
+        }
+
+        __global__ void _cuda_copy_tensor (float* dest, size_t size,  const float* src,  size_t dest_stride, size_t src_stride, size_t block_size)
+        {
+            for(auto i : grid_stride_range(0, size)) 
+            {
+                size_t blk = i/block_size;
+                size_t j = i%block_size;
+                dest[blk*dest_stride + j] = src[blk*src_stride + j];
+            }
+        }
+
         void copy_tensor(
-                tensor& dest,
-                size_t dest_k_offset,
-                const tensor& src,
-                size_t src_k_offset,
-                size_t count_k
+            bool add_to,
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
         )
         {
             const size_t dest_sample_size = static_cast<size_t>(dest.nc() * dest.nr() * dest.k());
@@ -1398,13 +1419,17 @@ namespace dlib
             float* dest_p = dest.device() + dest_k_offset * dest.nc() * dest.nr();
             const float* src_p = src.device() + src_k_offset * src.nc() * src.nr();;
 
-
-            for (long i = 0; i < src.num_samples(); ++i)
+            if (add_to)
             {
-                CHECK_CUDA(cudaMemcpyAsync(dest_p, src_p, block_size * sizeof(float), cudaMemcpyDeviceToDevice));
-
-                dest_p += dest_sample_size;
-                src_p  += src_sample_size;
+                launch_kernel(_cuda_copy_tensor_add_to, max_jobs(dest.size()), 
+                              dest_p, block_size*dest.num_samples(),
+                              src_p, dest_sample_size, src_sample_size, block_size);
+            }
+            else
+            {
+                launch_kernel(_cuda_copy_tensor, max_jobs(dest.size()), 
+                              dest_p, block_size*dest.num_samples(),
+                              src_p, dest_sample_size, src_sample_size, block_size);
             }
         }
 

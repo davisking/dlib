@@ -881,6 +881,7 @@ namespace dlib { namespace tt
 // ------------------------------------------------------------------------------------
 
     void copy_tensor(
+            bool add_to,
             tensor& dest,
             size_t dest_k_offset,
             const tensor& src,
@@ -889,9 +890,9 @@ namespace dlib { namespace tt
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+        cuda::copy_tensor(add_to, dest, dest_k_offset, src, src_k_offset, count_k);
 #else
-        cpu::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+        cpu::copy_tensor(add_to, dest, dest_k_offset, src, src_k_offset, count_k);
 #endif
     }
 
