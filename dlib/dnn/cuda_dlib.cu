@@ -1401,7 +1401,7 @@ namespace dlib
 
             for (long i = 0; i < src.num_samples(); ++i)
             {
-                CHECK_CUDA(cudaMemcpy(dest_p, src_p, block_size * sizeof(float), cudaMemcpyDeviceToDevice));
+                CHECK_CUDA(cudaMemcpyAsync(dest_p, src_p, block_size * sizeof(float), cudaMemcpyDeviceToDevice));
 
                 dest_p += dest_sample_size;
                 src_p  += src_sample_size;
