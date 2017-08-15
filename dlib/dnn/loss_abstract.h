@@ -444,7 +444,7 @@ namespace dlib
                       min_target_size pixels in length.  In this case the shortest side
                       will be set to min_target_size length, and the other side sized to
                       preserve the aspect ratio of the window.  
-                  This means that, target_size and min_target_size control the size of the
+                  This means that target_size and min_target_size control the size of the
                   detector windows, while the aspect ratios of the detector windows are
                   automatically determined by the contents of boxes.  It should also be
                   emphasized that the detector isn't going to be able to detect objects
