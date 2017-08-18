@@ -26,6 +26,7 @@ set(python_srcs
    src/shape_predictor.cpp
    src/correlation_tracker.cpp
    src/face_recognition.cpp
+   src/cnn_face_detector.cpp
 )
 
 # Only add the GUI module if requested
@@ -35,6 +36,6 @@ endif(NOT ${DLIB_NO_GUI_SUPPORT})
 
 add_python_module(dlib ${python_srcs})
 
-# When you run "make install" we will copy the compiled dlib.so (or dlib.pyd) 
+# When you run "make install" we will copy the compiled dlib.so (or dlib.pyd)
 # library file to the python_examples folder.
 install_dlib_to(../../python_examples)
