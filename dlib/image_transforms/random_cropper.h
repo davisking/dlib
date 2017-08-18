@@ -235,7 +235,7 @@ namespace dlib
             }
             else
             {
-                crop_rect = make_random_cropping_rect_resnet(img);
+                crop_rect = make_random_cropping_rect(img);
             }
             should_flip_crop = randomly_flip && rnd.get_random_double() > 0.5;
             const double angle = rnd.get_double_in_range(-max_rotation_degrees, max_rotation_degrees)*pi/180;
@@ -266,16 +266,18 @@ namespace dlib
         }
 
         template <typename image_type>
-        rectangle make_random_cropping_rect_resnet(
+        rectangle make_random_cropping_rect(
             const image_type& img_
         )
         {
             const_image_view<image_type> img(img_);
-            // figure out what rectangle we want to crop from the image
-            double mins = 0.1, maxs = 0.95;
+            // Figure out what rectangle we want to crop from the image.  We are going to
+            // crop out an image of size this->dims, so we pick a random scale factor that
+            // lets this random box be either as big as it can be while still fitting in
+            // the image or as small as a 3x zoomed in box randomly somewhere in the image. 
+            double mins = 1.0/3.0, maxs = std::min(img.nr()/(double)dims.rows, img.nc()/(double)dims.cols);
             auto scale = rnd.get_double_in_range(mins, maxs);
-            auto size = scale*std::min(img.nr(), img.nc());
-            rectangle rect(size, size);
+            rectangle rect(scale*dims.cols, scale*dims.rows);
             // randomly shift the box around
             point offset(rnd.get_random_32bit_number()%(img.nc()-rect.width()),
                 rnd.get_random_32bit_number()%(img.nr()-rect.height()));
