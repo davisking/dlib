@@ -2906,7 +2906,7 @@ namespace dlib
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
-            DLIB_CASSERT(sub.get_output().size() >= sub.get_output().num_samples()*(_offset+_k*_nr*_nc), 
+            DLIB_CASSERT((long)sub.get_output().size() >= sub.get_output().num_samples()*(_offset+_k*_nr*_nc), 
                 "The tensor we are trying to extract from the input tensor is too big to fit into the input tensor.");
 
             aout = alias_tensor(sub.get_output().num_samples(), _k*_nr*_nc);
