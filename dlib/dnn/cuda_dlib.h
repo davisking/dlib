@@ -346,13 +346,29 @@ namespace dlib
             tensor& params_grad 
         );
 
-        void copy_tensor(
-                tensor& dest,
-                size_t dest_k_offset,
-                const tensor& src,
-                size_t src_k_offset,
-                size_t count_k
+
+    // ----------------------------------------------------------------------------------------
+
+        void resize_bilinear (
+            tensor& dest,
+            const tensor& src
         );
+
+        void resize_bilinear_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
+
+    // ----------------------------------------------------------------------------------------
+
+        void copy_tensor(
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+        );
+
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

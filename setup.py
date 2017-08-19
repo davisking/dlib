@@ -526,7 +526,11 @@ class build(_build):
             # this checks the sysconfig and will correctly pick up a brewed python lib
             # e.g. in /usr/local/Cellar
             py_ver = get_python_version()
+            # check: in some virtual environments the libpython has the form "libpython_#m.dylib
             py_lib = os.path.join(get_config_var('LIBDIR'), 'libpython'+py_ver+'.dylib')
+            if not os.path.isfile(py_lib):
+                py_lib = os.path.join(get_config_var('LIBDIR'), 'libpython'+py_ver+'m.dylib')
+                
             cmake_extra_arch += ['-DPYTHON_LIBRARY={lib}'.format(lib=py_lib)]
 
         if sys.platform == "win32":

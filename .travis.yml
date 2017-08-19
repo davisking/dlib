@@ -29,6 +29,22 @@ matrix:
         - PATH=$HOME/bin:$PATH
         - VARIANT=examples
       addons: *ao_gcc5
+    # build the python extension 
+    - compiler: gcc
+      env:
+        - GCC_VER=5
+        - ADDRESS_MODEL=64
+        - BUILD_SYSTEM=cmake
+        - PATH=$HOME/bin:$PATH
+        - VARIANT=python-api
+      addons: &ao_gcc5
+        apt:
+          sources: 
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages: 
+            - libboost-python1.55-dev
+            - *gcc5_pkgs
           
 cache:
   directories:

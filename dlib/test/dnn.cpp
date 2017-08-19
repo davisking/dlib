@@ -1453,6 +1453,30 @@ namespace
     {
         {
             print_spinner();
+            upsample_<1,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<2,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            upsample_<3,3> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             l2normalize_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
@@ -1973,6 +1997,80 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_simple_autoencoder()
+    {
+        print_spinner();
+
+        const int output_width = 7;
+        const int output_height = 7;
+        const int num_samples = 100;
+        ::std::vector<matrix<float>> x(num_samples);
+
+        matrix<float> tmp(output_width, output_height);
+        for (int i = 0; i < num_samples; ++i)
+        {
+            const int model = i % 4;
+
+            for (int r = 0; r < output_height; ++r)
+                for (int c = 0; c < output_width; ++c)
+                    switch (model) {
+                    case 0: tmp(r, c) = r / output_height; break;
+                    case 1: tmp(r, c) = c / output_width; break;
+                    case 2: tmp(r, c) = 1.0 - r / output_height; break;
+                    case 3: tmp(r, c) = 1.0 - c / output_width; break;
+                    default: DLIB_TEST_MSG(false, "Invalid model: " << model << " (should be between 0 and 3)");
+                    }
+
+            x[i] = tmp;
+        }
+
+        using net_type = loss_mean_squared_per_pixel<
+                            cont<1,output_height,output_width,2,2,
+                            relu<con<4,output_height,output_width,2,2,
+                            input<matrix<float>>>>>>;
+        net_type net;
+
+        const auto autoencoder_error = [&x, &net, &output_height, &output_width]()
+        {
+            const auto y = net(x);
+            double error = 0.0;
+            for (size_t i = 0; i < x.size(); ++i)
+                for (int r = 0; r < output_height; ++r)
+                    for (int c = 0; c < output_width; ++c)
+                        error += fabs(y[i](r, c) - x[i](r, c));
+
+            return error / (x.size() * output_height * output_width);
+        };
+
+        // The autoencoder can't be very good before it's been trained
+        // (or at least the probability of the reconstruction error
+        // being small should be super low; in fact, the error ought to
+        // be much higher than 0.01, however since the initialization
+        // is random, putting the limit below too high could make the
+        // tests fail when other, unrelated tests are added into the
+        // sequence)
+        const double error_before = autoencoder_error();
+        DLIB_TEST_MSG(error_before > 0.01, "Autoencoder error before training = " << error_before);
+
+        // Make sure there's an information bottleneck, as intended
+        const auto& output2 = dlib::layer<2>(net).get_output();
+        DLIB_TEST(output2.nr() == 1);
+        DLIB_TEST(output2.nc() == 1);
+        DLIB_TEST(output2.k() == 4);
+
+        sgd defsolver(0,0.9);
+        dnn_trainer<net_type> trainer(net, defsolver);
+        trainer.set_learning_rate(0.01);
+        trainer.set_max_num_epochs(1000);
+        trainer.train(x, x);
+
+        // Now we should have learned everything there is to it
+        const double error_after = autoencoder_error();
+        DLIB_TEST_MSG(error_after < 1e-6, "Autoencoder error after training = " << error_after);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task()
     {
         print_spinner();
@@ -2307,6 +2405,178 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_loss_multiclass_per_pixel_weighted()
+    {
+        // Train with pixel-specific weights
+
+        print_spinner();
+
+        constexpr int input_height = 5;
+        constexpr int input_width = 7;
+        constexpr int output_height = input_height;
+        constexpr int output_width = input_width;
+        const int num_samples = 1000;
+        const int num_classes = 6;
+
+        ::std::default_random_engine generator(16);
+        ::std::uniform_real_distribution<double> u01(0.0, 1.0);
+        ::std::uniform_int_distribution<uint16_t> noisy_label(0, num_classes - 1);
+
+        ::std::vector<matrix<double>> x(num_samples);
+        ::std::vector<matrix<uint16_t>> y(num_samples);
+
+        matrix<double> xtmp(input_height, input_width);
+        matrix<uint16_t> ytmp(output_height, output_width);
+
+        // Generate input data
+        for (int ii = 0; ii < num_samples; ++ii) {
+            for (int jj = 0; jj < input_height; ++jj) {
+                for (int kk = 0; kk < input_width; ++kk) {
+                    xtmp(jj, kk) = u01(generator);
+                    ytmp(jj, kk) = noisy_label(generator);
+                }
+            }
+            x[ii] = xtmp;
+            y[ii] = ytmp;
+        }
+
+        using net_type = loss_multiclass_log_per_pixel_weighted<con<num_classes,1,1,1,1,input<matrix<double>>>>;
+        using weighted_label = loss_multiclass_log_per_pixel_weighted_::weighted_label;
+
+        ::std::vector<matrix<weighted_label>> y_weighted(num_samples);
+
+        for (int weighted_class = 0; weighted_class < num_classes; ++weighted_class) {
+
+            print_spinner();
+
+            // Assign weights
+            for (int ii = 0; ii < num_samples; ++ii) {
+                if (weighted_class == 0) {
+                    y_weighted[ii].set_size(input_height, input_width);
+                }
+                for (int jj = 0; jj < input_height; ++jj) {
+                    for (int kk = 0; kk < input_width; ++kk) {
+                        const uint16_t label = y[ii](jj, kk);
+                        const float weight
+                            = label == weighted_class
+                            ? 1.1f
+                            : 0.9f;
+                        y_weighted[ii](jj, kk) = weighted_label(label, weight);
+                    }
+                }
+            }
+
+            net_type net;
+            sgd defsolver(0,0.9);
+            dnn_trainer<net_type> trainer(net, defsolver);
+            trainer.set_learning_rate(0.1);
+            trainer.set_min_learning_rate(0.01);
+            trainer.set_mini_batch_size(10);
+            trainer.set_max_num_epochs(10);
+            trainer.train(x, y_weighted);
+
+            const ::std::vector<matrix<uint16_t>> predictions = net(x);
+
+            int num_weighted_class = 0;
+            int num_not_weighted_class = 0;
+
+            for ( int ii = 0; ii < num_samples; ++ii ) {
+                const matrix<uint16_t>& prediction = predictions[ii];
+                DLIB_TEST(prediction.nr() == output_height);
+                DLIB_TEST(prediction.nc() == output_width);
+                for ( int jj = 0; jj < output_height; ++jj )
+                    for ( int kk = 0; kk < output_width; ++kk )
+                        if ( prediction(jj, kk) == weighted_class )
+                            ++num_weighted_class;
+                        else 
+                            ++num_not_weighted_class;
+            }
+
+            DLIB_TEST_MSG(num_weighted_class > num_not_weighted_class,
+                          "The weighted class (" << weighted_class << ") does not dominate: "
+                          << num_weighted_class << " <= " << num_not_weighted_class);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_tensor_resize_bilinear(long samps, long k, long nr, long nc,  long onr, long onc)
+    {
+        resizable_tensor img(samps,k,nr,nc);
+        resizable_tensor out(samps,k,onr,onc);
+        resizable_tensor out2(samps,k,onr,onc);
+
+        dlib::rand rnd;
+        for (int iter = 0; iter < 10; ++iter)
+        {
+            print_spinner();
+
+            const size_t idx = rnd.get_random_64bit_number()%img.size();
+
+            img = 1;
+            img.host()[idx] = 2;
+            cpu::resize_bilinear(out, img);
+#ifdef DLIB_USE_CUDA
+            cuda::resize_bilinear(out2, img);
+            DLIB_CASSERT(max(abs(mat(out)-mat(out2))) < 1e-5);
+#endif
+
+            resizable_tensor gradient_input;
+            gradient_input.copy_size(out);
+            tt::tensor_rand rnd;
+            rnd.fill_uniform(gradient_input);
+
+            const float h = 1e-2;
+
+            img.host()[idx] = 2;
+            cpu::resize_bilinear(out, img);
+            float f1 = dot(out, gradient_input); 
+
+            img.host()[idx] = 2+h;
+            cpu::resize_bilinear(out, img);
+            float f2 = dot(out, gradient_input); 
+
+            const float numerical_grad = (f2-f1)/h;
+            dlog << LINFO << "numerical grad: " << numerical_grad;
+
+
+            resizable_tensor grad, grad2;
+            grad.copy_size(img);
+            grad = 0.1;
+            grad2.copy_size(img);
+            grad2 = 0.1;
+
+            cpu::resize_bilinear_gradient(grad2, gradient_input);
+            dlog << LINFO << "analytic grad: "<< grad2.host()[idx]-0.1;
+            DLIB_CASSERT(std::abs(numerical_grad - grad2.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad2.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+
+#ifdef DLIB_USE_CUDA
+            cuda::resize_bilinear_gradient(grad, gradient_input);
+            dlog << LINFO << "analytic grad: "<< grad.host()[idx]-0.1;
+            DLIB_CASSERT(std::abs(numerical_grad - grad.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+            DLIB_CASSERT(max(abs(mat(grad)-mat(grad2))) < 1e-5);
+#endif
+
+        }
+    }
+
+
+    void test_serialization()
+    {
+        print_spinner();
+
+        using net_type = loss_mean_squared<fc<1, input<matrix<double>>>>;
+        net_type net, net2;
+
+        std::ostringstream out;
+        serialize(net, out);
+        const std::string serialized = out.str();
+        std::istringstream in(serialized);
+        dlib::deserialize(net2, in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -2339,6 +2609,9 @@ namespace
             compare_adam();
             test_copy_tensor_gpu();
 #endif
+            test_tensor_resize_bilinear(2, 3, 6,6, 11, 11);
+            test_tensor_resize_bilinear(2, 3, 6,6, 3, 4);
+            test_tensor_resize_bilinear(2, 3, 5,6, 12, 21);
             test_max_pool(1,1,2,3,0,0);
             test_max_pool(3,3,1,1,0,0);
             test_max_pool(3,3,2,2,0,0);
@@ -2375,10 +2648,13 @@ namespace
             test_concat();
             test_simple_linear_regression();
             test_multioutput_linear_regression();
+            test_simple_autoencoder();
             test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_outputs_on_trivial_task();
             test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
+            test_loss_multiclass_per_pixel_weighted();
+            test_serialization();
         }
 
         void perform_test()

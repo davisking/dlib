@@ -296,6 +296,18 @@ namespace dlib
             const tensor& gradient_input
         );
 
+    // ----------------------------------------------------------------------------------------
+
+        void resize_bilinear (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void resize_bilinear_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        );
+
     // -----------------------------------------------------------------------------------
 
         class pooling

@@ -611,6 +611,108 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        int scale_y, 
+        int scale_x 
+        >
+    class upsample_
+    {
+    public:
+        static_assert(scale_y >= 1, "upsampling scale factor can't be less than 1.");
+        static_assert(scale_x >= 1, "upsampling scale factor can't be less than 1.");
+
+        upsample_() 
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            output.set_size(
+                sub.get_output().num_samples(),
+                sub.get_output().k(),
+                scale_y*sub.get_output().nr(),
+                scale_x*sub.get_output().nc());
+            tt::resize_bilinear(output, sub.get_output());
+        } 
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            tt::resize_bilinear_gradient(sub.get_gradient_input(), gradient_input);
+        }
+
+        inline point map_input_to_output (point p) const 
+        { 
+            p.x() = p.x()*scale_x;
+            p.y() = p.y()*scale_y;
+            return p; 
+        }
+        inline point map_output_to_input (point p) const 
+        { 
+            p.x() = p.x()/scale_x;
+            p.y() = p.y()/scale_y;
+            return p; 
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const upsample_& , std::ostream& out)
+        {
+            serialize("upsample_", out);
+            serialize(scale_y, out);
+            serialize(scale_x, out);
+        }
+
+        friend void deserialize(upsample_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "upsample_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::upsample_.");
+
+            int _scale_y;
+            int _scale_x;
+            deserialize(_scale_y, in);
+            deserialize(_scale_x, in);
+            if (_scale_y != scale_y || _scale_x != scale_x)
+                throw serialization_error("Wrong scale found while deserializing dlib::upsample_");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const upsample_& )
+        {
+            out << "upsample\t ("
+                << "scale_y="<<scale_y
+                << ", scale_x="<<scale_x
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const upsample_& /*item*/, std::ostream& out)
+        {
+            out << "<upsample"
+                << " scale_y='"<<scale_y<<"'"
+                << " scale_x='"<<scale_x<<"'/>\n";
+        }
+
+    private:
+        resizable_tensor params;
+    };
+
+    template <
+        int scale,
+        typename SUBNET
+        >
+    using upsample = add_layer<upsample_<scale,scale>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         long _nr,
         long _nc,
         int _stride_y,
