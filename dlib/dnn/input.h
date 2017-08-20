@@ -125,11 +125,19 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
-            if (version != "input_rgb_image")
+            if (version != "input_rgb_image" && version != "input_rgb_image_sized")
                 throw serialization_error("Unexpected version found while deserializing dlib::input_rgb_image.");
             deserialize(item.avg_red, in);
             deserialize(item.avg_green, in);
             deserialize(item.avg_blue, in);
+
+            // read and discard the sizes if this was really a sized input layer.
+            if (version == "input_rgb_image_sized")
+            {
+                size_t nr, nc;
+                deserialize(nr, in);
+                deserialize(nc, in);
+            }
         }
 
         friend std::ostream& operator<<(std::ostream& out, const input_rgb_image& item)
