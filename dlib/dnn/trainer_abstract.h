@@ -76,7 +76,7 @@ namespace dlib
                 - #get_learning_rate() == 1e-2 
                 - #get_min_learning_rate() == 1e-5
                 - #get_iterations_without_progress_threshold() == 2000
-                - #get_test_iterations_without_progress_threshold() == 200
+                - #get_test_iterations_without_progress_threshold() == 500
                 - #get_learning_rate_shrink_factor() == 0.1
                 - #get_learning_rate_schedule().size() == 0
                 - #get_train_one_step_calls() == 0

@@ -861,7 +861,7 @@ namespace dlib
             min_learning_rate = 1e-5;
             iter_without_progress_thresh = 2000;
             steps_without_progress = 0;
-            test_iter_without_progress_thresh = 200;
+            test_iter_without_progress_thresh = 500;
             test_steps_without_progress = 0;
 
             learning_rate_shrink = 0.1;
