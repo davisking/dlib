@@ -135,11 +135,57 @@ namespace dlib
 
             point& p;
 
-            template<typename layer_type>
-            void operator()(size_t idx, const layer_type& net) 
+            template<typename input_layer_type>
+            void operator()(const input_layer_type& net) 
             {
+            }
+
+            template <typename T, typename U>
+            void operator()(const add_loss_layer<T,U>& net) 
+            {
+                (*this)(net.subnet());
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(const add_layer<T,U,E>& net) 
+            {
+                (*this)(net.subnet());
                 p = net.layer_details().map_input_to_output(p);
             }
+            template <bool B, typename T, typename U, typename E>
+            void operator()(const dimpl::subnet_wrapper<add_layer<T,U,E>,B>& net) 
+            {
+                (*this)(net.subnet());
+                p = net.layer_details().map_input_to_output(p);
+            }
+
+
+            template <unsigned long ID, typename U, typename E>
+            void operator()(const add_tag_layer<ID,U,E>& net) 
+            {
+                // tag layers are an identity transform, so do nothing
+                (*this)(net.subnet());
+            }
+            template <bool is_first, unsigned long ID, typename U, typename E>
+            void operator()(const dimpl::subnet_wrapper<add_tag_layer<ID,U,E>,is_first>& net) 
+            {
+                // tag layers are an identity transform, so do nothing
+                (*this)(net.subnet());
+            }
+
+
+            template <template<typename> class TAG_TYPE, typename U>
+            void operator()(const add_skip_layer<TAG_TYPE,U>& net) 
+            {
+                (*this)(layer<TAG_TYPE>(net));
+            }
+            template <bool is_first, template<typename> class TAG_TYPE, typename SUBNET>
+            void operator()(const dimpl::subnet_wrapper<add_skip_layer<TAG_TYPE,SUBNET>,is_first>& net) 
+            {
+                // skip layers are an identity transform, so do nothing
+                (*this)(layer<TAG_TYPE>(net));
+            }
+
         };
 
         class visitor_net_map_output_to_input
@@ -149,11 +195,57 @@ namespace dlib
 
             point& p;
 
-            template<typename layer_type>
-            void operator()(size_t idx, const layer_type& net) 
+            template<typename input_layer_type>
+            void operator()(const input_layer_type& net) 
+            {
+            }
+
+            template <typename T, typename U>
+            void operator()(const add_loss_layer<T,U>& net) 
+            {
+                (*this)(net.subnet());
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(const add_layer<T,U,E>& net) 
             {
                 p = net.layer_details().map_output_to_input(p);
+                (*this)(net.subnet());
             }
+            template <bool B, typename T, typename U, typename E>
+            void operator()(const dimpl::subnet_wrapper<add_layer<T,U,E>,B>& net) 
+            {
+                p = net.layer_details().map_output_to_input(p);
+                (*this)(net.subnet());
+            }
+
+
+            template <unsigned long ID, typename U, typename E>
+            void operator()(const add_tag_layer<ID,U,E>& net) 
+            {
+                // tag layers are an identity transform, so do nothing
+                (*this)(net.subnet());
+            }
+            template <bool is_first, unsigned long ID, typename U, typename E>
+            void operator()(const dimpl::subnet_wrapper<add_tag_layer<ID,U,E>,is_first>& net) 
+            {
+                // tag layers are an identity transform, so do nothing
+                (*this)(net.subnet());
+            }
+
+
+            template <template<typename> class TAG_TYPE, typename U>
+            void operator()(const add_skip_layer<TAG_TYPE,U>& net) 
+            {
+                (*this)(layer<TAG_TYPE>(net));
+            }
+            template <bool is_first, template<typename> class TAG_TYPE, typename SUBNET>
+            void operator()(const dimpl::subnet_wrapper<add_skip_layer<TAG_TYPE,SUBNET>,is_first>& net) 
+            {
+                // skip layers are an identity transform, so do nothing
+                (*this)(layer<TAG_TYPE>(net));
+            }
+
         };
     }
 
@@ -164,7 +256,7 @@ namespace dlib
     )
     {
         impl::visitor_net_map_input_to_output temp(p);
-        visit_layers_backwards_range<0,net_type::num_layers-1>(net, temp);
+        temp(net);
         return p;
     }
 
@@ -175,7 +267,7 @@ namespace dlib
     )
     {
         impl::visitor_net_map_output_to_input temp(p);
-        visit_layers_range<0,net_type::num_layers-1>(net, temp);
+        temp(net);
         return p;
     }
 

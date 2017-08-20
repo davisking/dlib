@@ -88,6 +88,17 @@ namespace dlib
               net.get_output().  This kind of mapping is useful when working with fully
               convolutional networks as you will often want to know what parts of the
               output feature maps correspond to what parts of the input.
+            - If the network contains skip layers then any layers skipped over by the skip
+              layer are ignored for the purpose of computing this coordinate mapping.  That
+              is, if you walk the network from the output layer to the input layer, where
+              each time you encounter a skip layer you jump to the layer indicated by the
+              skip layer, you will visit exactly the layers in the network involved in the
+              input_tensor_to_output_tensor() calculation. This behavior is useful since it
+              allows you to compute some auxiliary DNN as a separate branch of computation
+              that is separate from the main network's job of running some kind of fully
+              convolutional network over an image.  For instance, you might want to have a
+              branch in your network that computes some global image level
+              summarization/feature.
     !*/
 
 // ----------------------------------------------------------------------------------------
