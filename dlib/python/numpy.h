@@ -18,7 +18,7 @@ void validate_numpy_array_type (
 )
 {
     using namespace boost::python;
-    const char ch = extract<char>(obj.attr("dtype").attr("char"));
+    const char ch = boost::python::extract<char>(obj.attr("dtype").attr("char"));
 
     if (dlib::is_same_type<T,double>::value && ch != 'd')
         throw dlib::error("Expected numpy.ndarray of float64");

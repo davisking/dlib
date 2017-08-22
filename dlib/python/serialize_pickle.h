@@ -45,10 +45,10 @@ struct serialize_pickle : boost::python::pickle_suite
         // UTF-8 encodings.  So instead we access the python C interface directly and use
         // bytes objects.  However, we keep the deserialization code that worked with str
         // for backwards compatibility with previously pickled files.
-        if (extract<str>(state[0]).check())
+        if (boost::python::extract<str>(state[0]).check())
         {
-            str data = extract<str>(state[0]);
-            std::string temp(extract<const char*>(data), len(data));
+            str data = boost::python::extract<str>(state[0]);
+            std::string temp(boost::python::extract<const char*>(data), len(data));
             std::istringstream sin(temp);
             deserialize(item, sin);
         }
