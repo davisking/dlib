@@ -154,7 +154,7 @@ namespace dlib
             /*!
                 WHAT THIS OBJECT REPRESENTS
                     This is a block of memory on a CUDA device that will be automatically
-                    resized if requestes size is larger than allocated
+                    resized if requested size is larger than allocated.
             !*/
         public:
             cuda_data_void_ptr get(size_t size)
