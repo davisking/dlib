@@ -2392,7 +2392,7 @@ namespace dlib
                 defined above.  In particular, the output of this layer is simply a copy of
                 the input tensor.  However, you can configure the extract layer to output
                 only some subset of the input tensor and also to reshape it.  Therefore,
-                the dimensions of the tensors output by this layer are as follows (letting
+                the dimensions of the tensor output by this layer are as follows (letting
                 IN be the input tensor and OUT the output tensor):
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == _k 
