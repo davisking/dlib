@@ -122,6 +122,9 @@ namespace dlib
                 - std::bad_alloc 
         !*/
 
+        array2d(const array2d&) = delete;        // copy constructor
+        array2d& operator=(const array2d&) = delete;    // assignment operator
+
         array2d(
             array2d&& item
         );
@@ -251,12 +254,6 @@ namespace dlib
                   rows and therefore might return larger numbers.
                   An example of such an object is the dlib::cv_image.
         !*/
-
-    private:
-
-        // restricted functions
-        array2d(array2d&);        // copy constructor
-        array2d& operator=(array2d&);    // assignment operator
 
     };
 
