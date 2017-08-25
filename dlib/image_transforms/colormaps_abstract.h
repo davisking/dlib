@@ -43,6 +43,8 @@ namespace dlib
         double max_val
     );
     /*!
+        requires
+            - min_val <= max_val
         ensures
             - Maps value to a color.  In particular, we use a heatmap color scheme where
               values <= min_val are black and larger values become more red, then yellow,
@@ -95,6 +97,8 @@ namespace dlib
         double max_val
     );
     /*!
+        requires
+            - min_val <= max_val
         ensures
             - Maps value to a color.  In particular, we use a jet color scheme where 
               values <= min_val are dark blue and larger values become light blue, then
