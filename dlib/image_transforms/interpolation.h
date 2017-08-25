@@ -828,8 +828,8 @@ namespace dlib
                 simd4f bl(in_img[bottom][fleft[0]],  in_img[bottom][fleft[1]],  in_img[bottom][fleft[2]],  in_img[bottom][fleft[3]]);
                 simd4f br(in_img[bottom][fright[0]], in_img[bottom][fright[1]], in_img[bottom][fright[2]], in_img[bottom][fright[3]]);
 
-                simd4i out = simd4i(tlf*tl + trf*tr + blf*bl + brf*br);
-                int32 fout[4];
+                simd4f out = simd4f(tlf*tl + trf*tr + blf*bl + brf*br);
+                float fout[4];
                 out.store(fout);
 
                 out_img[r][c]   = static_cast<T>(fout[0]);
