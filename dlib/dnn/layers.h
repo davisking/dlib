@@ -90,8 +90,8 @@ namespace dlib
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
 
-        inline point map_input_to_output (
-            point p
+        inline dpoint map_input_to_output (
+            dpoint p
         ) const
         {
             p.x() = (p.x()+padding_x()-nc()/2)/stride_x();
@@ -99,8 +99,8 @@ namespace dlib
             return p;
         }
 
-        inline point map_output_to_input (
-            point p
+        inline dpoint map_output_to_input (
+            dpoint p
         ) const
         {
             p.x() = p.x()*stride_x() - padding_x() + nc()/2;
@@ -187,7 +187,7 @@ namespace dlib
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
         {
             conv.get_gradient_for_data (true, gradient_input, filters(params,0), sub.get_gradient_input());
-            // no point computing the parameter gradients if they won't be used.
+            // no dpoint computing the parameter gradients if they won't be used.
             if (learning_rate_multiplier != 0)
             {
                 auto filt = filters(params_grad,0);
@@ -374,8 +374,8 @@ namespace dlib
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
 
-        inline point map_output_to_input (
-            point p
+        inline dpoint map_output_to_input (
+            dpoint p
         ) const
         {
             p.x() = (p.x()+padding_x()-nc()/2)/stride_x();
@@ -383,8 +383,8 @@ namespace dlib
             return p;
         }
 
-        inline point map_input_to_output (
-            point p
+        inline dpoint map_input_to_output (
+            dpoint p
         ) const
         {
             p.x() = p.x()*stride_x() - padding_x() + nc()/2;
@@ -646,13 +646,13 @@ namespace dlib
             tt::resize_bilinear_gradient(sub.get_gradient_input(), gradient_input);
         }
 
-        inline point map_input_to_output (point p) const 
+        inline dpoint map_input_to_output (dpoint p) const 
         { 
             p.x() = p.x()*scale_x;
             p.y() = p.y()*scale_y;
             return p; 
         }
-        inline point map_output_to_input (point p) const 
+        inline dpoint map_output_to_input (dpoint p) const 
         { 
             p.x() = p.x()/scale_x;
             p.y() = p.y()/scale_y;
@@ -746,8 +746,8 @@ namespace dlib
         long padding_y() const { return padding_y_; }
         long padding_x() const { return padding_x_; }
 
-        inline point map_input_to_output (
-            point p
+        inline dpoint map_input_to_output (
+            dpoint p
         ) const
         {
             p.x() = (p.x()+padding_x()-nc()/2)/stride_x();
@@ -755,8 +755,8 @@ namespace dlib
             return p;
         }
 
-        inline point map_output_to_input (
-            point p
+        inline dpoint map_output_to_input (
+            dpoint p
         ) const
         {
             p.x() = p.x()*stride_x() - padding_x() + nc()/2;
@@ -943,8 +943,8 @@ namespace dlib
         long padding_y() const { return padding_y_; }
         long padding_x() const { return padding_x_; }
 
-        inline point map_input_to_output (
-            point p
+        inline dpoint map_input_to_output (
+            dpoint p
         ) const
         {
             p.x() = (p.x()+padding_x()-nc()/2)/stride_x();
@@ -952,8 +952,8 @@ namespace dlib
             return p;
         }
 
-        inline point map_output_to_input (
-            point p
+        inline dpoint map_output_to_input (
+            dpoint p
         ) const
         {
             p.x() = p.x()*stride_x() - padding_x() + nc()/2;
@@ -1155,8 +1155,8 @@ namespace dlib
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
 
-        inline point map_input_to_output (const point& p) const { return p; }
-        inline point map_output_to_input (const point& p) const { return p; }
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
 
         template <typename SUBNET>
@@ -1696,8 +1696,8 @@ namespace dlib
                 tt::multiply(true, data_grad, mask, gradient_input);
         }
 
-        inline point map_input_to_output (const point& p) const { return p; }
-        inline point map_output_to_input (const point& p) const { return p; }
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
@@ -1781,8 +1781,8 @@ namespace dlib
             tt::affine_transform(output, input, val);
         } 
 
-        inline point map_input_to_output (const point& p) const { return p; }
-        inline point map_output_to_input (const point& p) const { return p; }
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
         void backward_inplace(
             const tensor& gradient_input, 
@@ -1889,8 +1889,8 @@ namespace dlib
 
         layer_mode get_mode() const { return mode; }
 
-        inline point map_input_to_output (const point& p) const { return p; }
-        inline point map_output_to_input (const point& p) const { return p; }
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
         template <typename SUBNET>
         void setup (const SUBNET& sub)
@@ -2256,8 +2256,8 @@ namespace dlib
             tt::relu_gradient(data_grad, computed_output, gradient_input);
         }
 
-        inline point map_input_to_output (const point& p) const { return p; }
-        inline point map_output_to_input (const point& p) const { return p; }
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
@@ -2336,8 +2336,8 @@ namespace dlib
                 gradient_input, params, params_grad);
         }
 
-        inline point map_input_to_output (const point& p) const { return p; }
-        inline point map_output_to_input (const point& p) const { return p; }
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
@@ -2411,8 +2411,8 @@ namespace dlib
             tt::sigmoid_gradient(data_grad, computed_output, gradient_input);
         }
 
-        inline point map_input_to_output (const point& p) const { return p; }
-        inline point map_output_to_input (const point& p) const { return p; }
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
@@ -2464,8 +2464,8 @@ namespace dlib
         {
         }
 
-        inline point map_input_to_output (const point& p) const { return p; }
-        inline point map_output_to_input (const point& p) const { return p; }
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
         void forward_inplace(const tensor& input, tensor& output)
         {
@@ -2678,8 +2678,8 @@ namespace dlib
             impl::concat_helper_impl<TAG_TYPES...>::split(gradient_input, sub, 0);
         }
 
-        point map_input_to_output(point p) const { return p; }
-        point map_output_to_input(point p) const { return p; }
+        dpoint map_input_to_output(dpoint p) const { return p; }
+        dpoint map_output_to_input(dpoint p) const { return p; }
 
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }

@@ -131,9 +131,9 @@ namespace dlib
         {
         public:
 
-            visitor_net_map_input_to_output(point& p_) : p(p_) {}
+            visitor_net_map_input_to_output(dpoint& p_) : p(p_) {}
 
-            point& p;
+            dpoint& p;
 
             template<typename input_layer_type>
             void operator()(const input_layer_type& net) 
@@ -191,9 +191,9 @@ namespace dlib
         class visitor_net_map_output_to_input
         {
         public:
-            visitor_net_map_output_to_input(point& p_) : p(p_) {}
+            visitor_net_map_output_to_input(dpoint& p_) : p(p_) {}
 
-            point& p;
+            dpoint& p;
 
             template<typename input_layer_type>
             void operator()(const input_layer_type& net) 
@@ -250,9 +250,9 @@ namespace dlib
     }
 
     template <typename net_type>
-    inline point input_tensor_to_output_tensor(
+    inline dpoint input_tensor_to_output_tensor(
         const net_type& net,
-        point p 
+        dpoint p 
     )
     {
         impl::visitor_net_map_input_to_output temp(p);
@@ -261,9 +261,9 @@ namespace dlib
     }
 
     template <typename net_type>
-    inline point output_tensor_to_input_tensor(
+    inline dpoint output_tensor_to_input_tensor(
         const net_type& net,
-        point p  
+        dpoint p  
     )
     {
         impl::visitor_net_map_output_to_input temp(p);
