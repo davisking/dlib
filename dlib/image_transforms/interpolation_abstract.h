@@ -417,6 +417,28 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    void resize_image (
+        double size_scale,
+        image_type& img 
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+        ensures
+            - Resizes img so that each of it's dimensions are size_scale times larger than img.
+              In particular, we will have:
+                - #img.nr() == std::round(size_scale*img.nr())
+                - #img.nc() == std::round(size_scale*img.nc())
+                - #img == a bilinearly interpolated copy of the input image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type1,
         typename image_type2
         >

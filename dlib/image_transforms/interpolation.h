@@ -1010,6 +1010,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    void resize_image (
+        double size_scale,
+        image_type& img 
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( size_scale > 0 ,
+            "\t void resize_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t size_scale:  " << size_scale
+            );
+
+        image_type temp;
+        set_image_size(temp, std::round(size_scale*num_rows(img)), std::round(size_scale*num_columns(img)));
+        resize_image(img, temp);
+        swap(img, temp);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type1,
         typename image_type2
         >
