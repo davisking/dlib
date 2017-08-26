@@ -521,6 +521,12 @@ namespace dlib
         float get_avg_green() const { return avg_green; }
         float get_avg_blue()  const { return avg_blue; }
 
+        unsigned long get_pyramid_padding () const { return pyramid_padding; }
+        void set_pyramid_padding (unsigned long value) { pyramid_padding = value; }
+
+        unsigned long get_pyramid_outer_padding () const { return pyramid_outer_padding; }
+        void set_pyramid_outer_padding (unsigned long value) { pyramid_outer_padding = value; }
+
         bool image_contained_point (
             const tensor& data,
             const point& p
@@ -579,9 +585,9 @@ namespace dlib
             parallel_for(0, imgs.size(), [&](long i){
                 std::vector<rectangle> rects;
                 if (i == 0)
-                    create_tiled_pyramid<pyramid_type>(ibegin[i], imgs[i], data.annotation().get<std::vector<rectangle>>());
+                    create_tiled_pyramid<pyramid_type>(ibegin[i], imgs[i], data.annotation().get<std::vector<rectangle>>(), pyramid_padding, pyramid_outer_padding);
                 else
-                    create_tiled_pyramid<pyramid_type>(ibegin[i], imgs[i], rects);
+                    create_tiled_pyramid<pyramid_type>(ibegin[i], imgs[i], rects, pyramid_padding, pyramid_outer_padding);
             });
             nr = imgs[0].nr();
             nc = imgs[0].nc();
@@ -611,38 +617,58 @@ namespace dlib
 
         friend void serialize(const input_rgb_image_pyramid& item, std::ostream& out)
         {
-            serialize("input_rgb_image_pyramid", out);
+            serialize("input_rgb_image_pyramid2", out);
             serialize(item.avg_red, out);
             serialize(item.avg_green, out);
             serialize(item.avg_blue, out);
+            serialize(item.pyramid_padding, out);
+            serialize(item.pyramid_outer_padding, out);
         }
 
         friend void deserialize(input_rgb_image_pyramid& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "input_rgb_image_pyramid")
+            if (version != "input_rgb_image_pyramid" && version != "input_rgb_image_pyramid2")
                 throw serialization_error("Unexpected version found while deserializing dlib::input_rgb_image_pyramid.");
             deserialize(item.avg_red, in);
             deserialize(item.avg_green, in);
             deserialize(item.avg_blue, in);
+            if (version == "input_rgb_image_pyramid2")
+            {
+                deserialize(item.pyramid_padding, in);
+                deserialize(item.pyramid_outer_padding, in);
+            }
+            else
+            {
+                item.pyramid_padding = 10;
+                item.pyramid_outer_padding = 11;
+            }
         }
 
         friend std::ostream& operator<<(std::ostream& out, const input_rgb_image_pyramid& item)
         {
             out << "input_rgb_image_pyramid("<<item.avg_red<<","<<item.avg_green<<","<<item.avg_blue<<")";
+            out << " pyramid_padding="<<item.pyramid_padding;
+            out << " pyramid_outer_padding="<<item.pyramid_outer_padding;
             return out;
         }
 
         friend void to_xml(const input_rgb_image_pyramid& item, std::ostream& out)
         {
-            out << "<input_rgb_image_pyramid r='"<<item.avg_red<<"' g='"<<item.avg_green<<"' b='"<<item.avg_blue<<"'/>";
+            out << "<input_rgb_image_pyramid r='"<<item.avg_red<<"' g='"<<item.avg_green
+                <<"' b='"<<item.avg_blue
+                <<"' pyramid_padding='"<<item.pyramid_padding
+                <<"' pyramid_outer_padding='"<<item.pyramid_outer_padding
+                <<"'/>";
         }
 
     private:
         float avg_red;
         float avg_green;
         float avg_blue;
+        unsigned long pyramid_padding = 10;
+        unsigned long pyramid_outer_padding = 11;
     };
 
 // ----------------------------------------------------------------------------------------

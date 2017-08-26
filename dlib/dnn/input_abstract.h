@@ -294,6 +294,8 @@ namespace dlib
                 - #get_avg_red()   == 122.782
                 - #get_avg_green() == 117.001
                 - #get_avg_blue()  == 104.298
+                - #get_pyramid_padding() == 10
+                - #get_pyramid_outer_padding() == 11
         !*/
 
         input_rgb_image_pyramid (
@@ -306,6 +308,8 @@ namespace dlib
                 - #get_avg_red() == avg_red
                 - #get_avg_green() == avg_green
                 - #get_avg_blue() == avg_blue
+                - #get_pyramid_padding() == 10
+                - #get_pyramid_outer_padding() == 11
         !*/
 
         float get_avg_red(
@@ -327,6 +331,37 @@ namespace dlib
         /*!
             ensures
                 - returns the value subtracted from the blue color channel.
+        !*/
+
+        unsigned long get_pyramid_padding (
+        ) const; 
+        /*!
+            ensures
+                - When this object creates a pyramid it will call create_tiled_pyramid() and
+                  set create_tiled_pyramid's pyramid_padding parameter to get_pyramid_padding().
+        !*/
+        void set_pyramid_padding (
+            unsigned long value
+        );
+        /*!
+            ensures
+                - #get_pyramid_padding() == value
+        !*/
+
+        unsigned long get_pyramid_outer_padding (
+        ) const; 
+        /*!
+            ensures
+                - When this object creates a pyramid it will call create_tiled_pyramid()
+                  and set create_tiled_pyramid's pyramid_outer_padding parameter to
+                  get_pyramid_outer_padding().
+        !*/
+        void set_pyramid_outer_padding (
+            unsigned long value
+        );
+        /*!
+            ensures
+                - #get_pyramid_outer_padding() == value
         !*/
 
         template <typename forward_iterator>
