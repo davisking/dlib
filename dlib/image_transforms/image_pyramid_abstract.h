@@ -219,7 +219,8 @@ namespace dlib
         const image_type1& img,
         image_type2& out_img,
         std::vector<rectangle>& rects,
-        const unsigned long padding = 10
+        const unsigned long padding = 10,
+        const unsigned long outer_padding = 0
     );
     /*!
         requires
@@ -237,7 +238,8 @@ namespace dlib
               pyramid levels are generated from pyramid_type's downsampling.  The entire
               resulting pyramid is packed into a single image and stored in out_img.
             - When packing pyramid levels into out_img, there will be padding pixels of
-              space between each sub-image.
+              space between each sub-image.  There will also be outer_padding pixels of
+              padding around the edge of the image.  All padding pixels have a value of 0.
             - The resulting pyramid will be composed of #rects.size() images packed into
               out_img.  Moreover, #rects[i] is the location inside out_img of the i-th
               pyramid level. 

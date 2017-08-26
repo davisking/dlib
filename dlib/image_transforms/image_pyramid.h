@@ -988,7 +988,8 @@ namespace dlib
         const image_type1& img,
         image_type2& out_img,
         std::vector<rectangle>& rects,
-        const unsigned long padding = 10
+        const unsigned long padding = 10,
+        const unsigned long outer_padding = 0
     )
     {
         DLIB_ASSERT(!is_same_object(img, out_img));
@@ -1038,14 +1039,15 @@ namespace dlib
         }
         height -= padding; // don't add unnecessary padding to the very right side.
 
-        set_image_size(out_img,height,img.nc());
+        const long width = img.nc();
+        set_image_size(out_img,height+outer_padding*2,width+outer_padding*2);
         assign_all_pixels(out_img, 0);
 
-        long y = 0;
+        long y = outer_padding;
         size_t i = 0;
-        while(y < height)
+        while(y < height+outer_padding)
         {
-            rectangle rect = translate_rect(get_rect(pyramid[i]),point(0,y));
+            rectangle rect = translate_rect(get_rect(pyramid[i]),point(outer_padding,y));
             DLIB_ASSERT(get_rect(out_img).contains(rect));
             rects.push_back(rect);
             auto si = sub_image(out_img, rect);
@@ -1056,7 +1058,7 @@ namespace dlib
         y -= padding;
         while (i < pyramid.size())
         {
-            point p1(img.nc()-1,y-1);
+            point p1(outer_padding+width-1,y-1);
             point p2 = p1 - get_rect(pyramid[i]).br_corner();
             rectangle rect(p1,p2);
             DLIB_ASSERT(get_rect(out_img).contains(rect));
