@@ -9,15 +9,15 @@
     with a CNN and train the entire detector end-to-end.  This allows us to make
     much more powerful detectors.
 
-    It would be a good idea to become familiar with dlib's DNN tooling before
-    reading this example.  So you should read dnn_introduction_ex.cpp and
-    dnn_introduction2_ex.cpp before reading this example program.  You should also read the
-    DNN+MMOD example as well: dnn_mmod_ex.cpp
+    It would be a good idea to become familiar with dlib's DNN tooling before reading this
+    example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
+    before reading this example program.  You should also read the introductory DNN+MMOD
+    example as well before proceeding.  So read dnn_mmod_ex.cpp first.
     
 
     This example is essentially a more complex version of dnn_mmod_ex.cpp.  In it we train
     a detector that finds the rear ends of motor vehicles.  I will also discuss some
-    aspects of data preparation useful when training this kind of detector.
+    aspects of data preparation useful when training this kind of detector.  
     
 */
 
@@ -33,7 +33,6 @@ using namespace dlib;
 
 
 
-// the dnn vehicle detector network
 template <long num_filters, typename SUBNET> using con5d = con<num_filters,5,5,2,2,SUBNET>;
 template <long num_filters, typename SUBNET> using con5  = con<num_filters,5,5,1,1,SUBNET>;
 template <typename SUBNET> using downsampler  = relu<bn_con<con5d<32, relu<bn_con<con5d<32, relu<bn_con<con5d<16,SUBNET>>>>>>>>>;
@@ -47,6 +46,12 @@ int ignore_overlapped_boxes(
     std::vector<mmod_rect>& boxes,
     const test_box_overlap& overlaps
 )
+/*!
+    ensures
+        - Whenever two rectangles in boxes overlap, according to overlaps(), we set the
+          smallest box to ignore.
+        - returns the number of newly ignored boxes.
+!*/
 {
     int num_ignored = 0;
     for (size_t i = 0; i < boxes.size(); ++i)
@@ -87,6 +92,8 @@ int main(int argc, char** argv) try
         cout << "by typing: " << endl;
         cout << "   ./dnn_mmod_train_find_cars_ex dlib_rear_end_vehicles" << endl;
         cout << endl;
+        cout << "It takes about a day to finish if run on a high end GPU like a 1080ti." << endl;
+        cout << endl;
         return 0;
     }
     const std::string data_directory = argv[1];
@@ -97,6 +104,61 @@ int main(int argc, char** argv) try
     load_image_dataset(images_train, boxes_train, data_directory+"/training.xml");
     load_image_dataset(images_test,  boxes_test,  data_directory+"/testing.xml");
 
+    // When I was creating the dlib vehicle detection dataset I had to label all the cars
+    // in each image.  MMOD requires all cars to be labeled, since any unlabeled part of an
+    // image is implicitly assumed to be not a car, and the algorithm will use it as
+    // negative training data.  So every car must be labeled, either with a normal
+    // rectangle or an "ignore" rectangle that tells MMOD to simply ignore it (i.e. neither
+    // treat it as a thing to detect nor as negative training data).  
+    // 
+    // In our present case, many images contain very tiny cars in the distance, ones that
+    // are essentially just dark smudges.  It's not reasonable to expect the CNN
+    // architecture we defined to detect such vehicles.  However, I erred on the side of
+    // having more complete annotations when creating the dataset.  So when I labeled these
+    // images I labeled many of these really difficult cases as vehicles to detect.   
+    //
+    // So the first thing we are going to do is clean up our dataset a little bit.  In
+    // particular, we are going to mark boxes smaller than 35*35 pixels as ignore since
+    // only really small and blurry cars appear at those sizes.  We will also mark boxes
+    // that are heavily overlapped by another box as ignore.  We do this because we want to
+    // allow for stronger non-maximum suppression logic in the learned detector, since that
+    // will help make it easier to learn a good detector. 
+    // 
+    // To explain this non-max suppression idea further it's important to understand how
+    // the detector works.  Essentially, sliding window detectors scan all image locations
+    // and ask "is there a care here?".  If there really is a car in an image then usually
+    // many sliding window locations will produce high detection scores, indicating that
+    // there is a car at those locations.  If we just stopped there then each car would
+    // produce multiple detections.  But that isn't what we want.  We want each car to
+    // produce just one detection.  So it's common for detectors to include "non-maximum
+    // suppression" logic which simply takes the strongest detection and then deletes all
+    // detections "close to" the strongest.  This is a simple post-processing step that can
+    // eliminate duplicate detections.  However, we have to define what "close to" means.
+    // We can do this by looking at your training data and checking how close the closest
+    // target boxes are to each other, and then picking a "close to" measure that doesn't
+    // suppress those target boxes but is otherwise as tight as possible.  This is exactly
+    // what the mmod_options object does by default.
+    //
+    // Importantly, this means that if your training dataset contains an image with two
+    // target boxes that really overlap a whole lot, then the non-maximum suppression
+    // "close to" measure will be configured to allow detections to really overlap a whole
+    // lot.  On the other hand, if your dataset didn't contain any overlapped boxes at all,
+    // then the non-max suppression logic would be configured to filter out any boxes that
+    // overlapped at all, and thus would be performing a much stronger non-max suppression.  
+    //
+    // Why does this matter?  Well, remember that we want to avoid duplicate detections.
+    // If non-max suppression just kills everything in a really wide area around a car then
+    // the CNN doesn't really need to learn anything about avoiding duplicate detections.
+    // However, if non-max suppression only suppresses a tiny area around each detection
+    // then the CNN will need to learn to output small detection scores for those areas of
+    // the image not suppressed.  The smaller the non-max suppression region the more the
+    // CNN has to learn and the more difficult the learning problem will become.  This is
+    // why we remove highly overlapped objects from the training dataset.  That is, we do
+    // it so that the non-max suppression logic will be able to be reasonably effective.
+    // Here we are ensuring that any boxes that are entirely contained by another are
+    // suppressed.  We also ensure that boxes with an intersection over union of 0.5 or
+    // greater are suppressed.  This will improve the resulting detector since it will be
+    // able to use more aggressive non-max suppression settings.
 
     int num_overlapped_ignored_test = 0;
     for (auto& v : boxes_test)
@@ -136,9 +198,18 @@ int main(int argc, char** argv) try
             // errors and inconsistencies can often greatly improve models trained from
             // such data.  It's almost always worth the time to try and improve your
             // training dataset.   
+            //
+            // In any case, my point is that there are other types of dataset cleaning you
+            // could put here.  What exactly you need depends on your application.  But you
+            // should carefully consider it and not take your dataset as a given.  The work
+            // of creating a good detector is largely about creating a high quality
+            // training dataset.  
         }
     }
 
+    // When modifying a dataset like this, it's a really good idea to print out a log of
+    // how many boxes you ignored.  It's easy to accidentally ignore a huge block of data,
+    // so you should always look and see that things are doing what you expect.
     cout << "num_overlapped_ignored: "<< num_overlapped_ignored << endl;
     cout << "num_additional_ignored: "<< num_additional_ignored << endl;
     cout << "num_overlapped_ignored_test: "<< num_overlapped_ignored_test << endl;
@@ -153,9 +224,10 @@ int main(int argc, char** argv) try
     // sedans).  Here we are telling the MMOD algorithm that a vehicle is recognizable as
     // long as the longest box side is at least 70 pixels long and the shortest box side is
     // at least 30 pixels long.  It will use these parameters to decide how large each of
-    // the sliding windows need to be so as to be able to detect all the vehicles.  Since
-    // our dataset has basically only these 3 different aspect ratios, it will decide to
-    // use 3 different sliding windows at the end of the network.  
+    // the sliding windows needs to be so as to be able to detect all the vehicles.  Since
+    // our dataset has basically these 3 different aspect ratios, it will decide to use 3
+    // different sliding windows.  This means the final con layer in the network will have
+    // 3 filters, one for each of these aspect ratios. 
     mmod_options options(boxes_train, 70, 30);
 
     // This setting is very important and dataset specific.  The vehicle detection dataset
@@ -169,7 +241,7 @@ int main(int argc, char** argv) try
     // But first, we need to understand exactly what this option does.  The MMOD loss
     // is essentially counting the number of false alarms + missed detections, produced by
     // the detector, for each image.  During training, the code is running the detector on
-    // each image in a mini-batch and looking at it's output and counting the number of
+    // each image in a mini-batch and looking at its output and counting the number of
     // mistakes.  The optimizer tries to find parameters settings that minimize the number
     // of detector mistakes.
     // 
@@ -193,14 +265,27 @@ int main(int argc, char** argv) try
     net_type net(options);
     // The final layer of the network must be a con_ layer that contains 
     // options.detector_windows.size() filters.  This is because these final filters are
-    // what perform the final "sliding window" detection in the network.  
+    // what perform the final "sliding window" detection in the network.  For the dlib
+    // vehicle dataset, there will be 3 sliding window detectors, so we will be setting
+    // num_filters to 3 here.
     net.subnet().layer_details().set_num_filters(options.detector_windows.size());
+
 
     dnn_trainer<net_type> trainer(net,sgd(0.0001,0.9));
     trainer.set_learning_rate(0.1);
     trainer.be_verbose();
-    trainer.set_iterations_without_progress_threshold(50000);
+
+    // While training, we are going to use early stopping.  That is, we will be checking
+    // how good the detector is performing on our test data and when it stops getting
+    // better on the test data we will drop the learning rate.  We will keep doing that
+    // until the learning rate is less than 1e-4.   These two settings tell the training to
+    // do that.  Essentially, we are setting the first argument to infinity, and only the
+    // test iterations without progress threshold will matter.  In particular, it says that
+    // once we observe 1000 testing mini-batches where the test loss clearly isn't
+    // decreasing we will lower the learning rate.
+    trainer.set_iterations_without_progress_threshold(1000000);
     trainer.set_test_iterations_without_progress_threshold(1000);
+
     const string sync_filename = "mmod_cars_sync";
     trainer.set_synchronization_file(sync_filename, std::chrono::minutes(5));
 
@@ -215,12 +300,15 @@ int main(int argc, char** argv) try
     cropper.set_min_object_size(0.20); 
     cropper.set_max_rotation_degrees(2);
     dlib::rand rnd;
+
+    // Log the training parameters to the console
     cout << trainer << cropper << endl;
 
     int cnt = 1;
     // Run the trainer until the learning rate gets small.  
     while(trainer.get_learning_rate() >= 1e-4)
     {
+        // Every 30 mini-batches we do a testing mini-batch.  
         if (cnt%30 != 0 || images_test.size() == 0)
         {
             cropper(87, images_train, boxes_train, mini_batch_samples, mini_batch_labels);
