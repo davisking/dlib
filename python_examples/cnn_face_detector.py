@@ -39,7 +39,6 @@
 #   Or downloaded from http://scikit-image.org/download.html.
 
 import sys
-sys.path.append('../tools/python/build')
 import dlib
 from skimage import io
 
@@ -62,12 +61,14 @@ for f in sys.argv[2:]:
     # faces.
     dets = cnn_face_detector(img, 1)
     '''
-    This detector returns a mmod_rectangles object. This object contains a list of mmod_rect objects.
+    This detector returns a mmod_rectangles object. This object contains a list of mmod_rectangle objects.
     These objects can be accessed by simply iterating over the mmod_rectangles object
-    The mmod_rect object has two member variables, a dlib.rectangle object, and a confidence score.
+    The mmod_rectangle object has two member variables, a dlib.rectangle object, and a confidence score.
     
     It is also possible to pass a list of images to the detector.
-    In this case it will return a batch_mmod_rectangles object.
+        - like this: dets = cnn_face_detector([image list], upsample_num, batch_size = 128)
+
+    In this case it will return a mmod_rectangless object.
     This object behaves just like a list of lists and can be iterated over.
     '''
     print("Number of faces detected: {}".format(len(dets)))

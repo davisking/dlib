@@ -61,14 +61,15 @@ public:
 
     std::vector<std::vector<mmod_rect> > detect_mult (
         boost::python::list& imgs,
-        const int upsample_num_times
+        const int upsample_num_times,
+        const int batch_size = 128
     )
     {
         pyramid_down<2> pyr;
         std::vector<matrix<rgb_pixel> > dimgs;
         dimgs.reserve(len(imgs));
 
-        for(auto i = 0; i < len(imgs); i++)
+        for(int i = 0; i < len(imgs); i++)
         {
             // Copy the data into dlib based objects
             matrix<rgb_pixel> image;
@@ -80,14 +81,25 @@ public:
             else
                 throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
 
-            for(auto i = 0; i < upsample_num_times; i++)
+            for(int i = 0; i < upsample_num_times; i++)
             {
                 pyramid_up(image);
             }
             dimgs.push_back(image);
         }
 
-        auto dets = net(dimgs);
+        for(int i = 1; i < dimgs.size(); i++)
+        {
+            if
+            (
+                dimgs[i - 1].nc() != dimgs[i].nc() ||
+                dimgs[i - 1].nr() != dimgs[i].nr()
+            )
+                throw dlib::error("Images in list must all have the same dimensions.");
+            
+        }        
+
+        auto dets = net(dimgs, batch_size);
         std::vector<std::vector<mmod_rect> > all_rects;
 
         for(auto&& im_dets : dets)
@@ -135,13 +147,13 @@ void bind_cnn_face_detection()
         .def(
             "__call__", 
             &cnn_face_detection_model_v1::detect_mult, 
-            (arg("imgs"), arg("upsample_num_times")=0), 
+            (arg("imgs"), arg("upsample_num_times")=0, arg("batch_size")=128), 
             "takes a list of images as input returning a 2d list of mmod rectangles"
             );
     }
     {
     typedef mmod_rect type;
-    class_<type>("mmod_rect", "Wrapper around a rectangle object and a detection confidence score.")
+    class_<type>("mmod_rectangle", "Wrapper around a rectangle object and a detection confidence score.")
         .def_readwrite("rect",   &type::rect)
         .def_readwrite("confidence", &type::detection_confidence);
     }
@@ -152,7 +164,7 @@ void bind_cnn_face_detection()
     }
     {
     typedef std::vector<std::vector<mmod_rect> > type;
-    class_<type>("batch_mmod_rectangles", "A 2D array of mmod rectangle objects.")
+    class_<type>("mmod_rectangless", "A 2D array of mmod rectangle objects.")
         .def(vector_indexing_suite<type>());
     } 
 }
