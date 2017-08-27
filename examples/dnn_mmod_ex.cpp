@@ -213,6 +213,10 @@ int main(int argc, char** argv) try
     }
     return 0;
 
+    // Now that you finished this example, you should read dnn_mmod_train_find_cars_ex.cpp,
+    // which is a more advanced example.  It discusses many issues surrounding properly
+    // setting the MMOD parameters and creating a good training dataset.
+
 }
 catch(std::exception& e)
 {

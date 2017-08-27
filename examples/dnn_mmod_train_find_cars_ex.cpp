@@ -12,7 +12,7 @@
     It would be a good idea to become familiar with dlib's DNN tooling before reading this
     example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
     before reading this example program.  You should also read the introductory DNN+MMOD
-    example as well before proceeding.  So read dnn_mmod_ex.cpp first.
+    example dnn_mmod_ex.cpp as well before proceeding.
     
 
     This example is essentially a more complex version of dnn_mmod_ex.cpp.  In it we train
@@ -124,18 +124,19 @@ int main(int argc, char** argv) try
     // 
     // To explain this non-max suppression idea further it's important to understand how
     // the detector works.  Essentially, sliding window detectors scan all image locations
-    // and ask "is there a care here?".  If there really is a car in an image then usually
-    // many sliding window locations will produce high detection scores, indicating that
-    // there is a car at those locations.  If we just stopped there then each car would
-    // produce multiple detections.  But that isn't what we want.  We want each car to
-    // produce just one detection.  So it's common for detectors to include "non-maximum
-    // suppression" logic which simply takes the strongest detection and then deletes all
-    // detections "close to" the strongest.  This is a simple post-processing step that can
-    // eliminate duplicate detections.  However, we have to define what "close to" means.
-    // We can do this by looking at your training data and checking how close the closest
-    // target boxes are to each other, and then picking a "close to" measure that doesn't
-    // suppress those target boxes but is otherwise as tight as possible.  This is exactly
-    // what the mmod_options object does by default.
+    // and ask "is there a care here?".  If there really is a car in a specific location in
+    // an image then usually many slightly different sliding window locations will produce
+    // high detection scores, indicating that there is a car at those locations.  If we
+    // just stopped there then each car would produce multiple detections.  But that isn't
+    // what we want.  We want each car to produce just one detection.  So it's common for
+    // detectors to include "non-maximum suppression" logic which simply takes the
+    // strongest detection and then deletes all detections "close to" the strongest.  This
+    // is a simple post-processing step that can eliminate duplicate detections.  However,
+    // we have to define what "close to" means.  We can do this by looking at your training
+    // data and checking how close the closest target boxes are to each other, and then
+    // picking a "close to" measure that doesn't suppress those target boxes but is
+    // otherwise as tight as possible.  This is exactly what the mmod_options object does
+    // by default.
     //
     // Importantly, this means that if your training dataset contains an image with two
     // target boxes that really overlap a whole lot, then the non-maximum suppression
@@ -152,8 +153,8 @@ int main(int argc, char** argv) try
     // the image not suppressed.  The smaller the non-max suppression region the more the
     // CNN has to learn and the more difficult the learning problem will become.  This is
     // why we remove highly overlapped objects from the training dataset.  That is, we do
-    // it so that the non-max suppression logic will be able to be reasonably effective.
-    // Here we are ensuring that any boxes that are entirely contained by another are
+    // it so the non-max suppression logic will be able to be reasonably effective.  Here
+    // we are ensuring that any boxes that are entirely contained by another are
     // suppressed.  We also ensure that boxes with an intersection over union of 0.5 or
     // greater are suppressed.  This will improve the resulting detector since it will be
     // able to use more aggressive non-max suppression settings.
@@ -205,9 +206,9 @@ int main(int argc, char** argv) try
         }
     }
 
-    // When modifying a dataset like this, it's a really good idea to print out a log of
-    // how many boxes you ignored.  It's easy to accidentally ignore a huge block of data,
-    // so you should always look and see that things are doing what you expect.
+    // When modifying a dataset like this, it's a really good idea to print a log of how
+    // many boxes you ignored.  It's easy to accidentally ignore a huge block of data, so
+    // you should always look and see that things are doing what you expect.
     cout << "num_overlapped_ignored: "<< num_overlapped_ignored << endl;
     cout << "num_additional_ignored: "<< num_additional_ignored << endl;
     cout << "num_overlapped_ignored_test: "<< num_overlapped_ignored_test << endl;
@@ -221,24 +222,36 @@ int main(int argc, char** argv) try
     // boxes, tall and skinny boxes (e.g. semi trucks), and short and wide boxes (e.g.
     // sedans).  Here we are telling the MMOD algorithm that a vehicle is recognizable as
     // long as the longest box side is at least 70 pixels long and the shortest box side is
-    // at least 30 pixels long.  It will use these parameters to decide how large each of
-    // the sliding windows needs to be so as to be able to detect all the vehicles.  Since
-    // our dataset has basically these 3 different aspect ratios, it will decide to use 3
-    // different sliding windows.  This means the final con layer in the network will have
-    // 3 filters, one for each of these aspect ratios. 
+    // at least 30 pixels long.  mmod_options will use these parameters to decide how large
+    // each of the sliding windows needs to be so as to be able to detect all the vehicles.
+    // Since our dataset has basically these 3 different aspect ratios, it will decide to
+    // use 3 different sliding windows.  This means the final con layer in the network will
+    // have 3 filters, one for each of these aspect ratios. 
+    //
+    // Another thing to consider when setting the sliding window size is the "stride" of
+    // your network.  The network we defined above downsamples the image by a factor of 8x
+    // in the first few layers.  So when the sliding windows are scanning the image, they
+    // are stepping over it with a stride of 8 pixels.  If you set the sliding window size
+    // too small then the stride will become an issue.  For instance, if you set the
+    // sliding window size to 4 pixels, then it means a 4x4 window will be moved by 8
+    // pixels at a time when scanning. This is obviously a problem since 75% of the image
+    // won't even be visited by the sliding window.  So you need to set the window size to
+    // be big enough relative to the stride of your network.  In our case, the windows are
+    // at least 30 pixels in length, so being moved by 8 pixel steps is fine. 
     mmod_options options(boxes_train, 70, 30);
+
 
     // This setting is very important and dataset specific.  The vehicle detection dataset
     // contains boxes that are marked as "ignore", as we discussed above.  Some of them are
-    // ignored because we set ignore to true on them in the above code.  However, the xml
-    // files already contained a lot of ignore boxes.  Some of them are large boxes that
-    // encompass large parts of an image and the intention is to have everything inside
-    // those boxes be ignored.  Therefore, we need to tell the MMOD algorithm to do that,
-    // which we do by setting options.overlaps_ignore appropriately.  
+    // ignored because we set ignore to true in the above code.  However, the xml files
+    // also contained a lot of ignore boxes.  Some of them are large boxes that encompass
+    // large parts of an image and the intention is to have everything inside those boxes
+    // be ignored.  Therefore, we need to tell the MMOD algorithm to do that, which we do
+    // by setting options.overlaps_ignore appropriately.  
     // 
     // But first, we need to understand exactly what this option does.  The MMOD loss
-    // is essentially counting the number of false alarms + missed detections, produced by
-    // the detector, for each image.  During training, the code is running the detector on
+    // is essentially counting the number of false alarms + missed detections produced by
+    // the detector for each image.  During training, the code is running the detector on
     // each image in a mini-batch and looking at its output and counting the number of
     // mistakes.  The optimizer tries to find parameters settings that minimize the number
     // of detector mistakes.
@@ -261,7 +274,8 @@ int main(int argc, char** argv) try
     options.overlaps_ignore = test_box_overlap(0.5, 0.95);
 
     net_type net(options);
-    // The final layer of the network must be a con_ layer that contains 
+
+    // The final layer of the network must be a con layer that contains 
     // options.detector_windows.size() filters.  This is because these final filters are
     // what perform the final "sliding window" detection in the network.  For the dlib
     // vehicle dataset, there will be 3 sliding window detectors, so we will be setting
@@ -273,15 +287,16 @@ int main(int argc, char** argv) try
     trainer.set_learning_rate(0.1);
     trainer.be_verbose();
 
+
     // While training, we are going to use early stopping.  That is, we will be checking
     // how good the detector is performing on our test data and when it stops getting
     // better on the test data we will drop the learning rate.  We will keep doing that
-    // until the learning rate is less than 1e-4.   These two settings tell the training to
+    // until the learning rate is less than 1e-4.   These two settings tell the trainer to
     // do that.  Essentially, we are setting the first argument to infinity, and only the
     // test iterations without progress threshold will matter.  In particular, it says that
     // once we observe 1000 testing mini-batches where the test loss clearly isn't
     // decreasing we will lower the learning rate.
-    trainer.set_iterations_without_progress_threshold(1000000);
+    trainer.set_iterations_without_progress_threshold(50000);
     trainer.set_test_iterations_without_progress_threshold(1000);
 
     const string sync_filename = "mmod_cars_sync";
@@ -351,13 +366,19 @@ int main(int argc, char** argv) try
 
     // It's a really good idea to print the training parameters.  This is because you will
     // invariably be running multiple rounds of training and should be logging the output
-    // to a log file.  This print statement will include many of the training parameters in
+    // to a file.  This print statement will include many of the training parameters in
     // your log.
     cout << trainer << cropper << endl;
 
     cout << "\nsync_filename: " << sync_filename << endl;
     cout << "num training images: "<< images_train.size() << endl;
     cout << "training results: " << test_object_detection_function(net, images_train, boxes_train, test_box_overlap(), 0, options.overlaps_ignore);
+    // Upsampling the data will allow the detector to find smaller cars.  Recall that 
+    // we configured it to use a sliding window nominally 70 pixels in size.  So upsampling
+    // here will let it find things nominally 35 pixels in size.  Although we include a
+    // limit of 1800*1800 here which means "don't upsample an image if it's already larger
+    // than 1800*1800".  We do this so we don't run out of RAM, which is a concern because
+    // some of the images in the dlib vehicle dataset are really high resolution.
     upsample_image_dataset<pyramid_down<2>>(images_train, boxes_train, 1800*1800);
     cout << "training upsampled results: " << test_object_detection_function(net, images_train, boxes_train, test_box_overlap(), 0, options.overlaps_ignore);
 
@@ -369,21 +390,24 @@ int main(int argc, char** argv) try
 
     /*
         This program takes many hours to execute on a high end GPU.  It took about a day to
-        train on an NVIDIA 1080ti.  The resulting model file is available at
-        http://dlib.net/files/mmod_rear_end_vehicle_detector.dat.bz2
+        train on a NVIDIA 1080ti.  The resulting model file is available at
+            http://dlib.net/files/mmod_rear_end_vehicle_detector.dat.bz2
         It should be noted that this file on dlib.net has a dlib::shape_predictor appended
         onto the end of it (see dnn_mmod_find_cars_ex.cpp for an example of its use).  This
         explains why the model file on dlib.net is larger than the
         mmod_rear_end_vehicle_detector.dat output by this program.
 
-        Also, the training and testing accuracies were:
+        You can see some videos of this vehicle detector running on YouTube:
+            https://www.youtube.com/watch?v=4B3bzmxMAZU
+            https://www.youtube.com/watch?v=bP2SUo5vSlc
 
-        num training images: 2217
-        training results: 0.990738 0.736431 0.736073 
-        training upsampled results: 0.986837 0.937694 0.936912 
-        num testing images: 135
-        testing results: 0.988827 0.471372 0.470806 
-        testing upsampled results: 0.987879 0.651132 0.650399 
+        Also, the training and testing accuracies were:
+            num training images: 2217
+            training results: 0.990738 0.736431 0.736073 
+            training upsampled results: 0.986837 0.937694 0.936912 
+            num testing images: 135
+            testing results: 0.988827 0.471372 0.470806 
+            testing upsampled results: 0.987879 0.651132 0.650399 
     */
 
     return 0;
