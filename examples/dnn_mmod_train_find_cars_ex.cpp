@@ -72,41 +72,6 @@ int ignore_overlapped_boxes(
 
 // ----------------------------------------------------------------------------------------
 
-template <
-    typename pyramid_type,
-    typename image_array_type
-    >
-void upsample_image_dataset_limit (
-    image_array_type& images,
-    std::vector<std::vector<mmod_rect>>& objects
-)
-{
-    // make sure requires clause is not broken
-    DLIB_ASSERT( images.size() == objects.size(),
-        "\t void upsample_image_dataset_limit()"
-        << "\n\t Invalid inputs were given to this function."
-        << "\n\t images.size():   " << images.size() 
-        << "\n\t objects.size():  " << objects.size() 
-    );
-
-    typename image_array_type::value_type temp;
-    pyramid_type pyr;
-    for (unsigned long i = 0; i < images.size(); ++i)
-    {
-        if (images[i].size() < 1800*1800)
-        {
-            pyramid_up(images[i], temp, pyr);
-            swap(temp, images[i]);
-            for (unsigned long j = 0; j < objects[i].size(); ++j)
-            {
-                objects[i][j].rect = pyr.rect_up(objects[i][j].rect);
-            }
-        }
-    }
-}
-
-// ----------------------------------------------------------------------------------------
-
 int main(int argc, char** argv) try
 {
     if (argc != 2)
@@ -307,13 +272,13 @@ int main(int argc, char** argv) try
     cout << "\nsync_filename: " << sync_filename << endl;
     cout << "num training images: "<< images_train.size() << endl;
     cout << "training results: " << test_object_detection_function(net, images_train, boxes_train, test_box_overlap(), 0, options.overlaps_ignore);
-    upsample_image_dataset_limit<pyramid_down<2>>(images_train, boxes_train);
+    upsample_image_dataset<pyramid_down<2>>(images_train, boxes_train, 1800*1800);
     cout << "training upsampled results: " << test_object_detection_function(net, images_train, boxes_train, test_box_overlap(), 0, options.overlaps_ignore);
 
 
     cout << "num testing images: "<< images_test.size() << endl;
     cout << "testing results: " << test_object_detection_function(net, images_test, boxes_test, test_box_overlap(), 0, options.overlaps_ignore);
-    upsample_image_dataset_limit<pyramid_down<2>>(images_test, boxes_test);
+    upsample_image_dataset<pyramid_down<2>>(images_test, boxes_test, 1800*1800);
     cout << "testing upsampled results: " << test_object_detection_function(net, images_test, boxes_test, test_box_overlap(), 0, options.overlaps_ignore);
 
     /*
