@@ -1045,7 +1045,7 @@ namespace dlib
 
         long y = outer_padding;
         size_t i = 0;
-        while(y < height+outer_padding)
+        while(y < height+(long)outer_padding)
         {
             rectangle rect = translate_rect(get_rect(pyramid[i]),point(outer_padding,y));
             DLIB_ASSERT(get_rect(out_img).contains(rect));

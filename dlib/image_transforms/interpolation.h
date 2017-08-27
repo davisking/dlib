@@ -1306,7 +1306,8 @@ namespace dlib
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            if (images[i].size() <= max_image_size)
+            const unsigned long img_size = num_rows(images[i])*num_columns(images[i]);
+            if (img_size <= max_image_size)
             {
                 pyramid_up(images[i], temp, pyr);
                 swap(temp, images[i]);
@@ -1340,7 +1341,8 @@ namespace dlib
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            if (images[i].size() <= max_image_size)
+            const unsigned long img_size = num_rows(images[i])*num_columns(images[i]);
+            if (img_size <= max_image_size)
             {
                 pyramid_up(images[i], temp, pyr);
                 swap(temp, images[i]);
@@ -1377,7 +1379,8 @@ namespace dlib
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            if (images[i].size() <= max_image_size)
+            const unsigned long img_size = num_rows(images[i])*num_columns(images[i]);
+            if (img_size <= max_image_size)
             {
                 pyramid_up(images[i], temp, pyr);
                 swap(temp, images[i]);
