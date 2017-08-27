@@ -168,6 +168,10 @@
                   <link>face_detector.py.html</link>
                </item>
                <item>
+                  <name>CNN Face Detector</name>
+                  <link>cnn_face_detector.py.html</link>
+               </item>
+               <item>
                   <name>Train Object Detector</name>
                   <link>train_object_detector.py.html</link>
                </item>

@@ -727,6 +727,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
             <example>dnn_mmod_face_detection_ex.cpp.html</example>
             <example>dnn_mmod_dog_hipsterizer.cpp.html</example>
+            <example>cnn_face_detector.py.html</example>
          </examples>
       </component>
       
