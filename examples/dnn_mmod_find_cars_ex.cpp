@@ -16,6 +16,10 @@
     the dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp examples to learn
     how the API works.  For an introduction to the object detection method you
     should read dnn_mmod_ex.cpp.
+
+    You can also see some videos of this vehicle detector running on YouTube:
+        https://www.youtube.com/watch?v=4B3bzmxMAZU
+        https://www.youtube.com/watch?v=bP2SUo5vSlc
 */
 
 
