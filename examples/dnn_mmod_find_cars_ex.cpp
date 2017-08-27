@@ -68,7 +68,7 @@ int main() try
         // rectangle is our refined detection position.
         auto fd = sp(img,d);
         rectangle rect;
-        for (long j = 0; j < fd.num_parts(); ++j)
+        for (unsigned long j = 0; j < fd.num_parts(); ++j)
             rect += fd.part(j);
         win.add_overlay(rect, rgb_pixel(255,0,0));
     }
