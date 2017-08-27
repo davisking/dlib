@@ -81,7 +81,7 @@ int main() try
 
     // Now let's look at how the detector works.  The high level processing steps look like:
     //   1. Create an image pyramid and pack the pyramid into one big image.  We call this
-    //      the "tiled pyramid image".
+    //      image the "tiled pyramid".
     //   2. Run the tiled pyramid image through the CNN.  The CNN outputs a new image where
     //      bright pixels in the output image indicate the presence of cars.  
     //   3. Find pixels in the CNN's output image with a value > 0.  Those locations are your
@@ -110,7 +110,7 @@ int main() try
     create_tiled_pyramid<pyramid_type>(img, tiled_img, rects, 
                                        input_layer(net).get_pyramid_padding(), 
                                        input_layer(net).get_pyramid_outer_padding());
-    image_window winpyr(tiled_img, "Tiled pyramid image");
+    image_window winpyr(tiled_img, "Tiled pyramid");
 
 
 
