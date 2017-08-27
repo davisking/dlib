@@ -1,11 +1,27 @@
+// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
+/*
+    This example shows how to run a CNN based vehicle detector using dlib.  The
+    example loads a pretrained model and uses it to find the rear ends of cars in
+    images.  We will also visualize some of the detector's processing steps by
+    plotting various intermediate images on the screen.  Viewing these can help
+    understand how the detector works.
+    
+    The model used by this example was trained by the dnn_mmod_train_find_cars_ex.cpp 
+    example.  Also, since this is a CNN, you really should use a GPU to get the
+    best execution speed.  For instance, when run on a NVIDIA 1080ti, this
+    detector runs at 39fps when run on the provided test image.  That's about an 
+    order of magnitude faster than when run on the CPU.
+
+    Users who are just learning about dlib's deep learning API should read
+    the dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp examples to learn
+    how the API works.  For an introduction to the object detection method you
+    should read dnn_mmod_ex.cpp.
+*/
 
 
 #include <iostream>
 #include <dlib/dnn.h>
-#include <dlib/data_io.h>
-#include <dlib/gui_widgets.h>
-#include <dlib/dir_nav.h>
-#include <dlib/time_this.h>
+#include <dlib/image_io.h>
 #include <dlib/gui_widgets.h>
 #include <dlib/image_processing.h>
 
@@ -59,35 +75,62 @@ int main() try
     cin.get();
 
 
+    // Now let's look at how the detector works.  The top level processing steps look like:
+    //   1. Create an image pyramid and pack the pyramid into one big image.  We call this
+    //      the "tiled pyramid image".
+    //   2. Run the tiled pyramid image through the CNN.  The CNN outputs a new image where
+    //      bright pixels in the output image indicate the presence of cars.  
+    //   3. Find pixels in the CNN output image with a value > 0.  Those locations are your
+    //      preliminary car detections.  
+    //   4. Perform non-maximum suppression on the preliminary detections to produce the
+    //      final output.
+    //
+    // We will be plotting the images from steps 1 and 2 so you can visualize what's
+    // happening.  For the CNN output image, we will use the jet colormap so that "bright"
+    // outputs, i.e. pixels with big values, appear in red and "dim" outputs appear as a
+    // cold blue color.  To do this we pick a range of CNN output values for the color
+    // mapping.  The specific values don't matter.  They are just selected to give a nice
+    // looking output image.
+    const float lower = -2.5;
+    const float upper = 0.0;
+    cout << "jet color mapping range:  lower="<< lower << "  upper="<< upper << endl;
 
-    // Create a tiled image pyramid and display it on the screen. 
+
+
+    // Create a tiled pyramid image and display it on the screen. 
     std::vector<rectangle> rects;
     matrix<rgb_pixel> tiled_img;
     create_tiled_pyramid<std::remove_reference<decltype(input_layer(net))>::type::pyramid_type>(img,
         tiled_img, rects, input_layer(net).get_pyramid_padding(),
         input_layer(net).get_pyramid_outer_padding());
-    image_window winpyr(tiled_img, "Tiled image pyramid");
+    image_window winpyr(tiled_img, "Tiled pyramid image");
 
 
 
+    // This CNN detector represents a sliding window detector with 3 sliding windows, one
+    // for each aspect ratio of vehicle box.  The aspect ratio of a detection is determined
+    // by which channel in the output image triggers the detection.  Here we are just going
+    // to max pool the channels together to get one final image for our display.  In this
+    // image, a pixel will be bright if any of the sliding window detectors thinks there is
+    // a car at that location.
     cout << "Number of channels in final tensor image: " << net.subnet().get_output().k() << endl;
     matrix<float> network_output = image_plane(net.subnet().get_output(),0,0);
     for (long k = 1; k < net.subnet().get_output().k(); ++k)
         network_output = max_pointwise(network_output, image_plane(net.subnet().get_output(),0,k));
-    const double v0_scale = img.nc()/(double)network_output.nc();
-    resize_image(v0_scale, network_output);
+    // We will also upsample the CNN output image.  The CNN we defined has an 8x
+    // downsampling layer at the beginning. In the code below we are going to overlay this
+    // CNN output image on top of the raw input image.  To make that look nice it helps to
+    // upsample the CNN output image back to the same resolution as the input image, which
+    // we do here.
+    const double network_output_scale = img.nc()/(double)network_output.nc();
+    resize_image(network_output_scale, network_output);
 
 
-    const float lower = -2.5;// min(network_output);
-    const float upper = 0.0;// max(network_output);
-    cout << "jet color mapping range:  lower="<< lower << "  upper="<< upper << endl;
-
-    // Display the final layer as a color image
+    // Display the network's output as a color image.   
     image_window win_output(jet(network_output, upper, lower), "Output tensor from the network");
 
 
-
-    // Overlay network_output on top of the tiled image pyramid and display it.
+    // Also, overlay network_output on top of the tiled image pyramid and display it.
     matrix<rgb_pixel> tiled_img_sal = tiled_img;
     for (long r = 0; r < tiled_img_sal.nr(); ++r)
     {
@@ -95,10 +138,12 @@ int main() try
         {
             dpoint tmp(c,r);
             tmp = input_tensor_to_output_tensor(net, tmp);
-            tmp = point(v0_scale*tmp);
+            tmp = point(network_output_scale*tmp);
             if (get_rect(network_output).contains(tmp))
             {
                 float val = network_output(tmp.y(),tmp.x());
+                // alpha blend the network output pixel with the RGB image to make our
+                // overlay.
                 rgb_alpha_pixel p;
                 assign_pixel(p , colormap_jet(val,lower,upper));
                 p.alpha = 120;
@@ -106,12 +151,20 @@ int main() try
             }
         }
     }
+    // If you look at this image you can see that the vehicles get bright red blobs on
+    // them.  That's the CNN saying "there is a car here!".  You will also notice that
+    // there is a certain scale it finds cars at.  They have to be not too big or too
+    // small, which is why we have an image pyramid.  The pyramid allows us to find cars of
+    // all scales.
     image_window win_pyr_sal(tiled_img_sal, "Saliency on image pyramid");
 
 
 
 
-    // Now collapse the pyramid scales into the original image
+    // Finally, we can collapse the pyramid back into the original image.  The CNN doesn't
+    // actually do this step, since it's enough to threshold the tiled pyramid image to get
+    // the detections.  However, it makes a nice visualization and clearly indicates that
+    // the detector is firing for all the cars.
     matrix<float> collapsed_saliency(img.nr(), img.nc());
     resizable_tensor input_tensor;
     input_layer(net).to_tensor(&img, &img+1, input_tensor);
@@ -125,10 +178,11 @@ int main() try
             float max_sal = -1e30;
             for (double scale = 1; scale > 0.2; scale *= 5.0/6.0)
             {
-                // map from input image coordinates to tiled pyramid and then to output
-                // tensor coordinates.
+                // Map from input image coordinates to tiled pyramid coordinates.
                 dpoint tmp = center(input_layer(net).image_space_to_tensor_space(input_tensor,scale, drectangle(dpoint(c,r))));
-                tmp = point(v0_scale*input_tensor_to_output_tensor(net, tmp));
+                // Now map from pyramid coordinates to network_output coordinates.
+                tmp = point(network_output_scale*input_tensor_to_output_tensor(net, tmp));
+
                 if (get_rect(network_output).contains(tmp))
                 {
                     float val = network_output(tmp.y(),tmp.x());
