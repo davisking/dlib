@@ -677,7 +677,8 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<rectangle> >& objects
+        std::vector<std::vector<rectangle> >& objects,
+        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
     );
     /*!
         requires
@@ -690,6 +691,7 @@ namespace dlib
               pyramid_type.  Therefore, #images[i] will contain the larger upsampled
               version of images[i].  It also adjusts all the rectangles in objects so that
               they still bound the same visual objects in each image.
+            - Input images already containing more than max_image_size pixels are not upsampled.
             - #images.size() == image.size()
             - #objects.size() == objects.size()
             - for all valid i:
@@ -704,7 +706,8 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<mmod_rect>>& objects
+        std::vector<std::vector<mmod_rect>>& objects,
+        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
     );
     /*!
         requires
@@ -717,6 +720,7 @@ namespace dlib
               pyramid_type.  Therefore, #images[i] will contain the larger upsampled
               version of images[i].  It also adjusts all the rectangles in objects so that
               they still bound the same visual objects in each image.
+            - Input images already containing more than max_image_size pixels are not upsampled.
             - #images.size() == image.size()
             - #objects.size() == objects.size()
             - for all valid i:
@@ -732,7 +736,8 @@ namespace dlib
     void upsample_image_dataset (
         image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
-        std::vector<std::vector<rectangle> >& objects2 
+        std::vector<std::vector<rectangle> >& objects2,
+        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
     );
     /*!
         requires
@@ -746,6 +751,7 @@ namespace dlib
               pyramid_type.  Therefore, #images[i] will contain the larger upsampled
               version of images[i].  It also adjusts all the rectangles in objects and
               objects2 so that they still bound the same visual objects in each image.
+            - Input images already containing more than max_image_size pixels are not upsampled.
             - #images.size() == image.size()
             - #objects.size() == objects.size()
             - #objects2.size() == objects2.size()
