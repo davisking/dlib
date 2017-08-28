@@ -12,6 +12,18 @@
 
 <current>
 New Features and Improvements:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fix build error in Visual Studio when CUDA is enabled. 
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.5" date="Aug 27, 2017">
+New Features and Improvements:
    - Deep Learning
       - Added a python wrapper for using the CNN face detector.
       - Added support for cuDNN v6 and v7.
@@ -158,7 +170,7 @@ Bug fixes:
      is used in a dll in some situations.
    - Fixed various compiler errors in obscure environments.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
