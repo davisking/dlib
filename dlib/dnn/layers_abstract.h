@@ -428,6 +428,13 @@ namespace dlib
                 defined above.  In particular, it defines a fully connected layer that
                 takes an input tensor and multiplies it by a weight matrix and outputs the
                 results.
+
+                The dimensions of the tensors output by this layer are as follows (letting
+                IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == get_num_outputs()
+                    - OUT.nr() == 1
+                    - OUT.nc() == 1
         !*/
 
     public:
