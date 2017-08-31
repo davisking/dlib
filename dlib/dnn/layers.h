@@ -2916,6 +2916,12 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
+            if (aout.num_samples() != sub.get_output().num_samples())
+            {
+                aout = alias_tensor(sub.get_output().num_samples(), _k*_nr*_nc);
+                ain = alias_tensor(sub.get_output().num_samples(),  sub.get_output().size()/sub.get_output().num_samples());
+            }
+
             output.set_size(sub.get_output().num_samples(), _k, _nr, _nc);
             auto out = aout(output,0);
             auto in = ain(sub.get_output(),0);
