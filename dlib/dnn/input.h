@@ -534,7 +534,7 @@ namespace dlib
         {
             auto&& rects = any_cast<std::vector<rectangle>>(data.annotation());
             DLIB_CASSERT(rects.size() > 0);
-            return rects[0].contains(p);
+            return rects[0].contains(p+rects[0].tl_corner());
         }
 
         drectangle tensor_space_to_image_space (
