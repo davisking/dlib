@@ -617,7 +617,10 @@ namespace dlib
             size_t offset
         ) const
         {
-            DLIB_CASSERT(offset+size() <= t.size());
+            DLIB_CASSERT(offset+size() <= t.size(), 
+                "offset: "<<offset <<"\n"<<
+                "size(): "<<size() <<"\n"<<
+                "t.size(): "<<t.size() <<"\n");
 
 #ifdef DLIB_USE_CUDA
             if (!inst.cudnn_descriptor)
