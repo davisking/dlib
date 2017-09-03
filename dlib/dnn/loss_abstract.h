@@ -374,25 +374,29 @@ namespace dlib
 
     public:
 
-        struct detector_window_size
+        struct detector_window_details
         {
-            detector_window_size() = default; 
-            detector_window_size(unsigned long w, unsigned long h) : width(w), height(h) {}
+            detector_window_details() = default; 
+            detector_window_details(unsigned long w, unsigned long h) : width(w), height(h) {}
+            detector_window_details(unsigned long w, unsigned long h, const std::string& l) : width(w), height(h), label(l) {}
 
             unsigned long width = 0;
             unsigned long height = 0;
+            std::string label;
 
-            friend inline void serialize(const detector_window_size& item, std::ostream& out);
-            friend inline void deserialize(detector_window_size& item, std::istream& in);
+            friend inline void serialize(const detector_window_details& item, std::ostream& out);
+            friend inline void deserialize(detector_window_details& item, std::istream& in);
         };
 
         mmod_options() = default;
 
         // This kind of object detector is a sliding window detector.  The detector_windows
         // field determines how many sliding windows we will use and what the shape of each
-        // window is.  Since you will usually use the MMOD loss with an image pyramid, the
-        // detector sizes also determine the size of the smallest object you can detect.
-        std::vector<detector_window_size> detector_windows;
+        // window is.  It also determines the output label applied to each detection
+        // identified by each window.  Since you will usually use the MMOD loss with an
+        // image pyramid, the detector sizes also determine the size of the smallest object
+        // you can detect.
+        std::vector<detector_window_details> detector_windows;
 
         // These parameters control how we penalize different kinds of mistakes.  See 
         // Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046)
@@ -439,6 +443,10 @@ namespace dlib
                       each box in boxes could potentially be detected by one of the
                       detector windows.  This essentially comes down to picking detector
                       windows with aspect ratios similar to the aspect ratios in boxes.
+                      Note that we also make sure that each box can be detected by a window
+                      with the same label.  For example, if all the boxes had the same
+                      aspect ratio but there were 4 different labels used in boxes then
+                      there would be 4 resulting detector windows, one for each label.
                     - The longest edge of each detector window is target_size pixels in
                       length, unless the window's shortest side would be less than
                       min_target_size pixels in length.  In this case the shortest side

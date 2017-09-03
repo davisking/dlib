@@ -159,12 +159,21 @@ namespace dlib
         mmod_rect() = default; 
         mmod_rect(const rectangle& r) : rect(r) {}
         mmod_rect(const rectangle& r, double score) : rect(r),detection_confidence(score) {}
+        mmod_rect(const rectangle& r, double score, const std::string& label) : rect(r),detection_confidence(score),label(label) {}
 
         rectangle rect;
         double detection_confidence = 0;
         bool ignore = false;
+        std::string label;
 
         operator rectangle() const { return rect; }
+
+        bool operator == (const mmod_rect& rhs) const;
+        /*!
+            ensures
+                - returns true if and only if all the elements of this object compare equal
+                  to the corresponding elements of rhs.
+        !*/
     };
 
     mmod_rect ignored_mmod_rect(
@@ -176,6 +185,7 @@ namespace dlib
                 - R.rect == r
                 - R.ignore == true
                 - R.detection_confidence == 0
+                - R.label == ""
     !*/
 
     void serialize(const mmod_rect& item, std::ostream& out);
