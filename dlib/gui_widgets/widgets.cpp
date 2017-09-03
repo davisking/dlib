@@ -6440,7 +6440,8 @@ namespace dlib
                 event_handler();
         }
 
-        if (is_printable && !hidden && enabled && rect_is_selected && (key == 'i'))
+        if (!hidden && enabled && rect_is_selected && 
+            ((is_printable && key == 'i') || (!is_printable && key==base_window::KEY_END)))
         {
             overlay_rects[selected_rect].crossed_out = !overlay_rects[selected_rect].crossed_out;
             parent.invalidate_rectangle(rect);

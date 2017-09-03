@@ -625,7 +625,7 @@ display_about(
                         "field at the top of the application.  You can quickly edit the contents of the Next Label field "
                         "by hitting the tab key. Double clicking "
                         "a rectangle selects it and the delete key removes it.  You can also mark "
-                        "a rectangle as ignored by hitting the i key when it is selected.  Ignored "
+                        "a rectangle as ignored by hitting the i or END keys when it is selected.  Ignored "
                         "rectangles are visually displayed with an X through them.  You can remove an image "
                         "entirely by selecting it in the list on the left and pressing alt+d."
                         ,0,0) << endl << endl;
