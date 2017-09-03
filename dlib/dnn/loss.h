@@ -439,8 +439,8 @@ namespace dlib
                         detector_height = target_size/ratio;
                         if (detector_height < min_target_size)
                         {
-                            detector_width = min_target_size;
-                            detector_height = min_target_size*ratio;
+                            detector_width = min_target_size*ratio;
+                            detector_height = min_target_size;
                         }
                     }
 
