@@ -13,11 +13,14 @@ namespace dlib
     namespace impl
     {
         inline std::set<std::string> get_labels (
-            const std::vector<mmod_rect>& rects
+            const std::vector<mmod_rect>& rects1,
+            const std::vector<mmod_rect>& rects2
         )
         {
             std::set<std::string> labels;
-            for (auto& rr : rects)
+            for (auto& rr : rects1)
+                labels.insert(rr.label);
+            for (auto& rr : rects2)
                 labels.insert(rr.label);
             return labels;
         }
@@ -62,7 +65,7 @@ namespace dlib
             detector.loss_details().to_label(temp, detector.subnet(), &hits, adjust_threshold);
 
 
-            for (auto& label : impl::get_labels(truth_dets[i]))
+            for (auto& label : impl::get_labels(truth_dets[i], hits))
             {
                 std::vector<full_object_detection> truth_boxes;
                 std::vector<rectangle> ignore;
