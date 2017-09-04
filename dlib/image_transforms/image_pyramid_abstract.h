@@ -211,6 +211,26 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        unsigned int N
+        >
+    void find_pyramid_down_output_image_size(
+        const pyramid_down<N>& pyr,
+        long& nr,
+        long& nc
+    );
+    /*!
+        requires
+            - nr >= 0
+            - nc >= 0
+        ensures
+            - If pyr() were called on an image with nr by nc rows and columns, what would
+              be the size of the output image?  This function finds the size of the output
+              image and stores it back into #nr and #nc.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename pyramid_type,
         typename image_type1,
         typename image_type2

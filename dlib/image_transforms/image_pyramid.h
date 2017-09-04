@@ -979,6 +979,50 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <unsigned int N>
+    void find_pyramid_down_output_image_size(
+        const pyramid_down<N>& pyr,
+        long& nr,
+        long& nc
+    )
+    {
+        const double rate = pyramid_rate(pyr);
+        nr = std::floor(rate*nr);
+        nc = std::floor(rate*nc);
+    }
+
+    inline void find_pyramid_down_output_image_size(
+        const pyramid_down<3>& /*pyr*/,
+        long& nr,
+        long& nc
+    )
+    {
+        nr = 2*(nr-2)/3;
+        nc = 2*(nc-2)/3;
+    }
+
+    inline void find_pyramid_down_output_image_size(
+        const pyramid_down<2>& /*pyr*/,
+        long& nr,
+        long& nc
+    )
+    {
+        nr = (nr-3)/2;
+        nc = (nc-3)/2;
+    }
+
+    inline void find_pyramid_down_output_image_size(
+        const pyramid_down<1>& /*pyr*/,
+        long& nr,
+        long& nc
+    )
+    {
+        nr = 0;
+        nc = 0;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename pyramid_type,
         typename image_type1,
