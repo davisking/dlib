@@ -856,25 +856,33 @@ namespace dlib { namespace tt
 
     void resize_bilinear (
         tensor& dest,
-        const tensor& src
+        long dest_row_stride,
+        long dest_channel_stride,
+        const tensor& src,
+        long src_row_stride,
+        long src_channel_stride
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::resize_bilinear(dest,src);
+        cuda::resize_bilinear(dest,dest_row_stride,dest_channel_stride, src,src_row_stride,src_channel_stride);
 #else
-        cpu::resize_bilinear(dest,src);
+        cpu::resize_bilinear(dest,dest_row_stride,dest_channel_stride, src,src_row_stride,src_channel_stride);
 #endif
     }
 
     void resize_bilinear_gradient (
         tensor& grad,
-        const tensor& gradient_input
+        long grad_row_stride,
+        long grad_channel_stride,
+        const tensor& gradient_input,
+        long gradient_input_row_stride,
+        long gradient_input_channel_stride
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::resize_bilinear_gradient(grad,gradient_input);
+        cuda::resize_bilinear_gradient(grad,grad_row_stride,grad_channel_stride,  gradient_input,gradient_input_row_stride,gradient_input_channel_stride);
 #else
-        cpu::resize_bilinear_gradient(grad,gradient_input);
+        cpu::resize_bilinear_gradient(grad,grad_row_stride,grad_channel_stride,  gradient_input,gradient_input_row_stride,gradient_input_channel_stride);
 #endif
     }
 

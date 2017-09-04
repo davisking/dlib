@@ -1774,8 +1774,8 @@ namespace
 
         net_type2 pnet;
 
-        DLIB_CASSERT(pnet.num_layers == 131, pnet.num_layers);
-        DLIB_CASSERT(pnet.num_computational_layers == 109, pnet.num_computational_layers);
+        DLIB_TEST_MSG(pnet.num_layers == 131, pnet.num_layers);
+        DLIB_TEST_MSG(pnet.num_computational_layers == 109, pnet.num_computational_layers);
 
         std::vector<bool> hit(pnet.num_computational_layers, false);
         size_t count = 0;
@@ -2322,7 +2322,7 @@ namespace
         for (int is_bias = 0; is_bias <= 1; ++is_bias) {
             for (uint16_t k = 0; k < num_classes; ++k) {
                 size_t index = k + is_bias * num_classes;
-                DLIB_CASSERT(index < learned_params.size());
+                DLIB_TEST(index < learned_params.size());
                 if (k == true_label) {
                     DLIB_TEST(learned_params_data[index] > 1e5);
                 }
@@ -2419,13 +2419,13 @@ namespace
 
                     for (long k = 0; k < num_classes; ++k) {
                         const size_t index = ((ii * output_tensor.k() + k) * output_tensor.nr() + jj) * output_tensor.nc() + kk;
-                        DLIB_CASSERT(index < output_tensor.size());
+                        DLIB_TEST(index < output_tensor.size());
 
                         if (k == true_label) {
-                            DLIB_TEST_MSG(out_data[index] > 1e4, "");
+                            DLIB_TEST(out_data[index] > 1e4);
                         }
                         else {
-                            DLIB_TEST_MSG(out_data[index] < -1e4, "");
+                            DLIB_TEST(out_data[index] < -1e4);
                         }
                     }
                 }
@@ -2745,7 +2745,7 @@ namespace
             cpu::resize_bilinear(out, img);
 #ifdef DLIB_USE_CUDA
             cuda::resize_bilinear(out2, img);
-            DLIB_CASSERT(max(abs(mat(out)-mat(out2))) < 1e-5);
+            DLIB_TEST(max(abs(mat(out)-mat(out2))) < 1e-5);
 #endif
 
             resizable_tensor gradient_input;
@@ -2775,14 +2775,85 @@ namespace
 
             cpu::resize_bilinear_gradient(grad2, gradient_input);
             dlog << LINFO << "analytic grad: "<< grad2.host()[idx]-0.1;
-            DLIB_CASSERT(std::abs(numerical_grad - grad2.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad2.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+            DLIB_TEST_MSG(std::abs(numerical_grad - grad2.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad2.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
 
 #ifdef DLIB_USE_CUDA
             cuda::resize_bilinear_gradient(grad, gradient_input);
             dlog << LINFO << "analytic grad: "<< grad.host()[idx]-0.1;
-            DLIB_CASSERT(std::abs(numerical_grad - grad.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
-            DLIB_CASSERT(max(abs(mat(grad)-mat(grad2))) < 1e-5);
+            DLIB_TEST_MSG(std::abs(numerical_grad - grad.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+            DLIB_TEST(max(abs(mat(grad)-mat(grad2))) < 1e-5);
 #endif
+
+        }
+
+
+        // now test with strided/sub-window calls
+        alias_tensor aimg(samps, k, nr-2,nc-2);
+        alias_tensor aout(samps, k, onr-2,onc-2);
+        for (int iter = 0; iter < 10; ++iter)
+        {
+            print_spinner();
+
+            const size_t idx = rnd.get_random_64bit_number()%img.size();
+
+            img = 1;
+            img.host()[idx] = 2;
+            out = 9;
+            out2 = 9;
+            auto wout = aout(out, out.nc()*1+1);
+            auto wimg = aimg(img, img.nc()*1+1);
+            cpu::resize_bilinear(wout,out.nc(),out.nr()*out.nc(),  wimg,img.nc(),img.nr()*img.nc());
+#ifdef DLIB_USE_CUDA
+            auto wout2 = aout(out2, out2.nc()*1+1);
+            cuda::resize_bilinear(wout2,out2.nc(),out2.nr()*out2.nc(),  wimg,img.nc(),img.nr()*img.nc());
+            DLIB_TEST(max(abs(mat(out)-mat(out2))) < 1e-5);
+#endif
+
+
+            resizable_tensor gradient_input;
+            gradient_input.copy_size(out);
+            tt::tensor_rand rnd;
+            rnd.fill_uniform(gradient_input);
+
+            const float h = 1e-2;
+
+            img.host()[idx] = 2;
+            out = 0;
+            wout = aout(out, out.nc()*1+1);
+            wimg = aimg(img, img.nc()*1+1);
+            cpu::resize_bilinear(wout,out.nc(),out.nr()*out.nc(),  wimg,img.nc(),img.nr()*img.nc());
+            float f1 = dot(out, gradient_input); 
+
+            img.host()[idx] = 2+h;
+            out = 0;
+            cpu::resize_bilinear(wout,out.nc(),out.nr()*out.nc(),  wimg,img.nc(),img.nr()*img.nc());
+            float f2 = dot(out, gradient_input); 
+
+            const float numerical_grad = (f2-f1)/h;
+            dlog << LINFO << "numerical grad: " << numerical_grad;
+
+
+            resizable_tensor grad, grad2;
+            grad.copy_size(img);
+            grad = 0.1;
+            grad2.copy_size(img);
+            grad2 = 0.1;
+
+            auto wgrad2 = aimg(grad2, grad2.nc()*1+1);
+            auto wgradient_input = aout(gradient_input, gradient_input.nc()*1+1);
+            cpu::resize_bilinear_gradient(wgrad2,grad2.nc(),grad2.nr()*grad2.nc(),  wgradient_input,gradient_input.nc(),gradient_input.nr()*gradient_input.nc());
+            dlog << LINFO << "analytic grad: "<< grad2.host()[idx]-0.1;
+            DLIB_TEST_MSG(std::abs(numerical_grad - grad2.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad2.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+
+#ifdef DLIB_USE_CUDA
+            wgrad2 = aimg(grad, grad.nc()*1+1);
+            wgradient_input = aout(gradient_input, gradient_input.nc()*1+1);
+            cuda::resize_bilinear_gradient(wgrad2,grad.nc(),grad.nr()*grad.nc(),  wgradient_input,gradient_input.nc(),gradient_input.nr()*gradient_input.nc());
+            dlog << LINFO << "analytic grad: "<< grad.host()[idx]-0.1;
+            DLIB_TEST_MSG(std::abs(numerical_grad - grad.host()[idx]+0.1) < 1e-2, std::abs(numerical_grad - grad.host()[idx]+0.1) << "  numerical_grad: " << numerical_grad);
+            DLIB_TEST_MSG(max(abs(mat(grad)-mat(grad2))) < 1e-5, max(abs(mat(grad)-mat(grad2))));
+#endif
+
 
         }
     }

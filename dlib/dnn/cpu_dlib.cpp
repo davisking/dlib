@@ -1478,7 +1478,11 @@ namespace dlib
 
         void resize_bilinear (
             tensor& dest,
-            const tensor& src
+            long dest_row_stride,
+            long dest_channel_stride,
+            const tensor& src,
+            long src_row_stride,
+            long src_channel_stride
         )
         {
             DLIB_CASSERT(is_same_object(dest, src)==false);
@@ -1509,27 +1513,31 @@ namespace dlib
                             const long right  = std::min(left+1, src.nc()-1);
                             const float lr_frac = x - left;
 
-                            float tl = s[top*src.nc()+left];
-                            float tr = s[top*src.nc()+right];
-                            float bl = s[bottom*src.nc()+left];
-                            float br = s[bottom*src.nc()+right];
+                            float tl = s[top*src_row_stride+left];
+                            float tr = s[top*src_row_stride+right];
+                            float bl = s[bottom*src_row_stride+left];
+                            float br = s[bottom*src_row_stride+right];
 
                             float temp = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
                                 tb_frac*((1-lr_frac)*bl + lr_frac*br);
 
-                            d[r*dest.nc()+c] = temp;
+                            d[r*dest_row_stride+c] = temp;
                         }
                     }
 
-                    d += dest.nr()*dest.nc();
-                    s += src.nr()*src.nc();
+                    d += dest_channel_stride;
+                    s += src_channel_stride;
                 }
             }
         }
 
         void resize_bilinear_gradient (
             tensor& grad,
-            const tensor& gradient_input
+            long grad_row_stride,
+            long grad_channel_stride,
+            const tensor& gradient_input,
+            long gradient_input_row_stride,
+            long gradient_input_channel_stride
         )
         {
             DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
@@ -1560,17 +1568,17 @@ namespace dlib
                             const long right  = std::min(left+1, grad.nc()-1);
                             const float lr_frac = x - left;
 
-                            const float tmp = gi[r*gradient_input.nc()+c];
+                            const float tmp = gi[r*gradient_input_row_stride+c];
 
-                            g[top*grad.nc()+left]     += tmp*(1-tb_frac)*(1-lr_frac);
-                            g[top*grad.nc()+right]    += tmp*(1-tb_frac)*(lr_frac);
-                            g[bottom*grad.nc()+left]  += tmp*(tb_frac)*(1-lr_frac);
-                            g[bottom*grad.nc()+right] += tmp*(tb_frac)*(lr_frac);
+                            g[top*grad_row_stride+left]     += tmp*(1-tb_frac)*(1-lr_frac);
+                            g[top*grad_row_stride+right]    += tmp*(1-tb_frac)*(lr_frac);
+                            g[bottom*grad_row_stride+left]  += tmp*(tb_frac)*(1-lr_frac);
+                            g[bottom*grad_row_stride+right] += tmp*(tb_frac)*(lr_frac);
                         }
                     }
 
-                    g += grad.nr()*grad.nc();
-                    gi += gradient_input.nr()*gradient_input.nc();
+                    g += grad_channel_stride;
+                    gi += gradient_input_channel_stride;
                 }
             }
         }

@@ -1371,8 +1371,59 @@ namespace dlib { namespace tt
 
     void resize_bilinear (
         tensor& dest,
-        const tensor& src
+        long dest_row_stride,
+        long dest_channel_stride,
+        const tensor& src,
+        long src_row_stride,
+        long src_channel_stride
     );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+        ensures
+            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
+              that has been bilinearly interpolated to fit into the shape of
+              image_plane(dest,i,k).
+            - Instead of supposing the row stride and channel stride in the tensors is
+              given by tensor::nc() and tensor::nr()*tensor::nc() respectively, we use the
+              provided stride values to transition from one row and channel to the next.
+              This is useful in combination with alias_tensor objects since it allows you
+              to operate on subwindows in an image.
+    !*/
+
+    void resize_bilinear_gradient (
+        tensor& grad,
+        long grad_row_stride,
+        long grad_channel_stride,
+        const tensor& gradient_input,
+        long gradient_input_row_stride,
+        long gradient_input_channel_stride
+    );
+    /*!
+        requires
+            - is_same_object(grad, gradient_input)==false
+            - gradient_input.num_samples() == grad.num_samples()
+            - gradient_input.k() == grad.k()
+        ensures
+            - Suppose that DEST is the output of resize_bilinear(DEST,SRC) for some SRC
+              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
+              the gradient of f() with respect to SRC and adds it to grad.   It should be
+              noted that we don't need to know the contents of DEST to compute this
+              gradient.  All that matters is that gradient_input have the same dimensions
+              as DEST.
+            - Instead of supposing the row stride and channel stride in the tensors is
+              given by tensor::nc() and tensor::nr()*tensor::nc() respectively, we use the
+              provided stride values to transition from one row and channel to the next.
+              This is useful in combination with alias_tensor objects since it allows you
+              to operate on subwindows in an image.
+    !*/
+
+    inline void resize_bilinear (
+        tensor& dest,
+        const tensor& src
+    ) { resize_bilinear(dest, dest.nc(), dest.nr()*dest.nc(), src, src.nc(), src.nr()*src.nc()); }
     /*!
         requires
             - is_same_object(dest, src)==false
@@ -1384,10 +1435,10 @@ namespace dlib { namespace tt
               image_plane(dest,i,k).
     !*/
 
-    void resize_bilinear_gradient (
+    inline void resize_bilinear_gradient (
         tensor& grad,
         const tensor& gradient_input
-    );
+    ) { resize_bilinear_gradient(grad, grad.nc(), grad.nr()*grad.nc(), gradient_input, gradient_input.nc(), gradient_input.nr()*gradient_input.nc()); }
     /*!
         requires
             - is_same_object(grad, gradient_input)==false
