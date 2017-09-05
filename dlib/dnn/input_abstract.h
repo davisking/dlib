@@ -27,8 +27,9 @@ namespace dlib
                 you need to define your own custom input layer.
 
             THREAD SAFETY
-                Input layer objects must be thread safe.  That is, multiple threads must be
-                able to make calls to a single instance at the same time. 
+                to_tensor() must be thread safe.  That is, multiple threads must be able to
+                make calls to to_tensor() on a single instance of this object at the same
+                time.
         !*/
     public:
 
