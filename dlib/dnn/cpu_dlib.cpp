@@ -7,6 +7,8 @@
 
 #include "cpu_dlib.h"
 #include "tensor_tools.h"
+#include "../image_transforms/interpolation.h"
+#include "../threads.h"
 
 namespace dlib
 {
@@ -1494,41 +1496,14 @@ namespace dlib
 
             const float* s = src.host();
             float* d = dest.host();
-            const float x_scale = (src.nc()-1)/(float)std::max<long>((dest.nc()-1),1);
-            const float y_scale = (src.nr()-1)/(float)std::max<long>((dest.nr()-1),1);
-            for (long samp = 0; samp < dest.num_samples(); ++samp)
+
+            parallel_for(0, dest.k()*dest.num_samples(), [&](long i)
             {
-                for (long k = 0; k < dest.k(); ++k)
-                {
-                    for (long r = 0; r < dest.nr(); ++r)
-                    {
-                        const float y = r*y_scale;
-                        const long top    = static_cast<long>(std::floor(y));
-                        const long bottom = std::min(top+1, src.nr()-1);
-                        const float tb_frac = y - top;
-                        for (long c = 0; c < dest.nc(); ++c)
-                        {
-                            const float x = c*x_scale;
-                            const long left   = static_cast<long>(std::floor(x));
-                            const long right  = std::min(left+1, src.nc()-1);
-                            const float lr_frac = x - left;
+                auto simg = sub_image(s+i*src_channel_stride, src.nr(), src.nc(), src_row_stride);
+                auto dimg = sub_image(d+i*dest_channel_stride, dest.nr(), dest.nc(), dest_row_stride);
 
-                            float tl = s[top*src_row_stride+left];
-                            float tr = s[top*src_row_stride+right];
-                            float bl = s[bottom*src_row_stride+left];
-                            float br = s[bottom*src_row_stride+right];
-
-                            float temp = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
-                                tb_frac*((1-lr_frac)*bl + lr_frac*br);
-
-                            d[r*dest_row_stride+c] = temp;
-                        }
-                    }
-
-                    d += dest_channel_stride;
-                    s += src_channel_stride;
-                }
-            }
+                resize_image(simg, dimg);
+            });
         }
 
         void resize_bilinear_gradient (
