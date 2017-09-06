@@ -20,6 +20,8 @@ namespace dlib
     template <typename T>
     struct sub_image_proxy
     {
+        sub_image_proxy() = default;
+
         sub_image_proxy (
             T& img,
             rectangle rect
@@ -34,15 +36,17 @@ namespace dlib
             _data = (char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
         }
 
-        void* _data;
-        long _width_step;
-        long _nr;
-        long _nc;
+        void* _data = 0;
+        long _width_step = 0;
+        long _nr = 0;
+        long _nc = 0;
     };
 
     template <typename T>
     struct const_sub_image_proxy
     {
+        const_sub_image_proxy() = default;
+
         const_sub_image_proxy (
             const T& img,
             rectangle rect
@@ -57,10 +61,10 @@ namespace dlib
             _data = (const char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
         }
 
-        const void* _data;
-        long _width_step;
-        long _nr;
-        long _nc;
+        const void* _data = 0;
+        long _width_step = 0;
+        long _nr = 0;
+        long _nc = 0;
     };
 
     template <typename T>
@@ -152,6 +156,38 @@ namespace dlib
     )
     {
         return const_sub_image_proxy<image_type>(img,rect);
+    }
+
+    template <typename T>
+    inline sub_image_proxy<matrix<T>> sub_image (
+        T* img,
+        long nr,
+        long nc,
+        long row_stride
+    )
+    {
+        sub_image_proxy<matrix<T>> tmp;
+        tmp._data = img;
+        tmp._nr = nr;
+        tmp._nc = nc;
+        tmp._width_step = row_stride*sizeof(T);
+        return tmp;
+    }
+
+    template <typename T>
+    inline const const_sub_image_proxy<matrix<T>> sub_image (
+        const T* img,
+        long nr,
+        long nc,
+        long row_stride
+    )
+    {
+        const_sub_image_proxy<matrix<T>> tmp;
+        tmp._data = img;
+        tmp._nr = nr;
+        tmp._nc = nc;
+        tmp._width_step = row_stride*sizeof(T);
+        return tmp;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -693,11 +729,8 @@ namespace dlib
         const_image_view<image_type1> in_img(in_img_);
         image_view<image_type2> out_img(out_img_);
 
-        if (out_img.nr() <= 1 || out_img.nc() <= 1)
-        {
-            assign_all_pixels(out_img, 0);
+        if (out_img.size() == 0 || in_img.size() == 0)
             return;
-        }
 
 
         typedef typename image_traits<image_type1>::pixel_type T;
@@ -762,11 +795,24 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
-    typename enable_if<is_grayscale_image<image_type> >::type resize_image (
+    struct images_have_same_pixel_types
+    {
+        typedef typename image_traits<image_type1>::pixel_type ptype1;
+        typedef typename image_traits<image_type2>::pixel_type ptype2;
+        const static bool value = is_same_type<ptype1, ptype2>::value;
+    };
+
+    template <
+        typename image_type,
+        typename image_type2
+        >
+    typename enable_if_c<is_grayscale_image<image_type>::value && is_grayscale_image<image_type2>::value && images_have_same_pixel_types<image_type,image_type2>::value>::type 
+    resize_image (
         const image_type& in_img_,
-        image_type& out_img_,
+        image_type2& out_img_,
         interpolate_bilinear
     )
     {
@@ -778,13 +824,10 @@ namespace dlib
             );
 
         const_image_view<image_type> in_img(in_img_);
-        image_view<image_type> out_img(out_img_);
+        image_view<image_type2> out_img(out_img_);
 
-        if (out_img.nr() <= 1 || out_img.nc() <= 1)
-        {
-            assign_all_pixels(out_img, 0);
+        if (out_img.size() == 0 || in_img.size() == 0)
             return;
-        }
 
         typedef typename image_traits<image_type>::pixel_type T;
         const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
@@ -882,11 +925,8 @@ namespace dlib
         const_image_view<image_type> in_img(in_img_);
         image_view<image_type> out_img(out_img_);
 
-        if (out_img.nr() <= 1 || out_img.nc() <= 1)
-        {
-            assign_all_pixels(out_img, 0);
+        if (out_img.size() == 0 || in_img.size() == 0)
             return;
-        }
 
 
         typedef typename image_traits<image_type>::pixel_type T;

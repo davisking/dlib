@@ -1265,6 +1265,30 @@ namespace dlib
             - returns sub_image_proxy<image_type>(img,rect)
     !*/
 
+    template <typename T>
+    sub_image_proxy<some_appropriate_type> sub_image (
+        T* img,
+        long nr,
+        long nc,
+        long row_stride
+    );
+    /*!
+        requires
+            - img == a pointer to at least nr*row_stride T objects
+            - nr >= 0
+            - nc >= 0
+            - row_stride >= 0
+        ensures
+            - This function returns an image that is just a thin wrapper around the given
+              pointer.  It will have the dimensions defined by the supplied longs.  To be
+              precise, this function returns an image object IMG such that:
+                - image_data(IMG) == img
+                - num_rows(IMG) == nr
+                - num_columns(IMG) == nc
+                - width_step(IMG) == row_stride*sizeof(T)
+                - IMG contains pixels of type T.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -1306,6 +1330,30 @@ namespace dlib
               dlib/image_processing/generic_image.h 
         ensures
             - returns const_sub_image_proxy<image_type>(img,rect)
+    !*/
+
+    template <typename T>
+    const const_sub_image_proxy<some_appropriate_type> sub_image (
+        const T* img,
+        long nr,
+        long nc,
+        long row_stride
+    );
+    /*!
+        requires
+            - img == a pointer to at least nr*row_stride T objects
+            - nr >= 0
+            - nc >= 0
+            - row_stride >= 0
+        ensures
+            - This function returns an image that is just a thin wrapper around the given
+              pointer.  It will have the dimensions defined by the supplied longs.  To be
+              precise, this function returns an image object IMG such that:
+                - image_data(IMG) == img
+                - num_rows(IMG) == nr
+                - num_columns(IMG) == nc
+                - width_step(IMG) == row_stride*sizeof(T)
+                - IMG contains pixels of type T.
     !*/
 
 // ----------------------------------------------------------------------------------------
