@@ -1380,6 +1380,15 @@ namespace dlib
                   R(r,c) == std::min(a(r,c), b(r,c))
     !*/
 
+    const matrix_exp min_pointwise (
+        const matrix_exp& a,
+        const matrix_exp& b,
+        const matrix_exp& c 
+    );
+    /*!
+        performs min_pointwise(a,min_pointwise(b,c));
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     const matrix_exp::type max (
@@ -1411,6 +1420,15 @@ namespace dlib
                 - R has the same dimensions as a and b. 
                 - for all valid r and c:
                   R(r,c) == std::max(a(r,c), b(r,c))
+    !*/
+
+    const matrix_exp max_pointwise (
+        const matrix_exp& a,
+        const matrix_exp& b,
+        const matrix_exp& c 
+    );
+    /*!
+        performs max_pointwise(a,max_pointwise(b,c));
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -364,37 +364,42 @@ namespace dlib
     {
     public:
 
-        struct detector_window_size
+        struct detector_window_details
         {
-            detector_window_size() = default; 
-            detector_window_size(unsigned long w, unsigned long h) : width(w), height(h) {}
+            detector_window_details() = default; 
+            detector_window_details(unsigned long w, unsigned long h) : width(w), height(h) {}
+            detector_window_details(unsigned long w, unsigned long h, const std::string& l) : width(w), height(h), label(l) {}
 
             unsigned long width = 0;
             unsigned long height = 0;
+            std::string label;
 
-            friend inline void serialize(const detector_window_size& item, std::ostream& out)
+            friend inline void serialize(const detector_window_details& item, std::ostream& out)
             {
-                int version = 1;
+                int version = 2;
                 serialize(version, out);
                 serialize(item.width, out);
                 serialize(item.height, out);
+                serialize(item.label, out);
             }
 
-            friend inline void deserialize(detector_window_size& item, std::istream& in)
+            friend inline void deserialize(detector_window_details& item, std::istream& in)
             {
                 int version = 0;
                 deserialize(version, in);
-                if (version != 1)
-                    throw serialization_error("Unexpected version found while deserializing dlib::mmod_options::detector_window_size");
+                if (version != 1 && version != 2)
+                    throw serialization_error("Unexpected version found while deserializing dlib::mmod_options::detector_window_details");
                 deserialize(item.width, in);
                 deserialize(item.height, in);
+                if (version == 2)
+                    deserialize(item.label, in);
             }
 
         };
 
         mmod_options() = default;
 
-        std::vector<detector_window_size> detector_windows;
+        std::vector<detector_window_details> detector_windows;
         double loss_per_false_alarm = 1;
         double loss_per_missed_target = 1;
         double truth_match_iou_threshold = 0.5;
@@ -412,33 +417,36 @@ namespace dlib
             DLIB_CASSERT(0.5 < min_detector_window_overlap_iou && min_detector_window_overlap_iou < 1);
 
             // Figure out what detector windows we will need.
-            for (auto ratio : find_covering_aspect_ratios(boxes, test_box_overlap(min_detector_window_overlap_iou)))
+            for (auto& label : get_labels(boxes))
             {
-                double detector_width;
-                double detector_height;
-                if (ratio < 1)
+                for (auto ratio : find_covering_aspect_ratios(boxes, test_box_overlap(min_detector_window_overlap_iou), label))
                 {
-                    detector_height = target_size;
-                    detector_width = ratio*target_size;
-                    if (detector_width < min_target_size)
+                    double detector_width;
+                    double detector_height;
+                    if (ratio < 1)
                     {
-                        detector_height = min_target_size;
-                        detector_width = min_target_size/ratio;
+                        detector_height = target_size;
+                        detector_width = ratio*target_size;
+                        if (detector_width < min_target_size)
+                        {
+                            detector_height = min_target_size;
+                            detector_width = min_target_size/ratio;
+                        }
                     }
-                }
-                else
-                {
-                    detector_width = target_size;
-                    detector_height = target_size/ratio;
-                    if (detector_height < min_target_size)
+                    else
                     {
-                        detector_width = min_target_size;
-                        detector_height = min_target_size*ratio;
+                        detector_width = target_size;
+                        detector_height = target_size/ratio;
+                        if (detector_height < min_target_size)
+                        {
+                            detector_width = min_target_size*ratio;
+                            detector_height = min_target_size;
+                        }
                     }
-                }
 
-                detector_window_size p((unsigned long)std::round(detector_width), (unsigned long)std::round(detector_height));
-                detector_windows.push_back(p);
+                    detector_window_details p((unsigned long)std::round(detector_width), (unsigned long)std::round(detector_height), label);
+                    detector_windows.push_back(p);
+                }
             }
 
             DLIB_CASSERT(detector_windows.size() != 0, "You can't call mmod_options's constructor with a set of boxes that is empty (or only contains ignored boxes).");
@@ -466,14 +474,22 @@ namespace dlib
             // some small variability in how boxes get positioned between the training data
             // and the coordinate system used by the detector when it runs.  So relaxing it
             // here takes care of that.
-            const double relax_amount = 0.05;
-            auto iou_thresh = std::min(1.0, overlaps_nms.get_iou_thresh()+relax_amount);
-            auto percent_covered_thresh = std::min(1.0, overlaps_nms.get_percent_covered_thresh()+relax_amount);
+            auto iou_thresh             = advance_toward_1(overlaps_nms.get_iou_thresh());
+            auto percent_covered_thresh = advance_toward_1(overlaps_nms.get_percent_covered_thresh());
             overlaps_nms = test_box_overlap(iou_thresh, percent_covered_thresh);
         }
 
 
     private:
+
+        static double advance_toward_1 (
+            double val
+        )
+        {
+            if (val < 1)
+                val += (1-val)*0.1;
+            return val;
+        }
 
         static size_t count_overlaps (
             const std::vector<rectangle>& rects,
@@ -534,9 +550,23 @@ namespace dlib
             return exemplars;
         }
 
+        static std::set<std::string> get_labels (
+            const std::vector<std::vector<mmod_rect>>& rects
+        )
+        {
+            std::set<std::string> labels;
+            for (auto& rr : rects)
+            {
+                for (auto& r : rr)
+                    labels.insert(r.label);
+            }
+            return labels;
+        }
+
         static std::vector<double> find_covering_aspect_ratios (
             const std::vector<std::vector<mmod_rect>>& rects,
-            const test_box_overlap& overlaps
+            const test_box_overlap& overlaps,
+            const std::string& label
         )
         {
             std::vector<rectangle> boxes;
@@ -547,7 +577,7 @@ namespace dlib
             {
                 for (auto&& b : bb)
                 {
-                    if (!b.ignore)
+                    if (!b.ignore && b.label == label)
                         boxes.push_back(move_rect(set_rect_area(b.rect,400*400), point(0,0)));
                 }
             }
@@ -585,7 +615,7 @@ namespace dlib
             unsigned long height;
             deserialize(width, in);
             deserialize(height, in);
-            item.detector_windows = {mmod_options::detector_window_size(width, height)};
+            item.detector_windows = {mmod_options::detector_window_details(width, height)};
         }
         else
         {
@@ -604,21 +634,23 @@ namespace dlib
     {
         struct intermediate_detection
         {
-            intermediate_detection() : detection_confidence(0), tensor_offset(0) {}
+            intermediate_detection() = default; 
 
             intermediate_detection(
                 rectangle rect_
-            ) : rect(rect_), detection_confidence(0), tensor_offset(0) {}
+            ) : rect(rect_) {}
 
             intermediate_detection(
                 rectangle rect_,
                 double detection_confidence_,
-                size_t tensor_offset_
-            ) : rect(rect_), detection_confidence(detection_confidence_), tensor_offset(tensor_offset_) {}
+                size_t tensor_offset_,
+                long channel
+            ) : rect(rect_), detection_confidence(detection_confidence_), tensor_offset(tensor_offset_), tensor_channel(channel) {}
 
             rectangle rect;
-            double detection_confidence;
-            size_t tensor_offset;
+            double detection_confidence = 0;
+            size_t tensor_offset = 0;
+            long tensor_channel = 0;
 
             bool operator<(const intermediate_detection& item) const { return detection_confidence < item.detection_confidence; }
         };
@@ -664,7 +696,9 @@ namespace dlib
                     if (overlaps_any_box_nms(final_dets, dets_accum[i].rect))
                         continue;
 
-                    final_dets.push_back(mmod_rect(dets_accum[i].rect, dets_accum[i].detection_confidence));
+                    final_dets.push_back(mmod_rect(dets_accum[i].rect,
+                                                   dets_accum[i].detection_confidence,
+                                                   options.detector_windows[dets_accum[i].tensor_channel].label));
                 }
 
                 *iter++ = std::move(final_dets);
@@ -697,12 +731,12 @@ namespace dlib
             double loss = 0;
 
             float* g = grad.host_write_only();
-            // zero initialize grad.
-            for (auto&& x : grad)
-                x = 0;
+            for (size_t i = 0; i < grad.size(); ++i)
+                g[i] = 0;
 
             const float* out_data = output_tensor.host();
 
+            std::vector<size_t> truth_idxs;  truth_idxs.reserve(truth->size());
             std::vector<intermediate_detection> dets;
             for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
@@ -720,20 +754,23 @@ namespace dlib
                     {
                         size_t k;
                         point p;
-                        if(image_rect_to_feat_coord(p, input_tensor, x, sub, k))
+                        if(image_rect_to_feat_coord(p, input_tensor, x, x.label, sub, k))
                         {
                             // Ignore boxes that can't be detected by the CNN.
                             loss -= 1;
                             continue;
                         }
-                        loss -= out_data[(k*output_tensor.nr() + p.y())*output_tensor.nc() + p.x()];
+                        const size_t idx = (k*output_tensor.nr() + p.y())*output_tensor.nc() + p.x();
+                        loss -= out_data[idx];
                         // compute gradient
-                        g[(k*output_tensor.nr() + p.y())*output_tensor.nc() + p.x()] = -scale;
+                        g[idx] = -scale;
+                        truth_idxs.push_back(idx);
                     }
                     else
                     {
                         // This box was ignored so shouldn't have been counted in the loss.
                         loss -= 1;
+                        truth_idxs.push_back(0);
                     }
                 }
 
@@ -750,7 +787,9 @@ namespace dlib
                     if (overlaps_any_box_nms(final_dets, dets[i].rect))
                         continue;
 
-                    const std::pair<double,unsigned int> hittruth = find_best_match(*truth, dets[i].rect);
+                    const auto& det_label = options.detector_windows[dets[i].tensor_channel].label;
+
+                    const std::pair<double,unsigned int> hittruth = find_best_match(*truth, dets[i].rect, det_label);
 
                     final_dets.push_back(dets[i].rect);
 
@@ -772,6 +811,35 @@ namespace dlib
                     }
                 }
 
+                // Check if any of the truth boxes are unobtainable because the NMS is
+                // killing them.  If so, automatically set those unobtainable boxes to
+                // ignore and print a warning message to the user.
+                for (size_t i = 0; i < hit_truth_table.size(); ++i)
+                {
+                    if (!hit_truth_table[i] && !(*truth)[i].ignore) 
+                    {
+                        // So we didn't hit this truth box.  Is that because there is
+                        // another, different truth box, that overlaps it according to NMS?
+                        const std::pair<double,unsigned int> hittruth = find_best_match(*truth, (*truth)[i], i);
+                        if (hittruth.second == i || (*truth)[hittruth.second].ignore)
+                            continue;
+                        rectangle best_matching_truth_box = (*truth)[hittruth.second];
+                        if (options.overlaps_nms(best_matching_truth_box, (*truth)[i]))
+                        {
+                            const size_t idx = truth_idxs[i];
+                            // We are ignoring this box so we shouldn't have counted it in the
+                            // loss in the first place.  So we subtract out the loss values we
+                            // added for it in the code above.
+                            loss -= 1-out_data[idx];
+                            g[idx] = 0;
+                            std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << (*truth)[i].rect;
+                            std::cout << " that is suppressed by non-max-suppression ";
+                            std::cout << "because it is overlapped by another truth rectangle located at " << best_matching_truth_box 
+                                      << " (IoU:"<< box_intersection_over_union(best_matching_truth_box,(*truth)[i]) <<", Percent covered:" 
+                                      << box_percent_covered(best_matching_truth_box,(*truth)[i]) << ")." << std::endl;
+                        }
+                    }
+                }
 
                 hit_truth_table.assign(hit_truth_table.size(), false);
                 final_dets.clear();
@@ -786,7 +854,9 @@ namespace dlib
                     if (overlaps_any_box_nms(final_dets, dets[i].rect))
                         continue;
 
-                    const std::pair<double,unsigned int> hittruth = find_best_match(*truth, dets[i].rect);
+                    const auto& det_label = options.detector_windows[dets[i].tensor_channel].label;
+
+                    const std::pair<double,unsigned int> hittruth = find_best_match(*truth, dets[i].rect, det_label);
 
                     const double truth_match = hittruth.first;
                     if (truth_match > options.truth_match_iou_threshold)
@@ -851,10 +921,26 @@ namespace dlib
             deserialize(item.options, in);
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const loss_mmod_& )
+        friend std::ostream& operator<<(std::ostream& out, const loss_mmod_& item)
         {
-            // TODO, add options fields
-            out << "loss_mmod";
+            out << "loss_mmod\t (";
+
+            out << "detector_windows:(";
+            auto& opts = item.options;
+            for (size_t i = 0; i < opts.detector_windows.size(); ++i)
+            {
+                out << opts.detector_windows[i].width << "x" << opts.detector_windows[i].height;
+                if (i+1 < opts.detector_windows.size())
+                    out << ",";
+            }
+            out << ")";
+            out << ", loss per FA:" << opts.loss_per_false_alarm;
+            out << ", loss per miss:" << opts.loss_per_missed_target;
+            out << ", truth match IOU thresh:" << opts.truth_match_iou_threshold;
+            out << ", overlaps_nms:("<<opts.overlaps_nms.get_iou_thresh()<<","<<opts.overlaps_nms.get_percent_covered_thresh()<<")";
+            out << ", overlaps_ignore:("<<opts.overlaps_ignore.get_iou_thresh()<<","<<opts.overlaps_ignore.get_percent_covered_thresh()<<")";
+
+            out << ")";
             return out;
         }
 
@@ -894,7 +980,7 @@ namespace dlib
                             drectangle rect = centered_drect(p, options.detector_windows[k].width, options.detector_windows[k].height);
                             rect = input_layer(net).tensor_space_to_image_space(input_tensor,rect);
 
-                            dets_accum.push_back(intermediate_detection(rect, score, (k*output_tensor.nr() + r)*output_tensor.nc() + c));
+                            dets_accum.push_back(intermediate_detection(rect, score, (k*output_tensor.nr() + r)*output_tensor.nc() + c, k));
                         }
                     }
                 }
@@ -903,7 +989,8 @@ namespace dlib
         }
 
         size_t find_best_detection_window (
-            rectangle rect
+            rectangle rect,
+            const std::string& label
         ) const
         {
             rect = move_rect(set_rect_area(rect, 400*400), point(0,0));
@@ -914,6 +1001,8 @@ namespace dlib
             double best_ratio_diff = -std::numeric_limits<double>::infinity();
             for (size_t i = 0; i < options.detector_windows.size(); ++i)
             {
+                if (options.detector_windows[i].label != label)
+                    continue;
                 rectangle det_window = centered_rect(point(0,0), options.detector_windows[i].width, options.detector_windows[i].height);
                 det_window = move_rect(set_rect_area(det_window, 400*400), point(0,0));
 
@@ -932,6 +1021,7 @@ namespace dlib
             point& tensor_p,
             const tensor& input_tensor,
             const rectangle& rect,
+            const std::string& label,
             const net_type& net,
             size_t& det_idx
         ) const 
@@ -945,7 +1035,7 @@ namespace dlib
                 throw impossible_labeling_error(sout.str());
             }
 
-            det_idx = find_best_detection_window(rect); 
+            det_idx = find_best_detection_window(rect,label); 
 
             // Compute the scale we need to be at to get from rect to our detection window.
             // Note that we compute the scale as the max of two numbers.  It doesn't
@@ -1010,14 +1100,39 @@ namespace dlib
 
         std::pair<double,unsigned int> find_best_match(
             const std::vector<mmod_rect>& boxes,
-            const rectangle& rect
+            const rectangle& rect,
+            const std::string& label
         ) const
         {
             double match = 0;
             unsigned int best_idx = 0;
             for (unsigned long i = 0; i < boxes.size(); ++i)
             {
-                if (boxes[i].ignore)
+                if (boxes[i].ignore || boxes[i].label != label)
+                    continue;
+
+                const double new_match = box_intersection_over_union(rect, boxes[i]);
+                if (new_match > match)
+                {
+                    match = new_match;
+                    best_idx = i;
+                }
+            }
+
+            return std::make_pair(match,best_idx);
+        }
+
+        std::pair<double,unsigned int> find_best_match(
+            const std::vector<mmod_rect>& boxes,
+            const rectangle& rect,
+            const size_t excluded_idx
+        ) const
+        {
+            double match = 0;
+            unsigned int best_idx = 0;
+            for (unsigned long i = 0; i < boxes.size(); ++i)
+            {
+                if (boxes[i].ignore || excluded_idx == i)
                     continue;
 
                 const double new_match = box_intersection_over_union(rect, boxes[i]);

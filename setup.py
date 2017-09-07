@@ -12,8 +12,10 @@ To build and install:
     python setup.py install
 To package the wheel (after pip installing twine and wheel):
     python setup.py bdist_wheel
-To upload the wheel to PyPi
+To upload the binary wheel to PyPi
     twine upload dist/*.whl
+To upload the source distribution to PyPi
+    python setup.py sdist upload
 To repackage the previously built package as wheel (bypassing build):
     python setup.py bdist_wheel --repackage
 To install a develop version (egg with symbolic link):

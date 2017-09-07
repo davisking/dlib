@@ -168,6 +168,10 @@
                   <link>face_detector.py.html</link>
                </item>
                <item>
+                  <name>CNN Face Detector</name>
+                  <link>cnn_face_detector.py.html</link>
+               </item>
+               <item>
                   <name>Train Object Detector</name>
                   <link>train_object_detector.py.html</link>
                </item>
@@ -223,6 +227,14 @@
                <item>
                   <name>Deep Face Recognition</name>
                   <link>dnn_face_recognition_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Vehicle Detection</name>
+                  <link>dnn_mmod_find_cars_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Vehicle Detection Trainer</name>
+                  <link>dnn_mmod_train_find_cars_ex.cpp.html</link>
                </item>
                <item>
                   <name>Deep Learning Face Detection</name>

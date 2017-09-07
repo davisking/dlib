@@ -211,6 +211,26 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        unsigned int N
+        >
+    void find_pyramid_down_output_image_size(
+        const pyramid_down<N>& pyr,
+        long& nr,
+        long& nc
+    );
+    /*!
+        requires
+            - nr >= 0
+            - nc >= 0
+        ensures
+            - If pyr() were called on an image with nr by nc rows and columns, what would
+              be the size of the output image?  This function finds the size of the output
+              image and stores it back into #nr and #nc.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename pyramid_type,
         typename image_type1,
         typename image_type2
@@ -219,7 +239,8 @@ namespace dlib
         const image_type1& img,
         image_type2& out_img,
         std::vector<rectangle>& rects,
-        const unsigned long padding = 10
+        const unsigned long padding = 10,
+        const unsigned long outer_padding = 0
     );
     /*!
         requires
@@ -237,7 +258,8 @@ namespace dlib
               pyramid levels are generated from pyramid_type's downsampling.  The entire
               resulting pyramid is packed into a single image and stored in out_img.
             - When packing pyramid levels into out_img, there will be padding pixels of
-              space between each sub-image.
+              space between each sub-image.  There will also be outer_padding pixels of
+              padding around the edge of the image.  All padding pixels have a value of 0.
             - The resulting pyramid will be composed of #rects.size() images packed into
               out_img.  Moreover, #rects[i] is the location inside out_img of the i-th
               pyramid level. 

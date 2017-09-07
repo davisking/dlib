@@ -106,6 +106,7 @@
          <name>Other</name>
          <item>dlib_testing_suite</item>
          <item>MATLAB</item>
+         <item>Java</item>
       </section>
 
     </top>  
@@ -1047,6 +1048,26 @@
             examples.
             You can also easily compile these files using CMake.  See the instructions in the README file
             in the dlib/matlab folder for further details.
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>Java</name>
+         <description>
+            dlib contains some CMake scripts and related tools that make calling C++ code
+            from Java easy.  If you look in the <a href="https://github.com/davisking/dlib/tree/master/dlib/java">dlib/java</a> folder you can find a CMake
+            project that uses SWIG to build some C++ code and then call it from Java.  In
+            particular, if you run the run_test.sh script it will build and run the code,
+            calling it from java.   
+
+            <p>
+               The dlib/java folder also contains some SWIG aware C++ classes that make
+               interacting with java arrays (e.g. double[]) from C++ efficient and easy.
+               See the documentation at the top of the <a href="dlib/java/java_array.h.html">java_array.h</a> file for details.
+            </p>
          </description>
                                  
       </component>

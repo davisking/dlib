@@ -30,6 +30,13 @@ namespace dlib
             const tensor& src2
         );
 
+        void multiply_zero_padded (
+            bool add_to,
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2
+        );
+
         void add(
             float beta,
             tensor& dest,
@@ -300,13 +307,31 @@ namespace dlib
 
         void resize_bilinear (
             tensor& dest,
-            const tensor& src
+            long dest_row_stride,
+            long dest_channel_stride,
+            const tensor& src,
+            long src_row_stride,
+            long src_channel_stride
         );
 
         void resize_bilinear_gradient (
             tensor& grad,
-            const tensor& gradient_input
+            long grad_row_stride,
+            long grad_channel_stride,
+            const tensor& gradient_input,
+            long gradient_input_row_stride,
+            long gradient_input_channel_stride
         );
+
+        inline void resize_bilinear (
+            tensor& dest,
+            const tensor& src
+        ) { resize_bilinear(dest, dest.nc(), dest.nr()*dest.nc(), src, src.nc(), src.nr()*src.nc()); }
+
+        inline void resize_bilinear_gradient (
+            tensor& grad,
+            const tensor& gradient_input
+        ) { resize_bilinear_gradient(grad, grad.nc(), grad.nr()*grad.nc(), gradient_input, gradient_input.nc(), gradient_input.nr()*gradient_input.nc()); }
 
     // -----------------------------------------------------------------------------------
 
@@ -438,6 +463,7 @@ namespace dlib
     // -----------------------------------------------------------------------------------
 
         void copy_tensor(
+            bool add_to,
             tensor& dest,
             size_t dest_k_offset,
             const tensor& src,

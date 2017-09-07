@@ -58,6 +58,11 @@ if (CMAKE_VERSION VERSION_LESS "3.1.2")
       # Since we don't know what compiler this is just try to build a c++11 project and see if it compiles.
       test_compiler_for_cpp11()
    endif()
+elseif( MSVC AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.3) 
+   # Clang can compile all Dlib's code at Windows platform. Tested with Clang 5
+   message(STATUS "C++11 activated.")
+   add_global_compiler_switch("-Xclang -fcxx-exceptions")
+   set(COMPILER_CAN_DO_CPP_11 1)
 elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24215.1 ) 
    message(STATUS "NOTE: Visual Studio didn't have good enough C++11 support until Visual Studio 2015 update 3 (v19.0.24215.1)")
    message(STATUS "So we aren't enabling things that require full C++11 support (e.g. the deep learning tools).")

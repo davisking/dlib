@@ -146,6 +146,22 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                   <link>dlib/dnn/layers_abstract.h.html#con_</link>
                </item>
                <item>
+                  <name>cont</name>
+                  <link>dlib/dnn/layers_abstract.h.html#cont_</link>
+               </item>
+               <item>
+                  <name>extract</name>
+                  <link>dlib/dnn/layers_abstract.h.html#extract_</link>
+               </item>
+               <item>
+                  <name>mult_prev</name>
+                  <link>dlib/dnn/layers_abstract.h.html#mult_prev_</link>
+               </item>
+               <item>
+                  <name>upsample</name>
+                  <link>dlib/dnn/layers_abstract.h.html#upsample_</link>
+               </item>
+               <item>
                   <name>l2normalize</name>
                   <link>dlib/dnn/layers_abstract.h.html#l2normalize_</link>
                </item>
@@ -227,6 +243,14 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                   <link>dlib/dnn/loss_abstract.h.html#loss_multiclass_log_</link>
                </item>
                <item>
+                  <name>loss_multiclass_log_per_pixel</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_multiclass_log_per_pixel_</link>
+               </item>
+               <item>
+                  <name>loss_multiclass_log_per_pixel_weighted</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_multiclass_log_per_pixel_weighted_</link>
+               </item>
+               <item>
                   <name>loss_mmod</name>
                   <link>#loss_mmod_</link>
                </item>
@@ -235,12 +259,16 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                   <link>#loss_metric_</link>
                </item>
                <item>
-                  <name>loss_mean_squared_</name>
+                  <name>loss_mean_squared</name>
                   <link>#loss_mean_squared_</link>
                </item>
                <item>
+                  <name>loss_mean_squared_per_pixel</name>
+                  <link>#loss_mean_squared_per_pixel_</link>
+               </item>
+               <item>
                   <name>loss_mean_squared_multioutput_</name>
-                  <link>#loss_mean_squared_multioutput_</link>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_mean_squared_multioutput_</link>
                </item>
             </sub>
          </item>
@@ -462,6 +490,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_imagenet_ex.cpp.html</example>
             <example>dnn_imagenet_train_ex.cpp.html</example>
             <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
             <example>dnn_mmod_face_detection_ex.cpp.html</example>
             <example>dnn_mmod_dog_hipsterizer.cpp.html</example>
             <example>dnn_metric_learning_ex.cpp.html</example>
@@ -491,6 +521,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_imagenet_ex.cpp.html</example>
             <example>dnn_imagenet_train_ex.cpp.html</example>
             <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
             <example>dnn_metric_learning_ex.cpp.html</example>
             <example>dnn_metric_learning_on_images_ex.cpp.html</example>
          </examples>
@@ -513,6 +545,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_imagenet_ex.cpp.html</example>
             <example>dnn_imagenet_train_ex.cpp.html</example>
             <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
             <example>dnn_metric_learning_ex.cpp.html</example>
             <example>dnn_metric_learning_on_images_ex.cpp.html</example>
             <example>dnn_face_recognition_ex.cpp.html</example>
@@ -665,6 +699,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          </description>
          <examples>
             <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
             <example>dnn_mmod_face_detection_ex.cpp.html</example>
             <example>dnn_mmod_dog_hipsterizer.cpp.html</example>
          </examples>
@@ -687,8 +723,11 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          </description>
          <examples>
             <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
             <example>dnn_mmod_face_detection_ex.cpp.html</example>
             <example>dnn_mmod_dog_hipsterizer.cpp.html</example>
+            <example>cnn_face_detector.py.html</example>
          </examples>
       </component>
       
@@ -3466,6 +3505,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>object_detector_advanced_ex.cpp.html</example>
             <example>train_object_detector.cpp.html</example>
             <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
          </examples>
                                  
       </component>

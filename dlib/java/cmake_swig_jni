@@ -1,0 +1,262 @@
+# This file is used to create SWIG based JNI interfaces to C++ code.  You use
+# it by defining some CMake variables and then include(cmake_swig_jni).  You
+# would make a CMakeLists.txt file that looks like the following:
+#
+#   cmake_minimum_required (VERSION 2.8.12)
+#   project (example)
+#   set(java_package_name "org.mycompany")
+#   set(source_files
+#       your_cpp_source.cpp
+#       more_cpp_source.cpp
+#   )
+#
+#   ### We might need to link our code to some other C++ library like dlib.  You
+#   ### can do that by setting additional_link_libraries.  Here is an example of
+#   ### linking to dlib:
+#   include(../../dlib/dlib/cmake)
+#   set(additional_link_libraries dlib::dlib)
+#
+#   ### Tell swig to put the output files into the parent folder of your CMakeLists.txt 
+#   ### file when you run make install.
+#   set(install_target_output_folder ..)
+#   include(cmake_swig_jni)
+#
+#   ### Alternatively, instead of using install_target_output_folder, you can tell
+#   ### cmake to output the shared library, java source files, and the jar to
+#   ### separate output folders.  These commands would put them into folders
+#   ### thelib, thesrc, and thejar, respectively.
+#   # set(install_shared_library_output_folder thelib)
+#   # set(install_java_source_output_folder    thesrc)
+#   # set(install_jar_output_folder            thejar)
+
+
+
+
+
+
+################################################################################
+################################################################################
+#                             IMPLEMENTATION DETAILS
+################################################################################
+################################################################################
+
+cmake_minimum_required (VERSION 2.8.12)
+
+# This block of code tries to figure out what the JAVA_HOME environment
+# variable should be by looking at the folder that contains the java
+# executable.
+if (NOT DEFINED ENV{JAVA_HOME})
+   message(STATUS "JAVA_HOME environment variable not set, trying to guess it...")
+   find_program(JAVA_EXECUTABLE java)
+   # Resolve symbolic links, hopefully this will give us a path in the proper
+   # java home directory.
+   get_filename_component(JAVA_EXECUTABLE ${JAVA_EXECUTABLE} REALPATH)
+   # Pick out the parent directories
+   get_filename_component(JAVA_PATH1 ${JAVA_EXECUTABLE} PATH)
+   get_filename_component(JAVA_PATH2 ${JAVA_PATH1} PATH)
+   get_filename_component(JAVA_PATH3 ${JAVA_PATH2} PATH)
+   # and search them for include/jni.h.  If we find that then we probably have
+   # a good java home candidate.
+   find_path(AUTO_JAVA_HOME include/jni.h
+      PATHS
+      ${JAVA_PATH1}
+      ${JAVA_PATH2}
+      ${JAVA_PATH3}
+      "C:/Program Files/Java/jdk*"
+      "C:/Program Files (x86)/Java/jdk*"
+      )
+
+   if (AUTO_JAVA_HOME)
+      set(ENV{JAVA_HOME} ${AUTO_JAVA_HOME})
+      message(STATUS "Using JAVA_HOME OF " ${AUTO_JAVA_HOME})
+   else()
+      message(FATAL_ERROR "Couldn't find a folder for JAVA_HOME.  You must set the JAVA_HOME environment variable before running CMake.")
+   endif()
+endif()
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}/lib")
+
+find_package(SWIG REQUIRED)
+find_package(Java REQUIRED)
+find_package(JNI REQUIRED)
+include(UseSWIG)
+
+macro (add_global_switch def_name )
+   if (NOT CMAKE_CXX_FLAGS MATCHES "${def_name}")
+      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${def_name}" 
+         CACHE STRING "Flags used by the compiler during all C++ builds." 
+         FORCE)
+   endif ()
+   if (NOT CMAKE_C_FLAGS MATCHES "${def_name}")
+      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${def_name}" 
+         CACHE STRING "Flags used by the compiler during all C builds." 
+         FORCE)
+   endif ()
+endmacro()
+
+# SWIG doesn't work if optimizations are enabled and strict aliasing is not
+# turned off.  This is a little wonky but it's how SWIG is.
+if (CMAKE_COMPILER_IS_GNUCXX)
+    add_definitions(-fno-strict-aliasing)
+endif()
+if (UNIX)
+    # we need to make sure all the code is compiled with -fPIC. In particular,
+    # it's important that all the code for the whole project is, not just the
+    # stuff immediately compiled by us in this cmake file.  So we add -fPIC to
+    # the top level cmake flags variables.
+    add_global_switch(-fPIC)
+endif()
+
+set(dlib_root_path ${CMAKE_CURRENT_LIST_DIR}/../../)
+
+string(REGEX REPLACE "\\." "/" package_path ${java_package_name})
+string(REGEX REPLACE "\\..*" "" package_root_name ${java_package_name})
+
+include_directories(${dlib_root_path})
+
+set(CMAKE_SWIG_FLAGS -package ${java_package_name} -I${dlib_root_path})
+set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/lib/java_src/${package_path})
+
+set(output_library_name ${PROJECT_NAME})
+
+# Create the swig.i interface file that swig will run on.  We do it here in
+# the cmake script because this lets us automatically include the correct
+# output library name into the call to System.loadLibrary().
+FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/swig.i 
+        "
+    // Put the global functions in our api into a java class called global.
+    %module global 
+
+    %{
+    #include <exception>
+    #include <stdexcept>
+    static JavaVM *cached_jvm = 0;
+
+    JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
+        cached_jvm = jvm;
+        return JNI_VERSION_1_6;
+    }
+
+    static JNIEnv * JNI_GetEnv() {
+        JNIEnv *env;
+        jint rc = cached_jvm->GetEnv((void **)&env, JNI_VERSION_1_6);
+        if (rc == JNI_EDETACHED)
+            throw std::runtime_error(\"current thread not attached\");
+        if (rc == JNI_EVERSION)
+            throw std::runtime_error(\"jni version not supported\");
+        return env;
+    }
+
+    #include \"swig_api.h\"
+    %}
+
+    // Convert all C++ exceptions into java.lang.Exception
+    %exception {
+        try {
+            $action
+        } catch(std::exception& e) {
+            jclass clazz = jenv->FindClass(\"java/lang/Exception\");
+            jenv->ThrowNew(clazz, e.what());
+            return $null;
+        }
+    }
+
+    %pragma(java) jniclasscode=%{
+    static { System.loadLibrary(\"${output_library_name}\"); }
+    %}
+
+    %include \"swig_api.h\"
+    "
+)
+
+# There is a bug in CMake's Swig scripts that causes the build to fail if the
+# binary folder doesn't contain a folder with the same name as the binary dir.
+# So we make a subfolder of the same name to avoid that bug.
+get_filename_component(binary_dir_name "${CMAKE_CURRENT_BINARY_DIR}" NAME)
+FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${binary_dir_name}")
+
+set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/swig.i PROPERTIES CPLUSPLUS ON)
+swig_add_module(${output_library_name} java ${CMAKE_CURRENT_BINARY_DIR}/swig.i ${source_files})
+
+include_directories(${JNI_INCLUDE_DIRS})
+swig_link_libraries(${output_library_name}  ${additional_link_libraries})
+
+# Things to delete when "make clean" is run.
+set(clean_files
+    ${CMAKE_CURRENT_BINARY_DIR}/intermediate_files_compiled
+    ${CMAKE_CURRENT_BINARY_DIR}/lib/java_src 
+    )
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${clean_files}")
+
+# Compile the java files into a jar file and stick it in the lib folder.  Also, one problem
+# with this cmake setup is that it doesn't know that modifications to swig_api.h mean that
+# swig.i is invalidated and thus swig needs to be rerun.  So here we also touch swig.i
+# every time we build to make it always out of date and force swig to run on each build,
+# thus avoiding the stale swig outputs problem that would otherwise irritate people who
+# modify something and attempt to rebuild.
+add_custom_command(TARGET ${output_library_name} 
+   POST_BUILD
+   COMMAND cmake -E echo "compiling Java files..."
+   COMMAND cmake -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/intermediate_files_compiled"
+   COMMAND ${Java_JAVAC_EXECUTABLE} ${CMAKE_SWIG_OUTDIR}/*.java -d "${CMAKE_CURRENT_BINARY_DIR}/intermediate_files_compiled"
+   COMMAND cmake -E echo "Making jar file..."
+   COMMAND ${Java_JAR_EXECUTABLE} cvf "${CMAKE_CURRENT_BINARY_DIR}/lib/${PROJECT_NAME}.jar" -C "${CMAKE_CURRENT_BINARY_DIR}/intermediate_files_compiled" ${package_root_name}
+   COMMAND cmake -E touch swig.i
+   )
+
+
+# Determine the path to our CMakeLists.txt file.
+# There is either a bug (or break in compatability maybe) between versions
+# of cmake that cause the or expression in this regular expression to be
+# necessary.
+string(REGEX REPLACE "(cmake_swig_jni|CMakeLists.txt)$" "" base_path ${CMAKE_PARENT_LIST_FILE})
+
+#if the including cmake script set the install_target_output_folder variable
+#then make it so we install the compiled library and jar into that folder
+if (install_target_output_folder)
+    # The directory we will write the output files to.
+    set(install_dir "${base_path}${install_target_output_folder}")
+    set(CMAKE_INSTALL_PREFIX "${install_dir}")
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${install_dir}")
+    install(TARGETS ${output_library_name} 
+        DESTINATION "${install_dir}"
+        )
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib/${PROJECT_NAME}.jar 
+        DESTINATION "${install_dir}"
+        )
+endif()
+
+if (install_shared_library_output_folder)
+    set(install_dir "${base_path}${install_shared_library_output_folder}")
+    install(TARGETS ${output_library_name} 
+        DESTINATION "${install_dir}"
+        )
+endif()
+
+if (install_java_source_output_folder)
+    set(install_dir "${base_path}${install_java_source_output_folder}")
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib/java_src/${package_root_name}
+        DESTINATION "${install_dir}"
+        )
+endif()
+
+if (install_jar_output_folder)
+    set(install_dir "${base_path}${install_jar_output_folder}")
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib/${PROJECT_NAME}.jar 
+        DESTINATION "${install_dir}"
+        )
+endif()
+
+
+# Copy any system libraries to the output folder.  This really only matters on
+# windows where it's good to have the visual studio runtime show up in the lib
+# folder so that you don't forget to include it in your binary distribution.
+INCLUDE(InstallRequiredSystemLibraries)
+foreach (file_i ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS})
+   add_custom_command(TARGET ${output_library_name}
+      POST_BUILD
+      COMMAND cmake -E copy ${file_i} "${CMAKE_CURRENT_BINARY_DIR}/lib/"
+      )
+endforeach()
+

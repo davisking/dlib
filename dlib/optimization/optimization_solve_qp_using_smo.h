@@ -286,7 +286,7 @@ namespace dlib
             lambda = A*alpha;
         else
             lambda = A*alpha + d;
-        lambda = clamp(lambda, 0, max_lambda);
+        lambda = dlib::clamp(lambda, 0, max_lambda);
 
         // Compute f'(alpha) (i.e. the gradient of f(alpha) with respect to alpha) for the current alpha.  
         matrix<T,NR,NC,MM,L> df = Q*alpha - b - trans(A)*lambda;
@@ -333,7 +333,7 @@ namespace dlib
                     lambda = A*alpha;
                 else
                     lambda = A*alpha + d;
-                lambda = clamp(lambda, 0, max_lambda);
+                lambda = dlib::clamp(lambda, 0, max_lambda);
                 df = Q*alpha - b - trans(A)*lambda;
 
                 if (trans(alpha)*df - C*min(df) < eps)
@@ -375,7 +375,7 @@ namespace dlib
                     lambda = A*alpha;
                 else
                     lambda = A*alpha + d;
-                lambda = clamp(lambda, 0, max_lambda);
+                lambda = dlib::clamp(lambda, 0, max_lambda);
 
                 // Perform this form of the update every so often because doing so can help
                 // avoid the buildup of numerical errors you get with the alternate update
@@ -524,7 +524,7 @@ namespace dlib
             df = Q*alpha + b;
             // now take a projected gradient step using Nesterov's method.
             v = clamp(alpha - 1.0/lipschitz_bound * df, lower, upper);
-            alpha = clamp((1-gamma)*v + gamma*v_old, lower, upper);
+            alpha = dlib::clamp((1-gamma)*v + gamma*v_old, lower, upper);
 
 
             // check for convergence every 10 iterations

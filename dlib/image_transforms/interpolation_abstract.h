@@ -417,6 +417,28 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    void resize_image (
+        double size_scale,
+        image_type& img 
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+        ensures
+            - Resizes img so that each of it's dimensions are size_scale times larger than img.
+              In particular, we will have:
+                - #img.nr() == std::round(size_scale*img.nr())
+                - #img.nc() == std::round(size_scale*img.nc())
+                - #img == a bilinearly interpolated copy of the input image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type1,
         typename image_type2
         >
@@ -655,7 +677,8 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<rectangle> >& objects
+        std::vector<std::vector<rectangle> >& objects,
+        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
     );
     /*!
         requires
@@ -668,6 +691,7 @@ namespace dlib
               pyramid_type.  Therefore, #images[i] will contain the larger upsampled
               version of images[i].  It also adjusts all the rectangles in objects so that
               they still bound the same visual objects in each image.
+            - Input images already containing more than max_image_size pixels are not upsampled.
             - #images.size() == image.size()
             - #objects.size() == objects.size()
             - for all valid i:
@@ -682,7 +706,8 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<mmod_rect>>& objects
+        std::vector<std::vector<mmod_rect>>& objects,
+        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
     );
     /*!
         requires
@@ -695,6 +720,7 @@ namespace dlib
               pyramid_type.  Therefore, #images[i] will contain the larger upsampled
               version of images[i].  It also adjusts all the rectangles in objects so that
               they still bound the same visual objects in each image.
+            - Input images already containing more than max_image_size pixels are not upsampled.
             - #images.size() == image.size()
             - #objects.size() == objects.size()
             - for all valid i:
@@ -710,7 +736,8 @@ namespace dlib
     void upsample_image_dataset (
         image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
-        std::vector<std::vector<rectangle> >& objects2 
+        std::vector<std::vector<rectangle> >& objects2,
+        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
     );
     /*!
         requires
@@ -724,6 +751,7 @@ namespace dlib
               pyramid_type.  Therefore, #images[i] will contain the larger upsampled
               version of images[i].  It also adjusts all the rectangles in objects and
               objects2 so that they still bound the same visual objects in each image.
+            - Input images already containing more than max_image_size pixels are not upsampled.
             - #images.size() == image.size()
             - #objects.size() == objects.size()
             - #objects2.size() == objects2.size()
@@ -1237,6 +1265,30 @@ namespace dlib
             - returns sub_image_proxy<image_type>(img,rect)
     !*/
 
+    template <typename T>
+    sub_image_proxy<some_appropriate_type> sub_image (
+        T* img,
+        long nr,
+        long nc,
+        long row_stride
+    );
+    /*!
+        requires
+            - img == a pointer to at least nr*row_stride T objects
+            - nr >= 0
+            - nc >= 0
+            - row_stride >= 0
+        ensures
+            - This function returns an image that is just a thin wrapper around the given
+              pointer.  It will have the dimensions defined by the supplied longs.  To be
+              precise, this function returns an image object IMG such that:
+                - image_data(IMG) == img
+                - num_rows(IMG) == nr
+                - num_columns(IMG) == nc
+                - width_step(IMG) == row_stride*sizeof(T)
+                - IMG contains pixels of type T.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -1278,6 +1330,30 @@ namespace dlib
               dlib/image_processing/generic_image.h 
         ensures
             - returns const_sub_image_proxy<image_type>(img,rect)
+    !*/
+
+    template <typename T>
+    const const_sub_image_proxy<some_appropriate_type> sub_image (
+        const T* img,
+        long nr,
+        long nc,
+        long row_stride
+    );
+    /*!
+        requires
+            - img == a pointer to at least nr*row_stride T objects
+            - nr >= 0
+            - nc >= 0
+            - row_stride >= 0
+        ensures
+            - This function returns an image that is just a thin wrapper around the given
+              pointer.  It will have the dimensions defined by the supplied longs.  To be
+              precise, this function returns an image object IMG such that:
+                - image_data(IMG) == img
+                - num_rows(IMG) == nr
+                - num_columns(IMG) == nc
+                - width_step(IMG) == row_stride*sizeof(T)
+                - IMG contains pixels of type T.
     !*/
 
 // ----------------------------------------------------------------------------------------

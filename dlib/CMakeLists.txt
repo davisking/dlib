@@ -16,7 +16,7 @@ include(cmake_utils/use_cpp_11.cmake)
 
 
 set(CPACK_PACKAGE_VERSION_MAJOR "19")
-set(CPACK_PACKAGE_VERSION_MINOR "4")
+set(CPACK_PACKAGE_VERSION_MINOR "6")
 set(CPACK_PACKAGE_VERSION_PATCH "99")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 # Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want. 
@@ -343,12 +343,12 @@ if (NOT TARGET dlib)
          # Make sure there isn't something wrong with the version of LIBPNG
          # installed on this system.  
          if (PNG_FOUND)
-            set(CMAKE_REQUIRED_LIBRARIES ${PNG_LIBRARY})
+            set(CMAKE_REQUIRED_LIBRARIES ${PNG_LIBRARIES})
             CHECK_FUNCTION_EXISTS(png_create_read_struct LIBPNG_IS_GOOD)
          endif()
          if (PNG_FOUND AND LIBPNG_IS_GOOD)
             include_directories(${PNG_INCLUDE_DIR})
-            set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARY})
+            set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARIES})
             set(REQUIRES_LIBS " libpng")
          else()
             # If we can't find libpng then statically compile it in.

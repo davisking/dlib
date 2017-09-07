@@ -1730,6 +1730,8 @@
          <examples>
             <example>random_cropper_ex.cpp.html</example>
             <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
          </examples>
       </component>
 

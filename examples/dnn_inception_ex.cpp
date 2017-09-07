@@ -17,7 +17,7 @@
                        |
                     output
                  
-    That is, an inception blocks runs a number of smaller networks (e.g. block1,
+    That is, an inception block runs a number of smaller networks (e.g. block1,
     block2) and then concatenates their results.  For further reading refer to:
     Szegedy, Christian, et al. "Going deeper with convolutions." Proceedings of
     the IEEE Conference on Computer Vision and Pattern Recognition. 2015.

@@ -278,12 +278,37 @@ void test_pyramid_down_grayscale2()
     }
 }
 
+// ----------------------------------------------------------------------------------------
+
+template <typename pyramid_down_type>
+void test_pyr_sizes()
+{
+    dlib::rand rnd;
+
+    for (int iter = 0; iter < 20; ++iter)
+    {
+        long nr = rnd.get_random_32bit_number()%10+40;
+        long nc = rnd.get_random_32bit_number()%10+40;
+
+        array2d<unsigned char> img(nr,nc), img2;
+        assign_all_pixels(img,0);
+
+        pyramid_down_type pyr;
+
+        pyr(img, img2);
+        find_pyramid_down_output_image_size(pyr, nr, nc);
+        DLIB_TEST(img2.nr() == nr);
+        DLIB_TEST(img2.nc() == nc);
+    }
+}
+
 
 // ----------------------------------------------------------------------------------------
 
 template <typename pyramid_down_type>
 void test_pyramid_down_small_sizes()
 {
+    print_spinner();
     // just make sure it doesn't get messed up with small images.  This test
     // is only really useful if asserts are enabled.
     pyramid_down_type pyr;
@@ -378,6 +403,17 @@ void test_pyramid_down_small_sizes()
             print_spinner();
             dlog << LINFO << "call test_pyramid_down_grayscale2<pyramid_down<6> >();";
             test_pyramid_down_grayscale2<pyramid_down<6> >();
+
+
+            test_pyr_sizes<pyramid_down<1>>();
+            test_pyr_sizes<pyramid_down<2>>();
+            test_pyr_sizes<pyramid_down<3>>();
+            test_pyr_sizes<pyramid_down<4>>();
+            test_pyr_sizes<pyramid_down<5>>();
+            test_pyr_sizes<pyramid_down<6>>();
+            test_pyr_sizes<pyramid_down<7>>();
+            test_pyr_sizes<pyramid_down<8>>();
+            test_pyr_sizes<pyramid_down<28>>();
         }
     } a;
 

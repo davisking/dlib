@@ -652,6 +652,24 @@ namespace dlib
 
     };
 
+    template <typename T>
+    void serialize (
+        const running_stats_decayed<T>& item, 
+        std::ostream& out 
+    );
+    /*!
+        provides serialization support 
+    !*/
+
+    template <typename T>
+    void deserialize (
+        running_stats_decayed<T>& item, 
+        std::istream& in
+    );
+    /*!
+        provides serialization support 
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <

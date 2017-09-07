@@ -6,7 +6,7 @@ rem the pings are to wait between builds so visual studio doesn't get in a funk.
 
 
 echo testing python >> test_log.txt
-rm -rf build_python
+rmdir /S /Q build_python
 mkdir build_python
 cd build_python
 cmake -G "Visual Studio 14 2015 Win64" ../../../tools/python  -DPYTHON3=ON
@@ -17,7 +17,7 @@ cd ..
 
 
 echo testing vc2015 >> test_log.txt
-rm -rf build_vc2015_64
+rmdir /S /Q build_vc2015_64
 mkdir build_vc2015_64
 cd build_vc2015_64
 cmake -G "Visual Studio 14 2015 Win64" .. 

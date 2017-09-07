@@ -1355,6 +1355,21 @@ namespace
             matrix<double> m1, m2, m3, truth;
             m1 = randm(n,n);
             m2 = randm(n,n);
+
+            rectangle rect1(1,1,3,3);
+            rectangle rect2(2,1,4,3);
+
+            truth = subm(m1,rect1)*subm(m2,rect2);
+            m3 = mat(&m1(0,0)+6, 3,3, m1.nc()) * mat(&m2(0,0)+7, 3,3, m2.nc());
+
+            DLIB_TEST(max(abs(truth-m3)) < 1e-13);
+        }
+
+        {
+            const long n = 5;
+            matrix<double> m1, m2, m3, truth;
+            m1 = randm(n,n);
+            m2 = randm(n,n);
             m3 = randm(n,n);
 
 

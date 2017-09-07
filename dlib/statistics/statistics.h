@@ -723,6 +723,18 @@ namespace dlib
             return std::sqrt(variance());
         }
 
+        template <typename U>
+        friend void serialize (
+            const running_stats_decayed<U>& item, 
+            std::ostream& out 
+        );
+
+        template <typename U>
+        friend void deserialize (
+            running_stats_decayed<U>& item, 
+            std::istream& in
+        ); 
+
     private:
 
         T sum_x;
@@ -730,6 +742,38 @@ namespace dlib
         T n;
         T forget;
     };
+
+    template <typename T>
+    void serialize (
+        const running_stats_decayed<T>& item, 
+        std::ostream& out 
+    )
+    {
+        int version = 1;
+        serialize(version, out);
+
+        serialize(item.sum_x, out);
+        serialize(item.sum_xx, out);
+        serialize(item.n, out);
+        serialize(item.forget, out);
+    }
+
+    template <typename T>
+    void deserialize (
+        running_stats_decayed<T>& item, 
+        std::istream& in
+    ) 
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw dlib::serialization_error("Unexpected version number found while deserializing dlib::running_stats_decayed object.");
+
+        deserialize(item.sum_x, in);
+        deserialize(item.sum_xx, in);
+        deserialize(item.n, in);
+        deserialize(item.forget, in);
+    }
 
 // ----------------------------------------------------------------------------------------
 

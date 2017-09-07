@@ -1646,7 +1646,7 @@ convergence:
         if (dot(delta, g) < 0)
             return p;
         else
-            return vector<double,2>(p)+clamp(delta, -1, 1);
+            return vector<double,2>(p)+dlib::clamp(delta, -1, 1);
     }
 
 // ----------------------------------------------------------------------------------------
