@@ -420,6 +420,10 @@ namespace dlib
         // don't care if the detector gets them or not.  
         test_box_overlap overlaps_ignore;
 
+        // Usually the detector would be scale-invariant, and used with an image pyramid.
+        // However, sometimes scale-invariance may not be desired.
+        bool scale_invariant = true;
+
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,
             const unsigned long target_size,      
@@ -431,6 +435,9 @@ namespace dlib
                 - 0 < min_target_size <= target_size
                 - 0.5 < min_detector_window_overlap_iou < 1
             ensures
+                - scale_invariant = true
+                - This function should be used when scale-invariance is desired, and an
+                  image pyramid will be applied.
                 - This function tries to automatically set the MMOD options to reasonable
                   values, assuming you have a training dataset of boxes.size() images, where
                   the ith image contains objects boxes[i] you want to detect.
@@ -458,6 +465,32 @@ namespace dlib
                   emphasized that the detector isn't going to be able to detect objects
                   smaller than any of the detector windows.  So consider that when setting
                   these sizes.
+                - This function will also set the overlaps_nms tester to the most
+                  restrictive tester that doesn't reject anything in boxes.
+        !*/
+
+        mmod_options (
+            const std::vector<std::vector<mmod_rect>>& boxes,
+            const double min_detector_window_overlap_iou = 0.75
+        );
+        /*!
+            requires
+                - 0.5 < min_detector_window_overlap_iou < 1
+            ensures
+                - scale_invariant = false
+                - This function should be used when scale-invariance is not desired, and
+                  there is no intention to apply an image pyramid.
+                - This function tries to automatically set the MMOD options to reasonable
+                  values, assuming you have a training dataset of boxes.size() images, where
+                  the ith image contains objects boxes[i] you want to detect.
+                - The most important thing this function does is decide what detector
+                  windows should be used.  This is done by finding a set of detector
+                  windows that are sized such that:
+                    - When slid over an image pyramid, each box in boxes will have an
+                      intersection-over-union with one of the detector windows of at least
+                      min_detector_window_overlap_iou.  That is, we will make sure that
+                      each box in boxes could potentially be detected by one of the
+                      detector windows.
                 - This function will also set the overlaps_nms tester to the most
                   restrictive tester that doesn't reject anything in boxes.
         !*/
