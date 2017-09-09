@@ -100,7 +100,7 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
         # middle value, such as 10, which is only 10x slower but still gets an
         # LFW accuracy of 99.3%.
 
-labels = facerec.cluster(descriptors)
+labels = facerec.cluster(descriptors, 0.5)
 label_classes = list(set(labels))
 label_classes.sort()
 num_classes = len(label_classes)

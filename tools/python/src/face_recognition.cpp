@@ -39,7 +39,7 @@ public:
         cropper->set_max_rotation_degrees(3);
     }
 
-    boost::python::list cluster(boost::python::list descriptors)
+    boost::python::list cluster(boost::python::list descriptors, float threshold)
     {
         boost::python::list clusters;
 
@@ -61,7 +61,7 @@ public:
                 matrix<double,0,1> first_descriptor = boost::python::extract<matrix<double,0,1>>(descriptors[i]);
                 matrix<double,0,1> second_descriptor = boost::python::extract<matrix<double,0,1>>(descriptors[j]);
 
-                if (length(first_descriptor-second_descriptor) < 0.6)
+                if (length(first_descriptor-second_descriptor) < threshold)
                     edges.push_back(sample_pair(i,j));
             }
         }
@@ -237,7 +237,7 @@ void bind_face_recognition()
         .def("save_image_chips", &face_recognition_model_v1::save_image_chips, (arg("img"),arg("faces"),arg("chip_filename")),
             "Takes an image and a full_object_detections object that reference faces in that image and saves the faces with the specified file name prefix"
             )
-        .def("cluster", &face_recognition_model_v1::cluster, (arg("descriptors")),
+        .def("cluster", &face_recognition_model_v1::cluster, (arg("descriptors"), arg("threshold")),
             "Takes a list of descriptors and returns a list that contains a label for each descriptor. Clustering is done using chinese_whispers."
             );
     }
