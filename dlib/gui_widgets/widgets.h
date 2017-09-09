@@ -3589,7 +3589,7 @@ namespace dlib
         any_function<void(const point& p, bool is_double_click, unsigned long btn)> image_clicked_handler;
         popup_menu_region parts_menu;
         point last_right_click_pos;
-        const int part_width;
+        const double part_width;
         std::set<std::string> part_names;
         bool overlay_editing_enabled;
         timer<image_display> highlight_timer;
