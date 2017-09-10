@@ -406,7 +406,8 @@ namespace dlib
         test_box_overlap overlaps_nms = test_box_overlap(0.4);
         test_box_overlap overlaps_ignore;
 
-        enum class assumed_input_layer_type_t {
+        enum class assumed_input_layer_type_t : uint8_t
+        {
             NO_IMAGE_PYRAMID,
             IMAGE_PYRAMID
         };
@@ -645,7 +646,7 @@ namespace dlib
 
     inline void serialize(const mmod_options& item, std::ostream& out)
     {
-        int version = 2;
+        int version = 3;
 
         serialize(version, out);
         serialize(item.detector_windows, out);
@@ -654,13 +655,14 @@ namespace dlib
         serialize(item.truth_match_iou_threshold, out);
         serialize(item.overlaps_nms, out);
         serialize(item.overlaps_ignore, out);
+        serialize(static_cast<uint8_t>(item.assumed_input_layer_type), out);
     }
 
     inline void deserialize(mmod_options& item, std::istream& in)
     {
         int version = 0;
         deserialize(version, in);
-        if (version != 2 && version != 1)
+        if (version != 3 && version != 2 && version != 1)
             throw serialization_error("Unexpected version found while deserializing dlib::mmod_options");
         if (version == 1)
         {
@@ -679,6 +681,12 @@ namespace dlib
         deserialize(item.truth_match_iou_threshold, in);
         deserialize(item.overlaps_nms, in);
         deserialize(item.overlaps_ignore, in);
+        if (version >= 3)
+        {
+            uint8_t assumed_input_layer_type = 0;
+            deserialize(assumed_input_layer_type, in);
+            item.assumed_input_layer_type = static_cast<mmod_options::assumed_input_layer_type_t>(assumed_input_layer_type);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
