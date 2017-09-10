@@ -365,6 +365,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    enum class use_image_pyramid : uint8_t
+    {
+        no,
+        yes
+    };
+
     struct mmod_options
     {
         /*!
@@ -422,13 +428,7 @@ namespace dlib
 
         // Usually the detector would be scale-invariant, and used with an image pyramid.
         // However, sometimes scale-invariance may not be desired.
-        enum class use_image_pyramid : uint8_t
-        {
-            no,
-            yes
-        };
-
-        use_image_pyramid use_image_pyramid_ = use_image_pyramid::yes;
+        use_image_pyramid assume_image_pyramid = use_image_pyramid::yes;
 
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,

@@ -360,6 +360,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    enum class use_image_pyramid : uint8_t
+    {
+        no,
+        yes
+    };
+
     struct mmod_options
     {
     public:
@@ -405,12 +411,6 @@ namespace dlib
         double truth_match_iou_threshold = 0.5;
         test_box_overlap overlaps_nms = test_box_overlap(0.4);
         test_box_overlap overlaps_ignore;
-
-        enum class use_image_pyramid : uint8_t
-        {
-            no,
-            yes
-        };
 
         use_image_pyramid assume_image_pyramid = use_image_pyramid::yes;
 
@@ -685,7 +685,7 @@ namespace dlib
         {
             uint8_t assume_image_pyramid = 0;
             deserialize(assume_image_pyramid, in);
-            item.assume_image_pyramid = static_cast<mmod_options::use_image_pyramid>(assume_image_pyramid);
+            item.assume_image_pyramid = static_cast<use_image_pyramid>(assume_image_pyramid);
         }
     }
 
@@ -1052,10 +1052,10 @@ namespace dlib
         size_t find_best_detection_window (
             rectangle rect,
             const std::string& label,
-            mmod_options::use_image_pyramid assume_image_pyramid
+            use_image_pyramid assume_image_pyramid
         ) const
         {
-            if (assume_image_pyramid == mmod_options::use_image_pyramid::yes)
+            if (assume_image_pyramid == use_image_pyramid::yes)
             {
                 rect = move_rect(set_rect_area(rect, 400*400), point(0,0));
             }
@@ -1075,7 +1075,7 @@ namespace dlib
 
                 rectangle det_window;
                 
-                if (options.assume_image_pyramid == mmod_options::use_image_pyramid::yes)
+                if (options.assume_image_pyramid == use_image_pyramid::yes)
                 {
                     det_window = centered_rect(point(0,0), options.detector_windows[i].width, options.detector_windows[i].height);
                     det_window = move_rect(set_rect_area(det_window, 400*400), point(0,0));
@@ -1103,7 +1103,7 @@ namespace dlib
             const std::string& label,
             const net_type& net,
             size_t& det_idx,
-            mmod_options::use_image_pyramid assume_image_pyramid
+            use_image_pyramid assume_image_pyramid
         ) const 
         {
             using namespace std;
@@ -1118,7 +1118,7 @@ namespace dlib
             det_idx = find_best_detection_window(rect,label,assume_image_pyramid);
 
             double scale = 1.0;
-            if (options.assume_image_pyramid == mmod_options::use_image_pyramid::yes)
+            if (options.assume_image_pyramid == use_image_pyramid::yes)
             {
                 // Compute the scale we need to be at to get from rect to our detection window.
                 // Note that we compute the scale as the max of two numbers.  It doesn't
