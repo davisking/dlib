@@ -406,13 +406,13 @@ namespace dlib
         test_box_overlap overlaps_nms = test_box_overlap(0.4);
         test_box_overlap overlaps_ignore;
 
-        enum class assumed_input_layer_type_t : uint8_t
+        enum class use_image_pyramid : uint8_t
         {
-            NO_IMAGE_PYRAMID,
-            IMAGE_PYRAMID
+            no,
+            yes
         };
 
-        assumed_input_layer_type_t assumed_input_layer_type = assumed_input_layer_type_t::IMAGE_PYRAMID;
+        use_image_pyramid assume_image_pyramid = use_image_pyramid::yes;
 
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,
@@ -463,13 +463,13 @@ namespace dlib
         }
 
         mmod_options(
-            assumed_input_layer_type_t assumed_input_layer_type,
+            use_image_pyramid assume_image_pyramid,
             const std::vector<std::vector<mmod_rect>>& boxes,
             const double min_detector_window_overlap_iou = 0.75
         )
-            : assumed_input_layer_type(assumed_input_layer_type)
+            : assume_image_pyramid(assume_image_pyramid)
         {
-            DLIB_CASSERT(assumed_input_layer_type == assumed_input_layer_type_t::NO_IMAGE_PYRAMID);
+            DLIB_CASSERT(assume_image_pyramid == use_image_pyramid::no);
             DLIB_CASSERT(0.5 < min_detector_window_overlap_iou && min_detector_window_overlap_iou < 1);
 
             // Figure out what detector windows we will need.
@@ -655,7 +655,7 @@ namespace dlib
         serialize(item.truth_match_iou_threshold, out);
         serialize(item.overlaps_nms, out);
         serialize(item.overlaps_ignore, out);
-        serialize(static_cast<uint8_t>(item.assumed_input_layer_type), out);
+        serialize(static_cast<uint8_t>(item.assume_image_pyramid), out);
     }
 
     inline void deserialize(mmod_options& item, std::istream& in)
@@ -683,9 +683,9 @@ namespace dlib
         deserialize(item.overlaps_ignore, in);
         if (version >= 3)
         {
-            uint8_t assumed_input_layer_type = 0;
-            deserialize(assumed_input_layer_type, in);
-            item.assumed_input_layer_type = static_cast<mmod_options::assumed_input_layer_type_t>(assumed_input_layer_type);
+            uint8_t assume_image_pyramid = 0;
+            deserialize(assume_image_pyramid, in);
+            item.assume_image_pyramid = static_cast<mmod_options::use_image_pyramid>(assume_image_pyramid);
         }
     }
 
@@ -815,7 +815,7 @@ namespace dlib
                     {
                         size_t k;
                         point p;
-                        if(image_rect_to_feat_coord(p, input_tensor, x, x.label, sub, k, options.assumed_input_layer_type))
+                        if(image_rect_to_feat_coord(p, input_tensor, x, x.label, sub, k, options.assume_image_pyramid))
                         {
                             // Ignore boxes that can't be detected by the CNN.
                             loss -= 1;
@@ -1052,10 +1052,10 @@ namespace dlib
         size_t find_best_detection_window (
             rectangle rect,
             const std::string& label,
-            mmod_options::assumed_input_layer_type_t assumed_input_layer_type
+            mmod_options::use_image_pyramid assume_image_pyramid
         ) const
         {
-            if (assumed_input_layer_type == mmod_options::assumed_input_layer_type_t::IMAGE_PYRAMID)
+            if (assume_image_pyramid == mmod_options::use_image_pyramid::yes)
             {
                 rect = move_rect(set_rect_area(rect, 400*400), point(0,0));
             }
@@ -1065,7 +1065,7 @@ namespace dlib
             }
 
             // Figure out which detection window in options.detector_windows is most similar to rect
-            // (in terms of aspect ratio, if assumed_input_layer_type == IMAGE_PYRAMID).
+            // (in terms of aspect ratio, if assume_image_pyramid == use_image_pyramid::yes).
             size_t best_i = 0;
             double best_ratio_diff = -std::numeric_limits<double>::infinity();
             for (size_t i = 0; i < options.detector_windows.size(); ++i)
@@ -1075,7 +1075,7 @@ namespace dlib
 
                 rectangle det_window;
                 
-                if (options.assumed_input_layer_type == mmod_options::assumed_input_layer_type_t::IMAGE_PYRAMID)
+                if (options.assume_image_pyramid == mmod_options::use_image_pyramid::yes)
                 {
                     det_window = centered_rect(point(0,0), options.detector_windows[i].width, options.detector_windows[i].height);
                     det_window = move_rect(set_rect_area(det_window, 400*400), point(0,0));
@@ -1103,7 +1103,7 @@ namespace dlib
             const std::string& label,
             const net_type& net,
             size_t& det_idx,
-            mmod_options::assumed_input_layer_type_t assumed_input_layer_type
+            mmod_options::use_image_pyramid assume_image_pyramid
         ) const 
         {
             using namespace std;
@@ -1115,10 +1115,10 @@ namespace dlib
                 throw impossible_labeling_error(sout.str());
             }
 
-            det_idx = find_best_detection_window(rect,label,assumed_input_layer_type);
+            det_idx = find_best_detection_window(rect,label,assume_image_pyramid);
 
             double scale = 1.0;
-            if (options.assumed_input_layer_type == mmod_options::assumed_input_layer_type_t::IMAGE_PYRAMID)
+            if (options.assume_image_pyramid == mmod_options::use_image_pyramid::yes)
             {
                 // Compute the scale we need to be at to get from rect to our detection window.
                 // Note that we compute the scale as the max of two numbers.  It doesn't

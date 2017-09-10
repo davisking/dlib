@@ -422,12 +422,13 @@ namespace dlib
 
         // Usually the detector would be scale-invariant, and used with an image pyramid.
         // However, sometimes scale-invariance may not be desired.
-        enum class assumed_input_layer_type_t {
-            NO_IMAGE_PYRAMID,
-            IMAGE_PYRAMID
+        enum class use_image_pyramid : uint8_t
+        {
+            no,
+            yes
         };
 
-        assumed_input_layer_type_t assumed_input_layer_type = assumed_input_layer_type_t::IMAGE_PYRAMID;
+        use_image_pyramid use_image_pyramid_ = use_image_pyramid::yes;
 
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,
@@ -440,7 +441,7 @@ namespace dlib
                 - 0 < min_target_size <= target_size
                 - 0.5 < min_detector_window_overlap_iou < 1
             ensures
-                - assumed_input_layer_type == IMAGE_PYRAMID
+                - use_image_pyramid_ == use_image_pyramid::yes
                 - This function should be used when scale-invariance is desired, and
                   input_rgb_image_pyramid is therefore used as the input layer.
                 - This function tries to automatically set the MMOD options to reasonable
@@ -475,13 +476,13 @@ namespace dlib
         !*/
 
         mmod_options (
-            assumed_input_layer_type_t assumed_input_layer_type,
+            use_image_pyramid use_image_pyramid,
             const std::vector<std::vector<mmod_rect>>& boxes,
             const double min_detector_window_overlap_iou = 0.75
         );
         /*!
             requires
-                - assumed_input_layer_type == NO_IMAGE_PYRAMID
+                - use_image_pyramid == use_image_pyramid::no
                 - 0.5 < min_detector_window_overlap_iou < 1
             ensures
                 - This function should be used when scale-invariance is not desired, and
