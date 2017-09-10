@@ -1077,10 +1077,11 @@ namespace dlib
                 
                 if (options.assumed_input_layer_type == mmod_options::assumed_input_layer_type_t::IMAGE_PYRAMID)
                 {
-                    det_window = centered_rect(point(0, 0), options.detector_windows[i].width, options.detector_windows[i].height);
-                    det_window = move_rect(set_rect_area(det_window, 400 * 400), point(0, 0));
+                    det_window = centered_rect(point(0,0), options.detector_windows[i].width, options.detector_windows[i].height);
+                    det_window = move_rect(set_rect_area(det_window, 400*400), point(0,0));
                 }
-                else {
+                else
+                {
                     det_window = rectangle(options.detector_windows[i].width, options.detector_windows[i].height);
                 }
 
