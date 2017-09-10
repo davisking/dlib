@@ -266,15 +266,15 @@ int main(int argc, char** argv) try
     std::thread data_loader4([f](){ f(4); });
 
     // The main training loop.  Keep making mini-batches and giving them to the trainer.
-    // We will run until the learning rate has dropped by a factor of 1e-3.
-    while(trainer.get_learning_rate() >= initial_learning_rate*1e-3)
+    // We will run until the learning rate has dropped by a factor of 1e-4.
+    while(trainer.get_learning_rate() >= 1e-4)
     {
         samples.clear();
         labels.clear();
 
-        // make a 80 image mini-batch
+        // make a 30 image mini-batch
         training_sample temp;
-        while(samples.size() < 80)
+        while(samples.size() < 30)
         {
             data.dequeue(temp);
 
