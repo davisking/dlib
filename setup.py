@@ -28,6 +28,7 @@ Additional options:
     --compiler-flags: pass flags onto the compiler, e.g. --compiler-flag "-Os -Wall" passes -Os -Wall onto GCC.
     --debug: makes a debug build
     --cmake: path to specific cmake executable
+    --cmake-install-prefix: set the cmake install prefix in order to find libraries in custom locations 
     --G or -G: name of a build system generator (equivalent of passing -G "name" to cmake)
 """
 
@@ -84,6 +85,8 @@ def _get_options():
             _cmake_path = arg
         elif opt_key == 'compiler-flags':
             _cmake_extra.append('-DCMAKE_CXX_FLAGS={arg}'.format(arg=arg.strip()))
+        elif opt_key == 'cmake-install-prefix':
+            _cmake_extra.append('-DCMAKE_INSTALL_PREFIX={arg}'.format(arg=arg.strip()))
         elif opt_key == 'yes':
             _cmake_extra.append('-D{arg}=yes'.format(arg=arg.strip()))
         elif opt_key == 'no':
@@ -112,7 +115,7 @@ def _get_options():
             opt_key = opt
             sys.argv.remove(arg)
             continue
-        elif opt in ['yes', 'no', 'compiler-flags']:
+        elif opt in ['yes', 'no', 'compiler-flags', 'cmake-install-prefix']:
             opt_key = opt
             sys.argv.remove(arg)
             continue
