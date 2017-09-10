@@ -887,7 +887,7 @@ namespace dlib
                 for (auto&& x : final_dets)
                 {
                     loss += out_data[x.tensor_offset];
-                    g[x.tensor_offset] += scale;
+                    g[x.tensor_offset] += scale * options.loss_per_false_alarm;
                 }
 
                 ++truth;
