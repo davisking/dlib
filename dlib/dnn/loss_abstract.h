@@ -422,7 +422,12 @@ namespace dlib
 
         // Usually the detector would be scale-invariant, and used with an image pyramid.
         // However, sometimes scale-invariance may not be desired.
-        bool scale_invariant = true;
+        enum class assumed_input_layer_type_t {
+            NO_IMAGE_PYRAMID,
+            IMAGE_PYRAMID
+        };
+
+        assumed_input_layer_type_t assumed_input_layer_type = assumed_input_layer_type_t::IMAGE_PYRAMID;
 
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,
@@ -435,9 +440,9 @@ namespace dlib
                 - 0 < min_target_size <= target_size
                 - 0.5 < min_detector_window_overlap_iou < 1
             ensures
-                - scale_invariant = true
-                - This function should be used when scale-invariance is desired, and an
-                  image pyramid will be applied.
+                - assumed_input_layer_type == IMAGE_PYRAMID
+                - This function should be used when scale-invariance is desired, and
+                  input_rgb_image_pyramid is therefore used as the input layer.
                 - This function tries to automatically set the MMOD options to reasonable
                   values, assuming you have a training dataset of boxes.size() images, where
                   the ith image contains objects boxes[i] you want to detect.
@@ -470,14 +475,15 @@ namespace dlib
         !*/
 
         mmod_options (
+            assumed_input_layer_type_t assumed_input_layer_type,
             const std::vector<std::vector<mmod_rect>>& boxes,
             const double min_detector_window_overlap_iou = 0.75
         );
         /*!
             requires
+                - assumed_input_layer_type == NO_IMAGE_PYRAMID
                 - 0.5 < min_detector_window_overlap_iou < 1
             ensures
-                - scale_invariant = false
                 - This function should be used when scale-invariance is not desired, and
                   there is no intention to apply an image pyramid.
                 - This function tries to automatically set the MMOD options to reasonable
@@ -486,7 +492,7 @@ namespace dlib
                 - The most important thing this function does is decide what detector
                   windows should be used.  This is done by finding a set of detector
                   windows that are sized such that:
-                    - When slid over an image pyramid, each box in boxes will have an
+                    - When slid over an image, each box in boxes will have an
                       intersection-over-union with one of the detector windows of at least
                       min_detector_window_overlap_iou.  That is, we will make sure that
                       each box in boxes could potentially be detected by one of the
