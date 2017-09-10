@@ -2875,6 +2875,44 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_mmod_set_custom_loss_per_missed_target()
+    {
+        print_spinner();
+
+        using net_type = loss_mmod<con<1,6,6,1,1,input_rgb_image>>;
+
+        std::vector<matrix<rgb_pixel>> input(1);
+        std::vector<std::vector<mmod_rect>> truth(1);
+
+        input[0].set_size(50, 50);
+        input[0] = dlib::rgb_pixel(127, 127, 127);
+
+        truth[0].push_back(mmod_rect(rectangle(10, 10, 20, 20)));
+
+        const mmod_options options1(truth, 8, 8);
+
+        mmod_options options2 = options1;
+        options2.loss_per_missed_target *= 100;
+
+        const auto train_and_detect = [&](const mmod_options& options) {
+            print_spinner();
+            net_type net(options);
+            dnn_trainer<net_type> trainer(net);
+            trainer.set_max_num_epochs(100);
+            trainer.train(input, truth);
+            trainer.get_net();
+            return net(input[0]);
+        };
+
+        const auto detections1 = train_and_detect(options1);
+        const auto detections2 = train_and_detect(options2);
+
+        DLIB_TEST_MSG(train_and_detect(options1).empty(), "Detections should be empty for default loss_per_missed_target = " << options1.loss_per_missed_target);
+        DLIB_TEST_MSG(!train_and_detect(options2).empty(), "Detections should _not_ be empty for loss_per_missed_target = " << options2.loss_per_missed_target);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -2957,6 +2995,7 @@ namespace
             test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
             test_loss_multiclass_per_pixel_weighted();
             test_serialization();
+            test_mmod_set_custom_loss_per_missed_target();
         }
 
         void perform_test()

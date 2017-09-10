@@ -763,7 +763,7 @@ namespace dlib
                         const size_t idx = (k*output_tensor.nr() + p.y())*output_tensor.nc() + p.x();
                         loss -= out_data[idx];
                         // compute gradient
-                        g[idx] = -scale;
+                        g[idx] = -scale * options.loss_per_missed_target;
                         truth_idxs.push_back(idx);
                     }
                     else
