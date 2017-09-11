@@ -51,7 +51,16 @@ int main() try
     // This network was produced by the dnn_mmod_train_find_cars_ex.cpp example program.
     // As you can see, it also includes a shape_predictor.  To see a generic example of how
     // to train those refer to train_shape_predictor_ex.cpp.
-    deserialize("mmod_rear_end_vehicle_detector.dat") >> net >> sp;
+    proxy_deserialize deserializer = deserialize("mmod_rear_end_vehicle_detector.dat");
+    deserializer >> net;
+    try
+    {
+        deserializer >> sp;
+    }
+    catch (const serialization_error&)
+    {
+        cout << "Unable to deserialize the shape predictor - that's ok if you trained only the net" << endl;
+    }
 
     matrix<rgb_pixel> img;
     load_image(img, "../mmod_cars_test_image.jpg");
