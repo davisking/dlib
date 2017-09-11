@@ -6011,7 +6011,7 @@ namespace dlib
         selected_rect(0),
         default_rect_color(255,0,0,255),
         parts_menu(w),
-        part_width(15), // width part circles are drawn on the screen
+        part_width(100), // "parts" circles are drawn 1.0/part_width size on the screen relative to the size of the bounding rectangle. 
         overlay_editing_enabled(true),
         highlight_timer(*this, &image_display::timer_event_unhighlight_rect),
         highlighted_rect(std::numeric_limits<unsigned long>::max()),
@@ -6331,16 +6331,17 @@ namespace dlib
                 if (itr->second == OBJECT_PART_NOT_PRESENT)
                     continue;
 
-                rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
+                const long part_size = (long)std::max(1.0,std::round(std::sqrt(orect.area())/part_width));
+                rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_size, part_size);
 
                 if (rect_is_selected && selected_rect == i && 
                     selected_part_name.size() != 0 && selected_part_name == itr->first)
                 {
-                    draw_circle(c, center(temp), temp.width()/2, invert_pixel(color), area);
+                    draw_circle(c, center(temp), temp.width(), invert_pixel(color), area);
                 }
                 else
                 {
-                    draw_circle(c, center(temp), temp.width()/2, color, area);
+                    draw_circle(c, center(temp), temp.width(), color, area);
                 }
 
                 // make a rectangle that is at the spot we want to draw our string
@@ -6551,11 +6552,12 @@ namespace dlib
                     if (itr->second == OBJECT_PART_NOT_PRESENT)
                         continue;
 
-                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
+                    const long part_size = (long)std::max(1.0,std::round(std::sqrt(orect.area())/part_width));
+                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_size, part_size);
                     point c = center(temp);
 
                     // distance from edge of part circle
-                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()/2));
+                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()));
                     if (dist < best_dist)
                     {
                         best_idx = i;
@@ -6698,11 +6700,12 @@ namespace dlib
                     if (itr->second == OBJECT_PART_NOT_PRESENT)
                         continue;
 
-                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_width, part_width);
+                    const long part_size = (long)std::max(1.0,std::round(std::sqrt(orect.area())/part_width));
+                    rectangle temp = centered_rect(get_rect_on_screen(centered_rect(itr->second,1,1)), part_size, part_size);
                     point c = center(temp);
 
                     // distance from edge of part circle
-                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()/2));
+                    const long dist = static_cast<long>(std::abs(length(c - point(x,y)) + 0.5 - temp.width()));
                     if (dist < best_dist)
                     {
                         best_idx = i;

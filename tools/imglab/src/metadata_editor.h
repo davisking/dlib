@@ -28,7 +28,6 @@ public:
             using namespace dlib;
             hsi_pixel pix;
             pix.h = reverse(colors.size());
-            std::cout << "new h: "<< (unsigned int)pix.h << std::endl;
             pix.s = 255;
             pix.i = 150;
             rgb_alpha_pixel result;

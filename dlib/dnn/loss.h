@@ -818,7 +818,7 @@ namespace dlib
                         if(image_rect_to_feat_coord(p, input_tensor, x, x.label, sub, k, options.assume_image_pyramid))
                         {
                             // Ignore boxes that can't be detected by the CNN.
-                            loss -= 1;
+                            loss -= options.loss_per_missed_target;
                             continue;
                         }
                         const size_t idx = (k*output_tensor.nr() + p.y())*output_tensor.nc() + p.x();
@@ -830,7 +830,7 @@ namespace dlib
                     else
                     {
                         // This box was ignored so shouldn't have been counted in the loss.
-                        loss -= 1;
+                        loss -= options.loss_per_missed_target;
                         truth_idxs.push_back(0);
                     }
                 }
