@@ -1365,20 +1365,30 @@ namespace dlib
     );
     /*!
         requires
-            - det.num_parts() == 68
+            - det.num_parts() == 68 || det.num_parts() == 5
             - size > 0
             - padding >= 0
         ensures
             - This function assumes det contains a human face detection with face parts
               annotated using the annotation scheme from the iBUG 300-W face landmark
-              dataset.  Given these assumptions, it creates a chip_details object that will
-              extract a copy of the face that has been rotated upright, centered, and
-              scaled to a standard size when given to extract_image_chip(). 
+              dataset or a 5 point face annotation.  Given these assumptions, it creates a
+              chip_details object that will extract a copy of the face that has been
+              rotated upright, centered, and scaled to a standard size when given to
+              extract_image_chip(). 
+            - This function is specifically calibrated to work with one of these models:
+                - http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2
+                - http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
             - The extracted chips will have size rows and columns in them.
             - if padding == 0 then the chip will be closely cropped around the face.
               Setting larger padding values will result a looser cropping.  In particular,
               a padding of 0.5 would double the width of the cropped area, a value of 1
               would triple it, and so forth.
+            - The 5 point face annotation scheme is assumed to be:
+                - det part 0 == left eye corner, outside part of eye.
+                - det part 1 == left eye corner, inside part of eye.
+                - det part 2 == right eye corner, outside part of eye.
+                - det part 3 == right eye corner, inside part of eye.
+                - det part 4 == immediately under the nose, right at the top of the philtrum.
     !*/
 
 // ----------------------------------------------------------------------------------------
