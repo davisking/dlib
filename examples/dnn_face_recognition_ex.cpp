@@ -88,7 +88,7 @@ int main(int argc, char** argv) try
         cout << endl;
         cout << "You will also need to get the face landmarking model file as well as " << endl;
         cout << "the face recognition model file.  Download and then decompress these files from: " << endl;
-        cout << "http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2" << endl;
+        cout << "http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2" << endl;
         cout << "http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2" << endl;
         cout << endl;
         return 1;
@@ -99,7 +99,7 @@ int main(int argc, char** argv) try
     frontal_face_detector detector = get_frontal_face_detector();
     // We will also use a face landmarking model to align faces to a standard pose:  (see face_landmark_detection_ex.cpp for an introduction)
     shape_predictor sp;
-    deserialize("shape_predictor_68_face_landmarks.dat") >> sp;
+    deserialize("shape_predictor_5_face_landmarks.dat") >> sp;
     // And finally we load the DNN responsible for face recognition.
     anet_type net;
     deserialize("dlib_face_recognition_resnet_model_v1.dat") >> net;
