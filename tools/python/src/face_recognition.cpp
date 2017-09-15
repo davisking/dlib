@@ -58,8 +58,8 @@ public:
 
         for (auto& f : faces)
         {
-            if (f.num_parts() != 68)
-                throw dlib::error("The full_object_detection must use the iBUG 300W 68 point face landmark style.");
+            if (f.num_parts() != 68 && f.num_parts() != 5)
+                throw dlib::error("The full_object_detection must use the iBUG 300W 68 point face landmark style or dlib's 5 point style.");
         }
 
 
