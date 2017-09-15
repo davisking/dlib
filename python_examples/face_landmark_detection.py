@@ -21,7 +21,7 @@
 #   http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2.
 #   Note that the license for the iBUG 300-W dataset excludes commercial use.
 #   So you should contact Imperial College London to find out if it's OK for
-#   you use use this model file in a commercial product.
+#   you to use this model file in a commercial product.
 #
 #
 #   Also, note that you can train your own models using dlib's machine learning
