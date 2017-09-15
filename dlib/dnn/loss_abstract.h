@@ -693,6 +693,94 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_ranking_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the pairwise ranking
+                loss described in the paper:
+                    Optimizing Search Engines using Clickthrough Data by Thorsten Joachims
+
+                This is the same loss function used by the dlib::svm_rank_trainer object.
+                Therefore, it is generally appropriate when you have a two class problem
+                and you want to learn a function that ranks one class before the other.  
+
+                So for example, suppose you have two classes of data.  Objects of type A
+                and objects of type B.  Moreover, suppose that you want to sort the objects
+                so that A objects always come before B objects.  This loss will help you
+                learn a function that assigns a real number to each object such that A
+                objects get a larger number assigned to them than B objects.  This lets you
+                then sort the objects according to the output of the neural network and
+                obtain the desired result of having A objects come before B objects.
+
+                The training labels should be positive values for objects you want to get
+                high scores and negative for objects that should get small scores.  So
+                relative to our A/B example, you would give A objects labels of +1 and B
+                objects labels of -1.  This should cause the learned network to give A
+                objects large positive values and B objects negative values.
+
+
+                Finally, the specific loss function is:
+                    For all pairs of positive vs negative training examples A_i and B_j respectively:
+                      sum_ij:  max(0, B_i - A_j + margin_ij)
+                where margin_ij = the label for A_j minus the label for B_i.  If you
+                always use +1 and -1 labels then the margin is always 2.  However, this
+                formulation allows you to give certain training samples different weight by
+                adjusting the training labels appropriately.  
+        !*/
+
+    public:
+
+        typedef float training_label_type;
+        typedef float output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output label is the predicted ranking score.
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_ranking = add_loss_layer<loss_ranking_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class loss_mean_squared_
     {
         /*!
