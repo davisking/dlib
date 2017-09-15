@@ -21,6 +21,12 @@ namespace dlib
         !*/
     public:
 
+        enum padding_mode_t
+        {
+            bounding_box_relative,
+            landmark_relative 
+        };
+
         shape_predictor_trainer (
         )
         {
@@ -35,6 +41,7 @@ namespace dlib
             _feature_pool_region_padding = 0;
             _verbose = false;
             _num_threads = 0;
+            _padding_mode = landmark_relative;
         }
 
         unsigned long get_cascade_depth (
@@ -165,6 +172,15 @@ namespace dlib
             _num_test_splits = num;
         }
 
+        void set_padding_mode (
+            padding_mode_t mode
+        )
+        {
+            _padding_mode = mode;
+        }
+
+        padding_mode_t get_padding_mode (
+        ) const { return _padding_mode; }
 
         double get_feature_pool_region_padding (
         ) const { return _feature_pool_region_padding; }
@@ -172,6 +188,12 @@ namespace dlib
             double padding 
         )
         {
+            DLIB_CASSERT(padding > -0.5,
+                "\t void shape_predictor_trainer::set_feature_pool_region_padding()"
+                << "\n\t Invalid inputs were given to this function. "
+                << "\n\t padding: " << padding 
+            );
+
             _feature_pool_region_padding = padding;
         }
 
@@ -722,10 +744,23 @@ namespace dlib
             // Figure out the bounds on the object shapes.  We will sample uniformly
             // from this box.
             matrix<float> temp = reshape(initial_shape, initial_shape.size()/2, 2);
-            const double min_x = min(colm(temp,0))-padding;
-            const double min_y = min(colm(temp,1))-padding;
-            const double max_x = max(colm(temp,0))+padding;
-            const double max_y = max(colm(temp,1))+padding;
+            double min_x = min(colm(temp,0))-padding;
+            double min_y = min(colm(temp,1))-padding;
+            double max_x = max(colm(temp,0))+padding;
+            double max_y = max(colm(temp,1))+padding;
+
+            if (get_padding_mode() == bounding_box_relative)
+            {
+                min_x = std::min(0.0, min_x);
+                min_y = std::min(0.0, min_y);
+                max_x = std::max(1.0, max_x);
+                max_y = std::max(1.0, max_y);
+            }
+
+            min_x -= padding;
+            min_y -= padding;
+            max_x += padding;
+            max_y += padding;
 
             std::vector<std::vector<dlib::vector<float,2> > > pixel_coordinates;
             pixel_coordinates.resize(get_cascade_depth());
@@ -749,6 +784,7 @@ namespace dlib
         double _feature_pool_region_padding;
         bool _verbose;
         unsigned long _num_threads;
+        padding_mode_t _padding_mode;
     };
 
 // ----------------------------------------------------------------------------------------

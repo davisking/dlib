@@ -38,6 +38,7 @@ namespace dlib
                 - #get_feature_pool_region_padding() == 0
                 - #get_random_seed() == ""
                 - #get_num_threads() == 0
+                - #get_padding_mode() == landmark_relative 
                 - This object will not be verbose
         !*/
 
@@ -180,16 +181,53 @@ namespace dlib
                 - #get_feature_pool_size() == size
         !*/
 
+        enum padding_mode_t
+        {
+            bounding_box_relative,
+            landmark_relative 
+        };
+
+        padding_mode_t get_padding_mode (
+        ) const; 
+        /*!
+            ensures
+                - returns the current padding mode.  See get_feature_pool_region_padding()
+                  for a discussion of the modes.
+        !*/
+
+        void set_padding_mode (
+            padding_mode_t mode
+        );
+        /*!
+            ensures
+                - #get_padding_mode() == mode
+        !*/
+
         double get_feature_pool_region_padding (
         ) const; 
         /*!
             ensures
-                - When we randomly sample the pixels for the feature pool we do so in a box
-                  fit around the provided training landmarks.  By default, this box is the
-                  tightest box that contains the landmarks (i.e. this is what happens when
-                  get_feature_pool_region_padding()==0).  However, you can expand or shrink
-                  the size of the pixel sampling region by setting a different value of
-                  get_feature_pool_region_padding().  
+                - This algorithm works by comparing the relative intensity of pairs of
+                  pixels in the input image.  To decide which pixels to look at, the
+                  training algorithm randomly selects pixels from a box roughly centered
+                  around the object of interest.  We call this box the feature pool region
+                  box.  
+                  
+                  Each object of interest is defined by a full_object_detection, which
+                  contains a bounding box and a list of landmarks.  If
+                  get_padding_mode()==landmark_relative then the feature pool region box is
+                  the tightest box that contains the landmarks inside the
+                  full_object_detection.  In this mode the full_object_detection's bounding
+                  box is ignored.  Otherwise, if the padding mode is bounding_box_relative
+                  then the feature pool region box is the tightest box that contains BOTH
+                  the landmarks and the full_object_detection's bounding box.
+
+                  Additionally, you can adjust the size of the feature pool padding region
+                  by setting get_feature_pool_region_padding() to some value.  If
+                  get_feature_pool_region_padding()==0 then the feature pool region box is
+                  unmodified and defined exactly as stated above. However, you can expand
+                  the size of the box by setting the padding > 0 or shrink it by setting it
+                  to something < 0.
 
                   To explain this precisely, for a padding of 0 we say that the pixels are
                   sampled from a box of size 1x1.  The padding value is added to each side
@@ -203,10 +241,11 @@ namespace dlib
             double padding 
         );
         /*!
+            requires
+                - padding > -0.5
             ensures
                 - #get_feature_pool_region_padding() == padding
         !*/
-
 
         double get_lambda (
         ) const;
