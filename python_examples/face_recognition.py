@@ -54,9 +54,9 @@ from skimage import io
 if len(sys.argv) != 4:
     print(
         "Call this program like this:\n"
-        "   ./face_recognition.py shape_predictor_68_face_landmarks.dat dlib_face_recognition_resnet_model_v1.dat ../examples/faces\n"
+        "   ./face_recognition.py shape_predictor_5_face_landmarks.dat dlib_face_recognition_resnet_model_v1.dat ../examples/faces\n"
         "You can download a trained facial shape predictor and recognition model from:\n"
-        "    http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2\n"
+        "    http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2\n"
         "    http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2")
     exit()
 
