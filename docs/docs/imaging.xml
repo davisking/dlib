@@ -1713,6 +1713,9 @@
               sub-windows, storing each into its own image.  It also allows the user to
               specify the scale and rotation for the chip.
          </description>
+         <examples>
+            <example>face_landmark_detection_ex.cpp.html</example>
+         </examples>
       </component>
 
    <!-- ************************************************************************* -->

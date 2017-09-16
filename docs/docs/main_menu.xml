@@ -144,6 +144,10 @@
             <name>Examples: Python</name>
             <sub>
                <item>
+                  <name>Face Clustering</name>
+                  <link>face_clustering.py.html</link>
+               </item>
+               <item>
                   <name>Video Object Tracking</name>
                   <link>correlation_tracker.py.html</link>
                </item>
@@ -231,6 +235,10 @@
                <item>
                   <name>Deep Learning Vehicle Detection</name>
                   <link>dnn_mmod_find_cars_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Multi-Class Vehicle Detection</name>
+                  <link>dnn_mmod_find_cars2_ex.cpp.html</link>
                </item>
                <item>
                   <name>Deep Learning Vehicle Detection Trainer</name>
