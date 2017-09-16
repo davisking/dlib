@@ -456,7 +456,7 @@
                 you take an image of a human face as input and are expected to identify the
                 locations of important facial landmarks such as the corners of the mouth
                 and eyes, tip of the nose, and so forth.  For example, here is the output
-                of dlib's <a href="http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2">68-face-landmark shape_predictor</a> on an image from the HELEN dataset: <br/><br/>
+                of dlib's <a href="face_landmark_detection_ex.cpp.html">68-face-landmark shape_predictor</a> on an image from the HELEN dataset: <br/><br/>
 
                 <img src='face_landmarking_example.png'/>
                 <br/><br/>
