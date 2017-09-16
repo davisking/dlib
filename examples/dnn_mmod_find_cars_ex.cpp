@@ -224,7 +224,7 @@ catch(image_load_error& e)
 catch(serialization_error& e)
 {
     cout << e.what() << endl;
-    cout << "The model file can be obtained from: http://dlib.net/files/mmod_rear_end_vehicle_detector.dat.bz2   Don't forget to unzip the file." << endl;
+    cout << "The correct model file can be obtained from: http://dlib.net/files/mmod_rear_end_vehicle_detector.dat.bz2   Don't forget to unzip the file." << endl;
 }
 catch(std::exception& e)
 {
