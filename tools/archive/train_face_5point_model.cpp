@@ -1,7 +1,7 @@
 
 /*
 
-    This is the program that created the http://dlib.net/files/shape_predictor_5_face_landmarks.dat model file.
+    This is the program that created the http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2 model file.
 
 */
 
