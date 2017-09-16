@@ -161,13 +161,13 @@ int main(int argc, char** argv) try
 
     int num_overlapped_ignored_test = 0;
     for (auto& v : boxes_test)
-        num_overlapped_ignored_test += ignore_overlapped_boxes(v, test_box_overlap(0.50, 0.99));
+        num_overlapped_ignored_test += ignore_overlapped_boxes(v, test_box_overlap(0.50, 0.95));
 
     int num_overlapped_ignored = 0;
     int num_additional_ignored = 0;
     for (auto& v : boxes_train)
     {
-        num_overlapped_ignored += ignore_overlapped_boxes(v, test_box_overlap(0.50, 0.99));
+        num_overlapped_ignored += ignore_overlapped_boxes(v, test_box_overlap(0.50, 0.95));
         for (auto& bb : v)
         {
             if (bb.rect.width() < 35 && bb.rect.height() < 35)
@@ -308,7 +308,7 @@ int main(int argc, char** argv) try
     std::vector<matrix<rgb_pixel>> mini_batch_samples;
     std::vector<std::vector<mmod_rect>> mini_batch_labels; 
     random_cropper cropper;
-    cropper.set_seed(1);
+    cropper.set_seed(time(0));
     cropper.set_chip_dims(350, 350);
     cropper.set_min_object_size(0.20); 
     cropper.set_max_rotation_degrees(2);
