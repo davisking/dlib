@@ -1454,6 +1454,7 @@
          <term file="imaging.html" name="pyramid_disable"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="create_tiled_pyramid"            include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="pyramid_rate"               include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="find_pyramid_down_output_image_size"               include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="image_to_tiled_pyramid"               include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="tiled_pyramid_to_image"               include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="threshold_image"            include="dlib/image_transforms.h"/>
@@ -1536,6 +1537,7 @@
 
          <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="overlaps_any_box"        include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="box_intersection_over_union"        include="dlib/image_processing.h"/>
+         <term file="dlib/image_processing/box_overlap_testing_abstract.h.html" name="box_percent_covered"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="test_box_overlap"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="remove_unobtainable_rectangles"        include="dlib/image_processing.h"/>
          <term file="imaging.html" name="get_frontal_face_detector"         include="dlib/image_processing/frontal_face_detector.h"/>
