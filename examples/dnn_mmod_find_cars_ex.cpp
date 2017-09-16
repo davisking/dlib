@@ -8,9 +8,9 @@
     
     The model used by this example was trained by the dnn_mmod_train_find_cars_ex.cpp 
     example.  Also, since this is a CNN, you really should use a GPU to get the
-    best execution speed.  For instance, when run on a NVIDIA 1080ti, this
-    detector runs at 39fps when run on the provided test image.  That's about an 
-    order of magnitude faster than when run on the CPU.
+    best execution speed.  For instance, when run on a NVIDIA 1080ti, this detector 
+    runs at 98fps when run on the provided test image.  That's more than an order 
+    of magnitude faster than when run on the CPU.
 
     Users who are just learning about dlib's deep learning API should read
     the dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp examples to learn
