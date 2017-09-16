@@ -42,9 +42,9 @@ from skimage import io
 if len(sys.argv) != 5:
     print(
         "Call this program like this:\n"
-        "   ./face_clustering.py shape_predictor_68_face_landmarks.dat dlib_face_recognition_resnet_model_v1.dat ../examples/faces output_folder\n"
+        "   ./face_clustering.py shape_predictor_5_face_landmarks.dat dlib_face_recognition_resnet_model_v1.dat ../examples/faces output_folder\n"
         "You can download a trained facial shape predictor and recognition model from:\n"
-        "    http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2\n"
+        "    http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2\n"
         "    http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2")
     exit()
 
@@ -63,7 +63,7 @@ facerec = dlib.face_recognition_model_v1(face_rec_model_path)
 descriptors = []
 images = []
 
-# Now process all the images
+# Now find all the faces and compute 128D face descriptors for each face.
 for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
     print("Processing file: {}".format(f))
     img = io.imread(f)
@@ -78,34 +78,17 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
     for k, d in enumerate(dets):
         # Get the landmarks/parts for the face in box d.
         shape = sp(img, d)
-        # Draw the face landmarks on the screen so we can see what face is currently being processed.
 
         # Compute the 128D vector that describes the face in img identified by
-        # shape.  In general, if two face descriptor vectors have a Euclidean
-        # distance between them less than 0.6 then they are from the same
-        # person, otherwise they are from different people. Here we just print
-        # the vector to the screen.
+        # shape.  
         face_descriptor = facerec.compute_face_descriptor(img, shape)
         descriptors.append(face_descriptor)
         images.append((img, shape))
-        # It should also be noted that you can also call this function like this:
-        #  face_descriptor = facerec.compute_face_descriptor(img, shape, 100)
-        # The version of the call without the 100 gets 99.13% accuracy on LFW
-        # while the version with 100 gets 99.38%.  However, the 100 makes the
-        # call 100x slower to execute, so choose whatever version you like.  To
-        # explain a little, the 3rd argument tells the code how many times to
-        # jitter/resample the image.  When you set it to 100 it executes the
-        # face descriptor extraction 100 times on slightly modified versions of
-        # the face and returns the average result.  You could also pick a more
-        # middle value, such as 10, which is only 10x slower but still gets an
-        # LFW accuracy of 99.3%.
 
-labels = facerec.cluster(descriptors, 0.5)
-label_classes = list(set(labels))
-label_classes.sort()
-num_classes = len(label_classes)
+# Now let's cluster the faces.  
+labels = dlib.chinese_whispers_clustering(descriptors, 0.5)
+num_classes = len(set(labels))
 print("Number of clusters: {}".format(num_classes))
-print("Labels classes: {}".format(str(label_classes)))
 
 # Find biggest class
 biggest_class = None
@@ -116,8 +99,8 @@ for i in range(0, num_classes):
         biggest_class_length = class_length
         biggest_class = i
 
-print("Biggest class: {}".format(biggest_class))
-print("Biggest class length: {}".format(biggest_class_length))
+print("Biggest cluster id number: {}".format(biggest_class))
+print("Number of faces in biggest cluster: {}".format(biggest_class_length))
 
 # Find the indices for the biggest class
 indices = []
@@ -125,17 +108,18 @@ for i, label in enumerate(labels):
     if label == biggest_class:
         indices.append(i)
 
-print("Biggest class indices: {}".format(str(indices)))
+print("Indices of images in the biggest cluster: {}".format(str(indices)))
 
 # Ensure output directory exists
 if not os.path.isdir(output_folder_path):
     os.makedirs(output_folder_path)
 
 # Save the extracted faces
+print("Saving faces in largest cluster to output folder...")
 for i, index in enumerate(indices):
     img, shape = images[index]
     file_path = os.path.join(output_folder_path, "face_" + str(i))
-    facerec.save_image_chip(img, shape, file_path)
+    dlib.save_face_chip(img, shape, file_path)
     
     
 
