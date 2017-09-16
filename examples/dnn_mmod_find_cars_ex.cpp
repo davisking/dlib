@@ -49,8 +49,8 @@ int main() try
     shape_predictor sp;
     // You can get this file from http://dlib.net/files/mmod_rear_end_vehicle_detector.dat.bz2
     // This network was produced by the dnn_mmod_train_find_cars_ex.cpp example program.
-    // As you can see, it also includes a shape_predictor.  To see a generic example of how
-    // to train those refer to train_shape_predictor_ex.cpp.
+    // As you can see, the file also includes a separately trained shape_predictor.  To see
+    // a generic example of how to train those refer to train_shape_predictor_ex.cpp.
     deserialize("mmod_rear_end_vehicle_detector.dat") >> net >> sp;
 
     matrix<rgb_pixel> img;
