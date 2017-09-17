@@ -276,11 +276,12 @@ namespace dlib
             // lets this random box be either as big as it can be while still fitting in
             // the image or as small as a 3x zoomed in box randomly somewhere in the image. 
             double mins = 1.0/3.0, maxs = std::min(img.nr()/(double)dims.rows, img.nc()/(double)dims.cols);
+            mins = std::min(mins, maxs);
             auto scale = rnd.get_double_in_range(mins, maxs);
             rectangle rect(scale*dims.cols, scale*dims.rows);
             // randomly shift the box around
-            point offset(rnd.get_random_32bit_number()%(img.nc()-rect.width()),
-                rnd.get_random_32bit_number()%(img.nr()-rect.height()));
+            point offset(rnd.get_random_32bit_number()%(1+img.nc()-rect.width()),
+                         rnd.get_random_32bit_number()%(1+img.nr()-rect.height()));
             return move_rect(rect, offset);
         }
 
