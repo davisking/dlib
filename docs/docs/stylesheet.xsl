@@ -656,6 +656,11 @@
       <br/>
          <xsl:apply-templates/>
    </xsl:template>   
+
+   <xsl:template match="youtube">
+      <iframe width="900" height="506" src="{@src}" frameborder="0" allowfullscreen='1'></iframe>
+   </xsl:template>   
+
    <xsl:template match="a">
       <a href="{@href}">
          <xsl:apply-templates/>

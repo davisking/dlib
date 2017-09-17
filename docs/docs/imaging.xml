@@ -51,7 +51,9 @@
             <h2>Object Detection</h2>
             If you want to create object detectors then try the 
             <a href="#scan_fhog_pyramid">scan_fhog_pyramid</a> tool first.  It is quite
-            easy to use and train and will, in many cases, give excellent results.
+            easy to use and train and will, in many cases, give excellent results.  If that
+            doesn't give good results then try the more powerful 
+            <a href="ml.html#loss_mmod_">convolutional neural network</a> based detector.
          </p>
 
    </body>
