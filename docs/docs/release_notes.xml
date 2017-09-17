@@ -12,13 +12,57 @@
 
 <current>
 New Features and Improvements:
+   - Deep Learning:
+      - The CNN+MMOD detector is now a multi-class detector.  In particular,
+        the mmod_rect object now has a string label field which you can use to
+        label objects, and the loss_mmod_ layer will learn to label objects with
+        those labels.  For an example, see: https://www.youtube.com/watch?v=OHbJ7HhbG74
+      - CNN+MMOD detectors are now 2.5x faster.  For instance, this example program
+        http://dlib.net/dnn_mmod_find_cars_ex.cpp.html now runs at 98fps instead
+        of 39fps.  
+   - Added a 5 point face landmarking model that is over 10x smaller than the
+     68 point model, runs faster, and works with both HOG and CNN generated
+     face detections.  It is now the recommended landmarking model to use for 
+     face alignment.  render_face_detections() and get_face_chip_details() have been 
+     updated to work with both 5 and 68 point models, so the new 5 point model is
+     a drop in replacement for the 68 point model.
+   - The imglab tool is slightly improved.  It will display box labels with
+     higher relative contrast.  You can also now press END or i to ignore boxes
+     in imglab. This is useful because it's a much less stressing hand motion
+     to hit END that i in most cases.
+   - Added overloads of sub_image() that take raw pointers so you can make
+     sub_images of anything. 
+   - Changed TIME_THIS() to use std::chrono::high_resolution_clock, so now it's
+     much higher precision.
+   - Exposed Chinese whispers clustering to Python, added face clustering example.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed an error in input_rgb_image_pyramid::image_contained_point(). The
+     function might erroneously indicate that a point wasn't inside the original
+     image when really it was, causing spurious error messages.
+   - mmod_options would pick bad window sizes in some corner cases. This has been fixed.
+   - Fixed a bug in the extract layer that trigged when a tensor with a
+     different number of samples than the tensor used to initialize the network
+     was passed through the layer.
+   - The loss_per_missed_target parameter of the loss_mmod_ wasn't being used
+     exactly right when boxes were auto-ignored.  There weren't any practical
+     user facing problems due to this, but it has nevertheless been fixed. 
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.6" date="Aug 28, 2017">
+New Features and Improvements:
 
 Non-Backwards Compatible Changes:
 
 Bug fixes:
    - Fix build error in Visual Studio when CUDA is enabled. 
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
