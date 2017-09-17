@@ -110,6 +110,7 @@ set (tests
    pixel.cpp
    probabilistic.cpp
    pyramid_down.cpp
+   qlearning.cpp
    queue.cpp
    rand.cpp
    ranking.cpp
@@ -117,6 +118,7 @@ set (tests
    reference_counter.cpp
    rls.cpp
    sammon.cpp
+   sarsa.cpp
    scan_image.cpp
    sequence.cpp
    sequence_labeler.cpp

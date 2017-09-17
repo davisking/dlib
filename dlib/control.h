@@ -5,6 +5,8 @@
 
 #include "control/lspi.h"
 #include "control/mpc.h"
+#include "control/qlearning.h"
+#include "control/sarsa.h"
 
 #endif // DLIB_CONTRoL_
 
