@@ -2270,6 +2270,14 @@
                    <a href="ml.html#structural_object_detection_trainer">structural_object_detection_trainer</a>
                    to learn the parameters of an object_detector.  See the example programs for an introduction.
                 </p>
+
+               <p>
+                  Also note that dlib contains more powerful <a
+                  href="ml.html#loss_mmod_">CNN based object detection
+                  tooling</a>, which will usually run slower but produce much
+                  more general and accurate detectors.
+               </p>
+   
          </description>
          <examples>
             <example>fhog_object_detector_ex.cpp.html</example>
