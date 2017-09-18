@@ -10,6 +10,7 @@
 #include "../geometry.h"
 #include "../image_processing/box_overlap_testing.h"
 #include "../image_processing/full_object_detection.h"
+#include "../svm/ranking_tools.h"
 #include <sstream>
 
 namespace dlib
@@ -1417,6 +1418,147 @@ namespace dlib
 
     template <typename SUBNET>
     using loss_metric = add_loss_layer<loss_metric_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_ranking_
+    {
+    public:
+
+        typedef float training_label_type; // nominally +1/-1
+        typedef float output_label_type; // ranking score
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+
+            const tensor& output_tensor = sub.get_output();
+
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1 &&
+                         output_tensor.k() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            const float* out_data = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                *iter++ = out_data[i];
+            }
+        }
+
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1 &&
+                         output_tensor.k() == 1);
+            DLIB_CASSERT(grad.nr() == 1 &&
+                         grad.nc() == 1 &&
+                         grad.k() == 1);
+
+
+            std::vector<double> rel_scores;
+            std::vector<double> nonrel_scores;
+            std::vector<long> rel_idx, nonrel_idx;
+
+            const float* out_data = output_tensor.host();
+            float* g = grad.host_write_only();
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                const float y = *truth++;
+                if (y > 0)
+                {
+                    rel_scores.push_back(out_data[i]-y);
+                    rel_idx.push_back(i);
+                }
+                else if (y < 0)
+                {
+                    nonrel_scores.push_back(out_data[i]-y);
+                    nonrel_idx.push_back(i);
+                }
+                else
+                {
+                    g[i] = 0;
+                }
+            }
+
+
+            std::vector<unsigned long> rel_counts;
+            std::vector<unsigned long> nonrel_counts;
+            count_ranking_inversions(rel_scores, nonrel_scores, rel_counts, nonrel_counts);
+            const unsigned long total_pairs = rel_scores.size()*nonrel_scores.size();
+            DLIB_CASSERT(total_pairs > 0, "You can't give a ranking mini-batch that contains only one class.  Both classes must be represented.");
+            const double scale = 1.0/total_pairs;
+
+
+            double loss = 0;
+            for (unsigned long k = 0; k < rel_counts.size(); ++k)
+            {
+                loss -= rel_counts[k]*rel_scores[k];
+                g[rel_idx[k]] = -1.0*rel_counts[k]*scale;
+            }
+
+            for (unsigned long k = 0; k < nonrel_counts.size(); ++k)
+            {
+                loss += nonrel_counts[k]*nonrel_scores[k];
+                g[nonrel_idx[k]] = nonrel_counts[k]*scale;
+            }
+
+            return loss*scale;
+        }
+
+        friend void serialize(const loss_ranking_& , std::ostream& out)
+        {
+            serialize("loss_ranking_", out);
+        }
+
+        friend void deserialize(loss_ranking_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_ranking_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_ranking_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_ranking_& )
+        {
+            out << "loss_ranking";
+            return out;
+        }
+
+        friend void to_xml(const loss_ranking_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_ranking/>";
+        }
+
+    };
+
+    template <typename SUBNET>
+    using loss_ranking = add_loss_layer<loss_ranking_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
