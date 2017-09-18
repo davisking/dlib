@@ -178,9 +178,9 @@ namespace
         samples.push_back(sample_type(2,0,1,0));
         samples.push_back(sample_type(2,1,3,0));
 
-        samples.push_back(sample_type(3,0,2,0));
+        samples.push_back(sample_type(3,0,3,0));
         samples.push_back(sample_type(3,1,3,1));
-        samples.push_back(sample_type(3,0,2,0)); //to prevent sarsa from failing (it's a corner case)
+        samples.push_back(sample_type(3,0,2,0)); //to prevent sarsa from failing (it doesn't process the last entry)
 
 
         control_agent<chain_model<false> > trainer;

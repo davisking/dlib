@@ -144,6 +144,11 @@ namespace dlib
                   when run on the process that generated the samples. In particular,
                   if the returned policy is P then:
                     - P(S) == the best action to take when in state S.
+            notice
+                - Note that SARSA needs the actual next action taken so it doesn't process
+                the last sample. If you are trying to reach a goal the last sample should
+                be, at least, the moment when your state is the goal state and the reward
+                for doing so the previous step.
         !*/
     };
 }
