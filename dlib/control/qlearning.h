@@ -55,9 +55,9 @@ namespace dlib
         )
         {
             DLIB_ASSERT(value >= 0. && value <= 1.,
-                        "\t qlearning::qlearning(feature_extractor, max_iterations, learning_rate, discount)"
+                        "\t qlearning::set_learning_rate(value)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t learning_rate: " << value
+                        << "\n\t value: " << value
                         );
             learning_rate = value;
         }
@@ -70,9 +70,9 @@ namespace dlib
         )
         {
             DLIB_ASSERT(value >= 0. && value <= 1.,
-                        "\t qlearning::qlearning(feature_extractor, max_iterations, learning_rate, discount)"
+                        "\t qlearning::set_discount(value)"
                         << "\n\t invalid inputs were given to this function"
-                        << "\n\t discount: " << value
+                        << "\n\t value: " << value
                         );
             discount = value;
         }

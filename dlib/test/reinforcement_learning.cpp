@@ -12,7 +12,7 @@ namespace
     using namespace test;
     using namespace dlib;
     using namespace std;
-    dlib::logger dlog("test.lspi");
+    dlib::logger dlog("test.rl");
 
     template <bool have_prior>
     struct chain_model
@@ -77,7 +77,10 @@ namespace
 
     };
 
-    void test_lspi_prior1()
+    template<
+            template<typename> typename control_agent
+    >
+    void test_reinforcement_learning_prior1()
     {
         print_spinner();
         typedef process_sample<chain_model<true> > sample_type;
@@ -96,7 +99,7 @@ namespace
         samples.push_back(sample_type(3,1,3,1));
 
 
-        lspi<chain_model<true> > trainer;
+        control_agent<chain_model<true> > trainer;
         //trainer.be_verbose();
         trainer.set_lambda(0);
         policy<chain_model<true> > pol = trainer.train(samples);
@@ -119,7 +122,10 @@ namespace
         DLIB_TEST(pol(3) == 1);
     }
 
-    void test_lspi_prior2()
+    template<
+            template<typename> typename control_agent
+    >
+    void test_reinforcement_learning_prior2()
     {
         print_spinner();
         typedef process_sample<chain_model<true> > sample_type;
@@ -138,7 +144,7 @@ namespace
         samples.push_back(sample_type(3,1,3,0));
 
 
-        lspi<chain_model<true> > trainer;
+        control_agent<chain_model<true> > trainer;
         //trainer.be_verbose();
         trainer.set_lambda(0);
         policy<chain_model<true> > pol = trainer.train(samples);
@@ -154,7 +160,10 @@ namespace
         DLIB_TEST(pol(3) == 0);
     }
 
-    void test_lspi_noprior1()
+    template<
+            template<typename> typename control_agent
+    >
+    void test_reinforcement_learning_noprior1()
     {
         print_spinner();
         typedef process_sample<chain_model<false> > sample_type;
@@ -171,11 +180,11 @@ namespace
 
         samples.push_back(sample_type(3,0,2,0));
         samples.push_back(sample_type(3,1,3,1));
+        samples.push_back(sample_type(3,0,2,0)); //to prevent sarsa from failing (it's a corner case)
 
 
-        lspi<chain_model<false> > trainer;
+        control_agent<chain_model<false> > trainer;
         //trainer.be_verbose();
-        trainer.set_lambda(0.01);
         policy<chain_model<false> > pol = trainer.train(samples);
 
         dlog << LINFO << pol.get_weights();
@@ -191,7 +200,11 @@ namespace
         DLIB_TEST(pol(2) == 1);
         DLIB_TEST(pol(3) == 1);
     }
-    void test_lspi_noprior2()
+
+    template<
+            template<typename> typename control_agent
+    >
+    void test_reinforcement_learning_noprior2()
     {
         print_spinner();
         typedef process_sample<chain_model<false> > sample_type;
@@ -210,9 +223,8 @@ namespace
         samples.push_back(sample_type(3,1,3,0));
 
 
-        lspi<chain_model<false> > trainer;
+        control_agent<chain_model<false> > trainer;
         //trainer.be_verbose();
-        trainer.set_lambda(0.01);
         policy<chain_model<false> > pol = trainer.train(samples);
 
         dlog << LINFO << pol.get_weights();
@@ -229,14 +241,14 @@ namespace
         DLIB_TEST(pol(3) == 0);
     }
 
-    class lspi_tester : public tester
+    class rl_tester : public tester
     {
     public:
-        lspi_tester (
+        rl_tester (
         ) :
             tester (
-                "test_lspi",       // the command line argument name for this test
-                "Run tests on the lspi object.", // the command line argument description
+                "test_rl",       // the command line argument name for this test
+                "Run tests on the reinforcement learning objects (lspi, qlearning & sarsa).", // the command line argument description
                 0                     // the number of command line arguments for this test
             )
         {
@@ -245,14 +257,23 @@ namespace
         void perform_test (
         )
         {
-            test_lspi_prior1();
-            test_lspi_prior2();
+            dlog << LINFO << "lspi: \n";
+            test_reinforcement_learning_prior1<lspi>();
+            test_reinforcement_learning_prior2<lspi>();
 
-            test_lspi_noprior1();
-            test_lspi_noprior2();
+            test_reinforcement_learning_noprior1<lspi>();
+            test_reinforcement_learning_noprior2<lspi>();
+
+            dlog << LINFO << "qlearning: \n";
+            test_reinforcement_learning_noprior1<qlearning>();
+            test_reinforcement_learning_noprior2<qlearning>();
+
+            dlog << LINFO << "sarsa: \n";
+            test_reinforcement_learning_noprior1<sarsa>();
+            test_reinforcement_learning_noprior2<sarsa>();
         }
     };
 
-    lspi_tester a;
+    rl_tester a;
 }
 
