@@ -56,8 +56,8 @@ namespace dlib
         {
             DLIB_ASSERT(value >= 0. && value <= 1.,
                         "\t qlearning::set_learning_rate(value)"
-                        << "\n\t invalid inputs were given to this function"
-                        << "\n\t value: " << value
+                        "\n\t invalid inputs were given to this function"
+                        "\n\t value: " << value
                         );
             learning_rate = value;
         }
@@ -71,8 +71,8 @@ namespace dlib
         {
             DLIB_ASSERT(value >= 0. && value <= 1.,
                         "\t qlearning::set_discount(value)"
-                        << "\n\t invalid inputs were given to this function"
-                        << "\n\t value: " << value
+                        "\n\t invalid inputs were given to this function"
+                        "\n\t value: " << value
                         );
             discount = value;
         }
@@ -81,36 +81,79 @@ namespace dlib
                 typename vector_type
                 >
         policy<feature_extractor> train(
-            const vector_type& samples
+            const vector_type& trials
         ) const
         {
-            DLIB_ASSERT(samples.size() > 0,
-                "\t policy qlearning::train(samples)"
-                << "\n\t  invalid inputs were given to this function"
+            DLIB_ASSERT(trials.size() > 0,
+                "\t policy qlearning::train(trials)"
+                "\n\t  invalid inputs were given to this function"
                 );
             DLIB_ASSERT(feature_extractor::force_last_weight_to_1 == false,
-                "\t policy qlearning::train(samples)"
-                << "\n\t invalid template parameter were given to this function:"
-                << "\n\t feature_extractor::force_last_weight_to_1 must be false."
+                "\t policy qlearning::train(trials)"
+                "\n\t invalid template parameter were given to this function:"
+                "\n\t feature_extractor::force_last_weight_to_1 must be false."
                 );
 
-            matrix<double,0,1> w(fe.num_features());
+            unsigned long trials_size = trials.size() < max_iterations ? trials.size() : max_iterations;
+            matrix<double,0,1> w(fe.num_features()), f1, f2;
             w = 0;
-            matrix<double,0,1> f1, f2;
 
-            for(unsigned long iter = 0uL; iter < max_iterations; iter++){
-                for(unsigned long i = 0uL; i < samples.size(); i++){
-                    fe.get_features(samples[i].state, samples[i].action, f1);
-                    fe.get_features(samples[i].next_state,
-                                    fe.find_best_action(samples[i].next_state, w),
+            for(unsigned long i = 0uL; i < trials_size; i++){
+                for(unsigned long j = 0uL; j < trials[i].size(); j++){
+                    fe.get_features(trials[i][j].state, trials[i][j].action, f1);
+                    fe.get_features(trials[i][j].next_state,
+                                    fe.find_best_action(trials[i][j].next_state, w),
                                     f2);
 
-                    double correction = samples[i].reward + discount * dot(w, f2) - dot(w, f1);
+                    double correction = trials[i][j].reward + discount * dot(w, f2) - dot(w, f1);
+                    w = w + learning_rate * correction * f1;
+
+                }
+
+                if(verbose)
+                    std::cout << "trial: " << i << "\tweights: " << trans(w) << std::endl;
+            }
+
+            return policy<feature_extractor>(w,fe);
+        }
+
+        template <
+                typename InputIterator,
+                typename EndIterator
+        >
+        policy<feature_extractor> train(
+            InputIterator iterator, const EndIterator& end_iterator
+        ) const
+        {
+            typedef typename InputIterator::value_type value_type;
+            typedef typename value_type::iterator iterator_type;
+
+            DLIB_ASSERT(feature_extractor::force_last_weight_to_1 == false,
+                "\t policy qlearning::train(iterator, end_iterator)"
+                "\n\t invalid template parameter were given to this function:"
+                "\n\t feature_extractor::force_last_weight_to_1 must be false."
+                );
+
+            matrix<double,0,1> w(fe.num_features()), f1, f2;
+            w = 0;
+
+            unsigned long count = 0uL;
+            for( ; !(end_iterator == iterator); ++iterator){
+                value_type trial = *iterator;
+
+                for(iterator_type it = trial.begin(); !(trial.end() == it); ++it){
+                    fe.get_features(it->state, it->action, f1);
+                    fe.get_features(it->next_state,
+                                    fe.find_best_action(it->next_state, w),
+                                    f2);
+
+                    double correction = it->reward + discount * dot(w, f2) - dot(w, f1);
                     w = w + learning_rate * correction * f1;
                 }
 
                 if(verbose)
-                    std::cout << "iteration: " << iter << "\tweights: " << trans(w) << std::endl;
+                    std::cout << "trial: " << count << "\tweights: " << trans(w) << std::endl;
+                count++;
             }
 
             return policy<feature_extractor>(w,fe);

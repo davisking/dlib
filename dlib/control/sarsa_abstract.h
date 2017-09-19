@@ -133,22 +133,42 @@ namespace dlib
         ) const;
         /*!
             requires
-                - samples.size() > 1
+                - samples.size() > 0
                 - samples is something with an interface that looks like
-                  std::vector<process_sample<feature_extractor>>.  That is, it should
-                  be some kind of array of process_sample objects.
-                - feature_extractor::force_last_weight_to_1 == false // TODO
+                  std::vector<std::vector<extended_process_sample<feature_extractor>>>.  That is, it should
+                  be some kind of array of arrays of process_sample objects. The outer vectors are
+                  the trials and are ordered time-wise whereas the samples in each inner vector
+                  are the sequential steps from the goal until the end (if reached).
+                - feature_extractor::force_last_weight_to_1 == false
             ensures
                 - Trains a policy based on the given data and returns the results. The
                   idea is to find a policy that will obtain the largest possible reward
                   when run on the process that generated the samples. In particular,
                   if the returned policy is P then:
                     - P(S) == the best action to take when in state S.
-            notice
-                - Note that SARSA needs the actual next action taken so it doesn't process
-                the last sample. If you are trying to reach a goal the last sample should
-                be, at least, the moment when your state is the goal state and the reward
-                for doing so the previous step.
+        !*/
+
+        template <
+                typename InputIterator,
+                typename EndIterator
+                >
+        policy<feature_extractor> train(
+            InputIterator iterator, const EndIterator& end_iterator
+        ) const;
+        /*!
+            requires
+                - iterator is an input iterator (according to the definition from the stl)
+                and it makes reference to something like std::vector<extended_process_sample<feature_extractor>>>,
+                i.e., something from which we can take another input iterator and read the process samples.
+                - end_iterator is a class that can be right-hand compared with iterator and that comparison
+                returns true whenever we've reached the end of the trials.
+                - feature_extractor::force_last_weight_to_1 == false
+            ensures
+                - Trains a policy based on the given data and returns the results. The
+                  idea is to find a policy that will obtain the largest possible reward
+                  when run on the process that generated the samples. In particular,
+                  if the returned policy is P then:
+                    - P(S) == the best action to take when in state S.
         !*/
     };
 }
