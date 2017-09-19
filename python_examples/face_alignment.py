@@ -27,31 +27,26 @@
 #   Or downloaded from http://opencv.org/releases.html
 
 import sys
-import os
+
 import dlib
-import glob
 import cv2
 import numpy as np
 
-if len(sys.argv) != 4:
+if len(sys.argv) != 3:
     print(
         "Call this program like this:\n"
-        "   ./face_alignment.py shape_predictor_5_face_landmarks.dat dlib_face_recognition_resnet_model_v1.dat ../examples/faces/bald_guys.jpg\n"
-        "You can download a trained facial shape predictor and recognition model from:\n"
-        "    http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2\n"
-        "    http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2")
+        "   ./face_alignment.py shape_predictor_5_face_landmarks.dat ../examples/faces/bald_guys.jpg\n"
+        "You can download a trained facial shape predictor from:\n"
+        "    http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2\n")
     exit()
 
 predictor_path = sys.argv[1]
-face_rec_model_path = sys.argv[2]
-face_file_path = sys.argv[3]
+face_file_path = sys.argv[2]
 
 # Load all the models we need: a detector to find the faces, a shape predictor
-# to find face landmarks so we can precisely localize the face, and finally the
-# face recognition model.
+# to find face landmarks so we can precisely localize the face
 detector = dlib.get_frontal_face_detector()
 sp = dlib.shape_predictor(predictor_path)
-facerec = dlib.face_recognition_model_v1(face_rec_model_path)
 
 # Load the image using OpenCV
 bgr_img = cv2.imread(face_file_path)
