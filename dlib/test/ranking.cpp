@@ -434,7 +434,7 @@ namespace
         x.push_back(matrix_cast<float>(data.nonrelevant[0]));  y.push_back(-1);
 
         //trainer.be_verbose();
-        trainer.set_learning_rate_schedule(logspace(-1, -7, 2000));
+        trainer.set_learning_rate_schedule(logspace(-1, -7, 4000));
         trainer.train(x,y);
 
         matrix<float> params = mat(net.subnet().layer_details().get_layer_params());
@@ -442,8 +442,8 @@ namespace
         dlog << LINFO << "relevant output score: " << net(x[0]);
         dlog << LINFO << "nonrelevant output score: " << net(x[1]);
 
-        DLIB_TEST(std::abs(params(0) - 1) < 0.0001);
-        DLIB_TEST(std::abs(params(1) + 1) < 0.0001);
+        DLIB_TEST(std::abs(params(0) - 1) < 0.001);
+        DLIB_TEST(std::abs(params(1) + 1) < 0.001);
         DLIB_TEST(std::abs(net(x[0]) - 1) < 0.001);
         DLIB_TEST(std::abs(net(x[1]) + 1) < 0.001);
     }
