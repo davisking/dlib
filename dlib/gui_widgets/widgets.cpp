@@ -18,6 +18,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    // trz
+    int auto_part_num = 0;
+
     void toggle_button::
     set_size (
         unsigned long width,
@@ -6059,6 +6062,15 @@ namespace dlib
         overlay_rects[selected_rect].parts[part_name] = c1;
         parent.invalidate_rectangle(rect); 
 
+        // trz
+        // I do this here so that it advances when parts
+        // are added from the context menu too
+        // This also allows to restart the sequence from
+        // a random point using the context menu
+        int part_idx = std::distance(part_names.begin(), part_names.find(part_name));
+        //printf("part_idx: %d\n", part_idx);
+        auto_part_num = part_idx+1;
+
         if (event_handler.is_set())
             event_handler();
     }
@@ -6196,6 +6208,12 @@ namespace dlib
     )
     {
         auto_mutex M(m);
+
+        // trz
+        // reset it when we move to another image
+        auto_part_num = 0;
+        //printf("reset_auto_part_num\n");
+
         overlay_rects.clear();
         overlay_lines.clear();
         overlay_circles.clear();
@@ -6491,6 +6509,31 @@ namespace dlib
     )
     {
         scrollable_region::on_mouse_down(btn, state, x, y, is_double_click);
+
+        //trz
+        /*
+          Shift + click adds parts in sequence.
+          I'm not sure if here is the best place to add this, but it looks like
+          everything else is still working.
+        */
+        if (btn == base_window::LEFT && (state&base_window::SHIFT) && rect_is_selected) {
+            //printf("ADD PART\n");
+
+            if (auto_part_num == part_names.size()) {
+                // I think it's safer to do nothing rather that to loop over
+                return;
+            }
+
+            std::set<std::string>::iterator it = part_names.begin();
+            std::advance(it, auto_part_num);
+            std::string partName = *it;
+            //printf("Part name: %s - AutoPartNum: %d\n", partName.c_str(), auto_part_num);
+
+            last_right_click_pos = point(x,y);  //sorry, on_part_add wants this...
+            on_part_add(partName);
+
+            return;
+        }
 
         if (state&base_window::SHIFT)
         {
