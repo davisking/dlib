@@ -67,7 +67,7 @@ if num_faces == 0:
     print("Sorry, there were no faces found in '{}'".format(face_file_path))
     exit()
 
-# The full object detection object
+# Find the 5 face landmarks we need to do the alignment.
 faces = dlib.full_object_detections()
 for detection in dets:
     faces.append(sp(img, detection))
