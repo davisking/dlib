@@ -177,13 +177,18 @@ boost::python::list chinese_whispers_clustering(boost::python::list descriptors,
 void save_face_chips (
     object img,
     const std::vector<full_object_detection>& faces,
-    const std::string& chip_filename
+    const std::string& chip_filename,
+    size_t size = 150,
+    float padding = 0.25
 )
 {
+    if (!is_rgb_python_image(img))
+        throw dlib::error("Unsupported image type, must be RGB image.");
+
     int num_faces = faces.size();
     std::vector<chip_details> dets;
     for (auto& f : faces)
-        dets.push_back(get_face_chip_details(f, 150, 0.25));
+        dets.push_back(get_face_chip_details(f, size, padding));
     dlib::array<matrix<rgb_pixel>> face_chips;
     extract_image_chips(numpy_rgb_image(img), dets, face_chips);
     int i=0;
@@ -206,13 +211,86 @@ void save_face_chips (
 void save_face_chip (
     object img,
     const full_object_detection& face,
-    const std::string& chip_filename
+    const std::string& chip_filename,
+    size_t size = 150,
+    float padding = 0.25
 )
 {
     std::vector<full_object_detection> faces(1, face);
-    save_face_chips(img, faces, chip_filename);
+    save_face_chips(img, faces, chip_filename, size, padding);
     return;
 }
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(save_face_chip_with_defaults, save_face_chip, 3, 5)
+BOOST_PYTHON_FUNCTION_OVERLOADS(save_face_chips_with_defaults, save_face_chips, 3, 5)
+
+// ----------------------------------------------------------------------------------------
+
+boost::python::list get_face_chips (
+    object img,
+    const std::vector<full_object_detection>& faces,
+    size_t size = 150,
+    float padding = 0.25
+)
+{
+    if (!is_rgb_python_image(img))
+        throw dlib::error("Unsupported image type, must be RGB image.");
+
+    if (faces.size() < 1) {
+        throw dlib::error("No face were specified in the faces array.");
+    }
+
+    boost::python::list chips_list;
+
+    int num_faces = faces.size();
+    std::vector<chip_details> dets;
+    for (auto& f : faces)
+        dets.push_back(get_face_chip_details(f, size, padding));
+    dlib::array<matrix<rgb_pixel>> face_chips;
+    extract_image_chips(numpy_rgb_image(img), dets, face_chips);
+
+    for (auto& chip : face_chips) 
+    {
+        boost::python::list img;
+        
+        for(int row=0; row<size; row++) {
+            boost::python::list row_list;
+            for(int col=0; col<size; col++) {
+                rgb_pixel pixel = chip(row, col);
+                boost::python::list item;
+                
+                item.append(pixel.red);
+                item.append(pixel.green);
+                item.append(pixel.blue);
+                row_list.append(item);
+            }
+            img.append(row_list);
+        }
+
+        chips_list.append(img);
+    }
+    return chips_list;
+}
+
+boost::python::list get_face_chip (
+    object img,
+    const full_object_detection& face,
+    size_t size = 150,
+    float padding = 0.25
+)
+{
+    std::vector<full_object_detection> faces(1, face);
+    boost::python::list result = get_face_chips(img, faces, size, padding);
+    size_t num_images = boost::python::len(result);
+    if(num_images == 1) {
+        return boost::python::extract<boost::python::list>(result[0]); 
+    } else {
+        throw dlib::error("No face chips found!");
+    }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(get_face_chip_with_defaults, get_face_chip, 2, 4)
+BOOST_PYTHON_FUNCTION_OVERLOADS(get_face_chips_with_defaults, get_face_chips, 2, 4)
 
 
 // ----------------------------------------------------------------------------------------
@@ -232,17 +310,27 @@ void bind_face_recognition()
             );
     }
 
-    def("save_face_chip", &save_face_chip, (arg("img"),arg("face"),arg("chip_filename")),
-        "Takes an image and a full_object_detection that references a face in that image and saves the face with the specified file name prefix.  The face will be rotated upright and scaled to 150x150 pixels."
-        );
-    def("save_face_chips", &save_face_chips, (arg("img"),arg("faces"),arg("chip_filename")),
-        "Takes an image and a full_object_detections object that reference faces in that image and saves the faces with the specified file name prefix.  The faces will be rotated upright and scaled to 150x150 pixels."
-        );
+    def("save_face_chip", &save_face_chip, save_face_chip_with_defaults(
+	"Takes an image and a full_object_detection that references a face in that image and saves the face with the specified file name prefix.  The face will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.", 
+	(arg("img"), arg("face"), arg("chip_filename"), arg("size"), arg("padding"))
+    ));
+    def("save_face_chips", &save_face_chips, save_face_chips_with_defaults(
+	"Takes an image and a full_object_detections object that reference faces in that image and saves the faces with the specified file name prefix.  The faces will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.",
+	(arg("img"), arg("faces"), arg("chip_filename"), arg("size"), arg("padding"))
+    ));
+    def("get_face_chip", &get_face_chip, get_face_chip_with_defaults(
+	"Takes an image and a full_object_detection that references a face in that image and returns the face as a list of lists representing the image.  The face will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.", 
+	(arg("img"), arg("face"), arg("size"), arg("padding"))
+    ));
+    def("get_face_chips", &get_face_chips, get_face_chips_with_defaults(
+	"Takes an image and a full_object_detections object that reference faces in that image and returns the faces as a list of list of lists representing the image.  The faces will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.",
+	(arg("img"), arg("faces"), arg("size"), arg("padding"))
+    ));
     def("chinese_whispers_clustering", &chinese_whispers_clustering, (arg("descriptors"), arg("threshold")),
         "Takes a list of descriptors and returns a list that contains a label for each descriptor. Clustering is done using dlib::chinese_whispers."
         );
 
-    {
+    {   
     typedef std::vector<full_object_detection> type;
     class_<type>("full_object_detections", "An array of full_object_detection objects.")
         .def(vector_indexing_suite<type>())

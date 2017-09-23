@@ -119,7 +119,8 @@ print("Saving faces in largest cluster to output folder...")
 for i, index in enumerate(indices):
     img, shape = images[index]
     file_path = os.path.join(output_folder_path, "face_" + str(i))
-    dlib.save_face_chip(img, shape, file_path)
+    # The size and padding arguments are optional with default size=150x150 and padding=0.25
+    dlib.save_face_chip(img, shape, file_path, size=150, padding=0.25)
     
     
 
