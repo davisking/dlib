@@ -941,6 +941,24 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier()  == 0
         !*/
 
+        cont_(
+            num_con_outputs o
+        );
+        /*!
+            ensures
+                - #num_filters() == o.num_outputs 
+                - #nr() == _nr
+                - #nc() == _nc
+                - #stride_y() == _stride_y
+                - #stride_x() == _stride_x
+                - #padding_y() == _padding_y
+                - #padding_x() == _padding_x
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 1
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 0
+        !*/
+
         long num_filters(
         ) const; 
         /*!
@@ -948,6 +966,19 @@ namespace dlib
                 - returns the number of filters contained in this layer.  The k dimension
                   of the output tensors produced by this layer will be equal to the number
                   of filters.
+        !*/
+
+        void set_num_filters(
+            long num
+        );
+        /*!
+            requires
+                - num > 0
+                - get_layer_params().size() == 0
+                  (i.e. You can't change the number of filters in cont_ if the parameter
+                  tensor has already been allocated.)
+            ensures
+                - #num_filters() == num
         !*/
 
         long nr(
