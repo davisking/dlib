@@ -108,7 +108,7 @@ namespace dlib
         ) { max_iterations = max_iter; }
 
         unsigned long get_max_iterations (
-        ) { return max_iterations; }
+        ) const { return max_iterations; }
 
         template <typename vector_type>
         policy<feature_extractor> train (

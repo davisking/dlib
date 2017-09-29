@@ -78,7 +78,6 @@ set (tests
    learning_to_track.cpp
    least_squares.cpp
    linear_manifold_regularizer.cpp
-   lspi.cpp
    lz77_buffer.cpp
    map.cpp
    matrix2.cpp
@@ -115,6 +114,7 @@ set (tests
    ranking.cpp
    read_write_mutex.cpp
    reference_counter.cpp
+   reinforcement_learning.cpp
    rls.cpp
    sammon.cpp
    scan_image.cpp

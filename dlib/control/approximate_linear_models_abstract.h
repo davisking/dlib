@@ -3,7 +3,7 @@
 #undef DLIB_APPROXIMATE_LINEAR_MODELS_ABSTRACT_Hh_
 #ifdef DLIB_APPROXIMATE_LINEAR_MODELS_ABSTRACT_Hh_
 
-#include "../matrix.h"
+#include "../matrix_abstract.h"
 
 namespace dlib
 {
@@ -129,6 +129,51 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+            typename feature_extractor
+            >
+    struct extended_process_sample : public process_sample
+    {
+        /*!
+            REQUIREMENTS ON feature_extractor
+                feature_extractor should implement the example_feature_extractor interface
+                defined at the top of this file.
+
+            WHAT THIS OBJECT REPRESENTS
+                This object holds a training sample for a reinforcement learning algorithm.
+                In particular, it should be a sample from some process where the process
+                was in state this->state, then took this->action action which resulted in
+                receiving this->reward, ending up in the state this->next_state and
+                having as intended next action (according to its policy) this->next_action.
+        !*/
+
+        typedef feature_extractor feature_extractor_type;
+        typedef typename feature_extractor::state_type state_type;
+        typedef typename feature_extractor::action_type action_type;
+
+        extended_process_sample(){}
+
+        extended_process_sample(
+            const state_type& s,
+            const action_type& a,
+            const state_type& ns,
+            const action_type& na,
+            const double& r
+        ) : process_sample(s, a, ns, r), next_action(na) {}
+
+        action_type next_action;
+    };
+
+    template < typename feature_extractor >
+    void serialize (const extended_process_sample<feature_extractor>& item, std::ostream& out);
+    template < typename feature_extractor >
+    void deserialize (extended_process_sample<feature_extractor>& item, std::istream& in);
+    /*!
+        provides serialization support.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename feature_extractor
         >
     class policy
@@ -206,8 +251,10 @@ namespace dlib
         provides serialization support.
     !*/
 
+
 // ----------------------------------------------------------------------------------------
 
+}
 
 #endif // DLIB_APPROXIMATE_LINEAR_MODELS_ABSTRACT_Hh_
  

@@ -5,6 +5,8 @@
 
 #include "approximate_linear_models_abstract.h"
 #include "../matrix.h"
+#include "../rand.h"
+#include <ctime>
 
 namespace dlib
 {
@@ -51,6 +53,50 @@ namespace dlib
         deserialize(item.action, in);
         deserialize(item.next_state, in);
         deserialize(item.reward, in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+            typename feature_extractor
+            >
+    struct extended_process_sample : public process_sample<feature_extractor>
+    {
+        typedef feature_extractor feature_extractor_type;
+        typedef typename feature_extractor::state_type state_type;
+        typedef typename feature_extractor::action_type action_type;
+
+        extended_process_sample() : process_sample<feature_extractor>() {}
+
+        extended_process_sample(
+            const state_type& s,
+            const action_type& a,
+            const state_type& ns,
+            const action_type& na,
+            const double& r
+        ) : process_sample<feature_extractor>(s, a, ns, r), next_action(na) {}
+
+        action_type next_action;
+    };
+
+    template < typename feature_extractor >
+    void serialize (const extended_process_sample<feature_extractor>& item, std::ostream& out)
+    {
+        serialize(item.state, out);
+        serialize(item.action, out);
+        serialize(item.next_state, out);
+        serialize(item.reward, out);
+        serialize(item.next_action, out);
+    }
+
+    template < typename feature_extractor >
+    void deserialize (extended_process_sample<feature_extractor>& item, std::istream& in)
+    {
+        deserialize(item.state, in);
+        deserialize(item.action, in);
+        deserialize(item.next_state, in);
+        deserialize(item.reward, in);
+        deserialize(item.next_action, in);
     }
 
 // ----------------------------------------------------------------------------------------
