@@ -166,7 +166,7 @@ boost::python::list chinese_whispers_clustering(boost::python::list descriptors,
                 edges.push_back(sample_pair(i,j));
         }
     }
-    const auto num_clusters = chinese_whispers(edges, labels);
+    chinese_whispers(edges, labels);
     for (size_t i = 0; i < labels.size(); ++i)
     {
         clusters.append(labels[i]);
@@ -242,7 +242,6 @@ boost::python::list get_face_chips (
 
     boost::python::list chips_list;
 
-    int num_faces = faces.size();
     std::vector<chip_details> dets;
     for (auto& f : faces)
         dets.push_back(get_face_chip_details(f, size, padding));
@@ -253,9 +252,9 @@ boost::python::list get_face_chips (
     {
         boost::python::list img;
         
-        for(int row=0; row<size; row++) {
+        for(size_t row=0; row<size; row++) {
             boost::python::list row_list;
-            for(int col=0; col<size; col++) {
+            for(size_t col=0; col<size; col++) {
                 rgb_pixel pixel = chip(row, col);
                 boost::python::list item;
                 
