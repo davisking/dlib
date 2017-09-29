@@ -251,9 +251,9 @@ boost::python::list get_face_chips (
     {
         boost::python::list img;
         
-        for(int row=0; row<size; row++) {
+        for(size_t row=0; row<size; row++) {
             boost::python::list row_list;
-            for(int col=0; col<size; col++) {
+            for(size_t col=0; col<size; col++) {
                 rgb_pixel pixel = chip(row, col);
                 boost::python::list item;
                 
