@@ -166,6 +166,7 @@ boost::python::list chinese_whispers_clustering(boost::python::list descriptors,
                 edges.push_back(sample_pair(i,j));
         }
     }
+    chinese_whispers(edges, labels);
     for (size_t i = 0; i < labels.size(); ++i)
     {
         clusters.append(labels[i]);
