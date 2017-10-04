@@ -42,7 +42,7 @@
 
    <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz </xsl:variable>
    <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ </xsl:variable>
-   <xsl:variable name="badletters">?()&lt;&gt; /\&amp;~!@#$%^*_+=-[]{}</xsl:variable>
+   <xsl:variable name="badletters">'?()&lt;&gt; /\&amp;~!@#$%^*_+=-[]{}</xsl:variable>
    
    <!-- ************************************************************************* -->
 
