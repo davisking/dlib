@@ -164,7 +164,6 @@ namespace dlib
 
             // set the initial bias values to zero
             biases(params,filters.size()) = 0;
-
         }
 
         template <typename SUBNET>
@@ -346,23 +345,36 @@ namespace dlib
         static_assert(0 <= _padding_x && _padding_x < _nc, "The padding must be smaller than the filter size.");
 
         cont_(
+            num_con_outputs o
         ) : 
             learning_rate_multiplier(1),
             weight_decay_multiplier(1),
             bias_learning_rate_multiplier(1),
             bias_weight_decay_multiplier(0),
+            num_filters_(o.num_outputs),
             padding_y_(_padding_y),
             padding_x_(_padding_x)
         {
+            DLIB_CASSERT(num_filters_ > 0);
         }
 
-        long num_filters() const { return _num_filters; }
+        cont_() : cont_(num_con_outputs(_num_filters)) {}
+
+        long num_filters() const { return num_filters_; }
         long nr() const { return _nr; }
         long nc() const { return _nc; }
         long stride_y() const { return _stride_y; }
         long stride_x() const { return _stride_x; }
         long padding_y() const { return padding_y_; }
         long padding_x() const { return padding_x_; }
+
+        void set_num_filters(long num)
+        {
+            DLIB_CASSERT(num > 0);
+            DLIB_CASSERT(get_layer_params().size() == 0,
+                "You can't change the number of filters in cont_ if the parameter tensor has already been allocated.");
+            num_filters_ = num;
+        }
 
         double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
         double get_weight_decay_multiplier () const   { return weight_decay_multiplier; }
@@ -402,6 +414,7 @@ namespace dlib
             weight_decay_multiplier(item.weight_decay_multiplier),
             bias_learning_rate_multiplier(item.bias_learning_rate_multiplier),
             bias_weight_decay_multiplier(item.bias_weight_decay_multiplier),
+            num_filters_(item.num_filters_),
             padding_y_(item.padding_y_),
             padding_x_(item.padding_x_)
         {
@@ -427,6 +440,7 @@ namespace dlib
             weight_decay_multiplier = item.weight_decay_multiplier;
             bias_learning_rate_multiplier = item.bias_learning_rate_multiplier;
             bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
+            num_filters_ = item.num_filters_;
             return *this;
         }
 
@@ -434,18 +448,18 @@ namespace dlib
         void setup (const SUBNET& sub)
         {
             long num_inputs = _nr*_nc*sub.get_output().k();
-            long num_outputs = _num_filters;
+            long num_outputs = num_filters_;
             // allocate params for the filters and also for the filter bias values.
-            params.set_size(num_inputs*_num_filters + _num_filters);
+            params.set_size(num_inputs*num_filters_ + num_filters_);
 
             dlib::rand rnd(std::rand());
             randomize_parameters(params, num_inputs+num_outputs, rnd);
 
-            filters = alias_tensor(sub.get_output().k(),_num_filters, _nr, _nc);
-            biases = alias_tensor(1,_num_filters);
+            filters = alias_tensor(sub.get_output().k(), num_filters_, _nr, _nc);
+            biases = alias_tensor(1,num_filters_);
 
             // set the initial bias values to zero
-            biases(params,_num_filters) = 0;
+            biases(params,filters.size()) = 0;
         }
 
         template <typename SUBNET>
@@ -484,7 +498,7 @@ namespace dlib
         {
             serialize("cont_1", out);
             serialize(item.params, out);
-            serialize(_num_filters, out);
+            serialize(item.num_filters_, out);
             serialize(_nr, out);
             serialize(_nc, out);
             serialize(_stride_y, out);
@@ -503,7 +517,6 @@ namespace dlib
         {
             std::string version;
             deserialize(version, in);
-            long num_filters;
             long nr;
             long nc;
             int stride_y;
@@ -511,7 +524,7 @@ namespace dlib
             if (version == "cont_1")
             {
                 deserialize(item.params, in);
-                deserialize(num_filters, in);
+                deserialize(item.num_filters_, in);
                 deserialize(nr, in);
                 deserialize(nc, in);
                 deserialize(stride_y, in);
@@ -526,14 +539,6 @@ namespace dlib
                 deserialize(item.bias_weight_decay_multiplier, in);
                 if (item.padding_y_ != _padding_y) throw serialization_error("Wrong padding_y found while deserializing dlib::con_");
                 if (item.padding_x_ != _padding_x) throw serialization_error("Wrong padding_x found while deserializing dlib::con_");
-                if (num_filters != _num_filters) 
-                {
-                    std::ostringstream sout;
-                    sout << "Wrong num_filters found while deserializing dlib::con_" << std::endl;
-                    sout << "expected " << _num_filters << " but found " << num_filters << std::endl;
-                    throw serialization_error(sout.str());
-                }
-
                 if (nr != _nr) throw serialization_error("Wrong nr found while deserializing dlib::con_");
                 if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::con_");
                 if (stride_y != _stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::con_");
@@ -592,6 +597,7 @@ namespace dlib
         double weight_decay_multiplier;
         double bias_learning_rate_multiplier;
         double bias_weight_decay_multiplier;
+        long num_filters_;
 
         int padding_y_;
         int padding_x_;
