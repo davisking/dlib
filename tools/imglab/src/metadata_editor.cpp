@@ -9,6 +9,8 @@
 #include <dlib/image_io.h>
 #include <dlib/array2d.h>
 #include <dlib/pixel.h>
+#include <dlib/image_transforms.h>
+#include <dlib/image_processing.h>
 #include <sstream>
 #include <ctime>
 
@@ -16,27 +18,6 @@ using namespace std;
 using namespace dlib;
 
 extern const char* VERSION;
-
-rgb_alpha_pixel string_to_color(
-    const std::string& str
-)
-{
-    if (str.size() == 0)
-    {
-        return rgb_alpha_pixel(255,0,0,255);
-    }
-    else
-    {
-        // make up a random color based on the string label.
-        hsi_pixel pix;
-        pix.h = static_cast<unsigned char>(dlib::hash(str)&0xFF); 
-        pix.s = 255;
-        pix.i = 150;
-        rgb_alpha_pixel result;
-        assign_pixel(result, pix);
-        return result;
-    }
-}
 
 // ----------------------------------------------------------------------------------------
 
@@ -76,6 +57,7 @@ metadata_editor(
     overlay_label_name.set_text("Next Label: ");
     overlay_label.set_width(200);
 
+    display.set_image_clicked_handler(*this, &metadata_editor::on_image_clicked);
     display.set_overlay_rects_changed_handler(*this, &metadata_editor::on_overlay_rects_changed);
     display.set_overlay_rect_selected_handler(*this, &metadata_editor::on_overlay_rect_selected);
     overlay_label.set_text_modified_handler(*this, &metadata_editor::on_overlay_label_changed);
@@ -231,6 +213,31 @@ on_window_resized(
 
 // ----------------------------------------------------------------------------------------
 
+void propagate_boxes(
+    dlib::image_dataset_metadata::dataset& data,
+    unsigned long prev,
+    unsigned long next
+)
+{
+    if (prev == next || next >= data.images.size())
+        return;
+
+    array2d<rgb_pixel> img1, img2;
+    dlib::load_image(img1, data.images[prev].filename);
+    dlib::load_image(img2, data.images[next].filename);
+    for (unsigned long i = 0; i < data.images[prev].boxes.size(); ++i)
+    {
+        correlation_tracker tracker;
+        tracker.start_track(img1, data.images[prev].boxes[i].rect);
+        tracker.update(img2);
+        dlib::image_dataset_metadata::box box = data.images[prev].boxes[i];
+        box.rect = tracker.get_position();
+        data.images[next].boxes.push_back(box);
+    }
+}
+
+// ----------------------------------------------------------------------------------------
+
 void propagate_labels(
     const std::string& label,
     dlib::image_dataset_metadata::dataset& data,
@@ -336,12 +343,35 @@ on_keydown (
             last_keyboard_jump_pos_update = 0;
         }
 
+        if (key == 'd' && (state&base_window::KBD_MOD_ALT))
+        {
+            remove_selected_images();
+        }
+
+        if (key == 'e' && !overlay_label.has_input_focus())
+        {
+            display_equialized_image = !display_equialized_image;
+            select_image(image_pos);
+        }
+
+
         return;
     }
 
     if (key == base_window::KEY_UP)
     {
-        if (state&base_window::KBD_MOD_CONTROL)
+        if ((state&KBD_MOD_CONTROL) && (state&KBD_MOD_SHIFT))
+        {
+            // Don't do anything if there are no boxes in the current image.
+            if (metadata.images[image_pos].boxes.size() == 0)
+                return;
+            // Also don't do anything if there *are* boxes in the next image.
+            if (image_pos > 1 && metadata.images[image_pos-1].boxes.size() != 0)
+                return;
+
+            propagate_boxes(metadata, image_pos, image_pos-1);
+        }
+        else if (state&base_window::KBD_MOD_CONTROL)
         {
             // If the label we are supposed to propagate doesn't exist in the current image
             // then don't advance.
@@ -358,7 +388,18 @@ on_keydown (
     }
     else if (key == base_window::KEY_DOWN)
     {
-        if (state&base_window::KBD_MOD_CONTROL)
+        if ((state&KBD_MOD_CONTROL) && (state&KBD_MOD_SHIFT))
+        {
+            // Don't do anything if there are no boxes in the current image.
+            if (metadata.images[image_pos].boxes.size() == 0)
+                return;
+            // Also don't do anything if there *are* boxes in the next image.
+            if (image_pos+1 < metadata.images.size() && metadata.images[image_pos+1].boxes.size() != 0)
+                return;
+
+            propagate_boxes(metadata, image_pos, image_pos+1);
+        }
+        else if (state&base_window::KBD_MOD_CONTROL)
         {
             // If the label we are supposed to propagate doesn't exist in the current image
             // then don't advance.
@@ -418,7 +459,8 @@ on_lb_images_clicked(
 // ----------------------------------------------------------------------------------------
 
 std::vector<dlib::image_display::overlay_rect> get_overlays (
-    const dlib::image_dataset_metadata::image& data
+    const dlib::image_dataset_metadata::image& data,
+    color_mapper& string_to_color 
 )
 {
     std::vector<dlib::image_display::overlay_rect> temp(data.boxes.size());
@@ -450,15 +492,17 @@ load_image(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-        set_title(metadata.name + ": " +metadata.images[idx].filename);
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
         message_box("Error loading image", e.what());
     }
 
+    if (display_equialized_image)
+        equalize_histogram(img);
     display.set_image(img);
-    display.add_overlay(get_overlays(metadata.images[idx]));
+    display.add_overlay(get_overlays(metadata.images[idx], string_to_color));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -478,7 +522,7 @@ load_image_and_set_size(
     try
     {
         dlib::load_image(img, metadata.images[idx].filename);
-        set_title(metadata.name + ": " +metadata.images[idx].filename);
+        set_title(metadata.name + " #"+cast_to_string(idx)+": " +metadata.images[idx].filename);
     }
     catch (exception& e)
     {
@@ -503,8 +547,10 @@ load_image_and_set_size(
     set_size(needed_width, needed_height);
 
 
+    if (display_equialized_image)
+        equalize_histogram(img);
     display.set_image(img);
-    display.add_overlay(get_overlays(metadata.images[idx]));
+    display.add_overlay(get_overlays(metadata.images[idx], string_to_color));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -536,11 +582,20 @@ on_overlay_rects_changed(
 // ----------------------------------------------------------------------------------------
 
 void metadata_editor::
+on_image_clicked(
+    const point& /*p*/, bool /*is_double_click*/, unsigned long /*btn*/
+)
+{
+    display.set_default_overlay_rect_color(string_to_color(trim(overlay_label.text())));
+}
+
+// ----------------------------------------------------------------------------------------
+
+void metadata_editor::
 on_overlay_label_changed(
 )
 {
     display.set_default_overlay_rect_label(trim(overlay_label.text()));
-    display.set_default_overlay_rect_color(string_to_color(trim(overlay_label.text())));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -570,8 +625,9 @@ display_about(
                         "field at the top of the application.  You can quickly edit the contents of the Next Label field "
                         "by hitting the tab key. Double clicking "
                         "a rectangle selects it and the delete key removes it.  You can also mark "
-                        "a rectangle as ignored by hitting the i key when it is selected.  Ignored "
-                        "rectangles are visually displayed with an X through them."
+                        "a rectangle as ignored by hitting the i or END keys when it is selected.  Ignored "
+                        "rectangles are visually displayed with an X through them.  You can remove an image "
+                        "entirely by selecting it in the list on the left and pressing alt+d."
                         ,0,0) << endl << endl;
 
     sout << wrap_string("It is also possible to label object parts by selecting a rectangle and "
@@ -586,7 +642,13 @@ display_about(
                         "Holding shift + right click and then dragging allows you to move things around. "
                         "Holding ctrl and pressing the up or down keyboard keys will propagate "
                         "rectangle labels from one image to the next and also skip empty images. " 
-                        "Finally, typing a number on the keyboard will jump you to a specific image.",0,0) << endl;
+                        "Similarly, holding ctrl+shift will propagate entire boxes via a visual tracking " 
+                        "algorithm from one image to the next. "
+                        "Finally, typing a number on the keyboard will jump you to a specific image.",0,0) << endl << endl;
+
+    sout << wrap_string("You can also toggle image histogram equalization by pressing the e key."
+                        ,0,0) << endl;
+
 
     message_box("About Image Labeler",sout.str());
 }

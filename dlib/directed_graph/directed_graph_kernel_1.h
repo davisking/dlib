@@ -3,12 +3,13 @@
 #ifndef DLIB_DIRECTED_GRAPH_KERNEl_1_
 #define DLIB_DIRECTED_GRAPH_KERNEl_1_
 
+#include <memory>
+#include <vector>
+
 #include "../serialize.h"
 #include "../noncopyable.h"
 #include "../std_allocator.h"
-#include "../smart_pointers.h"
 #include "../algs.h"
-#include <vector>
 #include "directed_graph_kernel_abstract.h"
 #include "../is_kind.h"
 
@@ -357,18 +358,18 @@ namespace dlib
         private:
             friend class directed_graph_kernel_1;
             typedef std_allocator<node_type*,mem_manager> alloc_type;
-            typedef std_allocator<shared_ptr<E>,mem_manager> alloc_edge_type;
+            typedef std_allocator<std::shared_ptr<E>,mem_manager> alloc_edge_type;
             std::vector<node_type*,alloc_type> parents;
             std::vector<node_type*,alloc_type> children;
-            std::vector<shared_ptr<E>,alloc_edge_type> edge_parents;
-            std::vector<shared_ptr<E>,alloc_edge_type> edge_children;
+            std::vector<std::shared_ptr<E>,alloc_edge_type> edge_parents;
+            std::vector<std::shared_ptr<E>,alloc_edge_type> edge_children;
             unsigned long idx;
         };
 
     private:
 
-        typedef std_allocator<shared_ptr<node_type>,mem_manager> alloc_type;
-        typedef std::vector<shared_ptr<node_type>, alloc_type> vector_type;
+        typedef std_allocator<std::shared_ptr<node_type>,mem_manager> alloc_type;
+        typedef std::vector<std::shared_ptr<node_type>, alloc_type> vector_type;
         vector_type nodes;
     };
 
@@ -574,7 +575,7 @@ namespace dlib
             p.children.push_back(&c);
             c.parents.push_back(&p);
 
-            p.edge_children.push_back(shared_ptr<E>(new E));
+            p.edge_children.push_back(std::shared_ptr<E>(new E));
             c.edge_parents.push_back(p.edge_children.back());
         }
         catch (...)
@@ -632,7 +633,7 @@ namespace dlib
     {
         try
         {
-            shared_ptr<node_type> n(new node_type);
+            std::shared_ptr<node_type> n(new node_type);
             n->idx = nodes.size();
             nodes.push_back(n);
             return n->idx;

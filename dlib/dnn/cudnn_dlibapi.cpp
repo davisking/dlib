@@ -10,6 +10,7 @@
 #include <cudnn.h>
 #include <iostream>
 #include <string>
+#include <vector>
 #include "cuda_utils.h"
 #include "cpu_dlib.h"
 #include "cuda_dlib.h"
@@ -29,6 +30,8 @@ static const char* cudnn_get_error_string(cudnnStatus_t s)
             return "CUDNN_STATUS_EXECUTION_FAILED";
         case CUDNN_STATUS_NOT_SUPPORTED:
             return "CUDNN_STATUS_NOT_SUPPORTED";
+        case CUDNN_STATUS_ARCH_MISMATCH:
+            return "CUDNN_STATUS_ARCH_MISMATCH: Your GPU is too old and not supported by cuDNN";
         default:
             return "A call to cuDNN failed";
     }
@@ -70,40 +73,43 @@ namespace dlib
         class cudnn_context
         {
         public:
-            // not copyable 
+            // not copyable
             cudnn_context(const cudnn_context&) = delete;
             cudnn_context& operator=(const cudnn_context&) = delete;
 
             cudnn_context()
             {
-                CHECK_CUDNN(cudnnCreate(&handle));
-                CHECK_CUDA(cudaGetDevice(&device_id));
+                handles.resize(16);
             }
-
             ~cudnn_context()
             {
-                cudnnDestroy(handle);
+                for (auto h : handles)
+                {
+                    if (h)
+                        cudnnDestroy(h);
+                }
             }
 
             cudnnHandle_t get_handle (
-            ) 
+            )  
             { 
-                // Check if the active device for the current thread changed.  If so then
-                // regenerate our cuDNN handle so it will use the currently selected
-                // device.
                 int new_device_id;
                 CHECK_CUDA(cudaGetDevice(&new_device_id));
-                if (new_device_id != device_id)
-                {
-                    CHECK_CUDNN(cudnnDestroy(handle));
-                    CHECK_CUDNN(cudnnCreate(&handle));
-                }
-                return handle; 
+                // make room for more devices if needed
+                if (new_device_id >= (long)handles.size())
+                    handles.resize(new_device_id+16);
+
+                // If we don't have a handle already for this device then make one
+                if (!handles[new_device_id])
+                    CHECK_CUDNN(cudnnCreate(&handles[new_device_id]));
+
+                // Finally, return the handle for the current device
+                return handles[new_device_id];
             }
 
         private:
-            cudnnHandle_t handle;
-            int device_id;
+
+            std::vector<cudnnHandle_t> handles;
         };
 
         static cudnnHandle_t context()
@@ -111,7 +117,55 @@ namespace dlib
             thread_local cudnn_context c;
             return c.get_handle();
         }
+    // ------------------------------------------------------------------------------------
 
+        class cudnn_device_buffer
+        {
+        public:
+            // not copyable
+            cudnn_device_buffer(const cudnn_device_buffer&) = delete;
+            cudnn_device_buffer& operator=(const cudnn_device_buffer&) = delete;
+
+            cudnn_device_buffer()
+            {
+                buffers.resize(16);
+            }
+            ~cudnn_device_buffer()
+            {
+            }
+
+            std::shared_ptr<resizable_cuda_buffer> get_buffer (
+            )
+            {
+                int new_device_id;
+                CHECK_CUDA(cudaGetDevice(&new_device_id));
+                // make room for more devices if needed
+                if (new_device_id >= (long)buffers.size())
+                    buffers.resize(new_device_id+16);
+
+                // If we don't have a buffer already for this device then make one
+                std::shared_ptr<resizable_cuda_buffer> buff = buffers[new_device_id].lock();
+                if (!buff)
+                {
+                    buff = std::make_shared<resizable_cuda_buffer>();
+                    buffers[new_device_id] = buff;
+                }
+
+                // Finally, return the buffer for the current device
+                return buff;
+            }
+
+        private:
+
+            std::vector<std::weak_ptr<resizable_cuda_buffer>> buffers;
+        };
+
+
+        static std::shared_ptr<resizable_cuda_buffer> device_global_buffer()
+        {
+            thread_local cudnn_device_buffer buffer;
+            return buffer.get_buffer();
+        }
     // ------------------------------------------------------------------------------------
 
         class cudnn_activation_descriptor
@@ -185,15 +239,13 @@ namespace dlib
             int nc 
         )
         {
-            if (n == 0 || nr == 0 || nc == 0 || k == 0)
+            if (handle)
             {
-                if (handle)
-                {
-                    cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)handle);
-                    handle = nullptr;
-                }
+                cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)handle);
+                handle = nullptr;
             }
-            else
+
+            if (n != 0 && nr != 0 && nc != 0 && k != 0)
             {
                 cudnnTensorDescriptor_t h;
                 CHECK_CUDNN(cudnnCreateTensorDescriptor(&h));
@@ -254,7 +306,8 @@ namespace dlib
                   (have_same_dimensions(src, dest) ||
                   (src.num_samples()==1 && src.k()==dest.k() && src.nr()==1 && src.nc()==1) ||
                   (src.num_samples()==1 && src.k()==dest.k() && src.nr()==dest.nr() && src.nc()==dest.nc()) ||
-                  (src.num_samples()==1 && src.k()==1 && src.nr()==dest.nr() && src.nc()==dest.nc())) &&
+                  (src.num_samples()==1 && src.k()==1 && src.nr()==dest.nr() && src.nc()==dest.nc()) ||
+                  (src.num_samples()==dest.num_samples() && src.k()==1 && src.nr()==1 && src.nc()==1)) &&
                   is_same_object(src,dest) == false , 
                     "\n\t dest.num_samples(): " << dest.num_samples()
                     <<"\n\t dest.k():           " << dest.k()
@@ -273,6 +326,11 @@ namespace dlib
                 add_scaled(dest, alpha, src);
                 return;
             }
+            else if (src.num_samples()==dest.num_samples() && src.k()==1 && src.nr()==1 && src.nc()==1)
+            {
+                add_cv_to_all_columns(beta, dest, alpha, src);
+                return;
+            }
 
             CHECK_CUDNN(cudnnAddTensor(context(),
                                     &alpha,
@@ -281,32 +339,6 @@ namespace dlib
                                     &beta,
                                     descriptor(dest),
                                     dest.device()));
-        }
-
-        void set_tensor (
-            tensor& t,
-            float value
-        )
-        {
-            if (t.size() == 0)
-                return;
-            CHECK_CUDNN(cudnnSetTensor(context(),
-                                 descriptor(t),
-                                 t.device_write_only(),
-                                 &value));
-        }
-
-        void scale_tensor (
-            tensor& t,
-            float value
-        )
-        {
-            if (t.size() == 0)
-                return;
-            CHECK_CUDNN(cudnnScaleTensor(context(),
-                                   descriptor(t),
-                                   t.device(),
-                                   &value));
         }
 
         void assign_conv_bias_gradient (
@@ -322,7 +354,7 @@ namespace dlib
                   gradient_input.k() == grad.k() &&
                   gradient_input.size() > 0 &&
                   is_same_object(grad,gradient_input) == false
-                  ,"");
+                  );
 
             const float alpha = 1;
             const float beta = 0;
@@ -413,8 +445,8 @@ namespace dlib
         )
         {
             DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means));
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds));
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -487,15 +519,15 @@ namespace dlib
         )
         {
             const long num = src.k()*src.nr()*src.nc();
-            DLIB_CASSERT(src.num_samples() > 1, "");
-            DLIB_CASSERT(num == (long)means.size(),"");
-            DLIB_CASSERT(num == (long)invstds.size(),"");
-            DLIB_CASSERT(num == (long)gamma.size(),"");
-            DLIB_CASSERT(num == (long)gamma_grad.size(),"");
-            DLIB_CASSERT(num == (long)beta_grad.size(),"");
-            DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
-            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
-            DLIB_CASSERT(eps > 0,"");
+            DLIB_CASSERT(src.num_samples() > 1);
+            DLIB_CASSERT(num == (long)means.size());
+            DLIB_CASSERT(num == (long)invstds.size());
+            DLIB_CASSERT(num == (long)gamma.size());
+            DLIB_CASSERT(num == (long)gamma_grad.size());
+            DLIB_CASSERT(num == (long)beta_grad.size());
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src));
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
+            DLIB_CASSERT(eps > 0);
 
             const float in_scale = 1;
             const float out_scale = 1;
@@ -602,8 +634,8 @@ namespace dlib
         )
         {
             DLIB_CASSERT(0 <= averaging_factor && averaging_factor <= 1, "averaging_factor: " << averaging_factor);
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means),"");
-            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds),"");
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_means,means));
+            DLIB_CASSERT(averaging_factor==1 || have_same_dimensions(running_variances,invstds));
             DLIB_CASSERT(
                 src.num_samples() > 1 &&
                 gamma.num_samples() == 1 && 
@@ -676,14 +708,14 @@ namespace dlib
             tensor& beta_grad 
         )
         {
-            DLIB_CASSERT(src.k() == (long)means.size(),"");
-            DLIB_CASSERT(src.k() == (long)invstds.size(),"");
-            DLIB_CASSERT(src.k() == (long)gamma.size(),"");
-            DLIB_CASSERT(src.k() == (long)gamma_grad.size(),"");
-            DLIB_CASSERT(src.k() == (long)beta_grad.size(),"");
-            DLIB_CASSERT(have_same_dimensions(gradient_input, src),"");
-            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad),"");
-            DLIB_CASSERT(eps > 0,"");
+            DLIB_CASSERT(src.k() == (long)means.size());
+            DLIB_CASSERT(src.k() == (long)invstds.size());
+            DLIB_CASSERT(src.k() == (long)gamma.size());
+            DLIB_CASSERT(src.k() == (long)gamma_grad.size());
+            DLIB_CASSERT(src.k() == (long)beta_grad.size());
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src));
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
+            DLIB_CASSERT(eps > 0);
 
             const float in_scale = 1;
             const float out_scale = 1;
@@ -721,14 +753,8 @@ namespace dlib
             filter_handle(nullptr),
             conv_handle(nullptr),
             forward_algo(0),
-            forward_workspace_size_in_bytes(0),
-            forward_workspace(nullptr),
             backward_data_algo(0),
-            backward_data_workspace_size_in_bytes(0),
-            backward_data_workspace(nullptr),
-            backward_filters_algo(0),
-            backward_filters_workspace_size_in_bytes(0),
-            backward_filters_workspace(nullptr)
+            backward_filters_algo(0)
         {
             clear();
         }
@@ -748,24 +774,6 @@ namespace dlib
             out_nr = 0;
             out_nc = 0;
 
-            if (forward_workspace)
-                cudaFree(forward_workspace);
-            forward_workspace = nullptr;
-            forward_algo = 0;
-            forward_workspace_size_in_bytes = 0;
-
-            if (backward_data_workspace)
-                cudaFree(backward_data_workspace);
-            backward_data_workspace = nullptr;
-            backward_data_algo = 0;
-            backward_data_workspace_size_in_bytes = 0;
-
-            if (backward_filters_workspace)
-                cudaFree(backward_filters_workspace);
-            backward_filters_workspace = nullptr;
-            backward_filters_algo = 0;
-            backward_filters_workspace_size_in_bytes = 0;
-
             stride_y = 0;
             stride_x = 0;
             padding_y = 0;
@@ -778,6 +786,19 @@ namespace dlib
             filters_k = 0;
             filters_nr = 0;
             filters_nc = 0;
+
+            forward_algo = 0;
+            backward_data_algo = 0;
+            backward_filters_algo = 0;
+
+            forward_workspace_size_in_bytes = 0;
+            backward_data_workspace_size_in_bytes = 0;
+            backward_filters_workspace_size_in_bytes = 0;
+
+            forward_workspace.reset();
+            backward_data_workspace.reset();
+            backward_filters_workspace.reset();
+            workspace.reset();
         }
 
         void tensor_conv::
@@ -790,7 +811,7 @@ namespace dlib
             int padding_x_
         ) 
         {
-            DLIB_CASSERT(data.k() == filters.k(),"");
+            DLIB_CASSERT(data.k() == filters.k());
 
             // if the last call to setup gave the same exact settings then don't do
             // anything.
@@ -836,6 +857,16 @@ namespace dlib
                                                  filters.nc()));
 
                 CHECK_CUDNN(cudnnCreateConvolutionDescriptor((cudnnConvolutionDescriptor_t*)&conv_handle));
+#if CUDNN_MAJOR >= 6
+                CHECK_CUDNN(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
+                        padding_y, // vertical padding
+                        padding_x, // horizontal padding
+                        stride_y,
+                        stride_x,
+                        1, 1, // must be 1,1
+                        CUDNN_CROSS_CORRELATION,
+                        CUDNN_DATA_FLOAT)); // could also be CUDNN_CONVOLUTION
+#else
                 CHECK_CUDNN(cudnnSetConvolution2dDescriptor((cudnnConvolutionDescriptor_t)conv_handle,
                         padding_y, // vertical padding
                         padding_x, // horizontal padding
@@ -843,6 +874,7 @@ namespace dlib
                         stride_x,
                         1, 1, // must be 1,1
                         CUDNN_CROSS_CORRELATION)); // could also be CUDNN_CONVOLUTION
+#endif
 
                 CHECK_CUDNN(cudnnGetConvolution2dForwardOutputDim(
                         (const cudnnConvolutionDescriptor_t)conv_handle,
@@ -877,8 +909,6 @@ namespace dlib
                         descriptor(dest_desc),
                         forward_best_algo,
                         &forward_workspace_size_in_bytes));
-                CHECK_CUDA(cudaMalloc(&forward_workspace, forward_workspace_size_in_bytes));
-
 
                 // Pick which backward data algorithm we will use and allocate the
                 // necessary workspace buffer.
@@ -893,7 +923,8 @@ namespace dlib
                         std::numeric_limits<size_t>::max(),
                         &backward_data_best_algo));
                 backward_data_algo = backward_data_best_algo;
-                CHECK_CUDNN(cudnnGetConvolutionBackwardDataWorkspaceSize( 
+
+                CHECK_CUDNN(cudnnGetConvolutionBackwardDataWorkspaceSize(
                         context(),
                         (const cudnnFilterDescriptor_t)filter_handle,
                         descriptor(dest_desc),
@@ -901,8 +932,6 @@ namespace dlib
                         descriptor(data),
                         backward_data_best_algo,
                         &backward_data_workspace_size_in_bytes));
-                CHECK_CUDA(cudaMalloc(&backward_data_workspace, backward_data_workspace_size_in_bytes));
-
 
                 // Pick which backward filters algorithm we will use and allocate the
                 // necessary workspace buffer.
@@ -939,7 +968,8 @@ namespace dlib
                         (const cudnnFilterDescriptor_t)filter_handle,
                         backward_filters_best_algo,
                         &backward_filters_workspace_size_in_bytes));
-                CHECK_CUDA(cudaMalloc(&backward_filters_workspace, backward_filters_workspace_size_in_bytes));
+
+                workspace = device_global_buffer();
             }
             catch(...)
             {
@@ -956,19 +986,29 @@ namespace dlib
         }
 
         void tensor_conv::operator() (
+            const bool add_to_output,
             resizable_tensor& output,
             const tensor& data,
-            const tensor& filters,
-            int stride_y,
-            int stride_x,
-            int padding_y,
-            int padding_x
+            const tensor& filters
         )
         {
-            DLIB_CASSERT(is_same_object(output,data) == false,"");
-            DLIB_CASSERT(is_same_object(output,filters) == false,"");
-            DLIB_CASSERT(filters.k() == data.k(),"");
-            DLIB_CASSERT(stride_y > 0 && stride_x > 0,"");
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
+
+            output.set_size(out_num_samples, out_k, out_nr, out_nc);
+            (*this)(add_to_output, static_cast<tensor&>(output), data, filters);
+        }
+
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            tensor& output,
+            const tensor& data,
+            const tensor& filters
+        )
+        {
+            DLIB_CASSERT(is_same_object(output,data) == false);
+            DLIB_CASSERT(is_same_object(output,filters) == false);
+            DLIB_CASSERT(filters.k() == data.k());
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
             DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
                 "Filter windows must be small enough to fit into the padded image."
                 << "\n\t filters.nc(): " << filters.nc() 
@@ -983,19 +1023,23 @@ namespace dlib
                 );
 
 
-            setup(data,filters,stride_y,stride_x,padding_y,padding_x);
-
-            output.set_size(out_num_samples, out_k, out_nr, out_nc);
-
-            DLIB_ASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
-            DLIB_ASSERT(output.k() == filters.num_samples(),"");
-            DLIB_ASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y,"");
-            DLIB_ASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x,"");
+            DLIB_CASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
+            DLIB_CASSERT(output.k() == filters.num_samples());
+            DLIB_CASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y);
+            DLIB_CASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x);
 
 
 
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = add_to_output ? 1 : 0;
+
+            // Since cudnnConvolutionForward() is an asynchronous call, we need to hold a
+            // reference to the workspace buffer so we can be sure it isn't reallocated
+            // while the function is still executing on the device.  But each time we come
+            // here, we make sure to grab the latest workspace buffer so that, globally, we
+            // minimize the number of such buffers.
+            forward_workspace = workspace->get(forward_workspace_size_in_bytes);
+
             CHECK_CUDNN(cudnnConvolutionForward(
                     context(),
                     &alpha,
@@ -1013,13 +1057,21 @@ namespace dlib
         }
 
         void tensor_conv::get_gradient_for_data (
+            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& filters,
             tensor& data_gradient
         )
         {
             const float alpha = 1;
-            const float beta = 1;
+            const float beta = add_to_output ? 1 : 0;
+
+            // Since cudnnConvolutionBackwardData() is an asynchronous call, we need to hold a
+            // reference to the workspace buffer so we can be sure it isn't reallocated
+            // while the function is still executing on the device.  But each time we come
+            // here, we make sure to grab the latest workspace buffer so that, globally, we
+            // minimize the number of such buffers.
+            backward_data_workspace = workspace->get(backward_data_workspace_size_in_bytes);
 
 
             CHECK_CUDNN(cudnnConvolutionBackwardData(context(),
@@ -1039,13 +1091,22 @@ namespace dlib
 
         void tensor_conv::
         get_gradient_for_filters (
+            const bool add_to_output,
             const tensor& gradient_input, 
             const tensor& data,
             tensor& filters_gradient
         )
         {
             const float alpha = 1;
-            const float beta = 0;
+            const float beta = add_to_output ? 1 : 0;
+
+            // Since cudnnConvolutionBackwardFilter() is an asynchronous call, we need to hold a
+            // reference to the workspace buffer so we can be sure it isn't reallocated
+            // while the function is still executing on the device.  But each time we come
+            // here, we make sure to grab the latest workspace buffer so that, globally, we
+            // minimize the number of such buffers.
+            backward_filters_workspace = workspace->get(backward_filters_workspace_size_in_bytes);
+
             CHECK_CUDNN(cudnnConvolutionBackwardFilter(context(),
                                                     &alpha,
                                                     descriptor(data),
@@ -1217,8 +1278,8 @@ namespace dlib
 
             dest.set_size(outN,outC,outH,outW);
 
-            DLIB_CASSERT(dest.num_samples() == src.num_samples(),"");
-            DLIB_CASSERT(dest.k() == src.k(),"");
+            DLIB_CASSERT(dest.num_samples() == src.num_samples());
+            DLIB_CASSERT(dest.k() == src.k());
             DLIB_CASSERT(dest.nr() == 1 + (src.nr() + 2*padding_y - window_height)/stride_y, 
                 "\n stride_y:  " << stride_y  <<
                 "\n padding_y: " << padding_y  <<
@@ -1251,8 +1312,8 @@ namespace dlib
             tensor& grad 
         )
         {
-            DLIB_CASSERT(have_same_dimensions(gradient_input,dest),"");
-            DLIB_CASSERT(have_same_dimensions(src,grad),"");
+            DLIB_CASSERT(have_same_dimensions(gradient_input,dest));
+            DLIB_CASSERT(have_same_dimensions(src,grad));
 
             const float alpha = 1;
             const float beta = 1;
@@ -1278,7 +1339,7 @@ namespace dlib
             const tensor& src
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest,src),"");
+            DLIB_CASSERT(have_same_dimensions(dest,src));
             if (src.size() == 0)
                 return;
 
@@ -1305,7 +1366,7 @@ namespace dlib
         {
             DLIB_CASSERT(
                   have_same_dimensions(dest,gradient_input) == true &&
-                  have_same_dimensions(dest,grad) == true , "");
+                  have_same_dimensions(dest,grad) == true );
             if (dest.size() == 0)
                 return;
 
@@ -1332,7 +1393,7 @@ namespace dlib
             const tensor& src
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest,src),"");
+            DLIB_CASSERT(have_same_dimensions(dest,src));
             if (src.size() == 0)
                 return;
 
@@ -1356,7 +1417,7 @@ namespace dlib
         {
             DLIB_CASSERT(
                   have_same_dimensions(dest,gradient_input) == true &&
-                  have_same_dimensions(dest,grad) == true , "");
+                  have_same_dimensions(dest,grad) == true );
             if (dest.size() == 0)
                 return;
 
@@ -1383,7 +1444,7 @@ namespace dlib
             const tensor& src
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest,src),"");
+            DLIB_CASSERT(have_same_dimensions(dest,src));
             if (src.size() == 0)
                 return;
 
@@ -1407,7 +1468,7 @@ namespace dlib
         {
             DLIB_CASSERT(
                   have_same_dimensions(dest,gradient_input) == true &&
-                  have_same_dimensions(dest,grad) == true , "");
+                  have_same_dimensions(dest,grad) == true );
             if (dest.size() == 0)
                 return;
 
@@ -1434,7 +1495,7 @@ namespace dlib
             const tensor& src
         )
         {
-            DLIB_CASSERT(have_same_dimensions(dest,src),"");
+            DLIB_CASSERT(have_same_dimensions(dest,src));
             if (src.size() == 0)
                 return;
 
@@ -1458,7 +1519,7 @@ namespace dlib
         {
             DLIB_CASSERT(
                   have_same_dimensions(dest,gradient_input) == true &&
-                  have_same_dimensions(dest,grad) == true, "");
+                  have_same_dimensions(dest,grad) == true);
             if (dest.size() == 0)
                 return;
 
@@ -1479,8 +1540,7 @@ namespace dlib
         }
 
     // ------------------------------------------------------------------------------------
-
-    } 
+    }
 }
 
 #endif // DLIB_USE_CUDA

@@ -144,6 +144,10 @@
             <name>Examples: Python</name>
             <sub>
                <item>
+                  <name>Face Clustering</name>
+                  <link>face_clustering.py.html</link>
+               </item>
+               <item>
                   <name>Video Object Tracking</name>
                   <link>correlation_tracker.py.html</link>
                </item>
@@ -152,7 +156,11 @@
                   <link>face_landmark_detection.py.html</link>
                </item>
                <item>
-                  <name>find candidate object locations</name>
+                  <name>Face Recognition</name>
+                  <link>face_recognition.py.html</link>
+               </item>
+               <item>
+                  <name>Find Candidate Object Locations</name>
                   <link>find_candidate_object_locations.py.html</link>
                </item>
                <item>
@@ -162,6 +170,10 @@
                <item>
                   <name>Face Detector</name>
                   <link>face_detector.py.html</link>
+               </item>
+               <item>
+                  <name>CNN Face Detector</name>
+                  <link>cnn_face_detector.py.html</link>
                </item>
                <item>
                   <name>Train Object Detector</name>
@@ -208,6 +220,48 @@
                   <name>Deep Learning Inception</name>
                   <link>dnn_inception_ex.cpp.html</link>
                </item>
+               <item>
+                  <name>Deep Metric Learning Introduction</name>
+                  <link>dnn_metric_learning_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Metric Learning on Images</name>
+                  <link>dnn_metric_learning_on_images_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Face Recognition</name>
+                  <link>dnn_face_recognition_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Vehicle Detection</name>
+                  <link>dnn_mmod_find_cars_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Multi-Class Vehicle Detection</name>
+                  <link>dnn_mmod_find_cars2_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Vehicle Detection Trainer</name>
+                  <link>dnn_mmod_train_find_cars_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Face Detection</name>
+                  <link>dnn_mmod_face_detection_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Dog Hipsterizer</name>
+                  <link>dnn_mmod_dog_hipsterizer.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Max-Margin Object Detection</name>
+                  <link>dnn_mmod_ex.cpp.html</link>
+               </item>
+
+               <item>
+                  <name>Random Cropper</name>
+                  <link>random_cropper_ex.cpp.html</link>
+               </item>
+
                <item>
                   <name>Linear Model Predictive Control</name>
                   <link>mpc_ex.cpp.html</link>

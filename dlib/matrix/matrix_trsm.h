@@ -9,22 +9,24 @@ namespace dlib
 {
     namespace blas_bindings
     {
+#ifdef DLIB_USE_BLAS
 #ifndef CBLAS_H
         extern "C"
         {
-            void cblas_strsm(const enum CBLAS_ORDER Order, const enum CBLAS_SIDE Side,
-                             const enum CBLAS_UPLO Uplo, const enum CBLAS_TRANSPOSE TransA,
-                             const enum CBLAS_DIAG Diag, const int M, const int N,
+            void cblas_strsm(const CBLAS_ORDER Order, const CBLAS_SIDE Side,
+                             const CBLAS_UPLO Uplo, const CBLAS_TRANSPOSE TransA,
+                             const CBLAS_DIAG Diag, const int M, const int N,
                              const float alpha, const float *A, const int lda,
                              float *B, const int ldb);
 
-            void cblas_dtrsm(const enum CBLAS_ORDER Order, const enum CBLAS_SIDE Side,
-                             const enum CBLAS_UPLO Uplo, const enum CBLAS_TRANSPOSE TransA,
-                             const enum CBLAS_DIAG Diag, const int M, const int N,
+            void cblas_dtrsm(const CBLAS_ORDER Order, const CBLAS_SIDE Side,
+                             const CBLAS_UPLO Uplo, const CBLAS_TRANSPOSE TransA,
+                             const CBLAS_DIAG Diag, const int M, const int N,
                              const double alpha, const double *A, const int lda,
                              double *B, const int ldb);
         }
 #endif // if not CBLAS_H
+#endif // if DLIB_USE_BLAS
 
     // ------------------------------------------------------------------------------------
 
@@ -148,11 +150,11 @@ namespace dlib
 
         template <typename T>
         void local_trsm(
-            const enum CBLAS_ORDER Order,
-            enum CBLAS_SIDE Side,
-            enum CBLAS_UPLO Uplo, 
-            const enum CBLAS_TRANSPOSE TransA,
-            const enum CBLAS_DIAG Diag, 
+            const CBLAS_ORDER Order,
+            CBLAS_SIDE Side,
+            CBLAS_UPLO Uplo, 
+            const CBLAS_TRANSPOSE TransA,
+            const CBLAS_DIAG Diag, 
             long m, 
             long n, 
             T alpha, 
@@ -513,9 +515,9 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        inline void cblas_trsm(const enum CBLAS_ORDER Order, const enum CBLAS_SIDE Side,
-                               const enum CBLAS_UPLO Uplo, const enum CBLAS_TRANSPOSE TransA,
-                               const enum CBLAS_DIAG Diag, const int M, const int N,
+        inline void cblas_trsm(const CBLAS_ORDER Order, const CBLAS_SIDE Side,
+                               const CBLAS_UPLO Uplo, const CBLAS_TRANSPOSE TransA,
+                               const CBLAS_DIAG Diag, const int M, const int N,
                                const float alpha, const float *A, const int lda,
                                float *B, const int ldb)
         {
@@ -529,9 +531,9 @@ namespace dlib
             local_trsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
         }
 
-        inline void cblas_trsm(const enum CBLAS_ORDER Order, const enum CBLAS_SIDE Side,
-                               const enum CBLAS_UPLO Uplo, const enum CBLAS_TRANSPOSE TransA,
-                               const enum CBLAS_DIAG Diag, const int M, const int N,
+        inline void cblas_trsm(const CBLAS_ORDER Order, const CBLAS_SIDE Side,
+                               const CBLAS_UPLO Uplo, const CBLAS_TRANSPOSE TransA,
+                               const CBLAS_DIAG Diag, const int M, const int N,
                                const double alpha, const double *A, const int lda,
                                double *B, const int ldb)
         {
@@ -545,9 +547,9 @@ namespace dlib
             local_trsm(Order, Side, Uplo, TransA, Diag, M, N, alpha, A, lda, B, ldb);
         }
 
-        inline void cblas_trsm(const enum CBLAS_ORDER Order, const enum CBLAS_SIDE Side,
-                               const enum CBLAS_UPLO Uplo, const enum CBLAS_TRANSPOSE TransA,
-                               const enum CBLAS_DIAG Diag, const int M, const int N,
+        inline void cblas_trsm(const CBLAS_ORDER Order, const CBLAS_SIDE Side,
+                               const CBLAS_UPLO Uplo, const CBLAS_TRANSPOSE TransA,
+                               const CBLAS_DIAG Diag, const int M, const int N,
                                const long double alpha, const long double *A, const int lda,
                                long double *B, const int ldb)
         {
@@ -563,10 +565,10 @@ namespace dlib
             typename MM
             >
         inline void triangular_solver (
-            const enum CBLAS_SIDE Side,
-            const enum CBLAS_UPLO Uplo, 
-            const enum CBLAS_TRANSPOSE TransA,
-            const enum CBLAS_DIAG Diag,
+            const CBLAS_SIDE Side,
+            const CBLAS_UPLO Uplo, 
+            const CBLAS_TRANSPOSE TransA,
+            const CBLAS_DIAG Diag,
             const matrix<T,NR1,NC1,MM,row_major_layout>& A,
             const T alpha,
             matrix<T,NR2,NC2,MM,row_major_layout>& B
@@ -585,10 +587,10 @@ namespace dlib
             typename MM
             >
         inline void triangular_solver (
-            const enum CBLAS_SIDE Side,
-            const enum CBLAS_UPLO Uplo, 
-            const enum CBLAS_TRANSPOSE TransA,
-            const enum CBLAS_DIAG Diag,
+            const CBLAS_SIDE Side,
+            const CBLAS_UPLO Uplo, 
+            const CBLAS_TRANSPOSE TransA,
+            const CBLAS_DIAG Diag,
             const matrix<T,NR1,NC1,MM,column_major_layout>& A,
             const T alpha,
             matrix<T,NR2,NC2,MM,column_major_layout>& B
@@ -607,10 +609,10 @@ namespace dlib
             typename MM
             >
         inline void triangular_solver (
-            const enum CBLAS_SIDE Side,
-            const enum CBLAS_UPLO Uplo, 
-            const enum CBLAS_TRANSPOSE TransA,
-            const enum CBLAS_DIAG Diag,
+            const CBLAS_SIDE Side,
+            const CBLAS_UPLO Uplo, 
+            const CBLAS_TRANSPOSE TransA,
+            const CBLAS_DIAG Diag,
             const matrix<T,NR1,NC1,MM,column_major_layout>& A,
             matrix<T,NR2,NC2,MM,column_major_layout>& B,
             long rows_of_B
@@ -631,10 +633,10 @@ namespace dlib
             typename layout
             >
         inline void triangular_solver (
-            const enum CBLAS_SIDE Side,
-            const enum CBLAS_UPLO Uplo, 
-            const enum CBLAS_TRANSPOSE TransA,
-            const enum CBLAS_DIAG Diag,
+            const CBLAS_SIDE Side,
+            const CBLAS_UPLO Uplo, 
+            const CBLAS_TRANSPOSE TransA,
+            const CBLAS_DIAG Diag,
             const matrix<T,NR1,NC1,MM,layout>& A,
             matrix<T,NR2,NC2,MM,layout>& B
         )

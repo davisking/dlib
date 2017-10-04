@@ -91,6 +91,22 @@ namespace dlib
             deserialize(item.parts, in);
         }
 
+        bool operator==(
+            const full_object_detection& rhs
+        ) const
+        {
+            if (rect != rhs.rect)
+                return false;
+            if (parts.size() != rhs.parts.size())
+                return false;
+            for (size_t i = 0; i < parts.size(); ++i)
+            {
+                if (parts[i] != rhs.parts[i])
+                    return false;
+            }
+            return true;
+        }
+
     private:
         rectangle rect;
         std::vector<point> parts;  
@@ -109,6 +125,62 @@ namespace dlib
                 return false;
         }
         return true;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct mmod_rect
+    {
+        mmod_rect() = default; 
+        mmod_rect(const rectangle& r) : rect(r) {}
+        mmod_rect(const rectangle& r, double score) : rect(r),detection_confidence(score) {}
+        mmod_rect(const rectangle& r, double score, const std::string& label) : rect(r),detection_confidence(score), label(label) {}
+
+        rectangle rect;
+        double detection_confidence = 0;
+        bool ignore = false;
+        std::string label;
+
+        operator rectangle() const { return rect; }
+        bool operator == (const mmod_rect& rhs) const
+        { 
+            return rect == rhs.rect 
+                   && detection_confidence == rhs.detection_confidence
+                   && ignore == rhs.ignore 
+                   && label == rhs.label;
+        }
+    };
+
+    inline mmod_rect ignored_mmod_rect(const rectangle& r)
+    {
+        mmod_rect temp(r);
+        temp.ignore = true;
+        return temp;
+    }
+
+    inline void serialize(const mmod_rect& item, std::ostream& out)
+    {
+        int version = 2;
+        serialize(version, out);
+        serialize(item.rect, out);
+        serialize(item.detection_confidence, out);
+        serialize(item.ignore, out);
+        serialize(item.label, out);
+    }
+
+    inline void deserialize(mmod_rect& item, std::istream& in)
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1 && version != 2)
+            throw serialization_error("Unexpected version found while deserializing dlib::mmod_rect");
+        deserialize(item.rect, in);
+        deserialize(item.detection_confidence, in);
+        deserialize(item.ignore, in);
+        if (version == 2)
+            deserialize(item.label, in);
+        else
+            item.label = "";
     }
 
 // ----------------------------------------------------------------------------------------

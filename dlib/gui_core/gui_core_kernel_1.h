@@ -11,7 +11,9 @@
 #error "DLIB_NO_GUI_SUPPORT is defined so you can't use the GUI code.  Turn DLIB_NO_GUI_SUPPORT off if you want to use it."
 #endif
 
+#include <memory>
 #include <string>
+
 #include "../windows_magic.h"
 
 
@@ -39,8 +41,6 @@
 #include "../queue.h"
 #include "../pixel.h"
 #include "../unicode.h"
-#include "../smart_pointers_thread_safe.h"
-
 
 namespace dlib
 {
@@ -124,16 +124,16 @@ namespace dlib
     template <>
     struct pixel_traits<canvas::pixel>
     {
-        const static bool rgb  = true;
-        const static bool rgb_alpha  = false;
-        const static bool grayscale = false;
-        const static bool hsi = false;
-        const static long num = 3;
+        constexpr static bool rgb  = true;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
-        const static bool is_unsigned = true;
-        const static bool has_alpha = false;
+        constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = false;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -169,7 +169,7 @@ namespace dlib
     class base_window
     {
         friend LRESULT CALLBACK gui_core_kernel_1_globals::WndProc (HWND, UINT, WPARAM, LPARAM);
-        shared_ptr_thread_safe<gui_core_kernel_1_globals::event_handler_thread> globals;
+        std::shared_ptr<gui_core_kernel_1_globals::event_handler_thread> globals;
 
         HWND hwnd;
         DWORD style;

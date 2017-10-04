@@ -141,7 +141,7 @@ namespace dlib
     );
     /*!
         requires
-            - container muse be a container of double values that can be enumerated with a
+            - container must be a container of double values that can be enumerated with a
               range based for loop.
             - The container must contain more than 2 elements.
         ensures
@@ -158,7 +158,7 @@ namespace dlib
     );
     /*!
         requires
-            - container muse be a container of double values that can be enumerated with a
+            - container must be a container of double values that can be enumerated with a
               range based for loop.
             - The container must contain more than 2 elements.
         ensures
@@ -177,7 +177,7 @@ namespace dlib
     );
     /*!
         requires
-            - container muse be a container of double values that can be enumerated with
+            - container must be a container of double values that can be enumerated with
               .rbegin() and .rend().
             - 0.5 < probability_of_decrease < 1
         ensures
@@ -198,13 +198,37 @@ namespace dlib
     template <
         typename T
         > 
+    size_t count_steps_without_decrease_robust (
+        const T& container,
+        double probability_of_decrease = 0.51,
+        double quantile_discard = 0.10
+    );
+    /*!
+        requires
+            - container must be a container of double values that can be enumerated with
+              .begin() and .end() as well as .rbegin() and .rend().
+            - 0.5 < probability_of_decrease < 1
+            - 0 <= quantile_discard <= 1
+        ensures
+            - This function behaves just like
+              count_steps_without_decrease(container,probability_of_decrease) except that
+              it ignores values in container that are in the upper quantile_discard
+              quantile.  So for example, if the quantile discard is 0.1 then the 10%
+              largest values in container are ignored.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        > 
     size_t count_steps_without_increase (
         const T& container,
         double probability_of_increase = 0.51
     );
     /*!
         requires
-            - container muse be a container of double values that can be enumerated with
+            - container must be a container of double values that can be enumerated with
               .rbegin() and .rend().
             - 0.5 < probability_of_increase < 1
         ensures
@@ -219,6 +243,28 @@ namespace dlib
               small hint of increase, whereas a larger value of 0.99 would return a larger
               count since it keeps going until it is nearly certain the time series is
               increasing.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        > 
+    double find_upper_quantile (
+        const T& container,
+        double quantile
+    );
+    /*!
+        requires
+            - container must be a container of double values that can be enumerated with
+              .begin() and .end().
+            - 0 <= quantile <= 1
+            - container.size() > 0
+        ensures
+            - Finds and returns the value such that quantile percent of the values in
+              container are greater than it.  For example, 0.5 would find the median value
+              in container while 0.1 would find the value that lower bounded the 10%
+              largest values in container.
     !*/
 
 // ----------------------------------------------------------------------------------------

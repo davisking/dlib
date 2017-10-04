@@ -131,6 +131,121 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    struct snl_range
+    {
+        snl_range() = default;
+        snl_range(double val) : lower(val), upper(val) {}
+        snl_range(double l, double u) : lower(l), upper(u) { DLIB_ASSERT(lower <= upper)}
+
+        double lower = 0;
+        double upper = 0;
+
+        double width() const { return upper-lower; }
+        bool operator<(const snl_range& item) const { return lower < item.lower; }
+    };
+
+    inline snl_range merge(const snl_range& a, const snl_range& b)
+    {
+        return snl_range(std::min(a.lower, b.lower), std::max(a.upper, b.upper));
+    }
+
+    inline double distance (const snl_range& a, const snl_range& b)
+    {
+        return std::max(a.lower,b.lower) - std::min(a.upper,b.upper);
+    }
+
+    inline std::ostream& operator<< (std::ostream& out, const snl_range& item )
+    {
+        out << "["<<item.lower<<","<<item.upper<<"]";
+        return out;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline std::vector<snl_range> segment_number_line (
+        const std::vector<double>& x,
+        const double max_range_width
+    )
+    {
+        DLIB_CASSERT(max_range_width >= 0);
+
+        // create initial ranges, one for each value in x.  So initially, all the ranges have
+        // width of 0.
+        std::vector<snl_range> ranges;
+        for (auto v : x)
+            ranges.push_back(v);
+        std::sort(ranges.begin(), ranges.end());
+
+        std::vector<snl_range> greedy_final_ranges;
+        if (ranges.size() == 0)
+            return greedy_final_ranges;
+        // We will try two different clustering strategies.  One that does a simple greedy left
+        // to right sweep and another that does a bottom up agglomerative clustering.  This
+        // first loop runs the greedy left to right sweep.  Then at the end of this routine we
+        // will return the results that produced the tightest clustering.
+        greedy_final_ranges.push_back(ranges[0]);
+        for (size_t i = 1; i < ranges.size(); ++i)
+        {
+            auto m = merge(greedy_final_ranges.back(), ranges[i]);
+            if (m.width() <= max_range_width)
+                greedy_final_ranges.back() = m;
+            else
+                greedy_final_ranges.push_back(ranges[i]);
+        }
+
+
+        // Here we do the bottom up clustering.  So compute the edges connecting our ranges.
+        // We will simply say there are edges between ranges if and only if they are
+        // immediately adjacent on the number line.
+        std::vector<sample_pair> edges;
+        for (size_t i = 1; i < ranges.size(); ++i)
+            edges.push_back(sample_pair(i-1,i, distance(ranges[i-1],ranges[i])));
+        std::sort(edges.begin(), edges.end(), order_by_distance<sample_pair>);
+
+        disjoint_subsets sets;
+        sets.set_size(ranges.size());
+
+        // Now start merging nodes.
+        for (auto edge : edges)
+        {
+            // find the next best thing to merge.
+            unsigned long a = sets.find_set(edge.index1());
+            unsigned long b = sets.find_set(edge.index2());
+
+            // merge it if it doesn't result in an interval that's too big.
+            auto m = merge(ranges[a], ranges[b]);
+            if (m.width() <= max_range_width)
+            {
+                unsigned long news = sets.merge_sets(a,b);
+                ranges[news] = m;
+            }
+        }
+
+        // Now create a list of the final ranges.  We will do this by keeping track of which
+        // range we already added to final_ranges.
+        std::vector<snl_range> final_ranges;
+        std::vector<bool> already_output(ranges.size(), false);
+        for (unsigned long i = 0; i < sets.size(); ++i)
+        {
+            auto s = sets.find_set(i);
+            if (!already_output[s])
+            {
+                final_ranges.push_back(ranges[s]);
+                already_output[s] = true;
+            }
+        }
+
+        // only use the greedy clusters if they found a clustering with fewer clusters.
+        // Otherwise, the bottom up clustering probably produced a more sensible clustering.
+        if (final_ranges.size() <= greedy_final_ranges.size())
+            return final_ranges;
+        else
+            return greedy_final_ranges;
+    }
+
+// ----------------------------------------------------------------------------------------
 
 }
 

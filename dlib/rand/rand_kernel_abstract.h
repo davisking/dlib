@@ -135,6 +135,20 @@ namespace dlib
                     - returns a random double number N where:  0.0 <= N < 1.0.
             !*/
 
+            double get_double_in_range (
+                double begin,
+                double end
+            );
+            /*!
+                requires
+                    - begin <= end
+                ensures
+                    - if (begin < end) then
+                        - returns a random double number N where:  begin <= N < end.
+                    - else
+                        - returns begin
+            !*/
+
             double get_random_gaussian (
             );
             /*!

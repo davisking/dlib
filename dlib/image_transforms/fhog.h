@@ -11,8 +11,7 @@
 #include "assign_image.h"
 #include "draw.h"
 #include "interpolation.h"
-#include "../simd/simd4i.h"
-#include "../simd/simd4f.h"
+#include "../simd.h"
 
 namespace dlib
 {

@@ -11,6 +11,10 @@
 
 #include <cuda_runtime.h>
 #include <sstream>
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <type_traits>
 
 
 // Check the return value of a call to the CUDA runtime for an error condition.
@@ -131,8 +135,8 @@ namespace dlib
 
         struct max_jobs
         {
-            max_jobs(size_t n) : num(n) {}
-            size_t num;
+            max_jobs(int n) : num(n) {}
+            int num;
         };
 
         template <typename Kernel, typename... T>
@@ -261,7 +265,7 @@ namespace dlib
                     CUDA's y thread index (e.g. threadIdx.y) instead of the x index.
                     Therefore, if you launch a cuda kernel with a statement like:
                         dim3 blocks(10,1);
-                        dim3 threads(32,32);  // You need to have x any not equal to 1 to get parallelism over both loops.
+                        dim3 threads(32,32);  // You need to have x and y not equal to 1 to get parallelism over both loops.
                         add_arrays<<<blocks,threads>>>(a,b,out,nr,nc);
                     You can perform a nested 2D parallel for loop rather than doing just a
                     1D for loop.

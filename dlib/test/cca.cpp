@@ -139,7 +139,7 @@ namespace
             dlog << LINFO << "correlation error: "<< corr_error;
             DLIB_TEST_MSG(corr_error < 1e-13, Ltrans << "\n\n" << Rtrans);
 
-            DLIB_TEST(trans_error < 1e-9);
+            DLIB_TEST(trans_error < 2e-9);
         }
 
         dlog << LINFO << "*****************************************************";
@@ -236,7 +236,7 @@ namespace
                 // non-matching pairs of projections.
                 const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
                 dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
-                DLIB_TEST(std::abs(corr_rot1_error) < 1e-10);
+                DLIB_TEST(std::abs(corr_rot1_error) < 2e-9);
             }
             // Matching projection directions should be correlated with the amount of
             // correlation indicated by the return value of cca().
@@ -246,7 +246,7 @@ namespace
 
             const double trans_error = max(abs(L*Ltrans - R*Rtrans));
             dlog << LINFO << "trans_error: "<< trans_error;
-            DLIB_TEST(trans_error < 1e-10);
+            DLIB_TEST(trans_error < 2e-9);
 
             dlog << LINFO << "correlations: "<< trans(correlations);
         }
@@ -259,7 +259,7 @@ namespace
                 // non-matching pairs of projections.
                 const double corr_rot1_error = max(abs(compute_correlations(rm_zeros(L*rotate<0,1>(Ltrans)), rm_zeros(R*Rtrans))));
                 dlog << LINFO << "corr_rot1_error: "<< corr_rot1_error;
-                DLIB_TEST(std::abs(corr_rot1_error) < 1e-10);
+                DLIB_TEST(std::abs(corr_rot1_error) < 2e-9);
             }
             // Matching projection directions should be correlated with the amount of
             // correlation indicated by the return value of cca().
@@ -269,7 +269,7 @@ namespace
 
             const double trans_error = max(abs(L*Ltrans - R*Rtrans));
             dlog << LINFO << "trans_error: "<< trans_error;
-            DLIB_TEST(trans_error < 1e-9);
+            DLIB_TEST(trans_error < 2e-9);
 
             dlog << LINFO << "correlations: "<< trans(correlations);
         }

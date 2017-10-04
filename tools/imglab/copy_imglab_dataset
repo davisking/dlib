@@ -13,10 +13,10 @@ DEST=$2
 
 
 
-FILES=`imglab --files $XML_FILE | xargs perl  -e 'use File::Spec; foreach (@ARGV) {print File::Spec->abs2rel($_) . "\n"}' | sort | uniq`
+mkdir -p $DEST
 
-mkdir $DEST
-cp -a --parents $FILES $DEST
+# Get the list of files we need to copy, then build the cp statements with 1000 files at most in each statement, then tell bash to run them all.
+imglab --files $XML_FILE | xargs perl  -e 'use File::Spec; foreach (@ARGV) {print File::Spec->abs2rel($_) . "\n"}' | sort | uniq | xargs -L1000 echo | xargs  -I{} echo cp -a --parents {} $DEST | bash
 
 convert_imglab_paths_to_relative $XML_FILE > $DEST/$(basename $XML_FILE)
 

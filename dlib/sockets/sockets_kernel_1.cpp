@@ -6,6 +6,8 @@
 
 #ifdef WIN32
 
+#include <winsock2.h>
+
 #ifndef _WINSOCKAPI_
 #define _WINSOCKAPI_   /* Prevent inclusion of winsock.h in windows.h */
 #endif
@@ -15,7 +17,6 @@
 #include "sockets_kernel_1.h"
 
 #include <windows.h>
-#include <winsock2.h>
 
 #ifndef NI_MAXHOST
 #define NI_MAXHOST 1025
@@ -497,7 +498,7 @@ namespace dlib
 
     int listener::
     accept (
-        scoped_ptr<connection>& new_connection,
+        std::unique_ptr<connection>& new_connection,
         unsigned long timeout
     )
     {
@@ -645,7 +646,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------    
 
     int create_listener (
-        scoped_ptr<listener>& new_listener,
+        std::unique_ptr<listener>& new_listener,
         unsigned short port,
         const std::string& ip
     )
@@ -763,7 +764,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     int create_connection (
-        scoped_ptr<connection>& new_connection,
+        std::unique_ptr<connection>& new_connection,
         unsigned short foreign_port, 
         const std::string& foreign_ip, 
         unsigned short local_port,

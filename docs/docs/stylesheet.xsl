@@ -327,7 +327,7 @@
          <div class="component"  >
       
          <a href="#top"><font size='2'><center>[top]</center></font></a>
-         <h1 style="margin:0px;"><xsl:value-of select="name"/> <xsl:if test="@cpp11 = 'true'"><span class='cpp11'>(C++11)</span></xsl:if>
+         <h1 style="margin:0px;"><xsl:value-of select="name"/> 
          </h1>
          <BR/>
          <BR/>
@@ -656,6 +656,11 @@
       <br/>
          <xsl:apply-templates/>
    </xsl:template>   
+
+   <xsl:template match="youtube">
+      <iframe width="900" height="506" src="{@src}" frameborder="0" allowfullscreen='1'></iframe>
+   </xsl:template>   
+
    <xsl:template match="a">
       <a href="{@href}">
          <xsl:apply-templates/>

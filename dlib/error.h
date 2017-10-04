@@ -258,7 +258,7 @@ namespace dlib
             // MATLAB, then don't do these checks since it terminates the over arching
             // system.  Just let the errors go to the plugin handler and it will deal with
             // them.
-#if defined(MATLAB_MEX_FILE)
+#if defined(MATLAB_MEX_FILE) || defined(DLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
             return;
 #else
             static bool is_first_fatal_error = true;
@@ -418,6 +418,27 @@ namespace dlib
                 - #type == ETHREAD
                 - #info == ""
         !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class impossible_labeling_error : public dlib::error 
+    { 
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown by code that trains object detectors (e.g.
+                structural_svm_object_detection_problem) when they detect that the set of
+                truth boxes given to the training algorithm contains some impossible to
+                obtain outputs.  
+                
+                This kind of problem can happen when the set of image positions scanned by
+                the underlying object detection method doesn't include the truth rectangle
+                as a possible output.  Another possibility is when two truth boxes are very
+                close together and hard coded non-max suppression logic would prevent two
+                boxes in such close proximity from being output.
+        !*/
+    public: 
+        impossible_labeling_error(const std::string& msg) : dlib::error(msg) {};
     };
 
 // ----------------------------------------------------------------------------------------

@@ -102,7 +102,11 @@
 #include "../array.h"
 #include "../image_transforms.h"
 #include "../is_kind.h"
+#include "../string.h"
 #include "../any.h" // for sig_traits
+#include "../hash.h"
+#include <tuple>
+#include <map>
 
 #if defined(_MSC_VER)
 #define DLL_EXPORT_SYM __declspec(dllexport)
@@ -335,12 +339,6 @@ namespace mex_binding
 
     struct user_hit_ctrl_c {};
 
-    struct invalid_args_exception
-    {
-        invalid_args_exception(const std::string& msg_): msg(msg_) {}
-        std::string msg;
-    };
-
 // -------------------------------------------------------
 
     template <typename T>
@@ -366,6 +364,54 @@ namespace mex_binding
 
 // -------------------------------------------------------
 
+    string escape_percent(const string& str)
+    {
+        string temp;
+        for(auto c : str)
+        {
+            if (c != '%')
+            {
+                temp += c;
+            }
+            else
+            {
+                temp += c;
+                temp += c;
+            }
+        }
+        return temp;
+    }
+
+    string escape_percent(const std::ostringstream& sout)
+    {
+        return escape_percent(sout.str());
+    }
+
+// -------------------------------------------------------
+
+    template <
+        typename matrix_type
+        >
+    typename dlib::enable_if_c<is_matrix<matrix_type>::value || is_array2d<matrix_type>::value >::type
+    clear_mat (
+        matrix_type& m
+    )  
+    {
+        m.set_size(0,0);
+    }
+
+    template <
+        typename matrix_type
+        >
+    typename dlib::disable_if_c<is_matrix<matrix_type>::value || is_array2d<matrix_type>::value >::type
+    clear_mat (
+        matrix_type& 
+    )  
+    {
+    }
+
+// -------------------------------------------------------
+
     template <
         typename matrix_type,
         typename EXP
@@ -381,15 +427,13 @@ namespace mex_binding
         {
             std::ostringstream sout;
             sout << "Argument " << arg_idx+1 << " expects a matrix with " << matrix_type::NR << " rows but got one with " << src.nc();
-            mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              sout.str().c_str());
+            throw invalid_args_exception(sout);
         }
         if (matrix_type::NC != 0 && matrix_type::NC != src.nr())
         {
             std::ostringstream sout;
             sout << "Argument " << arg_idx+1 << " expects a matrix with " << matrix_type::NC << " columns but got one with " << src.nr();
-            mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              sout.str().c_str());
+            throw invalid_args_exception(sout);
         }
 
 
@@ -424,8 +468,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+        throw invalid_args_exception(sout);
     }
 
 
@@ -446,8 +489,7 @@ namespace mex_binding
         {
             std::ostringstream sout;
             sout << "Error, input argument " << arg_idx+1 << " must be a non-negative number.";
-            mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              sout.str().c_str());
+            throw invalid_args_exception(sout);
         }
         else
         {
@@ -468,8 +510,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+        throw invalid_args_exception(sout);
     }
 
 
@@ -495,8 +536,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+        throw invalid_args_exception(sout);
     }
 
 
@@ -520,14 +560,14 @@ namespace mex_binding
         if (!mxIsCell(src))
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " must be a cell array";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " must be a cell array";
+            throw invalid_args_exception(sout);
         }
         if (nr != 1 && nc != 1)
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " must be a cell array with exactly 1 row or 1 column (i.e. a row or column vector)";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " must be a cell array with exactly 1 row or 1 column (i.e. a row or column vector)";
+            throw invalid_args_exception(sout);
         }
 
         const long size = nr*nc;
@@ -543,8 +583,8 @@ namespace mex_binding
             {
                 std::ostringstream sout;
                 sout << "Error in argument " << arg_idx+1 << ": element " << i+1 << " of cell array not the expected type.\n";
-                sout << "\t" << e.msg;
-                throw invalid_args_exception(sout.str());
+                sout << "\t" << e.what();
+                throw invalid_args_exception(sout);
             }
         }
 
@@ -562,8 +602,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+        throw invalid_args_exception(sout);
     }
 
 // -------------------------------------------------------
@@ -579,8 +618,7 @@ namespace mex_binding
     {
         std::ostringstream sout;
         sout << "mex_function has some bug in it related to processing input argument " << arg_idx+1;
-        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                          sout.str().c_str());
+        throw invalid_args_exception(sout);
     }
 
     template <typename MM>
@@ -628,14 +666,20 @@ namespace mex_binding
                 mxGetNumberOfElements(prhs)!=1 ) 
             {
                 std::ostringstream sout;
-                sout << " argument " << arg_idx+1 << " must be a scalar";
-                throw invalid_args_exception(sout.str());
+                sout << "Input argument " << arg_idx+1 << " must be a scalar";
+                throw invalid_args_exception(sout);
             }
 
             assign_scalar(arg_idx, arg , mxGetScalar(prhs));
         }
         else if (is_matrix<T>::value || is_array2d<T>::value)
         {
+            if (prhs == NULL)
+            {
+                clear_mat(arg);
+                return;
+            }
+
             typedef typename inner_type<T>::type type;
 
             const int num_dims = mxGetNumberOfDimensions(prhs);
@@ -647,8 +691,8 @@ namespace mex_binding
                 if (!(num_dims == 3 && mxGetDimensions(prhs)[2] == 3 && mxIsUint8(prhs)))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a 3-D NxMx3 image matrix of uint8";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a 3-D NxMx3 image matrix of uint8";
+                    throw invalid_args_exception(sout);
                 }
 
                 const long rows = mxGetDimensions(prhs)[0];
@@ -660,8 +704,8 @@ namespace mex_binding
             if (num_dims != 2)
             {
                 std::ostringstream sout;
-                sout << " argument " << arg_idx+1 << " must be a 2-D matrix (got a " << num_dims << "-D matrix)";
-                throw invalid_args_exception(sout.str());
+                sout << "Input argument " << arg_idx+1 << " must be a 2-D matrix (got a " << num_dims << "-D matrix)";
+                throw invalid_args_exception(sout);
             }
 
 
@@ -670,8 +714,8 @@ namespace mex_binding
                 if (!mxIsDouble(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of doubles";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of doubles";
+                    throw invalid_args_exception(sout);
                 }
                 if (is_column_major_matrix<T>::value)
                     call_private_set_mxArray(arg, (mxArray*)prhs);
@@ -683,8 +727,8 @@ namespace mex_binding
                 if (!mxIsSingle(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of single/float";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of single/float";
+                    throw invalid_args_exception(sout);
                 }
 
                 if (is_column_major_matrix<T>::value)
@@ -697,9 +741,10 @@ namespace mex_binding
                 if (!mxIsLogical(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of logical elements.";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of logical elements.";
+                    throw invalid_args_exception(sout);
                 }
+                DLIB_CASSERT(sizeof(mxLogical) == sizeof(bool),"logical matrices are not supported by the mex wrapper when mxLogical isn't a bool.");
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const bool*)mxGetData(prhs), nc, nr));
             }
@@ -708,8 +753,8 @@ namespace mex_binding
                 if (!mxIsUint8(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of uint8";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of uint8";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const dlib::uint8*)mxGetData(prhs), nc, nr));
@@ -719,8 +764,8 @@ namespace mex_binding
                 if (!mxIsInt8(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of int8";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of int8";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const dlib::int8*)mxGetData(prhs), nc, nr));
@@ -731,8 +776,8 @@ namespace mex_binding
                 if (!mxIsInt16(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of int16";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of int16";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -743,8 +788,8 @@ namespace mex_binding
                 if (!mxIsUint16(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of uint16";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of uint16";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -756,8 +801,8 @@ namespace mex_binding
                 if (!mxIsInt32(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of int32";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of int32";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -769,8 +814,8 @@ namespace mex_binding
                 if (!mxIsUint32(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of uint32";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of uint32";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -782,8 +827,8 @@ namespace mex_binding
                 if (!mxIsUint64(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of uint64";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of uint64";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
@@ -795,16 +840,15 @@ namespace mex_binding
                 if (!mxIsInt64(prhs) || mxIsComplex(prhs))
                 {
                     std::ostringstream sout;
-                    sout << " argument " << arg_idx+1 << " must be a matrix of int64";
-                    throw invalid_args_exception(sout.str());
+                    sout << "Input argument " << arg_idx+1 << " must be a matrix of int64";
+                    throw invalid_args_exception(sout);
                 }
 
                 assign_mat(arg_idx, arg , pointer_to_matrix((const type*)mxGetData(prhs), nc, nr));
             }
             else
             {
-                mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                                  "mex_function uses unsupported matrix type");
+                throw invalid_args_exception("mex_function uses unsupported matrix type");
             }
         }
         else if (is_array_type<T>::value)
@@ -817,15 +861,14 @@ namespace mex_binding
             if (!mxIsClass(prhs, "function_handle"))
             {
                 std::ostringstream sout;
-                sout << " argument " << arg_idx+1 << " must be a function handle.";
-                throw invalid_args_exception(sout.str());
+                sout << "Input argument " << arg_idx+1 << " must be a function handle.";
+                throw invalid_args_exception(sout);
             }
             assign_function_handle(arg_idx, arg, prhs);
         }
         else
         {
-            mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              "mex_function uses unsupported input argument type");
+            throw invalid_args_exception("mex_function uses unsupported input argument type");
         }
     }
 
@@ -838,11 +881,21 @@ namespace mex_binding
         if (!mxIsStruct(prhs))
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " must be a struct";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " must be a struct";
+            throw invalid_args_exception(sout);
         }
 
-        arg.set_struct_handle(prhs);
+        arg.set_struct_handle(arg_idx, prhs);
+    }
+
+
+    void validate_and_populate_arg(
+        long arg_idx,
+        const mxArray *prhs,
+        matlab_object& arg
+    )
+    {
+        arg.set_object_handle(arg_idx, prhs);
     }
 
 
@@ -855,8 +908,8 @@ namespace mex_binding
         if (!mxIsChar(prhs))
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " must be a char string";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " must be a char string";
+            throw invalid_args_exception(sout);
         }
 
         const long nr = mxGetM(prhs);
@@ -866,8 +919,8 @@ namespace mex_binding
         if (mxGetString(prhs, &arg[0], arg.size()))
         {
             std::ostringstream sout;
-            sout << " argument " << arg_idx+1 << " encountered an error while calling mxGetString()";
-            throw invalid_args_exception(sout.str());
+            sout << "Input argument " << arg_idx+1 << " encountered an error while calling mxGetString()";
+            throw invalid_args_exception(sout);
         }
         arg.resize(size);
     }
@@ -1049,6 +1102,12 @@ namespace mex_binding
             // Don't need to do a copy if it's this kind of matrix since we can just
             // pull the underlying mxArray out directly and thus avoid a copy.
             plhs = item._private_release_mxArray();
+            // If there isn't anything there because the matrix is empty then set it to an
+            // empty matrix.
+            if (!plhs)
+                plhs = mxCreateDoubleMatrix(item.nr(),
+                                            item.nc(),
+                                            mxREAL);
         }
         else
         {
@@ -1070,6 +1129,13 @@ namespace mex_binding
             // Don't need to do a copy if it's this kind of matrix since we can just
             // pull the underlying mxArray out directly and thus avoid a copy.
             plhs = item._private_release_mxArray();
+            // If there isn't anything there because the matrix is empty then set it to an
+            // empty matrix.
+            if (!plhs)
+                plhs = mxCreateNumericMatrix(item.nr(),
+                                            item.nc(),
+                                            mxSINGLE_CLASS,
+                                            mxREAL);
         }
         else
         {
@@ -1088,6 +1154,14 @@ namespace mex_binding
     )
     {
         plhs = (mxArray*)item.release_struct_to_matlab();
+    }
+
+    void assign_to_matlab(
+        mxArray*& plhs,
+        matlab_object& item
+    )
+    {
+        plhs = (mxArray*)item.release_object_to_matlab();
     }
 
     void assign_to_matlab(
@@ -1165,11 +1239,25 @@ namespace mex_binding
     struct call_mex_function_helper;
 
     template <>
+    struct call_mex_function_helper<0>
+    {
+        template <typename funct>
+        void callit(
+            const funct& f,
+            int , mxArray **,
+            int , const mxArray **
+        ) const
+        {
+            f();
+        }
+    };
+
+    template <>
     struct call_mex_function_helper<1>
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1183,7 +1271,7 @@ namespace mex_binding
             int i = 0;
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
 
-            mex_function(A1);
+            f(A1);
 
             i = 0;
             if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
@@ -1195,7 +1283,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1213,7 +1301,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg1_type>::value) {validate_and_populate_arg(i,prhs[i],A1); ++i;} ELSE_ASSIGN_ARG_1;
             if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
 
-            mex_function(A1,A2);
+            f(A1,A2);
 
             i = 0;
             if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
@@ -1226,7 +1314,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1248,7 +1336,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg2_type>::value) {validate_and_populate_arg(i,prhs[i],A2); ++i;} ELSE_ASSIGN_ARG_2;
             if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
 
-            mex_function(A1,A2,A3);
+            f(A1,A2,A3);
 
             i = 0;
             if (is_output_type<arg1_type>::value) {assign_to_matlab(plhs[i],A1); ++i;}
@@ -1262,7 +1350,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1288,7 +1376,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg3_type>::value) {validate_and_populate_arg(i,prhs[i],A3); ++i;} ELSE_ASSIGN_ARG_3;
             if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
 
-            mex_function(A1,A2,A3,A4);
+            f(A1,A2,A3,A4);
 
 
             i = 0;
@@ -1304,7 +1392,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1334,7 +1422,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg4_type>::value) {validate_and_populate_arg(i,prhs[i],A4); ++i;} ELSE_ASSIGN_ARG_4;
             if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
 
-            mex_function(A1,A2,A3,A4,A5);
+            f(A1,A2,A3,A4,A5);
 
 
             i = 0;
@@ -1352,7 +1440,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1386,7 +1474,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg5_type>::value) {validate_and_populate_arg(i,prhs[i],A5); ++i;} ELSE_ASSIGN_ARG_5;
             if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
 
-            mex_function(A1,A2,A3,A4,A5,A6);
+            f(A1,A2,A3,A4,A5,A6);
 
 
             i = 0;
@@ -1405,7 +1493,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1443,7 +1531,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg6_type>::value) {validate_and_populate_arg(i,prhs[i],A6); ++i;} ELSE_ASSIGN_ARG_6;
             if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7);
+            f(A1,A2,A3,A4,A5,A6,A7);
 
 
             i = 0;
@@ -1463,7 +1551,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1505,7 +1593,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg7_type>::value) {validate_and_populate_arg(i,prhs[i],A7); ++i;} ELSE_ASSIGN_ARG_7;
             if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8);
+            f(A1,A2,A3,A4,A5,A6,A7,A8);
 
 
             i = 0;
@@ -1526,7 +1614,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1572,7 +1660,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg8_type>::value) {validate_and_populate_arg(i,prhs[i],A8); ++i;} ELSE_ASSIGN_ARG_8;
             if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9);
 
 
             i = 0;
@@ -1595,7 +1683,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1645,7 +1733,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg9_type>::value) {validate_and_populate_arg(i,prhs[i],A9); ++i;} ELSE_ASSIGN_ARG_9;
             if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10);
 
 
             i = 0;
@@ -1667,7 +1755,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1721,7 +1809,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg10_type>::value) {validate_and_populate_arg(i,prhs[i],A10); ++i;} ELSE_ASSIGN_ARG_10;
             if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11);
 
 
             i = 0;
@@ -1744,7 +1832,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1802,7 +1890,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg11_type>::value) {validate_and_populate_arg(i,prhs[i],A11); ++i;} ELSE_ASSIGN_ARG_11;
             if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12);
 
 
             i = 0;
@@ -1826,7 +1914,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1888,7 +1976,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg12_type>::value) {validate_and_populate_arg(i,prhs[i],A12); ++i;} ELSE_ASSIGN_ARG_12;
             if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13);
 
 
             i = 0;
@@ -1913,7 +2001,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -1979,7 +2067,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg13_type>::value) {validate_and_populate_arg(i,prhs[i],A13); ++i;} ELSE_ASSIGN_ARG_13;
             if (i < nrhs && is_input_type<arg14_type>::value) {validate_and_populate_arg(i,prhs[i],A14); ++i;} ELSE_ASSIGN_ARG_14;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14);
 
 
             i = 0;
@@ -2005,7 +2093,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -2075,7 +2163,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg14_type>::value) {validate_and_populate_arg(i,prhs[i],A14); ++i;} ELSE_ASSIGN_ARG_14;
             if (i < nrhs && is_input_type<arg15_type>::value) {validate_and_populate_arg(i,prhs[i],A15); ++i;} ELSE_ASSIGN_ARG_15;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15);
 
 
             i = 0;
@@ -2102,7 +2190,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -2176,7 +2264,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg15_type>::value) {validate_and_populate_arg(i,prhs[i],A15); ++i;} ELSE_ASSIGN_ARG_15;
             if (i < nrhs && is_input_type<arg16_type>::value) {validate_and_populate_arg(i,prhs[i],A16); ++i;} ELSE_ASSIGN_ARG_16;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16);
 
 
             i = 0;
@@ -2204,7 +2292,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -2282,7 +2370,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg16_type>::value) {validate_and_populate_arg(i,prhs[i],A16); ++i;} ELSE_ASSIGN_ARG_16;
             if (i < nrhs && is_input_type<arg17_type>::value) {validate_and_populate_arg(i,prhs[i],A17); ++i;} ELSE_ASSIGN_ARG_17;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17);
 
 
             i = 0;
@@ -2311,7 +2399,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -2393,7 +2481,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg17_type>::value) {validate_and_populate_arg(i,prhs[i],A17); ++i;} ELSE_ASSIGN_ARG_17;
             if (i < nrhs && is_input_type<arg18_type>::value) {validate_and_populate_arg(i,prhs[i],A18); ++i;} ELSE_ASSIGN_ARG_18;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18);
 
 
             i = 0;
@@ -2423,7 +2511,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -2509,7 +2597,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg18_type>::value) {validate_and_populate_arg(i,prhs[i],A18); ++i;} ELSE_ASSIGN_ARG_18;
             if (i < nrhs && is_input_type<arg19_type>::value) {validate_and_populate_arg(i,prhs[i],A19); ++i;} ELSE_ASSIGN_ARG_19;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18,A19);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18,A19);
 
 
             i = 0;
@@ -2540,7 +2628,7 @@ namespace mex_binding
     {
         template <typename funct>
         void callit(
-            const funct& ,
+            const funct& f,
             int nlhs, mxArray *plhs[],
             int nrhs, const mxArray *prhs[]
         ) const
@@ -2630,7 +2718,7 @@ namespace mex_binding
             if (i < nrhs && is_input_type<arg19_type>::value) {validate_and_populate_arg(i,prhs[i],A19); ++i;} ELSE_ASSIGN_ARG_19;
             if (i < nrhs && is_input_type<arg20_type>::value) {validate_and_populate_arg(i,prhs[i],A20); ++i;} ELSE_ASSIGN_ARG_20;
 
-            mex_function(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18,A19,A20);
+            f(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18,A19,A20);
 
 
             i = 0;
@@ -2656,6 +2744,14 @@ namespace mex_binding
             if (is_output_type<arg20_type>::value) {assign_to_matlab(plhs[i],A20); ++i;}
         }
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T> struct is_matlab_object                         { const static bool value = false; };
+    template <>           struct is_matlab_object <matlab_object>         { const static bool value = true; };
+    template <>           struct is_matlab_object <const matlab_object>   { const static bool value = true; };
+    template <>           struct is_matlab_object <matlab_object&>        { const static bool value = true; };
+    template <>           struct is_matlab_object <const matlab_object&>  { const static bool value = true; };
 
 // ----------------------------------------------------------------------------------------
 
@@ -2872,16 +2968,40 @@ namespace mex_binding
         #endif
 
 
+        //  Arguments with type matlab_object are optional in both input and output.
+        int num_optional_inputs = 0;
+        int num_optional_outputs = 0;
+        if (is_matlab_object<typename sig_traits<funct>::arg20_type>::value) if (is_input_type<typename sig_traits<funct>::arg20_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg19_type>::value) if (is_input_type<typename sig_traits<funct>::arg19_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg18_type>::value) if (is_input_type<typename sig_traits<funct>::arg18_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg17_type>::value) if (is_input_type<typename sig_traits<funct>::arg17_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg16_type>::value) if (is_input_type<typename sig_traits<funct>::arg16_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg15_type>::value) if (is_input_type<typename sig_traits<funct>::arg15_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg14_type>::value) if (is_input_type<typename sig_traits<funct>::arg14_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg13_type>::value) if (is_input_type<typename sig_traits<funct>::arg13_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg12_type>::value) if (is_input_type<typename sig_traits<funct>::arg12_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg11_type>::value) if (is_input_type<typename sig_traits<funct>::arg11_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg10_type>::value) if (is_input_type<typename sig_traits<funct>::arg10_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg9_type>::value) if (is_input_type<typename sig_traits<funct>::arg9_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg8_type>::value) if (is_input_type<typename sig_traits<funct>::arg8_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg7_type>::value) if (is_input_type<typename sig_traits<funct>::arg7_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg6_type>::value) if (is_input_type<typename sig_traits<funct>::arg6_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg5_type>::value) if (is_input_type<typename sig_traits<funct>::arg5_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg4_type>::value) if (is_input_type<typename sig_traits<funct>::arg4_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg3_type>::value) if (is_input_type<typename sig_traits<funct>::arg3_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg2_type>::value) if (is_input_type<typename sig_traits<funct>::arg2_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+        if (is_matlab_object<typename sig_traits<funct>::arg1_type>::value) if (is_input_type<typename sig_traits<funct>::arg1_type>::value) ++num_optional_inputs; else ++num_optional_outputs;
+
 
         /* check for proper number of arguments */
-        if(nrhs > expected_nrhs || nrhs < expected_nrhs - defaulted_args) 
+        if(nrhs > expected_nrhs || nrhs < expected_nrhs - defaulted_args - num_optional_inputs) 
         {
             std::ostringstream sout;
-            sout << "Expected between " << expected_nrhs-defaulted_args 
+            sout << "Expected between " << expected_nrhs-defaulted_args - num_optional_inputs 
                 << " and " << expected_nrhs << " input arguments, got " << nrhs << ".";
 
             mexErrMsgIdAndTxt("mex_function:nrhs",
-                              sout.str().c_str());
+                              escape_percent(sout).c_str());
         }
 
         if (nlhs > expected_nlhs)
@@ -2890,28 +3010,11 @@ namespace mex_binding
             sout << "Expected at most " << expected_nlhs << " output arguments, got " << nlhs << ".";
 
             mexErrMsgIdAndTxt("mex_function:nlhs",
-                              sout.str().c_str());
+                              escape_percent(sout).c_str());
         }
 
-        try
-        {
-            call_mex_function_helper<sig_traits<funct>::num_args> helper;
-            helper.callit(f, nlhs, plhs, nrhs, prhs);
-        }
-        catch (invalid_args_exception& e)
-        {
-            mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
-                              ("Input" + e.msg).c_str());
-        }
-        catch (user_hit_ctrl_c& )
-        {
-            // do nothing, just return to matlab
-        }
-        catch (std::exception& e)
-        {
-            mexErrMsgIdAndTxt("mex_function:error",
-                              e.what());
-        }
+        call_mex_function_helper<sig_traits<funct>::num_args> helper;
+        helper.callit(f, nlhs, plhs, nrhs, prhs);
 
     }
 
@@ -2947,12 +3050,12 @@ namespace mex_binding
             int num = static_cast<int>(pptr()-pbase());
             if (num != 0)
             {
+                check_for_matlab_ctrl_c();
+
                 buf[num] = 0; // null terminate the string
                 mexPrintf("%s",&buf[0]);
                 mexEvalString("drawnow"); // flush print to screen
                 pbump(-num);
-
-                check_for_matlab_ctrl_c();
             }
             return 0;
         }
@@ -3005,12 +3108,12 @@ namespace mex_binding
             int num = static_cast<int>(pptr()-pbase());
             if (num != 0)
             {
+                check_for_matlab_ctrl_c();
+
                 buf[num] = 0; // null terminate the string
                 mexWarnMsgTxt(&buf[0]);
                 mexEvalString("drawnow"); // flush print to screen
                 pbump(-num);
-
-                check_for_matlab_ctrl_c();
             }
             return 0;
         }
@@ -3093,7 +3196,7 @@ namespace mex_binding
         catch (invalid_args_exception& e)
         {
             throw dlib::error("Error occurred calling MATLAB function '" + function_name + "' from mex file. \n"
-                              "The MATLAB function didn't return what we expected it to.  \nIn particular, return" + e.msg);
+                              "The MATLAB function didn't return what we expected it to.  \nIn particular, return" + string(e.what()));
         }
     }
 
@@ -4332,6 +4435,54 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    matlab_object::~matlab_object(
+    )
+    {
+        if (handle && should_free)
+        {
+            mxDestroyArray((mxArray*)handle);
+            handle = 0;
+        }
+    }
+
+    template <typename T> 
+    matlab_object::
+    operator T(
+    ) const
+    {
+        T item;
+        get(item);
+        return item;
+    }
+
+    template <typename T> 
+    void matlab_object::
+    get(
+        T& item
+    ) const 
+    {
+        if (handle == 0)
+            throw dlib::invalid_args_exception("An attempt was made to access an empty matlab_object.");
+
+        mex_binding::validate_and_populate_arg(arg_idx,(mxArray*)handle,item);
+    }
+
+    template <typename T> 
+    matlab_object& matlab_object::
+    operator= (
+        const T& new_val
+    )
+    {
+        mxArray* item;
+        mex_binding::assign_to_matlab(item, new_val);
+        handle = item;
+        should_free = true;
+        return *this;
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     matlab_struct::sub::operator T() const
     {
@@ -4358,7 +4509,7 @@ namespace dlib
         {
             std::ostringstream sout;
             sout << "Struct field '" << mxGetFieldNameByNumber((const mxArray*)struct_handle, field_idx) << "' can't be interpreted as the requested type."
-                << endl << e.msg;
+                << endl << e.what();
             throw dlib::error(sout.str());
         }
     }
@@ -4533,6 +4684,307 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+#ifdef MEX_CLASS_NAME
+template <typename T, typename mfp_type>
+class mex_class_wrapper
+{
+public:
+    mex_class_wrapper(T& obj_, mfp_type mfp_) : obj(obj_), mfp(mfp_) {}
+
+    template <typename... Args>
+    void operator()(Args&&... args) const
+    {
+        (obj.*mfp)(std::forward<Args>(args)...);
+    }
+
+    mfp_type mfp;
+    T& obj;
+};
+
+template <typename T, typename mfp_type>
+mex_class_wrapper<T,mfp_type> wrap_mex_class(T& obj, mfp_type mfp) { return mex_class_wrapper<T,mfp_type>(obj, mfp); }
+
+namespace dlib
+{
+    template <typename T, typename mfp_type>
+    struct sig_traits<mex_class_wrapper<T,mfp_type>>
+    : public sig_traits<mfp_type>
+    {};
+
+    template <size_t i, typename T, bool is_good = i < std::tuple_size<T>::value>
+    struct tuple_element_default_void
+    {
+        typedef void type;
+    };
+
+    template <size_t i, typename T>
+    struct tuple_element_default_void<i,T,true>
+    {
+        typedef typename std::tuple_element<i,T>::type type;
+    };
+
+    template <typename class_type, typename return_type, typename... Args>
+    struct sig_traits<return_type(class_type::*)(Args...) >
+    {
+        enum { num_args = sizeof...(Args) };
+
+        typedef return_type result_type;
+
+        template <size_t i>
+        struct arg
+        {
+            typedef typename tuple_element_default_void<i-1, std::tuple<Args...>>::type type;
+        };
+
+        // These are here because that's how things are defined in sig_traits (since it is
+        // older than C++11, along with most of the other code in this file)
+        typedef typename arg<1>::type arg1_type;
+        typedef typename arg<2>::type arg2_type;
+        typedef typename arg<3>::type arg3_type;
+        typedef typename arg<4>::type arg4_type;
+        typedef typename arg<5>::type arg5_type;
+        typedef typename arg<6>::type arg6_type;
+        typedef typename arg<7>::type arg7_type;
+        typedef typename arg<8>::type arg8_type;
+        typedef typename arg<9>::type arg9_type;
+        typedef typename arg<10>::type arg10_type;
+        typedef typename arg<11>::type arg11_type;
+        typedef typename arg<12>::type arg12_type;
+        typedef typename arg<13>::type arg13_type;
+        typedef typename arg<14>::type arg14_type;
+        typedef typename arg<15>::type arg15_type;
+        typedef typename arg<16>::type arg16_type;
+        typedef typename arg<17>::type arg17_type;
+        typedef typename arg<18>::type arg18_type;
+        typedef typename arg<19>::type arg19_type;
+        typedef typename arg<20>::type arg20_type;
+    };
+
+    template <typename class_type, typename return_type, typename... Args>
+    struct sig_traits<return_type(class_type::*)(Args...) const>
+    {
+        enum { num_args = sizeof...(Args) };
+
+        typedef return_type result_type;
+
+        template <size_t i>
+        struct arg
+        {
+            typedef typename tuple_element_default_void<i-1, std::tuple<Args...>>::type type;
+        };
+
+        // These are here because that's how things are defined in sig_traits (since it is
+        // older than C++11, along with most of the other code in this file)
+        typedef typename arg<1>::type arg1_type;
+        typedef typename arg<2>::type arg2_type;
+        typedef typename arg<3>::type arg3_type;
+        typedef typename arg<4>::type arg4_type;
+        typedef typename arg<5>::type arg5_type;
+        typedef typename arg<6>::type arg6_type;
+        typedef typename arg<7>::type arg7_type;
+        typedef typename arg<8>::type arg8_type;
+        typedef typename arg<9>::type arg9_type;
+        typedef typename arg<10>::type arg10_type;
+        typedef typename arg<11>::type arg11_type;
+        typedef typename arg<12>::type arg12_type;
+        typedef typename arg<13>::type arg13_type;
+        typedef typename arg<14>::type arg14_type;
+        typedef typename arg<15>::type arg15_type;
+        typedef typename arg<16>::type arg16_type;
+        typedef typename arg<17>::type arg17_type;
+        typedef typename arg<18>::type arg18_type;
+        typedef typename arg<19>::type arg19_type;
+        typedef typename arg<20>::type arg20_type;
+    };
+}
+
+// ----------------------------------------------------------------------------------------
+
+
+template <size_t I>
+struct visit_impl
+{
+    template <typename T, typename F>
+    static void visit(T& tup, size_t idx, F fun)
+    {
+        if (idx == I - 1) fun(std::get<I - 1>(tup));
+        else visit_impl<I - 1>::visit(tup, idx, fun);
+    }
+};
+
+template <>
+struct visit_impl<0>
+{
+    template <typename T, typename F>
+    static void visit(T& tup, size_t idx, F fun) { DLIB_CASSERT(false,"this should never happen"); }
+};
+
+template <typename F, typename... Ts>
+void visit_at(std::tuple<Ts...> const& tup, size_t idx, F fun)
+{
+    visit_impl<sizeof...(Ts)>::visit(tup, idx, fun);
+}
+
+template <typename F, typename... Ts>
+void visit_at(std::tuple<Ts...>& tup, size_t idx, F fun)
+{
+    visit_impl<sizeof...(Ts)>::visit(tup, idx, fun);
+}
+
+class mex_class_dispatch
+{
+public:
+    mex_class_dispatch(
+        MEX_CLASS_NAME* ptr_,
+        int nlhs_, 
+        mxArray** plhs_,
+        int nrhs_, 
+        const mxArray** prhs_
+    ) : 
+        ptr(ptr_),
+        nlhs(nlhs_),
+        plhs(plhs_),
+        nrhs(nrhs_),
+        prhs(prhs_)
+    {}
+
+    template <typename funct>
+    void operator() (const funct& mfp)
+    {
+        mex_binding::call_mex_function(wrap_mex_class(*ptr,mfp), nlhs, plhs, nrhs, prhs);
+    }
+
+private:
+    MEX_CLASS_NAME* ptr;
+    int nlhs; 
+    mxArray** plhs;
+    int nrhs; 
+    const mxArray** prhs;
+};
+
+class class_factory_type : dlib::noncopyable
+{
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This is a container class for all the MEX_CLASS_NAME objects we create.  It allows
+            us to track what we have created and make sure the MATLAB user doesn't do any
+            double frees or use any stale pointers.   
+
+            It also helps us deal with the problem that would otherwise arise when a mex file
+            is unloaded from MATLAB when there are still active pointers to MEX_CLASS_NAME objects
+            in MATLAB, since we will be able to detect stale pointers.
+    !*/
+public:
+
+    class_factory_type()
+    {
+        seed = (uint64)time(0);
+    }
+
+    ~class_factory_type()
+    {
+        for (auto i : object_table)
+            delete i.second;
+    }
+
+    template <typename ...T>
+    uint64 create(T&& ...args)
+    {
+        MEX_CLASS_NAME* item = new MEX_CLASS_NAME(std::forward<T>(args)...);
+        uint64 id = (uint64)item;
+        // Now generate a unique id that incorporates our seed value. The point of doing
+        // this is to avoid any chance that a mex file will get unloaded and then reloaded
+        // and start constructing objects with the same addresses, while old stale objects
+        // at those addresses are still stored in matlab, which would then call into the
+        // mex file and make things go crazy.  So here we try to generate ID numbers that
+        // are globally unique.
+        uint64 i = 0;
+        id = murmur_hash3_128bit_3(id, seed, ++i).first;
+        // very unlikely but make sure there aren't any hash collisions.
+        while(object_table.count(id) != 0)
+            id = murmur_hash3_128bit_3(id, seed, ++i).first;
+
+        object_table[id] = item;
+        return id;
+    }
+
+    void free(uint64 item)
+    {
+        if (object_table.count(item) == 0)
+        {
+            throw dlib::error("An attempt to deallocate a mex class object with an invalid pointer was detected.");
+        }
+
+        delete object_table[item];
+        object_table.erase(item);
+    }
+
+    MEX_CLASS_NAME* access(uint64 item) // convert numeric ID to pointer to object that can be used.
+    {
+        if (object_table.count(item) == 0)
+        {
+            throw dlib::error("An attempt to access a mex class object with an invalid pointer was detected.");
+        }
+
+        return object_table[item];
+    }
+
+private:
+
+    std::map<uint64, MEX_CLASS_NAME*> object_table;
+    uint64 seed;
+} class_factory;
+
+// ----------------------------------------------------------------------------------------
+
+// Make a FOREACH macro
+#define FE_1(WHAT, X) WHAT(X) 
+#define FE_2(WHAT, X, ...) WHAT(X),FE_1(WHAT, __VA_ARGS__)
+#define FE_3(WHAT, X, ...) WHAT(X),FE_2(WHAT, __VA_ARGS__)
+#define FE_4(WHAT, X, ...) WHAT(X),FE_3(WHAT, __VA_ARGS__)
+#define FE_5(WHAT, X, ...) WHAT(X),FE_4(WHAT, __VA_ARGS__)
+#define FE_6(WHAT, X, ...) WHAT(X),FE_5(WHAT, __VA_ARGS__)
+#define FE_7(WHAT, X, ...) WHAT(X),FE_6(WHAT, __VA_ARGS__)
+#define FE_8(WHAT, X, ...) WHAT(X),FE_7(WHAT, __VA_ARGS__)
+#define FE_9(WHAT, X, ...) WHAT(X),FE_8(WHAT, __VA_ARGS__)
+#define FE_10(WHAT, X, ...) WHAT(X),FE_9(WHAT, __VA_ARGS__)
+#define FE_11(WHAT, X, ...) WHAT(X),FE_10(WHAT, __VA_ARGS__)
+#define FE_12(WHAT, X, ...) WHAT(X),FE_11(WHAT, __VA_ARGS__)
+#define FE_13(WHAT, X, ...) WHAT(X),FE_12(WHAT, __VA_ARGS__)
+#define FE_14(WHAT, X, ...) WHAT(X),FE_13(WHAT, __VA_ARGS__)
+#define FE_15(WHAT, X, ...) WHAT(X),FE_14(WHAT, __VA_ARGS__)
+#define FE_16(WHAT, X, ...) WHAT(X),FE_15(WHAT, __VA_ARGS__)
+#define FE_17(WHAT, X, ...) WHAT(X),FE_16(WHAT, __VA_ARGS__)
+#define FE_18(WHAT, X, ...) WHAT(X),FE_17(WHAT, __VA_ARGS__)
+#define FE_19(WHAT, X, ...) WHAT(X),FE_18(WHAT, __VA_ARGS__)
+#define FE_20(WHAT, X, ...) WHAT(X),FE_19(WHAT, __VA_ARGS__)
+//... repeat as needed
+#define GET_MACRO(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,NAME,...) NAME 
+#define FOR_EACH(action,...) GET_MACRO(__VA_ARGS__,FE_20,FE_19,FE_18,FE_17,FE_16,FE_15,FE_14,FE_13,FE_12,FE_11,FE_10,FE_9,FE_8,FE_7,FE_6,FE_5,FE_4,FE_3,FE_2,FE_1)(action,__VA_ARGS__)
+#define MEX_CLASS_ANNOTATE(x) &MEX_CLASS_NAME::x 
+
+// Now make a tuple containing all the member function pointers to our MEX_CLASS_NAME
+auto mex_class_methods = std::make_tuple(FOR_EACH(MEX_CLASS_ANNOTATE, MEX_CLASS_METHODS));
+
+
+#endif // MEX_CLASS_NAME
+
+// ----------------------------------------------------------------------------------------
+
+bool is_string(const mxArray* arr, const char* str)
+{
+    if (mxIsChar(arr))
+    {
+        char ch[20];
+        DLIB_CASSERT(mxGetString(arr, ch, sizeof(ch))==0, "Unable to retrieve string");
+        ch[sizeof(ch)-1] = 0;// ensure NULL termination regardless of what MATLAB does.
+        return strcmp(str,ch)==0;
+    }
+    return false;
+}
+
+// ----------------------------------------------------------------------------------------
+
 /* The gateway function called by MATLAB*/
 void mexFunction( int nlhs, mxArray *plhs[],
                   int nrhs, const mxArray *prhs[])
@@ -4545,7 +4997,144 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mex_binding::mex_warn_streambuf wsb;
 #endif
 
-    mex_binding::call_mex_function(mex_function, nlhs, plhs, nrhs, prhs);
+    try
+    {
+#ifdef MEX_CLASS_NAME
+        if (nrhs == 0)
+        {
+            #define DEF2STR(x) DEF2STR2((x))
+            #define DEF2STR2(x) #x
+
+            string classname = trim(string(DEF2STR(MEX_CLASS_NAME)), " \t()");
+            std::vector<string> methods = split(trim(string(DEF2STR(MEX_CLASS_METHODS)), " \t()"), " \t,");
+
+            string mex_filename = trim(string(DEF2STR(MEX_FILENAME))," \t()");
+            bool has_load_obj = false;
+            size_t load_obj_idx = 0;
+
+            cout << "classdef " << classname << " < handle\n"
+                 << "    properties (Access = private)\n"
+                 << "        cpp_ptr\n"
+                 << "    end\n"
+                 << "\n"
+                 << "    methods\n"
+                 << "        function this = "<<classname<<"()\n"
+                 << "            this.cpp_ptr = "<<mex_filename<<"('construct');\n"
+                 << "        end\n"
+                 << "\n"
+                 << "        function copied_obj = clone(this)\n"
+                 << "            %Returns a new independent object that is a copy of this.\n"
+                 << "            copied_obj = "<<classname<<"();\n"
+                 << "            copied_obj.cpp_ptr = "<<mex_filename<<"(this.cpp_ptr,'clone');\n"
+                 << "        end\n"
+                 << "\n";
+            for (size_t i = 0; i < methods.size(); ++i)
+            {
+                if (methods[i] == "load_obj")
+                {
+                    has_load_obj = true;
+                    load_obj_idx = i;
+                }
+                else
+                {
+                    cout << "        function varargout = "<<methods[i]<<"(this, varargin) \n"
+                        << "            [varargout{1:nargout}] = "<<mex_filename<<"(this.cpp_ptr, "<<i+1<<", varargin{:}); \n"
+                        << "        end \n\n";
+                }
+            }
+            cout << "    end\n\n";
+
+            cout << "    methods(Access=private) \n"
+                << "        function delete(this) \n"
+                << "            "<<mex_filename<<"(this.cpp_ptr); \n"
+                << "        end         \n";
+            if (has_load_obj)
+            {
+                cout << "        function varargout = load_obj(this, varargin) \n"
+                    << "            [varargout{1:nargout}] = "<<mex_filename<<"(this.cpp_ptr, "<<load_obj_idx+1<<", varargin{:}); \n"
+                    << "        end \n";
+            }
+            cout << "    end \n\n";
+
+            if (has_load_obj)
+            {
+                cout << "    methods(Static) \n"
+                    << "        function this = loadobj(in) \n"
+                    << "            this = "<<classname<<"(); \n"
+                    << "            this.load_obj(in); \n"
+                    << "        end          \n"
+                    << "    end \n";
+            }
+            cout << "end \n";
+        }
+        else if (nrhs == 1) 
+        {
+            // this is a constructor call
+            if (is_string(prhs[0],"construct"))
+            {
+                DLIB_CASSERT(nlhs == 1, "If you want to construct a new object then you must assign the pointer to something.");
+                plhs[0] = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
+                uint64* ptr_int = (uint64*)mxGetData(plhs[0]);
+                *ptr_int = class_factory.create();
+            }
+            else // destructor call
+            {
+                DLIB_CASSERT(mxIsUint64(prhs[0]) && mxGetNumberOfElements(prhs[0])==1, "When calling a class destructor the first argument must be a pointer (a UINT64 in matlab)");
+                const uint64 ptr_int = *((uint64*)mxGetData(prhs[0]));
+                class_factory.free(ptr_int);
+            }
+        }
+        else // a regular function call
+        {
+            DLIB_CASSERT(mxIsUint64(prhs[0]) && mxGetNumberOfElements(prhs[0])==1, "When calling a class member function the first argument must be a pointer (a UINT64 in matlab)");
+            if (is_string(prhs[1], "clone"))
+            {
+                DLIB_CASSERT(nlhs == 1, "If you want to construct a new object then you must assign the pointer to something.");
+                const uint64 ptr_int = *((uint64*)mxGetData(prhs[0]));
+
+                MEX_CLASS_NAME* ptr = class_factory.access(ptr_int);
+
+                plhs[0] = mxCreateNumericMatrix(1, 1, mxUINT64_CLASS, mxREAL);
+                uint64* ptr_int2 = (uint64*)mxGetData(plhs[0]);
+                // copy construct a new object
+                *ptr_int2 = class_factory.create(*ptr);
+            }
+            else
+            {
+                DLIB_CASSERT(mxIsDouble(prhs[1]) && mxGetNumberOfElements(prhs[1])==1, "When calling a class member function the second argument must be a number indicating which member function");
+                const uint64 ptr_int = *((uint64*)mxGetData(prhs[0]));
+                const int funct_idx = *(mxGetPr(prhs[1]));
+
+                auto num_registered_functions = std::tuple_size<decltype(mex_class_methods)>::value;
+                DLIB_CASSERT(1 <= funct_idx && funct_idx <= num_registered_functions, "Invalid function index provided.");
+
+                MEX_CLASS_NAME* ptr = class_factory.access(ptr_int);
+
+                // we used the first two arguments to decide what function to call.  So adjust nrhs
+                // and prhs so the member function never sees them.
+                mex_class_dispatch dispatch(ptr, nlhs, plhs, nrhs-2, prhs+2);
+                // now invoke the member function,  subtract 1 to convert to 0 indexing.
+                visit_at(mex_class_methods, funct_idx-1, dispatch);
+            }
+        }
+#else
+        mex_binding::call_mex_function(mex_function, nlhs, plhs, nrhs, prhs);
+#endif
+    }
+    catch (mex_binding::invalid_args_exception& e)
+    {
+        mexErrMsgIdAndTxt("mex_function:validate_and_populate_arg",
+                            mex_binding::escape_percent(e.what()).c_str());
+    }
+    catch (mex_binding::user_hit_ctrl_c& )
+    {
+        // do nothing, just return to matlab
+    }
+    catch (std::exception& e)
+    {
+        mexErrMsgIdAndTxt("mex_function:error",
+                            mex_binding::escape_percent(e.what()).c_str());
+    }
 
     cout << flush;
     cerr << flush;

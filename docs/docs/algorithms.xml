@@ -58,6 +58,8 @@
          <item>rand</item> 
          <item>median</item> 
          <item>running_stats</item> 
+         <item>running_stats_decayed</item> 
+         <item>running_scalar_covariance_decayed</item> 
          <item>running_gradient</item> 
          <item>running_scalar_covariance</item> 
          <item>mean_sign_agreement</item> 
@@ -69,6 +71,10 @@
          <item>running_cross_covariance</item> 
          <item>random_subset_selector</item> 
          <item>randomly_subsample</item> 
+         <item>find_upper_quantile</item> 
+         <item>count_steps_without_decrease_robust</item> 
+         <item>count_steps_without_decrease</item> 
+         <item>count_steps_without_increase</item> 
 
       </section>
 
@@ -478,7 +484,38 @@
       
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
+         <name>running_stats_decayed</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object represents something that can compute the running mean and
+                variance of a stream of real numbers.  It is similar to <a href="#running_stats">running_stats</a>
+                except that it forgets about data it has seen after a certain period of
+                time.  It does this by exponentially decaying old statistics. 
+         </description>
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>running_scalar_covariance_decayed</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+                This object represents something that can compute the running covariance of
+                a stream of real number pairs.  It is essentially the same as
+                <a href="#running_scalar_covariance">running_scalar_covariance</a> except that it forgets about data it has seen
+                after a certain period of time.  It does this by exponentially decaying old
+                statistics. 
+         </description>
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>running_gradient</name>
          <file>dlib/statistics/running_gradient.h</file>
          <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
@@ -487,6 +524,66 @@
                 trending up or down and by how much.  It does this by finding the least
                 squares fit of a line to the data and then allows you to perform a
                 statistical test on the slope of that line.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_upper_quantile</name>
+         <file>dlib/statistics/running_gradient.h</file>
+         <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
+         <description>
+              Finds and returns the scalar value such that a user specified percentage of
+              the values in a container are greater than said value.  For example, 0.5
+              would find the median value in a container while 0.1 would find the value
+              that lower bounded the 10% largest values in a container.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>count_steps_without_increase</name>
+         <file>dlib/statistics/running_gradient.h</file>
+         <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
+         <description>
+            Given a potentially noisy time series, this function returns a count of how
+            long the time series has gone without noticeably increasing in value.  It does
+            this by adding the elements of the time series into a <a
+            href="#running_gradient">running_gradient</a> object and counting how many
+            elements, starting with the most recent, you need to examine before you
+            are confident that the series has been increasing in value.    
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>count_steps_without_decrease</name>
+         <file>dlib/statistics/running_gradient.h</file>
+         <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
+         <description>
+            Given a potentially noisy time series, this function returns a count of how
+            long the time series has gone without noticeably decreasing in value.  It does
+            this by adding the elements of the time series into a <a
+            href="#running_gradient">running_gradient</a> object and counting how many
+            elements, starting with the most recent, you need to examine before you
+            are confident that the series has been decreasing in value.    
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>count_steps_without_decrease_robust</name>
+         <file>dlib/statistics/running_gradient.h</file>
+         <spec_file link="true">dlib/statistics/running_gradient_abstract.h</spec_file>
+         <description>
+            This function behaves just like <a
+            href="#count_steps_without_decrease">count_steps_without_decrease</a> except
+            that it ignores times series values that are anomalously large.  This makes it
+            robust to sudden noisy but transient spikes in the time series values.
          </description>
       </component>
       

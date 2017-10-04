@@ -233,6 +233,31 @@ namespace dlib
             - This function blocks until the copy has completed.
     !*/
 
+    void memcpy (
+        gpu_data& dest, 
+        size_t dest_offset,
+        const gpu_data& src,
+        size_t src_offset,
+        size_t num
+    );
+    /*!
+        requires
+            - dest_offset + num <= dest.size()
+            - src_offset  + num <= src.size()
+        ensures
+            - Copies the data in src to dest, but only copies data in the range
+              [src.host()+src_offset, src.host()+src_offset+num) to
+              [dest.host()+dest_offset, dest.host()+dest_offset+num).  Therefore, it is
+              just like the above memcpy() except that you can specify some subset of data
+              in a gpu_data object to be copied.
+            - Like the above version of memcpy(), the copy will happen in the most
+              efficient way, automatically using the appropriate type of host/device
+              transfers based on where data is currently resident. 
+            - It doesn't matter what GPU device is selected by cudaSetDevice().  You can
+              always copy gpu_data objects to and from each other regardless.
+            - This function blocks until the copy has completed.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
 }

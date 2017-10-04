@@ -5,9 +5,26 @@
 #define MIT_LL_CALL_MATLAB_H__
 
 #include <string>
+#include <sstream>
+#include <dlib/error.h>
+#include <dlib/assert.h>
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
+struct invalid_args_exception : error
+{
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This is the exception thrown when the mex wrapper tries to convert a matlab
+            object into a C++ object but for whatever reason can't (usually because the
+            types don't match).
+    !*/
+    invalid_args_exception(const std::string& msg_): error(msg_) {}
+    invalid_args_exception(const std::ostringstream& msg_): error(msg_.str()) {}
+};
 
 // ----------------------------------------------------------------------------------------
 
@@ -17,6 +34,62 @@ void check_for_matlab_ctrl_c();
         - If the user of MATLAB has pressed ctrl+c then this function will throw an
           exception.
 !*/
+
+// ----------------------------------------------------------------------------------------
+
+class matlab_object
+{
+    /*!
+        WHAT THIS OBJECT REPRESENTS
+            This object is a simple wrapper around matlab's generic mxArray, which is the
+            thing that is matlab's "anything object".  So a matlab_object can be used as an
+            argument to a mex_function() that can bind to any matlab object at all. It can
+            also bind to "nothing" and so is inherently also an optional argument when
+            present in a mex_funciton().
+    !*/
+public:
+    matlab_object() : handle(0),should_free(false),arg_idx(0) {}
+    matlab_object(const matlab_object&) = delete;
+
+    ~matlab_object();
+
+
+    // Check if a matlab object is bound to this object.
+    bool is_empty() const { return handle==0; }
+    operator bool() const { return handle!=0; }
+
+    // Convert from MATLAB to C++, throw invalid_args_exception if not possible.
+    template <typename T> operator T() const;
+    template <typename T> void get(T& item) const; 
+
+    // Convert from a C++ object to MATLAB
+    template <typename T> matlab_object& operator= (const T& new_val);
+
+
+    template <typename T> bool try_get(T& item) const
+    {
+        try { get(item); return true; }
+        catch(invalid_args_exception&) { return false; }
+    }
+
+    const void* get_handle() const { return handle; }
+    /*!
+        ensures
+            - returns a pointer to the mxArray object.  Might be NULL. 
+    !*/
+
+
+    matlab_object& operator=(const matlab_object&) = delete;
+
+    // Users shouldn't call these functions
+    const void* release_object_to_matlab() { const void* temp=handle; handle = 0; return temp; }
+    void set_object_handle(int arg_idx_, const void* sh) { DLIB_CASSERT(!handle); handle = sh; arg_idx=arg_idx_; }
+private:
+
+    const void* handle;
+    bool should_free;
+    int arg_idx;
+};
 
 // ----------------------------------------------------------------------------------------
 
@@ -42,7 +115,8 @@ class matlab_struct
 
     class sub;
 public:
-    matlab_struct() : struct_handle(0),should_free(false) {}
+    matlab_struct() : struct_handle(0),should_free(false),arg_idx(0) {}
+    matlab_struct(const matlab_struct&) = delete;
     ~matlab_struct();
 
     const sub operator[] (const std::string& name) const;
@@ -50,7 +124,7 @@ public:
     bool has_field(const std::string& name) const;
 
     const void* release_struct_to_matlab() { const void* temp=struct_handle; struct_handle = 0; return temp; }
-    void set_struct_handle(const void* sh) { struct_handle = sh; }
+    void set_struct_handle(int arg_idx_, const void* sh) { DLIB_CASSERT(!struct_handle); struct_handle = sh; arg_idx=arg_idx_; }
 private:
 
     class sub 
@@ -72,6 +146,7 @@ private:
     };
     const void* struct_handle;
     bool should_free;
+    int arg_idx;
     matlab_struct& operator=(const matlab_struct&); 
 };
 

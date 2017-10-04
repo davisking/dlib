@@ -16,6 +16,15 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        enum gender_t
+        {
+            UNKNOWN,
+            MALE,
+            FEMALE
+        };
+
+    // ------------------------------------------------------------------------------------
+
         struct box
         {
             /*!
@@ -36,7 +45,9 @@ namespace dlib
                 ignore(false),
                 pose(0),
                 detection_score(0),
-                angle(0)
+                angle(0),
+                gender(UNKNOWN),
+                age(0)
             {}
 
             box (
@@ -49,7 +60,9 @@ namespace dlib
                 ignore(false),
                 pose(0),
                 detection_score(0),
-                angle(0)
+                angle(0),
+                gender(UNKNOWN),
+                age(0)
             {}
 
             rectangle rect;
@@ -71,6 +84,9 @@ namespace dlib
             // Therefore, to make the object appear upright we would have to rotate the
             // image counter-clockwise by angle radians.
             double angle; 
+
+            gender_t gender;
+            double age;
 
             bool has_label() const { return label.size() != 0; }
             /*!

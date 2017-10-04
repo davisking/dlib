@@ -38,11 +38,16 @@ namespace dlib
                 currently selected (i.e. the one indicated by cudaGetDevice()) when
                 dnn_trainer is constructed.  It will continue to use that device even if
                 you later change it by a call to cudaSetDevice().
+
+            EXCEPTIONS
+                If an exception is thrown by any part of the neural network during training
+                then the exception will be propagated out of the trainer to the user.
+                Moreover, the trainer instance will be unusable and should be destroyed.
         !*/
 
     public:
 
-        typedef typename net_type::label_type label_type;
+        typedef typename net_type::training_label_type training_label_type;
         typedef typename net_type::input_type input_type;
         const static size_t num_computational_layers = net_type::num_computational_layers;
 
@@ -71,9 +76,12 @@ namespace dlib
                 - #get_learning_rate() == 1e-2 
                 - #get_min_learning_rate() == 1e-5
                 - #get_iterations_without_progress_threshold() == 2000
+                - #get_test_iterations_without_progress_threshold() == 500
                 - #get_learning_rate_shrink_factor() == 0.1
                 - #get_learning_rate_schedule().size() == 0
                 - #get_train_one_step_calls() == 0
+                - #get_test_one_step_calls() == 0
+                - #get_synchronization_file() == ""
                 - if (cuda_extra_devices.size() > 0) then
                     - This object will use multiple graphics cards to run the learning
                       algorithms.  In particular, it will always use whatever device is
@@ -83,8 +91,8 @@ namespace dlib
                       cuda_extra_devices.
         !*/
 
-       net_type& get_net (
-        ) const; 
+        net_type& get_net (
+        ); 
         /*!
             ensures
                 - returns the neural network object used by this trainer.  This is the
@@ -94,6 +102,8 @@ namespace dlib
                   dnn_trainer's constructor.
                 - This function blocks until all threads inside the dnn_trainer have
                   stopped touching the net. 
+                - This function will sync the trainer state to disk if the current state 
+                  hasn't already been synced to disk since the last network modification.
         !*/
 
         const std::vector<solver_type>& get_solvers (
@@ -222,15 +232,15 @@ namespace dlib
                     - This trainer will use an explicit learning rate schedule defined by
                       the learning rate values in get_learning_rate_schedule().  For
                       example, if get_learning_rate_schedule() returned {0.1, 0.09, 0.08,
-                      0.07, 0.6} then the first training mini-batch would use a learning
+                      0.07, 0.06} then the first training mini-batch would use a learning
                       rate of 0.1, then the next training mini-batch uses 0.09, and then
                       0.8, and so on until the end of the schedule is reached.  
                       
                       If you continue to run training after the end of the schedule has
                       been reached then the learning rate will be fixed to 0.99 times the
                       final value.  So in our example, eventually the learning rate would
-                      be fixed to 0.99*0.6.  This allows you to test if we have reached the
-                      end of the schedule by checking if get_learning_rate() >= 0.6.
+                      be fixed to 0.99*0.06.  This allows you to test if we have reached the
+                      end of the schedule by checking if get_learning_rate() >= 0.06.
         !*/
 
         unsigned long get_steps_without_progress (
@@ -303,6 +313,13 @@ namespace dlib
                 - returns the number of times train_one_step() has been called.
         !*/
 
+        unsigned long long get_test_one_step_calls (
+        ) const;
+        /*!
+            ensures
+                - returns the number of times test_one_step() has been called.
+        !*/
+
         void be_verbose (
         );
         /*!
@@ -324,26 +341,42 @@ namespace dlib
         );
         /*!
             ensures
+                - #get_synchronization_file() == filename
                 - While training is running, either via train() or repeated calls to
                   train_one_step(), this object will save its entire state, including the
                   state of get_net(), to disk in the file named filename every
                   time_between_syncs seconds.
-                - if the filename file already exists then the state of this trainer will
+                - If the filename file already exists then the state of this trainer will
                   be loaded from that file by this call to set_synchronization_file().
                   This allows you to resume a training session which was previously
                   interrupted.
+                - It should be noted that when saving, the trainer will alternate between
+                  saving to a file called filename and another file called filename+"_".
+                  We do this because it's possible that your computer might crash (not
+                  because of dlib, just in general) before the data is safely saved to
+                  disk.  This way, you will always have a backup file if the write to disk
+                  gets corrupted or is incomplete.  Moreover, when loading, we will always
+                  load from the newest of the two possible files.
+        !*/
+
+        const std::string& get_synchronization_file (
+        );
+        /*!
+            ensures
+                - Returns the name of the file the dnn_trainer will periodically save it's
+                  state to.  If the return value is "" then synchronization is disabled.
         !*/
 
         void train (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
+            const std::vector<training_label_type>& labels 
         ); 
         /*!
             requires
                 - data.size() == labels.size()
                 - data.size() > 0
                 - net_type uses a supervised loss.  
-                  i.e. net_type::label_type != no_label_type.
+                  i.e. net_type::training_label_type != no_label_type.
             ensures
                 - Trains a supervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
@@ -360,6 +393,8 @@ namespace dlib
                   will pick up from the last synchronization point.  
                 - You can obtain the average loss value during the final training epoch by
                   calling get_average_loss().
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         void train (
@@ -369,7 +404,7 @@ namespace dlib
             requires 
                 - data.size() > 0
                 - net_type uses an unsupervised loss.  
-                  i.e. net_type::label_type == no_label_type.
+                  i.e. net_type::training_label_type == no_label_type.
             ensures
                 - Trains an unsupervised neural network based on the given training data.
                   The goal of training is to find the network parameters that minimize
@@ -386,18 +421,51 @@ namespace dlib
                   will pick up from the last synchronization point.  
                 - You can obtain the average loss value during the final training epoch by
                   calling get_average_loss().
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
         !*/
 
         void train_one_step (
             const std::vector<input_type>& data,
-            const std::vector<label_type>& labels 
+            const std::vector<training_label_type>& labels 
         );
         /*!
             requires
                 - data.size() == labels.size()
                 - data.size() > 0
                 - net_type uses a supervised loss.  
-                  i.e. net_type::label_type != no_label_type.
+                  i.e. net_type::training_label_type != no_label_type.
+            ensures
+                - Performs one stochastic gradient update step based on the mini-batch of
+                  data and labels supplied to this function.  In particular, calling
+                  train_one_step() in a loop is equivalent to calling the train() method
+                  defined above.  However, train_one_step() allows you to stream data from
+                  disk into the training process while train() requires you to first load
+                  all the training data into RAM.  Otherwise, these training methods are
+                  equivalent.
+                - You can observe the current average loss value by calling get_average_loss().
+                - The network training will happen in another thread.  Therefore, after
+                  calling this function you should call get_net() before you touch the net
+                  object from the calling thread to ensure no other threads are still
+                  accessing the network.
+                - #get_train_one_step_calls() == get_train_one_step_calls() + 1.
+        !*/
+
+        template <
+            typename data_iterator,
+            typename label_iterator
+            >
+        void train_one_step (
+            data_iterator dbegin,
+            data_iterator dend,
+            label_iterator lbegin
+        );
+        /*!
+            requires
+                - std::advance(lbegin, std::distance(dbegin, dend) - 1) is dereferencable
+                - std::distance(dbegin, dend) > 0
+                - net_type uses a supervised loss.  
+                  i.e. net_type::training_label_type != no_label_type.
             ensures
                 - Performs one stochastic gradient update step based on the mini-batch of
                   data and labels supplied to this function.  In particular, calling
@@ -421,7 +489,7 @@ namespace dlib
             requires
                 - data.size() > 0
                 - net_type uses an unsupervised loss.  
-                  i.e. net_type::label_type == no_label_type.
+                  i.e. net_type::training_label_type == no_label_type.
             ensures
                 - Performs one stochastic gradient update step based on the mini-batch of
                   data supplied to this function.  In particular, calling train_one_step()
@@ -438,6 +506,34 @@ namespace dlib
                 - #get_train_one_step_calls() == get_train_one_step_calls() + 1.
         !*/
 
+        template <
+            typename data_iterator
+            >
+        void train_one_step (
+            data_iterator dbegin,
+            data_iterator dend
+        );
+        /*!
+            requires
+                - std::distance(dbegin, dend) > 0
+                - net_type uses an unsupervised loss.  
+                  i.e. net_type::training_label_type == no_label_type.
+            ensures
+                - Performs one stochastic gradient update step based on the mini-batch of
+                  data supplied to this function.  In particular, calling train_one_step()
+                  in a loop is equivalent to calling the train() method defined above.
+                  However, train_one_step() allows you to stream data from disk into the
+                  training process while train() requires you to first load all the
+                  training data into RAM.  Otherwise, these training methods are
+                  equivalent.
+                - You can observe the current average loss value by calling get_average_loss().
+                - The network training will happen in another thread.  Therefore, after
+                  calling this function you should call get_net() before you touch the net
+                  object from the calling thread to ensure no other threads are still
+                  accessing the network.
+                - #get_train_one_step_calls() == get_train_one_step_calls() + 1.
+        !*/
+        
         double get_average_loss (
         ) const;
         /*!
@@ -466,7 +562,190 @@ namespace dlib
                   stopped touching the net. 
         !*/
 
+    // ----------------------
+
+        double get_average_test_loss (
+        ) const;
+        /*!
+            ensures
+                - returns the average loss value observed during previous calls to
+                  test_one_step(). 
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
+        !*/
+
+        void test_one_step (
+            const std::vector<input_type>& data,
+            const std::vector<training_label_type>& labels 
+        );
+        /*!
+            requires
+                - data.size() == labels.size()
+                - data.size() > 0
+                - net_type uses a supervised loss.  
+                  i.e. net_type::training_label_type != no_label_type.
+            ensures
+                - Runs the given data through the network and computes and records the loss.  
+                - This call does not modify network parameters.  The point of
+                  test_one_step() is two fold, to allow you to observe the accuracy of the
+                  network on hold out data during training, and to allow the trainer to
+                  automatically adjust the learning rate when the test loss stops
+                  improving.  It should be noted that you are not required to use
+                  test_one_step() at all, but if you want to do this kind of thing it is
+                  available.
+                - You can observe the current average loss value by calling get_average_test_loss().
+                - The computation will happen in another thread.  Therefore, after calling
+                  this function you should call get_net() before you touch the net object
+                  from the calling thread to ensure no other threads are still accessing
+                  the network.
+                - #get_test_one_step_calls() == get_test_one_step_calls() + 1.
+        !*/
+
+        template <
+            typename data_iterator,
+            typename label_iterator
+            >
+        void test_one_step (
+            data_iterator dbegin, 
+            data_iterator dend,
+            label_iterator lbegin
+        );
+        /*!
+            requires
+                - std::advance(lbegin, std::distance(dbegin, dend) - 1) is dereferencable
+                - std::distance(dbegin, dend) > 0
+                - net_type uses a supervised loss.  
+                  i.e. net_type::training_label_type != no_label_type.
+            ensures
+                - Runs the given data through the network and computes and records the loss.  
+                - This call does not modify network parameters.  The point of
+                  test_one_step() is two fold, to allow you to observe the accuracy of the
+                  network on hold out data during training, and to allow the trainer to
+                  automatically adjust the learning rate when the test loss stops
+                  improving.  It should be noted that you are not required to use
+                  test_one_step() at all, but if you want to do this kind of thing it is
+                  available.
+                - You can observe the current average loss value by calling get_average_test_loss().
+                - The computation will happen in another thread.  Therefore, after calling
+                  this function you should call get_net() before you touch the net object
+                  from the calling thread to ensure no other threads are still accessing
+                  the network.
+                - #get_test_one_step_calls() == get_test_one_step_calls() + 1.
+        !*/
+
+        void test_one_step (
+            const std::vector<input_type>& data
+        );
+        /*!
+            requires
+                - data.size() > 0
+                - net_type uses an unsupervised loss.  
+                  i.e. net_type::training_label_type == no_label_type.
+            ensures
+                - Runs the given data through the network and computes and records the loss.  
+                - This call does not modify network parameters.  The point of
+                  test_one_step() is two fold, to allow you to observe the accuracy of the
+                  network on hold out data during training, and to allow the trainer to
+                  automatically adjust the learning rate when the test loss stops
+                  improving.  It should be noted that you are not required to use
+                  test_one_step() at all, but if you want to do this kind of thing it is
+                  available.
+                - You can observe the current average loss value by calling get_average_test_loss().
+                - The computation will happen in another thread.  Therefore, after calling
+                  this function you should call get_net() before you touch the net object
+                  from the calling thread to ensure no other threads are still accessing
+                  the network.
+                - #get_test_one_step_calls() == get_test_one_step_calls() + 1.
+        !*/
+
+        template <
+            typename data_iterator
+            >
+        void test_one_step (
+            data_iterator dbegin, 
+            data_iterator dend
+        );
+        /*!
+            requires
+                - std::distance(dbegin, dend) > 0
+                - net_type uses an unsupervised loss.  
+                  i.e. net_type::training_label_type == no_label_type.
+            ensures
+                - Runs the given data through the network and computes and records the loss.  
+                - This call does not modify network parameters.  The point of
+                  test_one_step() is two fold, to allow you to observe the accuracy of the
+                  network on hold out data during training, and to allow the trainer to
+                  automatically adjust the learning rate when the test loss stops
+                  improving.  It should be noted that you are not required to use
+                  test_one_step() at all, but if you want to do this kind of thing it is
+                  available.
+                - You can observe the current average loss value by calling get_average_test_loss().
+                - The computation will happen in another thread.  Therefore, after calling
+                  this function you should call get_net() before you touch the net object
+                  from the calling thread to ensure no other threads are still accessing
+                  the network.
+                - #get_test_one_step_calls() == get_test_one_step_calls() + 1.
+        !*/
+
+        void set_test_iterations_without_progress_threshold (
+            unsigned long thresh 
+        );
+        /*!
+            ensures
+                - #get_test_iterations_without_progress_threshold() == thresh
+                - #get_learning_rate_schedule().size() == 0
+                - This function blocks until all threads inside the dnn_trainer have
+                  stopped touching the net. 
+        !*/
+
+        unsigned long get_test_iterations_without_progress_threshold (
+        ) const;
+        /*!
+            ensures
+                - This object monitors the progress of training and estimates if the
+                  testing error is being reduced.  It does this by looking at the previous
+                  get_test_iterations_without_progress_threshold() mini-batch results from
+                  test_one_step() and applying the statistical test defined by the
+                  running_gradient object to see if the testing error is getting smaller.
+                  If it isn't being reduced then get_learning_rate() is made smaller by a
+                  factor of get_learning_rate_shrink_factor().
+
+                  Therefore, get_test_iterations_without_progress_threshold() should always be
+                  set to something sensibly large so that this test can be done with
+                  reasonably high confidence.  Think of this test as saying "if the testing loss
+                  hasn't decreased for the previous get_test_iterations_without_progress_threshold() 
+                  calls to test_one_step() then shrink the learning rate".
+        !*/
+
+        unsigned long get_test_steps_without_progress (
+        ) const;
+        /*!
+            ensures
+                - if (get_learning_rate_shrink_factor() != 1) then
+                    - returns an estimate of how many mini-batches have executed without us
+                      observing a statistically significant decrease in the testing error
+                      (i.e. the error on the data given to the trainer via test_one_step()
+                      calls).
+                - else
+                    - returns 0
+        !*/
+
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename net_type, 
+        typename solver_type 
+        >
+    std::ostream& operator<< (
+        std::ostream& out,
+        dnn_trainer<net_type,solver_type>& trainer
+    );
+    /*!
+        ensures
+            - Prints a log of the current parameters of trainer to out.
+    !*/
 
 // ----------------------------------------------------------------------------------------
 

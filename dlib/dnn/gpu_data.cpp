@@ -23,21 +23,60 @@ namespace dlib
         const gpu_data& src
     )
     {
-        DLIB_CASSERT(dest.size() == src.size(), "");
-        if (src.size() == 0)
+        DLIB_CASSERT(dest.size() == src.size());
+        if (src.size() == 0 || &dest == &src)
             return;
 
-        // copy the memory efficiently based on which copy is current in each object.
-        if (dest.device_ready() && src.device_ready())
-            CHECK_CUDA(cudaMemcpy(dest.device(), src.device(),          src.size()*sizeof(float), cudaMemcpyDeviceToDevice));
-        else if (!dest.device_ready() && src.device_ready())
-            CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.device(), src.size()*sizeof(float), cudaMemcpyDeviceToHost));
-        else if (dest.device_ready() && !src.device_ready())
-            CHECK_CUDA(cudaMemcpy(dest.device(), src.host(),            src.size()*sizeof(float), cudaMemcpyHostToDevice));
-        else 
-            CHECK_CUDA(cudaMemcpy(dest.host_write_only(), src.host(),   src.size()*sizeof(float), cudaMemcpyHostToHost));
+        memcpy(dest,0, src, 0, src.size());
     }
 
+    void memcpy (
+        gpu_data& dest, 
+        size_t dest_offset,
+        const gpu_data& src,
+        size_t src_offset,
+        size_t num
+    )
+    {
+        DLIB_CASSERT(dest_offset + num <= dest.size());
+        DLIB_CASSERT(src_offset + num <= src.size());
+        if (num == 0)
+            return;
+
+        // if there is aliasing
+        if (&dest == &src && std::max(dest_offset, src_offset) < std::min(dest_offset,src_offset)+num)
+        {
+            // if they perfectly alias each other then there is nothing to do
+            if (dest_offset == src_offset)
+                return;
+            else
+                std::memmove(dest.host()+dest_offset, src.host()+src_offset, sizeof(float)*num);
+        }
+        else
+        {
+            // if we write to the entire thing then we can use device_write_only()
+            if (dest_offset == 0 && num == dest.size())
+            {
+                // copy the memory efficiently based on which copy is current in each object.
+                if (src.device_ready())
+                    CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.device()+src_offset,  num*sizeof(float), cudaMemcpyDeviceToDevice));
+                else 
+                    CHECK_CUDA(cudaMemcpy(dest.device_write_only(), src.host()+src_offset,    num*sizeof(float), cudaMemcpyHostToDevice));
+            }
+            else
+            {
+                // copy the memory efficiently based on which copy is current in each object.
+                if (dest.device_ready() && src.device_ready())
+                    CHECK_CUDA(cudaMemcpy(dest.device()+dest_offset, src.device()+src_offset, num*sizeof(float), cudaMemcpyDeviceToDevice));
+                else if (!dest.device_ready() && src.device_ready())
+                    CHECK_CUDA(cudaMemcpy(dest.host()+dest_offset, src.device()+src_offset,   num*sizeof(float), cudaMemcpyDeviceToHost));
+                else if (dest.device_ready() && !src.device_ready())
+                    CHECK_CUDA(cudaMemcpy(dest.device()+dest_offset, src.host()+src_offset,   num*sizeof(float), cudaMemcpyHostToDevice));
+                else 
+                    CHECK_CUDA(cudaMemcpy(dest.host()+dest_offset, src.host()+src_offset,     num*sizeof(float), cudaMemcpyHostToHost));
+            }
+        }
+    }
 // ----------------------------------------------------------------------------------------
 
     void gpu_data::

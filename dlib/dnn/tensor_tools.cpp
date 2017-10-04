@@ -43,6 +43,148 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void inverse_norms (
+        resizable_tensor& invnorms,
+        const tensor& data,
+        const double eps
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::inverse_norms(invnorms, data, eps);
+#else
+        invnorms = reciprocal(sqrt(sum_cols(squared(mat(data))) + eps));
+#endif
+    }
+
+    void dot_prods (
+        resizable_tensor& out,
+        const tensor& lhs,
+        const tensor& rhs
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::dot_prods(out, lhs, rhs);
+#else
+        out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+#endif
+    }
+
+    void scale_columns (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(out,m));
+        DLIB_CASSERT(is_vector(v));
+        if (m.size() == 0 && v.size() == 0)
+            return;
+        DLIB_CASSERT(m.size() != 0);
+        DLIB_CASSERT(m.size()/m.num_samples() == v.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::scale_columns(out, m, v);
+#else
+        DLIB_CASSERT(false, "shouldn't be called right now");
+        out = scale_columns(mat(m), mat(v));
+#endif
+    }
+
+    void scale_rows (
+        tensor& out,
+        const tensor& m,
+        const tensor& v
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(out,m));
+        DLIB_CASSERT(is_vector(v));
+        if (m.size() == 0 && v.size() == 0)
+            return;
+        DLIB_CASSERT(m.size() != 0);
+        DLIB_CASSERT(m.num_samples() == v.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::scale_rows(out, m, v);
+#else
+        out = scale_rows(mat(m), mat(v));
+#endif
+    }
+
+    void scale_rows2 (
+        float beta, 
+        tensor& out,
+        const tensor& m1,
+        const tensor& m2,
+        const tensor& v1,
+        const tensor& v2
+    )
+    {
+        DLIB_CASSERT(have_same_dimensions(out,m1));
+        DLIB_CASSERT(have_same_dimensions(out,m2));
+        DLIB_CASSERT(have_same_dimensions(v1,v2));
+        DLIB_CASSERT(is_vector(mat(v1))); 
+        DLIB_CASSERT(v1.size() == m1.num_samples());
+
+#ifdef DLIB_USE_CUDA
+        cuda::scale_rows2(beta, out, m1, m2, v1, v2);
+#else
+        if (beta == 0)
+            out = scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+        else
+            out = beta*mat(out) + scale_rows(mat(m1) - scale_rows(mat(m2),mat(v1)), mat(v2));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void exp (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::exp(dest,src);
+#else
+        dest = exp(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void log (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::log(dest,src);
+#else
+        dest = log(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void log10 (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+        DLIB_CASSERT(dest.size() == src.size());
+
+#ifdef DLIB_USE_CUDA
+        cuda::log10(dest,src);
+#else
+        dest = log10(mat(src));
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void gemm (
         float beta,
         tensor& dest,
@@ -101,7 +243,7 @@ namespace dlib { namespace tt
         float stddev
     )
     {
-        DLIB_CASSERT(data.size()%2 == 0,"");
+        DLIB_CASSERT(data.size()%2 == 0);
 #ifdef DLIB_USE_CUDA
         rnd.fill_gaussian(data, mean, stddev);
 #else
@@ -135,11 +277,11 @@ namespace dlib { namespace tt
     {
         DLIB_CASSERT(dest.k() == src1.k() && src1.k() == src2.k() &&
             dest.nr() == src1.nr() && src1.nr() == src2.nr() &&
-            dest.nc() == src1.nc() && src1.nc() == src2.nc() ,"");
+            dest.nc() == src1.nc() && src1.nc() == src2.nc() );
         const long MD = std::max(std::max(dest.num_samples(),src1.num_samples()),src2.num_samples());
         DLIB_CASSERT((dest.num_samples()==1 || dest.num_samples()==MD) &&
                     (src1.num_samples()==1 || src1.num_samples()==MD) &&
-                    (src2.num_samples()==1 || src2.num_samples()==MD) ,"");
+                    (src2.num_samples()==1 || src2.num_samples()==MD) );
 #ifdef DLIB_USE_CUDA
         cuda::multiply(add_to, dest, src1, src2);
 #else
@@ -159,6 +301,20 @@ namespace dlib { namespace tt
         cuda::multiply_conv(add_to, dest, src1, src2);
 #else
         cpu::multiply_conv(add_to, dest, src1, src2);
+#endif
+    }
+
+    void multiply_zero_padded (
+        bool add_to,
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::multiply_zero_padded(add_to, dest, src1, src2);
+#else
+        cpu::multiply_zero_padded(add_to, dest, src1, src2);
 #endif
     }
 
@@ -256,6 +412,24 @@ namespace dlib { namespace tt
         cuda::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
 #else
         cpu::affine_transform_range(begin, end, dest,src1,src2,src3,A,B,C);
+#endif
+    }
+
+    void affine_transform(
+        const rectangle& rect,
+        tensor& dest, 
+        const tensor& src1, 
+        const tensor& src2, 
+        const tensor& src3, 
+        float A, 
+        float B,
+        float C
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::affine_transform(rect, dest,src1,src2,src3,A,B,C);
+#else
+        cpu::affine_transform(rect, dest,src1,src2,src3,A,B,C);
 #endif
     }
 
@@ -678,22 +852,72 @@ namespace dlib { namespace tt
 #endif
     }
 
+// ----------------------------------------------------------------------------------------
+
+    void resize_bilinear (
+        tensor& dest,
+        long dest_row_stride,
+        long dest_channel_stride,
+        const tensor& src,
+        long src_row_stride,
+        long src_channel_stride
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_bilinear(dest,dest_row_stride,dest_channel_stride, src,src_row_stride,src_channel_stride);
+#else
+        cpu::resize_bilinear(dest,dest_row_stride,dest_channel_stride, src,src_row_stride,src_channel_stride);
+#endif
+    }
+
+    void resize_bilinear_gradient (
+        tensor& grad,
+        long grad_row_stride,
+        long grad_channel_stride,
+        const tensor& gradient_input,
+        long gradient_input_row_stride,
+        long gradient_input_channel_stride
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::resize_bilinear_gradient(grad,grad_row_stride,grad_channel_stride,  gradient_input,gradient_input_row_stride,gradient_input_channel_stride);
+#else
+        cpu::resize_bilinear_gradient(grad,grad_row_stride,grad_channel_stride,  gradient_input,gradient_input_row_stride,gradient_input_channel_stride);
+#endif
+    }
+
 // ------------------------------------------------------------------------------------
 
-        void copy_tensor(
-                tensor& dest,
-                size_t dest_k_offset,
-                const tensor& src,
-                size_t src_k_offset,
-                size_t count_k
-        )
-        {
+    void copy_tensor(
+            bool add_to,
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
+    )
+    {
 #ifdef DLIB_USE_CUDA
-            cuda::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+        cuda::copy_tensor(add_to, dest, dest_k_offset, src, src_k_offset, count_k);
 #else
-            cpu::copy_tensor(dest, dest_k_offset, src, src_k_offset, count_k);
+        cpu::copy_tensor(add_to, dest, dest_k_offset, src, src_k_offset, count_k);
 #endif
-        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void inv::
+    operator() (
+        const tensor& m,
+        resizable_tensor& out
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        finv(m,out);
+#else
+        out = dlib::inv(mat(m));
+#endif
+    }
 
 // ----------------------------------------------------------------------------------------
 

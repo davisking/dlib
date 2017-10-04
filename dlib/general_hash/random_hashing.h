@@ -862,7 +862,7 @@ namespace dlib
         const static uint64 mask = max-1; 
         return logvals[h.first&mask]*cosvals[h.second&mask];
 
-        // Note that we are just using the Box–Muller transform to compute the result.  In
+        // Note that we are just using the Box-Muller transform to compute the result.  In
         // particular, we are doing this (where u1 and u2 are uniform random variables in
         // the range [0,1]): 
         //    return sqrt(-2*log(u1)) * cos(2*PI*u2);

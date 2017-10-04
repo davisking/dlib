@@ -4,6 +4,7 @@
 #ifdef DLIB_PARALLEL_FoR_ABSTRACT_Hh_ 
 
 #include "thread_pool_extension_abstract.h"
+#include "async_abstract.h"
 
 namespace dlib
 {
@@ -23,7 +24,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This is a convenience function for submitting a block of jobs to a thread_pool.  
               In particular, given the half open range [begin, end), this function will
@@ -60,7 +60,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 thread_pool tp(num_threads);
@@ -81,7 +80,6 @@ namespace dlib
         requires
             - chunks_per_thread > 0
             - begin <= end
-            - funct does not throw any exceptions
         ensures
             - This is a convenience function for submitting a block of jobs to a
               thread_pool.  In particular, given the range [begin, end), this function will
@@ -116,11 +114,28 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 thread_pool tp(num_threads);
                 parallel_for_blocked(tp, begin, end, funct, chunks_per_thread);
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_blocked (
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is equivalent to the following block of code:
+                parallel_for_blocked(default_thread_pool(), begin, end, funct, chunks_per_thread);
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -139,7 +154,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following function call:
               parallel_for_blocked(tp, begin, end, [&](long begin_sub, long end_sub) 
@@ -169,7 +183,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 thread_pool tp(num_threads);
@@ -190,7 +203,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following function call:
               parallel_for_blocked(tp, begin, end, [&](long begin_sub, long end_sub) 
@@ -218,7 +230,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is equivalent to the following block of code:
                 thread_pool tp(num_threads);
@@ -226,6 +237,24 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for (
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is equivalent to the following block of code:
+                parallel_for(default_thread_pool(), begin, end, funct, chunks_per_thread);
+    !*/
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <typename T>
@@ -241,7 +270,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
@@ -263,7 +291,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
@@ -284,7 +311,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
@@ -305,11 +331,30 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for() routine defined above except
               that it will print messages to cout showing the progress in executing the
               parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_verbose (
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for() routine defined above except
+              that it will print messages to cout showing the progress in executing the
+              parallel for loop.
+            - It will also use the default_thread_pool().
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -328,7 +373,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for_blocked() routine defined
               above except that it will print messages to cout showing the progress in
@@ -350,7 +394,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for_blocked() routine defined
               above except that it will print messages to cout showing the progress in
@@ -371,7 +414,6 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for_blocked() routine defined
               above except that it will print messages to cout showing the progress in
@@ -392,11 +434,30 @@ namespace dlib
         requires
             - begin <= end
             - chunks_per_thread > 0
-            - funct does not throw any exceptions
         ensures
             - This function is identical to the parallel_for_blocked() routine defined
               above except that it will print messages to cout showing the progress in
               executing the parallel for loop.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void parallel_for_blocked_verbose (
+        long begin,
+        long end,
+        const T& funct,
+        long chunks_per_thread = 8
+    );
+    /*!
+        requires
+            - begin <= end
+            - chunks_per_thread > 0
+        ensures
+            - This function is identical to the parallel_for_blocked() routine defined
+              above except that it will print messages to cout showing the progress in
+              executing the parallel for loop.
+            - It will also use the default_thread_pool()
     !*/
 
 // ----------------------------------------------------------------------------------------

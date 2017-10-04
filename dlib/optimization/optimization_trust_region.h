@@ -294,6 +294,8 @@ namespace dlib
             const type rho = measured_improvement/std::abs(predicted_improvement);
 
 
+            if (!is_finite(rho))
+                break;
             
             if (rho < 0.25)
             {

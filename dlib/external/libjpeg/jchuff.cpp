@@ -303,8 +303,8 @@ emit_bits (working_state * state, unsigned int code, int size)
 /* Emit some bits; return TRUE if successful, FALSE if must suspend */
 {
   /* This routine is heavily used, so it's worth coding tightly. */
-  register long put_buffer = (long) code;
-  register int put_bits = state->cur.put_bits;
+  long put_buffer = (long) code;
+  int put_bits = state->cur.put_bits;
 
   /* if size is 0, caller used an invalid Huffman table entry */
   if (size == 0)
@@ -353,9 +353,9 @@ LOCAL(int)
 encode_one_block (working_state * state, JCOEFPTR block, int last_dc_val,
 		  c_derived_tbl *dctbl, c_derived_tbl *actbl)
 {
-  register int temp, temp2;
-  register int nbits;
-  register int k, r, i;
+  int temp, temp2;
+  int nbits;
+  int k, r, i;
   
   /* Encode the DC coefficient difference per section F.1.2.1 */
   
@@ -572,9 +572,9 @@ LOCAL(void)
 htest_one_block (j_compress_ptr cinfo, JCOEFPTR block, int last_dc_val,
 		 long dc_counts[], long ac_counts[])
 {
-  register int temp;
-  register int nbits;
-  register int k, r;
+  int temp;
+  int nbits;
+  int k, r;
   
   /* Encode the DC coefficient difference per section F.1.2.1 */
   

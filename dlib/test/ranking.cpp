@@ -2,6 +2,7 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 #include <dlib/svm.h>
 #include <dlib/rand.h>
+#include <dlib/dnn.h>
 #include <sstream>
 #include <string>
 #include <cstdlib>
@@ -404,6 +405,50 @@ namespace
     }
 
 // ----------------------------------------------------------------------------------------
+
+    void test_dnn_ranking_loss()
+    {
+        print_spinner();
+        typedef matrix<double,2,1> sample_type;
+
+
+        ranking_pair<sample_type> data;
+        sample_type samp;
+
+        // Make one relevant example.
+        samp = 1, 0; 
+        data.relevant.push_back(samp);
+
+        // Now make a non-relevant example.
+        samp = 0, 1; 
+        data.nonrelevant.push_back(samp);
+
+
+        using net_type = loss_ranking<fc_no_bias<1,input<matrix<float,2,1>>>>;
+        net_type net;
+        dnn_trainer<net_type> trainer(net, sgd(1.0, 0.9));
+        std::vector<matrix<float,2,1>> x;
+        std::vector<float> y;
+
+        x.push_back(matrix_cast<float>(data.relevant[0]));  y.push_back(1);
+        x.push_back(matrix_cast<float>(data.nonrelevant[0]));  y.push_back(-1);
+
+        //trainer.be_verbose();
+        trainer.set_learning_rate_schedule(logspace(-1, -7, 4000));
+        trainer.train(x,y);
+
+        matrix<float> params = mat(net.subnet().layer_details().get_layer_params());
+        dlog << LINFO << "params: "<< params;
+        dlog << LINFO << "relevant output score: " << net(x[0]);
+        dlog << LINFO << "nonrelevant output score: " << net(x[1]);
+
+        DLIB_TEST(std::abs(params(0) - 1) < 0.001);
+        DLIB_TEST(std::abs(params(1) + 1) < 0.001);
+        DLIB_TEST(std::abs(net(x[0]) - 1) < 0.001);
+        DLIB_TEST(std::abs(net(x[1]) + 1) < 0.001);
+    }
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -427,6 +472,7 @@ namespace
             test_svmrank_weight_force_dense<false>();
             run_prior_test();
             run_prior_sparse_test();
+            test_dnn_ranking_loss();
 
         }
     } a;

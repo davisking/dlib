@@ -1,13 +1,14 @@
 // Copyright (C) 2007  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_THREAD_FUNCTIOn_
-#define DLIB_THREAD_FUNCTIOn_ 
+#define DLIB_THREAD_FUNCTIOn_
+
+#include <memory>
 
 #include "thread_function_extension_abstract.h"
 #include "threads_kernel.h"
 #include "auto_mutex_extension.h"
 #include "threaded_object_extension.h"
-#include "../smart_pointers.h"
 
 namespace dlib
 {
@@ -197,7 +198,7 @@ namespace dlib
             f->go();
         }
 
-        scoped_ptr<base_funct> f;
+        std::unique_ptr<base_funct> f;
 
         // restricted functions
         thread_function(thread_function&);        // copy constructor

@@ -7,7 +7,6 @@
 #include "simd4f.h"
 #include "simd8i.h"
 
-
 namespace dlib
 {
 #ifdef DLIB_HAVE_AVX
@@ -43,6 +42,11 @@ namespace dlib
         inline void store(type* ptr)         const { _mm256_storeu_ps(ptr, x); }
 
         inline simd8f& operator=(const simd8i& rhs) { *this = simd8f(rhs); return *this; }
+        inline simd8f& operator=(const float& val)
+        {
+            x = simd8f(val);
+            return *this;
+        }
 
         inline unsigned int size() const { return 8; }
         inline float operator[](unsigned int idx) const 
@@ -167,7 +171,7 @@ namespace dlib
 #endif
     }
     inline simd8f& operator+= (simd8f& lhs, const simd8f& rhs) 
-    { return lhs = lhs + rhs; return lhs;}
+    { lhs = lhs + rhs; return lhs; }
 
 // ----------------------------------------------------------------------------------------
 
@@ -181,7 +185,7 @@ namespace dlib
 #endif
     }
     inline simd8f& operator-= (simd8f& lhs, const simd8f& rhs) 
-    { return lhs = lhs - rhs; return lhs;}
+    { lhs = lhs - rhs; return lhs; }
 
 // ----------------------------------------------------------------------------------------
 
@@ -195,7 +199,7 @@ namespace dlib
 #endif
     }
     inline simd8f& operator*= (simd8f& lhs, const simd8f& rhs) 
-    { return lhs = lhs * rhs; return lhs;}
+    { lhs = lhs * rhs; return lhs; }
 
 // ----------------------------------------------------------------------------------------
 
@@ -209,7 +213,7 @@ namespace dlib
 #endif
     }
     inline simd8f& operator/= (simd8f& lhs, const simd8f& rhs) 
-    { return lhs = lhs / rhs; return lhs;}
+    { lhs = lhs / rhs; return lhs; }
 
 // ----------------------------------------------------------------------------------------
 

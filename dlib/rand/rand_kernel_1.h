@@ -137,6 +137,15 @@ namespace dlib
                 return (a<<32)|b;
             }
 
+            double get_double_in_range (
+                double begin,
+                double end
+            )
+            {
+                DLIB_ASSERT(begin <= end);
+                return begin + get_random_double()*(end-begin);
+            }
+
             double get_random_double (
             )
             {

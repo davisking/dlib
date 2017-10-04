@@ -81,14 +81,6 @@
       </section>
 
       <section>
-         <name>Smart Pointers</name>
-         <item>scoped_ptr</item>
-         <item>shared_ptr</item>
-         <item>shared_ptr_thread_safe</item>
-         <item>weak_ptr</item>
-      </section>
-
-      <section>
          <name>Interfaces</name>
          <item>map_pair</item> 
          <item>enumerable</item> 
@@ -485,29 +477,6 @@
    <!-- ************************************************************************* -->
 
       <component>
-         <name>weak_ptr</name>
-         <file>dlib/smart_pointers.h</file>
-         <spec_file>dlib/smart_pointers/weak_ptr_abstract.h</spec_file>
-         <description>
-            <p>
-                The weak_ptr class template stores a weak reference to an object that is 
-                already managed by a shared_ptr. To access the object, a weak_ptr can 
-                be converted to a shared_ptr using the member function lock().  
-            </p>
-
-            <p>
-                This is an implementation of the std::tr1::weak_ptr template from the 
-                document ISO/IEC PDTR 19768, Proposed Draft Technical Report on C++
-                Library Extensions.  The only deviation from that document is that this 
-                shared_ptr is declared inside the dlib namespace rather than std::tr1.
-            </p>
-         </description>
-               
-      </component>
-      
-   <!-- ************************************************************************* -->
-
-      <component>
          <name>type_safe_union</name>
          <file>dlib/type_safe_union.h</file>
          <spec_file link="true">dlib/type_safe_union/type_safe_union_kernel_abstract.h</spec_file>
@@ -620,45 +589,6 @@
       </component>
       
    <!-- ************************************************************************* -->
-      
-
-      <component>
-         <name>shared_ptr_thread_safe</name>
-         <file>dlib/smart_pointers_thread_safe.h</file>
-         <spec_file>dlib/smart_pointers/shared_ptr_thread_safe_abstract.h</spec_file>
-         <description>
-            <p>
-                This object represents a reference counted smart pointer just like 
-                <a href="#shared_ptr">shared_ptr</a> except that it is threadsafe.
-            </p>
-         </description>
-               
-      </component>
-      
-   <!-- ************************************************************************* -->
-      <component>
-         <name>shared_ptr</name>
-         <file>dlib/smart_pointers.h</file>
-         <spec_file>dlib/smart_pointers/shared_ptr_abstract.h</spec_file>
-         <description>
-            <p>
-                This object represents a reference counted smart pointer.  Each shared_ptr
-                contains a pointer to some object and when the last shared_ptr that points
-                to the object is destructed or reset() then the object is guaranteed to be 
-                deleted.
-            </p>
-
-            <p>
-                This is an implementation of the std::tr1::shared_ptr template from the 
-                document ISO/IEC PDTR 19768, Proposed Draft Technical Report on C++
-                Library Extensions.  The only deviation from that document is that this 
-                shared_ptr is declared inside the dlib namespace rather than std::tr1.
-            </p>
-         </description>
-               
-      </component>
-      
-   <!-- ************************************************************************* -->
 
       <component>
          <name>tuple</name>
@@ -698,23 +628,6 @@
       
    <!-- ************************************************************************* -->
 
-      <component>
-         <name>scoped_ptr</name>
-         <file>dlib/smart_pointers.h</file>
-         <spec_file>dlib/smart_pointers/scoped_ptr_abstract.h</spec_file>
-         <description>
-                This is a implementation of the scoped_ptr class found in the Boost C++ 
-                library.  It is a simple smart pointer class which guarantees that the 
-                pointer contained within it will always be deleted.  
-                
-                The class does not permit copying and so does not do any kind of 
-                reference counting.  Thus it is very simple and quite fast.
-         </description>
-               
-      </component>
-      
-   <!-- ************************************************************************* -->
-      
       <component checked="true">
          <name>graph</name>
          <file>dlib/graph.h</file>

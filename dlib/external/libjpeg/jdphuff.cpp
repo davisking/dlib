@@ -19,6 +19,9 @@
 #include "jpeglib.h"
 #include "jdhuff.h"		/* Declarations shared with jdhuff.c */
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wshift-negative-value"
+#endif
 
 #ifdef D_PROGRESSIVE_SUPPORTED
 
@@ -287,7 +290,7 @@ decode_mcu_DC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 {   
   phuff_entropy_ptr entropy = (phuff_entropy_ptr) cinfo->entropy;
   int Al = cinfo->Al;
-  register int s, r;
+  int s, r;
   int blkn, ci;
   JBLOCKROW block;
   BITREAD_STATE_VARS;
@@ -359,7 +362,7 @@ decode_mcu_AC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
   phuff_entropy_ptr entropy = (phuff_entropy_ptr) cinfo->entropy;
   int Se = cinfo->Se;
   int Al = cinfo->Al;
-  register int s, k, r;
+  int s, k, r;
   unsigned int EOBRUN;
   JBLOCKROW block;
   BITREAD_STATE_VARS;
@@ -494,7 +497,7 @@ decode_mcu_AC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
   int Se = cinfo->Se;
   int p1 = 1 << cinfo->Al;	/* 1 in the bit position being coded */
   int m1 = (-1) << cinfo->Al;	/* -1 in the bit position being coded */
-  register int s, k, r;
+  int s, k, r;
   unsigned int EOBRUN;
   JBLOCKROW block;
   JCOEFPTR thiscoef;

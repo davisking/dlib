@@ -123,6 +123,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>input</item>
                <item>input_rgb_image</item>
                <item>input_rgb_image_sized</item>
+               <item>input_rgb_image_pyramid</item>
                <item>
                   <name>EXAMPLE_INPUT_LAYER</name>
                   <link>dlib/dnn/input_abstract.h.html#EXAMPLE_INPUT_LAYER</link>
@@ -143,6 +144,26 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>con</name>
                   <link>dlib/dnn/layers_abstract.h.html#con_</link>
+               </item>
+               <item>
+                  <name>cont</name>
+                  <link>dlib/dnn/layers_abstract.h.html#cont_</link>
+               </item>
+               <item>
+                  <name>extract</name>
+                  <link>dlib/dnn/layers_abstract.h.html#extract_</link>
+               </item>
+               <item>
+                  <name>mult_prev</name>
+                  <link>dlib/dnn/layers_abstract.h.html#mult_prev_</link>
+               </item>
+               <item>
+                  <name>upsample</name>
+                  <link>dlib/dnn/layers_abstract.h.html#upsample_</link>
+               </item>
+               <item>
+                  <name>l2normalize</name>
+                  <link>dlib/dnn/layers_abstract.h.html#l2normalize_</link>
                </item>
                <item>
                   <name>dropout</name>
@@ -221,6 +242,34 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                   <name>loss_multiclass_log</name>
                   <link>dlib/dnn/loss_abstract.h.html#loss_multiclass_log_</link>
                </item>
+               <item>
+                  <name>loss_multiclass_log_per_pixel</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_multiclass_log_per_pixel_</link>
+               </item>
+               <item>
+                  <name>loss_multiclass_log_per_pixel_weighted</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_multiclass_log_per_pixel_weighted_</link>
+               </item>
+               <item>
+                  <name>loss_mmod</name>
+                  <link>#loss_mmod_</link>
+               </item>
+               <item>
+                  <name>loss_metric</name>
+                  <link>#loss_metric_</link>
+               </item>
+               <item>
+                  <name>loss_mean_squared</name>
+                  <link>#loss_mean_squared_</link>
+               </item>
+               <item>
+                  <name>loss_mean_squared_per_pixel</name>
+                  <link>#loss_mean_squared_per_pixel_</link>
+               </item>
+               <item>
+                  <name>loss_mean_squared_multioutput_</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_mean_squared_multioutput_</link>
+               </item>
             </sub>
          </item>
          <item nolink="true">
@@ -253,6 +302,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>spectral_cluster</item> 
          <item>chinese_whispers</item> 
          <item>bottom_up_cluster</item> 
+         <item>segment_number_line</item> 
          <item>modularity</item> 
       </section>
       <section>
@@ -311,6 +361,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>test_shape_predictor</item>
          <item>average_precision</item>
          <item>equal_error_rate</item>
+         <item>compute_roc_curve</item>
       </section>
 
       <section>
@@ -413,7 +464,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>add_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -438,12 +489,21 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_inception_ex.cpp.html</example>
             <example>dnn_imagenet_ex.cpp.html</example>
             <example>dnn_imagenet_train_ex.cpp.html</example>
+            <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars2_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_face_detection_ex.cpp.html</example>
+            <example>dnn_mmod_dog_hipsterizer.cpp.html</example>
+            <example>dnn_metric_learning_ex.cpp.html</example>
+            <example>dnn_metric_learning_on_images_ex.cpp.html</example>
+            <example>dnn_face_recognition_ex.cpp.html</example>
          </examples>
       </component>
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>dnn_trainer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/trainer_abstract.h</spec_file>
@@ -461,12 +521,16 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_inception_ex.cpp.html</example>
             <example>dnn_imagenet_ex.cpp.html</example>
             <example>dnn_imagenet_train_ex.cpp.html</example>
+            <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
+            <example>dnn_metric_learning_ex.cpp.html</example>
+            <example>dnn_metric_learning_on_images_ex.cpp.html</example>
          </examples>
       </component>
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>add_loss_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -480,12 +544,20 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>dnn_inception_ex.cpp.html</example>
             <example>dnn_imagenet_ex.cpp.html</example>
             <example>dnn_imagenet_train_ex.cpp.html</example>
+            <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
+            <example>dnn_metric_learning_ex.cpp.html</example>
+            <example>dnn_metric_learning_on_images_ex.cpp.html</example>
+            <example>dnn_face_recognition_ex.cpp.html</example>
+            <example>dnn_mmod_face_detection_ex.cpp.html</example>
+            <example>dnn_mmod_dog_hipsterizer.cpp.html</example>
          </examples>
       </component>
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>repeat</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -501,7 +573,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>add_tag_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -528,7 +600,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>add_skip_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -547,7 +619,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -568,7 +640,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>input</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
@@ -587,7 +659,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>input_rgb_image</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
@@ -602,7 +674,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>input_rgb_image_sized</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
@@ -614,7 +686,109 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
+         <name>input_rgb_image_pyramid</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/input_abstract.h</spec_file>
+         <description>
+            This input layer works with RGB images of type <tt>matrix&lt;rgb_pixel&gt;</tt>.  It is
+            identical to <a href="#input_rgb_image">input_rgb_image</a> except that it
+            outputs a tensor containing a <a href="imaging.html#create_tiled_pyramid">tiled image pyramid</a> 
+            of each input image rather than a simple copy of each image.  
+            This input layer is meant to be used with a loss layer such as the <a href="#loss_mmod_">MMOD loss layer</a>.
+         </description>
+         <examples>
+            <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars2_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_face_detection_ex.cpp.html</example>
+            <example>dnn_mmod_dog_hipsterizer.cpp.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>loss_mmod_</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/loss_abstract.h</spec_file>
+         <description>
+            This object is a <a href="dlib/dnn/loss_abstract.h.html#EXAMPLE_LOSS_LAYER_">loss layer</a> 
+            for a deep neural network.  In particular, it implements the Max Margin Object Detection 
+            loss defined in the paper:
+            <blockquote><a href="http://arxiv.org/abs/1502.00046">Max-Margin Object Detection</a> by Davis E. King.</blockquote>
+         
+            This means you use this loss if you want to detect the locations of objects
+            in images.  For example, here are some videos that uses loss_mmod to find cars:
+
+            <center><youtube src="https://www.youtube.com/embed/4B3bzmxMAZU"/></center>
+            <br/>
+            <center><youtube src="https://www.youtube.com/embed/OHbJ7HhbG74"/></center>
+
+         </description>
+         <examples>
+            <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_find_cars2_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
+            <example>dnn_mmod_face_detection_ex.cpp.html</example>
+            <example>dnn_mmod_dog_hipsterizer.cpp.html</example>
+            <example>cnn_face_detector.py.html</example>
+         </examples>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>loss_metric_</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/loss_abstract.h</spec_file>
+         <description>
+            This object is a <a href="dlib/dnn/loss_abstract.h.html#EXAMPLE_LOSS_LAYER_">loss layer</a> 
+            for a deep neural network.   In particular, it allows you to learn to map objects
+            into a vector space where objects sharing the same class label are close to
+            each other, while objects with different labels are far apart.   
+         </description>
+         <examples>
+            <example>dnn_metric_learning_ex.cpp.html</example>
+            <example>dnn_metric_learning_on_images_ex.cpp.html</example>
+            <example>dnn_face_recognition_ex.cpp.html</example>
+            <example>face_recognition.py.html</example>
+            <example>face_clustering.py.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>loss_mean_squared_</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/loss_abstract.h</spec_file>
+         <description>
+            This object is a <a href="dlib/dnn/loss_abstract.h.html#EXAMPLE_LOSS_LAYER_">loss layer</a> 
+            for a deep neural network. In particular, it implements the mean squared loss, which is
+            appropriate for regression problems.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>loss_mean_squared_multioutput_</name>
+         <file>dlib/dnn.h</file>
+         <spec_file link="true">dlib/dnn/loss_abstract.h</spec_file>
+         <description>
+            This object is a <a href="dlib/dnn/loss_abstract.h.html#EXAMPLE_LOSS_LAYER_">loss layer</a> 
+            for a deep neural network. In particular, it implements the mean squared loss, which is
+            appropriate for regression problems.  It is identical to the <a href="#loss_mean_squared_">loss_mean_squared_</a> 
+            loss except this version supports multiple output values.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>test_layer</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/core_abstract.h</spec_file>
@@ -627,7 +801,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>resizable_tensor</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/tensor_abstract.h</spec_file>
@@ -666,7 +840,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
    <!-- ************************************************************************* -->
 
-      <component cpp11="true">
+      <component>
          <name>alias_tensor</name>
          <file>dlib/dnn.h</file>
          <spec_file link="true">dlib/dnn/tensor_abstract.h</spec_file>
@@ -742,6 +916,21 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
 
       <component>
+         <name>segment_number_line</name>
+         <file>dlib/clustering.h</file>
+         <spec_file link="true">dlib/clustering/bottom_up_cluster_abstract.h</spec_file>
+         <description>
+            This routine clusters real valued scalars in essentially linear time.  
+            It uses a combination of bottom up clustering and a simple greedy scan
+            to try and find the most compact set of ranges that contain all
+            given scalar values. 
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>chinese_whispers</name>
          <file>dlib/clustering.h</file>
          <spec_file link="true">dlib/clustering/chinese_whispers_abstract.h</spec_file>
@@ -753,6 +942,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
              graph into groups.  The method is able to automatically determine the number
              of clusters.  
          </description>
+         <examples>
+            <example>dnn_face_recognition_ex.cpp.html</example>
+            <example>face_clustering.py.html</example>
+         </examples>
                                  
       </component>
 
@@ -1799,7 +1992,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
       <component>
          <name>shape_predictor_trainer</name>
          <file>dlib/image_processing.h</file>
-         <spec_file link="true">dlib/image_processing/shape_predictor_abstract.h</spec_file>
+         <spec_file link="true">dlib/image_processing/shape_predictor_trainer_abstract.h</spec_file>
          <description>
                This object is a tool for training <a href="imaging.html#shape_predictor">shape_predictors</a> 
                based on annotated training images.  Its implementation uses the algorithm described in:
@@ -3241,6 +3434,17 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
       </component>
       
    <!-- ************************************************************************* -->
+
+      <component>
+         <name>compute_roc_curve</name>
+         <file>dlib/statistics.h</file>
+         <spec_file link="true">dlib/statistics/lda_abstract.h</spec_file>
+         <description>
+            This function computes a ROC curve (receiver operating characteristic curve). 
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
       
       <component>
          <name>test_ranking_function</name>
@@ -3312,6 +3516,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             <example>object_detector_ex.cpp.html</example>
             <example>object_detector_advanced_ex.cpp.html</example>
             <example>train_object_detector.cpp.html</example>
+            <example>dnn_mmod_ex.cpp.html</example>
+            <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
          </examples>
                                  
       </component>

@@ -489,6 +489,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline rectangle set_rect_area (
+        const rectangle& rect,
+        unsigned long area
+    );
+    /*!
+        requires
+            - area > 0
+        ensures
+            - Returns a rectangle R such that:
+                - center(R) == center(rect)
+                - R has the same aspect ratio as rect.  If rect.area() == 0 then the
+                  returned rect has a 1:1 aspect ratio.
+                - R.area() == area
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     inline rectangle set_aspect_ratio (
         const rectangle& rect,
         double ratio
@@ -702,6 +719,22 @@ namespace dlib
                 - returns p
             - else
                 - returns the point in rect that is closest to p
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline size_t nearest_rect (
+        const std::vector<rectangle>& rects,
+        const point& p
+    );
+    /*!
+        requires
+            - rects.size() > 0
+        ensures
+            - returns the index of the rectangle that is closest to the point p.  In
+              particular, this function returns an IDX such that:
+                length(nearest_point(rects[IDX],p) - p)
+              is minimized.
     !*/
 
 // ----------------------------------------------------------------------------------------

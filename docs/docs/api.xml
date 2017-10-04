@@ -595,6 +595,14 @@
                   <name>file_exists</name>
                   <link>dlib/dir_nav/dir_nav_extensions_abstract.h.html#file_exists</link>
                </item>
+               <item>
+                  <name>select_oldest_file</name>
+                  <link>dlib/dir_nav/dir_nav_extensions_abstract.h.html#select_oldest_file</link>
+               </item>
+               <item>
+                  <name>select_newest_file</name>
+                  <link>dlib/dir_nav/dir_nav_extensions_abstract.h.html#select_newest_file</link>
+               </item>
             </sub>
          </item>
          <item>

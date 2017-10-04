@@ -43,7 +43,7 @@ namespace dlib
         {
             const tensor& params = l.get_layer_params();
 
-            DLIB_CASSERT(params.size() != 0,"");
+            DLIB_CASSERT(params.size() != 0);
             if (v.size() == 0)
             {
                 v.copy_size(params_grad);
@@ -89,6 +89,25 @@ namespace dlib
             return v;
         }
 
+        template <
+            long _num_filters,
+            long _nr,
+            long _nc,
+            int _stride_y,
+            int _stride_x,
+            int _padding_y,
+            int _padding_x
+            >
+        const tensor& operator() (
+            const float learning_rate,
+            const cont_<_num_filters,_nr,_nc,_stride_y,_stride_x,_padding_y,_padding_x>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()-l.num_filters());
+            return v;
+        }
+
         template < layer_mode mode >
         const tensor& operator() (
             const float learning_rate,
@@ -119,6 +138,12 @@ namespace dlib
             deserialize(item.momentum, in);
         }
 
+        friend std::ostream& operator<< (std::ostream& out, const sgd& item)
+        {
+            out << "sgd: weight_decay="<<item.get_weight_decay() << ", momentum="<<item.get_momentum(); 
+            return out;
+        }
+
     private:
 
         template <typename layer_type> 
@@ -131,7 +156,7 @@ namespace dlib
         {
             const tensor& params = l.get_layer_params();
 
-            DLIB_CASSERT(params.size() != 0,"");
+            DLIB_CASSERT(params.size() != 0);
             if (v.size() == 0)
             {
                 v.copy_size(params_grad);
@@ -204,7 +229,7 @@ namespace dlib
         )
         {
             const tensor& params = l.get_layer_params();
-            DLIB_CASSERT(params.size() != 0,"");
+            DLIB_CASSERT(params.size() != 0);
             if (v.size() == 0)
             {
                 m.copy_size(params_grad);
@@ -255,6 +280,25 @@ namespace dlib
             return s;
         }
 
+        template <
+            long _num_filters,
+            long _nr,
+            long _nc,
+            int _stride_y,
+            int _stride_x,
+            int _padding_y,
+            int _padding_x
+            >
+        const tensor& operator() (
+            const float learning_rate,
+            const cont_<_num_filters,_nr,_nc,_stride_y,_stride_x,_padding_y,_padding_x>& l,
+            const tensor& params_grad
+        )
+        {
+            update_considering_bias(learning_rate, l, params_grad, params_grad.size()-l.num_filters());
+            return s;
+        }
+
         template < layer_mode mode >
         const tensor& operator() (
             const float learning_rate,
@@ -294,6 +338,12 @@ namespace dlib
             deserialize(item.t, in);
         }
 
+        friend std::ostream& operator<< (std::ostream& out, const adam& item)
+        {
+            out << "adam: weight_decay="<<item.get_weight_decay() << ", momentum1="<<item.get_momentum1() << ", momentum2="<<item.get_momentum2(); 
+            return out;
+        }
+
     private:
 
         template <typename layer_type> 
@@ -305,7 +355,7 @@ namespace dlib
         )
         {
             const tensor& params = l.get_layer_params();
-            DLIB_CASSERT(params.size() != 0,"");
+            DLIB_CASSERT(params.size() != 0);
             if (v.size() == 0)
             {
                 m.copy_size(params_grad);

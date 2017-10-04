@@ -17,16 +17,17 @@
 #pragma comment (lib, "imm32.lib")
 #endif
 
-
+#include <cmath>
+#include <memory>
 #include <sstream>
+#include <vector>
+
 #include "../threads.h"
 #include "../assert.h"
 #include "../queue.h"
 #include "../sync_extension.h"
 #include "../queue.h"
 #include "../logger.h"
-#include <cmath>
-#include <vector>
 
 namespace dlib
 {
@@ -63,9 +64,9 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        const shared_ptr_thread_safe<dlib::mutex>& global_mutex()
+        const std::shared_ptr<dlib::mutex>& global_mutex()
         {
-            static shared_ptr_thread_safe<dlib::mutex> m(new dlib::mutex);
+            static std::shared_ptr<dlib::mutex> m(new dlib::mutex);
             return m;
         }
 
@@ -118,7 +119,7 @@ namespace dlib
             // processing.
             thread_id_type event_thread_id;
 
-            shared_ptr_thread_safe<dlib::mutex> reference_to_global_mutex;
+            std::shared_ptr<dlib::mutex> reference_to_global_mutex;
 
             event_handler_thread(
             ) :
@@ -288,10 +289,10 @@ namespace dlib
         struct call_global_mutex { call_global_mutex() { global_mutex(); } };
         static call_global_mutex call_global_mutex_instance;
 
-        const shared_ptr_thread_safe<event_handler_thread>& global_data()
+        const std::shared_ptr<event_handler_thread>& global_data()
         {
             auto_mutex M(*global_mutex());
-            static shared_ptr_thread_safe<event_handler_thread> p;
+            static std::shared_ptr<event_handler_thread> p;
             if (p.get() == 0)
             {
                 p.reset(new event_handler_thread());
@@ -671,7 +672,7 @@ namespace dlib
             SetThreadPriority(hand,THREAD_PRIORITY_ABOVE_NORMAL);
             CloseHandle(hand);
 
-            shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+            std::shared_ptr<event_handler_thread> globals(global_data());
 
             window_table_type& window_table = globals->window_table;
             HWND& helper_window = globals->helper_window;
@@ -1465,7 +1466,7 @@ namespace dlib
         !*/
         {   
             using namespace gui_core_kernel_1_globals;
-            shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+            std::shared_ptr<event_handler_thread> globals(global_data());
             // if we are running in the event handling thread then just call
             // CreateWindow directly
             if (get_thread_id() == globals->event_thread_id)
@@ -2071,7 +2072,7 @@ namespace dlib
         using namespace gui_core_kernel_1_globals;
         using namespace std;
 
-        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+        std::shared_ptr<event_handler_thread> globals(global_data());
 
         if (OpenClipboard(globals->helper_window))
         {
@@ -2138,7 +2139,7 @@ namespace dlib
     {
         using namespace gui_core_kernel_1_globals;
         using namespace std;
-        shared_ptr_thread_safe<event_handler_thread> globals(global_data());
+        std::shared_ptr<event_handler_thread> globals(global_data());
 
         auto_mutex M(globals->window_table.get_mutex());
         if (OpenClipboard(globals->helper_window))

@@ -96,7 +96,7 @@ double mean_aspect_ratio (
         for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
         {
             rectangle rect = data.images[i].boxes[j].rect;
-            if (rect.area() == 0)
+            if (rect.area() == 0 || data.images[i].boxes[j].ignore)
                 continue;
             sum += rect.width()/(double)rect.height();
             ++cnt;
@@ -107,6 +107,18 @@ double mean_aspect_ratio (
         return sum/cnt;
     else
         return 0;
+}
+
+// ----------------------------------------------------------------------------------------
+
+bool has_non_ignored_boxes (const image_dataset_metadata::image& img)
+{
+    for (auto&& b : img.boxes)
+    {
+        if (!b.ignore)
+            return true;
+    }
+    return false;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -127,8 +139,8 @@ int cluster_dataset(
 
     image_dataset_metadata::dataset data;
 
-    set_current_dir(get_parent_directory(file(parser[0])));
     image_dataset_metadata::load_image_dataset_metadata(data, parser[0]);
+    set_current_dir(get_parent_directory(file(parser[0])));
 
     const double aspect_ratio = mean_aspect_ratio(data);
 
@@ -140,8 +152,9 @@ int cluster_dataset(
     for (unsigned long i = 0; i < data.images.size(); ++i)
     {
         pbar.print_status(i);
-        if (data.images[i].boxes.size() == 0)
+        if (!has_non_ignored_boxes(data.images[i]))
             continue;
+
         array2d<rgb_pixel> img, chip;
         load_image(img, data.images[i].filename);
 
@@ -179,10 +192,11 @@ int cluster_dataset(
         unsigned long idx = 0;
         for (unsigned long i = 0; i < data.images.size(); ++i)
         {
-            if (data.images[i].boxes.size() == 0)
-                continue;
             idata[i].first = std::numeric_limits<double>::infinity();
             idata[i].second.filename = data.images[i].filename;
+            if (!has_non_ignored_boxes(data.images[i]))
+                continue;
+
             for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
             {
                 idata[i].second.boxes.push_back(data.images[i].boxes[j]);

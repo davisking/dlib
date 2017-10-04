@@ -672,6 +672,13 @@ namespace
 
         }
 
+    }
+
+
+    void matrix_test2()
+    {
+        print_spinner();
+
 
         {
 
@@ -1057,6 +1064,28 @@ namespace
         }
 
         {
+            matrix<double> a = randm(3,4);
+            matrix<double> b = randm(3,4);
+
+            matrix<double> m1, m2;
+
+            m1 = max_pointwise(a,b);
+            m2 = min_pointwise(a,b);
+            DLIB_TEST(m1.nr() == a.nr());
+            DLIB_TEST(m1.nc() == a.nc());
+            DLIB_TEST(m2.nr() == a.nr());
+            DLIB_TEST(m2.nc() == a.nc());
+            for (long r = 0; r < a.nr(); ++r)
+            {
+                for (long c = 0; c < a.nc(); ++c)
+                {
+                    DLIB_TEST_MSG(m1(r,c) == std::max(a(r,c), b(r,c)), m1(r,c)  << " : " << a(r,c) << " " << b(r,c));
+                    DLIB_TEST(m2(r,c) == std::min(a(r,c), b(r,c)));
+                }
+            }
+        }
+
+        {
             matrix<double,4,5> m;
             set_subm(m, range(0,3), range(0,4)) = 4;
             DLIB_TEST(min(m) == max(m) && min(m) == 4);
@@ -1326,6 +1355,21 @@ namespace
             matrix<double> m1, m2, m3, truth;
             m1 = randm(n,n);
             m2 = randm(n,n);
+
+            rectangle rect1(1,1,3,3);
+            rectangle rect2(2,1,4,3);
+
+            truth = subm(m1,rect1)*subm(m2,rect2);
+            m3 = mat(&m1(0,0)+6, 3,3, m1.nc()) * mat(&m2(0,0)+7, 3,3, m2.nc());
+
+            DLIB_TEST(max(abs(truth-m3)) < 1e-13);
+        }
+
+        {
+            const long n = 5;
+            matrix<double> m1, m2, m3, truth;
+            m1 = randm(n,n);
+            m2 = randm(n,n);
             m3 = randm(n,n);
 
 
@@ -1385,6 +1429,7 @@ namespace
         )
         {
             matrix_test();
+            matrix_test2();
         }
     } a;
 

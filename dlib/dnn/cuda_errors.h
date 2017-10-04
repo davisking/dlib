@@ -52,6 +52,17 @@ namespace dlib
 
         cublas_error(const std::string& message): cuda_error(message) {}
     };
+
+    struct cusolver_error : public cuda_error
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown if any calls to the NVIDIA cuSolver library
+                returns an error.  
+        !*/
+
+        cusolver_error(const std::string& message): cuda_error(message) {}
+    };
 }
 
 

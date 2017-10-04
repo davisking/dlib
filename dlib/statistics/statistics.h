@@ -453,6 +453,331 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T
+        >
+    class running_scalar_covariance_decayed
+    {
+    public:
+
+        explicit running_scalar_covariance_decayed(
+            T decay_halflife = 1000 
+        )
+        {
+            DLIB_ASSERT(decay_halflife > 0);
+
+            sum_xy = 0;
+            sum_x = 0;
+            sum_y = 0;
+            sum_xx = 0;
+            sum_yy = 0;
+            forget = std::pow(0.5, 1/decay_halflife);
+            n = 0;
+
+            COMPILE_TIME_ASSERT ((
+                    is_same_type<float,T>::value ||
+                    is_same_type<double,T>::value ||
+                    is_same_type<long double,T>::value 
+            ));
+        }
+
+        T forget_factor (
+        ) const 
+        { 
+            return forget; 
+        }
+
+        void add (
+            const T& x,
+            const T& y
+        )
+        {
+            sum_xy = sum_xy*forget + x*y;
+
+            sum_xx = sum_xx*forget + x*x;
+            sum_yy = sum_yy*forget + y*y;
+
+            sum_x  = sum_x*forget + x;
+            sum_y  = sum_y*forget + y;
+
+            n = n*forget + forget;
+        }
+
+        T current_n (
+        ) const
+        {
+            return n;
+        }
+
+        T mean_x (
+        ) const
+        {
+            if (n != 0)
+                return sum_x/n;
+            else
+                return 0;
+        }
+
+        T mean_y (
+        ) const
+        {
+            if (n != 0)
+                return sum_y/n;
+            else
+                return 0;
+        }
+
+        T covariance (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_scalar_covariance_decayed::covariance()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return 1/n * (sum_xy - sum_y*sum_x/n);
+        }
+
+        T correlation (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_scalar_covariance_decayed::correlation()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            T temp = std::sqrt(variance_x()*variance_y());
+            if (temp != 0)
+                return covariance() / temp;
+            else
+                return 0; // just say it's zero if there isn't any variance in x or y.
+        }
+
+        T variance_x (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_scalar_covariance_decayed::variance_x()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            T temp = 1/n * (sum_xx - sum_x*sum_x/n);
+            // make sure the variance is never negative.  This might
+            // happen due to numerical errors.
+            if (temp >= 0)
+                return temp;
+            else
+                return 0;
+        }
+
+        T variance_y (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_scalar_covariance_decayed::variance_y()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            T temp = 1/n * (sum_yy - sum_y*sum_y/n);
+            // make sure the variance is never negative.  This might
+            // happen due to numerical errors.
+            if (temp >= 0)
+                return temp;
+            else
+                return 0;
+        }
+
+        T stddev_x (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_scalar_covariance_decayed::stddev_x()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return std::sqrt(variance_x());
+        }
+
+        T stddev_y (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_scalar_covariance_decayed::stddev_y()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return std::sqrt(variance_y());
+        }
+
+    private:
+
+        T sum_xy;
+        T sum_x;
+        T sum_y;
+        T sum_xx;
+        T sum_yy;
+        T n;
+        T forget;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        >
+    class running_stats_decayed
+    {
+    public:
+
+        explicit running_stats_decayed(
+            T decay_halflife = 1000 
+        )
+        {
+            DLIB_ASSERT(decay_halflife > 0);
+
+            sum_x = 0;
+            sum_xx = 0;
+            forget = std::pow(0.5, 1/decay_halflife);
+            n = 0;
+
+            COMPILE_TIME_ASSERT ((
+                    is_same_type<float,T>::value ||
+                    is_same_type<double,T>::value ||
+                    is_same_type<long double,T>::value 
+            ));
+        }
+
+        T forget_factor (
+        ) const 
+        { 
+            return forget; 
+        }
+
+        void add (
+            const T& x
+        )
+        {
+
+            sum_xx = sum_xx*forget + x*x;
+
+            sum_x  = sum_x*forget + x;
+
+            n = n*forget + forget;
+        }
+
+        T current_n (
+        ) const
+        {
+            return n;
+        }
+
+        T mean (
+        ) const
+        {
+            if (n != 0)
+                return sum_x/n;
+            else
+                return 0;
+        }
+
+        T variance (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_stats_decayed::variance()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            T temp = 1/n * (sum_xx - sum_x*sum_x/n);
+            // make sure the variance is never negative.  This might
+            // happen due to numerical errors.
+            if (temp >= 0)
+                return temp;
+            else
+                return 0;
+        }
+
+        T stddev (
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(current_n() > 0,
+                "\tT running_stats_decayed::stddev()"
+                << "\n\tyou have to add some numbers to this object first"
+                << "\n\tthis: " << this
+                );
+
+            return std::sqrt(variance());
+        }
+
+        template <typename U>
+        friend void serialize (
+            const running_stats_decayed<U>& item, 
+            std::ostream& out 
+        );
+
+        template <typename U>
+        friend void deserialize (
+            running_stats_decayed<U>& item, 
+            std::istream& in
+        ); 
+
+    private:
+
+        T sum_x;
+        T sum_xx;
+        T n;
+        T forget;
+    };
+
+    template <typename T>
+    void serialize (
+        const running_stats_decayed<T>& item, 
+        std::ostream& out 
+    )
+    {
+        int version = 1;
+        serialize(version, out);
+
+        serialize(item.sum_x, out);
+        serialize(item.sum_xx, out);
+        serialize(item.n, out);
+        serialize(item.forget, out);
+    }
+
+    template <typename T>
+    void deserialize (
+        running_stats_decayed<T>& item, 
+        std::istream& in
+    ) 
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw dlib::serialization_error("Unexpected version number found while deserializing dlib::running_stats_decayed object.");
+
+        deserialize(item.sum_x, in);
+        deserialize(item.sum_xx, in);
+        deserialize(item.n, in);
+        deserialize(item.forget, in);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename T, 
         typename alloc
         >

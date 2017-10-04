@@ -108,7 +108,7 @@ int main(int argc, char** argv)
         trainer.set_nu(0.05);
         trainer.set_tree_depth(2);
 
-        // some parts of training process can be parellelized.
+        // some parts of training process can be parallelized.
         // Trainer will use this count of threads when possible
         trainer.set_num_threads(2);
 

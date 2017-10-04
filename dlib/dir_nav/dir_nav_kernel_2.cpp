@@ -62,6 +62,12 @@ namespace dlib
         else
         {
             state.file_size = static_cast<uint64>(buffer.st_size);
+
+
+            state.last_modified = std::chrono::system_clock::from_time_t(buffer.st_mtime);
+#ifdef _BSD_SOURCE 
+            state.last_modified += std::chrono::nanoseconds(buffer.st_atim.tv_nsec);
+#endif
         }
 
     }

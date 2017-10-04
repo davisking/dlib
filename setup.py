@@ -10,8 +10,12 @@ To build the dlib:
     python setup.py build
 To build and install:
     python setup.py install
-To package the wheel:
+To package the wheel (after pip installing twine and wheel):
     python setup.py bdist_wheel
+To upload the binary wheel to PyPi
+    twine upload dist/*.whl
+To upload the source distribution to PyPi
+    python setup.py sdist upload
 To repackage the previously built package as wheel (bypassing build):
     python setup.py bdist_wheel --repackage
 To install a develop version (egg with symbolic link):
@@ -21,6 +25,7 @@ To exclude/include certain options in the cmake config use --yes and --no:
     --yes DLIB_NO_GUI_SUPPORT: will set -DDLIB_NO_GUI_SUPPORT=yes
     --no DLIB_NO_GUI_SUPPORT: will set -DDLIB_NO_GUI_SUPPORT=no
 Additional options:
+    --compiler-flags: pass flags onto the compiler, e.g. --compiler-flag "-Os -Wall" passes -Os -Wall onto GCC.
     --debug: makes a debug build
     --cmake: path to specific cmake executable
     --G or -G: name of a build system generator (equivalent of passing -G "name" to cmake)
@@ -77,6 +82,8 @@ def _get_options():
     for opt_idx, arg in enumerate(argv):
         if opt_key == 'cmake':
             _cmake_path = arg
+        elif opt_key == 'compiler-flags':
+            _cmake_extra.append('-DCMAKE_CXX_FLAGS={arg}'.format(arg=arg.strip()))
         elif opt_key == 'yes':
             _cmake_extra.append('-D{arg}=yes'.format(arg=arg.strip()))
         elif opt_key == 'no':
@@ -105,7 +112,7 @@ def _get_options():
             opt_key = opt
             sys.argv.remove(arg)
             continue
-        elif opt in ['yes', 'no']:
+        elif opt in ['yes', 'no', 'compiler-flags']:
             opt_key = opt
             sys.argv.remove(arg)
             continue
@@ -353,7 +360,7 @@ def read_version():
     major = re.findall("set\(CPACK_PACKAGE_VERSION_MAJOR.*\"(.*)\"", open('dlib/CMakeLists.txt').read())[0]
     minor = re.findall("set\(CPACK_PACKAGE_VERSION_MINOR.*\"(.*)\"", open('dlib/CMakeLists.txt').read())[0]
     patch = re.findall("set\(CPACK_PACKAGE_VERSION_PATCH.*\"(.*)\"", open('dlib/CMakeLists.txt').read())[0]
-    return major + '.' + minor + '.' + patch 
+    return major + '.' + minor + '.' + patch
 
 
 def rmtree(name):
@@ -502,33 +509,35 @@ class build(_build):
 
         # make sure build artifacts are generated for the version of Python currently running
         cmake_extra_arch = []
+
+        inc_dir = get_python_inc()
+        lib_dir = get_config_var('LIBDIR')
+        if (inc_dir != None):
+            cmake_extra_arch += ['-DPYTHON_INCLUDE_DIR=' + inc_dir]
+        if (lib_dir != None):
+            cmake_extra_arch += ['-DCMAKE_LIBRARY_PATH=' + lib_dir]
+
         if sys.version_info >= (3, 0):
             cmake_extra_arch += ['-DPYTHON3=yes']
 
         log.info("Detected platform: %s" % sys.platform)
         if sys.platform == "darwin":
             # build on OS X
-            inc_dir = get_python_inc()
-            cmake_extra_arch += ['-DPYTHON_INCLUDE_DIR={inc}'.format(inc=inc_dir)]
 
             # by default, cmake will choose the system python lib in /usr/lib
             # this checks the sysconfig and will correctly pick up a brewed python lib
             # e.g. in /usr/local/Cellar
             py_ver = get_python_version()
+            # check: in some virtual environments the libpython has the form "libpython_#m.dylib
             py_lib = os.path.join(get_config_var('LIBDIR'), 'libpython'+py_ver+'.dylib')
+            if not os.path.isfile(py_lib):
+                py_lib = os.path.join(get_config_var('LIBDIR'), 'libpython'+py_ver+'m.dylib')
+                
             cmake_extra_arch += ['-DPYTHON_LIBRARY={lib}'.format(lib=py_lib)]
 
-        if platform_arch == '64bit' and sys.platform == "win32":
-            # 64bit build on Windows
-
-            if not generator_set:
-                # see if we can deduce the 64bit default generator
+        if sys.platform == "win32":
+            if platform_arch == '64bit' and  not generator_set:
                 cmake_extra_arch += get_msvc_win64_generator()
-
-            # help cmake to find Python library in 64bit Python in Windows
-            #  because cmake is 32bit and cannot find PYTHON_LIBRARY from registry.
-            inc_dir = get_python_inc()
-            cmake_extra_arch += ['-DPYTHON_INCLUDE_DIR={inc}'.format(inc=inc_dir)]
 
             # this imitates cmake in path resolution
             py_ver = get_python_version()
@@ -609,7 +618,7 @@ setup(
     version=read_version(),
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     description='A toolkit for making real world machine learning and data analysis applications',
-    long_description=readme('README.txt'),
+    long_description=readme('README.md'),
     author='Davis King',
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',

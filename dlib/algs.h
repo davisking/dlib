@@ -10,8 +10,28 @@
 
 // this file contains miscellaneous stuff                      
 
+// Give people who forget the -std=c++11 option a reminder
+#if (defined(__GNUC__) && ((__GNUC__ >= 4 && __GNUC_MINOR__ >= 8) || (__GNUC__ > 4))) || \
+    (defined(__clang__) && ((__clang_major__ >= 3 && __clang_minor__ >= 4) || (__clang_major__ >= 3)))
+    #if __cplusplus < 201103
+        #error "Dlib requires C++11 support.  Give your compiler the -std=c++11 option to enable it."
+    #endif
+#endif
+
+#if defined __NVCC__
+    // Disable the "statement is unreachable" message since it will go off on code that is
+    // actually reachable but just happens to not be reachable sometimes during certain
+    // template instantiations.
+    #pragma diag_suppress code_is_unreachable
+#endif
+
 
 #ifdef _MSC_VER
+
+#if  _MSC_VER < 1900
+#error "dlib versions newer than v19.1 use C++11 and therefore require Visual Studio 2015 or newer."
+#endif
+
 // Disable the following warnings for Visual Studio
 
 // this is to disable the "'this' : used in base member initializer list"
@@ -50,6 +70,13 @@
 
 // Disable "warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)"
 #pragma warning(disable : 4290)
+
+
+// DNN module uses template-based network declaration that leads to very long
+// type names. Visual Studio will produce Warning C4503 in such cases. https://msdn.microsoft.com/en-us/library/074af4b6.aspx says
+// that correct binaries are still produced even when this warning happens, but linker errors from visual studio, if they occurr could be confusing.
+#pragma warning( disable: 4503 )
+
 
 #endif
 

@@ -18,14 +18,21 @@ namespace dlib
     /*!
         requires
             - for all valid i:
-                - dets[i].num_parts() == 68
+                - dets[i].num_parts() == 68 || dets[i].num_parts() == 5
         ensures
             - Interprets the given objects as face detections with parts annotated using
-              the iBUG face landmark scheme.  We then return a set of overlay lines that
-              will draw the objects onto the screen in a way that properly draws the
-              outline of the face features defined by the part locations.
+              either the iBUG face landmark scheme or a 5 point face annotation.  We then
+              return a set of overlay lines that will draw the objects onto the screen in a
+              way that properly draws the outline of the face features defined by the part
+              locations.
             - returns a vector with dets.size() elements, each containing the lines
               necessary to render a face detection from dets.
+            - The 5 point face annotation scheme is assumed to be:
+                - det part 0 == left eye corner, outside part of eye.
+                - det part 1 == left eye corner, inside part of eye.
+                - det part 2 == right eye corner, outside part of eye.
+                - det part 3 == right eye corner, inside part of eye.
+                - det part 4 == immediately under the nose, right at the top of the philtrum.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -36,7 +43,7 @@ namespace dlib
     );
     /*!
         requires
-            - det.num_parts() == 68
+            - det.num_parts() == 68 || det.num_parts() == 5
         ensures
             - This function is identical to the above render_face_detections() routine
               except that it takes just a single full_object_detection instead of a

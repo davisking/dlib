@@ -44,7 +44,7 @@ namespace dlib
                 - singular values less than max(m.nr(),m.nc()) times the machine epsilon 
                   times the largest singular value are ignored.  
             - else
-                - singular values less than tol are ignored.
+                - singular values less than tol*max(singular value in m) are ignored.
     !*/
 
 // ----------------------------------------------------------------------------------------

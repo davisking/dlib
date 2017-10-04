@@ -148,6 +148,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    std::string select_oldest_file (
+        const std::string& filename1,
+        const std::string& filename2
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    std::string select_newest_file (
+        const std::string& filename1,
+        const std::string& filename2
+    );
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #ifdef NO_MAKEFILE

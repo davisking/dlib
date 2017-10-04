@@ -303,6 +303,43 @@ namespace
         DLIB_TEST(labels[1] == 1);
     }
 
+    void test_segment_number_line()
+    {
+        dlib::rand rnd;
+
+
+        std::vector<double> x;
+        for (int i = 0; i < 5000; ++i)
+        {
+            x.push_back(rnd.get_double_in_range(-1.5, -1.01));
+            x.push_back(rnd.get_double_in_range(-0.99, -0.01));
+            x.push_back(rnd.get_double_in_range(0.01, 1));
+        }
+
+        auto r = segment_number_line(x,1);
+        std::sort(r.begin(), r.end());
+        DLIB_TEST(r.size() == 3);
+        DLIB_TEST(-1.5 <= r[0].lower && r[0].lower < r[0].upper && r[0].upper <= -1.01);
+        DLIB_TEST(-0.99 <= r[1].lower && r[1].lower < r[1].upper && r[1].upper <= -0.01);
+        DLIB_TEST(0.01 <= r[2].lower && r[2].lower < r[2].upper && r[2].upper <= 1);
+
+        x.clear();
+        for (int i = 0; i < 5000; ++i)
+        {
+            x.push_back(rnd.get_double_in_range(-2, 1));
+            x.push_back(rnd.get_double_in_range(-2, 1));
+            x.push_back(rnd.get_double_in_range(-2, 1));
+        }
+
+        r = segment_number_line(x,1);
+        DLIB_TEST(r.size() == 3);
+        r = segment_number_line(x,1.5);
+        DLIB_TEST(r.size() == 2);
+        r = segment_number_line(x,10.5);
+        DLIB_TEST(r.size() == 1);
+        DLIB_TEST(-2 <= r[0].lower && r[0].lower < r[0].upper && r[0].upper <= 1);
+    }
+
     class test_clustering : public tester
     {
     public:
@@ -316,6 +353,7 @@ namespace
         )
         {
             test_bottom_up_clustering();
+            test_segment_number_line();
 
             dlib::rand rnd;
 

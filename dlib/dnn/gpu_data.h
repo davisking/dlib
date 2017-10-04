@@ -208,13 +208,53 @@ namespace dlib
 
 #ifdef DLIB_USE_CUDA
     void memcpy (gpu_data& dest, const gpu_data& src);
+
+    void memcpy (
+        gpu_data& dest, 
+        size_t dest_offset,
+        const gpu_data& src,
+        size_t src_offset,
+        size_t num
+    );
+
 #else
+
     inline void memcpy (gpu_data& dest, const gpu_data& src)
     {
-        DLIB_CASSERT(dest.size() == src.size(), "");
-        if (src.size() == 0)
+        DLIB_CASSERT(dest.size() == src.size());
+        if (src.size() == 0 || &dest == &src)
             return;
         std::memcpy(dest.host_write_only(), src.host(), sizeof(float)*src.size());
+    }
+
+    inline void memcpy (
+        gpu_data& dest, 
+        size_t dest_offset,
+        const gpu_data& src,
+        size_t src_offset,
+        size_t num
+    )
+    {
+        DLIB_CASSERT(dest_offset + num <= dest.size());
+        DLIB_CASSERT(src_offset + num <= src.size());
+        if (num == 0)
+            return;
+        if (&dest == &src && std::max(dest_offset, src_offset) < std::min(dest_offset,src_offset)+num)
+        {
+            // if they perfectly alias each other then there is nothing to do
+            if (dest_offset == src_offset)
+                return;
+            else
+                std::memmove(dest.host()+dest_offset, src.host()+src_offset, sizeof(float)*num);
+        }
+        else
+        {
+            // if we write to the entire thing then we can use host_write_only()
+            if (dest_offset == 0 && num == dest.size())
+                std::memcpy(dest.host_write_only(), src.host()+src_offset, sizeof(float)*num);
+            else
+                std::memcpy(dest.host()+dest_offset, src.host()+src_offset, sizeof(float)*num);
+        }
     }
 #endif
 

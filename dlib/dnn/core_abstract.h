@@ -562,6 +562,8 @@ namespace dlib
                   clean().  The purpose of clean() is to compact the network object prior
                   to saving it to disk so that it takes up less space and the IO is
                   quicker.
+                - This also calls the .clean() method on any layer details objects that 
+                  define a .clean() method.
         !*/
 
     };
@@ -619,9 +621,12 @@ namespace dlib
         typedef typename subnet_type::input_type input_type;
         const static size_t num_computational_layers = subnet_type::num_computational_layers;
         const static size_t num_layers = subnet_type::num_layers + 1;
-        // If LOSS_DETAILS is an unsupervised loss then label_type==no_label_type.
+        // If LOSS_DETAILS is an unsupervised loss then training_label_type==no_label_type.
         // Otherwise it is defined as follows:
-        typedef typename LOSS_DETAILS::label_type label_type;
+        typedef typename LOSS_DETAILS::training_label_type training_label_type;
+        // Similarly, if LOSS_DETAILS doesn't provide any output conversion then
+        // output_label_type==no_label_type.
+        typedef typename LOSS_DETAILS::output_label_type output_label_type;
 
 
 
@@ -660,7 +665,7 @@ namespace dlib
         ); 
         /*!
             ensures
-                - #loss_details() == layer_det
+                - #loss_details() == loss_details_type(layer_det)
                 - #subnet()       == subnet_type(args)
         !*/
 
@@ -671,16 +676,19 @@ namespace dlib
         );
         /*!
             ensures
-                - #loss_details() == layer_det
+                - #loss_details() == loss_details_type(layer_det)
                 - #subnet()       == subnet_type(args)
         !*/
 
         template <typename ...T>
         add_loss_layer(
-            T ...args
+            T&& ...args
         ); 
         /*!
             ensures
+                - This version of the constructor is only called if loss_details_type can't
+                  be constructed from the first thing in args.  In this case, the args are
+                  simply passed on to the sub layers in their entirety.
                 - #loss_details() == loss_details_type()
                 - #subnet()       == subnet_type(args)
         !*/
@@ -765,7 +773,7 @@ namespace dlib
                 - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - obegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor() label_type elements.
+                  x.num_samples()/sample_expansion_factor() output_label_type elements.
             ensures
                 - runs x through the network and writes the output to the range at obegin.
                 - loss_details().to_label() is used to write the network output into
@@ -783,7 +791,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
                 - obegin == iterator pointing to the start of a range of
-                  std::distance(ibegin,iend) label_type elements.
+                  std::distance(ibegin,iend) output_label_type elements.
             ensures
                 - runs [ibegin,iend) through the network and writes the output to the range
                   at obegin.
@@ -793,18 +801,18 @@ namespace dlib
 
     // -------------
 
-        const label_type& operator() (
+        const output_label_type& operator() (
             const input_type& x
         );
         /*!
             ensures
                 - runs a single object, x, through the network and returns the output.
                 - loss_details().to_label() is used to convert the network output into a
-                  label_type.
+                  output_label_type.
         !*/
 
         template <typename iterable_type>
-        std::vector<label_type> operator() (
+        std::vector<output_label_type> operator() (
             const iterable_type& data,
             size_t batch_size = 128
         );
@@ -823,7 +831,50 @@ namespace dlib
                   items.  Using a batch_size > 1 can be faster because it better exploits
                   the available hardware parallelism.
                 - loss_details().to_label() is used to convert the network output into a
-                  label_type.
+                  output_label_type.
+        !*/
+
+        template <typename ...T>
+        const output_label_type& process (
+            const input_type& x, 
+            T&& ...args
+        );
+        /*!
+            ensures
+                - This function is just like (*this)(x), i.e. it runs a single object, x,
+                  through the network and returns the output.  But we additionally pass the 
+                  given args to loss_details().to_label() as the 4th argument (or more,
+                  depending on how many things are in args) when converting the network
+                  output to an output_label_type.  This is useful, for instance, with loss
+                  layers like loss_mmod_ which has an optional adjust_threshold argument to
+                  to_label() that adjusts the detection threshold.  Therefore, for such
+                  networks you could call them like: net.process(some_image, -0.5), and -0.5
+                  would be passed so the adjust_threshold argument of to_tensor().
+        !*/
+
+        template <typename iterable_type, typename ...T>
+        std::vector<output_label_type> process_batch (
+            const iterable_type& data, 
+            size_t batch_size, 
+            T&& ...args
+        );
+        /*!
+            requires
+                - batch_size > 0
+                - data must have a .begin() and .end() that supply iterators over a
+                  sequence of input_type elements.  E.g. data could have a type of
+                  std::vector<input_type>
+            ensures
+                - This function is just like (*this)(data,batch_size), i.e. it runs a
+                  bunch of objects through the network and returns the outputs.  But we
+                  additionally pass the given args to loss_details().to_label() as the 4th
+                  argument (or more, depending on how many things are in args) when
+                  converting the network output to output_label_types.  This is useful,
+                  for instance, with loss layers like loss_mmod_ which has an optional
+                  adjust_threshold argument to to_label() that adjusts the detection
+                  threshold.  Therefore, for such networks you could call them like:
+                  net.process_batch(std::vector<image_type>({some_image, another_image}), 128, -0.5), 
+                  and -0.5 would be passed so the adjust_threshold argument of to_tensor().
         !*/
 
     // -------------
@@ -841,7 +892,7 @@ namespace dlib
                 - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor() label_type elements.
+                  x.num_samples()/sample_expansion_factor() training_label_type elements.
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and returns the resulting loss. 
@@ -861,7 +912,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
                 - lbegin == iterator pointing to the start of a range of
-                  std::distance(ibegin,iend) label_type elements.
+                  std::distance(ibegin,iend) training_label_type elements.
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and returns the resulting loss. 
@@ -877,7 +928,7 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - sample_expansion_factor() != 0
                   (i.e. to_tensor() must have been called to set sample_expansion_factor()
                   to something non-zero.)
@@ -895,7 +946,7 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
             ensures
@@ -918,7 +969,7 @@ namespace dlib
                 - x.num_samples()%sample_expansion_factor() == 0
                 - x.num_samples() > 0
                 - lbegin == iterator pointing to the start of a range of
-                  x.num_samples()/sample_expansion_factor() label_type elements.
+                  x.num_samples()/sample_expansion_factor() training_label_type elements.
             ensures
                 - runs x through the network, compares the output to the expected output
                   pointed to by lbegin, and computes parameter and data gradients with
@@ -941,7 +992,7 @@ namespace dlib
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
                 - lbegin == iterator pointing to the start of a range of
-                  std::distance(ibegin,iend) label_type elements.
+                  std::distance(ibegin,iend) training_label_type elements.
             ensures
                 - runs [ibegin,iend) through the network, compares the output to the
                   expected output pointed to by lbegin, and computes parameter and data
@@ -958,7 +1009,7 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - sample_expansion_factor() != 0
                   (i.e. to_tensor() must have been called to set sample_expansion_factor()
                   to something non-zero.)
@@ -979,7 +1030,7 @@ namespace dlib
         );
         /*!
             requires
-                - LOSS_DETAILS is an unsupervised loss.  i.e. label_type==no_label_type.
+                - LOSS_DETAILS is an unsupervised loss.  i.e. training_label_type==no_label_type.
                 - [ibegin, iend) is an iterator range over input_type objects.
                 - std::distance(ibegin,iend) > 0
             ensures
@@ -1393,6 +1444,7 @@ namespace dlib
             - returns the input later of the given network object.  Specifically, this
               function is equivalent to calling:
                 layer<net_type::num_layers-1>(net);
+              That is, you get the input layer details object for the network.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1486,6 +1538,121 @@ namespace dlib
 
                 for (size_t i = 0; i < net_type::num_layers; ++i)
                     v(i, layer<i>(net));
+    !*/
+
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_backwards(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_net_type& t)
+              That is, it must take a size_t and then any of the network types such as
+              add_layer, add_loss_layer, etc.
+        ensures
+            - Loops over all the layers in net and calls v() on them.  The loop happens in
+              the reverse order of visit_layers().  To be specific, this function
+              essentially performs the following:
+
+                for (size_t i = net_type::num_layers; i != 0; --i)
+                    v(i-1, layer<i-1>(net));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        size_t begin,
+        size_t end,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_range(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_net_type& t)
+              That is, it must take a size_t and then any of the network types such as
+              add_layer, add_loss_layer, etc.
+            - begin <= end <= net_type::num_layers
+        ensures
+            - Loops over the layers in the range [begin,end) in net and calls v() on them.
+              The loop happens in the reverse order of visit_layers().  To be specific,
+              this function essentially performs the following:
+
+                for (size_t i = begin; i < end; ++i)
+                    v(i, layer<i>(net));
+    !*/
+
+    template <
+        size_t begin,
+        size_t end,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_backwards_range(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_net_type& t)
+              That is, it must take a size_t and then any of the network types such as
+              add_layer, add_loss_layer, etc.
+            - begin <= end <= net_type::num_layers
+        ensures
+            - Loops over the layers in the range [begin,end) in net and calls v() on them.
+              The loop happens in the reverse order of visit_layers_range().  To be specific,
+              this function essentially performs the following:
+
+                for (size_t i = end; i != begin; --i)
+                    v(i-1, layer<i-1>(net));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        unsigned long tag_id,
+        typename net_type,
+        typename visitor
+        >
+    void visit_layers_until_tag(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(any_net_type& t)
+              That is, it must take any of the network types such as add_layer,
+              add_loss_layer, etc.
+        ensures
+            - Loops over all the layers in net beginning with layer<0>(net) and going until
+              a tag layer with an ID of tag_id is encountered.  To be specific, this
+              function essentially performs the following:
+
+                size_t i = 0;
+                while(layer<i>(net) isn't an add_tag_layer with ID == tag_id) {
+                    v(layer<i>(net));
+                    ++i;
+                }
+                v(layer<i>(net));  // also visits the tag layer itself at the very end.
     !*/
 
 // ----------------------------------------------------------------------------------------

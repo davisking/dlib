@@ -64,6 +64,11 @@ namespace dlib
         provides serialization support  
     !*/
 
+    std::ostream& operator<< (std::ostream& out, const EXAMPLE_SOLVER& item);
+    /*!
+        Prints the solver's name and parameters to out.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -119,6 +124,11 @@ namespace dlib
     void deserialize(sgd& item, std::istream& in);
     /*!
         provides serialization support  
+    !*/
+
+    std::ostream& operator<< (std::ostream& out, const sgd& item);
+    /*!
+        Prints the solver's name and parameters to out.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -179,6 +189,11 @@ namespace dlib
     void deserialize(adam& item, std::istream& in);
     /*!
         provides serialization support  
+    !*/
+
+    std::ostream& operator<< (std::ostream& out, const adam& item);
+    /*!
+        Prints the solver's name and parameters to out.
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -441,6 +441,30 @@ namespace dlib
         return shrink_rect(rect, -width, -height);
     }
 
+    inline drectangle set_rect_area (
+        const drectangle& rect,
+        double area
+    )
+    {
+        DLIB_ASSERT(area >= 0, "drectangle can't have a negative area.");
+
+        if (area == 0)
+            return drectangle(dcenter(rect));
+
+        if (rect.area() == 0)
+        {
+            // In this case we will make the output rectangle a square with the requested
+            // area.
+            double scale = std::sqrt(area);
+            return centered_drect(rect, scale, scale);
+        }
+        else
+        {
+            double scale = std::sqrt(area/rect.area());
+            return centered_drect(rect, rect.width()*scale, rect.height()*scale);
+        }
+    }
+
     inline drectangle set_aspect_ratio (
         const drectangle& rect,
         double ratio

@@ -369,6 +369,39 @@ namespace
                     DLIB_TEST(d == 4);
                 }
 
+
+                tp.wait_for_all_tasks();
+
+                // make sure exception propagation from tasks works correctly.
+                auto f_throws = []() { throw dlib::error("test exception");};
+                bool got_exception = false;
+                try
+                {
+                    tp.add_task_by_value(f_throws);
+                    tp.wait_for_all_tasks();
+                }
+                catch(dlib::error& e)
+                {
+                    DLIB_TEST(e.info == "test exception");
+                    got_exception = true;
+                }
+                DLIB_TEST(got_exception);
+
+                dlib::future<int> aa;
+                auto f_throws2 = [](int& a) { a = 1; throw dlib::error("test exception");};
+                got_exception = false;
+                try
+                {
+                    tp.add_task(f_throws2, aa);
+                    aa.get();
+                }
+                catch(dlib::error& e)
+                {
+                    DLIB_TEST(e.info == "test exception");
+                    got_exception = true;
+                }
+                DLIB_TEST(got_exception);
+
             }
         }
 

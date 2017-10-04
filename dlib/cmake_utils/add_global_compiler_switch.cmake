@@ -1,6 +1,6 @@
 
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 
 # Make macros that can add compiler switches to the entire project.  Not just
 # to the current cmake folder being built.  
