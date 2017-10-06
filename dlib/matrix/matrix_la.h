@@ -412,7 +412,7 @@ test_f_convergence:
                 if (z != 0)
                 {
                     c = f / z;
-                    s = h / z;c
+                    s = h / z;
                 }
                 f = c * g + s * y;
                 x = -s * g + c * y;
