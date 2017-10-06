@@ -1134,10 +1134,11 @@ convergence:
                     if (bandwidth > A.nr() / 2)
                     {
                        banded = false;
-                       break;
+                       goto escape_banded_detection;
                     }
                  }
         }
+escape_banded_detection:
 
         if (banded)
         {
