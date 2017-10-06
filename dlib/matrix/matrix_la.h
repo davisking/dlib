@@ -1117,7 +1117,71 @@ convergence:
             );
         typename matrix_exp<EXP>::matrix_type L(A.nr(),A.nc());
 
+        typedef typename EXP::type T;
+
+
+        bool banded = false;
+        long bandwidth = 0;
+
+        if (A.nr() > 4) // Only test for banded matrix if matrix is big enough
+        {
+           // Detect if matrix is banded and, if so, matrix bandwidth
+           banded = true;
+           for (long r = 0; r < A.nr(); ++r)
+              for (long c = (r + bandwidth + 1); c < A.nc(); ++c)
+                 if (A(r, c) != 0)
+                 {
+                    bandwidth = c - r;
+                    if (bandwidth > A.nr() / 2)
+                    {
+                       banded = false;
+                       break;
+                    }
+                 }
+        }
+
+        if (banded)
+        {
+           // Store in compact form
+           typename matrix_exp<EXP>::matrix_type B(A.nr(), bandwidth + 1);
+           set_all_elements(B, 0);
+
+           for (long r = 0; r < A.nr(); ++r)
+              for (long c = r; c < std::min(r + bandwidth + 1, A.nc()); ++c)
+                 B(r, c - r) = A(r, c);
+
+           // Peform compact Cholesky
+           for (long k = 0; k < A.nr(); ++k)
+           {
+              long last = std::min(k + bandwidth, A.nr() - 1) - k;
+              for (long j = 1; j <= last; ++j)
+              {
+                 long i = k + j;
+                 for (long c = 0; c <= (last - j); ++c)
+                    B(i, c) -= B(k, j) / B(k, 0) * B(k, c + j);
+              }
+              T norm = std::sqrt(B(k, 0));
+              for (long c = 0; c <= bandwidth; ++c)
+                 B(k, c) /= norm;
+           }
+           for (long r = A.nr() - bandwidth + 1; r < A.nr(); ++r)
+              B(r, bandwidth) = 0;
+
+           // Unpack lower triangular area
+           set_all_elements(L, 0);
+           for (long r = 0; r < A.nr(); ++r)
+              for (long c = 0; c <= bandwidth; ++c)
+              {
+                 long ind = r + c;
+                 if (ind < A.nc())
+                    L(ind, r) = B(r, c);
+              }
+
+           return L;
+        }
+
 #ifdef DLIB_USE_LAPACK
+        
         // Only call LAPACK if the matrix is big enough.  Otherwise,
         // our own code is faster, especially for statically dimensioned 
         // matrices.
@@ -1129,7 +1193,6 @@ convergence:
             return lowerm(L);
         }
 #endif
-        typedef typename EXP::type T;
         set_all_elements(L,0);
 
         // do nothing if the matrix is empty
