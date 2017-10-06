@@ -412,7 +412,7 @@ test_f_convergence:
                 if (z != 0)
                 {
                     c = f / z;
-                    s = h / z;
+                    s = h / z;c
                 }
                 f = c * g + s * y;
                 x = -s * g + c * y;
@@ -1119,7 +1119,6 @@ convergence:
 
         typedef typename EXP::type T;
 
-
         bool banded = false;
         long bandwidth = 0;
 
@@ -1180,8 +1179,7 @@ convergence:
            return L;
         }
 
-#ifdef DLIB_USE_LAPACK
-        
+#ifdef DLIB_USE_LAPACK        
         // Only call LAPACK if the matrix is big enough.  Otherwise,
         // our own code is faster, especially for statically dimensioned 
         // matrices.
