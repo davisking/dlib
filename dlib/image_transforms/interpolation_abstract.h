@@ -499,7 +499,7 @@ namespace dlib
         requires
             - image_array_type == a dlib::array or std::vector of image objects that each
               implement the interface defined in dlib/image_processing/generic_image.h
-            - T == rectangle or full_object_detection
+            - T == rectangle, full_object_detection, or mmod_rect
             - images.size() == objects.size()
         ensures
             - This function computes all the left/right flips of the contents of images and
@@ -532,8 +532,8 @@ namespace dlib
               implement the interface defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - images.size() == objects2.size()
-            - T == rectangle or full_object_detection
-            - U == rectangle or full_object_detection
+            - T == rectangle, full_object_detection, or mmod_rect
+            - U == rectangle, full_object_detection, or mmod_rect
         ensures
             - This function computes all the left/right flips of the contents of images and
               then appends them onto the end of the images array.  It also finds the
@@ -571,8 +571,8 @@ namespace dlib
             - angles.size() > 0
             - images.size() == objects.size()
             - images.size() == objects2.size()
-            - T == rectangle or full_object_detection
-            - U == rectangle or full_object_detection
+            - T == rectangle, full_object_detection, or mmod_rect
+            - U == rectangle, full_object_detection, or mmod_rect
         ensures
             - This function computes angles.size() different rotations of all the given
               images and then replaces the contents of images with those rotations of the
@@ -608,7 +608,7 @@ namespace dlib
             - is_vector(angles) == true
             - angles.size() > 0
             - images.size() == objects.size()
-            - T == rectangle or full_object_detection
+            - T == rectangle, full_object_detection, or mmod_rect
         ensures
             - This function is identical to the add_image_rotations() define above except
               that it doesn't have objects2 as an argument.  
