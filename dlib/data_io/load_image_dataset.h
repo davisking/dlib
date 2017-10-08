@@ -190,7 +190,7 @@ namespace dlib
 
     namespace impl
     {
-        size_t num_non_ignored_boxes (const std::vector<mmod_rect>& rects)
+        inline size_t num_non_ignored_boxes (const std::vector<mmod_rect>& rects)
         {
             size_t cnt = 0;
             for (auto& b : rects)
