@@ -25,7 +25,7 @@ namespace dlib
 
     public:
 
-        explicit correlation_tracker (unsigned long filter_size = 6, 
+        explicit correlation_tracker (unsigned long filter_size = 7,
             unsigned long num_scale_levels = 5, 
             unsigned long scale_window_size = 23,
             double regularizer_space = 0.001,
@@ -143,6 +143,7 @@ namespace dlib
         double update (
             const image_type& img
         );
+
         /*!
             requires
                 - image_type == an image object that implements the interface defined in
@@ -152,6 +153,17 @@ namespace dlib
             ensures
                 - performs: return update(img, get_position())
         !*/
+
+        //-----------Julius
+
+        void set_filter_size(const unsigned long filter_size_);
+        void set_num_scale_levels(const unsigned long num_scale_levels_);
+        void set_scale_window_size(const unsigned long scale_window_size_);
+        void set_regularizer_space(const double regularizer_space_);
+        void set_regularizer_scale(const double regularizer_scale_);
+        void set_scale_pyramid_alpha(const double scale_pyramid_alpha_);
+        void set_nu_scale(const double nu_scale_);
+        void set_nu_space(const double nu_space_);
 
     };
 }

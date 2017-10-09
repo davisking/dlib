@@ -10,6 +10,19 @@ using namespace dlib;
 using namespace std;
 using namespace boost::python;
 
+// ---------Julius----------
+
+void print_parameters_setting(const correlation_tracker& tracker) {
+    cout << "======Tracker's parameters setting======" << endl;
+    cout << "filter_size: " << (int) tracker.get_filter_size() << endl;
+    cout << "num_scale_levels: " << (int) tracker.get_num_scale_levels() << endl;
+    cout << "scale_window_size: " << tracker.get_scale_window_size() << endl;
+    cout << "regularizer_space: " << tracker.get_regularizer_space() << endl;
+    cout << "regularizer_scale: " << tracker.get_regularizer_scale() << endl;
+    cout << "scale_pyramid_alpha: " << tracker.get_scale_pyramid_alpha() << endl;
+    cout << "nu_scale: " << tracker.get_nu_scale() << endl;
+    cout << "========================================" << endl;
+}
 // ----------------------------------------------------------------------------------------
 
 void start_track (
@@ -93,6 +106,42 @@ double update_guess_rec (
 
 drectangle get_position (const correlation_tracker& tracker) { return tracker.get_position(); }
 
+double get_nu_scale (const correlation_tracker& tracker) { return tracker.get_nu_scale(); }
+double get_nu_space (const correlation_tracker& tracker) { return tracker.get_nu_space(); }
+
+//----------Julius
+void set_filter_size(correlation_tracker& tracker, const unsigned long filter_size_) {
+    tracker.set_filter_size(filter_size_);
+}
+
+void set_num_scale_levels(correlation_tracker& tracker, const unsigned long num_scale_levels_) {
+    tracker.set_num_scale_levels(num_scale_levels_);
+}
+
+void set_scale_window_size(correlation_tracker& tracker, const unsigned long scale_window_size_) {
+    tracker.set_scale_window_size(scale_window_size_);
+}
+
+void set_regularizer_space(correlation_tracker& tracker, const double regularizer_space_) {
+    tracker.set_regularizer_space(regularizer_space_);
+}
+
+void set_regularizer_scale(correlation_tracker& tracker, const double regularizer_scale_) {
+    tracker.set_regularizer_scale(regularizer_scale_);
+}
+
+void set_scale_pyramid_alpha(correlation_tracker& tracker, const double scale_pyramid_alpha_) {
+    tracker.set_scale_pyramid_alpha(scale_pyramid_alpha_);
+}
+
+void set_nu_scale(correlation_tracker& tracker, const double nu_scale_) {
+    tracker.set_nu_scale(nu_scale_);
+}
+
+void set_nu_space(correlation_tracker& tracker, const double nu_space_) {
+    tracker.set_nu_space(nu_space_);
+}
+
 // ----------------------------------------------------------------------------------------
 
 void bind_correlation_tracker()
@@ -161,6 +210,17 @@ void bind_correlation_tracker()
                 - Returns the peak to side-lobe ratio.  This is a number that measures how \n\
                   confident the tracker is that the object is inside #get_position(). \n\
                   Larger values indicate higher confidence.")
-        .def("get_position", &::get_position, "returns the predicted position of the object under track.");
+        .def("get_position", &::get_position, "returns the predicted position of the object under track.")
+        .def("get_nu_scale", &::get_nu_scale, "get_nu_scale")
+        .def("get_nu_space", &::get_nu_space, "get_nu_space")
+        .def("print_parameters_setting", &::print_parameters_setting, "returns all the parameters of the tracker.")
+        .def("set_filter_size", &::set_filter_size, (arg("filter_size")), "set_filter_size")
+        .def("set_num_scale_levels", &::set_num_scale_levels, (arg("num_scale_levels")), "set_num_scale_levels")
+        .def("set_scale_window_size", &::set_scale_window_size, (arg("scale_window_size")), "set_scale_window_size")
+        .def("set_regularizer_space", &::set_regularizer_space, (arg("regularizer_space")), "set_regularizer_space")
+        .def("set_regularizer_scale", &::set_regularizer_scale, (arg("regularizer_scale")), "set_regularizer_scale")
+        .def("set_scale_pyramid_alpha", &::set_scale_pyramid_alpha, (arg("scale_pyramid_alpha")), "set_scale_pyramid_alpha")
+        .def("set_nu_scale", &::set_nu_scale, (arg("nu_scale")), "set_nu_scale")
+        .def("set_nu_space", &::set_nu_space, (arg("nu_space")), "set_nu_space");
     }
 }

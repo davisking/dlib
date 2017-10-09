@@ -20,7 +20,7 @@ namespace dlib
     {
     public:
 
-        explicit correlation_tracker (unsigned long filter_size = 6, 
+        explicit correlation_tracker (unsigned long filter_size = 7,
             unsigned long num_scale_levels = 5, 
             unsigned long scale_window_size = 23,
             double regularizer_space = 0.001,
@@ -224,6 +224,40 @@ namespace dlib
             )
         {
             return update(img, get_position());
+        }
+
+        // --------Julius
+
+        void set_filter_size(const unsigned long filter_size_) {
+            filter_size = filter_size_;
+        }
+
+        void set_num_scale_levels(const unsigned long num_scale_levels_) {
+            num_scale_levels = num_scale_levels_;
+        }
+
+        void set_scale_window_size(const unsigned long scale_window_size_) {
+            scale_window_size = scale_window_size_;
+        }
+
+        void set_regularizer_space(const double regularizer_space_) {
+            regularizer_space = regularizer_space_;
+        }
+
+        void set_regularizer_scale(const double regularizer_scale_) {
+            regularizer_scale = regularizer_scale_;
+        }
+
+        void set_scale_pyramid_alpha(const double scale_pyramid_alpha_) {
+            scale_pyramid_alpha = scale_pyramid_alpha_;
+        }
+
+        void set_nu_scale(const double nu_scale_) {
+            nu_scale = nu_scale_;
+        }
+
+        void set_nu_space(const double nu_space_) {
+            nu_space = nu_space_;
         }
 
     private:
