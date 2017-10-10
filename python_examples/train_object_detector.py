@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 #
-# This example program shows how you can use dlib to make an object
-#   detector for things like faces, pedestrians, and any other semi-rigid
-#   object.  In particular, we go though the steps to train the kind of sliding
-#   window object detector first published by Dalal and Triggs in 2005 in the
-#   paper Histograms of Oriented Gradients for Human Detection.
+# This example program shows how you can use dlib to make a HOG based object
+# detector for things like faces, pedestrians, and any other semi-rigid
+# object.  In particular, we go though the steps to train the kind of sliding
+# window object detector first published by Dalal and Triggs in 2005 in the
+# paper Histograms of Oriented Gradients for Human Detection.
 #
 #
 # COMPILING/INSTALLING THE DLIB PYTHON INTERFACE

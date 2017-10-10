@@ -274,6 +274,11 @@ namespace dlib
                        If an exception is thrown then it has no effect on *this.
             !*/
 
+            void push_back (T&& item) { push_back(item); }
+            /*!
+                enable push_back from rvalues 
+            !*/
+
             typedef T* iterator;
             typedef const T* const_iterator;
 

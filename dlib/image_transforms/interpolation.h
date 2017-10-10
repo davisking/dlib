@@ -1163,6 +1163,15 @@ namespace dlib
             return centered_rect(tran(center(rect)), rect.width(), rect.height());
         }
 
+        inline mmod_rect tform_object (
+            const point_transform_affine& tran,
+            mmod_rect rect
+        )
+        {
+            rect.rect = tform_object(tran, rect.rect);
+            return rect;
+        }
+
         inline full_object_detection tform_object(
             const point_transform_affine& tran,
             const full_object_detection& obj
@@ -1209,7 +1218,7 @@ namespace dlib
             for (unsigned long i = 0; i < objects[j].size(); ++i)
                 rects.push_back(impl::tform_object(tran, objects[j][i]));
 
-            images.push_back(temp);
+            images.push_back(std::move(temp));
             objects.push_back(rects);
         }
     }
@@ -1245,7 +1254,7 @@ namespace dlib
         for (unsigned long j = 0; j < num; ++j)
         {
             const point_transform_affine tran = flip_image_left_right(images[j], temp);
-            images.push_back(temp);
+            images.push_back(std::move(temp));
 
             rects.clear();
             for (unsigned long i = 0; i < objects[j].size(); ++i)
@@ -1544,7 +1553,7 @@ namespace dlib
             for (unsigned long j = 0; j < images.size(); ++j)
             {
                 const point_transform_affine tran = rotate_image(images[j], temp, angles(i));
-                new_images.push_back(temp);
+                new_images.push_back(std::move(temp));
 
                 objtemp.clear();
                 for (unsigned long k = 0; k < objects[j].size(); ++k)

@@ -188,6 +188,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        inline size_t num_non_ignored_boxes (const std::vector<mmod_rect>& rects)
+        {
+            size_t cnt = 0;
+            for (auto& b : rects)
+            {
+                if (!b.ignore)
+                    cnt++;
+            }
+            return cnt;
+        }
+    }
+
     template <
         typename array_type
         >
@@ -235,7 +249,7 @@ namespace dlib
                 }
             }
 
-            if (!source.should_skip_empty_images() || rects.size() != 0)
+            if (!source.should_skip_empty_images() || impl::num_non_ignored_boxes(rects) != 0)
             {
                 load_image(img, data.images[i].filename);
                 if (rects.size() != 0)  

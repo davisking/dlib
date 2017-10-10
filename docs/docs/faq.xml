@@ -360,6 +360,90 @@ cross_validate_trainer_threaded(trainer,
 
    <!-- ************************************************************************* -->
 
+
+   <questions group="Computer Vision">
+      <question text="Why doesn't the object detector I trained work?">
+         There are three general mistakes people make when trying to train an object detector with dlib. 
+         <ul>
+            <li><h3>Not labeling all the objects in each image</h3>
+               The tools for training object detectors in dlib use the <a href="https://arxiv.org/abs/1502.00046">Max-Margin Object Detection</a>
+               loss.  This loss optimizes the performance of the detector on the whole image, not on some subset of windows cropped from the training data.
+               That means it counts the number of missed detections and false alarms for each of the training images and tries to find a way
+               to minimize the sum of these two error metrics.  For this to be possible, <b>you must label all the objects in each training image</b>.
+               If you leave unannotated objects in some of your training images then the loss will think any detections on these unannotated objects
+               are false alarms, and will therefore try to find a detector that doesn't detect them.  If you have enough unannotated objects, the 
+               most accurate detector will be the one that never detects anything.  That's obviously not what you want.  So make sure you annotate all the
+               objects in each image.
+               <p>
+                  Sometimes annotating all the objects in each image is too
+                  onerous, or there are ambiguous objects you don't care about.
+                  In these cases you should annotate these objects you don't
+                  care about with ignore boxes so that the MMOD loss knows to
+                  ignore them.  You can do this with dlib's imglab tool by
+                  selecting a box and pressing i.  Moreover, there are two ways
+                  the code treats ignore boxes.  When a detector generates a
+                  detection it compares it against any ignore boxes and ignores
+                  it if the boxes "overlap".  Deciding if they overlap is based
+                  on either their intersection over union or just basic percent
+                  coverage of one by another.  You have to think about what
+                  mode you want when you annotate things and configure the
+                  training code appropriately.  The default behavior is to use
+                  intersection over union to measure overlap.  However, if you
+                  wanted to simply mask out large parts of an image you
+                  wouldn't want to use intersection over union to measure
+                  overlap since small boxes contained entirely within the large
+                  ignored region would have small IoU with the big ignore region and thus not "overlap"
+                  the ignore region.  In this case you should change the
+                  settings to reflect this before training.  The available configuration
+                  options are discussed in great detail in parts of <a href="#Whereisthedocumentationforobjectfunction">dlib's documentation</a>.
+               </p>
+            </li>
+            <li><h3>Using training images that don't look like the testing images</h3>
+               This should be obvious, but needs to be pointed out.  If there
+               is some clear difference between your training and testing
+               images then you have messed up.  You need to show the training
+               algorithm real images so it can learn what to do.  If instead
+               you only show it images that look obviously different from your
+               testing images don't be surprised if, when you run the detector
+               on the testing images, it doesn't work.  As a rule of thumb,
+               <b>a human should not be able to tell if an image came from the training dataset or testing dataset</b>.  
+
+               <p>
+                  Here are some examples of bad datasets:
+                  <ul>
+                     <li>A training dataset where objects always appear with
+                        some specific orientation but the testing images have a
+                        diverse set of orientations.</li>
+                     <li>A training dataset where objects are tightly cropped, but testing images that are uncropped.</li>
+                     <li>A training dataset where objects appear only on a perfectly white background with nothing else present, but testing images where objects appear in a normal environment like living rooms or in natural scenes.</li>
+                  </ul>
+               </p>
+            </li>
+            <li><h3>Using a HOG based detector but not understanding the limits of HOG templates</h3>
+               The <a href="fhog_object_detector_ex.cpp.html">HOG detector</a> is very fast and generally easy to train.  However, you
+               have to be aware that HOG detectors are essentially rigid templates that are scanned over an image.  So a single HOG detector
+               isn't going to be able to detect objects that appear in a wide range of orientations or undergo complex deformations or have complex
+               articulation.
+               <p>
+                  For example, a HOG detector isn't going to be able to learn to detect human faces that are upright as well as faces rotated 90 degrees.
+                  If you wanted to deal with that you would be best off training 2 detectors. One for upright faces and another for 90 degree rotated faces.
+                  You can efficiently run multiple HOG detectors at once using the <a href="imaging.html#evaluate_detectors">evaluate_detectors</a> function, so it's not a huge deal to do this.  Dlib's imglab tool also has a --cluster option that will help you split a training dataset into clusters that can 
+                  be detected by a single HOG detector.  You will still need to manually review and clean the dataset after applying --cluster, but it makes
+                  the process of splitting a dataset into coherent poses, from the point of view of HOG, a lot easier.
+               </p>
+               <p>
+                  However, it should be emphasized that even using multiple HOG detectors will only get you so far.  So at some point you should consider
+                  using a <a href="ml.html#loss_mmod_">CNN based detection method</a> since CNNs can generally deal with arbitrary
+                  rotations, poses, and deformations with one unified
+                  detector.
+               </p>
+            </li>
+         </ul>
+      </question>
+   </questions>
+
+   <!-- ************************************************************************* -->
+
    <questions group="Deep Learning">
       <question text="Why can't I use the DNN module with Visual Studio?">
          You can, but you need to use Visual Studio 2015 Update 3 or newer since prior versions
@@ -369,6 +453,15 @@ cross_validate_trainer_threaded(trainer,
          Microsoft web page has good enough C++11 support to compile the DNN
          tools in dlib.  So make sure you have a version no older than October
          2016.
+         <p>
+            However, as of this writing, the newest version of Visual Studio is Visual Studio 2017, which 
+            has WORSE C++11 support that Visual Studio 2015.  In particular, if you try to use
+            the DNN tooling in Visual Studio 2017 the compiler will just hang.  So use Visual Studio 2015.
+         </p>
+         <p>
+            It should also be noted that not even Visual Studio 2015 has perfect C++11 support.  Specifically, the 
+            larger and more complex imagenet and metric learning training examples don't compile in Visual Studio 2015.
+         </p>
       </question>
 
       <question text="Why can't I change the network architecture at runtime?">

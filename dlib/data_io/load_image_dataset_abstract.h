@@ -51,8 +51,9 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns true if we are supposed to skip images that don't have any boxes
-                  to load when loading an image dataset using load_image_dataset().
+                - returns true if we are supposed to skip images that don't have any
+                  non-ignored boxes to load when loading an image dataset using
+                  load_image_dataset().
         !*/
 
         image_dataset_file boxes_match_label(
