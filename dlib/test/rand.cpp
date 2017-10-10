@@ -381,6 +381,32 @@ namespace
         DLIB_TEST(std::abs(max_val - 1.0) < 0.001);
     }
 
+    void test_get_integer()
+    {
+
+        print_spinner();
+        dlib::rand rnd;
+
+
+        int big = 0;
+        int small = 0;
+
+        const long long maxval = (((unsigned long long)1)<<62) + (((unsigned long long)1)<<61);
+        for (int i = 0; i < 10000000; ++i)
+        {
+            if (rnd.get_integer(maxval) > maxval/2)
+                ++big;
+            else
+                ++small;
+        }
+
+        // make sure there isn't any funny bias
+        DLIB_TEST(std::abs(big/(double)small - 1) < 0.001);
+
+        cout << big/(double)small << endl;
+
+    }
+
     class rand_tester : public tester
     {
     public:
@@ -401,6 +427,7 @@ namespace
             test_normal_numbers(rnd);
             test_gaussian_random_hash();
             test_uniform_random_hash();
+            test_get_integer();
         }
     } a;
 
