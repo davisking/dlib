@@ -33,4 +33,17 @@ set(dlib_LIBRARIES ${dlib_LIBRARIES} "@dlib_needed_libraries@")
 set(dlib_LIBS      ${dlib_LIBRARIES} "@dlib_needed_libraries@")
 set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@" "@dlib_needed_includes@")
 
+
+# Mark these variables above as deprecated.
+function(__deprecated_var var access)
+   if(access STREQUAL "READ_ACCESS")
+      message(WARNING "The variable '${var}' is deprecated!  Instead, simply use target_link_libraries(your_app dlib::dlib).  See http://dlib.net/examples/CMakeLists.txt.html for an example.")
+   endif()
+endfunction()
+variable_watch(dlib_LIBRARIES __deprecated_var)
+variable_watch(dlib_LIBS __deprecated_var)
+variable_watch(dlib_INCLUDE_DIRS __deprecated_var)
+
+
+
 include(@CMAKE_INSTALL_FULL_INCLUDEDIR@/dlib/cmake_utils/use_cpp_11.cmake)
