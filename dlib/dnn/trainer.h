@@ -139,11 +139,11 @@ namespace dlib
         }
 
         net_type& get_net (
-            force_flush_to_disk force_flush_to_disk = force_flush_to_disk::yes
+            force_flush_to_disk force_flush = force_flush_to_disk::yes
         )  
         { 
             wait_for_thread_to_pause();
-            sync_to_disk(force_flush_to_disk == force_flush_to_disk::yes);
+            sync_to_disk(force_flush == force_flush_to_disk::yes);
             propagate_exception();
             return net; 
         }
