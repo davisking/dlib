@@ -55,6 +55,10 @@ namespace dlib
         }
     }
 
+    enum class force_flush_to_disk {
+        no = 0,
+        yes = 1
+    };
 
     template <
         typename net_type, 
@@ -135,10 +139,11 @@ namespace dlib
         }
 
         net_type& get_net (
+            force_flush_to_disk force_flush_to_disk = force_flush_to_disk::yes
         )  
         { 
             wait_for_thread_to_pause();
-            sync_to_disk(true);
+            sync_to_disk(force_flush_to_disk == force_flush_to_disk::yes);
             propagate_exception();
             return net; 
         }
