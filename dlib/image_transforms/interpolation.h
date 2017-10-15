@@ -2077,13 +2077,6 @@ namespace dlib
                 if (17 <= i && i <= 26)
                     continue;
 
-                if (1+i != 37 && 
-                    1+i != 40 &&
-                    1+i != 43 &&
-                    1+i != 46 &&
-                    1+i != 34)
-                    continue;
-
                 dpoint p;
                 p.x() = (padding+mean_face_shape_x[i-17])/(2*padding+1);
                 p.y() = (padding+mean_face_shape_y[i-17])/(2*padding+1);
