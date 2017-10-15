@@ -146,6 +146,35 @@ namespace dlib
                 return begin + get_random_double()*(end-begin);
             }
 
+            long long get_integer_in_range(
+                long long begin,
+                long long end
+            )
+            {
+                DLIB_ASSERT(begin <= end);
+                if (begin == end)
+                    return begin;
+
+                auto r = get_random_64bit_number();
+                const auto limit = std::numeric_limits<decltype(r)>::max();
+                const auto range = end-begin;
+                // Use rejection sampling to remove the biased sampling you would get with
+                // the naive get_random_64bit_number()%range sampling. 
+                while(r >= (limit/range)*range)
+                    r = get_random_64bit_number();
+
+                return begin + static_cast<long long>(r%range);
+            }
+
+            long long get_integer(
+                long long end
+            )
+            {
+                DLIB_ASSERT(end >= 0);
+
+                return get_integer_in_range(0,end);
+            }
+
             double get_random_double (
             )
             {

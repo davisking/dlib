@@ -1470,6 +1470,8 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
+            DLIB_CASSERT(num_inputs == sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k(),
+                "The size of the input tensor to this fc layer doesn't match the size the fc layer was trained with.");
             output.set_size(sub.get_output().num_samples(), num_outputs);
 
             auto w = weights(params, 0);
