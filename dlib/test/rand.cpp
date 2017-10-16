@@ -388,22 +388,22 @@ namespace
         dlib::rand rnd;
 
 
-        int big = 0;
-        int small = 0;
+        int big_val = 0;
+        int small_val = 0;
 
         const long long maxval = (((unsigned long long)1)<<62) + (((unsigned long long)1)<<61);
         for (int i = 0; i < 10000000; ++i)
         {
             if (rnd.get_integer(maxval) > maxval/2)
-                ++big;
+                ++big_val;
             else
-                ++small;
+                ++small_val;
         }
 
         // make sure there isn't any funny bias
-        DLIB_TEST(std::abs(big/(double)small - 1) < 0.001);
+        DLIB_TEST(std::abs(big_val/(double)small_val - 1) < 0.001);
 
-        cout << big/(double)small << endl;
+        cout << big_val/(double)small_val << endl;
 
     }
 
