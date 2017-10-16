@@ -45,6 +45,7 @@ namespace dlib
                 - for all valid i:
                     - #find_set(i) == i
                       (i.e. this object contains new_size subsets, each containing exactly one element)
+                    - #get_size_of_set(i) == 1
         !*/
 
         unsigned long size (
@@ -88,6 +89,7 @@ namespace dlib
             ensures
                 - #find_set(a) == #find_set(b)
                   (i.e. merges the set's containing a and b)
+                - #get_size_of_set(#find_set(a)) == get_size_of_set(a) + get_size_of_set(b)
                 - #get_number_of_sets() == get_number_of_sets() - 1
                 - returns #find_set(a)
         !*/
@@ -99,6 +101,17 @@ namespace dlib
                 - returns the current number of different subsets.
         !*/
 
+        unsigned long get_size_of_set(
+                unsigned long item
+        ) const;
+        /*!
+            requires
+                - item < size()
+                - find_set(item) == item
+                  (i.e. item is the representative element of some set)
+            ensures
+                - returns the number of elements which belongs to the set where item is the representative element.
+        !*/
     };
 
 // ----------------------------------------------------------------------------------------

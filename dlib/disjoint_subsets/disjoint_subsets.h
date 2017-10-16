@@ -20,6 +20,7 @@ namespace dlib
         ) noexcept
         {
             items.clear();
+            sets_size.clear();
             number_of_sets = 0;
         }
 
@@ -28,10 +29,12 @@ namespace dlib
         )
         {
             items.resize(new_size);
+            sets_size.resize(new_size);
             for (unsigned long i = 0; i < items.size(); ++i)
             {
                 items[i].parent = i;
                 items[i].rank = 0;
+                sets_size[i] = 1;
             }
             number_of_sets = new_size;
         }
@@ -106,12 +109,14 @@ namespace dlib
             if (items[a].rank > items[b].rank)
             {
                 items[b].parent = a;
+                sets_size[a] += sets_size[b];
                 number_of_sets--;
                 return a;
             }
             else
             {
                 items[a].parent = b;
+                sets_size[b] += sets_size[a];
                 if (items[a].rank == items[b].rank)
                 {
                     items[b].rank = items[b].rank + 1;
@@ -125,6 +130,24 @@ namespace dlib
         ) const noexcept
         {
             return number_of_sets;
+        }
+
+        unsigned long get_size_of_set(
+                unsigned long item
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(item < size() &&
+                        find_set(item) == item,
+                        "\t unsigned long disjoint_subsets::get_size_of_set()"
+                                << "\n\t invalid arguments were given to this function"
+                                << "\n\t item: " << item
+                                << "\n\t size(): " << size()
+                                << "\n\t find_set(item): " << find_set(item)
+                                << "\n\t this: " << this
+            );
+
+            return sets_size[item];
         }
 
     private:
@@ -141,6 +164,7 @@ namespace dlib
         };
 
         mutable std::vector<data> items;
+        mutable std::vector<unsigned long> sets_size;
         unsigned long number_of_sets{0};
 
     };
