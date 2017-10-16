@@ -16,6 +16,7 @@ namespace dlib
         /*!
             INITIAL VALUE
                 - size() == 0
+                - get_number_of_sets() == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a set of integers which is partitioned into
@@ -30,6 +31,7 @@ namespace dlib
         /*!
             ensures
                 - #size() == 0
+                - #get_number_of_sets() == 0
                 - returns this object to its initial value
         !*/
 
@@ -39,6 +41,7 @@ namespace dlib
         /*!
             ensures
                 - #size() == new_size
+                - #get_number_of_sets() == new_size
                 - for all valid i:
                     - #find_set(i) == i
                       (i.e. this object contains new_size subsets, each containing exactly one element)
@@ -85,7 +88,15 @@ namespace dlib
             ensures
                 - #find_set(a) == #find_set(b)
                   (i.e. merges the set's containing a and b)
+                - #get_number_of_sets() == get_number_of_sets() - 1
                 - returns #find_set(a)
+        !*/
+
+        unsigned long get_number_of_sets (
+        ) const noexcept;
+        /*!
+            ensures
+                - returns the current number of different subsets.
         !*/
 
     };

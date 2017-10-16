@@ -20,6 +20,7 @@ namespace dlib
         ) noexcept
         {
             items.clear();
+            number_of_sets = 0;
         }
 
         void set_size (
@@ -32,6 +33,7 @@ namespace dlib
                 items[i].parent = i;
                 items[i].rank = 0;
             }
+            number_of_sets = new_size;
         }
 
         unsigned long size (
@@ -104,6 +106,7 @@ namespace dlib
             if (items[a].rank > items[b].rank)
             {
                 items[b].parent = a;
+                number_of_sets--;
                 return a;
             }
             else
@@ -113,8 +116,15 @@ namespace dlib
                 {
                     items[b].rank = items[b].rank + 1;
                 }
+                number_of_sets--;
                 return b;
             }
+        }
+
+        unsigned long get_number_of_sets (
+        ) const noexcept
+        {
+            return number_of_sets;
         }
 
     private:
@@ -131,6 +141,7 @@ namespace dlib
         };
 
         mutable std::vector<data> items;
+        unsigned long number_of_sets{0};
 
     };
 
