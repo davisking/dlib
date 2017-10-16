@@ -26,7 +26,7 @@ namespace dlib
     public:
 
         void clear (
-        );
+        ) noexcept;
         /*!
             ensures
                 - #size() == 0
@@ -45,7 +45,7 @@ namespace dlib
         !*/
 
         unsigned long size (
-        ) const;
+        ) const noexcept;
         /*!
             ensures
                 - returns the total number of integer elements represented

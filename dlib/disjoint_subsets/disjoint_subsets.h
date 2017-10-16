@@ -17,7 +17,7 @@ namespace dlib
     public:
 
         void clear (
-        )
+        ) noexcept
         {
             items.clear();
         }
@@ -35,7 +35,7 @@ namespace dlib
         }
 
         unsigned long size (
-        ) const
+        ) const noexcept
         {
             return items.size();
         }
