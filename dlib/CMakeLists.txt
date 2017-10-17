@@ -32,10 +32,14 @@ if(has_parent)
    endif()
 endif()
 
-# Set only because there are old target_link_libraries() statements in the
-# FindCUDA.cmake file that comes with CMake that error out if the new behavior
-# is used.
-cmake_policy(SET CMP0023 OLD)
+if (CMAKE_VERSION VERSION_LESS "3.9.0")
+   # Set only because there are old target_link_libraries() statements in the
+   # FindCUDA.cmake file that comes with CMake that error out if the new behavior
+   # is used.  In newer versions of CMake we can instead set CUDA_LINK_LIBRARIES_KEYWORD which fixes this issue.
+   cmake_policy(SET CMP0023 OLD)
+else()
+   set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
+endif()
 
 
 macro (enable_preprocessor_switch option_name)
