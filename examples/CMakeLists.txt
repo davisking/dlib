@@ -66,7 +66,7 @@ target_link_libraries(assignment_learning_ex dlib::dlib)
 #
 # The cmake .. command looks in the parent folder for a file named
 # CMakeLists.txt, reads it, sets up everything needed to build program.  Also,
-# note that CMake can also generate Visual Studio or XCode project files.  So
+# note that CMake can generate Visual Studio or XCode project files.  So
 # if instead you had written:
 #   mkdir build
 #   cmake .. -G "Visual Studio 14 2015 Win64" ..
