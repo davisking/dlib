@@ -135,7 +135,7 @@ else()
 endif()
 
 # include dlib so we can link against it
-include(${CMAKE_CURRENT_LIST_DIR}/../cmake)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/.. dlib_build)
 
 
 # We put the extra _ on the end of the name just so it's possible to

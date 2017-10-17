@@ -12,7 +12,7 @@ PROJECT(${target_name})
 # compile the dlib/all/source.cpp file into its own object just to make sure it compiles
 set(DLIB_TEST_COMPILE_ALL_SOURCE_CPP ON)
 
-include(../cmake)
+add_subdirectory(.. dlib_build)
 
 # This variable contains a list of all the tests we are building
 # into the regression test suite.
