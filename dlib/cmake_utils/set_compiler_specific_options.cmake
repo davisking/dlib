@@ -1,6 +1,9 @@
 
 cmake_minimum_required(VERSION 2.8.12)
 
+if (POLICY CMP0054)
+    cmake_policy(SET CMP0054 NEW)
+endif()
 
 set(USING_OLD_VISUAL_STUDIO_COMPILER 0)
 if(MSVC AND MSVC_VERSION VERSION_LESS 1900)

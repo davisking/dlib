@@ -80,7 +80,7 @@ else()
             cxx_delegating_constructors
             cxx_thread_local
             cxx_constexpr
-            cxx_decltype_incomplete_return_types
+            # cxx_decltype_incomplete_return_types  # purposfully commented out because cmake errors out on this when using visual studio and cmake 3.8.0
             cxx_auto_type
          )
 
