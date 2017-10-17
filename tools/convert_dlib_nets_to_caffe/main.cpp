@@ -610,7 +610,7 @@ public:
     ) { }
 
     virtual void start_element ( 
-        const unsigned long line_number,
+        const unsigned long /*line_number*/,
         const std::string& name,
         const dlib::attribute_list& atts
     )
@@ -668,7 +668,7 @@ public:
     }
 
     virtual void end_element ( 
-        const unsigned long line_number,
+        const unsigned long /*line_number*/,
         const std::string& name
     )
     {
@@ -693,9 +693,9 @@ public:
     }
 
     virtual void processing_instruction (
-        const unsigned long line_number,
-        const std::string& target,
-        const std::string& data
+        const unsigned long /*line_number*/,
+        const std::string& /*target*/,
+        const std::string& /*data*/
     )
     {
     }
