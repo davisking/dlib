@@ -2,6 +2,8 @@
 
 cmake_minimum_required(VERSION 2.8.12)
 
+message(WARNING "add_global_compiler_switch() is deprecated.  Use target_compile_options() instead")
+
 # Make macros that can add compiler switches to the entire project.  Not just
 # to the current cmake folder being built.  
 macro ( add_global_compiler_switch switch_name )

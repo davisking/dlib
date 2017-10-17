@@ -7,6 +7,10 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(dlib)
 
+
+include(cmake_utils/set_compiler_specific_options.cmake)
+
+
 # Adhere to GNU filesystem layout conventions
 include(GNUInstallDirs)
 
@@ -23,6 +27,9 @@ set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPAC
 get_directory_property(has_parent PARENT_DIRECTORY)
 if(has_parent)
    set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
+   if (NOT DEFINED DLIB_IN_PROJECT_BUILD)
+      set(DLIB_IN_PROJECT_BUILD true)
+   endif()
 endif()
 
 # Set only because there are old target_link_libraries() statements in the
@@ -517,7 +524,7 @@ if (NOT TARGET dlib)
             set(CUDA_FOUND 0)
          endif()
 
-         if (CUDA_FOUND AND COMPILER_CAN_DO_CPP_11)
+         if (CUDA_FOUND AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER))
 
             # There is some bug in cmake that causes it to mess up the
             # -std=c++11 option if you let it propagate it to nvcc in some
@@ -527,7 +534,7 @@ if (NOT TARGET dlib)
                set(CUDA_PROPAGATE_HOST_FLAGS OFF)
                # Grab all the -D flags from CMAKE_CXX_FLAGS so we can pass them
                # to nvcc.
-               string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC ${CMAKE_CXX_FLAGS})
+               string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC "${CMAKE_CXX_FLAGS}")
             endif()
 
 
@@ -603,7 +610,7 @@ if (NOT TARGET dlib)
             endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
+         if (CUDA_FOUND AND cudnn AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER) AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
@@ -624,7 +631,7 @@ if (NOT TARGET dlib)
          else()
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
-            if (COMPILER_CAN_DO_CPP_11)
+            if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
                if (cuda_test_compile_worked)
                   if (NOT cudnn OR NOT cudnn_include OR NOT cudnn_test_compile_worked)
                      message(STATUS "*** cuDNN V5.0 OR GREATER NOT FOUND.  DLIB WILL NOT USE CUDA. ***")
@@ -709,21 +716,30 @@ if (NOT TARGET dlib)
                                  INTERFACE $<INSTALL_INTERFACE:include>
                                  PUBLIC ${dlib_needed_includes}
                                  )
-      target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
+      target_link_libraries(dlib_shared PUBLIC ${dlib_needed_libraries})
       target_compile_options(dlib_shared PRIVATE ${active_preprocessor_switches})
    endif()
 
 
    # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
-      ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
+      add_library(dlib_all_source_cpp STATIC all/source.cpp) 
       target_link_libraries(dlib_all_source_cpp dlib)
       target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
+      enable_cpp11_for_target(dlib_all_source_cpp)
+   endif()
+
+   if (TARGET dlib)
+      enable_cpp11_for_target(dlib)
+      target_compile_options(dlib PUBLIC ${active_compile_opts})
+   endif()
+   if (TARGET dlib_shared)
+      enable_cpp11_for_target(dlib_shared)
+      target_compile_options(dlib_shared PUBLIC ${active_compile_opts})
    endif()
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
-       cmake_minimum_required(VERSION 2.8.8)
        if(UNIX)
            set_target_properties(dlib_shared PROPERTIES
                                         OUTPUT_NAME dlib 

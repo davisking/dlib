@@ -33,6 +33,9 @@ set(dlib_LIBRARIES ${dlib_LIBRARIES} "@dlib_needed_libraries@")
 set(dlib_LIBS      ${dlib_LIBRARIES} "@dlib_needed_libraries@")
 set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@" "@dlib_needed_includes@")
 
+mark_as_advanced(dlib_LIBRARIES)
+mark_as_advanced(dlib_LIBS)
+mark_as_advanced(dlib_INCLUDE_DIRS)
 
 # Mark these variables above as deprecated.
 function(__deprecated_var var access)
@@ -46,4 +49,3 @@ variable_watch(dlib_INCLUDE_DIRS __deprecated_var)
 
 
 
-include(@CMAKE_INSTALL_FULL_INCLUDEDIR@/dlib/cmake_utils/use_cpp_11.cmake)
