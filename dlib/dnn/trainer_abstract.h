@@ -14,6 +14,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    enum class force_flush_to_disk {
+        no = 0,
+        yes = 1
+    };
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename net_type, 
         typename solver_type = sgd
@@ -92,6 +99,7 @@ namespace dlib
         !*/
 
         net_type& get_net (
+            force_flush_to_disk force_flush = force_flush_to_disk::yes
         ); 
         /*!
             ensures
@@ -102,8 +110,9 @@ namespace dlib
                   dnn_trainer's constructor.
                 - This function blocks until all threads inside the dnn_trainer have
                   stopped touching the net. 
-                - This function will sync the trainer state to disk if the current state 
-                  hasn't already been synced to disk since the last network modification.
+                - If force_flush is yes, then this function will sync the trainer state to
+                  disk if the current state hasn't already been synced to disk since the
+                  last network modification.
         !*/
 
         const std::vector<solver_type>& get_solvers (
