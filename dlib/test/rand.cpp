@@ -403,7 +403,7 @@ namespace
         // make sure there isn't any funny bias
         DLIB_TEST(std::abs(big_val/(double)small_val - 1) < 0.001);
 
-        cout << big_val/(double)small_val << endl;
+        //cout << big_val/(double)small_val << endl;
 
     }
 
