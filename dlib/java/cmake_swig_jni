@@ -42,7 +42,7 @@
 
 cmake_minimum_required (VERSION 2.8.12)
 
-include(../cmake_utils/use_cpp_11.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake_utils/use_cpp_11.cmake)
 
 # This block of code tries to figure out what the JAVA_HOME environment
 # variable should be by looking at the folder that contains the java
