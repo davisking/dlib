@@ -16,6 +16,14 @@ elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24215.1 )
    set(USING_OLD_VISUAL_STUDIO_COMPILER 1)
 endif()
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+   execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+   if (GCC_VERSION VERSION_LESS 4.8)
+      message(FATAL_ERROR "C++11 is required to use dlib, but the version of GCC you are using is too old and doesn't support C++11.  You need GCC 4.8 or newer. ")
+   endif()
+endif()
+
+
 # push USING_OLD_VISUAL_STUDIO_COMPILER to the parent so we can use it in the
 # examples CMakeLists.txt file.
 get_directory_property(has_parent PARENT_DIRECTORY)
