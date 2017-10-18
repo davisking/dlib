@@ -49,7 +49,7 @@ y.append(-1)
 #  svm = dlib.svm_c_trainer_histogram_intersection()
 #  svm = dlib.svm_c_trainer_radial_basis()
 svm = dlib.svm_c_trainer_linear()
-svm.be_verbose = True
+svm.be_verbose()
 svm.set_c(10)
 
 # Now train the model.  The return value is the trained model capable of making predictions.
