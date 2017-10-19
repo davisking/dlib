@@ -14,3 +14,11 @@ find_library(cudnn cudnn
     PATH_SUFFIXES lib64 lib x64
     )
 mark_as_advanced(cudnn cudnn_include)
+
+if (cudnn AND cudnn_include)
+    message(STATUS "Found cuDNN: " ${cudnn})
+else()
+    message(STATUS "*** cuDNN V5.0 OR GREATER NOT FOUND.                                                       ***")
+    message(STATUS "*** Dlib requires cuDNN V5.0 OR GREATER.  Since cuDNN is not found DLIB WILL NOT USE CUDA. ***")
+    message(STATUS "*** If you have cuDNN then set CMAKE_PREFIX_PATH to include cuDNN's folder.                ***")
+endif()
