@@ -177,6 +177,11 @@ namespace dlib
             {
                 CHECK_CUDA(cudaGetDevice(&the_device_id));
 
+                // free memory blocks before we allocate new ones.
+                data_size = 0;
+                data_host.reset();
+                data_device.reset();
+
                 void* data;
                 CHECK_CUDA(cudaMallocHost(&data, new_size*sizeof(float)));
                 // Note that we don't throw exceptions since the free calls are invariably
