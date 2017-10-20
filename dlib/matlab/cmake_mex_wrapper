@@ -93,7 +93,11 @@ MACRO(add_mex_function name )
    endif()
    set_target_properties(${name} PROPERTIES PREFIX "")
    TARGET_LINK_LIBRARIES(${name} ${MATLAB_LIBRARIES} ${ARGN})
-   install(TARGETS ${name} DESTINATION "${install_dir}")
+   if (install_target_output_folder)
+      install(TARGETS ${name} DESTINATION "${install_target_output_folder}")
+   else()
+      install(TARGETS ${name} DESTINATION "${install_dir}")
+   endif()
 ENDMACRO()
 
 
