@@ -681,7 +681,7 @@ namespace dlib
     {
         const long x = p.x();
         const long y = p.y();
-        rectangle rect(x,y,img.nc()+x-1,img.nr()+y-1);
+        rectangle rect(x,y,num_columns(img)+x-1,num_rows(img)+y-1);
         rectangle area = c.intersect(rect).intersect(area_);
         if (area.is_empty())
             return;
@@ -709,11 +709,11 @@ namespace dlib
     )
     {
         const rectangle area = c.intersect(rect).intersect(area_);
-        if (area.is_empty() || img.size() == 0)
+        if (area.is_empty() || num_columns(img) * num_rows(img) == 0)
             return;
 
-        const matrix<long,1> x = matrix_cast<long>(round(linspace(0, img.nc()-1, rect.width())));
-        const matrix<long,1> y = matrix_cast<long>(round(linspace(0, img.nr()-1, rect.height())));
+        const matrix<long,1> x = matrix_cast<long>(round(linspace(0, num_columns(img)-1, rect.width())));
+        const matrix<long,1> y = matrix_cast<long>(round(linspace(0, num_rows(img)-1, rect.height())));
 
         for (long row = area.top(); row <= area.bottom(); ++row)
         {
