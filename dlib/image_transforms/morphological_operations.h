@@ -707,7 +707,7 @@ namespace dlib
         {
             if (marker[r][c]&&should_remove_pixel(img,r,c,iter)) 
             {
-                to_remove.push_back(point(c,r));
+                to_remove.emplace_back(c,r);
                 marker[r][c] = 0;
             }
         }
@@ -742,7 +742,7 @@ namespace dlib
         )
         {
             if (marker[r][c])
-                to_check2.push_back(point(c,r));
+                to_check2.emplace_back(c,r);
         }
 
     } // end namespace impl
@@ -790,7 +790,7 @@ namespace dlib
             {
                 if (is_bw_border_pixel(img, r, c))
                 {
-                    to_check.push_back(point(c,r));
+                    to_check.emplace_back(c,r);
                 }
             }
         }

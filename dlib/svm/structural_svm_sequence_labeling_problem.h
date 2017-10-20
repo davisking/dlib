@@ -29,14 +29,14 @@ namespace dlib
                 double feat_value
             )
             {
-                feats.push_back(std::make_pair(feat_index, feat_value));
+                feats.emplace_back(feat_index, feat_value);
             }
 
             inline void operator() (
                 unsigned long feat_index
             )
             {
-                feats.push_back(std::make_pair(feat_index, 1));
+                feats.emplace_back(feat_index, 1);
             }
 
             std::vector<std::pair<unsigned long, double> >& feats;

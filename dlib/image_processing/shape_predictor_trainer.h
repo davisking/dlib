@@ -412,8 +412,7 @@ namespace dlib
         {
             using namespace impl;
             std::deque<std::pair<unsigned long, unsigned long> > parts;
-            parts.push_back(std::make_pair(0, (unsigned long)samples.size()));
-
+            parts.emplace_back(0, (unsigned long)samples.size());
             impl::regression_tree tree;
 
             // walk the tree in breadth first order
@@ -467,8 +466,8 @@ namespace dlib
                 tree.splits.push_back(split);
                 const unsigned long mid = partition_samples(split, samples, range.first, range.second);
 
-                parts.push_back(std::make_pair(range.first, mid));
-                parts.push_back(std::make_pair(mid, range.second));
+                parts.emplace_back(range.first, mid);
+                parts.emplace_back(mid, range.second);
             }
 
             // Now all the parts contain the ranges for the leaves so we can use them to

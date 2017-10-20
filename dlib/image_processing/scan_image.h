@@ -215,7 +215,7 @@ namespace dlib
 
                     if (dets.size() < max_dets)
                     {
-                        dets.push_back(std::make_pair(val, point(c,r)));
+                        dets.emplace_back(val, point(c,r));
                     }
                     else 
                     {

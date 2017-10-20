@@ -20,16 +20,16 @@ namespace dlib
             std::vector<point>& neighbors
         ) const
         {
-            neighbors.push_back(point(p.x()+1,p.y()+1));
-            neighbors.push_back(point(p.x()+1,p.y()  ));
-            neighbors.push_back(point(p.x()+1,p.y()-1));
+            neighbors.emplace_back(p.x()+1,p.y()+1);
+            neighbors.emplace_back(p.x()+1,p.y()  );
+            neighbors.emplace_back(p.x()+1,p.y()-1);
 
-            neighbors.push_back(point(p.x(),p.y()+1));
-            neighbors.push_back(point(p.x(),p.y()-1));
+            neighbors.emplace_back(p.x(),p.y()+1);
+            neighbors.emplace_back(p.x(),p.y()-1);
 
-            neighbors.push_back(point(p.x()-1,p.y()+1));
-            neighbors.push_back(point(p.x()-1,p.y()  ));
-            neighbors.push_back(point(p.x()-1,p.y()-1));
+            neighbors.emplace_back(p.x()-1,p.y()+1);
+            neighbors.emplace_back(p.x()-1,p.y()  );
+            neighbors.emplace_back(p.x()-1,p.y()-1);
         }
     };
 

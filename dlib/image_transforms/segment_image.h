@@ -277,24 +277,24 @@ namespace dlib
                 if (area.contains(c-1,r))
                 {
                     const diff_type diff = edge_diff(pix, in_img[r  ][c-1]);
-                    sorted_edges.push_back(segment_image_edge_data(area,p,point(c-1,r),diff));
+                    sorted_edges.emplace_back(area,p,point(c-1,r),diff);
                 }
 
                 if (area.contains(c+1,r))
                 {
                     const diff_type diff = edge_diff(pix, in_img[r  ][c+1]);
-                    sorted_edges.push_back(segment_image_edge_data(area,p,point(c+1,r),diff));
+                    sorted_edges.emplace_back(area,p,point(c+1,r),diff);
                 }
 
                 if (area.contains(c  ,r-1))
                 {
                     const diff_type diff = edge_diff(pix, in_img[r-1][c  ]);
-                    sorted_edges.push_back( segment_image_edge_data(area,p,point(c  ,r-1),diff));
+                    sorted_edges.emplace_back(area,p,point(c  ,r-1),diff);
                 }
                 if (area.contains(c  ,r+1))
                 {
                     const diff_type diff = edge_diff(pix, in_img[r+1][c  ]);
-                    sorted_edges.push_back( segment_image_edge_data(area,p,point(c  ,r+1),diff));
+                    sorted_edges.emplace_back(area,p,point(c  ,r+1),diff);
                 }
             }
             // same thing as the above loop but now we do it on the interior of the image and therefore
@@ -308,13 +308,13 @@ namespace dlib
                     diff_type diff;
 
                     diff = edge_diff(pix, in_img[r  ][c+1]);
-                    sorted_edges.push_back( segment_image_edge_data(area,p,point(c+1,r),diff));
+                    sorted_edges.emplace_back(area,p,point(c+1,r),diff);
                     diff = edge_diff(pix, in_img[r+1][c+1]);
-                    sorted_edges.push_back( segment_image_edge_data(area,p,point(c+1,r+1),diff));
+                    sorted_edges.emplace_back(area,p,point(c+1,r+1),diff);
                     diff = edge_diff(pix, in_img[r+1][c  ]);
-                    sorted_edges.push_back( segment_image_edge_data(area,p,point(c  ,r+1),diff));
+                    sorted_edges.emplace_back(area,p,point(c  ,r+1),diff);
                     diff = edge_diff(pix, in_img[r-1][c+1]);
-                    sorted_edges.push_back( segment_image_edge_data(area,p,point(c+1,r-1),diff));
+                    sorted_edges.emplace_back(area,p,point(c+1,r-1),diff);
                 }
             }
 

@@ -28,52 +28,52 @@ namespace dlib
 
             if (d.num_parts() == 5)
             {
-                lines.push_back(image_window::overlay_line(d.part(0), d.part(1), color));
-                lines.push_back(image_window::overlay_line(d.part(1), d.part(4), color));
-                lines.push_back(image_window::overlay_line(d.part(4), d.part(3), color));
-                lines.push_back(image_window::overlay_line(d.part(3), d.part(2), color));
+                lines.emplace_back(d.part(0), d.part(1), color);
+                lines.emplace_back(d.part(1), d.part(4), color);
+                lines.emplace_back(d.part(4), d.part(3), color);
+                lines.emplace_back(d.part(3), d.part(2), color);
             }
             else
             {
                 // Around Chin. Ear to Ear
                 for (unsigned long i = 1; i <= 16; ++i)
-                    lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
+                    lines.emplace_back(d.part(i), d.part(i-1), color);
 
                 // Line on top of nose
                 for (unsigned long i = 28; i <= 30; ++i)
-                    lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
+                    lines.emplace_back(d.part(i), d.part(i-1), color);
 
                 // left eyebrow
                 for (unsigned long i = 18; i <= 21; ++i)
-                    lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
+                    lines.emplace_back(d.part(i), d.part(i-1), color);
                 // Right eyebrow
                 for (unsigned long i = 23; i <= 26; ++i)
-                    lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
+                    lines.emplace_back(d.part(i), d.part(i-1), color);
                 // Bottom part of the nose
                 for (unsigned long i = 31; i <= 35; ++i)
-                    lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
+                    lines.emplace_back(d.part(i), d.part(i-1), color);
                 // Line from the nose to the bottom part above
-                lines.push_back(image_window::overlay_line(d.part(30), d.part(35), color));
+                lines.emplace_back(d.part(30), d.part(35), color);
 
                 // Left eye
                 for (unsigned long i = 37; i <= 41; ++i)
-                    lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
-                lines.push_back(image_window::overlay_line(d.part(36), d.part(41), color));
+                    lines.emplace_back(d.part(i), d.part(i-1), color);
+                lines.emplace_back(d.part(36), d.part(41), color);
 
                 // Right eye
                 for (unsigned long i = 43; i <= 47; ++i)
-                    lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
-                lines.push_back(image_window::overlay_line(d.part(42), d.part(47), color));
+                    lines.emplace_back(d.part(i), d.part(i-1), color);
+                lines.emplace_back(d.part(42), d.part(47), color);
 
                 // Lips outer part
                 for (unsigned long i = 49; i <= 59; ++i)
-                    lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
-                lines.push_back(image_window::overlay_line(d.part(48), d.part(59), color));
+                    lines.emplace_back(d.part(i), d.part(i-1), color);
+                lines.emplace_back(d.part(48), d.part(59), color);
 
                 // Lips inside part
                 for (unsigned long i = 61; i <= 67; ++i)
-                    lines.push_back(image_window::overlay_line(d.part(i), d.part(i-1), color));
-                lines.push_back(image_window::overlay_line(d.part(60), d.part(67), color));
+                    lines.emplace_back(d.part(i), d.part(i-1), color);
+                lines.emplace_back(d.part(60), d.part(67), color);
             }
         }
         return lines;

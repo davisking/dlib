@@ -466,7 +466,7 @@ namespace dlib
                         continue;
                     rtemp.push_back(b.rect);
                 }
-                temp.push_back(std::move(rtemp));
+                temp.emplace_back(std::move(rtemp));
             }
             overlaps_nms = find_tight_overlap_tester(temp);
             // Relax the non-max-suppression a little so that it doesn't accidentally make
@@ -981,7 +981,7 @@ namespace dlib
                             drectangle rect = centered_drect(p, options.detector_windows[k].width, options.detector_windows[k].height);
                             rect = input_layer(net).tensor_space_to_image_space(input_tensor,rect);
 
-                            dets_accum.push_back(intermediate_detection(rect, score, (k*output_tensor.nr() + r)*output_tensor.nc() + c, k));
+                            dets_accum.emplace_back(rect, score, (k*output_tensor.nr() + r)*output_tensor.nc() + c, k);
                         }
                     }
                 }

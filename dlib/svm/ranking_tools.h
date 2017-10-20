@@ -272,13 +272,13 @@ namespace dlib
             for (unsigned long k = 0; k < rel_scores.size(); ++k)
             {
                 rel_scores[k] = funct(samples[i].relevant[k]);
-                total_scores.push_back(std::make_pair(rel_scores[k], true));
+                total_scores.emplace_back(rel_scores[k], true);
             }
 
             for (unsigned long k = 0; k < nonrel_scores.size(); ++k)
             {
                 nonrel_scores[k] = funct(samples[i].nonrelevant[k]);
-                total_scores.push_back(std::make_pair(nonrel_scores[k], false));
+                total_scores.emplace_back(nonrel_scores[k], false);
             }
 
             // Now compute the average precision for this sample.  We need to sort the
@@ -401,13 +401,13 @@ namespace dlib
                 for (unsigned long k = 0; k < rel_scores.size(); ++k)
                 {
                     rel_scores[k] = df(samples_test[i].relevant[k]);
-                    total_scores.push_back(std::make_pair(rel_scores[k], true));
+                    total_scores.emplace_back(rel_scores[k], true);
                 }
 
                 for (unsigned long k = 0; k < nonrel_scores.size(); ++k)
                 {
                     nonrel_scores[k] = df(samples_test[i].nonrelevant[k]);
-                    total_scores.push_back(std::make_pair(nonrel_scores[k], false));
+                    total_scores.emplace_back(nonrel_scores[k], false);
                 }
 
                 // Now compute the average precision for this sample.  We need to sort the

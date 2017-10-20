@@ -381,7 +381,7 @@ namespace dlib
                         while (i < labels.size() && labels[i] == impl_ss::INSIDE)
                             ++i;
 
-                        y.push_back(std::make_pair(begin, i));
+                        y.emplace_back(begin, i);
                         --i;
                     }
                 }
@@ -398,11 +398,11 @@ namespace dlib
                         while (i < labels.size() && labels[i] == impl_ss::INSIDE)
                             ++i;
 
-                        y.push_back(std::make_pair(begin, i+1));
+                        y.emplace_back(begin, i+1);
                     }
                     else if (labels[i] == impl_ss::UNIT)
                     {
-                        y.push_back(std::make_pair(i, i+1));
+                        y.emplace_back(i, i+1);
                     }
                 }
             }

@@ -126,7 +126,7 @@ namespace dlib
                 {
                     col_filter = std::sqrt(w(i))*colm(u,i);
                     row_filter = std::sqrt(w(i))*colm(v,i);
-                    results[r].push_back(std::make_pair(row_filter, col_filter));
+                    results[r].emplace_back(row_filter, col_filter);
                 }
             }
         }

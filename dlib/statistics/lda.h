@@ -147,9 +147,9 @@ namespace dlib
         std::vector<std::pair<double,int> > temp;
         temp.reserve(low_vals.size()+high_vals.size());
         for (unsigned long i = 0; i < low_vals.size(); ++i)
-            temp.push_back(std::make_pair(low_vals[i], -1));
+            temp.emplace_back(low_vals[i], -1);
         for (unsigned long i = 0; i < high_vals.size(); ++i)
-            temp.push_back(std::make_pair(high_vals[i], +1));
+            temp.emplace_back(high_vals[i], +1);
 
         std::sort(temp.begin(), temp.end());
 
@@ -200,9 +200,9 @@ namespace dlib
         std::vector<std::pair<double,int> > temp;
         temp.reserve(true_detections.size()+false_detections.size());
         for (unsigned long i = 0; i < true_detections.size(); ++i)
-            temp.push_back(std::make_pair(true_detections[i], +1));
+            temp.emplace_back(true_detections[i], +1);
         for (unsigned long i = 0; i < false_detections.size(); ++i)
-            temp.push_back(std::make_pair(false_detections[i], -1));
+            temp.emplace_back(false_detections[i], -1);
 
         std::sort(temp.rbegin(), temp.rend());
 

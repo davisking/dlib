@@ -260,9 +260,9 @@ namespace dlib
 
                     for (long i = 0; i < des.size(); ++i)
                     {
-                        feats[r][c].push_back(std::make_pair(offset + i, des(i)));
+                        feats[r][c].emplace_back(offset + i, des(i));
                     }
-                    feats[r][c].push_back(std::make_pair(offset + des.size(), 1.0));
+                    feats[r][c].emplace_back(offset + des.size(), 1.0);
                 }
             }
         }

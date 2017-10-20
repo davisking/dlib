@@ -208,9 +208,9 @@ namespace dlib
         !*/
         {
             std::vector<vector<float,2> > from_points, to_points;
-            from_points.push_back(rect.tl_corner()); to_points.push_back(point(0,0));
-            from_points.push_back(rect.tr_corner()); to_points.push_back(point(1,0));
-            from_points.push_back(rect.br_corner()); to_points.push_back(point(1,1));
+            from_points.push_back(rect.tl_corner()); to_points.emplace_back(0,0);
+            from_points.push_back(rect.tr_corner()); to_points.emplace_back(1,0);
+            from_points.push_back(rect.br_corner()); to_points.emplace_back(1,1);
             return find_affine_transform(from_points, to_points);
         }
 
@@ -226,9 +226,9 @@ namespace dlib
         !*/
         {
             std::vector<vector<float,2> > from_points, to_points;
-            to_points.push_back(rect.tl_corner()); from_points.push_back(point(0,0));
-            to_points.push_back(rect.tr_corner()); from_points.push_back(point(1,0));
-            to_points.push_back(rect.br_corner()); from_points.push_back(point(1,1));
+            to_points.push_back(rect.tl_corner()); from_points.emplace_back(0,0);
+            to_points.push_back(rect.tr_corner()); from_points.emplace_back(1,0);
+            to_points.push_back(rect.br_corner()); from_points.emplace_back(1,1);
             return find_affine_transform(from_points, to_points);
         }
 
@@ -384,7 +384,7 @@ namespace dlib
                     unsigned long leaf_idx;
                     current_shape += forests[iter][i](feature_pixel_values, leaf_idx);
 
-                    feats.push_back(std::make_pair(feat_offset+leaf_idx, 1));
+                    feats.emplace_back(feat_offset+leaf_idx, 1);
                     feat_offset += forests[iter][i].num_leaves();
                 }
             }
