@@ -17,9 +17,12 @@
 
 #ifdef DLIB_USE_LAPACK
 #include "lapack/potrf.h"
+#include "lapack/pbtrf.h"
 #include "lapack/gesdd.h"
 #include "lapack/gesvd.h"
 #endif
+
+#include <iostream>
 
 namespace dlib
 {
@@ -1143,12 +1146,18 @@ escape_banded_detection:
         if (banded)
         {
            // Store in compact form
-           typename matrix_exp<EXP>::matrix_type B(A.nr(), bandwidth + 1);
+           typename matrix_exp<EXP>::matrix_type B(bandwidth + 1, A.nc());
            set_all_elements(B, 0);
 
            for (long r = 0; r < A.nr(); ++r)
               for (long c = r; c < std::min(r + bandwidth + 1, A.nc()); ++c)
-                 B(r, c - r) = A(r, c);
+                 B(c - r, r) = A(r, c);
+
+#ifdef DLIB_USE_LAPACK 
+
+           lapack::pbtrf('L', B);
+           
+#else
 
            // Peform compact Cholesky
            for (long k = 0; k < A.nr(); ++k)
@@ -1158,23 +1167,25 @@ escape_banded_detection:
               {
                  long i = k + j;
                  for (long c = 0; c <= (last - j); ++c)
-                    B(i, c) -= B(k, j) / B(k, 0) * B(k, c + j);
+                    B(c, i) -= B(j, k) / B(0, k) * B(c + j, k);
               }
-              T norm = std::sqrt(B(k, 0));
-              for (long c = 0; c <= bandwidth; ++c)
-                 B(k, c) /= norm;
+              T norm = std::sqrt(B(0, k));
+              for (long i = 0; i <= bandwidth; ++i)
+                 B(i, k) /= norm;
            }
-           for (long r = A.nr() - bandwidth + 1; r < A.nr(); ++r)
-              B(r, bandwidth) = 0;
+           for (long c = A.nc() - bandwidth + 1; c < A.nc(); ++c)
+              B(bandwidth, c) = 0;
+
+#endif
 
            // Unpack lower triangular area
            set_all_elements(L, 0);
-           for (long r = 0; r < A.nr(); ++r)
-              for (long c = 0; c <= bandwidth; ++c)
+           for (long c = 0; c < A.nc(); ++c)
+              for (long i = 0; i <= bandwidth; ++i)
               {
-                 long ind = r + c;
+                 long ind = c + i;
                  if (ind < A.nc())
-                    L(ind, r) = B(r, c);
+                    L(ind, c) = B(i, c);
               }
 
            return L;
