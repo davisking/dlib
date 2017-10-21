@@ -157,6 +157,30 @@ namespace dlib
                   of this image
         !*/
 
+        inline const pixel_type& operator()(
+            const long row, const long column
+        ) const
+        /*!
+            requires
+                - 0 <= row < nr()
+                - 0 <= column < nc()
+            ensures
+                - returns a const reference to the pixel at coordinates (row, column)
+                  of this image
+        !*/
+
+        inline pixel_type& operator()(
+            const long row, const long column
+        )
+        /*!
+            requires
+                - 0 <= row < nr()
+                - 0 <= column < nc()
+            ensures
+                - returns a reference to the pixel at coordinates (row, column)
+                  of this image
+        !*/
+
         cv_image& operator= ( 
             const cv_image& item
         );
