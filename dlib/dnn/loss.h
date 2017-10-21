@@ -831,7 +831,7 @@ namespace dlib
                             // We are ignoring this box so we shouldn't have counted it in the
                             // loss in the first place.  So we subtract out the loss values we
                             // added for it in the code above.
-                            loss -= 1-out_data[idx];
+                            loss -= options.loss_per_missed_target-out_data[idx];
                             g[idx] = 0;
                             std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << (*truth)[i].rect;
                             std::cout << " that is suppressed by non-max-suppression ";
