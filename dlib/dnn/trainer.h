@@ -584,7 +584,8 @@ namespace dlib
         void record_test_loss(double loss)
         {
             test_previous_loss_values.push_back(loss);
-            rs_test.add(loss);
+            if (is_finite(loss))
+                rs_test.add(loss);
             // discard really old loss values.
             while (test_previous_loss_values.size() > test_iter_without_progress_thresh)
                 test_previous_loss_values.pop_front();
