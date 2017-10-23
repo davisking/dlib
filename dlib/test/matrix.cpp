@@ -762,6 +762,17 @@ namespace
         }
 
         {
+            // Test band chol in column major layout
+            matrix<double,10,10,default_memory_manager,column_major_layout> m(rand_sp_banded<double>(10, 3));
+
+            matrix<double> L = chol(m);
+            DLIB_TEST_MSG(equal(L*trans(L), m, 1e-10), L*trans(L)-m);   
+            DLIB_TEST_MSG(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "");
+            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*inv_lower_triangular((L))), ""); 
+            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*trans(inv_upper_triangular(trans(L)))), "");
+        }
+
+        {
             matrix<int> m(3,4), m2;
             m = 1,2,3,4,
                 4,5,6,6,
