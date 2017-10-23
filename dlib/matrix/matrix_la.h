@@ -1145,8 +1145,8 @@ escape_banded_detection:
 
         if (banded)
         {
-           // Store in compact form
-           typename matrix_exp<EXP>::matrix_type B(bandwidth + 1, A.nc());
+           // Store in compact form - use column major for LAPACK
+           matrix<T,0,0,default_memory_manager,column_major_layout> B(bandwidth + 1, A.nc());
            set_all_elements(B, 0);
 
            for (long r = 0; r < A.nr(); ++r)
