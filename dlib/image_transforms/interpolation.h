@@ -11,6 +11,7 @@
 #include "../simd.h"
 #include "../image_processing/full_object_detection.h"
 #include <limits>
+#include "../rand.h"
 
 namespace dlib
 {
@@ -2101,6 +2102,45 @@ namespace dlib
         for (unsigned long i = 0; i < dets.size(); ++i)
             res.push_back(get_face_chip_details(dets[i], size, padding));
         return res;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    image_type jitter_image(
+        const image_type& img,
+        dlib::rand& rnd
+    )
+    {
+        DLIB_CASSERT(num_rows(img)*num_columns(img) != 0);
+        DLIB_CASSERT(num_rows(img)==num_columns(img));
+
+        const double max_rotation_degrees = 3;
+        const double min_object_height = 0.97; 
+        const double max_object_height = 0.99999; 
+        const double translate_amount = 0.02;
+
+
+        const auto rect = shrink_rect(get_rect(img),3);
+
+        // perturb the location of the crop by a small fraction of the object's size.
+        const point rand_translate = dpoint(rnd.get_double_in_range(-translate_amount,translate_amount)*rect.width(), 
+            rnd.get_double_in_range(-translate_amount,translate_amount)*rect.height());
+
+        // perturb the scale of the crop by a fraction of the object's size
+        const double rand_scale_perturb = rnd.get_double_in_range(min_object_height, max_object_height); 
+
+        const long box_size = rect.height()/rand_scale_perturb;
+        const auto crop_rect = centered_rect(center(rect)+rand_translate, box_size, box_size);
+        const double angle = rnd.get_double_in_range(-max_rotation_degrees, max_rotation_degrees)*pi/180;
+        image_type crop;
+        extract_image_chip(img, chip_details(crop_rect, chip_dims(img.nr(),img.nc()), angle), crop);
+        if (rnd.get_random_double() > 0.5)
+            flip_image_left_right(crop); 
+
+        return crop;
     }
 
 // ----------------------------------------------------------------------------------------

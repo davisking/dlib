@@ -1411,6 +1411,29 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    image_type jitter_image(
+        const image_type& img,
+        dlib::rand& rnd
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+            - img.size() > 0
+            - img.nr() == img.nc()
+        ensures
+            - Randomly jitters the image a little bit and returns this new jittered image.
+              To be specific, the returned image has the same size as img and will look
+              generally similar.  The difference is that the returned image will have been
+              slightly rotated, zoomed, and translated.  There is also a 50% chance it will
+              be mirrored left to right.
+    !*/
+    
 // ----------------------------------------------------------------------------------------
 
 }
