@@ -35,7 +35,8 @@ namespace dlib
                 - #get_chip_dims() == chip_dims(300,300)
                 - #get_randomly_flip() == true
                 - #get_max_rotation_degrees() == 30
-                - #get_min_object_size() == 0.25
+                - #get_min_object_length_long_dim() == 70 
+                - #get_min_object_length_short_dim() == 30
                 - #get_max_object_size() == 0.7
                 - #get_background_crops_fraction() == 0.5
                 - #get_translate_amount() == 0.1
@@ -143,27 +144,38 @@ namespace dlib
                 - #get_max_rotation_degrees() == std::abs(value)
         !*/
 
-        double get_min_object_size (
+        long get_min_object_length_long_dim (
+        ) const; 
+        /*!
+            ensures
+                - When a chip is extracted around an object, the chip will be sized so that
+                  the longest edge of the object (i.e. either its height or width,
+                  whichever is longer) is at least #get_min_object_length_long_dim() pixels
+                  in length.  When we say "object" here we are referring specifically to
+                  the rectangle in the mmod_rect output by the cropper.
+        !*/
+
+        long get_min_object_length_short_dim (
         ) const;
         /*!
             ensures
                 - When a chip is extracted around an object, the chip will be sized so that
-                  at least one of the object's height or width are >= get_min_object_size() *
-                  the chip's height and width, respectively.  E.g. if the chip is 640x480
-                  pixels in size then the object will be at least 480*get_min_object_size()
-                  pixels tall or 640*get_min_object_size() pixels wide.  This also means
-                  that if get_min_object_size() >1 then the object will only be partially
-                  visible in the crop since it will be too big to fit.  
+                  the shortest edge of the object (i.e. either its height or width,
+                  whichever is shorter) is at least #get_min_object_length_short_dim()
+                  pixels in length.  When we say "object" here we are referring
+                  specifically to the rectangle in the mmod_rect output by the cropper.
         !*/
 
         void set_min_object_size (
-            double value
-        );
+            long long_dim,
+            long short_dim
+        ); 
         /*!
             requires
-                - 0 < value 
+                - 0 < short_dim <= long_dim
             ensures
-                - #get_min_object_size() == value
+                - #get_min_object_length_short_dim() == short_dim
+                - #get_min_object_length_long_dim() == long_dim
         !*/
 
         double get_max_object_size (

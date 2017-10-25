@@ -44,9 +44,13 @@ int main(int argc, char** argv) try
     // You can tell it how much scale jittering you would like by saying "please
     // make the objects in the crops have a min and max size of such and such".
     // You do that by calling these two functions.  Here we are saying we want the
-    // objects in our crops to be between 0.2*400 and 0.8*400 pixels in height.
-    cropper.set_min_object_size(0.2);
+    // objects in our crops to be no more than 0.8*400 pixels in height and width.
     cropper.set_max_object_size(0.8);
+    // And also that they shouldn't be too small. Specifically, each object's smallest
+    // dimension (i.e. height or width) should be at least 60 pixels and at least one of
+    // the dimensions must be at least 80 pixels.  So the smallest objects the cropper will
+    // output will be either 80x60 or 60x80.
+    cropper.set_min_object_size(80,60);
     // The cropper can also randomly mirror and rotate crops, which we ask it to
     // perform as well.
     cropper.set_randomly_flip(true);
