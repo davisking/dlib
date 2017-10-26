@@ -339,8 +339,8 @@ namespace dlib
                     for (unsigned long i = 0; i < horizon; ++i)
                     {
                         v_old[i] = v[i];
-                        v[i] = clamp(controls[i] - 1.0/lambda * df[i], lower, upper);
-                        controls[i] = clamp(v[i] + (std::sqrt(lambda)-1)/(std::sqrt(lambda)+1)*(v[i]-v_old[i]), lower, upper);
+                        v[i] = dlib::clamp(controls[i] - 1.0/lambda * df[i], lower, upper);
+                        controls[i] = dlib::clamp(v[i] + (std::sqrt(lambda)-1)/(std::sqrt(lambda)+1)*(v[i]-v_old[i]), lower, upper);
                     }
                 }
             }

@@ -230,6 +230,7 @@ namespace dlib
                         rects.push_back(mmod_rect(data.images[i].boxes[j].rect));
                         min_rect_size = std::min<double>(min_rect_size, rects.back().rect.area());
                     }
+                    rects.back().label = data.images[i].boxes[j].label;
 
                 }
             }

@@ -112,7 +112,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            return normal_cfd(thresh, gradient(), standard_error());
+            return normal_cdf(thresh, gradient(), standard_error());
         }
 
         double probability_gradient_greater_than (
@@ -153,7 +153,7 @@ namespace dlib
 
     private:
 
-        static double normal_cfd(double value, double mean, double stddev) 
+        static double normal_cdf(double value, double mean, double stddev) 
         {
             if (stddev == 0)
             {

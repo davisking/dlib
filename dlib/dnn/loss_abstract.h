@@ -108,6 +108,8 @@ namespace dlib
                 - for all valid i:
                     - layer<i>(sub).get_gradient_input() has the same dimensions as
                       layer<i>(sub).get_output().
+                    - layer<i>(sub).get_gradient_input() contains all zeros (i.e.
+                      initially, all input gradients are 0).
                 - truth == an iterator pointing to the beginning of a range of
                   input_tensor.num_samples()/sub.sample_expansion_factor() elements.  Moreover,
                   they must be training_label_type elements.
@@ -124,6 +126,9 @@ namespace dlib
                   assignments, for all valid i: 
                     - layer<i>(sub).get_gradient_input() = the gradient of
                       L(input_tensor,truth,sub) with respect to layer<i>(sub).get_output().
+                      Note that, since get_gradient_input() is zero initialized, you don't
+                      have to write gradient information to layers that have a zero
+                      loss gradient.
                 - returns L(input_tensor,truth,sub)
         !*/
     };
@@ -369,25 +374,29 @@ namespace dlib
 
     public:
 
-        struct detector_window_size
+        struct detector_window_details
         {
-            detector_window_size() = default; 
-            detector_window_size(unsigned long w, unsigned long h) : width(w), height(h) {}
+            detector_window_details() = default; 
+            detector_window_details(unsigned long w, unsigned long h) : width(w), height(h) {}
+            detector_window_details(unsigned long w, unsigned long h, const std::string& l) : width(w), height(h), label(l) {}
 
             unsigned long width = 0;
             unsigned long height = 0;
+            std::string label;
 
-            friend inline void serialize(const detector_window_size& item, std::ostream& out);
-            friend inline void deserialize(detector_window_size& item, std::istream& in);
+            friend inline void serialize(const detector_window_details& item, std::ostream& out);
+            friend inline void deserialize(detector_window_details& item, std::istream& in);
         };
 
         mmod_options() = default;
 
         // This kind of object detector is a sliding window detector.  The detector_windows
         // field determines how many sliding windows we will use and what the shape of each
-        // window is.  Since you will usually use the MMOD loss with an image pyramid, the
-        // detector sizes also determine the size of the smallest object you can detect.
-        std::vector<detector_window_size> detector_windows;
+        // window is.  It also determines the output label applied to each detection
+        // identified by each window.  Since you will usually use the MMOD loss with an
+        // image pyramid, the detector sizes also determine the size of the smallest object
+        // you can detect.
+        std::vector<detector_window_details> detector_windows;
 
         // These parameters control how we penalize different kinds of mistakes.  See 
         // Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046)
@@ -434,12 +443,16 @@ namespace dlib
                       each box in boxes could potentially be detected by one of the
                       detector windows.  This essentially comes down to picking detector
                       windows with aspect ratios similar to the aspect ratios in boxes.
+                      Note that we also make sure that each box can be detected by a window
+                      with the same label.  For example, if all the boxes had the same
+                      aspect ratio but there were 4 different labels used in boxes then
+                      there would be 4 resulting detector windows, one for each label.
                     - The longest edge of each detector window is target_size pixels in
                       length, unless the window's shortest side would be less than
                       min_target_size pixels in length.  In this case the shortest side
                       will be set to min_target_size length, and the other side sized to
                       preserve the aspect ratio of the window.  
-                  This means that, target_size and min_target_size control the size of the
+                  This means that target_size and min_target_size control the size of the
                   detector windows, while the aspect ratios of the detector windows are
                   automatically determined by the contents of boxes.  It should also be
                   emphasized that the detector isn't going to be able to detect objects
@@ -862,6 +875,152 @@ namespace dlib
 
     template <typename SUBNET>
     using loss_multiclass_log_per_pixel = add_loss_layer<loss_multiclass_log_per_pixel_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_multiclass_log_per_pixel_weighted_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the multiclass logistic
+                regression loss (e.g. negative log-likelihood loss), which is appropriate
+                for multiclass classification problems.  It is basically just like
+                loss_multiclass_log_per_pixel_ except that it lets you define per-pixel
+                weights, which may be useful e.g. if you want to emphasize rare classes
+                while training.  (If the classification problem is difficult, a flat weight
+                structure may lead the network to always predict the most common label, in
+                particular if the degree of imbalance is high.  To emphasize a certain
+                class or classes, simply increase the weights of the corresponding pixels,
+                relative to the weights of the other pixels.)
+
+                Note that if you set the weight to 0 whenever a pixel's label is equal to
+                loss_multiclass_log_per_pixel_::label_to_ignore, and to 1 otherwise, then
+                you essentially get loss_multiclass_log_per_pixel_ as a special case.
+        !*/
+    public:
+
+        struct weighted_label
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This object represents the truth label of a single pixel, together with
+                    an associated weight (the higher the weight, the more emphasis the
+                    corresponding pixel is given during the training).
+            !*/
+
+            weighted_label();
+            weighted_label(uint16_t label, float weight = 1.f);
+
+            // The ground-truth label. In semantic segmentation, 65536 classes ought to be
+            // enough for anybody.
+            uint16_t label = 0;
+
+            // The weight of the corresponding pixel.
+            float weight = 1.f;
+        };
+
+        typedef matrix<weighted_label> training_label_type;
+        typedef matrix<uint16_t> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output label is the predicted class for each classified element.  The number
+            of possible output classes is sub.get_output().k().
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+                - all labels pointed to by truth are < sub.get_output().k(), or the corresponding weight
+                  is zero.
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_multiclass_log_per_pixel_weighted = add_loss_layer<loss_multiclass_log_per_pixel_weighted_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_mean_squared_per_pixel_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the mean squared loss,
+                which is appropriate for regression problems.  It is basically just like
+                loss_mean_squared_multioutput_ except that it lets you define matrix or
+                image outputs, instead of vector.
+        !*/
+    public:
+
+        typedef matrix<float> training_label_type;
+        typedef matrix<float> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output labels are the predicted continuous variables.
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+                - for all idx such that 0 <= idx < sub.get_output().num_samples():
+                    - sub.get_output().nr() == (*(truth + idx)).nr()
+                    - sub.get_output().nc() == (*(truth + idx)).nc()
+        !*/
+    };
+
+    template <typename SUBNET>
+    using loss_mean_squared_per_pixel = add_loss_layer<loss_mean_squared_per_pixel_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

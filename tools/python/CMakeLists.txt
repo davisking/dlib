@@ -3,6 +3,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
 
 set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
+# Make DLIB_ASSERT statements not abort the python interpreter, but just return an error.
+add_definitions(-DDLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
+
 include(../../dlib/cmake_utils/add_python_module)
 
 add_definitions(-DDLIB_VERSION=${DLIB_VERSION})
@@ -26,6 +29,7 @@ set(python_srcs
    src/shape_predictor.cpp
    src/correlation_tracker.cpp
    src/face_recognition.cpp
+   src/cnn_face_detector.cpp
 )
 
 # Only add the GUI module if requested
@@ -35,6 +39,6 @@ endif(NOT ${DLIB_NO_GUI_SUPPORT})
 
 add_python_module(dlib ${python_srcs})
 
-# When you run "make install" we will copy the compiled dlib.so (or dlib.pyd) 
+# When you run "make install" we will copy the compiled dlib.so (or dlib.pyd)
 # library file to the python_examples folder.
 install_dlib_to(../../python_examples)

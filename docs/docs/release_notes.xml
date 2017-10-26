@@ -11,6 +11,170 @@
 <!-- **************************************************************************************  -->
 
 <current>
+New Features and Improvements:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fix build error in Visual Studio when CUDA is enabled. 
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.5" date="Aug 27, 2017">
+New Features and Improvements:
+   - Deep Learning
+      - Added a python wrapper for using the CNN face detector.
+      - Added support for cuDNN v6 and v7.
+      - Added a simple tool to convert dlib model files to caffe models.  
+        See the tools/convert_dlib_nets_to_caffe folder for details.
+      - New DNN layers
+         - loss_multiclass_log_per_pixel_
+         - loss_multiclass_log_per_pixel_weighted_
+         - loss_mean_squared_per_pixel_
+         - cont_       (transpose convolution, sometimes called "deconvolution")
+         - mult_prev_  (like add_prev_ but multiplies instead of adds)
+         - extract_    (sort of like caffe's slice layer)
+         - upsample_   (upsamples a tensor using bilinear interpolation)
+      - Object Detection
+         - Upgraded loss_mmod_ to support objects of varying aspect ratio. This
+           changes the API for the mmod_options struct slightly.
+         - Relaxed the default non-max suppression parameters used by the
+           mmod_options object so that users of the deep learning MMOD tool don't
+           get spurious errors about impossibly labeled objects during training.
+         - Added missing input validation to loss_mmod_.  Specifically, the loss
+           layer now checks if the user is giving truth boxes that can't be detected
+           because the non-max suppression settings would prevent them from being
+           output at the same time. If this happens then we print a warning message
+           and set one of the offending boxes to "ignore".  I also changed all
+           the input validation errors to warning messages with auto conversion
+           to ignore boxes rather than exceptions.
+         - Changed the random_cropper's interface so that instead of talking in
+           terms of min and max object height, it's now min and max object size.
+           This way, if you have objects that are short and wide (i.e. objects where
+           the relevant dimension is width rather than height) you will get sensible
+           behavior out of the random cropper.
+         - Added options to input_rgb_image_pyramid that let the user set
+           create_tiled_pyramid()'s padding parameters. Also changed the default
+           outer border padding from 0 to 11. This effects even previously trained
+           models. So any model that doesn't explicitly set the outer patting to
+           something else will have a padding of 11. This should be a more
+           reasonable value for most networks.
+         - Added process() and process_batch() to add_loss_layer. These routines
+           let you easily pass arguments to any optional parameters of a loss
+           layer's to_tensor() routine. For instance, it makes it more convenient to
+           set loss_mmod_'s adjust_threshold parameter.
+      - Added visit_layers_until_tag()
+      - Improved how dnn_trainer synchronizes its state to disk.  It now uses
+        two files and alternates between them.  This should be more robust in
+        the face of random hardware failure during synchronization than the
+        previous synchronization method.
+      - Made it so you can set the number of output filters for con_ layers at runtime.
+      - The way cuDNN work buffers are managed has been improved, leading to
+        less GPU RAM usage.  Therefore, users should not need to call
+        set_dnn_prefer_smallest_algorithms() anymore.
+      - Added operator&lt;&lt; for random_cropper and dnn_trainer to allow 
+        easy logging of training parameters.
+      - Made concat_ layer a lot faster.
+      - Made the dnn_trainer not forget all the previous loss values it knows
+        about when it determines that there have been a lot of steps without
+        progress and shrinks the learning rate. Instead, it removes only a
+        small amount of the oldest values.   The problem with the old way of
+        removing all the loss values in the history was that if you set the
+        steps without progress threshold to a really high number you would
+        often observe that the last few learning rate values were obviously not
+        making progress, however, since all the previous loss values were
+        forgotten the trainer needed to fully populate its loss history from
+        scratch before it would figure this out.  This new style makes the
+        trainer not waste time running this excessive optimization of obviously
+        useless mini-batches.  I also changed the default
+        get_test_iterations_without_progress_threshold() from 200 to 500.  Now
+        that we have a better history management of loss values in the trainer
+        it's much more sensible to have a larger value here.
+   - Dlib's simd classes will now use ARM NEON instructions.  This makes the
+     HOG based object detector faster on mobile devices running ARM processors.
+   - Added last_modified() method to dlib::file.  Also, added
+     select_oldest_file() and select_newest_file().
+   - Added solve_qp_box_constrained_blockdiag()
+   - Added an overload of mat() that takes a row stride value.
+   - Added cmake scripts and some related tooling that makes it easy to call
+     C++ code from java.  See dlib/java/ folder.  
+   - MATLAB MEX wrapper API
+      - Made the mex wrapper deal with cell arrays that have null elements.
+      - Made ctrl+c detection in a mex file work more reliably in newer versions of matlab.
+   - Added set_rect_area()
+   - Gave test_object_detection_function() an option to set how ignore box
+     overlap is tested.
+   - Added serialization support for the running_stats_decayed object.
+   - Additions to imglab
+      - Added --sort and also the ability to propagate boxes from one image to
+        the next using dlib::correlation_tracker.
+      - Made it so you can remove images by pressing alt+d. 
+      - Made is so pressing e in imglab toggles between views of the image
+        where the histogram is equalized or unmodified. This way, if you are
+        looking at particularly dark or badly contrasted images you can toggle
+        this mode and maybe get a better view of what you are labeling.
+   - Made the attribute_list of the xml parser a little more friendly by
+     allowing you to ask for attributes that don't exist and get a defined
+     behavior (an exception being thrown) rather than it being a contract
+     violation.
+
+Non-Backwards Compatible Changes:
+   - DNN solver objects are now required to declare operator&lt;&lt;.
+   - Broke backwards compatibility with previous dnn_trainer serialization
+     format.  The network serialization format has not changed however.  So old
+     model files will still load properly.
+   - Changed random_cropper interface.
+   - Changed the XML format output by net_to_xml(). Specifically, the XML tag
+     for affine layers was changed to use the same conventions as other layers
+     that support convolutional vs fully connected modes.
+   - Dlib's smart pointers have been deprecated and all of dlib's code has been
+     changed to use the std:: version of these smart pointers.  The old dlib
+     smart pointers are still present, allowing users to explicitly include
+     them if needed, but users should migrate to the C++11 standard version of
+     these tools. 
+   - Changed the functions that transform between input tensor coordinates and
+     output tensor coordinates to use dpoint instead of point. This way, we can
+     obtain sub-pixel coordinates if we need them.
+   - Upgraded loss_mmod_ to support objects of varying aspect ratio. This
+     changes the API for the mmod_options struct slightly.
+
+Bug fixes:
+   - Made resize_image() and functions that use it like the pyramid objects
+     produce better results when run on float and double images. There was
+     needless rounding to integers happening in the bilinear interpolation. Now
+     if you work with a float image the entire process will run without integer
+     rounding.
+   - Made the input_tensor_to_output_tensor() and output_tensor_to_input_tensor() 
+     coordinate mappings work on networks that contain skip layers.
+   - The input_rgb_image_sized is supposed to be convertible to
+     input_rgb_image, which it was in all ways except you couldn't deserialize
+     directly like you would expect. This has now been fixed.
+   - There was a bug in the concat_ layer's backward() method. It was assigning
+     the gradient to previous layers instead of adding the gradient, as required
+     by the layer interface specification.  Probably no-one has been impacted
+     by this bug, but it's still a bug and has been fixed.
+   - Changed the random_cropper so that it samples background patches uniformly
+     across scales regardless of the input image size. Previously, if you gave
+     really large images or really small images it had a bias towards giving only
+     large patches or small patches respectively.
+   - Fixed name lookup problem for calls to serialize() on network objects.
+   - Fixed double delete in tokenizer_kernel_1.
+   - Fixed error in pyramid_down&lt;2&gt; that caused the output image to be a
+     little funny looking in some cases.
+   - Fixed the visit_layers_backwards() and visit_layers_backwards_range()
+     routines so they visit layers in the correct order.
+   - Made build scripts work on a wider range of platforms and configurations.
+   - Worked around global timer cleanup issues that occur on windows when dlib
+     is used in a dll in some situations.
+   - Fixed various compiler errors in obscure environments.
+
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.4" date="Mar 07, 2017">
 New Features:
 
 Non-Backwards Compatible Changes:
@@ -20,7 +184,7 @@ Bug fixes:
    - Fixed a slow memory leak that could occur when using cuDNN.
 
 Other:
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 

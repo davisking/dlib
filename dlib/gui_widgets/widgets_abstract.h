@@ -2801,7 +2801,7 @@ namespace dlib
             >
         void set_image_clicked_handler (
             T& object,
-            void (T::*event_handler)(const point& p, bool is_double_click)
+            void (T::*event_handler)(const point& p, bool is_double_click, unsigned long btn)
         );
         /*
             requires
@@ -2811,6 +2811,7 @@ namespace dlib
                   anywhere on the image.  When they do so this callback is called with the
                   location of the image pixel which was clicked.  The is_double_click bool
                   will also tell you if it was a double click or single click.
+                - btn == the button that was released. (either base_window::LEFT, base_window::MIDDLE, or base_window::RIGHT)
                 - any previous calls to this function are overridden by this new call.  
                   (i.e. you can only have one event handler associated with this 
                   event at a time)
@@ -2819,7 +2820,7 @@ namespace dlib
         */
 
         void set_image_clicked_handler (
-            const any_function<void(const point& p, bool is_double_click)>& event_handler
+            const any_function<void(const point& p, bool is_double_click, unsigned long btn)>& event_handler
         );
         /*
             ensures
@@ -2827,6 +2828,7 @@ namespace dlib
                   on the image.  When they do so this callback is called with the location
                   of the image pixel which was clicked.  The is_double_click bool will also
                   tell you if it was a double click or single click.
+                - btn == the button that was released. (either base_window::LEFT, base_window::MIDDLE, or base_window::RIGHT)
                 - Any previous calls to this function are overridden by this new call.
                   (i.e. you can only have one event handler associated with this event at a
                   time)

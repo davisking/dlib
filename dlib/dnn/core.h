@@ -597,6 +597,10 @@ namespace dlib
     template <typename LAYER_DETAILS, typename SUBNET, typename enabled = void>
     class add_layer;
 
+    template <typename LAYER_DETAILS, typename SUBNET, typename enabled>
+    void serialize(const add_layer<LAYER_DETAILS,SUBNET,enabled>& item, std::ostream& out);
+    template <typename LAYER_DETAILS, typename SUBNET, typename enabled>
+    void deserialize(add_layer<LAYER_DETAILS,SUBNET,enabled>& item, std::istream& in);
 
     template <typename T, typename U>
     struct is_nonloss_layer_type<add_layer<T,U>> : std::true_type {};
@@ -2448,23 +2452,10 @@ namespace dlib
             subnetwork.clean();
         }
 
-        friend void serialize(const add_loss_layer& item, std::ostream& out)
-        {
-            int version = 1;
-            serialize(version, out);
-            serialize(item.loss, out);
-            serialize(item.subnetwork, out);
-        }
-
-        friend void deserialize(add_loss_layer& item, std::istream& in)
-        {
-            int version = 0;
-            deserialize(version, in);
-            if (version != 1)
-                throw serialization_error("Unexpected version found while deserializing dlib::add_loss_layer.");
-            deserialize(item.loss, in);
-            deserialize(item.subnetwork, in);
-        }
+        template <typename T, typename U>
+        friend void serialize(const add_loss_layer<T,U>& item, std::ostream& out);
+        template <typename T, typename U>
+        friend void deserialize(add_loss_layer<T,U>& item, std::istream& in);
 
         friend std::ostream& operator<< (std::ostream& out, const add_loss_layer& item)
         {
@@ -2496,6 +2487,26 @@ namespace dlib
         output_label_type temp_label;
         resizable_tensor temp_tensor;
     };
+
+    template <typename LOSS_DETAILS, typename SUBNET>
+    void serialize(const add_loss_layer<LOSS_DETAILS,SUBNET>& item, std::ostream& out)
+    {
+        int version = 1;
+        serialize(version, out);
+        serialize(item.loss, out);
+        serialize(item.subnetwork, out);
+    }
+
+    template <typename LOSS_DETAILS, typename SUBNET>
+    void deserialize(add_loss_layer<LOSS_DETAILS,SUBNET>& item, std::istream& in)
+    {
+        int version = 0;
+        deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing dlib::add_loss_layer.");
+        deserialize(item.loss, in);
+        deserialize(item.subnetwork, in);
+    }
 
 
     template <typename T, typename U>

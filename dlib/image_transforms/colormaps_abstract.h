@@ -43,6 +43,8 @@ namespace dlib
         double max_val
     );
     /*!
+        requires
+            - min_val <= max_val
         ensures
             - Maps value to a color.  In particular, we use a heatmap color scheme where
               values <= min_val are black and larger values become more red, then yellow,
@@ -65,7 +67,7 @@ namespace dlib
         ensures
             - Interprets img as a grayscale image and returns a new matrix which represents
               a colored version of img.  In particular, the colormap is defined by
-              colormap_heat().
+              out_color = colormap_heat(grayscale_pixel_value, min_val, max_val).
             - The returned matrix will have the same dimensions as img.
     !*/
 
@@ -95,6 +97,8 @@ namespace dlib
         double max_val
     );
     /*!
+        requires
+            - min_val <= max_val
         ensures
             - Maps value to a color.  In particular, we use a jet color scheme where 
               values <= min_val are dark blue and larger values become light blue, then
@@ -117,7 +121,7 @@ namespace dlib
         ensures
             - Interprets img as a grayscale image and returns a new matrix which represents
               a colored version of img.  In particular, the colormap is defined by
-              colormap_jet().
+              out_color = colormap_jet(grayscale_pixel_value, min_val, max_val).
             - The returned matrix will have the same dimensions as img.
     !*/
 

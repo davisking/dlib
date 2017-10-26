@@ -36,6 +36,29 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double box_percent_covered (
+        const drectangle& a,
+        const drectangle& b
+    ) 
+    {
+        const double inner = a.intersect(b).area();
+        if (inner == 0)
+            return 0;
+        return std::max(inner/a.area(), inner/b.area());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline double box_percent_covered (
+        const rectangle& a,
+        const rectangle& b
+    ) 
+    {
+        return box_percent_covered(drectangle(a), drectangle(b));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class test_box_overlap
     {
     public:

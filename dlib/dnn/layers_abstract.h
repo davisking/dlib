@@ -349,8 +349,8 @@ namespace dlib
         !*/
 
 
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         /*!
             These two functions are optional.  If provided, they should map between
             (column,row) coordinates in input and output tensors of forward().  Providing
@@ -428,6 +428,13 @@ namespace dlib
                 defined above.  In particular, it defines a fully connected layer that
                 takes an input tensor and multiplies it by a weight matrix and outputs the
                 results.
+
+                The dimensions of the tensors output by this layer are as follows (letting
+                IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == get_num_outputs()
+                    - OUT.nr() == 1
+                    - OUT.nc() == 1
         !*/
 
     public:
@@ -857,8 +864,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -876,8 +883,6 @@ namespace dlib
         typename SUBNET
         >
     using con = add_layer<con_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
-
-// ----------------------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------------------
 
@@ -1072,8 +1077,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1091,6 +1096,60 @@ namespace dlib
         typename SUBNET
         >
     using cont = add_layer<cont_<num_filters,nr,nc,stride_y,stride_x>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        int scale_y, 
+        int scale_x 
+        >
+    class upsample_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                All of them must be >= 1.
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it allows you to upsample a layer using
+                bilinear interpolation.  To be very specific, it upsamples each of the
+                channels in an input tensor.  Therefore, if IN is the input tensor to this
+                layer and OUT the output tensor, then we will have:
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == IN.k() 
+                    - OUT.nr() == IN.nr()*scale_y
+                    - OUT.nc() == IN.nr()*scale_x
+                    - for all valid i,k:  image_plane(OUT,i,k) is a copy of
+                      image_plane(IN,i,k) that has been bilinearly interpolated to fit into
+                      the shape of image_plane(OUT,i,k).
+        !*/
+    public:
+
+        upsample_(
+        );
+        /*!
+            ensures
+                - This object has no state, so the constructor does nothing, aside from
+                  providing default constructability.
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        int scale,
+        typename SUBNET
+        >
+    using upsample = add_layer<upsample_<scale,scale>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -1132,8 +1191,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1186,8 +1245,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1397,8 +1456,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1507,8 +1566,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1643,8 +1702,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1788,8 +1847,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& computed_output, const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1835,8 +1894,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1890,8 +1949,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1923,8 +1982,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -1958,8 +2017,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         void forward_inplace(const tensor& input, tensor& output);
         void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!
@@ -2086,6 +2145,78 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        template<typename> class tag
+        >
+    class mult_prev_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  This layer simply multiplies the output of two previous
+                layers.  In particular, it multiplies the tensor from its immediate
+                predecessor layer, sub.get_output(), with the tensor from a deeper layer,
+                layer<tag>(sub).get_output().
+
+                Therefore, you supply a tag via mult_prev_'s template argument that tells
+                it what layer to multiply with the output of the previous layer.  The
+                result of this multiplication is output by mult_prev_.  Finally, the
+                multiplication happens pointwise according to 4D tensor arithmetic.  If the
+                dimensions don't match then missing elements are presumed to be equal to 0.
+                Moreover, each dimension of the output tensor is equal to the maximum
+                dimension of either of the inputs.  That is, if the tensors A and B are
+                being multiplied to produce C then:
+                    - C.num_samples() == max(A.num_samples(), B.num_samples())
+                    - C.k()  == max(A.k(), B.k())
+                    - C.nr() == max(A.nr(), B.nr())
+                    - C.nc() == max(A.nc(), B.nc())
+        !*/
+
+    public:
+        mult_prev_(
+        ); 
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using mult_prev = add_layer<mult_prev_<tag>, SUBNET>;
+
+    // Here we add some convenient aliases for using mult_prev_ with the tag layers. 
+    template <typename SUBNET> using mult_prev1  = mult_prev<tag1, SUBNET>;
+    template <typename SUBNET> using mult_prev2  = mult_prev<tag2, SUBNET>;
+    template <typename SUBNET> using mult_prev3  = mult_prev<tag3, SUBNET>;
+    template <typename SUBNET> using mult_prev4  = mult_prev<tag4, SUBNET>;
+    template <typename SUBNET> using mult_prev5  = mult_prev<tag5, SUBNET>;
+    template <typename SUBNET> using mult_prev6  = mult_prev<tag6, SUBNET>;
+    template <typename SUBNET> using mult_prev7  = mult_prev<tag7, SUBNET>;
+    template <typename SUBNET> using mult_prev8  = mult_prev<tag8, SUBNET>;
+    template <typename SUBNET> using mult_prev9  = mult_prev<tag9, SUBNET>;
+    template <typename SUBNET> using mult_prev10 = mult_prev<tag10, SUBNET>;
+    using mult_prev1_  = mult_prev_<tag1>;
+    using mult_prev2_  = mult_prev_<tag2>;
+    using mult_prev3_  = mult_prev_<tag3>;
+    using mult_prev4_  = mult_prev_<tag4>;
+    using mult_prev5_  = mult_prev_<tag5>;
+    using mult_prev6_  = mult_prev_<tag6>;
+    using mult_prev7_  = mult_prev_<tag7>;
+    using mult_prev8_  = mult_prev_<tag8>;
+    using mult_prev9_  = mult_prev_<tag9>;
+    using mult_prev10_ = mult_prev_<tag10>;
+
+// ----------------------------------------------------------------------------------------
+
     template<
         template<typename> class... TAG_TYPES
         >
@@ -2111,8 +2242,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
-        point map_input_to_output(point p) const;
-        point map_output_to_input(point p) const;
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const;
         tensor& get_layer_params();
         /*!
@@ -2207,11 +2338,11 @@ namespace dlib
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  It takes tensors as input and L2 normalizes them.  In particular,
                 it has the following properties:
-                    - The output tensors from this layer have the same dimenstions as the
+                    - The output tensors from this layer have the same dimensions as the
                       input tensors.
                     - If you think of each input tensor as a set of tensor::num_samples()
                       vectors, then the output tensor contains the same vectors except they
-                      have been length normlized so that their L2 norms are all 1.  I.e. 
+                      have been length normalized so that their L2 norms are all 1.  I.e. 
                       for each vector v we will have ||v||==1.
         !*/
 
@@ -2245,6 +2376,71 @@ namespace dlib
             These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
         !*/
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        long _offset,
+        long _k,
+        long _nr,
+        long _nc
+        >
+    class extract_
+    {
+        /*!
+            REQUIREMENTS ON TEMPLATE ARGUMENTS
+                - 0 <= _offset
+                - 0 < _k
+                - 0 < _nr
+                - 0 < _nc
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, the output of this layer is simply a copy of
+                the input tensor.  However, you can configure the extract layer to output
+                only some subset of the input tensor and also to reshape it.  Therefore,
+                the dimensions of the tensor output by this layer are as follows (letting
+                IN be the input tensor and OUT the output tensor):
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == _k 
+                    - OUT.nr() == _nr 
+                    - OUT.nc() == _nc 
+
+                So the output will always have the same number of samples as the input, but
+                within each sample (the k,nr,nc part) we will copy only a subset of the
+                values.  Moreover, the _offset parameter controls which part of each sample
+                we take.  To be very precise, we will have:
+                    - let IN_SIZE   = IN.k()*IN.nr()*IN.nc()
+                    - let OUT_SIZE  = _k*_nr*_nc 
+                    - for i in range[0,IN.num_samples()) and j in range[0,OUT_SIZE):
+                        - OUT.host()[i*OUT_SIZE+j] == IN.host()[i*IN_SIZE+_offset+j]
+
+
+                Finally, all this means that the input tensor to this layer must have a big
+                enough size to accommodate taking a _k*_nr*_nc slice from each of its
+                samples.  
+        !*/
+
+    public:
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <
+        long offset,
+        long k,
+        long nr,
+        long nc,
+        typename SUBNET
+        >
+    using extract = add_layer<extract_<offset,k,nr,nc>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

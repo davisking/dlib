@@ -74,28 +74,39 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>
-    point input_tensor_to_output_tensor(
+    dpoint input_tensor_to_output_tensor(
         const net_type& net,
-        point p 
+        dpoint p 
     );
     /*!
         requires
             - net_type is an object of type add_layer, add_skip_layer, or add_tag_layer.
             - All layers in the net must provide map_input_to_output() functions.
         ensures
-            - Given a point (i.e. a row,column coordinate) in the input tensor given to
-              net, this function returns the corresponding point in the output tensor
+            - Given a dpoint (i.e. a row,column coordinate) in the input tensor given to
+              net, this function returns the corresponding dpoint in the output tensor
               net.get_output().  This kind of mapping is useful when working with fully
               convolutional networks as you will often want to know what parts of the
               output feature maps correspond to what parts of the input.
+            - If the network contains skip layers then any layers skipped over by the skip
+              layer are ignored for the purpose of computing this coordinate mapping.  That
+              is, if you walk the network from the output layer to the input layer, where
+              each time you encounter a skip layer you jump to the layer indicated by the
+              skip layer, you will visit exactly the layers in the network involved in the
+              input_tensor_to_output_tensor() calculation. This behavior is useful since it
+              allows you to compute some auxiliary DNN as a separate branch of computation
+              that is separate from the main network's job of running some kind of fully
+              convolutional network over an image.  For instance, you might want to have a
+              branch in your network that computes some global image level
+              summarization/feature.
     !*/
 
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>
-    point output_tensor_to_input_tensor(
+    dpoint output_tensor_to_input_tensor(
         const net_type& net,
-        point p  
+        dpoint p  
     );
     /*!
         requires
@@ -103,7 +114,7 @@ namespace dlib
             - All layers in the net must provide map_output_to_input() functions.
         ensures
             - This function provides the reverse mapping of input_tensor_to_output_tensor().
-              That is, given a point in net.get_output(), what is the corresponding point
+              That is, given a dpoint in net.get_output(), what is the corresponding dpoint
               in the input tensor?
     !*/
 

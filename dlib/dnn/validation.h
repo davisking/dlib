@@ -6,9 +6,25 @@
 #include "../svm/cross_validate_object_detection_trainer_abstract.h"
 #include "../svm/cross_validate_object_detection_trainer.h"
 #include "layers.h"
+#include <set>
 
 namespace dlib
 {
+    namespace impl
+    {
+        inline std::set<std::string> get_labels (
+            const std::vector<mmod_rect>& rects1,
+            const std::vector<mmod_rect>& rects2
+        )
+        {
+            std::set<std::string> labels;
+            for (auto& rr : rects1)
+                labels.insert(rr.label);
+            for (auto& rr : rects2)
+                labels.insert(rr.label);
+            return labels;
+        }
+    }
 
     template <
         typename SUBNET,
@@ -19,7 +35,8 @@ namespace dlib
         const image_array_type& images,
         const std::vector<std::vector<mmod_rect>>& truth_dets,
         const test_box_overlap& overlap_tester = test_box_overlap(),
-        const double adjust_threshold = 0
+        const double adjust_threshold = 0,
+        const test_box_overlap& overlaps_ignore_tester = test_box_overlap()
     )
     {
         // make sure requires clause is not broken
@@ -48,22 +65,32 @@ namespace dlib
             detector.loss_details().to_label(temp, detector.subnet(), &hits, adjust_threshold);
 
 
-            std::vector<full_object_detection> truth_boxes;
-            std::vector<rectangle> ignore;
-            std::vector<std::pair<double,rectangle>> boxes;
-            // copy hits and truth_dets into the above three objects
-            for (auto&& b : truth_dets[i])
+            for (auto& label : impl::get_labels(truth_dets[i], hits))
             {
-                if (b.ignore)
-                    ignore.push_back(b);
-                else
-                    truth_boxes.push_back(full_object_detection(b.rect));
-            }
-            for (auto&& b : hits)
-                boxes.push_back(std::make_pair(b.detection_confidence, b.rect));
+                std::vector<full_object_detection> truth_boxes;
+                std::vector<rectangle> ignore;
+                std::vector<std::pair<double,rectangle>> boxes;
+                // copy hits and truth_dets into the above three objects
+                for (auto&& b : truth_dets[i])
+                {
+                    if (b.ignore)
+                    {
+                        ignore.push_back(b);
+                    }
+                    else if (b.label == label)
+                    {
+                        truth_boxes.push_back(full_object_detection(b.rect));
+                        ++total_true_targets;
+                    }
+                }
+                for (auto&& b : hits)
+                {
+                    if (b.label == label)
+                        boxes.push_back(std::make_pair(b.detection_confidence, b.rect));
+                }
 
-            correct_hits += impl::number_of_truth_hits(truth_boxes, ignore, boxes, overlap_tester, all_dets, missing_detections);
-            total_true_targets += truth_boxes.size();
+                correct_hits += impl::number_of_truth_hits(truth_boxes, ignore, boxes, overlap_tester, all_dets, missing_detections, overlaps_ignore_tester);
+            }
         }
 
         std::sort(all_dets.rbegin(), all_dets.rend());

@@ -306,6 +306,23 @@ namespace dlib { namespace tt
                 - Instead of assigning the result to dest, this function adds the result to dest.
     !*/
 
+    void multiply_zero_padded (
+        bool add_to,
+        tensor& dest,
+        const tensor& src1,
+        const tensor& src2
+    );
+    /*!
+        ensures
+            - if (add_to) then
+                - performs: dest += src1 * src2
+            - else
+                - performs: dest = src1 * src2
+            - In either case, the multiplication happens pointwise according to 4D tensor
+              arithmetic.  If the dimensions don't match then missing elements are presumed
+              to be equal to 0.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     void affine_transform(
@@ -1352,6 +1369,92 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void resize_bilinear (
+        tensor& dest,
+        long dest_row_stride,
+        long dest_channel_stride,
+        const tensor& src,
+        long src_row_stride,
+        long src_channel_stride
+    );
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+        ensures
+            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
+              that has been bilinearly interpolated to fit into the shape of
+              image_plane(dest,i,k).
+            - Instead of supposing the row stride and channel stride in the tensors is
+              given by tensor::nc() and tensor::nr()*tensor::nc() respectively, we use the
+              provided stride values to transition from one row and channel to the next.
+              This is useful in combination with alias_tensor objects since it allows you
+              to operate on subwindows in an image.
+    !*/
+
+    void resize_bilinear_gradient (
+        tensor& grad,
+        long grad_row_stride,
+        long grad_channel_stride,
+        const tensor& gradient_input,
+        long gradient_input_row_stride,
+        long gradient_input_channel_stride
+    );
+    /*!
+        requires
+            - is_same_object(grad, gradient_input)==false
+            - gradient_input.num_samples() == grad.num_samples()
+            - gradient_input.k() == grad.k()
+        ensures
+            - Suppose that DEST is the output of resize_bilinear(DEST,SRC) for some SRC
+              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
+              the gradient of f() with respect to SRC and adds it to grad.   It should be
+              noted that we don't need to know the contents of DEST to compute this
+              gradient.  All that matters is that gradient_input have the same dimensions
+              as DEST.
+            - Instead of supposing the row stride and channel stride in the tensors is
+              given by tensor::nc() and tensor::nr()*tensor::nc() respectively, we use the
+              provided stride values to transition from one row and channel to the next.
+              This is useful in combination with alias_tensor objects since it allows you
+              to operate on subwindows in an image.
+    !*/
+
+    inline void resize_bilinear (
+        tensor& dest,
+        const tensor& src
+    ) { resize_bilinear(dest, dest.nc(), dest.nr()*dest.nc(), src, src.nc(), src.nr()*src.nc()); }
+    /*!
+        requires
+            - is_same_object(dest, src)==false
+            - dest.num_samples() == src.num_samples()
+            - dest.k() == src.k()
+        ensures
+            - for all valid i,k:  image_plane(dest,i,k) is a copy of image_plane(src,i,k)
+              that has been bilinearly interpolated to fit into the shape of
+              image_plane(dest,i,k).
+    !*/
+
+    inline void resize_bilinear_gradient (
+        tensor& grad,
+        const tensor& gradient_input
+    ) { resize_bilinear_gradient(grad, grad.nc(), grad.nr()*grad.nc(), gradient_input, gradient_input.nc(), gradient_input.nr()*gradient_input.nc()); }
+    /*!
+        requires
+            - is_same_object(grad, gradient_input)==false
+            - gradient_input.num_samples() == grad.num_samples()
+            - gradient_input.k() == grad.k()
+        ensures
+            - Suppose that DEST is the output of resize_bilinear(DEST,SRC) for some SRC
+              tensor, let f(SRC) == dot(gradient_input,DEST).  Then this function computes
+              the gradient of f() with respect to SRC and adds it to grad.   It should be
+              noted that we don't need to know the contents of DEST to compute this
+              gradient.  All that matters is that gradient_input have the same dimensions
+              as DEST.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     class multi_device_tensor_averager
     {
         /*!
@@ -1492,6 +1595,7 @@ namespace dlib { namespace tt
 // ----------------------------------------------------------------------------------------
 
     void copy_tensor(
+            bool add_to,
             tensor& dest,
             size_t dest_k_offset,
             const tensor& src,
@@ -1506,9 +1610,14 @@ namespace dlib { namespace tt
             - dest.k() - dest_k_offset >= count_k
             - src.k() - src_k_offset >= count_k
             - is_same_object(dest,src) == false
+            - The memory areas of src and dest do not overlap.
         ensures
-            - performs: dest[i, k + dest_k_offset, r, c] = src[i, k + src_k_offset, r, c], where k in [0..count_k]
-              Copies content of each sample from src in to corresponding place of sample at dest.
+            - if (add_to) then
+                - performs: dest[i, k + dest_k_offset, r, c] += src[i, k + src_k_offset, r, c], where k in [0..count_k]
+                  i.e., adds content of each sample from src in to corresponding place of sample at dest.
+            - else
+                - performs: dest[i, k + dest_k_offset, r, c]  = src[i, k + src_k_offset, r, c], where k in [0..count_k]
+                  i.e., copies content of each sample from src in to corresponding place of sample at dest.
     !*/
 
 // ----------------------------------------------------------------------------------------

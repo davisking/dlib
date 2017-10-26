@@ -258,7 +258,7 @@ namespace dlib
             // MATLAB, then don't do these checks since it terminates the over arching
             // system.  Just let the errors go to the plugin handler and it will deal with
             // them.
-#if defined(MATLAB_MEX_FILE)
+#if defined(MATLAB_MEX_FILE) || defined(DLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
             return;
 #else
             static bool is_first_fatal_error = true;

@@ -10,6 +10,7 @@
 #include "image_pyramid.h"
 #include "../simd.h"
 #include "../image_processing/full_object_detection.h"
+#include <limits>
 
 namespace dlib
 {
@@ -19,6 +20,8 @@ namespace dlib
     template <typename T>
     struct sub_image_proxy
     {
+        sub_image_proxy() = default;
+
         sub_image_proxy (
             T& img,
             rectangle rect
@@ -33,15 +36,17 @@ namespace dlib
             _data = (char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
         }
 
-        void* _data;
-        long _width_step;
-        long _nr;
-        long _nc;
+        void* _data = 0;
+        long _width_step = 0;
+        long _nr = 0;
+        long _nc = 0;
     };
 
     template <typename T>
     struct const_sub_image_proxy
     {
+        const_sub_image_proxy() = default;
+
         const_sub_image_proxy (
             const T& img,
             rectangle rect
@@ -56,10 +61,10 @@ namespace dlib
             _data = (const char*)image_data(img) + sizeof(pixel_type)*rect.left() + rect.top()*_width_step;
         }
 
-        const void* _data;
-        long _width_step;
-        long _nr;
-        long _nc;
+        const void* _data = 0;
+        long _width_step = 0;
+        long _nr = 0;
+        long _nc = 0;
     };
 
     template <typename T>
@@ -151,6 +156,38 @@ namespace dlib
     )
     {
         return const_sub_image_proxy<image_type>(img,rect);
+    }
+
+    template <typename T>
+    inline sub_image_proxy<matrix<T>> sub_image (
+        T* img,
+        long nr,
+        long nc,
+        long row_stride
+    )
+    {
+        sub_image_proxy<matrix<T>> tmp;
+        tmp._data = img;
+        tmp._nr = nr;
+        tmp._nc = nc;
+        tmp._width_step = row_stride*sizeof(T);
+        return tmp;
+    }
+
+    template <typename T>
+    inline const const_sub_image_proxy<matrix<T>> sub_image (
+        const T* img,
+        long nr,
+        long nc,
+        long row_stride
+    )
+    {
+        const_sub_image_proxy<matrix<T>> tmp;
+        tmp._data = img;
+        tmp._nr = nr;
+        tmp._nc = nc;
+        tmp._width_step = row_stride*sizeof(T);
+        return tmp;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -692,11 +729,8 @@ namespace dlib
         const_image_view<image_type1> in_img(in_img_);
         image_view<image_type2> out_img(out_img_);
 
-        if (out_img.nr() <= 1 || out_img.nc() <= 1)
-        {
-            assign_all_pixels(out_img, 0);
+        if (out_img.size() == 0 || in_img.size() == 0)
             return;
-        }
 
 
         typedef typename image_traits<image_type1>::pixel_type T;
@@ -761,11 +795,24 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
-    typename enable_if<is_grayscale_image<image_type> >::type resize_image (
+    struct images_have_same_pixel_types
+    {
+        typedef typename image_traits<image_type1>::pixel_type ptype1;
+        typedef typename image_traits<image_type2>::pixel_type ptype2;
+        const static bool value = is_same_type<ptype1, ptype2>::value;
+    };
+
+    template <
+        typename image_type,
+        typename image_type2
+        >
+    typename enable_if_c<is_grayscale_image<image_type>::value && is_grayscale_image<image_type2>::value && images_have_same_pixel_types<image_type,image_type2>::value>::type 
+    resize_image (
         const image_type& in_img_,
-        image_type& out_img_,
+        image_type2& out_img_,
         interpolate_bilinear
     )
     {
@@ -777,13 +824,10 @@ namespace dlib
             );
 
         const_image_view<image_type> in_img(in_img_);
-        image_view<image_type> out_img(out_img_);
+        image_view<image_type2> out_img(out_img_);
 
-        if (out_img.nr() <= 1 || out_img.nc() <= 1)
-        {
-            assign_all_pixels(out_img, 0);
+        if (out_img.size() == 0 || in_img.size() == 0)
             return;
-        }
 
         typedef typename image_traits<image_type>::pixel_type T;
         const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
@@ -828,8 +872,8 @@ namespace dlib
                 simd4f bl(in_img[bottom][fleft[0]],  in_img[bottom][fleft[1]],  in_img[bottom][fleft[2]],  in_img[bottom][fleft[3]]);
                 simd4f br(in_img[bottom][fright[0]], in_img[bottom][fright[1]], in_img[bottom][fright[2]], in_img[bottom][fright[3]]);
 
-                simd4i out = simd4i(tlf*tl + trf*tr + blf*bl + brf*br);
-                int32 fout[4];
+                simd4f out = simd4f(tlf*tl + trf*tr + blf*bl + brf*br);
+                float fout[4];
                 out.store(fout);
 
                 out_img[r][c]   = static_cast<T>(fout[0]);
@@ -881,11 +925,8 @@ namespace dlib
         const_image_view<image_type> in_img(in_img_);
         image_view<image_type> out_img(out_img_);
 
-        if (out_img.nr() <= 1 || out_img.nc() <= 1)
-        {
-            assign_all_pixels(out_img, 0);
+        if (out_img.size() == 0 || in_img.size() == 0)
             return;
-        }
 
 
         typedef typename image_traits<image_type>::pixel_type T;
@@ -1005,6 +1046,29 @@ namespace dlib
             );
 
         resize_image(in_img, out_img, interpolate_bilinear());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void resize_image (
+        double size_scale,
+        image_type& img 
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT( size_scale > 0 ,
+            "\t void resize_image()"
+            << "\n\t Invalid inputs were given to this function."
+            << "\n\t size_scale:  " << size_scale
+            );
+
+        image_type temp;
+        set_image_size(temp, std::round(size_scale*num_rows(img)), std::round(size_scale*num_columns(img)));
+        resize_image(img, temp);
+        swap(img, temp);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1266,7 +1330,8 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<rectangle> >& objects
+        std::vector<std::vector<rectangle> >& objects,
+        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
     )
     {
         // make sure requires clause is not broken
@@ -1281,11 +1346,15 @@ namespace dlib
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            pyramid_up(images[i], temp, pyr);
-            swap(temp, images[i]);
-            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            const unsigned long img_size = num_rows(images[i])*num_columns(images[i]);
+            if (img_size <= max_image_size)
             {
-                objects[i][j] = pyr.rect_up(objects[i][j]);
+                pyramid_up(images[i], temp, pyr);
+                swap(temp, images[i]);
+                for (unsigned long j = 0; j < objects[i].size(); ++j)
+                {
+                    objects[i][j] = pyr.rect_up(objects[i][j]);
+                }
             }
         }
     }
@@ -1296,7 +1365,8 @@ namespace dlib
         >
     void upsample_image_dataset (
         image_array_type& images,
-        std::vector<std::vector<mmod_rect>>& objects
+        std::vector<std::vector<mmod_rect>>& objects,
+        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
     )
     {
         // make sure requires clause is not broken
@@ -1311,11 +1381,15 @@ namespace dlib
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            pyramid_up(images[i], temp, pyr);
-            swap(temp, images[i]);
-            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            const unsigned long img_size = num_rows(images[i])*num_columns(images[i]);
+            if (img_size <= max_image_size)
             {
-                objects[i][j].rect = pyr.rect_up(objects[i][j].rect);
+                pyramid_up(images[i], temp, pyr);
+                swap(temp, images[i]);
+                for (unsigned long j = 0; j < objects[i].size(); ++j)
+                {
+                    objects[i][j].rect = pyr.rect_up(objects[i][j].rect);
+                }
             }
         }
     }
@@ -1327,7 +1401,8 @@ namespace dlib
     void upsample_image_dataset (
         image_array_type& images,
         std::vector<std::vector<rectangle> >& objects,
-        std::vector<std::vector<rectangle> >& objects2 
+        std::vector<std::vector<rectangle> >& objects2,
+        unsigned long max_image_size = std::numeric_limits<unsigned long>::max()
     )
     {
         // make sure requires clause is not broken
@@ -1344,15 +1419,19 @@ namespace dlib
         pyramid_type pyr;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            pyramid_up(images[i], temp, pyr);
-            swap(temp, images[i]);
-            for (unsigned long j = 0; j < objects[i].size(); ++j)
+            const unsigned long img_size = num_rows(images[i])*num_columns(images[i]);
+            if (img_size <= max_image_size)
             {
-                objects[i][j] = pyr.rect_up(objects[i][j]);
-            }
-            for (unsigned long j = 0; j < objects2[i].size(); ++j)
-            {
-                objects2[i][j] = pyr.rect_up(objects2[i][j]);
+                pyramid_up(images[i], temp, pyr);
+                swap(temp, images[i]);
+                for (unsigned long j = 0; j < objects[i].size(); ++j)
+                {
+                    objects[i][j] = pyr.rect_up(objects[i][j]);
+                }
+                for (unsigned long j = 0; j < objects2[i].size(); ++j)
+                {
+                    objects2[i][j] = pyr.rect_up(objects2[i][j]);
+                }
             }
         }
     }

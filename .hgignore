@@ -32,3 +32,7 @@ dlib/test/test_log.txt
 dlib/test/build_vc2015_64/*
 dlib/test/build_vc2013_64/*
 dlib/test/build_vc2012_64/*
+dlib/java/libmyproject.so
+dlib/java/myproject.jar
+dlib/java/swig_test.class
+

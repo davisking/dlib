@@ -34,6 +34,34 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline double box_percent_covered (
+        const drectangle& a,
+        const drectangle& b
+    ); 
+    /*!
+        ensures
+            - let OVERLAP = a.intersect(b).area()
+            - This function returns max(OVERLAP/a.area(), OVERLAP/b.area())
+              e.g. If one box entirely contains another then this function returns 1, if
+              they don't overlap at all it returns 0.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline double box_percent_covered (
+        const rectangle& a,
+        const rectangle& b
+    ); 
+    /*!
+        ensures
+            - let OVERLAP = a.intersect(b).area()
+            - This function returns max(OVERLAP/a.area(), OVERLAP/b.area())
+              e.g. If one box entirely contains another then this function returns 1, if
+              they don't overlap at all it returns 0.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     class test_box_overlap
     {
         /*!

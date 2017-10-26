@@ -12,8 +12,10 @@ To build and install:
     python setup.py install
 To package the wheel (after pip installing twine and wheel):
     python setup.py bdist_wheel
-To upload the wheel to PyPi
+To upload the binary wheel to PyPi
     twine upload dist/*.whl
+To upload the source distribution to PyPi
+    python setup.py sdist upload
 To repackage the previously built package as wheel (bypassing build):
     python setup.py bdist_wheel --repackage
 To install a develop version (egg with symbolic link):
@@ -526,7 +528,11 @@ class build(_build):
             # this checks the sysconfig and will correctly pick up a brewed python lib
             # e.g. in /usr/local/Cellar
             py_ver = get_python_version()
+            # check: in some virtual environments the libpython has the form "libpython_#m.dylib
             py_lib = os.path.join(get_config_var('LIBDIR'), 'libpython'+py_ver+'.dylib')
+            if not os.path.isfile(py_lib):
+                py_lib = os.path.join(get_config_var('LIBDIR'), 'libpython'+py_ver+'m.dylib')
+                
             cmake_extra_arch += ['-DPYTHON_LIBRARY={lib}'.format(lib=py_lib)]
 
         if sys.platform == "win32":

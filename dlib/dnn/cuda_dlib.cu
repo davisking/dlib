@@ -515,6 +515,134 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        __global__ void _cuda_mult1(float* d, const float* s1, const float* s2, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] = s1[i]*s2[i];
+            }
+        }
+
+        __global__ void _cuda_mult1_add_to(float* d, const float* s1, const float* s2, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                d[i] += s1[i]*s2[i];
+            }
+        }
+
+        __global__ void _cuda_mult2(float* d, const float* s1, const float* s2, 
+                                   size_t dn, size_t dk, size_t dr, size_t dc,
+                                   size_t s1n, size_t s1k, size_t s1r, size_t s1c,
+                                   size_t s2n, size_t s2k, size_t s2r, size_t s2c)
+        {
+            for (auto i : grid_stride_range(0, dn*dk*dr*dc))
+            {
+                size_t n,k,r,c;
+                unpack_idx(i, dk,dr,dc, n,k,r,c);
+
+                float v1 = 0;
+                float v2 = 0;
+
+                if (n < s1n &&
+                    k < s1k &&
+                    r < s1r &&
+                    c < s1c )
+                {
+                    v1 = s1[pack_idx(s1k,s1r,s1c, n,k,r,c)];
+                }
+
+                if (n < s2n &&
+                    k < s2k &&
+                    r < s2r &&
+                    c < s2c )
+                {
+                    v2 = s2[pack_idx(s2k,s2r,s2c, n,k,r,c)];
+                }
+
+                d[i] = v1*v2;
+            }
+        }
+
+        __global__ void _cuda_mult2_add_to(float* d, const float* s1, const float* s2, 
+                                   size_t dn, size_t dk, size_t dr, size_t dc,
+                                   size_t s1n, size_t s1k, size_t s1r, size_t s1c,
+                                   size_t s2n, size_t s2k, size_t s2r, size_t s2c)
+        {
+            for (auto i : grid_stride_range(0, dn*dk*dr*dc))
+            {
+                size_t n,k,r,c;
+                unpack_idx(i, dk,dr,dc, n,k,r,c);
+
+                float v1 = 0;
+                float v2 = 0;
+
+                if (n < s1n &&
+                    k < s1k &&
+                    r < s1r &&
+                    c < s1c )
+                {
+                    v1 = s1[pack_idx(s1k,s1r,s1c, n,k,r,c)];
+                }
+
+                if (n < s2n &&
+                    k < s2k &&
+                    r < s2r &&
+                    c < s2c )
+                {
+                    v2 = s2[pack_idx(s2k,s2r,s2c, n,k,r,c)];
+                }
+
+                d[i] += v1*v2;
+            }
+        }
+
+        void multiply_zero_padded (
+            bool add_to,
+            tensor& dest,
+            const tensor& src1,
+            const tensor& src2
+        )
+        {
+            if (dest.size() == 0)
+                return;
+
+            // Do the simple and fast version if everything has the same dimensions
+            if (have_same_dimensions(dest, src1) &&
+                have_same_dimensions(dest, src2))
+            {
+                if (add_to)
+                    launch_kernel(_cuda_mult1_add_to,max_jobs(dest.size()), dest.device(), src1.device(), src2.device(), dest.size());
+                else
+                    launch_kernel(_cuda_mult1,max_jobs(dest.size()), dest.device(), src1.device(), src2.device(), dest.size());
+            }
+            else
+            {
+                if (add_to)
+                {
+                    // Otherwise, do the more complex version with bounds checking.
+                    launch_kernel(_cuda_mult2_add_to,max_jobs(dest.size()),
+                                dest.device(), src1.device(), src2.device(), 
+                                dest.num_samples(), dest.k(), dest.nr(), dest.nc(),
+                                src1.num_samples(), src1.k(), src1.nr(), src1.nc(),
+                                src2.num_samples(), src2.k(), src2.nr(), src2.nc()
+                                );
+                }
+                else
+                {
+                    // Otherwise, do the more complex version with bounds checking.
+                    launch_kernel(_cuda_mult2,max_jobs(dest.size()),
+                                dest.device(), src1.device(), src2.device(), 
+                                dest.num_samples(), dest.k(), dest.nr(), dest.nc(),
+                                src1.num_samples(), src1.k(), src1.nr(), src1.nc(),
+                                src2.num_samples(), src2.k(), src2.nr(), src2.nc()
+                                );
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
         __global__ void _cuda_add1(float* d, const float* s1, const float* s2, size_t n)
         {
             for (auto i : grid_stride_range(0, n))
@@ -1139,12 +1267,248 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_resize_bilinear(size_t dsize, size_t dchan_size, size_t dnc, float* d, 
+                                              size_t schan_size, int snr, int snc, const float* s, 
+                                              const float x_scale, const float y_scale)
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::floor(y));
+                const int bottom = ::min(top+1, snr-1);
+                const float tb_frac = y - top;
+
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::floor(x));
+                const int right  = ::min(left+1, snc-1);
+                const float lr_frac = x - left;
+
+                float tl = s[sidx+top*snc+left];
+                float tr = s[sidx+top*snc+right];
+                float bl = s[sidx+bottom*snc+left];
+                float br = s[sidx+bottom*snc+right];
+
+                float temp = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
+                    tb_frac*((1-lr_frac)*bl + lr_frac*br);
+
+                d[i] = temp;
+            }
+        }
+
+        __global__ void _cuda_resize_bilinear_strided(size_t dsize, size_t dchan_size, size_t dnc, float* d, 
+                                              size_t schan_size, int snr, int snc, const float* s, 
+                                              const float x_scale, const float y_scale, 
+                                              size_t dest_row_stride, size_t src_row_stride, size_t dest_chan_size_strided
+                                              )
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+                const int didx = channel*dest_chan_size_strided + r*dest_row_stride+c;
+
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::floor(y));
+                const int bottom = ::min(top+1, snr-1);
+                const float tb_frac = y - top;
+
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::floor(x));
+                const int right  = ::min(left+1, snc-1);
+                const float lr_frac = x - left;
+
+                float tl = s[sidx+top*src_row_stride+left];
+                float tr = s[sidx+top*src_row_stride+right];
+                float bl = s[sidx+bottom*src_row_stride+left];
+                float br = s[sidx+bottom*src_row_stride+right];
+
+                float temp = (1-tb_frac)*((1-lr_frac)*tl + lr_frac*tr) + 
+                    tb_frac*((1-lr_frac)*bl + lr_frac*br);
+
+                d[didx] = temp;
+            }
+        }
+
+        void resize_bilinear (
+            tensor& dest,
+            long dest_row_stride,
+            long dest_channel_stride,
+            const tensor& src,
+            long src_row_stride,
+            long src_channel_stride
+        )
+        {
+            DLIB_CASSERT(is_same_object(dest, src)==false);
+            DLIB_CASSERT(dest.num_samples() == src.num_samples());
+            DLIB_CASSERT(dest.k() == src.k());
+
+            if (dest.size() == 0 || src.size() == 0)
+                return;
+
+            const float x_scale = (src.nc()-1)/(float)std::max<long>((dest.nc()-1),1);
+            const float y_scale = (src.nr()-1)/(float)std::max<long>((dest.nr()-1),1);
+
+            if (dest.nc() == dest_row_stride && dest.nr()*dest.nc()==dest_channel_stride &&
+                src.nc()  == src_row_stride  && src.nr()*src.nc()==src_channel_stride)
+            {
+                launch_kernel(_cuda_resize_bilinear, 
+                        dest.size(), dest.nr()*dest.nc(), dest.nc(), dest.device(),
+                        src.nr()*src.nc(), src.nr(), src.nc(), src.device(),
+                        x_scale, y_scale);
+            }
+            else
+            {
+                launch_kernel(_cuda_resize_bilinear_strided, 
+                        dest.size(), dest.nr()*dest.nc(), dest.nc(), dest.device(),
+                        src_channel_stride, src.nr(), src.nc(), src.device(),
+                        x_scale, y_scale, dest_row_stride, src_row_stride, dest_channel_stride);
+            }
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_resize_bilinear_gradient(size_t dsize, size_t dchan_size, size_t dnc, const float* d, 
+                                              size_t schan_size, int snr, int snc, float* s, 
+                                              const float x_scale, const float y_scale)
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+                const float tmp = d[i];
+
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::floor(y));
+                const int bottom = ::min(top+1, snr-1);
+                const float tb_frac = y - top;
+
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::floor(x));
+                const int right  = ::min(left+1, snc-1);
+                const float lr_frac = x - left;
+
+
+                atomicAdd(s+sidx+top*snc+left,     tmp*(1-tb_frac)*(1-lr_frac));
+                atomicAdd(s+sidx+top*snc+right,    tmp*(1-tb_frac)*(lr_frac));
+                atomicAdd(s+sidx+bottom*snc+left,  tmp*(tb_frac)*(1-lr_frac));
+                atomicAdd(s+sidx+bottom*snc+right, tmp*(tb_frac)*(lr_frac));
+            }
+        }
+
+        __global__ void _cuda_resize_bilinear_gradient_strided(size_t dsize, size_t dchan_size, size_t dnc, const float* d, 
+                                              size_t schan_size, int snr, int snc, float* s, 
+                                              const float x_scale, const float y_scale,
+                                              size_t dest_row_stride, size_t src_row_stride, size_t dest_chan_size_strided
+                                              )
+        {
+            for(auto i : grid_stride_range(0, dsize)) 
+            {
+
+                const int idx = i%dchan_size;
+                const int channel = i/dchan_size;
+                const int didx = channel*dest_chan_size_strided;
+                const int sidx = channel*schan_size;
+                const int r = idx/dnc;
+                const int c = idx%dnc;
+
+                const float tmp = d[didx + r*dest_row_stride+c];
+
+                const float y = r*y_scale;
+                const int top    = static_cast<int>(::floor(y));
+                const int bottom = ::min(top+1, snr-1);
+                const float tb_frac = y - top;
+
+                const float x = c*x_scale;
+                const int left   = static_cast<int>(::floor(x));
+                const int right  = ::min(left+1, snc-1);
+                const float lr_frac = x - left;
+
+
+                atomicAdd(s+sidx+top*src_row_stride+left,     tmp*(1-tb_frac)*(1-lr_frac));
+                atomicAdd(s+sidx+top*src_row_stride+right,    tmp*(1-tb_frac)*(lr_frac));
+                atomicAdd(s+sidx+bottom*src_row_stride+left,  tmp*(tb_frac)*(1-lr_frac));
+                atomicAdd(s+sidx+bottom*src_row_stride+right, tmp*(tb_frac)*(lr_frac));
+            }
+        }
+
+        void resize_bilinear_gradient (
+            tensor& grad,
+            long grad_row_stride,
+            long grad_channel_stride,
+            const tensor& gradient_input,
+            long gradient_input_row_stride,
+            long gradient_input_channel_stride
+        )
+        {
+            DLIB_CASSERT(is_same_object(grad, gradient_input)==false);
+            DLIB_CASSERT(gradient_input.num_samples() == grad.num_samples());
+            DLIB_CASSERT(gradient_input.k() == grad.k());
+
+            if (grad.size() == 0 || gradient_input.size() == 0)
+                return;
+
+            const float x_scale = (grad.nc()-1)/(float)std::max<long>((gradient_input.nc()-1),1);
+            const float y_scale = (grad.nr()-1)/(float)std::max<long>((gradient_input.nr()-1),1);
+
+            if (grad.nc() == grad_row_stride && grad.nr()*grad.nc()==grad_channel_stride &&
+                gradient_input.nc() == gradient_input_row_stride && gradient_input.nr()*gradient_input.nc()==gradient_input_channel_stride)
+            {
+                launch_kernel(_cuda_resize_bilinear_gradient, 
+                        gradient_input.size(), gradient_input.nr()*gradient_input.nc(), gradient_input.nc(), gradient_input.device(),
+                        grad.nr()*grad.nc(), grad.nr(), grad.nc(), grad.device(),
+                        x_scale, y_scale);
+            }
+            else
+            {
+                launch_kernel(_cuda_resize_bilinear_gradient_strided, 
+                        gradient_input.size(), gradient_input.nr()*gradient_input.nc(), gradient_input.nc(), gradient_input.device(),
+                        grad_channel_stride, grad.nr(), grad.nc(), grad.device(),
+                        x_scale, y_scale, gradient_input_row_stride, grad_row_stride, gradient_input_channel_stride);
+            }
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_copy_tensor_add_to (float* dest, size_t size,  const float* src,  size_t dest_stride, size_t src_stride, size_t block_size)
+        {
+            for(auto i : grid_stride_range(0, size)) 
+            {
+                size_t blk = i/block_size;
+                size_t j = i%block_size;
+                dest[blk*dest_stride + j] += src[blk*src_stride + j];
+            }
+        }
+
+        __global__ void _cuda_copy_tensor (float* dest, size_t size,  const float* src,  size_t dest_stride, size_t src_stride, size_t block_size)
+        {
+            for(auto i : grid_stride_range(0, size)) 
+            {
+                size_t blk = i/block_size;
+                size_t j = i%block_size;
+                dest[blk*dest_stride + j] = src[blk*src_stride + j];
+            }
+        }
+
         void copy_tensor(
-                tensor& dest,
-                size_t dest_k_offset,
-                const tensor& src,
-                size_t src_k_offset,
-                size_t count_k
+            bool add_to,
+            tensor& dest,
+            size_t dest_k_offset,
+            const tensor& src,
+            size_t src_k_offset,
+            size_t count_k
         )
         {
             const size_t dest_sample_size = static_cast<size_t>(dest.nc() * dest.nr() * dest.k());
@@ -1160,13 +1524,17 @@ namespace dlib
             float* dest_p = dest.device() + dest_k_offset * dest.nc() * dest.nr();
             const float* src_p = src.device() + src_k_offset * src.nc() * src.nr();;
 
-
-            for (long i = 0; i < src.num_samples(); ++i)
+            if (add_to)
             {
-                CHECK_CUDA(cudaMemcpy(dest_p, src_p, block_size * sizeof(float), cudaMemcpyDeviceToDevice));
-
-                dest_p += dest_sample_size;
-                src_p  += src_sample_size;
+                launch_kernel(_cuda_copy_tensor_add_to, max_jobs(dest.size()), 
+                              dest_p, block_size*dest.num_samples(),
+                              src_p, dest_sample_size, src_sample_size, block_size);
+            }
+            else
+            {
+                launch_kernel(_cuda_copy_tensor, max_jobs(dest.size()), 
+                              dest_p, block_size*dest.num_samples(),
+                              src_p, dest_sample_size, src_sample_size, block_size);
             }
         }
 

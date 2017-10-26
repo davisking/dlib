@@ -96,7 +96,7 @@ double mean_aspect_ratio (
         for (unsigned long j = 0; j < data.images[i].boxes.size(); ++j)
         {
             rectangle rect = data.images[i].boxes[j].rect;
-            if (rect.area() == 0)
+            if (rect.area() == 0 || data.images[i].boxes[j].ignore)
                 continue;
             sum += rect.width()/(double)rect.height();
             ++cnt;

@@ -168,7 +168,7 @@ namespace dlib
             const matrix_exp<EXP>& item
         )
         {
-            DLIB_CASSERT(idx < num_samples());
+            DLIB_CASSERT(idx < (unsigned long)num_samples());
             DLIB_CASSERT(item.size() == nr()*nc()*k());
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
@@ -617,7 +617,10 @@ namespace dlib
             size_t offset
         ) const
         {
-            DLIB_CASSERT(offset+size() <= t.size());
+            DLIB_CASSERT(offset+size() <= t.size(), 
+                "offset: "<<offset <<"\n"<<
+                "size(): "<<size() <<"\n"<<
+                "t.size(): "<<t.size() <<"\n");
 
 #ifdef DLIB_USE_CUDA
             if (!inst.cudnn_descriptor)

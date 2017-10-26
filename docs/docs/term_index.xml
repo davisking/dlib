@@ -126,6 +126,9 @@
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_hinge_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_log_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_weighted_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_mean_squared_per_pixel_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_metric_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_mean_squared_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_mean_squared_multioutput_" include="dlib/dnn.h"/>
@@ -141,6 +144,10 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="EXAMPLE_COMPUTATIONAL_LAYER_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="fc_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="con_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="mult_prev_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="extract_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="upsample_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="cont_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="l2normalize_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="dropout_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="multiply_" include="dlib/dnn.h"/>
@@ -858,6 +865,7 @@
          <term file="metaprogramming.html" name="COMPILE_TIME_ASSERT"               include="dlib/assert.h"/>
          <term file="metaprogramming.html" name="DLIB_ASSERT_HAS_STANDARD_LAYOUT"   include="dlib/assert.h"/>
          <term file="other.html" name="MATLAB"                       />
+         <term file="other.html" name="java"                       />
          <term file="other.html" name="TIME_THIS"                       include="dlib/time_this.h"/>
          <term link="other.html#timing code blocks" name="print"        include="dlib/timing.h"/>
          <term file="other.html" name="timing code blocks"              include="dlib/timing.h"/>
@@ -1001,6 +1009,8 @@
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="get_files_in_directory_tree"    include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="get_parent_directory"     include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="file_exists"        include="dlib/dir_nav.h"/>
+         <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="select_oldest_file"        include="dlib/dir_nav.h"/>
+         <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="select_newest_file"        include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_ending"       include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_endings"      include="dlib/dir_nav.h"/>
          <term file="dlib/dir_nav/dir_nav_extensions_abstract.h.html" name="match_all"          include="dlib/dir_nav.h"/>

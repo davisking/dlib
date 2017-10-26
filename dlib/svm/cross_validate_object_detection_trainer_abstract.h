@@ -142,7 +142,8 @@ namespace dlib
         const image_array_type& images,
         const std::vector<std::vector<mmod_rect>>& truth_dets,
         const test_box_overlap& overlap_tester = test_box_overlap(),
-        const double adjust_threshold = 0
+        const double adjust_threshold = 0,
+        const test_box_overlap& overlaps_ignore_tester = test_box_overlap()
     );
     /*!
         requires
@@ -154,12 +155,13 @@ namespace dlib
               object_detector's except it runs on CNNs that use loss_mmod.
             - Tests the given detector against the supplied object detection problem and
               returns the precision, recall, and average precision.  Note that the task is
-              to predict, for each images[i], the set of object locations given by
-              truth_dets[i].  Additionally, any detections on image[i] that match a box in
-              truth_dets[i] that are marked ignore are ignored.  That is, detections
-              matching an ignore box do not count as a false alarm and similarly if any
+              to predict, for each images[i], the set of object locations, and their
+              corresponding labels, given by truth_dets[i].  Additionally, any detections
+              on image[i] that match a box in truth_dets[i] that are marked ignore are
+              ignored.  That is, detections matching an ignore box, regardless of the
+              ignore box's label, do not count as a false alarm and similarly if any
               ignored box in truth_dets goes undetected it does not count as a missed
-              detection.  
+              detection.  To test if a box overlaps an ignore box, we use overlaps_ignore_tester.
             - In particular, returns a matrix M such that:  
                 - M(0) == the precision of the detector object.  This is a number
                   in the range [0,1] which measures the fraction of detector outputs
@@ -177,8 +179,8 @@ namespace dlib
                   ordering them in descending order of their detection scores.  Then we use
                   the average_precision() routine to score the ranked listing and store the
                   output into M(2).
-                - This function considers a detector output D to match a rectangle T if and
-                  only if overlap_tester(T,D) returns true. 
+                - This function considers a detector output D to match a truth rectangle T if 
+                  and only if overlap_tester(T,D) returns true and the labels are identical strings. 
                 - Note that you can use the adjust_threshold argument to raise or lower the
                   detection threshold.  This value is passed into the identically named
                   argument to the detector object and therefore influences the number of

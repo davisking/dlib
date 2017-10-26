@@ -6277,10 +6277,14 @@ namespace dlib
         for (unsigned long i = 0; i < overlay_rects.size(); ++i)
         {
             const rectangle orect = get_rect_on_screen(i);
+            rgb_alpha_pixel color = overlay_rects[i].color;
+            // draw crossed out boxes slightly faded
+            if (overlay_rects[i].crossed_out)
+                color.alpha = 150;
 
             if (rect_is_selected && selected_rect == i)
             {
-                draw_rectangle(c, orect, invert_pixel(overlay_rects[i].color), area);
+                draw_rectangle(c, orect, invert_pixel(color), area);
             }
             else if (highlighted_rect < overlay_rects.size() && highlighted_rect == i)
             {
@@ -6308,14 +6312,14 @@ namespace dlib
             }
             else
             {
-                draw_rectangle(c, orect, overlay_rects[i].color, area);
+                draw_rectangle(c, orect, color, area);
             }
 
             if (overlay_rects[i].label.size() != 0)
             {
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r(orect.br_corner(),  c.br_corner());
-                mfont->draw_string(c, r, overlay_rects[i].label, overlay_rects[i].color, 0, 
+                mfont->draw_string(c, r, overlay_rects[i].label, color, 0, 
                                    std::string::npos, area);
             }
 
@@ -6332,17 +6336,17 @@ namespace dlib
                 if (rect_is_selected && selected_rect == i && 
                     selected_part_name.size() != 0 && selected_part_name == itr->first)
                 {
-                    draw_circle(c, center(temp), temp.width()/2, invert_pixel(overlay_rects[i].color), area);
+                    draw_circle(c, center(temp), temp.width()/2, invert_pixel(color), area);
                 }
                 else
                 {
-                    draw_circle(c, center(temp), temp.width()/2, overlay_rects[i].color, area);
+                    draw_circle(c, center(temp), temp.width()/2, color, area);
                 }
 
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r((temp.br_corner() + temp.bl_corner())/2,  
                             c.br_corner());
-                mfont->draw_string(c, r, itr->first, overlay_rects[i].color, 0, 
+                mfont->draw_string(c, r, itr->first, color, 0, 
                                    std::string::npos, area);
             }
 
@@ -6350,13 +6354,13 @@ namespace dlib
             {
                 if (rect_is_selected && selected_rect == i)
                 {
-                    draw_line(c, orect.tl_corner(), orect.br_corner(),invert_pixel(overlay_rects[i].color), area);
-                    draw_line(c, orect.bl_corner(), orect.tr_corner(),invert_pixel(overlay_rects[i].color), area);
+                    draw_line(c, orect.tl_corner(), orect.br_corner(),invert_pixel(color), area);
+                    draw_line(c, orect.bl_corner(), orect.tr_corner(),invert_pixel(color), area);
                 }
                 else
                 {
-                    draw_line(c, orect.tl_corner(), orect.br_corner(),overlay_rects[i].color, area);
-                    draw_line(c, orect.bl_corner(), orect.tr_corner(),overlay_rects[i].color, area);
+                    draw_line(c, orect.tl_corner(), orect.br_corner(),color, area);
+                    draw_line(c, orect.bl_corner(), orect.tr_corner(),color, area);
                 }
             }
         }
@@ -6436,7 +6440,8 @@ namespace dlib
                 event_handler();
         }
 
-        if (is_printable && !hidden && enabled && rect_is_selected && (key == 'i'))
+        if (!hidden && enabled && rect_is_selected && 
+            ((is_printable && key == 'i') || (!is_printable && key==base_window::KEY_END)))
         {
             overlay_rects[selected_rect].crossed_out = !overlay_rects[selected_rect].crossed_out;
             parent.invalidate_rectangle(rect);
