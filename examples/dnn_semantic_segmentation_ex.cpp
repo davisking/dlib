@@ -12,7 +12,7 @@
     4. Wait while the network is being trained.
     5. Build the dnn_semantic_segmentation_ex example program.
     6. Run:
-       ./dnn_semantic_segmentation_ex /path/to/VOC2012/JPEGImages/2007_000033.jpg
+       ./dnn_semantic_segmentation_ex /path/to/VOC2012-or-other-images
 */
 
 #include "dnn_semantic_segmentation_ex.h"
@@ -78,11 +78,12 @@ std::string get_most_prominent_non_background_classlabel(const matrix<uint16_t>&
 
 int main(int argc, char** argv) try
 {
-    if (argc == 1)
+    if (argc != 2)
     {
-        cout << "Give this program image files as command line arguments.\n" << endl;
-        cout << "You will also need a trained 'voc2012net.dnn' file. " << endl;
+        cout << "You call this program like this: " << endl;
+        cout << "./dnn_semantic_segmentation_train_ex /path/to/images" << endl;
         cout << endl;
+        cout << "You will also need a trained 'voc2012net.dnn' file. " << endl;
         return 1;
     }
 
@@ -95,10 +96,19 @@ int main(int argc, char** argv) try
     matrix<rgb_pixel> rgb_label_image;
     matrix<rgb_pixel> result_image;
 
-    // Read images from the command prompt.
-    for (int i = 1; i < argc; ++i)
+    const std::vector<file> files = dlib::get_files_in_directory_tree(argv[1],
+        [](const dlib::file& name)
+        {
+            return dlib::match_ending(".jpeg")(name)
+                || dlib::match_ending(".jpg")(name)
+                || dlib::match_ending(".png")(name);
+        });
+
+    cout << "Found " << files.size() << " images, processing..." << endl;
+
+    for (const file& file : files)
     {
-        load_image(input_image, argv[i]);
+        load_image(input_image, file.full_name());
 
         const matrix<uint16_t>& index_label_image = net(input_image);
         index_label_image_to_rgb_label_image(index_label_image, rgb_label_image);
@@ -118,7 +128,7 @@ int main(int argc, char** argv) try
 
         const std::string classlabel = get_most_prominent_non_background_classlabel(index_label_image);
 
-        cout << argv[i] << " : " << classlabel << " - hit enter to process the next image";
+        cout << file.name() << " : " << classlabel << " - hit enter to process the next image";
         cin.get();
     }
 }

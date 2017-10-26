@@ -12,7 +12,7 @@
     4. Wait while the network is being trained.
     5. Build the dnn_semantic_segmentation_ex example program.
     6. Run:
-       ./dnn_semantic_segmentation_ex /path/to/VOC2012/JPEGImages/2007_000033.jpg
+       ./dnn_semantic_segmentation_ex /path/to/VOC2012-or-other-images
 */
 
 #include "dnn_semantic_segmentation_ex.h"
