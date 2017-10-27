@@ -141,7 +141,7 @@ boost::python::list chinese_whispers_clustering(boost::python::list descriptors,
     std::vector<unsigned long> labels;
     for (size_t i = 0; i < num_descriptors; ++i)
     {
-        for (size_t j = i+1; j < num_descriptors; ++j)
+        for (size_t j = i; j < num_descriptors; ++j)
         {
             matrix<double,0,1>& first_descriptor = boost::python::extract<matrix<double,0,1>&>(descriptors[i]);
             matrix<double,0,1>& second_descriptor = boost::python::extract<matrix<double,0,1>&>(descriptors[j]);
