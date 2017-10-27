@@ -333,6 +333,34 @@ elseif(WIN32 AND NOT MINGW)
         endif()
     endif()
 
+    if (NOT blas_found)
+      find_package(blas)
+      if (${BLAS_FOUND})
+         set(blas_libraries ${BLAS_LIBRARIES})      
+         set(blas_found 1)
+         set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+         # If you compiled OpenBLAS with LAPACK in it then it should have the
+         # sgetrf_single function in it.  So if we find that function in
+         # OpenBLAS then just use OpenBLAS's LAPACK. 
+         CHECK_FUNCTION_EXISTS(sgetrf_single OPENBLAS_HAS_LAPACK)
+         if (OPENBLAS_HAS_LAPACK)
+            message(STATUS "Using OpenBLAS's built in LAPACK")
+            # set(lapack_libraries gfortran) 
+            set(lapack_found 1)
+         endif()
+      endif()
+   endif()
+
+
+   if (NOT lapack_found)
+      find_package(lapack)
+      if (${LAPACK_FOUND})
+         set(lapack_libraries ${LAPACK_LIBRARIES})
+         set(lapack_found 1)
+         message(STATUS "Found LAPACK library")
+      endif()
+   endif()
+
 
 endif()
 
