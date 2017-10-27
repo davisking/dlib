@@ -322,15 +322,6 @@ elseif(WIN32 AND NOT MINGW)
             set(lapack_found 0)
         endif()
 
-        if (MSVC AND blas_found)
-            # need to set /bigobj when statically linking with the MKL on
-            # visual studio or it doesn't work right.
-            if (NOT CMAKE_CXX_FLAGS MATCHES "/bigobj")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj" 
-                    CACHE STRING "Flags used by the compiler during all C++ builds." 
-                    FORCE)
-            endif ()
-        endif()
     endif()
 
     if (NOT blas_found)
