@@ -354,7 +354,6 @@ elseif(WIN32 AND NOT MINGW)
 
    if (NOT lapack_found)
       find_package(lapack)
-      message("~~~~~~~~~~~~~~> LAPACK: ${LAPACK_FOUND}")
       if (${LAPACK_FOUND})
          set(lapack_libraries ${LAPACK_LIBRARIES})
          set(lapack_found 1)
