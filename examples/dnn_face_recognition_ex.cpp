@@ -142,7 +142,7 @@ int main(int argc, char** argv) try
     std::vector<sample_pair> edges;
     for (size_t i = 0; i < face_descriptors.size(); ++i)
     {
-        for (size_t j = i+1; j < face_descriptors.size(); ++j)
+        for (size_t j = i; j < face_descriptors.size(); ++j)
         {
             // Faces are connected in the graph if they are close enough.  Here we check if
             // the distance between two face descriptors is less than 0.6, which is the
