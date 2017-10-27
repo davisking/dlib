@@ -157,7 +157,7 @@ namespace dlib
             DLIB_CASSERT(images.size() == rects.size());
             size_t idx;
             { std::lock_guard<std::mutex> lock(rnd_mutex);
-                idx = rnd.get_random_64bit_number()%images.size();
+                idx = rnd.get_integer(images.size());
             }
             (*this)(images[idx], rects[idx], crop, crop_rects);
         }
@@ -290,9 +290,9 @@ namespace dlib
         ) 
         {
             DLIB_CASSERT(has_non_ignored_box(rects));
-            size_t idx = rnd.get_random_64bit_number()%rects.size();
+            size_t idx = rnd.get_integer(rects.size());
             while(rects[idx].ignore)
-                idx = rnd.get_random_64bit_number()%rects.size();
+                idx = rnd.get_integer(rects.size());
             return idx;
         }
 
@@ -311,8 +311,8 @@ namespace dlib
             auto scale = rnd.get_double_in_range(mins, maxs);
             rectangle rect(scale*dims.cols, scale*dims.rows);
             // randomly shift the box around
-            point offset(rnd.get_random_32bit_number()%(1+img.nc()-rect.width()),
-                         rnd.get_random_32bit_number()%(1+img.nr()-rect.height()));
+            point offset(rnd.get_integer(1+img.nc()-rect.width()),
+                         rnd.get_integer(1+img.nr()-rect.height()));
             return move_rect(rect, offset);
         }
 
