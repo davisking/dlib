@@ -1448,6 +1448,17 @@ namespace dlib
         unsigned long get_num_outputs (
         ) const { return num_outputs; }
 
+        void set_num_outputs(long num) 
+        {
+            DLIB_CASSERT(num > 0);
+            if (num != num_outputs)
+            {
+                DLIB_CASSERT(get_layer_params().size() == 0, 
+                    "You can't change the number of filters in fc_ if the parameter tensor has already been allocated.");
+                num_outputs = num;
+            }
+        }
+
         fc_bias_mode get_bias_mode (
         ) const { return bias_mode; }
 

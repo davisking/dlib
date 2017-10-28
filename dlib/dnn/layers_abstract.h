@@ -475,6 +475,19 @@ namespace dlib
                     - The rest of the dimensions of T will be 1.
         !*/
 
+        void set_num_outputs(
+            long num
+        );
+        /*!
+            requires
+                - num > 0
+                - get_layer_params().size() == 0 || get_num_outputs() == num
+                  (i.e. You can't change the number of outputs in fc_ if the parameter
+                  tensor has already been allocated.)
+            ensures
+                - #get_num_outputs() == num
+        !*/
+
         fc_bias_mode get_bias_mode (
         ) const;
         /*!
