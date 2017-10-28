@@ -649,13 +649,12 @@ if (NOT TARGET dlib)
          # make sure sqlite3.h is in the include path
          find_path(sqlite_path sqlite3.h)
          if (sqlite AND sqlite_path)
-            get_filename_component(sqlite_path2 ${sqlite_path} PATH CACHE)
-            set(dlib_needed_includes ${dlib_needed_includes} ${sqlite_path2})
+            set(dlib_needed_includes ${dlib_needed_includes} ${sqlite_path})
             set(dlib_needed_libraries ${dlib_needed_libraries} ${sqlite} )
          else()
             set(DLIB_LINK_WITH_SQLITE3 OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
          endif()
-         mark_as_advanced(sqlite sqlite_path sqlite_path2)
+         mark_as_advanced(sqlite sqlite_path)
       endif()
 
 
