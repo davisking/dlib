@@ -730,7 +730,7 @@ namespace dlib
         /*!
             requires
                 - num > 0
-                - get_layer_params().size() == 0
+                - get_layer_params().size() == 0 || num_filters() == num
                   (i.e. You can't change the number of filters in con_ if the parameter
                   tensor has already been allocated.)
             ensures
@@ -974,7 +974,7 @@ namespace dlib
         /*!
             requires
                 - num > 0
-                - get_layer_params().size() == 0
+                - get_layer_params().size() == 0 || num_filters() == num
                   (i.e. You can't change the number of filters in cont_ if the parameter
                   tensor has already been allocated.)
             ensures

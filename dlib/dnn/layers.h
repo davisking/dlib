@@ -75,9 +75,12 @@ namespace dlib
         void set_num_filters(long num) 
         {
             DLIB_CASSERT(num > 0);
-            DLIB_CASSERT(get_layer_params().size() == 0, 
-                "You can't change the number of filters in con_ if the parameter tensor has already been allocated.");
-            num_filters_ = num;
+            if (num != num_filters_)
+            {
+                DLIB_CASSERT(get_layer_params().size() == 0, 
+                    "You can't change the number of filters in con_ if the parameter tensor has already been allocated.");
+                num_filters_ = num;
+            }
         }
 
         double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
@@ -371,9 +374,12 @@ namespace dlib
         void set_num_filters(long num)
         {
             DLIB_CASSERT(num > 0);
-            DLIB_CASSERT(get_layer_params().size() == 0,
-                "You can't change the number of filters in cont_ if the parameter tensor has already been allocated.");
-            num_filters_ = num;
+            if (num != num_filters_)
+            {
+                DLIB_CASSERT(get_layer_params().size() == 0,
+                    "You can't change the number of filters in cont_ if the parameter tensor has already been allocated.");
+                num_filters_ = num;
+            }
         }
 
         double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
