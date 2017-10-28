@@ -254,7 +254,7 @@ if (NOT TARGET dlib)
                # If both X11 and anaconda are installed, it's possible for the
                # anaconda path to appear before /opt/X11, so we remove anaconda.
                foreach (ITR ${X11_INCLUDE_DIR})
-                  if ("${ITR}" MATCHES "(.*)(ana|mini)conda(.*)")
+                  if ("${ITR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)")
                      list (REMOVE_ITEM X11_INCLUDE_DIR ${ITR})
                   endif ()
                endforeach(ITR)
@@ -422,7 +422,7 @@ if (NOT TARGET dlib)
          # Make sure there isn't something wrong with the version of libjpeg 
          # installed on this system.  Also don't use the installed libjpeg
          # if this is an APPLE system because apparently it's broken (as of 2015/01/01).
-         if (JPEG_FOUND)
+         if (JPEG_FOUND AND NOT ("${JPEG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)"))
             set(CMAKE_REQUIRED_LIBRARIES ${JPEG_LIBRARY})
             CHECK_FUNCTION_EXISTS(jpeg_read_header LIBJPEG_IS_GOOD)
          endif()
