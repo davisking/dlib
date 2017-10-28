@@ -1074,7 +1074,8 @@ namespace dlib
                 }
                 else
                 {
-                    std::cout << "This is because the rectangle's aspect ratio is too different from the best matching detection window, ";
+                    std::cout << "This is either because (1) the final layer's features have too large of a stride across the image, limiting the possible locations the sliding window can search ";
+                    std::cout << "or (2) because the rectangle's aspect ratio is too different from the best matching detection window, ";
                     std::cout << "which has a width and height of " << options.detector_windows[det_idx].width << " and " << options.detector_windows[det_idx].height << "." << std::endl;
                 }
                 return true;
