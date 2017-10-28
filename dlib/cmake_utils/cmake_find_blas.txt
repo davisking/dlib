@@ -331,7 +331,7 @@ endif()
 
 # When all else fails use CMake's built in functions to find BLAS and LAPACK
 if (NOT blas_found)
-    find_package(BLAS)
+    find_package(BLAS QUIET)
     if (${BLAS_FOUND})
         set(blas_libraries ${BLAS_LIBRARIES})      
         set(blas_found 1)
@@ -339,7 +339,7 @@ if (NOT blas_found)
 endif()
 
 if (NOT lapack_found)
-    find_package(LAPACK)
+    find_package(LAPACK QUIET)
     if (${LAPACK_FOUND})
         set(lapack_libraries ${LAPACK_LIBRARIES})
         set(lapack_found 1)
