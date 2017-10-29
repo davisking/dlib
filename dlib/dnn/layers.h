@@ -1451,7 +1451,7 @@ namespace dlib
         void set_num_outputs(long num) 
         {
             DLIB_CASSERT(num > 0);
-            if (num != num_outputs)
+            if (num != (long)num_outputs)
             {
                 DLIB_CASSERT(get_layer_params().size() == 0, 
                     "You can't change the number of filters in fc_ if the parameter tensor has already been allocated.");
