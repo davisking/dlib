@@ -150,17 +150,11 @@ set (tests
    tuple.cpp
    type_safe_union.cpp
    vectorstream.cpp
+   dnn.cpp
+   cublas.cpp
+   find_optimal_parameters.cpp
+   elastic_net.cpp
    )
-
-# Tests that require C++11 support
-if (COMPILER_CAN_DO_CPP_11)
-   set(tests ${tests}
-      dnn.cpp
-      cublas.cpp
-      find_optimal_parameters.cpp
-      elastic_net.cpp
-      )
-endif()
 
 
 # add all the cpp files we want to compile to this list.  This tells
