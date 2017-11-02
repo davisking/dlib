@@ -155,9 +155,9 @@ namespace dlib
 
                     if (time < 1000)
                         cout << "  " << name << ": " << time << " milliseconds" << endl;
-                    else if (time < 1000*1000)
+                    else if (time < 1000*60)
                         cout << "  " << name << ": " << time/1000.0 << " seconds" << endl;
-                    else if (time < 1000*1000*60)
+                    else if (time < 1000*60*60)
                         cout << "  " << name << ": " << time/1000.0/60.0 << " minutes" << endl;
                     else
                         cout << "  " << name << ": " << time/1000.0/60.0/60.0 << " hours" << endl;
