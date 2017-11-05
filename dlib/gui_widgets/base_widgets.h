@@ -410,8 +410,8 @@ namespace dlib
             auto_mutex M(m);
             assign_image_scaled(img,new_img);
             rectangle old(rect);
-            rect.set_right(rect.left()+img.nc()-1); 
-            rect.set_bottom(rect.top()+img.nr()-1);
+            rect.set_right(rect.left()+num_columns(img)-1); 
+            rect.set_bottom(rect.top()+num_rows(img)-1);
             parent.invalidate_rectangle(rect+old);
         }
 
