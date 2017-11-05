@@ -2143,7 +2143,7 @@ namespace
         trainer.set_learning_rate(1e-5);
         trainer.set_min_learning_rate(1e-11);
         trainer.set_mini_batch_size(50);
-        trainer.set_max_num_epochs(300);
+        trainer.set_max_num_epochs(2000);
         trainer.train(x, y);
 
         running_stats<double> rs;
@@ -2227,6 +2227,8 @@ namespace
     void test_simple_autoencoder()
     {
         print_spinner();
+
+        srand(1234);
 
         const int output_width = 7;
         const int output_height = 7;
