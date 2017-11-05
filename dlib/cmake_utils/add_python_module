@@ -75,6 +75,23 @@ else()
     FIND_PACKAGE(PythonLibs 2.6)
 endif()
 
+if (CMAKE_COMPILER_IS_GNUCXX)
+    # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
+    # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
+    # does.
+    add_definitions("-fPIC")
+    set(CMAKE_POSITION_INDEPENDENT_CODE True)
+else()
+    set(CMAKE_POSITION_INDEPENDENT_CODE True)
+endif()
+
+# include dlib so we can link against it
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/.. dlib_build)
+if (USING_OLD_VISUAL_STUDIO_COMPILER)
+   message(FATAL_ERROR "You have to use a version of Visual Studio that supports C++11.  As of November 2017, the only version that has good enough C++11 support to compile the dlib Pyhton API is Visual Studio 2015.  Visual Studio 2017 has WORSE C++11 support than Visual Studio 2015, so Visual Studio 2017 is unable to compile the Pyhton API.  ***USE VISUAL STUDIO 2015 INSTEAD***")
+endif()
+
+
 if (NOT Boost_FOUND)
     message(STATUS " *****************************************************************************************************")
     if (WIN32)
@@ -100,7 +117,7 @@ if (NOT Boost_FOUND)
         message(STATUS " Next, if you aren't using python setup.py then you will be invoking cmake to compile dlib.  ")
         message(STATUS " In this case you may have to use cmake's -G option to set the 64 vs. 32bit mode of visual studio. ")
         message(STATUS " Also, if you want a Python3 library you will need to add -DPYTHON3=1.  You do this with a statement like: ")
-        message(STATUS "    cmake -G \"Visual Studio 12 2013 Win64\" -DPYTHON3=1 ..\\..\\tools\\python")
+        message(STATUS "    cmake -G \"Visual Studio 14 2015 Win64\" -DPYTHON3=1 ..\\..\\tools\\python")
         message(STATUS " Rather than:")
         message(STATUS "    cmake ..\\..\\tools\\python")
         message(STATUS " Which will build a 32bit Python2 module by default on most systems.")
@@ -123,20 +140,6 @@ message(STATUS "USING BOOST_LIBS: ${Boost_LIBRARIES}")
 if (WIN32)
     message(STATUS "USING PYTHON_LIBS: ${PYTHON_LIBRARIES}")
 endif()
-
-if (CMAKE_COMPILER_IS_GNUCXX)
-    # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
-    # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
-    # does.
-    add_definitions("-fPIC")
-    set(CMAKE_POSITION_INDEPENDENT_CODE True)
-else()
-    set(CMAKE_POSITION_INDEPENDENT_CODE True)
-endif()
-
-# include dlib so we can link against it
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/.. dlib_build)
-
 
 # We put the extra _ on the end of the name just so it's possible to
 # have a module name of dlib and not get a conflict with the target named
