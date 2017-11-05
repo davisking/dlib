@@ -1641,7 +1641,7 @@ namespace dlib
                 const float y = *truth++;
                 const float temp1 = y - out_data[i];
                 const float temp2 = scale*temp1;
-                loss += 0.5*temp2*temp1;
+                loss += temp2*temp1;
                 g[i] = -temp2;
 
             }
@@ -1758,7 +1758,7 @@ namespace dlib
                     const float y = ytrue(j, 0);
                     const float temp1 = y - *out_data++;
                     const float temp2 = scale*temp1;
-                    loss += 0.5*temp2*temp1;
+                    loss += temp2*temp1;
                     *g = -temp2;
                     ++g;
                 }
@@ -2201,7 +2201,7 @@ namespace dlib
                         const size_t idx = tensor_index(output_tensor, i, 0, r, c);
                         const float temp1 = y - out_data[idx];
                         const float temp2 = scale*temp1;
-                        loss += 0.5*temp2*temp1;
+                        loss += temp2*temp1;
                         g[idx] = -temp2;
                     }
                 }
