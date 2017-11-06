@@ -432,6 +432,12 @@ cross_validate_trainer_threaded(trainer,
                   the process of splitting a dataset into coherent poses, from the point of view of HOG, a lot easier.
                </p>
                <p>
+                  A related issue arises because HOG is a rigid template, which is that the boxes in your training data need to all have essentially the same
+                  aspect ratio.  For instance, a single HOG filter can't possibly detect objects that are both 100x50 pixels and 50x100 pixels.  To do this you 
+                  would need to split your dataset into two parts, objects with a 2:1 aspect ratio and objects with a 1:2 aspect ratio and then train two separate
+                  HOG detectors, one for each aspect ratio.  
+               </p>
+               <p>
                   However, it should be emphasized that even using multiple HOG detectors will only get you so far.  So at some point you should consider
                   using a <a href="ml.html#loss_mmod_">CNN based detection method</a> since CNNs can generally deal with arbitrary
                   rotations, poses, and deformations with one unified
