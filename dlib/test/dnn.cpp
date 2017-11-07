@@ -2120,6 +2120,7 @@ namespace
 
     void test_simple_linear_regression_with_mult_prev()
     {
+        srand(1234);
         print_spinner();
         const int num_samples = 1000;
         ::std::vector<matrix<double>> x(num_samples);
