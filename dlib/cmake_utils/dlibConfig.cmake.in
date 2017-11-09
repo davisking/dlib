@@ -29,6 +29,7 @@ if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
 endif()
 
 set(dlib_LIBRARIES dlib::dlib)
+set(dlib_LIBS      dlib::dlib)
 set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@" "@dlib_needed_includes@")
 
 mark_as_advanced(dlib_LIBRARIES)
