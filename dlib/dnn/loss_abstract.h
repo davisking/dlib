@@ -781,6 +781,106 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_epsilon_insensitive_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the epsilon insensitive
+                loss, which is appropriate for regression problems.  In particular, this
+                loss function is;
+                    loss(y1,y2) = abs(y1-y2)<epsilon ? 0 : abs(y1-y2)-epsilon
+
+                Therefore, the loss is basically just the abs() loss except there is a dead
+                zone around zero, causing the loss to not care about mistakes of magnitude
+                smaller than epsilon.
+        !*/
+    public:
+
+        typedef float training_label_type;
+        typedef float output_label_type;
+
+        loss_epsilon_insensitive_(
+        ) = default;
+        /*!
+            ensures
+                - #get_epsilon() == 1
+        !*/
+
+        loss_epsilon_insensitive_(
+            double eps
+        );
+        /*!
+            requires
+                - eps >= 0
+            ensures
+                - #get_epsilon() == eps
+        !*/
+
+        double get_epsilon (
+        ) const;
+        /*!
+            ensures
+                - returns the epsilon value used in the loss function.  Mistakes in the
+                  regressor smaller than get_epsilon() are ignored by the loss function.
+        !*/
+
+        void set_epsilon(
+            double eps
+        );
+        /*!
+            requires
+                - eps >= 0
+            ensures
+                - #get_epsilon() == eps
+        !*/
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output label is the predicted continuous variable.
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().k() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_epsilon_insensitive = add_loss_layer<loss_epsilon_insensitive_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class loss_mean_squared_
     {
         /*!

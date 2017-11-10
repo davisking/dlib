@@ -1679,6 +1679,137 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_epsilon_insensitive_
+    {
+    public:
+
+        typedef float training_label_type;
+        typedef float output_label_type;
+
+        loss_epsilon_insensitive_() = default;
+        loss_epsilon_insensitive_(double eps) : eps(eps) 
+        {
+            DLIB_CASSERT(eps >= 0, "You can't set a negative error epsilon.");
+        }
+
+        double get_epsilon () const { return eps; }
+        void set_epsilon(double e)
+        {
+            DLIB_CASSERT(e >= 0, "You can't set a negative error epsilon.");
+            eps = e;
+        }
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+
+            const tensor& output_tensor = sub.get_output();
+
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1 &&
+                         output_tensor.k() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            const float* out_data = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                *iter++ = out_data[i];
+            }
+        }
+
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1 &&
+                         output_tensor.k() == 1);
+            DLIB_CASSERT(grad.nr() == 1 &&
+                         grad.nc() == 1 &&
+                         grad.k() == 1);
+
+            // The loss we output is the average loss over the mini-batch.
+            const double scale = 1.0/output_tensor.num_samples();
+            double loss = 0;
+            float* g = grad.host_write_only();
+            const float* out_data = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                const float y = *truth++;
+                const float err = out_data[i]-y;
+                if (err > eps)
+                {
+                    loss += scale*(err-eps);
+                    g[i] = scale;
+                }
+                else if (err < -eps)
+                {
+                    loss += scale*(eps-err);
+                    g[i] = -scale;
+                }
+            }
+            return loss;
+        }
+
+        friend void serialize(const loss_epsilon_insensitive_& item, std::ostream& out)
+        {
+            serialize("loss_epsilon_insensitive_", out);
+            serialize(item.eps, out);
+        }
+
+        friend void deserialize(loss_epsilon_insensitive_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_epsilon_insensitive_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_epsilon_insensitive_.");
+            deserialize(item.eps, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_epsilon_insensitive_& item)
+        {
+            out << "loss_epsilon_insensitive epsilon: " << item.eps;
+            return out;
+        }
+
+        friend void to_xml(const loss_epsilon_insensitive_& item, std::ostream& out)
+        {
+            out << "<loss_epsilon_insensitive_ epsilon='" << item.eps << "'/>";
+        }
+
+    private:
+        double eps = 1;
+
+    };
+
+    template <typename SUBNET>
+    using loss_epsilon_insensitive = add_loss_layer<loss_epsilon_insensitive_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class loss_mean_squared_multioutput_
     {
     public:
