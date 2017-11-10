@@ -116,6 +116,7 @@ std::string regression_test__str__(const regression_test& item)
 {
     std::ostringstream sout;
     sout << "mean_squared_error: "<< item.mean_squared_error << "  R_squared: "<< item.R_squared; 
+    sout << "  mean_average_error: "<< item.mean_average_error << "  mean_error_stddev: "<< item.mean_error_stddev; 
     return sout.str();
 }
 std::string regression_test__repr__(const regression_test& item) { return "< " + regression_test__str__(item) + " >";}
@@ -247,6 +248,10 @@ void bind_decision_functions()
     class_<regression_test>("_regression_test")
         .def("__str__", regression_test__str__)
         .def("__repr__", regression_test__repr__)
+        .add_property("mean_average_error", &regression_test::mean_average_error,
+            "The mean average error of a regression function on a dataset.")
+        .add_property("mean_error_stddev", &regression_test::mean_error_stddev,
+            "The standard deviation of the absolute value of the error of a regression function on a dataset.")
         .add_property("mean_squared_error", &regression_test::mean_squared_error,
             "The mean squared error of a regression function on a dataset.")
         .add_property("R_squared", &regression_test::R_squared,
