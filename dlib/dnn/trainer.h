@@ -1012,28 +1012,9 @@ namespace dlib
                 // previously saved state in the hopes that the problem won't reoccur.
                 if (loss_increased_since_last_disk_sync()) 
                 {
-                    // keep the loss values, because otherwise we might end up never shrinking the learning rate
-                    const auto previous_loss_values_to_keep = std::move(previous_loss_values);
-                    const auto test_previous_loss_values_to_keep = std::move(test_previous_loss_values);
-
-                    // keep also the step counts, in order to avoid confusion
-                    const auto train_one_step_calls_to_keep = train_one_step_calls;
-                    const auto test_one_step_calls_to_keep = test_one_step_calls;
-                    const unsigned long steps_without_progress_to_keep = steps_without_progress;
-                    const unsigned long test_steps_without_progress_to_keep = test_steps_without_progress;
-
                     std::ifstream fin(newest_syncfile(), std::ios::binary);
                     deserialize(*this, fin);
                     sync_file_reloaded = true;
-
-                    // restore the loss and the step count values
-                    previous_loss_values = std::move(previous_loss_values_to_keep);
-                    test_previous_loss_values = std::move(test_previous_loss_values_to_keep);
-                    train_one_step_calls = train_one_step_calls_to_keep;
-                    test_one_step_calls = test_one_step_calls_to_keep;
-                    steps_without_progress = steps_without_progress_to_keep;
-                    test_steps_without_progress = test_steps_without_progress_to_keep;
-
                     if (verbose)
                         std::cout << "Loss has been increasing, reloading saved state from " << newest_syncfile() << std::endl;
                 }
