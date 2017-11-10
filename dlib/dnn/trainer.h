@@ -1007,9 +1007,11 @@ namespace dlib
                 this->net.clean(); 
 
                 // if the loss has actually been going up since the last time we saved our
-                // state to disk then something has probably gone wrong in the
-                // optimization.  So in this case we do the opposite and recall the
-                // previously saved state in the hopes that the problem won't reoccur.
+                // state to disk then something has probably gone wrong in the optimization
+                // (for example, the trainer may have dropped the learning rate too early
+                // because of a sudden spike in loss). So in this case we do the opposite
+                // and recall the previously saved state in the hopes that the problem won't
+                // reoccur.
                 if (loss_increased_since_last_disk_sync()) 
                 {
                     std::ifstream fin(newest_syncfile(), std::ios::binary);
