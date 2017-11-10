@@ -194,8 +194,8 @@ namespace dlib
                 {
                     // set to ignore if not totally in the crop or if too small.
                     if (!get_rect(crop).contains(rect.rect) || 
-                        (rect.rect.height() < min_object_length_long_dim  && rect.rect.width() < min_object_length_long_dim) || 
-                        (rect.rect.height() < min_object_length_short_dim || rect.rect.width() < min_object_length_short_dim))
+                        ((long)rect.rect.height() < min_object_length_long_dim  && (long)rect.rect.width() < min_object_length_long_dim) || 
+                        ((long)rect.rect.height() < min_object_length_short_dim || (long)rect.rect.width() < min_object_length_short_dim))
                     {
                         rect.ignore = true;
                     }
