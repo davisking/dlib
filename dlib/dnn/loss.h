@@ -239,10 +239,10 @@ namespace dlib
     };
 
     template <typename T>
-    T safe_log(T input)
+    T safe_log(T input, T epsilon = 1e-10)
     {
         // Prevent trying to calculate the logarithm of a very small number (let alone zero)
-        return std::log(std::max(input, static_cast<T>(1e-6)));
+        return std::log(std::max(input, epsilon));
     }
 
     template <typename SUBNET>
