@@ -682,6 +682,7 @@ namespace dlib
         deserialize(item.truth_match_iou_threshold, in);
         deserialize(item.overlaps_nms, in);
         deserialize(item.overlaps_ignore, in);
+        item.assume_image_pyramid = use_image_pyramid::yes;
         if (version >= 3)
         {
             uint8_t assume_image_pyramid = 0;
