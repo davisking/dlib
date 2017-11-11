@@ -120,7 +120,7 @@ namespace dlib
                 const double score = feats.compute_object_score(w, search_rects[i]);
                 if (score >= thresh)
                 {
-                    dets.push_back(std::make_pair(score, search_rects[i]));
+                    dets.emplace_back(score, search_rects[i]);
                 }
             }
         }
@@ -152,7 +152,7 @@ namespace dlib
                 const double score = cur_dot - prev_dot;
                 if (score >= thresh)
                 {
-                    dets.push_back(std::make_pair(score, search_rects[i]));
+                    dets.emplace_back(score, search_rects[i]);
                 }
                 prev_dot = cur_dot;
             }

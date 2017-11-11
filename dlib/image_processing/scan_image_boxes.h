@@ -191,7 +191,7 @@ namespace dlib
                 {
                     const dlib::vector<double,2> tl(x(i),y(j));
                     const dlib::vector<double,2> br(x(i+1),y(j+1));
-                    rects.push_back(rectangle(tl,br));
+                    rects.emplace_back(tl,br);
                 }
             }
         }
@@ -503,7 +503,7 @@ namespace dlib
 
             if (score >= thresh)
             {
-                dets.push_back(std::make_pair(score, search_rects[i]));
+                dets.emplace_back(score, search_rects[i]);
             }
         }
 

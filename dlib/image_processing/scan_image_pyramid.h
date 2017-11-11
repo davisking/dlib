@@ -737,7 +737,7 @@ namespace dlib
                     rectangle rect = translate_rect(det_templates[i].object_box, p);
                     rect = pyr.rect_up(rect, l);
 
-                    dets.push_back(std::make_pair(score, rect));
+                    dets.emplace_back(score, rect);
                 }
             }
         }
@@ -1016,7 +1016,7 @@ namespace dlib
             else
             {
                 // add an empty rectangle since this part wasn't observed.
-                rects.push_back(rectangle());
+                rects.emplace_back();
             }
         }
 

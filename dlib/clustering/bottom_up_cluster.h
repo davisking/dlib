@@ -201,7 +201,7 @@ namespace dlib
         // immediately adjacent on the number line.
         std::vector<sample_pair> edges;
         for (size_t i = 1; i < ranges.size(); ++i)
-            edges.push_back(sample_pair(i-1,i, distance(ranges[i-1],ranges[i])));
+            edges.emplace_back(i-1,i, distance(ranges[i-1],ranges[i]));
         std::sort(edges.begin(), edges.end(), order_by_distance<sample_pair>);
 
         disjoint_subsets sets;

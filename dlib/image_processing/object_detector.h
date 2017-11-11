@@ -560,8 +560,8 @@ namespace dlib
         // convert all the rectangle detections into full_object_detections.
         for (unsigned long i = 0; i < dets.size(); ++i)
         {
-            final_dets.push_back(std::make_pair(dets[i].detection_confidence, 
-                                                scanner.get_full_object_detection(dets[i].rect, w[dets[i].weight_index].w)));
+            final_dets.emplace_back(dets[i].detection_confidence,
+                                    scanner.get_full_object_detection(dets[i].rect, w[dets[i].weight_index].w));
         }
     }
 

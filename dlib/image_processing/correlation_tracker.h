@@ -241,9 +241,9 @@ namespace dlib
             drectangle ppp = position*std::pow(get_scale_pyramid_alpha(), -(double)get_num_scale_levels()/2);
             dlib::array<array2d<pixel_type> > chips;
             std::vector<dlib::vector<double,2> > from_points, to_points;
-            from_points.push_back(point(0,0));
-            from_points.push_back(point(chip_size-1,0));
-            from_points.push_back(point(chip_size-1,chip_size-1));
+            from_points.emplace_back(0,0);
+            from_points.emplace_back(chip_size-1,0);
+            from_points.emplace_back(chip_size-1,chip_size-1);
             for (unsigned long i = 0; i < get_num_scale_levels(); ++i)
             {
                 array2d<pixel_type> chip(chip_size,chip_size);

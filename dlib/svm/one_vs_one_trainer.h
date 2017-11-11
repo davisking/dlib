@@ -120,7 +120,7 @@ namespace dlib
             {
                 for (unsigned long j = i+1; j < distinct_labels.size(); ++j)
                 {
-                    pairs.push_back(unordered_pair<label_type>(distinct_labels[i], distinct_labels[j]));
+                    pairs.emplace_back(distinct_labels[i], distinct_labels[j]);
 
                     // make sure we have a trainer for this pair
                     const typename binary_function_table::const_iterator itr = trainers.find(pairs.back());

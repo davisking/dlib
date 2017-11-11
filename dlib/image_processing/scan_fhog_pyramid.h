@@ -797,7 +797,7 @@ namespace dlib
                             rectangle rect = fe.feats_to_image(centered_rect(point(c,r),det_box_width,det_box_height), 
                                 cell_size, filter_rows_padding, filter_cols_padding);
                             rect = pyr.rect_up(rect, l);
-                            dets.push_back(std::make_pair(saliency_image[r][c], rect));
+                            dets.emplace_back(saliency_image[r][c], rect);
                         }
                     }
                 }

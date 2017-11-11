@@ -60,7 +60,7 @@ namespace dlib
                     continue;
             }
             max_area = std::max(rects[i].area(), max_area);
-            sorted_rects.push_back(std::make_pair(rects[i].area(), rects[i]));
+            sorted_rects.emplace_back(rects[i].area(), rects[i]);
         }
         sorted_rects.sort(dlib::impl::compare_first);
 

@@ -273,8 +273,8 @@ namespace dlib
                             r.rect = pyr.rect_down(r.rect);
                     }
                 }
-                images.push_back(std::move(img));
-                object_locations.push_back(std::move(rects));
+                images.emplace_back(std::move(img));
+                object_locations.emplace_back(std::move(rects));
             }
         }
     }

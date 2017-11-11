@@ -304,7 +304,7 @@ namespace dlib
             using namespace impl;
             for (unsigned long i = 1; i < det_history.size(); ++i)
             {
-                data.push_back(std::make_pair(get_unlabeled_dets(det_history[i]), tracks));
+                data.emplace_back(get_unlabeled_dets(det_history[i]), tracks);
                 labels.push_back(get_association_labels(det_history[i], track_labels));
                 add_dets_to_tracks(tracks, track_labels, det_history[i]);
             }
