@@ -217,8 +217,6 @@ int main(int argc, char** argv) try
         return 1;
     }
         
-    set_dnn_prefer_smallest_algorithms();
-
 
     const double initial_learning_rate = 0.1;
     const double weight_decay = 0.0001;
