@@ -135,21 +135,21 @@ template <typename SUBNET> using alevel4t = ares<64,ares<64,ares_up<64,SUBNET>>>
 
 // training network type
 using net_type = dlib::loss_multiclass_log_per_pixel<
-                            dlib::bn_con<dlib::cont<class_count,7,7,2,2,
+                            dlib::cont<class_count,7,7,2,2,
                             level4t<level3t<level2t<level1t<
                             level1<level2<level3<level4<
                             dlib::max_pool<3,3,2,2,dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
                             dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                            >>>>>>>>>>>>>>>;
+                            >>>>>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
 using anet_type = dlib::loss_multiclass_log_per_pixel<
-                            dlib::affine<dlib::cont<class_count,7,7,2,2,
+                            dlib::cont<class_count,7,7,2,2,
                             alevel4t<alevel3t<alevel2t<alevel1t<
                             alevel1<alevel2<alevel3<alevel4<
                             dlib::max_pool<3,3,2,2,dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
                             dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                            >>>>>>>>>>>>>>>;
+                            >>>>>>>>>>>>>>;
 
 #endif // __INTELLISENSE__
 
