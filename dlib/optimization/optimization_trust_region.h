@@ -227,6 +227,168 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <
+            typename EXP1,
+            typename EXP2,
+            typename EXP3
+            >
+        bool bounds_violated (
+            const matrix_exp<EXP1>& v,
+            const matrix_exp<EXP2>& l,
+            const matrix_exp<EXP3>& u
+        )
+        {
+            DLIB_ASSERT(v.nr() == l.nr() && v.nr() == u.nr());
+            DLIB_ASSERT(v.nc() == l.nc() && v.nc() == u.nc());
+            for (long r = 0; r < v.nr(); ++r)
+            {
+                for (long c = 0; c < v.nc(); c++)
+                {
+                    if (!(l(r,c) <= v(r,c) && v(r,c) <= u(r,c)))
+                        return true;
+                }
+            }
+            return false;
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename EXP1,
+        typename EXP2,
+        typename T, long NR, long NC, typename MM, typename L,
+        typename EXP3
+        >
+    void solve_trust_region_subproblem_bounded ( 
+        const matrix_exp<EXP1>& B_,
+        const matrix_exp<EXP2>& g_,
+        const typename EXP1::type radius_,
+        matrix<T,NR,NC,MM,L>& p_,
+        double eps,
+        unsigned long max_iter,
+        const matrix_exp<EXP3>& lower_,
+        const matrix_exp<EXP3>& upper_
+    )
+    {
+        // make sure requires clause is not broken
+        DLIB_ASSERT(B_.nr() == B_.nc() && is_col_vector(g_) && g_.size() == B_.nr(),
+            "\t unsigned long solve_trust_region_subproblem_bounded()"
+            << "\n\t invalid arguments were given to this function"
+            << "\n\t B_.nr():            " << B_.nr()
+            << "\n\t B_.nc():            " << B_.nc()
+            << "\n\t is_col_vector(g_):  " << is_col_vector(g_) 
+            << "\n\t g_.size():          " << g_.size() 
+            );
+        DLIB_ASSERT(radius_ > 0 && eps > 0 && max_iter > 0,
+            "\t unsigned long solve_trust_region_subproblem_bounded()"
+            << "\n\t invalid arguments were given to this function"
+            << "\n\t radius_:   " << radius_
+            << "\n\t eps:      " << eps 
+            << "\n\t max_iter: " << max_iter 
+            );
+        DLIB_ASSERT(is_col_vector(lower_) && lower_.size() == g_.size());
+        DLIB_ASSERT(is_col_vector(upper_) && upper_.size() == g_.size());
+        DLIB_ASSERT(max(upper_-lower_) >= 0);
+        // make sure the problem is feasible.  That is, there should be a point inside the
+        // lower and upper bounds that has a norm <= radius_
+        DLIB_ASSERT(length(clamp(zeros_matrix(lower_),lower_,upper_)) <= radius_, 
+            "The lower and upper bounds are incompatible with the radius since there is no point within the bounds with a norm less than the radius.");
+
+        // We are going to solve this by greedily finding the most violated bound constraint,
+        // locking that variable to its constrained value, removing it from the problem,
+        // and then resolving.  We do that until no more constraint violations are present.
+
+        solve_trust_region_subproblem(B_,g_,radius_,p_,eps,max_iter);
+
+
+        // just stop here if all the bounds are satisfied.
+        if (!impl::bounds_violated(p_, lower_, upper_))
+            return;
+
+        matrix<double> B = matrix_cast<double>(B_);
+        matrix<double,0,1> g = matrix_cast<double>(g_);
+        double radius = radius_;
+        matrix<double,0,1> p = matrix_cast<double>(p_);
+        matrix<double,0,1> lower = matrix_cast<double>(lower_);
+        matrix<double,0,1> upper = matrix_cast<double>(upper_);
+
+        // keep a table that tells us how to map any reduced QP back to the original QP
+        std::vector<long> idxs(g.size());
+        for (size_t i = 0; i < idxs.size(); ++i)
+            idxs[i] = i;
+
+
+        // while we haven't found a p that satisfies the bounds constraints
+        while(impl::bounds_violated(p, lower, upper) )
+        {
+            // Find the most violated variable and fix its value to a constant (the bound
+            // value).
+            long most_violated_idx = 0;
+            double max_violation = 0;
+            double bounded_value = 0;
+            for (long i = 0; i < lower.size(); ++i)
+            {
+                if (!(lower(i) <= p(i) && p(i) <= upper(i)))
+                {
+                    if (lower(i)-p(i) > max_violation)
+                    {
+                        max_violation = lower(i)-p(i);
+                        most_violated_idx = i;
+                        bounded_value = lower(i);
+                    }
+                    else if (p(i)-upper(i) > max_violation)
+                    {
+                        max_violation = p(i)-upper(i);
+                        most_violated_idx = i;
+                        bounded_value = upper(i);
+                    }
+                }
+            }
+
+            // assign this variable to its final value.
+            p_(idxs[most_violated_idx]) = bounded_value;
+
+
+            // now reduce the QP by removing the variable p_(idxs[most_violated_idx]).  
+            idxs.erase(idxs.begin()+most_violated_idx);
+            // we are out of variables to remove since everything is at bounds.
+            if (idxs.size() == 0)
+                break;
+
+            lower = remove_row(lower,most_violated_idx);
+            upper = remove_row(upper,most_violated_idx);
+            g += colm(B,most_violated_idx)*bounded_value;
+            g = remove_row(g,most_violated_idx);
+            p = remove_row(p,most_violated_idx);
+            B = removerc(B,most_violated_idx, most_violated_idx);
+
+            // Removing a variable changes the radius, so we have to subtract the bounded
+            // value from the radius so as to not change the effective radius for the whole
+            // problem.
+            double squared_radius = radius*radius - bounded_value*bounded_value;
+            if (squared_radius <= 0)
+            {
+                p = 0;
+                break;
+            }
+            radius = std::sqrt(squared_radius);
+
+
+            solve_trust_region_subproblem(B,g,radius,p,eps,max_iter);
+        }
+
+        // assign the non-bound-constrained variables to their final values
+        for (size_t i = 0; i < idxs.size(); ++i)
+            p_(idxs[i]) = p(i);
+
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
     template <
         typename stop_strategy_type,
         typename funct_model
