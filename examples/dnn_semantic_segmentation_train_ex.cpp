@@ -68,7 +68,8 @@ void randomly_crop_image (
     extract_image_chip(label_image, chip_details, crop.second, interpolate_nearest_neighbor());
 
     // Also randomly flip the input image and the labels.
-    if (rnd.get_random_double() > 0.5) {
+    if (rnd.get_random_double() > 0.5)
+    {
         crop.first = fliplr(crop.first);
         crop.second = fliplr(crop.second);
     }
@@ -94,11 +95,13 @@ std::vector<image_info> get_pascal_voc2012_listing(
 
     std::vector<image_info> results;
 
-    while (in) {
+    while (in)
+    {
         std::string basename;
         in >> basename;
 
-        if (!basename.empty()) {
+        if (!basename.empty())
+        {
             image_info image_info;
             image_info.image_filename = voc2012_folder + "/JPEGImages/" + basename + ".jpg";
             image_info.label_filename = voc2012_folder + "/SegmentationClass/" + basename + ".png";
@@ -128,7 +131,8 @@ std::vector<image_info> get_pascal_voc2012_val_listing(
 const Voc2012class& find_voc2012_class(const dlib::rgb_pixel& rgb_label)
 {
     return find_voc2012_class(
-        [&rgb_label](const Voc2012class& voc2012class) {
+        [&rgb_label](const Voc2012class& voc2012class)
+        {
             return rgb_label == voc2012class.rgb_label;
         }
     );
@@ -146,8 +150,10 @@ void rgb_label_image_to_index_label_image(const dlib::matrix<dlib::rgb_pixel>& r
 
     index_label_image.set_size(nr, nc);
 
-    for (long r = 0; r < nr; ++r) {
-        for (long c = 0; c < nc; ++c) {
+    for (long r = 0; r < nr; ++r)
+    {
+        for (long c = 0; c < nc; ++c)
+        {
             index_label_image(r, c) = rgb_label_to_index_label(rgb_label_image(r, c));
         }
     }
@@ -164,7 +170,8 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
     matrix<rgb_pixel> rgb_label_image;
     matrix<uint16_t> index_label_image;
 
-    for (const auto& image_info : dataset) {
+    for (const auto& image_info : dataset)
+    {
         load_image(input_image, image_info.image_filename);
         load_image(rgb_label_image, image_info.label_filename);
 
@@ -175,15 +182,20 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
         const long nr = index_label_image.nr();
         const long nc = index_label_image.nc();
 
-        for (long r = 0; r < nr; ++r) {
-            for (long c = 0; c < nc; ++c) {
+        for (long r = 0; r < nr; ++r)
+        {
+            for (long c = 0; c < nc; ++c)
+            {
                 const uint16_t truth = index_label_image(r, c);
-                if (truth != dlib::loss_multiclass_log_per_pixel_::label_to_ignore) {
+                if (truth != dlib::loss_multiclass_log_per_pixel_::label_to_ignore)
+                {
                     const uint16_t prediction = net_output(r, c);
-                    if (prediction == truth) {
+                    if (prediction == truth)
+                    {
                         ++num_right;
                     }
-                    else {
+                    else
+                    {
                         ++num_wrong;
                     }
                 }

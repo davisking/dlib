@@ -29,7 +29,8 @@ using namespace dlib;
 const Voc2012class& find_voc2012_class(const uint16_t& index_label)
 {
     return find_voc2012_class(
-        [&index_label](const Voc2012class& voc2012class) {
+        [&index_label](const Voc2012class& voc2012class)
+        {
             return index_label == voc2012class.index;
         }
     );
@@ -47,8 +48,10 @@ void index_label_image_to_rgb_label_image(const matrix<uint16_t>& index_label_im
 
     rgb_label_image.set_size(nr, nc);
 
-    for (long r = 0; r < nr; ++r) {
-        for (long c = 0; c < nc; ++c) {
+    for (long r = 0; r < nr; ++r)
+    {
+        for (long c = 0; c < nc; ++c)
+        {
             rgb_label_image(r, c) = index_label_to_rgb_label(index_label_image(r, c));
         }
     }
@@ -61,8 +64,10 @@ std::string get_most_prominent_non_background_classlabel(const matrix<uint16_t>&
 
     std::vector<unsigned int> counters(class_count);
 
-    for (long r = 0; r < nr; ++r) {
-        for (long c = 0; c < nc; ++c) {
+    for (long r = 0; r < nr; ++r)
+    {
+        for (long c = 0; c < nc; ++c)
+        {
             const uint16_t label = index_label_image(r, c);
             ++counters[label];
         }

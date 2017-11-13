@@ -77,10 +77,12 @@ const Voc2012class& find_voc2012_class(Predicate predicate)
 {
     const auto i = std::find_if(classes.begin(), classes.end(), predicate);
 
-    if (i != classes.end()) {
+    if (i != classes.end())
+    {
         return *i;
     }
-    else {
+    else
+    {
         throw std::runtime_error("Unable to find a matching VOC2012 class");
     }
 }
