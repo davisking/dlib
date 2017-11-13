@@ -245,6 +245,9 @@ int main(int argc, char** argv) try
     // stats window to something big too.
     set_all_bn_running_stats_window_sizes(net, 1000);
 
+    // Output training parameters.
+    cout << trainer << endl;
+
     std::vector<matrix<rgb_pixel>> samples;
     std::vector<matrix<uint16_t>> labels;
 
