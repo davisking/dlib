@@ -83,7 +83,10 @@ int main(int argc, char** argv) try
         cout << "You call this program like this: " << endl;
         cout << "./dnn_semantic_segmentation_train_ex /path/to/images" << endl;
         cout << endl;
-        cout << "You will also need a trained 'voc2012net.dnn' file. " << endl;
+        cout << "You will also need a trained 'voc2012net.dnn' file." << endl;
+        cout << "You can either train it yourself (see example program" << endl;
+        cout << "dnn_semantic_segmentation_train_ex), or download a" << endl;
+        cout << "copy from here: http://dlib.net/files/voc2012net.dnn" << endl;
         return 1;
     }
 
@@ -94,7 +97,6 @@ int main(int argc, char** argv) try
 
     matrix<rgb_pixel> input_image;
     matrix<rgb_pixel> rgb_label_image;
-    matrix<rgb_pixel> result_image;
 
     const std::vector<file> files = dlib::get_files_in_directory_tree(argv[1],
         dlib::match_endings(".jpeg *.jpg *.png"));
@@ -103,24 +105,20 @@ int main(int argc, char** argv) try
 
     for (const file& file : files)
     {
+        // Load the input image.
         load_image(input_image, file.full_name());
 
-        const matrix<uint16_t>& index_label_image = net(input_image);
+        // Create predictions for each pixel. At this point, the type of each prediction
+        // is an index (a value between 0 and 20).
+        const matrix<uint16_t> index_label_image = net(input_image);
+
+        // Convert the indexes to RGB values.
         index_label_image_to_rgb_label_image(index_label_image, rgb_label_image);
 
-        const long nr = input_image.nr(), nc = input_image.nc();
+        // Show the input image on the left, and the predicted RGB labels on the right.
+        win.set_image(join_rows(input_image, rgb_label_image));
 
-        result_image.set_size(nr, 2 * nc);
-
-        for (long r = 0; r < nr; ++r) {
-            for (long c = 0; c < nc; ++c) {
-                result_image(r, c) = input_image(r, c);
-                result_image(r, nc + c) = rgb_label_image(r, c);
-            }
-        }
-
-        win.set_image(result_image);
-
+        // Find the most prominent class label from amongst the per-pixel predictions.
         const std::string classlabel = get_most_prominent_non_background_classlabel(index_label_image);
 
         cout << file.name() << " : " << classlabel << " - hit enter to process the next image";
