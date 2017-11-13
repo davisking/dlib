@@ -97,12 +97,7 @@ int main(int argc, char** argv) try
     matrix<rgb_pixel> result_image;
 
     const std::vector<file> files = dlib::get_files_in_directory_tree(argv[1],
-        [](const dlib::file& name)
-        {
-            return dlib::match_ending(".jpeg")(name)
-                || dlib::match_ending(".jpg")(name)
-                || dlib::match_ending(".png")(name);
-        });
+        dlib::match_endings(".jpeg *.jpg *.png"));
 
     cout << "Found " << files.size() << " images, processing..." << endl;
 
