@@ -89,8 +89,6 @@ const Voc2012class& find_voc2012_class(Predicate predicate)
 
 // ----------------------------------------------------------------------------------------
 
-#ifndef __INTELLISENSE__
-
 template <int N, template <typename> class BN, int stride, typename SUBNET> 
 using block = BN<dlib::con<N,3,3,1,1, dlib::relu<BN<dlib::con<N,3,3,stride,stride,SUBNET>>>>>;
 
@@ -152,8 +150,6 @@ using anet_type = dlib::loss_multiclass_log_per_pixel<
                             dlib::max_pool<3,3,2,2,dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
                             dlib::input<dlib::matrix<dlib::rgb_pixel>>
                             >>>>>>>>>>>>>>;
-
-#endif // __INTELLISENSE__
 
 // ----------------------------------------------------------------------------------------
 
