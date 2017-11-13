@@ -2,7 +2,16 @@
 /*
     Semantic segmentation using the PASCAL VOC2012 dataset.
 
-    Instructions:
+    In segmentation, the task is to assign each pixel of an input image
+    a label - for example, 'dog'.  Then, the idea is that neighboring
+    pixels having the same label can be connected together to form a
+    larger region, representing a complete (or partially occluded) dog.
+    So technically, segmentation can be viewed as classification of
+    individual pixels (using the relevant context in the input images),
+    however the goal usually is to identify meaningful regions that
+    represent complete entities of interest (such as dogs).
+
+    Instructions how to run the example:
     1. Download the PASCAL VOC2012 data, and untar it somewhere.
        http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar
     2. Build the dnn_semantic_segmentation_train_ex example program.
@@ -12,6 +21,13 @@
     5. Build the dnn_semantic_segmentation_ex example program.
     6. Run:
        ./dnn_semantic_segmentation_ex /path/to/VOC2012-or-other-images
+
+    An alternative to steps 2-4 above is to download a pre-trained network
+    from here: http://dlib.net/files/voc2012net.dnn
+
+    It would be a good idea to become familiar with dlib's DNN tooling before reading this
+    example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
+    before reading this example program.
 */
 
 #ifndef DLIB_DNn_SEMANTIC_SEGMENTATION_EX_H_
@@ -28,13 +44,22 @@ inline bool operator == (const dlib::rgb_pixel& a, const dlib::rgb_pixel& b)
 
 // ----------------------------------------------------------------------------------------
 
+// The PASCAL VOC2012 dataset contains 20 ground-truth classes + background.  Each class
+// is represented using an RGB color value.  We associate each class also to an index in the
+// range [0, 20], used internally by the network.
+
 struct Voc2012class {
     Voc2012class(uint16_t index, const dlib::rgb_pixel& rgb_label, const std::string& classlabel)
         : index(index), rgb_label(rgb_label), classlabel(classlabel)
     {}
 
+    // The index of the class. In the PASCAL VOC 2012 dataset, indexes from 0 to 20 are valid.
     const uint16_t index = 0;
+
+    // The corresponding RGB representation of the class.
     const dlib::rgb_pixel rgb_label;
+
+    // The label of the class in plain text.
     const std::string classlabel;
 };
 
@@ -89,6 +114,13 @@ const Voc2012class& find_voc2012_class(Predicate predicate)
 
 // ----------------------------------------------------------------------------------------
 
+// Introduce the building blocks used to define the segmentation network.
+// The network first does residual downsampling (similar to the dnn_imagenet_(train_)ex 
+// example program), and then residual upsampling. The network could be improved e.g.
+// by introducing skip connections from the input image, and/or the first layers, to the
+// last layer(s).  (See Long et al., Fully Convolutional Networks for Semantic Segmentation,
+// https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf)
+
 template <int N, template <typename> class BN, int stride, typename SUBNET> 
 using block = BN<dlib::con<N,3,3,1,1, dlib::relu<BN<dlib::con<N,3,3,stride,stride,SUBNET>>>>>;
 
@@ -132,6 +164,8 @@ template <typename SUBNET> using alevel1t = ares<512,ares<512,ares_up<512,SUBNET
 template <typename SUBNET> using alevel2t = ares<256,ares<256,ares_up<256,SUBNET>>>;
 template <typename SUBNET> using alevel3t = ares<128,ares<128,ares_up<128,SUBNET>>>;
 template <typename SUBNET> using alevel4t = ares<64,ares<64,ares_up<64,SUBNET>>>;
+
+// ----------------------------------------------------------------------------------------
 
 // training network type
 using net_type = dlib::loss_multiclass_log_per_pixel<

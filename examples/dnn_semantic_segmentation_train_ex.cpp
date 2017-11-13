@@ -1,9 +1,10 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
     This example shows how to train a semantic segmentation net using the PASCAL VOC2012
-    dataset.
+    dataset.  For an introduction to what segmentation is, see the accompanying header file
+    dnn_semantic_segmentation_ex.h.
 
-    Instructions:
+    Instructions how to run the example:
     1. Download the PASCAL VOC2012 data, and untar it somewhere.
        http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar
     2. Build the dnn_semantic_segmentation_train_ex example program.
@@ -13,6 +14,10 @@
     5. Build the dnn_semantic_segmentation_ex example program.
     6. Run:
        ./dnn_semantic_segmentation_ex /path/to/VOC2012-or-other-images
+
+    It would be a good idea to become familiar with dlib's DNN tooling before reading this
+    example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
+    before reading this example program.
 */
 
 #include "dnn_semantic_segmentation_ex.h"
@@ -27,7 +32,12 @@
 using namespace std;
 using namespace dlib;
 
-typedef std::pair<matrix<rgb_pixel>, matrix<uint16_t>> training_sample;
+// A single training sample. A mini-batch comprises many of these.
+struct training_sample
+{
+    matrix<rgb_pixel> input_image;
+    matrix<uint16_t> label_image; // The ground-truth label of each pixel.
+};
 
 // ----------------------------------------------------------------------------------------
 
@@ -61,31 +71,35 @@ void randomly_crop_image (
     const chip_details chip_details(rect, chip_dims(227, 227));
 
     // Crop the input image.
-    extract_image_chip(input_image, chip_details, crop.first, interpolate_bilinear());
+    extract_image_chip(input_image, chip_details, crop.input_image, interpolate_bilinear());
 
     // Crop the labels correspondingly. However, note that here bilinear
     // interpolation would make absolutely no sense.
-    extract_image_chip(label_image, chip_details, crop.second, interpolate_nearest_neighbor());
+    extract_image_chip(label_image, chip_details, crop.label_image, interpolate_nearest_neighbor());
 
     // Also randomly flip the input image and the labels.
     if (rnd.get_random_double() > 0.5)
     {
-        crop.first = fliplr(crop.first);
-        crop.second = fliplr(crop.second);
+        crop.input_image = fliplr(crop.input_image);
+        crop.label_image = fliplr(crop.label_image);
     }
 
     // And then randomly adjust the colors.
-    apply_random_color_offset(crop.first, rnd);
+    apply_random_color_offset(crop.input_image, rnd);
 }
 
 // ----------------------------------------------------------------------------------------
 
+// The names of the input image and the associated RGB label image in the PASCAL VOC 2012
+// data set.
 struct image_info
 {
     string image_filename;
     string label_filename;
 };
 
+// Read the list of image files belonging to either the "train", "trainval", or "val" set
+// of the PASCAL VOC2012 data.
 std::vector<image_info> get_pascal_voc2012_listing(
     const std::string& voc2012_folder,
     const std::string& file = "train" // "train", "trainval", or "val"
@@ -112,6 +126,7 @@ std::vector<image_info> get_pascal_voc2012_listing(
     return results;
 }
 
+// Read the list of image files belong to the "train" set of the PASCAL VOC2012 data.
 std::vector<image_info> get_pascal_voc2012_train_listing(
     const std::string& voc2012_folder
 )
@@ -119,6 +134,7 @@ std::vector<image_info> get_pascal_voc2012_train_listing(
     return get_pascal_voc2012_listing(voc2012_folder, "train");
 }
 
+// Read the list of image files belong to the "val" set of the PASCAL VOC2012 data.
 std::vector<image_info> get_pascal_voc2012_val_listing(
     const std::string& voc2012_folder
 )
@@ -128,6 +144,14 @@ std::vector<image_info> get_pascal_voc2012_val_listing(
 
 // ----------------------------------------------------------------------------------------
 
+// The PASCAL VOC2012 dataset contains 20 ground-truth classes + background.  Each class
+// is represented using an RGB color value.  We associate each class also to an index in the
+// range [0, 20], used internally by the network.  To convert the ground-truth data to
+// something that the network can efficiently digest, we need to be able to map the RGB
+// values to the corresponding indexes.
+
+// Given an RGB representation, find the corresponding PASCAL VOC2012 class
+// (e.g., 'dog').
 const Voc2012class& find_voc2012_class(const dlib::rgb_pixel& rgb_label)
 {
     return find_voc2012_class(
@@ -138,12 +162,18 @@ const Voc2012class& find_voc2012_class(const dlib::rgb_pixel& rgb_label)
     );
 }
 
+// Convert an RGB class label to an index in the range [0, 20].
 inline uint16_t rgb_label_to_index_label(const dlib::rgb_pixel& rgb_label)
 {
     return find_voc2012_class(rgb_label).index;
 }
 
-void rgb_label_image_to_index_label_image(const dlib::matrix<dlib::rgb_pixel>& rgb_label_image, dlib::matrix<uint16_t>& index_label_image)
+// Convert an image containing RGB class labels to a corresponding
+// image containing indexes in the range [0, 20].
+void rgb_label_image_to_index_label_image(
+    const dlib::matrix<dlib::rgb_pixel>& rgb_label_image,
+    dlib::matrix<uint16_t>& index_label_image
+)
 {
     const long nr = rgb_label_image.nr();
     const long nc = rgb_label_image.nc();
@@ -161,6 +191,7 @@ void rgb_label_image_to_index_label_image(const dlib::matrix<dlib::rgb_pixel>& r
 
 // ----------------------------------------------------------------------------------------
 
+// Calculate the per-pixel accuracy on a dataset whose file names are supplied as a parameter.
 double calculate_accuracy(anet_type& anet, const std::vector<image_info>& dataset)
 {
     int num_right = 0;
@@ -172,16 +203,23 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
 
     for (const auto& image_info : dataset)
     {
+        // Load the input image.
         load_image(input_image, image_info.image_filename);
+
+        // Load the ground-truth (RGB) labels.
         load_image(rgb_label_image, image_info.label_filename);
 
+        // Create predictions for each pixel. At this point, the type of each prediction
+        // is an index (a value between 0 and 20).
         matrix<uint16_t> net_output = anet(input_image);
 
+        // Convert the indexes to RGB values.
         rgb_label_image_to_index_label_image(rgb_label_image, index_label_image);
 
         const long nr = index_label_image.nr();
         const long nc = index_label_image.nc();
 
+        // Compare the predicted values to the ground-truth values.
         for (long r = 0; r < nr; ++r)
         {
             for (long c = 0; c < nc; ++c)
@@ -203,6 +241,7 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
         }
     }
 
+    // Return the accuracy estimate.
     return num_right / static_cast<double>(num_right + num_wrong);
 }
 
@@ -265,11 +304,22 @@ int main(int argc, char** argv) try
         training_sample temp;
         while(data.is_enabled())
         {
+            // Pick a random input image.
             const image_info& image_info = listing[rnd.get_random_32bit_number()%listing.size()];
+
+            // Load the input image.
             load_image(input_image, image_info.image_filename);
+
+            // Load the ground-truth (RGB) labels.
             load_image(rgb_label_image, image_info.label_filename);
+
+            // Convert the indexes to RGB values.
             rgb_label_image_to_index_label_image(rgb_label_image, index_label_image);
+
+            // Randomly pick a part of the image.
             randomly_crop_image(input_image, index_label_image, temp, rnd);
+
+            // Push the result to be used by the trainer.
             data.enqueue(temp);
         }
     };
@@ -285,14 +335,14 @@ int main(int argc, char** argv) try
         samples.clear();
         labels.clear();
 
-        // make a 30 image mini-batch
+        // make a 30-image mini-batch
         training_sample temp;
         while(samples.size() < 30)
         {
             data.dequeue(temp);
 
-            samples.push_back(std::move(temp.first));
-            labels.push_back(std::move(temp.second));
+            samples.push_back(std::move(temp.input_image));
+            labels.push_back(std::move(temp.label_image));
         }
 
         trainer.train_one_step(samples, labels);
@@ -314,12 +364,12 @@ int main(int argc, char** argv) try
     serialize("voc2012net.dnn") << net;
 
 
-
-
+    // Make a copy of the network to use it for inference.
     anet_type anet = net;
 
     cout << "Testing the network..." << endl;
 
+    // Find the accuracy of the newly trained network on both the training and the validation sets.
     cout << "train accuracy  :  " << calculate_accuracy(anet, get_pascal_voc2012_train_listing(argv[1])) << endl;
     cout << "val accuracy    :  " << calculate_accuracy(anet, get_pascal_voc2012_val_listing(argv[1])) << endl;
 }

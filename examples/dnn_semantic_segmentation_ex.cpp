@@ -1,9 +1,10 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
     This example shows how to do semantic segmentation on an image using net pretrained
-    on the PASCAL VOC2012 dataset.
+    on the PASCAL VOC2012 dataset.  For an introduction to what segmentation is, see the
+    accompanying header file dnn_semantic_segmentation_ex.h.
 
-    Instructions:
+    Instructions how to run the example:
     1. Download the PASCAL VOC2012 data, and untar it somewhere.
        http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar
     2. Build the dnn_semantic_segmentation_train_ex example program.
@@ -13,6 +14,13 @@
     5. Build the dnn_semantic_segmentation_ex example program.
     6. Run:
        ./dnn_semantic_segmentation_ex /path/to/VOC2012-or-other-images
+
+    An alternative to steps 2-4 above is to download a pre-trained network
+    from here: http://dlib.net/files/voc2012net.dnn
+
+    It would be a good idea to become familiar with dlib's DNN tooling before reading this
+    example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
+    before reading this example program.
 */
 
 #include "dnn_semantic_segmentation_ex.h"
@@ -26,6 +34,14 @@ using namespace dlib;
  
 // ----------------------------------------------------------------------------------------
 
+// The PASCAL VOC2012 dataset contains 20 ground-truth classes + background.  Each class
+// is represented using an RGB color value.  We associate each class also to an index in the
+// range [0, 20], used internally by the network.  To generate nice RGB representations of
+// inference results, we need to be able to convert the index values to the corresponding
+// RGB values.
+
+// Given an index in the range [0, 20], find the corresponding PASCAL VOC2012 class
+// (e.g., 'dog').
 const Voc2012class& find_voc2012_class(const uint16_t& index_label)
 {
     return find_voc2012_class(
@@ -36,12 +52,18 @@ const Voc2012class& find_voc2012_class(const uint16_t& index_label)
     );
 }
 
+// Convert an index in the range [0, 20] to a corresponding RGB class label.
 inline rgb_pixel index_label_to_rgb_label(uint16_t index_label)
 {
     return find_voc2012_class(index_label).rgb_label;
 }
 
-void index_label_image_to_rgb_label_image(const matrix<uint16_t>& index_label_image, matrix<rgb_pixel>& rgb_label_image)
+// Convert an image containing indexes in the range [0, 20] to a corresponding
+// image containing RGB class labels.
+void index_label_image_to_rgb_label_image(
+    const matrix<uint16_t>& index_label_image,
+    matrix<rgb_pixel>& rgb_label_image
+)
 {
     const long nr = index_label_image.nr();
     const long nc = index_label_image.nc();
@@ -57,6 +79,7 @@ void index_label_image_to_rgb_label_image(const matrix<uint16_t>& index_label_im
     }
 }
 
+// Find the most prominent class label from amongst the per-pixel predictions.
 std::string get_most_prominent_non_background_classlabel(const matrix<uint16_t>& index_label_image)
 {
     const long nr = index_label_image.nr();
@@ -95,14 +118,17 @@ int main(int argc, char** argv) try
         return 1;
     }
 
+    // Read the file containing the trained network from the working directory.
     anet_type net;
     deserialize("voc2012net.dnn") >> net;
 
+    // Show inference results in a window.
     image_window win;
 
     matrix<rgb_pixel> input_image;
     matrix<rgb_pixel> rgb_label_image;
 
+    // Find supported image files.
     const std::vector<file> files = dlib::get_files_in_directory_tree(argv[1],
         dlib::match_endings(".jpeg *.jpg *.png"));
 
