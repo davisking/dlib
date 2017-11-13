@@ -129,9 +129,9 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
       # compiler to run out of RAM and to crash.  Maybe someday Visual Studio
       # won't be broken :(
       # (NB: While the 32-bit VC++ compiler launched by the Visual Studio IDE will
-	  #  run out of memory, running a 64-bit MSBuild.exe on the Command Prompt
-	  #  seems to work fine. So you can try something like this:
-	  #  "C:\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" C:\path\to\examples.sln /p:Configuration=Release /p:Platform=x64 /t:dnn_imagenet_train_ex
+      #  run out of memory, running a 64-bit MSBuild.exe on the Command Prompt
+      #  seems to work fine. So you can try something like this:
+      #  "C:\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" C:\path\to\examples.sln /p:Configuration=Release /p:Platform=x64 /t:dnn_imagenet_train_ex
       #  It does take quite a while to build these examples, though!
       #  Note that you may additionally need to set Debug Information Format to
       #  C7 compatible (/Z7), in case you get compiler error "cannot update
