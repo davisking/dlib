@@ -29,13 +29,13 @@ inline bool operator == (const dlib::rgb_pixel& a, const dlib::rgb_pixel& b)
 // ----------------------------------------------------------------------------------------
 
 struct Voc2012class {
-    Voc2012class(uint16_t index, const dlib::rgb_pixel& rgb_label, const char* classlabel)
+    Voc2012class(uint16_t index, const dlib::rgb_pixel& rgb_label, const std::string& classlabel)
         : index(index), rgb_label(rgb_label), classlabel(classlabel)
     {}
 
     const uint16_t index = 0;
     const dlib::rgb_pixel rgb_label;
-    const char* classlabel = nullptr;
+    const std::string classlabel;
 };
 
 namespace {
