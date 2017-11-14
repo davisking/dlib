@@ -352,7 +352,7 @@ endif()
 if (lapack_found)
    include(CheckFunctionExists)
    include(CheckFortranFunctionExists)
-   set(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
+   set(CMAKE_REQUIRED_LIBRARIES ${lapack_libraries})
 
    check_function_exists("sgesv" LAPACK_FOUND_C_UNMANGLED)
    check_function_exists("sgesv_" LAPACK_FOUND_C_MANGLED)
