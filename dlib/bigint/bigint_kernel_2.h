@@ -15,8 +15,6 @@
 namespace dlib
 {
     
-    using namespace dlib::relational_operators; // defined in algs.h
-
     class bigint_kernel_2 
     {
         /*!
@@ -556,6 +554,11 @@ namespace dlib
             throw serialization_error("Error deserializing object of type bigint_kernel_c"); 
         }
     }   
+
+    inline bool operator>  (const bigint_kernel_2& a, const bigint_kernel_2& b) { return b < a; } 
+    inline bool operator!= (const bigint_kernel_2& a, const bigint_kernel_2& b) { return !(a == b); }
+    inline bool operator<= (const bigint_kernel_2& a, const bigint_kernel_2& b) { return !(b < a); }
+    inline bool operator>= (const bigint_kernel_2& a, const bigint_kernel_2& b) { return !(a < b); }
 
 }
 
