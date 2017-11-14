@@ -189,6 +189,7 @@ if (NOT TARGET dlib)
          data_io/mnist.cpp
          dnn/cpu_dlib.cpp
          dnn/tensor_tools.cpp
+         global_optimization/global_function_search.cpp
    )
 
 
