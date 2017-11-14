@@ -1466,6 +1466,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     unsigned long tabbed_display::
+    selected_tab (
+    ) const
+    {
+        auto_mutex M(m);
+        return selected_tab_;
+    }
+
+    unsigned long tabbed_display::
     number_of_tabs (
     ) const
     {
