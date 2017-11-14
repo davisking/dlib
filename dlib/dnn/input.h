@@ -695,38 +695,42 @@ namespace dlib
 
             // copy the first raw image into the top part of the tiled pyramid.  We need to
             // do this for each of the input images/samples in the tensor.
+            const size_t offset = data.nr() * data.nc();
             for (auto i = ibegin; i != iend; ++i)
             {
                 auto& img = *i;
-                ptr += rects[0].top()*data.nc();
+                auto ptr_red = ptr + rects[0].top() * data.nc() + rects[0].left();
                 for (long r = 0; r < img.nr(); ++r)
-                {
-                    auto p = ptr+rects[0].left();
+                {                   
                     for (long c = 0; c < img.nc(); ++c)
-                        p[c] = (img(r,c).red-avg_red)/256.0;
-                    ptr += data.nc();
+                    {
+                        ptr_red[c] = (img(r, c).red - avg_red) / 256.0;
+                    }
+                    ptr_red += data.nc();
                 }
-                ptr += data.nc()*(data.nr()-rects[0].bottom()-1);
+                ptr += offset;
 
-                ptr += rects[0].top()*data.nc();
+                auto ptr_green = ptr + rects[0].top() * data.nc() + rects[0].left();
                 for (long r = 0; r < img.nr(); ++r)
-                {
-                    auto p = ptr+rects[0].left();
+                {                   
                     for (long c = 0; c < img.nc(); ++c)
-                        p[c] = (img(r,c).green-avg_green)/256.0;
-                    ptr += data.nc();
+                    {
+                        ptr_green[c] = (img(r, c).green - avg_green) / 256.0;
+                    }
+                    ptr_green += data.nc();
                 }
-                ptr += data.nc()*(data.nr()-rects[0].bottom()-1);
+                ptr += offset;
 
-                ptr += rects[0].top()*data.nc();
+                auto ptr_blue = ptr + rects[0].top() * data.nc() + rects[0].left();
                 for (long r = 0; r < img.nr(); ++r)
-                {
-                    auto p = ptr+rects[0].left();
+                {                   
                     for (long c = 0; c < img.nc(); ++c)
-                        p[c] = (img(r,c).blue-avg_blue)/256.0;
-                    ptr += data.nc();
+                    {
+                        ptr_blue[c] = (img(r, c).blue - avg_blue) / 256.0;
+                    }
+                    ptr_blue += data.nc();
                 }
-                ptr += data.nc()*(data.nr()-rects[0].bottom()-1);
+                ptr += offset;
             }
 
             // now build the image pyramid into data.  This does the same thing as
