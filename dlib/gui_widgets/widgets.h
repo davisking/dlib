@@ -1190,6 +1190,9 @@ namespace dlib
             unsigned long num
         );
 
+        unsigned long selected_tab (
+        ) const;
+
         unsigned long number_of_tabs (
         ) const;
 

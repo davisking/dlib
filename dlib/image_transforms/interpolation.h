@@ -1856,12 +1856,14 @@ namespace dlib
 
     template <
         typename image_type1,
-        typename image_type2
+        typename image_type2,
+        typename interpolation_type
         >
     void extract_image_chips (
         const image_type1& img,
         const std::vector<chip_details>& chip_locations,
-        dlib::array<image_type2>& chips
+        dlib::array<image_type2>& chips,
+        const interpolation_type& interp
     )
     {
         // make sure requires clause is not broken
@@ -1957,10 +1959,56 @@ namespace dlib
 
                 // now extract the actual chip
                 if (level == -1)
-                    transform_image(sub_image(img,bounding_box),chips[i],interpolate_bilinear(),trns);
+                    transform_image(sub_image(img,bounding_box),chips[i],interp,trns);
                 else
-                    transform_image(levels[level],chips[i],interpolate_bilinear(),trns);
+                    transform_image(levels[level],chips[i],interp,trns);
             }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    void extract_image_chips(
+        const image_type1& img,
+        const std::vector<chip_details>& chip_locations,
+        dlib::array<image_type2>& chips
+    )
+    {
+        extract_image_chips(img, chip_locations, chips, interpolate_bilinear());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2,
+        typename interpolation_type
+        >
+    void extract_image_chip (
+        const image_type1& img,
+        const chip_details& location,
+        image_type2& chip,
+        const interpolation_type& interp
+    )
+    {
+        // If the chip doesn't have any rotation or scaling then use the basic version of
+        // chip extraction that just does a fast copy.
+        if (location.angle == 0 && 
+            location.rows == location.rect.height() &&
+            location.cols == location.rect.width())
+        {
+            impl::basic_extract_image_chip(img, location.rect, chip);
+        }
+        else
+        {
+            std::vector<chip_details> chip_locations(1,location);
+            dlib::array<image_type2> chips;
+            extract_image_chips(img, chip_locations, chips, interp);
+            swap(chips[0], chip);
         }
     }
 
@@ -1976,21 +2024,7 @@ namespace dlib
         image_type2& chip
     )
     {
-        // If the chip doesn't have any rotation or scaling then use the basic version of
-        // chip extraction that just does a fast copy.
-        if (location.angle == 0 && 
-            location.rows == location.rect.height() &&
-            location.cols == location.rect.width())
-        {
-            impl::basic_extract_image_chip(img, location.rect, chip);
-        }
-        else
-        {
-            std::vector<chip_details> chip_locations(1,location);
-            dlib::array<image_type2> chips;
-            extract_image_chips(img, chip_locations, chips);
-            swap(chips[0], chip);
-        }
+        extract_image_chip(img, location, chip, interpolate_bilinear());
     }
 
 // ----------------------------------------------------------------------------------------
