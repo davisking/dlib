@@ -371,7 +371,7 @@ int main(int argc, char** argv) try
 
     net.clean();
     cout << "saving network" << endl;
-    serialize("voc2012net.dnn") << net;
+    serialize("semantic_segmentation_voc2012net.dnn") << net;
 
 
     // Make a copy of the network to use it for inference.
