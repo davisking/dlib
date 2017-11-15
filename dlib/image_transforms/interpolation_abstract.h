@@ -1182,6 +1182,8 @@ namespace dlib
             - for all valid i: 
                 - chip_locations[i].rect.is_empty() == false
                 - chip_locations[i].size() != 0
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              interpolate_quadratic, or a type with a compatible interface.
         ensures
             - This function extracts "chips" from an image.  That is, it takes a list of
               rectangular sub-windows (i.e. chips) within an image and extracts those
@@ -1213,7 +1215,7 @@ namespace dlib
     /*!
         ensures
             - This function is a simple convenience / compatibility wrapper that calls the
-              above-defined extract_image_chips function using bilinear interpolation.
+              above-defined extract_image_chips() function using bilinear interpolation.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1232,7 +1234,8 @@ namespace dlib
     /*!
         ensures
             - This function simply calls extract_image_chips() with a single chip location
-              and stores the single output chip into #chip.
+              and stores the single output chip into #chip.  It uses the provided
+              interpolation method.
     !*/
 
     template <
@@ -1247,7 +1250,7 @@ namespace dlib
     /*!
         ensures
             - This function is a simple convenience / compatibility wrapper that calls the
-              above-defined extract_image_chip function using bilinear interpolation.
+              above-defined extract_image_chip() function using bilinear interpolation.
     !*/
 
 // ----------------------------------------------------------------------------------------
