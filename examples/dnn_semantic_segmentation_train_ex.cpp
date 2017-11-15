@@ -74,7 +74,8 @@ void randomly_crop_image (
     extract_image_chip(input_image, chip_details, crop.input_image, interpolate_bilinear());
 
     // Crop the labels correspondingly. However, note that here bilinear
-    // interpolation would make absolutely no sense.
+    // interpolation would make absolutely no sense - you wouldn't say that
+    // a bicycle is half-way between an aeroplane and a bird, would you?
     extract_image_chip(label_image, chip_details, crop.label_image, interpolate_nearest_neighbor());
 
     // Also randomly flip the input image and the labels.
@@ -216,6 +217,8 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
         // Convert the indexes to RGB values.
         rgb_label_image_to_index_label_image(rgb_label_image, index_label_image);
 
+        // Note that net_output may be a little larger than input_image.
+        // Here we just ignore the padding, if any.
         const long nr = index_label_image.nr();
         const long nc = index_label_image.nc();
 

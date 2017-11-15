@@ -126,6 +126,7 @@ int main(int argc, char** argv) try
     image_window win;
 
     matrix<rgb_pixel> input_image;
+    matrix<uint16_t> index_label_image;
     matrix<rgb_pixel> rgb_label_image;
 
     // Find supported image files.
@@ -140,8 +141,16 @@ int main(int argc, char** argv) try
         load_image(input_image, file.full_name());
 
         // Create predictions for each pixel. At this point, the type of each prediction
-        // is an index (a value between 0 and 20).
-        const matrix<uint16_t> index_label_image = net(input_image);
+        // is an index (a value between 0 and 20). Note that the net may return an image
+        // that is not exactly the same size as the input.
+        const matrix<uint16_t> temp = net(input_image);
+
+        // Resize the returned image to be exactly the same size as the input.
+        // Note that it does not make sense to apply bilinear interpolation to the
+        // class indexes: you wouldn't say that a bicycle is half-way between an
+        // aeroplane and a bird, would you?
+        index_label_image.set_size(input_image.nr(), input_image.nc());
+        resize_image(temp, index_label_image, interpolate_nearest_neighbor());
 
         // Convert the indexes to RGB values.
         index_label_image_to_rgb_label_image(index_label_image, rgb_label_image);
