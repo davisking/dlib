@@ -496,7 +496,6 @@ namespace dlib
 
             // remove the evaluation request from the incomplete list.
             auto i = std::find(info->incomplete_evals.begin(), info->incomplete_evals.end(), req);
-            DLIB_CASSERT(i != info->incomplete_evals.end());
             info->incomplete_evals.erase(i);
         }
     }
