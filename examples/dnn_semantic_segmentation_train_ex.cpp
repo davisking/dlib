@@ -201,6 +201,7 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
     matrix<rgb_pixel> input_image;
     matrix<rgb_pixel> rgb_label_image;
     matrix<uint16_t> index_label_image;
+    matrix<uint16_t> net_output;
 
     for (const auto& image_info : dataset)
     {
@@ -211,14 +212,18 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
         load_image(rgb_label_image, image_info.label_filename);
 
         // Create predictions for each pixel. At this point, the type of each prediction
-        // is an index (a value between 0 and 20).
-        matrix<uint16_t> net_output = anet(input_image);
+        // is an index (a value between 0 and 20). Note that the net may return an image
+        // that is not exactly the same size as the input.
+        const matrix<uint16_t> net_output_temp = anet(input_image);
 
         // Convert the indexes to RGB values.
         rgb_label_image_to_index_label_image(rgb_label_image, index_label_image);
 
-        // Note that net_output may be a little larger than input_image.
-        // Here we just ignore the padding, if any.
+        // Resize the net output to be exactly the same size as the ground-truth labels.
+        // Note that again bilinear interpolation wouldn't make sense.
+        net_output.set_size(index_label_image.nr(), index_label_image.nc());
+        resize_image(net_output_temp, net_output, interpolate_nearest_neighbor());
+
         const long nr = index_label_image.nr();
         const long nc = index_label_image.nc();
 
