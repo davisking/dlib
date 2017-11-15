@@ -145,12 +145,12 @@ int main(int argc, char** argv) try
         // that is not exactly the same size as the input.
         const matrix<uint16_t> temp = net(input_image);
 
-        // Resize the returned image to be exactly the same size as the input.
-        // Note that it does not make sense to apply bilinear interpolation to the
-        // class indexes: you wouldn't say that a bicycle is half-way between an
-        // aeroplane and a bird, would you?
-        index_label_image.set_size(input_image.nr(), input_image.nc());
-        resize_image(temp, index_label_image, interpolate_nearest_neighbor());
+        // Crop the returned image to be exactly the same size as the input.
+        const chip_details chip_details(
+            centered_rect(temp.nc() / 2, temp.nr() / 2, input_image.nc(), input_image.nr()),
+            chip_dims(input_image.nr(), input_image.nc())
+        );
+        extract_image_chip(temp, chip_details, index_label_image, interpolate_nearest_neighbor());
 
         // Convert the indexes to RGB values.
         index_label_image_to_rgb_label_image(index_label_image, rgb_label_image);
