@@ -103,6 +103,7 @@ set (tests
    one_vs_one_trainer.cpp
    optimization.cpp
    optimization_test_functions.cpp
+   global_optimization.cpp
    opt_qp_solver.cpp
    parallel_for.cpp
    parse.cpp

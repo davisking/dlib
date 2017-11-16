@@ -26,6 +26,8 @@ SET(blas_found 0)
 SET(lapack_found 0)
 SET(found_intel_mkl 0)
 SET(found_intel_mkl_headers 0)
+SET(lapack_with_underscore 0)
+SET(lapack_without_underscore 0)
 
 message(STATUS "Searching for BLAS and LAPACK")
 
@@ -344,5 +346,24 @@ if (NOT lapack_found)
         set(lapack_libraries ${LAPACK_LIBRARIES})
         set(lapack_found 1)
     endif()
+endif()
+
+# If using lapack, determine whether to mangle functions
+if (lapack_found)
+   include(CheckFunctionExists)
+   include(CheckFortranFunctionExists)
+   set(CMAKE_REQUIRED_LIBRARIES ${lapack_libraries})
+
+   check_function_exists("sgesv" LAPACK_FOUND_C_UNMANGLED)
+   check_function_exists("sgesv_" LAPACK_FOUND_C_MANGLED)
+   if (CMAKE_Fortran_COMPILER_LOADED)
+      check_fortran_function_exists("sgesv" LAPACK_FOUND_FORTRAN_UNMANGLED)
+      check_fortran_function_exists("sgesv_" LAPACK_FOUND_FORTRAN_MANGLED)
+   endif ()
+   if (LAPACK_FOUND_C_MANGLED OR LAPACK_FOUND_FORTRAN_MANGLED)
+      set(lapack_with_underscore 1)
+   elseif (LAPACK_FOUND_C_UNMANGLED OR LAPACK_FOUND_FORTRAN_UNMANGLED)
+      set(lapack_without_underscore 1)
+   endif ()
 endif()
 

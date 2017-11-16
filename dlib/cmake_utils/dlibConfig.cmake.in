@@ -28,9 +28,8 @@ if(NOT TARGET dlib-shared AND NOT dlib_BINARY_DIR)
    include("${dlib_CMAKE_DIR}/dlib.cmake")
 endif()
 
-find_library(dlib_LIBRARIES dlib HINTS "@CMAKE_INSTALL_FULL_LIBDIR@")
-set(dlib_LIBRARIES ${dlib_LIBRARIES} "@dlib_needed_libraries@")
-set(dlib_LIBS      ${dlib_LIBRARIES} "@dlib_needed_libraries@")
+set(dlib_LIBRARIES dlib::dlib)
+set(dlib_LIBS      dlib::dlib)
 set(dlib_INCLUDE_DIRS "@CMAKE_INSTALL_FULL_INCLUDEDIR@" "@dlib_needed_includes@")
 
 mark_as_advanced(dlib_LIBRARIES)

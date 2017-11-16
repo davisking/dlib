@@ -1163,12 +1163,14 @@ namespace dlib
 
     template <
         typename image_type1,
-        typename image_type2
+        typename image_type2,
+        typename interpolation_type
         >
     void extract_image_chips (
         const image_type1& img,
         const std::vector<chip_details>& chip_locations,
-        dlib::array<image_type2>& chips
+        dlib::array<image_type2>& chips,
+        const interpolation_type& interp
     );
     /*!
         requires
@@ -1180,11 +1182,14 @@ namespace dlib
             - for all valid i: 
                 - chip_locations[i].rect.is_empty() == false
                 - chip_locations[i].size() != 0
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              interpolate_quadratic, or a type with a compatible interface.
         ensures
             - This function extracts "chips" from an image.  That is, it takes a list of
               rectangular sub-windows (i.e. chips) within an image and extracts those
               sub-windows, storing each into its own image.  It also scales and rotates the
               image chips according to the instructions inside each chip_details object.
+              It uses the interpolation method supplied as a parameter.
             - #chips == the extracted image chips
             - #chips.size() == chip_locations.size()
             - for all valid i:
@@ -1198,7 +1203,40 @@ namespace dlib
             - Any pixels in an image chip that go outside img are set to 0 (i.e. black).
     !*/
 
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    void extract_image_chips (
+        const image_type1& img,
+        const std::vector<chip_details>& chip_locations,
+        dlib::array<image_type2>& chips
+    );
+    /*!
+        ensures
+            - This function is a simple convenience / compatibility wrapper that calls the
+              above-defined extract_image_chips() function using bilinear interpolation.
+    !*/
+
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2,
+        typename interpolation_type
+        >
+    void extract_image_chip (
+        const image_type1& img,
+        const chip_details& chip_location,
+        image_type2& chip,
+        const interpolation_type& interp
+    );
+    /*!
+        ensures
+            - This function simply calls extract_image_chips() with a single chip location
+              and stores the single output chip into #chip.  It uses the provided
+              interpolation method.
+    !*/
 
     template <
         typename image_type1,
@@ -1211,8 +1249,8 @@ namespace dlib
     );
     /*!
         ensures
-            - This function simply calls extract_image_chips() with a single chip location
-              and stores the single output chip into #chip.
+            - This function is a simple convenience / compatibility wrapper that calls the
+              above-defined extract_image_chip() function using bilinear interpolation.
     !*/
 
 // ----------------------------------------------------------------------------------------

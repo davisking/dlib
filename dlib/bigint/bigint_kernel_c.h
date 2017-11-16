@@ -1124,6 +1124,17 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template < typename bigint_base >
+    inline bool operator>  (const bigint_kernel_c<bigint_base>& a, const bigint_kernel_c<bigint_base>& b) { return b < a; } 
+    template < typename bigint_base >
+    inline bool operator!= (const bigint_kernel_c<bigint_base>& a, const bigint_kernel_c<bigint_base>& b) { return !(a == b); }
+    template < typename bigint_base >
+    inline bool operator<= (const bigint_kernel_c<bigint_base>& a, const bigint_kernel_c<bigint_base>& b) { return !(b < a); }
+    template < typename bigint_base >
+    inline bool operator>= (const bigint_kernel_c<bigint_base>& a, const bigint_kernel_c<bigint_base>& b) { return !(a < b); }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_BIGINT_KERNEl_C_

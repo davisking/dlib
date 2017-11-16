@@ -87,6 +87,7 @@
 // Stuff that requires C++11 (and some threading stuff)
 #include "../dnn/cpu_dlib.cpp"
 #include "../dnn/tensor_tools.cpp"
+#include "../global_optimization/global_function_search.cpp"
 
 
 #define DLIB_ALL_SOURCE_END

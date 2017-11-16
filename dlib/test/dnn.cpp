@@ -2118,8 +2118,56 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_simple_linear_regression_eil()
+    {
+        print_spinner();
+        const int num_samples = 1000;
+        ::std::vector<matrix<double>> x(num_samples);
+        ::std::vector<float> y(num_samples);
+        ::std::default_random_engine generator(16);
+        ::std::normal_distribution<float> distribution(0,0.0001);
+        const float true_intercept = 50.0;
+        const float true_slope = 10.0;
+        for ( int ii = 0; ii < num_samples; ++ii )
+        {
+            const double val = static_cast<double>(ii)/10;
+            matrix<double> tmp(1,1);
+            tmp = val;
+            x[ii] = tmp;
+            y[ii] = (true_intercept + true_slope*static_cast<float>(val) + distribution(generator));
+        }
+
+        using net_type = loss_epsilon_insensitive<fc<1, input<matrix<double>>>>;
+        net_type net(0.01);
+        layer<1>(net).layer_details().set_bias_learning_rate_multiplier(300);
+        sgd defsolver(0,0.9);
+        dnn_trainer<net_type> trainer(net, defsolver);
+        trainer.set_learning_rate(1e-5);
+        trainer.set_min_learning_rate(1e-8);
+        trainer.set_mini_batch_size(50);
+        trainer.set_max_num_epochs(570);
+        trainer.train(x, y);
+
+        const float slope = layer<1>(net).layer_details().get_weights().host()[0];
+        const float slope_error = abs(true_slope - slope);
+        const float intercept = layer<1>(net).layer_details().get_biases().host()[0];
+        const float intercept_error = abs(true_intercept - intercept);
+        const float eps_slope = 0.01, eps_intercept = 0.1;
+
+        dlog << LINFO << "slope_error: "<< slope_error;
+        dlog << LINFO << "intercept_error: "<< intercept_error;
+        DLIB_TEST_MSG(slope_error <= eps_slope,
+                      "Expected slope = " << true_slope << " Estimated slope = " << slope << " Error limit = " << eps_slope);
+        DLIB_TEST_MSG(intercept_error <= eps_intercept,
+                      "Expected intercept = " << true_intercept << " Estimated intercept = " << intercept << " Error limit = " << eps_intercept);
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_simple_linear_regression_with_mult_prev()
     {
+        srand(1234);
         print_spinner();
         const int num_samples = 1000;
         ::std::vector<matrix<double>> x(num_samples);
@@ -2950,6 +2998,7 @@ namespace
             test_copy_tensor_add_to_cpu();
             test_concat();
             test_simple_linear_regression();
+            test_simple_linear_regression_eil();
             test_simple_linear_regression_with_mult_prev();
             test_multioutput_linear_regression();
             test_simple_autoencoder();

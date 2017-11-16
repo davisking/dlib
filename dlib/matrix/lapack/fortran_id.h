@@ -18,7 +18,11 @@
 
 // First we need to know what the conventions for linking
 // C with Fortran is on this platform/toolset
-#if defined(__GNUC__) || defined(__ICC) || defined(__sgi) || defined(__COMO__) || defined(__KCC)
+#if defined(LAPACK_FORCE_UNDERSCORE)
+#define DLIB_BIND_FORTRAN_LOWERCASE_UNDERSCORE
+#elif defined(LAPACK_FORCE_NOUNDERSCORE)
+#define DLIB_BIND_FORTRAN_LOWERCASE
+#elif defined(__GNUC__) || defined(__ICC) || defined(__sgi) || defined(__COMO__) || defined(__KCC)
 #define DLIB_BIND_FORTRAN_LOWERCASE_UNDERSCORE
 #elif defined(__IBMCPP__) || defined(_MSC_VER) || defined(__BORLANDC__)
 #define DLIB_BIND_FORTRAN_LOWERCASE

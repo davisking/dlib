@@ -1182,6 +1182,28 @@ namespace
         off = 1.0; DLIB_TEST(std::abs( poly_min_extrap(off*off, -2*off, (1-off)*(1-off)) - off) < 1e-13); 
     }
 
+    void test_solve_trust_region_subproblem_bounded()
+    {
+        print_spinner();
+        matrix<double> H(2,2);
+        H = 1, 0,
+        0, 1;
+        matrix<double,0,1> g, lower, upper, p, true_p;
+        g = {0, 0};
+
+        double radius = 0.5;
+        lower = {0.5, 0};
+        upper = {10, 10};
+
+
+        solve_trust_region_subproblem_bounded(H,g, radius, p,  0.001, 500, lower, upper);
+        true_p = { 0.5, 0};
+        DLIB_TEST_MSG(length(p-true_p) < 1e-12, p);
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class optimization_tester : public tester
     {
     public:
@@ -1200,6 +1222,7 @@ namespace
             test_box_constrained_optimizers(lbfgs_search_strategy(5));
             test_poly_min_extract_2nd();
             optimization_test();
+            test_solve_trust_region_subproblem_bounded();
         }
     } a;
 
