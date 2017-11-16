@@ -669,7 +669,7 @@ namespace dlib
     {
         template <typename image_type>
         inline bool should_remove_pixel (
-            const image_type& img_,
+            image_type& img_,
             long r,
             long c,
             int iter
@@ -715,7 +715,7 @@ namespace dlib
 
         template <typename image_type>
         inline bool is_bw_border_pixel(
-            const image_type& img_,
+            image_type& img_,
             long r,
             long c
         )

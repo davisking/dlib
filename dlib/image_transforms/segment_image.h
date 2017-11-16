@@ -139,7 +139,7 @@ namespace dlib
         template <typename in_image_type, typename T>
         typename enable_if<uint8_or_uint16_pixels<in_image_type> >::type 
         get_pixel_edges (
-            const in_image_type& in_img_,
+            in_image_type& in_img_,
             std::vector<segment_image_edge_data_T<T> >& sorted_edges
         )
         {
@@ -465,7 +465,7 @@ namespace dlib
             out_rects.clear();
             edges.clear();
 
-            image_view<in_image_type> in_img(in_img_);
+            const_image_view<in_image_type> in_img(in_img_);
             // don't bother doing anything if the image is too small
             if (in_img.nr() < 2 || in_img.nc() < 2)
             {
