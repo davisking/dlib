@@ -139,7 +139,7 @@ namespace dlib
         template <typename in_image_type, typename T>
         typename enable_if<uint8_or_uint16_pixels<in_image_type> >::type 
         get_pixel_edges (
-            in_image_type& in_img_,
+            const in_image_type& in_img,
             std::vector<segment_image_edge_data_T<T> >& sorted_edges
         )
         {
@@ -148,7 +148,6 @@ namespace dlib
             std::vector<unsigned long> counts(std::numeric_limits<ptype>::max()+1, 0);
 
             edge_diff_funct<ptype> edge_diff;
-            image_view<in_image_type> in_img(in_img_);
 
             border_enumerator be(get_rect(in_img), 1);
             // we are going to do a radix sort on the edge weights.  So the first step
@@ -449,7 +448,7 @@ namespace dlib
             typename diff_type
             >
         void find_basic_candidate_object_locations (
-            const in_image_type& in_img_,
+            const in_image_type& in_img,
             const std::vector<dlib::impl::segment_image_edge_data_T<diff_type> >& sorted_edges,
             std::vector<rectangle>& out_rects,
             std::vector<edge_data>& edges,
@@ -465,7 +464,6 @@ namespace dlib
             out_rects.clear();
             edges.clear();
 
-            const_image_view<in_image_type> in_img(in_img_);
             // don't bother doing anything if the image is too small
             if (in_img.nr() < 2 || in_img.nc() < 2)
             {
