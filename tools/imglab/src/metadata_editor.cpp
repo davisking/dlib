@@ -354,6 +354,14 @@ on_keydown (
             select_image(image_pos);
         }
 
+        if (key == 'w' && !overlay_label.has_input_focus())
+        {
+            select_image(image_pos-1);
+        }
+        else if (key == 's' && !overlay_label.has_input_focus())
+        {
+            select_image(image_pos+1);
+        }
 
         return;
     }
