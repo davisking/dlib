@@ -148,7 +148,7 @@ namespace dlib
             std::vector<unsigned long> counts(std::numeric_limits<ptype>::max()+1, 0);
 
             edge_diff_funct<ptype> edge_diff;
-            const_image_view<in_image_type> in_img(in_img_);
+            image_view<in_image_type> in_img(in_img_);
 
             border_enumerator be(get_rect(in_img), 1);
             // we are going to do a radix sort on the edge weights.  So the first step
@@ -465,7 +465,7 @@ namespace dlib
             out_rects.clear();
             edges.clear();
 
-            const_image_view<in_image_type> in_img(in_img_);
+            image_view<in_image_type> in_img(in_img_);
             // don't bother doing anything if the image is too small
             if (in_img.nr() < 2 || in_img.nc() < 2)
             {

@@ -675,7 +675,7 @@ namespace dlib
             int iter
         )
         {
-            const_image_view<image_type> img(img_);
+            image_view<image_type> img(img_);
             unsigned int p2 = img[r-1][c];
             unsigned int p3 = img[r-1][c+1];
             unsigned int p4 = img[r][c+1];
@@ -720,7 +720,7 @@ namespace dlib
             long c
         )
         {
-            const_image_view<image_type> img(img_);
+            image_view<image_type> img(img_);
             unsigned int p2 = img[r-1][c];
             unsigned int p3 = img[r-1][c+1];
             unsigned int p4 = img[r][c+1];
