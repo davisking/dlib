@@ -41,12 +41,14 @@ namespace dlib
     public:
 
         static_assert(_num_filters > 0, "The number of filters must be > 0");
-        static_assert(_nr > 0, "The number of rows in a filter must be > 0");
-        static_assert(_nc > 0, "The number of columns in a filter must be > 0");
+        static_assert(_nr >= 0, "The number of rows in a filter must be >= 0");
+        static_assert(_nc >= 0, "The number of columns in a filter must be >= 0");
         static_assert(_stride_y > 0, "The filter stride must be > 0");
         static_assert(_stride_x > 0, "The filter stride must be > 0");
-        static_assert(0 <= _padding_y && _padding_y < _nr, "The padding must be smaller than the filter size.");
-        static_assert(0 <= _padding_x && _padding_x < _nc, "The padding must be smaller than the filter size.");
+        static_assert(_nr==0 || (0 <= _padding_y && _padding_y < _nr), "The padding must be smaller than the filter size.");
+        static_assert(_nc==0 || (0 <= _padding_x && _padding_x < _nc), "The padding must be smaller than the filter size.");
+        static_assert(_nr!=0 || 0 == _padding_y, "If _nr==0 then the padding must be set to 0 as well.");
+        static_assert(_nc!=0 || 0 == _padding_x, "If _nr==0 then the padding must be set to 0 as well.");
 
         con_(
             num_con_outputs o
@@ -65,8 +67,20 @@ namespace dlib
         con_() : con_(num_con_outputs(_num_filters)) {}
 
         long num_filters() const { return num_filters_; }
-        long nr() const { return _nr; }
-        long nc() const { return _nc; }
+        long nr() const 
+        { 
+            if (_nr==0)
+                return filters.nr();
+            else
+                return _nr;
+        }
+        long nc() const 
+        { 
+            if (_nc==0)
+                return filters.nc();
+            else
+                return _nc;
+        }
         long stride_y() const { return _stride_y; }
         long stride_x() const { return _stride_x; }
         long padding_y() const { return padding_y_; }
@@ -154,7 +168,10 @@ namespace dlib
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
-            long num_inputs = _nr*_nc*sub.get_output().k();
+            const long filt_nr = _nr!=0 ? _nr : sub.get_output().nr();
+            const long filt_nc = _nc!=0 ? _nc : sub.get_output().nc();
+
+            long num_inputs = filt_nr*filt_nc*sub.get_output().k();
             long num_outputs = num_filters_;
             // allocate params for the filters and also for the filter bias values.
             params.set_size(num_inputs*num_filters_ + num_filters_);
@@ -162,7 +179,7 @@ namespace dlib
             dlib::rand rnd(std::rand());
             randomize_parameters(params, num_inputs+num_outputs, rnd);
 
-            filters = alias_tensor(num_filters_, sub.get_output().k(), _nr, _nc);
+            filters = alias_tensor(num_filters_, sub.get_output().k(), filt_nr, filt_nc);
             biases = alias_tensor(1,num_filters_);
 
             // set the initial bias values to zero
@@ -263,8 +280,8 @@ namespace dlib
         {
             out << "con\t ("
                 << "num_filters="<<item.num_filters_
-                << ", nr="<<_nr
-                << ", nc="<<_nc
+                << ", nr="<<item.nr()
+                << ", nc="<<item.nc()
                 << ", stride_y="<<_stride_y
                 << ", stride_x="<<_stride_x
                 << ", padding_y="<<item.padding_y_
@@ -281,8 +298,8 @@ namespace dlib
         {
             out << "<con"
                 << " num_filters='"<<item.num_filters_<<"'"
-                << " nr='"<<_nr<<"'"
-                << " nc='"<<_nc<<"'"
+                << " nr='"<<item.nr()<<"'"
+                << " nc='"<<item.nc()<<"'"
                 << " stride_y='"<<_stride_y<<"'"
                 << " stride_x='"<<_stride_x<<"'"
                 << " padding_y='"<<item.padding_y_<<"'"

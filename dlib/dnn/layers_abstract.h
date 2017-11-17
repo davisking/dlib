@@ -673,10 +673,22 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
-                All of them must be > 0.
-                Also, we require that:
-                    - 0 <= _padding_y && _padding_y < _nr
-                    - 0 <= _padding_x && _padding_x < _nc
+                - _num_filters > 0
+                - _nr >= 0
+                - _nc >= 0
+                - _stride_y > 0
+                - _stride_x > 0
+                - _padding_y >= 0
+                - _padding_x >= 0
+                - Also, we require that:
+                    - if (_nr == 0) then
+                        - _padding_y == 0
+                    - else
+                        - _padding_y < _nr
+                    - if (_nc == 0) then
+                        - _padding_x == 0
+                    - else
+                        - _padding_x < _nc
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -690,6 +702,15 @@ namespace dlib
                     - OUT.k()  == num_filters()
                     - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
                     - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
+
+                Note also that setting _nr or _nc to 0 has a special meaning of "set the
+                filter size equal to the input image size".  Specifically, it means: 
+                    - if (_nr == 0) then
+                        - nr() == IN.nr()
+                        - OUT.nr() == 1
+                    - if (_nc == 0) then
+                        - nc() == IN.nc()
+                        - OUT.nc() == 1
         !*/
 
     public:
@@ -754,14 +775,22 @@ namespace dlib
         ) const; 
         /*!
             ensures
-                - returns the number of rows in the filters in this layer.
+                - returns the number of rows in the filters in this layer.  Note that if
+                  nr()==0 then it means the size of the filter is not yet assigned, but
+                  once setup() is called nr() will be set to the input tensor's nr().
+                  Therefore, nr()==0 has the special interpretation of "be the same size as
+                  the input tensor".
         !*/
 
         long nc(
         ) const;
         /*!
             ensures
-                - returns the number of columns in the filters in this layer.
+                - returns the number of columns in the filters in this layer.  Note that if
+                  nc()==0 then it means the size of the filter is not yet assigned, but
+                  once setup() is called nc() will be set to the input tensor's nc().
+                  Therefore, nc()==0 has the special interpretation of "be the same size as
+                  the input tensor".
         !*/
 
         long stride_y(

@@ -1717,6 +1717,24 @@ namespace
         }
         {
             print_spinner();
+            con_<3,0,2,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            con_<3,2,0,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            con_<3,0,0,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             fc_<1,FC_HAS_BIAS> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
