@@ -153,6 +153,68 @@ namespace
         auto grad_error = compare_gradients(src_grad, grad_src);
         dlog << LINFO << "src error: " << grad_error;
         DLIB_TEST(grad_error < 0.001);
+
+#ifdef DLIB_USE_CUDA
+        resizable_tensor src1 = src;
+        resizable_tensor src2 = src;
+        resizable_tensor dest1, dest2;
+        dest1.copy_size(src);
+        dest2.copy_size(src);
+        cuda::softmax_all(dest1, src1);
+        cpu::softmax_all(dest2, src2);
+        DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2))) < 1e-5, max(abs(mat(dest1)-mat(dest2))));
+#endif
+    }
+
+    void test_softmax_all()
+    {
+        using namespace dlib::tt;
+        print_spinner();
+        const long nr = 3;
+        const long nc = 3;
+        resizable_tensor src(5,5,nr,nr), dest(5,5,nr,nc), gradient_input(5,5,nr,nc);
+        tt::tensor_rand rnd;
+        rnd.fill_uniform(src);
+        rnd.fill_uniform(dest);
+        // fill like this as a test of the assignment operator.
+        gradient_input = matrix_cast<float>(gaussian_randm(5,5*nr*nc, 2));
+
+
+
+        auto grad_src = [&](long idx) {
+            auto f = [&](float eps) {
+                const float old = src.host()[idx];
+                src.host()[idx] += eps;
+                tt::softmax_all(dest, src);
+                float result = dot(gradient_input, dest);
+                src.host()[idx] = old;
+                return result;
+            };
+            const float eps = 0.01;
+            return (f(+eps)-f(-eps))/(2*eps);
+        };
+
+        resizable_tensor src_grad;
+        src_grad.copy_size(src);
+        src_grad = 0;
+
+        tt::softmax_all(dest, src);
+        softmax_all_gradient(src_grad, dest, gradient_input);
+
+        auto grad_error = compare_gradients(src_grad, grad_src);
+        dlog << LINFO << "src error: " << grad_error;
+        DLIB_TEST(grad_error < 0.001);
+
+#ifdef DLIB_USE_CUDA
+        resizable_tensor src1 = src;
+        resizable_tensor src2 = src;
+        resizable_tensor dest1, dest2;
+        dest1.copy_size(src);
+        dest2.copy_size(src);
+        cuda::softmax_all(dest1, src1);
+        cpu::softmax_all(dest2, src2);
+        DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2))) < 1e-5, max(abs(mat(dest1)-mat(dest2))));
+#endif
     }
 
     void test_batch_normalize()
@@ -1701,6 +1763,12 @@ namespace
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
+        {
+            print_spinner();
+            softmax_all_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2988,6 +3056,7 @@ namespace
             test_avg_pool(4,5,40,50,0,1);
             test_tanh();
             test_softmax();
+            test_softmax_all();
             test_sigmoid();
             test_batch_normalize();
             test_batch_normalize_conv();

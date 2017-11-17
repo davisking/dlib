@@ -1388,6 +1388,60 @@ namespace dlib
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
 
+        void softmax_all (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            DLIB_CASSERT(have_same_dimensions(dest,src));
+            if (src.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = 0;
+
+            CHECK_CUDNN(cudnnSoftmaxForward(context(),
+                                      CUDNN_SOFTMAX_ACCURATE,
+                                      CUDNN_SOFTMAX_MODE_INSTANCE,
+                                      &alpha,
+                                      descriptor(src),
+                                      src.device(),
+                                      &beta,
+                                      descriptor(dest),
+                                      dest.device()));
+        }
+
+
+        void softmax_all_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        )
+        {
+            DLIB_CASSERT(
+                  have_same_dimensions(dest,gradient_input) == true &&
+                  have_same_dimensions(dest,grad) == true );
+            if (dest.size() == 0)
+                return;
+
+            const float alpha = 1;
+            const float beta = is_same_object(grad,gradient_input) ? 0 : 1;
+            CHECK_CUDNN(cudnnSoftmaxBackward(context(),
+                                      CUDNN_SOFTMAX_ACCURATE,
+                                      CUDNN_SOFTMAX_MODE_INSTANCE,
+                                      &alpha,
+                                      descriptor(dest),
+                                      dest.device(),
+                                      descriptor(gradient_input),
+                                      gradient_input.device(),
+                                      &beta,
+                                      descriptor(grad),
+                                      grad.device()));
+        }
+
+    // ------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
+
         void sigmoid (
             tensor& dest,
             const tensor& src

@@ -1218,6 +1218,44 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void softmax_all (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - have_same_dimensions(dest, src) == true
+        ensures
+            - Note that the softmax function is a vector valued function: 
+              s(x) == exp(x)/sum(exp(x)) 
+            - Computes the softmax function on src and writes the results to dest.  The
+              softmax is computed over the entire tensor with one invocation of s().  So
+              unlike softmax() which computes many s() evaluations, one for each spatial
+              location, softmax_all() calls s() once for the entire tensor.
+            - This function supports in-place operation, i.e. having
+              is_same_object(dest, src)==true
+    !*/
+
+    void softmax_all_gradient (
+        tensor& grad,
+        const tensor& dest,
+        const tensor& gradient_input
+    );
+    /*!
+        requires
+            - have_same_dimensions(dest,gradient_input) == true 
+            - have_same_dimensions(dest,grad) == true 
+            - is_same_object(grad, dest)==false
+        ensures
+            - We interpret dest as the output of softmax_all(dest,SRC) for some SRC tensor.
+              Then let f(SRC) == dot(gradient_input,dest) Then this function computes the
+              gradient of f() with respect to SRC and assigns it to grad.
+            - This function supports in-place operation, i.e. having
+              is_same_object(grad, gradient_input)==true
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void sigmoid (
         tensor& dest,
         const tensor& src

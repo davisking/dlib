@@ -250,6 +250,19 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        void softmax_all (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void softmax_all_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        );
+
+    // ------------------------------------------------------------------------------------
+
         void sigmoid (
             tensor& dest,
             const tensor& src

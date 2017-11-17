@@ -2118,6 +2118,42 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class softmax_all_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a softmax layer.  To be precise,
+                we define the softmax function s(x) as:
+                    s(x) == exp(x)/sum(exp(x)) 
+                where x is a vector.  Then this layer treats its input tensor as a
+                collection of tensor::num_samples() vectors and applies s() to each vector
+                in the tensor.  Therefore, there are logically tensor::num_samples()
+                invocations of s().
+        !*/
+
+    public:
+
+        softmax_all_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using softmax_all = add_layer<softmax_all_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     template <
         template<typename> class tag
         >

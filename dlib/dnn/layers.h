@@ -2610,6 +2610,70 @@ namespace dlib
     using softmax = add_layer<softmax_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+
+    class softmax_all_
+    {
+    public:
+        softmax_all_() 
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::softmax_all(output, input);
+        } 
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input, 
+            tensor& data_grad, 
+            tensor& 
+        )
+        {
+            tt::softmax_all_gradient(data_grad, computed_output, gradient_input);
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const softmax_all_& , std::ostream& out)
+        {
+            serialize("softmax_all_", out);
+        }
+
+        friend void deserialize(softmax_all_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "softmax_all_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::softmax_all_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const softmax_all_& )
+        {
+            out << "softmax_all";
+            return out;
+        }
+
+        friend void to_xml(const softmax_all_& /*item*/, std::ostream& out)
+        {
+            out << "<softmax_all/>\n";
+        }
+
+    private:
+        resizable_tensor params;
+    };
+
+    template <typename SUBNET>
+    using softmax_all = add_layer<softmax_all_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     namespace impl
     {
         template <template<typename> class TAG_TYPE, template<typename> class... TAG_TYPES>
