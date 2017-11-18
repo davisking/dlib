@@ -104,8 +104,8 @@ namespace dlib
         );
         /*!
             requires
-                - points.size() > 1
                 - all the x vectors in points must have the same non-zero dimensionality.
+                - relative_noise_magnitude >= 0
                 - solver_eps > 0
             ensures
                 - Creates an upper bounding function U(x), as described above, assuming that
@@ -116,9 +116,59 @@ namespace dlib
                   only do this if you know F(x) is non-stochastic and continuous
                   everywhere.
                 - When solving the QP used to find the parameters of U(x), the upper
-                  bounding function, we solve the QP to solver_eps accuracy.
+                  bounding function, we solve the QP to solver_eps accuracy.   It's
+                  possible that large enough solver_eps can lead to upper bounds that don't
+                  upper bound all the supplied points.  But for reasonable epsilon values
+                  this shouldn't be a problem. 
                 - #num_points() == points.size()
                 - #dimensionality() == points[0].x.size()
+        !*/
+
+        upper_bound_function(
+            const double relative_noise_magnitude,
+            const double solver_eps 
+        );
+        /*!
+            requires
+                - relative_noise_magnitude >= 0
+                - solver_eps > 0
+            ensures
+                - #num_points() == 0
+                - #dimensionality() == 0
+                - This destructor is the same as calling the above constructor with points.size()==0
+        !*/
+
+
+        void add (
+            const function_evaluation& point
+        );
+        /*!
+            requires
+                - num_points() == 0 || point.x.size() == dimensionality()
+                - point.x.size() != 0
+            ensures
+                - Adds point to get_points().
+                - Incrementally updates the upper bounding function with the given function
+                  evaluation.  That is, we assume that F(point.x)==point.y and solve the QP
+                  described above to find the new U(x) that upper bounds all the points
+                  this object knows about (i.e. all the points in get_points() and the new point).
+                - Calling add() is much faster than recreating the upper_bound_function
+                  from scratch with all the points.  This is because we warm start with the
+                  previous solution to the QP.  This is done by discarding any non-active
+                  constraints and solving the QP again with only the previously active
+                  constraints and the new constraints formed by all the pairs of the new
+                  point and the old points.  This means the QP solved by add() is much
+                  smaller than the QP that would be solved by a fresh call to the
+                  upper_bound_function constructor.
+        !*/
+
+        const std::vector<function_evaluation>& get_points(
+        ) const;
+        /*!
+            ensures
+                - returns the points from F(x) used to define this upper bounding function.
+                  These are all the function_evaluation objects given to this object via
+                  its constructor and add().
         !*/
 
         long num_points(
@@ -126,6 +176,7 @@ namespace dlib
         /*!
             ensures
                 - returns the number of points used to define the upper bounding function.
+                  (i.e. returns get_points().size())
         !*/
 
         long dimensionality(
@@ -136,7 +187,7 @@ namespace dlib
         !*/
 
         double operator() (
-            matrix<double,0,1> x
+            const matrix<double,0,1>& x
         ) const;
         /*!
             requires

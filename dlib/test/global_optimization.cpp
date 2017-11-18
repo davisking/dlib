@@ -38,13 +38,29 @@ namespace
 
 
         std::vector<function_evaluation> evals;
-        for (int i = 0; i < 200; ++i)
+        for (int i = 0; i < 100; ++i)
         {
             auto x = make_rnd();
             evals.emplace_back(x,rosen(x));
         }
 
         upper_bound_function ub(evals, relative_noise_magnitude, solver_eps);
+        DLIB_TEST(ub.num_points() == (long)evals.size());
+        DLIB_TEST(ub.dimensionality() == 2);
+        for (auto& ev : evals)
+        {
+            dlog << LINFO << ub(ev.x) - ev.y;
+            DLIB_TEST_MSG(ub(ev.x) - ev.y > -1e10, ub(ev.x) - ev.y);
+        }
+
+
+        for (int i = 0; i < 100; ++i)
+        {
+            auto x = make_rnd();
+            evals.emplace_back(x,rosen(x));
+            ub.add(evals.back());
+        }
+
         DLIB_TEST(ub.num_points() == (long)evals.size());
         DLIB_TEST(ub.dimensionality() == 2);
 
