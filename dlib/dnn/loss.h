@@ -2468,6 +2468,111 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_dot_ 
+    {
+    public:
+
+        typedef matrix<float,0,1> training_label_type;
+        typedef matrix<float,0,1> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+                *iter++ = trans(rowm(mat(output_tensor),i));
+        }
+
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            const long network_output_dims = output_tensor.size()/output_tensor.num_samples();
+
+
+            // The loss we output is the average loss over the mini-batch. 
+            const double scale = 1.0/output_tensor.num_samples();
+            double loss = 0;
+            float* g = grad.host();
+            const float* out_data = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                DLIB_CASSERT(truth->size() == network_output_dims, "The network must output a vector with the same dimensionality as the training labels. "
+                    << "\ntruth->size():       " << truth->size()
+                    << "\nnetwork_output_dims: " << network_output_dims); 
+
+                const float* t = &(*truth++)(0);
+
+                for (long j = 0; j < network_output_dims; ++j)
+                {
+                    g[j] = -t[j]*scale;
+                    loss -= out_data[j]*t[j];
+                }
+
+                g += network_output_dims;
+                out_data += network_output_dims;
+            }
+            return loss*scale;
+        }
+
+        friend void serialize(const loss_dot_& , std::ostream& out)
+        {
+            serialize("loss_dot_", out);
+        }
+
+        friend void deserialize(loss_dot_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_dot_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_dot_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_dot_& )
+        {
+            out << "loss_dot";
+            return out;
+        }
+
+        friend void to_xml(const loss_dot_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_dot/>";
+        }
+
+    };
+
+    template <typename SUBNET>
+    using loss_dot = add_loss_layer<loss_dot_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
 
 }
 

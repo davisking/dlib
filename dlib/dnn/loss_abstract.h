@@ -1252,6 +1252,68 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_dot_ 
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, selecting this loss means you want
+                maximize the dot product between the output of a network and a set of
+                training vectors.  The loss is therefore the negative dot product.  To be
+                very specific, if X is the output vector of a network and Y is a training
+                label (also a vector), then the loss for this training sample is: -dot(X,Y)
+        !*/
+
+    public:
+
+        typedef matrix<float,0,1> training_label_type;
+        typedef matrix<float,0,1> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output labels are simply the final network outputs stuffed into a
+            vector.  To be very specific, the output is the following for all valid i:
+                *(iter+i) == trans(rowm(mat(sub.get_output()),i))
+        !*/
+
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+                - Let NETWORK_OUTPUT_DIMS == sub.get_output().size()/sub.get_output().num_samples()
+                - for all idx such that 0 <= idx < sub.get_output().num_samples():
+                    - NETWORK_OUTPUT_DIMS == (*(truth + idx)).size()
+        !*/
+    };
+
+    template <typename SUBNET>
+    using loss_dot = add_loss_layer<loss_dot_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_LOSS_ABSTRACT_H_

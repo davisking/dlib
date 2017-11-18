@@ -3011,6 +3011,46 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_loss_dot()
+    {
+        print_spinner();
+
+        std::vector<matrix<float,0,1>> samples;
+        std::vector<matrix<float,0,1>> labels;
+
+        const matrix<float> proj = matrix_cast<float>(randm(2,3));
+        for (int i = 0; i < 128; ++i)
+        {
+            // The task is going to be to learn the matrix proj.  So we make our
+            // training data thusly:
+            matrix<float,0,1> x = matrix_cast<float>(randm(3,1));
+            matrix<float,0,1> y = normalize(proj*x);
+            samples.push_back(x);
+            labels.push_back(y);
+        }
+
+        using net_type = loss_dot<
+            l2normalize<fc_no_bias<2, 
+            input<matrix<float,0,1>> 
+            >>>;
+
+        net_type net;
+        dnn_trainer<net_type> trainer(net, sgd(1e-4, 0.9));
+        trainer.set_learning_rate(0.01);
+        trainer.set_min_learning_rate(0.0000001);
+        trainer.set_mini_batch_size(128);
+        trainer.set_max_num_epochs(50000);
+        trainer.train(samples, labels);
+
+
+        for (size_t i = 0; i < samples.size(); ++i)
+        {
+            DLIB_TEST(std::abs(1-dot(net(samples[i]),labels[i])) < 0.001);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -3095,6 +3135,7 @@ namespace
             test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
             test_loss_multiclass_per_pixel_weighted();
             test_serialization();
+            test_loss_dot();
         }
 
         void perform_test()
