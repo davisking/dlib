@@ -54,17 +54,31 @@ namespace dlib
             std::vector<sample_type> x;
             std::vector<double> y;
 
-            // normalize the data so the values aren't extreme
-            std::vector<matrix<double,0,1>> temp;
+            // We are going to normalize the data so the values aren't extreme.  First, we
+            // collect statistics on our data.
+            std::vector<running_stats<double>> x_rs(dims);
+            running_stats<double> y_rs;
             for (auto& v : points)
-                temp.push_back(v.x);
-            xnormalizer.train(temp);
-            for (auto& v : points)
-                v.x = xnormalizer(v.x);
+            {
+                for (long i = 0; i < v.x.size(); ++i)
+                    x_rs[i].add(v.x(i));
+                y_rs.add(v.y);
+            }
 
             x.reserve(points.size()*(points.size()-1)/2);
             y.reserve(points.size()*(points.size()-1)/2);
 
+            // compute normalization vectors for the data.  The only reason we do this is
+            // to make the optimization well conditioned.  In particular, scaling the y
+            // values will prevent numerical errors in the 1-diff*diff computation below that
+            // would otherwise result when diff is really big.  Also, scaling the xvalues
+            // to be about 1 will similarly make the optimization more stable and it also
+            // has the added benefit of keeping the relative_noise_magnitude's scale
+            // constant regardless of the size of x values.
+            const double yscale = 1.0/y_rs.stddev();
+            std::vector<double> xscale(dims);
+            for (size_t i = 0; i < xscale.size(); ++i)
+                xscale[i] = 1.0/(x_rs[i].stddev()*yscale); // make it so that xscale[i]*yscale ==  1/x_rs[i].stddev()
 
 
             sample_type samp;
@@ -75,7 +89,7 @@ namespace dlib
                     samp.clear();
                     for (long k = 0; k < dims; ++k)
                     {
-                        double temp = points[i].x(k) - points[j].x(k);
+                        double temp = (points[i].x(k) - points[j].x(k))*xscale[k]*yscale;
                         samp.push_back(std::make_pair(k, temp*temp));
                     }
 
@@ -84,7 +98,7 @@ namespace dlib
                     else
                         samp.push_back(std::make_pair(dims + i, relative_noise_magnitude));
 
-                    double diff = points[i].y - points[j].y;
+                    const double diff = (points[i].y - points[j].y)*yscale;
                     samp.push_back(std::make_pair(dims + points.size(), 1-diff*diff));
 
                     x.push_back(samp);
@@ -104,7 +118,7 @@ namespace dlib
             const auto& bv = df.basis_vectors(0);
             slopes.set_size(dims);
             for (long i = 0; i < dims; ++i)
-                slopes(i) = bv[i].second;
+                slopes(i) = bv[i].second*xscale[i]*xscale[i];
 
             //cout << "slopes:" << trans(slopes);
 
@@ -162,7 +176,6 @@ namespace dlib
             DLIB_CASSERT(x.size() == dimensionality());
 
 
-            x = xnormalizer(x);
 
             double upper_bound = std::numeric_limits<double>::infinity();
 
@@ -177,7 +190,6 @@ namespace dlib
 
     private:
 
-        vector_normalizer<matrix<double,0,1>> xnormalizer;
         std::vector<function_evaluation> points;
         std::vector<double> offsets; // offsets.size() == points.size()
         matrix<double,0,1> slopes; // slopes.size() == points[0].first.size()
