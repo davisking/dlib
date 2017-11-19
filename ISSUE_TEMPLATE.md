@@ -5,11 +5,10 @@ Also, **the issue tracker is not a code writing service, do not ask for someone 
 Finally, before you ask a question, check google for a solution, [the dlib FAQ](http://dlib.net/faq.html), or generally consult the dlib documentation.  Every single function in dlib is documented in detail.  If you post an issue but you obviously haven't read the documentation for the part of dlib you are using then you won't get an answer.  
 
 If you aren't reporting a bug or problem with dlib then delete this template and write whatever you want here.
-
-test
+ 
 
 <!-- ================================================================ -->
-<!-- ========i=============  BUG REPORT TEMPLATE ===================== -->
+<!-- =====================  BUG REPORT TEMPLATE ===================== -->
 <!-- ================================================================ -->
 
 
