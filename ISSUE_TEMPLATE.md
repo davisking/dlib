@@ -6,6 +6,7 @@ Finally, before you ask a question, check google for a solution, [the dlib FAQ](
 
 If you aren't reporting a bug or problem with dlib then delete this template and write whatever you want here.
 
+test
 
 <!-- ================================================================ -->
 <!-- ========i=============  BUG REPORT TEMPLATE ===================== -->
