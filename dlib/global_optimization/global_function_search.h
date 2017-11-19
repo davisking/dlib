@@ -53,7 +53,7 @@ namespace dlib
                 best_x = zeros_matrix(spec.lower);
             }
 
-            std::vector<function_evaluation> all_function_evals (
+            upper_bound_function build_upper_bound_with_all_function_evals (
             ) const;
 
             static double find_nn (
@@ -65,7 +65,7 @@ namespace dlib
             function_spec spec;
             size_t function_idx = 0;
             std::shared_ptr<std::mutex> m;
-            std::vector<function_evaluation> complete_evals;
+            upper_bound_function ub;
             std::vector<outstanding_function_eval_request> incomplete_evals;
             matrix<double,0,1> best_x; 
             double best_objective_value = -std::numeric_limits<double>::infinity(); 

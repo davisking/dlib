@@ -3,7 +3,6 @@
 #include "upper_bound_function.h"
 #include "../optimization.h"
 
-#include "../timing.h" // TODO, remove
 
 namespace dlib
 {
@@ -205,7 +204,6 @@ namespace dlib
             const std::vector<bool>& is_integer_variable
         )
         {
-            timing::block oaijsdofijas(1, "pick_next_sample_quad_interp");
             DLIB_CASSERT(samples.size() > 0);
             // We don't use the QP to optimize integer variables.  Instead, we just fix them at
             // their best observed value and use the QP to optimize the real variables.  So the
@@ -324,21 +322,16 @@ namespace dlib
 
         max_upper_bound_function pick_next_sample_max_upper_bound_function (
             dlib::rand& rnd,
-            const std::vector<function_evaluation>& samples,
+            const upper_bound_function& ub,
             const matrix<double,0,1>& lower,
             const matrix<double,0,1>& upper,
             const std::vector<bool>& is_integer_variable,
-            const double relative_noise_magnitude = 0.001,
-            const size_t num_random_samples = 5000
+            const size_t num_random_samples 
         )
         {
-            timing::block oaijsdofijas(0, "pick_next_sample_max_upper_bound_function");
-            DLIB_CASSERT(samples.size() > 0);
-            // TODO, assert everyone has same dims
+            DLIB_CASSERT(ub.num_points() > 0);
 
 
-            // build the upper bound
-            upper_bound_function ub(samples, relative_noise_magnitude);
 
             // now do a simple random search to find the maximum upper bound
             double best_ub_so_far = -std::numeric_limits<double>::infinity();
@@ -356,7 +349,7 @@ namespace dlib
             }
 
             double max_value = -std::numeric_limits<double>::infinity();
-            for (auto& v : samples)
+            for (auto& v : ub.get_points())
                 max_value = std::max(max_value, v.y);
 
             return max_upper_bound_function(v, best_ub_so_far - max_value, best_ub_so_far);
@@ -404,18 +397,23 @@ namespace dlib
 
     namespace gopt_impl 
     {
-        std::vector<function_evaluation> funct_info::all_function_evals (
+        upper_bound_function funct_info::build_upper_bound_with_all_function_evals (
         ) const
         {
-            auto temp = complete_evals;
-            temp.reserve(temp.size()+incomplete_evals.size());
+            upper_bound_function tmp(ub);
+
             // we are going to add the incomplete evals into this and assume the
             // incomplete evals are going to take y values equal to their nearest
             // neighbor complete evals.
             for (auto& eval : incomplete_evals)
-                temp.emplace_back(eval.x, find_nn(complete_evals, eval.x));
+            {
+                function_evaluation e;
+                e.x = eval.x;
+                e.y = find_nn(ub.get_points(), eval.x);
+                tmp.add(e);
+            }
 
-            return temp;
+            return tmp;
         }
 
         double funct_info::find_nn (
@@ -521,7 +519,7 @@ namespace dlib
         auto i = std::find(info->incomplete_evals.begin(), info->incomplete_evals.end(), req);
         DLIB_CASSERT(i != info->incomplete_evals.end());
         info->incomplete_evals.erase(i);
-        info->complete_evals.emplace_back(req.x,y);
+        info->ub.add(function_evaluation(req.x,y));
 
 
         // Now do trust region radius maintenance and keep track of the best objective
@@ -532,6 +530,8 @@ namespace dlib
             // was.
             double measured_improvement = y-req.anchor_objective_value;
             double rho = measured_improvement/std::abs(req.predicted_improvement);
+            std::cout << "rho: "<< rho << std::endl;
+            std::cout << "radius: "<< info->radius << std::endl;
             if (rho < 0.25)
                 info->radius *= 0.5;
             else if (rho > 0.75)
@@ -540,8 +540,9 @@ namespace dlib
 
         if (y > info->best_objective_value)
         {
-            if (length(req.x - info->best_x) > info->radius*1.001)
+            if (!req.was_trust_region_generated_request && length(req.x - info->best_x) > info->radius*1.001)
             {
+                std::cout << "reset radius because of big move, " << length(req.x - info->best_x) << "  radius was " << info->radius << std::endl;
                 // reset trust region radius since we made a big move.  Doing this will
                 // cause the radius to be reset to the size of the local region.
                 info->radius = 0;
@@ -578,7 +579,7 @@ namespace dlib
         DLIB_CASSERT(functions_.size() == initial_function_evals.size());
         for (size_t i = 0; i < initial_function_evals.size(); ++i)
         {
-            functions[i]->complete_evals = initial_function_evals[i];
+            functions[i]->ub = upper_bound_function(initial_function_evals[i]);
         }
     }
 
@@ -609,7 +610,7 @@ namespace dlib
         for (size_t i = 0; i < functions.size(); ++i)
         {
             specs.emplace_back(functions[i]->spec);
-            function_evals.emplace_back(functions[i]->complete_evals);
+            function_evals.emplace_back(functions[i]->ub.get_points());
         }
     }
 
@@ -645,7 +646,7 @@ namespace dlib
         for (auto& info : functions)
         {
             const long dims = info->spec.lower.size();
-            if (info->complete_evals.size() < std::max<long>(3,dims))
+            if (info->ub.num_points() < std::max<long>(3,dims))
             {
                 outstanding_function_eval_request new_req;
                 new_req.request_id = next_request_id++;
@@ -663,10 +664,11 @@ namespace dlib
             auto info = best_function();
             const long dims = info->spec.lower.size();
             // if we have enough points to do a trust region step
-            if (info->complete_evals.size() > dims+1)
+            if (info->ub.num_points() > dims+1)
             {
-                auto tmp = pick_next_sample_quad_interp(info->complete_evals,
+                auto tmp = pick_next_sample_quad_interp(info->ub.get_points(),
                     info->radius, info->spec.lower, info->spec.upper, info->spec.is_integer_variable);
+                std::cout << "QP predicted improvement: "<< tmp.predicted_improvement << std::endl;
                 if (tmp.predicted_improvement > qp_eps)
                 {
                     do_trust_region_step = false;
@@ -696,8 +698,8 @@ namespace dlib
             for (auto& info : functions)
             {
                 auto tmp = pick_next_sample_max_upper_bound_function(rnd,
-                    info->all_function_evals(), info->spec.lower, info->spec.upper,
-                    info->spec.is_integer_variable,  relative_noise_magnitude, num_random_samples);
+                    info->build_upper_bound_with_all_function_evals(), info->spec.lower, info->spec.upper,
+                    info->spec.is_integer_variable,  num_random_samples);
                 if (tmp.predicted_improvement > 0 && tmp.upper_bound > best_upper_bound) 
                 {
                     best_upper_bound = tmp.upper_bound;
@@ -757,7 +759,11 @@ namespace dlib
 
     double global_function_search::
     get_relative_noise_magnitude (
-    ) const { return relative_noise_magnitude; }
+    ) const 
+    { 
+        return relative_noise_magnitude; 
+    }
+
     void global_function_search::
     set_relative_noise_magnitude (
         double value
@@ -765,11 +771,18 @@ namespace dlib
     {
         DLIB_CASSERT(0 <= value);
         relative_noise_magnitude = value;
+        // recreate all the upper bound functions with the new relative noise magnitude
+        for (auto& f : functions)
+            f->ub = upper_bound_function(f->ub.get_points(), relative_noise_magnitude);
     }
 
     size_t global_function_search::
     get_monte_carlo_upper_bound_sample_num (
-    ) const { return num_random_samples; }
+    ) const 
+    { 
+        return num_random_samples; 
+    }
+
     void global_function_search::
     set_monte_carlo_upper_bound_sample_num (
         size_t num
