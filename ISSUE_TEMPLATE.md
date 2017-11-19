@@ -7,9 +7,9 @@ Finally, before you ask a question, check google for a solution, [the dlib FAQ](
 If you aren't reporting a bug or problem with dlib then delete this template and write whatever you want here.
 
 
-<!-- ====================================================================== -->
-<!-- ========================  BUG REPORT TEMPLATE ======================== -->
-<!-- ====================================================================== -->
+<!-- ================================================================ -->
+<!-- =====================  BUG REPORT TEMPLATE ===================== -->
+<!-- ================================================================ -->
 
 
 <!-- Delete the above instructions and then provide a general summary of the issue in the Title above -->
