@@ -238,6 +238,13 @@ namespace dlib
 
     };
 
+    template <typename T>
+    T safe_log(T input, T epsilon = 1e-10)
+    {
+        // Prevent trying to calculate the logarithm of a very small number (let alone zero)
+        return std::log(std::max(input, epsilon));
+    }
+
     template <typename SUBNET>
     using loss_binary_log = add_loss_layer<loss_binary_log_, SUBNET>;
 
@@ -317,7 +324,7 @@ namespace dlib
                     const unsigned long idx = i*output_tensor.k()+k;
                     if (k == y)
                     {
-                        loss += scale*-std::log(g[idx]);
+                        loss += scale*-safe_log(g[idx]);
                         g[idx] = scale*(g[idx]-1);
                     }
                     else
@@ -2139,7 +2146,7 @@ namespace dlib
                             const size_t idx = tensor_index(output_tensor, i, k, r, c);
                             if (k == y)
                             {
-                                loss += scale*-std::log(g[idx]);
+                                loss += scale*-safe_log(g[idx]);
                                 g[idx] = scale*(g[idx] - 1);
                             }
                             else if (y == label_to_ignore)
@@ -2285,7 +2292,7 @@ namespace dlib
                             const size_t idx = tensor_index(output_tensor, i, k, r, c);
                             if (k == y)
                             {
-                                loss += weight*scale*-std::log(g[idx]);
+                                loss += weight*scale*-safe_log(g[idx]);
                                 g[idx] = weight*scale*(g[idx] - 1);
                             }
                             else
