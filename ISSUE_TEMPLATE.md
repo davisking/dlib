@@ -12,7 +12,7 @@ If you aren't reporting a bug or problem with dlib then delete this template and
 <!-- ================================================================ -->
 
 
-<!-- Delete the above instructions and then provide a general summary of the issue in the Title above -->
+<!-- Delete the above instructions and then provide a general summary of the issue in the Title above.  Then fill out the template below. -->
 
 ## Expected Behavior
 <!--- Tell us what should happen.  What were you doing?  What part of dlib are you using?  What do you think should happen? -->
