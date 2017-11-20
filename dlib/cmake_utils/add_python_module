@@ -32,7 +32,7 @@ get_filename_component(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE} REALPATH)
 # Pick out the parent directories
 get_filename_component(PYTHON_PATH ${PYTHON_EXECUTABLE} PATH)
 get_filename_component(PYTHON_PATH ${PYTHON_PATH} PATH)
-set(CMAKE_PREFIX_PATH ${PYTHON_PATH})
+list(APPEND CMAKE_PREFIX_PATH "${PYTHON_PATH}")
 
 
 # To avoid dll hell, always link everything statically when compiling in
