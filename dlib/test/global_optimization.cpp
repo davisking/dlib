@@ -85,6 +85,75 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    double complex_holder_table ( double x0, double x1)
+    {
+        // The regular HolderTable function
+        //return -std::abs(sin(x0)*cos(x1)*exp(std::abs(1-std::sqrt(x0*x0+x1*x1)/pi)));
+
+        // My more complex version of it with discontinuities and more local minima.
+        double sign = 1;
+        for (double j = -4; j < 9; j += 0.5)
+        {
+            if (j < x0 && x0 < j+0.5) 
+                x0 += sign*0.25;
+            sign *= -1;
+        }
+        // HolderTable function tilted towards 10,10
+        return -std::abs(sin(x0)*cos(x1)*exp(std::abs(1-std::sqrt(x0*x0+x1*x1)/pi))) +(x0+x1)/10 + sin(x0*10)*cos(x1*10);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test_global_function_search()
+    {
+
+        function_spec spec{{-10,-10}, {10,10}};
+        function_spec spec2{{-10,-10, -50}, {10,10, 50}};
+        global_function_search opt({spec, spec, spec2});
+
+        dlib::rand rnd;
+        bool found_optimal_point = false;
+        for (int i = 0; i < 400 && !found_optimal_point; ++i)
+        {
+            print_spinner();
+            std::vector<function_evaluation_request> nexts;
+            for (int k = 0; k < rnd.get_integer_in_range(1,4); ++k)
+                nexts.emplace_back(opt.get_next_x());
+
+            for (auto& next : nexts)
+            {
+                switch (next.function_idx())
+                {
+                    case 0: next.set( -complex_holder_table(next.x()(0), next.x()(1))); break;
+                    case 1: next.set( -10*complex_holder_table(next.x()(0), next.x()(1))); break;
+                    case 2: next.set( -2*complex_holder_table(next.x()(0), next.x()(1))); break;
+                    default: DLIB_TEST(false); break;
+                }
+
+                matrix<double,0,1> x;
+                double y;
+                size_t function_idx;
+                opt.get_best_function_eval(x,y,function_idx);
+                /*
+                cout << "\ni: "<< i << endl;
+                cout << "best eval x: "<< trans(x);
+                cout << "best eval y: "<< y << endl;
+                cout << "best eval function index: "<< function_idx << endl;
+                */
+
+                if (std::abs(y  - 10*21.9210397) < 0.0001)
+                {
+                    found_optimal_point = true;
+                    break;
+                }
+            }
+        }
+
+        DLIB_TEST(found_optimal_point);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class global_optimization_tester : public tester
     {
     public:
@@ -100,6 +169,7 @@ namespace
             test_upper_bound_function(0.1, 1e-6);
             test_upper_bound_function(0.0, 1e-6);
             test_upper_bound_function(0.0, 1e-1);
+            test_global_function_search();
         }
     } a;
 
