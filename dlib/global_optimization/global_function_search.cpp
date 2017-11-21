@@ -573,13 +573,16 @@ namespace dlib
     global_function_search::
     global_function_search(
         const std::vector<function_spec>& functions_,
-        const std::vector<std::vector<function_evaluation>>& initial_function_evals
-    ) : global_function_search(functions_)
+        const std::vector<std::vector<function_evaluation>>& initial_function_evals,
+        const double relative_noise_magnitude_
+    ) : global_function_search(functions_) 
     {
         DLIB_CASSERT(functions_.size() == initial_function_evals.size());
+        DLIB_CASSERT(relative_noise_magnitude >= 0);
+        relative_noise_magnitude = relative_noise_magnitude_;
         for (size_t i = 0; i < initial_function_evals.size(); ++i)
         {
-            functions[i]->ub = upper_bound_function(initial_function_evals[i]);
+            functions[i]->ub = upper_bound_function(initial_function_evals[i], relative_noise_magnitude);
         }
     }
 
@@ -669,7 +672,7 @@ namespace dlib
                 auto tmp = pick_next_sample_quad_interp(info->ub.get_points(),
                     info->radius, info->spec.lower, info->spec.upper, info->spec.is_integer_variable);
                 std::cout << "QP predicted improvement: "<< tmp.predicted_improvement << std::endl;
-                if (tmp.predicted_improvement > qp_eps)
+                if (tmp.predicted_improvement > min_trust_region_epsilon)
                 {
                     do_trust_region_step = false;
                     outstanding_function_eval_request new_req;
@@ -746,7 +749,7 @@ namespace dlib
 
     double global_function_search::
     get_solver_epsilon (
-    ) const { return qp_eps; }
+    ) const { return min_trust_region_epsilon; }
 
     void global_function_search::
     set_solver_epsilon (
@@ -754,7 +757,7 @@ namespace dlib
     )
     {
         DLIB_CASSERT(0 <= eps);
-        qp_eps = eps;
+        min_trust_region_epsilon = eps;
     }
 
     double global_function_search::

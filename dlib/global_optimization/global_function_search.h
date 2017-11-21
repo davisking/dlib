@@ -144,7 +144,8 @@ namespace dlib
 
         global_function_search(
             const std::vector<function_spec>& functions_,
-            const std::vector<std::vector<function_evaluation>>& initial_function_evals
+            const std::vector<std::vector<function_evaluation>>& initial_function_evals,
+            const double relative_noise_magnitude = 0.001
         ); 
 
         global_function_search(const global_function_search&) = delete;
@@ -210,7 +211,7 @@ namespace dlib
 
         dlib::rand rnd;
         double pure_random_search_probability = 0.02;
-        double qp_eps = 1e-11;
+        double min_trust_region_epsilon = 1e-11;
         double relative_noise_magnitude = 0.001;
         size_t num_random_samples = 5000;
         bool do_trust_region_step = true;
