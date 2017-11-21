@@ -5,15 +5,14 @@
 
 #include "global_function_search.h"
 
-// TODO, move ct_make_integer_range into some other file so we don't have to include the
-// dnn header.  That thing is huge.
-#include <dlib/dnn.h>
+#include "../metaprogramming.h"
 #include <utility>
 
 namespace dlib
 {
     namespace gopt_impl
     {
+
     // ----------------------------------------------------------------------------------------
 
         class disable_decay_to_scalar 
@@ -29,10 +28,11 @@ namespace dlib
         auto _cwv (
             T&& f, 
             const matrix<double,0,1>& a, 
-            impl::ct_integers_list<indices...>
+            compile_time_integer_list<indices...>
         ) -> decltype(f(a(indices-1)...)) 
         {
-            DLIB_CASSERT(a.size() == sizeof...(indices), "You invoked dlib::call_with_vect(f,a) but the number of arguments expected by f() doesn't match the size of 'a'. "
+            DLIB_CASSERT(a.size() == sizeof...(indices), 
+                "You invoked dlib::call_with_vect(f,a) but the number of arguments expected by f() doesn't match the size of 'a'. "
                 << "Expected " << sizeof...(indices) << " arguments but got " << a.size() << "."
             );  
             return f(a(indices-1)...); 
@@ -45,9 +45,9 @@ namespace dlib
         struct call_with_vect
         {
             template <typename T>
-            static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(_cwv(std::forward<T>(f),a,typename impl::ct_make_integer_range<max_unpack>::type()))
+            static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(_cwv(std::forward<T>(f),a,typename make_compile_time_integer_range<max_unpack>::type()))
             {
-                return _cwv(std::forward<T>(f),a,typename impl::ct_make_integer_range<max_unpack>::type());
+                return _cwv(std::forward<T>(f),a,typename make_compile_time_integer_range<max_unpack>::type());
             }
 
             template <typename T>
