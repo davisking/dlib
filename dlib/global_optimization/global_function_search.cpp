@@ -6,6 +6,9 @@
 
 namespace dlib
 {
+
+// ----------------------------------------------------------------------------------------
+
     namespace qopt_impl
     {
         void fit_qp_mse(
@@ -320,6 +323,8 @@ namespace dlib
             double upper_bound = 0;
         };
 
+    // ------------------------------------------------------------------------------------
+
         max_upper_bound_function pick_next_sample_max_upper_bound_function (
             dlib::rand& rnd,
             const upper_bound_function& ub,
@@ -362,7 +367,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    function_spec::function_spec(const matrix<double,0,1>& lower_, const matrix<double,0,1>& upper_) : lower(lower_), upper(upper_)
+    function_spec::function_spec(
+        const matrix<double,0,1>& lower_, 
+        const matrix<double,0,1>& upper_
+    ) : 
+        lower(lower_), upper(upper_)
     {
         DLIB_CASSERT(lower.size() == upper.size());
         for (size_t i = 0; i < lower.size(); ++i)
@@ -374,7 +383,14 @@ namespace dlib
         is_integer_variable.assign(lower.size(), false);
     }
 
-    function_spec::function_spec(const matrix<double,0,1>& lower, const matrix<double,0,1>& upper, std::vector<bool> is_integer) : function_spec(std::move(lower),std::move(upper))
+// ----------------------------------------------------------------------------------------
+
+    function_spec::function_spec(
+        const matrix<double,0,1>& lower,
+        const matrix<double,0,1>& upper, 
+        std::vector<bool> is_integer
+    ) : 
+        function_spec(std::move(lower),std::move(upper))
     {
         is_integer_variable = std::move(is_integer);
         DLIB_CASSERT(lower.size() == (long)is_integer_variable.size());
@@ -416,6 +432,8 @@ namespace dlib
             return tmp;
         }
 
+    // ------------------------------------------------------------------------------------
+
         double funct_info::find_nn (
             const std::vector<function_evaluation>& evals,
             const matrix<double,0,1>& x
@@ -435,11 +453,14 @@ namespace dlib
             return best_y;
         }
 
-    }
+    } // end namespace gopt_impl 
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
-    function_evaluation_request::function_evaluation_request(function_evaluation_request&& item)
+    function_evaluation_request::function_evaluation_request(
+        function_evaluation_request&& item
+    )
     {
         m_has_been_evaluated = item.m_has_been_evaluated;
         req = item.req;
@@ -449,20 +470,30 @@ namespace dlib
         item.m_has_been_evaluated = true;
     }
 
+// ----------------------------------------------------------------------------------------
+    
     function_evaluation_request& function_evaluation_request::
-    operator=(function_evaluation_request&& item)
+    operator=(
+        function_evaluation_request&& item
+    )
     {
         function_evaluation_request(std::move(item)).swap(*this);
         return *this;
     }
 
+// ----------------------------------------------------------------------------------------
+
     void function_evaluation_request::
-    swap(function_evaluation_request& item)
+    swap(
+        function_evaluation_request& item
+    )
     {
         std::swap(m_has_been_evaluated, item.m_has_been_evaluated);
         std::swap(req, item.req);
         std::swap(info, item.info);
     }
+
+// ----------------------------------------------------------------------------------------
 
     size_t function_evaluation_request::
     function_idx (
@@ -478,12 +509,16 @@ namespace dlib
         return req.x;
     }
 
+// ----------------------------------------------------------------------------------------
+
     bool function_evaluation_request::
     has_been_evaluated (
     ) const
     {
         return m_has_been_evaluated;
     }
+
+// ----------------------------------------------------------------------------------------
 
     function_evaluation_request::
     ~function_evaluation_request()
@@ -498,16 +533,12 @@ namespace dlib
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
     void function_evaluation_request::
     set (
         double y
     )
-    /*!
-        requires
-            - has_been_evaluated() == false
-        ensures
-            - #has_been_evaluated() == true
-    !*/
     {
         DLIB_CASSERT(has_been_evaluated() == false);
         std::lock_guard<std::mutex> lock(*info->m);
@@ -559,6 +590,8 @@ namespace dlib
         const function_spec& function
     ) : global_function_search(std::vector<function_spec>(1,function)) {}
 
+// ----------------------------------------------------------------------------------------
+
     global_function_search::
     global_function_search(
         const std::vector<function_spec>& functions_
@@ -570,12 +603,15 @@ namespace dlib
             functions.emplace_back(std::make_shared<gopt_impl::funct_info>(functions_[i],i,m));
     }
 
+// ----------------------------------------------------------------------------------------
+
     global_function_search::
     global_function_search(
         const std::vector<function_spec>& functions_,
         const std::vector<std::vector<function_evaluation>>& initial_function_evals,
         const double relative_noise_magnitude_
-    ) : global_function_search(functions_) 
+    ) : 
+        global_function_search(functions_) 
     {
         DLIB_CASSERT(functions_.size() == initial_function_evals.size());
         DLIB_CASSERT(relative_noise_magnitude >= 0);
@@ -586,12 +622,16 @@ namespace dlib
         }
     }
 
+// ----------------------------------------------------------------------------------------
 
     size_t global_function_search::
-    num_functions() const 
+    num_functions(
+    ) const 
     { 
         return functions.size();
     }
+
+// ----------------------------------------------------------------------------------------
 
     void global_function_search::
     set_seed (
@@ -600,6 +640,8 @@ namespace dlib
     {
         rnd = dlib::rand(seed);
     }
+
+// ----------------------------------------------------------------------------------------
 
     void global_function_search::
     get_function_evaluations (
@@ -617,6 +659,8 @@ namespace dlib
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
     void global_function_search::
     get_best_function_eval (
         matrix<double,0,1>& x,
@@ -633,6 +677,8 @@ namespace dlib
         y = info.best_objective_value;
         x = info.best_x;
     }
+
+// ----------------------------------------------------------------------------------------
 
     function_evaluation_request global_function_search::
     get_next_x (
@@ -734,9 +780,16 @@ namespace dlib
 
     }
 
+// ----------------------------------------------------------------------------------------
+
     double global_function_search::
     get_pure_random_search_probability (
-    ) const { return pure_random_search_probability; }
+    ) const 
+    { 
+        return pure_random_search_probability; 
+    }
+
+// ----------------------------------------------------------------------------------------
 
     void global_function_search::
     set_pure_random_search_probability (
@@ -747,9 +800,16 @@ namespace dlib
         pure_random_search_probability = prob;
     }
 
+// ----------------------------------------------------------------------------------------
+
     double global_function_search::
     get_solver_epsilon (
-    ) const { return min_trust_region_epsilon; }
+    ) const 
+    { 
+        return min_trust_region_epsilon; 
+    }
+
+// ----------------------------------------------------------------------------------------
 
     void global_function_search::
     set_solver_epsilon (
@@ -760,12 +820,16 @@ namespace dlib
         min_trust_region_epsilon = eps;
     }
 
+// ----------------------------------------------------------------------------------------
+
     double global_function_search::
     get_relative_noise_magnitude (
     ) const 
     { 
         return relative_noise_magnitude; 
     }
+
+// ----------------------------------------------------------------------------------------
 
     void global_function_search::
     set_relative_noise_magnitude (
@@ -779,12 +843,16 @@ namespace dlib
             f->ub = upper_bound_function(f->ub.get_points(), relative_noise_magnitude);
     }
 
+// ----------------------------------------------------------------------------------------
+
     size_t global_function_search::
     get_monte_carlo_upper_bound_sample_num (
     ) const 
     { 
         return num_random_samples; 
     }
+
+// ----------------------------------------------------------------------------------------
 
     void global_function_search::
     set_monte_carlo_upper_bound_sample_num (
@@ -795,16 +863,22 @@ namespace dlib
         num_random_samples = num;
     }
 
+// ----------------------------------------------------------------------------------------
 
     std::shared_ptr<gopt_impl::funct_info> global_function_search::
-    best_function() const
+    best_function(
+    ) const
     {
         size_t idx = 0;
         return best_function(idx);
     }
 
+// ----------------------------------------------------------------------------------------
+
     std::shared_ptr<gopt_impl::funct_info> global_function_search::
-    best_function(size_t& idx) const
+    best_function(
+        size_t& idx
+    ) const
     {
         auto i = std::max_element(functions.begin(), functions.end(), 
             [](const std::shared_ptr<gopt_impl::funct_info>& a, const std::shared_ptr<gopt_impl::funct_info>& b) { return a->best_objective_value < b->best_objective_value; });
@@ -812,6 +886,8 @@ namespace dlib
         idx = std::distance(functions.begin(),i);
         return *i;
     }
+
+// ----------------------------------------------------------------------------------------
 
     bool global_function_search::
     has_incomplete_trust_region_request (

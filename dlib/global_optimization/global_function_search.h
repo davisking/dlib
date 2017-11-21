@@ -16,9 +16,16 @@ namespace dlib
 
     struct function_spec
     {
-        function_spec(const matrix<double,0,1>& lower_, const matrix<double,0,1>& upper_);
+        function_spec(
+            const matrix<double,0,1>& lower_, 
+            const matrix<double,0,1>& upper_
+        );
 
-        function_spec(const matrix<double,0,1>& lower, const matrix<double,0,1>& upper, std::vector<bool> is_integer);
+        function_spec(
+            const matrix<double,0,1>& lower, 
+            const matrix<double,0,1>& upper, 
+            std::vector<bool> is_integer
+        );
 
         matrix<double,0,1> lower;
         matrix<double,0,1> upper;
@@ -48,7 +55,12 @@ namespace dlib
             funct_info(const funct_info&) = delete;
             funct_info& operator=(const funct_info&) = delete;
 
-            funct_info(const function_spec& spec, size_t function_idx, const std::shared_ptr<std::mutex>& m) : spec(spec), function_idx(function_idx), m(m)
+            funct_info(
+                const function_spec& spec,
+                size_t function_idx, 
+                const std::shared_ptr<std::mutex>& m
+            ) : 
+                spec(spec), function_idx(function_idx), m(m)
             {
                 best_x = zeros_matrix(spec.lower);
             }
@@ -81,12 +93,11 @@ namespace dlib
     public:
 
         function_evaluation_request() = delete;
-
         function_evaluation_request(const function_evaluation_request&) = delete;
         function_evaluation_request& operator=(const function_evaluation_request&) = delete;
 
-        function_evaluation_request(function_evaluation_request&& item);
 
+        function_evaluation_request(function_evaluation_request&& item);
         function_evaluation_request& operator=(function_evaluation_request&& item);
 
         void swap(function_evaluation_request& item);
@@ -151,7 +162,8 @@ namespace dlib
         global_function_search(const global_function_search&) = delete;
         global_function_search& operator=(const global_function_search& item) = delete;
 
-        size_t num_functions() const;
+        size_t num_functions(
+        ) const;
 
         void set_seed (
             time_t seed
@@ -201,9 +213,12 @@ namespace dlib
 
     private:
 
-        std::shared_ptr<gopt_impl::funct_info> best_function() const;
+        std::shared_ptr<gopt_impl::funct_info> best_function(
+        ) const;
 
-        std::shared_ptr<gopt_impl::funct_info> best_function(size_t& idx) const;
+        std::shared_ptr<gopt_impl::funct_info> best_function(
+            size_t& idx
+        ) const;
 
         bool has_incomplete_trust_region_request (
         ) const;
