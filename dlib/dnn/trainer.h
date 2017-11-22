@@ -705,7 +705,7 @@ namespace dlib
                                 test_steps_without_progress = 0;
                                 // Empty out some of the previous loss values so that test_steps_without_progress 
                                 // will decrease below test_iter_without_progress_thresh.  
-                                for (int cnt = 0; cnt < test_previous_loss_values_dump_amount && test_previous_loss_values.size() > 0; ++cnt)
+                                for (int cnt = 0; cnt < test_previous_loss_values_dump_amount+test_iter_without_progress_thresh/10 && test_previous_loss_values.size() > 0; ++cnt)
                                     test_previous_loss_values.pop_front();
                             }
                         }
@@ -825,7 +825,7 @@ namespace dlib
                             steps_without_progress = 0;
                             // Empty out some of the previous loss values so that steps_without_progress 
                             // will decrease below iter_without_progress_thresh.  
-                            for (int cnt = 0; cnt < previous_loss_values_dump_amount && previous_loss_values.size() > 0; ++cnt)
+                            for (int cnt = 0; cnt < previous_loss_values_dump_amount+iter_without_progress_thresh/10 && previous_loss_values.size() > 0; ++cnt)
                                 previous_loss_values.pop_front();
                         }
                     }
