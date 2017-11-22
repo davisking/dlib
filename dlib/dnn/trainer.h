@@ -579,6 +579,20 @@ namespace dlib
             return test_one_step_calls;
         }
 
+        void set_previous_loss_values_dump_amount (
+            int amount
+        )
+        {
+            DLIB_CASSERT(amount > 0);
+            previous_loss_values_dump_amount = amount;
+        }
+
+        int get_previous_loss_values_dump_amount (
+        ) const
+        {
+            return previous_loss_values_dump_amount;
+        }
+
     private:
 
         void record_test_loss(double loss)

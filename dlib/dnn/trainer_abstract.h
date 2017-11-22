@@ -739,6 +739,29 @@ namespace dlib
                     - returns 0
         !*/
 
+        void set_previous_loss_values_dump_amount (
+            int amount
+        );
+        /*!
+            requires
+                - amount > 0
+            ensures
+                - Whenever the training routine decides to shrink the learning rate, it drops some
+                  previous loss values so that steps_without_progress will decrease below
+                  iter_without_progress_thresh. The number of previous loss values to drop is
+                  the parameter given to this function.
+        !*/
+
+        int get_previous_loss_values_dump_amount (
+        ) const;
+        /*!
+            ensures
+                - Whenever the training routine decides to shrink the learning rate, it drops some
+                  previous loss values so that steps_without_progress will decrease below
+                  iter_without_progress_thresh. This function returns the number of previous loss
+                  values that is dropped.
+        !*/
+
     };
 
 // ----------------------------------------------------------------------------------------
