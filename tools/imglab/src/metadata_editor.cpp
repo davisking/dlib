@@ -354,8 +354,19 @@ on_keydown (
             select_image(image_pos);
         }
 
-
-        return;
+        // Make 'w' and 's' act like KEY_UP and KEY_DOWN
+        if ((key == 'w' || key == 'W') && !overlay_label.has_input_focus())
+        {
+            key = base_window::KEY_UP;
+        }
+        else if ((key == 's' || key == 'S') && !overlay_label.has_input_focus())
+        {
+            key = base_window::KEY_DOWN;
+        }
+        else
+        {
+            return;
+        }
     }
 
     if (key == base_window::KEY_UP)
@@ -635,6 +646,9 @@ display_about(
                         "Note that you must define the allowable part labels by giving --parts on the "
                         "command line.  An example would be '--parts \"leye reye nose mouth\"'."
                         ,0,0) << endl << endl;
+
+    sout << wrap_string("Press the down or s key to select the next image in the list and the up or w "
+                        "key to select the previous one.",0,0) << endl << endl;
 
     sout << wrap_string("Additionally, you can hold ctrl and then scroll the mouse wheel to zoom.  A normal left click "
                         "and drag allows you to navigate around the image.  Holding ctrl and "
