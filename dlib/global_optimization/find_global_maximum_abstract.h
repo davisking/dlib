@@ -184,12 +184,45 @@ namespace dlib
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
+        const std::vector<bool>& is_integer_variable,
+        const max_function_calls num,
+        double solver_epsilon 
+    )
+    {
+        return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct
+        >
+    function_evaluation find_global_maximum (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 1e-11
     ) 
     {
         return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct
+        >
+    function_evaluation find_global_maximum (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const max_function_calls num,
+        double solver_epsilon
+    ) 
+    {
+        return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -207,6 +240,22 @@ namespace dlib
     ) 
     {
         return find_global_maximum(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct
+        >
+    function_evaluation find_global_maximum (
+        funct f,
+        const double bound1,
+        const double bound2,
+        const max_function_calls num,
+        double solver_epsilon 
+    ) 
+    {
+        return find_global_maximum(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -259,7 +308,6 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-
 
 }
 

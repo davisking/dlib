@@ -125,8 +125,7 @@ namespace dlib
             //matrix<double,0,1> z = pinv(W)*r;
             lu_decomposition<decltype(W)> lu(W);
             matrix<double,0,1> z = lu.solve(r);
-            if (lu.is_singular())
-                std::cout << "WARNING, THE W MATRIX IS SINGULAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+            //if (lu.is_singular()) std::cout << "WARNING, THE W MATRIX IS SINGULAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 
             matrix<double,0,1> lambda = rowm(z, range(0,M-1));
 
@@ -561,8 +560,8 @@ namespace dlib
             // was.
             double measured_improvement = y-req.anchor_objective_value;
             double rho = measured_improvement/std::abs(req.predicted_improvement);
-            std::cout << "rho: "<< rho << std::endl;
-            std::cout << "radius: "<< info->radius << std::endl;
+            //std::cout << "rho: "<< rho << std::endl;
+            //std::cout << "radius: "<< info->radius << std::endl;
             if (rho < 0.25)
                 info->radius *= 0.5;
             else if (rho > 0.75)
@@ -573,7 +572,7 @@ namespace dlib
         {
             if (!req.was_trust_region_generated_request && length(req.x - info->best_x) > info->radius*1.001)
             {
-                std::cout << "reset radius because of big move, " << length(req.x - info->best_x) << "  radius was " << info->radius << std::endl;
+                //std::cout << "reset radius because of big move, " << length(req.x - info->best_x) << "  radius was " << info->radius << std::endl;
                 // reset trust region radius since we made a big move.  Doing this will
                 // cause the radius to be reset to the size of the local region.
                 info->radius = 0;
@@ -719,7 +718,7 @@ namespace dlib
             {
                 auto tmp = pick_next_sample_quad_interp(info->ub.get_points(),
                     info->radius, info->spec.lower, info->spec.upper, info->spec.is_integer_variable);
-                std::cout << "QP predicted improvement: "<< tmp.predicted_improvement << std::endl;
+                //std::cout << "QP predicted improvement: "<< tmp.predicted_improvement << std::endl;
                 if (tmp.predicted_improvement > min_trust_region_epsilon)
                 {
                     do_trust_region_step = false;
