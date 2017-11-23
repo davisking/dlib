@@ -46,11 +46,11 @@ namespace dlib
                 The upper_bound_function class is a tool for creating this kind of upper
                 bounding function from a set of function_evaluations of F(x).  We do this
                 by considering only U(x) of the form:
-                    U(x) = {
+                    U = [](matrix<double,0,1> x) {
                        double min_ub = infinity;
                        for (size_t i = 0; i < POINTS.size(); ++i) {
                             function_evaluation p = POINTS[i]
-                            double local_bound = p.y + sqrt(noise_terms[i] + sqrt(trans(p.x-x)*M*(p.x-x)))
+                            double local_bound = p.y + sqrt(noise_terms[i] + trans(p.x-x)*M*(p.x-x))
                             min_ub = min(min_ub, local_bound)
                         }
                     }
@@ -64,7 +64,8 @@ namespace dlib
                     min_{M,noise_terms}:  sum(squared(M)) + sum(squared(noise_terms/relative_noise_magnitude))
                     s.t.   U(POINTS[i].x) >= POINTS[i].y,  for all i 
                            noise_terms[i] >= 0
-                           diag(M) >= 0
+                           min(M) >= 0
+                           M is a diagonal matrix 
                
                 Therefore, the quadratic program finds the U(x) that always upper bounds
                 F(x) on the supplied POINTS, but is otherwise as small as possible.
