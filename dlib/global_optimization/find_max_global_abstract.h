@@ -53,7 +53,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is a simple typed integer class used to strongly type the "max number
-                of function calls" argument to find_global_maximum().
+                of function calls" argument to find_max_global().
 
         !*/
 
@@ -73,7 +73,7 @@ namespace dlib
     template <
         typename funct
         >
-    std::pair<size_t,function_evaluation> find_global_maximum (
+    std::pair<size_t,function_evaluation> find_max_global (
         std::vector<funct>& functions,
         const std::vector<function_spec>& specs,
         const max_function_calls num,
@@ -101,7 +101,7 @@ namespace dlib
               The goal is to maximize the following objective function:
                  max_{i,x_i}: functions[i](x_i)
                  subject to the constraints on x_i defined by specs[i].
-              Once found, the return value of find_global_maximum() is:
+              Once found, the return value of find_max_global() is:
                 make_pair(i, function_evaluation(x_i,functions[i](x_i))). 
               That is, we search for the settings of i and x that return the largest output
               and return those settings.
@@ -115,7 +115,7 @@ namespace dlib
               far.  That is, once a local maxima is identified to about solver_epsilon
               accuracy, the algorithm will spend all its time exploring the functions to
               find other local maxima to investigate.
-            - find_global_maximum() runs until one of the following is true:
+            - find_max_global() runs until one of the following is true:
                 - The total number of calls to the provided functions is == num.max_calls
                 - More than max_runtime time has elapsed since the start of this function.
     !*/
@@ -125,7 +125,7 @@ namespace dlib
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -153,7 +153,7 @@ namespace dlib
               The goal is to maximize the following objective function:
                  f(x)
                  subject to the constraints on x defined by function_spec(bound1,bound2,is_integer_variable).
-              Once found, the return value of find_global_maximum() is:
+              Once found, the return value of find_max_global() is:
                 function_evaluation(x,f(x))). 
               That is, we search for the setting of x that returns the largest output and
               return that setting.
@@ -167,20 +167,20 @@ namespace dlib
               far.  That is, once a local maxima is identified to about solver_epsilon
               accuracy, the algorithm will spend all its time exploring the function to
               find other local maxima to investigate.
-            - find_global_maximum() runs until one of the following is true:
+            - find_max_global() runs until one of the following is true:
                 - The total number of calls to f() is == num.max_calls
                 - More than max_runtime time has elapsed since the start of this function.
     !*/
 
 // ----------------------------------------------------------------------------------------
 // The following functions are just convenient overloads for calling the above defined
-// find_global_maximum() routines.
+// find_max_global() routines.
 // ----------------------------------------------------------------------------------------
 
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -189,7 +189,7 @@ namespace dlib
         double solver_epsilon 
     )
     {
-        return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -197,7 +197,7 @@ namespace dlib
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -206,7 +206,7 @@ namespace dlib
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -214,7 +214,7 @@ namespace dlib
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -222,7 +222,7 @@ namespace dlib
         double solver_epsilon
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -230,7 +230,7 @@ namespace dlib
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const double bound1,
         const double bound2,
@@ -239,7 +239,7 @@ namespace dlib
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -247,7 +247,7 @@ namespace dlib
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const double bound1,
         const double bound2,
@@ -255,7 +255,7 @@ namespace dlib
         double solver_epsilon 
     ) 
     {
-        return find_global_maximum(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -263,7 +263,7 @@ namespace dlib
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -271,7 +271,7 @@ namespace dlib
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -279,7 +279,7 @@ namespace dlib
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const double bound1,
         const double bound2,
@@ -287,7 +287,7 @@ namespace dlib
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -295,7 +295,7 @@ namespace dlib
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -304,7 +304,7 @@ namespace dlib
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------

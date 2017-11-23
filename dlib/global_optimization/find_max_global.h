@@ -3,7 +3,7 @@
 #ifndef DLIB_FiND_GLOBAL_MAXIMUM_hH_
 #define DLIB_FiND_GLOBAL_MAXIMUM_hH_
 
-#include "find_global_maximum_abstract.h"
+#include "find_max_global_abstract.h"
 #include "global_function_search.h"
 #include "../metaprogramming.h"
 #include <utility>
@@ -115,7 +115,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    std::pair<size_t,function_evaluation> find_global_maximum (
+    std::pair<size_t,function_evaluation> find_max_global (
         std::vector<funct>& functions,
         const std::vector<function_spec>& specs,
         const max_function_calls num,
@@ -148,7 +148,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -160,7 +160,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     {
         std::vector<funct> functions(1,std::move(f));
         std::vector<function_spec> specs(1, function_spec(bound1, bound2, is_integer_variable));
-        return find_global_maximum(functions, specs, num, max_runtime, solver_epsilon).second;
+        return find_max_global(functions, specs, num, max_runtime, solver_epsilon).second;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -177,7 +177,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon 
     )
     {
-        return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -194,7 +194,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -202,7 +202,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -210,7 +210,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -218,7 +218,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const double bound1,
         const double bound2,
@@ -227,7 +227,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -235,7 +235,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const double bound1,
         const double bound2,
@@ -243,7 +243,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon 
     ) 
     {
-        return find_global_maximum(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -251,7 +251,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -259,7 +259,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -267,7 +267,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const double bound1,
         const double bound2,
@@ -275,7 +275,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -283,7 +283,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     template <
         typename funct
         >
-    function_evaluation find_global_maximum (
+    function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
@@ -292,7 +292,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
