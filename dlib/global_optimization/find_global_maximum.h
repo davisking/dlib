@@ -3,10 +3,11 @@
 #ifndef DLIB_FiND_GLOBAL_MAXIMUM_hH_
 #define DLIB_FiND_GLOBAL_MAXIMUM_hH_
 
+#include "find_global_maximum_abstract.h"
 #include "global_function_search.h"
-
 #include "../metaprogramming.h"
 #include <utility>
+#include <chrono>
 
 namespace dlib
 {
@@ -32,7 +33,7 @@ namespace dlib
         ) -> decltype(f(a(indices-1)...)) 
         {
             DLIB_CASSERT(a.size() == sizeof...(indices), 
-                "You invoked dlib::call_with_vect(f,a) but the number of arguments expected by f() doesn't match the size of 'a'. "
+                "You invoked dlib::call_function_and_expand_args(f,a) but the number of arguments expected by f() doesn't match the size of 'a'. "
                 << "Expected " << sizeof...(indices) << " arguments but got " << a.size() << "."
             );  
             return f(a(indices-1)...); 
@@ -42,7 +43,7 @@ namespace dlib
         // So we write the terrible garbage in the #else for visual studio.  When Visual Studio supports C++11 I'll update this #ifdef to use the C++11 code.
 #ifndef _MSC_VER 
         template <size_t max_unpack>
-        struct call_with_vect
+        struct call_function_and_expand_args
         {
             template <typename T>
             static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(_cwv(std::forward<T>(f),a,typename make_compile_time_integer_range<max_unpack>::type()))
@@ -51,14 +52,14 @@ namespace dlib
             }
 
             template <typename T>
-            static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(call_with_vect<max_unpack-1>::template go(std::forward<T>(f),a))
+            static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(call_function_and_expand_args<max_unpack-1>::template go(std::forward<T>(f),a))
             {
-                return call_with_vect<max_unpack-1>::go(std::forward<T>(f),a);
+                return call_function_and_expand_args<max_unpack-1>::go(std::forward<T>(f),a);
             }
         };
 
         template <>
-        struct call_with_vect<0>
+        struct call_function_and_expand_args<0>
         {
             template <typename T>
             static auto go(T&& f, const matrix<double,0,1>& a) -> decltype(f(disable_decay_to_scalar(a)))
@@ -68,7 +69,7 @@ namespace dlib
         };
 #else
         template <size_t max_unpack>
-        struct call_with_vect
+        struct call_function_and_expand_args
         {         
 template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), disable_decay_to_scalar(a))  {return f(disable_decay_to_scalar(a));   }
 template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), a(0)) { DLIB_CASSERT(a.size() == 1); return f(a(0)); }
@@ -86,13 +87,13 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
 // ----------------------------------------------------------------------------------------
 
     template <typename T> 
-    auto call_with_vect(
+    auto call_function_and_expand_args(
         T&& f, 
         const matrix<double,0,1>& a
-    ) -> decltype(gopt_impl::call_with_vect<40>::go(f,a))
+    ) -> decltype(gopt_impl::call_function_and_expand_args<40>::go(f,a))
     {
         // unpack up to 40 parameters when calling f()
-        return gopt_impl::call_with_vect<40>::go(std::forward<T>(f),a);
+        return gopt_impl::call_function_and_expand_args<40>::go(std::forward<T>(f),a);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -107,6 +108,10 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
 
 // ----------------------------------------------------------------------------------------
 
+    const auto FOREVER = std::chrono::hours(24*356*290); // 290 years
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename funct
         >
@@ -114,7 +119,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         std::vector<funct>& functions,
         const std::vector<function_spec>& specs,
         const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 1e-11
     ) 
     {
@@ -126,7 +131,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         for (size_t i = 0; i < num.max_calls && std::chrono::steady_clock::now() < time_to_stop; ++i)
         {
             auto next = opt.get_next_x();
-            double y = call_with_vect(functions[next.function_idx()], next.x());
+            double y = call_function_and_expand_args(functions[next.function_idx()], next.x());
             next.set(y);
 
 
@@ -163,48 +168,17 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         >
     function_evaluation find_global_maximum (
         funct f,
-        const matrix<double,0,1>& lower,
-        const matrix<double,0,1>& upper,
-        const max_function_calls num,
-        double solver_epsilon = 1e-11
-    ) 
-    {
-        std::vector<funct> functions(1,f);
-        std::vector<function_spec> specs(1, function_spec(lower, upper));
-        auto forever = std::chrono::hours(24*356*290);
-        return find_global_maximum(functions, specs, num, forever, solver_epsilon).second;
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_global_maximum (
-        funct f,
-        const double lower,
-        const double upper,
-        const max_function_calls num,
-        double solver_epsilon = 1e-11
-    ) 
-    {
-        return find_global_maximum(f, matrix<double,0,1>({lower}), matrix<double,0,1>({upper}), num, solver_epsilon);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_global_maximum (
-        funct f,
-        const matrix<double,0,1>& lower,
-        const matrix<double,0,1>& upper,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 1e-11
     ) 
     {
-        std::vector<funct> functions(1, std::move(f));
-        std::vector<function_spec> specs(1, function_spec(lower, upper, is_integer_variable));
-        auto forever = std::chrono::hours(24*356*290);
-        return find_global_maximum(functions, specs, num, forever, solver_epsilon).second;
+        std::vector<funct> functions(1,std::move(f));
+        std::vector<function_spec> specs(1, function_spec(bound1, bound2, is_integer_variable));
+        return find_global_maximum(functions, specs, num, max_runtime, solver_epsilon).second;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -214,46 +188,80 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         >
     function_evaluation find_global_maximum (
         funct f,
-        const matrix<double,0,1>& lower,
-        const matrix<double,0,1>& upper,
-        const std::chrono::nanoseconds max_runtime,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 1e-11
     ) 
     {
-        std::vector<funct> functions(1,f);
-        std::vector<function_spec> specs(1, function_spec(lower, upper));
-        return find_global_maximum(functions, specs, max_function_calls(), max_runtime, solver_epsilon).second;
+        return find_global_maximum(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
     }
+
+// ----------------------------------------------------------------------------------------
 
     template <
         typename funct
         >
     function_evaluation find_global_maximum (
         funct f,
-        const double lower,
-        const double upper,
-        const std::chrono::nanoseconds max_runtime,
+        const double bound1,
+        const double bound2,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 1e-11
     ) 
     {
-        return find_global_maximum(f, matrix<double,0,1>({lower}), matrix<double,0,1>({upper}), max_runtime, solver_epsilon);
+        return find_global_maximum(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
     }
+
+// ----------------------------------------------------------------------------------------
 
     template <
         typename funct
         >
     function_evaluation find_global_maximum (
         funct f,
-        const matrix<double,0,1>& lower,
-        const matrix<double,0,1>& upper,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const std::chrono::nanoseconds max_runtime,
+        double solver_epsilon = 1e-11
+    ) 
+    {
+        return find_global_maximum(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct
+        >
+    function_evaluation find_global_maximum (
+        funct f,
+        const double bound1,
+        const double bound2,
+        const std::chrono::nanoseconds max_runtime,
+        double solver_epsilon = 1e-11
+    ) 
+    {
+        return find_global_maximum(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename funct
+        >
+    function_evaluation find_global_maximum (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const std::chrono::nanoseconds max_runtime,
         double solver_epsilon = 1e-11
     ) 
     {
-        std::vector<funct> functions(1, std::move(f));
-        std::vector<function_spec> specs(1, function_spec(lower, upper, is_integer_variable));
-        return find_global_maximum(functions, specs, max_function_calls(), max_runtime, solver_epsilon).second;
+        return find_global_maximum(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------

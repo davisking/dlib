@@ -368,10 +368,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     function_spec::function_spec(
-        const matrix<double,0,1>& lower_, 
-        const matrix<double,0,1>& upper_
+        matrix<double,0,1> bound1, 
+        matrix<double,0,1> bound2
     ) : 
-        lower(lower_), upper(upper_)
+        lower(std::move(bound1)), upper(std::move(bound2))
     {
         DLIB_CASSERT(lower.size() == upper.size());
         for (size_t i = 0; i < lower.size(); ++i)
@@ -386,11 +386,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     function_spec::function_spec(
-        const matrix<double,0,1>& lower,
-        const matrix<double,0,1>& upper, 
+        matrix<double,0,1> bound1,
+        matrix<double,0,1> bound2, 
         std::vector<bool> is_integer
     ) : 
-        function_spec(std::move(lower),std::move(upper))
+        function_spec(std::move(bound1),std::move(bound2))
     {
         is_integer_variable = std::move(is_integer);
         DLIB_CASSERT(lower.size() == (long)is_integer_variable.size());
@@ -597,6 +597,7 @@ namespace dlib
         const std::vector<function_spec>& functions_
     )
     {
+        DLIB_CASSERT(functions_.size() > 0);
         m = std::make_shared<std::mutex>();
         functions.reserve(functions_.size());
         for (size_t i = 0; i < functions_.size(); ++i)
@@ -613,6 +614,7 @@ namespace dlib
     ) : 
         global_function_search(functions_) 
     {
+        DLIB_CASSERT(functions_.size() > 0);
         DLIB_CASSERT(functions_.size() == initial_function_evals.size());
         DLIB_CASSERT(relative_noise_magnitude >= 0);
         relative_noise_magnitude = relative_noise_magnitude_;

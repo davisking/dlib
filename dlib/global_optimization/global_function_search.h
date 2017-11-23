@@ -3,6 +3,7 @@
 #ifndef DLIB_GLOBAL_FuNCTION_SEARCH_Hh_
 #define DLIB_GLOBAL_FuNCTION_SEARCH_Hh_
 
+#include "global_function_search_abstract.h"
 #include <vector>
 #include "../matrix.h"
 #include <mutex>
@@ -17,13 +18,13 @@ namespace dlib
     struct function_spec
     {
         function_spec(
-            const matrix<double,0,1>& lower_, 
-            const matrix<double,0,1>& upper_
+            matrix<double,0,1> bound1, 
+            matrix<double,0,1> bound2
         );
 
         function_spec(
-            const matrix<double,0,1>& lower, 
-            const matrix<double,0,1>& upper, 
+            matrix<double,0,1> bound1, 
+            matrix<double,0,1> bound2, 
             std::vector<bool> is_integer
         );
 
@@ -116,12 +117,6 @@ namespace dlib
         void set (
             double y
         );
-        /*!
-            requires
-                - has_been_evaluated() == false
-            ensures
-                - #has_been_evaluated() == true
-        !*/
 
     private:
 
@@ -143,7 +138,7 @@ namespace dlib
     {
     public:
 
-        global_function_search() = delete;
+        global_function_search() = default;
 
         explicit global_function_search(
             const function_spec& function
@@ -161,6 +156,9 @@ namespace dlib
 
         global_function_search(const global_function_search&) = delete;
         global_function_search& operator=(const global_function_search& item) = delete;
+
+        global_function_search(global_function_search&& item) = default;
+        global_function_search& operator=(global_function_search&& item) = default;
 
         size_t num_functions(
         ) const;
