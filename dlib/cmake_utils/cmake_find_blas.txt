@@ -26,7 +26,10 @@ SET(blas_found 0)
 SET(lapack_found 0)
 SET(found_intel_mkl 0)
 SET(found_intel_mkl_headers 0)
+SET(lapack_with_underscore 0)
+SET(lapack_without_underscore 0)
 
+message(STATUS "Searching for BLAS and LAPACK")
 
 if (UNIX OR MINGW)
     message(STATUS "Searching for BLAS and LAPACK")
@@ -322,19 +325,45 @@ elseif(WIN32 AND NOT MINGW)
             set(lapack_found 0)
         endif()
 
-        if (MSVC AND blas_found)
-            # need to set /bigobj when statically linking with the MKL on
-            # visual studio or it doesn't work right.
-            if (NOT CMAKE_CXX_FLAGS MATCHES "/bigobj")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj" 
-                    CACHE STRING "Flags used by the compiler during all C++ builds." 
-                    FORCE)
-            endif ()
-        endif()
     endif()
 
 
 endif()
 
 
+# When all else fails use CMake's built in functions to find BLAS and LAPACK
+if (NOT blas_found)
+    find_package(BLAS QUIET)
+    if (${BLAS_FOUND})
+        set(blas_libraries ${BLAS_LIBRARIES})      
+        set(blas_found 1)
+    endif()
+endif()
+
+if (NOT lapack_found)
+    find_package(LAPACK QUIET)
+    if (${LAPACK_FOUND})
+        set(lapack_libraries ${LAPACK_LIBRARIES})
+        set(lapack_found 1)
+    endif()
+endif()
+
+# If using lapack, determine whether to mangle functions
+if (lapack_found)
+   include(CheckFunctionExists)
+   include(CheckFortranFunctionExists)
+   set(CMAKE_REQUIRED_LIBRARIES ${lapack_libraries})
+
+   check_function_exists("sgesv" LAPACK_FOUND_C_UNMANGLED)
+   check_function_exists("sgesv_" LAPACK_FOUND_C_MANGLED)
+   if (CMAKE_Fortran_COMPILER_LOADED)
+      check_fortran_function_exists("sgesv" LAPACK_FOUND_FORTRAN_UNMANGLED)
+      check_fortran_function_exists("sgesv_" LAPACK_FOUND_FORTRAN_MANGLED)
+   endif ()
+   if (LAPACK_FOUND_C_MANGLED OR LAPACK_FOUND_FORTRAN_MANGLED)
+      set(lapack_with_underscore 1)
+   elseif (LAPACK_FOUND_C_UNMANGLED OR LAPACK_FOUND_FORTRAN_UNMANGLED)
+      set(lapack_without_underscore 1)
+   endif ()
+endif()
 

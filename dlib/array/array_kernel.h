@@ -193,6 +193,10 @@ namespace dlib
             T& item
         );
 
+        void push_back (
+            T&& item
+        );
+
         typedef T* iterator;
         typedef const T* const_iterator;
         iterator                begin()                         { return array_elements; }
@@ -778,6 +782,17 @@ namespace dlib
             exchange(item,(*this)[this->size()-1]);
         }
     }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename mem_manager
+        >
+    void array<T,mem_manager>::
+    push_back (
+        T&& item
+    ) { push_back(item); }
 
 // ----------------------------------------------------------------------------------------
 

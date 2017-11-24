@@ -7,6 +7,10 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(dlib)
 
+
+include(cmake_utils/set_compiler_specific_options.cmake)
+
+
 # Adhere to GNU filesystem layout conventions
 include(GNUInstallDirs)
 
@@ -23,12 +27,19 @@ set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPAC
 get_directory_property(has_parent PARENT_DIRECTORY)
 if(has_parent)
    set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
+   if (NOT DEFINED DLIB_IN_PROJECT_BUILD)
+      set(DLIB_IN_PROJECT_BUILD true)
+   endif()
 endif()
 
-# Set only because there are old target_link_libraries() statements in the
-# FindCUDA.cmake file that comes with CMake that error out if the new behavior
-# is used.
-cmake_policy(SET CMP0023 OLD)
+if (CMAKE_VERSION VERSION_LESS "3.9.0")
+   # Set only because there are old target_link_libraries() statements in the
+   # FindCUDA.cmake file that comes with CMake that error out if the new behavior
+   # is used.  In newer versions of CMake we can instead set CUDA_LINK_LIBRARIES_KEYWORD which fixes this issue.
+   cmake_policy(SET CMP0023 OLD)
+else()
+   set(CUDA_LINK_LIBRARIES_KEYWORD PUBLIC)
+endif()
 
 
 macro (enable_preprocessor_switch option_name)
@@ -178,6 +189,7 @@ if (NOT TARGET dlib)
          data_io/mnist.cpp
          dnn/cpu_dlib.cpp
          dnn/tensor_tools.cpp
+         global_optimization/global_function_search.cpp
    )
 
 
@@ -243,7 +255,7 @@ if (NOT TARGET dlib)
                # If both X11 and anaconda are installed, it's possible for the
                # anaconda path to appear before /opt/X11, so we remove anaconda.
                foreach (ITR ${X11_INCLUDE_DIR})
-                  if ("${ITR}" MATCHES "(.*)(ana|mini)conda(.*)")
+                  if ("${ITR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)")
                      list (REMOVE_ITEM X11_INCLUDE_DIR ${ITR})
                   endif ()
                endforeach(ITR)
@@ -411,7 +423,7 @@ if (NOT TARGET dlib)
          # Make sure there isn't something wrong with the version of libjpeg 
          # installed on this system.  Also don't use the installed libjpeg
          # if this is an APPLE system because apparently it's broken (as of 2015/01/01).
-         if (JPEG_FOUND)
+         if (JPEG_FOUND AND NOT ("${JPEG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)"))
             set(CMAKE_REQUIRED_LIBRARIES ${JPEG_LIBRARY})
             CHECK_FUNCTION_EXISTS(jpeg_read_header LIBJPEG_IS_GOOD)
          endif()
@@ -491,6 +503,13 @@ if (NOT TARGET dlib)
          if (DLIB_USE_LAPACK)
             if (lapack_found)
                set (dlib_needed_libraries ${dlib_needed_libraries} ${lapack_libraries})
+               if (lapack_with_underscore)
+                  set(LAPACK_FORCE_UNDERSCORE 1)
+                  enable_preprocessor_switch(LAPACK_FORCE_UNDERSCORE)
+               elseif (lapack_without_underscore)
+                  set(LAPACK_FORCE_NOUNDERSCORE 1)
+                  enable_preprocessor_switch(LAPACK_FORCE_NOUNDERSCORE)
+               endif ()
             else()
                set(DLIB_USE_LAPACK OFF CACHE STRING ${DLIB_USE_LAPACK_STR} FORCE )
                toggle_preprocessor_switch(DLIB_USE_LAPACK)
@@ -517,7 +536,7 @@ if (NOT TARGET dlib)
             set(CUDA_FOUND 0)
          endif()
 
-         if (CUDA_FOUND AND COMPILER_CAN_DO_CPP_11)
+         if (CUDA_FOUND AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER))
 
             # There is some bug in cmake that causes it to mess up the
             # -std=c++11 option if you let it propagate it to nvcc in some
@@ -527,7 +546,7 @@ if (NOT TARGET dlib)
                set(CUDA_PROPAGATE_HOST_FLAGS OFF)
                # Grab all the -D flags from CMAKE_CXX_FLAGS so we can pass them
                # to nvcc.
-               string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC ${CMAKE_CXX_FLAGS})
+               string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC "${CMAKE_CXX_FLAGS}")
             endif()
 
 
@@ -550,7 +569,7 @@ if (NOT TARGET dlib)
 
             include(cmake_utils/test_for_cudnn/find_cudnn.txt)
 
-            if (cudnn AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
+            if (cudnn AND cudnn_include AND NOT DEFINED cuda_test_compile_worked AND NOT DEFINED cudnn_test_compile_worked)
                # make sure cuda is really working by doing a test compile
                message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
 
@@ -574,10 +593,10 @@ if (NOT TARGET dlib)
                               ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cudnn cudnn_test
                               CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
                                           )
-                  if (cudnn_test_compile_worked)
-                     message(STATUS "Found cuDNN: " ${cudnn})
-                  else()
-                     message(STATUS "*** Found cuDNN, but it looks like the wrong version so dlib will not use it. ***")
+                  if (NOT cudnn_test_compile_worked)
+                     message(STATUS "*** Found cuDNN, but it looks like the wrong version so dlib will not use it.              ***")
+                     message(STATUS "*** Dlib requires cuDNN V5.0 OR GREATER.  Since cuDNN is not found DLIB WILL NOT USE CUDA. ***")
+                     message(STATUS "*** If you have cuDNN then set CMAKE_PREFIX_PATH to include cuDNN's folder.                ***")
                   endif()
                endif()
             endif()
@@ -603,7 +622,7 @@ if (NOT TARGET dlib)
             endif()
          endif()
 
-         if (CUDA_FOUND AND cudnn AND COMPILER_CAN_DO_CPP_11 AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
+         if (CUDA_FOUND AND cudnn AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER) AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
             set(source_files ${source_files} 
                dnn/cuda_dlib.cu 
                dnn/cudnn_dlibapi.cpp
@@ -621,19 +640,14 @@ if (NOT TARGET dlib)
                                       ${openmp_libarires}
                                       )
             include_directories(${cudnn_include})
+            message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA")
          else()
             set(DLIB_USE_CUDA OFF CACHE STRING ${DLIB_USE_BLAS_STR} FORCE )
             toggle_preprocessor_switch(DLIB_USE_CUDA)
-            if (COMPILER_CAN_DO_CPP_11)
-               if (cuda_test_compile_worked)
-                  if (NOT cudnn OR NOT cudnn_include OR NOT cudnn_test_compile_worked)
-                     message(STATUS "*** cuDNN V5.0 OR GREATER NOT FOUND.  DLIB WILL NOT USE CUDA. ***")
-                     message(STATUS "*** If you have cuDNN then set CMAKE_PREFIX_PATH to include cuDNN's folder.")
-                  endif()
-               endif()
-            else ()
+            if (USING_OLD_VISUAL_STUDIO_COMPILER)
                message(STATUS "*** Dlib CUDA support requires C++11 but your compiler doesn't support it. ***")
             endif()
+            message(STATUS "Disabling CUDA support for dlib.  DLIB WILL NOT USE CUDA")
          endif()
       endif()
       
@@ -643,13 +657,12 @@ if (NOT TARGET dlib)
          # make sure sqlite3.h is in the include path
          find_path(sqlite_path sqlite3.h)
          if (sqlite AND sqlite_path)
-            get_filename_component(sqlite_path2 ${sqlite_path} PATH CACHE)
-            set(dlib_needed_includes ${dlib_needed_includes} ${sqlite_path2})
+            set(dlib_needed_includes ${dlib_needed_includes} ${sqlite_path})
             set(dlib_needed_libraries ${dlib_needed_libraries} ${sqlite} )
          else()
             set(DLIB_LINK_WITH_SQLITE3 OFF CACHE STRING ${DLIB_LINK_WITH_SQLITE3_STR} FORCE )
          endif()
-         mark_as_advanced(sqlite sqlite_path sqlite_path2)
+         mark_as_advanced(sqlite sqlite_path)
       endif()
 
 
@@ -709,21 +722,30 @@ if (NOT TARGET dlib)
                                  INTERFACE $<INSTALL_INTERFACE:include>
                                  PUBLIC ${dlib_needed_includes}
                                  )
-      target_link_libraries(dlib_shared PRIVATE ${dlib_needed_libraries})
+      target_link_libraries(dlib_shared PUBLIC ${dlib_needed_libraries})
       target_compile_options(dlib_shared PRIVATE ${active_preprocessor_switches})
    endif()
 
 
    # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
-      ADD_LIBRARY(dlib_all_source_cpp STATIC all/source.cpp) 
+      add_library(dlib_all_source_cpp STATIC all/source.cpp) 
       target_link_libraries(dlib_all_source_cpp dlib)
       target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
+      enable_cpp11_for_target(dlib_all_source_cpp)
+   endif()
+
+   if (TARGET dlib)
+      enable_cpp11_for_target(dlib)
+      target_compile_options(dlib PUBLIC ${active_compile_opts})
+   endif()
+   if (TARGET dlib_shared)
+      enable_cpp11_for_target(dlib_shared)
+      target_compile_options(dlib_shared PUBLIC ${active_compile_opts})
    endif()
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
-       cmake_minimum_required(VERSION 2.8.8)
        if(UNIX)
            set_target_properties(dlib_shared PROPERTIES
                                         OUTPUT_NAME dlib 

@@ -116,8 +116,11 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON T
-                T is a matrix or array2d object and it must contain some kind of pixel
-                type.  I.e. pixel_traits<T::type> must be defined. 
+                One of the following must be true:
+                    - T is a matrix or array2d object and it must contain some kind of
+                      pixel type.  I.e. pixel_traits<T::type> must be defined.   
+                    - T is a std::array<matrix<U>> where U is any built in scalar type like
+                      float, double, or unsigned char. 
 
             WHAT THIS OBJECT REPRESENTS
                 This is a basic input layer that simply copies images into a tensor.  
@@ -141,7 +144,8 @@ namespace dlib
             ensures
                 - Converts the iterator range into a tensor and stores it into #data.  In
                   particular, if the input images have R rows, C columns, and K channels
-                  (where K is given by pixel_traits::num) then we will have:
+                  (where K is given by pixel_traits::num or std::array::size() if
+                  std::array inputs are used) then we will have:
                     - #data.num_samples() == std::distance(ibegin,iend)
                     - #data.nr() == R
                     - #data.nc() == C
@@ -149,6 +153,8 @@ namespace dlib
                   For example, a matrix<float,3,3> would turn into a tensor with 3 rows, 3
                   columns, and k()==1.  Or a matrix<rgb_pixel,4,5> would turn into a tensor
                   with 4 rows, 5 columns, and k()==3 (since rgb_pixels have 3 channels).
+                  Or a std::array<matrix<float,3,3>,5> would turn into a tensor with 3 rows
+                  and columns, and k()==5 channels.
                 - If the input data contains pixels of type unsigned char, rgb_pixel, or
                   other pixel types with a basic_pixel_type of unsigned char then each
                   value written to the output tensor is first divided by 256.0 so that the

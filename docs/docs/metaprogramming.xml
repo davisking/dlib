@@ -58,6 +58,8 @@
          <item>tabs</item> 
          <item>tmin</item> 
          <item>tmax</item> 
+         <item>compile_time_integer_list</item> 
+         <item>make_compile_time_integer_range</item> 
       </section>
  
       <section>
@@ -114,6 +116,31 @@
             This is a template to compute the max of two values at compile time.
          </description>
          
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>compile_time_integer_list</name>
+         <file>dlib/metaprogramming.h</file>
+         <spec_file link="true">dlib/metaprogramming.h</spec_file>
+         <description>
+            This is a variadic template that can represent a list of integers.
+         </description>
+         
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>make_compile_time_integer_range</name>
+         <file>dlib/metaprogramming.h</file>
+         <spec_file link="true">dlib/metaprogramming.h</spec_file>
+         <description>
+            This is a variadic template that takes one number, MAX, as input
+            and creates a <a href="#compile_time_integer_list">compile_time_integer_list</a>
+            representing the range of integers [1,MAX] inclusive. 
+         </description>
       </component>
       
    <!-- ************************************************************************* -->

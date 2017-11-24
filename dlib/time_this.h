@@ -17,7 +17,7 @@
         using std::chrono::duration_cast;                                                                       \
         using std::chrono::duration;                                                                            \
         if (_tt_thetime >= std::chrono::minutes(1))                                                             \
-            _tt_out << "\ntime: " << duration_cast<duration<double>>(_tt_thetime).count() << "min\n";           \
+            _tt_out << "\ntime: " << duration_cast<duration<double,std::ratio<60>>>(_tt_thetime).count() << "min\n";           \
         else if (_tt_thetime >= std::chrono::seconds(1))                                                        \
             _tt_out << "\ntime: " << duration_cast<duration<double>>(_tt_thetime).count() << "sec\n";           \
         else if (_tt_thetime >= std::chrono::milliseconds(1))                                                   \

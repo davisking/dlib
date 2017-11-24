@@ -153,6 +153,68 @@ namespace
         auto grad_error = compare_gradients(src_grad, grad_src);
         dlog << LINFO << "src error: " << grad_error;
         DLIB_TEST(grad_error < 0.001);
+
+#ifdef DLIB_USE_CUDA
+        resizable_tensor src1 = src;
+        resizable_tensor src2 = src;
+        resizable_tensor dest1, dest2;
+        dest1.copy_size(src);
+        dest2.copy_size(src);
+        cuda::softmax_all(dest1, src1);
+        cpu::softmax_all(dest2, src2);
+        DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2))) < 1e-5, max(abs(mat(dest1)-mat(dest2))));
+#endif
+    }
+
+    void test_softmax_all()
+    {
+        using namespace dlib::tt;
+        print_spinner();
+        const long nr = 3;
+        const long nc = 3;
+        resizable_tensor src(5,5,nr,nr), dest(5,5,nr,nc), gradient_input(5,5,nr,nc);
+        tt::tensor_rand rnd;
+        rnd.fill_uniform(src);
+        rnd.fill_uniform(dest);
+        // fill like this as a test of the assignment operator.
+        gradient_input = matrix_cast<float>(gaussian_randm(5,5*nr*nc, 2));
+
+
+
+        auto grad_src = [&](long idx) {
+            auto f = [&](float eps) {
+                const float old = src.host()[idx];
+                src.host()[idx] += eps;
+                tt::softmax_all(dest, src);
+                float result = dot(gradient_input, dest);
+                src.host()[idx] = old;
+                return result;
+            };
+            const float eps = 0.01;
+            return (f(+eps)-f(-eps))/(2*eps);
+        };
+
+        resizable_tensor src_grad;
+        src_grad.copy_size(src);
+        src_grad = 0;
+
+        tt::softmax_all(dest, src);
+        softmax_all_gradient(src_grad, dest, gradient_input);
+
+        auto grad_error = compare_gradients(src_grad, grad_src);
+        dlog << LINFO << "src error: " << grad_error;
+        DLIB_TEST(grad_error < 0.001);
+
+#ifdef DLIB_USE_CUDA
+        resizable_tensor src1 = src;
+        resizable_tensor src2 = src;
+        resizable_tensor dest1, dest2;
+        dest1.copy_size(src);
+        dest2.copy_size(src);
+        cuda::softmax_all(dest1, src1);
+        cpu::softmax_all(dest2, src2);
+        DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2))) < 1e-5, max(abs(mat(dest1)-mat(dest2))));
+#endif
     }
 
     void test_batch_normalize()
@@ -1655,6 +1717,24 @@ namespace
         }
         {
             print_spinner();
+            con_<3,0,2,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            con_<3,2,0,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            con_<3,0,0,2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             fc_<1,FC_HAS_BIAS> l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
@@ -1698,6 +1778,12 @@ namespace
         {
             print_spinner();
             softmax_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            softmax_all_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
@@ -2118,8 +2204,56 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_simple_linear_regression_eil()
+    {
+        print_spinner();
+        const int num_samples = 1000;
+        ::std::vector<matrix<double>> x(num_samples);
+        ::std::vector<float> y(num_samples);
+        ::std::default_random_engine generator(16);
+        ::std::normal_distribution<float> distribution(0,0.0001);
+        const float true_intercept = 50.0;
+        const float true_slope = 10.0;
+        for ( int ii = 0; ii < num_samples; ++ii )
+        {
+            const double val = static_cast<double>(ii)/10;
+            matrix<double> tmp(1,1);
+            tmp = val;
+            x[ii] = tmp;
+            y[ii] = (true_intercept + true_slope*static_cast<float>(val) + distribution(generator));
+        }
+
+        using net_type = loss_epsilon_insensitive<fc<1, input<matrix<double>>>>;
+        net_type net(0.01);
+        layer<1>(net).layer_details().set_bias_learning_rate_multiplier(300);
+        sgd defsolver(0,0.9);
+        dnn_trainer<net_type> trainer(net, defsolver);
+        trainer.set_learning_rate(1e-5);
+        trainer.set_min_learning_rate(1e-8);
+        trainer.set_mini_batch_size(50);
+        trainer.set_max_num_epochs(570);
+        trainer.train(x, y);
+
+        const float slope = layer<1>(net).layer_details().get_weights().host()[0];
+        const float slope_error = abs(true_slope - slope);
+        const float intercept = layer<1>(net).layer_details().get_biases().host()[0];
+        const float intercept_error = abs(true_intercept - intercept);
+        const float eps_slope = 0.01, eps_intercept = 0.1;
+
+        dlog << LINFO << "slope_error: "<< slope_error;
+        dlog << LINFO << "intercept_error: "<< intercept_error;
+        DLIB_TEST_MSG(slope_error <= eps_slope,
+                      "Expected slope = " << true_slope << " Estimated slope = " << slope << " Error limit = " << eps_slope);
+        DLIB_TEST_MSG(intercept_error <= eps_intercept,
+                      "Expected intercept = " << true_intercept << " Estimated intercept = " << intercept << " Error limit = " << eps_intercept);
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_simple_linear_regression_with_mult_prev()
     {
+        srand(1234);
         print_spinner();
         const int num_samples = 1000;
         ::std::vector<matrix<double>> x(num_samples);
@@ -2143,7 +2277,7 @@ namespace
         trainer.set_learning_rate(1e-5);
         trainer.set_min_learning_rate(1e-11);
         trainer.set_mini_batch_size(50);
-        trainer.set_max_num_epochs(300);
+        trainer.set_max_num_epochs(2000);
         trainer.train(x, y);
 
         running_stats<double> rs;
@@ -2227,6 +2361,8 @@ namespace
     void test_simple_autoencoder()
     {
         print_spinner();
+
+        srand(1234);
 
         const int output_width = 7;
         const int output_height = 7;
@@ -2875,6 +3011,46 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_loss_dot()
+    {
+        print_spinner();
+
+        std::vector<matrix<float,0,1>> samples;
+        std::vector<matrix<float,0,1>> labels;
+
+        const matrix<float> proj = matrix_cast<float>(randm(2,3));
+        for (int i = 0; i < 128; ++i)
+        {
+            // The task is going to be to learn the matrix proj.  So we make our
+            // training data thusly:
+            matrix<float,0,1> x = matrix_cast<float>(randm(3,1));
+            matrix<float,0,1> y = normalize(proj*x);
+            samples.push_back(x);
+            labels.push_back(y);
+        }
+
+        using net_type = loss_dot<
+            l2normalize<fc_no_bias<2, 
+            input<matrix<float,0,1>> 
+            >>>;
+
+        net_type net;
+        dnn_trainer<net_type> trainer(net, sgd(1e-4, 0.9));
+        trainer.set_learning_rate(0.01);
+        trainer.set_min_learning_rate(0.0000001);
+        trainer.set_mini_batch_size(128);
+        trainer.set_max_num_epochs(50000);
+        trainer.train(samples, labels);
+
+
+        for (size_t i = 0; i < samples.size(); ++i)
+        {
+            DLIB_TEST(std::abs(1-dot(net(samples[i]),labels[i])) < 0.001);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -2938,6 +3114,7 @@ namespace
             test_avg_pool(4,5,40,50,0,1);
             test_tanh();
             test_softmax();
+            test_softmax_all();
             test_sigmoid();
             test_batch_normalize();
             test_batch_normalize_conv();
@@ -2948,6 +3125,7 @@ namespace
             test_copy_tensor_add_to_cpu();
             test_concat();
             test_simple_linear_regression();
+            test_simple_linear_regression_eil();
             test_simple_linear_regression_with_mult_prev();
             test_multioutput_linear_regression();
             test_simple_autoencoder();
@@ -2957,6 +3135,7 @@ namespace
             test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
             test_loss_multiclass_per_pixel_weighted();
             test_serialization();
+            test_loss_dot();
         }
 
         void perform_test()

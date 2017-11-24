@@ -55,6 +55,10 @@ namespace dlib
         }
     }
 
+    enum class force_flush_to_disk {
+        no = 0,
+        yes = 1
+    };
 
     template <
         typename net_type, 
@@ -135,10 +139,11 @@ namespace dlib
         }
 
         net_type& get_net (
+            force_flush_to_disk force_flush = force_flush_to_disk::yes
         )  
         { 
             wait_for_thread_to_pause();
-            sync_to_disk(true);
+            sync_to_disk(force_flush == force_flush_to_disk::yes);
             propagate_exception();
             return net; 
         }
@@ -579,7 +584,8 @@ namespace dlib
         void record_test_loss(double loss)
         {
             test_previous_loss_values.push_back(loss);
-            rs_test.add(loss);
+            if (is_finite(loss))
+                rs_test.add(loss);
             // discard really old loss values.
             while (test_previous_loss_values.size() > test_iter_without_progress_thresh)
                 test_previous_loss_values.pop_front();
@@ -699,7 +705,7 @@ namespace dlib
                                 test_steps_without_progress = 0;
                                 // Empty out some of the previous loss values so that test_steps_without_progress 
                                 // will decrease below test_iter_without_progress_thresh.  
-                                for (int cnt = 0; cnt < test_previous_loss_values_dump_amount && test_previous_loss_values.size() > 0; ++cnt)
+                                for (int cnt = 0; cnt < test_previous_loss_values_dump_amount+test_iter_without_progress_thresh/10 && test_previous_loss_values.size() > 0; ++cnt)
                                     test_previous_loss_values.pop_front();
                             }
                         }
@@ -819,7 +825,7 @@ namespace dlib
                             steps_without_progress = 0;
                             // Empty out some of the previous loss values so that steps_without_progress 
                             // will decrease below iter_without_progress_thresh.  
-                            for (int cnt = 0; cnt < previous_loss_values_dump_amount && previous_loss_values.size() > 0; ++cnt)
+                            for (int cnt = 0; cnt < previous_loss_values_dump_amount+iter_without_progress_thresh/10 && previous_loss_values.size() > 0; ++cnt)
                                 previous_loss_values.pop_front();
                         }
                     }

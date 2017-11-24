@@ -40,9 +40,8 @@ using namespace std;
 // The dlib_face_recognition_resnet_model_v1 model used by this example was trained using
 // essentially the code shown in dnn_metric_learning_on_images_ex.cpp except the
 // mini-batches were made larger (35x15 instead of 5x5), the iterations without progress
-// was set to 10000, the jittering you can see below in jitter_image() was used during
-// training, and the training dataset consisted of about 3 million images instead of 55.
-// Also, the input layer was locked to images of size 150.
+// was set to 10000, and the training dataset consisted of about 3 million images instead of
+// 55.  Also, the input layer was locked to images of size 150.
 template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
 using residual = add_prev1<block<N,BN,1,tag1<SUBNET>>>;
 
@@ -143,7 +142,7 @@ int main(int argc, char** argv) try
     std::vector<sample_pair> edges;
     for (size_t i = 0; i < face_descriptors.size(); ++i)
     {
-        for (size_t j = i+1; j < face_descriptors.size(); ++j)
+        for (size_t j = i; j < face_descriptors.size(); ++j)
         {
             // Faces are connected in the graph if they are close enough.  Here we check if
             // the distance between two face descriptors is less than 0.6, which is the
@@ -206,26 +205,14 @@ std::vector<matrix<rgb_pixel>> jitter_image(
 )
 {
     // All this function does is make 100 copies of img, all slightly jittered by being
-    // zoomed, rotated, and translated a little bit differently.
-    thread_local random_cropper cropper;
-    cropper.set_chip_dims(150,150);
-    cropper.set_randomly_flip(true);
-    cropper.set_max_object_size(0.99999);
-    cropper.set_background_crops_fraction(0);
-    cropper.set_min_object_size(0.97);
-    cropper.set_translate_amount(0.02);
-    cropper.set_max_rotation_degrees(3);
+    // zoomed, rotated, and translated a little bit differently. They are also randomly
+    // mirrored left to right.
+    thread_local dlib::rand rnd;
 
-    std::vector<mmod_rect> raw_boxes(1), ignored_crop_boxes;
-    raw_boxes[0] = shrink_rect(get_rect(img),3);
     std::vector<matrix<rgb_pixel>> crops; 
-
-    matrix<rgb_pixel> temp; 
     for (int i = 0; i < 100; ++i)
-    {
-        cropper(img, raw_boxes, temp, ignored_crop_boxes);
-        crops.push_back(move(temp));
-    }
+        crops.push_back(jitter_image(img,rnd));
+
     return crops;
 }
 

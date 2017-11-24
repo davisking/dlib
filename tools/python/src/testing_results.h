@@ -19,14 +19,19 @@ struct binary_test
 
 struct regression_test 
 {
-    regression_test() : mean_squared_error(0), R_squared(0) {}
+    regression_test() = default; 
     regression_test(
-        const dlib::matrix<double,1,2>& m
+        const dlib::matrix<double,1,4>& m
     ) : mean_squared_error(m(0)),
-        R_squared(m(1)) {}
+        R_squared(m(1)),
+        mean_average_error(m(2)),
+        mean_error_stddev(m(3))
+    {}
 
-    double mean_squared_error;
-    double R_squared;
+    double mean_squared_error = 0;
+    double R_squared = 0;
+    double mean_average_error = 0;
+    double mean_error_stddev = 0;
 };
 
 struct ranking_test 

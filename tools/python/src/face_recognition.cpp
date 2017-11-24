@@ -28,15 +28,6 @@ public:
     face_recognition_model_v1(const std::string& model_filename)
     {
         deserialize(model_filename) >> net;
-
-        cropper = make_shared<random_cropper>();
-        cropper->set_chip_dims(150,150);
-        cropper->set_randomly_flip(true);
-        cropper->set_max_object_size(0.99999);
-        cropper->set_background_crops_fraction(0);
-        cropper->set_min_object_size(0.97);
-        cropper->set_translate_amount(0.02);
-        cropper->set_max_rotation_degrees(3);
     }
 
     matrix<double,0,1> compute_face_descriptor (
@@ -91,23 +82,16 @@ public:
 
 private:
 
-    std::shared_ptr<random_cropper> cropper;
+    dlib::rand rnd;
 
     std::vector<matrix<rgb_pixel>> jitter_image(
         const matrix<rgb_pixel>& img,
         const int num_jitters
     )
     {
-        std::vector<mmod_rect> raw_boxes(1), ignored_crop_boxes;
-        raw_boxes[0] = shrink_rect(get_rect(img),3);
         std::vector<matrix<rgb_pixel>> crops; 
-
-        matrix<rgb_pixel> temp; 
         for (int i = 0; i < num_jitters; ++i)
-        {
-            (*cropper)(img, raw_boxes, temp, ignored_crop_boxes);
-            crops.push_back(move(temp));
-        }
+            crops.push_back(dlib::jitter_image(img,rnd));
         return crops;
     }
 
@@ -157,7 +141,7 @@ boost::python::list chinese_whispers_clustering(boost::python::list descriptors,
     std::vector<unsigned long> labels;
     for (size_t i = 0; i < num_descriptors; ++i)
     {
-        for (size_t j = i+1; j < num_descriptors; ++j)
+        for (size_t j = i; j < num_descriptors; ++j)
         {
             matrix<double,0,1>& first_descriptor = boost::python::extract<matrix<double,0,1>&>(descriptors[i]);
             matrix<double,0,1>& second_descriptor = boost::python::extract<matrix<double,0,1>&>(descriptors[j]);

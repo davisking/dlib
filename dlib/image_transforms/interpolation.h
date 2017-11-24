@@ -11,6 +11,7 @@
 #include "../simd.h"
 #include "../image_processing/full_object_detection.h"
 #include <limits>
+#include "../rand.h"
 
 namespace dlib
 {
@@ -1163,6 +1164,15 @@ namespace dlib
             return centered_rect(tran(center(rect)), rect.width(), rect.height());
         }
 
+        inline mmod_rect tform_object (
+            const point_transform_affine& tran,
+            mmod_rect rect
+        )
+        {
+            rect.rect = tform_object(tran, rect.rect);
+            return rect;
+        }
+
         inline full_object_detection tform_object(
             const point_transform_affine& tran,
             const full_object_detection& obj
@@ -1209,7 +1219,7 @@ namespace dlib
             for (unsigned long i = 0; i < objects[j].size(); ++i)
                 rects.push_back(impl::tform_object(tran, objects[j][i]));
 
-            images.push_back(temp);
+            images.push_back(std::move(temp));
             objects.push_back(rects);
         }
     }
@@ -1245,7 +1255,7 @@ namespace dlib
         for (unsigned long j = 0; j < num; ++j)
         {
             const point_transform_affine tran = flip_image_left_right(images[j], temp);
-            images.push_back(temp);
+            images.push_back(std::move(temp));
 
             rects.clear();
             for (unsigned long i = 0; i < objects[j].size(); ++i)
@@ -1544,7 +1554,7 @@ namespace dlib
             for (unsigned long j = 0; j < images.size(); ++j)
             {
                 const point_transform_affine tran = rotate_image(images[j], temp, angles(i));
-                new_images.push_back(temp);
+                new_images.push_back(std::move(temp));
 
                 objtemp.clear();
                 for (unsigned long k = 0; k < objects[j].size(); ++k)
@@ -1846,12 +1856,14 @@ namespace dlib
 
     template <
         typename image_type1,
-        typename image_type2
+        typename image_type2,
+        typename interpolation_type
         >
     void extract_image_chips (
         const image_type1& img,
         const std::vector<chip_details>& chip_locations,
-        dlib::array<image_type2>& chips
+        dlib::array<image_type2>& chips,
+        const interpolation_type& interp
     )
     {
         // make sure requires clause is not broken
@@ -1947,10 +1959,56 @@ namespace dlib
 
                 // now extract the actual chip
                 if (level == -1)
-                    transform_image(sub_image(img,bounding_box),chips[i],interpolate_bilinear(),trns);
+                    transform_image(sub_image(img,bounding_box),chips[i],interp,trns);
                 else
-                    transform_image(levels[level],chips[i],interpolate_bilinear(),trns);
+                    transform_image(levels[level],chips[i],interp,trns);
             }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    void extract_image_chips(
+        const image_type1& img,
+        const std::vector<chip_details>& chip_locations,
+        dlib::array<image_type2>& chips
+    )
+    {
+        extract_image_chips(img, chip_locations, chips, interpolate_bilinear());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2,
+        typename interpolation_type
+        >
+    void extract_image_chip (
+        const image_type1& img,
+        const chip_details& location,
+        image_type2& chip,
+        const interpolation_type& interp
+    )
+    {
+        // If the chip doesn't have any rotation or scaling then use the basic version of
+        // chip extraction that just does a fast copy.
+        if (location.angle == 0 && 
+            location.rows == location.rect.height() &&
+            location.cols == location.rect.width())
+        {
+            impl::basic_extract_image_chip(img, location.rect, chip);
+        }
+        else
+        {
+            std::vector<chip_details> chip_locations(1,location);
+            dlib::array<image_type2> chips;
+            extract_image_chips(img, chip_locations, chips, interp);
+            swap(chips[0], chip);
         }
     }
 
@@ -1966,21 +2024,7 @@ namespace dlib
         image_type2& chip
     )
     {
-        // If the chip doesn't have any rotation or scaling then use the basic version of
-        // chip extraction that just does a fast copy.
-        if (location.angle == 0 && 
-            location.rows == location.rect.height() &&
-            location.cols == location.rect.width())
-        {
-            impl::basic_extract_image_chip(img, location.rect, chip);
-        }
-        else
-        {
-            std::vector<chip_details> chip_locations(1,location);
-            dlib::array<image_type2> chips;
-            extract_image_chips(img, chip_locations, chips);
-            swap(chips[0], chip);
-        }
+        extract_image_chip(img, location, chip, interpolate_bilinear());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2068,13 +2112,6 @@ namespace dlib
                 if (17 <= i && i <= 26)
                     continue;
 
-                if (1+i != 37 && 
-                    1+i != 40 &&
-                    1+i != 43 &&
-                    1+i != 46 &&
-                    1+i != 34)
-                    continue;
-
                 dpoint p;
                 p.x() = (padding+mean_face_shape_x[i-17])/(2*padding+1);
                 p.y() = (padding+mean_face_shape_y[i-17])/(2*padding+1);
@@ -2099,6 +2136,45 @@ namespace dlib
         for (unsigned long i = 0; i < dets.size(); ++i)
             res.push_back(get_face_chip_details(dets[i], size, padding));
         return res;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    image_type jitter_image(
+        const image_type& img,
+        dlib::rand& rnd
+    )
+    {
+        DLIB_CASSERT(num_rows(img)*num_columns(img) != 0);
+        DLIB_CASSERT(num_rows(img)==num_columns(img));
+
+        const double max_rotation_degrees = 3;
+        const double min_object_height = 0.97; 
+        const double max_object_height = 0.99999; 
+        const double translate_amount = 0.02;
+
+
+        const auto rect = shrink_rect(get_rect(img),3);
+
+        // perturb the location of the crop by a small fraction of the object's size.
+        const point rand_translate = dpoint(rnd.get_double_in_range(-translate_amount,translate_amount)*rect.width(), 
+            rnd.get_double_in_range(-translate_amount,translate_amount)*rect.height());
+
+        // perturb the scale of the crop by a fraction of the object's size
+        const double rand_scale_perturb = rnd.get_double_in_range(min_object_height, max_object_height); 
+
+        const long box_size = rect.height()/rand_scale_perturb;
+        const auto crop_rect = centered_rect(center(rect)+rand_translate, box_size, box_size);
+        const double angle = rnd.get_double_in_range(-max_rotation_degrees, max_rotation_degrees)*pi/180;
+        image_type crop;
+        extract_image_chip(img, chip_details(crop_rect, chip_dims(img.nr(),img.nc()), angle), crop);
+        if (rnd.get_random_double() > 0.5)
+            flip_image_left_right(crop); 
+
+        return crop;
     }
 
 // ----------------------------------------------------------------------------------------

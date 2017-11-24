@@ -743,6 +743,33 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void softmax_all (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::softmax_all(dest,src);
+#else
+        cpu::softmax_all(dest,src);
+#endif
+    }
+
+    void softmax_all_gradient (
+        tensor& grad,
+        const tensor& dest,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::softmax_all_gradient(grad, dest, gradient_input);
+#else
+        cpu::softmax_all_gradient(grad, dest, gradient_input);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void sigmoid (
         tensor& dest,
         const tensor& src

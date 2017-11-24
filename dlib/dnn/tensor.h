@@ -322,7 +322,7 @@ namespace dlib
         resizable_tensor(const resizable_tensor& item) : _annotation(item.annotation()) 
         {
             copy_size(item);
-            memcpy(data_instance, item.data_instance);
+            memcpy(*this, item);
         }
         resizable_tensor(const tensor& item) : _annotation(item.annotation()) 
         {
@@ -348,6 +348,8 @@ namespace dlib
         {
             set_size(0,0,0,0);
             _annotation.clear();
+            // free underlying memory
+            data_instance.set_size(0);
         }
 
         void copy_size (
@@ -385,7 +387,8 @@ namespace dlib
             m_nr = nr_;
             m_nc = nc_;
             m_size = n_*k_*nr_*nc_;
-            data_instance.set_size(m_size);
+            if ((long)data_instance.size() < m_size)
+                data_instance.set_size(m_size);
 #ifdef DLIB_USE_CUDA
             cudnn_descriptor.set_size(m_n,m_k,m_nr,m_nc);
 #endif

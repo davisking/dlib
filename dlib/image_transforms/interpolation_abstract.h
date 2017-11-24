@@ -499,7 +499,7 @@ namespace dlib
         requires
             - image_array_type == a dlib::array or std::vector of image objects that each
               implement the interface defined in dlib/image_processing/generic_image.h
-            - T == rectangle or full_object_detection
+            - T == rectangle, full_object_detection, or mmod_rect
             - images.size() == objects.size()
         ensures
             - This function computes all the left/right flips of the contents of images and
@@ -532,8 +532,8 @@ namespace dlib
               implement the interface defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - images.size() == objects2.size()
-            - T == rectangle or full_object_detection
-            - U == rectangle or full_object_detection
+            - T == rectangle, full_object_detection, or mmod_rect
+            - U == rectangle, full_object_detection, or mmod_rect
         ensures
             - This function computes all the left/right flips of the contents of images and
               then appends them onto the end of the images array.  It also finds the
@@ -571,8 +571,8 @@ namespace dlib
             - angles.size() > 0
             - images.size() == objects.size()
             - images.size() == objects2.size()
-            - T == rectangle or full_object_detection
-            - U == rectangle or full_object_detection
+            - T == rectangle, full_object_detection, or mmod_rect
+            - U == rectangle, full_object_detection, or mmod_rect
         ensures
             - This function computes angles.size() different rotations of all the given
               images and then replaces the contents of images with those rotations of the
@@ -608,7 +608,7 @@ namespace dlib
             - is_vector(angles) == true
             - angles.size() > 0
             - images.size() == objects.size()
-            - T == rectangle or full_object_detection
+            - T == rectangle, full_object_detection, or mmod_rect
         ensures
             - This function is identical to the add_image_rotations() define above except
               that it doesn't have objects2 as an argument.  
@@ -1163,12 +1163,14 @@ namespace dlib
 
     template <
         typename image_type1,
-        typename image_type2
+        typename image_type2,
+        typename interpolation_type
         >
     void extract_image_chips (
         const image_type1& img,
         const std::vector<chip_details>& chip_locations,
-        dlib::array<image_type2>& chips
+        dlib::array<image_type2>& chips,
+        const interpolation_type& interp
     );
     /*!
         requires
@@ -1180,11 +1182,14 @@ namespace dlib
             - for all valid i: 
                 - chip_locations[i].rect.is_empty() == false
                 - chip_locations[i].size() != 0
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear, 
+              interpolate_quadratic, or a type with a compatible interface.
         ensures
             - This function extracts "chips" from an image.  That is, it takes a list of
               rectangular sub-windows (i.e. chips) within an image and extracts those
               sub-windows, storing each into its own image.  It also scales and rotates the
               image chips according to the instructions inside each chip_details object.
+              It uses the interpolation method supplied as a parameter.
             - #chips == the extracted image chips
             - #chips.size() == chip_locations.size()
             - for all valid i:
@@ -1198,7 +1203,40 @@ namespace dlib
             - Any pixels in an image chip that go outside img are set to 0 (i.e. black).
     !*/
 
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    void extract_image_chips (
+        const image_type1& img,
+        const std::vector<chip_details>& chip_locations,
+        dlib::array<image_type2>& chips
+    );
+    /*!
+        ensures
+            - This function is a simple convenience / compatibility wrapper that calls the
+              above-defined extract_image_chips() function using bilinear interpolation.
+    !*/
+
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
+        typename image_type2,
+        typename interpolation_type
+        >
+    void extract_image_chip (
+        const image_type1& img,
+        const chip_details& chip_location,
+        image_type2& chip,
+        const interpolation_type& interp
+    );
+    /*!
+        ensures
+            - This function simply calls extract_image_chips() with a single chip location
+              and stores the single output chip into #chip.  It uses the provided
+              interpolation method.
+    !*/
 
     template <
         typename image_type1,
@@ -1211,8 +1249,8 @@ namespace dlib
     );
     /*!
         ensures
-            - This function simply calls extract_image_chips() with a single chip location
-              and stores the single output chip into #chip.
+            - This function is a simple convenience / compatibility wrapper that calls the
+              above-defined extract_image_chip() function using bilinear interpolation.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1411,6 +1449,29 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    image_type jitter_image(
+        const image_type& img,
+        dlib::rand& rnd
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+            - img.size() > 0
+            - img.nr() == img.nc()
+        ensures
+            - Randomly jitters the image a little bit and returns this new jittered image.
+              To be specific, the returned image has the same size as img and will look
+              generally similar.  The difference is that the returned image will have been
+              slightly rotated, zoomed, and translated.  There is also a 50% chance it will
+              be mirrored left to right.
+    !*/
+    
 // ----------------------------------------------------------------------------------------
 
 }

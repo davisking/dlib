@@ -3,7 +3,8 @@
 #ifndef DLIB_TImING_Hh_
 #define DLIB_TImING_Hh_
 
-#include "misc_api.h"
+#include <chrono> 
+#include <atomic> 
 #include <cstring>
 #include "string.h"
 
@@ -76,9 +77,9 @@ namespace dlib
         const int TIME_SLOTS = 500;
         const int NAME_LENGTH = 40;
 
-        inline uint64* time_buf()
+        inline std::atomic<uint64_t>* time_buf()
         {
-            static uint64 buf[TIME_SLOTS] = {0};
+            static std::atomic<uint64_t> buf[TIME_SLOTS];
             return buf;
         }
 
@@ -96,26 +97,26 @@ namespace dlib
             return buf[i];
         }
 
-        inline timestamper& ts()
+        inline uint64_t ts()
         {
-            static timestamper ts_;
-            return ts_;
+            using namespace std::chrono;
+            return duration_cast<duration<double,std::nano>>(high_resolution_clock::now().time_since_epoch()).count();
         }
 
-        inline void start(int i )
+        inline void start(int i)
         {
-            time_buf()[i] -= ts().get_timestamp();
+            time_buf()[i] -= ts();
         }
 
         inline void start(int i, const char* name)
         {
-            time_buf()[i] -= ts().get_timestamp();
+            time_buf()[i] -= ts();
             name_buf(i,name);
         }
 
         inline void stop(int i)
         {
-            time_buf()[i] += ts().get_timestamp();
+            time_buf()[i] += ts();
         }
 
         inline void print()
@@ -140,7 +141,7 @@ namespace dlib
             {
                 if (time_buf()[i] != 0)
                 {
-                    double time = time_buf()[i]/1000.0;
+                    double time = time_buf()[i]/1000.0/1000.0;
                     string name;
                     // Check if the name buffer is empty.  Use the name it contains if it isn't.
                     if (name_buf(i,"")[0] != '\0')
@@ -154,9 +155,9 @@ namespace dlib
 
                     if (time < 1000)
                         cout << "  " << name << ": " << time << " milliseconds" << endl;
-                    else if (time < 1000*1000)
+                    else if (time < 1000*60)
                         cout << "  " << name << ": " << time/1000.0 << " seconds" << endl;
-                    else if (time < 1000*1000*60)
+                    else if (time < 1000*60*60)
                         cout << "  " << name << ": " << time/1000.0/60.0 << " minutes" << endl;
                     else
                         cout << "  " << name << ": " << time/1000.0/60.0/60.0 << " hours" << endl;

@@ -8,23 +8,23 @@ cmake_minimum_required(VERSION 2.8.12)
 # create a variable called target_name and set it to the string "htmlify"
 set (target_name htmlify)
 
-PROJECT(${target_name})
+project(${target_name})
 
-include(../../dlib/cmake)
+add_subdirectory(../../dlib dlib_build)
 
 # add all the cpp files we want to compile to this list.  This tells
 # cmake that they are part of our target (which is the executable named htmlify)
-ADD_EXECUTABLE(${target_name} 
+add_executable(${target_name} 
    htmlify.cpp
    to_xml.cpp
    )
 
 # Tell cmake to link our target executable to dlib.
-TARGET_LINK_LIBRARIES(${target_name} dlib::dlib )
+target_link_libraries(${target_name} dlib::dlib )
 
 
 
-INSTALL(TARGETS ${target_name}
+install(TARGETS ${target_name}
 	RUNTIME DESTINATION bin
 	)
 

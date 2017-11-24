@@ -289,10 +289,29 @@ namespace dlib
         struct call_global_mutex { call_global_mutex() { global_mutex(); } };
         static call_global_mutex call_global_mutex_instance;
 
-        const std::shared_ptr<event_handler_thread>& global_data()
+        // Note that we need to use dlib::shared_ptr_thread_safe here rather than
+        // std::shared_ptr.  This is because the destructor of event_handler_thread
+        // triggers an event in the main event loop telling it to stop and that event loop
+        // holds a shared pointer to the event_handler_thread.  So what can happen is
+        // global_data()'s shared pointer gets destructed because the program is
+        // terminating, which causes the event_handler_thread destructor to run, which
+        // eventually causes the event loop to ask global_data() for a handle to the event
+        // thread.  This is bad for std::shared_ptr since (at least as of 2017) most
+        // implementations of std::shared_ptr decrement the reference count to 0 before
+        // invoking the event_handler_thread's destructor and then when the event thread
+        // calls global_data() it increments the counter again, then decrements it back to
+        // 0, triggering a double deletion, when the event handler routine finally
+        // finishes.  
+        // 
+        // dlib::shared_ptr_thread_safe doesn't have this problem.  An alternative would be
+        // to somehow avoid this kind of self reference.  But it's not obvious how to do
+        // that given the limitations of the Win32 event WndProc() structure imposed by
+        // windows.  So in any case, we just use the old dlib::shared_ptr_thread_safe to
+        // avoid this problem.
+        const shared_ptr_thread_safe<event_handler_thread>& global_data()
         {
             auto_mutex M(*global_mutex());
-            static std::shared_ptr<event_handler_thread> p;
+            static shared_ptr_thread_safe<event_handler_thread> p;
             if (p.get() == 0)
             {
                 p.reset(new event_handler_thread());
@@ -672,7 +691,7 @@ namespace dlib
             SetThreadPriority(hand,THREAD_PRIORITY_ABOVE_NORMAL);
             CloseHandle(hand);
 
-            std::shared_ptr<event_handler_thread> globals(global_data());
+            auto globals = global_data();
 
             window_table_type& window_table = globals->window_table;
             HWND& helper_window = globals->helper_window;
@@ -1466,7 +1485,7 @@ namespace dlib
         !*/
         {   
             using namespace gui_core_kernel_1_globals;
-            std::shared_ptr<event_handler_thread> globals(global_data());
+            auto globals = global_data();
             // if we are running in the event handling thread then just call
             // CreateWindow directly
             if (get_thread_id() == globals->event_thread_id)
@@ -2072,7 +2091,7 @@ namespace dlib
         using namespace gui_core_kernel_1_globals;
         using namespace std;
 
-        std::shared_ptr<event_handler_thread> globals(global_data());
+        auto globals = global_data();
 
         if (OpenClipboard(globals->helper_window))
         {
@@ -2139,7 +2158,7 @@ namespace dlib
     {
         using namespace gui_core_kernel_1_globals;
         using namespace std;
-        std::shared_ptr<event_handler_thread> globals(global_data());
+        auto globals = global_data();
 
         auto_mutex M(globals->window_table.get_mutex());
         if (OpenClipboard(globals->helper_window))

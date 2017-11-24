@@ -18,7 +18,8 @@ namespace dlib
         chip_dims dims = chip_dims(300,300);
         bool randomly_flip = true;
         double max_rotation_degrees = 30;
-        double min_object_size = 0.25; // cropped object will be at least this fraction of the size of the image.
+        long min_object_length_long_dim = 75; // cropped object will be at least this many pixels along its longest edge.
+        long min_object_length_short_dim = 30; // cropped object will be at least this many pixels along its shortest edge.
         double max_object_size = 0.7; // cropped object will be at most this fraction of the size of the image.
         double background_crops_fraction = 0.5;
         double translate_amount = 0.10;
@@ -78,14 +79,19 @@ namespace dlib
             double value
         ) { max_rotation_degrees = std::abs(value); }
 
-        double get_min_object_size (
-        ) const { return min_object_size; }
+        long get_min_object_length_long_dim (
+        ) const { return min_object_length_long_dim; }
+        long get_min_object_length_short_dim (
+        ) const { return min_object_length_short_dim; }
+
         void set_min_object_size (
-            double value
+            long long_dim,
+            long short_dim
         ) 
         { 
-            DLIB_CASSERT(0 < value);
-            min_object_size = value; 
+            DLIB_CASSERT(0 < short_dim && short_dim <= long_dim);
+            min_object_length_long_dim = long_dim; 
+            min_object_length_short_dim = short_dim; 
         }
 
         double get_max_object_size (
@@ -151,7 +157,7 @@ namespace dlib
             DLIB_CASSERT(images.size() == rects.size());
             size_t idx;
             { std::lock_guard<std::mutex> lock(rnd_mutex);
-                idx = rnd.get_random_64bit_number()%images.size();
+                idx = rnd.get_integer(images.size());
             }
             (*this)(images[idx], rects[idx], crop, crop_rects);
         }
@@ -175,9 +181,6 @@ namespace dlib
             extract_image_chip(img, crop_plan, crop);
             const rectangle_transform tform = get_mapping_to_chip(crop_plan);
 
-            const unsigned long min_object_size_absolute_rows = std::round(min_object_size*crop_plan.rows);
-            const unsigned long min_object_size_absolute_cols = std::round(min_object_size*crop_plan.cols);
-
             // copy rects into crop_rects and set ones that are outside the crop to ignore or
             // drop entirely as appropriate.
             crop_rects.clear();
@@ -190,8 +193,12 @@ namespace dlib
                 if (get_rect(crop).intersect(rect.rect).area() != 0)
                 {
                     // set to ignore if not totally in the crop or if too small.
-                    if (!get_rect(crop).contains(rect.rect) || (rect.rect.height() < min_object_size_absolute_rows && rect.rect.width() < min_object_size_absolute_cols))
+                    if (!get_rect(crop).contains(rect.rect) || 
+                        ((long)rect.rect.height() < min_object_length_long_dim  && (long)rect.rect.width() < min_object_length_long_dim) || 
+                        ((long)rect.rect.height() < min_object_length_short_dim || (long)rect.rect.width() < min_object_length_short_dim))
+                    {
                         rect.ignore = true;
+                    }
 
                     crop_rects.push_back(rect);
                 }
@@ -223,15 +230,39 @@ namespace dlib
             if (has_non_ignored_box(rects) && rnd.get_random_double() >= background_crops_fraction)
             {
                 auto rect = rects[randomly_pick_rect(rects)].rect;
+
                 // perturb the location of the crop by a small fraction of the object's size.
-                const point rand_translate = dpoint(rnd.get_double_in_range(-translate_amount,translate_amount)*rect.width(), 
-                    rnd.get_double_in_range(-translate_amount,translate_amount)*std::max(rect.height(),rect.width()));
+                const point rand_translate = dpoint(rnd.get_double_in_range(-translate_amount,translate_amount)*std::max(rect.height(),rect.width()), 
+                                                    rnd.get_double_in_range(-translate_amount,translate_amount)*std::max(rect.height(),rect.width()));
 
-                // perturb the scale of the crop by a fraction of the object's size
-                const double rand_scale_perturb = rnd.get_double_in_range(min_object_size, max_object_size); 
+                // We are going to grow rect into the cropping rect.  First, we grow it a
+                // little so that it has the desired minimum border around it.  
+                drectangle drect = centered_drect(center(rect)+rand_translate, rect.width()/max_object_size, rect.height()/max_object_size);
 
-                const long box_size = std::max(rect.height(),rect.width())/rand_scale_perturb;
-                crop_rect = centered_rect(center(rect)+rand_translate, box_size, box_size);
+                // Now make rect have the same aspect ratio as dims so that there won't be
+                // any funny stretching when we crop it.  We do this by growing it along
+                // whichever dimension is too short.
+                const double target_aspect = dims.cols/(double)dims.rows;
+                if (drect.width()/drect.height() < target_aspect)
+                    drect = centered_drect(drect, target_aspect*drect.height(), drect.height());
+                else 
+                    drect = centered_drect(drect, drect.width(), drect.width()/target_aspect);
+
+                // Now perturb the scale of the crop.  We do this by shrinking it, but not
+                // so much that it gets smaller than the min object sizes require. 
+                double current_width = dims.cols*rect.width()/drect.width();
+                double current_height = dims.rows*rect.height()/drect.height();
+
+                // never make any dimension smaller than the short dim.
+                double min_scale1 = std::max(min_object_length_short_dim/current_width, min_object_length_short_dim/current_height);
+                // at least one dimension needs to be longer than the long dim.
+                double min_scale2 = std::min(min_object_length_long_dim/current_width, min_object_length_long_dim/current_height);
+                double min_scale = std::max(min_scale1, min_scale2); 
+
+                const double rand_scale_perturb = 1.0/rnd.get_double_in_range(min_scale, 1); 
+                crop_rect = centered_drect(drect, drect.width()*rand_scale_perturb, drect.height()*rand_scale_perturb);
+                DLIB_CASSERT(crop_rect.width() == crop_rect.height());
+
             }
             else
             {
@@ -259,9 +290,9 @@ namespace dlib
         ) 
         {
             DLIB_CASSERT(has_non_ignored_box(rects));
-            size_t idx = rnd.get_random_64bit_number()%rects.size();
+            size_t idx = rnd.get_integer(rects.size());
             while(rects[idx].ignore)
-                idx = rnd.get_random_64bit_number()%rects.size();
+                idx = rnd.get_integer(rects.size());
             return idx;
         }
 
@@ -280,8 +311,8 @@ namespace dlib
             auto scale = rnd.get_double_in_range(mins, maxs);
             rectangle rect(scale*dims.cols, scale*dims.rows);
             // randomly shift the box around
-            point offset(rnd.get_random_32bit_number()%(1+img.nc()-rect.width()),
-                         rnd.get_random_32bit_number()%(1+img.nr()-rect.height()));
+            point offset(rnd.get_integer(1+img.nc()-rect.width()),
+                         rnd.get_integer(1+img.nr()-rect.height()));
             return move_rect(rect, offset);
         }
 
@@ -298,14 +329,15 @@ namespace dlib
     {
         using std::endl;
         out << "random_cropper details: " << endl;
-        out << "  chip_dims.rows:            " << item.get_chip_dims().rows << endl;
-        out << "  chip_dims.cols:            " << item.get_chip_dims().cols << endl;
-        out << "  randomly_flip:             " << std::boolalpha << item.get_randomly_flip() << endl;
-        out << "  max_rotation_degrees:      " << item.get_max_rotation_degrees() << endl;
-        out << "  min_object_size:           " << item.get_min_object_size() << endl;
-        out << "  max_object_size:           " << item.get_max_object_size() << endl;
-        out << "  background_crops_fraction: " << item.get_background_crops_fraction() << endl;
-        out << "  translate_amount:          " << item.get_translate_amount() << endl;
+        out << "  chip_dims.rows:              " << item.get_chip_dims().rows << endl;
+        out << "  chip_dims.cols:              " << item.get_chip_dims().cols << endl;
+        out << "  randomly_flip:               " << std::boolalpha << item.get_randomly_flip() << endl;
+        out << "  max_rotation_degrees:        " << item.get_max_rotation_degrees() << endl;
+        out << "  min_object_length_long_dim:  " << item.get_min_object_length_long_dim() << endl;
+        out << "  min_object_length_short_dim: " << item.get_min_object_length_short_dim() << endl;
+        out << "  max_object_size:             " << item.get_max_object_size() << endl;
+        out << "  background_crops_fraction:   " << item.get_background_crops_fraction() << endl;
+        out << "  translate_amount:            " << item.get_translate_amount() << endl;
         return out;
     }
 

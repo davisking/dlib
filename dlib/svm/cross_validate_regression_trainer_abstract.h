@@ -16,9 +16,9 @@ namespace dlib
         typename sample_type,
         typename label_type
         >
-    matrix<double,1,2>
+    matrix<double,1,4>
     test_regression_function (
-        const reg_funct_type& reg_funct,
+        reg_funct_type& reg_funct,
         const std::vector<sample_type>& x_test,
         const std::vector<label_type>& y_test
     );
@@ -35,6 +35,9 @@ namespace dlib
                 - M(1) == the R-squared value (i.e. the squared correlation between
                   reg_funct(x_test[i]) and y_test[i]).  This is a number between 0
                   and 1.
+                - M(2) == the mean absolute error.  
+                  This is given by: sum over i: abs(reg_funct(x_test[i]) - y_test[i])
+                - M(3) == the standard deviation of the absolute error.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -44,7 +47,7 @@ namespace dlib
         typename sample_type,
         typename label_type 
         >
-    matrix<double,1,2>
+    matrix<double,1,4>
     cross_validate_regression_trainer (
         const trainer_type& trainer,
         const std::vector<sample_type>& x,
@@ -66,6 +69,9 @@ namespace dlib
                 - M(1) == the R-squared value (i.e. the squared correlation between
                   a predicted y value and its true value).  This is a number between 
                   0 and 1.
+                - M(2) == the mean absolute error.  
+                  This is given by: sum over i: abs(reg_funct(x_test[i]) - y_test[i])
+                - M(3) == the standard deviation of the absolute error.
     !*/
 
 }

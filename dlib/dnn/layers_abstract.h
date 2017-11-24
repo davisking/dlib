@@ -475,6 +475,19 @@ namespace dlib
                     - The rest of the dimensions of T will be 1.
         !*/
 
+        void set_num_outputs(
+            long num
+        );
+        /*!
+            requires
+                - num > 0
+                - get_layer_params().size() == 0 || get_num_outputs() == num
+                  (i.e. You can't change the number of outputs in fc_ if the parameter
+                  tensor has already been allocated.)
+            ensures
+                - #get_num_outputs() == num
+        !*/
+
         fc_bias_mode get_bias_mode (
         ) const;
         /*!
@@ -660,10 +673,22 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON TEMPLATE ARGUMENTS
-                All of them must be > 0.
-                Also, we require that:
-                    - 0 <= _padding_y && _padding_y < _nr
-                    - 0 <= _padding_x && _padding_x < _nc
+                - _num_filters > 0
+                - _nr >= 0
+                - _nc >= 0
+                - _stride_y > 0
+                - _stride_x > 0
+                - _padding_y >= 0
+                - _padding_x >= 0
+                - Also, we require that:
+                    - if (_nr == 0) then
+                        - _padding_y == 0
+                    - else
+                        - _padding_y < _nr
+                    - if (_nc == 0) then
+                        - _padding_x == 0
+                    - else
+                        - _padding_x < _nc
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
@@ -677,6 +702,15 @@ namespace dlib
                     - OUT.k()  == num_filters()
                     - OUT.nr() == 1+(IN.nr() + 2*padding_y() - nr())/stride_y()
                     - OUT.nc() == 1+(IN.nc() + 2*padding_x() - nc())/stride_x()
+
+                Note also that setting _nr or _nc to 0 has a special meaning of "set the
+                filter size equal to the input image size".  Specifically, it means: 
+                    - if (_nr == 0) then
+                        - nr() == IN.nr()
+                        - OUT.nr() == 1
+                    - if (_nc == 0) then
+                        - nc() == IN.nc()
+                        - OUT.nc() == 1
         !*/
 
     public:
@@ -730,7 +764,7 @@ namespace dlib
         /*!
             requires
                 - num > 0
-                - get_layer_params().size() == 0
+                - get_layer_params().size() == 0 || num_filters() == num
                   (i.e. You can't change the number of filters in con_ if the parameter
                   tensor has already been allocated.)
             ensures
@@ -741,14 +775,22 @@ namespace dlib
         ) const; 
         /*!
             ensures
-                - returns the number of rows in the filters in this layer.
+                - returns the number of rows in the filters in this layer.  Note that if
+                  nr()==0 then it means the size of the filter is not yet assigned, but
+                  once setup() is called nr() will be set to the input tensor's nr().
+                  Therefore, nr()==0 has the special interpretation of "be the same size as
+                  the input tensor".
         !*/
 
         long nc(
         ) const;
         /*!
             ensures
-                - returns the number of columns in the filters in this layer.
+                - returns the number of columns in the filters in this layer.  Note that if
+                  nc()==0 then it means the size of the filter is not yet assigned, but
+                  once setup() is called nc() will be set to the input tensor's nc().
+                  Therefore, nc()==0 has the special interpretation of "be the same size as
+                  the input tensor".
         !*/
 
         long stride_y(
@@ -974,7 +1016,7 @@ namespace dlib
         /*!
             requires
                 - num > 0
-                - get_layer_params().size() == 0
+                - get_layer_params().size() == 0 || num_filters() == num
                   (i.e. You can't change the number of filters in cont_ if the parameter
                   tensor has already been allocated.)
             ensures
@@ -2105,6 +2147,42 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class softmax_all_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a softmax layer.  To be precise,
+                we define the softmax function s(x) as:
+                    s(x) == exp(x)/sum(exp(x)) 
+                where x is a vector.  Then this layer treats its input tensor as a
+                collection of tensor::num_samples() vectors and applies s() to each vector
+                in the tensor.  Therefore, there are logically tensor::num_samples()
+                invocations of s().
+        !*/
+
+    public:
+
+        softmax_all_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ 
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using softmax_all = add_layer<softmax_all_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     template <
         template<typename> class tag
         >
@@ -2138,6 +2216,8 @@ namespace dlib
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const; 
         tensor& get_layer_params(); 
         /*!

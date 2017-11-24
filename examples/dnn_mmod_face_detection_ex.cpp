@@ -26,16 +26,16 @@
 
         Additionally, the following training parameters were different during
         training: The following lines in dnn_mmod_ex.cpp were changed from
-            mmod_options options(face_boxes_train, 40*40);
+            mmod_options options(face_boxes_train, 40,40);
             trainer.set_iterations_without_progress_threshold(300);
         to the following when training the model used in this example:
-            mmod_options options(face_boxes_train, 80*80);
+            mmod_options options(face_boxes_train, 80,80);
             trainer.set_iterations_without_progress_threshold(8000);
 
         Also, the random_cropper was left at its default settings,  So we didn't
         call these functions:
             cropper.set_chip_dims(200, 200);
-            cropper.set_min_object_height(0.2);
+            cropper.set_min_object_size(40,40);
 
         The training data used to create the model is also available at 
         http://dlib.net/files/data/dlib_face_detection_dataset-2016-09-30.tar.gz

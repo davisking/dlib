@@ -39,8 +39,8 @@ project(examples)
 
 # Tell cmake we will need dlib.  This command will pull in dlib and compile it
 # into your project.  Note that you don't need to compile or install dlib.  All
-# it needs is the dlib source code folder and it will take care of everything.
-include(../dlib/cmake)
+# cmake needs is the dlib source code folder and it will take care of everything.
+add_subdirectory(../dlib dlib_build)
 
 
 # The next thing we need to do is tell CMake about the code you want to
@@ -66,7 +66,7 @@ target_link_libraries(assignment_learning_ex dlib::dlib)
 #
 # The cmake .. command looks in the parent folder for a file named
 # CMakeLists.txt, reads it, sets up everything needed to build program.  Also,
-# note that CMake can also generate Visual Studio or XCode project files.  So
+# note that CMake can generate Visual Studio or XCode project files.  So
 # if instead you had written:
 #   mkdir build
 #   cmake .. -G "Visual Studio 14 2015 Win64" ..
@@ -124,12 +124,22 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
    add_gui_example(dnn_mmod_find_cars_ex)
    add_gui_example(dnn_mmod_find_cars2_ex)
    add_example(dnn_mmod_train_find_cars_ex)
+   add_gui_example(dnn_semantic_segmentation_ex)
    if (NOT MSVC)
-      # Don't try to compile this program using Visual Studio since it causes the
+      # Don't try to compile these programs using Visual Studio since it causes the
       # compiler to run out of RAM and to crash.  Maybe someday Visual Studio
       # won't be broken :(
+      # (NB: While the 32-bit VC++ compiler launched by the Visual Studio IDE will
+      #  run out of memory, running a 64-bit MSBuild.exe on the Command Prompt
+      #  seems to work fine. So you can try something like this:
+      #  "C:\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" C:\path\to\examples.sln /p:Configuration=Release /p:Platform=x64 /t:dnn_imagenet_train_ex
+      #  It does take quite a while to build these examples, though!
+      #  Note that you may additionally need to set Debug Information Format to
+      #  C7 compatible (/Z7), in case you get compiler error "cannot update
+      #  program database".)
       add_example(dnn_imagenet_train_ex)
       add_example(dnn_metric_learning_on_images_ex)
+      add_example(dnn_semantic_segmentation_train_ex)
    endif()
 endif()
 

@@ -1,3 +1,4 @@
+
 // Copyright (C) 2006  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
@@ -23,7 +24,26 @@ namespace
     using namespace dlib;
     using namespace std;
 
+    dlib::rand rnd;
+
     logger dlog("test.matrix");
+
+    template <typename type>
+    const matrix<type> rand_sp_banded(long n, long bw)
+    {
+        matrix<type> m = 10 * identity_matrix<type>(n);
+        for (long row = 0; row < m.nr(); ++row)
+        {
+            for (long col = row; col < min(m.nc(), row + bw); ++col)
+            {
+                type r = rnd.get_random_double();
+                m(row,col) += r;
+                m(col,row) += r; 
+            }
+        }
+
+        return m;
+    }
 
     void matrix_test (
     )
@@ -728,6 +748,28 @@ namespace
             DLIB_TEST_MSG(equal(round_zeros(inv_lower_triangular((L))*(L),1e-10) ,identity_matrix<double>(6), 1e-10),
                          round_zeros(inv_lower_triangular((L))*(L),1e-10)); 
 
+        }
+
+        {
+            // Test band chol
+            matrix<double> m = rand_sp_banded<double>(10, 3);
+
+            matrix<double> L = chol(m);
+            DLIB_TEST_MSG(equal(L*trans(L), m, 1e-10), L*trans(L)-m);   
+            DLIB_TEST_MSG(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "");
+            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*inv_lower_triangular((L))), ""); 
+            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*trans(inv_upper_triangular(trans(L)))), "");
+        }
+
+        {
+            // Test band chol in column major layout
+            matrix<double,10,10,default_memory_manager,column_major_layout> m(rand_sp_banded<double>(10, 3));
+
+            matrix<double> L = chol(m);
+            DLIB_TEST_MSG(equal(L*trans(L), m, 1e-10), L*trans(L)-m);   
+            DLIB_TEST_MSG(equal(inv(m), inv_upper_triangular(trans(L))*inv_lower_triangular((L))), "");
+            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*inv_lower_triangular((L))), ""); 
+            DLIB_TEST_MSG(equal(inv(m), trans(inv_lower_triangular(L))*trans(inv_upper_triangular(trans(L)))), "");
         }
 
         {

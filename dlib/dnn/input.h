@@ -9,6 +9,7 @@
 #include "../pixel.h"
 #include "../image_processing.h"
 #include <sstream>
+#include <array>
 #include "tensor_tools.h"
 
 
@@ -390,6 +391,99 @@ namespace dlib
         friend std::ostream& operator<<(std::ostream& out, const input& /*item*/)
         {
             out << "input<matrix>";
+            return out;
+        }
+
+        friend void to_xml(const input& /*item*/, std::ostream& out)
+        {
+            out << "<input/>";
+        }
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, long NR, long NC, typename MM, typename L, size_t K>
+    class input<std::array<matrix<T,NR,NC,MM,L>,K>> 
+    {
+    public:
+        typedef std::array<matrix<T,NR,NC,MM,L>,K> input_type;
+
+        input() {}
+        input(const input&) {}
+
+        bool image_contained_point ( const tensor& data, const point& p) const { return get_rect(data).contains(p); }
+        drectangle tensor_space_to_image_space ( const tensor& /*data*/, drectangle r) const { return r; }
+        drectangle image_space_to_tensor_space ( const tensor& /*data*/, double /*scale*/, drectangle r ) const { return r; }
+
+        template <typename forward_iterator>
+        void to_tensor (
+            forward_iterator ibegin,
+            forward_iterator iend,
+            resizable_tensor& data
+        ) const
+        {
+            DLIB_CASSERT(std::distance(ibegin,iend) > 0);
+            DLIB_CASSERT(ibegin->size() != 0, "When using std::array<matrix> inputs you can't give 0 sized arrays.");
+            const auto nr = (*ibegin)[0].nr();
+            const auto nc = (*ibegin)[0].nc();
+            // make sure all the input matrices have the same dimensions
+            for (auto i = ibegin; i != iend; ++i)
+            {
+                for (size_t k = 0; k < K; ++k)
+                {
+                    const auto& arr = *i;
+                    DLIB_CASSERT(arr[k].nr()==nr && arr[k].nc()==nc,
+                        "\t input::to_tensor()"
+                        << "\n\t When using std::array<matrix> as input, all matrices in a batch must have the same dimensions."
+                        << "\n\t nr: " << nr
+                        << "\n\t nc: " << nc
+                        << "\n\t k:  " << k 
+                        << "\n\t arr[k].nr(): " << arr[k].nr()
+                        << "\n\t arr[k].nc(): " << arr[k].nc()
+                    );
+                }
+            }
+
+            
+            // initialize data to the right size to contain the stuff in the iterator range.
+            data.set_size(std::distance(ibegin,iend), K, nr, nc);
+
+            auto ptr = data.host();
+            for (auto i = ibegin; i != iend; ++i)
+            {
+                for (size_t k = 0; k < K; ++k)
+                {
+                    for (long r = 0; r < nr; ++r)
+                    {
+                        for (long c = 0; c < nc; ++c)
+                        {
+                            if (is_same_type<T,unsigned char>::value)
+                                *ptr++ = (*i)[k](r,c)/256.0;
+                            else
+                                *ptr++ = (*i)[k](r,c);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        friend void serialize(const input& /*item*/, std::ostream& out)
+        {
+            serialize("input<array<matrix>>", out);
+        }
+
+        friend void deserialize(input& /*item*/, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "input<array<matrix>>")
+                throw serialization_error("Unexpected version found while deserializing dlib::input<array<matrix>>.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const input& /*item*/)
+        {
+            out << "input<array<matrix>>";
             return out;
         }
 

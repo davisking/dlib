@@ -848,6 +848,8 @@
          <term file="containers.html" name="any_trainer"             include="dlib/any.h"/>
          <term file="containers.html" name="any_decision_function"   include="dlib/any.h"/>
 
+         <term file="metaprogramming.html" name="compile_time_integer_list"          include="dlib/metaprogramming.h"/>
+         <term file="metaprogramming.html" name="make_compile_time_integer_range"    include="dlib/metaprogramming.h"/>
          <term file="metaprogramming.html" name="enable_if"          include="dlib/enable_if.h"/>
          <term file="metaprogramming.html" name="disable_if"         include="dlib/enable_if.h"/>
 

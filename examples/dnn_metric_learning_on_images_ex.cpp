@@ -116,7 +116,12 @@ void load_mini_batch (
     // You might want to do some data augmentation at this point.  Here we do some simple
     // color augmentation.
     for (auto&& crop : images)
+    {
         disturb_colors(crop,rnd);
+        // Jitter most crops
+        if (rnd.get_random_double() > 0.1)
+            crop = jitter_image(crop,rnd);
+    }
 
 
     // All the images going into a mini-batch have to be the same size.  And really, all

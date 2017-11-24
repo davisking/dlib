@@ -1466,6 +1466,14 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     unsigned long tabbed_display::
+    selected_tab (
+    ) const
+    {
+        auto_mutex M(m);
+        return selected_tab_;
+    }
+
+    unsigned long tabbed_display::
     number_of_tabs (
     ) const
     {
@@ -5627,9 +5635,6 @@ namespace dlib
 
 
         const unsigned long padding = style->get_padding(*mfont);
-
-        // find the delta between the cursor rect and the corner of the total rect 
-        point delta = point(cursor_rect.left(), cursor_rect.top()) - point(total_rect().left(), total_rect().top());
 
         // now scroll us so that we can see the current cursor 
         scroll_to_rect(centered_rect(cursor_rect, cursor_rect.width() + padding + 6, cursor_rect.height() + 1));

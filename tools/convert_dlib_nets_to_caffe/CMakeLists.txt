@@ -9,13 +9,13 @@ set (target_name dtoc)
 
 PROJECT(${target_name})
 
-include(../../dlib/cmake)
+add_subdirectory(../../dlib dlib_build)
 
-ADD_EXECUTABLE(${target_name} 
+add_executable(${target_name} 
    main.cpp
    )
 
-TARGET_LINK_LIBRARIES(${target_name} dlib::dlib )
+target_link_libraries(${target_name} dlib::dlib )
 
 
 INSTALL(TARGETS ${target_name}

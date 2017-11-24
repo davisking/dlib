@@ -374,10 +374,10 @@ namespace dlib
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const     \
         { return m.destructively_aliases(item); }                                               \
                                                                                                 \
-    };                                                                                          
+    }
 
 #define DLIB_DEFINE_FUNCTION_M(op_name, name, function, extra_cost)                             \
-    DLIB_DEFINE_OP_M(op_name, function, extra_cost)                                             \
+    DLIB_DEFINE_OP_M(op_name, function, extra_cost);                                            \
     template < typename M >                                                                     \
     const matrix_op<op_name<M> > name ( const matrix_exp<M>& m)                                 \
     {                                                                                           \
@@ -417,10 +417,10 @@ namespace dlib
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const     \
         { return m.destructively_aliases(item); }                                               \
                                                                                                 \
-    };                                                                                          
-                                                                                                
+    }
+
 #define DLIB_DEFINE_FUNCTION_MS(op_name, name, function, extra_cost)                            \
-    DLIB_DEFINE_OP_MS(op_name, function, extra_cost)                                            \
+    DLIB_DEFINE_OP_MS(op_name, function, extra_cost);                                           \
     template < typename M, typename S >                                                         \
     const matrix_op<op_name<M, S> > name ( const matrix_exp<M>& m, const S& s)                  \
     {                                                                                           \
@@ -460,10 +460,10 @@ namespace dlib
         template <typename U> bool destructively_aliases ( const matrix_exp<U>& item) const     \
         { return m.destructively_aliases(item); }                                               \
                                                                                                 \
-    };                                                                                          
-                                                                                                
+    }
+
 #define DLIB_DEFINE_FUNCTION_SM(op_name, name, function, extra_cost)                            \
-    DLIB_DEFINE_OP_SM(op_name, function, extra_cost)                                            \
+    DLIB_DEFINE_OP_SM(op_name, function, extra_cost);                                           \
     template < typename S, typename M >                                                         \
     const matrix_op<op_name<S, M> > name (const S& s, const matrix_exp<M>& m)                   \
     {                                                                                           \
