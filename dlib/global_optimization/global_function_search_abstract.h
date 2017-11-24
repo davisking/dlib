@@ -89,14 +89,6 @@ namespace dlib
             moving from item causes item.has_been_evaluated() == true,  TODO, clarify 
         !*/
 
-        void swap(
-            function_evaluation_request& item
-        );
-        /*!
-            ensures
-                - swaps the state of *this and item
-        !*/
-
         ~function_evaluation_request(
         );
         /*!
@@ -113,7 +105,6 @@ namespace dlib
         bool has_been_evaluated (
         ) const;
 
-
         void set (
             double y
         );
@@ -122,6 +113,14 @@ namespace dlib
                 - has_been_evaluated() == false
             ensures
                 - #has_been_evaluated() == true
+        !*/
+
+        void swap(
+            function_evaluation_request& item
+        );
+        /*!
+            ensures
+                - swaps the state of *this and item
         !*/
 
     };
@@ -143,18 +142,6 @@ namespace dlib
                 - #num_functions() == 0
         !*/
 
-        // This object can't be copied.
-        global_function_search(const global_function_search&) = delete;
-        global_function_search& operator=(const global_function_search& item) = delete;
-
-        global_function_search(global_function_search&& item) = default;
-        global_function_search& operator=(global_function_search&& item) = default;
-        /*!
-            ensures
-                - moves the state of item into *this
-                - #item.num_functions() == 0
-        !*/
-
         explicit global_function_search(
             const function_spec& function
         ); 
@@ -169,12 +156,24 @@ namespace dlib
             const double relative_noise_magnitude = 0.001
         ); 
 
-        size_t num_functions(
-        ) const;
+        // This object can't be copied.
+        global_function_search(const global_function_search&) = delete;
+        global_function_search& operator=(const global_function_search& item) = delete;
+
+        global_function_search(global_function_search&& item) = default;
+        global_function_search& operator=(global_function_search&& item) = default;
+        /*!
+            ensures
+                - moves the state of item into *this
+                - #item.num_functions() == 0
+        !*/
 
         void set_seed (
             time_t seed
         );
+
+        size_t num_functions(
+        ) const;
 
         void get_function_evaluations (
             std::vector<function_spec>& specs,
