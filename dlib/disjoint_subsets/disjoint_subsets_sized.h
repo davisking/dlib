@@ -29,7 +29,7 @@ namespace dlib
             unsigned long new_size
         ) override
         {
-			disjoint_subsets::set_size(new_size);
+            disjoint_subsets::set_size(new_size);
             sets_size.assign(new_size, 1);
             number_of_sets = new_size;
         }
@@ -55,13 +55,13 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-			disjoint_subsets::merge_sets(a, b);
+            disjoint_subsets::merge_sets(a, b);
 
-			if (find_set(a) == a) sets_size[a] += sets_size[b];
-			else sets_size[b] += sets_size[a];
-			--number_of_sets;
+            if (find_set(a) == a) sets_size[a] += sets_size[b];
+            else sets_size[b] += sets_size[a];
+            --number_of_sets;
 
-			return find_set(a);
+            return find_set(a);
         }
 
         unsigned long get_number_of_sets (

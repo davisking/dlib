@@ -16,14 +16,14 @@ namespace dlib
     {
     public:
 
-		disjoint_subsets() = default;
-		virtual ~disjoint_subsets() = default;
+        disjoint_subsets() = default;
+        virtual ~disjoint_subsets() = default;
 
-		disjoint_subsets(const disjoint_subsets&) = default;
-		disjoint_subsets& operator=(const disjoint_subsets&) = default;
+        disjoint_subsets(const disjoint_subsets&) = default;
+        disjoint_subsets& operator=(const disjoint_subsets&) = default;
 
-		disjoint_subsets(disjoint_subsets&&) = default;
-		disjoint_subsets& operator=(disjoint_subsets&&) = default;
+        disjoint_subsets(disjoint_subsets&&) = default;
+        disjoint_subsets& operator=(disjoint_subsets&&) = default;
 
         virtual void clear (
         ) noexcept
