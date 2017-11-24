@@ -25,7 +25,7 @@ namespace dlib
         !*/
     public:
 
-        virtual void clear (
+        void clear (
         ) noexcept;
         /*!
             ensures
@@ -33,7 +33,7 @@ namespace dlib
                 - returns this object to its initial value
         !*/
 
-        virtual void set_size (
+        void set_size (
             unsigned long new_size
         );
         /*!
@@ -44,7 +44,7 @@ namespace dlib
                       (i.e. this object contains new_size subsets, each containing exactly one element)
         !*/
 
-        virtual unsigned long size (
+        unsigned long size (
         ) const noexcept;
         /*!
             ensures
@@ -52,7 +52,7 @@ namespace dlib
                   by this object.
         !*/
 
-        virtual unsigned long find_set (
+        unsigned long find_set (
             unsigned long item
         ) const;
         /*!
@@ -69,7 +69,7 @@ namespace dlib
                   have find_set(A) == find_set(B).
         !*/
 
-        virtual unsigned long merge_sets (
+        unsigned long merge_sets (
             unsigned long a,
             unsigned long b
         );

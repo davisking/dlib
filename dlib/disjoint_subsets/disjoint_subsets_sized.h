@@ -13,31 +13,53 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class disjoint_subsets_sized : public disjoint_subsets
+    class disjoint_subsets_sized
     {
     public:
 
-        virtual void clear (
-        ) noexcept override
+        void clear (
+        ) noexcept
         {
-            disjoint_subsets::clear();
+            disjoint_subsets_.clear();
             sets_size.clear();
             number_of_sets = 0;
         }
 
-        virtual void set_size (
+        void set_size (
             unsigned long new_size
-        ) override
+        )
         {
-            disjoint_subsets::set_size(new_size);
+            disjoint_subsets_.set_size(new_size);
             sets_size.assign(new_size, 1);
             number_of_sets = new_size;
         }
 
-        virtual unsigned long merge_sets (
+        unsigned long size (
+        ) const noexcept
+        {
+            return disjoint_subsets_.size();
+        }
+
+        unsigned long find_set (
+            unsigned long item
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(item < size(),
+                "\t unsigned long disjoint_subsets::find_set()"
+                << "\n\t item must be less than size()"
+                << "\n\t item: " << item
+                << "\n\t size(): " << size()
+                << "\n\t this: " << this
+                );
+
+            return disjoint_subsets_.find_set(item);
+        }
+
+        unsigned long merge_sets (
             unsigned long a,
             unsigned long b
-        ) override
+        )
         {
             // make sure requires clause is not broken
             DLIB_ASSERT(a != b &&
@@ -55,7 +77,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            disjoint_subsets::merge_sets(a, b);
+            disjoint_subsets_.merge_sets(a, b);
 
             if (find_set(a) == a) sets_size[a] += sets_size[b];
             else sets_size[b] += sets_size[a];
@@ -97,6 +119,7 @@ namespace dlib
 
         mutable std::vector<unsigned long> sets_size;
         unsigned long number_of_sets{0};
+        disjoint_subsets disjoint_subsets_;
 
     };
 

@@ -16,22 +16,13 @@ namespace dlib
     {
     public:
 
-        disjoint_subsets() = default;
-        virtual ~disjoint_subsets() = default;
-
-        disjoint_subsets(const disjoint_subsets&) = default;
-        disjoint_subsets& operator=(const disjoint_subsets&) = default;
-
-        disjoint_subsets(disjoint_subsets&&) = default;
-        disjoint_subsets& operator=(disjoint_subsets&&) = default;
-
-        virtual void clear (
+        void clear (
         ) noexcept
         {
             items.clear();
         }
 
-        virtual void set_size (
+        void set_size (
             unsigned long new_size
         )
         {
@@ -43,13 +34,13 @@ namespace dlib
             }
         }
 
-        virtual unsigned long size (
+        unsigned long size (
         ) const noexcept
         {
             return items.size();
         }
 
-        virtual unsigned long find_set (
+        unsigned long find_set (
             unsigned long item
         ) const
         {
@@ -89,7 +80,7 @@ namespace dlib
             }
         }
 
-        virtual unsigned long merge_sets (
+        unsigned long merge_sets (
             unsigned long a,
             unsigned long b
         )
