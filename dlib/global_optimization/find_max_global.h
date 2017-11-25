@@ -217,7 +217,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon 
     )
     {
-        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
