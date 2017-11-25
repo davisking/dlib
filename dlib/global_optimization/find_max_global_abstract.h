@@ -114,7 +114,11 @@ namespace dlib
               elsewhere rather than on further improving the current local optima found so
               far.  That is, once a local maxima is identified to about solver_epsilon
               accuracy, the algorithm will spend all its time exploring the functions to
-              find other local maxima to investigate.
+              find other local maxima to investigate.  An epsilon of 0 means it will keep
+              solving until it reaches full floating point precision.  Larger values will
+              cause it to switch to pure global exploration sooner and therefore might be
+              more effective if your objective function has many local maxima and you don't
+              care about a super high precision solution.
             - find_max_global() runs until one of the following is true:
                 - The total number of calls to the provided functions is == num.max_calls
                 - More than max_runtime time has elapsed since the start of this function.
@@ -178,7 +182,11 @@ namespace dlib
               elsewhere rather than on further improving the current local optima found so
               far.  That is, once a local maxima is identified to about solver_epsilon
               accuracy, the algorithm will spend all its time exploring the function to
-              find other local maxima to investigate.
+              find other local maxima to investigate.  An epsilon of 0 means it will keep
+              solving until it reaches full floating point precision.  Larger values will
+              cause it to switch to pure global exploration sooner and therefore might be
+              more effective if your objective function has many local maxima and you don't
+              care about a super high precision solution.
             - find_max_global() runs until one of the following is true:
                 - The total number of calls to f() is == num.max_calls
                 - More than max_runtime time has elapsed since the start of this function.
