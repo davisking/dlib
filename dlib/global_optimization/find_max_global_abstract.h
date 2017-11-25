@@ -118,6 +118,18 @@ namespace dlib
             - find_max_global() runs until one of the following is true:
                 - The total number of calls to the provided functions is == num.max_calls
                 - More than max_runtime time has elapsed since the start of this function.
+            - Any variables that satisfy the following conditions are optimized on a log-scale:
+                - The lower bound on the variable is > 0
+                - The ratio of the upper bound to lower bound is > 1000
+                - The variable is not an integer variable
+              We do this because it's common to optimize machine learning models that have
+              parameters with bounds in a range such as [1e-5 to 1e10] (e.g. the SVM C
+              parameter) and it's much more appropriate to optimize these kinds of
+              variables on a log scale.  So we transform them by applying std::log() to
+              them and then undo the transform via std::exp() before invoking the function
+              being optimized.  Therefore, this transformation is invisible to the user
+              supplied functions.  In most cases, it improves the efficiency of the
+              optimizer.
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -170,6 +182,18 @@ namespace dlib
             - find_max_global() runs until one of the following is true:
                 - The total number of calls to f() is == num.max_calls
                 - More than max_runtime time has elapsed since the start of this function.
+            - Any variables that satisfy the following conditions are optimized on a log-scale:
+                - The lower bound on the variable is > 0
+                - The ratio of the upper bound to lower bound is > 1000
+                - The variable is not an integer variable
+              We do this because it's common to optimize machine learning models that have
+              parameters with bounds in a range such as [1e-5 to 1e10] (e.g. the SVM C
+              parameter) and it's much more appropriate to optimize these kinds of
+              variables on a log scale.  So we transform them by applying std::log() to
+              them and then undo the transform via std::exp() before invoking the function
+              being optimized.  Therefore, this transformation is invisible to the user
+              supplied functions.  In most cases, it improves the efficiency of the
+              optimizer.
     !*/
 
 // ----------------------------------------------------------------------------------------
