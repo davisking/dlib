@@ -1,18 +1,19 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
 
-    This is an example illustrating the use the general purpose non-linear 
+    This is an example illustrating the use the general purpose non-linear
     optimization routines from the dlib C++ Library.
 
-    The library provides implementations of the conjugate gradient,  BFGS,
-    L-BFGS, and BOBYQA optimization algorithms.  These algorithms allow you to
-    find the minimum of a function of many input variables.  This example walks
-    though a few of the ways you might put these routines to use.
+    The library provides implementations of many popular algorithms such as L-BFGS
+    and BOBYQA.  These algorithms allow you to find the minimum or maximum of a
+    function of many input variables.  This example walks though a few of the ways
+    you might put these routines to use.
 
 */
 
 
 #include <dlib/optimization.h>
+#include <dlib/global_optimization.h>
 #include <iostream>
 
 
@@ -21,8 +22,8 @@ using namespace dlib;
 
 // ----------------------------------------------------------------------------------------
 
-// In dlib, the general purpose solvers optimize functions that take a column
-// vector as input and return a double.  So here we make a typedef for a
+// In dlib, most of the general purpose solvers optimize functions that take a
+// column vector as input and return a double.  So here we make a typedef for a
 // variable length column vector of doubles.  This is the type we will use to
 // represent the input to our objective functions which we will be minimizing.
 typedef matrix<double,0,1> column_vector;
@@ -84,49 +85,6 @@ matrix<double> rosen_hessian (const column_vector& m)
 
 // ----------------------------------------------------------------------------------------
 
-class test_function
-{
-    /*
-        This object is an example of what is known as a "function object" in C++.
-        It is simply an object with an overloaded operator().  This means it can 
-        be used in a way that is similar to a normal C function.  The interesting
-        thing about this sort of function is that it can have state.  
-        
-        In this example, our test_function object contains a column_vector 
-        as its state and it computes the mean squared error between this 
-        stored column_vector and the arguments to its operator() function.
-
-        This is a very simple function, however, in general you could compute
-        any function you wanted here.  An example of a typical use would be 
-        to find the parameters of some regression function that minimized 
-        the mean squared error on a set of data.  In this case the arguments
-        to the operator() function would be the parameters of your regression
-        function.  You would loop over all your data samples and compute the output 
-        of the regression function for each data sample given the parameters and 
-        return a measure of the total error.   The dlib optimization functions 
-        could then be used to find the parameters that minimized the error.
-    */
-public:
-
-    test_function (
-        const column_vector& input
-    )
-    {
-        target = input;
-    }
-
-    double operator() ( const column_vector& arg) const
-    {
-        // return the mean squared error between the target vector and the input vector
-        return mean(squared(target-arg));
-    }
-
-private:
-    column_vector target;
-};
-
-// ----------------------------------------------------------------------------------------
-
 class rosen_model 
 {
     /*!
@@ -159,15 +117,13 @@ int main()
 {
     try
     {
-        // make a column vector of length 2
-        column_vector starting_point(2);
 
 
         // Set the starting point to (4,8).  This is the point the optimization algorithm
         // will start out from and it will move it closer and closer to the function's 
         // minimum point.   So generally you want to try and compute a good guess that is
         // somewhat near the actual optimum value.
-        starting_point = 4, 8;
+        column_vector starting_point = {4, 8};
 
         // The first example below finds the minimum of the rosen() function and uses the
         // analytical derivative computed by rosen_derivative().  Since it is very easy to
@@ -205,7 +161,7 @@ int main()
         // of find_min() that doesn't require you to supply a derivative function.  
         // This version will compute a numerical approximation of the derivative since 
         // we didn't supply one to it.
-        starting_point = -94, 5.2;
+        starting_point = {-94, 5.2};
         find_min_using_approximate_derivatives(bfgs_search_strategy(),
                                                objective_delta_stop_strategy(1e-7),
                                                rosen, starting_point, -1);
@@ -219,7 +175,7 @@ int main()
         // The L-BFGS algorithm however uses only O(N) memory.  So if you have a 
         // function of a huge number of variables the L-BFGS algorithm is probably 
         // a better choice.
-        starting_point = 0.8, 1.3;
+        starting_point = {0.8, 1.3};
         find_min(lbfgs_search_strategy(10),  // The 10 here is basically a measure of how much memory L-BFGS will use.
                  objective_delta_stop_strategy(1e-7).be_verbose(),  // Adding be_verbose() causes a message to be 
                                                                     // printed for each iteration of optimization.
@@ -227,7 +183,7 @@ int main()
 
         cout << endl << "rosen solution: \n" << starting_point << endl;
 
-        starting_point = -94, 5.2;
+        starting_point = {-94, 5.2};
         find_min_using_approximate_derivatives(lbfgs_search_strategy(10),
                                                objective_delta_stop_strategy(1e-7),
                                                rosen, starting_point, -1);
@@ -240,7 +196,7 @@ int main()
         // the variables.  So for example, if you wanted to find the minimizer
         // of the rosen function where both input variables were in the range
         // 0.1 to 0.8 you would do it like this:
-        starting_point = 0.1, 0.1; // Start with a valid point inside the constraint box.
+        starting_point = {0.1, 0.1}; // Start with a valid point inside the constraint box.
         find_min_box_constrained(lbfgs_search_strategy(10),  
                                  objective_delta_stop_strategy(1e-9),  
                                  rosen, rosen_derivative, starting_point, 0.1, 0.8);
@@ -251,7 +207,7 @@ int main()
         cout << endl << "constrained rosen solution: \n" << starting_point << endl;
 
         // You can also use an approximate derivative like so:
-        starting_point = 0.1, 0.1; 
+        starting_point = {0.1, 0.1}; 
         find_min_box_constrained(bfgs_search_strategy(),  
                                  objective_delta_stop_strategy(1e-9),  
                                  rosen, derivative(rosen), starting_point, 0.1, 0.8);
@@ -262,7 +218,7 @@ int main()
 
         // In many cases, it is useful if we also provide second derivative information
         // to the optimizers.  Two examples of how we can do that are shown below.  
-        starting_point = 0.8, 1.3;
+        starting_point = {0.8, 1.3};
         find_min(newton_search_strategy(rosen_hessian),
                  objective_delta_stop_strategy(1e-7),
                  rosen,
@@ -274,7 +230,7 @@ int main()
         // We can also use find_min_trust_region(), which is also a method which uses
         // second derivatives.  For some kinds of non-convex function it may be more
         // reliable than using a newton_search_strategy with find_min().
-        starting_point = 0.8, 1.3;
+        starting_point = {0.8, 1.3};
         find_min_trust_region(objective_delta_stop_strategy(1e-7),
             rosen_model(), 
             starting_point, 
@@ -285,41 +241,18 @@ int main()
 
 
 
-        // Now let's look at using the test_function object with the optimization 
-        // functions.  
-        cout << "\nFind the minimum of the test_function" << endl;
 
-        column_vector target(4);
-        starting_point.set_size(4);
-
-        // This variable will be used as the target of the test_function.   So,
-        // our simple test_function object will have a global minimum at the
-        // point given by the target.  We will then use the optimization 
-        // routines to find this minimum value.
-        target = 3, 5, 1, 7;
-
-        // set the starting point far from the global minimum
-        starting_point = 1,2,3,4;
-        find_min_using_approximate_derivatives(bfgs_search_strategy(),
-                                               objective_delta_stop_strategy(1e-7),
-                                               test_function(target), starting_point, -1);
-        // At this point the correct value of (3,5,1,7) should be found and stored in starting_point
-        cout << "test_function solution:\n" << starting_point << endl;
-
-        // Now let's try it again with the conjugate gradient algorithm.
-        starting_point = -4,5,99,3;
-        find_min_using_approximate_derivatives(cg_search_strategy(),
-                                               objective_delta_stop_strategy(1e-7),
-                                               test_function(target), starting_point, -1);
-        cout << "test_function solution:\n" << starting_point << endl;
-
-
-
-        // Finally, let's try the BOBYQA algorithm.  This is a technique specially
+        // Next, let's try the BOBYQA algorithm.  This is a technique specially
         // designed to minimize a function in the absence of derivative information.  
-        // Generally speaking, it is the method of choice if derivatives are not available.
-        starting_point = -4,5,99,3;
-        find_min_bobyqa(test_function(target), 
+        // Generally speaking, it is the method of choice if derivatives are not available
+        // and the function you are optimizing is smooth and has only one local optima.  As
+        // an example, consider the be_like_target function defined below:
+        column_vector target = {3, 5, 1, 7};
+        auto be_like_target = [&](const column_vector& x) {
+            return mean(squared(x-target));
+        };
+        starting_point = {-4,5,99,3};
+        find_min_bobyqa(be_like_target, 
                         starting_point, 
                         9,    // number of interpolation points
                         uniform_matrix<double>(4,1, -1e100),  // lower bound constraint
@@ -328,8 +261,61 @@ int main()
                         1e-6,  // stopping trust region radius
                         100    // max number of objective function evaluations
         );
-        cout << "test_function solution:\n" << starting_point << endl;
+        cout << "be_like_target solution:\n" << starting_point << endl;
 
+
+
+
+
+        // Finally, let's try the find_max_global() routine.  Like
+        // find_max_bobyqa(), this is a technique specially designed to maximize
+        // a function in the absence of derivative information.  However, it is
+        // also designed to handle functions with many local optima.  Where
+        // BOBYQA would get stuck at the nearest local optima, find_max_global()
+        // won't.  find_max_global() uses a global optimization method based on a
+        // combination of non-parametric global function modeling and BOBYQA
+        // style quadratic trust region modeling to efficiently find a global
+        // maximizer.  It usually does a good job with a relatively small number
+        // of calls to the function being optimized.  
+        // 
+        // You also don't have to give it a starting point or set any parameters,
+        // other than defining the bounds constraints.  This makes it the method
+        // of choice for derivative free optimization in the presence of local
+        // optima.  Its API also allows you to define functions that take a
+        // column_vector as shown above or to explicitly use named doubles as
+        // arguments, which we do here.
+        auto complex_holder_table = [](double x0, double x1)
+        {
+            // This function is a version of the well known Holder table test
+            // function, which is a function containing a bunch of local optima.
+            // Here we make it even more difficult by adding more local optima
+            // and also a bunch of discontinuities. 
+
+            // add discontinuities
+            double sign = 1;
+            for (double j = -4; j < 9; j += 0.5)
+            {
+                if (j < x0 && x0 < j+0.5) 
+                    x0 += sign*0.25;
+                sign *= -1;
+            }
+            // Holder table function tilted towards 10,10 and with additional
+            // high frequency terms to add more local optima.
+            return std::abs(sin(x0)*cos(x1)*exp(std::abs(1-std::sqrt(x0*x0+x1*x1)/pi))) -(x0+x1)/10 - sin(x0*10)*cos(x1*10);
+        };
+
+        // To optimize this difficult function all we need to do is call
+        // find_max_global()
+        auto result = find_max_global(complex_holder_table, 
+                        {-10,-10}, // lower bounds
+                        {10,10}, // upper bounds
+                        max_function_calls(300));
+
+        cout.precision(9);
+        // These cout statements will show that find_max_global() found the
+        // globally optimal solution to 9 digits of precision:
+        cout << "complex holder table function solution y (should be 21.9210397): " << result.y << endl;
+        cout << "complex holder table function solution x:\n" << result.x << endl;
     }
     catch (std::exception& e)
     {
