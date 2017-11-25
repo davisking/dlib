@@ -71,14 +71,14 @@ namespace dlib
         template <size_t max_unpack>
         struct call_function_and_expand_args
         {         
-template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), disable_decay_to_scalar(a))  {return f(disable_decay_to_scalar(a));   }
-template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), a(0)) { DLIB_CASSERT(a.size() == 1); return f(a(0)); }
-template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), a(0),a(1)) { DLIB_CASSERT(a.size() == 2); return f(a(0),a(1)); }
-template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), a(0), a(1), a(2)) { DLIB_CASSERT(a.size() == 3); return f(a(0), a(1),a(2)); }
-template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), a(0), a(1), a(2), a(3)) { DLIB_CASSERT(a.size() == 4); return f(a(0), a(1), a(2), a(3)); }
-template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), a(0), a(1), a(2), a(3), a(4)) { DLIB_CASSERT(a.size() == 5); return f(a(0), a(1), a(2), a(3), a(4)); }
-template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), a(0), a(1), a(2), a(3), a(4), a(5)) { DLIB_CASSERT(a.size() == 6); return f(a(0), a(1), a(2), a(3), a(4), a(5)); }
-template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(std::forward<T>(f), a(0), a(1), a(2), a(3), a(4), a(5), a(6)) { DLIB_CASSERT(a.size() == 7); return f(a(0), a(1), a(2), a(3), a(4), a(5), a(6)); }
+template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(f(disable_decay_to_scalar(a)))  {return f(disable_decay_to_scalar(a));   }
+template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(f(a(0))) { DLIB_CASSERT(a.size() == 1); return f(a(0)); }
+template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(f(a(0),a(1))) { DLIB_CASSERT(a.size() == 2); return f(a(0),a(1)); }
+template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(f(a(0), a(1), a(2))) { DLIB_CASSERT(a.size() == 3); return f(a(0), a(1),a(2)); }
+template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(f(a(0), a(1), a(2), a(3))) { DLIB_CASSERT(a.size() == 4); return f(a(0), a(1), a(2), a(3)); }
+template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(f(a(0), a(1), a(2), a(3), a(4))) { DLIB_CASSERT(a.size() == 5); return f(a(0), a(1), a(2), a(3), a(4)); }
+template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(f(a(0), a(1), a(2), a(3), a(4), a(5))) { DLIB_CASSERT(a.size() == 6); return f(a(0), a(1), a(2), a(3), a(4), a(5)); }
+template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> decltype(f(a(0), a(1), a(2), a(3), a(4), a(5), a(6))) { DLIB_CASSERT(a.size() == 7); return f(a(0), a(1), a(2), a(3), a(4), a(5), a(6)); }
         };
 #endif
     }
