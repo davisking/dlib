@@ -224,7 +224,7 @@ namespace dlib
 
         dlib::rand rnd;
         double pure_random_search_probability = 0.02;
-        double min_trust_region_epsilon = 1e-11;
+        double min_trust_region_epsilon = 0;
         double relative_noise_magnitude = 0.001;
         size_t num_random_samples = 5000;
         bool do_trust_region_step = true;

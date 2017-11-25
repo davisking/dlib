@@ -332,7 +332,7 @@ namespace dlib
             ensures
                 - #num_functions() == 0
                 - #get_relative_noise_magnitude() == 0.001
-                - #get_solver_epsilon() == 1e-11
+                - #get_solver_epsilon() == 0
                 - #get_monte_carlo_upper_bound_sample_num() == 5000
                 - #get_pure_random_search_probability() == 0.02
         !*/
@@ -345,7 +345,7 @@ namespace dlib
                 - #num_functions() == 1
                 - #get_function_evaluations() will indicate that there are no function evaluations yet.
                 - #get_relative_noise_magnitude() == 0.001
-                - #get_solver_epsilon() == 1e-11
+                - #get_solver_epsilon() == 0
                 - #get_monte_carlo_upper_bound_sample_num() == 5000
                 - #get_pure_random_search_probability() == 0.02
         !*/
@@ -358,7 +358,7 @@ namespace dlib
                 - #num_functions() == functions.size()
                 - #get_function_evaluations() will indicate that there are no function evaluations yet.
                 - #get_relative_noise_magnitude() == 0.001
-                - #get_solver_epsilon() == 1e-11
+                - #get_solver_epsilon() == 0
                 - #get_monte_carlo_upper_bound_sample_num() == 5000
                 - #get_pure_random_search_probability() == 0.02
         !*/
@@ -376,7 +376,7 @@ namespace dlib
                 - #num_functions() == functions.size()
                 - #get_function_evaluations() will return the provided initial_function_evals.
                 - #get_relative_noise_magnitude() == relative_noise_magnitude
-                - #get_solver_epsilon() == 1e-11
+                - #get_solver_epsilon() == 0
                 - #get_monte_carlo_upper_bound_sample_num() == 5000
                 - #get_pure_random_search_probability() == 0.02
         !*/
