@@ -263,20 +263,19 @@ int main() try
 
 
 
-    // Finally, let's try the find_max_global() routine.  Like
-    // find_max_bobyqa(), this is a technique specially designed to maximize
-    // a function in the absence of derivative information.  However, it is
-    // also designed to handle functions with many local optima.  Where
-    // BOBYQA would get stuck at the nearest local optima, find_max_global()
-    // won't.  find_max_global() uses a global optimization method based on a
-    // combination of non-parametric global function modeling and BOBYQA
-    // style quadratic trust region modeling to efficiently find a global
-    // maximizer.  It usually does a good job with a relatively small number
-    // of calls to the function being optimized.  
+    // Finally, let's try the find_max_global() routine.  Like find_min_bobyqa(),
+    // this technique is specially designed to optimize a function in the absence
+    // of derivative information.  However, it is also designed to handle
+    // functions with many local optima.  Where BOBYQA would get stuck at the
+    // nearest local optima, find_max_global() won't.  find_max_global() uses a
+    // global optimization method based on a combination of non-parametric global
+    // function modeling and BOBYQA style quadratic trust region modeling to
+    // efficiently find a global maximizer.  It usually does a good job with a
+    // relatively small number of calls to the function being optimized.  
     // 
     // You also don't have to give it a starting point or set any parameters,
-    // other than defining the bounds constraints.  This makes it the method
-    // of choice for derivative free optimization in the presence of local
+    // other than defining bounds constraints.  This makes it the method of
+    // choice for derivative free optimization in the presence of multiple local
     // optima.  Its API also allows you to define functions that take a
     // column_vector as shown above or to explicitly use named doubles as
     // arguments, which we do here.
