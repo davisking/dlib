@@ -27,12 +27,8 @@ namespace
 
     dlib::rand rnd;
 
-    void matrix_test (
+    void matrix_test1 (
     )
-    /*!
-        ensures
-            - runs tests on the matrix stuff compliance with the specs
-    !*/
     {        
         typedef memory_manager_stateless<char>::kernel_2_2a MM;
         print_spinner();
@@ -739,6 +735,13 @@ namespace
         }
 
 
+    }
+
+
+    void matrix_test2 (
+    )
+    {        
+        typedef memory_manager_stateless<char>::kernel_2_2a MM;
         {
             srand(423452);
             const long M = 10;
@@ -1145,7 +1148,8 @@ namespace
         void perform_test (
         )
         {
-            matrix_test();
+            matrix_test1();
+            matrix_test2();
         }
     } a;
 

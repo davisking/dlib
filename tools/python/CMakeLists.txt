@@ -46,6 +46,7 @@ set(python_srcs
    src/correlation_tracker.cpp
    src/face_recognition.cpp
    src/cnn_face_detector.cpp
+   src/global_optimization.cpp
 )
 
 # Only add the Numpy returning functions if Numpy is present

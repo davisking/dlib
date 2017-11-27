@@ -79,7 +79,7 @@ namespace dlib
             size_t function_idx = 0;
             std::shared_ptr<std::mutex> m;
             upper_bound_function ub;
-            std::vector<outstanding_function_eval_request> incomplete_evals;
+            std::vector<outstanding_function_eval_request> outstanding_evals;
             matrix<double,0,1> best_x; 
             double best_objective_value = -std::numeric_limits<double>::infinity(); 
             double radius = 0;
@@ -101,7 +101,7 @@ namespace dlib
         function_evaluation_request(function_evaluation_request&& item);
         function_evaluation_request& operator=(function_evaluation_request&& item);
 
-        void swap(function_evaluation_request& item);
+        ~function_evaluation_request();
 
         size_t function_idx (
         ) const;
@@ -112,11 +112,11 @@ namespace dlib
         bool has_been_evaluated (
         ) const;
 
-        ~function_evaluation_request();
-
         void set (
             double y
         );
+
+        void swap(function_evaluation_request& item);
 
     private:
 
@@ -218,13 +218,13 @@ namespace dlib
             size_t& idx
         ) const;
 
-        bool has_incomplete_trust_region_request (
+        bool has_outstanding_trust_region_request (
         ) const;
 
 
         dlib::rand rnd;
         double pure_random_search_probability = 0.02;
-        double min_trust_region_epsilon = 1e-11;
+        double min_trust_region_epsilon = 0;
         double relative_noise_magnitude = 0.001;
         size_t num_random_samples = 5000;
         bool do_trust_region_step = true;
