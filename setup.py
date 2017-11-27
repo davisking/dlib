@@ -53,6 +53,8 @@ import signal
 from threading import Thread
 import time
 import re
+import pkg_resources
+import textwrap
 
 
 # change directory to this module path
@@ -612,6 +614,22 @@ class build_ext(_build_ext):
     def run(self):
         # cmake will do the heavy lifting, just pick up the fruits of its labour
         pass
+
+def is_installed(requirement):
+    try:
+        pkg_resources.require(requirement)
+    except pkg_resources.ResolutionError:
+        return False
+    else:
+        return True
+
+if not is_installed('numpy>=1.11.0'):
+    print(textwrap.dedent("""
+            Error: numpy needs to be installed first. You can install it via:
+
+            $ pip install numpy
+            """), file=sys.stderr)
+    exit(1)
 
 setup(
     name='dlib',
