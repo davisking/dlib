@@ -40,8 +40,7 @@ def show_jittered_images(jittered_images):
         Shows the specified jittered images one by one
     '''
     for img in jittered_images:
-        cv_rgb_image = np.array(img).astype(np.uint8)
-        cv_bgr_img = cv2.cvtColor(cv_rgb_image, cv2.COLOR_RGB2BGR)
+        cv_bgr_img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         cv2.imshow('image',cv_bgr_img)
         cv2.waitKey(0)
 

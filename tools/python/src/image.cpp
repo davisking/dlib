@@ -44,6 +44,9 @@ boost::python::list get_jitter_images(object img, size_t num_jitters = 1, bool d
     // The top level list (containing 1 or more images) to return to python
     boost::python::list jitter_list;
 
+    size_t rows = num_rows(img_mat);
+    size_t cols = num_columns(img_mat);
+
     // Size of the numpy array
     npy_intp dims[3] = { num_rows(img_mat), num_columns(img_mat), 3};
 
@@ -53,12 +56,12 @@ boost::python::list get_jitter_images(object img, size_t num_jitters = 1, bool d
         // If required disturb colors of the image
         if(disturb_colors)
             dlib::disturb_colors(crop, rnd_jitter);
-
-        void* img_data_copy = malloc(img_mat.nr() * width_step(crop));
-        memcpy(img_data_copy, image_data(crop), img_mat.nr() * width_step(crop));
-        PyObject *pyObj = PyArray_SimpleNewFromData(3, dims, NPY_UINT8, img_data_copy);
-        PyArray_ENABLEFLAGS((PyArrayObject*)pyObj, NPY_ARRAY_OWNDATA);
-        boost::python::handle<> handle(pyObj);
+        
+        PyObject *arr = PyArray_SimpleNew(3, dims, NPY_UINT8);
+        npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject*) arr);
+        memcpy(outdata, image_data(crop), rows * width_step(crop));
+                
+        boost::python::handle<> handle(arr);
         // Append image to jittered image list
         jitter_list.append(object(handle));
     }
