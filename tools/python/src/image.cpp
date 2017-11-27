@@ -3,9 +3,14 @@
 #include "dlib/pixel.h"
 #include <dlib/image_transforms.h>
 
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include <numpy/ndarrayobject.h>
+
 using namespace dlib;
 using namespace std;
 using namespace boost::python;
+
+dlib::rand rnd_jitter;
 
 // ----------------------------------------------------------------------------------------
 
@@ -32,8 +37,6 @@ boost::python::list get_jitter_images(object img, size_t num_jitters = 1, bool d
     if (!is_rgb_python_image(img))
         throw dlib::error("Unsupported image type, must be RGB image.");
 
-    dlib::rand rnd;
-
     // Convert the image to matrix<rgb_pixel> for processing
     matrix<rgb_pixel> img_mat;
     assign_image(img_mat, numpy_rgb_image(img));
@@ -41,35 +44,25 @@ boost::python::list get_jitter_images(object img, size_t num_jitters = 1, bool d
     // The top level list (containing 1 or more images) to return to python
     boost::python::list jitter_list;
 
+    // Size of the numpy array
+    npy_intp dims[3] = { num_rows(img_mat), num_columns(img_mat), 3};
+
     for (int i = 0; i < num_jitters; ++i) {
         // Get a jittered crop
-        matrix<rgb_pixel> crop = dlib::jitter_image(img_mat,rnd);
+        matrix<rgb_pixel> crop = dlib::jitter_image(img_mat, rnd_jitter);
         // If required disturb colors of the image
         if(disturb_colors)
-            dlib::disturb_colors(crop,rnd);
+            dlib::disturb_colors(crop, rnd_jitter);
 
-        // Treat the image as a list of lists
-        boost::python::list img_as_list;
-        size_t rows = img_mat.nr();
-        size_t cols = img_mat.nc();
-        
-        for(size_t row=0; row<rows; row++) {
-            boost::python::list row_list;
-            for(size_t col=0; col<cols; col++) {
-                rgb_pixel pixel = crop(row, col);
-                boost::python::list item;
-                
-                item.append(pixel.red);
-                item.append(pixel.green);
-                item.append(pixel.blue);
-                row_list.append(item);
-            }
-            img_as_list.append(row_list);
-        }
-
-        jitter_list.append(img_as_list);
+        void* img_data_copy = malloc(img_mat.nr() * width_step(crop));
+        memcpy(img_data_copy, image_data(crop), img_mat.nr() * width_step(crop));
+        PyObject *pyObj = PyArray_SimpleNewFromData(3, dims, NPY_UINT8, img_data_copy);
+        PyArray_ENABLEFLAGS((PyArrayObject*)pyObj, NPY_ARRAY_OWNDATA);
+        boost::python::handle<> handle(pyObj);
+        // Append image to jittered image list
+        jitter_list.append(object(handle));
     }
-        
+           
     return jitter_list;
 }
 
@@ -79,6 +72,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(get_jitter_images_with_defaults, get_jitter_imag
 void bind_image_classes()
 {
     using boost::python::arg;
+    import_array();
 
     {
     class_<rgb_pixel>("rgb_pixel")

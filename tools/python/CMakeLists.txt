@@ -8,6 +8,22 @@ add_definitions(-DDLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
 
 include(../../dlib/cmake_utils/add_python_module)
 
+# Test for numpy
+FIND_PACKAGE(PythonInterp)
+IF(PYTHONINTERP_FOUND)
+    EXECUTE_PROCESS( COMMAND ${PYTHON_EXECUTABLE} -c "import numpy" OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE NUMPYRC)
+    IF(NUMPYRC EQUAL 1)
+        MESSAGE(FATAL_ERROR "Python interpreter found but 'numpy' package not available")
+    ELSE(NUMPYRC EQUAL 1)
+        MESSAGE(STATUS "Found Python with installed numpy package")
+        EXECUTE_PROCESS( COMMAND ${PYTHON_EXECUTABLE} -c "import sys; from numpy import get_include; sys.stdout.write(get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE_PATH)
+        MESSAGE(STATUS "Numpy include path '${NUMPY_INCLUDE_PATH}'")
+        include_directories(${NUMPY_INCLUDE_PATH})
+    ENDIF(NUMPYRC EQUAL 1)
+ELSE(PYTHONINTERP_FOUND)
+    MESSAGE(FATAL_ERROR "Could not find Python interpreter")
+ENDIF(PYTHONINTERP_FOUND)
+
 add_definitions(-DDLIB_VERSION=${DLIB_VERSION})
 
 # Tell cmake to compile all these cpp files into a dlib python module.
