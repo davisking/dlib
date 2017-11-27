@@ -13,7 +13,7 @@ FIND_PACKAGE(PythonInterp)
 IF(PYTHONINTERP_FOUND)
     EXECUTE_PROCESS( COMMAND ${PYTHON_EXECUTABLE} -c "import numpy" OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE NUMPYRC)
     IF(NUMPYRC EQUAL 1)
-        MESSAGE(FATAL_ERROR "Python interpreter found but 'numpy' package not available")
+        MESSAGE(WARNING "Numpy not found. Functions that return numpy arrays will throw exceptions!")
     ELSE(NUMPYRC EQUAL 1)
         MESSAGE(STATUS "Found Python with installed numpy package")
         EXECUTE_PROCESS( COMMAND ${PYTHON_EXECUTABLE} -c "import sys; from numpy import get_include; sys.stdout.write(get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE_PATH)
@@ -47,6 +47,17 @@ set(python_srcs
    src/face_recognition.cpp
    src/cnn_face_detector.cpp
 )
+
+# Only add the Numpy returning functions if Numpy is present
+IF(NUMPYRC EQUAL 1)
+    list(APPEND python_srcs src/numpy_returns_stub.cpp)
+ELSE(NUMPYRC EQUAL 1)
+    list(APPEND python_srcs src/numpy_returns.cpp)
+ENDIF(NUMPYRC EQUAL 1)
+
+if(NOT ${DLIB_NO_GUI_SUPPORT})
+   list(APPEND python_srcs src/gui.cpp)
+endif(NOT ${DLIB_NO_GUI_SUPPORT})
 
 # Only add the GUI module if requested
 if(NOT ${DLIB_NO_GUI_SUPPORT})

@@ -623,13 +623,12 @@ def is_installed(requirement):
     else:
         return True
 
-if not is_installed('numpy>=1.11.0'):
+if not is_installed('numpy>=1.5.1'):
     print(textwrap.dedent("""
-            Error: numpy needs to be installed first. You can install it via:
-
+            Warning: Functions that return numpy arrays need Numpy (>= v1.5.1) installed!
+            You can install numpy and then run this setup again:
             $ pip install numpy
             """), file=sys.stderr)
-    exit(1)
 
 setup(
     name='dlib',
