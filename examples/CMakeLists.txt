@@ -125,6 +125,8 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
    add_gui_example(dnn_mmod_find_cars2_ex)
    add_example(dnn_mmod_train_find_cars_ex)
    add_gui_example(dnn_semantic_segmentation_ex)
+   add_example(dnn_imagenet_train_ex)
+   add_example(dnn_metric_learning_on_images_ex)
    if (NOT MSVC)
       # Don't try to compile these programs using Visual Studio since it causes the
       # compiler to run out of RAM and to crash.  Maybe someday Visual Studio
@@ -133,12 +135,9 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
       #  run out of memory, running a 64-bit MSBuild.exe on the Command Prompt
       #  seems to work fine. So you can try something like this:
       #  "C:\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe" C:\path\to\examples.sln /p:Configuration=Release /p:Platform=x64 /t:dnn_imagenet_train_ex
-      #  It does take quite a while to build these examples, though!
       #  Note that you may additionally need to set Debug Information Format to
       #  C7 compatible (/Z7), in case you get compiler error "cannot update
       #  program database".)
-      add_example(dnn_imagenet_train_ex)
-      add_example(dnn_metric_learning_on_images_ex)
       add_example(dnn_semantic_segmentation_train_ex)
    endif()
 endif()
