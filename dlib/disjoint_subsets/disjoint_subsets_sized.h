@@ -1,9 +1,10 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_DISJOINT_SUBsETS_Hh_
-#define DLIB_DISJOINT_SUBsETS_Hh_
+#ifndef DLIB_DISJOINT_SUBsETS_SIZED_Hh_
+#define DLIB_DISJOINT_SUBsETS_SIZED_Hh_
 
-#include "disjoint_subsets_abstract.h"
+#include "disjoint_subsets_sized_abstract.h"
+#include "disjoint_subsets.h"
 #include <vector>
 #include "../algs.h"
 
@@ -12,32 +13,31 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class disjoint_subsets
+    class disjoint_subsets_sized
     {
     public:
 
         void clear (
         ) noexcept
         {
-            items.clear();
+            disjoint_subsets_.clear();
+            sets_size.clear();
+            number_of_sets = 0;
         }
 
         void set_size (
             unsigned long new_size
         )
         {
-            items.resize(new_size);
-            for (unsigned long i = 0; i < items.size(); ++i)
-            {
-                items[i].parent = i;
-                items[i].rank = 0;
-            }
+            disjoint_subsets_.set_size(new_size);
+            sets_size.assign(new_size, 1);
+            number_of_sets = new_size;
         }
 
         unsigned long size (
         ) const noexcept
         {
-            return items.size();
+            return disjoint_subsets_.size();
         }
 
         unsigned long find_set (
@@ -53,31 +53,7 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            if (items[item].parent == item)
-            {
-                return item;
-            }
-            else
-            {
-                // find root of item
-                unsigned long x = item;
-                do
-                {
-                    x = items[x].parent;
-                } while (items[x].parent != x);
-
-                // do path compression
-                const unsigned long root = x;
-                x = item;
-                while (items[x].parent != x)
-                {
-                    const unsigned long prev = x;
-                    x = items[x].parent;
-                    items[prev].parent = root;
-                }
-
-                return root;
-            }
+            return disjoint_subsets_.find_set(item);
         }
 
         unsigned long merge_sets (
@@ -101,20 +77,37 @@ namespace dlib
                 << "\n\t this: " << this
                 );
 
-            if (items[a].rank > items[b].rank)
-            {
-                items[b].parent = a;
-                return a;
-            }
-            else
-            {
-                items[a].parent = b;
-                if (items[a].rank == items[b].rank)
-                {
-                    items[b].rank = items[b].rank + 1;
-                }
-                return b;
-            }
+            disjoint_subsets_.merge_sets(a, b);
+
+            if (find_set(a) == a) sets_size[a] += sets_size[b];
+            else sets_size[b] += sets_size[a];
+            --number_of_sets;
+
+            return find_set(a);
+        }
+
+        unsigned long get_number_of_sets (
+        ) const noexcept
+        {
+            return number_of_sets;
+        }
+
+        unsigned long get_size_of_set(
+                unsigned long item
+        ) const
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(item < size() &&
+                        find_set(item) == item,
+                        "\t unsigned long disjoint_subsets::get_size_of_set()"
+                                << "\n\t invalid arguments were given to this function"
+                                << "\n\t item: " << item
+                                << "\n\t size(): " << size()
+                                << "\n\t find_set(item): " << find_set(item)
+                                << "\n\t this: " << this
+            );
+
+            return sets_size[item];
         }
 
     private:
@@ -124,13 +117,9 @@ namespace dlib
             for a discussion of how this algorithm works.
         */
 
-        struct data
-        {
-            unsigned long rank;
-            unsigned long parent;
-        };
-
-        mutable std::vector<data> items;
+        mutable std::vector<unsigned long> sets_size;
+        unsigned long number_of_sets{0};
+        disjoint_subsets disjoint_subsets_;
 
     };
 
@@ -138,4 +127,4 @@ namespace dlib
 
 }
 
-#endif // DLIB_DISJOINT_SUBsETS_Hh_
+#endif // DLIB_DISJOINT_SUBsETS_SIZED_Hh_

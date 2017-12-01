@@ -49,6 +49,7 @@ set (tests
    directed_graph.cpp
    discriminant_pca.cpp
    disjoint_subsets.cpp
+   disjoint_subsets_sized.cpp
    ekm_and_lisf.cpp
    empirical_kernel_map.cpp
    entropy_coder.cpp
@@ -176,5 +177,3 @@ if (NOT DLIB_NO_GUI_SUPPORT)
    add_subdirectory(examples)
    add_subdirectory(tools)
 endif()
-
-

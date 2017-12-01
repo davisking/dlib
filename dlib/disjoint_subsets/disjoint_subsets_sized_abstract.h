@@ -1,7 +1,7 @@
 // Copyright (C) 2011  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_DISJOINT_SUBsETS_ABSTRACT_Hh_
-#ifdef DLIB_DISJOINT_SUBsETS_ABSTRACT_Hh_
+#undef DLIB_DISJOINT_SUBsETS_SIZED_ABSTRACT_Hh_
+#ifdef DLIB_DISJOINT_SUBsETS_SIZED_ABSTRACT_Hh_
 
 #include <vector>
 #include "../algs.h"
@@ -11,11 +11,12 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class disjoint_subsets
+    class disjoint_subsets_sized : public disjoint_subsets
     {
         /*!
             INITIAL VALUE
                 - size() == 0
+                - get_number_of_sets() == 0
 
             WHAT THIS OBJECT REPRESENTS
                 This object represents a set of integers which is partitioned into
@@ -25,26 +26,29 @@ namespace dlib
         !*/
     public:
 
-        void clear (
+        virtual void clear (
         ) noexcept;
         /*!
             ensures
                 - #size() == 0
+                - #get_number_of_sets() == 0
                 - returns this object to its initial value
         !*/
 
-        void set_size (
+        virtual void set_size (
             unsigned long new_size
         );
         /*!
             ensures
                 - #size() == new_size
+                - #get_number_of_sets() == new_size
                 - for all valid i:
                     - #find_set(i) == i
                       (i.e. this object contains new_size subsets, each containing exactly one element)
+                    - #get_size_of_set(i) == 1
         !*/
 
-        unsigned long size (
+        virtual unsigned long size (
         ) const noexcept;
         /*!
             ensures
@@ -52,7 +56,7 @@ namespace dlib
                   by this object.
         !*/
 
-        unsigned long find_set (
+        virtual unsigned long find_set (
             unsigned long item
         ) const;
         /*!
@@ -69,7 +73,7 @@ namespace dlib
                   have find_set(A) == find_set(B).
         !*/
 
-        unsigned long merge_sets (
+        virtual unsigned long merge_sets (
             unsigned long a,
             unsigned long b
         );
@@ -85,7 +89,28 @@ namespace dlib
             ensures
                 - #find_set(a) == #find_set(b)
                   (i.e. merges the set's containing a and b)
+                - #get_size_of_set(#find_set(a)) == get_size_of_set(a) + get_size_of_set(b)
+                - #get_number_of_sets() == get_number_of_sets() - 1
                 - returns #find_set(a)
+        !*/
+
+        unsigned long get_number_of_sets (
+        ) const noexcept;
+        /*!
+            ensures
+                - returns the current number of different subsets.
+        !*/
+
+        unsigned long get_size_of_set(
+                unsigned long item
+        ) const;
+        /*!
+            requires
+                - item < size()
+                - find_set(item) == item
+                  (i.e. item is the representative element of some set)
+            ensures
+                - returns the number of elements which belongs to the set where item is the representative element.
         !*/
     };
 

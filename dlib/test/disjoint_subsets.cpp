@@ -10,7 +10,7 @@
 
 #include "tester.h"
 
-namespace  
+namespace
 {
 
     using namespace test;
@@ -34,7 +34,6 @@ namespace
         DLIB_TEST(s.find_set(2) == 2);
         DLIB_TEST(s.find_set(3) == 3);
         DLIB_TEST(s.find_set(4) == 4);
-
 
         unsigned long id = s.merge_sets(1,3);
         DLIB_TEST(s.find_set(0) == 0);
@@ -101,6 +100,3 @@ namespace
 
 
 }
-
-
-
