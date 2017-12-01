@@ -6,7 +6,7 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
-#include <dlib/disjoint_subsets_sized.h>
+#include <dlib/disjoint_subsets.h>
 
 #include "tester.h"
 

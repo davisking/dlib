@@ -11,7 +11,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class disjoint_subsets_sized : public disjoint_subsets
+    class disjoint_subsets_sized 
     {
         /*!
             INITIAL VALUE
@@ -22,11 +22,13 @@ namespace dlib
                 This object represents a set of integers which is partitioned into
                 a number of disjoint subsets.  It supports the two fundamental operations
                 of finding which subset a particular integer belongs to as well as
-                merging subsets.
+                merging subsets.  It also allows you to find out how big each subset is.  It 
+                is therefore essentially the same thing as dlib::disjoint_subsets, except
+                it also keeps track of of the size of each subset.
         !*/
     public:
 
-        virtual void clear (
+        void clear (
         ) noexcept;
         /*!
             ensures
@@ -35,7 +37,7 @@ namespace dlib
                 - returns this object to its initial value
         !*/
 
-        virtual void set_size (
+        void set_size (
             unsigned long new_size
         );
         /*!
@@ -48,7 +50,7 @@ namespace dlib
                     - #get_size_of_set(i) == 1
         !*/
 
-        virtual unsigned long size (
+        unsigned long size (
         ) const noexcept;
         /*!
             ensures
@@ -56,7 +58,7 @@ namespace dlib
                   by this object.
         !*/
 
-        virtual unsigned long find_set (
+        unsigned long find_set (
             unsigned long item
         ) const;
         /*!
@@ -73,7 +75,7 @@ namespace dlib
                   have find_set(A) == find_set(B).
         !*/
 
-        virtual unsigned long merge_sets (
+        unsigned long merge_sets (
             unsigned long a,
             unsigned long b
         );
