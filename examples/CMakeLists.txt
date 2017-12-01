@@ -126,7 +126,6 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
    add_example(dnn_mmod_train_find_cars_ex)
    add_gui_example(dnn_semantic_segmentation_ex)
    add_example(dnn_imagenet_train_ex)
-   add_example(dnn_metric_learning_on_images_ex)
    if (NOT MSVC)
       # Don't try to compile these programs using Visual Studio since it causes the
       # compiler to run out of RAM and to crash.  Maybe someday Visual Studio
@@ -139,6 +138,7 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
       #  C7 compatible (/Z7), in case you get compiler error "cannot update
       #  program database".)
       add_example(dnn_semantic_segmentation_train_ex)
+      add_example(dnn_metric_learning_on_images_ex)
    endif()
 endif()
 
