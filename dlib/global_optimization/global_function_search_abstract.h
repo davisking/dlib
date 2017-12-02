@@ -17,7 +17,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object is a simple struct that lets you define the valid inputs to a
-                multivariate function.  It lets you define bounds constraints for each
+                multivariate function.  It lets you define bound constraints for each
                 variable as well as say if a variable is integer valued or not.  Therefore,
                 an instance of this struct says that a function takes upper.size() input
                 variables, where the ith variable must be in the range [lower(i) upper(i)]
@@ -134,7 +134,7 @@ namespace dlib
                 This object performs global optimization of a set of user supplied
                 functions.  The goal is to maximize the following objective function:
                     max_{function_i,x_i}: function_i(x_i)
-                subject to bounds constraints on each element of x_i.  Moreover, each
+                subject to bound constraints on each element of x_i.  Moreover, each
                 element of x_i can be either real valued or integer valued.  Each of the
                 functions can also take a different number of variables.  Therefore, the
                 final result of the optimization tells you which function produced the
