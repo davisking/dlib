@@ -65,8 +65,8 @@ namespace dlib
 }
 
 // redefine the DLIB_CASSERT macro to include the stack trace
-#undef DLIB_CASSERT
-#define DLIB_CASSERT(_exp,_message)                                              \
+#undef DLIBM_CASSERT
+#define DLIBM_CASSERT(_exp,_message)                                              \
     {if ( !(_exp) )                                                         \
     {                                                                       \
         std::ostringstream dlib_o_out;                                       \
