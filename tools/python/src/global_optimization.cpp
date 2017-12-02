@@ -132,6 +132,52 @@ boost::python::tuple py_find_max_global2 (
 
 // ----------------------------------------------------------------------------------------
 
+boost::python::tuple py_find_min_global (
+    object f,
+    boost::python::list bound1,
+    boost::python::list bound2,
+    boost::python::list is_integer_variable,
+    unsigned long num_function_calls,
+    double solver_epsilon = 0
+)
+{
+    DLIB_CASSERT(len(bound1) == len(bound2));
+    DLIB_CASSERT(len(bound1) == len(is_integer_variable));
+
+    auto func = [&](const matrix<double,0,1>& x)
+    {
+        return call_func(f, x);
+    };
+
+    auto result = find_min_global(func, list_to_mat(bound1), list_to_mat(bound2),
+        list_to_bool_vector(is_integer_variable), max_function_calls(num_function_calls),
+        solver_epsilon);
+
+    return boost::python::make_tuple(mat_to_list(result.x),result.y);
+}
+
+boost::python::tuple py_find_min_global2 (
+    object f,
+    boost::python::list bound1,
+    boost::python::list bound2,
+    unsigned long num_function_calls,
+    double solver_epsilon = 0
+)
+{
+    DLIB_CASSERT(len(bound1) == len(bound2));
+
+    auto func = [&](const matrix<double,0,1>& x)
+    {
+        return call_func(f, x);
+    };
+
+    auto result = find_min_global(func, list_to_mat(bound1), list_to_mat(bound2), max_function_calls(num_function_calls), solver_epsilon);
+
+    return boost::python::make_tuple(mat_to_list(result.x),result.y);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_global_optimization()
 {
     /*!
@@ -244,5 +290,23 @@ ensures \n\
 	(arg("f"), arg("bound1"), arg("bound2"), arg("num_function_calls"), arg("solver_epsilon")=0)
     );
     }
+
+
+
+    {
+    def("find_min_global", &py_find_min_global, 
+      "This function is just like find_max_global(), except it performs minimization rather than maximization." 
+        , 
+	(arg("f"), arg("bound1"), arg("bound2"), arg("is_integer_variable"), arg("num_function_calls"), arg("solver_epsilon")=0)
+    );
+    }
+
+    {
+    def("find_min_global", &py_find_min_global2, 
+        "This function simply calls the other version of find_min_global() with is_integer_variable set to False for all variables.", 
+	(arg("f"), arg("bound1"), arg("bound2"), arg("num_function_calls"), arg("solver_epsilon")=0)
+    );
+    }
+
 }
 
