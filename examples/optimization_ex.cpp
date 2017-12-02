@@ -263,14 +263,14 @@ int main() try
 
 
 
-    // Finally, let's try the find_max_global() routine.  Like find_min_bobyqa(),
-    // this technique is specially designed to optimize a function in the absence
+    // Finally, let's try the find_min_global() routine.  Like find_min_bobyqa(),
+    // this technique is specially designed to minimize a function in the absence
     // of derivative information.  However, it is also designed to handle
     // functions with many local optima.  Where BOBYQA would get stuck at the
-    // nearest local optima, find_max_global() won't.  find_max_global() uses a
+    // nearest local optima, find_min_global() won't.  find_min_global() uses a
     // global optimization method based on a combination of non-parametric global
     // function modeling and BOBYQA style quadratic trust region modeling to
-    // efficiently find a global maximizer.  It usually does a good job with a
+    // efficiently find a global minimizer.  It usually does a good job with a
     // relatively small number of calls to the function being optimized.  
     // 
     // You also don't have to give it a starting point or set any parameters,
@@ -296,20 +296,20 @@ int main() try
         }
         // Holder table function tilted towards 10,10 and with additional
         // high frequency terms to add more local optima.
-        return std::abs(sin(x0)*cos(x1)*exp(std::abs(1-std::sqrt(x0*x0+x1*x1)/pi))) -(x0+x1)/10 - sin(x0*10)*cos(x1*10);
+        return -( std::abs(sin(x0)*cos(x1)*exp(std::abs(1-std::sqrt(x0*x0+x1*x1)/pi))) -(x0+x1)/10 - sin(x0*10)*cos(x1*10));
     };
 
     // To optimize this difficult function all we need to do is call
-    // find_max_global()
-    auto result = find_max_global(complex_holder_table, 
+    // find_min_global()
+    auto result = find_min_global(complex_holder_table, 
                                   {-10,-10}, // lower bounds
                                   {10,10}, // upper bounds
                                   max_function_calls(300));
 
     cout.precision(9);
-    // These cout statements will show that find_max_global() found the
+    // These cout statements will show that find_min_global() found the
     // globally optimal solution to 9 digits of precision:
-    cout << "complex holder table function solution y (should be 21.9210397): " << result.y << endl;
+    cout << "complex holder table function solution y (should be -21.9210397): " << result.y << endl;
     cout << "complex holder table function solution x:\n" << result.x << endl;
 }
 catch (std::exception& e)

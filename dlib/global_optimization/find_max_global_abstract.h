@@ -53,7 +53,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is a simple typed integer class used to strongly type the "max number
-                of function calls" argument to find_max_global().
+                of function calls" argument to find_max_global() and find_min_global().
 
         !*/
 
@@ -136,6 +136,21 @@ namespace dlib
               optimizer.
     !*/
 
+    template <
+        typename funct
+        >
+    std::pair<size_t,function_evaluation> find_min_global (
+        std::vector<funct>& functions,
+        const std::vector<function_spec>& specs,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
+        double solver_epsilon = 0
+    );
+    /*!
+        This function is identical to the find_max_global() defined immediately above,
+        except that we perform minimization rather than maximization.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -204,9 +219,26 @@ namespace dlib
               optimizer.
     !*/
 
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const std::vector<bool>& is_integer_variable,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
+        double solver_epsilon = 0
+    );
+    /*!
+        This function is identical to the find_max_global() defined immediately above,
+        except that we perform minimization rather than maximization.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 // The following functions are just convenient overloads for calling the above defined
-// find_max_global() routines.
+// find_max_global() and find_min_global() routines.
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -222,6 +254,21 @@ namespace dlib
     )
     {
         return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const std::vector<bool>& is_integer_variable,
+        const max_function_calls num,
+        double solver_epsilon 
+    )
+    {
+        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -241,6 +288,21 @@ namespace dlib
         return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
     }
 
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -255,6 +317,20 @@ namespace dlib
     ) 
     {
         return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const max_function_calls num,
+        double solver_epsilon
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -274,6 +350,21 @@ namespace dlib
         return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
     }
 
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const double bound1,
+        const double bound2,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -288,6 +379,20 @@ namespace dlib
     ) 
     {
         return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const double bound1,
+        const double bound2,
+        const max_function_calls num,
+        double solver_epsilon 
+    ) 
+    {
+        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -306,6 +411,20 @@ namespace dlib
         return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
     }
 
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const std::chrono::nanoseconds max_runtime,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -320,6 +439,20 @@ namespace dlib
     ) 
     {
         return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const double bound1,
+        const double bound2,
+        const std::chrono::nanoseconds max_runtime,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -337,6 +470,21 @@ namespace dlib
     ) 
     {
         return find_max_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const std::vector<bool>& is_integer_variable,
+        const std::chrono::nanoseconds max_runtime,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------

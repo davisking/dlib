@@ -213,6 +213,66 @@ namespace
         DLIB_TEST_MSG(std::abs(result.y  - 21.9210397) < 0.0001, std::abs(result.y  - 21.9210397));
     }
 
+// ----------------------------------------------------------------------------------------
+
+    void test_find_min_global(
+    )
+    {
+        print_spinner();
+        auto rosen = [](const matrix<double,0,1>& x) { return +1*( 100*std::pow(x(1) - x(0)*x(0),2.0) + std::pow(1 - x(0),2)); };
+
+        auto result = find_min_global(rosen, {0, 0}, {2, 2}, max_function_calls(100), 0);
+        matrix<double,0,1> true_x = {1,1};
+
+        dlog << LINFO << "rosen: " <<  trans(result.x);
+        DLIB_TEST_MSG(min(abs(true_x-result.x)) < 1e-5, min(abs(true_x-result.x)));
+        print_spinner();
+
+        result = find_min_global(rosen, {0, 0}, {2, 2}, max_function_calls(100));
+        dlog << LINFO << "rosen: " <<  trans(result.x);
+        DLIB_TEST_MSG(min(abs(true_x-result.x)) < 1e-5, min(abs(true_x-result.x)));
+        print_spinner();
+
+        result = find_min_global(rosen, {0, 0}, {2, 2}, std::chrono::seconds(5));
+        dlog << LINFO << "rosen: " <<  trans(result.x);
+        DLIB_TEST_MSG(min(abs(true_x-result.x)) < 1e-5, min(abs(true_x-result.x)));
+        print_spinner();
+
+        result = find_min_global(rosen, {0, 0}, {2, 2}, {false,false}, max_function_calls(100));
+        dlog << LINFO << "rosen: " <<  trans(result.x);
+        DLIB_TEST_MSG(min(abs(true_x-result.x)) < 1e-5, min(abs(true_x-result.x)));
+        print_spinner();
+
+        result = find_min_global(rosen, {0, 0}, {0.9, 0.9}, {false,false}, max_function_calls(100));
+        true_x = {0.9, 0.81};
+        dlog << LINFO << "rosen, bounded at 0.9: " <<  trans(result.x);
+        DLIB_TEST_MSG(min(abs(true_x-result.x)) < 1e-5, min(abs(true_x-result.x)));
+        print_spinner();
+
+        result = find_min_global([](double x){ return std::pow(x-2,2.0); }, -10, 10, max_function_calls(10), 0);
+        dlog << LINFO << "(x-2)^2: " <<  trans(result.x);
+        DLIB_TEST(result.x.size()==1);
+        DLIB_TEST(std::abs(result.x - 2) < 1e-9);
+        print_spinner();
+
+        result = find_min_global([](double x){ return std::pow(x-2,2.0); }, -10, 1, max_function_calls(10));
+        dlog << LINFO << "(x-2)^2, bound at 1: " <<  trans(result.x);
+        DLIB_TEST(result.x.size()==1);
+        DLIB_TEST(std::abs(result.x - 1) < 1e-9);
+        print_spinner();
+
+        result = find_min_global([](double x){ return std::pow(x-2,2.0); }, -10, 1, std::chrono::seconds(2));
+        dlog << LINFO << "(x-2)^2, bound at 1: " <<  trans(result.x);
+        DLIB_TEST(result.x.size()==1);
+        DLIB_TEST(std::abs(result.x - 1) < 1e-9);
+        print_spinner();
+
+
+        result = find_min_global([](double a, double b){ return complex_holder_table(a,b);}, 
+            {-10, -10}, {10, 10}, max_function_calls(300), 0);
+        dlog << LINFO << "complex_holder_table y: "<< result.y;
+        DLIB_TEST_MSG(std::abs(result.y  + 21.9210397) < 0.0001, std::abs(result.y  + 21.9210397));
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -233,6 +293,7 @@ namespace
             test_upper_bound_function(0.0, 1e-1);
             test_global_function_search();
             test_find_max_global();
+            test_find_min_global();
         }
     } a;
 

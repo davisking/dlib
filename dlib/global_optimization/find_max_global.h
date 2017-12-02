@@ -112,6 +112,83 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        template <
+            typename funct
+            >
+        std::pair<size_t,function_evaluation> find_max_global (
+            std::vector<funct>& functions,
+            std::vector<function_spec> specs,
+            const max_function_calls num,
+            const std::chrono::nanoseconds max_runtime,
+            double solver_epsilon,
+            double ymult
+        ) 
+        {
+            // Decide which parameters should be searched on a log scale.  Basically, it's
+            // common for machine learning models to have parameters that should be searched on
+            // a log scale (e.g. SVM C).  These parameters are usually identifiable because
+            // they have bounds like [1e-5 1e10], that is, they span a very large range of
+            // magnitudes from really small to really big.  So there we are going to check for
+            // that and if we find parameters with that kind of bound constraints we will
+            // transform them to a log scale automatically.
+            std::vector<std::vector<bool>> log_scale(specs.size());
+            for (size_t i = 0; i < specs.size(); ++i)
+            {
+                for (long j = 0; j < specs[i].lower.size(); ++j)
+                {
+                    if (!specs[i].is_integer_variable[j] && specs[i].lower(j) > 0 && specs[i].upper(j)/specs[i].lower(j) > 1000)
+                    {
+                        log_scale[i].push_back(true);
+                        specs[i].lower(j) = std::log(specs[i].lower(j));
+                        specs[i].upper(j) = std::log(specs[i].upper(j));
+                    }
+                    else
+                    {
+                        log_scale[i].push_back(false);
+                    }
+                }
+            }
+
+            global_function_search opt(specs);
+            opt.set_solver_epsilon(solver_epsilon);
+
+            const auto time_to_stop = std::chrono::steady_clock::now() + max_runtime;
+
+            // Now run the main solver loop.
+            for (size_t i = 0; i < num.max_calls && std::chrono::steady_clock::now() < time_to_stop; ++i)
+            {
+                auto next = opt.get_next_x();
+                matrix<double,0,1> x = next.x();
+                // Undo any log-scaling that was applied to the variables before we pass them
+                // to the functions being optimized.
+                for (long j = 0; j < x.size(); ++j)
+                {
+                    if (log_scale[next.function_idx()][j])
+                        x(j) = std::exp(x(j));
+                }
+                double y = ymult*call_function_and_expand_args(functions[next.function_idx()], x);
+                next.set(y);
+            }
+
+
+            matrix<double,0,1> x;
+            double y;
+            size_t function_idx;
+            opt.get_best_function_eval(x,y,function_idx);
+            // Undo any log-scaling that was applied to the variables before we output them. 
+            for (long j = 0; j < x.size(); ++j)
+            {
+                if (log_scale[function_idx][j])
+                    x(j) = std::exp(x(j));
+            }
+            return std::make_pair(function_idx, function_evaluation(x,y/ymult));
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename funct
         >
@@ -123,64 +200,21 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         double solver_epsilon = 0
     ) 
     {
-        // Decide which parameters should be searched on a log scale.  Basically, it's
-        // common for machine learning models to have parameters that should be searched on
-        // a log scale (e.g. SVM C).  These parameters are usually identifiable because
-        // they have bounds like [1e-5 1e10], that is, they span a very large range of
-        // magnitudes from really small to really big.  So there we are going to check for
-        // that and if we find parameters with that kind of bound constraints we will
-        // transform them to a log scale automatically.
-        std::vector<std::vector<bool>> log_scale(specs.size());
-        for (size_t i = 0; i < specs.size(); ++i)
-        {
-            for (long j = 0; j < specs[i].lower.size(); ++j)
-            {
-                if (!specs[i].is_integer_variable[j] && specs[i].lower(j) > 0 && specs[i].upper(j)/specs[i].lower(j) > 1000)
-                {
-                    log_scale[i].push_back(true);
-                    specs[i].lower(j) = std::log(specs[i].lower(j));
-                    specs[i].upper(j) = std::log(specs[i].upper(j));
-                }
-                else
-                {
-                    log_scale[i].push_back(false);
-                }
-            }
-        }
+        return impl::find_max_global(functions, std::move(specs), num, max_runtime, solver_epsilon, +1);
+    }
 
-        global_function_search opt(specs);
-        opt.set_solver_epsilon(solver_epsilon);
-
-        const auto time_to_stop = std::chrono::steady_clock::now() + max_runtime;
-
-        // Now run the main solver loop.
-        for (size_t i = 0; i < num.max_calls && std::chrono::steady_clock::now() < time_to_stop; ++i)
-        {
-            auto next = opt.get_next_x();
-            matrix<double,0,1> x = next.x();
-            // Undo any log-scaling that was applied to the variables before we pass them
-            // to the functions being optimized.
-            for (long j = 0; j < x.size(); ++j)
-            {
-                if (log_scale[next.function_idx()][j])
-                    x(j) = std::exp(x(j));
-            }
-            double y = call_function_and_expand_args(functions[next.function_idx()], x);
-            next.set(y);
-        }
-
-
-        matrix<double,0,1> x;
-        double y;
-        size_t function_idx;
-        opt.get_best_function_eval(x,y,function_idx);
-        // Undo any log-scaling that was applied to the variables before we output them. 
-        for (long j = 0; j < x.size(); ++j)
-        {
-            if (log_scale[function_idx][j])
-                x(j) = std::exp(x(j));
-        }
-        return std::make_pair(function_idx, function_evaluation(x,std::move(y)));
+    template <
+        typename funct
+        >
+    std::pair<size_t,function_evaluation> find_min_global (
+        std::vector<funct>& functions,
+        std::vector<function_spec> specs,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
+        double solver_epsilon = 0
+    ) 
+    {
+        return impl::find_max_global(functions, std::move(specs), num, max_runtime, solver_epsilon, -1);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -203,6 +237,24 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         return find_max_global(functions, std::move(specs), num, max_runtime, solver_epsilon).second;
     }
 
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const std::vector<bool>& is_integer_variable,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
+        double solver_epsilon = 0
+    ) 
+    {
+        std::vector<funct> functions(1,std::move(f));
+        std::vector<function_spec> specs(1, function_spec(bound1, bound2, is_integer_variable));
+        return find_min_global(functions, std::move(specs), num, max_runtime, solver_epsilon).second;
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -218,6 +270,21 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     )
     {
         return find_max_global(std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const std::vector<bool>& is_integer_variable,
+        const max_function_calls num,
+        double solver_epsilon 
+    )
+    {
+        return find_min_global(std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -237,6 +304,21 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
     }
 
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -251,6 +333,20 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     ) 
     {
         return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const max_function_calls num,
+        double solver_epsilon
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -270,6 +366,21 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
     }
 
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const double bound1,
+        const double bound2,
+        const max_function_calls num,
+        const std::chrono::nanoseconds max_runtime = FOREVER,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -284,6 +395,20 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     ) 
     {
         return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const double bound1,
+        const double bound2,
+        const max_function_calls num,
+        double solver_epsilon 
+    ) 
+    {
+        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -302,6 +427,20 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
     }
 
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const std::chrono::nanoseconds max_runtime,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+    }
+
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -316,6 +455,20 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     ) 
     {
         return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const double bound1,
+        const double bound2,
+        const std::chrono::nanoseconds max_runtime,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -333,6 +486,21 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
     ) 
     {
         return find_max_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
+    }
+
+    template <
+        typename funct
+        >
+    function_evaluation find_min_global (
+        funct f,
+        const matrix<double,0,1>& bound1,
+        const matrix<double,0,1>& bound2,
+        const std::vector<bool>& is_integer_variable,
+        const std::chrono::nanoseconds max_runtime,
+        double solver_epsilon = 0
+    ) 
+    {
+        return find_min_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
     }
 
 // ----------------------------------------------------------------------------------------
