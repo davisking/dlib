@@ -744,10 +744,10 @@ namespace dlib
             // Figure out the bounds on the object shapes.  We will sample uniformly
             // from this box.
             matrix<float> temp = reshape(initial_shape, initial_shape.size()/2, 2);
-            double min_x = min(colm(temp,0))-padding;
-            double min_y = min(colm(temp,1))-padding;
-            double max_x = max(colm(temp,0))+padding;
-            double max_y = max(colm(temp,1))+padding;
+            double min_x = min(colm(temp,0));
+            double min_y = min(colm(temp,1));
+            double max_x = max(colm(temp,0));
+            double max_y = max(colm(temp,1));
 
             if (get_padding_mode() == bounding_box_relative)
             {
