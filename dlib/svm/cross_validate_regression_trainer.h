@@ -48,7 +48,7 @@ namespace dlib
         }
 
         matrix<double,1,4> result;
-        result = rs.mean(), std::pow(rc.correlation(),2), rs_mae.mean(), rs_mae.stddev();
+        result = rs.mean(), rc.correlation(), rs_mae.mean(), rs_mae.stddev();
         return result;
     }
 
@@ -142,7 +142,7 @@ namespace dlib
         } // for (long i = 0; i < folds; ++i)
 
         matrix<double,1,4> result;
-        result = rs.mean(), std::pow(rc.correlation(),2), rs_mae.mean(), rs_mae.stddev();
+        result = rs.mean(), rc.correlation(), rs_mae.mean(), rs_mae.stddev();
         return result;
     }
 
