@@ -288,7 +288,7 @@ namespace dlib
                 max_val =  0xFFFFFF;
                 max_val *= 0x1000000;
                 max_val += 0xFFFFFF;
-                max_val += 0.01;
+                max_val += 0.05;
 
 
                 has_gaussian = false;
