@@ -32,9 +32,8 @@ namespace dlib
               y_test and returns a matrix M summarizing the results.  Specifically:
                 - M(0) == the mean squared error.  
                   The MSE is given by: sum over i: pow(reg_funct(x_test[i]) - y_test[i], 2.0)
-                - M(1) == the R-squared value (i.e. the squared correlation between
-                  reg_funct(x_test[i]) and y_test[i]).  This is a number between 0
-                  and 1.
+                - M(1) == the correlation between reg_funct(x_test[i]) and y_test[i].
+                  This is a number between -1 and 1.
                 - M(2) == the mean absolute error.  
                   This is given by: sum over i: abs(reg_funct(x_test[i]) - y_test[i])
                 - M(3) == the standard deviation of the absolute error.
@@ -66,9 +65,8 @@ namespace dlib
               Specifically:
                 - M(0) == the mean squared error.  
                   The MSE is given by: sum over i: pow(reg_funct(x[i]) - y[i], 2.0)
-                - M(1) == the R-squared value (i.e. the squared correlation between
-                  a predicted y value and its true value).  This is a number between 
-                  0 and 1.
+                - M(1) == the correlation between a predicted y value and its true value.
+                  This is a number between -1 and 1.
                 - M(2) == the mean absolute error.  
                   This is given by: sum over i: abs(reg_funct(x_test[i]) - y_test[i])
                 - M(3) == the standard deviation of the absolute error.
