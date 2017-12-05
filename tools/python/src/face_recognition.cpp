@@ -130,6 +130,7 @@ private:
 
 boost::python::list chinese_whispers_clustering(boost::python::list descriptors, float threshold)
 {
+    DLIB_CASSERT(threshold > 0);
     boost::python::list clusters;
 
     size_t num_descriptors = len(descriptors);
