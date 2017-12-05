@@ -72,6 +72,16 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
+                This object represents a request, by the global_function_search object, to
+                evaluate a real-valued function and report back the results.  
+
+            THREAD SAFETY
+                You shouldn't let more than one thread touch a function_evaluation_request
+                at the same time.  However, it is safe to send instances of this class to
+                other threads for processing.  This lets you evaluate multiple
+                function_evaluation_requests in parallel.  Any appropriate synchronization
+                with regard to the originating global_function_search instance is handled
+                automatically.
         !*/
 
     public:
@@ -86,7 +96,9 @@ namespace dlib
         function_evaluation_request(function_evaluation_request&& item);
         function_evaluation_request& operator=(function_evaluation_request&& item);
         /*!
-            moving from item causes item.has_been_evaluated() == true,  TODO, clarify 
+            ensures
+                - *this takes the state of item.  
+                - #item.has_been_evaluated() == true
         !*/
 
         ~function_evaluation_request(
@@ -94,16 +106,35 @@ namespace dlib
         /*!
             ensures
                 - frees all resources associated with this object.  
+                - It's fine to destruct function_evaluation_requests even if they haven't
+                  been evaluated yet. If this happens it will simply be as if the request
+                  was never issued.
         !*/
 
         size_t function_idx (
         ) const;
+        /*!
+            ensures
+                - Returns the function index that identifies which function is to be
+                  evaluated.  
+        !*/
 
         const matrix<double,0,1>& x (
         ) const;
+        /*!
+            ensures
+                - returns the input parameters to the function to be evaluated.
+        !*/
 
         bool has_been_evaluated (
         ) const;
+        /*!
+            ensures
+                - If this evaluation request is still outstanding then returns false,
+                  otherwise returns true.  That is, if the global_function_search is still
+                  waiting for you report back by calling set() then
+                  has_been_evaluated()==false.
+        !*/
 
         void set (
             double y
@@ -113,6 +144,9 @@ namespace dlib
                 - has_been_evaluated() == false
             ensures
                 - #has_been_evaluated() == true
+                - Notifies the global_function_search instance that created this object
+                  that when the function_idx()th function is evaluated with x() as input
+                  then the output is y.
         !*/
 
         void swap(
@@ -179,8 +213,8 @@ namespace dlib
                 You can see that we alternate between global search and local refinement,
                 except in the case where the local model seems to have converged to within
                 get_solver_epsilon() accuracy.  In that case only global search steps are
-                used.  We do this in the hope that the global search steps will find a new
-                and better local optima to explore, which would then reactivate local
+                used.  We do this in the hope that the global search will find a new and
+                better local optima to explore, which would then reactivate local
                 refinement when it has something productive to do. 
 
                 
@@ -257,12 +291,11 @@ namespace dlib
                 runs the loop for you.  However, the API shown above gives you the
                 opportunity to run multiple function evaluations in parallel.  For
                 instance, it is perfectly valid to call get_next_x() multiple times and
-                send the resulting function_evaluation_request objects to separate threads for
-                processing.  Those separate threads can run the functions being optimized
-                (e.g. F and G or whatever) and report back by calling
-                function_evaluation_request::set() since the function_evaluation_request
-                object is thread safe.  You could even spread the work across a compute
-                cluster.
+                send the resulting function_evaluation_request objects to separate threads
+                for processing.  Those separate threads can run the functions being
+                optimized (e.g. F and G or whatever) and report back by calling
+                function_evaluation_request::set().  You could even spread the work across
+                a compute cluster if you have one.
 
                 So what happens if you have N outstanding function evaluation requests?
                 Or in other words, what happens if you called get_next_x() N times and
@@ -272,11 +305,10 @@ namespace dlib
                 should give you an idea of the usefulness of this kind of parallelism.  If
                 for example, your functions being optimized were simple convex functions
                 this kind of parallelism wouldn't help since essentially all the
-                interesting work in the solver is going to be done by the quadratic local
-                optimizer (since quadratic models are extremely good at optimizing convex
-                functions).  If however, your function has a lot of local optima, running
-                many instances of the global exploration steps in parallel might significantly 
-                reduce the time it takes to find a good solution.
+                interesting work in the solver is going to be done by the local optimizer.
+                However, if your function has a lot of local optima, running many global
+                exploration steps in parallel might significantly reduce the time it takes
+                to find a good solution.
                 
                 It should also be noted that our upper bounding model is implemented by the
                 dlib::upper_bound_function object, which is a tool that allows us to create
@@ -290,8 +322,8 @@ namespace dlib
                 expensive to evaluate then this relatively expensive upper bounding model
                 is well worth its computational cost.
                 
-                Finally, let's talk about related work.  The two most relevant papers in
-                the optimization literature are:
+                Finally, let's introduce some background literature on this algorithm.  The
+                two most relevant papers in the optimization literature are:
                     Global optimization of Lipschitz functions Malherbe, Cédric and Vayatis,
                     Nicolas International Conference on Machine Learning - 2017
                 and
@@ -299,15 +331,15 @@ namespace dlib
                     M.J.D. Powell, 40th Workshop on Large Scale Nonlinear Optimization (Erice,
                     Italy, 2004)
 
-                Our upper bounding model is inspired by the Malherbe paper.  See the
-                documentation of dlib::upper_bound_function for more details on that, as we
-                make a number of important extensions.  The other part of our method, our
-                local refinement model, is essentially the same type of trust region model
-                proposed by Powell.  That is, each time we do a local refinement step we
-                identify the best point seen so far, fit a quadratic function around it
-                using the function evaluations we have collected so far, and then use a
-                simple trust region procedure to decide the next best point to evaluate
-                based on our quadratic model.  
+                Our upper bounding model is an extension of the AdaLIPO method in the
+                Malherbe.  See the documentation of dlib::upper_bound_function for more
+                details on that, as we make a number of important extensions.  The other
+                part of our method, our local refinement model, is essentially the same
+                type of trust region model proposed by Powell in the above paper.  That is,
+                each time we do a local refinement step we identify the best point seen so
+                far, fit a quadratic function around it using the function evaluations we
+                have collected so far, and then use a simple trust region procedure to
+                decide the next best point to evaluate based on our quadratic model.  
 
                 The method proposed by Malherbe gives excellent global search performance
                 but has terrible convergence properties in the area around a maxima.
@@ -322,6 +354,11 @@ namespace dlib
                 function, the global_function_search object can reliably find the globally
                 optimal solution to full floating point precision in under a few hundred
                 steps.
+
+
+            THREAD SAFETY
+                You shouldn't let more than one thread touch a global_function_search
+                instance at the same time.  
         !*/
 
     public:
@@ -384,7 +421,7 @@ namespace dlib
         // This object can't be copied.
         global_function_search(const global_function_search&) = delete;
         global_function_search& operator=(const global_function_search& item) = delete;
-
+        // But it can be moved
         global_function_search(global_function_search&& item) = default;
         global_function_search& operator=(global_function_search&& item) = default;
         /*!
@@ -407,6 +444,8 @@ namespace dlib
         size_t num_functions(
         ) const;
         /*!
+            ensures
+                - returns the number of functions being optimized.
         !*/
 
         void get_function_evaluations (
@@ -417,7 +456,15 @@ namespace dlib
             ensures
                 - #specs.size() == num_functions()
                 - #function_evals.size() == num_functions()
-                - TODO
+                - This function allows you to query the state of the solver.  In
+                  particular, you can find the function_specs for each function being
+                  optimized and their recorded evaluations.  
+                - for all valid i:
+                    - function_evals[i] == all the function evaluations that have been
+                      recorded for the ith function (i.e. the function with the
+                      function_spec #specs[i]).  That is, this is the record of all the x
+                      and y values reported back by function_evaluation_request::set()
+                      calls.
         !*/
 
         void get_best_function_eval (
@@ -428,6 +475,17 @@ namespace dlib
         /*!
             requires
                 - num_functions() != 0
+            ensures
+                - if (no function evaluations have been recorded yet) then
+                    - The outputs of this function are in a valid but undefined state.
+                - else
+                    - This function tells you which function has produced the largest
+                      output seen so far.  It also tells you the inputs to that function
+                      that leads to those outputs (x) as well as the output value itself (y).
+                    - 0 <= #function_idx < num_functions()
+                    - #function_idx == the index of the function that produced the largest output seen so far.
+                    - #x == the input parameters to the function that produced the largest outputs seen so far.
+                    - #y == the largest output seen so far.
         !*/
 
         function_evaluation_request get_next_x (
@@ -435,10 +493,27 @@ namespace dlib
         /*!
             requires
                 - num_functions() != 0
+            ensures
+                - Generates and returns a function evaluation request.  See the discussion
+                  in the WHAT THIS OBJECT REPRESENTS section above for details.
         !*/
 
         double get_pure_random_search_probability (
         ) const; 
+        /*!
+            ensures
+                - When we decide to do a global explore step we will, with probability
+                  get_pure_random_search_probability(), sample a point completely at random
+                  rather than using the upper bounding model.  Therefore, if you set this
+                  probability to 0 then we will depend entirely on the upper bounding
+                  model.  Alternatively, if you set get_pure_random_search_probability() to
+                  1 then we won't use the upper bounding model at all and instead use pure
+                  random search to do global exploration.  Pure random search is much
+                  faster than using the upper bounding model, so if you know that your
+                  objective function is especially simple it can be faster to use pure
+                  random search.  However, if you really know your function that well you
+                  should probably use a gradient based optimizer :)
+        !*/
 
         void set_pure_random_search_probability (
             double prob
@@ -452,6 +527,21 @@ namespace dlib
 
         double get_solver_epsilon (
         ) const; 
+        /*!
+            ensures
+                - As discussed in the WHAT THIS OBJECT REPRESENTS section, we only do a
+                  local refinement step if we haven't already found the peak of the current
+                  local optima.  get_solver_epsilon() sets the tolerance for deciding if
+                  the local search method has found the local optima.  Therefore, when the
+                  local trust region model runs we check if its predicted improvement in
+                  the objective function is greater than get_solver_epsilon().  If it isn't
+                  then we assume it has converged and we should focus entirely on global
+                  search.
+
+                  This means that, for instance, setting get_solver_epsilon() to 0
+                  essentially instructs the solver to find each local optima to full
+                  floating point precision and only then to focus on pure global search.
+        !*/
 
         void set_solver_epsilon (
             double eps
@@ -465,6 +555,14 @@ namespace dlib
 
         double get_relative_noise_magnitude (
         ) const; 
+        /*!
+            ensures
+                - Returns the value of the relative noise magnitude parameter to the
+                  dlib::upper_bound_function's used by this object.  See the
+                  upper_bound_function's documentation for a detailed discussion of this
+                  parameter's meaning.  Most users should leave this value as its default
+                  setting.
+        !*/
 
         void set_relative_noise_magnitude (
             double value
@@ -478,6 +576,13 @@ namespace dlib
 
         size_t get_monte_carlo_upper_bound_sample_num (
         ) const; 
+        /*!
+            ensures
+                - To find the point that maximizes the upper bounding model we use
+                  get_monte_carlo_upper_bound_sample_num() random evaluations and select
+                  the largest upper bound from that set.   So this parameter influences how
+                  well we estimate the maximum point on the upper bounding model. 
+        !*/
 
         void set_monte_carlo_upper_bound_sample_num (
             size_t num

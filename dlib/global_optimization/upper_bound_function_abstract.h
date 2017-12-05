@@ -72,8 +72,8 @@ namespace dlib
 
 
 
-                The inspiration for the upper_bound_function object came from this
-                excellent paper:
+                The inspiration for the upper_bound_function object came from the AdaLIPO
+                algorithm from this excellent paper:
                     Global optimization of Lipschitz functions 
                     Malherbe, Cédric and Vayatis, Nicolas 
                     International Conference on Machine Learning - 2017
