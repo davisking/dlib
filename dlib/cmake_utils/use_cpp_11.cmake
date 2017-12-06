@@ -63,7 +63,7 @@ elseif( MSVC AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VE
    message(STATUS "C++11 activated.")
    add_global_compiler_switch("-Xclang -fcxx-exceptions")
    set(COMPILER_CAN_DO_CPP_11 1)
-elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24215.1 ) 
+elseif(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.24210.0 ) 
    message(STATUS "NOTE: Visual Studio didn't have good enough C++11 support until Visual Studio 2015 update 3 (v19.0.24215.1)")
    message(STATUS "So we aren't enabling things that require full C++11 support (e.g. the deep learning tools).")
    message(STATUS "Also, be aware that Visual Studio's version naming is confusing, in particular, there are multiple versions of 'update 3'")
