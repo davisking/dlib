@@ -1,8 +1,11 @@
 #!/usr/bin/python
 # The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 #
-#   This example shows how faces are jittered and data augmentation using dlib's disturb_colors
-#   takes place during the training of a face recognition model using metric learning.
+#   This example shows how faces were jittered and augmented to create training
+#   data for dlib's face recognition model.  It takes an input image and
+#   disturbs the colors as well as applies random translations, rotations, and
+#   scaling.
+
 #
 # COMPILING/INSTALLING THE DLIB PYTHON INTERFACE
 #   You can install dlib using the command:
@@ -25,7 +28,6 @@
 #   Also note that this example requires OpenCV and Numpy which can be installed
 #   via the command:
 #       pip install opencv-python numpy
-#   Or downloaded from http://opencv.org/releases.html
 #
 #   The image file used in this example is in the public domain:
 #   https://commons.wikimedia.org/wiki/File:Tom_Cruise_avp_2014_4.jpg
@@ -81,16 +83,15 @@ for detection in dets:
 
 # Get the aligned face image and show it
 image = dlib.get_face_chip(img, faces[0], size=320)
-cv_rgb_image = np.array(image).astype(np.uint8)
-cv_bgr_img = cv2.cvtColor(cv_rgb_image, cv2.COLOR_RGB2BGR)
+cv_bgr_img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 cv2.imshow('image',cv_bgr_img)
 cv2.waitKey(0)
 
 # Show 5 jittered images without data augmentation
-jittered_images = dlib.jitter_image(cv_rgb_image, num_jitters=5)
+jittered_images = dlib.jitter_image(image, num_jitters=5)
 show_jittered_images(jittered_images)
 
 # Show 5 jittered images with data augmentation
-jittered_images = dlib.jitter_image(cv_rgb_image, num_jitters=5, disturb_colors=True)
+jittered_images = dlib.jitter_image(image, num_jitters=5, disturb_colors=True)
 show_jittered_images(jittered_images)
 cv2.destroyAllWindows()
