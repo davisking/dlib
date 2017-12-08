@@ -9,20 +9,21 @@ add_definitions(-DDLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
 include(../../dlib/cmake_utils/add_python_module)
 
 # Test for numpy
-FIND_PACKAGE(PythonInterp)
-IF(PYTHONINTERP_FOUND)
-    EXECUTE_PROCESS( COMMAND ${PYTHON_EXECUTABLE} -c "import numpy" OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE NUMPYRC)
-    IF(NUMPYRC EQUAL 1)
-        MESSAGE(WARNING "Numpy not found. Functions that return numpy arrays will throw exceptions!")
-    ELSE(NUMPYRC EQUAL 1)
-        MESSAGE(STATUS "Found Python with installed numpy package")
-        EXECUTE_PROCESS( COMMAND ${PYTHON_EXECUTABLE} -c "import sys; from numpy import get_include; sys.stdout.write(get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE_PATH)
-        MESSAGE(STATUS "Numpy include path '${NUMPY_INCLUDE_PATH}'")
-        include_directories(${NUMPY_INCLUDE_PATH})
-    ENDIF(NUMPYRC EQUAL 1)
-ELSE(PYTHONINTERP_FOUND)
-    MESSAGE(FATAL_ERROR "Could not find Python interpreter")
-ENDIF(PYTHONINTERP_FOUND)
+find_package(PythonInterp)
+if(PYTHONINTERP_FOUND)
+   execute_process( COMMAND ${PYTHON_EXECUTABLE} -c "import numpy" OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE NUMPYRC)
+   if(NUMPYRC EQUAL 1)
+      message(WARNING "Numpy not found. Functions that return numpy arrays will throw exceptions!")
+   else()
+      message(STATUS "Found Python with installed numpy package")
+      execute_process( COMMAND ${PYTHON_EXECUTABLE} -c "import sys; from numpy import get_include; sys.stdout.write(get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE_PATH)
+      message(STATUS "Numpy include path '${NUMPY_INCLUDE_PATH}'")
+      include_directories(${NUMPY_INCLUDE_PATH})
+   endif()
+else()
+   message(WARNING "Numpy not found. Functions that return numpy arrays will throw exceptions!")
+   set(NUMPYRC 1)
+endif()
 
 add_definitions(-DDLIB_VERSION=${DLIB_VERSION})
 
@@ -50,20 +51,16 @@ set(python_srcs
 )
 
 # Only add the Numpy returning functions if Numpy is present
-IF(NUMPYRC EQUAL 1)
-    list(APPEND python_srcs src/numpy_returns_stub.cpp)
-ELSE(NUMPYRC EQUAL 1)
-    list(APPEND python_srcs src/numpy_returns.cpp)
-ENDIF(NUMPYRC EQUAL 1)
-
-if(NOT ${DLIB_NO_GUI_SUPPORT})
-   list(APPEND python_srcs src/gui.cpp)
-endif(NOT ${DLIB_NO_GUI_SUPPORT})
+if(NUMPYRC EQUAL 1)
+   list(APPEND python_srcs src/numpy_returns_stub.cpp)
+else()
+   list(APPEND python_srcs src/numpy_returns.cpp)
+endif()
 
 # Only add the GUI module if requested
 if(NOT ${DLIB_NO_GUI_SUPPORT})
    list(APPEND python_srcs src/gui.cpp)
-endif(NOT ${DLIB_NO_GUI_SUPPORT})
+endif()
 
 add_python_module(dlib ${python_srcs})
 
