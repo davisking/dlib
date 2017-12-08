@@ -611,10 +611,10 @@ if (NOT TARGET dlib)
             # Intel MKL, hasn't already decided what to use.  This is because
             # it makes the MKL bug out if you link to another openmp lib other
             # than Intel's when you use the MKL.
-            if (NOT openmp_libarires AND NOT MSVC AND NOT XCODE)
+            if (NOT openmp_libraries AND NOT MSVC AND NOT XCODE)
                find_package(OpenMP)
                if (OPENMP_FOUND)
-                  set(openmp_libarires ${OpenMP_CXX_FLAGS}) 
+                  set(openmp_libraries ${OpenMP_CXX_FLAGS}) 
                else()
                   message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
                   set(CUDA_FOUND 0)
