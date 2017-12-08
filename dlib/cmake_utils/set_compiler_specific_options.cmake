@@ -93,6 +93,13 @@ elseif (MSVC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC") # else if using Visu
       list(APPEND active_preprocessor_switches "-DDLIB_HAVE_SSE2")
    endif()
 
+elseif((";${gcc_like_compilers};" MATCHES ";${CMAKE_CXX_COMPILER_ID};")  AND
+        ("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "^arm"))
+   option(USE_NEON_INSTRUCTIONS "Compile your program with ARM-NEON instructions" OFF)
+   if(USE_NEON_INSTRUCTIONS)
+      list(APPEND active_compile_opts -mfpu=neon)
+      message(STATUS "Enabling ARM-NEON instructions")
+   endif()
 endif()
 
 
