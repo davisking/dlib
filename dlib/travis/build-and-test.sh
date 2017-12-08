@@ -16,6 +16,7 @@ if [ "$VARIANT" = "examples" ]; then
 fi
 
 if [ "$VARIANT" = "python-api" ]; then
+  pip install --user numpy
   ../cmake/bin/cmake ../tools/python -DCMAKE_BUILD_TYPE=Release
   ../cmake/bin/cmake --build . --target install -- -j 2
 
