@@ -1,7 +1,7 @@
 // Copyright (C) 2017 Adrián Javaloy (adrian.javaloy@gmail.com)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#undef DLIB_QLEARNING_ABSTRACT_Hh_
-#ifdef DLIB_QLEARNING_ABSTRACT_Hh_
+#undef DLIB_SARSA_ABSTRACT_Hh_
+#ifdef DLIB_SARSA_ABSTRACT_Hh_
 
 #include "policy_abstract.h"
 #include "model_abstract.h"
@@ -11,7 +11,7 @@ namespace dlib
     template <
         typename model_type
         >
-    class qlearning
+    class sarsa
     {
         /*!
             REQUIREMENTS ON model_type
@@ -26,17 +26,18 @@ namespace dlib
 
                 Supposing we are in state s and action a and we are going to a new state s'
                 the learning function has the form:
-                    Q(s, a) = (1 - lr) * Q(s,a) + lr * (reward + disc * max_a' Q(s', a'))
-                where lr is the learning_rate and disc the discount.
+                    Q(s, a) = (1 - lr) * Q(s,a) + lr * (reward + disc * Q(s', a'))
+                where lr is the learning_rate, disc the discount and a' is the next action
+                the algorithm will perform after reaching s'.
                 That formula means that it takes a convex combination of the current qvalue
                 and the expected qvalue.
 
-                Note that it is an off-policy reinforcement learning algorithm meaning
-                that it doesn't take the policy into account while learning.
+                Note that, unlike qlearning, sarsa is an on-policy reinforcement learning
+                algorithm meaning that it takes the policy into account while learning.
         !*/
 
     public:
-        qlearning(
+        sarsa(
         );
         /*!
             ensures
@@ -47,7 +48,7 @@ namespace dlib
                 - #is not verbose
         !*/
 
-        explicit qlearning(
+        explicit sarsa(
             double learning_rate,
             double discount,
             unsigned int iterations,
@@ -105,7 +106,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the maximum number of iterations that qlearning will
+                - returns the maximum number of iterations that sarsa will
                   perform during the training.
         !*/
 
@@ -167,7 +168,7 @@ namespace dlib
                   an implementation of the policy interface defined in policy_abstract.h.
             ensures
                 - returns a policy of the type policy_type as the result of applying the
-                  qlearning learning function over iterations runs over using the weight
+                  sarsa learning function over iterations runs over using the weight
                   matrix of the argument as the initial weights.
         !*/
 
@@ -185,9 +186,10 @@ namespace dlib
                 - returns train_policy(greedy_policy<model_type>(model));
         !*/
     };
+    };
 
 // ----------------------------------------------------------------------------------------
 
 }
 
-#endif // DLIB_QLEARNING_ABSTRACT_Hh_
+#endif // DLIB_SARSA_ABSTRACT_Hh_

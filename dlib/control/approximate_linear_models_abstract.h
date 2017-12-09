@@ -59,14 +59,15 @@ namespace dlib
                 - returns the dimensionality of the PSI() feature vector.  
         !*/
 
-        void get_features (
-            const state_type& state,
-            matrix<double,0,1>& feats
+        matrix<double,0,1> get_features (
+            const state_type &state,
+            const action_type &action
         ) const;
         /*!
+            requires
+                - action is a valid option from state.
             ensures
-                - #feats.size() == num_features()
-                - #feats == PSI(state,action)
+                - returns PSI(state,action)
         !*/
 
     };

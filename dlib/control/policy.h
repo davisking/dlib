@@ -3,9 +3,10 @@
 #ifndef DLIB_POLICY_Hh_
 #define DLIB_POLICY_Hh_
 
-#include <random>
 #include "../matrix.h"
 #include "policy_abstract.h"
+#include <iostream>
+#include <random>
 
 namespace dlib
 {
@@ -22,15 +23,16 @@ namespace dlib
         typedef typename model_type::action_type action_type;
 
         greedy_policy (
-        )
+            const model_type &model_
+        ) : model(model_)
         {
             w.set_size(model.states_size());
             w = 0;
         }
 
         greedy_policy (
-            const matrix<double,0,1>& weights_,
-            const model_type& model_ = model_type()
+            const model_type &model_,
+            const matrix<double,0,1>& weights_
         ) : w(weights_), model(model_) {}
 
         action_type operator() (
@@ -51,7 +53,7 @@ namespace dlib
 
     private:
         matrix<double,0,1> w;
-        model_type model;
+        const model_type &model;
     };
 
     template < typename model_type >
@@ -79,57 +81,40 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename model_type,
+        typename policy_type,
         typename generator = std::default_random_engine
         >
     class epsilon_policy
     {
     public:
-
-        typedef model_type feature_extractor_type;
-        typedef typename model_type::state_type state_type;
-        typedef typename model_type::action_type action_type;
+        typedef typename policy_type::state_type state_type;
+        typedef typename policy_type::action_type action_type;
 
         epsilon_policy (
             double epsilon_,
-            const generator &gen_ = std::default_random_engine()
-        ) : epsilon(epsilon_), gen(gen_)
-        {
-            w.set_size(model.states_size());
-            w = 0;
-        }
-
-        epsilon_policy (
-            double epsilon_,
-            const matrix<double,0,1>& weights_,
-            const model_type& model_ = model_type(),
-            const generator gen_ = std::default_random_engine()
-        ) : w(weights_), model(model_), epsilon(epsilon_), gen(gen_) {}
+            const policy_type &policy_,
+            const generator &gen_ = generator()
+        ) : policy(policy_), epsilon(epsilon_), gen(gen_) {}
 
         action_type operator() (
             const state_type& state
         ) const
         {
             std::bernoulli_distribution d(epsilon);
-            if(d(gen)){
-  //              std::cout << "random\n";
-                return model.random_action(state);
-            }
-            else{
-//                std::cout << "best\n";
-                return model.find_best_action(state,w);
-            }
-            //return d(gen) ? model.random_action(state) : model.find_best_action(state,w);
+            return d(gen) ? get_model().random_action(state) : policy(state);
         }
 
-        const model_type& get_model (
-        ) const { return model; }
+        policy_type get_policy(
+        ) const { return policy; }
+
+        auto get_model (
+        ) const -> decltype(get_policy().get_model()) { return policy.get_model(); }
 
         matrix<double,0,1>& get_weights (
-        ) { return w; }
+        ) { return policy.get_weights(); }
 
         const matrix<double,0,1>& get_weights (
-        ) const { return w; }
+        ) const { return policy.get_weights(); }
 
         double get_epsilon(
         ) const { return epsilon; }
@@ -138,43 +123,44 @@ namespace dlib
         ) const { return gen; }
 
     private:
-        matrix<double,0,1> w;
-        model_type model;
+        policy_type policy;
         double epsilon;
 
         mutable generator gen;
     };
 
-    template < typename model_type, typename generator >
-    inline void serialize(const epsilon_policy<model_type, generator>& item, std::ostream& out)
+    template < typename policy_type, typename generator >
+    inline void serialize(const epsilon_policy<policy_type, generator>& item, std::ostream& out)
     {
         int version = 1;
         serialize(version, out);
-        serialize(item.get_model(), out);
-        serialize(item.get_weights(), out);
+        serialize(item.get_policy(), out);
         serialize(item.get_epsilon(), out);
         serialize(item.get_generator(), out);
     }
-    template < typename model_type, typename generator >
-    inline void deserialize(epsilon_policy<model_type, generator>& item, std::istream& in)
+
+    template < typename policy_type, typename generator >
+    inline void deserialize(epsilon_policy<policy_type, generator>& item, std::istream& in)
     {
         int version = 0;
         deserialize(version, in);
         if (version != 1)
             throw serialization_error("Unexpected version found while deserializing dlib::greedy_policy object.");
-        model_type model;
-        matrix<double,0,1> w;
+
+        policy_type policy;
         double epsilon;
         generator gen;
-        deserialize(model, in);
-        deserialize(w, in);
+        deserialize(policy, in);
         deserialize(epsilon, in);
         deserialize(gen, in);
-        item = epsilon_policy<model_type, generator>(w,model, epsilon, gen);
+        item = epsilon_policy<policy_type, generator>(epsilon, policy, gen);
     }
 
 // ----------------------------------------------------------------------------------------
 
+    // For backward compability with lspi
+    template < typename model_type >
+    using policy = greedy_policy<model_type>; //template aliasing is possible post C++11
 }
 
 #endif // DLIB_POLICY_Hh_

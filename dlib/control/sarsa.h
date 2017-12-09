@@ -1,18 +1,18 @@
 // Copyright (C) 2017 Adrián Javaloy (adrian.javaloy@gmail.com)
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef DLIB_QLEARNING_Hh_
-#define DLIB_QLEARNING_Hh_
+#ifndef DLIB_SARSA_Hh_
+#define DLIB_SARSA_Hh_
 
 #include "policy.h"
-#include <iostream>
 #include <type_traits>
+#include <iostream>
 
 namespace dlib
 {
-    class qlearning
+    class sarsa
     {
     public:
-        explicit qlearning(
+        explicit sarsa(
             double lr = 0.2,
             double disc = 0.8,
             unsigned int miters = 100u,
@@ -32,7 +32,7 @@ namespace dlib
         )
         {
             DLIB_ASSERT(value >= 0. && value <= 1.,
-                "\t qlearning::set_learning_rate(value)"
+                "\t sarsa::set_learning_rate(value)"
                 "\n\t invalid inputs were given to this function"
                 "\n\t value: " << value
             );
@@ -47,7 +47,7 @@ namespace dlib
         )
         {
             DLIB_ASSERT(value >= 0. && value <= 1.,
-                "\t qlearning::set_discount(value)"
+                "\t sarsa::set_discount(value)"
                 "\n\t invalid inputs were given to this function"
                 "\n\t value: " << value
             );
@@ -69,7 +69,7 @@ namespace dlib
         )
         {
             DLIB_ASSERT(value >= 0. && value <= 1.,
-                "\t qlearning::set_epsilon(value)"
+                "\t sarsa::set_epsilon(value)"
                 "\n\t invalid inputs were given to this function"
                 "\n\t value: " << value
             );
@@ -86,8 +86,8 @@ namespace dlib
         ) { verbose = false; }
 
         template <
-            typename policy_type
-            >
+                typename policy_type
+                >
         policy_type train_policy(
             const policy_type &policy
         ) const
@@ -102,30 +102,31 @@ namespace dlib
             auto& w = eps_pol.get_weights();
 
             DLIB_ASSERT(weights.size() == model.states_size(),
-                "\t qlearning::train(weights)"
+                "\t sarsa::train(weights)"
                 "\n\t invalid inputs were given to this function"
                 "\n\t weights.size: " << weights.size() <<
                 "\n\t features size: " << model.states_size()
             );
 
             reward_type total_reward = static_cast<reward_type>(0);
-            std::cout << "iterations: " << iterations << std::endl;
             for(auto iter = 0u; iter < iterations; ++iter){
                 auto state = model.initial_state();
+                auto action = eps_pol(state);
 
                 reward_type reward = static_cast<reward_type>(0);
                 while(!model.is_final(state)){
-                    auto action = eps_pol(state);
                     auto next_state = model.step(state, action);
+                    auto next_action = eps_pol(next_state);
                     auto next_reward = model.reward(state, action, next_state);
 
                     const auto feats = model.get_features(state, action);
-                    const auto feats_next_best = model.get_features(next_state, model.find_best_action(next_state, w));
+                    const auto feats_next = model.get_features(next_state, next_action);
 
-                    double correction = reward + discount * dot(w, feats_next_best) - dot(w, feats);
+                    double correction = reward + discount * dot(w, feats_next) - dot(w, feats);
                     w += learning_rate * correction * feats;
 
                     state = next_state;
+                    action = next_action;
                     reward += next_reward;
                 }
 
@@ -160,4 +161,4 @@ namespace dlib
 
 }
 
-#endif // DLIB_QLEARNING_Hh_
+#endif // DLIB_SARSA_Hh_

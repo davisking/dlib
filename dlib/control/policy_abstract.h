@@ -3,7 +3,6 @@
 #undef DLIB_POLICY_ABSTRACT_Hh_
 #ifdef DLIB_POLICY_ABSTRACT_Hh_
 
-#include <random>
 #include "../matrix.h"
 #include "model_abstract.h"
 
@@ -31,18 +30,18 @@ public:
     typedef typename model_type::action_type action_type;
 
     example_policy (
+        const model_type &model
     );
     /*!
         ensures
-            - #get_model() == model_type()
-              (i.e. it will have its default value)
+            - #get_model() == model
             - #get_weights().size() == #get_model().states_size()
             - #get_weights() == 0
     !*/
 
     example_policy (
-        const matrix<double,0,1>& weights,
-        const model_type& model
+        const model_type& model,
+        const matrix<double,0,1>& weights
     );
     /*!
         requires
@@ -111,18 +110,18 @@ public:
     typedef typename model_type::action_type action_type;
 
     greedy_policy (
+        const model_type &model
     );
     /*!
         ensures
-            - #get_model() == model_type()
-              (i.e. it will have its default value)
+            - #get_model() == model
             - #get_weights().size() == #get_model().states_size()
             - #get_weights() == 0
     !*/
 
     greedy_policy (
-        const matrix<double,0,1>& weights,
-        const model_type& model
+        const model_type& model,
+        const matrix<double,0,1>& weights
     );
     /*!
         requires
@@ -176,58 +175,42 @@ void deserialize(greedy_policy<model_type>& item, std::istream& in);
 // ----------------------------------------------------------------------------------------
 
 template <
-    typename model_type,
+    typename policy_type,
     typename generator
     >
 class epsilon_policy
 {
     /*!
-        REQUIREMENTS ON model_type
-            model_type should implement the interface defined at model_abstract.h.
+        REQUIREMENTS ON policy_type
+            policy_type should implement the example_policy interface defined at the
+            top of this file.
 
         REQUIREMENTS ON generator
             generator should be a PRNG type like the ones defined in std::random.
 
         WHAT THIS OBJECT REPRESENTS
-            This is an implementation of the policy interface that returns the best
-            action for the given state with probability 1-epsilon while it returns
-            an doable random action with probability epsilon.
+            This is a special policy that returns the best action (according to the
+            underlying policy) for the given state with probability 1-epsilon
+            while it returns a valid random action with probability epsilon.
     !*/
 
 public:
 
-    typedef typename model_type::state_type state_type;
-    typedef typename model_type::action_type action_type;
+    typedef typename policy_type::state_type state_type;
+    typedef typename policy_type::action_type action_type;
 
     epsilon_policy (
         double epsilon,
-        const generator &gen = std::default_random_engine()
+        const policy_type &policy,
+        const generator &gen = generator()
     );
     /*!
         requires
             - epsilon >= 0 and epsilon <= 1
         ensures
-            - #get_model() == model_type()
-              (i.e. it will have its default value)
-            - #get_weights().size() == #get_model().states_size()
-            - #get_weights() == 0
             - #get_epsilon() == epsilon
-    !*/
-
-    epsilon_policy (
-        double epsilon,
-        const matrix<double,0,1>& weights,
-        const model_type& model,
-        const generator &gen = std::default_random_engine()
-    );
-    /*!
-        requires
-            - model.states_size() == weights.size()
-            - epsilon >= 0 and epsilon <= 1
-        ensures
-            - #get_model() == model
-            - #get_weights() == weights
-            - #get_epsilon() == epsilon
+            - #get_policy() == policy
+            - #get_generator() == gen
     !*/
 
     action_type operator() (
@@ -235,15 +218,22 @@ public:
     ) const;
     /*!
         ensures
-            - returns get_model().find_best_action(state, w) with probability 1-epsilon
+            - returns get_policy()(state, w) with probability 1-epsilon
               and get_model().random_action(state) with probability epsilon.
     !*/
 
-    const model_type& get_model (
+    policy_type get_policy(
     ) const;
     /*!
         ensures
-            - returns the model used by this object
+            - returns the underlying policy used by the object.
+    !*/
+
+    auto get_model (
+    ) const -> decltype(get_policy().get_model());
+    /*!
+        ensures
+            - returns the model used by the underlying policy.
     !*/
 
     matrix<double,0,1>& get_weights (
@@ -278,10 +268,10 @@ public:
 
 };
 
-template < typename model_type >
-void serialize(const epsilon_policy<model_type>& item, std::ostream& out);
-template < typename model_type >
-void deserialize(epsilon_policy<model_type>& item, std::istream& in);
+template < typename policy_type, typename generator >
+inline void serialize(const epsilon_policy<policy_type, generator>& item, std::ostream& out);
+template < typename policy_type, typename generator >
+inline void deserialize(epsilon_policy<policy_type, generator>& item, std::istream& in);
 /*!
     provides serialization support.
 !*/
