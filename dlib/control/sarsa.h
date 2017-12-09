@@ -58,8 +58,8 @@ namespace dlib
         ) const { return iterations; }
 
         void set_iterations(
-            unsigned int iterations
-        ) { iterations = iterations; }
+            unsigned int value
+        ) { iterations = value; }
 
         double get_epsilon(
         ) const { return epsilon; }

@@ -204,8 +204,21 @@ private:
 template <
         typename model_t
         >
-void print(std::ostream &os, const model_t &model, const typename model_t::state_type &state)
+void print(
+        std::ostream &os,
+        const model_t &model,
+        const typename model_t::state_type &state,
+        const matrix<double,0,1> &weights,
+        const typename model_t::action_type &action
+)
 {
+    std::cout << "weights: ";
+    for(int i = 0; i < 4; i++)
+        std::cout << weights(state*4+i) << " ";
+    std::cout << std::endl;
+
+    std::cout << "action: " << static_cast<int>(action) << "\n";
+
     for(auto i = 0; i < model_t::HEIGHT; i++){
         for(auto j = 0; j < model_t::WIDTH; j++){
             typename model_t::state_type s = model_t::WIDTH * i + j;
@@ -223,7 +236,7 @@ template <
         >
 void run_example(const model_t &model, algorithm_t &&algorithm)
 {
-    algorithm.be_verbose();  // uncomment it if you want to see training info.
+    //algorithm.be_verbose();  // uncomment it if you want to see training info.
     auto policy = algorithm.train(model);
 
     std::cout << "Starting final simulation..." << std::endl;
@@ -232,14 +245,14 @@ void run_example(const model_t &model, algorithm_t &&algorithm)
     int i;
 
     for(i = 0; i < 100 && !model.is_final(s); i++){
-        print(std::cout, model, s);
-
         auto a = policy(s);
         auto new_s = model.step(s, a);
         r += model.reward(s,a,new_s);
+
+        print(std::cout, model, s, policy.get_weights(), a);
         s = new_s;
     }
-    print(std::cout, model, s);
+    print(std::cout, model, s, policy.get_weights(), static_cast<decltype(policy(s))>(0));
     std::cout << "Simulation finished." << std::endl;
 
     if(!model.is_final(s))
@@ -255,7 +268,7 @@ int main(int argc, char** argv)
     std::cout << "Hello." << std::endl;
 
     const auto height = 4u;
-    const auto width = 5u;
+    const auto width = 7u;
     typedef cliff_model<height, width, feature_extractor> model_type;
     model_type model;
 
@@ -263,10 +276,14 @@ int main(int argc, char** argv)
     std::cout << "Qlearning or SARSA? (q/s): ";
     std::cin >> response;
 
-    if(response == 'q')
-        run_example(model, qlearning());
-    else if(response == 's')
-        run_example(model, sarsa());
+    if(response == 'q'){
+        qlearning algorithm;
+        algorithm.set_iterations(500); //for this size qlearning doesn't converge with 100 iterations
+        run_example(model, algorithm);
+    }
+    else if(response == 's'){
+        run_example(model, sarsa()); //On the other side, sarsa does converge
+    }
     else
         std::cerr << "Invalid option." << std::endl;
 

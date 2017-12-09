@@ -58,8 +58,8 @@ namespace dlib
         ) const { return iterations; }
 
         void set_iterations(
-            unsigned int iterations
-        ) { iterations = iterations; }
+            unsigned int value
+        ) { iterations = value; }
 
         double get_epsilon(
         ) const { return epsilon; }
@@ -109,10 +109,10 @@ namespace dlib
             );
 
             reward_type total_reward = static_cast<reward_type>(0);
-            std::cout << "iterations: " << iterations << std::endl;
             for(auto iter = 0u; iter < iterations; ++iter){
                 auto state = model.initial_state();
 
+                auto steps = 0u;
                 reward_type reward = static_cast<reward_type>(0);
                 while(!model.is_final(state)){
                     auto action = eps_pol(state);
@@ -127,12 +127,15 @@ namespace dlib
 
                     state = next_state;
                     reward += next_reward;
+                    steps++;
                 }
 
                 total_reward += reward;
                 if(verbose)
                     std::cout << "iteration: " << iter << "\t reward: " << reward
-                              << "\t mean: " << total_reward/static_cast<int>(iter+1) << std::endl;
+                              << "\t mean: " << total_reward/static_cast<int>(iter+1)
+                              << "\t steps: " << steps
+                              << std::endl;
             }
 
             if(verbose)

@@ -35,6 +35,12 @@ namespace dlib
             const matrix<double,0,1>& weights_
         ) : w(weights_), model(model_) {}
 
+        //backward compability
+        greedy_policy (
+            const matrix<double,0,1>& weights_,
+            const model_type &model_
+        ) : w(weights_), model(model_) {}
+
         action_type operator() (
             const state_type& state
         ) const

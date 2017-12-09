@@ -118,6 +118,7 @@ set (tests
    ranking.cpp
    read_write_mutex.cpp
    reference_counter.cpp
+   reinforcement_learning.cpp
    rls.cpp
    random_forest.cpp
    sammon.cpp
@@ -159,7 +160,6 @@ set (tests
    find_optimal_parameters.cpp
    elastic_net.cpp
    )
-
 
 # add all the cpp files we want to compile to this list.  This tells
 # cmake that they are part of our target (which is the executable named dtest)

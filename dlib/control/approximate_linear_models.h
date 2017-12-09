@@ -17,7 +17,7 @@ namespace dlib
     {
         typedef typename model_type::state_type state_type;
         typedef typename model_type::action_type action_type;
-        typedef typename model_type::reward_type reward_type;
+        typedef double reward_type;
 
         process_sample(){}
 
