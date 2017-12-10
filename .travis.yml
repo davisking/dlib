@@ -60,6 +60,8 @@ matrix:
             - boost-latest
           packages: 
             - libboost-python1.55-dev
+            - python3 
+            - python3-pip
             - *gcc5_pkgs
           
 cache:
