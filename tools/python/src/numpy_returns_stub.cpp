@@ -44,7 +44,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(get_face_chips_with_defaults, get_face_chips, 2,
 
 // ----------------------------------------------------------------------------------------
 
-void* bind_numpy_returns()
+void bind_numpy_returns()
 {
     using boost::python::arg;
 
@@ -64,6 +64,4 @@ void* bind_numpy_returns()
 	"Takes an image and a full_object_detections object that reference faces in that image and returns the faces as a list of Numpy arrays representing the image.  The faces will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.",
 	(arg("img"), arg("faces"), arg("size"), arg("padding"))
     ));
-
-    return 0;
 }

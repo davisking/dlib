@@ -125,10 +125,25 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(get_face_chips_with_defaults, get_face_chips, 2,
 
 // ----------------------------------------------------------------------------------------
 
-void* bind_numpy_returns()
+// we need this wonky stuff because different versions of numpy's import_array macro
+// contain differently typed return statements inside import_array().
+#if PY_VERSION_HEX >= 0x03000000
+#define DLIB_NUMPY_IMPORT_ARRAY_RETURN_TYPE void* 
+#define DLIB_NUMPY_IMPORT_RETURN return 0
+#else
+#define DLIB_NUMPY_IMPORT_ARRAY_RETURN_TYPE void
+#define DLIB_NUMPY_IMPORT_RETURN return
+#endif
+DLIB_NUMPY_IMPORT_ARRAY_RETURN_TYPE import_numpy_stuff()
+{
+    import_array();
+    DLIB_NUMPY_IMPORT_RETURN;
+}
+
+void bind_numpy_returns()
 {
     using boost::python::arg;
-    import_array();
+    import_numpy_stuff();
 
     def("jitter_image", &get_jitter_images, get_jitter_images_with_defaults(
     "Takes an image and returns a list of jittered images."
@@ -146,6 +161,4 @@ void* bind_numpy_returns()
 	"Takes an image and a full_object_detections object that reference faces in that image and returns the faces as a list of Numpy arrays representing the image.  The faces will be rotated upright and scaled to 150x150 pixels or with the optional specified size and padding.",
 	(arg("img"), arg("faces"), arg("size"), arg("padding"))
     ));
-
-    return 0;
 }
