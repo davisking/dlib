@@ -25,7 +25,12 @@ endif()
 # Sometimes a computer will have multiple python verions installed.  So in this
 # block of code we find the one in the user's path and add its home folder into
 # cmake's search path.  That way it will use that version of python first. 
-find_program(PYTHON_EXECUTABLE python)
+if (PYTHON3)
+    find_program(PYTHON_EXECUTABLE python3)
+endif()
+if (NOT PYTHON_EXECUTABLE)
+    find_program(PYTHON_EXECUTABLE python)
+endif()
 # Resolve symbolic links, hopefully this will give us a path in the proper
 # python home directory.
 get_filename_component(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE} REALPATH)
