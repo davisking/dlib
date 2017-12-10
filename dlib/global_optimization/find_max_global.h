@@ -138,7 +138,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
             {
                 for (long j = 0; j < specs[i].lower.size(); ++j)
                 {
-                    if (!specs[i].is_integer_variable[j] && specs[i].lower(j) > 0 && specs[i].upper(j)/specs[i].lower(j) > 1000)
+                    if (!specs[i].is_integer_variable[j] && specs[i].lower(j) > 0 && specs[i].upper(j)/specs[i].lower(j) >= 1000)
                     {
                         log_scale[i].push_back(true);
                         specs[i].lower(j) = std::log(specs[i].lower(j));
