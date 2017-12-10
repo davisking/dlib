@@ -83,7 +83,7 @@ namespace dlib
         );
         /*!
             requires
-                - 0 <= value < 1
+                - 0 <= value <= 1
             ensures
                 - #get_background_crops_fraction() == value
         !*/
@@ -306,6 +306,23 @@ namespace dlib
                   rectangles are marked as ignore if they aren't completely contained
                   inside the crop.
                 - #crop_rects.size() <= rects.size()
+        !*/
+
+        template <
+            typename image_type1
+            >
+        image_type1 operator() (
+            const image_type1& img
+        );
+        /*!
+            requires
+                - img.size() != 0
+                - image_type1 == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h 
+            ensures
+                - This function simply calls (*this)(img, junk1, crop, junk2) and returns
+                  crop.  Therefore it is simply a convenience function for extracting a
+                  random background patch.
         !*/
     };
 

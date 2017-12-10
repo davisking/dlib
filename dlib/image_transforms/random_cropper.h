@@ -50,7 +50,7 @@ namespace dlib
             double value
         )
         {
-            DLIB_CASSERT(0 <= value && value < 1);
+            DLIB_CASSERT(0 <= value && value <= 1);
             background_crops_fraction = value;
         }
 
@@ -160,6 +160,19 @@ namespace dlib
                 idx = rnd.get_integer(images.size());
             }
             (*this)(images[idx], rects[idx], crop, crop_rects);
+        }
+
+        template <
+            typename image_type1
+            >
+        image_type1 operator() (
+            const image_type1& img
+        )
+        {
+            image_type1 crop;
+            std::vector<mmod_rect> junk1, junk2;
+            (*this)(img, junk1, crop, junk2);
+            return crop;
         }
 
         template <
