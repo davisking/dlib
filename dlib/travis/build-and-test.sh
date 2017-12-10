@@ -24,7 +24,6 @@ if [ "$VARIANT" = "python-api" ]; then
 fi
 
 if [ "$VARIANT" = "python3-api" ]; then
-  pip3 install --user numpy
   ../cmake/bin/cmake ../tools/python -DPYTHON3=ON -DCMAKE_BUILD_TYPE=Release
   ../cmake/bin/cmake --build . --target install -- -j 2
 
