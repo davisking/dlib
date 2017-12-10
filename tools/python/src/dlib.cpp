@@ -21,7 +21,7 @@ void bind_correlation_tracker();
 void bind_face_recognition();
 void bind_cnn_face_detection();
 void bind_global_optimization();
-void bind_numpy_returns();
+void* bind_numpy_returns();
 
 #ifndef DLIB_NO_GUI_SUPPORT
 void bind_gui();
