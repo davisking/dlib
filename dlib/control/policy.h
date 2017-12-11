@@ -88,7 +88,7 @@ namespace dlib
 
     template <
         typename policy_type,
-        typename generator = std::default_random_engine
+        typename prng_engine = std::default_random_engine
         >
     class epsilon_policy
     {
@@ -99,7 +99,7 @@ namespace dlib
         epsilon_policy (
             double epsilon_,
             const policy_type &policy_,
-            const generator &gen_ = generator()
+            const prng_engine &gen_ = prng_engine()
         ) : policy(policy_), epsilon(epsilon_), gen(gen_) {}
 
         action_type operator() (
@@ -125,14 +125,14 @@ namespace dlib
         double get_epsilon(
         ) const { return epsilon; }
 
-        const generator& get_generator(
+        const prng_engine& get_generator(
         ) const { return gen; }
 
     private:
         policy_type policy;
         double epsilon;
 
-        mutable generator gen;
+        mutable prng_engine gen;
     };
 
     template < typename policy_type, typename generator >

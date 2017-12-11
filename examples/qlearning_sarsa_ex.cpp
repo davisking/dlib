@@ -43,7 +43,8 @@ public:
     typedef feature_extractor_type<state_type, action_type> feature_extractor;
 
     explicit cliff_model(
-    ) : fe(height, width, 4){}
+        int seed = 0
+    ) : fe(height, width, 4), gen(seed){}
 
     action_type random_action(
         const state_type& state // since all movements are always allowed we don't use state
@@ -145,14 +146,13 @@ private:
             result = state / width == 0;
             break;
         case actions::down:
-            result = (state / width == height-2 && state % width > 0 && state % width < width-1)
-                    || state / width == height-1;
+            result = state / width == height-1;
             break;
         case actions::left:
-            result = state % width == 0; // || state == height*width-1; <- is the goal condition
+            result = state % width == 0;
             break;
         case actions::right:
-            result = state % width == width-1 || state == (height-1)*width;
+            result = state % width == width-1;
             break;
         }
 
@@ -267,8 +267,8 @@ int main(int argc, char** argv)
 {
     std::cout << "Hello." << std::endl;
 
-    const auto height = 4u;
-    const auto width = 7u;
+    const auto height = 5u;
+    const auto width = 10u;
     typedef cliff_model<height, width, feature_extractor> model_type;
     model_type model;
 
@@ -276,14 +276,10 @@ int main(int argc, char** argv)
     std::cout << "Qlearning or SARSA? (q/s): ";
     std::cin >> response;
 
-    if(response == 'q'){
-        qlearning algorithm;
-        algorithm.set_iterations(500); //for this size qlearning doesn't converge with 100 iterations
-        run_example(model, algorithm);
-    }
-    else if(response == 's'){
-        run_example(model, sarsa()); //On the other side, sarsa does converge
-    }
+    if(response == 'q')
+        run_example(model, qlearning());
+    else if(response == 's')
+        run_example(model, sarsa());
     else
         std::cerr << "Invalid option." << std::endl;
 

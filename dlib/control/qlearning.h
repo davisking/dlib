@@ -6,6 +6,7 @@
 #include "policy.h"
 #include <iostream>
 #include <type_traits>
+#include <random>
 
 namespace dlib
 {
@@ -86,10 +87,12 @@ namespace dlib
         ) { verbose = false; }
 
         template <
-            typename policy_type
+            typename policy_type,
+            typename prng_engine = std::default_random_engine
             >
         policy_type train_policy(
-            const policy_type &policy
+            const policy_type &policy,
+            const prng_engine &gen = prng_engine()
         ) const
         {
             typedef typename std::decay<decltype(policy.get_model())>::type::reward_type reward_type;
@@ -98,7 +101,7 @@ namespace dlib
                 std::cout << "Starting training..." << std::endl;
 
             const auto &model = policy.get_model();
-            epsilon_policy<policy_type> eps_pol(epsilon, policy);
+            epsilon_policy<policy_type, prng_engine> eps_pol(epsilon, policy, gen);
             auto& w = eps_pol.get_weights();
 
             DLIB_ASSERT(weights.size() == model.states_size(),
@@ -113,11 +116,11 @@ namespace dlib
                 auto state = model.initial_state();
 
                 auto steps = 0u;
-                reward_type reward = static_cast<reward_type>(0);
+                reward_type iteration_reward = static_cast<reward_type>(0);
                 while(!model.is_final(state)){
                     auto action = eps_pol(state);
                     auto next_state = model.step(state, action);
-                    auto next_reward = model.reward(state, action, next_state);
+                    auto reward = model.reward(state, action, next_state);
 
                     const auto feats = model.get_features(state, action);
                     const auto feats_next_best = model.get_features(next_state, model.find_best_action(next_state, w));
@@ -126,13 +129,13 @@ namespace dlib
                     w += learning_rate * correction * feats;
 
                     state = next_state;
-                    reward += next_reward;
+                    iteration_reward += reward;
                     steps++;
                 }
 
-                total_reward += reward;
+                total_reward += iteration_reward;
                 if(verbose)
-                    std::cout << "iteration: " << iter << "\t reward: " << reward
+                    std::cout << "iteration: " << iter << "\t reward: " << iteration_reward
                               << "\t mean: " << total_reward/static_cast<int>(iter+1)
                               << "\t steps: " << steps
                               << std::endl;
@@ -145,11 +148,13 @@ namespace dlib
         }
 
         template <
-                typename model_type
+                typename model_type,
+                typename prng_engine = std::default_random_engine
                 >
         greedy_policy<model_type> train(
-            const model_type &model
-        ) const { return train_policy(greedy_policy<model_type>(model)); }
+            const model_type &model,
+            const prng_engine &gen = prng_engine()
+        ) const { return train_policy(greedy_policy<model_type>(model), gen); }
 
     private:
         double learning_rate;

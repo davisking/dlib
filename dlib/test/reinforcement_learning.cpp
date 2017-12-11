@@ -36,7 +36,8 @@ namespace
         typedef feature_extractor_type<state_type, action_type> feature_extractor;
 
         explicit cliff_model(
-        ) : fe(height, width, 4){}
+            int seed = 0
+        ) : fe(height, width, 4), gen(seed) {}
 
         action_type random_action(
             const state_type& state // since all movements are always allowed we don't use state
@@ -138,14 +139,13 @@ namespace
                 result = state / width == 0;
                 break;
             case actions::down:
-                result = (state / width == height-2 && state % width > 0 && state % width < width-1)
-                        || state / width == height-1;
+                result = state / width == height-1;
                 break;
             case actions::left:
-                result = state % width == 0; // || state == height*width-1; <- is the goal condition
+                result = state % width == 0;
                 break;
             case actions::right:
-                result = state % width == width-1 || state == (height-1)*width;
+                result = state % width == width-1;
                 break;
             }
 
@@ -195,16 +195,17 @@ namespace
         int width,
         typename algorithm_t
         >
-    void test(unsigned int iterations)
+    void test()
     {
+        constexpr static int seed = 7;
+
         typedef cliff_model<height, width, feature_extractor> model_t;
-        const int max_steps = 150;
+        const int max_steps = 100;
 
         print_spinner();
         algorithm_t algorithm;
-        algorithm.set_iterations(iterations);
-        model_t model;
-        auto policy = algorithm.train(model);
+        model_t model(seed);
+        auto policy = algorithm.train(model, std::default_random_engine(seed));
 
         auto s = model.initial_state();
         auto r = static_cast<typename model_t::reward_type>(0);
@@ -244,18 +245,15 @@ namespace
         void perform_test (
         )
         {
-            // I have to hardcode the number of iterations
-            // since qlearning is off-policy it can get the wrong answer if it iterates too much
-            // this could be troublesome if convergence depends too much on randomness
-            test<4,5,qlearning>(100);
-            test<5,5,qlearning>(1000);
-            test<4,7,qlearning>(500);
-            test<5,10,qlearning>(2000);
+            test<4,5,qlearning>();
+            test<5,5,qlearning>();
+            test<4,7,qlearning>();
+            test<5,10,qlearning>();
 
-            test<4,5,sarsa>(100);
-            test<5,5,sarsa>(200);
-            test<4,7,sarsa>(200);
-            test<5,10,sarsa>(300);
+            test<4,5,sarsa>();
+            test<5,5,sarsa>();
+            test<4,7,sarsa>();
+            test<5,10,sarsa>();
         }
     };
 
