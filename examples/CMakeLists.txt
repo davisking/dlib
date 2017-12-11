@@ -89,7 +89,7 @@ target_link_libraries(assignment_learning_ex dlib::dlib)
 #################################################################################
 
 
-# Since there are a lot of examples I'm going to use a macro to simply this
+# Since there are a lot of examples I'm going to use a macro to simplify this
 # CMakeLists.txt file.  However, usually you will create only one executable in
 # your cmake projects and use the syntax shown above.
 macro(add_example name)
