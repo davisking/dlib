@@ -187,8 +187,6 @@ if (NOT TARGET dlib)
          unicode/unicode.cpp
          data_io/image_dataset_metadata.cpp
          data_io/mnist.cpp
-         dnn/cpu_dlib.cpp
-         dnn/tensor_tools.cpp
          global_optimization/global_function_search.cpp
    )
 
@@ -232,6 +230,8 @@ if (NOT TARGET dlib)
          threads/async.cpp
          timer/timer.cpp
          stack_trace.cpp
+         dnn/cpu_dlib.cpp
+         dnn/tensor_tools.cpp
          )
 
       if(UNIX)
