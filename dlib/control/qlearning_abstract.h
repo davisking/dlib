@@ -5,6 +5,7 @@
 
 #include "policy_abstract.h"
 #include "model_abstract.h"
+#include <random>
 
 namespace dlib
 {
@@ -156,33 +157,44 @@ namespace dlib
         !*/
 
         template <
-            typename policy_type
+            typename policy_type,
+            typename prng_engine = std::default_random_engine
             >
         policy_type train_policy(
-            const policy_type &policy
+            const policy_type &policy,
+            const prng_engine &gen = prng_engine()
         ) const;
         /*!
             requires
                 - policy is of the form example_policy<model_type>, i.e., an instance of
                   an implementation of the policy interface defined in policy_abstract.h.
+                - prng_engine is a pseudo-random number generator class like the ones
+                  defined in std::random. By default it assumes it to be the standard
+                  default_random_engine class.
             ensures
                 - returns a policy of the type policy_type as the result of applying the
                   qlearning learning function over iterations runs over using the weight
-                  matrix of the argument as the initial weights.
+                  matrix of the argument as the initial weights. Besides that, the
+                  exploration is done with an epsilon policy using the given prng.
         !*/
 
         template <
-                typename model_type
+                typename model_type,
+                typename prng_engine = std::default_random_engine
                 >
         greedy_policy<model_type> train(
-            const model_type &model
+            const model_type &model,
+            const prng_engine &gen = prng_engine()
         ) const;
         /*!
             requires
                 - model_type is an implementation of the example_model interface defined
                   at model_abstract.h.
+                - prng_engine is a pseudo-random number generator class like the ones
+                  defined in std::random. By default it assumes it to be the standard
+                  default_random_engine class.
             ensures
-                - returns train_policy(greedy_policy<model_type>(model));
+                - returns train_policy(greedy_policy<model_type>(model), gen);
         !*/
     };
 

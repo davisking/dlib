@@ -148,9 +148,9 @@ namespace dlib
         }
 
         template <
-                typename model_type,
-                typename prng_engine = std::default_random_engine
-                >
+            typename model_type,
+            typename prng_engine = std::default_random_engine
+            >
         greedy_policy<model_type> train(
             const model_type &model,
             const prng_engine &gen = prng_engine()

@@ -5,6 +5,7 @@
 
 #include "../matrix.h"
 #include "model_abstract.h"
+#include <random>
 
 namespace dlib
 {
@@ -176,7 +177,7 @@ void deserialize(greedy_policy<model_type>& item, std::istream& in);
 
 template <
     typename policy_type,
-    typename generator
+    typename prng_engine = std::default_random_engine()
     >
 class epsilon_policy
 {
@@ -185,8 +186,8 @@ class epsilon_policy
             policy_type should implement the example_policy interface defined at the
             top of this file.
 
-        REQUIREMENTS ON generator
-            generator should be a PRNG type like the ones defined in std::random.
+        REQUIREMENTS ON prng_engine
+            prng_engine should be a PRNG class like the ones defined in std::random.
 
         WHAT THIS OBJECT REPRESENTS
             This is a special policy that returns the best action (according to the
@@ -202,7 +203,7 @@ public:
     epsilon_policy (
         double epsilon,
         const policy_type &policy,
-        const generator &gen = generator()
+        const prng_engine &gen = prng_engine()
     );
     /*!
         requires
@@ -259,7 +260,7 @@ public:
             - returns the epsilon value used by the policy.
     !*/
 
-    const generator& get_generator(
+    const prng_engine& get_generator(
     ) const;
     /*!
         ensures
