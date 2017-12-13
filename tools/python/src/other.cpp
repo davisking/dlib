@@ -8,6 +8,7 @@
 #include <dlib/sparse_vector.h>
 #include <boost/python/args.hpp>
 #include <dlib/optimization.h>
+#include <dlib/statistics/running_gradient.h>
 
 using namespace dlib;
 using namespace std;
@@ -73,6 +74,30 @@ double _assignment_cost (
 )
 {
     return assignment_cost(cost, python_list_to_vector<long>(assignment));
+}
+
+// ----------------------------------------------------------------------------------------
+
+size_t py_count_steps_without_decrease (
+    boost::python::object arr,
+    double probability_of_decrease
+) 
+{ 
+    DLIB_CASSERT(0.5 < probability_of_decrease && probability_of_decrease < 1);
+    return count_steps_without_decrease(python_list_to_vector<double>(arr), probability_of_decrease); 
+}
+
+// ----------------------------------------------------------------------------------------
+
+size_t py_count_steps_without_decrease_robust (
+    boost::python::object arr,
+    double probability_of_decrease,
+    double quantile_discard
+) 
+{ 
+    DLIB_CASSERT(0.5 < probability_of_decrease && probability_of_decrease < 1);
+    DLIB_CASSERT(0 <= quantile_discard && quantile_discard <= 1);
+    return count_steps_without_decrease_robust(python_list_to_vector<double>(arr), probability_of_decrease, quantile_discard); 
 }
 
 // ----------------------------------------------------------------------------------------
@@ -154,5 +179,81 @@ ensures    \n\
 
     def("hit_enter_to_continue", hit_enter_to_continue, 
         "Asks the user to hit enter to continue and pauses until they do so.");
+
+
+
+
+    def("count_steps_without_decrease",py_count_steps_without_decrease, (arg("time_series"), arg("probability_of_decrease")=0.51),
+"requires \n\
+    - time_series must be a one dimensional array of real numbers.  \n\
+    - 0.5 < probability_of_decrease < 1 \n\
+ensures \n\
+    - If you think of the contents of time_series as a potentially noisy time \n\
+      series, then this function returns a count of how long the time series has \n\
+      gone without noticeably decreasing in value.  It does this by scanning along \n\
+      the elements, starting from the end (i.e. time_series[-1]) to the beginning, \n\
+      and checking how many elements you need to examine before you are confident \n\
+      that the series has been decreasing in value.  Here, \"confident of decrease\" \n\
+      means the probability of decrease is >= probability_of_decrease.   \n\
+    - Setting probability_of_decrease to 0.51 means we count until we see even a \n\
+      small hint of decrease, whereas a larger value of 0.99 would return a larger \n\
+      count since it keeps going until it is nearly certain the time series is \n\
+      decreasing. \n\
+    - The max possible output from this function is len(time_series). \n\
+    - The implementation of this function is done using the dlib::running_gradient \n\
+      object, which is a tool that finds the least squares fit of a line to the \n\
+      time series and the confidence interval around the slope of that line.  That \n\
+      can then be used in a simple statistical test to determine if the slope is \n\
+      positive or negative." 
+    /*!
+        requires
+            - time_series must be a one dimensional array of real numbers. 
+            - 0.5 < probability_of_decrease < 1
+        ensures
+            - If you think of the contents of time_series as a potentially noisy time
+              series, then this function returns a count of how long the time series has
+              gone without noticeably decreasing in value.  It does this by scanning along
+              the elements, starting from the end (i.e. time_series[-1]) to the beginning,
+              and checking how many elements you need to examine before you are confident
+              that the series has been decreasing in value.  Here, "confident of decrease"
+              means the probability of decrease is >= probability_of_decrease.  
+            - Setting probability_of_decrease to 0.51 means we count until we see even a
+              small hint of decrease, whereas a larger value of 0.99 would return a larger
+              count since it keeps going until it is nearly certain the time series is
+              decreasing.
+            - The max possible output from this function is len(time_series).
+            - The implementation of this function is done using the dlib::running_gradient
+              object, which is a tool that finds the least squares fit of a line to the
+              time series and the confidence interval around the slope of that line.  That
+              can then be used in a simple statistical test to determine if the slope is
+              positive or negative.
+    !*/
+    );
+
+    def("count_steps_without_decrease_robust",py_count_steps_without_decrease_robust, (arg("time_series"), arg("probability_of_decrease")=0.51, arg("quantile_discard")=0.1),
+"requires \n\
+    - time_series must be a one dimensional array of real numbers.  \n\
+    - 0.5 < probability_of_decrease < 1 \n\
+    - 0 <= quantile_discard <= 1 \n\
+ensures \n\
+    - This function behaves just like \n\
+      count_steps_without_decrease(time_series,probability_of_decrease) except that \n\
+      it ignores values in the time series that are in the upper quantile_discard \n\
+      quantile.  So for example, if the quantile discard is 0.1 then the 10% \n\
+      largest values in the time series are ignored." 
+    /*!
+        requires
+            - time_series must be a one dimensional array of real numbers. 
+            - 0.5 < probability_of_decrease < 1
+            - 0 <= quantile_discard <= 1
+        ensures
+            - This function behaves just like
+              count_steps_without_decrease(time_series,probability_of_decrease) except that
+              it ignores values in the time series that are in the upper quantile_discard
+              quantile.  So for example, if the quantile discard is 0.1 then the 10%
+              largest values in the time series are ignored.
+    !*/
+    );
+
 }
 
