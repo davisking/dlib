@@ -24,9 +24,10 @@ namespace dlib
             return cv::Mat();
 
         typedef typename image_traits<image_type>::pixel_type type;
+        typedef typename pixel_traits<type>::basic_pixel_type basic_pixel_type;
         if (pixel_traits<type>::num == 1)
         {
-            return cv::Mat(num_rows(img), num_columns(img), cv::DataType<type>::type, image_data(img), width_step(img));
+            return cv::Mat(num_rows(img), num_columns(img), cv::DataType<basic_pixel_type>::type, image_data(img), width_step(img));
         }
         else
         {
