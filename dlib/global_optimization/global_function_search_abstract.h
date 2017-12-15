@@ -186,8 +186,8 @@ namespace dlib
                 and a local optima refinement mode.  This is accomplished by building and
                 maintaining two models of the objective function:
                     1. A global model that upper bounds our objective function.  This is a
-                       non-parametric model based on all function evaluations ever seen by
-                       the global_function_search object.  
+                       non-parametric piecewise linear model based on all function
+                       evaluations ever seen by the global_function_search object.  
                     2. A local quadratic model fit around the best point seen so far.   
                 
                 The optimization procedure therefore looks like this:
