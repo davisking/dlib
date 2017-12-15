@@ -141,8 +141,6 @@ namespace dlib
             const long dims = points[0].x.size();
 
             using sample_type = std::vector<std::pair<size_t,double>>;
-
-            using sample_type = std::vector<std::pair<size_t,double>>;
             using kernel_type = sparse_linear_kernel<sample_type>;
             std::vector<sample_type> x;
             std::vector<double> y;
