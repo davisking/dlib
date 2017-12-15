@@ -35,13 +35,14 @@ namespace dlib
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object represents a non-parametric function that can be used to define
-                an upper bound on some more complex and unknown function.  To describe this
-                precisely, lets assume there is a function F(x) which you are capable of
-                sampling from but otherwise know nothing about, and that you would like to
-                find an upper bounding function U(x) such that U(x) >= F(x) for any x.  It
-                would also be good if U(x)-F(x) was minimal.  I.e. we would like U(x) to be
-                a tight upper bound, not something vacuous like U(x) = infinity.
+                This object represents a piecewise linear non-parametric function that can
+                be used to define an upper bound on some more complex and unknown function.
+                To describe this precisely, lets assume there is a function F(x) which you
+                are capable of sampling from but otherwise know nothing about, and that you
+                would like to find an upper bounding function U(x) such that U(x) >= F(x)
+                for any x.  It would also be good if U(x)-F(x) was minimal.  I.e. we would
+                like U(x) to be a tight upper bound, not something vacuous like U(x) =
+                infinity.
 
                 The upper_bound_function class is a tool for creating this kind of upper
                 bounding function from a set of function_evaluations of F(x).  We do this
