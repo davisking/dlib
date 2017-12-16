@@ -87,7 +87,7 @@ namespace dlib
         ensures
             - This function solves the following optimization problem:
                 Minimize: f(p) == 0.5*trans(p)*B*p + trans(g)*p
-                subject to the following constraint:
+                subject to the following constraints:
                     - length(p) <= radius
                     - lower(i) <= p(i) <= upper(i), for all i
             - Solves the problem to eps accuracy.  We do this by greedily finding the most
