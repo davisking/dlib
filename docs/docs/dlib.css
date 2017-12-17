@@ -248,6 +248,11 @@ div.inc {
    float: right;
 }
 
+video
+{
+   border: black dotted 1px;
+   border-bottom: black solid 2px;
+}
 
 .code_box
 {

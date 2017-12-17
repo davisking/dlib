@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+<?xml version="1.0" encoding="utf8" ?>
    
 <!--
    To the extent possible under law, Davis E King  has waived all copyright and 
@@ -731,6 +731,11 @@
          </ul>
       </xsl:if>
    </xsl:template>   
+   <xsl:template match="ol">
+      <ol>
+         <xsl:apply-templates/>
+       </ol>
+   </xsl:template>   
    <xsl:template match="u">
       <u>
          <xsl:apply-templates/>
@@ -780,6 +785,12 @@
       <img src="{@src}" border="0" height="{@height}" width="{@width}" alt="{@alt}">
          <xsl:apply-templates/>
        </img>
+   </xsl:template>   
+   <xsl:template match="video">
+      <video controls="">
+         <source src="{@src}" type="video/webm"/>
+         <xsl:apply-templates/>
+      </video>
    </xsl:template>   
 
    <xsl:template name="term_list_go">
