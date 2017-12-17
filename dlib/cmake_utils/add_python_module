@@ -93,7 +93,7 @@ endif()
 # include dlib so we can link against it
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/.. dlib_build)
 if (USING_OLD_VISUAL_STUDIO_COMPILER)
-   message(FATAL_ERROR "You have to use a version of Visual Studio that supports C++11.  As of November 2017, the only version that has good enough C++11 support to compile the dlib Pyhton API is Visual Studio 2015.  Visual Studio 2017 has WORSE C++11 support than Visual Studio 2015, so Visual Studio 2017 is unable to compile the Pyhton API.  ***USE VISUAL STUDIO 2015 INSTEAD***")
+   message(FATAL_ERROR "You have to use a version of Visual Studio that supports C++11.  As of December 2017, the only versions that have good enough C++11 support to compile the dlib Pyhton API is a fully updated Visual Studio 2015 or a fully updated Visual Studio 2017.  Older versions of either of these compilers have bad C++11 support and will fail to compile the Python extension. ***SO UPDATE YOUR VISUAL STUDIO TO MAKE THIS ERROR GO AWAY***")
 endif()
 
 
