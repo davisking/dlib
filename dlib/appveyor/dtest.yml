@@ -7,7 +7,7 @@ build_script:
   - mkdir %APPVEYOR_BUILD_FOLDER%\build_test
   - cd %APPVEYOR_BUILD_FOLDER%\build_test
   - cmake -G "Visual Studio 14 2015 Win64" -T host=x64 ../dlib/test
-  - cmake --build . --config %CONFIGURATION% 
+  - cmake --build . --config %CONFIGURATION% --target dtest
 
 test_script:
   # run test
