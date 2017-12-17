@@ -394,7 +394,7 @@ namespace dlib
                 }
                 auto last_modified = std::chrono::system_clock::from_time_t(buffer.st_mtime);
 #ifdef _BSD_SOURCE 
-                last_modified += std::chrono::duration_cast<std::chrono:system_clock::duration>(std::chrono::nanoseconds(buffer.st_atim.tv_nsec));
+                last_modified += std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::nanoseconds(buffer.st_atim.tv_nsec));
 #endif
 
                 if (S_ISDIR(buffer.st_mode) == 0)
