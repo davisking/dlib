@@ -19,6 +19,7 @@ New Features and Improvements:
       - Added solve_trust_region_subproblem_bounded()
       - Added tools for doing global optimization. The main new tools here are find_max_global() and global_function_search.
       - Updated model_selection_ex.cpp and optimization_ex.cpp to use these new tools.
+      - added call_function_and_expand_args()
    - Added loss_ranking_ layer 
    - Added loss_epsilon_insensitive_ layer
    - Added softmax_all layer.

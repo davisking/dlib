@@ -264,8 +264,11 @@
          <term file="optimization.html" name="find_max_box_constrained"    include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_max_global"             include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="find_min_global"             include="dlib/global_optimization.h"/>
-         <term file="optimization.html" name="global_function_search"             include="dlib/global_optimization.h"/>
+         <term file="optimization.html" name="global_function_search"           include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="upper_bound_function"             include="dlib/global_optimization.h"/>
+         <term file="optimization.html" name="call_function_and_expand_args"    include="dlib/global_optimization.h"/>
+         <term file="dlib/global_optimization/find_max_global_abstract.h.html" name="FOREVER"   include="dlib/global_optimization.h"/>
+         <term file="dlib/global_optimization/find_max_global_abstract.h.html" name="max_function_calls"   include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="max_cost_assignment"         include="dlib/optimization.h"/>
          <term link="optimization.html#max_cost_assignment" name="Hungarian Algorithm"         include="dlib/optimization.h"/>
          <term file="optimization.html" name="max_sum_submatrix"           include="dlib/optimization.h"/>

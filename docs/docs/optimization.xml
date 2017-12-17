@@ -92,6 +92,7 @@
          <item>parse_tree_to_string</item> 
          <item>find_trees_not_rooted_with_tag</item> 
          <item>upper_bound_function</item> 
+         <item>call_function_and_expand_args</item> 
       </section>
 
     </top>  
@@ -1277,6 +1278,32 @@ Or it can use the elastic net regularizer:
             Lipschitz parameters for each dimension, allowing the model to handle functions with
             widely varying sensitivities to each input variable.  
             </p>
+         </description>
+                                 
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>call_function_and_expand_args</name>
+         <file>dlib/global_optimization.h</file>
+         <spec_file link="true">dlib/global_optimization/find_max_global_abstract.h</spec_file>
+         <description>
+            This routine allows you to pass a <tt>dlib::matrix&lt;double,0,1&gt;</tt> object to
+            a function that takes simple <tt>double</tt> arguments.  It does this by automatically
+            expanding the matrix elements and invoking the function.  For example, suppose you had
+            a function like this:
+            <code_box>
+double f(double x, double y, double z); </code_box>
+            You could then call f() like this:
+            <code_box>
+matrix&lt;double,0,1&gt; args = {3,4,5};
+call_function_and_expand_args(f, args); // calls: f(3,4,5) </code_box>
+
+            This kind of thing is convenient when writing optimizers like <a
+            href="#find_max_global">find_max_global</a> since it allows a wide range of
+            input functions to be given to the optimizer, including functions with
+            explicitly named arguments like x,y,z as shown above.
          </description>
                                  
       </component>
