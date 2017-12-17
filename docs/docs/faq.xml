@@ -460,13 +460,24 @@ cross_validate_trainer_threaded(trainer,
          tools in dlib.  So make sure you have a version no older than October
          2016.
          <p>
-            However, as of this writing, the newest version of Visual Studio is Visual Studio 2017, which 
-            has WORSE C++11 support that Visual Studio 2015.  In particular, if you try to use
-            the DNN tooling in Visual Studio 2017 the compiler will just hang.  So use Visual Studio 2015.
+            To make this even more complicated, Visual Studio 2017 had
+            regressions in its C++11 support.  So all versions of Visual Studio
+            2017 prior to December 2017 would just hang if you tried to compile
+            the DNN examples.  Happily, the newest versions of Visual Studio
+            2017 appear to have good C++11 support and will compile the DNN
+            codes without any issue.  So make sure your Visual Studio is
+            fully updated.
          </p>
          <p>
-            It should also be noted that not even Visual Studio 2015 has perfect C++11 support.  Specifically, the 
-            larger and more complex imagenet and metric learning training examples don't compile in Visual Studio 2015.
+            Finally, it should be noted that you should give the <tt>-T host=x64</tt>
+            cmake option when generating a Visual Studio project.  If you don't
+            do this then you will get the default Visual Studio toolchain,
+            <b>which runs the compiler in 32bit mode, restricting it to 2GB of
+            RAM, leading to compiler crashes due to it running out of RAM in some
+            cases</b>.  This isn't the 1990s anymore, so you should probably
+            run your compiler in 64bit mode so it can use your computer's RAM.
+            Giving <tt>-T host=x64</tt> will let Visual Studio use as much RAM
+            as it needs.
          </p>
       </question>
 

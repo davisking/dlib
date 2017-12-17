@@ -38,8 +38,10 @@ tell CMake which one you want it to use via the -G option.
    Finally, note that when using Visual Studio, CMake will by default generate a 32bit executable.  
    This means the programs you compile will only be able to use 2GB of RAM.  To avoid this, you need
    to tell CMake to generate a 64bit executable.  You do this by using a command like 
-   <code_box>cmake -G "Visual Studio 14 2015 Win64" ..</code_box> instead of <code_box>cmake ..</code_box>  
-   You can see the list of valid arguments to <tt>-G</tt> by running <tt>cmake</tt> with no options. 
+   <code_box>cmake -G "Visual Studio 14 2015 Win64" -T host=x64 ..</code_box> instead of <code_box>cmake ..</code_box>  
+   You can see the list of valid arguments to <tt>-G</tt> by running <tt>cmake</tt> with no options.   Note also the <tt>-T host=x64</tt>
+   option, which tells Visual Studio to let the compiler use more than 2GB of RAM.  That is important if you don't want the compiler to
+   crash from running out of RAM in some situations.
 </p>
             
 
