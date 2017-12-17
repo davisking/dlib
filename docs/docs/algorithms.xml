@@ -25,6 +25,7 @@
          <name>Tools</name>
          <item>bigint</item> 
          <item>disjoint_subsets</item> 
+         <item>disjoint_subsets_sized</item> 
          <item nolink="true">
             <name>Quantum Computing</name>
             <sub>
@@ -458,6 +459,20 @@
                 a number of disjoint subsets.  It supports the two fundamental operations
                 of finding which subset a particular integer belongs to as well as 
                 merging subsets. 
+         </description>
+
+      </component>
+      
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>disjoint_subsets_sized</name>
+         <file>dlib/disjoint_subsets.h</file>
+         <spec_file link="true">dlib/disjoint_subsets/disjoint_subsets_sized_abstract.h</spec_file>
+         <description>
+                This object is just like <a href="#disjoint_subsets">disjoint_subsets</a> except that it
+                also keeps track of the size of each set.
          </description>
 
       </component>

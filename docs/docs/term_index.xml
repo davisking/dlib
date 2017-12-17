@@ -122,6 +122,7 @@
 
          <term file="ml.html" name="dnn_trainer" include="dlib/dnn.h"/>
 
+         <term file="dlib/dnn/trainer_abstract.h.html" name="force_flush_to_disk" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="EXAMPLE_LOSS_LAYER_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_hinge_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_log_" include="dlib/dnn.h"/>
@@ -129,6 +130,9 @@
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_weighted_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_mean_squared_per_pixel_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_ranking_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_dot_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_epsilon_insensitive_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_metric_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_mean_squared_" include="dlib/dnn.h"/>
          <term file="ml.html" name="loss_mean_squared_multioutput_" include="dlib/dnn.h"/>
@@ -160,6 +164,7 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="sig_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="htan_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="softmax_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="softmax_all_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="add_prev_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="concat_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="inception" include="dlib/dnn.h"/>
@@ -257,6 +262,10 @@
          <term file="optimization.html" name="find_min"                    include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min_box_constrained"    include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_max_box_constrained"    include="dlib/optimization.h"/>
+         <term file="optimization.html" name="find_max_global"             include="dlib/global_optimization.h"/>
+         <term file="optimization.html" name="find_min_global"             include="dlib/global_optimization.h"/>
+         <term file="optimization.html" name="global_function_search"             include="dlib/global_optimization.h"/>
+         <term file="optimization.html" name="upper_bound_function"             include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="max_cost_assignment"         include="dlib/optimization.h"/>
          <term link="optimization.html#max_cost_assignment" name="Hungarian Algorithm"         include="dlib/optimization.h"/>
          <term file="optimization.html" name="max_sum_submatrix"           include="dlib/optimization.h"/>
@@ -290,10 +299,11 @@
          <term link="dlib/graph_cuts/min_cut_abstract.h.html#node_label" name="FREE_NODE" include="dlib/graph_cuts.h" />
 
          <term file="optimization.html" name="solve_trust_region_subproblem"  include="dlib/optimization.h"/>
+         <term file="optimization.html" name="solve_trust_region_subproblem_bounded"  include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min_single_variable"       include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min_using_approximate_derivatives" include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_min_bobyqa"                include="dlib/optimization.h"/>
-         <term file="optimization.html" name="find_optimal_parameters"        include="dlib/optimization/find_optimal_parameters.h"/>
+         <!-- DEPRECATED  <term file="optimization.html" name="find_optimal_parameters"        include="dlib/optimization/find_optimal_parameters.h"/> -->
          <term file="optimization.html" name="elastic_net"                    include="dlib/optimization/elastic_net.h"/>
          <term file="optimization.html" name="solve_qp_box_constrained"       include="dlib/optimization.h"/>
          <term file="optimization.html" name="solve_qp_box_constrained_blockdiag"       include="dlib/optimization.h"/>
@@ -348,6 +358,7 @@
          <term file="algorithms.html" name="create_max_margin_projection_hash" include="dlib/lsh.h"/>
          <term file="imaging.html" name="randomly_sample_image_features"   include="dlib/statistics.h"/>
          <term file="algorithms.html" name="disjoint_subsets"              include="dlib/disjoint_subsets.h"/>
+         <term file="algorithms.html" name="disjoint_subsets_sized"        include="dlib/disjoint_subsets.h"/>
          <term link="algorithms.html#disjoint_subsets" name="union-find"   include="dlib/disjoint_subsets.h"/>
          <term file="linear_algebra.html" name="rectangle"                 include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="drectangle"                 include="dlib/geometry.h"/>

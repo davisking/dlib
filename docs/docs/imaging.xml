@@ -222,6 +222,7 @@
          <item>rotate_image_dataset</item> 
          <item>extract_image_chips</item> 
          <item>random_cropper</item> 
+         <item>jitter_image</item> 
          <item>sub_image</item> 
       </section>
 
@@ -480,6 +481,7 @@
 
             <example>train_shape_predictor.py.html</example>
             <example>face_landmark_detection.py.html</example>
+            <example>face_alignment.py.html</example>
          </examples>
                                  
       </component>
@@ -1737,6 +1739,22 @@
             <example>dnn_mmod_ex.cpp.html</example>
             <example>dnn_mmod_find_cars_ex.cpp.html</example>
             <example>dnn_mmod_train_find_cars_ex.cpp.html</example>
+         </examples>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>jitter_image</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            Randomly jitters an image by slightly rotating, scaling, and translating it.
+            There is also a 50% chance it will be mirrored left to right.
+         </description>
+         <examples>
+            <example>dnn_metric_learning_on_images_ex.cpp.html</example>
+            <example>dnn_face_recognition_ex.cpp.html</example>
          </examples>
       </component>
 
