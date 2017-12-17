@@ -54,6 +54,7 @@ namespace dlib
                             double local_bound = p.y + sqrt(noise_terms[i] + trans(p.x-x)*M*(p.x-x))
                             min_ub = min(min_ub, local_bound)
                         }
+                        return min_ub;
                     }
                 Where POINTS is an array of function_evaluation instances drawn from F(x),
                 M is a diagonal matrix, and noise_terms is an array of scalars.
