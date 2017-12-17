@@ -66,7 +66,7 @@ namespace dlib
 
             state.last_modified = std::chrono::system_clock::from_time_t(buffer.st_mtime);
 #ifdef _BSD_SOURCE 
-            state.last_modified += std::chrono::nanoseconds(buffer.st_atim.tv_nsec);
+            state.last_modified += std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::nanoseconds(buffer.st_atim.tv_nsec));
 #endif
         }
 
