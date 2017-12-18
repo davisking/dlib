@@ -23,8 +23,8 @@ New Features and Improvements:
       - Made log loss layers more numerically stable.
       - Upgraded the con layer so you can set the number of rows or columns to
         0 in the layer specification. Doing this means "make the filter cover
-        the whole input image dimension". So it's an easy way to make a filter
-        sized exactly so that it will have one output along that dimension,
+        the whole input image dimension".  This provides an easy way to make a
+        filter sized so it will have one output along that dimension,
         effectively making it like a fully connected layer operating on a row
         or column.
       - Added support for non-scale-invariant MMOD.
@@ -48,9 +48,9 @@ New Features and Improvements:
    - Added disjoint_subsets_sized
    - Added Python APIs: get_face_chips(), count_steps_without_decrease(),
      count_steps_without_decrease_robust(), and jitter_image().
-   - Various improvements to cmake scripts: e.g. improved warning and error
+   - Various improvements to CMake scripts: e.g. improved warning and error
      messages, added USE_NEON_INSTRUCTIONS option.
-   - chol() will use a banded cholesky algorithm for banded matrices, making it
+   - chol() will use a banded Cholesky algorithm for banded matrices, making it
      much faster in these cases.
    - Changed the timing code to use the C++11 high resolution clock and
      atomics. This makes the timing code a lot more precise.
@@ -78,7 +78,6 @@ Non-Backwards Compatible Changes:
      this change reverts back to the previous behavior.
 
 Bug fixes:
-   - Fixed DLIB_ISO_CPP_ONLY not building.
    - Fixed toMat() not compiling in some cases.
    - Significantly reduced the compile time of the DNN example programs in
      visual studio.
@@ -110,7 +109,8 @@ Bug fixes:
      some of these problems, in particular, there were some cases where
      unloading dlib's python extension would deadlock.  This should now be
      fixed.
-   - Fixed DLIB_STACK_TRACE macro not compiling.
+   - Fixed compile time errors when either of these macros were enabled:
+     DLIB_STACK_TRACE, DLIB_ISO_CPP_ONLY.
 
 </current>
 
