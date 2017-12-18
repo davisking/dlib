@@ -122,7 +122,7 @@ int main() try
 
 
     // And finally, we call this global optimizer that will search for the best parameters.
-    // It will call cross_validation_score() 30 times with different settings and return
+    // It will call cross_validation_score() 50 times with different settings and return
     // the best parameter setting it finds.  find_max_global() uses a global optimization
     // method based on a combination of non-parametric global function modeling and
     // quadratic trust region modeling to efficiently find a global maximizer.  It usually
@@ -132,7 +132,7 @@ int main() try
     auto result = find_max_global(cross_validation_score, 
                                   {1e-5, 1e-5, 1e-5},  // lower bound constraints on gamma, c1, and c2, respectively
                                   {100,  1e6,  1e6},   // upper bound constraints on gamma, c1, and c2, respectively
-                                  max_function_calls(30));
+                                  max_function_calls(50));
 
     double best_gamma = result.x(0);
     double best_c1    = result.x(1);
