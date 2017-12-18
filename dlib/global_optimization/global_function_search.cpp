@@ -702,7 +702,23 @@ namespace dlib
         for (auto& info : functions)
         {
             const long dims = info->spec.lower.size();
-            if (info->ub.num_points() < std::max<long>(3,dims))
+            if (info->ub.num_points() < 1)
+            {
+                outstanding_function_eval_request new_req;
+                new_req.request_id = next_request_id++;
+                // Pick the point right in the center of the bounds to evaluate first since
+                // people will commonly center the bound on a location they think is good.
+                // So might as well try there first.
+                new_req.x = (info->spec.lower + info->spec.upper)/2.0;
+                for (long i = 0; i < new_req.x.size(); ++i)
+                {
+                    if (info->spec.is_integer_variable[i])
+                        new_req.x(i) = std::round(new_req.x(i));
+                }
+                info->outstanding_evals.emplace_back(new_req);
+                return function_evaluation_request(new_req,info);
+            }
+            else if (info->ub.num_points() < std::max<long>(3,dims))
             {
                 outstanding_function_eval_request new_req;
                 new_req.request_id = next_request_id++;

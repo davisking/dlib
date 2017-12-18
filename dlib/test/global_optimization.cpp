@@ -160,29 +160,29 @@ namespace
         print_spinner();
         auto rosen = [](const matrix<double,0,1>& x) { return -1*( 100*std::pow(x(1) - x(0)*x(0),2.0) + std::pow(1 - x(0),2)); };
 
-        auto result = find_max_global(rosen, {0, 0}, {2, 2}, max_function_calls(100), 0);
+        auto result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, max_function_calls(100), 0);
         matrix<double,0,1> true_x = {1,1};
 
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
         print_spinner();
 
-        result = find_max_global(rosen, {0, 0}, {2, 2}, max_function_calls(100));
+        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, max_function_calls(100));
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
         print_spinner();
 
-        result = find_max_global(rosen, {0, 0}, {2, 2}, std::chrono::seconds(5));
+        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, std::chrono::seconds(5));
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
         print_spinner();
 
-        result = find_max_global(rosen, {0, 0}, {2, 2}, {false,false}, max_function_calls(100));
+        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, {false,false}, max_function_calls(100));
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
         print_spinner();
 
-        result = find_max_global(rosen, {0, 0}, {0.9, 0.9}, {false,false}, max_function_calls(100));
+        result = find_max_global(rosen, {0.1, 0.1}, {0.9, 0.9}, {false,false}, max_function_calls(140));
         true_x = {0.9, 0.81};
         dlog << LINFO << "rosen, bounded at 0.9: " <<  trans(result.x);
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
@@ -221,24 +221,24 @@ namespace
         print_spinner();
         auto rosen = [](const matrix<double,0,1>& x) { return +1*( 100*std::pow(x(1) - x(0)*x(0),2.0) + std::pow(1 - x(0),2)); };
 
-        auto result = find_min_global(rosen, {0, 0}, {2, 2}, max_function_calls(100), 0);
+        auto result = find_min_global(rosen, {0.1, 0.1}, {2, 2}, max_function_calls(100), 0);
         matrix<double,0,1> true_x = {1,1};
 
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(min(abs(true_x-result.x)) < 1e-5, min(abs(true_x-result.x)));
         print_spinner();
 
-        result = find_min_global(rosen, {0, 0}, {2, 2}, max_function_calls(100));
+        result = find_min_global(rosen, {0.1, 0.1}, {2, 2}, max_function_calls(100));
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(min(abs(true_x-result.x)) < 1e-5, min(abs(true_x-result.x)));
         print_spinner();
 
-        result = find_min_global(rosen, {0, 0}, {2, 2}, std::chrono::seconds(5));
+        result = find_min_global(rosen, {0.1, 0.1}, {2, 2}, std::chrono::seconds(5));
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(min(abs(true_x-result.x)) < 1e-5, min(abs(true_x-result.x)));
         print_spinner();
 
-        result = find_min_global(rosen, {0, 0}, {2, 2}, {false,false}, max_function_calls(100));
+        result = find_min_global(rosen, {0.1, 0.1}, {2, 2}, {false,false}, max_function_calls(100));
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(min(abs(true_x-result.x)) < 1e-5, min(abs(true_x-result.x)));
         print_spinner();
