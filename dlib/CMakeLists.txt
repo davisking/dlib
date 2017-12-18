@@ -638,7 +638,7 @@ if (NOT TARGET dlib)
                                       ${CUDA_curand_LIBRARY}
                                       ${cusolver}
                                       )
-            if(OPENMP_FOUND)
+            if(openmp_libraries)
                list(APPEND dlib_needed_libraries ${openmp_libraries})
             endif()
             
