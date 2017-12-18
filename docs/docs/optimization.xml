@@ -1225,7 +1225,7 @@ Or it can use the elastic net regularizer:
             using the <a href="#global_function_search">global_function_search</a> object.
             See global_function_search's documentation for details of the algorithm.  Importantly,
             find_max_global() does not require the user to specify derivatives
-            or starting guesses, all while taking efforts to use as few calls to
+            or starting guesses, all while attempting to use as few calls to
             the objective function as possible.  It is therefore appropriate for tasks
             where evaluating the objective function is time consuming or
             expensive, such as in hyper parameter optimization of machine
