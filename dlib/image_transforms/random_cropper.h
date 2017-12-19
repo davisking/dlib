@@ -274,7 +274,6 @@ namespace dlib
 
                 const double rand_scale_perturb = 1.0/rnd.get_double_in_range(min_scale, 1); 
                 crop_rect = centered_drect(drect, drect.width()*rand_scale_perturb, drect.height()*rand_scale_perturb);
-                DLIB_CASSERT(crop_rect.width() == crop_rect.height());
 
             }
             else
