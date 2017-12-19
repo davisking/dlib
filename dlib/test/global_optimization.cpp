@@ -288,7 +288,7 @@ namespace
         void perform_test (
         )
         {
-            test_upper_bound_function(0.1, 1e-6);
+            test_upper_bound_function(0.01, 1e-6);
             test_upper_bound_function(0.0, 1e-6);
             test_upper_bound_function(0.0, 1e-1);
             test_global_function_search();
