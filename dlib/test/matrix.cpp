@@ -1451,6 +1451,45 @@ namespace
 
         }
 
+        {
+            matrix<double,3,3,default_memory_manager,column_major_layout> a(3,3);
+            matrix<double,3,3,default_memory_manager,column_major_layout> m = randm(3,3);
+            matrix<double,3,1,default_memory_manager,column_major_layout> b = randm(3,1);
+
+            a = 0;
+            set_colm(a,0) = m*b;
+            DLIB_TEST(colm(a,0) == m*b);
+            a = 0;
+            set_rowm(a,0) = trans(m*b);
+            DLIB_TEST(rowm(a,0) == trans(m*b));
+            DLIB_TEST(rowm(a,0) != m*b);
+        }
+        {
+            matrix<double,0,0,default_memory_manager,column_major_layout> a(3,3);
+            matrix<double,0,0,default_memory_manager,column_major_layout> m = randm(3,3);
+            matrix<double,0,0,default_memory_manager,column_major_layout> b = randm(3,1);
+
+            a = 0;
+            set_colm(a,0) = m*b;
+            DLIB_TEST(colm(a,0) == m*b);
+            a = 0;
+            set_rowm(a,0) = trans(m*b);
+            DLIB_TEST(rowm(a,0) == trans(m*b));
+            DLIB_TEST(rowm(a,0) != m*b);
+        }
+        {
+            matrix<double> a(3,3);
+            matrix<double> m = randm(3,3);
+            matrix<double> b = randm(3,1);
+
+            a = 0;
+            set_colm(a,0) = m*b;
+            DLIB_TEST(colm(a,0) == m*b);
+            a = 0;
+            set_rowm(a,0) = trans(m*b);
+            DLIB_TEST(rowm(a,0) == trans(m*b));
+            DLIB_TEST(rowm(a,0) != m*b);
+        }
     }
 
 

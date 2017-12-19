@@ -410,6 +410,18 @@ namespace dlib
         template <typename T, long NR, long NC, typename MM>
         int get_ld (const assignable_sub_matrix<T,NR,NC,MM,column_major_layout>& m) { return m.m.nr(); }
 
+        template <typename T, long NR, long NC, typename MM>
+        int get_ld (const assignable_col_matrix<T,NR,NC,MM,row_major_layout>& m) { return m.m.nc(); }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_ld (const assignable_col_matrix<T,NR,NC,MM,column_major_layout>& m) { return m.m.nr(); }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_ld (const assignable_row_matrix<T,NR,NC,MM,row_major_layout>& m) { return m.m.nc(); }
+
+        template <typename T, long NR, long NC, typename MM>
+        int get_ld (const assignable_row_matrix<T,NR,NC,MM,column_major_layout>& m) { return m.m.nr(); }
+
         template <typename T>
         int get_ld (const assignable_ptr_matrix<T>& m) { return m.nc(); }
 
