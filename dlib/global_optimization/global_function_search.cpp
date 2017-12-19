@@ -702,7 +702,8 @@ namespace dlib
         for (auto& info : functions)
         {
             const long dims = info->spec.lower.size();
-            if (info->ub.num_points() < 1)
+            // If this is the very beginning of the optimization process
+            if (info->ub.num_points()+info->outstanding_evals.size() < 1)
             {
                 outstanding_function_eval_request new_req;
                 new_req.request_id = next_request_id++;
