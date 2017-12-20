@@ -11,7 +11,7 @@ include README.md
 recursive-include dlib **
 recursive-exclude dlib/test **
 recursive-exclude dlib/build **
-recursive-include docs **
+recursive-exclude docs **
 recursive-include python_examples *.txt *.py *.bat
 recursive-exclude python_examples/build **
 recursive-include tools/python **
