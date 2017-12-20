@@ -49,7 +49,10 @@ boost::python::list mat_to_list (
 
 size_t num_function_arguments(object f)
 {
-    return boost::python::extract<std::size_t>(f.attr("func_code").attr("co_argcount"));
+    if (hasattr(f,"func_code"))
+        return boost::python::extract<std::size_t>(f.attr("func_code").attr("co_argcount"));
+    else
+        return boost::python::extract<std::size_t>(f.attr("__code__").attr("co_argcount"));
 }
 
 double call_func(object f, const matrix<double,0,1>& args)
