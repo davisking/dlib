@@ -12,6 +12,17 @@
 
 <current>
 New Features and Improvements:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.8" date="Dec 19, 2017">
+New Features and Improvements:
    - Added a global optimizer, find_max_global(), which is suitable for
      optimizing expensive functions with many local optima.  For example, you
      can use it for hyperparameter optimization.  See model_selection_ex.cpp
@@ -112,7 +123,7 @@ Bug fixes:
    - Fixed compile time errors when either of these macros were enabled:
      DLIB_STACK_TRACE, DLIB_ISO_CPP_ONLY.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
