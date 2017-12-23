@@ -809,4 +809,18 @@ if (NOT TARGET dlib)
 
 endif()
 
+if (MSVC)
+   # Give the output library files names that are unique functions of the
+   # visual studio mode that compiled them.  We do this so that people who
+   # compile dlib and then copy the .lib files around (which they shouldn't be
+   # doing in the first place!) will hopefully be slightly less confused by
+   # what happens since, at the very least, the filenames will indicate what
+   # visual studio runtime they go with.
+   math(EXPR numbits ${CMAKE_SIZEOF_VOID_P}*8)
+   set_target_properties(dlib PROPERTIES DEBUG_POSTFIX "_debug_${numbits}bit_msvc${MSVC_VERSION}")
+   set_target_properties(dlib PROPERTIES RELEASE_POSTFIX "_release_${numbits}bit_msvc${MSVC_VERSION}")
+   set_target_properties(dlib PROPERTIES MINSIZEREL_POSTFIX "_minsizerel_${numbits}bit_msvc${MSVC_VERSION}")
+   set_target_properties(dlib PROPERTIES RELWITHDEBINFO_POSTFIX "_relwithdebinfo_${numbits}bit_msvc${MSVC_VERSION}")
+endif()
+
 add_library(dlib::dlib ALIAS dlib)
