@@ -91,8 +91,8 @@ namespace dlib
                 return _high[idx-4];
         }
 
-        inline simd4i low() const { return _low; }
-        inline simd4i high() const { return _high; }
+        inline const simd4i& low() const { return _low; }
+        inline const simd4i& high() const { return _high; }
 
     private:
         simd4i _low, _high;
