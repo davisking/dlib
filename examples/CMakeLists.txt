@@ -65,10 +65,10 @@ target_link_libraries(assignment_learning_ex dlib::dlib)
 #   cmake --build . --config Release
 #
 # The cmake .. command looks in the parent folder for a file named
-# CMakeLists.txt, reads it, sets up everything needed to build program.  Also,
-# note that CMake can generate Visual Studio or XCode project files.  So if
-# instead you had written:
-#   mkdir build
+# CMakeLists.txt, reads it, and sets up everything needed to build program.
+# Also, note that CMake can generate Visual Studio or XCode project files.  So
+# if instead you had written:
+#   cd build
 #   cmake .. -G Xcode
 #
 # You would be able to open the resulting Xcode project and compile and edit
