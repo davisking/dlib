@@ -28,7 +28,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -46,7 +46,7 @@
      id="namedview8334"
      showgrid="false"
      inkscape:zoom="0.83543029"
-     inkscape:cx="405.47507"
+     inkscape:cx="207.37356"
      inkscape:cy="369.09988"
      inkscape:window-x="65"
      inkscape:window-y="24"
@@ -21752,13 +21752,13 @@
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;color-interpolation:auto;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto"
-     x="229.8414"
+     x="114.17912"
      y="17.094727"
      id="text11666"
      sodipodi:linespacing="125%"><tspan
        sodipodi:role="line"
        id="tspan11668"
-       x="229.8414"
+       x="114.17912"
        y="17.094727"
-       style="font-size:22.5px">Bayesian Optimization vs. MaxLIPO+TR</tspan></text>
+       style="font-size:22.5px">Solving Holder Table Function: BayesOpt vs. MaxLIPO+TR</tspan></text>
 </svg>
