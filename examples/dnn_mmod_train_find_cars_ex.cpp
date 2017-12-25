@@ -124,7 +124,7 @@ int main(int argc, char** argv) try
     // 
     // To explain this non-max suppression idea further it's important to understand how
     // the detector works.  Essentially, sliding window detectors scan all image locations
-    // and ask "is there a care here?".  If there really is a car in a specific location in
+    // and ask "is there a car here?".  If there really is a car in a specific location in
     // an image then usually many slightly different sliding window locations will produce
     // high detection scores, indicating that there is a car at those locations.  If we
     // just stopped there then each car would produce multiple detections.  But that isn't
