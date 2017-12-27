@@ -36,6 +36,7 @@ import shutil
 import stat
 import errno
 
+import subprocess
 from setuptools.command.bdist_egg import bdist_egg as _bdist_egg
 from setuptools.command.develop import develop as _develop
 from distutils.command.build_ext import build_ext as _build_ext
@@ -43,6 +44,7 @@ from distutils.command.build import build as _build
 from distutils.errors import DistutilsSetupError
 from distutils.spawn import find_executable
 from distutils.sysconfig import get_python_inc, get_python_version, get_config_var
+from distutils.version import LooseVersion
 from distutils import log
 import os
 import sys
@@ -183,78 +185,6 @@ def enum_reg_key(rk):
     return sub_keys
 
 
-def get_msvc_win64_generator():
-    """find the default MSVC generator but Win64
-    This logic closely matches cmake's resolution for default build generator.
-    Only we select the Win64 version of it.
-    """
-    try:
-        import _winreg as winreg
-    except ImportError:
-        # noinspection PyUnresolvedReferences
-        import winreg
-
-    known_vs = {
-        "6.0": "Visual Studio 6",
-        "7.0": "Visual Studio 7",
-        "7.1": "Visual Studio 7 .NET 2003",
-        "8.0": "Visual Studio 8 2005",
-        "9.0": "Visual Studio 9 2008",
-        "10.0": "Visual Studio 10 2010",
-        "11.0": "Visual Studio 11 2012",
-        "12.0": "Visual Studio 12 2013",
-        "14.0": "Visual Studio 14 2015",
-    }
-
-    newest_vs = None
-    newest_ver = 0
-
-    platform_arch = platform.architecture()[0]
-    sam = winreg.KEY_WOW64_32KEY + winreg.KEY_READ if '64' in platform_arch else winreg.KEY_READ
-    for vs in ['VisualStudio\\', 'VCExpress\\', 'WDExpress\\']:
-        vs_key = "SOFTWARE\\Microsoft\\{vs}\\".format(vs=vs)
-        try:
-            root_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, vs_key, 0, sam)
-        except OSError:
-            continue
-        try:
-            sub_keys = enum_reg_key(root_key)
-        except OSError:
-            sub_keys = []
-        winreg.CloseKey(root_key)
-        if not sub_keys:
-            continue
-
-        # look to see if we have InstallDir
-        for sub_key in sub_keys:
-            try:
-                root_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, vs_key + sub_key, 0, sam)
-            except OSError:
-                continue
-            ins_dir = reg_value(root_key, 'InstallDir')
-            winreg.CloseKey(root_key)
-
-            if not ins_dir:
-                continue
-
-            gen_name = known_vs.get(sub_key)
-            if gen_name is None:
-                # if it looks like a version number
-                try:
-                    ver = float(sub_key)
-                except ValueError:
-                    continue
-                gen_name = 'Visual Studio %d' % int(ver)
-            else:
-                ver = float(sub_key)
-
-            if ver > newest_ver:
-                newest_vs = gen_name
-                newest_ver = ver
-
-    if newest_vs:
-        return ['-G', newest_vs + ' Win64']
-    return []
 
 try:
     from Queue import Queue, Empty
@@ -281,6 +211,10 @@ def _log_buf(buf):
     for line in lines:
         log.info(line)
 
+def get_cmake_version(cmake_path):
+    p = re.compile("version ([0-9.]+)")
+    cmake_output = subprocess.check_output(cmake_path + " --version").decode("utf-8");
+    return p.search(cmake_output).group(1)
 
 def run_process(cmds, timeout=None):
     """run a process asynchronously
@@ -538,8 +472,12 @@ class build(_build):
             cmake_extra_arch += ['-DPYTHON_LIBRARY={lib}'.format(lib=py_lib)]
 
         if sys.platform == "win32":
-            if platform_arch == '64bit' and  not generator_set:
-                cmake_extra_arch += get_msvc_win64_generator()
+            if platform_arch == '64bit':
+                cmake_extra_arch += ['-DCMAKE_GENERATOR_PLATFORM=x64']
+                # Setting the cmake generator only works in versions of cmake >= 3.1
+                if (LooseVersion(get_cmake_version(cmake_path)) < LooseVersion("3.1.0")):
+                    raise DistutilsSetupError(
+                        "You need to install a newer version of cmake. Version 3.1 or newer is required.");
 
             # this imitates cmake in path resolution
             py_ver = get_python_version()
