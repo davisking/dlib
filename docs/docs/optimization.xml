@@ -1193,7 +1193,7 @@ Or it can use the elastic net regularizer:
             video concludes. 
             </p>
             <center>
-            <video src="find_max_global_example.webm">
+            <video src="find_max_global_example">
                Video of optimizer running
             </video>
             </center>

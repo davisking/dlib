@@ -787,8 +787,9 @@
        </img>
    </xsl:template>   
    <xsl:template match="video">
-      <video controls="">
-         <source src="{@src}" type="video/webm"/>
+      <video controls="true" poster="{@src}.png">
+         <source src="{@src}.webm" type="video/webm"/>
+         <source src="{@src}.mp4" type="video/mp4"/>
          <xsl:apply-templates/>
       </video>
    </xsl:template>   
