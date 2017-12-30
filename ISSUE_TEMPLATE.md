@@ -1,14 +1,11 @@
-
 IF YOU ARE REPORTING A BUG OR PROBLEM WITH DLIB THEN FILL OUT THE ENTIRE TEMPLATE BELOW.  ISSUES ASKING QUESTIONS ABOUT WHY SOMETHING DOESN'T WORK THAT FAIL TO FILL OUT THE ENTIRE TEMPLATE WILL BE CLOSED.
-
 
 **The issue tracker is not a code writing service, do not ask for someone to write code for you.**  E.g. Do not ask for feature improvements to the example programs. **If there is some feature improvement you want in an example program then it's up to you to write it**.  
 
-Before you ask a question, check Google for a solution, [the dlib FAQ](http://dlib.net/faq.html), or consult the dlib documentation.  Every single function in dlib is documented in detail.  If you post an issue but you obviously haven't read the documentation then your issue will be closed.  
+Before you ask a question, check Google for a solution, [the dlib FAQ](http://dlib.net/faq.html), or consult the dlib documentation.  Every single function in dlib is documented in detail.  If you obviously haven't read the documentation your issue will be closed.  
 
 If you aren't reporting a bug or problem with dlib then delete this template and write whatever you want here.
  
-
 <!-- ================================================================== -->
 <!-- ==================  BUG/PROBLEM REPORT TEMPLATE ================== -->
 <!-- ================================================================== -->
