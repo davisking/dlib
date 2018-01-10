@@ -584,9 +584,15 @@ if (NOT TARGET dlib)
                try_compile(cuda_test_compile_worked ${PROJECT_BINARY_DIR}/cuda_test_build 
                            ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
                            CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
+                           OUTPUT_VARIABLE try_compile_output_message
                            )
                if (NOT cuda_test_compile_worked)
-                  message(STATUS "*** CUDA was found but your compiler failed to compile a simple CUDA program so dlib isn't going to use CUDA. ***")
+                  string(REPLACE "\n" "\n   ***   " try_compile_output_message "${try_compile_output_message}")
+                  message(STATUS "*****************************************************************************************************************")
+                  message(STATUS "*** CUDA was found but your compiler failed to compile a simple CUDA program so dlib isn't going to use CUDA. ")
+                  message(STATUS "*** The output of the failed CUDA test compile is shown below: ")
+                  message(STATUS "***   ${try_compile_output_message}")
+                  message(STATUS "*****************************************************************************************************************")
                else()
                   message(STATUS "Checking if you have the right version of cuDNN installed.")
                   try_compile(cudnn_test_compile_worked ${PROJECT_BINARY_DIR}/cudnn_test_build 
