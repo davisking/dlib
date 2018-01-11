@@ -38,7 +38,7 @@ public:
         feature_vector_type& psi 
     ) const 
     {
-        psi = problem.attr("get_truth_joint_feature_vector")(idx).cast<feature_vector_type&>();
+        psi = problem.attr("get_truth_joint_feature_vector")(idx).template cast<feature_vector_type&>();
     }
 
     virtual void separation_oracle (
