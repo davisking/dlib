@@ -26,6 +26,7 @@ add_executable(${target_name}
    src/common.h
    src/common.cpp
    src/cluster.cpp
+   src/flip_dataset.cpp
 )
 
 
