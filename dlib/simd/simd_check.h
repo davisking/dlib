@@ -117,7 +117,7 @@
     { 
         std::array<unsigned int,4> info;
         // Load EAX, EBX, ECX, EDX into info
-        __cpuid(info.data(), function_id);
+        __cpuid((int*)info.data(), function_id);
         return info;
     }
 
