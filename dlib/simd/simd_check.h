@@ -3,6 +3,8 @@
 #ifndef DLIB_SIMd_CHECK_Hh_
 #define DLIB_SIMd_CHECK_Hh_
 
+#include <array>
+
 //#define DLIB_DO_NOT_USE_SIMD
 
 // figure out which SIMD instructions we can use.
@@ -105,6 +107,69 @@
     #include <arm_neon.h> // ARM NEON
 #endif
 
+// ----------------------------------------------------------------------------------------
+// Define functions to check, at runtime, what instructions are available
+
+#if defined(_MSC_VER) && (defined(_M_I86) || defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64) )
+    #include <intrin.h>
+
+    inline std::array<unsigned int,4> cpuid(int function_id) 
+    { 
+        std::array<unsigned int,4> info;
+        // Load EAX, EBX, ECX, EDX into info
+        __cpuid(info.data(), function_id);
+        return info;
+    }
+
+#elif (defined(__GNUC__) || defined(__clang__)) && (defined(__i386__) || defined(__i686__) || defined(__amd64__) || defined(__x86_64__))
+    #include <cpuid.h>
+
+    inline std::array<unsigned int,4> cpuid(int function_id) 
+    { 
+        std::array<unsigned int,4> info;
+        // Load EAX, EBX, ECX, EDX into info
+        __cpuid(function_id, info[0], info[1], info[2], info[3]);
+        return info;
+    }
+
+#else
+
+    inline std::array<unsigned int,4> cpuid(int) 
+    {
+        return std::array<unsigned int,4>{};
+    }
+
+#endif
+
+    inline bool cpu_has_sse2_instructions()   { return cpuid(1)[3]&(1<<26); }
+    inline bool cpu_has_sse3_instructions()   { return cpuid(1)[2]&(1<<0);  }
+    inline bool cpu_has_sse41_instructions()  { return cpuid(1)[2]&(1<<19); }
+    inline bool cpu_has_sse42_instructions()  { return cpuid(1)[2]&(1<<20); }
+    inline bool cpu_has_avx_instructions()    { return cpuid(1)[2]&(1<<28); }
+    inline bool cpu_has_avx2_instructions()   { return cpuid(7)[1]&(1<<5);  }
+    inline bool cpu_has_avx512_instructions() { return cpuid(7)[1]&(1<<16); }
+
+    inline void warn_about_unavailable_but_used_cpu_instructions()
+    {
+#if defined(DLIB_HAVE_AVX2)
+        if (!cpu_has_avx2_instructions())
+            std::cerr << "Dlib was compiled to use AVX2 instructions, but these aren't available on your machine" << std::endl;
+#elif defined(DLIB_HAVE_AVX)
+        if (!cpu_has_avx_instructions())
+            std::cerr << "Dlib was compiled to use AVX instructions, but these aren't available on your machine" << std::endl;
+#elif defined(DLIB_HAVE_SSE41)
+        if (!cpu_has_sse41_instructions())
+            std::cerr << "Dlib was compiled to use SSE41 instructions, but these aren't available on your machine" << std::endl;
+#elif defined(DLIB_HAVE_SSE3)
+        if (!cpu_has_sse3_instructions())
+            std::cerr << "Dlib was compiled to use SSE3 instructions, but these aren't available on your machine" << std::endl;
+#elif defined(DLIB_HAVE_SSE2)
+        if (!cpu_has_sse2_instructions())
+            std::cerr << "Dlib was compiled to use SSE2 instructions, but these aren't available on your machine" << std::endl;
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
 
 #endif // DLIB_SIMd_CHECK_Hh_
 
