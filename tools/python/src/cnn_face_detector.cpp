@@ -6,10 +6,15 @@
 #include <dlib/dnn.h>
 #include <dlib/image_transforms.h>
 #include "indexing.h"
+#include <pybind11/stl_bind.h>
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
+
+namespace py = pybind11;
+
+PYBIND11_MAKE_OPAQUE(std::vector<mmod_rect>);
+PYBIND11_MAKE_OPAQUE(std::vector<std::vector<mmod_rect> >);
 
 class cnn_face_detection_model_v1
 {
@@ -22,7 +27,7 @@ public:
     }
 
     std::vector<mmod_rect> detect (
-        object pyimage,
+        py::object pyimage,
         const int upsample_num_times
     )
     {
@@ -60,7 +65,7 @@ public:
     }
 
     std::vector<std::vector<mmod_rect> > detect_mult (
-        boost::python::list& imgs,
+        py::list& imgs,
         const int upsample_num_times,
         const int batch_size = 128
     )
@@ -73,7 +78,7 @@ public:
         {
             // Copy the data into dlib based objects
             matrix<rgb_pixel> image;
-            object tmp = boost::python::extract<object>(imgs[i]);
+            py::object tmp = imgs[i].cast<py::object>();
             if (is_gray_python_image(tmp))
                 assign_image(image, numpy_gray_image(tmp));
             else if (is_rgb_python_image(tmp))
@@ -131,15 +136,15 @@ private:
 
 // ----------------------------------------------------------------------------------------
 
-void bind_cnn_face_detection()
+void bind_cnn_face_detection(py::module& m)
 {
-    using boost::python::arg;
     {
-    class_<cnn_face_detection_model_v1>("cnn_face_detection_model_v1", "This object detects human faces in an image.  The constructor loads the face detection model from a file. You can download a pre-trained model from http://dlib.net/files/mmod_human_face_detector.dat.bz2.", init<std::string>())
+    py::class_<cnn_face_detection_model_v1>(m, "cnn_face_detection_model_v1", "This object detects human faces in an image.  The constructor loads the face detection model from a file. You can download a pre-trained model from http://dlib.net/files/mmod_human_face_detector.dat.bz2.")
+        .def(py::init<std::string>())
         .def(
             "__call__", 
             &cnn_face_detection_model_v1::detect, 
-            (arg("img"), arg("upsample_num_times")=0),
+            py::arg("img"), py::arg("upsample_num_times")=0,
             "Find faces in an image using a deep learning model.\n\
           - Upsamples the image upsample_num_times before running the face \n\
             detector."
@@ -147,24 +152,24 @@ void bind_cnn_face_detection()
         .def(
             "__call__", 
             &cnn_face_detection_model_v1::detect_mult, 
-            (arg("imgs"), arg("upsample_num_times")=0, arg("batch_size")=128), 
+            py::arg("imgs"), py::arg("upsample_num_times")=0, py::arg("batch_size")=128, 
             "takes a list of images as input returning a 2d list of mmod rectangles"
             );
     }
     {
     typedef mmod_rect type;
-    class_<type>("mmod_rectangle", "Wrapper around a rectangle object and a detection confidence score.")
+    py::class_<type>(m, "mmod_rectangle", "Wrapper around a rectangle object and a detection confidence score.")
         .def_readwrite("rect",   &type::rect)
         .def_readwrite("confidence", &type::detection_confidence);
     }
     {
     typedef std::vector<mmod_rect> type;
-    class_<type>("mmod_rectangles", "An array of mmod rectangle objects.")
-        .def(vector_indexing_suite<type>());
+    py::bind_vector<type>(m, "mmod_rectangles", "An array of mmod rectangle objects.")
+        .def("extend", extend_vector_with_python_list<mmod_rect>);
     }
     {
     typedef std::vector<std::vector<mmod_rect> > type;
-    class_<type>("mmod_rectangless", "A 2D array of mmod rectangle objects.")
-        .def(vector_indexing_suite<type>());
+    py::bind_vector<type>(m, "mmod_rectangless", "A 2D array of mmod rectangle objects.")
+        .def("extend", extend_vector_with_python_list<std::vector<mmod_rect>>);
     } 
 }

@@ -3,22 +3,23 @@
 #ifndef DLIB_PYTHON_NuMPY_Hh_
 #define DLIB_PYTHON_NuMPY_Hh_
 
-#include <boost/python.hpp>
+#include <pybind11/pybind11.h>
 #include <dlib/error.h>
 #include <dlib/algs.h>
 #include <dlib/string.h>
 #include <dlib/array.h>
 #include <dlib/pixel.h>
 
+namespace py = pybind11;
+
 // ----------------------------------------------------------------------------------------
 
 template <typename T>
 void validate_numpy_array_type (
-    const boost::python::object& obj
+    const py::object& obj
 )
 {
-    using namespace boost::python;
-    const char ch = boost::python::extract<char>(obj.attr("dtype").attr("char"));
+    const char ch = obj.attr("dtype").attr("char").cast<char>();
 
     if (dlib::is_same_type<T,double>::value && ch != 'd')
         throw dlib::error("Expected numpy.ndarray of float64");
@@ -34,7 +35,7 @@ void validate_numpy_array_type (
 
 template <int dims>
 void get_numpy_ndarray_shape (
-    const boost::python::object& obj,
+    const py::object& obj,
     long (&shape)[dims]
 )
 /*!
@@ -73,7 +74,7 @@ void get_numpy_ndarray_shape (
 
 template <typename T, int dims>
 void get_numpy_ndarray_parts (
-    boost::python::object& obj,
+    py::object& obj,
     T*& data,
     dlib::array<T>& contig_buf,
     long (&shape)[dims]
@@ -123,7 +124,7 @@ void get_numpy_ndarray_parts (
 
 template <typename T, int dims>
 void get_numpy_ndarray_parts (
-    const boost::python::object& obj,
+    const py::object& obj,
     const T*& data,
     dlib::array<T>& contig_buf,
     long (&shape)[dims]

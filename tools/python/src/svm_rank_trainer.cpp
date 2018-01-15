@@ -2,20 +2,22 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include <dlib/python.h>
-#include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
 #include <dlib/svm.h>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "testing_results.h"
-#include <boost/python/args.hpp>
+#include <pybind11/stl_bind.h>
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
+namespace py = pybind11;
 
 typedef matrix<double,0,1> sample_type; 
 typedef std::vector<std::pair<unsigned long,double> > sparse_vect;
+typedef std::vector<ranking_pair<sample_type> > ranking_pairs;
+typedef std::vector<ranking_pair<sparse_vect> > sparse_ranking_pairs;
 
+PYBIND11_MAKE_OPAQUE(ranking_pairs);
+PYBIND11_MAKE_OPAQUE(sparse_ranking_pairs);
 
 // ----------------------------------------------------------------------------------------
 
@@ -23,7 +25,7 @@ namespace dlib
 {
     template <typename T>
     bool operator== (
-        const ranking_pair<T>& ,
+        const ranking_pair<T>&, 
         const ranking_pair<T>& 
     )
     {
@@ -84,16 +86,18 @@ double get_c (const trainer_type& trainer)
 
 template <typename trainer>
 void add_ranker (
+    py::module& m,
     const char* name
 )
 {
-    class_<trainer>(name)
-        .add_property("epsilon", get_epsilon<trainer>, set_epsilon<trainer>)
-        .add_property("c", get_c<trainer>, set_c<trainer>)
-        .add_property("max_iterations", &trainer::get_max_iterations, &trainer::set_max_iterations)
-        .add_property("force_last_weight_to_1", &trainer::forces_last_weight_to_1, &trainer::force_last_weight_to_1)
-        .add_property("learns_nonnegative_weights", &trainer::learns_nonnegative_weights, &trainer::set_learns_nonnegative_weights)
-        .add_property("has_prior", &trainer::has_prior)
+    py::class_<trainer>(m, name)
+        .def(py::init())
+        .def_property("epsilon", get_epsilon<trainer>, set_epsilon<trainer>)
+        .def_property("c", get_c<trainer>, set_c<trainer>)
+        .def_property("max_iterations", &trainer::get_max_iterations, &trainer::set_max_iterations)
+        .def_property("force_last_weight_to_1", &trainer::forces_last_weight_to_1, &trainer::force_last_weight_to_1)
+        .def_property("learns_nonnegative_weights", &trainer::learns_nonnegative_weights, &trainer::set_learns_nonnegative_weights)
+        .def_property_readonly("has_prior", &trainer::has_prior)
         .def("train", train1<trainer>)
         .def("train", train2<trainer>)
         .def("set_prior", &trainer::set_prior)
@@ -120,42 +124,41 @@ const ranking_test _cross_ranking_validate_trainer (
 
 // ----------------------------------------------------------------------------------------
 
-void bind_svm_rank_trainer()
+void bind_svm_rank_trainer(py::module& m)
 {
-    using boost::python::arg;
-    class_<ranking_pair<sample_type> >("ranking_pair")
-        .add_property("relevant", &ranking_pair<sample_type>::relevant)
-        .add_property("nonrelevant", &ranking_pair<sample_type>::nonrelevant)
-        .def_pickle(serialize_pickle<ranking_pair<sample_type> >());
+    py::class_<ranking_pair<sample_type> >(m, "ranking_pair")
+        .def(py::init())
+        .def_readwrite("relevant", &ranking_pair<sample_type>::relevant)
+        .def_readwrite("nonrelevant", &ranking_pair<sample_type>::nonrelevant)
+        .def(py::pickle(&getstate<ranking_pair<sample_type>>, &setstate<ranking_pair<sample_type>>));
 
-    class_<ranking_pair<sparse_vect> >("sparse_ranking_pair")
-        .add_property("relevant", &ranking_pair<sparse_vect>::relevant)
-        .add_property("nonrelevant", &ranking_pair<sparse_vect>::nonrelevant)
-        .def_pickle(serialize_pickle<ranking_pair<sparse_vect> >());
+    py::class_<ranking_pair<sparse_vect> >(m, "sparse_ranking_pair")
+        .def(py::init())
+        .def_readwrite("relevant", &ranking_pair<sparse_vect>::relevant)
+        .def_readwrite("nonrelevant", &ranking_pair<sparse_vect>::nonrelevant)
+        .def(py::pickle(&getstate<ranking_pair<sparse_vect>>, &setstate<ranking_pair<sparse_vect>>));
 
-    typedef std::vector<ranking_pair<sample_type> > ranking_pairs;
-    class_<ranking_pairs>("ranking_pairs")
-        .def(vector_indexing_suite<ranking_pairs>())
+    py::bind_vector<ranking_pairs>(m, "ranking_pairs")
         .def("clear", &ranking_pairs::clear)
         .def("resize", resize<ranking_pairs>)
-        .def_pickle(serialize_pickle<ranking_pairs>());
+        .def("extend", extend_vector_with_python_list<ranking_pair<sample_type>>)
+        .def(py::pickle(&getstate<ranking_pairs>, &setstate<ranking_pairs>));
 
-    typedef std::vector<ranking_pair<sparse_vect> > sparse_ranking_pairs;
-    class_<sparse_ranking_pairs>("sparse_ranking_pairs")
-        .def(vector_indexing_suite<sparse_ranking_pairs>())
+    py::bind_vector<sparse_ranking_pairs>(m, "sparse_ranking_pairs")
         .def("clear", &sparse_ranking_pairs::clear)
         .def("resize", resize<sparse_ranking_pairs>)
-        .def_pickle(serialize_pickle<sparse_ranking_pairs>());
+        .def("extend", extend_vector_with_python_list<ranking_pair<sparse_vect>>)
+        .def(py::pickle(&getstate<sparse_ranking_pairs>, &setstate<sparse_ranking_pairs>));
 
-    add_ranker<svm_rank_trainer<linear_kernel<sample_type> > >("svm_rank_trainer");
-    add_ranker<svm_rank_trainer<sparse_linear_kernel<sparse_vect> > >("svm_rank_trainer_sparse");
+    add_ranker<svm_rank_trainer<linear_kernel<sample_type> > >(m, "svm_rank_trainer");
+    add_ranker<svm_rank_trainer<sparse_linear_kernel<sparse_vect> > >(m, "svm_rank_trainer_sparse");
 
-    def("cross_validate_ranking_trainer", &_cross_ranking_validate_trainer<
+    m.def("cross_validate_ranking_trainer", &_cross_ranking_validate_trainer<
                 svm_rank_trainer<linear_kernel<sample_type> >,sample_type>,
-                (arg("trainer"), arg("samples"), arg("folds")) );
-    def("cross_validate_ranking_trainer", &_cross_ranking_validate_trainer<
+                py::arg("trainer"), py::arg("samples"), py::arg("folds") );
+    m.def("cross_validate_ranking_trainer", &_cross_ranking_validate_trainer<
                 svm_rank_trainer<sparse_linear_kernel<sparse_vect> > ,sparse_vect>,
-                (arg("trainer"), arg("samples"), arg("folds")) );
+                py::arg("trainer"), py::arg("samples"), py::arg("folds") );
 }
 
 

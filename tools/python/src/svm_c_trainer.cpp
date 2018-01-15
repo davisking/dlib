@@ -3,14 +3,11 @@
 
 #include <dlib/python.h>
 #include "testing_results.h"
-#include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
 #include <dlib/svm_threaded.h>
-#include <boost/python/args.hpp>
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
 
 typedef matrix<double,0,1> sample_type; 
 typedef std::vector<std::pair<unsigned long,double> > sparse_vect;
@@ -75,26 +72,27 @@ template <typename trainer_type>
 double get_c_class2 ( const trainer_type& trainer) { return trainer.get_c_class2(); }
 
 template <typename trainer_type>
-class_<trainer_type> setup_trainer (
+py::class_<trainer_type> setup_trainer (
+    py::module& m,
     const std::string& name
 )
 {
-    return class_<trainer_type>(name.c_str())
+    return py::class_<trainer_type>(m, name.c_str())
         .def("train", train<trainer_type>)
         .def("set_c", set_c<trainer_type>)
-        .add_property("c_class1", get_c_class1<trainer_type>, set_c_class1<trainer_type>)
-        .add_property("c_class2", get_c_class2<trainer_type>, set_c_class2<trainer_type>)
-        .add_property("epsilon", get_epsilon<trainer_type>, set_epsilon<trainer_type>);
+        .def_property("c_class1", get_c_class1<trainer_type>, set_c_class1<trainer_type>)
+        .def_property("c_class2", get_c_class2<trainer_type>, set_c_class2<trainer_type>)
+        .def_property("epsilon", get_epsilon<trainer_type>, set_epsilon<trainer_type>);
 }
 
 template <typename trainer_type>
-class_<trainer_type> setup_trainer2 (
+py::class_<trainer_type> setup_trainer2 (
+    py::module& m,
     const std::string& name
 )
 {
-
-    return setup_trainer<trainer_type>(name)
-        .add_property("cache_size", get_cache_size<trainer_type>, set_cache_size<trainer_type>);
+    return setup_trainer<trainer_type>(m, name)
+        .def_property("cache_size", get_cache_size<trainer_type>, set_cache_size<trainer_type>);
 }
 
 void set_gamma (
@@ -165,79 +163,80 @@ const binary_test _cross_validate_trainer_t (
 
 // ----------------------------------------------------------------------------------------
 
-void bind_svm_c_trainer()
+void bind_svm_c_trainer(py::module& m)
 {
-    using boost::python::arg;
+    namespace py = pybind11;
     {
         typedef svm_c_trainer<radial_basis_kernel<sample_type> > T;
-        setup_trainer2<T>("svm_c_trainer_radial_basis")
-            .add_property("gamma", get_gamma, set_gamma);
-        def("cross_validate_trainer", _cross_validate_trainer<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
+        setup_trainer2<T>(m, "svm_c_trainer_radial_basis")
+            .def_property("gamma", get_gamma, set_gamma);
+        m.def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"));
+        m.def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"),py::arg("num_threads"));
     }
 
     {
         typedef svm_c_trainer<sparse_radial_basis_kernel<sparse_vect> > T;
-        setup_trainer2<T>("svm_c_trainer_sparse_radial_basis")
-            .add_property("gamma", get_gamma_sparse, set_gamma_sparse);
-        def("cross_validate_trainer", _cross_validate_trainer<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
+        setup_trainer2<T>(m, "svm_c_trainer_sparse_radial_basis")
+            .def_property("gamma", get_gamma_sparse, set_gamma_sparse);
+        m.def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"));
+        m.def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"),py::arg("num_threads"));
     }
 
     {
         typedef svm_c_trainer<histogram_intersection_kernel<sample_type> > T;
-        setup_trainer2<T>("svm_c_trainer_histogram_intersection");
-        def("cross_validate_trainer", _cross_validate_trainer<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
+        setup_trainer2<T>(m, "svm_c_trainer_histogram_intersection");
+        m.def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"));
+        m.def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"),py::arg("num_threads"));
     }
 
     {
         typedef svm_c_trainer<sparse_histogram_intersection_kernel<sparse_vect> > T;
-        setup_trainer2<T>("svm_c_trainer_sparse_histogram_intersection");
-        def("cross_validate_trainer", _cross_validate_trainer<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
+        setup_trainer2<T>(m, "svm_c_trainer_sparse_histogram_intersection");
+        m.def("cross_validate_trainer", _cross_validate_trainer<T>, 
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"));
+        m.def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"),py::arg("num_threads"));
     }
 
     {
         typedef svm_c_linear_trainer<linear_kernel<sample_type> > T;
-        setup_trainer<T>("svm_c_trainer_linear")
-            .add_property("max_iterations", &T::get_max_iterations, &T::set_max_iterations)
-            .add_property("force_last_weight_to_1", &T::forces_last_weight_to_1, &T::force_last_weight_to_1)
-            .add_property("learns_nonnegative_weights", &T::learns_nonnegative_weights, &T::set_learns_nonnegative_weights)
-            .add_property("has_prior", &T::has_prior)
+        setup_trainer<T>(m, "svm_c_trainer_linear")
+            .def(py::init())
+            .def_property("max_iterations", &T::get_max_iterations, &T::set_max_iterations)
+            .def_property("force_last_weight_to_1", &T::forces_last_weight_to_1, &T::force_last_weight_to_1)
+            .def_property("learns_nonnegative_weights", &T::learns_nonnegative_weights, &T::set_learns_nonnegative_weights)
+            .def_property_readonly("has_prior", &T::has_prior)
             .def("set_prior", &T::set_prior)
             .def("be_verbose", &T::be_verbose)
             .def("be_quiet", &T::be_quiet);
 
-        def("cross_validate_trainer", _cross_validate_trainer<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
+        m.def("cross_validate_trainer", _cross_validate_trainer<T>,
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"));
+        m.def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>,
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"),py::arg("num_threads"));
     }
 
     {
         typedef svm_c_linear_trainer<sparse_linear_kernel<sparse_vect> > T;
-        setup_trainer<T>("svm_c_trainer_sparse_linear")
-            .add_property("max_iterations", &T::get_max_iterations, &T::set_max_iterations)
-            .add_property("force_last_weight_to_1", &T::forces_last_weight_to_1, &T::force_last_weight_to_1)
-            .add_property("learns_nonnegative_weights", &T::learns_nonnegative_weights, &T::set_learns_nonnegative_weights)
-            .add_property("has_prior", &T::has_prior)
+        setup_trainer<T>(m, "svm_c_trainer_sparse_linear")
+            .def_property("max_iterations", &T::get_max_iterations, &T::set_max_iterations)
+            .def_property("force_last_weight_to_1", &T::forces_last_weight_to_1, &T::force_last_weight_to_1)
+            .def_property("learns_nonnegative_weights", &T::learns_nonnegative_weights, &T::set_learns_nonnegative_weights)
+            .def_property_readonly("has_prior", &T::has_prior)
             .def("set_prior", &T::set_prior)
             .def("be_verbose", &T::be_verbose)
             .def("be_quiet", &T::be_quiet);
 
-        def("cross_validate_trainer", _cross_validate_trainer<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds")));
-        def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>, 
-            (arg("trainer"),arg("x"),arg("y"),arg("folds"),arg("num_threads")));
+        m.def("cross_validate_trainer", _cross_validate_trainer<T>,
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"));
+        m.def("cross_validate_trainer_threaded", _cross_validate_trainer_t<T>,
+            py::arg("trainer"),py::arg("x"),py::arg("y"),py::arg("folds"),py::arg("num_threads"));
     }
 }
 

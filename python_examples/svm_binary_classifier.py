@@ -26,8 +26,10 @@
 #
 
 import dlib
-import pickle
-
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 x = dlib.vectors()
 y = dlib.array()
@@ -62,5 +64,5 @@ print("prediction for second sample: {}".format(classifier(x[1])))
 
 # classifier models can also be pickled in the same was as any other python object.
 with open('saved_model.pickle', 'wb') as handle:
-    pickle.dump(classifier, handle)
+    pickle.dump(classifier, handle, 2)
 

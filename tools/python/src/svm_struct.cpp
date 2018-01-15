@@ -3,13 +3,11 @@
 
 #include <dlib/python.h>
 #include <dlib/matrix.h>
-#include <boost/python/args.hpp>
 #include <dlib/svm.h>
-
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
+namespace py = pybind11;
 
 template <typename psi_type>
 class svm_struct_prob : public structural_svm_problem<matrix<double,0,1>, psi_type>
@@ -20,7 +18,7 @@ class svm_struct_prob : public structural_svm_problem<matrix<double,0,1>, psi_ty
     typedef typename base::scalar_type scalar_type;
 public:
     svm_struct_prob (
-        object& problem_,
+        py::object& problem_,
         long num_dimensions_,
         long num_samples_
     ) : 
@@ -40,7 +38,7 @@ public:
         feature_vector_type& psi 
     ) const 
     {
-        psi = extract<feature_vector_type&>(problem.attr("get_truth_joint_feature_vector")(idx));
+        psi = problem.attr("get_truth_joint_feature_vector")(idx).template cast<feature_vector_type&>();
     }
 
     virtual void separation_oracle (
@@ -50,51 +48,49 @@ public:
         feature_vector_type& psi
     ) const 
     {
-        object res = problem.attr("separation_oracle")(idx,boost::ref(current_solution));
+        py::object res = problem.attr("separation_oracle")(idx,std::ref(current_solution));
         pyassert(len(res) == 2, "separation_oracle() must return two objects, the loss and the psi vector");
+        py::tuple t = res.cast<py::tuple>();
         // let the user supply the output arguments in any order.
-        if (extract<double>(res[0]).check())
-        {
-            loss = extract<double>(res[0]);
-            psi = extract<feature_vector_type&>(res[1]);
-        }
-        else
-        {
-            psi = extract<feature_vector_type&>(res[0]);
-            loss = extract<double>(res[1]);
-        }
+        try {
+            loss = t[0].cast<scalar_type>();
+            psi = t[1].cast<feature_vector_type&>();
+        } catch(py::cast_error &e) {
+            psi = t[0].cast<feature_vector_type&>();
+            loss = t[1].cast<scalar_type>();
+       }
     }
 
 private:
 
     const long num_dimensions;
     const long num_samples;
-    object& problem;
+    py::object& problem;
 };
 
 // ----------------------------------------------------------------------------------------
 
 template <typename psi_type>
 matrix<double,0,1> solve_structural_svm_problem_impl(
-    object problem
+    py::object problem
 )
 {
-    const double C = extract<double>(problem.attr("C"));
-    const bool be_verbose = hasattr(problem,"be_verbose") && extract<bool>(problem.attr("be_verbose"));
-    const bool use_sparse_feature_vectors = hasattr(problem,"use_sparse_feature_vectors") && 
-                                            extract<bool>(problem.attr("use_sparse_feature_vectors"));
-    const bool learns_nonnegative_weights = hasattr(problem,"learns_nonnegative_weights") && 
-                                            extract<bool>(problem.attr("learns_nonnegative_weights"));
+  const double C = problem.attr("C").cast<double>();
+    const bool be_verbose = py::hasattr(problem,"be_verbose") && problem.attr("be_verbose").cast<bool>();
+    const bool use_sparse_feature_vectors = py::hasattr(problem,"use_sparse_feature_vectors") && 
+                                            problem.attr("use_sparse_feature_vectors").cast<bool>();
+    const bool learns_nonnegative_weights = py::hasattr(problem,"learns_nonnegative_weights") && 
+                                            problem.attr("learns_nonnegative_weights").cast<bool>();
 
     double eps = 0.001;
     unsigned long max_cache_size = 10;
-    if (hasattr(problem, "epsilon"))
-        eps = extract<double>(problem.attr("epsilon"));
-    if (hasattr(problem, "max_cache_size"))
-        max_cache_size = extract<double>(problem.attr("max_cache_size"));
+    if (py::hasattr(problem, "epsilon"))
+        eps = problem.attr("epsilon").cast<double>();
+    if (py::hasattr(problem, "max_cache_size"))
+        max_cache_size = problem.attr("max_cache_size").cast<double>();
 
-    const long num_samples = extract<long>(problem.attr("num_samples"));
-    const long num_dimensions = extract<long>(problem.attr("num_dimensions"));
+    const long num_samples = problem.attr("num_samples").cast<long>();
+    const long num_dimensions = problem.attr("num_dimensions").cast<long>();
 
     pyassert(num_samples > 0, "You can't train a Structural-SVM if you don't have any training samples.");
 
@@ -129,12 +125,11 @@ matrix<double,0,1> solve_structural_svm_problem_impl(
 // ----------------------------------------------------------------------------------------
 
 matrix<double,0,1> solve_structural_svm_problem(
-    object problem
+    py::object problem
 )
 {
     // Check if the python code is using sparse or dense vectors to represent PSI()
-    extract<matrix<double,0,1> > isdense(problem.attr("get_truth_joint_feature_vector")(0));
-    if (isdense.check())
+    if (py::isinstance<matrix<double,0,1>>(problem.attr("get_truth_joint_feature_vector")(0)))
         return solve_structural_svm_problem_impl<matrix<double,0,1> >(problem);
     else
         return solve_structural_svm_problem_impl<std::vector<std::pair<unsigned long,double> > >(problem);
@@ -142,11 +137,9 @@ matrix<double,0,1> solve_structural_svm_problem(
 
 // ----------------------------------------------------------------------------------------
 
-void bind_svm_struct()
+void bind_svm_struct(py::module& m)
 {
-    using boost::python::arg;
-
-    def("solve_structural_svm_problem",solve_structural_svm_problem, (arg("problem")),
+    m.def("solve_structural_svm_problem",solve_structural_svm_problem, py::arg("problem"),
 "This function solves a structural SVM problem and returns the weight vector    \n\
 that defines the solution.  See the example program python_examples/svm_struct.py    \n\
 for documentation about how to create a proper problem object.   " 

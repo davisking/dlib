@@ -2,18 +2,17 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include <dlib/python.h>
-#include <boost/shared_ptr.hpp>
 #include <dlib/matrix.h>
-#include <boost/python/slice.hpp>
 #include <dlib/geometry/vector.h>
+#include <pybind11/stl_bind.h>
 #include "indexing.h"
-
 
 using namespace dlib;
 using namespace std;
-using namespace boost::python;
 
 typedef matrix<double,0,1> cv;
+
+PYBIND11_MAKE_OPAQUE(std::vector<point>);
 
 void cv_set_size(cv& m, long s)
 {
@@ -52,23 +51,20 @@ string cv__repr__ (const cv& v)
     return sout.str();
 }
 
-boost::shared_ptr<cv> cv_from_object(object obj)
+std::shared_ptr<cv> cv_from_object(py::object obj)
 {
-    extract<long> thesize(obj);
-    if (thesize.check())
-    {
-        long nr = thesize;
-        boost::shared_ptr<cv> temp(new cv(nr));
+    try {
+        long nr = obj.cast<long>();
+        auto temp = std::make_shared<cv>(nr);
         *temp = 0;
         return temp;
-    }
-    else
-    {
+    } catch(py::cast_error &e) {
+        py::list li = obj.cast<py::list>();
         const long nr = len(obj);
-        boost::shared_ptr<cv> temp(new cv(nr));
+        auto temp = std::make_shared<cv>(nr);
         for ( long r = 0; r < nr; ++r)
         {
-            (*temp)(r) = extract<double>(obj[r]);
+            (*temp)(r) = li[r].cast<double>();
         }
         return temp;
     }
@@ -88,7 +84,7 @@ void cv__setitem__(cv& c, long p, double val)
     if (p > c.size()-1) {
         PyErr_SetString( PyExc_IndexError, "index out of range"
         );
-        boost::python::throw_error_already_set();
+        throw py::error_already_set();
     }
     c(p) = val;
 }
@@ -101,38 +97,29 @@ double cv__getitem__(cv& m, long r)
     if (r > m.size()-1 || r < 0) {
         PyErr_SetString( PyExc_IndexError, "index out of range"
         );
-        boost::python::throw_error_already_set();
+        throw py::error_already_set();
     }
     return m(r);
 }
 
 
-cv cv__getitem2__(cv& m, slice r)
+cv cv__getitem2__(cv& m, py::slice r)
 {
-    slice::range<cv::iterator> bounds;
-    bounds = r.get_indicies<>(m.begin(), m.end());
-    long num = (bounds.stop-bounds.start+1);
-    // round num up to the next multiple of bounds.step.
-    if ((num%bounds.step) != 0)
-        num += bounds.step - num%bounds.step;
+    size_t start, stop, step, slicelength;
+    if (!r.compute(m.size(), &start, &stop, &step, &slicelength))
+        throw py::error_already_set();
 
-    cv temp(num/bounds.step);
+    cv temp(slicelength);
 
-    if (temp.size() == 0)
-        return temp;
-    long ii = 0;
-    while(bounds.start != bounds.stop)
-    {
-        temp(ii++) = *bounds.start;
-        std::advance(bounds.start, bounds.step);
+    for (size_t i = 0; i < slicelength; ++i) {
+         temp(i) = m(start); start += step;
     }
-    temp(ii) = *bounds.start;
     return temp;
 }
 
-boost::python::tuple cv_get_matrix_size(cv& m)
+py::tuple cv_get_matrix_size(cv& m)
 {
-    return boost::python::make_tuple(m.nr(), m.nc());
+    return py::make_tuple(m.nr(), m.nc());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -155,41 +142,41 @@ long point_x(const point& p) { return p.x(); }
 long point_y(const point& p) { return p.y(); }
 
 // ----------------------------------------------------------------------------------------
-void bind_vector()
+void bind_vector(py::module& m)
 {
-    using boost::python::arg;
     {
-    class_<cv>("vector", "This object represents the mathematical idea of a column vector.", init<>())
+    py::class_<cv, std::shared_ptr<cv>>(m, "vector", "This object represents the mathematical idea of a column vector.")
+        .def(py::init())
         .def("set_size", &cv_set_size)
         .def("resize", &cv_set_size)
-        .def("__init__", make_constructor(&cv_from_object))
+        .def(py::init(&cv_from_object))
         .def("__repr__", &cv__repr__)
         .def("__str__", &cv__str__)
         .def("__len__", &cv__len__)
         .def("__getitem__", &cv__getitem__)
         .def("__getitem__", &cv__getitem2__)
         .def("__setitem__", &cv__setitem__)
-        .add_property("shape", &cv_get_matrix_size)
-        .def_pickle(serialize_pickle<cv>());
+        .def_property_readonly("shape", &cv_get_matrix_size)
+        .def(py::pickle(&getstate<cv>, &setstate<cv>));
 
-    def("dot", dotprod, "Compute the dot product between two dense column vectors.");
+    m.def("dot", &dotprod, "Compute the dot product between two dense column vectors.");
     }
     {
     typedef point type;
-    class_<type>("point", "This object represents a single point of integer coordinates that maps directly to a dlib::point.")
-            .def(init<long,long>((arg("x"), arg("y"))))
+    py::class_<type>(m, "point", "This object represents a single point of integer coordinates that maps directly to a dlib::point.")
+            .def(py::init<long,long>(), py::arg("x"), py::arg("y"))
             .def("__repr__", &point__repr__)
             .def("__str__", &point__str__)
-            .add_property("x", &point_x, "The x-coordinate of the point.")
-            .add_property("y", &point_y, "The y-coordinate of the point.")
-            .def_pickle(serialize_pickle<type>());
+            .def_property_readonly("x", &point_x, "The x-coordinate of the point.")
+            .def_property_readonly("y", &point_y, "The y-coordinate of the point.")
+            .def(py::pickle(&getstate<type>, &setstate<type>));
     }
     {
     typedef std::vector<point> type;
-    class_<type>("points", "An array of point objects.")
-        .def(vector_indexing_suite<type>())
+    py::bind_vector<type>(m, "points", "An array of point objects.")
         .def("clear", &type::clear)
         .def("resize", resize<type>)
-        .def_pickle(serialize_pickle<type>());
+        .def("extend", extend_vector_with_python_list<point>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 }

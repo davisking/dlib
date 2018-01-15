@@ -2,12 +2,10 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include <dlib/python.h>
-#include <boost/shared_ptr.hpp>
 #include <dlib/statistics.h>
-#include <boost/python/args.hpp>
 
 using namespace dlib;
-using namespace boost::python;
+namespace py = pybind11;
 
 typedef std::vector<std::pair<unsigned long,double> > sparse_vect;
 
@@ -53,22 +51,22 @@ matrix<double,0,1> apply_cca_transform (
     return sparse_matrix_vector_multiply(trans(m), v);
 }
 
-void bind_cca()
+void bind_cca(py::module& m)
 {
-    class_<cca_outputs>("cca_outputs")
-        .add_property("correlations", &cca_outputs::correlations)
-        .add_property("Ltrans", &cca_outputs::Ltrans)
-        .add_property("Rtrans", &cca_outputs::Rtrans);
+    py::class_<cca_outputs>(m, "cca_outputs")
+        .def_readwrite("correlations", &cca_outputs::correlations)
+        .def_readwrite("Ltrans", &cca_outputs::Ltrans)
+        .def_readwrite("Rtrans", &cca_outputs::Rtrans);
 
-    def("max_index_plus_one", sparse_vector_max_index_plus_one, arg("v"),
+    m.def("max_index_plus_one", sparse_vector_max_index_plus_one, py::arg("v"),
 "ensures    \n\
     - returns the dimensionality of the given sparse vector.  That is, returns a    \n\
       number one larger than the maximum index value in the vector.  If the vector    \n\
-      is empty then returns 0.   " 
+      is empty then returns 0.   "
     );
 
 
-    def("apply_cca_transform", apply_cca_transform, (arg("m"), arg("v")),
+    m.def("apply_cca_transform", apply_cca_transform, py::arg("m"), py::arg("v"),
 "requires    \n\
     - max_index_plus_one(v) <= m.nr()    \n\
 ensures    \n\
@@ -77,7 +75,7 @@ ensures    \n\
     );
 
 
-    def("cca", _cca1, (arg("L"), arg("R"), arg("num_correlations"), arg("extra_rank")=5, arg("q")=2, arg("regularization")=0),
+    m.def("cca", _cca1, py::arg("L"), py::arg("R"), py::arg("num_correlations"), py::arg("extra_rank")=5, py::arg("q")=2, py::arg("regularization")=0,
 "requires    \n\
     - num_correlations > 0    \n\
     - len(L) > 0     \n\
