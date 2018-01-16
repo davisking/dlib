@@ -2,6 +2,7 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 
 #include <pybind11/pybind11.h>
+#include <dlib/simd.h>
 
 namespace py = pybind11;
 
@@ -39,6 +40,8 @@ PYBIND11_MODULE(dlib, m)
 #define DLIB_QUOTE_STRING(x) DLIB_QUOTE_STRING2(x)
 #define DLIB_QUOTE_STRING2(x) #x
     m.attr("__version__") = DLIB_QUOTE_STRING(DLIB_VERSION);
+
+    warn_about_unavailable_but_used_cpu_instructions();
 
     bind_matrix(m);
     bind_vector(m);
