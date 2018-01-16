@@ -44,7 +44,7 @@ or type
 python setup.py install --yes USE_AVX_INSTRUCTIONS
 ```
 
-if you have a CPU that supports AVX instructions, since this makes some things run faster.  Note that you need to have boost-python installed to compile the Python API.
+if you have a CPU that supports AVX instructions, since this makes some things run faster.  
 
 
 
