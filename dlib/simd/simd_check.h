@@ -4,6 +4,7 @@
 #define DLIB_SIMd_CHECK_Hh_
 
 #include <array>
+#include <iostream>
 
 //#define DLIB_DO_NOT_USE_SIMD
 
