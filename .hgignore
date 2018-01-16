@@ -9,6 +9,9 @@
 \.obj$
 \.pyc$
 ^build/
+^dist/
+^\.cache/
+^dlib\.egg-info/
 ^docs/release/
 ^docs/docs/web/
 ^docs/docs/chm/
