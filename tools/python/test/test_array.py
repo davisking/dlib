@@ -3,7 +3,12 @@ try:
     import cPickle as pickle  # Use cPickle on Python 2.7
 except ImportError:
     import pickle
-from types import FloatType
+
+try:
+    from types import FloatType
+except ImportError:
+    FloatType = float
+
 from pytest import raises
 
 
