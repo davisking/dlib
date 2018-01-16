@@ -5,6 +5,7 @@
 \.swo$
 \.o$
 \.a$
+\.so$
 \.orig$
 \.obj$
 \.pyc$
