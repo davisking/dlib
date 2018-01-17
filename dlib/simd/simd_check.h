@@ -154,19 +154,19 @@
     {
 #if defined(DLIB_HAVE_AVX2)
         if (!cpu_has_avx2_instructions())
-            std::cerr << "Dlib was compiled to use AVX2 instructions, but these aren't available on your machine" << std::endl;
+            std::cerr << "Dlib was compiled to use AVX2 instructions, but these aren't available on your machine." << std::endl;
 #elif defined(DLIB_HAVE_AVX)
         if (!cpu_has_avx_instructions())
-            std::cerr << "Dlib was compiled to use AVX instructions, but these aren't available on your machine" << std::endl;
+            std::cerr << "Dlib was compiled to use AVX instructions, but these aren't available on your machine." << std::endl;
 #elif defined(DLIB_HAVE_SSE41)
         if (!cpu_has_sse41_instructions())
-            std::cerr << "Dlib was compiled to use SSE41 instructions, but these aren't available on your machine" << std::endl;
+            std::cerr << "Dlib was compiled to use SSE41 instructions, but these aren't available on your machine." << std::endl;
 #elif defined(DLIB_HAVE_SSE3)
         if (!cpu_has_sse3_instructions())
-            std::cerr << "Dlib was compiled to use SSE3 instructions, but these aren't available on your machine" << std::endl;
+            std::cerr << "Dlib was compiled to use SSE3 instructions, but these aren't available on your machine." << std::endl;
 #elif defined(DLIB_HAVE_SSE2)
         if (!cpu_has_sse2_instructions())
-            std::cerr << "Dlib was compiled to use SSE2 instructions, but these aren't available on your machine" << std::endl;
+            std::cerr << "Dlib was compiled to use SSE2 instructions, but these aren't available on your machine." << std::endl;
 #endif
     }
 
