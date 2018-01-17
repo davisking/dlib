@@ -34,7 +34,7 @@ import platform
 import subprocess
 import multiprocessing
 from distutils import log
-from math import ceil
+from math import ceil,floor
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
@@ -137,8 +137,7 @@ class CMakeBuild(build_ext):
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             # Do a parallel build
-            num_cores = int(ceil(multiprocessing.cpu_count()/2.0)) 
-            build_args += ['--', '-j'+str(num_cores)]
+            build_args += ['--', '-j'+str(num_available_cpu_cores(4))]
 
         build_folder = os.path.abspath(self.build_temp)
 
@@ -151,6 +150,20 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=build_folder)
         print("Invoking CMake build: '{}'".format(['cmake', '--build', '.'] + build_args))
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=build_folder)
+
+def num_available_cpu_cores(ram_per_build_process_in_gb):
+    try:
+        mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')  
+        mem_gib = mem_bytes/(1024.**3)
+        # Assume hyperthreading so divide by 2
+        num_cores = int(ceil(multiprocessing.cpu_count()/2.0)) 
+        # Require 4gb of ram per build thread.
+        mem_cores = int(floor(mem_gib/float(ram_per_build_process_in_gb)+0.5));
+        # We are limited either by RAM or CPU cores.  So pick the limiting amount
+        # and return that.
+        return max(min(num_cores, mem_cores), 1)
+    except ValueError:
+        return 2 # just assume 2 if we can't get the os to tell us the right answer.
 
 
 from setuptools.command.test import test as TestCommand
