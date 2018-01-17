@@ -146,14 +146,19 @@ class CMakeBuild(build_ext):
         if not os.path.exists(build_folder):
             os.makedirs(build_folder)
 
-        print("Invoking CMake setup: '{}'".format(['cmake', ext.sourcedir] + cmake_args))
-        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=build_folder)
-        print("Invoking CMake build: '{}'".format(['cmake', '--build', '.'] + build_args))
-        subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=build_folder)
+        cmake_setup = ['cmake', ext.sourcedir] + cmake_args
+        cmake_build = ['cmake', '--build', '.'] + build_args
+
+        print("Invoking CMake setup: '{}'".format(' '.join(cmake_setup)))
+        subprocess.check_call(cmake_setup, cwd=build_folder)
+        print("Invoking CMake build: '{}'".format(' '.join(cmake_build)))
+        subprocess.check_call(cmake_build, cwd=build_folder)
 
 def num_available_cpu_cores(ram_per_build_process_in_gb):
     if os.environ.has_key('TRAVIS') and os.environ['TRAVIS']=='true':
-        return 2 # When building on travis-ci, just use 2 cores since travis-ci limits you to that regardless of what the hardware might suggest.
+        # When building on travis-ci, just use 2 cores since travis-ci limits
+        # you to that regardless of what the hardware might suggest.
+        return 2 
     try:
         mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')  
         mem_gib = mem_bytes/(1024.**3)
