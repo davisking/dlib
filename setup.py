@@ -147,8 +147,9 @@ class CMakeBuild(build_ext):
         if not os.path.exists(build_folder):
             os.makedirs(build_folder)
 
-        print("Invoking CMake: '{}'".format(['cmake', ext.sourcedir] + cmake_args))
+        print("Invoking CMake setup: '{}'".format(['cmake', ext.sourcedir] + cmake_args))
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=build_folder)
+        print("Invoking CMake build: '{}'".format(['cmake', '--build', '.'] + build_args))
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=build_folder)
 
 
