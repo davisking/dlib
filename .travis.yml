@@ -59,6 +59,9 @@ matrix:
             - python3 
             - python3-pip
             - *gcc5_pkgs
+    - os: osx
+      osx_image: xcode9.2
+         
           
 cache:
   directories:
