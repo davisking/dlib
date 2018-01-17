@@ -142,13 +142,13 @@
 
 #endif
 
-    inline bool cpu_has_sse2_instructions()   { return cpuid(1)[3]&(1<<26); }
-    inline bool cpu_has_sse3_instructions()   { return cpuid(1)[2]&(1<<0);  }
-    inline bool cpu_has_sse41_instructions()  { return cpuid(1)[2]&(1<<19); }
-    inline bool cpu_has_sse42_instructions()  { return cpuid(1)[2]&(1<<20); }
-    inline bool cpu_has_avx_instructions()    { return cpuid(1)[2]&(1<<28); }
-    inline bool cpu_has_avx2_instructions()   { return cpuid(7)[1]&(1<<5);  }
-    inline bool cpu_has_avx512_instructions() { return cpuid(7)[1]&(1<<16); }
+    inline bool cpu_has_sse2_instructions()   { return 0!=(cpuid(1)[3]&(1<<26)); }
+    inline bool cpu_has_sse3_instructions()   { return 0!=(cpuid(1)[2]&(1<<0));  }
+    inline bool cpu_has_sse41_instructions()  { return 0!=(cpuid(1)[2]&(1<<19)); }
+    inline bool cpu_has_sse42_instructions()  { return 0!=(cpuid(1)[2]&(1<<20)); }
+    inline bool cpu_has_avx_instructions()    { return 0!=(cpuid(1)[2]&(1<<28)); }
+    inline bool cpu_has_avx2_instructions()   { return 0!=(cpuid(7)[1]&(1<<5));  }
+    inline bool cpu_has_avx512_instructions() { return 0!=(cpuid(7)[1]&(1<<16)); }
 
     inline void warn_about_unavailable_but_used_cpu_instructions()
     {
