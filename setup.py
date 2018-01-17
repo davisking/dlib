@@ -152,6 +152,8 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=build_folder)
 
 def num_available_cpu_cores(ram_per_build_process_in_gb):
+    if os.environ.has_key('TRAVIS') and os.environ['TRAVIS']=='true':
+        return 2 # When building on travis-ci, just use 2 cores since travis-ci limits you to that regardless of what the hardware might suggest.
     try:
         mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')  
         mem_gib = mem_bytes/(1024.**3)
