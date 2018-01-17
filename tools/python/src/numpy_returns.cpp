@@ -5,7 +5,6 @@
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/ndarrayobject.h>
 
-dlib::rand rnd_jitter;
 
 using namespace dlib;
 using namespace std;
@@ -16,6 +15,7 @@ namespace py = pybind11;
 
 py::list get_jitter_images(py::object img, size_t num_jitters = 1, bool disturb_colors = false)
 {
+    static dlib::rand rnd_jitter;
     if (!is_rgb_python_image(img))
         throw dlib::error("Unsupported image type, must be RGB image.");
 

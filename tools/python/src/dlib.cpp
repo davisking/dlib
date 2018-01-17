@@ -32,6 +32,8 @@ void bind_gui(py::module& m);
 
 PYBIND11_MODULE(dlib, m)
 {
+    warn_about_unavailable_but_used_cpu_instructions();
+
     // Disable printing of the C++ function signature in the python __doc__ string
     // since it is full of huge amounts of template clutter.
     py::options options;
@@ -41,7 +43,6 @@ PYBIND11_MODULE(dlib, m)
 #define DLIB_QUOTE_STRING2(x) #x
     m.attr("__version__") = DLIB_QUOTE_STRING(DLIB_VERSION);
 
-    warn_about_unavailable_but_used_cpu_instructions();
 
     bind_matrix(m);
     bind_vector(m);
