@@ -12,6 +12,7 @@
 ^build/
 ^dist/
 ^\.cache/
+^\.eggs/
 ^dlib\.egg-info/
 ^docs/release/
 ^docs/docs/web/
