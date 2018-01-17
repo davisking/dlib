@@ -4,7 +4,12 @@ try:
 except ImportError:
     import pickle
 from pytest import raises
-import numpy
+
+try:
+    import numpy
+except ImportError:
+    # Just skip these tests if numpy isn't installed
+    exit(0)
 
 
 def test_matrix_empty_init():
