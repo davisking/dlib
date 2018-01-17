@@ -32,7 +32,9 @@ import sys
 import shutil
 import platform
 import subprocess
+import multiprocessing
 from distutils import log
+from math import ceil
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
@@ -134,7 +136,9 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            # Do a parallel build
+            num_cores = int(ceil(multiprocessing.cpu_count()/2.0)) 
+            build_args += ['--', '-j'+str(num_cores)]
 
         build_folder = os.path.abspath(self.build_temp)
 
