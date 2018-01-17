@@ -78,7 +78,7 @@ def test_vector_invalid_getitem():
 
 
 def test_vector_init_with_negative_number():
-    with raises(MemoryError):
+    with raises(Exception):
         vector(-3)
 
 

@@ -21,7 +21,7 @@ def test_array_init_with_number():
 
 
 def test_array_init_with_negative_number():
-    with raises(MemoryError):
+    with raises(Exception):
         array(-5)
 
 
