@@ -25,8 +25,11 @@ if [ "$VARIANT" = "python-api" ]; then
 fi
 
 if [ "$VARIANT" = "python3-api" ]; then
-  pip3 install -U setuptools
-  python3 setup.py test --clean
-  pip install --user numpy
-  python3 setup.py test --clean
+  #python3 setup.py test --clean
+  #pip3 install --user numpy
+  #python3 setup.py test --clean
+
+  python3 setup.py build --clean
+  pip3 install --user numpy
+  python3 setup.py build --clean
 fi
