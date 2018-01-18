@@ -15,6 +15,17 @@ matrix:
 
     ###################
     - language: cpp
+      compiler: clang
+      os: linux
+      env:
+        - VARIANT=examples
+        - CXX=clang++
+        - CC=clang
+      script:
+        - dlib/travis/build-and-test.sh
+
+    ###################
+    - language: cpp
       compiler: gcc
       os: linux
       env:
