@@ -25,9 +25,6 @@ if [ "$VARIANT" = "python-api" ]; then
 fi
 
 if [ "$VARIANT" = "python3-api" ]; then
-  virtualenv -p python3 dlibtest
-  source dlibtest/bin/activate
-  pip3 install -U setuptools
   python3 setup.py test --clean
   pip3 install --user numpy
   python3 setup.py test --clean
