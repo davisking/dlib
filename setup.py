@@ -155,7 +155,7 @@ class CMakeBuild(build_ext):
         subprocess.check_call(cmake_build, cwd=build_folder)
 
 def num_available_cpu_cores(ram_per_build_process_in_gb):
-    if os.environ.has_key('TRAVIS') and os.environ['TRAVIS']=='true':
+    if 'TRAVIS' in os.environ and os.environ['TRAVIS']=='true':
         # When building on travis-ci, just use 2 cores since travis-ci limits
         # you to that regardless of what the hardware might suggest.
         return 2 
