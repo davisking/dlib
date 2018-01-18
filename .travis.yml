@@ -55,6 +55,7 @@ matrix:
         apt:
           sources: 
             - ubuntu-toolchain-r-test
+            - virtualenv
           packages: 
             - python3 
             - python3-pip

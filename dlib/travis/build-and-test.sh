@@ -25,11 +25,10 @@ if [ "$VARIANT" = "python-api" ]; then
 fi
 
 if [ "$VARIANT" = "python3-api" ]; then
-  #python3 setup.py test --clean
-  #pip3 install --user numpy
-  #python3 setup.py test --clean
-
-  python3 setup.py build --clean
+  virtualenv -p python3 dlibtest
+  source dlibtest/bin/activate
+  pip3 install -U setuptools
+  python3 setup.py test --clean
   pip3 install --user numpy
-  python3 setup.py build --clean
+  python3 setup.py test --clean
 fi
