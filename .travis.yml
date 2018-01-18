@@ -1,13 +1,44 @@
 
 
-language: python
-python:
-  - 2.7
-env:
-  - VARIANT=python-api
+matrix:
+  include:
+    ###################
+    - language: cpp
+      compiler: 
+        - gcc
+      os: linux
+      env:
+        - VARIANT=test
+      script:
+        - dlib/travis/build-and-test.sh
 
-        
+    ###################
+    - language: cpp
+      compiler: 
+        - gcc
+      os: linux
+      env:
+        - VARIANT=examples
+      script:
+        - dlib/travis/build-and-test.sh
+
+    ###################
+    - language: python
+      python:
+        - 2.7
+      env:
+        - VARIANT=python-api
+      script:
+        - dlib/travis/build-and-test.sh
+
+    ###################
+    - language: cpp
+      os: osx
+      osx_image: xcode9.2
+      env:
+        - VARIANT=test
+      script:
+        - dlib/travis/build-and-test.sh
+         
           
-script:
-  - dlib/travis/build-and-test.sh
 
