@@ -6,6 +6,13 @@ matrix:
     - language: cpp
       compiler: 
         - gcc
+      os: linux
+      env:
+        - VARIANT=test
+
+    ###################
+    - language: cpp
+      compiler: 
         - clang
       os: linux
       env:
@@ -23,8 +30,6 @@ matrix:
     - language: python
       python:
         - "2.7"
-        - "3.6"
-      os: linux
       env:
         - VARIANT=python-api
 
