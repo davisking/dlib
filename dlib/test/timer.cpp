@@ -128,11 +128,11 @@ namespace
 
             t1.set_delay_time(1000);
             t2.set_delay_time(500);
-            t3.set_delay_time(200);
+            t3.set_delay_time(1500);
 
             DLIB_TEST(t1.delay_time() == 1000);
             DLIB_TEST(t2.delay_time() == 500);
-            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST(t3.delay_time() == 1500);
             DLIB_TEST(t1.is_running() == false);
             DLIB_TEST(t2.is_running() == false);
             DLIB_TEST(t3.is_running() == false);
@@ -155,7 +155,7 @@ namespace
             DLIB_TEST(h.count == 0);
             DLIB_TEST(t1.delay_time() == 1000);
             DLIB_TEST(t2.delay_time() == 500);
-            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST(t3.delay_time() == 1500);
             DLIB_TEST(t1.is_running() == false);
             DLIB_TEST(t2.is_running() == false);
             DLIB_TEST(t3.is_running() == false);
@@ -172,7 +172,7 @@ namespace
 
             DLIB_TEST(t1.delay_time() == 1000);
             DLIB_TEST(t2.delay_time() == 500);
-            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST(t3.delay_time() == 1500);
             DLIB_TEST(t1.is_running() == true);
             DLIB_TEST(t2.is_running() == true);
             DLIB_TEST(t3.is_running() == true);
@@ -189,7 +189,7 @@ namespace
 
             DLIB_TEST(t1.delay_time() == 1000);
             DLIB_TEST(t2.delay_time() == 500);
-            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST(t3.delay_time() == 1500);
             DLIB_TEST(t1.is_running() == false);
             DLIB_TEST(t2.is_running() == false);
             DLIB_TEST(t3.is_running() == false);
@@ -215,16 +215,16 @@ namespace
                 DLIB_TEST(t2.is_running() == true);
                 DLIB_TEST(t3.is_running() == true);
 
-                dlib::sleep(1100);
+                dlib::sleep(1800);
                 print_spinner();
-                // this should allow the timers to trigger 8 times
+                // this should allow the timers to trigger 5 times
                 t1.stop();
                 t2.stop();
                 t3.stop();
 
-                DLIB_TEST_MSG(h.count == 8*i,"h.count: " << h.count << " i: " << i);
+                DLIB_TEST_MSG(h.count == 5*i,"h.count: " << h.count << " i: " << i);
                 dlib::sleep(1100);
-                DLIB_TEST_MSG(h.count == 8*i,"h.count: " << h.count << " i: " << i);
+                DLIB_TEST_MSG(h.count == 5*i,"h.count: " << h.count << " i: " << i);
             }
 
 
@@ -255,7 +255,7 @@ namespace
             h.count = 0;
             t3.start();
             DLIB_TEST(t3.is_running() == true);
-            DLIB_TEST(t3.delay_time() == 200);
+            DLIB_TEST(t3.delay_time() == 1500);
             DLIB_TEST_MSG(h.count == 0,h.count);
             t3.clear();
             DLIB_TEST(t3.is_running() == false);
