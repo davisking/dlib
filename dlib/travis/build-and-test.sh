@@ -20,7 +20,7 @@ fi
 
 if [ "$VARIANT" = "python-api" ]; then
   python setup.py test --clean
-  pip uninstall numpy
+  pip uninstall numpy -y
   python setup.py test --clean
 fi
 
