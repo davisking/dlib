@@ -13,14 +13,6 @@ matrix:
     ###################
     - language: cpp
       compiler: 
-        - clang
-      os: linux
-      env:
-        - VARIANT=test
-
-    ###################
-    - language: cpp
-      compiler: 
         - gcc
       os: linux
       env:
@@ -29,7 +21,7 @@ matrix:
     ###################
     - language: python
       python:
-        - "2.7"
+        - 2.7
       env:
         - VARIANT=python-api
 
