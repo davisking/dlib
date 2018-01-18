@@ -20,12 +20,12 @@ fi
 
 if [ "$VARIANT" = "python-api" ]; then
   python setup.py test --clean
-  pip install --user numpy
+  pip install numpy
   python setup.py test --clean
 fi
 
 if [ "$VARIANT" = "python3-api" ]; then
   python3 setup.py test --clean
-  pip3 install --user numpy
+  pip3 install numpy
   python3 setup.py test --clean
 fi

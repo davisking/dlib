@@ -4,8 +4,18 @@ matrix:
   include:
     ###################
     - language: cpp
-      compiler: 
-        - gcc
+      compiler: clang
+      os: linux
+      env:
+        - VARIANT=test
+        - CXX=clang++
+        - CC=clang
+      script:
+        - dlib/travis/build-and-test.sh
+
+    ###################
+    - language: cpp
+      compiler: gcc
       os: linux
       env:
         - VARIANT=test
@@ -14,8 +24,7 @@ matrix:
 
     ###################
     - language: cpp
-      compiler: 
-        - gcc
+      compiler: gcc
       os: linux
       env:
         - VARIANT=examples
@@ -25,6 +34,14 @@ matrix:
     ###################
     - language: python
       python: 2.7
+      env:
+        - VARIANT=python-api
+      script:
+        - dlib/travis/build-and-test.sh
+
+    ###################
+    - language: python
+      python: 3.5
       env:
         - VARIANT=python-api
       script:
