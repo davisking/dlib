@@ -22,6 +22,8 @@
 #include "lapack/gesvd.h"
 #endif
 
+#include "../threads.h"
+
 #include <iostream>
 
 namespace dlib
@@ -644,13 +646,13 @@ convergence:
         Q.set_size(A.size(), l);
 
         // Compute Q = A*gaussian_randm()
-        for (long r = 0; r < Q.nr(); ++r)
+        parallel_for(0, Q.nr(), [&](long r)
         {
             for (long c = 0; c < Q.nc(); ++c)
             {
                 Q(r,c) = dot(A[r], gaussian_randm(std::numeric_limits<long>::max(), 1, c));
             }
-        }
+        });
 
         orthogonalize(Q);
 
@@ -658,39 +660,45 @@ convergence:
         // span of the most important singular vectors of A.
         if (q != 0)
         {
+            dlib::mutex mut;
             const unsigned long n = max_index_plus_one(A);
             for (unsigned long itr = 0; itr < q; ++itr)
             {
-                matrix<T,0,0,MM,L> Z(n, l);
+                matrix<T,0,0,MM> Z;
                 // Compute Z = trans(A)*Q
-                Z = 0;
-                for (unsigned long m = 0; m < A.size(); ++m)
+                parallel_for_blocked(0, A.size(), [&](long begin, long end)
                 {
-                    for (unsigned long r = 0; r < l; ++r)
+                    matrix<T,0,0,MM> Zlocal(n,l);
+                    Zlocal = 0;
+                    for (long m = begin; m < end; ++m)
                     {
-                        typename sparse_vector_type::const_iterator i;
-                        for (i = A[m].begin(); i != A[m].end(); ++i)
+                        for (unsigned long r = 0; r < l; ++r)
                         {
-                            const unsigned long c = i->first;
-                            const T val = i->second;
+                            for (auto& i : A[m])
+                            {
+                                const auto c = i.first;
+                                const auto val = i.second;
 
-                            Z(c,r) += Q(m,r)*val;
+                                Zlocal(c,r) += Q(m,r)*val;
+                            }
                         }
                     }
-                }
+                    auto_mutex lock(mut);
+                    Z += Zlocal;
+                },1);
 
                 Q.set_size(0,0); // free RAM
                 orthogonalize(Z);
 
                 // Compute Q = A*Z
                 Q.set_size(A.size(), l);
-                for (long r = 0; r < Q.nr(); ++r)
+                parallel_for(0, Q.nr(), [&](long r)
                 {
                     for (long c = 0; c < Q.nc(); ++c)
                     {
                         Q(r,c) = dot(A[r], colm(Z,c));
                     }
-                }
+                });
 
                 Z.set_size(0,0); // free RAM
                 orthogonalize(Q);
@@ -736,22 +744,28 @@ convergence:
         // is so that when we take its SVD later using svd3() it doesn't consume
         // a whole lot of RAM.  That is, we make sure the square matrix coming out
         // of svd3() has size lxl rather than the potentially much larger nxn.
-        matrix<T,0,0,MM,L> B(n,k);
-        B = 0;
-        for (unsigned long m = 0; m < A.size(); ++m)
+        matrix<T,0,0,MM> B;
+        dlib::mutex mut;
+        parallel_for_blocked(0, A.size(), [&](long begin, long end)
         {
-            for (unsigned long r = 0; r < k; ++r)
+            matrix<T,0,0,MM> Blocal(n,k);
+            Blocal = 0;
+            for (long m = begin; m < end; ++m)
             {
-                typename sparse_vector_type::const_iterator i;
-                for (i = A[m].begin(); i != A[m].end(); ++i)
+                for (unsigned long r = 0; r < k; ++r)
                 {
-                    const unsigned long c = i->first;
-                    const T val = i->second;
+                    for (auto& i : A[m])
+                    {
+                        const auto c = i.first;
+                        const auto val = i.second;
 
-                    B(c,r) += Q(m,r)*val;
+                        Blocal(c,r) += Q(m,r)*val;
+                    }
                 }
             }
-        }
+            auto_mutex lock(mut);
+            B += Blocal;
+        },1);
 
         svd3(B, v,w,u);
         u = Q*u;
