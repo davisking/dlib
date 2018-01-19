@@ -59,13 +59,15 @@ matrix:
         - dlib/travis/build-and-test.sh
 
     ###################
-    - language: cpp
-      os: osx
-      osx_image: xcode9.2
-      env:
-        - VARIANT=test
-      script:
-        - dlib/travis/build-and-test.sh
+    # # Disabled because travis's OS X machines take hours (or days) to begin
+    # running.  Or maybe they are just broken entirely.  Who knows.
+    #- language: cpp
+    #  os: osx
+    #  osx_image: xcode9.2
+    #  env:
+    #    - VARIANT=test
+    #  script:
+    #    - dlib/travis/build-and-test.sh
          
           
 
