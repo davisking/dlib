@@ -19,8 +19,8 @@ std::vector<long> align_points(
     const std::vector<dpoint>& from,
     const std::vector<dpoint>& to,
     double min_angle = -90*pi/180.0,
-    double max_angle = -90*pi/180.0,
-    long num_angles = 180 
+    double max_angle = 90*pi/180.0,
+    long num_angles = 181 
 )
 /*!
     ensures
@@ -43,11 +43,12 @@ std::vector<long> align_points(
 
     for (auto angle : linspace(min_angle, max_angle, num_angles))
     {
+        auto rot = rotation_matrix(angle);
         for (long r = 0; r < dists.nr(); ++r)
         {
             for (long c = 0; c < dists.nc(); ++c)
             {
-                dists(r,c) = length_squared(from[r]-to[c]);
+                dists(r,c) = length_squared(rot*from[r]-to[c]);
             }
         }
 
