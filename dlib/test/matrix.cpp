@@ -1471,11 +1471,11 @@ namespace
 
             a = 0;
             set_colm(a,0) = m*b;
-            DLIB_TEST(colm(a,0) == m*b);
+            DLIB_TEST(equal(colm(a,0) , m*b));
             a = 0;
             set_rowm(a,0) = trans(m*b);
-            DLIB_TEST(rowm(a,0) == trans(m*b));
-            DLIB_TEST(rowm(a,0) != m*b);
+            DLIB_TEST(equal(rowm(a,0) , trans(m*b)));
+            DLIB_TEST(!equal(rowm(a,0) , m*b));
         }
         {
             matrix<double> a(3,3);
@@ -1484,11 +1484,11 @@ namespace
 
             a = 0;
             set_colm(a,0) = m*b;
-            DLIB_TEST(colm(a,0) == m*b);
+            DLIB_TEST(equal(colm(a,0) , m*b));
             a = 0;
             set_rowm(a,0) = trans(m*b);
-            DLIB_TEST(rowm(a,0) == trans(m*b));
-            DLIB_TEST(rowm(a,0) != m*b);
+            DLIB_TEST(equal(rowm(a,0) , trans(m*b)));
+            DLIB_TEST(!equal(rowm(a,0) , m*b));
         }
     }
 
