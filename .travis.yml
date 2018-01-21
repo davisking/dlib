@@ -33,6 +33,24 @@ matrix:
       script:
         - dlib/travis/build-and-test.sh
 
+    ########### test with C++17 ########
+    - language: cpp
+      compiler: gcc
+      os: linux
+      env:
+        - VARIANT=test
+        - CXX=g++-7
+        - CC=gcc-7
+	- CXXFLAGS=-std=c++17
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      script:
+        - dlib/travis/build-and-test.sh
+
     ###################
     - language: cpp
       compiler: gcc
