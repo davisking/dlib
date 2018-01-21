@@ -35,7 +35,6 @@ matrix:
 
     ########### test with C++17 ########
     - language: cpp
-      compiler: gcc
       os: linux
       env:
         - VARIANT=test
