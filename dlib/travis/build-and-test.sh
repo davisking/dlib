@@ -2,6 +2,8 @@
 # Exit if anything fails.
 set -eux
 
+eval "${MATRIX_EVAL}"
+
 # build dlib and tests
 if [ "$VARIANT" = "test" ]; then
   mkdir build
