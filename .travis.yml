@@ -41,7 +41,7 @@ matrix:
         - VARIANT=test
         - CXX=g++-7
         - CC=gcc-7
-	- CXXFLAGS=-std=c++17
+        - CXXFLAGS=-std=c++17
       addons:
         apt:
           sources:
