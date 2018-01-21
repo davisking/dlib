@@ -136,24 +136,6 @@ namespace dlib
                   this exception is thrown if r.expired() == true
         !*/
 
-        template<typename Y>
-        explicit shared_ptr(
-            std::auto_ptr<Y>& r
-        );
-        /*!
-            requires
-                - p.get() != 0
-                - p.release() is convertible to a T* type pointer
-                - p.release() can be deleted by calling "delete p.release();" and doing so will not throw exceptions
-            ensures
-                - #get() == p.release()
-                - #use_count() == 1
-                - #r.get() == 0
-                - #*this object owns the pointer p.release()
-            throws
-                - std::bad_alloc
-        !*/
-
         ~shared_ptr(
         );
         /*!
@@ -185,20 +167,6 @@ namespace dlib
         /*!
             requires
                 - Y* is convertible to T* 
-            ensures
-                - equivalent to shared_ptr(r).swap(*this).
-                - returns #*this
-        !*/
-
-        template<typename Y> 
-        shared_ptr& operator= (
-            std::auto_ptr<Y>& r
-        );
-        /*!
-            requires
-                - p.get() != 0
-                - p.release() is convertible to a T* type pointer
-                - p.release() can be deleted by calling "delete p.release();" and doing so will not throw exceptions
             ensures
                 - equivalent to shared_ptr(r).swap(*this).
                 - returns #*this

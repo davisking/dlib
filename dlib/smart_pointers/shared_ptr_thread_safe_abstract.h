@@ -114,24 +114,6 @@ namespace dlib
                   a shared_ptr_thread_safe object that shares ownership with r.
         !*/
 
-        template<typename Y>
-        explicit shared_ptr_thread_safe(
-            std::auto_ptr<Y>& r
-        );
-        /*!
-            requires
-                - p.get() != 0
-                - p.release() is convertible to a T* type pointer
-                - p.release() can be deleted by calling "delete p.release();" and doing so will not throw exceptions
-            ensures
-                - #get() == p.release()
-                - #use_count() == 1
-                - #r.get() == 0
-                - #*this object owns the pointer p.release()
-            throws
-                - std::bad_alloc
-        !*/
-
         ~shared_ptr_thread_safe(
         );
         /*!
@@ -163,20 +145,6 @@ namespace dlib
         /*!
             requires
                 - Y* is convertible to T* 
-            ensures
-                - equivalent to shared_ptr_thread_safe(r).swap(*this).
-                - returns #*this
-        !*/
-
-        template<typename Y> 
-        shared_ptr_thread_safe& operator= (
-            std::auto_ptr<Y>& r
-        );
-        /*!
-            requires
-                - p.get() != 0
-                - p.release() is convertible to a T* type pointer
-                - p.release() can be deleted by calling "delete p.release();" and doing so will not throw exceptions
             ensures
                 - equivalent to shared_ptr_thread_safe(r).swap(*this).
                 - returns #*this
