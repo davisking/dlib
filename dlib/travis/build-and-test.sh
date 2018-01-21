@@ -2,7 +2,10 @@
 # Exit if anything fails.
 set -eux
 
-eval "${MATRIX_EVAL}"
+# execute the contents of MATRIX_EVAL if it's set
+if [[ -v MATRIX_EVAL ]]; then
+    eval "${MATRIX_EVAL}"
+fi
 
 # build dlib and tests
 if [ "$VARIANT" = "test" ]; then
