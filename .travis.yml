@@ -8,8 +8,6 @@ matrix:
       os: linux
       env:
         - VARIANT=test
-        - CXX=clang++
-        - CC=clang
       script:
         - dlib/travis/build-and-test.sh
 
@@ -19,8 +17,6 @@ matrix:
       os: linux
       env:
         - VARIANT=examples
-        - CXX=clang++
-        - CC=clang
       script:
         - dlib/travis/build-and-test.sh
 
@@ -35,11 +31,10 @@ matrix:
 
     ########### test with C++17 ########
     - language: cpp
+      compiler: gcc-7
       os: linux
       env:
         - VARIANT=test
-        - CXX=g++-7
-        - CC=gcc-7
         - CXXFLAGS=-std=c++17
       addons:
         apt:
