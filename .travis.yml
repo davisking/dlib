@@ -31,11 +31,15 @@ matrix:
 
     ########### test with C++17 ########
     - language: cpp
-      compiler: gcc-7
+      compiler: gcc
       os: linux
       env:
         - VARIANT=test
         - CXXFLAGS=-std=c++17
+          # Need to set MATRIX_EVAL to set CC and CXX env vars.  You would
+          # think you could just set them in the env area like any other, but
+          # travis is wonky about CC and CXX vars so you have to do it this way.
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
       addons:
         apt:
           sources:
