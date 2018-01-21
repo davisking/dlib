@@ -692,7 +692,7 @@ namespace dlib
         bool learn_nonnegative_weights;
         bool last_weight_1;
         matrix<scalar_type,0,1> prior;
-        scalar_type prior_b;
+        scalar_type prior_b = 0;
     }; 
 
 // ----------------------------------------------------------------------------------------

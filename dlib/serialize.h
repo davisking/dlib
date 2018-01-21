@@ -277,7 +277,7 @@ namespace dlib
             size &= 0x0F;
             
             // check if the serialized object is too big
-            if (size > sizeof(T))
+            if (size > (unsigned long)tmin<sizeof(T),8>::value || size == 0)
             {
                 return true;
             }
@@ -391,7 +391,7 @@ namespace dlib
             size &= 0x8F;
 
             // check if an error occurred 
-            if (size > sizeof(T)) 
+            if (size > (unsigned long)tmin<sizeof(T),8>::value || size == 0)
                 return true;
            
 

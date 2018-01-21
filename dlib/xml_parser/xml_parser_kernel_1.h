@@ -357,6 +357,7 @@ namespace dlib
 
 
                 case empty_element: is_empty = true;
+                                    // fall through
                 case element_start:
                     {
                         seen_root_tag = true;
