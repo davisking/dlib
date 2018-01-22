@@ -150,6 +150,7 @@ makedocs ()
     if [ "$1" != "fast" ] 
     then
         cd ..
+        python setup.py build || report_failure
         python setup.py build_sphinx -c docs/docs/python --build-dir docs/sphinx.$$ || report_failure
         cd docs
         cp -r sphinx.$$/html docs/web/python
