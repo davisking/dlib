@@ -12,29 +12,6 @@ htmlify_python_file ()
     pygmentize -f html -O full,style=vs $1 > $1.html
 }
 
-build_python_interface ()
-{
-    pushd ../python_examples
-    mkdir build 
-    cd build                 || report_failure
-    cmake ../../tools/python || report_failure
-    make -j4 install         || report_failure
-
-
-    # Check if we should run all the python examples to make sure they
-    # work without generating an error.
-    if [ $1 == "test-python" ]
-    then
-        cd ..
-        FILES=`ls *.py`
-        for f in $FILES
-        do
-            python $f > /dev/null < /dev/null || report_failure 
-        done
-    fi
-
-    popd
-}
 
 add_links_between_example_programs()
 {
@@ -169,22 +146,17 @@ makedocs ()
     cp -r htmltemp.$$/examples/* docs/chm/docs
     rm -rf htmltemp.$$
 
-    # Create python docs.  If we are making a release then stop immediately if 
-    # the python docs can't be created (this happens if the .so file isn't compiled)
-    if [ "$1" = "makerel" ] 
+    # create python docs unless you say ./makedocs fast
+    if [ "$1" != "fast" ] 
     then
-        build_python_interface test-python
-        sphinx-build -b html docs/python sphinx.$$ || report_failure
-    else
-        if [ "$1" != "fast" ]
-        then
-            build_python_interface no-test-python
-        fi;
-        sphinx-build -b html docs/python sphinx.$$
+        cd ..
+        python setup.py build_sphinx -c docs/docs/python --build-dir docs/sphinx.$$ || report_failure
+        cd docs
+        cp -r sphinx.$$/html docs/web/python
+        mv  sphinx.$$/html docs/chm/docs/python
+        rm -rf sphinx.$$
     fi;
 
-    cp -r sphinx.$$ docs/web/python
-    mv  sphinx.$$ docs/chm/docs/python
 
     cp docs/cache/dlib/test/makefile docs/web/dlib/test
     cp docs/cache/dlib/test/makefile docs/chm/docs/dlib/test
