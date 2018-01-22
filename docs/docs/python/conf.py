@@ -17,7 +17,7 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../../../python_examples'))
+sys.path.insert(0, os.path.abspath('../../../build/lib.linux-x86_64-2.7'))
 
 import generate_dlib_listing
 generate_dlib_listing.make_listing_files()
