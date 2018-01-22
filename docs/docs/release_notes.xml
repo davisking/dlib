@@ -12,10 +12,22 @@
 
 <current>
 New Features and Improvements:
+   - Switched the Python API from Boost.Python to pybind11.  This means Python
+     users don't need to install Boost anymore, making building dlib's Python API
+     much easier.
+   - Made the sparse version of svd_fast() use multiple CPU cores.
+   - Changed the behavior of imglab's --flip option.  It will now attempt to
+     adjust any object part labels so that the flipped dataset has the same
+     average part layout as the source dataset. There is also a new --flip-basic 
+     option that behaves like the old --flip. However, most people flipping a
+     dataset with part annotations will want to use --flip.  For more details
+     see: http://blog.dlib.net/2018/01/correctly-mirroring-datasets.html
 
 Non-Backwards Compatible Changes:
+   - Removed std::auto_ptr from dlib's old (and depreciated) smart pointers. 
 
 Bug fixes:
+   - Fixed global_optimization.py not working in Python 3.
 
 </current>
 
