@@ -43,6 +43,33 @@ PYBIND11_MODULE(dlib, m)
 #define DLIB_QUOTE_STRING2(x) #x
     m.attr("__version__") = DLIB_QUOTE_STRING(DLIB_VERSION);
 
+#ifdef DLIB_USE_CUDA
+    m.attr("DLIB_USE_CUDA") = true;
+#else
+    m.attr("DLIB_USE_CUDA") = false;
+#endif
+#ifdef DLIB_USE_BLAS 
+    m.attr("DLIB_USE_BLAS") = true;
+#else
+    m.attr("DLIB_USE_BLAS") = false;
+#endif
+#ifdef DLIB_USE_LAPACK
+    m.attr("DLIB_USE_LAPACK") = true;
+#else
+    m.attr("DLIB_USE_LAPACK") = false;
+#endif
+#ifdef DLIB_HAVE_AVX
+    m.attr("USE_AVX_INSTRUCTIONS") = true;
+#else
+    m.attr("USE_AVX_INSTRUCTIONS") = false;
+#endif
+#ifdef DLIB_HAVE_NEON 
+    m.attr("USE_NEON_INSTRUCTIONS") = true;
+#else
+    m.attr("USE_NEON_INSTRUCTIONS") = false;
+#endif
+
+
 
     bind_matrix(m);
     bind_vector(m);
