@@ -54,33 +54,6 @@ cmake --build . --config Release
 
       <!-- ****************************************** -->
 
-      <question text="Why won't the Python bindings compile/work?">
-         To compile dlib's Python bindings you need a correctly installed copy of Boost.Python.  
-         If you are getting errors either during compile time or when you try to import dlib
-         then it is <b>very likely</b> that you have installed Boost.Python incorrectly.
-         <p>
-            <b>It is critical that the copy of Boost.Python you are using is compiled against the specific
-            version of the Python interpreter you are trying to use.</b>  If this is not the case then it won't work.
-            Here are some reasons why you might not have a correct install of Boost.Python
-            <ul>
-               <li>You downloaded Boost.Python binaries from the internet and
-                  they aren't build for whatever Python you are using.  The fix
-                  for this is to either find the correct Boost.Python binaries
-                  or build Boost.Python yourself.</li>
-               <li>You have more than one copy of Python installed on your computer.  The build scripts will try to use
-               whatever python is in your path when you build.  So you need to be consistent about what python interpreter you are using.
-               Everything, both dlib and boost, need to be compiled against the specific Python interpreter you want to use. The simplest thing to do is to 
-               delete other Python interpreters from your machine so there is no confusion.
-               </li>
-            </ul>
-            Other problems users have reported are compiler errors related to X11.  This is pretty much always
-            caused by Anaconda, which includes broken X11 headers in its distribution.  Delete Anaconda if you have
-            this problem.
-         </p>
-      </question>
-
-      <!-- ****************************************** -->
-
       <question text="Why is dlib slow?">
          Dlib isn't slow.  I get this question many times a week and 95% of the time it's from someone
          using Visual Studio who has compiled their program in Debug mode rather than the optimized
