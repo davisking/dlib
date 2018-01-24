@@ -73,6 +73,7 @@ if (UNIX OR MINGW)
             /opt/intel/mkl/*/lib/em64t
             /opt/intel/mkl/lib/intel64
             /opt/intel/lib/intel64
+            /opt/intel/mkl/lib
             )
 
         find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
