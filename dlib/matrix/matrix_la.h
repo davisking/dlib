@@ -505,14 +505,30 @@ convergence:
         typename T,
         long NR,
         long NC,
-        typename MM,
-        typename L
+        typename MM
         >
     void orthogonalize (
-        matrix<T,NR,NC,MM,L>& m
+        matrix<T,NR,NC,MM,row_major_layout>& m
     )
     {
-        qr_decomposition<matrix<T,NR,NC,MM,L> >(m).get_q(m);
+        // We don't really need to use this temporary, but doing it this way runs a lot
+        // faster.
+        matrix<T,NR,NC,MM,column_major_layout> temp;
+        qr_decomposition<matrix<T,NR,NC,MM,row_major_layout>>(m).get_q(temp);
+        m = temp;
+    }
+
+    template <
+        typename T,
+        long NR,
+        long NC,
+        typename MM
+        >
+    void orthogonalize (
+        matrix<T,NR,NC,MM,column_major_layout>& m
+    )
+    {
+        qr_decomposition<matrix<T,NR,NC,MM,column_major_layout>>(m).get_q(m);
     }
 
 // ----------------------------------------------------------------------------------------
