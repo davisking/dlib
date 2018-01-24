@@ -803,6 +803,22 @@ namespace
             DLIB_TEST(equal_error_rate(vals2, vals1).first == 1);
         }
 
+        void test_event_corr()
+        {
+            print_spinner();
+            DLIB_TEST(event_correlation(1000,1000,500,2000) == 0);
+            DLIB_TEST(std::abs(event_correlation(1000,1000,300,2000) + 164.565757010104) < 1e-11);
+            DLIB_TEST(std::abs(event_correlation(1000,1000,700,2000) - 164.565757010104) < 1e-11);
+
+            DLIB_TEST(event_correlation(10,1000,5,2000) == 0);
+            DLIB_TEST(event_correlation(1000,10,5,2000) == 0);
+            DLIB_TEST(std::abs(event_correlation(10,1000,1,2000) - event_correlation(1000,10,1,2000)) < 1e-11);
+            DLIB_TEST(std::abs(event_correlation(10,1000,9,2000) - event_correlation(1000,10,9,2000)) < 1e-11);
+
+            DLIB_TEST(std::abs(event_correlation(10,1000,1,2000) + 3.69672251700842) < 1e-11);
+            DLIB_TEST(std::abs(event_correlation(10,1000,9,2000) - 3.69672251700842) < 1e-11);
+        }
+
         void perform_test (
         )
         {
@@ -824,6 +840,7 @@ namespace
             another_test();
             test_average_precision();
             test_lda();
+            test_event_corr();
         }
     } a;
 
