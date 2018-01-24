@@ -249,6 +249,21 @@ namespace dlib
               value should be good for many problems.
     !*/
 
+    template <
+        typename sparse_vector_type, 
+        typename T
+        >
+    void svd_fast (
+        const std::vector<sparse_vector_type>& A,
+        matrix<T>& w,
+        matrix<T>& v,
+        unsigned long l,
+        unsigned long q = 1
+    );
+    /*!
+        This function is identical to the above svd_fast() except it doesn't compute u.
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <

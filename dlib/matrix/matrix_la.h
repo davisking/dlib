@@ -724,6 +724,74 @@ convergence:
 
 // ----------------------------------------------------------------------------------------
 
+    namespace simpl
+    {
+        template <
+            typename sparse_vector_type, 
+            typename T,
+            long Unr, long Unc,
+            long Wnr, long Wnc,
+            long Vnr, long Vnc,
+            typename MM,
+            typename L
+            >
+        void svd_fast (
+            bool compute_u,
+            const std::vector<sparse_vector_type>& A,
+            matrix<T,Unr,Unc,MM,L>& u,
+            matrix<T,Wnr,Wnc,MM,L>& w,
+            matrix<T,Vnr,Vnc,MM,L>& v,
+            unsigned long l,
+            unsigned long q 
+        )
+        {
+            const long n = max_index_plus_one(A);
+            const unsigned long k = std::min(l, std::min<unsigned long>(A.size(),n));
+
+            DLIB_ASSERT(l > 0 && A.size() > 0 && n > 0, 
+                "\t void svd_fast()"
+                << "\n\t Invalid inputs were given to this function."
+                << "\n\t l: " << l 
+                << "\n\t n (i.e. max_index_plus_one(A)): " << n 
+                << "\n\t A.size(): " << A.size() 
+                );
+
+            matrix<T,0,0,MM,L> Q;
+            find_matrix_range(A, k, Q, q);
+
+            // Compute trans(B) = trans(Q)*A.   The reason we store B transposed
+            // is so that when we take its SVD later using svd3() it doesn't consume
+            // a whole lot of RAM.  That is, we make sure the square matrix coming out
+            // of svd3() has size lxl rather than the potentially much larger nxn.
+            matrix<T,0,0,MM> B;
+            dlib::mutex mut;
+            parallel_for_blocked(0, A.size(), [&](long begin, long end)
+            {
+                matrix<T,0,0,MM> Blocal(n,k);
+                Blocal = 0;
+                for (long m = begin; m < end; ++m)
+                {
+                    for (unsigned long r = 0; r < k; ++r)
+                    {
+                        for (auto& i : A[m])
+                        {
+                            const auto c = i.first;
+                            const auto val = i.second;
+
+                            Blocal(c,r) += Q(m,r)*val;
+                        }
+                    }
+                }
+                auto_mutex lock(mut);
+                B += Blocal;
+            },1);
+
+            svd3(B, v,w,u);
+            if (compute_u)
+                u = Q*u;
+        }
+    }
+
     template <
         typename sparse_vector_type, 
         typename T,
@@ -742,49 +810,27 @@ convergence:
         unsigned long q = 1
     )
     {
-        const long n = max_index_plus_one(A);
-        const unsigned long k = std::min(l, std::min<unsigned long>(A.size(),n));
+        simpl::svd_fast(true, A,u,w,v,l,q);
+    }
 
-        DLIB_ASSERT(l > 0 && A.size() > 0 && n > 0, 
-            "\t void svd_fast()"
-            << "\n\t Invalid inputs were given to this function."
-            << "\n\t l: " << l 
-            << "\n\t n (i.e. max_index_plus_one(A)): " << n 
-            << "\n\t A.size(): " << A.size() 
-            );
-
-        matrix<T,0,0,MM,L> Q;
-        find_matrix_range(A, k, Q, q);
-
-        // Compute trans(B) = trans(Q)*A.   The reason we store B transposed
-        // is so that when we take its SVD later using svd3() it doesn't consume
-        // a whole lot of RAM.  That is, we make sure the square matrix coming out
-        // of svd3() has size lxl rather than the potentially much larger nxn.
-        matrix<T,0,0,MM> B;
-        dlib::mutex mut;
-        parallel_for_blocked(0, A.size(), [&](long begin, long end)
-        {
-            matrix<T,0,0,MM> Blocal(n,k);
-            Blocal = 0;
-            for (long m = begin; m < end; ++m)
-            {
-                for (unsigned long r = 0; r < k; ++r)
-                {
-                    for (auto& i : A[m])
-                    {
-                        const auto c = i.first;
-                        const auto val = i.second;
-
-                        Blocal(c,r) += Q(m,r)*val;
-                    }
-                }
-            }
-            auto_mutex lock(mut);
-            B += Blocal;
-        },1);
-
-        svd3(B, v,w,u);
-        u = Q*u;
+    template <
+        typename sparse_vector_type, 
+        typename T,
+        long Wnr, long Wnc,
+        long Vnr, long Vnc,
+        typename MM,
+        typename L
+        >
+    void svd_fast (
+        const std::vector<sparse_vector_type>& A,
+        matrix<T,Wnr,Wnc,MM,L>& w,
+        matrix<T,Vnr,Vnc,MM,L>& v,
+        unsigned long l,
+        unsigned long q = 1
+    )
+    {
+        matrix<T,0,0,MM,L> u;
+        simpl::svd_fast(false, A,u,w,v,l,q);
     }
 
 // ----------------------------------------------------------------------------------------
