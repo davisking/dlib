@@ -290,6 +290,20 @@ namespace dlib { namespace tt
 
     }
 
+    void scale_channels (
+        bool add_to,
+        tensor& dest,
+        const tensor& src,
+        const tensor& scales
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::scale_channels(add_to, dest, src, scales);
+#else
+        cpu::scale_channels(add_to, dest, src, scales);
+#endif
+    }
+
     void multiply_conv (
         bool add_to,
         tensor& dest,

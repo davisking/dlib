@@ -37,6 +37,13 @@ namespace dlib
             const tensor& src2
         );
 
+        void scale_channels (
+            bool add_to,
+            tensor& dest,
+            const tensor& src,
+            const tensor& scales
+        );
+
         void add(
             float beta,
             tensor& dest,

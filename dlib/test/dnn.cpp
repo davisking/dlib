@@ -793,6 +793,33 @@ namespace
 
 #ifdef DLIB_USE_CUDA
 
+    void test_scale_channels()
+    {
+        tt::tensor_rand rnd;
+
+        resizable_tensor dest1(2,3,4,5), dest2;
+        rnd.fill_gaussian(dest1);
+        dest2 = dest1;
+
+        resizable_tensor src(2,3,4,5);
+        resizable_tensor scales(2,3);
+        rnd.fill_gaussian(src);
+        rnd.fill_gaussian(scales);
+
+
+        cpu::scale_channels(true, dest1, src, scales);
+        cuda::scale_channels(true, dest2, src, scales);
+
+        DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-6);
+
+        cpu::scale_channels(false, dest1, src, scales);
+        cuda::scale_channels(false, dest2, src, scales);
+
+        DLIB_TEST(max(abs(mat(dest1)-mat(dest2))) < 1e-6);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_affine_rect()
     {
         dlib::rand rnd;
@@ -3084,6 +3111,7 @@ namespace
             compare_adam();
             test_copy_tensor_gpu();
             test_copy_tensor_add_to_gpu();
+            test_scale_channels();
 #endif
             test_tensor_resize_bilinear(2, 3, 6,6, 11, 11);
             test_tensor_resize_bilinear(2, 3, 6,6, 3, 4);

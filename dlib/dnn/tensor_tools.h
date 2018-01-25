@@ -275,6 +275,27 @@ namespace dlib { namespace tt
                 - Instead of assigning the result to dest, this function adds the result to dest.
     !*/
 
+    void scale_channels (
+        bool add_to,
+        tensor& dest,
+        const tensor& src,
+        const tensor& scales
+    );
+    /*!
+        requires
+            - have_same_dimensions(dest, src) == true
+            - scales.num_samples() == src.num_samples()
+            - scales.k()           == src.k()
+            - scales.nr()          == 1
+            - scales.nc()          == 1
+        ensures
+            - Scales each channel of src by the corresponding value in scales.  To be
+              precise, we will have:
+                - #dest(n,k,r,c) == src(n,k,r,c)*scales(n,k,1,1)
+            - if (add_to) then
+                - Instead of assigning the result to dest, this function adds the result to dest.
+    !*/
+
     void multiply_conv (
         bool add_to,
         tensor& dest,

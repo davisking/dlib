@@ -515,6 +515,50 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        __global__ void _cuda_scale_channels_add_to(float* d, const float* src, size_t n, const float* scales, size_t bs)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                auto k = i/bs;
+                d[i] += src[i]*scales[k];
+            }
+        }
+
+        __global__ void _cuda_scale_channels(float* d, const float* src, size_t n, const float* scales, size_t bs)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                auto k = i/bs;
+                d[i] = src[i]*scales[k];
+            }
+        }
+
+        void scale_channels (
+            bool add_to,
+            tensor& dest,
+            const tensor& src,
+            const tensor& scales
+        )
+        {
+            DLIB_CASSERT(have_same_dimensions(dest,src) && 
+                         scales.num_samples() == src.num_samples() &&
+                         scales.k()           == src.k() &&
+                         scales.nr()          == 1 &&
+                         scales.nc()          == 1 );
+
+            if (dest.size() == 0)
+                return;
+
+            if (add_to)
+                launch_kernel(_cuda_scale_channels_add_to,max_jobs(dest.size()),
+                    dest.device(), src.device(), src.size(), scales.device(), src.nr()*src.nc());
+            else
+                launch_kernel(_cuda_scale_channels,max_jobs(dest.size()),
+                    dest.device_write_only(), src.device(), src.size(), scales.device(), src.nr()*src.nc());
+        }
+
+    // ------------------------------------------------------------------------------------
+
         __global__ void _cuda_mult1(float* d, const float* s1, const float* s2, size_t n)
         {
             for (auto i : grid_stride_range(0, n))

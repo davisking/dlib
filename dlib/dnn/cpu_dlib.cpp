@@ -77,6 +77,8 @@ namespace dlib
             }
         }
 
+    // ------------------------------------------------------------------------------------
+
         void multiply_conv (
             bool add_to,
             tensor& dest,
@@ -150,6 +152,72 @@ namespace dlib
                 }
             }
         }
+
+    // ------------------------------------------------------------------------------------
+
+        void scale_channels (
+            bool add_to,
+            tensor& dest,
+            const tensor& src,
+            const tensor& scales
+        )
+        {
+            DLIB_CASSERT(have_same_dimensions(dest,src) && 
+                         scales.num_samples() == src.num_samples() &&
+                         scales.k()           == src.k() &&
+                         scales.nr()          == 1 &&
+                         scales.nc()          == 1 );
+
+            if (dest.size() == 0)
+                return;
+
+            if (add_to)
+            {
+                auto d = dest.host();
+                auto s = src.host();
+                auto scal = scales.host();
+
+                for (long n = 0; n < src.num_samples(); ++n)
+                {
+                    for (long k = 0; k < src.k(); ++k)
+                    {
+                        const auto scale = scal[n*scales.k() + k];
+                        for (long r = 0; r < src.nr(); ++r)
+                        {
+                            for (long c = 0; c < src.nc(); ++c)
+                            {
+                                *d++ += (*s++) * scale;
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            else
+            {
+                auto d = dest.host_write_only();
+                auto s = src.host();
+                auto scal = scales.host();
+
+                for (long n = 0; n < src.num_samples(); ++n)
+                {
+                    for (long k = 0; k < src.k(); ++k)
+                    {
+                        const auto scale = scal[n*scales.k() + k];
+                        for (long r = 0; r < src.nr(); ++r)
+                        {
+                            for (long c = 0; c < src.nc(); ++c)
+                            {
+                                *d++ = (*s++) * scale;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
 
         void add(
             float beta,
