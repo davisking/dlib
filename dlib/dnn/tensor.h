@@ -617,7 +617,7 @@ namespace dlib
 
         alias_tensor_instance operator() (
             tensor& t,
-            size_t offset
+            size_t offset = 0
         ) const
         {
             DLIB_CASSERT(offset+size() <= t.size(), 
@@ -642,7 +642,7 @@ namespace dlib
 
         alias_tensor_const_instance operator() (
             const tensor& t,
-            size_t offset
+            size_t offset = 0
         ) const
         {
             alias_tensor_const_instance temp;
