@@ -69,6 +69,23 @@ namespace dlib { namespace tt
 #endif
     }
 
+    void dot_prods (
+        bool add_to,
+        tensor& out,
+        const tensor& lhs,
+        const tensor& rhs
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::dot_prods(add_to, out, lhs, rhs);
+#else
+        if (add_to)
+            out += sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+        else
+            out = sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+#endif
+    }
+
     void scale_columns (
         tensor& out,
         const tensor& m,

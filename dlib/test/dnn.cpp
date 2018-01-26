@@ -1256,6 +1256,24 @@ namespace
             out2 = scale_rows(mat(data), mat(invnorms1));
             DLIB_TEST(max(abs(mat(out1)-mat(out2))) < 1e-6);
         }
+
+        {
+            resizable_tensor a(123,432), b(123,432);
+            rnd.fill_gaussian(a);
+            rnd.fill_gaussian(b);
+
+            resizable_tensor out;
+            dot_prods(out, a,b);
+            const matrix<float> truth = sum_cols(pointwise_multiply(mat(a), mat(b)));
+            DLIB_TEST(max(abs(mat(out) - truth)) < 1e-4);
+            out = 0;
+            DLIB_TEST(max(abs(mat(out) - truth)) > 1e-2);
+            dot_prods(false, out, a,b);
+            DLIB_TEST(max(abs(mat(out) - truth)) < 1e-4);
+            dot_prods(true, out, a,b);
+            DLIB_TEST(max(abs(mat(out)/2 - truth)) < 1e-4);
+            DLIB_TEST(max(abs(mat(out) - truth)) > 1e-2);
+        }
     }
 
 // ----------------------------------------------------------------------------------------

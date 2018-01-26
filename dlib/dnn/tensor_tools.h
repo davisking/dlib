@@ -50,6 +50,24 @@ namespace dlib { namespace tt
             - #out == sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
     !*/
 
+    void dot_prods (
+        bool add_to,
+        tensor& out,
+        const tensor& lhs,
+        const tensor& rhs
+    );
+    /*!
+        requires
+            - have_same_dimensions(lhs,rhs) == true
+            - out.size() == lhs.num_samples()
+            - out.k() == out.nr() == out.nc() == 1
+        ensures
+            - if (add_to) then
+                - #out == mat(out) + sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+            - else
+                - #out == sum_cols(pointwise_multiply(mat(lhs), mat(rhs))); 
+    !*/
+
     void scale_columns (
         tensor& out,
         const tensor& m,

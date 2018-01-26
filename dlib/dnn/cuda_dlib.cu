@@ -142,9 +142,8 @@ namespace dlib
         )
         {
             invnorms.set_size(data.num_samples());
-            dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
-            dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
-            _cuda_inverse_norms<<<blocks,threads>>>(invnorms.device(), data.device(), data.num_samples(), data.size()/data.num_samples(), eps);
+            launch_kernel(_cuda_inverse_norms, max_jobs(data.size()/data.num_samples(), data.num_samples()),
+                invnorms.device(), data.device(), data.num_samples(), data.size()/data.num_samples(), eps);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -170,16 +169,57 @@ namespace dlib
             }
         }
 
+        __global__ void _cuda_dot_prods_add_to(float* out, const float* lhs, const float* rhs, size_t nr, size_t nc)
+        {
+            for (auto i : grid_stride_range_y(0, nr))
+            {
+                auto l = lhs + i*nc;
+                auto r = rhs + i*nc;
+                float temp = 0;
+                for (auto j : grid_stride_range(0, nc))
+                    temp += l[j]*r[j];
+
+                // and store the sum into out[i]
+                warp_reduce_atomic_add(out[i], temp);
+            }
+        }
+
         void dot_prods (
             resizable_tensor& out,
             const tensor& lhs,
             const tensor& rhs
         )
         {
+            DLIB_CASSERT(have_same_dimensions(lhs,rhs));
+
             out.set_size(lhs.num_samples());
-            dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
-            dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
-            _cuda_dot_prods<<<blocks,threads>>>(out.device(), lhs.device(), rhs.device(), lhs.num_samples(), lhs.size()/lhs.num_samples());
+            if (out.size() == 0)
+                return;
+
+            const auto nr = lhs.num_samples();
+            const auto nc = lhs.size()/lhs.num_samples();
+
+            launch_kernel(_cuda_dot_prods, max_jobs(nc,nr), out.device_write_only(), lhs.device(), rhs.device(), nr, nc);
+        }
+
+        void dot_prods (
+            bool add_to,
+            tensor& out,
+            const tensor& lhs,
+            const tensor& rhs
+        )
+        {
+            DLIB_CASSERT(have_same_dimensions(lhs,rhs));
+            DLIB_CASSERT(out.k() == 1 && out.nr() == 1 && out.nc() == 1);
+            DLIB_CASSERT(out.size() == lhs.num_samples());
+
+            const auto nr = lhs.num_samples();
+            const auto nc = lhs.size()/lhs.num_samples();
+
+            if (add_to)
+                launch_kernel(_cuda_dot_prods_add_to, max_jobs(nc,nr), out.device(), lhs.device(), rhs.device(), nr, nc);
+            else
+                launch_kernel(_cuda_dot_prods, max_jobs(nc,nr), out.device_write_only(), lhs.device(), rhs.device(), nr, nc);
         }
 
     // ----------------------------------------------------------------------------------------
@@ -501,14 +541,15 @@ namespace dlib
                 if (dest.size() == 0)
                     return;
 
-                dim3 blocks(1,10);  // x size 1 so we don't need to worry about inter-block synchronization (since only y spans blocks)
-                dim3 threads(32,32); // x size must be 32 because we are using warp_reduce_atomic_add() in the kernel.
+
+                const auto bs = src1.nr()*src1.nc();
+                const auto n = src1.num_samples()*src1.k();
                 if (add_to)
-                    _cuda_multiply_conv2_add_to<<<blocks,threads>>>(
-                        dest.device(), src1.device(), src1.num_samples()*src1.k(), src2.device(), src1.nr()*src1.nc(), src1.k());
+                    launch_kernel(_cuda_multiply_conv2_add_to, max_jobs(bs,n),
+                        dest.device(), src1.device(), n, src2.device(), bs, src1.k());
                 else
-                    _cuda_multiply_conv2<<<blocks,threads>>>(
-                        dest.device(), src1.device(), src1.num_samples()*src1.k(), src2.device(), src1.nr()*src1.nc(), src1.k());
+                    launch_kernel(_cuda_multiply_conv2, max_jobs(bs,n),
+                        dest.device(), src1.device(), n, src2.device(), bs, src1.k());
             }
 
         }
