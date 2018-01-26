@@ -8,6 +8,8 @@
 #endif
 
 #include "cuda_errors.h"
+#include "../algs.h"
+#include <cmath>
 
 #include <cuda_runtime.h>
 #include <sstream>
@@ -135,8 +137,10 @@ namespace dlib
 
         struct max_jobs
         {
-            max_jobs(int n) : num(n) {}
-            int num;
+            max_jobs(int x) : num_x(x) {}
+            max_jobs(int x, int y) : num_x(x), num_y(y) {}
+            int num_x;
+            int num_y = 1;
         };
 
         template <typename Kernel, typename... T>
@@ -171,16 +175,70 @@ namespace dlib
                   launch_kernel().  
         !*/
         {
-            if (m.num == 0)
+            if (m.num_x == 0 || m.num_y == 0)
                 return;
             int num_blocks, num_threads;
             CHECK_CUDA(cudaOccupancyMaxPotentialBlockSize(&num_blocks,&num_threads,K));
             // Check if the job is really small and we don't really need to launch a kernel
             // with this many blocks and threads.
-            if (num_blocks*num_threads > m.num)
-                num_blocks = (m.num+num_threads-1)/num_threads;
+            if (num_blocks*num_threads > m.num_x*m.num_y)
+                num_blocks = (m.num_x*m.num_y+num_threads-1)/num_threads;
 
-            K<<<num_blocks,num_threads>>>(args...);
+            if (m.num_y == 1)
+            {
+                K<<<num_blocks,num_threads>>>(args...);
+            }
+            else
+            {
+                /*
+                    In general, the reason m.num_y!=1 (i.e. the reason you are in this
+                    code path) is because we are using nested grid-stride loops.  There are
+                    two important things to note about what we are doing here.  To
+                    illustrate them we will talk about this little CUDA code snippet:
+
+                        // initialize out before we begin.
+                        for (auto i : grid_stride_range_y(0, nr))
+                            for (auto j : grid_stride_range(0, 1))
+                                out[i] = 0;
+
+                        __syncthreads(); // synchronize threads in block
+
+                        // loop over some 2D thing and sum and store things into out.
+                        for (auto i : grid_stride_range_y(0, nr))
+                        {
+                            float temp = 0;
+                            for (auto j : grid_stride_range(0, nc))
+                                temp += whatever[i*nc+j];
+
+                            // store the sum into out[i]
+                            warp_reduce_atomic_add(out[i], temp);
+                        }
+                    
+                    First, we make sure the number of x threads is a multiple of 32 so that
+                    you can use warp_reduce_atomic_add() inside the y loop.  
+                    
+                    Second, we put the x block size to 1 so inter-block synchronization is
+                    easier.  For example, if the number of x blocks wasn't 1 the above code
+                    would have a race condition in it.  This is because the execution of
+                    out[i]=0 would be done by blocks with blockIdx.x==0, but then in the
+                    second set of loops, *all* the x blocks use out[i].  Since
+                    __syncthreads() doesn't do any synchronization between blocks some of
+                    the blocks might begin before the out[i]=0 statements finished and that
+                    would be super bad.
+                */
+                
+                // Try and make sure that the ratio of x to y threads is reasonable based
+                // on the respective size of our loops.
+                int x_threads = 32;
+                int y_threads = num_threads/32;
+                const int ratio = static_cast<int>(std::round(put_in_range(1, y_threads, m.num_x/(double)m.num_y)));
+                x_threads *= ratio;
+                y_threads /= ratio;
+
+                dim3 blocks(1,num_blocks);  
+                dim3 threads(x_threads,y_threads); 
+                K<<<blocks,threads>>>(args...);
+            }
         }
 
     // ------------------------------------------------------------------------------------
@@ -264,7 +322,7 @@ namespace dlib
                     This object is just like grid_stride_range except that it looks at
                     CUDA's y thread index (e.g. threadIdx.y) instead of the x index.
                     Therefore, if you launch a cuda kernel with a statement like:
-                        dim3 blocks(10,1);
+                        dim3 blocks(1,10);
                         dim3 threads(32,32);  // You need to have x and y not equal to 1 to get parallelism over both loops.
                         add_arrays<<<blocks,threads>>>(a,b,out,nr,nc);
                     You can perform a nested 2D parallel for loop rather than doing just a
