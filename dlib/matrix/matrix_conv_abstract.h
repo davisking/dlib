@@ -47,6 +47,23 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp xcorr_fft (
+        const matrix_exp& m1,
+        const matrix_exp& m2
+    );
+    /*!
+        requires
+            - m1 and m2 both contain elements of the same type
+            - m1 and m2 contain real or complex values and must be double, float, or long
+              double valued. (e.g. not integers)
+        ensures
+            - This function is identical to xcorr() except that it uses a fast Fourier
+              transform to do the convolution and is therefore much faster when both m1 and
+              m2 are large.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp conv_same (
         const matrix_exp& m1,
         const matrix_exp& m2
