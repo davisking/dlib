@@ -238,6 +238,8 @@ namespace dlib
                   and then finishes with a radix-2 or -4 iteration if needed.
         !*/
         {
+            COMPILE_TIME_ASSERT((is_same_type<double,T>::value || is_same_type<float,T>::value || is_same_type<long double,T>::value ));
+
             if (data.size() == 0)
                 return;
 
