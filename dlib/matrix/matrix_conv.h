@@ -5,6 +5,7 @@
 
 #include "matrix_conv_abstract.h"
 #include "matrix.h"
+#include "matrix_fft.h"
 
 namespace dlib
 {
@@ -110,6 +111,55 @@ namespace dlib
 
         typedef op_conv<M1,M2,true> op;
         return matrix_op<op>(op(m1.ref(),m2.ref()));
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        inline size_t bounding_power_of_two (
+            size_t n
+        )
+        {
+            size_t s = 1;
+            for (unsigned int i = 0; i < sizeof(s)*8 && s < n; ++i)
+                s <<= 1;
+            return s;
+        }
+    }
+
+    template <
+        typename EXP1, 
+        typename EXP2
+        >
+    typename EXP1::matrix_type xcorr_fft(
+        const matrix_exp<EXP1>& u,
+        const matrix_exp<EXP2>& v
+    )
+    {
+        COMPILE_TIME_ASSERT((is_same_type<typename EXP1::type, typename EXP2::type>::value == true));
+        using T = typename EXP1::type;
+        COMPILE_TIME_ASSERT((is_same_type<double,T>::value || is_same_type<float,T>::value || is_same_type<long double,T>::value ));
+
+        const long pad_nr = impl::bounding_power_of_two(u.nr() + v.nr() - 1);
+        const long pad_nc = impl::bounding_power_of_two(u.nc() + v.nc() - 1);
+
+        matrix<std::complex<T>> U(pad_nr, pad_nc), V(pad_nr,pad_nc);
+
+        U = 0;
+        V = 0;
+        set_subm(U,U.nr()-u.nr(),U.nc()-u.nc(),u.nr(),u.nc()) = u;
+        set_subm(V,get_rect(v)) = v;
+
+        fft_inplace(U);
+        fft_inplace(V);
+
+        return subm(real(ifft(pointwise_multiply(U, conj(V)))),
+            U.nr()-u.nr()-v.nr()+1, 
+            U.nc()-u.nc()-v.nc()+1, 
+            u.nr()+v.nr()-1,
+            u.nc()+v.nc()-1
+        );
     }
 
 // ----------------------------------------------------------------------------------------

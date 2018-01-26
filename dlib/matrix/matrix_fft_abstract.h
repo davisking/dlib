@@ -28,7 +28,7 @@ namespace dlib
     );  
     /*!
         requires
-            - data contains elements of type std::complex<>
+            - data contains elements of type std::complex<> that itself contains double, float, or long double.
             - is_power_of_two(data.nr()) == true
             - is_power_of_two(data.nc()) == true
         ensures
@@ -50,7 +50,7 @@ namespace dlib
     );  
     /*!
         requires
-            - data contains elements of type std::complex<>
+            - data contains elements of type std::complex<> that itself contains double, float, or long double.
             - is_power_of_two(data.nr()) == true
             - is_power_of_two(data.nc()) == true
         ensures
@@ -76,7 +76,7 @@ namespace dlib
     );
     /*!
         requires
-            - data contains elements of type std::complex<>
+            - data contains elements of type std::complex<> that itself contains double, float, or long double.
             - is_power_of_two(data.nr()) == true
             - is_power_of_two(data.nc()) == true
         ensures
@@ -99,7 +99,7 @@ namespace dlib
     );
     /*!
         requires
-            - data contains elements of type std::complex<>
+            - data contains elements of type std::complex<> that itself contains double, float, or long double.
             - is_power_of_two(data.nr()) == true
             - is_power_of_two(data.nc()) == true
         ensures

@@ -794,9 +794,9 @@ namespace
         DLIB_TEST(temp3 == temp);
 
 
+        dlib::rand rnd;
         for (int i = 0; i < 3; ++i)
         {
-            dlib::rand rnd;
             matrix<complex<int> > a, b;
             a = complex_matrix(matrix_cast<int>(round(20*randm(2,7,rnd))), 
                                matrix_cast<int>(round(20*randm(2,7,rnd))));
@@ -806,6 +806,20 @@ namespace
             DLIB_TEST(xcorr(a,b)       == conv(a, flip(conj(b))));
             DLIB_TEST(xcorr_valid(a,b) == conv_valid(a, flip(conj(b))));
             DLIB_TEST(xcorr_same(a,b)  == conv_same(a, flip(conj(b))));
+        }
+
+
+        for (int i = 0; i < 30; ++i)
+        {
+            auto nr1 = rnd.get_integer_in_range(1,30);
+            auto nc1 = rnd.get_integer_in_range(1,30);
+            auto nr2 = rnd.get_integer_in_range(1,30);
+            auto nc2 = rnd.get_integer_in_range(1,30);
+            matrix<double> a, b;
+            a = randm(nr1,nc1,rnd);
+            b = randm(nr2,nc2,rnd);
+
+            DLIB_TEST(max(abs(xcorr(a,b) - xcorr_fft(a,b))) < 1e-12);
         }
     }
 
