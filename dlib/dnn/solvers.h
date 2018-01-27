@@ -14,9 +14,9 @@ namespace dlib
     {
     public:
 
-        sgd(
+        explicit sgd(
             float weight_decay_,
-            float momentum_ 
+            float momentum_ = 0.9
         ) 
         { 
             weight_decay = weight_decay_;

@@ -103,9 +103,9 @@ namespace dlib
                 - #get_momentum()      == 0.9 
         !*/
 
-        sgd(
+        explicit sgd(
             float weight_decay,
-            float momentum 
+            float momentum = 0.9
         ); 
         /*!
             requires
