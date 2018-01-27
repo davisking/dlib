@@ -3096,6 +3096,65 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_loss_multimulticlass_log()
+    {
+        print_spinner();
+        std::map<string,std::vector<string>> all_labels;
+        all_labels["c1"] = {"a", "b", "c"};
+        all_labels["c2"] = {"d", "e", "f"};
+
+        // make training data
+        std::vector<matrix<float>> samples;
+        std::vector<std::map<string,string>> labels;
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                matrix<float> samp(2,3);
+                samp = 0;
+                samp(0,i) = 1;
+                samp(1,j) = 1;
+                samples.push_back(samp);
+
+                std::map<string,string> l;
+                if (i == 0) l["c1"] = "a";
+                if (i == 1) l["c1"] = "b";
+                if (i == 2) l["c1"] = "c";
+                if (j == 0) l["c2"] = "d";
+                if (j == 1) l["c2"] = "e";
+                if (j == 2) l["c2"] = "f";
+                labels.push_back(l);
+            }
+        }
+
+        using net_type = loss_multimulticlass_log<
+            fc<1,        
+            input<matrix<float>> 
+            >>;
+
+        net_type net(all_labels);
+        net.subnet().layer_details().set_num_outputs(net.loss_details().number_of_labels());
+
+        dnn_trainer<net_type> trainer(net, sgd(0.1));
+        trainer.set_learning_rate(0.1);
+        trainer.set_min_learning_rate(0.00001);
+        trainer.set_iterations_without_progress_threshold(500);
+
+        trainer.train(samples, labels);
+
+        auto predicted_labels = net(samples);
+
+        // make sure the network predicts the right labels
+        for (size_t i = 0; i < samples.size(); ++i)
+        {
+            DLIB_TEST(predicted_labels[i]["c1"] == labels[i]["c1"]);
+            DLIB_TEST(predicted_labels[i]["c2"] == labels[i]["c2"]);
+        }
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -3182,6 +3241,7 @@ namespace
             test_loss_multiclass_per_pixel_weighted();
             test_serialization();
             test_loss_dot();
+            test_loss_multimulticlass_log();
         }
 
         void perform_test()
