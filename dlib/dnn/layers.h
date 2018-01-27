@@ -2277,12 +2277,12 @@ namespace dlib
     template <
         template<typename> class tag
         >
-    class scale_prev_
+    class scale_
     {
     public:
         const static unsigned long id = tag_id<tag>::id;
 
-        scale_prev_() 
+        scale_() 
         {
         }
 
@@ -2297,8 +2297,8 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            auto&& src = sub.get_output();
-            auto&& scales = layer<tag>(sub).get_output();
+            auto&& scales = sub.get_output();
+            auto&& src = layer<tag>(sub).get_output();
             DLIB_CASSERT(scales.num_samples() == src.num_samples() &&
                          scales.k()           == src.k() &&
                          scales.nr()          == 1 &&
@@ -2311,13 +2311,13 @@ namespace dlib
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
         {
-            auto&& src = sub.get_output();
-            auto&& scales = layer<tag>(sub).get_output();
+            auto&& scales = sub.get_output();
+            auto&& src = layer<tag>(sub).get_output();
             // The gradient just flows backwards to the two layers that forward()
             // read from.
-            tt::scale_channels(true, sub.get_gradient_input(), gradient_input, scales);
+            tt::scale_channels(true, layer<tag>(sub).get_gradient_input(), gradient_input, scales);
 
-            auto&& scales_grad = layer<tag>(sub).get_gradient_input();
+            auto&& scales_grad = sub.get_gradient_input();
             auto sgrad = reshape_scales(scales_grad);
             tt::dot_prods(true, sgrad, reshape_src(src), reshape_src(gradient_input));
         }
@@ -2325,32 +2325,32 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const scale_prev_& item, std::ostream& out)
+        friend void serialize(const scale_& item, std::ostream& out)
         {
-            serialize("scale_prev_", out);
+            serialize("scale_", out);
             serialize(item.reshape_scales, out);
             serialize(item.reshape_src, out);
         }
 
-        friend void deserialize(scale_prev_& item, std::istream& in)
+        friend void deserialize(scale_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "scale_prev_")
-                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::scale_prev_.");
+            if (version != "scale_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::scale_.");
             deserialize(item.reshape_scales, in);
             deserialize(item.reshape_src, in);
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const scale_prev_& item)
+        friend std::ostream& operator<<(std::ostream& out, const scale_& item)
         {
-            out << "scale_prev"<<id;
+            out << "scale"<<id;
             return out;
         }
 
-        friend void to_xml(const scale_prev_& item, std::ostream& out)
+        friend void to_xml(const scale_& item, std::ostream& out)
         {
-            out << "<scale_prev tag='"<<id<<"'/>\n";
+            out << "<scale tag='"<<id<<"'/>\n";
         }
 
     private:
@@ -2363,29 +2363,29 @@ namespace dlib
         template<typename> class tag,
         typename SUBNET
         >
-    using scale_prev = add_layer<scale_prev_<tag>, SUBNET>;
+    using scale = add_layer<scale_<tag>, SUBNET>;
 
-    template <typename SUBNET> using scale_prev1  = scale_prev<tag1, SUBNET>;
-    template <typename SUBNET> using scale_prev2  = scale_prev<tag2, SUBNET>;
-    template <typename SUBNET> using scale_prev3  = scale_prev<tag3, SUBNET>;
-    template <typename SUBNET> using scale_prev4  = scale_prev<tag4, SUBNET>;
-    template <typename SUBNET> using scale_prev5  = scale_prev<tag5, SUBNET>;
-    template <typename SUBNET> using scale_prev6  = scale_prev<tag6, SUBNET>;
-    template <typename SUBNET> using scale_prev7  = scale_prev<tag7, SUBNET>;
-    template <typename SUBNET> using scale_prev8  = scale_prev<tag8, SUBNET>;
-    template <typename SUBNET> using scale_prev9  = scale_prev<tag9, SUBNET>;
-    template <typename SUBNET> using scale_prev10 = scale_prev<tag10, SUBNET>;
+    template <typename SUBNET> using scale1  = scale<tag1, SUBNET>;
+    template <typename SUBNET> using scale2  = scale<tag2, SUBNET>;
+    template <typename SUBNET> using scale3  = scale<tag3, SUBNET>;
+    template <typename SUBNET> using scale4  = scale<tag4, SUBNET>;
+    template <typename SUBNET> using scale5  = scale<tag5, SUBNET>;
+    template <typename SUBNET> using scale6  = scale<tag6, SUBNET>;
+    template <typename SUBNET> using scale7  = scale<tag7, SUBNET>;
+    template <typename SUBNET> using scale8  = scale<tag8, SUBNET>;
+    template <typename SUBNET> using scale9  = scale<tag9, SUBNET>;
+    template <typename SUBNET> using scale10 = scale<tag10, SUBNET>;
 
-    using scale_prev1_  = scale_prev_<tag1>;
-    using scale_prev2_  = scale_prev_<tag2>;
-    using scale_prev3_  = scale_prev_<tag3>;
-    using scale_prev4_  = scale_prev_<tag4>;
-    using scale_prev5_  = scale_prev_<tag5>;
-    using scale_prev6_  = scale_prev_<tag6>;
-    using scale_prev7_  = scale_prev_<tag7>;
-    using scale_prev8_  = scale_prev_<tag8>;
-    using scale_prev9_  = scale_prev_<tag9>;
-    using scale_prev10_ = scale_prev_<tag10>;
+    using scale1_  = scale_<tag1>;
+    using scale2_  = scale_<tag2>;
+    using scale3_  = scale_<tag3>;
+    using scale4_  = scale_<tag4>;
+    using scale5_  = scale_<tag5>;
+    using scale6_  = scale_<tag6>;
+    using scale7_  = scale_<tag7>;
+    using scale8_  = scale_<tag8>;
+    using scale9_  = scale_<tag9>;
+    using scale10_ = scale_<tag10>;
 
 // ----------------------------------------------------------------------------------------
 

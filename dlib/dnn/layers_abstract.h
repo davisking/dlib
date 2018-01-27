@@ -2331,15 +2331,15 @@ namespace dlib
     template <
         template<typename> class tag
         >
-    class scale_prev_
+    class scale_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  This layer scales the output channels of the previous layer
-                by multiplying it with the output of the tagged layer.  To be specific:
-                    - Let INPUT  == sub.get_output()
-                    - Let SCALES == layer<tag>(sub).get_output()
+                defined above.  This layer scales the output channels of the tagged layer
+                by multiplying it with the output of the previous layer.  To be specific:
+                    - Let INPUT  == layer<tag>(sub).get_output()
+                    - Let SCALES == sub.get_output()
                     - This layer takes INPUT and SCALES as input.
                     - The output of this layer has the same dimensions as INPUT.
                     - This layer requires:
@@ -2354,7 +2354,7 @@ namespace dlib
         !*/
 
     public:
-        scale_prev_(
+        scale_(
         ); 
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -2372,29 +2372,29 @@ namespace dlib
         template<typename> class tag,
         typename SUBNET
         >
-    using scale_prev = add_layer<scale_prev_<tag>, SUBNET>;
+    using scale = add_layer<scale_<tag>, SUBNET>;
 
-    // Here we add some convenient aliases for using scale_prev_ with the tag layers. 
-    template <typename SUBNET> using scale_prev1  = scale_prev<tag1, SUBNET>;
-    template <typename SUBNET> using scale_prev2  = scale_prev<tag2, SUBNET>;
-    template <typename SUBNET> using scale_prev3  = scale_prev<tag3, SUBNET>;
-    template <typename SUBNET> using scale_prev4  = scale_prev<tag4, SUBNET>;
-    template <typename SUBNET> using scale_prev5  = scale_prev<tag5, SUBNET>;
-    template <typename SUBNET> using scale_prev6  = scale_prev<tag6, SUBNET>;
-    template <typename SUBNET> using scale_prev7  = scale_prev<tag7, SUBNET>;
-    template <typename SUBNET> using scale_prev8  = scale_prev<tag8, SUBNET>;
-    template <typename SUBNET> using scale_prev9  = scale_prev<tag9, SUBNET>;
-    template <typename SUBNET> using scale_prev10 = scale_prev<tag10, SUBNET>;
-    using scale_prev1_  = scale_prev_<tag1>;
-    using scale_prev2_  = scale_prev_<tag2>;
-    using scale_prev3_  = scale_prev_<tag3>;
-    using scale_prev4_  = scale_prev_<tag4>;
-    using scale_prev5_  = scale_prev_<tag5>;
-    using scale_prev6_  = scale_prev_<tag6>;
-    using scale_prev7_  = scale_prev_<tag7>;
-    using scale_prev8_  = scale_prev_<tag8>;
-    using scale_prev9_  = scale_prev_<tag9>;
-    using scale_prev10_ = scale_prev_<tag10>;
+    // Here we add some convenient aliases for using scale_ with the tag layers. 
+    template <typename SUBNET> using scale1  = scale<tag1, SUBNET>;
+    template <typename SUBNET> using scale2  = scale<tag2, SUBNET>;
+    template <typename SUBNET> using scale3  = scale<tag3, SUBNET>;
+    template <typename SUBNET> using scale4  = scale<tag4, SUBNET>;
+    template <typename SUBNET> using scale5  = scale<tag5, SUBNET>;
+    template <typename SUBNET> using scale6  = scale<tag6, SUBNET>;
+    template <typename SUBNET> using scale7  = scale<tag7, SUBNET>;
+    template <typename SUBNET> using scale8  = scale<tag8, SUBNET>;
+    template <typename SUBNET> using scale9  = scale<tag9, SUBNET>;
+    template <typename SUBNET> using scale10 = scale<tag10, SUBNET>;
+    using scale1_  = scale_<tag1>;
+    using scale2_  = scale_<tag2>;
+    using scale3_  = scale_<tag3>;
+    using scale4_  = scale_<tag4>;
+    using scale5_  = scale_<tag5>;
+    using scale6_  = scale_<tag6>;
+    using scale7_  = scale_<tag7>;
+    using scale8_  = scale_<tag8>;
+    using scale9_  = scale_<tag9>;
+    using scale10_ = scale_<tag10>;
 
 // ----------------------------------------------------------------------------------------
 
