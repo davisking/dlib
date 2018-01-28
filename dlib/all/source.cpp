@@ -19,8 +19,6 @@
 #include "../md5/md5_kernel_1.cpp"
 #include "../tokenizer/tokenizer_kernel_1.cpp"
 #include "../unicode/unicode.cpp"
-#include "../data_io/image_dataset_metadata.cpp"
-#include "../data_io/mnist.cpp"
 
 
 
@@ -87,6 +85,8 @@
 
 
 
+#include "../data_io/image_dataset_metadata.cpp"
+#include "../data_io/mnist.cpp"
 #include "../global_optimization/global_function_search.cpp"
 
 
