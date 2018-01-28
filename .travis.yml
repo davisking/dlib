@@ -29,6 +29,24 @@ matrix:
       script:
         - dlib/travis/build-and-test.sh
 
+    ###################
+    - language: cpp
+      compiler: gcc
+      os: linux
+      env:
+        - VARIANT=tools
+      script:
+        - dlib/travis/build-and-test.sh
+
+    ###################
+    - language: cpp
+      compiler: gcc
+      os: linux
+      env:
+        - VARIANT=dlib_all_source_cpp
+      script:
+        - dlib/travis/build-and-test.sh
+
     ########### test with C++17 ########
     - language: cpp
       compiler: gcc

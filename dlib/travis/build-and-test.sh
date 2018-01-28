@@ -11,15 +11,29 @@ fi
 if [ "$VARIANT" = "test" ]; then
   mkdir build
   cd build
-  cmake ../dlib/test -DCMAKE_BUILD_TYPE=Release
+  cmake ../dlib/test 
   cmake --build . --target dtest -- -j 2
   ./dtest --runall
+fi
+
+if [ "$VARIANT" = "dlib_all_source_cpp" ]; then
+  mkdir build
+  cd build
+  cmake ../dlib/test 
+  cmake --build . --target dlib_all_source_cpp -- -j 2
+fi
+
+if [ "$VARIANT" = "tools" ]; then
+  mkdir build
+  cd build
+  cmake ../dlib/test/tools 
+  cmake --build .  -- -j 2
 fi
 
 if [ "$VARIANT" = "examples" ]; then
   mkdir build
   cd build
-  cmake ../examples -DCMAKE_BUILD_TYPE=Release
+  cmake ../examples 
   cmake --build . -- -j 1
 fi
 
