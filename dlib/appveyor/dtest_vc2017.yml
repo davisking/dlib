@@ -2,6 +2,8 @@ version: "{build}"
 
 configuration: Release
 
+image: Visual Studio 2017
+
 build_script:
   # build test
   - mkdir %APPVEYOR_BUILD_FOLDER%\build_test
