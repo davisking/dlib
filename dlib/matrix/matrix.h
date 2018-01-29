@@ -1923,6 +1923,50 @@ namespace dlib
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        long NR,
+        long NC,
+        typename mm,
+        typename l
+        >
+    void serialize (
+        const ramdump_t<matrix<T,NR,NC,mm,l>>& item_, 
+        std::ostream& out
+    )
+    {
+        auto& item = item_.item;
+        serialize(item.nr(), out);
+        serialize(item.nc(), out);
+        if (item.size() != 0)
+            out.write((char*)&item(0,0), sizeof(item(0,0))*item.size());
+    }
+
+    template <
+        typename T,
+        long NR,
+        long NC,
+        typename mm,
+        typename l
+        >
+    void deserialize (
+        ramdump_t<matrix<T,NR,NC,mm,l>>&& item_, 
+        std::istream& in 
+    )
+    {
+        auto& item = item_.item;
+        long nr, nc;
+        deserialize(nr, in);
+        deserialize(nc, in);
+        item.set_size(nr,nc);
+        if (item.size() != 0)
+            in.read((char*)&item(0,0), sizeof(item(0,0))*item.size());
+    }
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename EXP
         >
