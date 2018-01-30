@@ -7,6 +7,8 @@
 #include "shape_predictor.h"
 #include "../console_progress_indicator.h"
 #include "../threads.h"
+#include "../data_io/image_dataset_metadata.h"
+#include "box_overlap_testing.h"
 
 namespace dlib
 {
@@ -786,6 +788,51 @@ namespace dlib
         unsigned long _num_threads;
         padding_mode_t _padding_mode;
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename some_type_of_rectangle
+        >
+    image_dataset_metadata::dataset make_bounding_box_regression_training_data (
+        const image_dataset_metadata::dataset& truth,
+        const std::vector<std::vector<some_type_of_rectangle>>& detections
+    )
+    {
+        DLIB_CASSERT(truth.images.size() == detections.size(), 
+            "truth.images.size(): "<< truth.images.size() <<
+            "\tdetections.size(): "<< detections.size()
+        );
+        image_dataset_metadata::dataset result = truth;
+
+        for (size_t i = 0; i < truth.images.size(); ++i)
+        {
+            result.images[i].boxes.clear();
+            for (auto truth_box : truth.images[i].boxes)
+            {
+                if (truth_box.ignore)
+                    continue;
+
+                // Find the detection that best matches the current truth_box.
+                auto det = max_scoring_element(detections[i], [&truth_box](const rectangle& r) { return box_intersection_over_union(r, truth_box.rect); });
+                if (det.second > 0.5)
+                {
+                    // Remove any existing parts and replace them with the truth_box corners.
+                    truth_box.parts.clear();
+                    truth_box.parts["top_left"]     = truth_box.rect.tl_corner();
+                    truth_box.parts["top_right"]    = truth_box.rect.tr_corner();
+                    truth_box.parts["bottom_left"]  = truth_box.rect.bl_corner();
+                    truth_box.parts["bottom_right"] = truth_box.rect.br_corner();
+
+                    // Now replace the bounding truth_box with the detector's bounding truth_box.
+                    truth_box.rect = det.first;
+
+                    result.images[i].boxes.push_back(truth_box);
+                }
+            }
+        }
+        return result;
+    }
 
 // ----------------------------------------------------------------------------------------
 

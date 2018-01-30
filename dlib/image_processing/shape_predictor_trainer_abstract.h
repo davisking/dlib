@@ -4,6 +4,7 @@
 #ifdef DLIB_SHAPE_PREDICToR_TRAINER_ABSTRACT_H_
 
 #include "shape_predictor_abstract.h"
+#include "../data_io/image_dataset_metadata.h"
 
 namespace dlib
 {
@@ -364,6 +365,43 @@ namespace dlib
                   those missing parts.
         !*/
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename some_type_of_rectangle
+        >
+    image_dataset_metadata::dataset make_bounding_box_regression_training_data (
+        const image_dataset_metadata::dataset& truth,
+        const std::vector<std::vector<some_type_of_rectangle>>& detections
+    );
+    /*!
+        requires
+            - truth.images.size() == detections.size()
+            - some_type_of_rectangle == rectangle, drectangle, mmod_rect, or any other type
+              that is convertible to a rectangle.
+        ensures
+            - Suppose you have an object detector that can roughly locate objects in an
+              image.  This means your detector draws boxes around objects, but these are
+              *rough* boxes in the sense that they aren't positioned super accurately.  For
+              instance, HOG based detectors usually have a stride of 8 pixels.  So the
+              positional accuracy is going to be, at best, +/-8 pixels.  
+              
+              If you want to get better positional accuracy one easy thing to do is train a
+              shape_predictor to give you the corners of the object.  The
+              make_bounding_box_regression_training_data() routine helps you do this by
+              creating an appropriate training dataset.  It does this by taking the dataset
+              you used to train your detector (the truth object), and combining that with
+              the output of your detector on each image in the training dataset (the
+              detections object).  In particular, it will create a new annotated dataset
+              where each object box is one of the rectangles from detections and that
+              object has 4 part annotations, the corners of the truth rectangle
+              corresponding to that detection rectangle.  You can then take the returned
+              dataset and train a shape_predictor on it.  The resulting shape_predictor can
+              then be used to do bounding box regression.
+            - We assume that detections[i] contains object detections corresponding to 
+              the image truth.images[i].
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
