@@ -2302,7 +2302,10 @@ namespace dlib
             DLIB_CASSERT(scales.num_samples() == src.num_samples() &&
                          scales.k()           == src.k() &&
                          scales.nr()          == 1 &&
-                         scales.nc()          == 1 );
+                         scales.nc()          == 1, 
+                         "scales.k(): " << scales.k() <<
+                         "\nsrc.k(): " << src.k() 
+                         );
 
             output.copy_size(src);
             tt::scale_channels(false, output, src, scales);

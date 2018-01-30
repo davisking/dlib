@@ -154,6 +154,8 @@
 #include <memory>
 #include <set>
 #include <limits>
+#include <type_traits>
+#include <utility>
 #include "uintn.h"
 #include "interfaces/enumerable.h"
 #include "interfaces/map_pair.h"
@@ -172,6 +174,56 @@ namespace dlib
     public: 
         serialization_error(const std::string& e):error(e) {}
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    struct ramdump_t
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a type decoration used to indicate that serialization should be
+                done by simply dumping the memory of some object to disk as fast as
+                possible without any sort of conversions.  This means that the data written
+                will be "non-portable" in the sense that the format output by a RAM dump
+                may depend on things like the endianness of your CPU or settings of certain
+                compiler switches.
+
+                You use this object like this:
+                   serialize("yourfile.dat") << ramdump(yourobject);
+                   deserialize("yourfile.dat") >> ramdump(yourobject);
+                or 
+                   serialize(ramdump(yourobject), out);
+                   deserialize(ramdump(yourobject), in);
+
+                Also, not all objects have a ramdump mode.  If you try to use ramdump on an
+                object that does not define a serialization dump for ramdump you will get a
+                compiler error.
+        !*/
+        ramdump_t(T& item_) : item(item_) {}
+        T& item;
+    };
+
+    // This function just makes a ramdump that wraps an object.
+    template <typename T>
+    ramdump_t<typename std::remove_reference<T>::type> ramdump(T&& item) { return ramdump_t<typename std::remove_reference<T>::type>(item); }
+
+
+    template <
+        typename T
+        >
+    void serialize (
+        const ramdump_t<const T>& item_, 
+        std::ostream& out
+    )
+    {
+        // Move the const from inside the ramdump_t template to outside so we can bind
+        // against a serialize() call that takes just a const ramdump_t<T>.  Doing this
+        // saves you from needing to write multiple overloads of serialize() to handle
+        // these different const placement cases.
+        const auto temp = ramdump(const_cast<T&>(item_.item));
+        serialize(temp, out);
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1514,11 +1566,24 @@ namespace dlib
         template <typename T>
         inline proxy_deserialize& operator>>(T& item)
         {
+            return doit(item);
+        }
+
+        template <typename T>
+        inline proxy_deserialize& operator>>(ramdump_t<T>&& item)
+        {
+            return doit(std::move(item));
+        }
+
+    private:
+        template <typename T>
+        inline proxy_deserialize& doit(T&& item)
+        {
             try
             {
                 if (fin->peek() == EOF)
                     throw serialization_error("No more objects were in the file!");
-                deserialize(item, *fin);
+                deserialize(std::forward<T>(item), *fin);
             }
             catch (serialization_error& e)
             {
@@ -1554,7 +1619,6 @@ namespace dlib
             return *this;
         }
 
-    private:
         int objects_read = 0;
         std::string filename;
         std::shared_ptr<std::ifstream> fin;
