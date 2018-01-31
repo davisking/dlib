@@ -124,10 +124,12 @@ namespace dlib
                 - You observed X1 to give k1 successes out of n1 trials.
                 - You observed X2 to give k2 successes out of n2 trials.
             - This function performs a simple likelihood ratio test to determine if X1 and
-              X2 have the same parameter.  The return value of this function will be 0 if
-              they are probably the same or it will be some positive number otherwise.
-              Moreover, the larger the return value the more likely it is that X1 and X2
-              have different distributions.
+              X2 have the same parameter.  The return value of this function will be:
+                - Close to 0 if they are probably the same.
+                - Larger than 0 if X1 probably has a higher "success" rate than X2. 
+                - Smaller than 0 if X2 probably has a higher "success" rate than X1. 
+              Moreover, the larger the absolute magnitude of the return value the more
+              likely it is that X1 and X2 have different distributions.
             - For a discussion of the technique and applications see:
                   Dunning, Ted. "Accurate methods for the statistics of surprise and
                   coincidence." Computational linguistics 19.1 (1993): 61-74.

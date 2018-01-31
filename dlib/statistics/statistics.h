@@ -1840,7 +1840,15 @@ namespace dlib
             return k*std::log(p) + (n-k)*std::log(1-p);
         };
 
-        return ll(p1,k1,n1) + ll(p2,k2,n2) - ll(p,k1,n1) - ll(p,k2,n2); 
+        auto logll = ll(p1,k1,n1) + ll(p2,k2,n2) - ll(p,k1,n1) - ll(p,k2,n2); 
+
+        // The basic statistic only tells you if the random variables are different.  But
+        // it's nice to know which way they are different, i.e., which one is bigger.  So
+        // stuff that information into the sign bit of the return value.
+        if (p1>=p2)
+            return logll;
+        else
+            return -logll;
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1868,19 +1876,10 @@ namespace dlib
         const auto notB_count = total_num_observations - B_count;
         // How likely is it that the odds of A happening is different when conditioned on
         // whether or not B happened?
-        const auto cor =  binomial_random_vars_are_different( 
+        return binomial_random_vars_are_different( 
             AB_count, B_count,      // A conditional on the presence of B
             AnotB_count, notB_count // A conditional on the absence of B 
         );
-
-
-        // Check if there are more or less co-occurrences than expected (if A and B were
-        // unrelated) and use that to give the return value its sign.
-        const double expected_AB_count_if_unrelated = (A_count/(double)total_num_observations)*B_count;
-        if (AB_count >= expected_AB_count_if_unrelated)
-            return cor;
-        else
-            return -cor;
     }
 
 // ----------------------------------------------------------------------------------------
