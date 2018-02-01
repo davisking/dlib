@@ -593,11 +593,8 @@ namespace dlib
 
         void record_loss(double loss)
         {
-            // Say that we will check if the gradient is bad 200 times during each
-            // iter_without_progress_thresh interval of network updates.   This kind of
-            // budgeting causes our gradient checking to use a fixed amount of
-            // computational resources, regardless of the size of
-            // iter_without_progress_thresh.
+            // This kind of budgeting causes our gradient checking to use a fixed amount of
+            // computational resources, regardless of the size of iter_without_progress_thresh.
             gradient_check_budget += 200;
 
             rs.add(loss);
