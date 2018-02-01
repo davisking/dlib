@@ -801,10 +801,10 @@ namespace dlib
             abs<4>::value == 4
     !*/
 
-        template <long x, typename enabled=void>
-        struct tabs { const static long value = x; };
-        template <long x>
-        struct tabs<x,typename enable_if_c<(x < 0)>::type> { const static long value = -x; };
+    template <long x, typename enabled=void>
+    struct tabs { const static long value = x; };
+    template <long x>
+    struct tabs<x,typename enable_if_c<(x < 0)>::type> { const static long value = -x; };
 
 // ----------------------------------------------------------------------------------------
 
@@ -816,10 +816,10 @@ namespace dlib
             abs<4,7>::value == 7
     !*/
 
-        template <long x, long y, typename enabled=void>
-        struct tmax { const static long value = x; };
-        template <long x, long y>
-        struct tmax<x,y,typename enable_if_c<(y > x)>::type> { const static long value = y; };
+    template <long x, long y, typename enabled=void>
+    struct tmax { const static long value = x; };
+    template <long x, long y>
+    struct tmax<x,y,typename enable_if_c<(y > x)>::type> { const static long value = y; };
 
 // ----------------------------------------------------------------------------------------
 
@@ -831,12 +831,12 @@ namespace dlib
             abs<4,7>::value == 4
     !*/
 
-        template <long x, long y, typename enabled=void>
-        struct tmin { const static long value = x; };
-        template <long x, long y>
-        struct tmin<x,y,typename enable_if_c<(y < x)>::type> { const static long value = y; };
+    template <long x, long y, typename enabled=void>
+    struct tmin { const static long value = x; };
+    template <long x, long y>
+    struct tmin<x,y,typename enable_if_c<(y < x)>::type> { const static long value = y; };
 
-    // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
 
 #define DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(testname, returnT, funct_name, args)                        \
     struct _two_bytes_##testname { char a[2]; };                                                       \
