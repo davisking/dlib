@@ -1182,7 +1182,10 @@ namespace dlib
             parts.reserve(obj.num_parts());
             for (unsigned long i = 0; i < obj.num_parts(); ++i)
             {
-                parts.push_back(tran(obj.part(i)));
+                if (obj.part(i) != OBJECT_PART_NOT_PRESENT)
+                    parts.push_back(tran(obj.part(i)));
+                else
+                    parts.push_back(OBJECT_PART_NOT_PRESENT);
             }
             return full_object_detection(tform_object(tran,obj.get_rect()), parts);
         }
@@ -1798,7 +1801,12 @@ namespace dlib
         full_object_detection res(det);
         // map the parts
         for (unsigned long l = 0; l < det.num_parts(); ++l)
-            res.part(l) = tform(det.part(l));
+        {
+            if (det.part(l) != OBJECT_PART_NOT_PRESENT)
+                res.part(l) = tform(det.part(l));
+            else
+                res.part(l) = OBJECT_PART_NOT_PRESENT;
+        }
         // map the main rectangle
         rectangle rect;
         rect += tform(det.get_rect().tl_corner());
