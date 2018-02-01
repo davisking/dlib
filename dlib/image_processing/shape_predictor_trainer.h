@@ -353,6 +353,11 @@ namespace dlib
                     shape(2*i+1) = p.y();
                     present(2*i)   = 1;
                     present(2*i+1) = 1;
+
+                    if (length(p) > 100)
+                    {
+                        std::cout << "Warning, one of your objects has parts that are way outside its bounding box!  This is probably an error in your annotation." << std::endl;
+                    }
                 }
                 else
                 {
