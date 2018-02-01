@@ -577,7 +577,7 @@ namespace dlib
         friend std::ostream& operator<<(std::ostream& out, const cont_& item)
         {
             out << "cont\t ("
-                << "num_filters="<<_num_filters
+                << "num_filters="<<item.num_filters_
                 << ", nr="<<_nr
                 << ", nc="<<_nc
                 << ", stride_y="<<_stride_y
@@ -595,7 +595,7 @@ namespace dlib
         friend void to_xml(const cont_& item, std::ostream& out)
         {
             out << "<cont"
-                << " num_filters='"<<_num_filters<<"'"
+                << " num_filters='"<<item.num_filters_<<"'"
                 << " nr='"<<_nr<<"'"
                 << " nc='"<<_nc<<"'"
                 << " stride_y='"<<_stride_y<<"'"
