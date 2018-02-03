@@ -100,6 +100,16 @@ size_t py_count_steps_without_decrease_robust (
 
 // ----------------------------------------------------------------------------------------
 
+double probability_that_sequence_is_increasing (
+    py::object arr
+)
+{
+    DLIB_CASSERT(len(arr) > 2);
+    return probability_gradient_greater_than(python_list_to_vector<double>(arr), 0);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void hit_enter_to_continue()
 {
     std::cout << "Hit enter to continue";
@@ -251,5 +261,7 @@ ensures \n\
     !*/
     );
 
+    m.def("probability_that_sequence_is_increasing",probability_that_sequence_is_increasing, py::arg("time_series"),
+        "returns the probability that the given sequence of real numbers is increasing in value over time.");
 }
 
