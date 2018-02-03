@@ -2287,11 +2287,8 @@ namespace dlib
         }
 
         template <typename SUBNET>
-        void setup (const SUBNET& sub)
+        void setup (const SUBNET& /*sub*/)
         {
-            auto&& src = sub.get_output();
-            reshape_scales = alias_tensor(src.num_samples()*src.k());
-            reshape_src = alias_tensor(src.num_samples()*src.k(),src.nr()*src.nc());
         }
 
         template <typename SUBNET>
@@ -2319,6 +2316,12 @@ namespace dlib
             // The gradient just flows backwards to the two layers that forward()
             // read from.
             tt::scale_channels(true, layer<tag>(sub).get_gradient_input(), gradient_input, scales);
+
+            if (reshape_src.num_samples() != src.num_samples())
+            {
+                reshape_scales = alias_tensor(src.num_samples()*src.k());
+                reshape_src = alias_tensor(src.num_samples()*src.k(),src.nr()*src.nc());
+            }
 
             auto&& scales_grad = sub.get_gradient_input();
             auto sgrad = reshape_scales(scales_grad);
