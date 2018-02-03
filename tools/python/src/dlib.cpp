@@ -67,13 +67,22 @@ PYBIND11_MODULE(dlib, m)
 
 
 
+    // Note that the order here matters.  We need to do the basic types first.  If we don't 
+    // then what happens is the documentation created by sphinx will use horrible big
+    // template names to refer to C++ objects rather than the python names python users
+    // will expect.  For instance, if bind_basic_types() isn't called early then when
+    // routines take a std::vector<double>, rather than saying dlib.array in the python
+    // docs it will say "std::vector<double, std::allocator<double> >" which is awful and
+    // confusing to python users.
+    //
+    // So when adding new things always add them to the end of the list.
     bind_matrix(m);
     bind_vector(m);
-    bind_svm_c_trainer(m);
-    bind_decision_functions(m);
     bind_basic_types(m);
     bind_other(m);
+
     bind_svm_rank_trainer(m);
+    bind_decision_functions(m);
     bind_cca(m);
     bind_sequence_segmenter(m);
     bind_svm_struct(m);
@@ -86,6 +95,7 @@ PYBIND11_MODULE(dlib, m)
     bind_cnn_face_detection(m);
     bind_global_optimization(m);
     bind_numpy_returns(m);
+    bind_svm_c_trainer(m);
 #ifndef DLIB_NO_GUI_SUPPORT
     bind_gui(m);
 #endif
