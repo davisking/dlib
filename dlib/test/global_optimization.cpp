@@ -208,7 +208,7 @@ namespace
 
 
         result = find_max_global([](double a, double b){ return -complex_holder_table(a,b);}, 
-            {-10, -10}, {10, 10}, max_function_calls(300), 0);
+            {-10, -10}, {10, 10}, max_function_calls(400), 0);
         dlog << LINFO << "complex_holder_table y: "<< result.y;
         DLIB_TEST_MSG(std::abs(result.y  - 21.9210397) < 0.0001, std::abs(result.y  - 21.9210397));
     }
@@ -269,7 +269,7 @@ namespace
 
 
         result = find_min_global([](double a, double b){ return complex_holder_table(a,b);}, 
-            {-10, -10}, {10, 10}, max_function_calls(300), 0);
+            {-10, -10}, {10, 10}, max_function_calls(400), 0);
         dlog << LINFO << "complex_holder_table y: "<< result.y;
         DLIB_TEST_MSG(std::abs(result.y  + 21.9210397) < 0.0001, std::abs(result.y  + 21.9210397));
     }
