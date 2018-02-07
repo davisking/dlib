@@ -329,7 +329,7 @@ if (NOT blas_found)
     endif()
 endif()
 
-if (NOT lapack_found)
+if (blas_found AND NOT lapack_found)
     find_package(LAPACK QUIET)
     if (${LAPACK_FOUND})
         set(lapack_libraries ${LAPACK_LIBRARIES})
