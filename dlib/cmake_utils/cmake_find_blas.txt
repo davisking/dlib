@@ -327,15 +327,15 @@ if (NOT blas_found)
         set(blas_libraries ${BLAS_LIBRARIES})      
         set(blas_found 1)
     endif()
-endif()
-
-if (blas_found AND NOT lapack_found)
-    find_package(LAPACK QUIET)
-    if (${LAPACK_FOUND})
-        set(lapack_libraries ${LAPACK_LIBRARIES})
-        set(lapack_found 1)
+    if (NOT lapack_found)
+        find_package(LAPACK QUIET)
+        if (${LAPACK_FOUND})
+            set(lapack_libraries ${LAPACK_LIBRARIES})
+            set(lapack_found 1)
+        endif()
     endif()
 endif()
+
 
 # If using lapack, determine whether to mangle functions
 if (lapack_found)
