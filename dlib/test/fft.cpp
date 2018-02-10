@@ -98,6 +98,28 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <long nr, long nc>
+    void test_real_compile_time_sized_ffts()
+    {
+        print_spinner();
+        const matrix<complex<double>,nr,nc> m1 = complex_matrix(real(rand_complex(nr,nc)));
+        const matrix<complex<float>,nr,nc> fm1 = matrix_cast<complex<float> >(complex_matrix(real(rand_complex(nr,nc))));
+
+        DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(m1))))-m1)) < 1e-16);
+        DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(fm1))))-fm1)) < 1e-7);
+
+        matrix<complex<double>,nr,nc> temp = m1;
+        matrix<complex<float>,nr,nc> ftemp = fm1;
+        fft_inplace(temp);
+        fft_inplace(ftemp);
+        DLIB_TEST(max(norm(temp-fft(m1))) < 1e-16);
+        DLIB_TEST(max(norm(ftemp-fft(fm1))) < 1e-7);
+        ifft_inplace(temp);
+        ifft_inplace(ftemp);
+        DLIB_TEST(max(norm(temp/temp.size()-m1)) < 1e-16);
+        DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
+    }
+
     void test_random_real_ffts()
     {
         for (int iter = 0; iter < 10; ++iter)
@@ -126,6 +148,10 @@ namespace
                 }
             }
         }
+
+        test_real_compile_time_sized_ffts<16,16>();
+        test_real_compile_time_sized_ffts<16,1>();
+        test_real_compile_time_sized_ffts<1,16>();
     }
 
 // ----------------------------------------------------------------------------------------

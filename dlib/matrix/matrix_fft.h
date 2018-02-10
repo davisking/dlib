@@ -472,7 +472,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template < typename T, long NR, long NC, typename MM, typename L >
-    void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
+    typename enable_if_c<NR==1||NC==1>::type fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     // Note that we don't divide the outputs by data.size() so this isn't quite the inverse.
     {
         // make sure requires clause is not broken
@@ -485,19 +485,31 @@ namespace dlib
             << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
             );
 
-        if (data.nr() == 1 || data.nc() == 1)
-        {
-            impl::twiddles<T> cs;
-            impl::fft1d_inplace(data, false, cs);
-        }
-        else
-        {
-            impl::fft2d_inplace(data, false);
-        }
+        impl::twiddles<T> cs;
+        impl::fft1d_inplace(data, false, cs);
     }
 
     template < typename T, long NR, long NC, typename MM, typename L >
-    void ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
+    typename disable_if_c<NR==1||NC==1>::type fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
+    // Note that we don't divide the outputs by data.size() so this isn't quite the inverse.
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t void fft_inplace(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
+            );
+
+        impl::fft2d_inplace(data, false);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template < typename T, long NR, long NC, typename MM, typename L >
+    typename enable_if_c<NR==1||NC==1>::type ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
         // make sure requires clause is not broken
         DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
@@ -509,15 +521,24 @@ namespace dlib
             << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
             );
 
-        if (data.nr() == 1 || data.nc() == 1)
-        {
-            impl::twiddles<T> cs;
-            impl::fft1d_inplace(data, true, cs);
-        }
-        else
-        {
-            impl::fft2d_inplace(data, true);
-        }
+        impl::twiddles<T> cs;
+        impl::fft1d_inplace(data, true, cs);
+    }
+
+    template < typename T, long NR, long NC, typename MM, typename L >
+    typename disable_if_c<NR==1||NC==1>::type ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
+    {
+        // make sure requires clause is not broken
+        DLIB_CASSERT(is_power_of_two(data.nr()) && is_power_of_two(data.nc()),
+            "\t void ifft_inplace(data)"
+            << "\n\t The number of rows and columns must be powers of two."
+            << "\n\t data.nr(): "<< data.nr()
+            << "\n\t data.nc(): "<< data.nc()
+            << "\n\t is_power_of_two(data.nr()): " << is_power_of_two(data.nr())
+            << "\n\t is_power_of_two(data.nc()): " << is_power_of_two(data.nc())
+            );
+
+        impl::fft2d_inplace(data, true);
     }
 
 // ----------------------------------------------------------------------------------------
