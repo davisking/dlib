@@ -3,6 +3,7 @@
 
 #include <pybind11/pybind11.h>
 #include <dlib/simd.h>
+#include <string>
 
 namespace py = pybind11;
 
@@ -38,6 +39,7 @@ PYBIND11_MODULE(dlib, m)
 #define DLIB_QUOTE_STRING(x) DLIB_QUOTE_STRING2(x)
 #define DLIB_QUOTE_STRING2(x) #x
     m.attr("__version__") = DLIB_QUOTE_STRING(DLIB_VERSION);
+    m.attr("__time_compiled__") = std::string(__DATE__) + " " + std::string(__TIME__);
 
 #ifdef DLIB_USE_CUDA
     m.attr("DLIB_USE_CUDA") = true;
