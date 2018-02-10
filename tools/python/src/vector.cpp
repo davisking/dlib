@@ -167,8 +167,8 @@ void bind_vector(py::module& m)
             .def(py::init<long,long>(), py::arg("x"), py::arg("y"))
             .def("__repr__", &point__repr__)
             .def("__str__", &point__str__)
-            .def_property_readonly("x", &point_x, "The x-coordinate of the point.")
-            .def_property_readonly("y", &point_y, "The y-coordinate of the point.")
+            .def_property("x", &point_x, [](point& p, long x){p.x()=x;}, "The x-coordinate of the point.")
+            .def_property("y", &point_y, [](point& p, long y){p.x()=y;}, "The y-coordinate of the point.")
             .def(py::pickle(&getstate<type>, &setstate<type>));
     }
     {
