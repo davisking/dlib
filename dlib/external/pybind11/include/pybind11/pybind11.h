@@ -51,7 +51,6 @@ NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
 class cpp_function : public function {
 public:
     cpp_function() { }
-    cpp_function(std::nullptr_t) { }
 
     /// Construct a cpp_function from a vanilla function pointer
     template <typename Return, typename... Args, typename... Extra>
@@ -94,7 +93,8 @@ protected:
     template <typename Func, typename Return, typename... Args, typename... Extra>
     void initialize(Func &&f, Return (*)(Args...), const Extra&... extra) {
         using namespace detail;
-        struct capture { detail::remove_reference_t<Func> f; };
+
+        struct capture { remove_reference_t<Func> f; };
 
         /* Store the function including any extra state it might have (e.g. a lambda capture object) */
         auto rec = make_function_record();
@@ -113,23 +113,23 @@ protected:
 #  pragma GCC diagnostic pop
 #endif
             if (!std::is_trivially_destructible<Func>::value)
-                rec->free_data = [](detail::function_record *r) { ((capture *) &r->data)->~capture(); };
+                rec->free_data = [](function_record *r) { ((capture *) &r->data)->~capture(); };
         } else {
             rec->data[0] = new capture { std::forward<Func>(f) };
-            rec->free_data = [](detail::function_record *r) { delete ((capture *) r->data[0]); };
+            rec->free_data = [](function_record *r) { delete ((capture *) r->data[0]); };
         }
 
         /* Type casters for the function arguments and return value */
-        using cast_in = detail::argument_loader<Args...>;
-        using cast_out = detail::make_caster<
-            detail::conditional_t<std::is_void<Return>::value, detail::void_type, Return>
+        using cast_in = argument_loader<Args...>;
+        using cast_out = make_caster<
+            conditional_t<std::is_void<Return>::value, void_type, Return>
         >;
 
-        static_assert(detail::expected_num_args<Extra...>(sizeof...(Args), cast_in::has_args, cast_in::has_kwargs),
+        static_assert(expected_num_args<Extra...>(sizeof...(Args), cast_in::has_args, cast_in::has_kwargs),
                       "The number of argument annotations does not match the number of function arguments");
 
         /* Dispatch code which converts function arguments and performs the actual function call */
-        rec->impl = [](detail::function_call &call) -> handle {
+        rec->impl = [](function_call &call) -> handle {
             cast_in args_converter;
 
             /* Try to cast the function arguments into the C++ domain */
@@ -137,7 +137,7 @@ protected:
                 return PYBIND11_TRY_NEXT_OVERLOAD;
 
             /* Invoke call policy pre-call hook */
-            detail::process_attributes<Extra...>::precall(call);
+            process_attributes<Extra...>::precall(call);
 
             /* Get a pointer to the capture object */
             auto data = (sizeof(capture) <= sizeof(call.func.data)
@@ -145,30 +145,29 @@ protected:
             capture *cap = const_cast<capture *>(reinterpret_cast<const capture *>(data));
 
             /* Override policy for rvalues -- usually to enforce rvp::move on an rvalue */
-            const auto policy = detail::return_value_policy_override<Return>::policy(call.func.policy);
+            const auto policy = return_value_policy_override<Return>::policy(call.func.policy);
 
             /* Function scope guard -- defaults to the compile-to-nothing `void_type` */
-            using Guard = detail::extract_guard_t<Extra...>;
+            using Guard = extract_guard_t<Extra...>;
 
             /* Perform the function call */
             handle result = cast_out::cast(
                 std::move(args_converter).template call<Return, Guard>(cap->f), policy, call.parent);
 
             /* Invoke call policy post-call hook */
-            detail::process_attributes<Extra...>::postcall(call, result);
+            process_attributes<Extra...>::postcall(call, result);
 
             return result;
         };
 
         /* Process any user-provided function attributes */
-        detail::process_attributes<Extra...>::init(extra..., rec);
+        process_attributes<Extra...>::init(extra..., rec);
 
         /* Generate a readable signature describing the function's arguments and return value types */
-        static constexpr auto signature = _("(") + cast_in::arg_names + _(") -> ") + cast_out::name;
-        PYBIND11_DESCR_CONSTEXPR auto types = decltype(signature)::types();
+        PYBIND11_DESCR signature = _("(") + cast_in::arg_names() + _(") -> ") + cast_out::name();
 
         /* Register the function with Python from generic (non-templated) code */
-        initialize_generic(rec, signature.text, types.data(), sizeof...(Args));
+        initialize_generic(rec, signature.text(), signature.types(), sizeof...(Args));
 
         if (cast_in::has_args) rec->has_args = true;
         if (cast_in::has_kwargs) rec->has_kwargs = true;
@@ -218,30 +217,34 @@ protected:
 
         /* Generate a proper function signature */
         std::string signature;
-        size_t type_index = 0, arg_index = 0;
-        for (auto *pc = text; *pc != '\0'; ++pc) {
-            const auto c = *pc;
+        size_t type_depth = 0, char_index = 0, type_index = 0, arg_index = 0;
+        while (true) {
+            char c = text[char_index++];
+            if (c == '\0')
+                break;
 
             if (c == '{') {
-                // Write arg name for everything except *args and **kwargs.
-                if (*(pc + 1) == '*')
-                    continue;
-
-                if (arg_index < rec->args.size() && rec->args[arg_index].name) {
-                    signature += rec->args[arg_index].name;
-                } else if (arg_index == 0 && rec->is_method) {
-                    signature += "self";
-                } else {
-                    signature += "arg" + std::to_string(arg_index - (rec->is_method ? 1 : 0));
+                // Write arg name for everything except *args, **kwargs and return type.
+                if (type_depth == 0 && text[char_index] != '*' && arg_index < args) {
+                    if (!rec->args.empty() && rec->args[arg_index].name) {
+                        signature += rec->args[arg_index].name;
+                    } else if (arg_index == 0 && rec->is_method) {
+                        signature += "self";
+                    } else {
+                        signature += "arg" + std::to_string(arg_index - (rec->is_method ? 1 : 0));
+                    }
+                    signature += ": ";
                 }
-                signature += ": ";
+                ++type_depth;
             } else if (c == '}') {
-                // Write default value if available.
-                if (arg_index < rec->args.size() && rec->args[arg_index].descr) {
-                    signature += "=";
-                    signature += rec->args[arg_index].descr;
+                --type_depth;
+                if (type_depth == 0) {
+                    if (arg_index < rec->args.size() && rec->args[arg_index].descr) {
+                        signature += "=";
+                        signature += rec->args[arg_index].descr;
+                    }
+                    arg_index++;
                 }
-                arg_index++;
             } else if (c == '%') {
                 const std::type_info *t = types[type_index++];
                 if (!t)
@@ -266,8 +269,13 @@ protected:
                 signature += c;
             }
         }
-        if (arg_index != args || types[type_index] != nullptr)
+        if (type_depth != 0 || types[type_index] != nullptr)
             pybind11_fail("Internal error while parsing type signature (2)");
+
+        #if !defined(PYBIND11_CONSTEXPR_DESCR)
+            delete[] types;
+            delete[] text;
+        #endif
 
 #if PY_MAJOR_VERSION < 3
         if (strcmp(rec->name, "__next__") == 0) {
@@ -568,8 +576,8 @@ protected:
                     continue; // Unconsumed kwargs, but no py::kwargs argument to accept them
 
                 // 4a. If we have a py::args argument, create a new tuple with leftovers
-                tuple extra_args;
                 if (func.has_args) {
+                    tuple extra_args;
                     if (args_to_copy == 0) {
                         // We didn't copy out any position arguments from the args_in tuple, so we
                         // can reuse it directly without copying:
@@ -580,12 +588,12 @@ protected:
                         size_t args_size = n_args_in - args_copied;
                         extra_args = tuple(args_size);
                         for (size_t i = 0; i < args_size; ++i) {
-                            handle item = PyTuple_GET_ITEM(args_in, args_copied + i);
-                            extra_args[i] = item.inc_ref().ptr();
+                            extra_args[i] = PyTuple_GET_ITEM(args_in, args_copied + i);
                         }
                     }
                     call.args.push_back(extra_args);
                     call.args_convert.push_back(false);
+                    call.args_ref = std::move(extra_args);
                 }
 
                 // 4b. If we have a py::kwargs, pass on any remaining kwargs
@@ -594,6 +602,7 @@ protected:
                         kwargs = dict(); // If we didn't get one, send an empty one
                     call.args.push_back(kwargs);
                     call.args_convert.push_back(false);
+                    call.kwargs_ref = std::move(kwargs);
                 }
 
                 // 5. Put everything in a vector.  Not technically step 5, we've been building it
@@ -952,18 +961,18 @@ protected:
         tinfo->get_buffer_data = get_buffer_data;
     }
 
-    // rec_func must be set for either fget or fset.
     void def_property_static_impl(const char *name,
                                   handle fget, handle fset,
-                                  detail::function_record *rec_func) {
-        const auto is_static = rec_func && !(rec_func->is_method && rec_func->scope);
-        const auto has_doc = rec_func && rec_func->doc && pybind11::options::show_user_defined_docstrings();
+                                  detail::function_record *rec_fget) {
+        const auto is_static = !(rec_fget->is_method && rec_fget->scope);
+        const auto has_doc = rec_fget->doc && pybind11::options::show_user_defined_docstrings();
+
         auto property = handle((PyObject *) (is_static ? get_internals().static_property_type
                                                        : &PyProperty_Type));
         attr(name) = property(fget.ptr() ? fget : none(),
                               fset.ptr() ? fset : none(),
                               /*deleter*/none(),
-                              pybind11::str(has_doc ? rec_func->doc : ""));
+                              pybind11::str(has_doc ? rec_fget->doc : ""));
     }
 };
 
@@ -995,18 +1004,10 @@ template <typename /*Derived*/, typename F>
 auto method_adaptor(F &&f) -> decltype(std::forward<F>(f)) { return std::forward<F>(f); }
 
 template <typename Derived, typename Return, typename Class, typename... Args>
-auto method_adaptor(Return (Class::*pmf)(Args...)) -> Return (Derived::*)(Args...) {
-    static_assert(detail::is_accessible_base_of<Class, Derived>::value,
-        "Cannot bind an inaccessible base class method; use a lambda definition instead");
-    return pmf;
-}
+auto method_adaptor(Return (Class::*pmf)(Args...)) -> Return (Derived::*)(Args...) { return pmf; }
 
 template <typename Derived, typename Return, typename Class, typename... Args>
-auto method_adaptor(Return (Class::*pmf)(Args...) const) -> Return (Derived::*)(Args...) const {
-    static_assert(detail::is_accessible_base_of<Class, Derived>::value,
-        "Cannot bind an inaccessible base class method; use a lambda definition instead");
-    return pmf;
-}
+auto method_adaptor(Return (Class::*pmf)(Args...) const) -> Return (Derived::*)(Args...) const { return pmf; }
 
 template <typename type_, typename... options>
 class class_ : public detail::generic_type {
@@ -1197,7 +1198,7 @@ public:
     /// Uses cpp_function's return_value_policy by default
     template <typename... Extra>
     class_ &def_property_readonly(const char *name, const cpp_function &fget, const Extra& ...extra) {
-        return def_property(name, fget, nullptr, extra...);
+        return def_property(name, fget, cpp_function(), extra...);
     }
 
     /// Uses return_value_policy::reference by default
@@ -1209,7 +1210,7 @@ public:
     /// Uses cpp_function's return_value_policy by default
     template <typename... Extra>
     class_ &def_property_readonly_static(const char *name, const cpp_function &fget, const Extra& ...extra) {
-        return def_property_static(name, fget, nullptr, extra...);
+        return def_property_static(name, fget, cpp_function(), extra...);
     }
 
     /// Uses return_value_policy::reference_internal by default
@@ -1239,25 +1240,21 @@ public:
     template <typename... Extra>
     class_ &def_property_static(const char *name, const cpp_function &fget, const cpp_function &fset, const Extra& ...extra) {
         auto rec_fget = get_function_record(fget), rec_fset = get_function_record(fset);
-        auto *rec_active = rec_fget;
-        if (rec_fget) {
-           char *doc_prev = rec_fget->doc; /* 'extra' field may include a property-specific documentation string */
-           detail::process_attributes<Extra...>::init(extra..., rec_fget);
-           if (rec_fget->doc && rec_fget->doc != doc_prev) {
-              free(doc_prev);
-              rec_fget->doc = strdup(rec_fget->doc);
-           }
+        char *doc_prev = rec_fget->doc; /* 'extra' field may include a property-specific documentation string */
+        detail::process_attributes<Extra...>::init(extra..., rec_fget);
+        if (rec_fget->doc && rec_fget->doc != doc_prev) {
+            free(doc_prev);
+            rec_fget->doc = strdup(rec_fget->doc);
         }
         if (rec_fset) {
-            char *doc_prev = rec_fset->doc;
+            doc_prev = rec_fset->doc;
             detail::process_attributes<Extra...>::init(extra..., rec_fset);
             if (rec_fset->doc && rec_fset->doc != doc_prev) {
                 free(doc_prev);
                 rec_fset->doc = strdup(rec_fset->doc);
             }
-            if (! rec_active) rec_active = rec_fset;
         }
-        def_property_static_impl(name, fget, fset, rec_active);
+        def_property_static_impl(name, fget, fset, rec_fget);
         return *this;
     }
 
@@ -1375,30 +1372,15 @@ public:
         auto m_entries_ptr = m_entries.inc_ref().ptr();
         def("__repr__", [name, m_entries_ptr](Type value) -> pybind11::str {
             for (const auto &kv : reinterpret_borrow<dict>(m_entries_ptr)) {
-                if (pybind11::cast<Type>(kv.second[int_(0)]) == value)
+                if (pybind11::cast<Type>(kv.second) == value)
                     return pybind11::str("{}.{}").format(name, kv.first);
             }
             return pybind11::str("{}.???").format(name);
         });
-        def_property_readonly_static("__doc__", [m_entries_ptr](handle self) {
-            std::string docstring;
-            const char *tp_doc = ((PyTypeObject *) self.ptr())->tp_doc;
-            if (tp_doc)
-                docstring += std::string(tp_doc) + "\n\n";
-            docstring += "Members:";
-            for (const auto &kv : reinterpret_borrow<dict>(m_entries_ptr)) {
-                auto key = std::string(pybind11::str(kv.first));
-                auto comment = kv.second[int_(1)];
-                docstring += "\n\n  " + key;
-                if (!comment.is_none())
-                    docstring += " : " + (std::string) pybind11::str(comment);
-            }
-            return docstring;
-        });
-        def_property_readonly_static("__members__", [m_entries_ptr](handle /* self */) {
+        def_property_readonly_static("__members__", [m_entries_ptr](object /* self */) {
             dict m;
             for (const auto &kv : reinterpret_borrow<dict>(m_entries_ptr))
-                m[kv.first] = kv.second[int_(0)];
+                m[kv.first] = kv.second;
             return m;
         }, return_value_policy::copy);
         def(init([](Scalar i) { return static_cast<Type>(i); }));
@@ -1446,15 +1428,15 @@ public:
     /// Export enumeration entries into the parent scope
     enum_& export_values() {
         for (const auto &kv : m_entries)
-            m_parent.attr(kv.first) = kv.second[int_(0)];
+            m_parent.attr(kv.first) = kv.second;
         return *this;
     }
 
     /// Add an enumeration entry
-    enum_& value(char const* name, Type value, const char *doc = nullptr) {
+    enum_& value(char const* name, Type value) {
         auto v = pybind11::cast(value, return_value_policy::copy);
         this->attr(name) = v;
-        m_entries[pybind11::str(name)] = std::make_pair(v, doc);
+        m_entries[pybind11::str(name)] = v;
         return *this;
     }
 

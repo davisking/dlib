@@ -30,7 +30,8 @@
 #    define PYBIND11_HAS_OPTIONAL 1
 #  endif
 // std::experimental::optional (but not allowed in c++11 mode)
-#  if defined(PYBIND11_CPP14) && __has_include(<experimental/optional>)
+#  if defined(PYBIND11_CPP14) && (__has_include(<experimental/optional>) && \
+                                 !__has_include(<optional>))
 #    include <experimental/optional>
 #    define PYBIND11_HAS_EXP_OPTIONAL 1
 #  endif
@@ -91,7 +92,7 @@ template <typename Type, typename Key> struct set_caster {
         return s.release();
     }
 
-    PYBIND11_TYPE_CASTER(type, _("Set[") + key_conv::name + _("]"));
+    PYBIND11_TYPE_CASTER(type, _("Set[") + key_conv::name() + _("]"));
 };
 
 template <typename Type, typename Key, typename Value> struct map_caster {
@@ -127,7 +128,7 @@ template <typename Type, typename Key, typename Value> struct map_caster {
         return d.release();
     }
 
-    PYBIND11_TYPE_CASTER(Type, _("Dict[") + key_conv::name + _(", ") + value_conv::name + _("]"));
+    PYBIND11_TYPE_CASTER(Type, _("Dict[") + key_conv::name() + _(", ") + value_conv::name() + _("]"));
 };
 
 template <typename Type, typename Value> struct list_caster {
@@ -168,7 +169,7 @@ public:
         return l.release();
     }
 
-    PYBIND11_TYPE_CASTER(Type, _("List[") + value_conv::name + _("]"));
+    PYBIND11_TYPE_CASTER(Type, _("List[") + value_conv::name() + _("]"));
 };
 
 template <typename Type, typename Alloc> struct type_caster<std::vector<Type, Alloc>>
@@ -222,7 +223,7 @@ public:
         return l.release();
     }
 
-    PYBIND11_TYPE_CASTER(ArrayType, _("List[") + value_conv::name + _<Resizable>(_(""), _("[") + _<Size>() + _("]")) + _("]"));
+    PYBIND11_TYPE_CASTER(ArrayType, _("List[") + value_conv::name() + _<Resizable>(_(""), _("[") + _<Size>() + _("]")) + _("]"));
 };
 
 template <typename Type, size_t Size> struct type_caster<std::array<Type, Size>>
@@ -268,7 +269,7 @@ template<typename T> struct optional_caster {
         return true;
     }
 
-    PYBIND11_TYPE_CASTER(T, _("Optional[") + value_conv::name + _("]"));
+    PYBIND11_TYPE_CASTER(T, _("Optional[") + value_conv::name() + _("]"));
 };
 
 #if PYBIND11_HAS_OPTIONAL
@@ -348,7 +349,7 @@ struct variant_caster<V<Ts...>> {
     }
 
     using Type = V<Ts...>;
-    PYBIND11_TYPE_CASTER(Type, _("Union[") + detail::concat(make_caster<Ts>::name...) + _("]"));
+    PYBIND11_TYPE_CASTER(Type, _("Union[") + detail::concat(make_caster<Ts>::name()...) + _("]"));
 };
 
 #if PYBIND11_HAS_VARIANT
