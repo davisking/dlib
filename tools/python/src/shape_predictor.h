@@ -30,6 +30,7 @@ namespace dlib
             num_test_splits = 20;
             feature_pool_region_padding = 0;
             random_seed = "";
+            num_threads = 0;
         }
 
         bool be_verbose;
@@ -43,6 +44,9 @@ namespace dlib
         unsigned long num_test_splits;
         double feature_pool_region_padding;
         std::string random_seed;
+
+        // not serialized
+        unsigned long num_threads;
     };
 
     inline void serialize (
@@ -110,6 +114,7 @@ namespace dlib
             << "num_test_splits=" << o.num_test_splits << ","
             << "feature_pool_region_padding=" << o.feature_pool_region_padding << ","
             << "random_seed=" << o.random_seed
+            << "num_threads=" << o.num_threads
         << ")";
         return sout.str();
     }
@@ -165,6 +170,7 @@ namespace dlib
         trainer.set_feature_pool_region_padding(options.feature_pool_region_padding);
         trainer.set_lambda(options.lambda_param);
         trainer.set_num_test_splits(options.num_test_splits);
+        trainer.set_num_threads(options.num_threads);
 
         if (options.be_verbose)
         {
@@ -176,6 +182,7 @@ namespace dlib
             std::cout << "Training with oversampling amount: " << options.oversampling_amount << std::endl;
             std::cout << "Training with feature pool size: " << options.feature_pool_size << std::endl;
             std::cout << "Training with feature pool region padding: " << options.feature_pool_region_padding << std::endl;
+            std::cout << "Training with " << options.num_threads << " threads." << std::endl;
             std::cout << "Training with lambda_param: " << options.lambda_param << std::endl;
             std::cout << "Training with " << options.num_test_splits << " split tests."<< std::endl;
             trainer.be_verbose();

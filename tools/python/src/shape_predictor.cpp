@@ -208,6 +208,8 @@ void bind_shape_predictors(py::module &m)
                       e.g a padding of 0.5 would cause the algorithm to sample pixels from a box that was 2x2 pixels")
         .def_readwrite("random_seed", &type::random_seed,
                       "The random seed used by the internal random number generator")
+        .def_readwrite("num_threads", &type::num_threads,
+                        "Use this many threads/CPU cores for training.")
         .def("__str__", &::print_shape_predictor_training_options)
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
