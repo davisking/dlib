@@ -1,6 +1,7 @@
 // Copyright (C) 2015 Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include "opaque_types.h"
 #include <pybind11/pybind11.h>
 #include <dlib/simd.h>
 #include <string>

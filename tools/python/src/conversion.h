@@ -3,6 +3,7 @@
 #ifndef DLIB_PYTHON_CONVERSION_H__
 #define DLIB_PYTHON_CONVERSION_H__
 
+#include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/pixel.h>
 

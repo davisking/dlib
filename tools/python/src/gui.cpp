@@ -1,5 +1,6 @@
 #ifndef DLIB_NO_GUI_SUPPORT
 
+#include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/geometry.h>
 #include <dlib/image_processing/frontal_face_detector.h>

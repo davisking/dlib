@@ -1,6 +1,7 @@
 // Copyright (C) 2017  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/matrix.h>
 #include <dlib/geometry/vector.h>
@@ -17,7 +18,6 @@ using namespace std;
 
 namespace py = pybind11;
 
-PYBIND11_MAKE_OPAQUE(std::vector<full_object_detection>);
 
 typedef matrix<double,0,1> cv;
 

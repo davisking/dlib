@@ -3,6 +3,7 @@
 #ifndef DLIB_SIMPLE_OBJECT_DETECTOR_PY_H__
 #define DLIB_SIMPLE_OBJECT_DETECTOR_PY_H__
 
+#include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/matrix.h>
 #include <dlib/geometry.h>

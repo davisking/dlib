@@ -1,6 +1,7 @@
 // Copyright (C) 2017  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/matrix.h>
 #include <dlib/dnn.h>
@@ -13,8 +14,6 @@ using namespace std;
 
 namespace py = pybind11;
 
-PYBIND11_MAKE_OPAQUE(std::vector<mmod_rect>);
-PYBIND11_MAKE_OPAQUE(std::vector<std::vector<mmod_rect> >);
 
 class cnn_face_detection_model_v1
 {

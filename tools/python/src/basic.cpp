@@ -4,6 +4,7 @@
 #include <dlib/matrix.h>
 #include <sstream>
 #include <string>
+#include "opaque_types.h"
 
 #include <dlib/string.h>
 #include <pybind11/stl_bind.h>
@@ -12,22 +13,6 @@ using namespace std;
 using namespace dlib;
 namespace py = pybind11;
 
-PYBIND11_MAKE_OPAQUE(std::vector<double>);
-
-typedef std::vector<matrix<double,0,1>> column_vectors;
-PYBIND11_MAKE_OPAQUE(column_vectors);
-PYBIND11_MAKE_OPAQUE(std::vector<column_vectors>);
-
-typedef pair<unsigned long,unsigned long> ulong_pair;
-PYBIND11_MAKE_OPAQUE(ulong_pair);
-PYBIND11_MAKE_OPAQUE(std::vector<ulong_pair>);
-PYBIND11_MAKE_OPAQUE(std::vector<std::vector<ulong_pair>>);
-
-typedef pair<unsigned long,double> ulong_double_pair;
-PYBIND11_MAKE_OPAQUE(ulong_double_pair);
-PYBIND11_MAKE_OPAQUE(std::vector<ulong_double_pair>);
-PYBIND11_MAKE_OPAQUE(std::vector<std::vector<ulong_double_pair>>);
-PYBIND11_MAKE_OPAQUE(std::vector<std::vector<std::vector<ulong_double_pair> > >);
 
 std::shared_ptr<std::vector<double> > array_from_object(py::object obj)
 {

@@ -1,10 +1,13 @@
 // Copyright (C) 2018  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/data_io.h>
+#include <dlib/image_processing.h>
 #include <pybind11/stl_bind.h>
 #include <pybind11/stl.h>
+#include <iostream>
 
 namespace pybind11
 {
@@ -81,8 +84,6 @@ using namespace dlib::image_dataset_metadata;
 
 namespace py = pybind11;
 
-typedef std::map<std::string,point> parts_list_type;
-PYBIND11_MAKE_OPAQUE(parts_list_type);
 
 dataset py_load_image_dataset_metadata(
     const std::string& filename
@@ -102,6 +103,31 @@ std::shared_ptr<std::map<std::string,point>> map_from_object(py::dict obj)
     }
     return ret;
 }
+
+// ----------------------------------------------------------------------------------------
+
+image_dataset_metadata::dataset py_make_bounding_box_regression_training_data (
+    const image_dataset_metadata::dataset& truth,
+    const py::object& detections
+)
+{
+    try
+    {
+        // if detections is a std::vector then call like this.
+        return make_bounding_box_regression_training_data(truth, detections.cast<const std::vector<std::vector<rectangle>>&>());
+    }
+    catch (py::cast_error&)
+    {
+        // otherwise, detections should be a list of std::vectors.
+        py::list dets(detections);
+        std::vector<std::vector<rectangle>> temp;
+        for (auto& d : dets)
+            temp.emplace_back(d.cast<const std::vector<rectangle>&>());
+        return make_bounding_box_regression_training_data(truth, temp);
+    }
+}
+
+// ----------------------------------------------------------------------------------------
 
 void bind_image_dataset_metadata(py::module &m_)
 {
@@ -194,6 +220,60 @@ void bind_image_dataset_metadata(py::module &m_)
         "Attempts to interpret filename as a file containing XML formatted data as produced "
         "by the save_image_dataset_metadata() function.  The data is loaded and returned as a dlib.image_dataset_metadata.dataset object."
         );
+
+    m_.def("make_bounding_box_regression_training_data", &py_make_bounding_box_regression_training_data, 
+        py::arg("truth"), py::arg("detections"),
+"requires \n\
+    - len(truth.images) == len(detections) \n\
+    - detections == A dlib.rectangless object or a list of dlib.rectangles. \n\
+ensures \n\
+    - Suppose you have an object detector that can roughly locate objects in an \n\
+      image.  This means your detector draws boxes around objects, but these are \n\
+      *rough* boxes in the sense that they aren't positioned super accurately.  For \n\
+      instance, HOG based detectors usually have a stride of 8 pixels.  So the \n\
+      positional accuracy is going to be, at best, +/-8 pixels.   \n\
+       \n\
+      If you want to get better positional accuracy one easy thing to do is train a \n\
+      shape_predictor to give you the corners of the object.  The \n\
+      make_bounding_box_regression_training_data() routine helps you do this by \n\
+      creating an appropriate training dataset.  It does this by taking the dataset \n\
+      you used to train your detector (the truth object), and combining that with \n\
+      the output of your detector on each image in the training dataset (the \n\
+      detections object).  In particular, it will create a new annotated dataset \n\
+      where each object box is one of the rectangles from detections and that \n\
+      object has 4 part annotations, the corners of the truth rectangle \n\
+      corresponding to that detection rectangle.  You can then take the returned \n\
+      dataset and train a shape_predictor on it.  The resulting shape_predictor can \n\
+      then be used to do bounding box regression. \n\
+    - We assume that detections[i] contains object detections corresponding to  \n\
+      the image truth.images[i]." 
+    /*!
+        requires
+            - len(truth.images) == len(detections)
+            - detections == A dlib.rectangless object or a list of dlib.rectangles.
+        ensures
+            - Suppose you have an object detector that can roughly locate objects in an
+              image.  This means your detector draws boxes around objects, but these are
+              *rough* boxes in the sense that they aren't positioned super accurately.  For
+              instance, HOG based detectors usually have a stride of 8 pixels.  So the
+              positional accuracy is going to be, at best, +/-8 pixels.  
+              
+              If you want to get better positional accuracy one easy thing to do is train a
+              shape_predictor to give you the corners of the object.  The
+              make_bounding_box_regression_training_data() routine helps you do this by
+              creating an appropriate training dataset.  It does this by taking the dataset
+              you used to train your detector (the truth object), and combining that with
+              the output of your detector on each image in the training dataset (the
+              detections object).  In particular, it will create a new annotated dataset
+              where each object box is one of the rectangles from detections and that
+              object has 4 part annotations, the corners of the truth rectangle
+              corresponding to that detection rectangle.  You can then take the returned
+              dataset and train a shape_predictor on it.  The resulting shape_predictor can
+              then be used to do bounding box regression.
+            - We assume that detections[i] contains object detections corresponding to 
+              the image truth.images[i].
+    !*/
+    );
 }
 
 

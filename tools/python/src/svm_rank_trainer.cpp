@@ -1,6 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/matrix.h>
 #include <dlib/svm.h>
@@ -12,12 +13,7 @@ using namespace std;
 namespace py = pybind11;
 
 typedef matrix<double,0,1> sample_type; 
-typedef std::vector<std::pair<unsigned long,double> > sparse_vect;
-typedef std::vector<ranking_pair<sample_type> > ranking_pairs;
-typedef std::vector<ranking_pair<sparse_vect> > sparse_ranking_pairs;
 
-PYBIND11_MAKE_OPAQUE(ranking_pairs);
-PYBIND11_MAKE_OPAQUE(sparse_ranking_pairs);
 
 // ----------------------------------------------------------------------------------------
 

@@ -1,6 +1,7 @@
 // Copyright (C) 2013  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/matrix.h>
 #include <dlib/geometry/vector.h>
@@ -12,7 +13,6 @@ using namespace std;
 
 typedef matrix<double,0,1> cv;
 
-PYBIND11_MAKE_OPAQUE(std::vector<point>);
 
 void cv_set_size(cv& m, long s)
 {

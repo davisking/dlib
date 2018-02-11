@@ -5,13 +5,13 @@
 #include <dlib/geometry.h>
 #include <pybind11/stl_bind.h>
 #include "indexing.h"
+#include "opaque_types.h"
 
 using namespace dlib;
 using namespace std;
 
 namespace py = pybind11;
 
-PYBIND11_MAKE_OPAQUE(std::vector<rectangle>);
 
 // ----------------------------------------------------------------------------------------
 
@@ -120,9 +120,19 @@ void bind_rectangles(py::module& m)
         .def(py::self != py::self)
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
+
     {
     typedef std::vector<rectangle> type;
     py::bind_vector<type>(m, "rectangles", "An array of rectangle objects.")
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def("extend", extend_vector_with_python_list<rectangle>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
+
+    {
+    typedef std::vector<std::vector<rectangle>> type;
+    py::bind_vector<type>(m, "rectangless", "An array of arrays of rectangle objects.")
         .def("clear", &type::clear)
         .def("resize", resize<type>)
         .def("extend", extend_vector_with_python_list<rectangle>)

@@ -1,3 +1,4 @@
+#include "opaque_types.h"
 #include <dlib/python.h>
 #include "dlib/pixel.h"
 #include <dlib/image_transforms.h>
