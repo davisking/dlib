@@ -21,7 +21,6 @@ std::vector<bool> list_to_bool_vector(
     for (long i = 0; i < result.size(); ++i)
     {
         result[i] = l[i].cast<bool>();
-        cout << "bool val: " << result[i] << endl;
     }
     return result;
 }
