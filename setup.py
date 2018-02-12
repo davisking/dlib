@@ -21,7 +21,8 @@ To exclude/include certain options in the cmake config use --yes and --no:
     --yes USE_AVX_INSTRUCTIONS: will set -DUSE_AVX_INSTRUCTIONS=yes
     --no USE_AVX_INSTRUCTIONS: will set -DUSE_AVX_INSTRUCTIONS=no
 Additional options:
-    --compiler-flags: pass flags onto the compiler, e.g. --compiler-flag "-Os -Wall" passes -Os -Wall onto GCC.
+    --compiler-flags: pass flags onto the compiler, e.g. --compiler-flags "-Os -Wall" passes -Os -Wall onto GCC.
+    -G: Set the CMake generator.  E.g. -G "Visual Studio 14 2015"
     --clean: delete any previous build folders and rebuild.  You should do this if you change any build options
              by setting --compiler-flags or --yes or --no since last time you ran a build to make sure the changes
              take effect.
@@ -42,7 +43,7 @@ from distutils.version import LooseVersion
 
 
 def get_extra_cmake_options():
-    """read --clean, --yes, --no, and --compiler-flag options from the command line and add them as cmake switches.
+    """read --clean, --yes, --no, --compiler-flags, and -G options from the command line and add them as cmake switches.
     """
     _cmake_extra_options = []
     _clean_build_folder = False
@@ -51,9 +52,11 @@ def get_extra_cmake_options():
 
     argv = [arg for arg in sys.argv]  # take a copy
     # parse command line options and consume those we care about
-    for opt_idx, arg in enumerate(argv):
+    for arg in argv:
         if opt_key == 'compiler-flags':
             _cmake_extra_options.append('-DCMAKE_CXX_FLAGS={arg}'.format(arg=arg.strip()))
+        elif opt_key == 'G':
+            _cmake_extra_options += ['-G', arg.strip()]
         elif opt_key == 'yes':
             _cmake_extra_options.append('-D{arg}=yes'.format(arg=arg.strip()))
         elif opt_key == 'no':
@@ -71,6 +74,10 @@ def get_extra_cmake_options():
 
         if arg in ['--yes', '--no', '--compiler-flags']:
             opt_key = arg[2:].lower()
+            sys.argv.remove(arg)
+            continue
+        if arg in ['-G']:
+            opt_key = arg[1:]
             sys.argv.remove(arg)
             continue
 
