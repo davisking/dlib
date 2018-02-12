@@ -149,8 +149,8 @@ namespace dlib
             throw error("Invalid lambda_param value given to train_shape_predictor(), lambda_param must be > 0.");
         if (!(0 < options.nu && options.nu <= 1))
             throw error("Invalid nu value given to train_shape_predictor(). It is required that 0 < nu <= 1.");
-        if (options.feature_pool_region_padding < 0)
-            throw error("Invalid feature_pool_region_padding value given to train_shape_predictor(), feature_pool_region_padding must be >= 0.");
+        if (options.feature_pool_region_padding <= -0.5)
+            throw error("Invalid feature_pool_region_padding value given to train_shape_predictor(), feature_pool_region_padding must be > -0.5.");
 
         if (images.size() != detections.size())
             throw error("The list of images must have the same length as the list of detections.");
