@@ -523,15 +523,18 @@ namespace dlib
         {
             const double lambda = get_lambda(); 
             impl::split_feature feat;
-            double accept_prob;
-            do 
+            const size_t max_iters = get_feature_pool_size()*get_feature_pool_size();
+            for (size_t i = 0; i < max_iters; ++i)
             {
-                feat.idx1   = rnd.get_random_32bit_number()%get_feature_pool_size();
-                feat.idx2   = rnd.get_random_32bit_number()%get_feature_pool_size();
+                feat.idx1   = rnd.get_integer(get_feature_pool_size());
+                feat.idx2   = rnd.get_integer(get_feature_pool_size());
+                while (feat.idx1 == feat.idx2)
+                    feat.idx2   = rnd.get_integer(get_feature_pool_size());
                 const double dist = length(pixel_coordinates[feat.idx1]-pixel_coordinates[feat.idx2]);
-                accept_prob = std::exp(-dist/lambda);
+                const double accept_prob = std::exp(-dist/lambda);
+                if (accept_prob > rnd.get_random_double())
+                    break;
             }
-            while(feat.idx1 == feat.idx2 || !(accept_prob > rnd.get_random_double()));
 
             feat.thresh = (rnd.get_random_double()*256 - 128)/2.0;
 
