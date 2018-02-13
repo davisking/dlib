@@ -155,7 +155,7 @@ void bind_cnn_face_detection(py::module& m)
             "takes a list of images as input returning a 2d list of mmod rectangles"
             );
     }
-    m.def("set_dnn_prefer_smallest_algorithms", &set_dnn_prefer_smallest_algorithms, "Tells cuDNN to use slower architectures that use less RAM.");
+    m.def("set_dnn_prefer_smallest_algorithms", &set_dnn_prefer_smallest_algorithms, "Tells cuDNN to use slower algorithms that use less RAM.");
     {
     typedef mmod_rect type;
     py::class_<type>(m, "mmod_rectangle", "Wrapper around a rectangle object and a detection confidence score.")
