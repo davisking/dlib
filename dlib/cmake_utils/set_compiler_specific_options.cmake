@@ -126,6 +126,22 @@ if (MSVC)
       # Clang can compile all Dlib's code at Windows platform. Tested with Clang 5
       list(APPEND active_compile_opts "-Xclang -fcxx-exceptions")
    endif()
+
+   if(${CMAKE_VERSION} VERSION_GREATER 3.0.1)
+      # See if we can enable multi-process build.
+      cmake_host_system_information(RESULT num_logical_cores QUERY NUMBER_OF_LOGICAL_CORES)
+      cmake_host_system_information(RESULT available_ram_mb QUERY AVAILABLE_PHYSICAL_MEMORY)
+      math(EXPR required_ram_mb "${num_logical_cores} * 768")  # 768MB per process.
+      message(STATUS "Available physical memory: ${available_ram}MB")
+      message(STATUS "Logical core count: ${num_logical_cores}")
+      message(STATUS "Minimum memory required for multi-process build: ${required_ram_mb}MB")
+      if(${available_ram_mb} GREATER_EQUAL ${required_ram_mb})
+         message(STATUS "Enabling multi-process build")
+         list(APPEND active_compile_opts "/MP")
+      endif()
+   endif()
+
+   list(APPEND active_compile_opts "/wd4005")
 endif()
 
 
