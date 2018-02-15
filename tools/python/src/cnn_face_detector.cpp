@@ -64,7 +64,7 @@ public:
     }
 
     std::vector<std::vector<mmod_rect> > detect_mult (
-        py::list& imgs,
+        py::list imgs,
         const int upsample_num_times,
         const int batch_size = 128
     )
@@ -142,17 +142,17 @@ void bind_cnn_face_detection(py::module& m)
         .def(py::init<std::string>())
         .def(
             "__call__", 
+            &cnn_face_detection_model_v1::detect_mult, 
+            py::arg("imgs"), py::arg("upsample_num_times")=0, py::arg("batch_size")=128, 
+            "takes a list of images as input returning a 2d list of mmod rectangles"
+            )
+        .def(
+            "__call__", 
             &cnn_face_detection_model_v1::detect, 
             py::arg("img"), py::arg("upsample_num_times")=0,
             "Find faces in an image using a deep learning model.\n\
           - Upsamples the image upsample_num_times before running the face \n\
             detector."
-            )
-        .def(
-            "__call__", 
-            &cnn_face_detection_model_v1::detect_mult, 
-            py::arg("imgs"), py::arg("upsample_num_times")=0, py::arg("batch_size")=128, 
-            "takes a list of images as input returning a 2d list of mmod rectangles"
             );
     }
     m.def("set_dnn_prefer_smallest_algorithms", &set_dnn_prefer_smallest_algorithms, "Tells cuDNN to use slower algorithms that use less RAM.");
