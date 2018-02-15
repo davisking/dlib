@@ -108,7 +108,11 @@ namespace dlib
         __inline__ __device__ float warp_reduce_sum(float val) 
         {
             for (int offset = warpSize/2; offset > 0; offset /= 2) 
+#if CUDART_VERSION >= 9000
+                val += __shfl_down_sync(0xFFFFFFFF,val, offset);
+#else
                 val += __shfl_down(val, offset);
+#endif
             return val;
         }
 
