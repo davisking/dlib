@@ -127,7 +127,7 @@ namespace dlib
                 {
                     if (streambuf->sputn(reinterpret_cast<char*>(&buf),1)==0)
                     {
-                        throw std::ios_base::failure("error occured in the entropy_encoder object");
+                        throw std::ios_base::failure("error occurred in the entropy_encoder object");
                     }
                     buf = 0;
                     buf_used = 0;
@@ -189,26 +189,26 @@ namespace dlib
         }
 
         if (streambuf->sputn(reinterpret_cast<char*>(&buf),1) == 0)
-            throw std::ios_base::failure("error occured in the entropy_encoder object");
+            throw std::ios_base::failure("error occurred in the entropy_encoder object");
 
 
 
         buf = static_cast<unsigned char>((low >> 24)&0xFF);
         if (streambuf->sputn(reinterpret_cast<char*>(&buf),1) == 0)
-            throw std::ios_base::failure("error occured in the entropy_encoder object");
+            throw std::ios_base::failure("error occurred in the entropy_encoder object");
 
 
 
 
         buf = static_cast<unsigned char>((low >> 16)&0xFF);
         if (streambuf->sputn(reinterpret_cast<char*>(&buf),1)==0)
-            throw std::ios_base::failure("error occured in the entropy_encoder object");
+            throw std::ios_base::failure("error occurred in the entropy_encoder object");
 
 
 
         buf = static_cast<unsigned char>((low >> 8)&0xFF);
         if (streambuf->sputn(reinterpret_cast<char*>(&buf),1)==0)
-            throw std::ios_base::failure("error occured in the entropy_encoder object");
+            throw std::ios_base::failure("error occurred in the entropy_encoder object");
 
 
 
@@ -216,7 +216,7 @@ namespace dlib
         {
             buf = static_cast<unsigned char>((low)&0xFF);
             if (streambuf->sputn(reinterpret_cast<char*>(&buf),1)==0)
-                throw std::ios_base::failure("error occured in the entropy_encoder object");
+                throw std::ios_base::failure("error occurred in the entropy_encoder object");
         }
     
 

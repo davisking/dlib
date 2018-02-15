@@ -121,7 +121,7 @@ namespace dlib
             buffer <<= 8 - buffer_size;
             if (osp->rdbuf()->sputn(reinterpret_cast<char*>(&buffer),1) == 0)
             {
-                throw std::ios_base::failure("error occured in the bit_stream object");
+                throw std::ios_base::failure("error occurred in the bit_stream object");
             }
 
             buffer_size = 0;
