@@ -108,7 +108,7 @@ namespace
 
         matrix<double> L = randm(m,rank, rnd)*randm(rank,n, rnd);
         //matrix<double> R = randm(m,rank, rnd)*randm(rank,n2, rnd);
-        matrix<double> R = L*randm(n,n2);
+        matrix<double> R = L*randm(n,n2, rnd);
         //matrix<double> L = randm(m,n, rnd);
         //matrix<double> R = randm(m,n2, rnd);
 
