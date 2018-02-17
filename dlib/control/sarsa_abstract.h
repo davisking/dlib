@@ -16,22 +16,20 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON model_type
-                model_type is an implementation of the model interface declared in
-                  model_abstract.h.
+                model_type should implement the example_online_model interface defined in
+                the approximate_linear_models_abstract.h file.
 
             WHAT THIS OBJECT REPRESENTS
-                This objects is an implementation of the well-known reinforcement learning
-                algorithm Q-learning. This algorithms takes a bunch of process_samples
-                as input and outputs a policy that have learnt from that in order to take
-                the better results.
+                This object is an implementation of the well-known reinforcement learning
+                algorithm SARSA. It takes an online model and tries to learn the best
+                possible policy for the model's environment by interacting with it.
 
                 Supposing we are in state s and action a and we are going to a new state s'
-                the learning function has the form:
+                and taking the action a' in s', then the learning function has the form:
                     Q(s, a) = (1 - lr) * Q(s,a) + lr * (reward + disc * Q(s', a'))
-                where lr is the learning_rate, disc the discount and a' is the next action
-                the algorithm will perform after reaching s'.
-                That formula means that it takes a convex combination of the current qvalue
-                and the expected qvalue.
+                where lr is the learning_rate and disc is the discount factor.
+                That formula means that it takes a convex combination of the current qvalue,
+                that is, the current expected reward from there, and the new expected qvalue.
 
                 Note that, unlike qlearning, sarsa is an on-policy reinforcement learning
                 algorithm meaning that it takes the policy into account while learning.
@@ -46,7 +44,7 @@ namespace dlib
                 - #get_discount() == 0.8
                 - #get_iterations() == 100
                 - #get_epsilon() == 0.1
-                - #is not verbose
+                - #is_verbose() == false
         !*/
 
         explicit sarsa(
@@ -123,7 +121,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the probability of doing a non-optimal step while training.
+                - returns the probability of taking a random step while training.
         !*/
 
         void set_epsilon(
@@ -158,46 +156,21 @@ namespace dlib
         !*/
 
         template <
-            typename policy_type,
             typename prng_engine = std::default_random_engine
             >
-        policy_type train_policy(
-            const policy_type &policy,
-            const prng_engine &gen
-        ) const;
-        /*!
-            requires
-                - policy is of the form example_policy<model_type>, i.e., an instance of
-                  an implementation of the policy interface defined in policy_abstract.h.
-                - prng_engine is a pseudo-random number generator class like the ones
-                  defined in std::random. By default it assumes it to be the standard
-                  default_random_engine class.
-            ensures
-                - returns a policy of the type policy_type as the result of applying the
-                  sarsa learning function over iterations runs over using the weight
-                  matrix of the argument as the initial weights. Besides that, the
-                  exploration is done with an epsilon policy using the given prng.
-        !*/
-
-        template <
-            typename model_type,
-            typename prng_engine = std::default_random_engine
-            >
-        greedy_policy<model_type> train(
-            const model_type &model,
+        policy_type train(
+            policy<model_type> policy = policy<model_type>(),
             const prng_engine &gen = prng_engine()
         ) const;
         /*!
             requires
-                - model_type is an implementation of the example_model interface defined
-                  at model_abstract.h.
                 - prng_engine is a pseudo-random number generator class like the ones
-                  defined in std::random. By default it assumes it to be the standard
-                  default_random_engine class.
+                  defined in std::random. By default it is the standard one.
             ensures
-                - returns train_policy(greedy_policy<model_type>(model), gen);
+                - returns the policy resulting of applying the learning function over
+                  and over according to the parameters previously fed into this object.
         !*/
-    };
+
     };
 
 // ----------------------------------------------------------------------------------------

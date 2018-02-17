@@ -3,7 +3,6 @@
 #ifndef DLIB_CONTROL_
 #define DLIB_CONTROL_
 
-#include "control/policy.h"
 #include "control/lspi.h"
 #include "control/mpc.h"
 #include "control/qlearning.h"

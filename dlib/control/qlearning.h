@@ -3,23 +3,27 @@
 #ifndef DLIB_QLEARNING_Hh_
 #define DLIB_QLEARNING_Hh_
 
-#include "policy.h"
+#include "approximate_linear_models.h"
 #include <iostream>
 #include <type_traits>
 #include <random>
 
 namespace dlib
 {
+    template<
+        typename model_type
+        >
     class qlearning
     {
     public:
+
         explicit qlearning(
             double lr = 0.2,
             double disc = 0.8,
             unsigned int miters = 100u,
             double eps = 0.1,
             bool v = false
-        ) : iterations(miters), verbose(v) {
+        ) : iters(miters), verbose(v) {
             set_learning_rate(lr);
             set_discount(disc);
             set_epsilon(eps);
@@ -56,11 +60,11 @@ namespace dlib
         }
 
         unsigned int get_iterations(
-        ) const { return iterations; }
+        ) const { return iters; }
 
         void set_iterations(
             unsigned int value
-        ) { iterations = value; }
+        ) { iters = value; }
 
         double get_epsilon(
         ) const { return epsilon; }
@@ -87,43 +91,44 @@ namespace dlib
         ) { verbose = false; }
 
         template <
-            typename policy_type,
             typename prng_engine = std::default_random_engine
             >
-        policy_type train_policy(
-            const policy_type &policy,
+        policy<model_type> train(
+            policy<model_type> training_policy = policy<model_type>(),
             const prng_engine &gen = prng_engine()
         ) const
         {
-            typedef typename std::decay<decltype(policy.get_model())>::type::reward_type reward_type;
-
             if(verbose)
                 std::cout << "Starting training..." << std::endl;
 
-            const auto &model = policy.get_model();
-            epsilon_policy<policy_type, prng_engine> eps_pol(epsilon, policy, gen);
+            const auto& model = training_policy.get_model();
+            epsilon_policy<policy<model_type>, prng_engine> eps_pol(epsilon, training_policy, gen);
             auto& w = eps_pol.get_weights();
 
             DLIB_ASSERT(weights.size() == model.states_size(),
-                "\t qlearning::train(weights)"
+                "\t qlearning::train(policy, gen)"
                 "\n\t invalid inputs were given to this function"
-                "\n\t weights.size: " << weights.size() <<
-                "\n\t features size: " << model.states_size()
+                "\n\t policy's weights.size: " << weights.size() <<
+                "\n\t num of features: " << model.num_features()
             );
 
-            reward_type total_reward = static_cast<reward_type>(0);
-            for(auto iter = 0u; iter < iterations; ++iter){
-                auto state = model.initial_state();
+            matrix<double,0,1> feats(model.num_features()), feats_next_best(model.num_features());
 
+            double total_reward = 0.;
+            for(auto iter = 0u; iter < iters; ++iter)
+            {
+                auto state = model.initial_state();
                 auto steps = 0u;
-                reward_type iteration_reward = static_cast<reward_type>(0);
-                while(!model.is_final(state)){
+                double iteration_reward = 0.;
+
+                while(!model.is_final(state))
+                {
                     auto action = eps_pol(state);
                     auto next_state = model.step(state, action);
                     auto reward = model.reward(state, action, next_state);
 
-                    const auto feats = model.get_features(state, action);
-                    const auto feats_next_best = model.get_features(next_state, model.find_best_action(next_state, w));
+                    model.get_features(state, action, feats);
+                    model.get_features(next_state, model.find_best_action(next_state, w), feats_next_best);
 
                     double correction = reward + discount * dot(w, feats_next_best) - dot(w, feats);
                     w += learning_rate * correction * feats;
@@ -135,7 +140,8 @@ namespace dlib
 
                 total_reward += iteration_reward;
                 if(verbose)
-                    std::cout << "iteration: " << iter << "\t reward: " << iteration_reward
+                    std::cout << "iteration: " << iter
+                              << "\t reward: " << iteration_reward
                               << "\t mean: " << total_reward/static_cast<int>(iter+1)
                               << "\t steps: " << steps
                               << std::endl;
@@ -144,22 +150,13 @@ namespace dlib
             if(verbose)
                 std::cout << "Training finished." << std::endl;
 
-            return eps_pol.get_policy();
+            return training_policy;
         }
-
-        template <
-                typename model_type,
-                typename prng_engine = std::default_random_engine
-                >
-        greedy_policy<model_type> train(
-            const model_type &model,
-            const prng_engine &gen = prng_engine()
-        ) const { return train_policy(greedy_policy<model_type>(model), gen); }
 
     private:
         double learning_rate;
         double discount;
-        unsigned int iterations;
+        unsigned int iters;
         double epsilon;
         bool verbose;
     };

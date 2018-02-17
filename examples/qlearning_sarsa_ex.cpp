@@ -16,36 +16,41 @@ using namespace dlib;
 using namespace std;
 
 /*
-    Both of these algorithms work by a reward system. That means that they assign to each
-    pair (state, action) an expected reward (Qvalue) and they update those values iteratively
-    taking steps on a model/simulation and observing the reward they obtain. Like so, they
-    need a model class that allow them to work in a interactive way.
+    Both of these algorithms work with a reward system. It means that they assign to each
+    pair (state, action) an expected reward (qvalue) and they iteratively update those values
+    taking steps on an online model/simulation observing the reward obtained. Like so, they
+    need a model class that allows them to work in a interactive way.
 
-    The algorithms/agents objective is to maximize the expected reward by taking the proper
+    The algorithms/agents' objective is to maximize the expected reward by taking the proper
     steps.
 */
 
 /*
-    This is the model the agent is going to work with in the example. In particular,
+    Let me now introduce you the conceptual model the agent is going to use. Basically,
     this class represents a grid with a given height and width of the form
                                      ..........
                                      ..........
                                      IFFFFFFFFG
-    where: - F are pit cells (if the agent falls there it fails and simulation ends).
+    where: - Fs represent pit cells where the agent can fall and thus fail the simulation.
            - I is the starting position.
-           - G is the goal cell (the agent goal is to reach that cell).
-           - . are free cells where the agent can go.
+           - G is the goal cell where the agent aims to go.
+           - dots (.) represent free cells where the agent can freely go through.
 
     The agent receives the following reward: -100 for reaching F, 100 for reaching G and a
     reward of -1 otherwise.
 
     This model doesn't allow the agent to go out of bounds, instead it will stay in the same cell
-    he was before the action (like if there was a wall there) but receiving a reward of -1.
+    it was before the taking action (like if there was a wall) and receive a reward of -1.
+
+    Function approximation by feature extraction is a powerful tool for reducing the state space's size.
+    But ours is a toy example and so I use a one-shot representation, meaning that each feature
+    represents a single state of the space and it will be 1 when that's state is active and 0 otherwise.
 */
+
+//This is an implementation of the example_online_model interface on approximate_linear_models_abstract.h
 template <
         int height,
-        int width,
-        template<typename,typename> class feature_extractor_type
+        int width
         >
 class cliff_model
 {
@@ -54,7 +59,7 @@ public:
     enum class actions {up = 0, right, down, left};
     constexpr static int num_actions = 4;
 
-    // some constants that we need
+    // some constants we need
     constexpr static double EPS = 1e-16;
     constexpr static int HEIGHT = height;
     constexpr static int WIDTH = width;
@@ -62,21 +67,30 @@ public:
     // we define the model's types
     typedef int state_type;
     typedef actions action_type;
-    typedef int reward_type;
-
-    // this ensures that the feature extractor uses the same underlying types as our model
-    typedef feature_extractor_type<state_type, action_type> feature_extractor;
-
 
     // Constructor
     explicit cliff_model(
         int seed = 0
-    ) : fe(height, width, num_actions), gen(seed){}
+    ) : gen(seed){}
 
 
     // Functions that will use the agent
 
-    // It returns a random action. It's possible that the allowed actions differ from among states.
+    unsigned int num_features(
+    ) const { return num_actions * height * width; }
+
+    void get_features(
+        const state_type &state,
+        const action_type &action,
+        matrix<double,0,1>& feats
+    ) const
+    {
+        feats.set_size(num_features());
+        feats = 0;
+        feats(num_actions*state + static_cast<int>(action)) = 1; //only this one is 1
+    }
+
+    // It's possible that the allowed actions differ among states.
     // In this case all movements are always allowed so we don't need to use state.
     action_type random_action(
         const state_type& state
@@ -86,9 +100,6 @@ public:
         return static_cast<action_type>(dist(gen));
     }
 
-    // Returns the best action that maximizes the expected reward, that is,
-    // the action that maximizes dot_product(w, get_features(state, action))
-    // w will be the weights assign by the agent to each feature
     action_type find_best_action(
         const state_type& state,
         const matrix<double,0,1>& w
@@ -97,8 +108,10 @@ public:
         auto best = numeric_limits<double>::lowest();
         auto best_indexes = std::vector<int>();
 
-        for(auto i = 0; i < num_actions; i++){
-            auto feats = get_features(state, static_cast<action_type>(i));
+        for(auto i = 0; i < num_actions; i++)
+        {
+            matrix<double,0,1> feats;
+            get_features(state, static_cast<action_type>(i), feats);
             auto product = dot(w, feats);
 
             if(product > best){
@@ -114,27 +127,8 @@ public:
         return static_cast<action_type>(best_indexes[dist(gen)]);
     }
 
-
-    // This functions are delegated to the feature extractor
-
-    const feature_extractor& get_feature_extractor(
-    ) const { return fe; }
-
-    auto states_size(
-    ) const -> decltype(get_feature_extractor().num_features())
-    {
-        return get_feature_extractor().num_features();
-    }
-
-    auto get_features(
-        const state_type &state,
-        const action_type &action
-    ) const -> decltype(get_feature_extractor().get_features(state, action))
-    { return get_feature_extractor().get_features(state, action); }
-
-
     // This functions gives the rewards, that is, tells the agent how good are its movements
-    reward_type reward(
+    double reward(
         const state_type &state,
         const action_type &action,
         const state_type &new_state
@@ -146,7 +140,7 @@ public:
     state_type initial_state(
     ) const { return static_cast<state_type>((height-1) * width); }
 
-    // This is an important function, basically it allows the agent to move in the model's world
+    // This is an important function, basically it allows the agent to move around the environment
     state_type step(
         const state_type& state,
         const action_type& action
@@ -161,8 +155,7 @@ public:
                                             state - 1       ;
     }
 
-    // this functions allow the agent to know in which state of the simulation he is in
-
+    // this functions allow the agent to know in which state of the simulation it's in
     bool is_success(
         const state_type &state
     ) const { return state == height*width - 1; }
@@ -176,6 +169,7 @@ public:
     ) const { return is_success(state) || is_failure(state); }
 
 private:
+
     bool out_of_bounds(
         const state_type& state,
         const action_type& action
@@ -183,7 +177,8 @@ private:
     {
         bool result;
 
-        switch(action){
+        switch(action)
+        {
         case actions::up:
             result = state / width == 0;
             break;
@@ -201,53 +196,7 @@ private:
         return result;
     }
 
-    feature_extractor fe;
     mutable default_random_engine gen; //mutable because it doesn't changes the model state
-};
-
-/*
-    Usually when we use these types of agents the state space of the model is huge. That could make
-    the Qfunction to be unmanageable and so we need to use what is known as function approximation.
-
-    Basically it represents the states by a given features instead of the states themselves. That way
-    what usually was just a single value Q(state, action) now is codified as the linear combination of
-    learnt weights and the features, that is, Q(state, action) = dot_product(weights, features(state, action)).
-
-    Our example is a toy example and so we don't need to use it. However, to show how it works I use a simple
-    one-shot representation of the states. That means that I have a vector of features where the feature in the
-    ith position is one if we provide a specific (state, action) and 0 otherwise.
-*/
-template <
-        typename state_type,
-        typename action_type
-        >
-class feature_extractor
-{
-public:
-    feature_extractor(
-        int h,
-        int w,
-        int na
-    ) : height(h), width(w), num_actions(na) {}
-
-    //the size of the vector
-    inline long num_features(
-    ) const { return num_actions * height * width; }
-
-    matrix<double,0,1> get_features(
-        const state_type &state,
-        const action_type &action
-    ) const
-    {
-        matrix<double,0,1> feats(num_features());
-        feats = 0;
-        feats(num_actions*state + static_cast<int>(action)) = 1; //only this one is 1
-
-        return feats;
-    }
-
-private:
-    int height, width, num_actions;
 };
 
 // This is just a helper function to pretty-print the agent's state.
@@ -283,7 +232,7 @@ void print(
     This is the function that runs the agent. The code to run both agents are identical so I
     chose to use a templated function.
 
-    The difference between executions comes in the way they train. Namely, the way they updated the Qvalue.
+    The difference between executions comes in the way they train. Namely, the way they update the qvalue.
     Let's suppose that we are in the pair (s, a) and we are going to be in (s', a') in the next step.
 
     Q-learning is an off-policy algorithm meaning that doesn't consider its trully next move but the best one,
@@ -296,19 +245,16 @@ void print(
     in the next step instead of the optimal. So it's an on-policy algorithm. Its update formula is:
                             Q(s, a) = (1 - lr) * Q(s,a) + lr * (reward + disc * Q(s', a'))
 
-    This seems as a meaningless change, but what produces is that when training SARSA tends to be more conservative
-    in its movement while Q-learning tries to optimizes no matter what. In cases when you have to avoid failling
+    This looks as a meaningless change, but what produces is that, when training, SARSA tends to be more conservative
+    in its movements while Q-learning tries to optimizes them no matter what. In cases when you have to avoid failure
     (usually a real world example) SARSA is a better option.
 
-    In our example this difference is appreciated in the way they learn. Q-learning will try to go close to the pit
+    In our example this difference can be appreciated in the way they learn. Q-learning will try to go close to the pit
     cells all the time (falling a lot in the training process) and SARSA will go one or two cells off the cliff.
-
-    Usually, one decreases the learning ratio as the iterations go on and so SARSA would converge to the same solution
-    as Q-learning. This is not implemented yet and so the learning rate is constant always.
 */
 template <
         typename model_t,
-        typename algorithm_t // this can be qlearning or sarsa
+        typename algorithm_t // qlearning or sarsa
         >
 void run_example(const model_t &model, algorithm_t &&algorithm)
 {
@@ -317,7 +263,7 @@ void run_example(const model_t &model, algorithm_t &&algorithm)
 
     cout << "Starting final simulation..." << endl;
     auto s = model.initial_state();
-    auto r = static_cast<typename model_t::reward_type>(0);
+    double r = 0.;
     int i;
 
     for(i = 0; i < 100 && !model.is_final(s); i++){
@@ -345,17 +291,16 @@ int main(int argc, char** argv)
 
     const auto height = 3u;
     const auto width = 7u;
-    typedef cliff_model<height, width, feature_extractor> model_type;
-    model_type model;
+    cliff_model<height, width> model;
 
     char response;
     cout << "Qlearning or SARSA? (q/s): ";
     cin >> response;
 
     if(response == 'q')
-        run_example(model, qlearning());
+        run_example(model, qlearning<decltype(model)>());
     else if(response == 's')
-        run_example(model, sarsa());
+        run_example(model, sarsa<decltype(model)>());
     else
         cerr << "Invalid option." << endl;
 
