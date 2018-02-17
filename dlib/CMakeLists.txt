@@ -32,6 +32,31 @@ if(has_parent)
    endif()
 endif()
 
+
+if (DLIB_IN_PROJECT_BUILD)
+   # DLIB_IN_PROJECT_BUILD==true means you are using dlib by invoking
+   # add_subdirectory(dlib) in the parent project. In this case, we always want
+   # to build dlib as a static library so the parent project doesn't need to
+   # deal with some random dlib shared library file.  It is much better to
+   # statically compile dlib into the parent project.  So the following bit of
+   # CMake ensures that happens.  However, we have to take care to compile dlib
+   # with position independent code if appropriate (i.e. if the parent project
+   # is a shared library).
+   if (BUILD_SHARED_LIBS)
+      if (CMAKE_COMPILER_IS_GNUCXX)
+         # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
+         # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
+         # does.
+         add_definitions("-fPIC")
+      endif()
+      set(CMAKE_POSITION_INDEPENDENT_CODE true)
+   endif()
+
+   # Tell cmake to build dlib as a static library
+   set(BUILD_SHARED_LIBS false)
+endif()
+
+
 if (CMAKE_VERSION VERSION_LESS "3.9.0")
    # Set only because there are old target_link_libraries() statements in the
    # FindCUDA.cmake file that comes with CMake that error out if the new behavior
@@ -710,6 +735,9 @@ if (NOT TARGET dlib)
    if (DLIB_IN_PROJECT_BUILD)
       target_compile_options(dlib PUBLIC ${active_preprocessor_switches})
    else()
+      # These are private in this case because they will be controlled by the
+      # contents of dlib/config.h once it's installed. But for in project
+      # builds, there is no real config.h so they are public in the above case.
       target_compile_options(dlib PRIVATE ${active_preprocessor_switches})
    endif()
 
