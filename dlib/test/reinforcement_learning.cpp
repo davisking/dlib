@@ -167,7 +167,7 @@ namespace
     template <
         int height,
         int width,
-        template<typename> typename algorithm_t
+        template<typename> class algorithm_t
         >
     void test()
     {
