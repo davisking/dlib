@@ -151,7 +151,7 @@ namespace dlib
         ) const { return underlying_policy; }
 
         auto get_model (
-        ) const -> decltype(get_policy().get_model()) { return underlying_policy.get_model(); }
+        ) const -> decltype(underlying_policy.get_model()) { return underlying_policy.get_model(); }
 
         matrix<double,0,1>& get_weights (
         ) { return underlying_policy.get_weights(); }
