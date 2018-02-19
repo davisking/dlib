@@ -45,17 +45,18 @@ py::list mat_to_list (
     return l;
 }
 
-size_t num_function_arguments(py::object f)
+size_t num_function_arguments(py::object f, size_t expected_num)
 {
-    if (hasattr(f,"func_code"))
-        return f.attr("func_code").attr("co_argcount").cast<std::size_t>();
-    else
-        return f.attr("__code__").attr("co_argcount").cast<std::size_t>();
+    const auto code_object = f.attr(hasattr(f,"func_code") ? "func_code" : "__code__");
+    const auto num = code_object.attr("co_argcount").cast<std::size_t>();
+    if (num < expected_num && (code_object.attr("co_flags").cast<int>() & CO_VARARGS))
+        return expected_num;
+    return num;
 }
 
 double call_func(py::object f, const matrix<double,0,1>& args)
 {
-    const auto num = num_function_arguments(f);
+    const auto num = num_function_arguments(f, args.size());
     DLIB_CASSERT(num == args.size(), 
         "The function being optimized takes a number of arguments that doesn't agree with the size of the bounds lists you provided to find_max_global()");
     DLIB_CASSERT(0 < num && num < 15, "Functions being optimized must take between 1 and 15 scalar arguments.");
