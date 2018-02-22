@@ -155,7 +155,15 @@ void bind_cnn_face_detection(py::module& m)
             detector."
             );
     }
+
     m.def("set_dnn_prefer_smallest_algorithms", &set_dnn_prefer_smallest_algorithms, "Tells cuDNN to use slower algorithms that use less RAM.");
+
+    auto cuda = m.def_submodule("cuda", "Routines for setting CUDA specific properties.");
+    cuda.def("set_device", &dlib::cuda::set_device, py::arg("device_id"), 
+        "Set the active CUDA device.  It is required that 0 <= device_id < get_num_devices().");
+    cuda.def("get_device", &dlib::cuda::get_device, "Get the active CUDA device.");
+    cuda.def("get_num_devices", &dlib::cuda::get_num_devices, "Find out how many CUDA devices are available.");
+
     {
     typedef mmod_rect type;
     py::class_<type>(m, "mmod_rectangle", "Wrapper around a rectangle object and a detection confidence score.")
