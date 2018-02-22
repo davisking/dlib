@@ -570,7 +570,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() > 0
+                - current_n() > 1
             ensures
                 - returns the covariance between all the x and y samples presented
                   to this object via add()
@@ -580,7 +580,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() > 0
+                - current_n() > 1
             ensures
                 - returns the correlation coefficient between all the x and y samples 
                   presented to this object via add()
@@ -590,7 +590,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() > 0
+                - current_n() > 1
             ensures
                 - returns the sample variance value of all x samples presented 
                   to this object via add().
@@ -600,7 +600,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() > 0
+                - current_n() > 1
             ensures
                 - returns the sample variance value of all y samples presented 
                   to this object via add().
@@ -610,7 +610,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() > 0
+                - current_n() > 1
             ensures
                 - returns the sample standard deviation of all x samples
                   presented to this object via add().
@@ -620,7 +620,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() > 0
+                - current_n() > 1
             ensures
                 - returns the sample standard deviation of all y samples
                   presented to this object via add().
@@ -703,7 +703,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() > 0
+                - current_n() > 1
             ensures
                 - returns the sample variance value of all x samples presented to this
                   object via add().
@@ -713,7 +713,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - current_n() > 0
+                - current_n() > 1
             ensures
                 - returns the sample standard deviation of all x samples presented to this
                   object via add().

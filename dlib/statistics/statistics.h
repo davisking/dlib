@@ -499,7 +499,7 @@ namespace dlib
             sum_x  = sum_x*forget + x;
             sum_y  = sum_y*forget + y;
 
-            n = n*forget + forget;
+            n = n*forget + 1;
         }
 
         T current_n (
@@ -530,20 +530,20 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 0,
+            DLIB_ASSERT(current_n() > 1,
                 "\tT running_scalar_covariance_decayed::covariance()"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
                 );
 
-            return 1/n * (sum_xy - sum_y*sum_x/n);
+            return 1/(n-1) * (sum_xy - sum_y*sum_x/n);
         }
 
         T correlation (
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 0,
+            DLIB_ASSERT(current_n() > 1,
                 "\tT running_scalar_covariance_decayed::correlation()"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
@@ -560,13 +560,13 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 0,
+            DLIB_ASSERT(current_n() > 1,
                 "\tT running_scalar_covariance_decayed::variance_x()"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
                 );
 
-            T temp = 1/n * (sum_xx - sum_x*sum_x/n);
+            T temp = 1/(n-1) * (sum_xx - sum_x*sum_x/n);
             // make sure the variance is never negative.  This might
             // happen due to numerical errors.
             if (temp >= 0)
@@ -579,13 +579,13 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 0,
+            DLIB_ASSERT(current_n() > 1,
                 "\tT running_scalar_covariance_decayed::variance_y()"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
                 );
 
-            T temp = 1/n * (sum_yy - sum_y*sum_y/n);
+            T temp = 1/(n-1) * (sum_yy - sum_y*sum_y/n);
             // make sure the variance is never negative.  This might
             // happen due to numerical errors.
             if (temp >= 0)
@@ -598,7 +598,7 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 0,
+            DLIB_ASSERT(current_n() > 1,
                 "\tT running_scalar_covariance_decayed::stddev_x()"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
@@ -611,7 +611,7 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 0,
+            DLIB_ASSERT(current_n() > 1,
                 "\tT running_scalar_covariance_decayed::stddev_y()"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
@@ -673,7 +673,7 @@ namespace dlib
 
             sum_x  = sum_x*forget + x;
 
-            n = n*forget + forget;
+            n = n*forget + 1;
         }
 
         T current_n (
@@ -695,13 +695,13 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 0,
+            DLIB_ASSERT(current_n() > 1,
                 "\tT running_stats_decayed::variance()"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
                 );
 
-            T temp = 1/n * (sum_xx - sum_x*sum_x/n);
+            T temp = 1/(n-1) * (sum_xx - sum_x*sum_x/n);
             // make sure the variance is never negative.  This might
             // happen due to numerical errors.
             if (temp >= 0)
@@ -714,7 +714,7 @@ namespace dlib
         ) const
         {
             // make sure requires clause is not broken
-            DLIB_ASSERT(current_n() > 0,
+            DLIB_ASSERT(current_n() > 1,
                 "\tT running_stats_decayed::stddev()"
                 << "\n\tyou have to add some numbers to this object first"
                 << "\n\tthis: " << this
