@@ -816,7 +816,8 @@ namespace
                 {
                     rs.add(rnd.get_random_gaussian() + 1);
                     tmp[i] += rs.mean();
-                    tmp_var[i] += rs.variance();
+                    if (i > 0)
+                        tmp_var[i] += rs.variance();
                 }
             }
 
@@ -845,8 +846,11 @@ namespace
                 {
                     rs.add(rnd.get_random_gaussian() + 1, rnd.get_random_gaussian() + 1);
                     tmp[i] += (rs.mean_y()+rs.mean_x())/2;
-                    tmp_var[i] += (rs.variance_y()+rs.variance_x())/2;
-                    tmp_covar[i] += rs.covariance();
+                    if (i > 0)
+                    {
+                        tmp_var[i] += (rs.variance_y()+rs.variance_x())/2;
+                        tmp_covar[i] += rs.covariance();
+                    }
                 }
             }
 
