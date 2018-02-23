@@ -2470,7 +2470,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename S>
-    unsigned long list_box<S>::
+    size_t list_box<S>::
     size (
     ) const
     {
