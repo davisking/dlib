@@ -112,7 +112,7 @@ namespace dlib
             );
 
             // functions from the enumerable interface
-            inline unsigned long size (
+            inline size_t size (
             ) const;
 
             inline bool at_start (
@@ -155,13 +155,13 @@ namespace dlib
 
             node* in;
             node* out;
-            unsigned long queue_size;
-            unsigned long in_pos;
-            unsigned long out_pos;
+            size_t queue_size;
+            size_t in_pos;
+            size_t out_pos;
 
 
             mutable node* current_element;
-            mutable unsigned long current_element_pos;
+            mutable size_t current_element_pos;
             mutable bool at_start_;
 
             // restricted functions
@@ -419,7 +419,7 @@ namespace dlib
         unsigned long block_size,
         typename mem_manager
         >
-    unsigned long queue_kernel_2<T,block_size,mem_manager>::
+    size_t queue_kernel_2<T,block_size,mem_manager>::
     size (
     ) const
     {
