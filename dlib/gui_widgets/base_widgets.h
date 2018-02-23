@@ -329,7 +329,7 @@ namespace dlib
             const drawable& widget
         );
 
-        unsigned long size (
+        size_t size (
         ) const; 
 
         void set_pos (
@@ -2039,7 +2039,7 @@ namespace dlib
             unsigned long idx
         );
 
-        unsigned long size (
+        size_t size (
         ) const;
 
         void clear (

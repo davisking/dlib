@@ -44,7 +44,7 @@ namespace dlib
                       (i.e. this object contains new_size subsets, each containing exactly one element)
         !*/
 
-        unsigned long size (
+        size_t size (
         ) const noexcept;
         /*!
             ensures

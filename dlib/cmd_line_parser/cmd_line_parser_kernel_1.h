@@ -305,7 +305,7 @@ namespace dlib
         bool move_next (
         ) const { return options.move_next(); }
 
-        unsigned long size (
+        size_t size (
         ) const { return options.size(); }
 
     private:

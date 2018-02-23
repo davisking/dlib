@@ -132,7 +132,7 @@ namespace dlib
                   Both sequence 1 and sequence 2 should have the same effect on H.  
         !*/
 
-        inline unsigned long size (
+        inline size_t size (
         ) const;
         /*!
             ensures

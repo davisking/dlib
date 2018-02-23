@@ -50,7 +50,7 @@ namespace dlib
                     - #get_size_of_set(i) == 1
         !*/
 
-        unsigned long size (
+        size_t size (
         ) const noexcept;
         /*!
             ensures

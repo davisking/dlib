@@ -99,7 +99,7 @@ namespace dlib
                 - returns false if there are no more elements in the container
         !*/
 
-        unsigned long size (
+        size_t size (
         ) const;
         /*!
             ensures

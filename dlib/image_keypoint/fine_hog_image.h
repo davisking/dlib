@@ -73,8 +73,8 @@ namespace dlib
         inline void unload(
         ) { clear(); }
 
-        inline unsigned long size (
-        ) const { return static_cast<unsigned long>(nr()*nc()); }
+        inline size_t size (
+        ) const { return static_cast<size_t>(nr()*nc()); }
 
         inline long nr (
         ) const { return num_block_rows; }

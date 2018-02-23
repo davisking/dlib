@@ -67,7 +67,7 @@ namespace dlib
         const std::vector<T>& to_std_vector(
         ) const { return items; }
 
-        unsigned long size (
+        size_t size (
         ) const 
         {
             return items.size();

@@ -151,7 +151,7 @@ namespace
             }
         }
 
-        inline unsigned long size () const { return feat_image.size(); }
+        inline size_t size () const { return feat_image.size(); }
         inline long nr () const { return feat_image.nr(); }
         inline long nc () const { return feat_image.nc(); }
 

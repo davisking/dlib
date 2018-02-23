@@ -173,7 +173,7 @@ namespace dlib
                 - swaps *this with item
         !*/
 
-        unsigned long size (
+        size_t size (
         ) const;
         /*!
             ensures

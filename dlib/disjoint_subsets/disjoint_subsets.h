@@ -34,7 +34,7 @@ namespace dlib
             }
         }
 
-        unsigned long size (
+        size_t size (
         ) const noexcept
         {
             return items.size();

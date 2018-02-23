@@ -125,7 +125,7 @@ namespace dlib
                   operator() as defined below.
         !*/
 
-        unsigned long size (
+        size_t size (
         ) const;
         /*!
             ensures
