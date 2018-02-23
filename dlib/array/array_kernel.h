@@ -245,11 +245,12 @@ namespace dlib
     {
         try
         {
-            // This is probably the least likely value for a max_size from an old version.
+            // This is probably the least likely value for a max_size from an old version,
+            // from among numbers that are guaranteed to be representable using unsigned long.
             // TODO: start version numbering from 1, when it can be reasonably expected that
             //       there aren't too many objects around any longer serialized without any
             //       version number (but directly a max_size).
-            const unsigned long version = std::numeric_limits<unsigned long>::max();
+            const unsigned long version = 4294967295;
 
             serialize(version,out);
 
@@ -279,7 +280,7 @@ namespace dlib
             unsigned long version;
             deserialize(version, in);
 
-            if (version != std::numeric_limits<unsigned long>::max()) {
+            if (version != 4294967295) {
                 // old version - the "version" field is actually max_size, serialized as unsigned long
                 //             - also size is serialized as unsigned long
                 // TODO: remove this branch completely, when backward compatibility is no longer needed
