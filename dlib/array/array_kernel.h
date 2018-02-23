@@ -245,15 +245,6 @@ namespace dlib
     {
         try
         {
-            // This is probably the least likely value for a max_size from an old version,
-            // from among numbers that are guaranteed to be representable using unsigned long.
-            // TODO: start version numbering from 1, when it can be reasonably expected that
-            //       there aren't too many objects around any longer serialized without any
-            //       version number (but directly a max_size).
-            const unsigned long version = 4294967295;
-
-            serialize(version,out);
-
             serialize(item.max_size(),out);
             serialize(item.size(),out);
 
@@ -277,29 +268,13 @@ namespace dlib
     {
         try
         {
-            unsigned long version;
-            deserialize(version, in);
-
-            if (version != 4294967295) {
-                // old version - the "version" field is actually max_size, serialized as unsigned long
-                //             - also size is serialized as unsigned long
-                // TODO: remove this branch completely, when backward compatibility is no longer needed
-                unsigned long max_size = version, size;
-                deserialize(size, in);
-                item.set_max_size(max_size);
-                item.set_size(size);
-                for (unsigned long i = 0; i < size; ++i)
-                    deserialize(item[i], in);
-            }
-            else {
-                size_t max_size, size;
-                deserialize(max_size, in);
-                deserialize(size, in);
-                item.set_max_size(max_size);
-                item.set_size(size);
-                for (size_t i = 0; i < size; ++i)
-                    deserialize(item[i], in);
-            }
+            size_t max_size, size;
+            deserialize(max_size,in);
+            deserialize(size,in);
+            item.set_max_size(max_size);
+            item.set_size(size);
+            for (size_t i = 0; i < size; ++i)
+                deserialize(item[i],in);
         }
         catch (serialization_error e)
         { 
