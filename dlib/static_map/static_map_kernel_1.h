@@ -433,7 +433,7 @@ namespace dlib
         typename range,
         typename compare
         >
-    unsigned long static_map_kernel_1<domain,range,compare>::
+    size_t static_map_kernel_1<domain,range,compare>::
     size (
     ) const
     {

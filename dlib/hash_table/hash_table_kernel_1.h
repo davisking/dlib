@@ -336,7 +336,7 @@ namespace dlib
         typename mem_manager,
         typename compare
         >
-    unsigned long hash_table_kernel_1<domain,range,mem_manager,compare>::
+    size_t hash_table_kernel_1<domain,range,mem_manager,compare>::
     size(
     ) const
     {

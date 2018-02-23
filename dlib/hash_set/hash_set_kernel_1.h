@@ -266,7 +266,7 @@ namespace dlib
         typename hash_table,
         typename mem_manager
         >
-    unsigned long hash_set_kernel_1<T,expnum,hash_table,mem_manager>::
+    size_t hash_set_kernel_1<T,expnum,hash_table,mem_manager>::
     size (
     ) const
     {
