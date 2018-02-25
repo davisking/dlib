@@ -45,10 +45,10 @@ namespace dlib
 
         virtual ~tensor() {}
 
-        long num_samples() const { return m_n; }
-        long k() const { return m_k; }
-        long nr() const { return m_nr; }
-        long nc() const { return m_nc; }
+        long long num_samples() const { return m_n; }
+        long long k() const { return m_k; }
+        long long nr() const { return m_nr; }
+        long long nc() const { return m_nc; }
         size_t size() const { return m_size; }
 
         typedef float* iterator;
@@ -150,11 +150,11 @@ namespace dlib
 
         template <typename EXP>
         void set_sample (
-            unsigned long idx,
+            unsigned long long idx,
             const matrix_exp<EXP>& item
         )
         {
-            DLIB_CASSERT(idx < (unsigned long)num_samples());
+            DLIB_CASSERT(idx < (unsigned long long)num_samples());
             DLIB_CASSERT(item.size() == nr()*nc()*k());
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
@@ -164,11 +164,11 @@ namespace dlib
 
         template <typename EXP>
         void add_to_sample (
-            unsigned long idx,
+            unsigned long long idx,
             const matrix_exp<EXP>& item
         )
         {
-            DLIB_CASSERT(idx < (unsigned long)num_samples());
+            DLIB_CASSERT(idx < (unsigned long long)num_samples());
             DLIB_CASSERT(item.size() == nr()*nc()*k());
             static_assert((is_same_type<float, typename EXP::type>::value == true),
                 "To assign a matrix to a tensor the matrix must contain float values");
@@ -201,11 +201,11 @@ namespace dlib
         virtual const gpu_data& data() const = 0;
         virtual size_t get_alias_offset() const { return 0; } // needed by alias_tensor.
 
-        long m_n;
-        long m_k;
-        long m_nr;
-        long m_nc;
-        long m_size; // always equal to m_n*m_k*m_nr*m_nc
+        long long m_n;
+        long long m_k;
+        long long m_nr;
+        long long m_nc;
+        long long m_size; // always equal to m_n*m_k*m_nr*m_nc
     };
 
 // ----------------------------------------------------------------------------------------
@@ -224,8 +224,8 @@ namespace dlib
 
     inline const matrix_op<op_pointer_to_mat<float> > mat (
         const tensor& t,
-        long nr,
-        long nc
+        long long nr,
+        long long nc
     )
     {
         DLIB_ASSERT(nr >= 0 && nc >= 0 , 
@@ -234,7 +234,7 @@ namespace dlib
                     << "\n\t nr: " << nr
                     << "\n\t nc: " << nc
         );
-        DLIB_ASSERT(nr*nc == (long)t.size() , 
+        DLIB_ASSERT(nr*nc == (long long)t.size() , 
                     "\tconst matrix_exp mat(tensor, nr, nc)"
                     << "\n\t The sizes don't match up."
                     << "\n\t nr*nc:    " << nr*nc
@@ -256,8 +256,8 @@ namespace dlib
 
     inline const matrix_op<op_pointer_to_mat<float> > image_plane (
         const tensor& t,
-        long sample = 0,
-        long k = 0
+        long long sample = 0,
+        long long k = 0
     )
     {
         DLIB_ASSERT(0 <= sample && sample < t.num_samples() &&
@@ -311,7 +311,7 @@ namespace dlib
         }
 
         explicit resizable_tensor(
-            long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
+            long long n_, long long k_ = 1, long long nr_ = 1, long long nc_ = 1
         ) 
         {
             DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0);
@@ -377,7 +377,7 @@ namespace dlib
         }
 
         void set_size(
-            long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
+            long long n_, long long k_ = 1, long long nr_ = 1, long long nc_ = 1
         )
         {
             DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0);
@@ -387,7 +387,7 @@ namespace dlib
             m_nr = nr_;
             m_nc = nc_;
             m_size = n_*k_*nr_*nc_;
-            if ((long)data_instance.size() < m_size)
+            if ((long long)data_instance.size() < m_size)
                 data_instance.set_size(m_size);
 #ifdef DLIB_USE_CUDA
             cudnn_descriptor.set_size(m_n,m_k,m_nr,m_nc);
@@ -472,7 +472,7 @@ namespace dlib
         if (version != 2)
             throw serialization_error("Unexpected version found while deserializing dlib::resizable_tensor.");
 
-        long num_samples=0, k=0, nr=0, nc=0;
+        long long num_samples=0, k=0, nr=0, nc=0;
         deserialize(num_samples, in);
         deserialize(k, in);
         deserialize(nr, in);
@@ -588,7 +588,7 @@ namespace dlib
         ) {}
 
         alias_tensor (
-            long n_, long k_ = 1, long nr_ = 1, long nc_ = 1
+            long long n_, long long k_ = 1, long long nr_ = 1, long long nc_ = 1
         ) 
         {
             DLIB_ASSERT( n_ >= 0 && k_ >= 0 && nr_ >= 0 && nc_ >= 0);
@@ -600,16 +600,16 @@ namespace dlib
             inst.m_size = n_*k_*nr_*nc_;
         }
 
-        long num_samples(
+        long long num_samples(
         ) const { return inst.m_n; }
 
-        long k(
+        long long k(
         ) const { return inst.m_k; }
 
-        long nr(
+        long long nr(
         ) const { return inst.m_nr; }
 
-        long nc(
+        long long nc(
         ) const { return inst.m_nc; }
 
         size_t size(
@@ -670,7 +670,7 @@ namespace dlib
         deserialize(version, in);
         if (version != 1)
             throw serialization_error("Unexpected version found while deserializing dlib::alias_tensor.");
-        long num_samples, k, nr, nc;
+        long long num_samples, k, nr, nc;
         deserialize(num_samples, in);
         deserialize(k, in);
         deserialize(nr, in);
