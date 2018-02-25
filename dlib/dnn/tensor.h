@@ -387,7 +387,7 @@ namespace dlib
             m_nr = nr_;
             m_nc = nc_;
             m_size = n_*k_*nr_*nc_;
-            if ((long)data_instance.size() < m_size)
+            if ((long long)data_instance.size() < m_size)
                 data_instance.set_size(m_size);
 #ifdef DLIB_USE_CUDA
             cudnn_descriptor.set_size(m_n,m_k,m_nr,m_nc);
