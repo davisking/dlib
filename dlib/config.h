@@ -23,3 +23,9 @@
 // #define DLIB_USE_BLAS
 // #define DLIB_USE_LAPACK
 // #define DLIB_USE_CUDA
+
+
+#ifndef DLIB__CMAKE_GENERATED_A_CONFIG_H_FILE
+#define DLIB_NOT_CONFIGURED
+#endif 
+
