@@ -73,6 +73,7 @@ set (tests
    image.cpp
    iosockstream.cpp
    is_same_object.cpp
+   isotonic_regression.cpp
    kcentroid.cpp
    kernel_matrix.cpp
    kmeans.cpp
