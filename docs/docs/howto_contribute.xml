@@ -13,17 +13,10 @@
 
         <!--   ****************************   EASY CONTRIBUTIONS  ****************************    -->
 
-         There are some simple ways to contribute to dlib:
+        <h2>Contributing Money</h2>
 
-         <ul>
-            <li> Find confusing or incorrect documentation </li>
-            <li> Help make the web page prettier </li>
-            <li> Link to dlib from your web page </li>
-            <li> Add yourself or your project to the list of 
-            <a href="http://sourceforge.net/p/dclib/wiki/Known_users/">dlib users</a> </li>
-            <li> Try to run the dlib regression test suite on any platforms you
-            have access to </li>
-         </ul>
+         The simplest way to contribute is to donate money via Zelle or PayPal
+         to davis@dlib.net. Any amount is appreciated :)
 
         <!--   ****************************   CODE CONTRIBUTIONS  ****************************    -->
         <h2>Contributing Code</h2>

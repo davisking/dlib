@@ -340,14 +340,12 @@ namespace
             DLIB_TEST(std::abs(rsc2.correlation() - 0) < 1e-10);
 
 
-            const double s = 99/100.0;
-            const double ss = std::sqrt(s);;
             DLIB_TEST_MSG(std::abs(rs.mean() - rscd1.mean_x()) < 1e-2, std::abs(rs.mean() - rscd1.mean_x()) << " " << rscd1.mean_x());
             DLIB_TEST(std::abs(rs.mean() - rscd1.mean_y()) < 1e-2);
-            DLIB_TEST_MSG(std::abs(ss*rs.stddev() - rscd1.stddev_x()) < 1e-2, std::abs(ss*rs.stddev() - rscd1.stddev_x()));
-            DLIB_TEST(std::abs(ss*rs.stddev() - rscd1.stddev_y()) < 1e-2);
-            DLIB_TEST_MSG(std::abs(s*rs.variance() - rscd1.variance_x()) < 1e-2, std::abs(s*rs.variance() - rscd1.variance_x()));
-            DLIB_TEST(std::abs(s*rs.variance() - rscd1.variance_y()) < 1e-2);
+            DLIB_TEST_MSG(std::abs(rs.stddev() - rscd1.stddev_x()) < 1e-2, std::abs(rs.stddev() - rscd1.stddev_x()));
+            DLIB_TEST(std::abs(rs.stddev() - rscd1.stddev_y()) < 1e-2);
+            DLIB_TEST_MSG(std::abs(rs.variance() - rscd1.variance_x()) < 1e-2, std::abs(rs.variance() - rscd1.variance_x()));
+            DLIB_TEST(std::abs(rs.variance() - rscd1.variance_y()) < 1e-2);
             DLIB_TEST(std::abs(rscd1.correlation() - 1) < 1e-2);
             DLIB_TEST(std::abs(rscd2.correlation() - 0) < 1e-2);
 
@@ -803,6 +801,72 @@ namespace
             DLIB_TEST(equal_error_rate(vals2, vals1).first == 1);
         }
 
+        void test_running_stats_decayed()
+        {
+            print_spinner();
+            std::vector<double> tmp(300);
+            std::vector<double> tmp_var(tmp.size());
+            dlib::rand rnd;
+            const int num_rounds = 100000;
+            for (int rounds = 0; rounds < num_rounds; ++rounds)
+            {
+                running_stats_decayed<double> rs(100);
+
+                for (size_t i = 0; i < tmp.size(); ++i)
+                {
+                    rs.add(rnd.get_random_gaussian() + 1);
+                    tmp[i] += rs.mean();
+                    if (i > 0)
+                        tmp_var[i] += rs.variance();
+                }
+            }
+
+            // should print all 1s basically since the mean and variance should always be 1.
+            for (size_t i = 0; i < tmp.size(); ++i)
+            {
+                DLIB_TEST(std::abs(1-tmp[i]/num_rounds) < 0.001);
+                if (i > 1)
+                    DLIB_TEST(std::abs(1-tmp_var[i]/num_rounds) < 0.01);
+            }
+        }
+
+        void test_running_scalar_covariance_decayed()
+        {
+            print_spinner();
+            std::vector<double> tmp(300);
+            std::vector<double> tmp_var(tmp.size());
+            std::vector<double> tmp_covar(tmp.size());
+            dlib::rand rnd;
+            const int num_rounds = 500000;
+            for (int rounds = 0; rounds < num_rounds; ++rounds)
+            {
+                running_scalar_covariance_decayed<double> rs(100);
+
+                for (size_t i = 0; i < tmp.size(); ++i)
+                {
+                    rs.add(rnd.get_random_gaussian() + 1, rnd.get_random_gaussian() + 1);
+                    tmp[i] += (rs.mean_y()+rs.mean_x())/2;
+                    if (i > 0)
+                    {
+                        tmp_var[i] += (rs.variance_y()+rs.variance_x())/2;
+                        tmp_covar[i] += rs.covariance();
+                    }
+                }
+            }
+
+            // should print all 1s basically since the mean and variance should always be 1.
+            for (size_t i = 0; i < tmp.size(); ++i)
+            {
+                DLIB_TEST(std::abs(1-tmp[i]/num_rounds) < 0.001);
+                if (i > 1)
+                {
+                    DLIB_TEST(std::abs(1-tmp_var[i]/num_rounds) < 0.01);
+                    DLIB_TEST(std::abs(tmp_covar[i]/num_rounds) < 0.001);
+                }
+            }
+        }
+
+
         void test_event_corr()
         {
             print_spinner();
@@ -841,6 +905,8 @@ namespace
             test_average_precision();
             test_lda();
             test_event_corr();
+            test_running_stats_decayed();
+            test_running_scalar_covariance_decayed();
         }
     } a;
 
