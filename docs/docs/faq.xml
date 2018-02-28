@@ -7,6 +7,37 @@
    <!-- ************************************************************************* -->
    <questions group="General">
 
+      <question text="Why do I get USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1?">
+         You are getting this error because you are not compiling all the C++
+         code in your program with consistent settings. This is a violation of
+         <a href="https://en.wikipedia.org/wiki/One_Definition_Rule">C++'s One Definition Rule</a>. 
+         In this case, you are compiling some translation units with dlib's
+         assert macros enabled and others with them disabled.
+         <p>
+            For reference, the code that generates this error is: 
+            <a href="dlib/all/test_for_odr_violations.h.html">dlib/all/test_for_odr_violations.h</a> and 
+            <a href="dlib/all/test_for_odr_violations.cpp.html">dlib/all/test_for_odr_violations.cpp</a>.
+         </p>
+      </question>
+
+
+      <question text="Why do I get USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2?">
+         You are getting this error because you are not compiling all the C++
+         code in your program with consistent settings. This is a violation of
+         <a href="https://en.wikipedia.org/wiki/One_Definition_Rule">C++'s One Definition Rule</a>. 
+         In this case, you compiled a standalone copy of dlib with CMake and instead of using <tt>make install</tt>
+         or <tt>cmake --build . --target install</tt> to copy the resulting build files somewhere you went
+         and cherry picked files manually and messed it up.  In particular, CMake compiled dlib 
+         with a bunch of settings recorded in the CMake generated config.h file but you instead
+         are now trying to build more dlib related code with the 
+         <a href="dlib/config.h.html">dlib/config.h</a> from source control. 
+         <p>
+            For reference, the code that generates this error is: 
+            <a href="dlib/all/test_for_odr_violations.h.html">dlib/all/test_for_odr_violations.h</a> and 
+            <a href="dlib/all/test_for_odr_violations.cpp.html">dlib/all/test_for_odr_violations.cpp</a>.
+         </p>
+      </question>
+
       <question text="It doesn't work?">
          Do not post a question like "I'm using dlib, and it doesn't work?" or
          "I'm using the object detector and it doesn't work, what do I do?".
