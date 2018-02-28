@@ -25,6 +25,8 @@
 // #define DLIB_USE_CUDA
 
 
+// Define this so the code in dlib/all/test_for_odr_violations.h can detect ODR violations
+// related to users doing bad things with config.h
 #ifndef DLIB__CMAKE_GENERATED_A_CONFIG_H_FILE
 #define DLIB_NOT_CONFIGURED
 #endif 
