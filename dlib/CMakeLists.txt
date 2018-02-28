@@ -213,6 +213,7 @@ if (NOT TARGET dlib)
          data_io/image_dataset_metadata.cpp
          data_io/mnist.cpp
          global_optimization/global_function_search.cpp
+         all/test_for_odr_violations.cpp
    )
 
 

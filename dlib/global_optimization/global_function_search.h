@@ -9,6 +9,7 @@
 #include <mutex>
 #include "../rand.h"
 #include "upper_bound_function.h"
+#include "../all/test_for_odr_violations.h"
 
 namespace dlib
 {
