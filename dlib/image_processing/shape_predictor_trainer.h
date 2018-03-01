@@ -827,10 +827,12 @@ namespace dlib
                 {
                     // Remove any existing parts and replace them with the truth_box corners.
                     truth_box.parts.clear();
-                    truth_box.parts["top_left"]     = truth_box.rect.tl_corner();
-                    truth_box.parts["top_right"]    = truth_box.rect.tr_corner();
-                    truth_box.parts["bottom_left"]  = truth_box.rect.bl_corner();
-                    truth_box.parts["bottom_right"] = truth_box.rect.br_corner();
+                    auto b = truth_box.rect;
+                    truth_box.parts["left"]     = (b.tl_corner()+b.bl_corner())/2;
+                    truth_box.parts["right"]    = (b.tr_corner()+b.br_corner())/2;
+                    truth_box.parts["top"]      = (b.tl_corner()+b.tr_corner())/2;
+                    truth_box.parts["bottom"]   = (b.bl_corner()+b.br_corner())/2;
+                    truth_box.parts["middle"]   = center(b);
 
                     // Now replace the bounding truth_box with the detector's bounding truth_box.
                     truth_box.rect = det.first;

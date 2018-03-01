@@ -388,17 +388,24 @@ namespace dlib
               positional accuracy is going to be, at best, +/-8 pixels.  
               
               If you want to get better positional accuracy one easy thing to do is train a
-              shape_predictor to give you the corners of the object.  The
+              shape_predictor to give you the location of the object's box.  The
               make_bounding_box_regression_training_data() routine helps you do this by
               creating an appropriate training dataset.  It does this by taking the dataset
-              you used to train your detector (the truth object), and combining that with
-              the output of your detector on each image in the training dataset (the
-              detections object).  In particular, it will create a new annotated dataset
-              where each object box is one of the rectangles from detections and that
-              object has 4 part annotations, the corners of the truth rectangle
-              corresponding to that detection rectangle.  You can then take the returned
-              dataset and train a shape_predictor on it.  The resulting shape_predictor can
-              then be used to do bounding box regression.
+              you used to train your detector (given by the truth object), and combining
+              that with the output of your detector on each image in the training dataset
+              (given by the detections object).  In particular, it will create a new
+              annotated dataset where each object box is one of the rectangles from
+              detections and that object has 5 part annotations.  These annotations
+              identify the sides and middle of the truth rectangle corresponding to the
+              detection rectangle.  You can then take the returned dataset and train a
+              shape_predictor on it.  The resulting shape_predictor can then be used to do
+              bounding box regression.  
+              
+              As an aside, the reason we create 5 part annotations in this way is because
+              it gives the best shape_predictor when trained.  If instead you used the 4
+              corners it wouldn't work as well, due to tedious vagaries of the shape_predictor 
+              training process.
+
             - We assume that detections[i] contains object detections corresponding to 
               the image truth.images[i].
     !*/
