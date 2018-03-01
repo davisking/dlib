@@ -15,8 +15,8 @@
          assert macros enabled and others with them disabled.
          <p>
             For reference, the code that generates this error is: 
-            <a href="dlib/all/test_for_odr_violations.h.html">dlib/all/test_for_odr_violations.h</a> and 
-            <a href="dlib/all/test_for_odr_violations.cpp.html">dlib/all/test_for_odr_violations.cpp</a>.
+            <a href="dlib/test_for_odr_violations.h.html">dlib/test_for_odr_violations.h</a> and 
+            <a href="dlib/test_for_odr_violations.cpp.html">dlib/test_for_odr_violations.cpp</a>.
          </p>
       </question>
 
@@ -33,8 +33,8 @@
          <a href="dlib/config.h.html">dlib/config.h</a> from source control. 
          <p>
             For reference, the code that generates this error is: 
-            <a href="dlib/all/test_for_odr_violations.h.html">dlib/all/test_for_odr_violations.h</a> and 
-            <a href="dlib/all/test_for_odr_violations.cpp.html">dlib/all/test_for_odr_violations.cpp</a>.
+            <a href="dlib/test_for_odr_violations.h.html">dlib/test_for_odr_violations.h</a> and 
+            <a href="dlib/test_for_odr_violations.cpp.html">dlib/test_for_odr_violations.cpp</a>.
          </p>
       </question>
 
