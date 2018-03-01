@@ -19,7 +19,7 @@
 #include "../md5/md5_kernel_1.cpp"
 #include "../tokenizer/tokenizer_kernel_1.cpp"
 #include "../unicode/unicode.cpp"
-#include "test_for_odr_violations.cpp"
+#include "../test_for_odr_violations.cpp"
 
 
 

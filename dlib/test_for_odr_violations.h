@@ -3,8 +3,8 @@
 #ifndef DLIB_TEST_FOR_ODR_VIOLATIONS_H_
 #define DLIB_TEST_FOR_ODR_VIOLATIONS_H_
 
-#include "../assert.h"
-#include "../config.h"
+#include "assert.h"
+#include "config.h"
 
 extern "C"
 {

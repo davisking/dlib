@@ -13,7 +13,7 @@
 #include "../rand.h"
 #include <memory>
 #include "../geometry/rectangle.h"
-#include "../all/test_for_odr_violations.h"
+#include "../test_for_odr_violations.h"
 
 namespace dlib
 {

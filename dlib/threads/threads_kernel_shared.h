@@ -12,7 +12,7 @@
 #include "../memory_manager.h"
 #include "../queue.h"
 #include "../set.h"
-#include "../all/test_for_odr_violations.h"
+#include "../test_for_odr_violations.h"
 
 
 
