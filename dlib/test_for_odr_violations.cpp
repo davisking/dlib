@@ -11,9 +11,9 @@ extern "C"
 // from compiling part of their application with DLIB_ASSERT enabled and part with them
 // disabled since doing that would be a violation of C++'s one definition rule. 
 #ifdef ENABLE_ASSERTS
-    int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1;
+    const int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1 = 0;
 #else
-    int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1_;
+    const int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1_ = 0;
 #endif
 
 
@@ -29,7 +29,7 @@ extern "C"
 // Or even better, don't install dlib at all and instead build your program as shown in
 // examples/CMakeLists.txt
 #if defined(DLIB_NOT_CONFIGURED) && !defined(DLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
-    int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2;
+    const int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2 = 0;
 #endif
 
 
@@ -37,7 +37,7 @@ extern "C"
 
 
 #ifdef DLIB_CHECK_FOR_VERSION_MISSMATCH
-    int DLIB_CHECK_FOR_VERSION_MISSMATCH;
+    const int DLIB_CHECK_FOR_VERSION_MISSMATCH = 0;
 #endif
 
 }

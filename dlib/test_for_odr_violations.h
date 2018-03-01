@@ -17,13 +17,12 @@ extern "C"
 // you have simply forgotten to compile dlib/all/source.cpp into your application.
 // =========================>>> WHY YOU ARE GETTING AN ERROR HERE <<<=========================
 #ifdef ENABLE_ASSERTS
-    extern int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1;
-    inline int dlib_check_consistent_assert_usage() { USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1 = 0; return 0; }
+    const extern int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1;
+    const int DLIB_NO_WARN_UNUSED dlib_check_assert_helper_variable = USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1;
 #else
-    extern int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1_;
-    inline int dlib_check_consistent_assert_usage() { USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1_ = 0; return 0; }
+    const extern int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1_;
+    const int DLIB_NO_WARN_UNUSED dlib_check_assert_helper_variable = USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1_;
 #endif
-    const int DLIB_NO_WARN_UNUSED dlib_check_assert_helper_variable = dlib_check_consistent_assert_usage();
 
 
 
@@ -39,9 +38,8 @@ extern "C"
 // Or even better, don't install dlib at all and instead build your program as shown in
 // examples/CMakeLists.txt
 #if defined(DLIB_NOT_CONFIGURED) && !defined(DLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
-    extern int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2;
-    inline int dlib_check_consistent_config_h_usage() { USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2 = 0; return 0; }
-    const int DLIB_NO_WARN_UNUSED dlib_check_not_configured_helper_variable = dlib_check_consistent_config_h_usage();
+    const extern int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2;
+    const int DLIB_NO_WARN_UNUSED dlib_check_not_configured_helper_variable = USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2;
 #endif
 
 
@@ -49,9 +47,8 @@ extern "C"
 // Cause the user to get a linker error if they try to use header files from one version of
 // dlib with the compiled binary from a different version of dlib.
 #ifdef DLIB_CHECK_FOR_VERSION_MISSMATCH
-    extern int DLIB_CHECK_FOR_VERSION_MISSMATCH;
-    inline int dlib_check_for_dlib_version_missmatch() { DLIB_CHECK_FOR_VERSION_MISSMATCH = 0; return 0; }
-    const int DLIB_NO_WARN_UNUSED dlib_check_for_version_missmatch = dlib_check_for_dlib_version_missmatch();
+    const extern int DLIB_CHECK_FOR_VERSION_MISSMATCH;
+    const int DLIB_NO_WARN_UNUSED dlib_check_for_version_missmatch = DLIB_CHECK_FOR_VERSION_MISSMATCH;
 #endif
 
 }
