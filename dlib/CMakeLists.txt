@@ -748,9 +748,9 @@ if (NOT TARGET dlib)
       # Do this so that dlib/config.h can record the version of dlib it's configured with
       # and ultimately issue a linker error to people who try to use a binary dlib that is
       # the wrong version.
-      set(DLIB_CHECK_FOR_VERSION_MISSMATCH 
-         DLIB_VERSION_CHECK_${CPACK_PACKAGE_VERSION_MAJOR}_${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_PACKAGE_VERSION_PATCH})
-      target_compile_options(dlib PRIVATE "-DDLIB_CHECK_FOR_VERSION_MISSMATCH=${DLIB_CHECK_FOR_VERSION_MISSMATCH}")
+      set(DLIB_CHECK_FOR_VERSION_MISMATCH 
+         DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${CPACK_PACKAGE_VERSION_MAJOR}_${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_PACKAGE_VERSION_PATCH})
+      target_compile_options(dlib PRIVATE "-DDLIB_CHECK_FOR_VERSION_MISMATCH=${DLIB_CHECK_FOR_VERSION_MISMATCH}")
    endif()
 
 

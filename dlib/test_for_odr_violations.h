@@ -46,9 +46,9 @@ extern "C"
 
 // Cause the user to get a linker error if they try to use header files from one version of
 // dlib with the compiled binary from a different version of dlib.
-#ifdef DLIB_CHECK_FOR_VERSION_MISSMATCH
-    const extern int DLIB_CHECK_FOR_VERSION_MISSMATCH;
-    const int DLIB_NO_WARN_UNUSED dlib_check_for_version_missmatch = DLIB_CHECK_FOR_VERSION_MISSMATCH;
+#ifdef DLIB_CHECK_FOR_VERSION_MISMATCH
+    const extern int DLIB_CHECK_FOR_VERSION_MISMATCH;
+    const int DLIB_NO_WARN_UNUSED dlib_check_for_version_mismatch = DLIB_CHECK_FOR_VERSION_MISMATCH;
 #endif
 
 }
