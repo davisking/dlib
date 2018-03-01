@@ -80,7 +80,7 @@ namespace dlib
             );
 
             // functions from the enumerable interface
-            inline unsigned long size (
+            inline size_t size (
             ) const;
 
             inline bool at_start (
@@ -254,7 +254,7 @@ namespace dlib
         typename bst_base,
         typename mem_manager
         >
-    unsigned long set_kernel_1<T,bst_base,mem_manager>::
+    size_t set_kernel_1<T,bst_base,mem_manager>::
     size (
     ) const
     {

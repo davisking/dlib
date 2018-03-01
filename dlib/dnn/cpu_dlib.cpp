@@ -1639,17 +1639,17 @@ namespace dlib
             float* g = grad.host();
             const float x_scale = (grad.nc()-1)/(float)std::max<long>((gradient_input.nc()-1),1);
             const float y_scale = (grad.nr()-1)/(float)std::max<long>((gradient_input.nr()-1),1);
-            for (long samp = 0; samp < gradient_input.num_samples(); ++samp)
+            for (long long samp = 0; samp < gradient_input.num_samples(); ++samp)
             {
-                for (long k = 0; k < gradient_input.k(); ++k)
+                for (long long k = 0; k < gradient_input.k(); ++k)
                 {
-                    for (long r = 0; r < gradient_input.nr(); ++r)
+                    for (long long r = 0; r < gradient_input.nr(); ++r)
                     {
                         const float y = r*y_scale;
                         const long long top    = static_cast<long long>(std::floor(y));
                         const long long bottom = std::min(top+1, grad.nr()-1);
                         const float tb_frac = y - top;
-                        for (long c = 0; c < gradient_input.nc(); ++c)
+                        for (long long c = 0; c < gradient_input.nc(); ++c)
                         {
                             const float x = c*x_scale;
                             const long long left   = static_cast<long long>(std::floor(x));

@@ -127,7 +127,7 @@ namespace dlib
                 - returns the number of columns in this image
         !*/
 
-        unsigned long size (
+        size_t size (
         ) const; 
         /*!
             ensures

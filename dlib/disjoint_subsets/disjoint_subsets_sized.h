@@ -34,7 +34,7 @@ namespace dlib
             number_of_sets = new_size;
         }
 
-        unsigned long size (
+        size_t size (
         ) const noexcept
         {
             return disjoint_subsets_.size();

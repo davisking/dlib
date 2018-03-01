@@ -312,8 +312,8 @@ namespace dlib
             }
         }
 
-        unsigned long size (
-        ) const { return static_cast<unsigned long>(nc_ * nr_); }
+        size_t size (
+        ) const { return static_cast<size_t>(nc_) * static_cast<size_t>(nr_); }
 
         long width_step (
         ) const

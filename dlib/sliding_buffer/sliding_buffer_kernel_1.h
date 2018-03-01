@@ -82,7 +82,7 @@ namespace dlib
             catch (...) { buffer = 0; buffer_size = 0; throw; }
         }
 
-        unsigned long size (
+        size_t size (
         ) const { return buffer_size; }
 
         void rotate_left (

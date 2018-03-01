@@ -127,7 +127,7 @@ namespace dlib
                 bool move_next (
                 ) const { return list.move_next(); }
 
-                unsigned long size (
+                size_t size (
                 ) const { return list.size(); }
             };
 

@@ -40,7 +40,7 @@ namespace dlib
 
             typedef std::vector<neighbor>::const_iterator const_iterator;
 
-            unsigned long size (
+            size_t size (
             ) const
             /*!
                 ensures

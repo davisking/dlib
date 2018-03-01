@@ -65,7 +65,7 @@ namespace dlib
         }
 
         template <typename kernel_type>
-        inline unsigned long size ( 
+        inline size_t size (
             const typename kernel_type::sample_type&  
         )
         {

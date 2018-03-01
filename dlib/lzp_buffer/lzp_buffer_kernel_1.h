@@ -63,7 +63,7 @@ namespace dlib
             unsigned long& index
         );
 
-        inline unsigned long size (
+        inline size_t size (
         ) const;
 
         inline unsigned char operator[] (
@@ -208,7 +208,7 @@ namespace dlib
     template <
         typename sbuf
         >
-    unsigned long lzp_buffer_kernel_1<sbuf>::
+    size_t lzp_buffer_kernel_1<sbuf>::
     size (
     ) const 
     { 

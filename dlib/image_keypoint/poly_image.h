@@ -193,7 +193,7 @@ namespace dlib
             num_cols = 0;
         }
 
-        inline unsigned long size (
+        inline size_t size (
         ) const { return static_cast<unsigned long>(nr()*nc()); }
 
         inline long nr (

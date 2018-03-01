@@ -1792,7 +1792,7 @@ namespace dlib
         bool move_next (
         ) const;
 
-        unsigned long size (
+        size_t size (
         ) const;
 
         unsigned long get_selected (

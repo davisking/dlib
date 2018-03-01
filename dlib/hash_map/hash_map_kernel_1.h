@@ -100,7 +100,7 @@ namespace dlib
             );
 
             // functions from the enumerable interface
-            inline unsigned long size (
+            inline size_t size (
             ) const;
 
             inline bool at_start (
@@ -328,7 +328,7 @@ namespace dlib
         typename hash_table,
         typename mem_manager
         >
-    unsigned long hash_map_kernel_1<domain,range,expnum,hash_table,mem_manager>::
+    size_t hash_map_kernel_1<domain,range,expnum,hash_table,mem_manager>::
     size (
     ) const
     {

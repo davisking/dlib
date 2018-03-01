@@ -467,7 +467,7 @@ namespace dlib
         !*/
 
         explicit resizable_tensor(
-            long long n_, long long g k_ = 1, long long nr_ = 1, long long nc_ = 1
+            long long n_, long long k_ = 1, long long nr_ = 1, long long nc_ = 1
         );
         /*!
             requires

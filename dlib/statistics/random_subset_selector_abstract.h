@@ -101,7 +101,7 @@ namespace dlib
                 - #size() == 0
         !*/
 
-        unsigned long size (
+        size_t size (
         ) const;
         /*!
             ensures

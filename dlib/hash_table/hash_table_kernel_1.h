@@ -145,7 +145,7 @@ namespace dlib
             );
 
             // functions from the enumerable interface
-            inline unsigned long size (
+            inline size_t size (
             ) const;
 
             bool at_start (
@@ -336,7 +336,7 @@ namespace dlib
         typename mem_manager,
         typename compare
         >
-    unsigned long hash_table_kernel_1<domain,range,mem_manager,compare>::
+    size_t hash_table_kernel_1<domain,range,mem_manager,compare>::
     size(
     ) const
     {

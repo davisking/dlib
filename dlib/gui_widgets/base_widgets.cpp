@@ -1399,7 +1399,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long widget_group::
+    size_t widget_group::
     size (
     ) const 
     {  
@@ -1578,7 +1578,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    unsigned long popup_menu::
+    size_t popup_menu::
     size (
     ) const
     { 

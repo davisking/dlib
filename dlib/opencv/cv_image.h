@@ -50,7 +50,7 @@ namespace dlib
 
         cv_image() : _data(0), _widthStep(0), _nr(0), _nc(0) {}
 
-        unsigned long size () const { return static_cast<unsigned long>(_nr*_nc); }
+        size_t size () const { return static_cast<size_t>(_nr*_nc); }
 
         inline pixel_type* operator[](const long row ) 
         { 

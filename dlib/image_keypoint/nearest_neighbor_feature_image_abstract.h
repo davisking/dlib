@@ -102,7 +102,7 @@ namespace dlib
                   operator() as defined below.
         !*/
 
-        inline unsigned long size (
+        inline size_t size (
         ) const;
         /*!
             ensures
