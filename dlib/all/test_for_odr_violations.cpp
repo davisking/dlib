@@ -28,7 +28,7 @@ extern "C"
 // MIXING THEM WITH THE SOURCE FROM GITHUB.  USE CMAKE'S INSTALL SCRIPTS TO INSTALL DLIB.
 // Or even better, don't install dlib at all and instead build your program as shown in
 // examples/CMakeLists.txt
-#ifdef DLIB_NOT_CONFIGURED
+#if defined(DLIB_NOT_CONFIGURED) && !defined(DLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
     int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2;
 #endif
 }
