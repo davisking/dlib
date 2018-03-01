@@ -41,15 +41,20 @@ extern "C"
 #if defined(DLIB_NOT_CONFIGURED) && !defined(DLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
     extern int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2;
     inline int dlib_check_consistent_config_h_usage() { USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2 = 0; return 0; }
-#else
-    inline int dlib_check_consistent_config_h_usage() { return 0; }
-#endif
     const int DLIB_NO_WARN_UNUSED dlib_check_not_configured_helper_variable = dlib_check_consistent_config_h_usage();
+#endif
+
+
+
+// Cause the user to get a linker error if they try to use header files from one version of
+// dlib with the compiled binary from a different version of dlib.
+#ifdef DLIB_CHECK_FOR_VERSION_MISSMATCH
+    extern int DLIB_CHECK_FOR_VERSION_MISSMATCH;
+    inline int dlib_check_for_dlib_version_missmatch() { DLIB_CHECK_FOR_VERSION_MISSMATCH = 0; return 0; }
+    const int DLIB_NO_WARN_UNUSED dlib_check_for_version_missmatch = dlib_check_for_dlib_version_missmatch();
+#endif
 
 }
-
-
-
 
 #endif // DLIB_TEST_FOR_ODR_VIOLATIONS_H_
 

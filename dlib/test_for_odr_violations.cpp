@@ -31,6 +31,15 @@ extern "C"
 #if defined(DLIB_NOT_CONFIGURED) && !defined(DLIB__CMAKE_GENERATED_A_CONFIG_H_FILE)
     int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_2;
 #endif
+
+
+
+
+
+#ifdef DLIB_CHECK_FOR_VERSION_MISSMATCH
+    int DLIB_CHECK_FOR_VERSION_MISSMATCH;
+#endif
+
 }
 
 
