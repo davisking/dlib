@@ -406,6 +406,20 @@ namespace dlib
                 - #get_bottom() == filt
         !*/
 
+        rect_filter(
+            double meas_noise,
+            double acc,
+            double max_meas_dev
+        ) : rect_filter(momentum_filter(meas_noise, acc, max_meas_dev)) {}
+        /*!
+            requires
+                - meas_noise >= 0
+                - acc >= 0
+                - max_meas_dev >= 0
+            ensures
+                - Initializes this object with momentum_filter(meas_noise, acc, max_meas_dev)
+        !*/
+
         drectangle operator()(
             const drectangle& r
         );

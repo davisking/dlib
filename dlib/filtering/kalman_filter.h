@@ -300,6 +300,12 @@ namespace dlib
         rect_filter() = default;
 
         rect_filter(
+            double meas_noise,
+            double acc,
+            double max_meas_dev
+        ) : rect_filter(momentum_filter(meas_noise, acc, max_meas_dev)) {}
+
+        rect_filter(
             const momentum_filter& filt
         ) : 
             left(filt),
