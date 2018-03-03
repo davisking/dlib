@@ -20,7 +20,6 @@
 #include "../tokenizer/tokenizer_kernel_1.cpp"
 #include "../unicode/unicode.cpp"
 #include "../test_for_odr_violations.cpp"
-#include "../filtering/kalman_filter.cpp"
 
 
 
@@ -90,6 +89,7 @@
 #include "../data_io/image_dataset_metadata.cpp"
 #include "../data_io/mnist.cpp"
 #include "../global_optimization/global_function_search.cpp"
+#include "../filtering/kalman_filter.cpp"
 
 
 #define DLIB_ALL_SOURCE_END
