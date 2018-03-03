@@ -212,6 +212,120 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    class momentum_filter
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+        !*/
+    public:
+
+        momentum_filter(
+            double meas_noise,
+            double acc,
+            double max_meas_dev
+        ); 
+
+        momentum_filter() = default; 
+
+        double get_measurement_noise (
+        ) const; 
+
+        double get_typical_acceleration (
+        ) const;
+
+        double get_max_measurement_deviation (
+        ) const;
+
+        void reset(
+        );
+
+        double get_predicted_next_state(
+        ) const;
+
+        double operator()(
+            const double val
+        );
+
+    };
+
+    std::ostream& operator << (std::ostream& out, const momentum_filter& item);
+    void serialize(const momentum_filter& item, std::ostream& out);
+    void deserialize(momentum_filter& item, std::istream& in);
+
+// ----------------------------------------------------------------------------------------
+
+    momentum_filter find_optimal_momentum_filter (
+        const std::vector<std::vector<double>>& sequences,
+        const double smoothness = 1
+    );
+    /*!
+        requires
+            - sequences.size() != 0
+            - for all valid i: sequences[i].size() > 4
+            - smoothness >= 0
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    momentum_filter find_optimal_momentum_filter (
+        const std::vector<double>& sequence,
+        const double smoothness = 1
+    );
+    /*!
+        requires
+            - sequence.size() > 4
+            - smoothness >= 0
+        ensures
+            - performs: find_optimal_momentum_filter({1,sequence}, smoothness);
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    class rect_filter
+    {
+    public:
+        rect_filter() = default;
+
+        rect_filter(
+            const momentum_filter& filt
+        );
+
+        drectangle operator()(
+            const drectangle& r
+        );
+
+        drectangle operator()(
+            const rectangle& r
+        ); 
+
+        const momentum_filter& get_left() const; 
+        momentum_filter&       get_left();
+        const momentum_filter& get_top() const; 
+        momentum_filter&       get_top();
+        const momentum_filter& get_right() const; 
+        momentum_filter&       get_right();
+        const momentum_filter& get_bottom() const;
+        momentum_filter&       get_bottom(); 
+    };
+
+    void serialize(const rect_filter& item, std::ostream& out);
+    void deserialize(rect_filter& item, std::istream& in);
+
+// ----------------------------------------------------------------------------------------
+
+    rect_filter find_optimal_rect_filter (
+        const std::vector<rectangle>& rects,
+        const double smoothness = 1
+    );
+    /*!
+        requires
+            - rects.size() > 4
+            - smoothness >= 0
+    !*/
+
+// ----------------------------------------------------------------------------------------
 
 }
 
