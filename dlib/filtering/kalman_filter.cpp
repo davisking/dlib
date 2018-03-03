@@ -36,7 +36,7 @@ namespace dlib
                     if (i > 0)
                     {
                         // the filter should fit the data
-                        rs.add(std::abs(vals[i]-filt.get_predicted_next_state()));
+                        rs.add(std::abs(vals[i]-filt.get_predicted_next_position()));
                     }
                     double next_filt = filt(vals[i]);
                     if (i > 0)

@@ -172,10 +172,15 @@ namespace dlib
             double meas_noise,
             double acc,
             double max_meas_dev
-        ) : measurement_noise(meas_noise),
+        ) : 
+            measurement_noise(meas_noise),
             typical_acceleration(acc),
             max_measurement_deviation(max_meas_dev)
         {
+            DLIB_CASSERT(meas_noise >= 0);
+            DLIB_CASSERT(acc >= 0);
+            DLIB_CASSERT(max_meas_dev >= 0);
+
             kal.set_observation_model({1, 0});
             kal.set_transition_model( {1, 1,
                 0, 1});
@@ -201,35 +206,35 @@ namespace dlib
             *this = momentum_filter(measurement_noise, typical_acceleration, max_measurement_deviation);
         }
 
-        double get_predicted_next_state(
+        double get_predicted_next_position(
         ) const
         {
             return kal.get_predicted_next_state()(0);
         }
 
         double operator()(
-            const double val
+            const double measured_position
         )
         {
             auto x = kal.get_predicted_next_state();
             const auto max_deviation = max_measurement_deviation*measurement_noise;
-            // Check if val has suddenly jumped in value by a whole lot. This could happen if
-            // the velocity term experiences a much larger than normal acceleration, e.g.
-            // because the underlying object is doing a maneuver.  If this happens then we
-            // clamp the state so that the predicted next value is no more than
-            // max_deviation away from val at all times.
-            if (x(0) > val + max_deviation)
+            // Check if measured_position has suddenly jumped in value by a whole lot. This
+            // could happen if the velocity term experiences a much larger than normal
+            // acceleration, e.g.  because the underlying object is doing a maneuver.  If
+            // this happens then we clamp the state so that the predicted next value is no
+            // more than max_deviation away from measured_position at all times.
+            if (x(0) > measured_position + max_deviation)
             {
-                x(0) = val + max_deviation;
+                x(0) = measured_position + max_deviation;
                 kal.set_state(x);
             }
-            else if (x(0) < val - max_deviation)
+            else if (x(0) < measured_position - max_deviation)
             {
-                x(0) = val - max_deviation;
+                x(0) = measured_position - max_deviation;
                 kal.set_state(x);
             }
 
-            kal.update({val});
+            kal.update({measured_position});
 
             return kal.get_current_state()(0);
         }
