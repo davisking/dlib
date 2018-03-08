@@ -5,6 +5,7 @@
 
 #include "kalman_filter_abstract.h"
 #include "../matrix.h"
+#include "../geometry.h"
 
 namespace dlib
 {
@@ -160,6 +161,218 @@ namespace dlib
 
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    class momentum_filter
+    {
+    public:
+
+        momentum_filter(
+            double meas_noise,
+            double acc,
+            double max_meas_dev
+        ) : 
+            measurement_noise(meas_noise),
+            typical_acceleration(acc),
+            max_measurement_deviation(max_meas_dev)
+        {
+            DLIB_CASSERT(meas_noise >= 0);
+            DLIB_CASSERT(acc >= 0);
+            DLIB_CASSERT(max_meas_dev >= 0);
+
+            kal.set_observation_model({1, 0});
+            kal.set_transition_model( {1, 1,
+                0, 1});
+            kal.set_process_noise({0, 0,
+                0, typical_acceleration*typical_acceleration});
+
+            kal.set_measurement_noise({measurement_noise*measurement_noise});
+        }
+
+        momentum_filter() = default; 
+
+        double get_measurement_noise (
+        ) const { return measurement_noise; }
+
+        double get_typical_acceleration (
+        ) const { return typical_acceleration; }
+
+        double get_max_measurement_deviation (
+        ) const { return max_measurement_deviation; }
+
+        void reset()
+        {
+            *this = momentum_filter(measurement_noise, typical_acceleration, max_measurement_deviation);
+        }
+
+        double get_predicted_next_position(
+        ) const
+        {
+            return kal.get_predicted_next_state()(0);
+        }
+
+        double operator()(
+            const double measured_position
+        )
+        {
+            auto x = kal.get_predicted_next_state();
+            const auto max_deviation = max_measurement_deviation*measurement_noise;
+            // Check if measured_position has suddenly jumped in value by a whole lot. This
+            // could happen if the velocity term experiences a much larger than normal
+            // acceleration, e.g.  because the underlying object is doing a maneuver.  If
+            // this happens then we clamp the state so that the predicted next value is no
+            // more than max_deviation away from measured_position at all times.
+            if (x(0) > measured_position + max_deviation)
+            {
+                x(0) = measured_position + max_deviation;
+                kal.set_state(x);
+            }
+            else if (x(0) < measured_position - max_deviation)
+            {
+                x(0) = measured_position - max_deviation;
+                kal.set_state(x);
+            }
+
+            kal.update({measured_position});
+
+            return kal.get_current_state()(0);
+        }
+
+        friend std::ostream& operator << (std::ostream& out, const momentum_filter& item)
+        {
+            out << "measurement_noise:         " << item.measurement_noise << "\n";
+            out << "typical_acceleration:      " << item.typical_acceleration << "\n";
+            out << "max_measurement_deviation: " << item.max_measurement_deviation;
+            return out;
+        }
+
+        friend void serialize(const momentum_filter& item, std::ostream& out)
+        {
+            int version = 15;
+            serialize(version, out);
+            serialize(item.measurement_noise, out);
+            serialize(item.typical_acceleration, out);
+            serialize(item.max_measurement_deviation, out);
+            serialize(item.kal, out);
+        }
+
+        friend void deserialize(momentum_filter& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 15)
+                throw serialization_error("Unexpected version found while deserializing momentum_filter.");
+            deserialize(item.measurement_noise, in);
+            deserialize(item.typical_acceleration, in);
+            deserialize(item.max_measurement_deviation, in);
+            deserialize(item.kal, in);
+        }
+
+    private:
+
+        double measurement_noise = 2;
+        double typical_acceleration = 0.1;
+        double max_measurement_deviation = 3; // nominally number of standard deviations
+
+        kalman_filter<2,1> kal;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    momentum_filter find_optimal_momentum_filter (
+        const std::vector<std::vector<double>>& sequences,
+        const double smoothness = 1
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    momentum_filter find_optimal_momentum_filter (
+        const std::vector<double>& sequence,
+        const double smoothness = 1
+    );
+
+// ----------------------------------------------------------------------------------------
+
+    class rect_filter
+    {
+    public:
+        rect_filter() = default;
+
+        rect_filter(
+            double meas_noise,
+            double acc,
+            double max_meas_dev
+        ) : rect_filter(momentum_filter(meas_noise, acc, max_meas_dev)) {}
+
+        rect_filter(
+            const momentum_filter& filt
+        ) : 
+            left(filt),
+            top(filt),
+            right(filt),
+            bottom(filt)
+        {
+        }
+
+        drectangle operator()(const drectangle& r) 
+        {
+            return drectangle(left(r.left()),
+                            top(r.top()),
+                            right(r.right()),
+                            bottom(r.bottom()));
+        }
+
+        drectangle operator()(const rectangle& r) 
+        {
+            return drectangle(left(r.left()),
+                            top(r.top()),
+                            right(r.right()),
+                            bottom(r.bottom()));
+        }
+
+        const momentum_filter& get_left   () const { return left; }
+        momentum_filter&       get_left   ()       { return left; }
+        const momentum_filter& get_top    () const { return top; }
+        momentum_filter&       get_top    ()       { return top; }
+        const momentum_filter& get_right  () const { return right; }
+        momentum_filter&       get_right  ()       { return right; }
+        const momentum_filter& get_bottom () const { return bottom; }
+        momentum_filter&       get_bottom ()       { return bottom; }
+
+        friend void serialize(const rect_filter& item, std::ostream& out)
+        {
+            int version = 123;
+            serialize(version, out);
+            serialize(item.left, out);
+            serialize(item.top, out);
+            serialize(item.right, out);
+            serialize(item.bottom, out);
+        }
+
+        friend void deserialize(rect_filter& item, std::istream& in)
+        {
+            int version = 0;
+            deserialize(version, in);
+            if (version != 123)
+                throw dlib::serialization_error("Unknown version number found while deserializing rect_filter object.");
+            deserialize(item.left, in);
+            deserialize(item.top, in);
+            deserialize(item.right, in);
+            deserialize(item.bottom, in);
+        }
+
+    private:
+
+        momentum_filter left, top, right, bottom;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    rect_filter find_optimal_rect_filter (
+        const std::vector<rectangle>& rects,
+        const double smoothness = 1
+    );
 
 // ----------------------------------------------------------------------------------------
 
