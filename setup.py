@@ -26,6 +26,7 @@ Additional options:
     --clean: delete any previous build folders and rebuild.  You should do this if you change any build options
              by setting --compiler-flags or --yes or --no since last time you ran a build to make sure the changes
              take effect.
+    --set: set arbitrary options e.g. --set CUDA_HOST_COMPILER=/usr/bin/gcc-6.4.0
 """
 import os
 import re
@@ -43,7 +44,7 @@ from distutils.version import LooseVersion
 
 
 def get_extra_cmake_options():
-    """read --clean, --yes, --no, --compiler-flags, and -G options from the command line and add them as cmake switches.
+    """read --clean, --yes, --no, --set, --compiler-flags, and -G options from the command line and add them as cmake switches.
     """
     _cmake_extra_options = []
     _clean_build_folder = False
@@ -61,6 +62,8 @@ def get_extra_cmake_options():
             _cmake_extra_options.append('-D{arg}=yes'.format(arg=arg.strip()))
         elif opt_key == 'no':
             _cmake_extra_options.append('-D{arg}=no'.format(arg=arg.strip()))
+        elif opt_key == 'set':
+            _cmake_extra_options.append('-D{arg}'.format(arg=arg.strip()))
 
         if opt_key:
             sys.argv.remove(arg)
@@ -72,7 +75,7 @@ def get_extra_cmake_options():
             sys.argv.remove(arg)
             continue
 
-        if arg in ['--yes', '--no', '--compiler-flags']:
+        if arg in ['--yes', '--no', '--set', '--compiler-flags']:
             opt_key = arg[2:].lower()
             sys.argv.remove(arg)
             continue
