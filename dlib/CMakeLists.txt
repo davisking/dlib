@@ -512,7 +512,7 @@ if (NOT TARGET dlib)
 
       if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
          # Try to find BLAS, LAPACK and MKL
-         include(cmake_utils/cmake_find_blas.txt)
+         include(cmake_utils/find_blas.cmake)
 
          if (DLIB_USE_BLAS)
             if (blas_found)
