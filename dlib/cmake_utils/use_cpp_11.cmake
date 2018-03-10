@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 
 if (POLICY CMP0054)
-    cmake_policy(SET CMP0054 NEW)
+   cmake_policy(SET CMP0054 NEW)
 endif()
 
 
@@ -60,14 +60,14 @@ else()
    # Set a flag if the compiler you are using is capable of providing C++11 features.
    get_property(cxx_features GLOBAL PROPERTY CMAKE_CXX_KNOWN_FEATURES)
    if (";${cxx_features};" MATCHES ";cxx_rvalue_references;" AND
-       ";${cxx_features};" MATCHES ";cxx_variadic_templates;" AND
-       ";${cxx_features};" MATCHES ";cxx_lambdas;" AND
-       ";${cxx_features};" MATCHES ";cxx_defaulted_move_initializers;" AND
-       ";${cxx_features};" MATCHES ";cxx_delegating_constructors;" AND
-       ";${cxx_features};" MATCHES ";cxx_thread_local;" AND
-       ";${cxx_features};" MATCHES ";cxx_constexpr;" AND
-       ";${cxx_features};" MATCHES ";cxx_decltype_incomplete_return_types;" AND
-       ";${cxx_features};" MATCHES ";cxx_auto_type;")
+         ";${cxx_features};" MATCHES ";cxx_variadic_templates;" AND
+         ";${cxx_features};" MATCHES ";cxx_lambdas;" AND
+         ";${cxx_features};" MATCHES ";cxx_defaulted_move_initializers;" AND
+         ";${cxx_features};" MATCHES ";cxx_delegating_constructors;" AND
+         ";${cxx_features};" MATCHES ";cxx_thread_local;" AND
+         ";${cxx_features};" MATCHES ";cxx_constexpr;" AND
+         ";${cxx_features};" MATCHES ";cxx_decltype_incomplete_return_types;" AND
+         ";${cxx_features};" MATCHES ";cxx_auto_type;")
 
       set(COMPILER_CAN_DO_CPP_11 1)
       # Tell cmake that we need C++11 for dlib

@@ -32,128 +32,128 @@ SET(lapack_without_underscore 0)
 message(STATUS "Searching for BLAS and LAPACK")
 
 if (UNIX OR MINGW)
-    message(STATUS "Searching for BLAS and LAPACK")
+   message(STATUS "Searching for BLAS and LAPACK")
 
-    if (BUILDING_MATLAB_MEX_FILE)
-        find_library(MATLAB_BLAS_LIBRARY mwblas  PATHS ${MATLAB_LIB_FOLDERS} )
-        find_library(MATLAB_LAPACK_LIBRARY mwlapack  PATHS ${MATLAB_LIB_FOLDERS} )
-        if (MATLAB_BLAS_LIBRARY AND MATLAB_LAPACK_LIBRARY)
-            add_subdirectory(external/cblas)
-            set(blas_libraries  ${MATLAB_BLAS_LIBRARY} cblas  )
-            set(lapack_libraries  ${MATLAB_LAPACK_LIBRARY} )
-            set(blas_found 1)
-            set(lapack_found 1)
-            message(STATUS "Found MATLAB's BLAS and LAPACK libraries")
-        endif()
-        # Don't try to link to anything other than MATLAB's own internal blas
-        # and lapack libraries because doing so generally upsets MATLAB.  So
-        # we just end here no matter what.
-        return()
-    endif()
+   if (BUILDING_MATLAB_MEX_FILE)
+      find_library(MATLAB_BLAS_LIBRARY mwblas  PATHS ${MATLAB_LIB_FOLDERS} )
+      find_library(MATLAB_LAPACK_LIBRARY mwlapack  PATHS ${MATLAB_LIB_FOLDERS} )
+      if (MATLAB_BLAS_LIBRARY AND MATLAB_LAPACK_LIBRARY)
+         add_subdirectory(external/cblas)
+         set(blas_libraries  ${MATLAB_BLAS_LIBRARY} cblas  )
+         set(lapack_libraries  ${MATLAB_LAPACK_LIBRARY} )
+         set(blas_found 1)
+         set(lapack_found 1)
+         message(STATUS "Found MATLAB's BLAS and LAPACK libraries")
+      endif()
+      # Don't try to link to anything other than MATLAB's own internal blas
+      # and lapack libraries because doing so generally upsets MATLAB.  So
+      # we just end here no matter what.
+      return()
+   endif()
 
-    # First, search for libraries via pkg-config, which is the cleanest path
-    find_package(PkgConfig)
-    pkg_check_modules(BLAS_REFERENCE cblas)
-    pkg_check_modules(LAPACK_REFERENCE lapack)
-    if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND)
-        set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
-        set(lapack_libraries "${LAPACK_REFERENCE_LDFLAGS}")
-        set(blas_found 1)
-        set(lapack_found 1)
-        set(REQUIRES_LIBS "${REQUIRES_LIBS} cblas lapack")
-        message(STATUS "Found BLAS and LAPACK via pkg-config")
-        return()
-    endif()
+   # First, search for libraries via pkg-config, which is the cleanest path
+   find_package(PkgConfig)
+   pkg_check_modules(BLAS_REFERENCE cblas)
+   pkg_check_modules(LAPACK_REFERENCE lapack)
+   if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND)
+      set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
+      set(lapack_libraries "${LAPACK_REFERENCE_LDFLAGS}")
+      set(blas_found 1)
+      set(lapack_found 1)
+      set(REQUIRES_LIBS "${REQUIRES_LIBS} cblas lapack")
+      message(STATUS "Found BLAS and LAPACK via pkg-config")
+      return()
+   endif()
 
-    include(CheckTypeSize)
-    check_type_size( "void*" SIZE_OF_VOID_PTR)
+   include(CheckTypeSize)
+   check_type_size( "void*" SIZE_OF_VOID_PTR)
 
-    if (SIZE_OF_VOID_PTR EQUAL 8)
-        set( mkl_search_path
-            /opt/intel/mkl/*/lib/em64t
-            /opt/intel/mkl/lib/intel64
-            /opt/intel/lib/intel64
-            /opt/intel/mkl/lib
-            )
+   if (SIZE_OF_VOID_PTR EQUAL 8)
+      set( mkl_search_path
+         /opt/intel/mkl/*/lib/em64t
+         /opt/intel/mkl/lib/intel64
+         /opt/intel/lib/intel64
+         /opt/intel/mkl/lib
+         )
 
-        find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
-        mark_as_advanced(mkl_intel)
-    else()
-        set( mkl_search_path
-            /opt/intel/mkl/*/lib/32
-            /opt/intel/mkl/lib/ia32
-            /opt/intel/lib/ia32
-            )
+      find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
+      mark_as_advanced(mkl_intel)
+   else()
+      set( mkl_search_path
+         /opt/intel/mkl/*/lib/32
+         /opt/intel/mkl/lib/ia32
+         /opt/intel/lib/ia32
+         )
 
-        find_library(mkl_intel mkl_intel ${mkl_search_path})
-        mark_as_advanced(mkl_intel)
-    endif()
+      find_library(mkl_intel mkl_intel ${mkl_search_path})
+      mark_as_advanced(mkl_intel)
+   endif()
 
    include(CheckLibraryExists)
 
-    # Get mkl_include_dir
-    set(mkl_include_search_path
-        /opt/intel/mkl/include
-        /opt/intel/include
-    )
-    find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
-    mark_as_advanced(mkl_include_dir)
+   # Get mkl_include_dir
+   set(mkl_include_search_path
+      /opt/intel/mkl/include
+      /opt/intel/include
+      )
+   find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
+   mark_as_advanced(mkl_include_dir)
 
-    # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
-    # file first since this way avoids linking bugs in some cases.
-    find_library(mkl_rt mkl_rt ${mkl_search_path})
-    find_library(openmp_libraries iomp5 ${mkl_search_path}) 
-    mark_as_advanced(  mkl_rt  openmp_libraries )
-    # if we found the MKL 
-    if ( mkl_rt)
-        set(mkl_libraries  ${mkl_rt} )
-        set(blas_libraries  ${mkl_rt} )
-        set(lapack_libraries  ${mkl_rt} )
-        set(blas_found 1)
-        set(lapack_found 1)
-        set(found_intel_mkl 1)
-        message(STATUS "Found Intel MKL BLAS/LAPACK library")
-    endif()
+   # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
+   # file first since this way avoids linking bugs in some cases.
+   find_library(mkl_rt mkl_rt ${mkl_search_path})
+   find_library(openmp_libraries iomp5 ${mkl_search_path}) 
+   mark_as_advanced(  mkl_rt  openmp_libraries )
+   # if we found the MKL 
+   if ( mkl_rt)
+      set(mkl_libraries  ${mkl_rt} )
+      set(blas_libraries  ${mkl_rt} )
+      set(lapack_libraries  ${mkl_rt} )
+      set(blas_found 1)
+      set(lapack_found 1)
+      set(found_intel_mkl 1)
+      message(STATUS "Found Intel MKL BLAS/LAPACK library")
+   endif()
 
-    if (NOT found_intel_mkl)
-        # Search for the needed libraries from the MKL.  This time try looking for a different
-        # set of MKL files and try to link against those.
-        find_library(mkl_core mkl_core ${mkl_search_path})
-        find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
-        find_library(mkl_iomp iomp5 ${mkl_search_path})
-        find_library(mkl_pthread pthread ${mkl_search_path})
+   if (NOT found_intel_mkl)
+      # Search for the needed libraries from the MKL.  This time try looking for a different
+      # set of MKL files and try to link against those.
+      find_library(mkl_core mkl_core ${mkl_search_path})
+      find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
+      find_library(mkl_iomp iomp5 ${mkl_search_path})
+      find_library(mkl_pthread pthread ${mkl_search_path})
 
-        mark_as_advanced( mkl_intel mkl_core mkl_thread mkl_iomp mkl_pthread)
-        # If we found the MKL 
-        if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp AND mkl_pthread)
-            set(mkl_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
-            set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
-            set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
-            set(blas_found 1)
-            set(lapack_found 1)
-            set(found_intel_mkl 1)
-            message(STATUS "Found Intel MKL BLAS/LAPACK library")
-        endif()
-    endif()
+      mark_as_advanced( mkl_intel mkl_core mkl_thread mkl_iomp mkl_pthread)
+      # If we found the MKL 
+      if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp AND mkl_pthread)
+         set(mkl_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
+         set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
+         set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
+         set(blas_found 1)
+         set(lapack_found 1)
+         set(found_intel_mkl 1)
+         message(STATUS "Found Intel MKL BLAS/LAPACK library")
+      endif()
+   endif()
 
-    if (found_intel_mkl AND mkl_include_dir)
-        set(found_intel_mkl_headers 1)
-    endif()
+   if (found_intel_mkl AND mkl_include_dir)
+      set(found_intel_mkl_headers 1)
+   endif()
 
    # try to find some other LAPACK libraries if we didn't find the MKL
    set(extra_paths
-        /usr/lib64
-        /usr/lib64/atlas-sse3
-        /usr/lib64/atlas-sse2
-        /usr/lib64/atlas
-        /usr/lib
-        /usr/lib/atlas-sse3
-        /usr/lib/atlas-sse2
-        /usr/lib/atlas
-        /usr/lib/openblas-base
-        /opt/OpenBLAS/lib
-        $ENV{OPENBLAS_HOME}/lib
-        )
+      /usr/lib64
+      /usr/lib64/atlas-sse3
+      /usr/lib64/atlas-sse2
+      /usr/lib64/atlas
+      /usr/lib
+      /usr/lib/atlas-sse3
+      /usr/lib/atlas-sse2
+      /usr/lib/atlas
+      /usr/lib/openblas-base
+      /opt/OpenBLAS/lib
+      $ENV{OPENBLAS_HOME}/lib
+      )
 
    INCLUDE (CheckFunctionExists)
 
@@ -188,9 +188,9 @@ if (UNIX OR MINGW)
       mark_as_advanced( lapack_lib)
    endif()
 
-   
+
    # try to find some other BLAS libraries if we didn't find the MKL
-   
+
    if (NOT blas_found)
       find_library(atlas_lib atlas PATHS ${extra_paths})
       find_library(cblas_lib cblas PATHS ${extra_paths})
@@ -225,7 +225,7 @@ if (UNIX OR MINGW)
       mark_as_advanced( cblas_lib)
    endif()
 
-   
+
    if (NOT blas_found)
       find_library(generic_blas blas PATHS ${extra_paths})
       if (generic_blas)
@@ -257,64 +257,64 @@ if (UNIX OR MINGW)
 
 
 elseif(WIN32 AND NOT MINGW)
-    message(STATUS "Searching for BLAS and LAPACK")
+   message(STATUS "Searching for BLAS and LAPACK")
 
-    include(CheckTypeSize)
-    check_type_size( "void*" SIZE_OF_VOID_PTR)
-    if (SIZE_OF_VOID_PTR EQUAL 8)
-        set( mkl_search_path
-            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/intel64" 
-            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64" 
-            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64" 
-            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/intel64"
-            "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
-            "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
-            "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
-            "C:/Program Files/Intel/Composer XE/compiler/lib/intel64"
-            )
-        find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
-    else()
-        set( mkl_search_path
-            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/ia32" 
-            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/ia32"
-            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/ia32" 
-            "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/ia32"
-            "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
-            "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/ia32"
-            "C:/Program Files/Intel/Composer XE/mkl/lib/ia32"
-            "C:/Program Files/Intel/Composer XE/compiler/lib/ia32"
-            )
-        find_library(mkl_intel  mkl_intel_c ${mkl_search_path})
-    endif()
+   include(CheckTypeSize)
+   check_type_size( "void*" SIZE_OF_VOID_PTR)
+   if (SIZE_OF_VOID_PTR EQUAL 8)
+      set( mkl_search_path
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/intel64" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/intel64"
+         "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
+         "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
+         "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
+         "C:/Program Files/Intel/Composer XE/compiler/lib/intel64"
+         )
+      find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
+   else()
+      set( mkl_search_path
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/ia32" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/ia32"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/ia32" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/ia32"
+         "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
+         "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/ia32"
+         "C:/Program Files/Intel/Composer XE/mkl/lib/ia32"
+         "C:/Program Files/Intel/Composer XE/compiler/lib/ia32"
+         )
+      find_library(mkl_intel  mkl_intel_c ${mkl_search_path})
+   endif()
 
    INCLUDE (CheckFunctionExists)
 
-    # Search for the needed libraries from the MKL.  
-    find_library(mkl_core mkl_core ${mkl_search_path})
-    find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
-    find_library(mkl_iomp libiomp5md ${mkl_search_path})
+   # Search for the needed libraries from the MKL.  
+   find_library(mkl_core mkl_core ${mkl_search_path})
+   find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
+   find_library(mkl_iomp libiomp5md ${mkl_search_path})
 
-    mark_as_advanced( mkl_intel mkl_core mkl_thread  mkl_iomp)
-    # If we found the MKL 
-    if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp )
-        set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp}  )
-        set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} )
-        set(blas_found 1)
-        set(lapack_found 1)
-        message(STATUS "Found Intel MKL BLAS/LAPACK library")
+   mark_as_advanced( mkl_intel mkl_core mkl_thread  mkl_iomp)
+   # If we found the MKL 
+   if (mkl_intel AND mkl_core AND mkl_thread AND mkl_iomp )
+      set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp}  )
+      set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_iomp} )
+      set(blas_found 1)
+      set(lapack_found 1)
+      message(STATUS "Found Intel MKL BLAS/LAPACK library")
 
-        # Make sure the version of the Intel MKL we found is compatible with
-        # the compiler we are using.  One way to do this check is to see if we can
-        # link to it right now.
-        set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
-        CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
-        if (NOT HAVE_CBLAS)
-            message("BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
-            set(blas_found 0)
-            set(lapack_found 0)
-        endif()
+      # Make sure the version of the Intel MKL we found is compatible with
+      # the compiler we are using.  One way to do this check is to see if we can
+      # link to it right now.
+      set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+      CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
+      if (NOT HAVE_CBLAS)
+         message("BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
+         set(blas_found 0)
+         set(lapack_found 0)
+      endif()
 
-    endif()
+   endif()
 
 
 endif()
@@ -322,18 +322,18 @@ endif()
 
 # When all else fails use CMake's built in functions to find BLAS and LAPACK
 if (NOT blas_found)
-    find_package(BLAS QUIET)
-    if (${BLAS_FOUND})
-        set(blas_libraries ${BLAS_LIBRARIES})      
-        set(blas_found 1)
-        if (NOT lapack_found)
-            find_package(LAPACK QUIET)
-            if (${LAPACK_FOUND})
-                set(lapack_libraries ${LAPACK_LIBRARIES})
-                set(lapack_found 1)
-            endif()
-        endif()
-    endif()
+   find_package(BLAS QUIET)
+   if (${BLAS_FOUND})
+      set(blas_libraries ${BLAS_LIBRARIES})      
+      set(blas_found 1)
+      if (NOT lapack_found)
+         find_package(LAPACK QUIET)
+         if (${LAPACK_FOUND})
+            set(lapack_libraries ${LAPACK_LIBRARIES})
+            set(lapack_found 1)
+         endif()
+      endif()
+   endif()
 endif()
 
 
