@@ -576,7 +576,7 @@ namespace dlib
     )
     {
         std::ios::fmtflags oldflags = in.flags();  
-        in.flags(); 
+        in.flags(static_cast<std::ios_base::fmtflags>(0));
         std::streamsize ss = in.precision(35); 
         if (in.peek() == 'i')
         {
