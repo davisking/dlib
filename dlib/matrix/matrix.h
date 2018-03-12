@@ -33,6 +33,12 @@
 // warning off and then turning it back on at the end of the file.
 #pragma warning(disable : 4355)
 
+// "warning C4723: potential divide by 0" - This warning is triggered in
+// matrix(const std::initializer_list<T>& l) where the compiler can see that
+// matrix<> was templated in a way making NR ending up 0, but division by 0 at runtime
+// is not possible because the division operation is inside "if (NR!=0)" block.
+#pragma warning(disable : 4723)
+
 #endif
 
 namespace dlib
@@ -2147,8 +2153,9 @@ namespace dlib
 }
 
 #ifdef _MSC_VER
-// put that warning back to its default setting
+// put warnings back to their default settings
 #pragma warning(default : 4355)
+#pragma warning(default : 4723)
 #endif
 
 #endif // DLIB_MATRIx_
