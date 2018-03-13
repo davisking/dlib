@@ -171,9 +171,26 @@ namespace dlib
 
     class serialization_error : public error 
     {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception object.  It is thrown if serialization or
+                deserialization fails.
+        !*/
+
     public: 
         serialization_error(const std::string& e):error(e) {}
     };
+
+
+    void check_serialized_version(
+        const std::string& expected_version, 
+        std::istream& in
+    );
+    /*!
+        ensures
+            - Deserializes a string from in and if it doesn't match expected_version we
+              throw serialization_error.
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
@@ -1734,6 +1751,19 @@ namespace dlib
         if (!in || !item.ParseFromString(temp))
         {
             throw dlib::serialization_error("Error while deserializing a Google Protocol Buffer object.");
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void check_serialized_version(const std::string& expected_version, std::istream& in)
+    {
+        std::string version;
+        deserialize(version, in);
+        if (version != expected_version)
+        {
+            throw serialization_error("Unexpected version '"+version+
+                "' found while deserializing object. Expected version to be '"+expected_version+"'.");
         }
     }
 
