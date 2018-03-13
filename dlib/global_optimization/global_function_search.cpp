@@ -168,7 +168,9 @@ namespace dlib
             DLIB_CASSERT(x.size() > 0);
             for (size_t i = 0; i < x.size(); ++i)
                 DLIB_CASSERT(anchor.size() == x[i].size());
-            DLIB_CASSERT(anchor.size()+1 <= x.size() && x.size() <= (anchor.size()+1)*(anchor.size()+2)/2);
+
+            const long x_size = static_cast<long>(x.size());
+            DLIB_CASSERT(anchor.size()+1 <= x_size && x_size <= (anchor.size()+1)*(anchor.size()+2)/2);
 
 
             matrix<double> X(anchor.size(), x.size());
@@ -214,7 +216,7 @@ namespace dlib
             // their best observed value and use the QP to optimize the real variables.  So the
             // number of dimensions, as far as the QP is concerned, is the number of non-integer
             // variables.
-            long dims = 0;
+            size_t dims = 0;
             for (auto is_int : is_integer_variable)
             {
                 if (!is_int)
@@ -225,7 +227,7 @@ namespace dlib
 
             // Use enough points to fill out a quadratic model or the max available if we don't
             // have quite enough.
-            const long N = std::min((long)samples.size(), (dims+1)*(dims+2)/2); 
+            const long N = std::min(samples.size(), (dims+1)*(dims+2)/2); 
 
 
             // first find the best sample;
@@ -376,7 +378,7 @@ namespace dlib
         lower(std::move(bound1)), upper(std::move(bound2))
     {
         DLIB_CASSERT(lower.size() == upper.size());
-        for (size_t i = 0; i < lower.size(); ++i)
+        for (long i = 0; i < lower.size(); ++i)
         {
             if (upper(i) < lower(i))
                 std::swap(lower(i), upper(i));
