@@ -4,6 +4,7 @@
 #ifdef DLIB_ISOTONIC_ReGRESSION_ABSTRACT_H_
 
 #include <vector>
+#include <utility>
 
 namespace dlib
 {
@@ -31,9 +32,10 @@ namespace dlib
         );
         /*!
             requires
-                - [begin,end) is an iterator range of float or doubles.
-                - obegin points to an iterator range at least std::distance(begin,end) in
-                  size which is capable of storing double or float values.
+                - [begin,end) is an iterator range of float or doubles or a range of
+                  std::pair<T,double> or std::pair<T,float> where T an be anything.
+                - obegin points to an iterator range at least std::distance(begin,end). 
+                - obegin points to an iterator range of objects of type float, double, std::pair<T,float>, or std::pair<T,double>.
             ensures
                 - Given the range of real values stored in [begin,end), this method performs isotonic regression
                   on this data and writes the results to obegin.  To be specific:
@@ -44,11 +46,72 @@ namespace dlib
                       OUT[i] <= OUT[i+1], i.e. that OUT is monotonic.
                 - It is OK for [begin,end) to overlap with the range pointed to by obegin.
                   That is, this function can run in-place.
+                - Note that when the inputs or outputs are std::pairs this algorithm only
+                  looks at the .second field of the pair.  It therefore still treats these
+                  iterator ranges as ranges of reals since it only looks at the .second
+                  field, which is a real number.  The .first field is entirely ignored.
         !*/
 
         void operator() (
             std::vector<double>& vect
         ) { (*this)(vect.begin(), vect.end(), vect.begin()); }
+        /*!
+            ensures
+                - performs in-place isotonic regression.  Therefore, #vect will contain the
+                  isotonic regression of vect.
+                - #vect.size() == vect.size()
+        !*/
+
+        template <typename T, typename U>
+        void operator() (
+            std::vector<std::pair<T,U>>& vect
+        ) { (*this)(vect.begin(), vect.end(), vect.begin()); }
+        /*!
+            ensures
+                - performs in-place isotonic regression.  Therefore, #vect will contain the
+                  isotonic regression of vect.
+                - #vect.size() == vect.size()
+        !*/
+
+
+        template <
+            typename const_iterator, 
+            typename iterator
+            >
+        void fit_with_linear_output_interpolation (
+            const_iterator begin,
+            const_iterator end,
+            iterator obegin
+        );
+        /*!
+            requires
+                - [begin,end) is an iterator range of float or doubles or a range of
+                  std::pair<T,double> or std::pair<T,float> where T an be anything.
+                - obegin points to an iterator range at least std::distance(begin,end). 
+                - obegin points to an iterator range of objects of type float, double, std::pair<T,float>, or std::pair<T,double>.
+            ensures
+                - This function behaves just like (*this)(begin,end,obegin) except that the
+                  output is interpolated.  To explain, not that the optimal output of
+                  isotonic regression is a step function.  However, in many applications
+                  that isn't really what you want.  You want something smoother.  So
+                  fit_with_linear_output_interpolation() does isotonic regression and then
+                  linearly interpolates the step function into a piecewise linear function.
+        !*/
+
+        void fit_with_linear_output_interpolation (
+            std::vector<double>& vect
+        ) { fit_with_linear_output_interpolation(vect.begin(), vect.end(), vect.begin()); }
+        /*!
+            ensures
+                - performs in-place isotonic regression.  Therefore, #vect will contain the
+                  isotonic regression of vect.
+                - #vect.size() == vect.size()
+        !*/
+
+        template <typename T, typename U>
+        void fit_with_linear_output_interpolation (
+            std::vector<std::pair<T,U>>& vect
+        ) { fit_with_linear_output_interpolation(vect.begin(), vect.end(), vect.begin()); }
         /*!
             ensures
                 - performs in-place isotonic regression.  Therefore, #vect will contain the
