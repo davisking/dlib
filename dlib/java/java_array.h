@@ -369,7 +369,11 @@ public:
 
     operator java_type() const { return ref;}
 
-    void swap(array& item) { std::swap(ref, item.ref); }
+    void swap(array& item) 
+    { 
+        std::swap(ref, item.ref);  
+        std::swap(is_global_ref, item.is_global_ref);  
+    }
 
 private:
     java_type ref = NULL;
