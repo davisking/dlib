@@ -41,6 +41,8 @@ namespace
         {
             istringstream sin(get_decoded_string());
 
+            print_spinner();
+
             typedef matrix<double,0,1> sample_type;
             std::vector<double> labels;
             std::vector<sample_type> samples;
@@ -61,7 +63,7 @@ namespace
 
             auto result = test_regression_function(df, samples, labels);
             // train:    2.239 0.987173 0.970669   1.1399 
-            dlog << LINFO << "train: " << trans(result);
+            dlog << LINFO << "train: " << result;
             DLIB_TEST_MSG(result(0) < 2.3, result(0));
 
             running_stats<double> rs;
@@ -69,6 +71,18 @@ namespace
                 rs.add(std::pow(oobs[i]-labels[i],2.0));
             dlog << LINFO << "OOB MSE: "<< rs.mean();
             DLIB_TEST_MSG(rs.mean() < 10.2, rs.mean());
+
+            print_spinner();
+
+            stringstream ss;
+            serialize(df, ss);
+            decltype(df) df2;
+            deserialize(df2, ss);
+            DLIB_TEST(df2.get_num_trees() == 1000);
+            result = test_regression_function(df2, samples, labels);
+            // train:    2.239 0.987173 0.970669   1.1399 
+            dlog << LINFO << "serialized train results: " << result;
+            DLIB_TEST_MSG(result(0) < 2.3, result(0));
         }
     } a;
 

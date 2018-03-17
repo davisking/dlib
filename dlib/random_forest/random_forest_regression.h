@@ -46,6 +46,7 @@ namespace dlib
             std::vector<feature>& feats
         ) const
         {
+            DLIB_ASSERT(max_num_feats() != 0);
             num = std::min(num, num_feats);
 
             feats.clear();
@@ -66,6 +67,7 @@ namespace dlib
             const feature& f
         ) const
         {
+            DLIB_ASSERT(max_num_feats() != 0);
             return item(f);
         }
 
@@ -290,6 +292,7 @@ namespace dlib
             size_t num
         )
         {
+            DLIB_CASSERT(num > 0);
             num_trees = num;
         }
 
@@ -297,6 +300,7 @@ namespace dlib
             double frac
         )
         {
+            DLIB_CASSERT(0 < frac && frac <= 1);
             feature_subsampling_frac = frac;
         }
 
@@ -344,7 +348,7 @@ namespace dlib
         trained_function_type train (
             const std::vector<sample_type>& x,
             const std::vector<double>& y,
-            std::vector<double>& oob_values // predicted y, basically like LOO-CV
+            std::vector<double>& oob_values 
         ) const
         {
             return do_train(x,y,oob_values,true);
@@ -355,7 +359,7 @@ namespace dlib
         trained_function_type do_train (
             const std::vector<sample_type>& x,
             const std::vector<double>& y,
-            std::vector<double>& oob_values, // predicted y, basically like LOO-CV
+            std::vector<double>& oob_values, 
             bool compute_oob_values
         ) const 
         {
