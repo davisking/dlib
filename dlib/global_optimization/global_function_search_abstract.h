@@ -225,7 +225,7 @@ namespace dlib
                     // Suppose we want to find which of these functions, F() and G(), have
                     // the largest output and what input is necessary to produce the
                     // maximal output.
-                    auto F = [](double a, double b) { return  -std::pow(a-2,2.0) - std::pow(a-4,2.0); };
+                    auto F = [](double a, double b) { return  -std::pow(a-2,2.0) - std::pow(b-4,2.0); };
                     auto G = [](double x)           { return 2-std::pow(x-5,2.0); };
 
                     // We first define function_spec objects that specify bounds on the
