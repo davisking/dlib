@@ -5,6 +5,7 @@
 #include <dlib/python.h>
 #include <dlib/global_optimization.h>
 #include <dlib/matrix.h>
+#include <pybind11/stl.h>
 
 
 using namespace dlib;
@@ -180,6 +181,68 @@ py::tuple py_find_min_global2 (
 
 // ----------------------------------------------------------------------------------------
 
+function_spec py_function_spec1 (
+    py::list a,
+    py::list b
+)
+{
+    return function_spec(list_to_mat(a), list_to_mat(b));
+}
+
+function_spec py_function_spec2 (
+    py::list a,
+    py::list b,
+    py::list c
+)
+{
+    return function_spec(list_to_mat(a), list_to_mat(b), list_to_bool_vector(c));
+}
+
+std::shared_ptr<global_function_search> py_global_function_search1 (
+    py::list functions
+)
+{
+    std::vector<function_spec> tmp;
+    for (auto i : functions)
+        tmp.emplace_back(i.cast<function_spec>());
+
+    return std::make_shared<global_function_search>(tmp);
+}
+
+std::shared_ptr<global_function_search> py_global_function_search2 (
+    py::list functions,
+    py::list initial_function_evals,
+    double relative_noise_magnitude
+)
+{
+    std::vector<function_spec> specs;
+    for (auto i : functions)
+        specs.emplace_back(i.cast<function_spec>());
+
+    std::vector<std::vector<function_evaluation>> func_evals;
+    for (auto i : initial_function_evals)
+    {
+        std::vector<function_evaluation> evals;
+        for (auto j : i)
+        {
+            evals.emplace_back(j.cast<function_evaluation>());
+        }
+        func_evals.emplace_back(std::move(evals));
+    }
+
+    return std::make_shared<global_function_search>(specs, func_evals, relative_noise_magnitude);
+}
+
+function_evaluation py_function_evaluation(
+    const py::list& x, 
+    double y
+)
+{
+    return function_evaluation(list_to_mat(x), y);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_global_optimization(py::module& m)
 {
     /*!
@@ -308,6 +371,72 @@ ensures \n\
 	py::arg("f"), py::arg("bound1"), py::arg("bound2"), py::arg("num_function_calls"), py::arg("solver_epsilon")=0
     );
     }
+
+    // -------------------------------------------------
+    // -------------------------------------------------
+
+
+    py::class_<function_evaluation> (m, "function_evaluation",  R"RAW(  
+This object records the output of a real valued function in response to
+some input. 
+
+In particular, if you have a function F(x) then the function_evaluation is
+simply a struct that records x and the scalar value F(x). )RAW")
+        .def(py::init<matrix<double,0,1>,double>(), py::arg("x"), py::arg("y"))
+        .def(py::init<>(&py_function_evaluation), py::arg("x"), py::arg("y"))
+        .def_readonly("x",       &function_evaluation::x)
+        .def_readonly("y",       &function_evaluation::y);
+
+
+    py::class_<function_spec> (m, "function_spec",  "See: http://dlib.net/dlib/global_optimization/global_function_search_abstract.h.html")
+        .def(py::init<matrix<double,0,1>,matrix<double,0,1>>(), py::arg("bound1"), py::arg("bound2") )
+        .def(py::init<matrix<double,0,1>,matrix<double,0,1>,std::vector<bool>>(), py::arg("bound1"), py::arg("bound2"), py::arg("is_integer") )
+        .def(py::init<>(&py_function_spec1), py::arg("bound1"), py::arg("bound2"))
+        .def(py::init<>(&py_function_spec2), py::arg("bound1"), py::arg("bound2"), py::arg("is_integer"))
+        .def_readonly("lower",       &function_spec::lower)
+        .def_readonly("upper",       &function_spec::upper)
+        .def_readonly("is_integer_variable",       &function_spec::is_integer_variable);
+
+
+    py::class_<function_evaluation_request> (m, "function_evaluation_request", "See: http://dlib.net/dlib/global_optimization/global_function_search_abstract.h.html")
+        .def_property_readonly("function_idx", &function_evaluation_request::function_idx)
+        .def_property_readonly("x", &function_evaluation_request::x)
+        .def_property_readonly("has_been_evaluated", &function_evaluation_request::has_been_evaluated)
+        .def("set", &function_evaluation_request::set);
+
+    py::class_<global_function_search, std::shared_ptr<global_function_search>> (m, "global_function_search", "See: http://dlib.net/dlib/global_optimization/global_function_search_abstract.h.html")
+        .def(py::init<function_spec>(), py::arg("function"))
+        .def(py::init<>(&py_global_function_search1), py::arg("functions"))
+        .def(py::init<>(&py_global_function_search2), py::arg("functions"), py::arg("initial_function_evals"), py::arg("relative_noise_magnitude"))
+        .def("set_seed", &global_function_search::set_seed, py::arg("seed"))
+        .def("num_functions", &global_function_search::num_functions)
+        .def("get_function_evaluations", [](const global_function_search& self) { 
+            std::vector<function_spec> specs;
+            std::vector<std::vector<function_evaluation>> function_evals;
+            self.get_function_evaluations(specs,function_evals); 
+            py::list py_specs, py_func_evals;
+            for (auto& s : specs)
+                py_specs.append(s);
+            for (auto& i : function_evals)
+            {
+                py::list tmp;
+                for (auto& j : i)
+                    tmp.append(j);
+                py_func_evals.append(tmp);
+            }
+            return py::make_tuple(py_specs,py_func_evals);})
+        .def("get_best_function_eval", [](const global_function_search& self) { 
+            matrix<double,0,1> x; double y; size_t idx; self.get_best_function_eval(x,y,idx); return py::make_tuple(x,y,idx);})
+        .def("get_next_x", &global_function_search::get_next_x)
+        .def("get_pure_random_search_probability", &global_function_search::get_pure_random_search_probability)
+        .def("set_pure_random_search_probability", &global_function_search::set_pure_random_search_probability, py::arg("prob"))
+        .def("get_solver_epsilon", &global_function_search::get_solver_epsilon)
+        .def("set_solver_epsilon", &global_function_search::set_solver_epsilon, py::arg("eps"))
+        .def("get_relative_noise_magnitude", &global_function_search::get_relative_noise_magnitude)
+        .def("set_relative_noise_magnitude", &global_function_search::set_relative_noise_magnitude, py::arg("value"))
+        .def("get_monte_carlo_upper_bound_sample_num", &global_function_search::get_monte_carlo_upper_bound_sample_num)
+        .def("set_monte_carlo_upper_bound_sample_num", &global_function_search::set_monte_carlo_upper_bound_sample_num, py::arg("num"))
+        ;
 
 }
 
