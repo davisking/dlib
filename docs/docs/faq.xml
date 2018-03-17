@@ -402,6 +402,7 @@ cross_validate_trainer_threaded(trainer,
                   options are discussed in great detail in parts of <a href="#Whereisthedocumentationforobjectfunction">dlib's documentation</a>.
                </p>
             </li>
+
             <li><h3>Using training images that don't look like the testing images</h3>
                This should be obvious, but needs to be pointed out.  If there
                is some clear difference between your training and testing
@@ -422,7 +423,26 @@ cross_validate_trainer_threaded(trainer,
                      <li>A training dataset where objects appear only on a perfectly white background with nothing else present, but testing images where objects appear in a normal environment like living rooms or in natural scenes.</li>
                   </ul>
                </p>
+
+               <p>
+                  Another way you can mess this up is when using the <a
+                  href="imaging.html#random_cropper">random_cropper</a> to jitter your training data, which is
+                  common when training a CNN or other deep model.  In general, the random_cropper finds images
+                  that are more or less centered on your objects of interest and it also scales the images so
+                  the object has some user specified minimum size.  That's all fine.  But what can happen is
+                  you train a model that gets 0 training error but when you go and use it it doesn't detect
+                  any objects.  Why is that?  It's probably because all the objects in your normal images, the
+                  ones you give to the random_cropper, are really small.  Smaller than the min size you told
+                  the cropper to make them. So now your testing images are really different from your training
+                  images.  Moreover, in general object detectors have some minimum size they scan and if
+                  objects are smaller than that they will never be found.  Another related issue is all your
+                  uncropped images might show objects at the very border of the image. But the random_cropper
+                  will center the objects in the crops, by padding with zeros if necessary.  Again, <b>make your
+                  testing images look like the training images</b>.  Pad the edges of your images with zeros if
+                  needed.
+               </p>
             </li>
+
             <li><h3>Using a HOG based detector but not understanding the limits of HOG templates</h3>
                The <a href="fhog_object_detector_ex.cpp.html">HOG detector</a> is very fast and generally easy to train.  However, you
                have to be aware that HOG detectors are essentially rigid templates that are scanned over an image.  So a single HOG detector
