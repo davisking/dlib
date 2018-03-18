@@ -83,7 +83,7 @@ namespace dlib
             serialize(item.num_feats, out);
         }
 
-        friend void serialize(dense_feature_extractor& item, std::istream& in)
+        friend void deserialize(dense_feature_extractor& item, std::istream& in)
         {
             check_serialized_version("dense_feature_extractor", in);
             deserialize(item.num_feats, in);
@@ -210,6 +210,7 @@ namespace dlib
         friend void serialize(const random_forest_regression_function& item, std::ostream& out)
         {
             serialize("random_forest_regression_function", out);
+            serialize(item.fe, out);
             serialize(item.trees, out);
             serialize(item.leaves, out);
         }
@@ -217,6 +218,7 @@ namespace dlib
         friend void deserialize(random_forest_regression_function& item, std::istream& in)
         {
             check_serialized_version("random_forest_regression_function", in);
+            deserialize(item.fe, in);
             deserialize(item.trees, in);
             deserialize(item.leaves, in);
         }

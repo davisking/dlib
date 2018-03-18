@@ -121,7 +121,7 @@ namespace dlib
     };
 
     void serialize(const dense_feature_extractor& item, std::ostream& out);
-    void serialize(dense_feature_extractor& item, std::istream& in);
+    void deserialize(dense_feature_extractor& item, std::istream& in);
     /*!
         provides serialization support
     !*/
