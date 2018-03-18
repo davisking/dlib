@@ -77,6 +77,11 @@
          <item>count_steps_without_decrease</item> 
          <item>count_steps_without_increase</item> 
 
+         <item>binomial_random_vars_are_different</item> 
+         <item>event_correlation</item> 
+         <item>max_scoring_element</item> 
+         <item>min_scoring_element</item> 
+
       </section>
 
       <section>
@@ -104,6 +109,10 @@
          <name>Filtering</name>
          <item>kalman_filter</item> 
          <item>rls_filter</item> 
+         <item>momentum_filter</item> 
+         <item>rect_filter</item> 
+         <item>find_optimal_rect_filter</item> 
+         <item>find_optimal_momentum_filter</item> 
       </section>
 
     </top>  
@@ -326,7 +335,85 @@
                     by Greg Welch and Gary Bishop
                 </blockquote>
          </description>
-         
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>momentum_filter</name>
+         <file>dlib/filtering.h</file>
+         <spec_file link="true">dlib/filtering/kalman_filter_abstract.h</spec_file>
+         <description>
+            This object is a simple tool for filtering a single scalar value that
+            measures the location of a moving object that has some non-trivial
+            momentum.  Importantly, the measurements are noisy and the object can
+            experience sudden unpredictable accelerations.  To accomplish this
+            filtering we use a simple <a href="#kalman_filter">Kalman filter</a> with a 
+            state transition model of:
+<pre>
+
+   position_{i+1} = position_{i} + velocity_{i} 
+   velocity_{i+1} = velocity_{i} + some_unpredictable_acceleration
+
+</pre>
+
+            and a measurement model of:
+<pre>
+
+   measured_position_{i} = position_{i} + measurement_noise
+
+</pre>
+
+            Where <tt>some_unpredictable_acceleration</tt> and <tt>measurement_noise</tt> are 0 mean Gaussian 
+            noise sources.
+
+            To allow for really sudden and large but infrequent accelerations, at each
+            step we check if the current measured position deviates from the predicted
+            filtered position by more than a user specified amount,  
+            and if so we adjust the filter's state to keep it within these bounds.
+            This allows the moving object to undergo large unmodeled accelerations, far
+            in excess of what would be suggested by the basic Kalman filter's noise model, without
+            then experiencing a long lag time where the Kalman filter has to "catch
+            up" to the new position.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>rect_filter</name>
+         <file>dlib/filtering.h</file>
+         <spec_file link="true">dlib/filtering/kalman_filter_abstract.h</spec_file>
+         <description>
+            This object is just a <a href="#momentum_filter">momentum_filter</a> applied to the
+            four corners of a <a href="linear_algebra.html#rectangle">rectangle</a>.  It allows
+            you to filter a stream of rectangles, for instance, bounding boxes from an object detector
+            applied to a video stream.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_optimal_momentum_filter</name>
+         <file>dlib/filtering.h</file>
+         <spec_file link="true">dlib/filtering/kalman_filter_abstract.h</spec_file>
+         <description>
+            This function finds the "optimal" settings of a <a href="#momentum_filter">momentum_filter</a> 
+            based on unfiltered measurement data.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_optimal_rect_filter</name>
+         <file>dlib/filtering.h</file>
+         <spec_file link="true">dlib/filtering/kalman_filter_abstract.h</spec_file>
+         <description>
+            This function finds the "optimal" settings of a <a href="#rect_filter">rect_filter</a> 
+            based on unfiltered measurement data.
+         </description>
       </component>
             
    <!-- ************************************************************************* -->
@@ -569,6 +656,69 @@
             href="#running_gradient">running_gradient</a> object and counting how many
             elements, starting with the most recent, you need to examine before you
             are confident that the series has been increasing in value.    
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>binomial_random_vars_are_different</name>
+         <file>dlib/statistics/statistic.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+            This function performs a simple statistical test to check if two binomially
+            distributed random variables have the same parameter (i.e. the chance of
+            "success").  It uses the simple likelihood ratio test discussed in
+            the following paper:
+            <blockquote>
+               Dunning, Ted. "Accurate methods for the statistics of surprise and
+               coincidence." Computational linguistics 19.1 (1993): 61-74.
+            </blockquote>
+            So for an extended discussion of the method see the above paper.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>event_correlation</name>
+         <file>dlib/statistics/statistic.h</file>
+         <spec_file link="true">dlib/statistics/statistics_abstract.h</spec_file>
+         <description>
+            This function does a statistical test to determine if two events co-occur in a
+            statistically significant way.  It uses the simple likelihood ratio
+            test discussed in the following paper:
+            <blockquote>
+               Dunning, Ted. "Accurate methods for the statistics of surprise and
+               coincidence." Computational linguistics 19.1 (1993): 61-74.
+            </blockquote>
+            So for an extended discussion of the method see the above paper.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>max_scoring_element</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This function finds the element of container that has the largest score,
+            according to a user supplied score function, and returns a std::pair containing
+            that maximal element along with the score.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>min_scoring_element</name>
+         <file>dlib/algs.h</file>
+         <spec_file link="true">dlib/algs.h</spec_file>
+         <description>
+            This function finds the element of container that has the smallest score,
+            according to a user supplied score function, and returns a std::pair containing
+            that minimal element along with the score.
          </description>
       </component>
       

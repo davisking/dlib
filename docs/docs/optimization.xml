@@ -65,6 +65,7 @@
          <item>find_max_parse_cky</item> 
          <item>min_cut</item> 
          <item>elastic_net</item> 
+         <item>isotonic_regression</item> 
       </section>
 
       <section>
@@ -948,6 +949,23 @@ Or it can use the elastic net regularizer:
             <example>optimization_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>isotonic_regression</name>
+         <file>dlib/optimization.h</file>
+         <spec_file link="true">dlib/optimization/isotonic_regression_abstract.h</spec_file>
+         <description>
+            This object is a tool for performing 1-D isotonic regression. That is, it
+            finds the least squares fit of a non-parametric curve to some user supplied
+            data, subject to the constraint that the fitted curve is non-decreasing.
+
+            <p>
+            This is done using the fast O(n) pool adjacent violators algorithm.
+            </p>
+         </description>
       </component>
 
    <!-- ************************************************************************* -->

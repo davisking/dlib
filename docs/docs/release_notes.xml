@@ -12,6 +12,53 @@
 
 <current>
 New Features and Improvements:
+   - Made orthogonalize() faster.
+   - Added binomial_random_vars_are_different() and event_correlation().
+   - Added scale_ layer, allowing implementation of squeeze-and-excitation networks.
+   - Added xcorr_fft()
+   - Added loss_multimulticlass_log: used for learning a collection of multi-class classifiers.
+   - Added the ramdump type decorator for invoking faster serialization routines.
+   - Added check_serialized_version()
+   - Added max_scoring_element() and min_scoring_element()
+   - Added make_bounding_box_regression_training_data()
+   - Added isotonic_regression.
+   - Added momentum_filter and rect_filter as well as find_optimal_momentum_filter() and find_optimal_rect_filter()
+   - Added a random forest regression tool. see random_forest_regression_trainer.
+   - Python API:
+      - Add Python rvm_trainer
+      - Added probability_that_sequence_is_increasing() to python API
+      - Made dlib.point() have writable x and y properties.
+      - Added a __time_compiled__ field to the python API.
+      - Exposed the image_dataset_metadata routines for parsing XML datasets to Python.
+      - Added num_threads to shape_predictor_training_options.
+      - Added set_dnn_prefer_smallest_algorithms() 
+      - Added support for variadic Python functions in find_max_global.
+      - Added python interface to cuda::set_device() and other relevant functions.
+      - Added python interface to the more general global_function_search object.
+
+Non-Backwards Compatible Changes:
+   - Changed cmake so that there is only the dlib target and it isn't forced to
+     be static or shared, instead, the build type will toggle based on the state
+     of CMake's BUILD_SHARED_LIBS variable.  So there is no longer a dlib_shared target.
+   - Change types of tensor's size-related members to prevent integer overflow.
+
+Bug fixes:
+   - Fixed memory leak in java swig array binding tool.
+   - Fixed windows include order problem in all/source.cpp file.
+   - Fixed cont_ layers not printing the correct num_filters parameter when they are printed to cout or xml.
+   - Fixed code not handling OBJECT_PART_NOT_PRESENT for full_object_detection objects.
+   - Fixed fft_inplace() not compiling for compile time sized matrices.
+   - The shape_predictor_trainer could have very bad runtime for some really
+     bad parameter settings.  This has been fixed and also warning messages about
+     really bad training data or parameters have been added.
+   - Fixed the decayed running stats objects so they use unbiased estimators.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.9" date="Jan 22, 2018">
+New Features and Improvements:
    - Switched the Python API from Boost.Python to pybind11.  This means Python
      users don't need to install Boost anymore, making building dlib's Python API
      much easier.
@@ -29,7 +76,7 @@ Non-Backwards Compatible Changes:
 Bug fixes:
    - Fixed global_optimization.py not working in Python 3.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 

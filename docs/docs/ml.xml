@@ -69,6 +69,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>svr_linear_trainer</item> 
          <item>rvm_regression_trainer</item> 
          <item>rbf_network_trainer</item> 
+         <item>random_forest_regression_trainer</item> 
       </section>
       <section>
          <name>Structured Prediction</name>
@@ -148,6 +149,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>cont</name>
                   <link>dlib/dnn/layers_abstract.h.html#cont_</link>
+               </item>
+               <item>
+                  <name>scale</name>
+                  <link>dlib/dnn/layers_abstract.h.html#scale_</link>
                </item>
                <item>
                   <name>extract</name>
@@ -253,6 +258,10 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
                <item>
                   <name>loss_binary_log</name>
                   <link>dlib/dnn/loss_abstract.h.html#loss_binary_log_</link>
+               </item>
+               <item>
+                  <name>loss_multimulticlass_log</name>
+                  <link>dlib/dnn/loss_abstract.h.html#loss_multimulticlass_log_</link>
                </item>
                <item>
                   <name>loss_multiclass_log</name>
@@ -413,6 +422,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
       <section>
          <name>Function Objects</name>
+         <item>random_forest_regression_function</item>
          <item>decision_function</item>
          <item>projection_function</item>
          <item>distance_function</item>
@@ -438,6 +448,7 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
          <item>load_libsvm_formatted_data</item> 
          <item>save_libsvm_formatted_data</item> 
          <item>fix_nonzero_indexing</item>
+         <item>make_bounding_box_regression_training_data</item>
       </section>
 
       <section>
@@ -1707,6 +1718,30 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
    <!-- ************************************************************************* -->
 
       <component>
+         <name>random_forest_regression_trainer</name>
+         <file>dlib/random_forest.h</file>
+         <spec_file link="true">dlib/random_forest/random_forest_regression_abstract.h</spec_file>
+         <description>
+            This object implements Breiman's classic random forest regression
+            algorithm.  
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>random_forest_regression_function</name>
+         <file>dlib/random_forest.h</file>
+         <spec_file link="true">dlib/random_forest/random_forest_regression_abstract.h</spec_file>
+         <description>
+            This object represents a random forest that maps objects to real numbers.  You
+            can learn its parameters using the <a href="#random_forest_regression_trainer">random_forest_regression_trainer</a>.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>rvm_regression_trainer</name>
          <file>dlib/svm.h</file>
          <spec_file link="true">dlib/svm/rvm_abstract.h</spec_file>
@@ -2834,6 +2869,28 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
             This is actually a pair of overloaded functions.  Between the two of them
             they let you save <a href="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors">sparse</a> 
             or dense data vectors to file using the LIBSVM format.  
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>make_bounding_box_regression_training_data</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/shape_predictor_trainer_abstract.h</spec_file>
+         <description>
+            Suppose you have an object detector that can roughly locate objects in an
+            image.  This means your detector draws boxes around objects, but these are
+            <i>rough</i> boxes in the sense that they aren't positioned super accurately.  For
+            instance, HOG based detectors usually have a stride of 8 pixels.  So the
+            positional accuracy is going to be, at best, +/-8 pixels.  
+              
+            <p>
+            If you want to get better positional accuracy one easy thing to do is train a
+            <a href="#shape_predictor_trainer">shape_predictor</a> to give you the location
+            of the object's box.  The make_bounding_box_regression_training_data() routine
+            helps you do this by creating an appropriate training dataset.  
+            </p>
          </description>
       </component>
       

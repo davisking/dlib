@@ -458,6 +458,10 @@
                   <link>dlib/matrix/matrix_conv_abstract.h.html#conv_valid</link>
                </item>
                <item>
+                  <name>xcorr_fft</name>
+                  <link>dlib/matrix/matrix_conv_abstract.h.html#xcorr_fft</link>
+               </item>
+               <item>
                   <name>xcorr</name>
                   <link>dlib/matrix/matrix_conv_abstract.h.html#xcorr</link>
                </item>

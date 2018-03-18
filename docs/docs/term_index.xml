@@ -126,6 +126,7 @@
          <term file="dlib/dnn/loss_abstract.h.html" name="EXAMPLE_LOSS_LAYER_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_hinge_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_binary_log_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_multimulticlass_log_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_weighted_" include="dlib/dnn.h"/>
@@ -152,6 +153,7 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="extract_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="upsample_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="cont_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="scale_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="l2normalize_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="dropout_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="multiply_" include="dlib/dnn.h"/>
@@ -196,6 +198,11 @@
 
          <term file="algorithms.html" name="kalman_filter"  include="dlib/filtering.h"/>
          <term file="algorithms.html" name="rls_filter"     include="dlib/filtering.h"/>
+
+         <term file="algorithms.html" name="momentum_filter"     include="dlib/filtering.h"/>
+         <term file="algorithms.html" name="rect_filter"     include="dlib/filtering.h"/>
+         <term file="algorithms.html" name="find_optimal_rect_filter"     include="dlib/filtering.h"/>
+         <term file="algorithms.html" name="find_optimal_momentum_filter"     include="dlib/filtering.h"/>
 
          <term file="dlib/error.h.html" name="error_type"      include="dlib/error.h"/>
          <term file="dlib/error.h.html" name="error"           include="dlib/error.h"/>
@@ -264,6 +271,7 @@
          <term file="optimization.html" name="find_max_box_constrained"    include="dlib/optimization.h"/>
          <term file="optimization.html" name="find_max_global"             include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="find_min_global"             include="dlib/global_optimization.h"/>
+         <term file="optimization.html" name="isotonic_regression"         include="dlib/optimization.h"/>
          <term file="optimization.html" name="global_function_search"           include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="upper_bound_function"             include="dlib/global_optimization.h"/>
          <term file="optimization.html" name="call_function_and_expand_args"    include="dlib/global_optimization.h"/>
@@ -436,6 +444,8 @@
          <term file="algorithms.html" name="running_cross_covariance"      include="dlib/statistics.h"/>
          <term file="algorithms.html" name="random_subset_selector"        include="dlib/statistics.h"/>
          <term file="algorithms.html" name="randomly_subsample"            include="dlib/statistics.h"/>
+         <term file="algorithms.html" name="event_correlation"            include="dlib/statistics.h"/>
+         <term file="algorithms.html" name="binomial_random_vars_are_different"            include="dlib/statistics.h"/>
 
          <term file="ml.html" name="lspi"                                  include="dlib/control.h"/>
          <term file="ml.html" name="policy"                                include="dlib/control.h"/>
@@ -530,6 +540,7 @@
          <term file="ml.html" name="svm_c_linear_dcd_trainer"                       include="dlib/svm.h"/>
          <term file="ml.html" name="svm_rank_trainer"                               include="dlib/svm.h"/>
          <term file="ml.html" name="shape_predictor_trainer"                        include="dlib/image_processing.h"/>
+         <term file="ml.html" name="make_bounding_box_regression_training_data"     include="dlib/image_processing.h"/>
          <term file="ml.html" name="test_shape_predictor"                           include="dlib/image_processing.h"/>
          <term file="imaging.html" name="shape_predictor"                           include="dlib/image_processing.h"/>
          <term file="imaging.html" name="render_face_detections"                    include="dlib/image_processing/render_face_detections.h"/>
@@ -545,6 +556,12 @@
          <term file="ml.html" name="svm_c_ekm_trainer"                              include="dlib/svm.h"/>
          <term file="ml.html" name="rvm_trainer"                                    include="dlib/svm.h"/>
          <term file="ml.html" name="krr_trainer"                                    include="dlib/svm.h"/>
+
+         <term file="ml.html" name="random_forest_regression_trainer"               include="dlib/random_forest.h"/>
+         <term file="ml.html" name="random_forest_regression_function"              include="dlib/random_forest.h"/>
+         <term file="dlib/random_forest/random_forest_regression_abstract.h.html" name="dense_feature_extractor"              include="dlib/random_forest.h"/>
+         <term file="dlib/random_forest/random_forest_regression_abstract.h.html" name="internal_tree_node"              include="dlib/random_forest.h"/>
+
          <term file="ml.html" name="rr_trainer"                                     include="dlib/svm.h"/>
          <term file="ml.html" name="svr_trainer"                                    include="dlib/svm.h"/>
          <term file="ml.html" name="svr_linear_trainer"                             include="dlib/svm.h"/>
@@ -713,6 +730,7 @@
          <term file="dlib/matrix/matrix_conv_abstract.h.html" name="conv_same"               include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_conv_abstract.h.html" name="conv_valid"              include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr"                   include="dlib/matrix.h"/>
+         <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr_fft"               include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr_same"              include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_conv_abstract.h.html" name="xcorr_valid"             include="dlib/matrix.h"/>
 
@@ -928,6 +946,8 @@
          <term link="dlib/float_details.h.html" name="float_details"     include="dlib/float_details.h"/>
          <term file="other.html" name="copy_functor"        include="dlib/algs.h"/>
          <term file="other.html" name="deserialize"         include="dlib/serialize.h"/>
+         <term file="other.html" name="ramdump"             include="dlib/serialize.h"/>
+         <term file="other.html" name="check_serialized_version"             include="dlib/serialize.h"/>
          <term file="other.html" name="error"               include="dlib/error.h"/>
          <term file="other.html" name="memory_manager"      include="dlib/memory_manager.h"/>
          <term file="other.html" name="default_memory_manager" include="dlib/algs.h"/>
@@ -1330,6 +1350,8 @@
 
 
 
+         <term file="algorithms.html" name="max_scoring_element"     include="dlib/algs.h"/>
+         <term file="algorithms.html" name="min_scoring_element"     include="dlib/algs.h"/>
 
          <term file="algorithms.html" name="bigint"                  include="dlib/bigint.h"/>
          <term file="algorithms.html" name="crc32"                   include="dlib/crc32.h"/>

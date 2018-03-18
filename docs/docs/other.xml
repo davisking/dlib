@@ -58,6 +58,8 @@
  
       <section>
          <name>Global Functions</name>
+         <item>ramdump</item> 
+         <item>check_serialized_version</item> 
          <item>deserialize</item> 
          <item>serialize</item> 
          <item>zero_extend_cast</item> 
@@ -1003,6 +1005,51 @@
             
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>ramdump</name>
+         <file>dlib/serialize.h</file>
+         <spec_file link="true">dlib/serialize.h</spec_file>
+         <description>
+            This is a type decoration used to indicate that serialization should be
+            done by simply dumping the memory of some object to disk as fast as
+            possible without any sort of conversions.  This means that the data written
+            will be "non-portable" in the sense that the format output by a RAM dump
+            may depend on things like the endianness of your CPU or settings of certain
+            compiler switches.
+
+            <p>
+            You use this object like this:
+            <code_box>
+serialize("yourfile.dat") &lt;&lt; ramdump(yourobject);
+deserialize("yourfile.dat") &gt;&gt; ramdump(yourobject); </code_box>
+            or 
+            <code_box>
+serialize(ramdump(yourobject), out);
+deserialize(ramdump(yourobject), in); </code_box>
+
+            Also, not all objects have a ramdump mode.  If you try to use ramdump on an
+            object that does not define a serialization dump for ramdump you will get a
+            compiler error.
+            </p>
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>check_serialized_version</name>
+         <file>dlib/serialize.h</file>
+         <spec_file link="true">dlib/serialize.h</spec_file>
+         <description>
+            This function deserializes a string and checks if it matches a user supplied
+            string (the version).  If they don't match then dlib::serialization_error is
+            thrown.  The point of this function is to make checking version strings in
+            serialized files a little more convenient.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
       <component>
          <name>dlib_testing_suite</name>
          <description>
