@@ -118,7 +118,7 @@ namespace dlib
             - k1 <= n1
             - k2 <= n2
         ensures
-            - Given two Binomially distributed random variables, X1 and X2, we want to know
+            - Given two binomially distributed random variables, X1 and X2, we want to know
               if these variables have the same parameter (i.e. the chance of "success").
               So assume that:
                 - You observed X1 to give k1 successes out of n1 trials.
