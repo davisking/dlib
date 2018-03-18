@@ -241,7 +241,7 @@ namespace dlib
                 and if so we adjust the filter's state to keep it within these bounds.
                 This allows the moving object to undergo large unmodeled accelerations, far
                 in excess of what would be suggested by get_typical_acceleration(), without
-                then experiencing a long lag time where the Kalman filter has to "catches
+                then experiencing a long lag time where the Kalman filter has to "catch
                 up" to the new position.
         !*/
 

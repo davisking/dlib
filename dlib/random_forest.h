@@ -5,11 +5,6 @@
 
 #include "random_forest/random_forest_regression.h"
 
-namespace dlib
-{
-
-}
-
 #endif // DLIB_RANDOM_FOReST_H_
 
 
