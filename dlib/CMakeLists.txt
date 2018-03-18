@@ -89,10 +89,10 @@ endmacro()
 
 # Suppress superfluous randlib warnings about libdlib.a having no symbols on MacOSX.
 if (APPLE)
-    set(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
-    set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
-    set(CMAKE_C_ARCHIVE_FINISH   "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
-    set(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+   set(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+   set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+   set(CMAKE_C_ARCHIVE_FINISH   "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+   set(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
 endif()
 
 # Don't try to call add_library(dlib) and setup dlib's stuff if it has already
@@ -104,30 +104,30 @@ endif()
 if (NOT TARGET dlib)
 
    set (DLIB_ISO_CPP_ONLY_STR 
-   "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)" )
+      "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)" )
    set (DLIB_NO_GUI_SUPPORT_STR 
-   "Enable this if you don't want to compile any of the dlib GUI code" )
+      "Enable this if you don't want to compile any of the dlib GUI code" )
    set (DLIB_ENABLE_STACK_TRACE_STR 
-   "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
+      "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
    set (DLIB_USE_BLAS_STR
-   "Disable this if you don't want to use a BLAS library" )
+      "Disable this if you don't want to use a BLAS library" )
    set (DLIB_USE_LAPACK_STR
-   "Disable this if you don't want to use a LAPACK library" )
+      "Disable this if you don't want to use a LAPACK library" )
    set (DLIB_USE_CUDA_STR
-   "Disable this if you don't want to use NVIDIA CUDA" )
+      "Disable this if you don't want to use NVIDIA CUDA" )
    set (DLIB_PNG_SUPPORT_STR
-   "Disable this if you don't want to link against libpng" )
+      "Disable this if you don't want to link against libpng" )
    set (DLIB_GIF_SUPPORT_STR
-   "Disable this if you don't want to link against libgif" )
+      "Disable this if you don't want to link against libgif" )
    set (DLIB_JPEG_SUPPORT_STR
-   "Disable this if you don't want to link against libjpeg" )
+      "Disable this if you don't want to link against libjpeg" )
    set (DLIB_LINK_WITH_SQLITE3_STR
-   "Disable this if you don't want to link against sqlite3" )
+      "Disable this if you don't want to link against sqlite3" )
    #set (DLIB_USE_FFTW_STR "Disable this if you don't want to link against fftw" )
    set (DLIB_USE_MKL_FFT_STR
-   "Disable this is you don't want to use the MKL DFTI FFT implementation" )
+      "Disable this is you don't want to use the MKL DFTI FFT implementation" )
    set (DLIB_ENABLE_ASSERTS_STR
-   "Enable this if you want to turn on the DLIB_ASSERT macro" )
+      "Enable this if you want to turn on the DLIB_ASSERT macro" )
 
 
    option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
@@ -199,30 +199,30 @@ if (NOT TARGET dlib)
 
 
    set(source_files 
-         base64/base64_kernel_1.cpp
-         bigint/bigint_kernel_1.cpp
-         bigint/bigint_kernel_2.cpp
-         bit_stream/bit_stream_kernel_1.cpp
-         entropy_decoder/entropy_decoder_kernel_1.cpp
-         entropy_decoder/entropy_decoder_kernel_2.cpp
-         entropy_encoder/entropy_encoder_kernel_1.cpp
-         entropy_encoder/entropy_encoder_kernel_2.cpp
-         md5/md5_kernel_1.cpp
-         tokenizer/tokenizer_kernel_1.cpp
-         unicode/unicode.cpp
-         data_io/image_dataset_metadata.cpp
-         data_io/mnist.cpp
-         global_optimization/global_function_search.cpp
-         filtering/kalman_filter.cpp
-         test_for_odr_violations.cpp
-   )
+      base64/base64_kernel_1.cpp
+      bigint/bigint_kernel_1.cpp
+      bigint/bigint_kernel_2.cpp
+      bit_stream/bit_stream_kernel_1.cpp
+      entropy_decoder/entropy_decoder_kernel_1.cpp
+      entropy_decoder/entropy_decoder_kernel_2.cpp
+      entropy_encoder/entropy_encoder_kernel_1.cpp
+      entropy_encoder/entropy_encoder_kernel_2.cpp
+      md5/md5_kernel_1.cpp
+      tokenizer/tokenizer_kernel_1.cpp
+      unicode/unicode.cpp
+      data_io/image_dataset_metadata.cpp
+      data_io/mnist.cpp
+      global_optimization/global_function_search.cpp
+      filtering/kalman_filter.cpp
+      test_for_odr_violations.cpp
+      )
 
 
    set(dlib_needed_libraries)
    set(dlib_needed_includes)
 
    if (DLIB_ISO_CPP_ONLY)
-       add_library(dlib ${source_files} )
+      add_library(dlib ${source_files} )
    else()
 
       set(source_files ${source_files}
@@ -457,51 +457,51 @@ if (NOT TARGET dlib)
             # If we can't find libjpeg then statically compile it in.
             add_definitions(-DDLIB_JPEG_STATIC)
             set(source_files ${source_files}
-                  external/libjpeg/jcomapi.cpp
-                  external/libjpeg/jdapimin.cpp
-                  external/libjpeg/jdapistd.cpp
-                  external/libjpeg/jdatasrc.cpp
-                  external/libjpeg/jdcoefct.cpp
-                  external/libjpeg/jdcolor.cpp
-                  external/libjpeg/jddctmgr.cpp
-                  external/libjpeg/jdhuff.cpp
-                  external/libjpeg/jdinput.cpp
-                  external/libjpeg/jdmainct.cpp
-                  external/libjpeg/jdmarker.cpp
-                  external/libjpeg/jdmaster.cpp
-                  external/libjpeg/jdmerge.cpp
-                  external/libjpeg/jdphuff.cpp
-                  external/libjpeg/jdpostct.cpp
-                  external/libjpeg/jdsample.cpp
-                  external/libjpeg/jerror.cpp
-                  external/libjpeg/jidctflt.cpp
-                  external/libjpeg/jidctfst.cpp
-                  external/libjpeg/jidctint.cpp
-                  external/libjpeg/jidctred.cpp
-                  external/libjpeg/jmemmgr.cpp
-                  external/libjpeg/jmemnobs.cpp
-                  external/libjpeg/jquant1.cpp
-                  external/libjpeg/jquant2.cpp
-                  external/libjpeg/jutils.cpp  
-                  external/libjpeg/jcapimin.cpp
-                  external/libjpeg/jdatadst.cpp
-                  external/libjpeg/jcparam.cpp
-                  external/libjpeg/jcapistd.cpp
-                  external/libjpeg/jcmarker.cpp
-                  external/libjpeg/jcinit.cpp
-                  external/libjpeg/jcmaster.cpp
-                  external/libjpeg/jcdctmgr.cpp
-                  external/libjpeg/jccoefct.cpp  
-                  external/libjpeg/jccolor.cpp  
-                  external/libjpeg/jchuff.cpp  
-                  external/libjpeg/jcmainct.cpp  
-                  external/libjpeg/jcphuff.cpp  
-                  external/libjpeg/jcprepct.cpp  
-                  external/libjpeg/jcsample.cpp
-                  external/libjpeg/jfdctint.cpp
-                  external/libjpeg/jfdctflt.cpp
-                  external/libjpeg/jfdctfst.cpp
-                  )
+               external/libjpeg/jcomapi.cpp
+               external/libjpeg/jdapimin.cpp
+               external/libjpeg/jdapistd.cpp
+               external/libjpeg/jdatasrc.cpp
+               external/libjpeg/jdcoefct.cpp
+               external/libjpeg/jdcolor.cpp
+               external/libjpeg/jddctmgr.cpp
+               external/libjpeg/jdhuff.cpp
+               external/libjpeg/jdinput.cpp
+               external/libjpeg/jdmainct.cpp
+               external/libjpeg/jdmarker.cpp
+               external/libjpeg/jdmaster.cpp
+               external/libjpeg/jdmerge.cpp
+               external/libjpeg/jdphuff.cpp
+               external/libjpeg/jdpostct.cpp
+               external/libjpeg/jdsample.cpp
+               external/libjpeg/jerror.cpp
+               external/libjpeg/jidctflt.cpp
+               external/libjpeg/jidctfst.cpp
+               external/libjpeg/jidctint.cpp
+               external/libjpeg/jidctred.cpp
+               external/libjpeg/jmemmgr.cpp
+               external/libjpeg/jmemnobs.cpp
+               external/libjpeg/jquant1.cpp
+               external/libjpeg/jquant2.cpp
+               external/libjpeg/jutils.cpp  
+               external/libjpeg/jcapimin.cpp
+               external/libjpeg/jdatadst.cpp
+               external/libjpeg/jcparam.cpp
+               external/libjpeg/jcapistd.cpp
+               external/libjpeg/jcmarker.cpp
+               external/libjpeg/jcinit.cpp
+               external/libjpeg/jcmaster.cpp
+               external/libjpeg/jcdctmgr.cpp
+               external/libjpeg/jccoefct.cpp  
+               external/libjpeg/jccolor.cpp  
+               external/libjpeg/jchuff.cpp  
+               external/libjpeg/jcmainct.cpp  
+               external/libjpeg/jcphuff.cpp  
+               external/libjpeg/jcprepct.cpp  
+               external/libjpeg/jcsample.cpp
+               external/libjpeg/jfdctint.cpp
+               external/libjpeg/jfdctflt.cpp
+               external/libjpeg/jfdctfst.cpp
+               )
          endif()
          set(source_files ${source_files}
             image_loader/jpeg_loader.cpp
@@ -511,8 +511,8 @@ if (NOT TARGET dlib)
 
 
       if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
-          # Try to find BLAS, LAPACK and MKL
-         include(cmake_utils/cmake_find_blas.txt)
+         # Try to find BLAS, LAPACK and MKL
+         include(cmake_utils/find_blas.cmake)
 
          if (DLIB_USE_BLAS)
             if (blas_found)
@@ -596,19 +596,21 @@ if (NOT TARGET dlib)
                # make sure cuda is really working by doing a test compile
                message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
 
-               set(CUDA_TEST_CMAKE_FLAGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
-                                         "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
-                                         "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
+               set(CUDA_TEST_CMAKE_FLAGS 
+                  "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+                  "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
+                  "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
 
                if (NOT MSVC) # see https://github.com/davisking/dlib/issues/363
                   list(APPEND CUDA_TEST_CMAKE_FLAGS "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
                endif()
 
-               try_compile(cuda_test_compile_worked ${PROJECT_BINARY_DIR}/cuda_test_build 
-                           ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
-                           CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
-                           OUTPUT_VARIABLE try_compile_output_message
-                           )
+               try_compile(cuda_test_compile_worked 
+                  ${PROJECT_BINARY_DIR}/cuda_test_build 
+                  ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
+                  CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
+                  OUTPUT_VARIABLE try_compile_output_message
+                  )
                if (NOT cuda_test_compile_worked)
                   string(REPLACE "\n" "\n   ***   " try_compile_output_message "${try_compile_output_message}")
                   message(STATUS "*****************************************************************************************************************")
@@ -618,10 +620,11 @@ if (NOT TARGET dlib)
                   message(STATUS "*****************************************************************************************************************")
                else()
                   message(STATUS "Checking if you have the right version of cuDNN installed.")
-                  try_compile(cudnn_test_compile_worked ${PROJECT_BINARY_DIR}/cudnn_test_build 
-                              ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cudnn cudnn_test
-                              CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
-                                          )
+                  try_compile(cudnn_test_compile_worked 
+                     ${PROJECT_BINARY_DIR}/cudnn_test_build 
+                     ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cudnn cudnn_test
+                     CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
+                     )
                   if (NOT cudnn_test_compile_worked)
                      message(STATUS "*** Found cuDNN, but it looks like the wrong version so dlib will not use it.              ***")
                      message(STATUS "*** Dlib requires cuDNN V5.0 OR GREATER.  Since cuDNN is not found DLIB WILL NOT USE CUDA. ***")
@@ -662,15 +665,15 @@ if (NOT TARGET dlib)
                dnn/gpu_data.cpp
                )
             set(dlib_needed_libraries ${dlib_needed_libraries} 
-                                      ${CUDA_CUBLAS_LIBRARIES} 
-                                      ${cudnn}
-                                      ${CUDA_curand_LIBRARY}
-                                      ${cusolver}
-                                      )
+               ${CUDA_CUBLAS_LIBRARIES} 
+               ${cudnn}
+               ${CUDA_curand_LIBRARY}
+               ${cusolver}
+               )
             if(openmp_libraries)
                list(APPEND dlib_needed_libraries ${openmp_libraries})
             endif()
-            
+
             include_directories(${cudnn_include})
             message(STATUS "Enabling CUDA support for dlib.  DLIB WILL USE CUDA")
          else()
@@ -682,7 +685,7 @@ if (NOT TARGET dlib)
             message(STATUS "Disabling CUDA support for dlib.  DLIB WILL NOT USE CUDA")
          endif()
       endif()
-      
+
 
       if (DLIB_LINK_WITH_SQLITE3)
          find_library(sqlite sqlite3)
@@ -729,10 +732,10 @@ if (NOT TARGET dlib)
 
 
    target_include_directories(dlib
-                              INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
-                              INTERFACE $<INSTALL_INTERFACE:include>
-                              PUBLIC ${dlib_needed_includes}
-                              )
+      INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+      INTERFACE $<INSTALL_INTERFACE:include>
+      PUBLIC ${dlib_needed_includes}
+      )
    target_link_libraries(dlib PUBLIC ${dlib_needed_libraries})
    if (DLIB_IN_PROJECT_BUILD)
       target_compile_options(dlib PUBLIC ${active_preprocessor_switches})
@@ -770,52 +773,52 @@ if (NOT TARGET dlib)
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
-       set_target_properties(dlib PROPERTIES
-                                 VERSION ${VERSION})
-       install(TARGETS dlib
-               EXPORT dlib 
-               RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
-               LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-               ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      set_target_properties(dlib PROPERTIES
+         VERSION ${VERSION})
+      install(TARGETS dlib
+         EXPORT dlib 
+         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
+         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
-               FILES_MATCHING PATTERN "*.h" PATTERN "*.cmake"
-               REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
+      install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
+         FILES_MATCHING PATTERN "*.h" PATTERN "*.cmake"
+         REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
 
-       configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-       # overwrite config.h with the configured one
-       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
+      configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+      # overwrite config.h with the configured one
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 
-       configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
-       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
+      configure_file(${PROJECT_SOURCE_DIR}/revision.h.in ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/revision.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib)
 
-       ## Config.cmake generation and installation
+      ## Config.cmake generation and installation
 
-       set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
-       install(EXPORT dlib
-            NAMESPACE dlib::
-            DESTINATION ${ConfigPackageLocation})
+      set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake/dlib")
+      install(EXPORT dlib
+         NAMESPACE dlib::
+         DESTINATION ${ConfigPackageLocation})
 
-       configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
+      configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
 
-       include(CMakePackageConfigHelpers)
-       write_basic_package_version_file(
-           "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
-           VERSION ${VERSION}
-           COMPATIBILITY AnyNewerVersion
-           )
+      include(CMakePackageConfigHelpers)
+      write_basic_package_version_file(
+         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
+         VERSION ${VERSION}
+         COMPATIBILITY AnyNewerVersion
+         )
 
-       install(FILES 
-                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
-                    "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
-               DESTINATION ${ConfigPackageLocation})
+      install(FILES 
+         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
+         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
+         DESTINATION ${ConfigPackageLocation})
 
-       ## dlib-1.pc generation and installation
+      ## dlib-1.pc generation and installation
 
-       configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
-       install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
-           DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+      configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
+      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
+         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
    endif()
 
