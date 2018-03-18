@@ -194,6 +194,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A ramdump information !*/
     template <typename T>
     struct ramdump_t
     {
@@ -223,7 +224,10 @@ namespace dlib
 
     // This function just makes a ramdump that wraps an object.
     template <typename T>
-    ramdump_t<typename std::remove_reference<T>::type> ramdump(T&& item) { return ramdump_t<typename std::remove_reference<T>::type>(item); }
+    ramdump_t<typename std::remove_reference<T>::type> ramdump(T&& item) 
+    { 
+        return ramdump_t<typename std::remove_reference<T>::type>(item); 
+    }
 
 
     template <
