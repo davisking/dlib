@@ -10,6 +10,7 @@
 #include "matrix_assign.h"
 #include "matrix_conj_trans.h"
 #include "cblas_constants.h"
+#include <stdint.h>
 
 //#include <iostream>
 //using namespace std;
@@ -47,92 +48,95 @@ namespace dlib
 #ifndef CBLAS_H
         extern "C"
         {
+#ifndef CBLAS_INT_TYPE
+#define CBLAS_INT_TYPE int 
+#endif
             // Here we declare the prototypes for the CBLAS calls used by the BLAS bindings below
 
-            void cblas_saxpy(const int N, const float alpha, const float *X,
-                            const int incX, float *Y, const int incY);
-            void cblas_daxpy(const int N, const double alpha, const double *X,
-                            const int incX, double *Y, const int incY);
-            void cblas_caxpy(const int N, const void *alpha, const void *X,
-                            const int incX, void *Y, const int incY);
-            void cblas_zaxpy(const int N, const void *alpha, const void *X,
-                            const int incX, void *Y, const int incY);
+            void cblas_saxpy(const CBLAS_INT_TYPE N, const float alpha, const float *X,
+                            const CBLAS_INT_TYPE incX, float *Y, const CBLAS_INT_TYPE incY);
+            void cblas_daxpy(const CBLAS_INT_TYPE N, const double alpha, const double *X,
+                            const CBLAS_INT_TYPE incX, double *Y, const CBLAS_INT_TYPE incY);
+            void cblas_caxpy(const CBLAS_INT_TYPE N, const void *alpha, const void *X,
+                            const CBLAS_INT_TYPE incX, void *Y, const CBLAS_INT_TYPE incY);
+            void cblas_zaxpy(const CBLAS_INT_TYPE N, const void *alpha, const void *X,
+                            const CBLAS_INT_TYPE incX, void *Y, const CBLAS_INT_TYPE incY);
 
-            void cblas_sscal(const int N, const float alpha, float *X, const int incX);
-            void cblas_dscal(const int N, const double alpha, double *X, const int incX);
-            void cblas_cscal(const int N, const void *alpha, void *X, const int incX);
-            void cblas_zscal(const int N, const void *alpha, void *X, const int incX);
+            void cblas_sscal(const CBLAS_INT_TYPE N, const float alpha, float *X, const CBLAS_INT_TYPE incX);
+            void cblas_dscal(const CBLAS_INT_TYPE N, const double alpha, double *X, const CBLAS_INT_TYPE incX);
+            void cblas_cscal(const CBLAS_INT_TYPE N, const void *alpha, void *X, const CBLAS_INT_TYPE incX);
+            void cblas_zscal(const CBLAS_INT_TYPE N, const void *alpha, void *X, const CBLAS_INT_TYPE incX);
 
             void cblas_sgemm(const CBLAS_ORDER Order, const CBLAS_TRANSPOSE TransA,
-                             const CBLAS_TRANSPOSE TransB, const int M, const int N,
-                             const int K, const float alpha, const float *A,
-                             const int lda, const float *B, const int ldb,
-                             const float beta, float *C, const int ldc);
+                             const CBLAS_TRANSPOSE TransB, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const CBLAS_INT_TYPE K, const float alpha, const float *A,
+                             const CBLAS_INT_TYPE lda, const float *B, const CBLAS_INT_TYPE ldb,
+                             const float beta, float *C, const CBLAS_INT_TYPE ldc);
             void cblas_dgemm(const CBLAS_ORDER Order, const CBLAS_TRANSPOSE TransA,
-                             const CBLAS_TRANSPOSE TransB, const int M, const int N,
-                             const int K, const double alpha, const double *A,
-                             const int lda, const double *B, const int ldb,
-                             const double beta, double *C, const int ldc);
+                             const CBLAS_TRANSPOSE TransB, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const CBLAS_INT_TYPE K, const double alpha, const double *A,
+                             const CBLAS_INT_TYPE lda, const double *B, const CBLAS_INT_TYPE ldb,
+                             const double beta, double *C, const CBLAS_INT_TYPE ldc);
             void cblas_cgemm(const CBLAS_ORDER Order, const CBLAS_TRANSPOSE TransA,
-                             const CBLAS_TRANSPOSE TransB, const int M, const int N,
-                             const int K, const void *alpha, const void *A,
-                             const int lda, const void *B, const int ldb,
-                             const void *beta, void *C, const int ldc);
+                             const CBLAS_TRANSPOSE TransB, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const CBLAS_INT_TYPE K, const void *alpha, const void *A,
+                             const CBLAS_INT_TYPE lda, const void *B, const CBLAS_INT_TYPE ldb,
+                             const void *beta, void *C, const CBLAS_INT_TYPE ldc);
             void cblas_zgemm(const CBLAS_ORDER Order, const CBLAS_TRANSPOSE TransA,
-                             const CBLAS_TRANSPOSE TransB, const int M, const int N,
-                             const int K, const void *alpha, const void *A,
-                             const int lda, const void *B, const int ldb,
-                             const void *beta, void *C, const int ldc);
+                             const CBLAS_TRANSPOSE TransB, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const CBLAS_INT_TYPE K, const void *alpha, const void *A,
+                             const CBLAS_INT_TYPE lda, const void *B, const CBLAS_INT_TYPE ldb,
+                             const void *beta, void *C, const CBLAS_INT_TYPE ldc);
             void cblas_sgemv(const CBLAS_ORDER order,
-                             const CBLAS_TRANSPOSE TransA, const int M, const int N,
-                             const float alpha, const float *A, const int lda,
-                             const float *X, const int incX, const float beta,
-                             float *Y, const int incY);
+                             const CBLAS_TRANSPOSE TransA, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const float alpha, const float *A, const CBLAS_INT_TYPE lda,
+                             const float *X, const CBLAS_INT_TYPE incX, const float beta,
+                             float *Y, const CBLAS_INT_TYPE incY);
             void cblas_dgemv(const CBLAS_ORDER order,
-                             const CBLAS_TRANSPOSE TransA, const int M, const int N,
-                             const double alpha, const double *A, const int lda,
-                             const double *X, const int incX, const double beta,
-                             double *Y, const int incY);
+                             const CBLAS_TRANSPOSE TransA, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const double alpha, const double *A, const CBLAS_INT_TYPE lda,
+                             const double *X, const CBLAS_INT_TYPE incX, const double beta,
+                             double *Y, const CBLAS_INT_TYPE incY);
             void cblas_cgemv(const CBLAS_ORDER order,
-                             const CBLAS_TRANSPOSE TransA, const int M, const int N,
-                             const void *alpha, const void *A, const int lda,
-                             const void *X, const int incX, const void *beta,
-                             void *Y, const int incY);
+                             const CBLAS_TRANSPOSE TransA, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const void *alpha, const void *A, const CBLAS_INT_TYPE lda,
+                             const void *X, const CBLAS_INT_TYPE incX, const void *beta,
+                             void *Y, const CBLAS_INT_TYPE incY);
             void cblas_zgemv(const CBLAS_ORDER order,
-                             const CBLAS_TRANSPOSE TransA, const int M, const int N,
-                             const void *alpha, const void *A, const int lda,
-                             const void *X, const int incX, const void *beta,
-                             void *Y, const int incY);
-            void cblas_sger(const CBLAS_ORDER order, const int M, const int N,
-                            const float alpha, const float *X, const int incX,
-                            const float *Y, const int incY, float *A, const int lda);
-            void cblas_dger(const CBLAS_ORDER order, const int M, const int N,
-                            const double alpha, const double *X, const int incX,
-                            const double *Y, const int incY, double *A, const int lda);
-            void cblas_cgerc(const CBLAS_ORDER order, const int M, const int N,
-                             const void *alpha, const void *X, const int incX,
-                             const void *Y, const int incY, void *A, const int lda);
-            void cblas_zgerc(const CBLAS_ORDER order, const int M, const int N,
-                             const void *alpha, const void *X, const int incX,
-                             const void *Y, const int incY, void *A, const int lda);
-            float  cblas_sdot(const int N, const float  *X, const int incX,
-                              const float  *Y, const int incY);
-            double cblas_ddot(const int N, const double *X, const int incX,
-                              const double *Y, const int incY);
-            void   cblas_cdotu_sub(const int N, const void *X, const int incX,
-                                   const void *Y, const int incY, void *dotu);
-            void   cblas_zdotu_sub(const int N, const void *X, const int incX,
-                                   const void *Y, const int incY, void *dotu);
-            void   cblas_cdotc_sub(const int N, const void *X, const int incX,
-                                   const void *Y, const int incY, void *dotc);
-            void   cblas_zdotc_sub(const int N, const void *X, const int incX,
-                                   const void *Y, const int incY, void *dotc);
-            void cblas_cgeru(const CBLAS_ORDER order, const int M, const int N,
-                             const void *alpha, const void *X, const int incX,
-                             const void *Y, const int incY, void *A, const int lda);
-            void cblas_zgeru(const CBLAS_ORDER order, const int M, const int N,
-                             const void *alpha, const void *X, const int incX,
-                             const void *Y, const int incY, void *A, const int lda);
+                             const CBLAS_TRANSPOSE TransA, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const void *alpha, const void *A, const CBLAS_INT_TYPE lda,
+                             const void *X, const CBLAS_INT_TYPE incX, const void *beta,
+                             void *Y, const CBLAS_INT_TYPE incY);
+            void cblas_sger(const CBLAS_ORDER order, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                            const float alpha, const float *X, const CBLAS_INT_TYPE incX,
+                            const float *Y, const CBLAS_INT_TYPE incY, float *A, const CBLAS_INT_TYPE lda);
+            void cblas_dger(const CBLAS_ORDER order, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                            const double alpha, const double *X, const CBLAS_INT_TYPE incX,
+                            const double *Y, const CBLAS_INT_TYPE incY, double *A, const CBLAS_INT_TYPE lda);
+            void cblas_cgerc(const CBLAS_ORDER order, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const void *alpha, const void *X, const CBLAS_INT_TYPE incX,
+                             const void *Y, const CBLAS_INT_TYPE incY, void *A, const CBLAS_INT_TYPE lda);
+            void cblas_zgerc(const CBLAS_ORDER order, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const void *alpha, const void *X, const CBLAS_INT_TYPE incX,
+                             const void *Y, const CBLAS_INT_TYPE incY, void *A, const CBLAS_INT_TYPE lda);
+            float  cblas_sdot(const CBLAS_INT_TYPE N, const float  *X, const CBLAS_INT_TYPE incX,
+                              const float  *Y, const CBLAS_INT_TYPE incY);
+            double cblas_ddot(const CBLAS_INT_TYPE N, const double *X, const CBLAS_INT_TYPE incX,
+                              const double *Y, const CBLAS_INT_TYPE incY);
+            void   cblas_cdotu_sub(const CBLAS_INT_TYPE N, const void *X, const CBLAS_INT_TYPE incX,
+                                   const void *Y, const CBLAS_INT_TYPE incY, void *dotu);
+            void   cblas_zdotu_sub(const CBLAS_INT_TYPE N, const void *X, const CBLAS_INT_TYPE incX,
+                                   const void *Y, const CBLAS_INT_TYPE incY, void *dotu);
+            void   cblas_cdotc_sub(const CBLAS_INT_TYPE N, const void *X, const CBLAS_INT_TYPE incX,
+                                   const void *Y, const CBLAS_INT_TYPE incY, void *dotc);
+            void   cblas_zdotc_sub(const CBLAS_INT_TYPE N, const void *X, const CBLAS_INT_TYPE incX,
+                                   const void *Y, const CBLAS_INT_TYPE incY, void *dotc);
+            void cblas_cgeru(const CBLAS_ORDER order, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const void *alpha, const void *X, const CBLAS_INT_TYPE incX,
+                             const void *Y, const CBLAS_INT_TYPE incY, void *A, const CBLAS_INT_TYPE lda);
+            void cblas_zgeru(const CBLAS_ORDER order, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const void *alpha, const void *X, const CBLAS_INT_TYPE incX,
+                             const void *Y, const CBLAS_INT_TYPE incY, void *A, const CBLAS_INT_TYPE lda);
         }
 #endif // if not CBLAS_H
 
