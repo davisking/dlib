@@ -10,10 +10,10 @@
 #include "cblas.h"
 #include "cblas_f77.h"
 void cblas_ssyr2k(const enum CBLAS_ORDER Order, const enum CBLAS_UPLO Uplo,
-                  const enum CBLAS_TRANSPOSE Trans, const int N, const int K,
-                  const float alpha, const float  *A, const int lda,
-                  const float  *B, const int ldb, const float beta,
-                  float  *C, const int ldc)
+                  const enum CBLAS_TRANSPOSE Trans, const CBLAS_INT_TYPE N, const CBLAS_INT_TYPE K,
+                  const float alpha, const float  *A, const CBLAS_INT_TYPE lda,
+                  const float  *B, const CBLAS_INT_TYPE ldb, const float beta,
+                  float  *C, const CBLAS_INT_TYPE ldc)
 {
    char UL, TR;   
 #ifdef F77_CHAR

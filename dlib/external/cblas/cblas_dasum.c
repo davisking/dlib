@@ -9,7 +9,7 @@
  */
 #include "cblas.h"
 #include "cblas_f77.h"
-double cblas_dasum( const int N, const double *X, const int incX) 
+double cblas_dasum( const CBLAS_INT_TYPE N, const double *X, const CBLAS_INT_TYPE incX) 
 {
    double asum;
 #ifdef F77_INT

@@ -10,8 +10,8 @@
 #include "cblas.h"
 #include "cblas_f77.h"
 void cblas_zhpr(const enum CBLAS_ORDER order, const enum CBLAS_UPLO Uplo,
-                const int N, const double alpha, const void *X,
-                const int incX, void *A)
+                const CBLAS_INT_TYPE N, const double alpha, const void *X,
+                const CBLAS_INT_TYPE incX, void *A)
 {
    char UL;
 #ifdef F77_CHAR
@@ -26,7 +26,7 @@ void cblas_zhpr(const enum CBLAS_ORDER order, const enum CBLAS_UPLO Uplo,
    #define F77_N N
    #define F77_incX incx
 #endif
-   int n, i, tincx, incx=incX;
+   CBLAS_INT_TYPE n, i, tincx, incx=incX;
    double *x=(double *)X, *xx=(double *)X, *tx, *st;
 
  

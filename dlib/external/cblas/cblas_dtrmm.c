@@ -11,9 +11,9 @@
 #include "cblas_f77.h"
 void cblas_dtrmm(const enum CBLAS_ORDER Order, const enum CBLAS_SIDE Side,
                  const enum CBLAS_UPLO Uplo, const  enum CBLAS_TRANSPOSE TransA,
-                 const enum CBLAS_DIAG Diag, const int M, const int N,
-                 const double alpha, const double  *A, const int lda,
-                 double  *B, const int ldb)
+                 const enum CBLAS_DIAG Diag, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                 const double alpha, const double  *A, const CBLAS_INT_TYPE lda,
+                 double  *B, const CBLAS_INT_TYPE ldb)
 {
    char UL, TA, SD, DI;   
 #ifdef F77_CHAR

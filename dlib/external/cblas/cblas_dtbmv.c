@@ -9,8 +9,8 @@
 #include "cblas_f77.h"
 void cblas_dtbmv(const enum CBLAS_ORDER order, const enum CBLAS_UPLO Uplo,
                  const enum CBLAS_TRANSPOSE TransA, const enum CBLAS_DIAG Diag,
-                 const int N, const int K, const double  *A, const int lda,
-                 double  *X, const int incX)
+                 const CBLAS_INT_TYPE N, const CBLAS_INT_TYPE K, const double  *A, const CBLAS_INT_TYPE lda,
+                 double  *X, const CBLAS_INT_TYPE incX)
 {
    char TA;
    char UL;

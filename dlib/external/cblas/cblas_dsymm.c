@@ -10,10 +10,10 @@
 #include "cblas.h"
 #include "cblas_f77.h"
 void cblas_dsymm(const enum CBLAS_ORDER Order, const enum CBLAS_SIDE Side,
-                 const enum CBLAS_UPLO Uplo, const int M, const int N,
-                 const double alpha, const double  *A, const int lda,
-                 const double  *B, const int ldb, const double beta,
-                 double  *C, const int ldc)
+                 const enum CBLAS_UPLO Uplo, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                 const double alpha, const double  *A, const CBLAS_INT_TYPE lda,
+                 const double  *B, const CBLAS_INT_TYPE ldb, const double beta,
+                 double  *C, const CBLAS_INT_TYPE ldc)
 {
    char SD, UL;   
 #ifdef F77_CHAR

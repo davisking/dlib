@@ -10,11 +10,11 @@
 #include "cblas.h"
 #include "cblas_f77.h"
 void cblas_cgbmv(const enum CBLAS_ORDER order,
-                 const enum CBLAS_TRANSPOSE TransA, const int M, const int N,
-                 const int KL, const int KU,
-                 const void *alpha, const void  *A, const int lda,
-                 const void  *X, const int incX, const void *beta,
-                 void  *Y, const int incY)
+                 const enum CBLAS_TRANSPOSE TransA, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                 const CBLAS_INT_TYPE KL, const CBLAS_INT_TYPE KU,
+                 const void *alpha, const void  *A, const CBLAS_INT_TYPE lda,
+                 const void  *X, const CBLAS_INT_TYPE incX, const void *beta,
+                 void  *Y, const CBLAS_INT_TYPE incY)
 {
    char TA;
 #ifdef F77_CHAR
@@ -34,10 +34,10 @@ void cblas_cgbmv(const enum CBLAS_ORDER order,
    #define F77_incX incx
    #define F77_incY incY
 #endif
-   int n=0, i=0, incx=incX;
+   CBLAS_INT_TYPE n=0, i=0, incx=incX;
    const float *xx= (float *)X, *alp= (float *)alpha, *bet = (float *)beta;
    float ALPHA[2],BETA[2];
-   int tincY, tincx;
+   CBLAS_INT_TYPE tincY, tincx;
    float *x=(float *)X, *y=(float *)Y, *st=0, *tx=0;
 
    if (order == CblasColMajor)

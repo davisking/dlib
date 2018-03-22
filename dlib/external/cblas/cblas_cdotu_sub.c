@@ -9,8 +9,8 @@
  */
 #include "cblas.h"
 #include "cblas_f77.h"
-void cblas_cdotu_sub( const int N, const void *X,
-                     const int incX, const void *Y, const int incY,void *dotu)
+void cblas_cdotu_sub( const CBLAS_INT_TYPE N, const void *X,
+                     const CBLAS_INT_TYPE incX, const void *Y, const CBLAS_INT_TYPE incY,void *dotu)
 {
 #ifdef F77_INT
    F77_INT F77_N=N, F77_incX=incX, F77_incY=incY;

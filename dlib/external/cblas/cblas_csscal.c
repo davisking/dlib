@@ -8,8 +8,8 @@
  */
 #include "cblas.h"
 #include "cblas_f77.h"
-void cblas_csscal( const int N, const float alpha, void *X,
-                       const int incX)
+void cblas_csscal( const CBLAS_INT_TYPE N, const float alpha, void *X,
+                       const CBLAS_INT_TYPE incX)
 {
 #ifdef F77_INT
    F77_INT F77_N=N, F77_incX=incX;

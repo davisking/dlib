@@ -8,8 +8,8 @@
  */
 #include "cblas.h"
 #include "cblas_f77.h"
-void cblas_ccopy( const int N, const void *X,
-                      const int incX, void *Y, const int incY)
+void cblas_ccopy( const CBLAS_INT_TYPE N, const void *X,
+                      const CBLAS_INT_TYPE incX, void *Y, const CBLAS_INT_TYPE incY)
 {
 #ifdef F77_INT
    F77_INT F77_N=N, F77_incX=incX, F77_incY=incY;

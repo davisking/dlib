@@ -9,7 +9,7 @@
 #include "cblas_f77.h"
 void cblas_ctpsv(const enum CBLAS_ORDER order, const enum CBLAS_UPLO Uplo,
                  const enum CBLAS_TRANSPOSE TransA, const enum CBLAS_DIAG Diag,
-                 const int N, const void  *Ap, void  *X, const int incX)
+                 const CBLAS_INT_TYPE N, const void  *Ap, void  *X, const CBLAS_INT_TYPE incX)
 {
    char TA;
    char UL;
@@ -27,7 +27,7 @@ void cblas_ctpsv(const enum CBLAS_ORDER order, const enum CBLAS_UPLO Uplo,
    #define F77_N N
    #define F77_incX incX
 #endif
-   int n, i=0, tincX; 
+   CBLAS_INT_TYPE n, i=0, tincX; 
    float *st=0, *x=(float*)X;
 
    if (order == CblasColMajor)

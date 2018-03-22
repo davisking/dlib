@@ -5,7 +5,7 @@
 #include "cblas.h"
 #include "cblas_f77.h"
 
-void cblas_xerbla(int info, const char *rout, const char *form, ...)
+void cblas_xerbla(CBLAS_INT_TYPE info, const char *rout, const char *form, ...)
 {
    char empty[1] = "";
    va_list argptr;

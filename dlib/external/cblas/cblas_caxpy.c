@@ -8,8 +8,8 @@
  */
 #include "cblas.h"
 #include "cblas_f77.h"
-void cblas_caxpy( const int N, const void *alpha, const void *X,
-                       const int incX, void *Y, const int incY)
+void cblas_caxpy( const CBLAS_INT_TYPE N, const void *alpha, const void *X,
+                       const CBLAS_INT_TYPE incX, void *Y, const CBLAS_INT_TYPE incY)
 {
 #ifdef F77_INT
    F77_INT F77_N=N, F77_incX=incX, F77_incY=incY;

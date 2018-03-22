@@ -8,8 +8,8 @@
  */
 #include "cblas.h"
 #include "cblas_f77.h"
-void cblas_srotm( const int N, float *X, const int incX, float *Y, 
-                       const int incY, const float *P)
+void cblas_srotm( const CBLAS_INT_TYPE N, float *X, const CBLAS_INT_TYPE incX, float *Y, 
+                       const CBLAS_INT_TYPE incY, const float *P)
 {
 #ifdef F77_INT
    F77_INT F77_N=N, F77_incX=incX, F77_incY=incY;

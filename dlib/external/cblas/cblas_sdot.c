@@ -9,8 +9,8 @@
  */
 #include "cblas.h"
 #include "cblas_f77.h"
-float cblas_sdot( const int N, const float *X,
-                      const int incX, const float *Y, const int incY)
+float cblas_sdot( const CBLAS_INT_TYPE N, const float *X,
+                      const CBLAS_INT_TYPE incX, const float *Y, const CBLAS_INT_TYPE incY)
 {
    float dot;
 #ifdef F77_INT

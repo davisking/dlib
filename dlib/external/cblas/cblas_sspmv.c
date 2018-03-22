@@ -9,10 +9,10 @@
 #include "cblas.h"
 #include "cblas_f77.h"
 void cblas_sspmv(const enum CBLAS_ORDER order,
-                 const enum CBLAS_UPLO Uplo, const int N,
+                 const enum CBLAS_UPLO Uplo, const CBLAS_INT_TYPE N,
                  const float alpha, const float  *AP,
-                 const float  *X, const int incX, const float beta,
-                 float  *Y, const int incY)
+                 const float  *X, const CBLAS_INT_TYPE incX, const float beta,
+                 float  *Y, const CBLAS_INT_TYPE incY)
 {
    char UL;
 #ifdef F77_CHAR

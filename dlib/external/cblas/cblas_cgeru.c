@@ -7,9 +7,9 @@
  */
 #include "cblas.h"
 #include "cblas_f77.h"
-void cblas_cgeru(const enum CBLAS_ORDER order, const int M, const int N,
-                 const void *alpha, const void *X, const int incX,
-                 const void *Y, const int incY, void *A, const int lda)
+void cblas_cgeru(const enum CBLAS_ORDER order, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                 const void *alpha, const void *X, const CBLAS_INT_TYPE incX,
+                 const void *Y, const CBLAS_INT_TYPE incY, void *A, const CBLAS_INT_TYPE lda)
 {
 #ifdef F77_INT
    F77_INT F77_M=M, F77_N=N, F77_lda=lda, F77_incX=incX, F77_incY=incY;

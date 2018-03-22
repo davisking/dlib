@@ -8,8 +8,8 @@
 #include "cblas.h"
 #include "cblas_f77.h"
 void cblas_dspr2(const enum CBLAS_ORDER order, const enum CBLAS_UPLO Uplo,
-                const int N, const double  alpha, const double  *X,
-                const int incX, const double  *Y, const int incY, double  *A)
+                const CBLAS_INT_TYPE N, const double  alpha, const double  *X,
+                const CBLAS_INT_TYPE incX, const double  *Y, const CBLAS_INT_TYPE incY, double  *A)
 {
    char UL;
 #ifdef F77_CHAR

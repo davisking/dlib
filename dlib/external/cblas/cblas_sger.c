@@ -9,9 +9,9 @@
 
 #include "cblas.h"
 #include "cblas_f77.h"
-void cblas_sger(const enum CBLAS_ORDER order, const int M, const int N,
-                const float  alpha, const float  *X, const int incX,
-                const float  *Y, const int incY, float  *A, const int lda)
+void cblas_sger(const enum CBLAS_ORDER order, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                const float  alpha, const float  *X, const CBLAS_INT_TYPE incX,
+                const float  *Y, const CBLAS_INT_TYPE incY, float  *A, const CBLAS_INT_TYPE lda)
 {
 #ifdef F77_INT
    F77_INT F77_M=M, F77_N=N, F77_lda=lda, F77_incX=incX, F77_incY=incY;
