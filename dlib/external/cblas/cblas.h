@@ -572,7 +572,7 @@ void cblas_zher2k(const enum CBLAS_ORDER Order, const enum CBLAS_UPLO Uplo,
                   const void *B, const CBLAS_INT_TYPE ldb, const double beta,
                   void *C, const CBLAS_INT_TYPE ldc);
 
-void cblas_xerbla(CBLAS_INT_TYPE p, const char *rout, const char *form, ...);
+void cblas_xerbla(int p, const char *rout, const char *form, ...);
 
 #ifdef __cplusplus
 }
