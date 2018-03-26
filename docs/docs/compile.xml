@@ -68,15 +68,7 @@ tell CMake which one you want it to use via the -G option.
            In most cases, to use this library all you have to do is extract it somewhere, make
            sure the folder <i>containing</i> the dlib folder is in your include path, and
            finally add dlib/all/source.cpp to your
-           project.  It is worth noting that most of dlib is "header-only" which means that, in
-           many cases, you don't actually have to build dlib/all/source.cpp into your
-           application.  So if you don't get linker errors when you exclude dlib/all/source.cpp
-           from your project then you don't need it.
-        </p>
-        <p>
-            An example makefile that uses this library can be found here: <a
-            href="dlib/test/makefile">dlib/test/makefile</a>.  It is the makefile used to build
-            the regression test suite for this library.  
+           project.  
         </p>
         <p>
            Again, note that you should <b><i>not</i></b> add the dlib folder itself to your compiler's include path.  
@@ -112,11 +104,6 @@ tell CMake which one you want it to use via the -G option.
         From within the examples folder, you can compile nearly all of the examples with a single command like so:
 <code_box>
 g++ -std=c++11 -O3 -I.. ../dlib/all/source.cpp -lpthread -lX11 example_program_name.cpp
-</code_box>
-        Note that not all examples require this much work.  For example, the svm_ex.cpp example
-        can be compiled with just:
-<code_box>
-g++ -std=c++11 -O3 -I.. svm_ex.cpp
 </code_box>
 
 On non-Linux systems like Solaris, you might have to link to other libraries.  For example, I have seen systems
@@ -184,21 +171,7 @@ sudo apt-get install libx11-dev
            An example of when you might want to use this would be if you don't need GUI support and you are building
            on a UNIX platform that doesn't have the X11 headers installed.
         </p>
-         <anchor>NO_MAKEFILE</anchor>
-        <h3>#define NO_MAKEFILE</h3>
-        <p>
-           This preprocessor directive causes the dlib headers to pull in all the 
-           code that would normally be built in dlib/all/source.cpp.  Thus if you #define NO_MAKEFILE you won't 
-           have to add dlib/all/source.cpp to your project.  The <i>only</i> time this is useful is when your 
-           project consists of a single translation unit (i.e. a single cpp file).  In this instance NO_MAKEFILE
-           allows you to easily build your project on the command line by saying something like <tt>g++ -DNO_MAKEFILE
-           project.cpp</tt>.  But again, this is only for single cpp file projects.  If you use NO_MAKEFILE with projects 
-           that contain more than one cpp file you will get linker errors about multiply defined symbols.
-        </p>
-        <p>
-           Also note that if you use this macro then the <a href="metaprogramming.html#DLIB_STACK_TRACE">stack trace</a>
-           functionality in the library will be disabled.   
-        </p>
+
          <anchor>DLIB_THREAD_POOL_TIMEOUT</anchor>
         <h3>#define DLIB_THREAD_POOL_TIMEOUT &lt;time-in-milliseconds&gt;</h3>
         <p>
