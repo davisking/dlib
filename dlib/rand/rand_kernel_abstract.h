@@ -157,8 +157,9 @@ namespace dlib
                 requires
                     - begin <= end
                 ensures
-                    - returns a random integer selected from the range: begin <= N < end
-                      The integer is selected uniformly at random.
+                    - returns a random integer N selected from the range: begin <= N < end
+                      The integer is selected uniformly at random.  If begin==end then
+                      begin is returned.
             !*/
 
             long long get_integer(
