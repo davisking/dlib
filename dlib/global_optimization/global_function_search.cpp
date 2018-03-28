@@ -628,6 +628,13 @@ namespace dlib
         for (size_t i = 0; i < initial_function_evals.size(); ++i)
         {
             functions[i]->ub = upper_bound_function(initial_function_evals[i], relative_noise_magnitude);
+
+            if (initial_function_evals.size() != 0)
+            {
+                auto best = max_scoring_element(initial_function_evals[i], [](const function_evaluation& e) { return e.y; }).first;
+                functions[i]->best_objective_value = best.y;
+                functions[i]->best_x = best.x;
+            }
         }
     }
 
