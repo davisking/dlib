@@ -1191,7 +1191,7 @@ namespace dlib
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == IN.k() 
                     - OUT.nr() == IN.nr()*scale_y
-                    - OUT.nc() == IN.nr()*scale_x
+                    - OUT.nc() == IN.nc()*scale_x
                     - for all valid i,k:  image_plane(OUT,i,k) is a copy of
                       image_plane(IN,i,k) that has been bilinearly interpolated to fit into
                       the shape of image_plane(OUT,i,k).
@@ -1224,6 +1224,65 @@ namespace dlib
         >
     using upsample = add_layer<upsample_<scale,scale>, SUBNET>;
 
+// ----------------------------------------------------------------------------------------
+
+    class downsample_
+    {
+        /*!
+            REQUIREMENTS ON THE INPUT ARGUMENTS
+                - 0 < scale_x < 1
+                - 0 < scale_y < 1
+
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it allows you to downsample a layer using
+                bilinear interpolation.  To be very specific, it downsamples each of the
+                channels in an input tensor.  Therefore, if IN is the input tensor to this
+                layer and OUT the output tensor, then we will have:
+                    - OUT.num_samples() == IN.num_samples()
+                    - OUT.k()  == IN.k() 
+                    - OUT.nr() == IN.nr()*scale_y
+                    - OUT.nc() == IN.nc()*scale_x
+                    - for all valid i,k:  image_plane(OUT,i,k) is a copy of
+                      image_plane(IN,i,k) that has been bilinearly interpolated to fit into
+                      the shape of image_plane(OUT,i,k).
+                      
+            SAMPLE USAGE
+                Sample usage for a loss_mmod based network design with a single downsample layer:
+                using net_type = dlib::loss_mmod<con5<32,dlib::downsample<dlib::input_rgb_image_pyramid<pyramid_down<6>>>>>;
+                net_type net(options,downsample_(0.1,0.2));
+            
+        !*/
+    public:
+
+        explicit downsample_(
+            double scale_x = 0.5,
+            double scale_y = 0.5
+        );
+        /*!
+            requires
+                - 0 <= scale_x <= 1
+                - 0 <= scale_y <= 1
+            ensures
+                - #get_scale_x() == scale_x
+                - #get_scale_y() == scale_y
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using downsample = add_layer<downsample_, SUBNET>;
+    
 // ----------------------------------------------------------------------------------------
 
     class dropout_
