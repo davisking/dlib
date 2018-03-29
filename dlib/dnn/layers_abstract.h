@@ -1226,46 +1226,41 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class downsample_
+    template <
+        long NR_, 
+        long NC_
+        >
+    class resize_to_
     {
         /*!
             REQUIREMENTS ON THE INPUT ARGUMENTS
-                - 0 < scale_x < 1
-                - 0 < scale_y < 1
+                - NR_ >= 1
+                - NC_ >= 1
 
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  In particular, it allows you to downsample a layer using
-                bilinear interpolation.  To be very specific, it downsamples each of the
+                defined above.  In particular, it allows you to resize a layer using
+                bilinear interpolation.  To be very specific, it resizes each of the
                 channels in an input tensor.  Therefore, if IN is the input tensor to this
                 layer and OUT the output tensor, then we will have:
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == IN.k() 
                     - OUT.nr() == IN.nr()*scale_y
                     - OUT.nc() == IN.nc()*scale_x
+                    - scale_y == NR_/IN.nr()
+                    - scale_x == NC_/In.nc()
                     - for all valid i,k:  image_plane(OUT,i,k) is a copy of
                       image_plane(IN,i,k) that has been bilinearly interpolated to fit into
                       the shape of image_plane(OUT,i,k).
-                      
-            SAMPLE USAGE
-                Sample usage for a loss_mmod based network design with a single downsample layer:
-                using net_type = dlib::loss_mmod<con5<32,dlib::downsample<dlib::input_rgb_image_pyramid<pyramid_down<6>>>>>;
-                net_type net(options,downsample_(0.1,0.2));
-            
         !*/
     public:
 
-        explicit downsample_(
-            double scale_x = 0.5,
-            double scale_y = 0.5
+        resize_to_(
         );
         /*!
-            requires
-                - 0 <= scale_x <= 1
-                - 0 <= scale_y <= 1
             ensures
-                - #get_scale_x() == scale_x
-                - #get_scale_y() == scale_y
+                - This object has no state, so the constructor does nothing, aside from
+                  providing default constructability.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -1280,8 +1275,12 @@ namespace dlib
         !*/
     };
 
-    template <typename SUBNET>
-    using downsample = add_layer<downsample_, SUBNET>;
+    template <
+        long NR,
+        long NC,
+        typename SUBNET
+        >
+    using resize_to = add_layer<resize_to_<NR,NC>, SUBNET>;
     
 // ----------------------------------------------------------------------------------------
 
