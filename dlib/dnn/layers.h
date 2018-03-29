@@ -756,15 +756,16 @@ namespace dlib
         }
         
         template <typename SUBNET>
-        void setup (const SUBNET& sub)
+        void setup (const SUBNET& /*sub*/)
         {
-            scale_x = (double)NC_/(double)sub.get_output().nc();
-            scale_y = (double)NR_/(double)sub.get_output().nr();
         }
     
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
+            scale_y = (double)NR_/(double)sub.get_output().nr();
+            scale_x = (double)NC_/(double)sub.get_output().nc();
+            
             output.set_size(
                 sub.get_output().num_samples(),
                 sub.get_output().k(),

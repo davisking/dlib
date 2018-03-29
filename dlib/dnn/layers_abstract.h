@@ -1245,8 +1245,8 @@ namespace dlib
                 layer and OUT the output tensor, then we will have:
                     - OUT.num_samples() == IN.num_samples()
                     - OUT.k()  == IN.k() 
-                    - OUT.nr() == IN.nr()*scale_y
-                    - OUT.nc() == IN.nc()*scale_x
+                    - OUT.nr() == NR_
+                    - OUT.nc() == NC_
                     - scale_y == NR_/IN.nr()
                     - scale_x == NC_/In.nc()
                     - for all valid i,k:  image_plane(OUT,i,k) is a copy of
