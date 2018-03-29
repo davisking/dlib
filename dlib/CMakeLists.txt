@@ -768,7 +768,7 @@ if (NOT TARGET dlib)
 
    if (TARGET dlib)
       enable_cpp11_for_target(dlib)
-      target_compile_options(dlib PUBLIC ${active_compile_opts})
+      target_compile_options(dlib PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${active_compile_opts}>)
    endif()
 
    # Install the library
