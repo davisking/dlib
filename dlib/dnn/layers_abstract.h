@@ -1247,8 +1247,6 @@ namespace dlib
                     - OUT.k()  == IN.k() 
                     - OUT.nr() == NR_
                     - OUT.nc() == NC_
-                    - scale_y == NR_/IN.nr()
-                    - scale_x == NC_/In.nc()
                     - for all valid i,k:  image_plane(OUT,i,k) is a copy of
                       image_plane(IN,i,k) that has been bilinearly interpolated to fit into
                       the shape of image_plane(OUT,i,k).
