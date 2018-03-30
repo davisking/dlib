@@ -35,32 +35,20 @@ fi
 if [ "$VARIANT" = "old-cmake" ]; then
   mkdir build
   cd build
-  ls ..
-  ls ../cmake
-  ls ../cmake/2.8
-  ls ../cmake/2.8/bin/
-  ls -l ../cmake/2.8/bin/cmake
+  CMAKEDIR=../cmake2
+  ls $CMAKEDIR
+  ls $CMAKEDIR/2.8/bin/cmake
 
-  echo echo what is the deal > wtf
-  chmod u+x ./wtf
-  ls -l wtf
-  ./wtf
-
-  cp ../cmake/2.8/bin/cmake wtf
-  ls -l wtf
-  ./wtf --version
-  ../cmake/2.8/bin/cmake --version
-
-  ../cmake/2.8/bin/cmake ../dlib/test/tools 
-  ../cmake/2.8/bin/cmake --build .  -- -j 2
+  $CMAKEDIR/2.8/bin/cmake ../dlib/test/tools 
+  $CMAKEDIR/2.8/bin/cmake --build .  -- -j 2
 
   rm -rf *
-  ../cmake/3.1/bin/cmake ../dlib/test/tools 
-  ../cmake/3.1/bin/cmake --build .  -- -j 2
+  $CMAKEDIR/3.1/bin/cmake ../dlib/test/tools 
+  $CMAKEDIR/3.1/bin/cmake --build .  -- -j 2
 
   rm -rf *
-  ../cmake/3.5/bin/cmake ../dlib/test/tools 
-  ../cmake/3.5/bin/cmake --build .  -- -j 2
+  $CMAKEDIR/3.5/bin/cmake ../dlib/test/tools 
+  $CMAKEDIR/3.5/bin/cmake --build .  -- -j 2
 fi
 
 if [ "$VARIANT" = "examples" ]; then
