@@ -419,8 +419,8 @@ namespace dlib
         matrix<T,NR,NC,MM,L>& alpha,
         const matrix<T,NR,NC,MM,L>& lower,
         const matrix<T,NR,NC,MM,L>& upper,
-        T eps,
-        unsigned long max_iter
+        T eps = 1e-10,
+        unsigned long max_iter = 30000
     )
     {
         // make sure requires clause is not broken
@@ -521,26 +521,35 @@ namespace dlib
 
             v_old = v;
 
-            df = Q*alpha + b;
             // now take a projected gradient step using Nesterov's method.
             v = clamp(alpha - 1.0/lipschitz_bound * df, lower, upper);
             alpha = dlib::clamp((1-gamma)*v + gamma*v_old, lower, upper);
 
+            df = Q*alpha + b;
 
             // check for convergence every 10 iterations
             if (iter%10 == 0)
             {
                 max_df = 0;
+                double absalpha = 0;
+                double thealpha = 0;
                 for (long r = 0; r < Q.nr(); ++r)
                 {
+                    absalpha += std::abs(alpha(r));
                     if (alpha(r) <= lower(r) && df(r) > 0)
                         ;//alpha(r) = lower(r);
                     else if (alpha(r) >= upper(r) && df(r) < 0)
                         ;//alpha(r) = upper(r);
                     else if (std::abs(df(r)) > max_df)
+                    {
                         max_df = std::abs(df(r));
+                        thealpha = std::abs(alpha(r));
+                    }
                 }
-                if (max_df < eps)
+                absalpha /= Q.nr();
+                // Stop when the magnitude of the changes we are making to alpha are eps
+                // smaller than the typical alpha.
+                if (max_df/lipschitz_bound <= eps*std::min(thealpha,absalpha))
                     break;
             }
         }
@@ -613,8 +622,8 @@ namespace dlib
         std::vector<matrix<T,NR,NC,MM,L>>& alphas,
         const std::vector<matrix<T,NR,NC,MM,L>>& lowers,
         const std::vector<matrix<T,NR,NC,MM,L>>& uppers,
-        T eps,
-        unsigned long max_iter
+        T eps = 1e-10,
+        unsigned long max_iter = 30000
     )
     {
         // make sure requires clause is not broken
@@ -834,8 +843,6 @@ namespace dlib
 
             v_old.swap(v);
 
-            //df = Q*alpha + b;
-            compute_df();
 
             // now take a projected gradient step using Nesterov's method.
             for (size_t j = 0; j < alphas.size(); ++j)
@@ -844,11 +851,15 @@ namespace dlib
                 alphas[j] = clamp((1-gamma)*v[j] + gamma*v_old[j], lowers[j], uppers[j]);
             }
 
+            //df = Q*alpha + b;
+            compute_df();
 
             // check for convergence every 10 iterations
             if (iter%10 == 0)
             {
                 max_df = 0;
+                double absalpha = 0;
+                double thealpha = 0;
                 for (size_t r2 = 0; r2 < alphas.size(); ++r2) 
                 {
                     auto& alpha = alphas[r2];
@@ -857,15 +868,22 @@ namespace dlib
                     auto& upper = uppers[r2];
                     for (long r = 0; r < alpha.nr(); ++r)
                     {
+                        absalpha += std::abs(alpha(r));
                         if (alpha(r) <= lower(r) && df_(r) > 0)
                             ;//alpha(r) = lower(r);
                         else if (alpha(r) >= upper(r) && df_(r) < 0)
                             ;//alpha(r) = upper(r);
                         else if (std::abs(df_(r)) > max_df)
+                        {
                             max_df = std::abs(df_(r));
+                            thealpha = std::abs(alpha(r));
+                        }
                     }
                 }
-                if (max_df < eps)
+                absalpha /= num_variables;
+                // Stop when the magnitude of the changes we are making to alpha are eps
+                // smaller than the typical alpha.
+                if (max_df/lipschitz_bound <= eps*std::min(thealpha,absalpha))
                     break;
             }
         }

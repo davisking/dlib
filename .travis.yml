@@ -43,6 +43,19 @@ matrix:
       compiler: gcc
       os: linux
       env:
+        - VARIANT=old-cmake
+      before_install:
+        - dlib/travis/get-old-cmakes.sh
+      cache:
+        - directories: cmake
+      script:
+        - dlib/travis/build-and-test.sh
+
+    ###################
+    - language: cpp
+      compiler: gcc
+      os: linux
+      env:
         - VARIANT=dlib_all_source_cpp
       script:
         - dlib/travis/build-and-test.sh
@@ -104,4 +117,3 @@ matrix:
     #    - dlib/travis/build-and-test.sh
          
           
-
