@@ -41,7 +41,13 @@ if [ "$VARIANT" = "old-cmake" ]; then
   ls ../cmake/2.8/bin/
   ls -l ../cmake/2.8/bin/cmake
 
+  echo echo what is the deal > wtf
+  chmod u+x ./wtf
+  ls -l wtf
+  ./wtf
+
   cp ../cmake/2.8/bin/cmake wtf
+  ls -l wtf
   ./wtf --version
   ../cmake/2.8/bin/cmake --version
 
