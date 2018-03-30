@@ -30,6 +30,23 @@ if [ "$VARIANT" = "tools" ]; then
   cmake --build .  -- -j 2
 fi
 
+# The point of this test is just to make sure the cmake scripts work with the
+# oldest version of cmake we are supposed to support.
+if [ "$VARIANT" = "old-cmake" ]; then
+  mkdir build
+  cd build
+  ../cmake/2.8/bin/cmake ../dlib/test/tools 
+  ../cmake/2.8/bin/cmake --build .  -- -j 2
+
+  rm -rf *
+  ../cmake/3.1/bin/cmake ../dlib/test/tools 
+  ../cmake/3.1/bin/cmake --build .  -- -j 2
+
+  rm -rf *
+  ../cmake/3.5/bin/cmake ../dlib/test/tools 
+  ../cmake/3.5/bin/cmake --build .  -- -j 2
+fi
+
 if [ "$VARIANT" = "examples" ]; then
   mkdir build
   cd build
