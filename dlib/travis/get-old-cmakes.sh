@@ -15,9 +15,14 @@ fi
 if [[ ! -d $OUTDIR ]]; then
   echo "Downloading cmake..."
 
-  CMAKE_URL="http://www.cmake.org/files/v2.8/cmake-2.8.12-Linux-i386.tar.gz"
+  # Travis requires 64bit binaries but they aren't available for this version of cmake, so we build from source
+  CMAKE_URL="https://cmake.org/files/v2.8/cmake-2.8.12.1.tar.gz"
   mkdir -p $OUTDIR/2.8
   wget --no-check-certificate -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C $OUTDIR/2.8
+  cd $OUTDIR/2.8
+  ./configure
+  make -j2
+  cd ..
 
   CMAKE_URL="http://www.cmake.org/files/v3.1/cmake-3.1.2-Linux-x86_64.tar.gz"
   mkdir -p $OUTDIR/3.1
