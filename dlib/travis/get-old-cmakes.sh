@@ -9,7 +9,6 @@ if [ ! -x cmake/2.8/bin/cmake ] || [ ! -x cmake/3.1/bin/cmake ] || [ ! -x cmake/
     rm -rf cmake
 fi
 
-    rm -rf cmake
 
 if [[ ! -d cmake ]]; then
   echo "Downloading cmake..."

@@ -40,6 +40,7 @@ if [ "$VARIANT" = "old-cmake" ]; then
   ls ../cmake/2.8
   ls ../cmake/2.8/bin/
   ls -l ../cmake/2.8/bin/cmake
+  ls -l ../cmake/2.8/bin/cmake 
   ../cmake/2.8/bin/cmake ../dlib/test/tools 
   ../cmake/2.8/bin/cmake --build .  -- -j 2
 
