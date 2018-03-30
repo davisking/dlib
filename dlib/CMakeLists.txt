@@ -7,6 +7,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(dlib)
 
+message(STATUS "Using CMake version: ${CMAKE_VERSION}")
 
 include(cmake_utils/set_compiler_specific_options.cmake)
 
