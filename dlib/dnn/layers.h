@@ -742,6 +742,120 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        long NR_, 
+        long NC_
+        >
+    class resize_to_
+    {
+    public:
+        static_assert(NR_ >= 1, "NR resize parameter can't be less than 1.");
+        static_assert(NC_ >= 1, "NC resize parameter can't be less than 1.");
+        
+        resize_to_()
+        {
+        }
+        
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+    
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            scale_y = (double)NR_/(double)sub.get_output().nr();
+            scale_x = (double)NC_/(double)sub.get_output().nc();
+            
+            output.set_size(
+                sub.get_output().num_samples(),
+                sub.get_output().k(),
+                NR_,
+                NC_);
+            tt::resize_bilinear(output, sub.get_output());
+        } 
+        
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            tt::resize_bilinear_gradient(sub.get_gradient_input(), gradient_input);
+        }
+        
+        inline dpoint map_input_to_output (dpoint p) const 
+        { 
+            p.x() = p.x()*scale_x;
+            p.y() = p.y()*scale_y;
+            return p; 
+        }
+
+        inline dpoint map_output_to_input (dpoint p) const 
+        { 
+            p.x() = p.x()/scale_x;
+            p.y() = p.y()/scale_y;
+            return p; 
+        }
+        
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+        
+        friend void serialize(const resize_to_& item, std::ostream& out)
+        {
+            serialize("resize_to_", out);
+            serialize(NR_, out);
+            serialize(NC_, out);
+            serialize(item.scale_y, out);
+            serialize(item.scale_x, out);
+        }
+        
+        friend void deserialize(resize_to_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "resize_to_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::resize_to_.");
+
+            long _nr;
+            long _nc;
+            deserialize(_nr, in);
+            deserialize(_nc, in);
+            deserialize(item.scale_y, in);
+            deserialize(item.scale_x, in);
+            if (_nr != NR_ || _nc != NC_)
+                throw serialization_error("Wrong size found while deserializing dlib::resize_to_");
+        }
+        
+        friend std::ostream& operator<<(std::ostream& out, const resize_to_& item)
+        {
+            out << "resize_to ("
+                << "nr=" << NR_
+                << ", nc=" << NC_
+                << ")";
+            return out;
+        }
+        
+        friend void to_xml(const resize_to_& item, std::ostream& out)
+        {
+            out << "<resize_to";
+            out << " nr='" << NR_ << "'" ;
+            out << " nc='" << NC_ << "'/>\n";
+        }
+    private:
+        resizable_tensor params;
+        double scale_y;
+        double scale_x;
+    
+    };  // end of class resize_to_
+    
+    
+    template <
+        long NR,
+        long NC,
+        typename SUBNET
+        >
+    using resize_to = add_layer<resize_to_<NR,NC>, SUBNET>;
+    
+// ----------------------------------------------------------------------------------------
+
+    template <
         long _nr,
         long _nc,
         int _stride_y,
