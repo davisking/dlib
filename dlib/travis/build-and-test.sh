@@ -35,9 +35,9 @@ fi
 if [ "$VARIANT" = "old-cmake" ]; then
   mkdir build
   cd build
-  CMAKEDIR=../cmake2
+  CMAKEDIR=../wtf
   ls $CMAKEDIR
-  ls $CMAKEDIR/2.8/bin/cmake
+  ls -l $CMAKEDIR/2.8/bin/cmake
 
   $CMAKEDIR/2.8/bin/cmake ../dlib/test/tools 
   $CMAKEDIR/2.8/bin/cmake --build .  -- -j 2
