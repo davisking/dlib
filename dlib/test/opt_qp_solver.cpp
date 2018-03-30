@@ -592,6 +592,44 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_solve_qp_box_constrained()
+    {
+        dlog << LINFO << "test_solve_qp_box_constrained()";
+        print_spinner();
+        dlib::rand rnd;
+        matrix<double> m = randm(6,6,rnd);
+        m = m*trans(m);
+        matrix<double,0,1> b = randm(6,1,rnd)-0.5;
+
+        matrix<double,0,1> lower, upper, solution;
+        lower = -ones_matrix<double>(6,1)*1e100;
+        upper = ones_matrix<double>(6,1)*1e100;
+
+        solution = zeros_matrix(lower);
+        unsigned long iters = solve_qp_box_constrained(m,b,solution, lower, upper);
+
+        dlog << LINFO << "iters: " << iters;
+
+        matrix<double> true_solution = -pinv(m)*b;
+        DLIB_TEST_MSG(max(abs(solution - true_solution)) < 1e-6, max(abs(solution - true_solution)));
+
+        iters = solve_qp_box_constrained(m,b,solution, lower, upper, 1e-14);
+        dlog << LINFO << "iters: " << iters;
+
+        /*
+        const double obj1 = 0.5*trans(solution)*m*solution + trans(solution)*b;
+        const double obj2 = 0.5*trans(true_solution)*m*true_solution + trans(true_solution)*b;
+        cout << "iters:" << iters << endl;
+        cout << "obj1: "<< obj1 << endl;
+        cout << "obj2: "<< obj2 << endl;
+        cout << "obj1-obj2: "<< obj1-obj2 << endl;
+        */
+
+        DLIB_TEST_MSG(max(abs(solution - true_solution)) < 1e-10, max(abs(solution - true_solution)));
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_solve_qp_box_constrained_blockdiag_compact(dlib::rand& rnd, double percent_off_diag_present)
     {
         print_spinner();
@@ -706,6 +744,7 @@ namespace
         void perform_test(
         )
         {
+            test_solve_qp_box_constrained();
             print_spinner();
             test_solve_qp4_using_smo();
             print_spinner();

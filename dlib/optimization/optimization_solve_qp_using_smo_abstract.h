@@ -128,8 +128,8 @@ namespace dlib
         matrix<T,NR,NC,MM,L>& alpha,
         const matrix<T,NR,NC,MM,L>& lower,
         const matrix<T,NR,NC,MM,L>& upper,
-        T eps,
-        unsigned long max_iter
+        T eps = 1e-10,
+        unsigned long max_iter = 30000
     );
     /*!
         requires
@@ -155,10 +155,10 @@ namespace dlib
             - The solution to the above QP will be stored in #alpha.
             - This function uses a combination of a SMO algorithm along with Nesterov's
               method as the main iteration of the solver.  It starts the algorithm with the
-              given alpha and it works on the problem until the derivative of f(alpha) is
-              smaller than eps for each element of alpha or the alpha value is at a box
-              constraint.  So eps controls how accurate the solution is and smaller values
-              result in better solutions.
+              given alpha and works on the problem until the magnitude of the changes we
+              are making to alpha are eps times smaller than the typical values in alpha.
+              So eps controls how accurate the solution is and smaller values result in
+              better solutions.
             - At most max_iter iterations of optimization will be performed.  
             - returns the number of iterations performed.  If this method fails to
               converge to eps accuracy then the number returned will be max_iter+1.
@@ -176,8 +176,8 @@ namespace dlib
         std::vector<matrix<T,NR,NC,MM,L>>& alphas,
         const std::vector<matrix<T,NR,NC,MM,L>>& lowers,
         const std::vector<matrix<T,NR,NC,MM,L>>& uppers,
-        T eps,
-        unsigned long max_iter
+        T eps = 1e-10,
+        unsigned long max_iter = 30000
     );
     /*!
         requires
@@ -224,10 +224,10 @@ namespace dlib
             - The solution to the above QP will be stored in #alphas.
             - This function uses a combination of a SMO algorithm along with Nesterov's
               method as the main iteration of the solver.  It starts the algorithm with the
-              given alpha and it works on the problem until the derivative of f(alpha) is
-              smaller than eps for each element of alpha or the alpha value is at a box
-              constraint.  So eps controls how accurate the solution is and smaller values
-              result in better solutions.
+              given alpha and works on the problem until the magnitude of the changes we
+              are making to alpha are eps times smaller than the typical values in alpha.
+              So eps controls how accurate the solution is and smaller values result in
+              better solutions.
             - At most max_iter iterations of optimization will be performed.  
             - returns the number of iterations performed.  If this method fails to
               converge to eps accuracy then the number returned will be max_iter+1.
