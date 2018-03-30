@@ -113,9 +113,9 @@ matrix:
     #    - dlib/travis/build-and-test.sh
          
           
- cache:
-   directories:
-     - cmake
+cache:
+  directories:
+    - cmake
  
- before_install:
-   - dlib/travis/before-install.sh
+before_install:
+  - dlib/travis/before-install.sh
