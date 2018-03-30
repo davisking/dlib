@@ -1660,6 +1660,24 @@ namespace
         }
         {
             print_spinner();
+            resize_to_<1,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            resize_to_<2,1> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            resize_to_<2,2> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             l2normalize_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
