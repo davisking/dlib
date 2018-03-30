@@ -33,6 +33,7 @@ fi
 # The point of this test is just to make sure the cmake scripts work with the
 # oldest version of cmake we are supposed to support.
 if [ "$VARIANT" = "old-cmake" ]; then
+  find .
   mkdir build
   cd build
   ../cmake/2.8/bin/cmake ../dlib/test/tools 
