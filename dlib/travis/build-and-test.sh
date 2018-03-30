@@ -47,6 +47,12 @@ if [ "$VARIANT" = "old-cmake" ]; then
   rm -rf *
   $CMAKEDIR/3.5/bin/cmake ../dlib/test/tools 
   $CMAKEDIR/3.5/bin/cmake --build .  -- -j 2
+
+
+  # just to make sure there isn't anything funny about building standalone dlib
+  rm -rf *
+  $CMAKEDIR/2.8/bin/cmake ../dlib 
+  $CMAKEDIR/2.8/bin/cmake --build .  -- -j 2
 fi
 
 if [ "$VARIANT" = "examples" ]; then
