@@ -5,7 +5,6 @@ set -eux
 
 OUTDIR=cmake
 
-rm -rf $OUTDIR
 
 echo "Checking if cmake already downloaded"
 if [ ! -x $OUTDIR/2.8/bin/cmake ] || [ ! -x $OUTDIR/3.1/bin/cmake ] || [ ! -x $OUTDIR/3.5/bin/cmake ]; then

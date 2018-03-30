@@ -37,16 +37,16 @@ if [ "$VARIANT" = "old-cmake" ]; then
   cd build
   CMAKEDIR=../cmake
 
-  $CMAKEDIR/3.5/bin/cmake ../dlib/test/tools 
-  $CMAKEDIR/3.5/bin/cmake --build .  -- -j 2
+  $CMAKEDIR/2.8/bin/cmake ../dlib/test/tools 
+  $CMAKEDIR/2.8/bin/cmake --build .  -- -j 2
 
   rm -rf *
   $CMAKEDIR/3.1/bin/cmake ../dlib/test/tools 
   $CMAKEDIR/3.1/bin/cmake --build .  -- -j 2
 
   rm -rf *
-  $CMAKEDIR/2.8/bin/cmake ../dlib/test/tools 
-  $CMAKEDIR/2.8/bin/cmake --build .  -- -j 2
+  $CMAKEDIR/3.5/bin/cmake ../dlib/test/tools 
+  $CMAKEDIR/3.5/bin/cmake --build .  -- -j 2
 fi
 
 if [ "$VARIANT" = "examples" ]; then
