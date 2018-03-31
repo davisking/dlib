@@ -140,7 +140,7 @@ detector2 = dlib.fhog_object_detector("detector.svm")
 # make a list of all the detectors you wan to run.  Here we have 2, but you
 # could have any number.
 detectors = [detector1, detector2]
-image = io.imread(faces_folder + '/2008_002506.jpg');
+image = io.imread(faces_folder + '/2008_002506.jpg')
 [boxes, confidences, detector_idxs] = dlib.fhog_object_detector.run_multiple(detectors, image, upsample_num_times=1, adjust_threshold=0.0)
 for i in range(len(boxes)):
     print("detector {} found box {} with confidence {}.".format(detector_idxs[i], boxes[i], confidences[i]))
