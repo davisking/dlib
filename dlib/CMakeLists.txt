@@ -7,6 +7,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(dlib)
 
+message(STATUS "Using CMake version: ${CMAKE_VERSION}")
 
 include(cmake_utils/set_compiler_specific_options.cmake)
 
@@ -766,9 +767,13 @@ if (NOT TARGET dlib)
       enable_cpp11_for_target(dlib_all_source_cpp)
    endif()
 
-   if (TARGET dlib)
-      enable_cpp11_for_target(dlib)
+   enable_cpp11_for_target(dlib)
+   if((MSVC AND CMAKE_VERSION VERSION_LESS 3.11) OR CMAKE_VERSION VERSION_LESS 3.3)
       target_compile_options(dlib PUBLIC ${active_compile_opts})
+      target_compile_options(dlib PRIVATE ${active_compile_opts_private})
+   else()
+      target_compile_options(dlib PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${active_compile_opts}>)
+      target_compile_options(dlib PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${active_compile_opts_private}>)
    endif()
 
    # Install the library

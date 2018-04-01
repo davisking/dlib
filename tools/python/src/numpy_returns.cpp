@@ -44,7 +44,7 @@ py::list get_jitter_images(py::object img, size_t num_jitters = 1, bool disturb_
         npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject*) arr);
         memcpy(outdata, image_data(crop), rows * width_step(crop));
                 
-        py::handle handle(arr);
+        py::handle handle = arr;
         // Append image to jittered image list
         jitter_list.append(handle);
     }
@@ -87,7 +87,7 @@ py::list get_face_chips (
         PyObject *arr = PyArray_SimpleNew(3, dims, NPY_UINT8);
         npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject*) arr);
         memcpy(outdata, image_data(chip), rows * width_step(chip));
-        py::handle handle(arr);
+        py::handle handle = arr;
 
         // Append image to chips list
         chips_list.append(handle);
@@ -114,8 +114,7 @@ py::object get_face_chip (
     PyObject *arr = PyArray_SimpleNew(3, dims, NPY_UINT8);
     npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject *) arr);
     memcpy(outdata, image_data(chip), num_rows(chip) * width_step(chip));
-    py::handle handle(arr);
-    return handle.cast<py::object>();
+    return py::reinterpret_steal<py::object>(arr);
 }
 
 // ----------------------------------------------------------------------------------------
