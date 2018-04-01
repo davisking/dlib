@@ -770,8 +770,10 @@ if (NOT TARGET dlib)
    enable_cpp11_for_target(dlib)
    if((MSVC AND CMAKE_VERSION VERSION_LESS 3.11) OR CMAKE_VERSION VERSION_LESS 3.3)
       target_compile_options(dlib PUBLIC ${active_compile_opts})
+      target_compile_options(dlib PRIVATE ${active_compile_opts_private})
    else()
       target_compile_options(dlib PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${active_compile_opts}>)
+      target_compile_options(dlib PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${active_compile_opts_private}>)
    endif()
 
    # Install the library
