@@ -830,7 +830,7 @@ namespace dlib { namespace tt
               because, when using CUDA, it runs by generating asynchronous kernel launches
               whereas the version of dot() that returns the result immediately as a scalar
               must block the host while we wait for the result to be computed and then
-              transfered from the GPU do the host for return by dot().  So this version of
+              transferred from the GPU do the host for return by dot().  So this version of
               dot() might be much faster in some cases.
     !*/
 
