@@ -366,7 +366,7 @@ namespace dlib
             follows:
 
             ensures
-                - calling clean() Causes this object to forget about everything except its
+                - calling clean() causes this object to forget about everything except its
                   parameters.  This is useful if your layer caches information between
                   forward and backward passes and you want to clean out that cache
                   information before saving the network to disk.  

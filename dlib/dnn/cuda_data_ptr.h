@@ -160,8 +160,12 @@ namespace dlib
             cuda_data_void_ptr get(size_t size)
             /*!
                 ensures
-                    - This object will return the buffer of requested size of larger
+                    - This object will return the buffer of requested size or larger.
                     - buffer.size() >= size
+                    - Client code should not hold the returned cuda_data_void_ptr for long
+                      durations, but instead should call get() whenever the buffer is
+                      needed.  Doing so ensures that multiple buffers are not kept around
+                      in the event of a resize.
             !*/
             {
                 if (buffer.size() < size)

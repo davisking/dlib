@@ -160,12 +160,12 @@ namespace dlib
             std::vector<std::weak_ptr<resizable_cuda_buffer>> buffers;
         };
 
-
-        static std::shared_ptr<resizable_cuda_buffer> device_global_buffer()
+        std::shared_ptr<resizable_cuda_buffer> device_global_buffer()
         {
             thread_local cudnn_device_buffer buffer;
             return buffer.get_buffer();
         }
+
     // ------------------------------------------------------------------------------------
 
         class cudnn_activation_descriptor
