@@ -179,6 +179,26 @@ namespace dlib
             cuda_data_void_ptr buffer;
         };
 
+    // ----------------------------------------------------------------------------------------
+
+        std::shared_ptr<resizable_cuda_buffer> device_global_buffer(
+        );
+        /*!
+            ensures
+                - Returns a pointer to a globally shared CUDA memory buffer on the
+                  currently selected CUDA device.  The buffer is also thread local.  So
+                  each host thread will get its own buffer.  You can use this global buffer
+                  as scratch space for CUDA computations that all take place on the default
+                  stream.  Using it in this way ensures that there aren't any race conditions
+                  involving the use of the buffer.
+                - The global buffer is deallocated once all references to it are
+                  destructed.  It will be reallocated as required.  So if you want to avoid
+                  these reallocations then hold a copy of the shared_ptr returned by this
+                  function.
+        !*/
+
+    // ----------------------------------------------------------------------------------------
+
     }
 }
 
