@@ -37,26 +37,50 @@ namespace dlib
 
         void memcpy(
             void* dest,
-            const cuda_data_void_ptr& src
+            const cuda_data_void_ptr& src,
+            const size_t num
         )
         {
+            DLIB_ASSERT(num <= src.size());
             if (src.size() != 0)
             {
-                CHECK_CUDA(cudaMemcpy(dest, src.data(),  src.size(), cudaMemcpyDefault));
+                CHECK_CUDA(cudaMemcpy(dest, src.data(),  num, cudaMemcpyDefault));
             }
         }
 
     // ------------------------------------------------------------------------------------
 
         void memcpy(
-            cuda_data_void_ptr& dest, 
+            void* dest,
+            const cuda_data_void_ptr& src
+        )
+        {
+            memcpy(dest, src, src.size());
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void memcpy(
+            cuda_data_void_ptr dest, 
+            const void* src,
+            const size_t num
+        )
+        {
+            DLIB_ASSERT(num <= dest.size());
+            if (dest.size() != 0)
+            {
+                CHECK_CUDA(cudaMemcpy(dest.data(), src, num, cudaMemcpyDefault));
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        void memcpy(
+            cuda_data_void_ptr dest, 
             const void* src
         )
         {
-            if (dest.size() != 0)
-            {
-                CHECK_CUDA(cudaMemcpy(dest.data(), src, dest.size(), cudaMemcpyDefault));
-            }
+            memcpy(dest,src,dest.size());
         }
 
     // ------------------------------------------------------------------------------------
