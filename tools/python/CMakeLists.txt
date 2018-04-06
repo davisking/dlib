@@ -2,8 +2,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
 set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
-# Make DLIB_ASSERT statements not abort the python interpreter, but just return an error.
-add_definitions(-DDLIB_NO_ABORT_ON_2ND_FATAL_ERROR)
 
 # Set this to disable link time optimization. The only reason for
 # doing this to make the compile faster which is nice when developing
@@ -17,16 +15,6 @@ if (POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW)
 endif()
 
-
-if (CMAKE_COMPILER_IS_GNUCXX)
-    # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
-    # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
-    # does.
-    add_definitions("-fPIC")
-    set(CMAKE_POSITION_INDEPENDENT_CODE True)
-else()
-    set(CMAKE_POSITION_INDEPENDENT_CODE True)
-endif()
 
 # To avoid dll hell, always link everything statically when compiling in
 # visual studio.  This way, the resulting library won't depend on a bunch

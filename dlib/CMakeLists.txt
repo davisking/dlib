@@ -35,6 +35,20 @@ endif()
 
 
 if (DLIB_IN_PROJECT_BUILD)
+
+   # Check if we are being built as part of a pybind11 module. 
+   if (COMMAND pybind11_add_module)
+      set(CMAKE_POSITION_INDEPENDENT_CODE True)
+      if (CMAKE_COMPILER_IS_GNUCXX)
+         # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
+         # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
+         # does.
+         add_definitions("-fPIC")
+      endif()
+      # Make DLIB_ASSERT statements not abort the python interpreter, but just return an error.
+      list(APPEND active_preprocessor_switches "-DDLIB_NO_ABORT_ON_2ND_FATAL_ERROR")
+   endif()
+
    # DLIB_IN_PROJECT_BUILD==true means you are using dlib by invoking
    # add_subdirectory(dlib) in the parent project. In this case, we always want
    # to build dlib as a static library so the parent project doesn't need to
