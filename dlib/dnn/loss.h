@@ -6,7 +6,7 @@
 #include "loss_abstract.h"
 #include "core.h"
 #include "../matrix.h"
-#include "tensor_tools.h"
+#include "../cuda/tensor_tools.h"
 #include "../geometry.h"
 #include "../image_processing/box_overlap_testing.h"
 #include "../image_processing/full_object_detection.h"

@@ -254,8 +254,8 @@ if (NOT TARGET dlib)
          threads/async.cpp
          timer/timer.cpp
          stack_trace.cpp
-         dnn/cpu_dlib.cpp
-         dnn/tensor_tools.cpp
+         cuda/cpu_dlib.cpp
+         cuda/tensor_tools.cpp
          )
 
       if(UNIX)
@@ -657,13 +657,13 @@ if (NOT TARGET dlib)
 
          if (CUDA_FOUND AND cudnn AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER) AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
             set(source_files ${source_files} 
-               dnn/cuda_dlib.cu 
-               dnn/cudnn_dlibapi.cpp
-               dnn/cublas_dlibapi.cpp
-               dnn/cusolver_dlibapi.cu
-               dnn/curand_dlibapi.cpp
-               dnn/cuda_data_ptr.cpp
-               dnn/gpu_data.cpp
+               cuda/cuda_dlib.cu 
+               cuda/cudnn_dlibapi.cpp
+               cuda/cublas_dlibapi.cpp
+               cuda/cusolver_dlibapi.cu
+               cuda/curand_dlibapi.cpp
+               cuda/cuda_data_ptr.cpp
+               cuda/gpu_data.cpp
                )
             set(dlib_needed_libraries ${dlib_needed_libraries} 
                ${CUDA_CUBLAS_LIBRARIES} 

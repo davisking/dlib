@@ -14,7 +14,7 @@
 
 #include "../pipe.h"
 #include "../threads.h"
-#include "cuda_dlib.h"
+#include "../cuda/cuda_dlib.h"
 #include "../statistics/running_gradient.h"
 #include <atomic>
 #include <cstdio>

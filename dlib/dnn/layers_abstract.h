@@ -3,7 +3,7 @@
 #undef DLIB_DNn_LAYERS_ABSTRACT_H_
 #ifdef DLIB_DNn_LAYERS_ABSTRACT_H_
 
-#include "tensor_abstract.h"
+#include "../cuda/tensor_abstract.h"
 #include "core_abstract.h"
 
 

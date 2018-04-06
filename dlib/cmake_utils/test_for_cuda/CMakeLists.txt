@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(cuda_test)
 
-include_directories(../../dnn)
+include_directories(../../cuda)
 add_definitions(-DDLIB_USE_CUDA)
 
 # Override the FindCUDA.cmake setting to avoid duplication of host flags if using a toolchain:

@@ -79,8 +79,8 @@
 #include "../gui_core/gui_core_kernel_2.cpp"
 #endif // DLIB_NO_GUI_SUPPORT
 
-#include "../dnn/cpu_dlib.cpp"
-#include "../dnn/tensor_tools.cpp"
+#include "../cuda/cpu_dlib.cpp"
+#include "../cuda/tensor_tools.cpp"
 
 #endif // DLIB_ISO_CPP_ONLY
 

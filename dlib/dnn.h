@@ -9,7 +9,7 @@
 #   pragma warning( disable: 4503 )
 #endif
 
-#include "dnn/tensor.h"
+#include "cuda/tensor.h"
 #include "dnn/input.h"
 
 // Problem:    Visual Studio's vcpkgsrv.exe constantly uses a single CPU core,
@@ -27,8 +27,8 @@
 #include "dnn/core.h"
 #include "dnn/solvers.h"
 #include "dnn/trainer.h"
-#include "dnn/cpu_dlib.h"
-#include "dnn/tensor_tools.h"
+#include "cuda/cpu_dlib.h"
+#include "cuda/tensor_tools.h"
 #include "dnn/utilities.h"
 #include "dnn/validation.h"
 
