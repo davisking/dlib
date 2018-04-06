@@ -834,8 +834,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
       <component>
          <name>resizable_tensor</name>
-         <file>dlib/dnn.h</file>
-         <spec_file link="true">dlib/dnn/tensor_abstract.h</spec_file>
+         <file>dlib/cuda/tensor.h</file>
+         <spec_file link="true">dlib/cuda/tensor_abstract.h</spec_file>
          <description>
                This object represents a 4D array of float values, all stored contiguously
                in memory.  Importantly, it keeps two copies of the floats, one on the host
@@ -873,8 +873,8 @@ Davis E. King. <a href="http://jmlr.csail.mit.edu/papers/volume10/king09a/king09
 
       <component>
          <name>alias_tensor</name>
-         <file>dlib/dnn.h</file>
-         <spec_file link="true">dlib/dnn/tensor_abstract.h</spec_file>
+         <file>dlib/cuda/tensor.h</file>
+         <spec_file link="true">dlib/cuda/tensor_abstract.h</spec_file>
          <description>
             This object is a <a href="#resizable_tensor">tensor</a> that
             aliases another tensor.  That is, it doesn't have its own block of
