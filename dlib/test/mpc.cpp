@@ -328,8 +328,8 @@ namespace
                 lower = -4;
                 upper = 3;
 
-                solve_qp_box_using_smo(Q,b,alpha,lower, upper, 0.000000001, 500000);
-                solve_qp_box_constrained(Q,b,alpha2,lower, upper, 0.000000001, 50000);
+                solve_qp_box_using_smo(Q,b,alpha,lower, upper, 1e-12, 500000);
+                solve_qp_box_constrained(Q,b,alpha2,lower, upper, 1e-12, 50000);
                 dlog << LINFO << trans(alpha);
                 dlog << LINFO << trans(alpha2);
                 dlog << LINFO << "objective value:  " << 0.5*trans(alpha)*Q*alpha + trans(b)*alpha;

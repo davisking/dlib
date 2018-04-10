@@ -35,6 +35,20 @@ endif()
 
 
 if (DLIB_IN_PROJECT_BUILD)
+
+   # Check if we are being built as part of a pybind11 module. 
+   if (COMMAND pybind11_add_module)
+      set(CMAKE_POSITION_INDEPENDENT_CODE True)
+      if (CMAKE_COMPILER_IS_GNUCXX)
+         # Just setting CMAKE_POSITION_INDEPENDENT_CODE should be enough to set
+         # -fPIC for GCC but sometimes it still doesn't get set, so make sure it
+         # does.
+         add_definitions("-fPIC")
+      endif()
+      # Make DLIB_ASSERT statements not abort the python interpreter, but just return an error.
+      list(APPEND active_preprocessor_switches "-DDLIB_NO_ABORT_ON_2ND_FATAL_ERROR")
+   endif()
+
    # DLIB_IN_PROJECT_BUILD==true means you are using dlib by invoking
    # add_subdirectory(dlib) in the parent project. In this case, we always want
    # to build dlib as a static library so the parent project doesn't need to
@@ -254,8 +268,8 @@ if (NOT TARGET dlib)
          threads/async.cpp
          timer/timer.cpp
          stack_trace.cpp
-         dnn/cpu_dlib.cpp
-         dnn/tensor_tools.cpp
+         cuda/cpu_dlib.cpp
+         cuda/tensor_tools.cpp
          )
 
       if(UNIX)
@@ -657,13 +671,13 @@ if (NOT TARGET dlib)
 
          if (CUDA_FOUND AND cudnn AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER) AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
             set(source_files ${source_files} 
-               dnn/cuda_dlib.cu 
-               dnn/cudnn_dlibapi.cpp
-               dnn/cublas_dlibapi.cpp
-               dnn/cusolver_dlibapi.cu
-               dnn/curand_dlibapi.cpp
-               dnn/cuda_data_ptr.cpp
-               dnn/gpu_data.cpp
+               cuda/cuda_dlib.cu 
+               cuda/cudnn_dlibapi.cpp
+               cuda/cublas_dlibapi.cpp
+               cuda/cusolver_dlibapi.cu
+               cuda/curand_dlibapi.cpp
+               cuda/cuda_data_ptr.cpp
+               cuda/gpu_data.cpp
                )
             set(dlib_needed_libraries ${dlib_needed_libraries} 
                ${CUDA_CUBLAS_LIBRARIES} 
@@ -767,9 +781,13 @@ if (NOT TARGET dlib)
       enable_cpp11_for_target(dlib_all_source_cpp)
    endif()
 
-   if (TARGET dlib)
-      enable_cpp11_for_target(dlib)
+   enable_cpp11_for_target(dlib)
+   if((MSVC AND CMAKE_VERSION VERSION_LESS 3.11) OR CMAKE_VERSION VERSION_LESS 3.3)
       target_compile_options(dlib PUBLIC ${active_compile_opts})
+      target_compile_options(dlib PRIVATE ${active_compile_opts_private})
+   else()
+      target_compile_options(dlib PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${active_compile_opts}>)
+      target_compile_options(dlib PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${active_compile_opts_private}>)
    endif()
 
    # Install the library

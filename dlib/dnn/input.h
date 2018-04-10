@@ -10,7 +10,7 @@
 #include "../image_processing.h"
 #include <sstream>
 #include <array>
-#include "tensor_tools.h"
+#include "../cuda/tensor_tools.h"
 
 
 namespace dlib

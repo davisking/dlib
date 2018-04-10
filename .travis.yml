@@ -46,8 +46,8 @@ matrix:
         - VARIANT=old-cmake
       before_install:
         - dlib/travis/get-old-cmakes.sh
-      #cache:
-      #  - directories: cmake
+      cache:
+        - directories: cmake
       script:
         - dlib/travis/build-and-test.sh
 

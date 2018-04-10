@@ -3,7 +3,7 @@
 #undef DLIB_DNn_LAYERS_ABSTRACT_H_
 #ifdef DLIB_DNn_LAYERS_ABSTRACT_H_
 
-#include "tensor_abstract.h"
+#include "../cuda/tensor_abstract.h"
 #include "core_abstract.h"
 
 
@@ -366,7 +366,7 @@ namespace dlib
             follows:
 
             ensures
-                - calling clean() Causes this object to forget about everything except its
+                - calling clean() causes this object to forget about everything except its
                   parameters.  This is useful if your layer caches information between
                   forward and backward passes and you want to clean out that cache
                   information before saving the network to disk.  

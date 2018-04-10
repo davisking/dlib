@@ -122,6 +122,11 @@ if (MSVC)
    # that will not be readable by VS 2005.
    list(APPEND active_compile_opts "/bigobj")
 
+   # Build dlib with all cores.  Don't propagate the setting to client programs
+   # though since they might compile large translation units that use too much
+   # RAM.
+   list(APPEND active_compile_opts_private "/MP")
+
    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.3) 
       # Clang can compile all Dlib's code at Windows platform. Tested with Clang 5
       list(APPEND active_compile_opts "-Xclang -fcxx-exceptions")
