@@ -47,6 +47,7 @@ py::list get_jitter_images(py::object img, size_t num_jitters = 1, bool disturb_
         py::handle handle = arr;
         // Append image to jittered image list
         jitter_list.append(handle);
+        Py_DECREF(arr);
     }
            
     return jitter_list;
@@ -91,6 +92,7 @@ py::list get_face_chips (
 
         // Append image to chips list
         chips_list.append(handle);
+        Py_DECREF(arr);
     }
     return chips_list;
 }
