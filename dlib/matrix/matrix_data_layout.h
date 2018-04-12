@@ -265,7 +265,7 @@ namespace dlib
 
             T* data;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -348,7 +348,7 @@ namespace dlib
             T* data;
             long nr_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -433,7 +433,7 @@ namespace dlib
             T* data;
             long nc_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -519,7 +519,7 @@ namespace dlib
             long nr_;
             long nc_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     };
 
@@ -712,7 +712,7 @@ namespace dlib
 
             T* data;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -795,7 +795,7 @@ namespace dlib
             T* data;
             long nr_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -880,7 +880,7 @@ namespace dlib
             T* data;
             long nc_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
