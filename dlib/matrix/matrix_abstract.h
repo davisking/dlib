@@ -480,6 +480,21 @@ namespace dlib
                     - #nc() == 1
         !*/
 
+        std::unique_ptr<T[]> steal_memory(
+        );
+        /*!
+            requires
+                - NR*NC==0
+                  (i.e. this array isn't statically sized)
+            ensures
+                - Returns a pointer containing the memory block underlying this matrix.
+                  After calling steal_memory() this matrix doesn't own the memory anymore
+                  and is automatically set to the empty matrix.
+                - The returned pointer points to an array of size() T objects and in
+                  particular is the pointer &(*this)(0,0).
+                - #size() == 0
+        !*/
+
         template <typename U, size_t len>
         matrix& operator= (
             U (&array)[len]
