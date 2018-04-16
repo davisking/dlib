@@ -265,7 +265,7 @@ namespace dlib
 
             T* data;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -336,6 +336,14 @@ namespace dlib
                 nr_ = nr;
             }
 
+            std::unique_ptr<T[]> steal_memory()
+            {
+                auto ret = pool.extract_array(data);
+                data = nullptr;
+                nr_ = 0;
+                return ret;
+            }
+
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
@@ -348,7 +356,7 @@ namespace dlib
             T* data;
             long nr_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -421,6 +429,14 @@ namespace dlib
                 nc_ = nc;
             }
 
+            std::unique_ptr<T[]> steal_memory()
+            {
+                auto ret = pool.extract_array(data);
+                data = nullptr;
+                nc_ = 0;
+                return ret;
+            }
+
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
@@ -433,7 +449,7 @@ namespace dlib
             T* data;
             long nc_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -508,6 +524,15 @@ namespace dlib
                 nc_ = nc;
             }
 
+            std::unique_ptr<T[]> steal_memory()
+            {
+                auto ret = pool.extract_array(data);
+                data = nullptr;
+                nr_ = 0;
+                nc_ = 0;
+                return ret;
+            }
+
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
@@ -519,7 +544,7 @@ namespace dlib
             long nr_;
             long nc_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     };
 
@@ -712,7 +737,7 @@ namespace dlib
 
             T* data;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -783,6 +808,14 @@ namespace dlib
                 nr_ = nr;
             }
 
+            std::unique_ptr<T[]> steal_memory()
+            {
+                auto ret = pool.extract_array(data);
+                data = nullptr;
+                nr_ = 0;
+                return ret;
+            }
+
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
@@ -795,7 +828,7 @@ namespace dlib
             T* data;
             long nr_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -868,6 +901,14 @@ namespace dlib
                 nc_ = nc;
             }
 
+            std::unique_ptr<T[]> steal_memory()
+            {
+                auto ret = pool.extract_array(data);
+                data = nullptr;
+                nc_ = 0;
+                return ret;
+            }
+
 #ifdef MATLAB_MEX_FILE
             void _private_set_mxArray ( mxArray* ) { DLIB_CASSERT(false, "This function should never be called."); }
             mxArray* _private_release_mxArray(){DLIB_CASSERT(false, "This function should never be called."); }
@@ -880,7 +921,7 @@ namespace dlib
             T* data;
             long nc_;
             typename mem_manager::template rebind<T>::other pool;
-            };
+        };
 
     // ------------------------------------------------------------------------------------
 
@@ -960,6 +1001,15 @@ namespace dlib
                 data = pool.allocate_array(nr*nc);
                 nr_ = nr;
                 nc_ = nc;
+            }
+
+            std::unique_ptr<T[]> steal_memory()
+            {
+                auto ret = pool.extract_array(data);
+                data = nullptr;
+                nr_ = 0;
+                nc_ = 0;
+                return ret;
             }
 
         private:
@@ -1104,6 +1154,16 @@ namespace dlib
                 nc_ = nc;
             }
 
+            std::unique_ptr<T[]> steal_memory()
+            {
+                DLIB_CASSERT(!owned_by_matlab, "You can't steal the memory from a matrix if it's owned by MATLAB.");
+                std::unique_ptr<T[]> ret(data);
+                data = nullptr;
+                nr_ = 0;
+                nc_ = 0;
+                return ret;
+            }
+
         private:
             double* data;
             long nr_;
@@ -1245,6 +1305,16 @@ namespace dlib
                 }
                 nr_ = nr;
                 nc_ = nc;
+            }
+
+            std::unique_ptr<T[]> steal_memory()
+            {
+                DLIB_CASSERT(!owned_by_matlab, "You can't steal the memory from a matrix if it's owned by MATLAB.");
+                std::unique_ptr<T[]> ret(data);
+                data = nullptr;
+                nr_ = 0;
+                nc_ = 0;
+                return ret;
             }
 
         private:

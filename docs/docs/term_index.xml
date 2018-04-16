@@ -90,10 +90,10 @@
          <term file="dlib/dnn/core_abstract.h.html" name="set_dnn_prefer_fastest_algorithms" include="dlib/dnn.h"/>
          <term file="dlib/dnn/core_abstract.h.html" name="set_dnn_prefer_smallest_algorithms" include="dlib/dnn.h"/>
 
-         <term file="dlib/dnn/cuda_errors.h.html" name="cuda_error" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/cuda_errors.h.html" name="cudnn_error" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/cuda_errors.h.html" name="curand_error" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/cuda_errors.h.html" name="cublas_error" include="dlib/dnn.h"/>
+         <term file="dlib/cuda/cuda_errors.h.html" name="cuda_error" include="dlib/cuda/cuda_errors.h"/>
+         <term file="dlib/cuda/cuda_errors.h.html" name="cudnn_error" include="dlib/cuda/cuda_errors.h"/>
+         <term file="dlib/cuda/cuda_errors.h.html" name="curand_error" include="dlib/cuda/cuda_errors.h"/>
+         <term file="dlib/cuda/cuda_errors.h.html" name="cublas_error" include="dlib/cuda/cuda_errors.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="fc_bias_mode" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="FC_HAS_BIAS" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="FC_NO_BIAS" include="dlib/dnn.h"/>
@@ -101,17 +101,17 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="CONV_MODE" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="FC_MODE" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="set_all_bn_running_stats_window_sizes" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/tensor_abstract.h.html" name="tensor" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/tensor_abstract.h.html" name="resizable_tensor" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/tensor_abstract.h.html" name="alias_tensor_instance" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/tensor_abstract.h.html" name="alias_tensor_const_instance" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/tensor_abstract.h.html" name="alias_tensor" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/tensor_abstract.h.html" name="image_plane" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/tensor_abstract.h.html" name="have_same_dimensions" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/gpu_data_abstract.h.html" name="gpu_data" include="dlib/dnn.h"/>
+         <term file="dlib/cuda/tensor_abstract.h.html" name="tensor" include="dlib/cuda/tensor.h"/>
+         <term file="dlib/cuda/tensor_abstract.h.html" name="resizable_tensor" include="dlib/cuda/tensor.h"/>
+         <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor_instance" include="dlib/cuda/tensor.h"/>
+         <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor_const_instance" include="dlib/cuda/tensor.h"/>
+         <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor" include="dlib/cuda/tensor.h"/>
+         <term file="dlib/cuda/tensor_abstract.h.html" name="image_plane" include="dlib/cuda/tensor.h"/>
+         <term file="dlib/cuda/tensor_abstract.h.html" name="have_same_dimensions" include="dlib/cuda/tensor.h"/>
+         <term file="dlib/cuda/gpu_data_abstract.h.html" name="gpu_data" include="dlib/cuda/gpu_data.h"/>
          <term name="memcpy">
-            <term link="dlib/dnn/tensor_abstract.h.html#memcpy" name="for tensors"   include="dlib/dnn.h" />
-            <term link="dlib/dnn/gpu_data_abstract.h.html#memcpy" name="for gpu_data"   include="dlib/dnn.h" />
+            <term link="dlib/cuda/tensor_abstract.h.html#memcpy" name="for tensors"   include="dlib/cuda/tensor.h" />
+            <term link="dlib/cuda/gpu_data_abstract.h.html#memcpy" name="for gpu_data"   include="dlib/cuda/gpu_data.h" />
          </term>
 
          <term file="dlib/dnn/input_abstract.h.html" name="EXAMPLE_INPUT_LAYER" include="dlib/dnn.h"/>
@@ -173,7 +173,7 @@
 
          <term name="mat">
             <term link="linear_algebra.html#mat" name="general use"   include="dlib/matrix.h" />
-            <term link="dlib/dnn/tensor_abstract.h.html#mat" name="for tensors"   include="dlib/dnn.h" />
+            <term link="dlib/cuda/tensor_abstract.h.html#mat" name="for tensors"   include="dlib/cuda/tensor.h" />
          </term>
          <term file="linear_algebra.html" name="matrix" include="dlib/matrix.h"/>
          <term file="linear_algebra.html" name="move_rect" include="dlib/geometry.h"/>
@@ -739,7 +739,7 @@
          <term name="dot">
             <term link="dlib/matrix/matrix_utilities_abstract.h.html#dot" name="for matrix objects" include="dlib/matrix.h"/>
             <term link="dlib/svm/sparse_vector_abstract.h.html#dot" name="for sparse vectors" include="dlib/sparse_vector.h"/>
-            <term link="dlib/dnn/tensor_abstract.h.html#dot" name="for tensors" include="dlib/dnn.h"/>
+            <term link="dlib/cuda/tensor_abstract.h.html#dot" name="for tensors" include="dlib/cuda/tensor.h"/>
          </term>
 
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="lowerm"             include="dlib/matrix.h"/>
@@ -763,7 +763,7 @@
 
          <term name="is_vector">
             <term link="dlib/matrix/matrix_utilities_abstract.h.html#is_vector" name="for matrix objects"          include="dlib/matrix.h"/>
-            <term link="dlib/dnn/tensor_abstract.h.html#is_vector" name="for tensor objects"          include="dlib/dnn.h"/>
+            <term link="dlib/cuda/tensor_abstract.h.html#is_vector" name="for tensor objects"          include="dlib/cuda/tensor.h"/>
          </term>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_row_vector"      include="dlib/matrix.h"/>
          <term file="dlib/matrix/matrix_utilities_abstract.h.html" name="is_col_vector"      include="dlib/matrix.h"/>

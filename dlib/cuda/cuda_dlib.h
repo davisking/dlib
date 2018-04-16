@@ -409,6 +409,67 @@ namespace dlib
             size_t count_k
         );
 
+
+    // ----------------------------------------------------------------------------------------
+
+        class compute_loss_multiclass_log_per_pixel
+        {
+            /*!
+                The point of this class is to compute the loss computed by
+                loss_multiclass_log_per_pixel, but to do so with CUDA.
+            !*/
+        public:
+
+            compute_loss_multiclass_log_per_pixel(
+            )
+            {
+                work = device_global_buffer();
+            }
+
+            template <
+                typename const_label_iterator
+                >
+            void operator() (
+                const_label_iterator truth,
+                const tensor& subnetwork_output,
+                tensor& gradient,
+                double& loss
+            ) const
+            {
+                const size_t bytes_per_plane = subnetwork_output.nr()*subnetwork_output.nc()*sizeof(uint16_t);
+                // Allocate a cuda buffer to store all the truth images and also one float
+                // for the scalar loss output.
+                cuda_data_void_ptr buf = work->get(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
+
+                cuda_data_void_ptr loss_buf = buf;
+                buf = buf+sizeof(float);
+
+
+                // copy the truth data into a cuda buffer.
+                for (long i = 0; i < subnetwork_output.num_samples(); ++i, ++truth)
+                {
+                    const matrix<uint16_t>& t = *truth;
+                    DLIB_ASSERT(t.nr() == subnetwork_output.nr());
+                    DLIB_ASSERT(t.nc() == subnetwork_output.nc());
+                    memcpy(buf + i*bytes_per_plane, &t(0,0), bytes_per_plane);
+                }
+
+                do_work(static_cast<float*>(loss_buf.data()), static_cast<uint16_t*>(buf.data()), subnetwork_output, gradient, loss);
+            }
+
+        private:
+
+            static void do_work(
+                float* loss_cuda_work_buffer,
+                const uint16_t* truth_buffer,
+                const tensor& subnetwork_output,
+                tensor& gradient,
+                double& loss
+            );
+            
+            std::shared_ptr<resizable_cuda_buffer> work;
+        };
+
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 #define DLIB_DNn_SOLVERS_H_
 
 #include "solvers_abstract.h"
-#include "tensor.h"
+#include "../cuda/tensor.h"
 #include <iostream>
 #include "layers.h"
 

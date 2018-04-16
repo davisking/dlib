@@ -6,7 +6,7 @@
 #include "loss_abstract.h"
 #include "core.h"
 #include "../matrix.h"
-#include "tensor_tools.h"
+#include "../cuda/tensor_tools.h"
 #include "../geometry.h"
 #include "../image_processing/box_overlap_testing.h"
 #include "../image_processing/full_object_detection.h"
@@ -2407,6 +2407,13 @@ namespace dlib
                              "output size = " << output_tensor.nr() << " x " << output_tensor.nc());
             }
 
+
+#ifdef DLIB_USE_CUDA
+            double loss;
+            cuda_compute(truth, output_tensor, grad, loss);
+            return loss;
+#else
+
             tt::softmax(grad, output_tensor);
 
             // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
@@ -2445,6 +2452,7 @@ namespace dlib
                 }
             }
             return loss;
+#endif
         }
 
         friend void serialize(const loss_multiclass_log_per_pixel_& , std::ostream& out)
@@ -2478,6 +2486,10 @@ namespace dlib
             return ((sample * t.k() + k) * t.nr() + row) * t.nc() + column;
         }
 
+
+#ifdef DLIB_USE_CUDA
+        cuda::compute_loss_multiclass_log_per_pixel cuda_compute;
+#endif
     };
 
     template <typename SUBNET>

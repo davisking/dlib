@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include "../assert.h"
 
 namespace dlib
 {
@@ -45,11 +46,28 @@ namespace dlib
                     - returns the length of this buffer, in bytes.
             !*/
 
+            cuda_data_void_ptr operator+ (size_t offset) const 
+            /*!
+                requires
+                    - offset < size()
+                ensures
+                    - returns a pointer that is offset by the given amount.
+            !*/
+            { 
+                DLIB_CASSERT(offset < num);
+                cuda_data_void_ptr temp;
+                temp.num = num-offset;
+                temp.pdata = std::shared_ptr<void>(pdata, ((char*)pdata.get())+offset);
+                return temp;
+            }
+
         private:
 
             size_t num = 0;
             std::shared_ptr<void> pdata;
         };
+
+        inline cuda_data_void_ptr operator+(size_t offset, const cuda_data_void_ptr& rhs) { return rhs+offset; }
 
     // ------------------------------------------------------------------------------------
 
@@ -62,12 +80,27 @@ namespace dlib
                 - dest == a pointer to at least src.size() bytes on the host machine.
             ensures
                 - copies the GPU data from src into dest.
+                - This routine is equivalent to performing: memcpy(dest,src,src.size())
+        !*/
+
+        void memcpy(
+            void* dest,
+            const cuda_data_void_ptr& src,
+            const size_t num
+        );
+        /*!
+            requires
+                - dest == a pointer to at least num bytes on the host machine.
+                - num <= src.size()
+            ensures
+                - copies the GPU data from src into dest.  Copies only the first num bytes
+                  of src to dest.
         !*/
 
     // ------------------------------------------------------------------------------------
 
         void memcpy(
-            cuda_data_void_ptr& dest, 
+            cuda_data_void_ptr dest, 
             const void* src
         );
         /*!
@@ -75,6 +108,21 @@ namespace dlib
                 - dest == a pointer to at least src.size() bytes on the host machine.
             ensures
                 - copies the host data from src to the GPU memory buffer dest.
+                - This routine is equivalent to performing: memcpy(dest,src,dest.size())
+        !*/
+
+        void memcpy(
+            cuda_data_void_ptr dest, 
+            const void* src,
+            const size_t num
+        );
+        /*!
+            requires
+                - dest == a pointer to at least num bytes on the host machine.
+                - num <= dest.size()
+            ensures
+                - copies the host data from src to the GPU memory buffer dest.  Copies only
+                  the first num bytes of src to dest.
         !*/
 
     // ------------------------------------------------------------------------------------
@@ -160,8 +208,12 @@ namespace dlib
             cuda_data_void_ptr get(size_t size)
             /*!
                 ensures
-                    - This object will return the buffer of requested size of larger
+                    - This object will return the buffer of requested size or larger.
                     - buffer.size() >= size
+                    - Client code should not hold the returned cuda_data_void_ptr for long
+                      durations, but instead should call get() whenever the buffer is
+                      needed.  Doing so ensures that multiple buffers are not kept around
+                      in the event of a resize.
             !*/
             {
                 if (buffer.size() < size)
@@ -174,6 +226,26 @@ namespace dlib
         private:
             cuda_data_void_ptr buffer;
         };
+
+    // ----------------------------------------------------------------------------------------
+
+        std::shared_ptr<resizable_cuda_buffer> device_global_buffer(
+        );
+        /*!
+            ensures
+                - Returns a pointer to a globally shared CUDA memory buffer on the
+                  currently selected CUDA device.  The buffer is also thread local.  So
+                  each host thread will get its own buffer.  You can use this global buffer
+                  as scratch space for CUDA computations that all take place on the default
+                  stream.  Using it in this way ensures that there aren't any race conditions
+                  involving the use of the buffer.
+                - The global buffer is deallocated once all references to it are
+                  destructed.  It will be reallocated as required.  So if you want to avoid
+                  these reallocations then hold a copy of the shared_ptr returned by this
+                  function.
+        !*/
+
+    // ----------------------------------------------------------------------------------------
 
     }
 }

@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-#include "../dnn/tensor_tools.h"
+#include "../cuda/tensor_tools.h"
 
 #include "tester.h"
 

@@ -4,13 +4,13 @@
 #define DLIB_DNn_LAYERS_H_
 
 #include "layers_abstract.h"
-#include "tensor.h"
+#include "../cuda/tensor.h"
 #include "core.h"
 #include <iostream>
 #include <string>
 #include "../rand.h"
 #include "../string.h"
-#include "tensor_tools.h"
+#include "../cuda/tensor_tools.h"
 #include "../vectorstream.h"
 #include "utilities.h"
 #include <sstream>

@@ -119,55 +119,6 @@ namespace dlib
         }
     // ------------------------------------------------------------------------------------
 
-        class cudnn_device_buffer
-        {
-        public:
-            // not copyable
-            cudnn_device_buffer(const cudnn_device_buffer&) = delete;
-            cudnn_device_buffer& operator=(const cudnn_device_buffer&) = delete;
-
-            cudnn_device_buffer()
-            {
-                buffers.resize(16);
-            }
-            ~cudnn_device_buffer()
-            {
-            }
-
-            std::shared_ptr<resizable_cuda_buffer> get_buffer (
-            )
-            {
-                int new_device_id;
-                CHECK_CUDA(cudaGetDevice(&new_device_id));
-                // make room for more devices if needed
-                if (new_device_id >= (long)buffers.size())
-                    buffers.resize(new_device_id+16);
-
-                // If we don't have a buffer already for this device then make one
-                std::shared_ptr<resizable_cuda_buffer> buff = buffers[new_device_id].lock();
-                if (!buff)
-                {
-                    buff = std::make_shared<resizable_cuda_buffer>();
-                    buffers[new_device_id] = buff;
-                }
-
-                // Finally, return the buffer for the current device
-                return buff;
-            }
-
-        private:
-
-            std::vector<std::weak_ptr<resizable_cuda_buffer>> buffers;
-        };
-
-
-        static std::shared_ptr<resizable_cuda_buffer> device_global_buffer()
-        {
-            thread_local cudnn_device_buffer buffer;
-            return buffer.get_buffer();
-        }
-    // ------------------------------------------------------------------------------------
-
         class cudnn_activation_descriptor
         {
         public:
