@@ -9,6 +9,8 @@
 import sys
 import pickle
 import dlib
+import numpy as np
+
 if len(sys.argv) != 2:
     print(
         "Call this program like this:\n"
@@ -29,5 +31,4 @@ with open("shape.pkl", "wb") as shape_file:
     pickle.dump(shape, shape_file)
 
 face_chip = dlib.get_face_chip(img, shape)
-with open("test_face_chip.pkl", "wb") as face_chip_file:
-    pickle.dump(face_chip, face_chip_file)
+np.save("test_face_chip", face_chip)
