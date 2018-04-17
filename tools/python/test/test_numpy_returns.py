@@ -4,10 +4,14 @@ import pickle
 import numpy
 import pytest
 
+image_path = "examples/faces/Tom_Cruise_avp_2014_4.jpg"
+shape_path = "tools/python/test/shape.pkl"
+face_chip_path = "tools/python/test/test_face_chip.pkl"
+
 def get_test_image_and_shape():
-    img = dlib.load_rgb_image("Tom_Cruise_avp_2014_4.jpg")
+    img = dlib.load_rgb_image(image_path)
     shape = None
-    with open("shape.pkl", "rb") as shape_file:
+    with open(shape_path, "rb") as shape_file:
         shape = pickle.load(shape_file) 
     return img, shape
  
@@ -23,12 +27,12 @@ def get_test_face_chip():
  
 def test_get_face_chip():
     face_chip = get_test_face_chip()
-    expected = numpy.load("test_face_chip.pkl")
+    expected = numpy.load(face_chip_path)
     assert numpy.array_equal(face_chip, expected)
 
 def test_get_face_chips():
     face_chips = get_test_face_chips()
-    expected = numpy.load("test_face_chip.pkl")
+    expected = numpy.load(face_chip_path)
     assert numpy.array_equal(face_chips[0], expected)
 
 def test_regression_issue_1220_get_face_chip():
