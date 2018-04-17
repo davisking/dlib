@@ -7,9 +7,9 @@
 #   via the command:
 #       pip install numpy
 import sys
-import pickle
 import dlib
 import numpy as np
+import utils
 
 if len(sys.argv) != 2:
     print(
@@ -27,8 +27,7 @@ img = dlib.load_rgb_image("../../../examples/faces/Tom_Cruise_avp_2014_4.jpg")
 dets = detector(img)
 shape = predictor(img, dets[0])
 
-with open("shape.pkl", "wb") as shape_file:
-    pickle.dump(shape, shape_file)
+utils.save_pickled_compatible(shape, "shape.pkl")
 
 face_chip = dlib.get_face_chip(img, shape)
 np.save("test_face_chip", face_chip)
