@@ -785,13 +785,16 @@ namespace dlib
             // make sure one side of the bracket isn't super huge compared to the other
             // side.  If it is then contract it.
             const double bracket_ratio = abs(p1-p2)/abs(p2-p3);
-            if ( !( bracket_ratio < 10 && bracket_ratio > 0.1) )
-            {
-                // Force p_min to be on a reasonable side.  But only if lagrange_poly_min_extrap()
-                // didn't put it on a good side already.
-                if (bracket_ratio > 1 && p_min > p2)
+            // Force p_min to be on a reasonable side.  But only if lagrange_poly_min_extrap()
+            // didn't put it on a good side already.
+            if (bracket_ratio >= 10)
+            { 
+                if (p_min > p2)
                     p_min = (p1+p2)/2;
-                else if (p_min < p2)
+            }
+            else if (bracket_ratio <= 0.1) 
+            {
+                if (p_min < p2)
                     p_min = (p2+p3)/2;
             }
 
