@@ -195,7 +195,10 @@ namespace dlib
         double f_x2
     )
     {
-        DLIB_ASSERT(0 < x1 && x1 < x2,"Invalid inputs were given to this function");
+        DLIB_ASSERT(0 < x1 && x1 < x2,"Invalid inputs were given to this function.\n"
+            << "x1: " << x1 
+            << "    x2: " << x2 
+            );
         // The contents of this function follow the equations described on page 58 of the
         // book Numerical Optimization by Nocedal and Wright, second edition.
         matrix<double,2,2> m;
