@@ -1154,10 +1154,10 @@ namespace dlib
                 nc_ = nc;
             }
 
-            std::unique_ptr<T[]> steal_memory()
+            std::unique_ptr<double[]> steal_memory()
             {
                 DLIB_CASSERT(!owned_by_matlab, "You can't steal the memory from a matrix if it's owned by MATLAB.");
-                std::unique_ptr<T[]> ret(data);
+                std::unique_ptr<double[]> ret(data);
                 data = nullptr;
                 nr_ = 0;
                 nc_ = 0;
@@ -1307,10 +1307,10 @@ namespace dlib
                 nc_ = nc;
             }
 
-            std::unique_ptr<T[]> steal_memory()
+            std::unique_ptr<float[]> steal_memory()
             {
                 DLIB_CASSERT(!owned_by_matlab, "You can't steal the memory from a matrix if it's owned by MATLAB.");
-                std::unique_ptr<T[]> ret(data);
+                std::unique_ptr<float[]> ret(data);
                 data = nullptr;
                 nr_ = 0;
                 nc_ = 0;
