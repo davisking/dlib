@@ -21,7 +21,7 @@ if len(sys.argv) != 2:
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(sys.argv[1])
 
-img = dlib.load_rgb_image("../../../examples/faces/Tom_Cruise_avp_2014_4.jpg")
+img = dlib.load_rgb_image("Tom_Cruise_avp_2014_4.jpg")
 dets = detector(img)
 shape = predictor(img, dets[0])
 

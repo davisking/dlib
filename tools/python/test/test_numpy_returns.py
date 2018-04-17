@@ -5,7 +5,7 @@ import numpy
 import pytest
 
 def get_test_image_and_shape():
-    img = dlib.load_rgb_image("../../../examples/faces/Tom_Cruise_avp_2014_4.jpg")
+    img = dlib.load_rgb_image("Tom_Cruise_avp_2014_4.jpg")
     shape = None
     with open("shape.pkl", "rb") as shape_file:
         shape = pickle.load(shape_file) 
