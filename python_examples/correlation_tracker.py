@@ -32,16 +32,14 @@
 #   command:
 #       sudo apt-get install cmake
 #
-#   Also note that this example requires scikit-image which can be installed
+#   Also note that this example requires Numpy which can be installed
 #   via the command:
-#       pip install scikit-image
-#   Or downloaded from http://scikit-image.org/download.html. 
+#       pip install numpy
 
 import os
 import glob
 
 import dlib
-from skimage import io
 
 # Path to the video frames
 video_folder = os.path.join("..", "examples", "video_frames")
@@ -54,7 +52,7 @@ win = dlib.image_window()
 # We will track the frames as we load them off of disk
 for k, f in enumerate(sorted(glob.glob(os.path.join(video_folder, "*.jpg")))):
     print("Processing Frame {}".format(k))
-    img = io.imread(f)
+    img = dlib.load_rgb_image(f)
 
     # We need to initialize the tracker on the first frame
     if k == 0:

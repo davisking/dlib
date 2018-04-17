@@ -37,16 +37,12 @@ find_package(PythonInterp)
 if(PYTHONINTERP_FOUND)
    execute_process( COMMAND ${PYTHON_EXECUTABLE} -c "import numpy" OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE NUMPYRC)
    if(NUMPYRC EQUAL 1)
-      message(WARNING "Numpy not found. Functions that return numpy arrays will throw exceptions!")
+      message(WARNING "Numpy not found. Functions that return numpy arrays will not work without Numpy installed!")
    else()
       message(STATUS "Found Python with installed numpy package")
-      execute_process( COMMAND ${PYTHON_EXECUTABLE} -c "import sys; from numpy import get_include; sys.stdout.write(get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE_PATH)
-      message(STATUS "Numpy include path '${NUMPY_INCLUDE_PATH}'")
-      include_directories(${NUMPY_INCLUDE_PATH})
    endif()
 else()
-   message(WARNING "Numpy not found. Functions that return numpy arrays will throw exceptions!")
-   set(NUMPYRC 1)
+   message(WARNING "Numpy not found. Functions that return numpy arrays will not work without Numpy installed!")
 endif()
 
 add_definitions(-DDLIB_VERSION=${DLIB_VERSION})
@@ -73,14 +69,8 @@ set(python_srcs
    src/cnn_face_detector.cpp
    src/global_optimization.cpp
    src/image_dataset_metadata.cpp
+   src/numpy_returns.cpp
 )
-
-# Only add the Numpy returning functions if Numpy is present
-if(NUMPYRC EQUAL 1)
-   list(APPEND python_srcs src/numpy_returns_stub.cpp)
-else()
-   list(APPEND python_srcs src/numpy_returns.cpp)
-endif()
 
 # Only add the GUI module if requested
 if(NOT ${DLIB_NO_GUI_SUPPORT})

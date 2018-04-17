@@ -28,16 +28,14 @@
 #   command:
 #       sudo apt-get install cmake
 #
-#   Also note that this example requires scikit-image which can be installed
+#   Also note that this example requires Numpy which can be installed
 #   via the command:
-#       pip install scikit-image
-#   Or downloaded from http://scikit-image.org/download.html. 
+#       pip install numpy
 
 import sys
 import os
 import dlib
 import glob
-from skimage import io
 
 if len(sys.argv) != 5:
     print(
@@ -66,7 +64,7 @@ images = []
 # Now find all the faces and compute 128D face descriptors for each face.
 for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
     print("Processing file: {}".format(f))
-    img = io.imread(f)
+    img = dlib.load_rgb_image(f)
 
     # Ask the detector to find the bounding boxes of each face. The 1 in the
     # second argument indicates that we should upsample the image 1 time. This
