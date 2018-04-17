@@ -1169,6 +1169,12 @@ namespace dlib
 
         }
 
+        std::unique_ptr<T[]> steal_memory(
+        )
+        {
+            return data.steal_memory();
+        }
+
         matrix& operator=(const std::initializer_list<T>& l)
         {
             matrix temp(l);

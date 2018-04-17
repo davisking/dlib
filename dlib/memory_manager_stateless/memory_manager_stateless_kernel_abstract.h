@@ -4,6 +4,7 @@
 #ifdef DLIB_MEMORY_MANAGER_STATELESs_ABSTRACT_
 
 #include "../algs.h"
+#include <memory>
 
 namespace dlib
 {
@@ -113,9 +114,39 @@ namespace dlib
             /*!
                 ensures
                     - this function has no effect on *this or item.  It is just provided 
-                      to make this object's interface more compatable with the other 
+                      to make this object's interface more compatible with the other 
                       memory managers.
             !*/ 
+
+            std::unique_ptr<T> extract(
+                T* item
+            );
+            /*!
+                requires
+                    - item == is a pointer to memory that was obtained from a call to
+                      allocate(). 
+                ensures
+                    - returns a unique_ptr that owns item.  That is, if the returned ptr is
+                      PTR then PTR.get() == item.  Therefore, this function extracts item
+                      from the memory manager's internal pool.  Therefore, you shouldn't 
+                      call deallocate(item) after this.
+                    - Note that not all memory managers implement extract().
+            !*/
+
+            std::unique_ptr<T[]> extract_array(
+                T* item
+            );
+            /*!
+                requires
+                    - item == is a pointer to memory that was obtained from a call to
+                      allocate_array(). 
+                ensures
+                    - returns a unique_ptr that owns item.  That is, if the returned ptr is
+                      PTR then PTR.get() == item.  Therefore, this function extracts item
+                      from the memory manager's internal pool.  Therefore, you shouldn't 
+                      call deallocate_array(item) after this.
+                    - Note that not all memory managers implement extract().
+            !*/
 
         private:
 
