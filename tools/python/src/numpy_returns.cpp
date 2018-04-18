@@ -10,7 +10,7 @@ using namespace std;
 
 namespace py = pybind11;
 
-py::array_t<uint8_t> convert_to_numpy(matrix<rgb_pixel> &rgb_image)
+py::array_t<uint8_t> convert_to_numpy(matrix<rgb_pixel>&& rgb_image)
 {
     const size_t dtype_size = sizeof(uint8_t);
     const auto rows = static_cast<const size_t>(num_rows(rgb_image));
@@ -39,7 +39,7 @@ py::array_t<uint8_t> load_rgb_image (const std::string &path)
 {
     matrix<rgb_pixel> img;
     load_image(img, path);
-    return convert_to_numpy(img);
+    return convert_to_numpy(std::move(img));
 }
 
 bool has_ending (std::string const full_string, std::string const &ending) {
@@ -95,7 +95,7 @@ py::list get_jitter_images(py::object img, size_t num_jitters = 1, bool disturb_
             dlib::disturb_colors(crop, rnd_jitter);
         
         // Convert image to Numpy array
-        py::array_t<uint8_t> arr = convert_to_numpy(crop);
+        py::array_t<uint8_t> arr = convert_to_numpy(std::move(crop));
                 
         // Append image to jittered image list
         jitter_list.append(arr);
@@ -131,7 +131,7 @@ py::list get_face_chips (
     for (auto& chip : face_chips) 
     {
         // Convert image to Numpy array
-        py::array_t<uint8_t> arr = convert_to_numpy(chip);
+        py::array_t<uint8_t> arr = convert_to_numpy(std::move(chip));
 
         // Append image to chips list
         chips_list.append(arr);
@@ -151,7 +151,7 @@ py::array_t<uint8_t> get_face_chip (
 
     matrix<rgb_pixel> chip;
     extract_image_chip(numpy_rgb_image(img), get_face_chip_details(face, size, padding), chip);
-    return convert_to_numpy(chip);
+    return convert_to_numpy(std::move(chip));
 }
 
 // ----------------------------------------------------------------------------------------
