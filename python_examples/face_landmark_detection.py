@@ -45,16 +45,14 @@
 #   command:
 #       sudo apt-get install cmake
 #
-#   Also note that this example requires scikit-image which can be installed
+#   Also note that this example requires Numpy which can be installed
 #   via the command:
-#       pip install scikit-image
-#   Or downloaded from http://scikit-image.org/download.html. 
+#       pip install numpy
 
 import sys
 import os
 import dlib
 import glob
-from skimage import io
 
 if len(sys.argv) != 3:
     print(
@@ -76,7 +74,7 @@ win = dlib.image_window()
 
 for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
     print("Processing file: {}".format(f))
-    img = io.imread(f)
+    img = dlib.load_rgb_image(f)
 
     win.clear_overlay()
     win.set_image(img)

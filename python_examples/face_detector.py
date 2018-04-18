@@ -37,23 +37,20 @@
 #   command:
 #       sudo apt-get install cmake
 #
-#   Also note that this example requires scikit-image which can be installed
+#   Also note that this example requires Numpy which can be installed
 #   via the command:
-#       pip install scikit-image
-#   Or downloaded from http://scikit-image.org/download.html. 
+#       pip install numpy
 
 import sys
 
 import dlib
-from skimage import io
-
 
 detector = dlib.get_frontal_face_detector()
 win = dlib.image_window()
 
 for f in sys.argv[1:]:
     print("Processing file: {}".format(f))
-    img = io.imread(f)
+    img = dlib.load_rgb_image(f)
     # The 1 in the second argument indicates that we should upsample the image
     # 1 time.  This will make everything bigger and allow us to detect more
     # faces.
@@ -76,7 +73,7 @@ for f in sys.argv[1:]:
 # Also, the idx tells you which of the face sub-detectors matched.  This can be
 # used to broadly identify faces in different orientations.
 if (len(sys.argv[1:]) > 0):
-    img = io.imread(sys.argv[1])
+    img = dlib.load_rgb_image(sys.argv[1])
     dets, scores, idx = detector.run(img, 1, -1)
     for i, d in enumerate(dets):
         print("Detection {}, score: {}, face_type:{}".format(

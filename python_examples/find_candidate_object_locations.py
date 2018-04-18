@@ -31,18 +31,14 @@
 #   command:
 #       sudo apt-get install cmake
 #
-#   Also note that this example requires scikit-image which can be installed
+#   Also note that this example requires Numpy which can be installed
 #   via the command:
-#       pip install scikit-image
-#   Or downloaded from http://scikit-image.org/download.html. 
-
-
+#       pip install numpy 
 
 import dlib
-from skimage import io
 
 image_file = '../examples/faces/2009_004587.jpg'
-img = io.imread(image_file)
+img = dlib.load_rgb_image(image_file)
 
 # Locations of candidate objects will be saved into rects
 rects = []

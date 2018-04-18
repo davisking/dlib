@@ -33,14 +33,12 @@
 #   command:
 #       sudo apt-get install cmake
 #
-#   Also note that this example requires scikit-image which can be installed
+#   Also note that this example requires Numpy which can be installed
 #   via the command:
-#       pip install scikit-image
-#   Or downloaded from http://scikit-image.org/download.html.
+#       pip install numpy
 
 import sys
 import dlib
-from skimage import io
 
 if len(sys.argv) < 3:
     print(
@@ -55,7 +53,7 @@ win = dlib.image_window()
 
 for f in sys.argv[2:]:
     print("Processing file: {}".format(f))
-    img = io.imread(f)
+    img = dlib.load_rgb_image(f)
     # The 1 in the second argument indicates that we should upsample the image
     # 1 time.  This will make everything bigger and allow us to detect more
     # faces.
