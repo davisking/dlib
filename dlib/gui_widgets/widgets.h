@@ -3577,6 +3577,8 @@ namespace dlib
         std::vector<overlay_line> overlay_lines;
         std::vector<overlay_circle> overlay_circles;
 
+        unsigned long auto_part_num = 0;
+
         long zoom_in_scale;
         long zoom_out_scale;
         bool drawing_rect;
