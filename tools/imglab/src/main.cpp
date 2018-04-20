@@ -21,7 +21,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.13";
+const char* VERSION = "1.14";
 
 
 
