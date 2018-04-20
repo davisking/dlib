@@ -2349,7 +2349,12 @@ namespace dlib
                 can also add part labels (if they have been defined by calling add_labelable_part_name())
                 by selecting an overlay rectangle with the mouse and then right clicking
                 on the part.  If you want to move any rectangle or an object part then
-                shift+right click and drag it.
+                shift+right click and drag it.  Alternatively, if you haven't added any
+                part labels via add_labelable_part_name() you can add parts to a rectangle
+                by simply shift left clicking while it's selected.  This will add parts
+                with integer names and the integer names begin with 0 and increase. This
+                feature is only activated if the rectangle has no parts or all the parts
+                are already integer names.
                 
                 Finally, if you hold Ctrl and left click an overlay rectangle it will
                 change its label to get_default_overlay_rect_label() and color to

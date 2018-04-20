@@ -6054,11 +6054,11 @@ namespace dlib
         point c1 = loc - origin;
         if (zoom_in_scale != 1)
         {
-            c1 = c1/(double)zoom_in_scale;
+            c1 = c1/zoom_in_scale;
         }
         else if (zoom_out_scale != 1)
         {
-            c1 = c1*(double)zoom_out_scale;
+            c1 = c1*zoom_out_scale;
         }
 
         overlay_rects[selected_rect].parts[part_name] = c1;
@@ -6486,6 +6486,56 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace 
+    {
+        
+        bool only_contains_equal_sized_int_strings(
+            const std::map<std::string,point>& parts
+        )
+        {
+            if (parts.size() == 0)
+                return true;
+
+            const size_t string_size = parts.begin()->first.size();
+            for (const auto& p : parts)
+            {
+                if (p.first.size() != string_size)
+                    return false;
+                for (auto ch : p.first)
+                    if (!std::isdigit(ch))
+                        return false;
+            }
+            return true;
+        }
+
+        void zero_pad_part_names (
+            std::map<std::string,point>& parts
+        )
+        {
+            if (parts.size() < 5)
+                return;
+
+            const size_t num_digits_required = 1+std::floor(std::log10(parts.size()-1));
+            // if the first thing in the map has the right number of digits then assume
+            // everything is fine.
+            if (parts.begin()->first.size() == num_digits_required)
+                return;
+
+            std::map<std::string,point> new_parts;
+
+            for (auto& p : parts)
+            {
+                auto key = p.first;
+                while (key.size() < num_digits_required)
+                    key = '0' + key;
+                new_parts[key] = p.second;
+            }
+
+            parts.swap(new_parts);
+        }
+
+    }
+
     void image_display::
     on_mouse_down (
         unsigned long btn,
@@ -6506,6 +6556,60 @@ namespace dlib
             holding_shift_key = false;
             parent.invalidate_rectangle(rect);
         }
+
+        // if the user shift left clicks when a rect is selected add a part annotation, but
+        // only if they haven't explicitly indicated part names.  If they have part names
+        // then make them pick them from the right click menu.  But if they haven't set
+        // part names then we will automatically create integer numbered parts starting from 0.
+        // We will also only allow auto part numbering if all the parts are already
+        // numbers.
+        if (btn == base_window::LEFT && (state&base_window::SHIFT) && rect_is_selected &&
+            part_names.size() == 0 && only_contains_equal_sized_int_strings(overlay_rects[selected_rect].parts))
+        {
+            // Find the next part name.  Just find the next unused integer starting from 0.
+            int part_num = 0;
+            size_t num_digits_required = 0;
+            for (const auto& p : overlay_rects[selected_rect].parts)
+            {
+                num_digits_required = p.first.size();
+                const int num = std::atoi(p.first.c_str());
+                if (num != part_num)
+                    break;
+                ++part_num;
+            }
+            std::string part_name = std::to_string(part_num);
+            // pad part name so it's the same length as the other parts.
+            while (part_name.size() < num_digits_required)
+                part_name = '0' + part_name;
+
+
+            const point loc(x,y);
+
+            // Transform loc from gui window space into the space used by the overlay
+            // rectangles (i.e. relative to the raw image)
+            const point origin(total_rect().tl_corner());
+            point c1 = loc - origin;
+            if (zoom_in_scale != 1)
+            {
+                c1 = c1/zoom_in_scale;
+            }
+            else if (zoom_out_scale != 1)
+            {
+                c1 = c1*zoom_out_scale;
+            }
+
+            overlay_rects[selected_rect].parts[part_name] = c1;
+
+            zero_pad_part_names(overlay_rects[selected_rect].parts);
+            parent.invalidate_rectangle(rect); 
+
+
+            if (event_handler.is_set())
+                event_handler();
+
+            return;
+        }
+
 
         if (rect.contains(x,y) == false || hidden || !enabled)
             return;
@@ -6530,7 +6634,6 @@ namespace dlib
         if (btn == base_window::RIGHT && (state&base_window::SHIFT))
         {
             const bool rect_was_selected = rect_is_selected;
-            rect_is_selected = false;
             parts_menu.disable();
 
             long best_dist = std::numeric_limits<long>::max();
