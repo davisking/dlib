@@ -64,6 +64,8 @@ namespace dlib
 
         typedef T type;
         typedef mem_manager mem_manager_type;
+        typedef T*          iterator;       
+        typedef const T*    const_iterator; 
          
         // ----------------------------------------
 
@@ -253,6 +255,42 @@ namespace dlib
                   interfaces might have padding at the ends of their
                   rows and therefore might return larger numbers.
                   An example of such an object is the dlib::cv_image.
+        !*/
+
+        iterator begin(
+        );
+        /*!
+            ensures
+                - returns a random access iterator pointing to the first element in this
+                  object.
+                - The iterator will iterate over the elements of the object in row major
+                  order.
+        !*/
+
+        iterator end(
+        );
+        /*!
+            ensures
+                - returns a random access iterator pointing to one past the end of the last
+                  element in this object.
+        !*/
+
+        const_iterator begin(
+        ) const;
+        /*!
+            ensures
+                - returns a random access iterator pointing to the first element in this
+                  object.
+                - The iterator will iterate over the elements of the object in row major
+                  order.
+        !*/
+
+        const_iterator end(
+        ) const;
+        /*!
+            ensures
+                - returns a random access iterator pointing to one past the end of the last
+                  element in this object.
         !*/
 
     };

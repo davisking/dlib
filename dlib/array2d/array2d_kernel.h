@@ -60,6 +60,9 @@ namespace dlib
          
         typedef T type;
         typedef mem_manager mem_manager_type;
+        typedef T*          iterator;       
+        typedef const T*    const_iterator; 
+
 
         // -----------------------------------
 
@@ -320,6 +323,27 @@ namespace dlib
         {
             return nc_*sizeof(T);
         }
+
+        iterator begin() 
+        {
+            return data;
+        }
+
+        iterator end()
+        {
+            return data+size();
+        }
+
+        const_iterator begin()  const
+        {
+            return data;
+        }
+
+        const_iterator end() const
+        {
+            return data+size();
+        }
+
 
     private:
 
