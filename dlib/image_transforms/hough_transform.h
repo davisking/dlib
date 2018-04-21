@@ -346,6 +346,19 @@ namespace dlib
             }
         }
 
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        void operator() (
+            const in_image_type& img_,
+            out_image_type& himg_
+        ) const
+        {
+            rectangle box(0,0, num_columns(img_)-1, num_rows(img_)-1);
+            (*this)(img_, box, himg_);
+        }
+
     private:
 
         unsigned long _size;

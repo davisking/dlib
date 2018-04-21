@@ -137,6 +137,26 @@ namespace dlib
                   y-axis the distance of the line from the center of the box.
         !*/
 
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        void operator() (
+            const in_image_type& img,
+            out_image_type& himg
+        ) const;
+        /*!
+            requires
+                - in_image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+                - out_image_type == an image object that implements the interface defined in
+                  dlib/image_processing/generic_image.h and it must contain grayscale pixels.
+                - num_rows(img) == size()
+                - num_columns(img) == size()
+            ensures
+                - performs: (*this)(img, get_rect(img), himg);
+                  That is, just runs the hough transform on the whole input image.
+        !*/
     };
 }
 
