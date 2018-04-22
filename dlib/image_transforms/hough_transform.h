@@ -59,7 +59,7 @@ namespace dlib
             }
         }
 
-        unsigned long size(
+        inline unsigned long size(
         ) const { return _size; }
 
         long nr(
@@ -254,7 +254,7 @@ namespace dlib
             typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
 
             DLIB_CASSERT(box.width() == size() && box.height() == size(),
-                "\t hough_transform::hough_transform(size_)"
+                "\t void hough_transform::operator()"
                 << "\n\t Invalid arguments given to this function."
                 << "\n\t box.width():  " << box.width()
                 << "\n\t box.height(): " << box.height()
@@ -270,16 +270,127 @@ namespace dlib
             himg.set_size(size(), size());
             assign_all_pixels(himg, 0);
 
+            auto record_hit = [&](const point& hough_point, const point& /*img_point*/, const in_pixel_type& val)
+            {
+                himg[hough_point.y()][hough_point.x()] += val;
+            };
+            perform_hough_transform(img_, box, record_hit);
+        }
+
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        void operator() (
+            const in_image_type& img_,
+            out_image_type& himg_
+        ) const
+        {
+            rectangle box(0,0, num_columns(img_)-1, num_rows(img_)-1);
+            (*this)(img_, box, himg_);
+        }
+
+        template <
+            typename in_image_type
+            >
+        std::vector<std::vector<point>> find_pixels_voting_for_lines (
+            const in_image_type& img,
+            const rectangle& box,
+            const std::vector<point>& hough_points
+        ) const
+        {
+
+            typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+
+            DLIB_CASSERT(box.width() == size() && box.height() == size(),
+                "\t std::vector<std::vector<point>> hough_transform::find_pixels_voting_for_lines()"
+                << "\n\t Invalid arguments given to this function."
+                << "\n\t box.width():  " << box.width()
+                << "\n\t box.height(): " << box.height()
+                << "\n\t size():       " << size()
+                );
+#ifdef ENABLE_ASSERTS
+            for (auto& p : hough_points)
+                DLIB_CASSERT(get_rect(*this).contains(p), 
+                    "You gave a hough_points that isn't actually in the Hough space of this object."
+                    "\n\t get_rect(*this): "<< get_rect(*this) 
+                    "\n\t p: "<< p 
+                    );
+#endif
+
+            std::vector<std::vector<point>> constituent_points(hough_points.size());
+
+            // make a map that lets us look up in constant time if a hough point is in the
+            // constituent_points output and if so where.
+            matrix<uint32> hmap(size(),size());
+            hmap = hough_points.size();
+            for (size_t i = 0; i < hough_points.size(); ++i)
+                hmap(hough_points[i].y(),hough_points[i].x()) = i;
+
+            // record that this image point voted for this Hough point
+            auto record_hit = [&](const point& hough_point, const point& img_point, in_pixel_type)
+            {
+                auto idx = hmap(hough_point.y(), hough_point.x());
+                if (idx < constituent_points.size())
+                    constituent_points[idx].push_back(img_point);
+            };
+
+            perform_hough_transform(img, box, record_hit);
+
+            return constituent_points;
+        }
+
+        template <
+            typename in_image_type
+            >
+        std::vector<std::vector<point>> find_pixels_voting_for_lines (
+            const in_image_type& img,
+            const std::vector<point>& hough_points
+        ) const
+        {
+            rectangle box(0,0, num_columns(img)-1, num_rows(img)-1);
+            return find_pixels_voting_for_lines(img, box, hough_points);
+        }
+
+    private:
+
+        template <
+            typename in_image_type,
+            typename record_hit_function_type
+            >
+        void perform_hough_transform (
+            const in_image_type& img_,
+            const rectangle& box,
+            record_hit_function_type record_hit
+        ) const
+        {
+
+            typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
+
+            DLIB_ASSERT(box.width() == size() && box.height() == size(),
+                "\t void hough_transform::perform_hough_transform()"
+                << "\n\t Invalid arguments given to this function."
+                << "\n\t box.width():  " << box.width()
+                << "\n\t box.height(): " << box.height()
+                << "\n\t size():       " << size()
+                );
+
+            COMPILE_TIME_ASSERT(pixel_traits<in_pixel_type>::grayscale == true);
+
+
+            const_image_view<in_image_type> img(img_);
+
+
             const rectangle area = box.intersect(get_rect(img));
 
-            const long max_n8 = (himg.nc()/8)*8;
-            const long max_n4 = (himg.nc()/4)*4;
+            const long max_n8 = (size()/8)*8;
+            const long max_n4 = (size()/4)*4;
             for (long r = area.top(); r <= area.bottom(); ++r)
             {
                 const int32* ysin_base = &ysin_theta(r-box.top(),0);
                 for (long c = area.left(); c <= area.right(); ++c)
                 {
-                    const out_pixel_type val = static_cast<out_pixel_type>(img[r][c]);
+                    const auto val = img[r][c];
                     if (val != 0)
                     {
                         /*
@@ -290,12 +401,13 @@ namespace dlib
                         const point cent = center(box);
                         const long x = c - cent.x();
                         const long y = r - cent.y();
-                        for (long t = 0; t < himg.nc(); ++t)
+                        for (long t = 0; t < size(); ++t)
                         {
                             double theta = t*pi/even_size;
                             double radius = (x*std::cos(theta) + y*std::sin(theta))/sqrt_2 + even_size/2 + 0.5;
                             long rr = static_cast<long>(radius);
-                            himg[rr][t] += val;
+
+                            record_hit(point(t,rr), point(c,r), val);
                         }
                         continue;
                         */
@@ -316,14 +428,14 @@ namespace dlib
                             long rr6 = (*xcos++ + *ysin++)>>16;
                             long rr7 = (*xcos++ + *ysin++)>>16;
 
-                            himg[rr0][t++] += val;
-                            himg[rr1][t++] += val;
-                            himg[rr2][t++] += val;
-                            himg[rr3][t++] += val;
-                            himg[rr4][t++] += val;
-                            himg[rr5][t++] += val;
-                            himg[rr6][t++] += val;
-                            himg[rr7][t++] += val;
+                            record_hit(point(t++,rr0), point(c,r), val);
+                            record_hit(point(t++,rr1), point(c,r), val);
+                            record_hit(point(t++,rr2), point(c,r), val);
+                            record_hit(point(t++,rr3), point(c,r), val);
+                            record_hit(point(t++,rr4), point(c,r), val);
+                            record_hit(point(t++,rr5), point(c,r), val);
+                            record_hit(point(t++,rr6), point(c,r), val);
+                            record_hit(point(t++,rr7), point(c,r), val);
                         }
                         while(t < max_n4)
                         {
@@ -331,35 +443,20 @@ namespace dlib
                             long rr1 = (*xcos++ + *ysin++)>>16;
                             long rr2 = (*xcos++ + *ysin++)>>16;
                             long rr3 = (*xcos++ + *ysin++)>>16;
-                            himg[rr0][t++] += val;
-                            himg[rr1][t++] += val;
-                            himg[rr2][t++] += val;
-                            himg[rr3][t++] += val;
+                            record_hit(point(t++,rr0), point(c,r), val);
+                            record_hit(point(t++,rr1), point(c,r), val);
+                            record_hit(point(t++,rr2), point(c,r), val);
+                            record_hit(point(t++,rr3), point(c,r), val);
                         }
-                        while(t < himg.nc())
+                        while(t < (long)size())
                         {
                             long rr0 = (*xcos++ + *ysin++)>>16;
-                            himg[rr0][t++] += val;
+                            record_hit(point(t++,rr0), point(c,r), val);
                         }
                     }
                 }
             }
         }
-
-        template <
-            typename in_image_type,
-            typename out_image_type
-            >
-        void operator() (
-            const in_image_type& img_,
-            out_image_type& himg_
-        ) const
-        {
-            rectangle box(0,0, num_columns(img_)-1, num_rows(img_)-1);
-            (*this)(img_, box, himg_);
-        }
-
-    private:
 
         unsigned long _size;
         unsigned long even_size; // equal to _size if _size is even, otherwise equal to _size-1.
