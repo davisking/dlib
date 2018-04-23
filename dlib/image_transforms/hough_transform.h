@@ -313,8 +313,8 @@ namespace dlib
             for (auto& p : hough_points)
                 DLIB_CASSERT(get_rect(*this).contains(p), 
                     "You gave a hough_points that isn't actually in the Hough space of this object."
-                    "\n\t get_rect(*this): "<< get_rect(*this) 
-                    "\n\t p: "<< p 
+                    << "\n\t get_rect(*this): "<< get_rect(*this) 
+                    << "\n\t p: "<< p 
                     );
 #endif
 
