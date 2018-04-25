@@ -6,6 +6,8 @@
 #include "edge_detector_abstract.h"
 #include "../pixel.h"
 #include "../array2d.h"
+#include "../geometry.h"
+#include <vector>
 
 namespace dlib
 {
@@ -290,6 +292,105 @@ namespace dlib
                 }
             }
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void normalize_image_gradients (
+        image_type& img1_,
+        image_type& img2_
+    )
+    {
+        image_view<image_type> img1(img1_);
+        image_view<image_type> img2(img2_);
+
+        using pixel_type = typename image_traits<image_type>::pixel_type;
+        static_assert(std::is_same<pixel_type,float>::value || 
+            std::is_same<pixel_type,double>::value ||
+            std::is_same<pixel_type,long double>::value, 
+            "normalize_image_gradients() requires the input images to use floating point pixel types.");
+
+        DLIB_CASSERT(img1.nr() == img2.nr());
+        DLIB_CASSERT(img1.nc() == img2.nc());
+
+        // normalize all the gradients
+        for (long r = 0; r < img1.nr(); ++r)
+        {
+            for (long c = 0; c < img1.nc(); ++c)
+            {
+                if (img1[r][c] != 0 || img2[r][c] != 0)
+                {
+                    double len = std::sqrt(img1[r][c]*img1[r][c] + img2[r][c]*img2[r][c]);
+                    img1[r][c] /= len;
+                    img2[r][c] /= len;
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    std::vector<point> remove_incoherent_edge_pixels (
+        const std::vector<point>& line,
+        const image_type& horz_gradient_,
+        const image_type& vert_gradient_,
+        double angle_threshold
+    )
+    {
+        const_image_view<image_type> horz_gradient(horz_gradient_);
+        const_image_view<image_type> vert_gradient(vert_gradient_);
+
+        DLIB_CASSERT(horz_gradient.nr() == vert_gradient.nr());
+        DLIB_CASSERT(horz_gradient.nc() == vert_gradient.nc());
+        DLIB_CASSERT(angle_threshold >= 0);
+#ifdef ENABLE_ASSERTS
+        for (auto& p : line)
+            DLIB_ASSERT(get_rect(horz_gradient).contains(p), "All line points must be inside the given images.");
+#endif
+
+        // We make sure that each vector is within this threshold of the mean vector.  So
+        // to make sure they are pairwise within the user supplied angel threshold we need
+        // to divide by 2 before we proceed.
+        angle_threshold /= 2;
+
+        const double dotthresh = std::cos(angle_threshold*pi/180);
+        // find the average gradient on this line
+        dpoint avg;
+        for (auto p : line)
+            avg += dpoint(horz_gradient[p.y()][p.x()], vert_gradient[p.y()][p.x()]);
+        dpoint ref = avg.normalize();
+
+        // now iterate a few times and find the most common average gradient.
+        for (int i = 0; i < 10; ++i)
+        {
+            avg = dpoint();
+            for (auto p : line)
+            {
+                const dpoint v(horz_gradient[p.y()][p.x()], vert_gradient[p.y()][p.x()]);
+                const double dp = ref.dot(v);
+                if (dp > dotthresh)
+                    avg += v;
+                else if (-dp > dotthresh)
+                    avg -= v;
+            }
+            ref = avg.normalize();
+        }
+
+        // now remove all the points that deviate from the average gradient too much.
+        std::vector<point> newpixels;
+        for (auto p : line)
+        {
+            dpoint v(horz_gradient[p.y()][p.x()], vert_gradient[p.y()][p.x()]);
+            if (std::abs(ref.dot(v)) > dotthresh)
+                newpixels.push_back(p);
+        }
+        return newpixels;
     }
 
 // ----------------------------------------------------------------------------------------
