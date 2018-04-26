@@ -750,21 +750,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename T, typename U>
-    double distance_to_line (
-        const std::pair<vector<T,2>,vector<T,2> >& line,
-        const vector<U,2>& p
-    );
-    /*!
-        ensures
-            - returns the euclidean distance between the given line and the point p.  That
-              is, given a line that passes though the points line.first and line.second,
-              what is the distance between p and the nearest point on the line?  This
-              function returns that distance.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     void clip_line_to_rectangle (
         const rectangle& box,
         point& p1,
