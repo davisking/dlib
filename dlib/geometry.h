@@ -8,6 +8,7 @@
 #include "geometry/vector.h"
 #include "geometry/border_enumerator.h"
 #include "geometry/point_transforms.h"
+#include "geometry/line.h"
 
 #endif // DLIB_GEOMETRy_HEADER
 

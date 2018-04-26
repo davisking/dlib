@@ -81,23 +81,43 @@ namespace dlib
 
             // First we compute the radius measured in pixels from the center and the theta
             // angle in radians.
-            typedef dlib::vector<double,2> vect;
-            const rectangle box(0,0,size()-1,size()-1);
-            const vect cent = center(box);
-            double theta = p.x()-cent.x();
-            double radius = p.y()-cent.y();
-            theta = theta*pi/even_size;
-            radius = radius*sqrt_2 + 0.5;
+            double theta, radius;
+            get_line_properties(p, theta, radius);
+            theta *= pi/180;
 
             // now make a line segment on the line.
-            vect v1 = cent + vect(size()+1000,0) + vect(0,radius);
-            vect v2 = cent - vect(size()+1000,0) + vect(0,radius);
+            const rectangle box = get_rect(*this);
+            const dpoint cent = center(box);
+            dpoint v1 = cent + dpoint(size()+1000,0) + dpoint(0,radius);
+            dpoint v2 = cent - dpoint(size()+1000,0) + dpoint(0,radius);
             point p1 = rotate_point(cent, v1, theta);
             point p2 = rotate_point(cent, v2, theta);
 
             clip_line_to_rectangle(box, p1, p2);
 
             return std::make_pair(p1,p2);
+        }
+
+        double get_line_angle_in_degrees (
+            const point& p 
+        ) const
+        {
+            double angle, radius;
+            get_line_properties(p, angle, radius);
+            return angle;
+        }
+
+        void get_line_properties (
+            const point& p,
+            double& angle_in_degrees,
+            double& radius
+        ) const
+        {
+            const dpoint cent = center(get_rect(*this));
+            double theta = p.x()-cent.x();
+            radius = p.y()-cent.y();
+            angle_in_degrees = 180*theta/even_size;
+            radius = radius*sqrt_2 + 0.5;
         }
 
         template <
@@ -274,7 +294,7 @@ namespace dlib
             {
                 himg[hough_point.y()][hough_point.x()] += val;
             };
-            perform_hough_transform(img_, box, record_hit);
+            perform_generic_hough_transform(img_, box, record_hit);
         }
 
         template <
@@ -296,12 +316,16 @@ namespace dlib
         std::vector<std::vector<point>> find_pixels_voting_for_lines (
             const in_image_type& img,
             const rectangle& box,
-            const std::vector<point>& hough_points
+            const std::vector<point>& hough_points,
+            const unsigned long angle_window_size = 1,
+            const unsigned long radius_window_size = 1
         ) const
         {
 
             typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
 
+            DLIB_CASSERT(angle_window_size >= 1);
+            DLIB_CASSERT(radius_window_size >= 1);
             DLIB_CASSERT(box.width() == size() && box.height() == size(),
                 "\t std::vector<std::vector<point>> hough_transform::find_pixels_voting_for_lines()"
                 << "\n\t Invalid arguments given to this function."
@@ -325,7 +349,16 @@ namespace dlib
             matrix<uint32> hmap(size(),size());
             hmap = hough_points.size();
             for (size_t i = 0; i < hough_points.size(); ++i)
-                hmap(hough_points[i].y(),hough_points[i].x()) = i;
+            {
+                rectangle area = centered_rect(hough_points[i],angle_window_size,radius_window_size).intersect(get_rect(hmap));
+                for (long r = area.top(); r <= area.bottom(); ++r)
+                {
+                    for (long c = area.left(); c <= area.right(); ++c)
+                    {
+                        hmap(r,c) = i;
+                    }
+                }
+            }
 
             // record that this image point voted for this Hough point
             auto record_hit = [&](const point& hough_point, const point& img_point, in_pixel_type)
@@ -335,7 +368,7 @@ namespace dlib
                     constituent_points[idx].push_back(img_point);
             };
 
-            perform_hough_transform(img, box, record_hit);
+            perform_generic_hough_transform(img, box, record_hit);
 
             return constituent_points;
         }
@@ -345,20 +378,90 @@ namespace dlib
             >
         std::vector<std::vector<point>> find_pixels_voting_for_lines (
             const in_image_type& img,
-            const std::vector<point>& hough_points
+            const std::vector<point>& hough_points,
+            const unsigned long angle_window_size = 1,
+            const unsigned long radius_window_size = 1
         ) const
         {
             rectangle box(0,0, num_columns(img)-1, num_rows(img)-1);
-            return find_pixels_voting_for_lines(img, box, hough_points);
+            return find_pixels_voting_for_lines(img, box, hough_points, angle_window_size, radius_window_size);
         }
 
-    private:
+        template <
+            typename image_type,
+            typename thresh_type
+            >
+        std::vector<point> find_strong_hough_points(
+            const image_type& himg_,
+            const thresh_type hough_count_threshold,
+            const double angle_nms_thresh,
+            const double radius_nms_thresh
+        )
+        {
+            const_image_view<image_type> himg(himg_);
+
+            DLIB_CASSERT(himg.nr() == size());
+            DLIB_CASSERT(himg.nc() == size());
+            DLIB_CASSERT(angle_nms_thresh >= 0)
+            DLIB_CASSERT(radius_nms_thresh >= 0)
+
+            std::vector<std::pair<double,point>> initial_lines;
+            for (long r = 0; r < himg.nr(); ++r)
+            {
+                for (long c = 0; c < himg.nc(); ++c)
+                {
+                    if (himg[r][c] >= hough_count_threshold)
+                        initial_lines.emplace_back(himg[r][c], point(c,r));
+                }
+            }
+
+
+            std::vector<point> final_lines;
+            std::vector<std::pair<double,double>> final_angle_and_radius;
+
+            // Now do non-max suppression.  First, sort the initial_lines so the best lines come first.
+            std::sort(initial_lines.rbegin(), initial_lines.rend(), 
+                [](const std::pair<double,point>& a, const std::pair<double,point>& b){ return a.first<b.first;});
+            for (auto& r : initial_lines)
+            {
+                double angle, radius;
+                get_line_properties(r.second, angle, radius);
+
+                // check if anything in final_lines is too close to r.second.  If
+                // something is found then discard r.second.
+                auto too_close = false;
+                for (auto& ref : final_angle_and_radius)
+                {
+                    auto& ref_angle = ref.first;
+                    auto& ref_radius = ref.second;
+
+                    // We need to check for wrap around in angle since, for instance, a
+                    // line with angle and radius of 90 and 10 is the same line as one with
+                    // angle -90 and radius -10.
+                    if ((std::abs(ref_angle - angle) < angle_nms_thresh && std::abs(ref_radius-radius) < radius_nms_thresh) ||
+                        (180 - std::abs(ref_angle - angle) < angle_nms_thresh && std::abs(ref_radius+radius) < radius_nms_thresh))
+                    {
+                        too_close = true;
+                        break;
+                    }
+                }
+
+                if (!too_close)
+                {
+                    final_lines.emplace_back(r.second);
+                    final_angle_and_radius.emplace_back(angle, radius);
+                }
+            }
+
+            return final_lines;
+        }
+
 
         template <
             typename in_image_type,
             typename record_hit_function_type
             >
-        void perform_hough_transform (
+        void perform_generic_hough_transform (
             const in_image_type& img_,
             const rectangle& box,
             record_hit_function_type record_hit
@@ -368,7 +471,7 @@ namespace dlib
             typedef typename image_traits<in_image_type>::pixel_type in_pixel_type;
 
             DLIB_ASSERT(box.width() == size() && box.height() == size(),
-                "\t void hough_transform::perform_hough_transform()"
+                "\t void hough_transform::perform_generic_hough_transform()"
                 << "\n\t Invalid arguments given to this function."
                 << "\n\t box.width():  " << box.width()
                 << "\n\t box.height(): " << box.height()
@@ -457,6 +560,21 @@ namespace dlib
                 }
             }
         }
+
+        template <
+            typename in_image_type,
+            typename record_hit_function_type
+            >
+        void perform_generic_hough_transform (
+            const in_image_type& img_,
+            record_hit_function_type record_hit
+        ) const
+        {
+            rectangle box(0,0, num_columns(img_)-1, num_rows(img_)-1);
+            perform_generic_hough_transform(img_, box, record_hit);
+        }
+        
+    private:
 
         unsigned long _size;
         unsigned long even_size; // equal to _size if _size is even, otherwise equal to _size-1.
