@@ -102,6 +102,22 @@ namespace dlib
         }
 
         dnn_trainer(
+            net_type& net_,
+            const solver_type& solver_,
+            int device_id
+        ) : job_pipe(0), net(net_)
+        {
+            const int total_devices = dlib::cuda::get_num_devices();
+
+            DLIB_CASSERT(0 <= device_id && device_id < total_devices, "Invalid CUDA device id given to dnn_trainer.");
+
+            dlib::cuda::set_device(device_id);
+            devices.push_back(std::make_shared<device_data>(device_id, net, solver_));
+
+            init();
+        }
+
+        dnn_trainer(
             net_type& net_, 
             const solver_type& solver_,
             const std::vector<int>& cuda_extra_devices
