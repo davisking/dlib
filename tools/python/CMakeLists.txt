@@ -6,7 +6,7 @@ set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
 # Set this to disable link time optimization. The only reason for
 # doing this to make the compile faster which is nice when developing
 # new modules.
-set(PYBIND11_LTO_CXX_FLAGS "")
+# set(PYBIND11_LTO_CXX_FLAGS "")
 
 
 # Avoid cmake warnings about changes in behavior of some Mac OS X path 
