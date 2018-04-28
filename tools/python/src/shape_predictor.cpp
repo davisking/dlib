@@ -17,18 +17,18 @@ namespace py = pybind11;
 
 full_object_detection run_predictor (
         shape_predictor& predictor,
-        py::object img,
+        py::array img,
         py::object rect
 )
 {
     rectangle box = rect.cast<rectangle>();
-    if (is_gray_python_image(img))
+    if (is_image<unsigned char>(img))
     {
-        return predictor(numpy_gray_image(img), box);
+        return predictor(numpy_image<unsigned char>(img), box);
     }
-    else if (is_rgb_python_image(img))
+    else if (is_image<rgb_pixel>(img))
     {
-        return predictor(numpy_rgb_image(img), box);
+        return predictor(numpy_image<rgb_pixel>(img), box);
     }
     else
     {
@@ -97,7 +97,7 @@ inline shape_predictor train_shape_predictor_on_images_py (
         throw dlib::error("The length of the detections list must match the length of the images list.");
 
     std::vector<std::vector<full_object_detection> > detections(num_images);
-    dlib::array<array2d<unsigned char> > images(num_images);
+    dlib::array<numpy_image<unsigned char>> images(num_images);
     images_and_nested_params_to_dlib(pyimages, pydetections, images, detections);
 
     return train_shape_predictor_on_images(images, detections, options);
@@ -123,7 +123,7 @@ inline double test_shape_predictor_with_images_py (
     std::vector<std::vector<double> > scales;
     if (num_scales > 0)
         scales.resize(num_scales);
-    dlib::array<array2d<unsigned char> > images(num_images);
+    dlib::array<numpy_image<unsigned char>> images(num_images);
 
     // Now copy the data into dlib based objects so we can call the testing routine.
     for (unsigned long i = 0; i < num_images; ++i)
@@ -134,14 +134,12 @@ inline double test_shape_predictor_with_images_py (
              ++det_it)
           detections[i].push_back(det_it->cast<full_object_detection>());
 
-        pyimage_to_dlib_image(pyimages[i], images[i]);
+        images[i] = pyimages[i];
         if (num_scales > 0)
         {
             if (num_boxes != py::len(pyscales[i]))
                 throw dlib::error("The length of the scales list must match the length of the detections list.");
-            for (py::iterator scale_it = pyscales[i].begin();
-                 scale_it != pyscales[i].end();
-                 ++scale_it)
+            for (py::iterator scale_it = pyscales[i].begin(); scale_it != pyscales[i].end(); ++scale_it)
                 scales[i].push_back(scale_it->cast<double>());
         }
     }

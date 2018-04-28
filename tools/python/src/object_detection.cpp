@@ -37,8 +37,8 @@ inline simple_object_detector_py train_simple_object_detector_on_images_py (
         throw dlib::error("The length of the boxes list must match the length of the images list.");
 
     // We never have any ignore boxes for this version of the API.
-    std::vector<std::vector<rectangle> > ignore(num_images), boxes(num_images);
-    dlib::array<array2d<rgb_pixel> > images(num_images);
+    std::vector<std::vector<rectangle>> ignore(num_images), boxes(num_images);
+    dlib::array<numpy_image<rgb_pixel>> images(num_images);
     images_and_nested_params_to_dlib(pyimages, pyboxes, images, boxes);
 
     return train_simple_object_detector_on_images("", images, boxes, ignore, options);
@@ -56,8 +56,8 @@ inline simple_test_results test_simple_object_detector_with_images_py (
         throw dlib::error("The length of the boxes list must match the length of the images list.");
 
     // We never have any ignore boxes for this version of the API.
-    std::vector<std::vector<rectangle> > ignore(num_images), boxes(num_images);
-    dlib::array<array2d<rgb_pixel> > images(num_images);
+    std::vector<std::vector<rectangle>> ignore(num_images), boxes(num_images);
+    dlib::array<numpy_image<rgb_pixel>> images(num_images);
     images_and_nested_params_to_dlib(pyimages, pyboxes, images, boxes);
 
     return test_simple_object_detector_with_images(images, upsampling_amount, boxes, ignore, detector);
@@ -86,22 +86,13 @@ inline simple_test_results test_simple_object_detector_py_with_images_py (
 // ----------------------------------------------------------------------------------------
 
 inline void find_candidate_object_locations_py (
-    py::object pyimage,
+    py::array pyimage,
     py::list& pyboxes,
     py::tuple pykvals,
     unsigned long min_size,
     unsigned long max_merging_iterations
 )
 {
-    // Copy the data into dlib based objects
-    array2d<rgb_pixel> image;
-    if (is_gray_python_image(pyimage))
-        assign_image(image, numpy_gray_image(pyimage));
-    else if (is_rgb_python_image(pyimage))
-        assign_image(image, numpy_rgb_image(pyimage));
-    else
-        throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
-
     if (py::len(pykvals) != 3)
         throw dlib::error("kvals must be a tuple with three elements for start, end, num.");
 
@@ -117,7 +108,12 @@ inline void find_candidate_object_locations_py (
     for (long i = 0; i < count; ++i)
         rects.push_back(pyboxes[i].cast<rectangle>());
     // Find candidate objects
-    find_candidate_object_locations(image, rects, kvals, min_size, max_merging_iterations);
+    if (is_image<unsigned char>(pyimage))
+        find_candidate_object_locations(numpy_image<unsigned char>(pyimage), rects, kvals, min_size, max_merging_iterations);
+    else if (is_image<rgb_pixel>(pyimage))
+        find_candidate_object_locations(numpy_image<rgb_pixel>(pyimage), rects, kvals, min_size, max_merging_iterations);
+    else
+        throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
 
     // Collect boxes containing candidate objects
     std::vector<rectangle>::iterator iter;

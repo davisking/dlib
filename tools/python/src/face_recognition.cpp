@@ -32,7 +32,7 @@ public:
     }
 
     matrix<double,0,1> compute_face_descriptor (
-        py::object img,
+        numpy_image<rgb_pixel> img,
         const full_object_detection& face,
         const int num_jitters
     )
@@ -42,13 +42,11 @@ public:
     }
 
     std::vector<matrix<double,0,1>> compute_face_descriptors (
-        py::object img,
+        numpy_image<rgb_pixel> img,
         const std::vector<full_object_detection>& faces,
         const int num_jitters
     )
     {
-        if (!is_rgb_python_image(img))
-            throw dlib::error("Unsupported image type, must be RGB image.");
 
         for (auto& f : faces)
         {
@@ -61,7 +59,7 @@ public:
         for (auto& f : faces)
             dets.push_back(get_face_chip_details(f, 150, 0.25));
         dlib::array<matrix<rgb_pixel>> face_chips;
-        extract_image_chips(numpy_rgb_image(img), dets, face_chips);
+        extract_image_chips(img, dets, face_chips);
 
         std::vector<matrix<double,0,1>> face_descriptors;
         face_descriptors.reserve(face_chips.size());
@@ -161,22 +159,20 @@ py::list chinese_whispers_clustering(py::list descriptors, float threshold)
 }
 
 void save_face_chips (
-    py::object img,
+    numpy_image<rgb_pixel> img,
     const std::vector<full_object_detection>& faces,
     const std::string& chip_filename,
     size_t size = 150,
     float padding = 0.25
 )
 {
-    if (!is_rgb_python_image(img))
-        throw dlib::error("Unsupported image type, must be RGB image.");
 
     int num_faces = faces.size();
     std::vector<chip_details> dets;
     for (auto& f : faces)
         dets.push_back(get_face_chip_details(f, size, padding));
     dlib::array<matrix<rgb_pixel>> face_chips;
-    extract_image_chips(numpy_rgb_image(img), dets, face_chips);
+    extract_image_chips(numpy_image<rgb_pixel>(img), dets, face_chips);
     int i=0;
     for (auto& chip : face_chips) 
     {
@@ -195,7 +191,7 @@ void save_face_chips (
 }
 
 void save_face_chip (
-    py::object img,
+    numpy_image<rgb_pixel> img,
     const full_object_detection& face,
     const std::string& chip_filename,
     size_t size = 150,
@@ -204,7 +200,6 @@ void save_face_chip (
 {
     std::vector<full_object_detection> faces(1, face);
     save_face_chips(img, faces, chip_filename, size, padding);
-    return;
 }
 
 void bind_face_recognition(py::module &m)

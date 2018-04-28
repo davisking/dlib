@@ -35,13 +35,13 @@ void image_window_set_image_simple_detector_py (
 
 void image_window_set_image (
     image_window& win,
-    py::object img
+    py::array img
 )
 {
-    if (is_gray_python_image(img))
-        return win.set_image(numpy_gray_image(img));
-    else if (is_rgb_python_image(img))
-        return win.set_image(numpy_rgb_image(img));
+    if (is_image<unsigned char>(img))
+        return win.set_image(numpy_image<unsigned char>(img));
+    else if (is_image<rgb_pixel>(img))
+        return win.set_image(numpy_image<rgb_pixel>(img));
     else
         throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
 }
@@ -74,14 +74,14 @@ void add_overlay_parts (
     win.add_overlay(render_face_detections(detection, color));
 }
 
-std::shared_ptr<image_window> make_image_window_from_image(py::object img)
+std::shared_ptr<image_window> make_image_window_from_image(py::array img)
 {
     auto win = std::make_shared<image_window>();
     image_window_set_image(*win, img);
     return win;
 }
 
-std::shared_ptr<image_window> make_image_window_from_image_and_title(py::object img, const string& title)
+std::shared_ptr<image_window> make_image_window_from_image_and_title(py::array img, const string& title)
 {
     auto win = std::make_shared<image_window>();
     image_window_set_image(*win, img);
