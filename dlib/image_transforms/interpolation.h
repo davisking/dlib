@@ -2178,7 +2178,7 @@ namespace dlib
         const auto crop_rect = centered_rect(center(rect)+rand_translate, box_size, box_size);
         const double angle = rnd.get_double_in_range(-max_rotation_degrees, max_rotation_degrees)*pi/180;
         image_type crop;
-        extract_image_chip(img, chip_details(crop_rect, chip_dims(img.nr(),img.nc()), angle), crop);
+        extract_image_chip(img, chip_details(crop_rect, chip_dims(num_rows(img),num_columns(img)), angle), crop);
         if (rnd.get_random_double() > 0.5)
             flip_image_left_right(crop); 
 
