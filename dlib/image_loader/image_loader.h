@@ -44,7 +44,7 @@ namespace dlib
             unsigned long bfReserved;
             unsigned long biSize;
             unsigned long biWidth;
-            unsigned long biHeight;
+            long biHeight;
             unsigned short biBitCount;
             unsigned long biCompression;
             /*
@@ -110,7 +110,11 @@ namespace dlib
             i += 4;
             a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
             biHeight = a | (b<<8) | (c<<16) | (d<<24);
-
+            
+            bool bottomUp = biHeight < 0;
+            if (bottomUp)
+                biHeight = 0 - biHeight;
+            
             i += 4+2;
             a = buf[i]; b = buf[i+1];
             biBitCount = static_cast<unsigned short>(a | (b<<8));
@@ -216,7 +220,7 @@ namespace dlib
                                     p.red   = red[pixels[i]];
                                     p.green = green[pixels[i]];
                                     p.blue  = blue[pixels[i]];
-                                    assign_pixel(image[row][col+i],p);
+                                    assign_pixel(image[bottomUp ? biHeight - row - 1 : row][col+i],p);
                                 }
                             }
                             if (in.sgetn(reinterpret_cast<char*>(buf),padding) != padding)
@@ -281,14 +285,14 @@ namespace dlib
                                 p.red = red[pixel1];
                                 p.green = green[pixel1];
                                 p.blue = blue[pixel1];
-                                assign_pixel(image[row][col], p);
+                                assign_pixel(image[bottomUp ? biHeight - row - 1 : row][col], p);
 
                                 if (col+1 < biWidth)
                                 {
                                     p.red   = red[pixel2];
                                     p.green = green[pixel2];
                                     p.blue  = blue[pixel2];
-                                    assign_pixel(image[row][col+1], p);
+                                    assign_pixel(image[bottomUp ? biHeight - row - 1 : row][col+1], p);
                                 }
                             }
                             if (in.sgetn(reinterpret_cast<char*>(buf),padding) != padding)
@@ -359,7 +363,7 @@ namespace dlib
                                     p.red   = red[buf[0]];
                                     p.green = green[buf[0]];
                                     p.blue  = blue[buf[0]];
-                                    assign_pixel(image[row][col],p);
+                                    assign_pixel(image[bottomUp ? biHeight - row - 1 : row][col],p);
                                 }
                                 if (in.sgetn(reinterpret_cast<char*>(buf),padding) != padding)
                                     throw image_load_error("bmp load error 9: file too short");
@@ -434,7 +438,7 @@ namespace dlib
                                         p.red   = red[buf[0]];
                                         p.green = green[buf[0]];
                                         p.blue  = blue[buf[0]];
-                                        assign_pixel(image[row][col],p);
+                                        assign_pixel(image[bottomUp ? biHeight - row - 1 : row][col],p);
 
                                         ++col;
                                     }
@@ -469,7 +473,7 @@ namespace dlib
                                     p.red   = red[command];
                                     p.green = green[command];
                                     p.blue  = blue[command];
-                                    assign_pixel(image[row][col],p);
+                                    assign_pixel(image[bottomUp ? biHeight - row - 1 : row][col],p);
 
                                     ++col;
                                 }
@@ -521,7 +525,7 @@ namespace dlib
                                 p.red = buf[2];
                                 p.green = buf[1];
                                 p.blue = buf[0];
-                                assign_pixel(image[row][col], p);
+                                assign_pixel(image[bottomUp ? biHeight - row - 1 : row][col], p);
 
                             }
                             if (in.sgetn(reinterpret_cast<char*>(buf),padding) != padding)
