@@ -15,6 +15,12 @@ include(cmake_utils/set_compiler_specific_options.cmake)
 # Adhere to GNU filesystem layout conventions
 include(GNUInstallDirs)
 
+if (POLICY CMP0063)
+   # This policy tells cmake to really honor CXX_VISIBILITY_PRESET rather than
+   # ignore it for backwards compatibility.
+   cmake_policy(SET CMP0063 NEW)
+endif()
+
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
 include(cmake_utils/use_cpp_11.cmake)
@@ -855,6 +861,12 @@ if (MSVC)
    set_target_properties(dlib PROPERTIES RELEASE_POSTFIX "${VERSION}_release_${numbits}bit_msvc${MSVC_VERSION}")
    set_target_properties(dlib PROPERTIES MINSIZEREL_POSTFIX "${VERSION}_minsizerel_${numbits}bit_msvc${MSVC_VERSION}")
    set_target_properties(dlib PROPERTIES RELWITHDEBINFO_POSTFIX "${VERSION}_relwithdebinfo_${numbits}bit_msvc${MSVC_VERSION}")
+endif()
+
+# Check if we are being built as part of a pybind11 module. 
+if (COMMAND pybind11_add_module)
+   # Don't export unnecessary symbols.
+   set_target_properties(dlib PROPERTIES CXX_VISIBILITY_PRESET "hidden")
 endif()
 
 add_library(dlib::dlib ALIAS dlib)
