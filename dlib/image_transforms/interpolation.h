@@ -3,6 +3,9 @@
 #ifndef DLIB_INTERPOlATIONh_
 #define DLIB_INTERPOlATIONh_ 
 
+#include <thread>
+#include <algorithm>
+
 #include "interpolation_abstract.h"
 #include "../pixel.h"
 #include "../matrix.h"
@@ -1543,33 +1546,29 @@ namespace dlib
             << "\n\t objects2.size():   " << objects2.size() 
             );
 
-        image_array_type new_images;
-        std::vector<std::vector<T> > new_objects;
-        std::vector<std::vector<U> > new_objects2;
+        using namespace impl;
 
-        using namespace impl; 
+        image_array_type new_images(images.size() * angles.size());
+        std::vector<std::vector<T>> new_objects(images.size() * angles.size());
+        std::vector<std::vector<U>> new_objects2(images.size() * angles.size());
 
-        std::vector<T> objtemp;
-        std::vector<U> objtemp2;
-        typename image_array_type::value_type temp;
-        for (long i = 0; i < angles.size(); ++i)
-        {
-            for (unsigned long j = 0; j < images.size(); ++j)
+        dlib::parallel_for(0, images.size(), [&](long j) {
+            typename image_array_type::value_type temp;
+
+            long dst_base = j * angles.size();
+            for (long i = 0; i < angles.size(); ++i)
             {
+                long dst = dst_base + i;
                 const point_transform_affine tran = rotate_image(images[j], temp, angles(i));
-                new_images.push_back(std::move(temp));
+                exchange(new_images[dst], temp);
 
-                objtemp.clear();
                 for (unsigned long k = 0; k < objects[j].size(); ++k)
-                    objtemp.push_back(tform_object(tran, objects[j][k]));
-                new_objects.push_back(objtemp);
+                    new_objects[dst].push_back(tform_object(tran, objects[j][k]));
 
-                objtemp2.clear();
                 for (unsigned long k = 0; k < objects2[j].size(); ++k)
-                    objtemp2.push_back(tform_object(tran, objects2[j][k]));
-                new_objects2.push_back(objtemp2);
+                    new_objects2[dst].push_back(tform_object(tran, objects2[j][k]));
             }
-        }
+        });
 
         new_images.swap(images);
         new_objects.swap(objects);

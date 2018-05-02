@@ -90,6 +90,7 @@ namespace dlib
             _at_start(true)
         {}
 
+        array(const array&) = delete;
         array(
             array&& item
         ) : array()
