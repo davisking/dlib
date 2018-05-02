@@ -3,7 +3,7 @@
 #ifndef DLIB_INTERPOlATIONh_
 #define DLIB_INTERPOlATIONh_ 
 
-#include <thread>
+#include "../threads.h"
 #include <algorithm>
 
 #include "interpolation_abstract.h"
