@@ -123,6 +123,7 @@ endif()
 # or more other things which both depend on dlib. 
 if (NOT TARGET dlib)
    message(STATUS "Using CMake version: ${CMAKE_VERSION}")
+   message(STATUS "Compiling dlib version: ${VERSION}")
 
    set (DLIB_ISO_CPP_ONLY_STR 
       "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)" )
