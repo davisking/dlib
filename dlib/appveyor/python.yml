@@ -1,14 +1,14 @@
 
 environment:
   matrix:
-    - PATH: "C:\\Python33";%PATH%
-    - PATH: "C:\\Python33-x64";%PATH%
-    - PATH: "C:\\Python35";%PATH%
-    - PATH: "C:\\Python35-x64";%PATH%
-    - PATH: "C:\\Python36";%PATH%
-    - PATH: "C:\\Python36-x64";%PATH%
-    - PATH: "C:\\Python27";%PATH%
-    - PATH: "C:\\Python27-x64";%PATH%
+    - PATH: C:\Python33;%PATH%
+    - PATH: C:\Python33-x64;%PATH%
+    - PATH: C:\Python35;%PATH%
+    - PATH: C:\Python35-x64;%PATH%
+    - PATH: C:\Python36;%PATH%
+    - PATH: C:\Python36-x64;%PATH%
+    - PATH: C:\Python27;%PATH%
+    - PATH: C:\Python27-x64;%PATH%
 
 
 build_script:
