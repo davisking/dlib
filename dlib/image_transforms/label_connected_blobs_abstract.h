@@ -12,6 +12,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct neighbors_24
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a pixel neighborhood generating functor for 
+                use with the label_connected_blobs() routine defined below.
+        !*/
+
+        void operator() (
+            const point& p,
+            std::vector<point>& neighbors
+        ) const;
+        /*!
+            ensures
+                - adds the 24 neighboring pixels surrounding p into neighbors
+        !*/
+    };
+
     struct neighbors_8 
     {
         /*!

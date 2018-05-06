@@ -13,6 +13,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct neighbors_24
+    {
+        void operator() (
+            const point& p,
+            std::vector<point>& neighbors
+        ) const
+        {
+            for (long i = -2; i <= 2; ++i)
+                for (long j = -2; j <= 2; ++j)
+                    if (i!=0||j!=0)
+                        neighbors.push_back(point(p.x()+i,p.y()+j));
+        }
+    };
+
     struct neighbors_8 
     {
         void operator() (
