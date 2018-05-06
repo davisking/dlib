@@ -91,6 +91,8 @@ namespace dlib
         {}
 
         array(const array&) = delete;
+        array& operator=(array&) = delete; 
+
         array(
             array&& item
         ) : array()
@@ -217,10 +219,6 @@ namespace dlib
         mutable T* pos;
         T* last_pos;
         mutable bool _at_start;
-
-        // restricted functions
-        array(array<T>&);        // copy constructor
-        array<T>& operator=(array<T>&);    // assignment operator        
 
     };
 
