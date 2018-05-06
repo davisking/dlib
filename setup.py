@@ -159,6 +159,7 @@ class CMakeBuild(build_ext):
         cmake_setup = ['cmake', ext.sourcedir] + cmake_args
         cmake_build = ['cmake', '--build', '.'] + build_args
 
+        print("Building extension for Python {}".format(sys.version.split('\n',1)[0]))
         print("Invoking CMake setup: '{}'".format(' '.join(cmake_setup)))
         subprocess.check_call(cmake_setup, cwd=build_folder)
         print("Invoking CMake build: '{}'".format(' '.join(cmake_build)))
