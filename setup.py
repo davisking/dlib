@@ -161,8 +161,10 @@ class CMakeBuild(build_ext):
 
         print("Building extension for Python {}".format(sys.version.split('\n',1)[0]))
         print("Invoking CMake setup: '{}'".format(' '.join(cmake_setup)))
+        sys.stdout.flush()
         subprocess.check_call(cmake_setup, cwd=build_folder)
         print("Invoking CMake build: '{}'".format(' '.join(cmake_build)))
+        sys.stdout.flush()
         subprocess.check_call(cmake_build, cwd=build_folder)
 
 def num_available_cpu_cores(ram_per_build_process_in_gb):
