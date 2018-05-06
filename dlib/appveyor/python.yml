@@ -35,7 +35,7 @@ environment:
 
 
 build_script:
-  - python setup.py build
+  - python setup.py build --clean
 
 test_script:
   - python setup.py test
