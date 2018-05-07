@@ -18,10 +18,9 @@ namespace py = pybind11;
 full_object_detection run_predictor (
         shape_predictor& predictor,
         py::array img,
-        py::object rect
+        const rectangle& box
 )
 {
-    rectangle box = rect.cast<rectangle>();
     if (is_image<unsigned char>(img))
     {
         return predictor(numpy_image<unsigned char>(img), box);
@@ -69,17 +68,12 @@ std::vector<point> full_obj_det_parts (const full_object_detection& detection)
     return parts;
 }
 
-std::shared_ptr<full_object_detection> full_obj_det_init(py::object& pyrect, py::object& pyparts)
+std::shared_ptr<full_object_detection> full_obj_det_init(const rectangle& rect, py::list& pyparts)
 {
     const unsigned long num_parts = py::len(pyparts);
-    std::vector<point> parts(num_parts);
-    rectangle rect = pyrect.cast<rectangle>();
-    py::iterator parts_it = pyparts.begin();
-
-    for (unsigned long j = 0;
-         parts_it != pyparts.end();
-         ++j, ++parts_it)
-        parts[j] = parts_it->cast<point>();
+    std::vector<point> parts;
+    for (auto& item : pyparts)
+        parts.push_back(item.cast<point>());
 
     return std::make_shared<full_object_detection>(rect, parts);
 }
