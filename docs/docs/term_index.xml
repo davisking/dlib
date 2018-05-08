@@ -1496,7 +1496,7 @@
          <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="image_to_tiled_pyramid"               include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="tiled_pyramid_to_image"               include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="threshold_image"            include="dlib/image_transforms.h"/>
-         <term file="imaging.html" name="auto_threshold_image"       include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="partition_pixels"           include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="png_loader"                 include="dlib/image_io.h"/>
          <term file="imaging.html" name="jpeg_loader"                include="dlib/image_io.h"/>
 

@@ -167,7 +167,7 @@
          <item>sobel_edge_detector</item> 
          <item>suppress_non_maximum_edges</item> 
          <item>threshold_image</item>
-         <item>auto_threshold_image</item>
+         <item>partition_pixels</item>
          <item>hough_transform</item>
       </section>
 
@@ -1871,13 +1871,14 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>auto_threshold_image</name>
+         <name>partition_pixels</name>
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/thresholding_abstract.h</spec_file>
          <description>        
-            This global function performs a simple binary thresholding on an image.  
-            Instead of taking a user supplied threshold
-            it computes one from the image using k-means clustering.
+              This function finds a threshold value that would be reasonable to use with
+              <a href="#threshold_image">threshold_image</a>.  It does this by finding the threshold that
+              partitions the pixels in an image into two groups such that the sum of absolute
+              deviations between each pixel and the mean of its group is minimized.
          </description>
                                  
       </component>
