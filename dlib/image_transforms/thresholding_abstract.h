@@ -16,6 +16,29 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type 
+    partition_pixels (
+        const image_type& img
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::max() <= 65535 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha   == false
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::is_unsigned == true 
+        ensures
+            - Finds a threshold value that would be reasonable to use with
+              threshold_image(img, threshold).  It does this by finding the threshold that
+              partitions the pixels in img into two groups such that the sum of absolute
+              deviations between each pixel and the mean of its group is minimized.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename in_image_type,
         typename out_image_type
         >
@@ -26,8 +49,10 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
             - pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale == true  
             - pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false
             - pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false 
@@ -53,48 +78,17 @@ namespace dlib
             - calls threshold_image(img,img,thresh);
     !*/
 
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename in_image_type,
-        typename out_image_type
-        >
-    void auto_threshold_image (
-        const in_image_type& in_img,
-        out_image_type& out_img
-    );
-    /*!
-        requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - pixel_traits<typename image_traits<in_image_type>::pixel_type>::max() <= 65535 
-            - pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha   == false
-            - pixel_traits<typename image_traits<in_image_type>::pixel_type>::is_unsigned == true 
-            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale  == true  
-            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha  == false 
-            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::is_unsigned == true 
-        ensures
-            - #out_img == the thresholded version of in_img (in_img is converted to a grayscale
-              intensity image if it is color).  Pixels in in_img with grayscale values >= thresh 
-              have an output value of on_pixel and all others have a value of off_pixel.
-            - The thresh value used is determined by performing a k-means clustering
-              on the input image histogram with a k of 2.  The point between the two
-              means found is used as the thresh value.
-            - #out_img.nc() == in_img.nc()
-            - #out_img.nr() == in_img.nr()
-    !*/
-
     template <
         typename image_type
         >
-    void auto_threshold_image (
+    void threshold_image (
         image_type& img
     );
     /*!
         requires
-            - it is valid to call auto_threshold_image(img,img);
+            - it is valid to call threshold_image(img,img,thresh);
         ensures
-            - calls auto_threshold_image(img,img);
+            - calls threshold_image(img,img,partition_pixels(img));
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -111,8 +105,10 @@ namespace dlib
     );
     /*!
         requires
-            - in_image_type == is an implementation of array2d/array2d_kernel_abstract.h
-            - out_image_type == is an implementation of array2d/array2d_kernel_abstract.h
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
             - pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale == true  
             - pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false
             - pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false 

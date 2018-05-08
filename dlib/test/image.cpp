@@ -1814,6 +1814,86 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type
+        >
+    typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type 
+    test_partition_pixels (
+        const image_type& img
+    ) 
+    {
+        matrix<unsigned long,1> hist;
+        get_histogram(img,hist);
+
+        auto average1 = [&](unsigned long thresh)
+        {
+            double accum = 0;
+            double cnt = 0;
+            for (unsigned long i = 0; i < thresh; ++i)
+            {
+                accum += hist(i)*i;
+                cnt += hist(i);
+            }
+
+            if (cnt != 0)
+                return accum/cnt;
+            else
+                return 0.0;
+        };
+
+        auto average2 = [&](unsigned long thresh)
+        {
+            double accum = 0;
+            double cnt = 0;
+            for (long i = thresh; i < hist.size(); ++i)
+            {
+                accum += hist(i)*i;
+                cnt += hist(i);
+            }
+
+            if (cnt != 0)
+                return accum/cnt;
+            else
+                return 0.0;
+        };
+
+
+        auto total_abs = [&](unsigned long thresh)
+        {
+            auto a = average1(thresh);
+            auto b = average2(thresh);
+
+            double score = 0;
+            for (long i = 0; i < hist.size(); ++i)
+            {
+                if (i < (long)thresh)
+                    score += std::abs(a-i)*hist(i);
+                else
+                    score += std::abs(b-i)*hist(i);
+            }
+            return score;
+        };
+
+
+        unsigned long thresh = 0;
+        double min_sad = total_abs(0);
+        for (long i = 1; i < hist.size(); ++i)
+        {
+            double sad = total_abs(i);
+            //cout << "TRUTH: i:" << i << "  total: "<< total_abs(i) << endl;
+            if (sad+1e-13*sad < min_sad)
+            {
+                //cout << "CHANGE TRUTH: i:" << i << "  total: "<< total_abs(i)-min_sad << endl;
+                min_sad = sad;
+                thresh = i;
+            }
+        }
+
+        return thresh;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class image_tester : public tester
     {
     public:
@@ -1893,6 +1973,20 @@ namespace
                 DLIB_TEST(sum(matrix_cast<int>(mat(img)))/255 == 40);
                 draw_line(img, point(20,19), point(59,19), 00);
                 DLIB_TEST(sum(matrix_cast<int>(mat(img))) == 0);
+            }
+
+            {
+                matrix<unsigned char> img(4,7);
+
+                dlib::rand rnd;
+                for (int round = 0; round < 100; ++round)
+                {
+                    print_spinner();
+                    for (auto& p : img)
+                        p = rnd.get_random_8bit_number();
+
+                    DLIB_CASSERT(test_partition_pixels(img) == partition_pixels(img))
+                }
             }
         }
     } a;

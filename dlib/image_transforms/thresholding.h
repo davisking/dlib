@@ -18,6 +18,89 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type 
+    partition_pixels (
+        const image_type& img
+    ) 
+    {
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false );
+        COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<image_type>::pixel_type>::is_unsigned == true );
+
+
+        matrix<unsigned long,1> hist;
+        get_histogram(img,hist);
+
+        // create integral histograms
+        matrix<double,1> cum_hist(hist.size()+1), cum_histi(hist.size()+1);
+        cum_hist(0) = 0;
+        cum_histi(0) = 0;
+        for (long i = 0; i < hist.size(); ++i)
+        {
+            cum_hist(i+1) = cum_hist(i) + hist(i);
+            cum_histi(i+1) = cum_histi(i) + hist(i)*(double)i;
+        }
+
+        auto histsum = [&](long begin, long end) 
+        { 
+            return cum_hist(end)-cum_hist(begin); 
+        };
+        auto histsumi = [&](long begin, long end) 
+        { 
+            return cum_histi(end)-cum_histi(begin); 
+        };
+
+        // If we split the pixels into two groups, those < thresh (the left group) and
+        // those >= thresh (the right group), what would the sum of absolute deviations of
+        // each pixel from the mean of its group be?  total_abs(thresh) computes that
+        // value.
+        auto total_abs = [&](unsigned long thresh)
+        {
+            auto left_avg = histsumi(0,thresh);
+            auto tmp = histsum(0,thresh);
+            if (tmp != 0)
+                left_avg /= tmp;
+            auto right_avg = histsumi(thresh,hist.size());
+            tmp = histsum(thresh,hist.size());
+            if (tmp != 0)
+                right_avg /= tmp;
+
+
+            const long left_idx = (long)std::ceil(left_avg);
+            const long right_idx = (long)std::ceil(right_avg);
+
+            double score = 0;
+            score += left_avg*histsum(0,left_idx) - histsumi(0,left_idx); 
+            score -= left_avg*histsum(left_idx,thresh) - histsumi(left_idx,thresh); 
+            score += right_avg*histsum(thresh,right_idx) - histsumi(thresh,right_idx); 
+            score -= right_avg*histsum(right_idx,hist.size()) - histsumi(right_idx,hist.size()); 
+            return score;
+        };
+
+
+        unsigned long thresh = 0;
+        double min_sad = std::numeric_limits<double>::infinity();
+        for (long i = 0; i < hist.size(); ++i)
+        {
+            double sad = total_abs(i);
+            // The 1e-13 here is to avoid jumping to a higher threshold because of rounding
+            // error in total_abs() reporting a very slightly larger value.  Really this
+            // probably doesn't matter for any real application, but it makes the behavior
+            // of the code more stable which is always nice.
+            if (sad+1e-13*sad < min_sad)
+            {
+                min_sad = sad;
+                thresh = i;
+            }
+        }
+
+        return thresh;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename in_image_type,
         typename out_image_type
         >
@@ -67,6 +150,18 @@ namespace dlib
     )
     {
         threshold_image(img,img,thresh);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void threshold_image (
+        image_type& img
+    )
+    {
+        threshold_image(img,img,partition_pixels(img));
     }
 
 // ----------------------------------------------------------------------------------------
