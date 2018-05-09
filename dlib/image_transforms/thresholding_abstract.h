@@ -26,9 +26,7 @@ namespace dlib
         requires
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
-            - pixel_traits<typename image_traits<image_type>::pixel_type>::max() <= 65535 
-            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha   == false
-            - pixel_traits<typename image_traits<image_type>::pixel_type>::is_unsigned == true 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
         ensures
             - Finds a threshold value that would be reasonable to use with
               threshold_image(img, threshold).  It does this by finding the threshold that
@@ -79,6 +77,21 @@ namespace dlib
     !*/
 
     template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void threshold_image (
+        const in_image_type& in_img,
+        out_image_type& out_img
+    );
+    /*!
+        requires
+            - it is valid to call threshold_image(in_img,out_img,partition_pixels(in_img));
+        ensures
+            - calls threshold_image(in_img,out_img,partition_pixels(in_img));
+    !*/
+
+    template <
         typename image_type
         >
     void threshold_image (
@@ -86,7 +99,7 @@ namespace dlib
     );
     /*!
         requires
-            - it is valid to call threshold_image(img,img,thresh);
+            - it is valid to call threshold_image(img,img,partition_pixels(img));
         ensures
             - calls threshold_image(img,img,partition_pixels(img));
     !*/
@@ -112,7 +125,6 @@ namespace dlib
             - pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale == true  
             - pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false
             - pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false 
-            - lower_thresh <= upper_thresh
             - is_same_object(in_img, out_img) == false
         ensures
             - #out_img == the hysteresis thresholded version of in_img (in_img is converted to a 

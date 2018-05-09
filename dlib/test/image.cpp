@@ -1818,7 +1818,7 @@ namespace
         typename image_type
         >
     typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type 
-    test_partition_pixels (
+    simple_partition_pixels (
         const image_type& img
     ) 
     {
@@ -1881,7 +1881,7 @@ namespace
         {
             double sad = total_abs(i);
             //cout << "TRUTH: i:" << i << "  total: "<< total_abs(i) << endl;
-            if (sad+1e-13*sad < min_sad)
+            if (sad <= min_sad)
             {
                 //cout << "CHANGE TRUTH: i:" << i << "  total: "<< total_abs(i)-min_sad << endl;
                 min_sad = sad;
@@ -1890,6 +1890,40 @@ namespace
         }
 
         return thresh;
+    }
+
+    void test_partition_pixels()
+    {
+        matrix<unsigned char> img(4,7);
+
+        dlib::rand rnd;
+        for (int round = 0; round < 100; ++round)
+        {
+            print_spinner();
+            for (auto& p : img)
+                p = rnd.get_random_8bit_number();
+
+            DLIB_TEST(simple_partition_pixels(img) == partition_pixels(img));
+            DLIB_TEST(simple_partition_pixels(img) == impl::partition_pixels_float(img));
+
+            matrix<float> fimg = matrix_cast<float>(img);
+            DLIB_TEST(simple_partition_pixels(img) == partition_pixels(fimg));
+        }
+
+
+        img.set_size(245,123);
+        for (int round = 0; round < 100; ++round)
+        {
+            print_spinner();
+            for (auto& p : img)
+                p = rnd.get_random_8bit_number();
+
+            DLIB_TEST(simple_partition_pixels(img) == partition_pixels(img));
+            DLIB_TEST(simple_partition_pixels(img) == impl::partition_pixels_float(img));
+
+            matrix<float> fimg = matrix_cast<float>(img);
+            DLIB_TEST(simple_partition_pixels(img) == partition_pixels(fimg));
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1975,19 +2009,7 @@ namespace
                 DLIB_TEST(sum(matrix_cast<int>(mat(img))) == 0);
             }
 
-            {
-                matrix<unsigned char> img(4,7);
-
-                dlib::rand rnd;
-                for (int round = 0; round < 100; ++round)
-                {
-                    print_spinner();
-                    for (auto& p : img)
-                        p = rnd.get_random_8bit_number();
-
-                    DLIB_CASSERT(test_partition_pixels(img) == partition_pixels(img))
-                }
-            }
+            test_partition_pixels();
         }
     } a;
 

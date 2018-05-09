@@ -6,6 +6,7 @@
 #include "../pixel.h"
 #include "thresholding_abstract.h"
 #include "equalize_histogram.h"
+#include "../enable_if.h"
 
 namespace dlib
 {
@@ -16,11 +17,139 @@ namespace dlib
     const unsigned char off_pixel = 0;
 
 // ----------------------------------------------------------------------------------------
+    
+    namespace impl
+    {
+        template <
+            typename image_type
+            >
+        typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type 
+        partition_pixels_float (
+            const image_type& img_
+        ) 
+        {
+            /*
+              This is a version of partition_pixels() that doesn't use the histogram to
+              perform a radix sort but rather uses std::sort() as the first processing
+              step.  It is therefor useful in cases where the range of possible pixels is
+              too large for the faster histogram version.
+
+              Also, the reason we have this function in namespace impl is so we can call it
+              for easy testing in dlib's unit tests.  
+            */
+
+            COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false );
+
+            typedef typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type basic_pixel_type;
+
+            const_image_view<image_type> img(img_);
+
+            std::vector<basic_pixel_type> sorted;
+            sorted.reserve(img.size());
+
+            for (long r = 0; r < img.nr(); ++r)
+            {
+                for (long c = 0; c < img.nc(); ++c)
+                    sorted.emplace_back(get_pixel_intensity(img[r][c]));
+            }
+            std::sort(sorted.begin(), sorted.end());
+
+            std::vector<double> cumsum;
+            cumsum.reserve(sorted.size()+1);
+
+            // create integral array 
+            cumsum.emplace_back(0);
+            for (auto& v : sorted)
+                cumsum.emplace_back(cumsum.back()+v);
+
+
+            auto histsum = [&](long begin, long end) 
+            { 
+                return end-begin;
+            };
+            auto histsumi = [&](long begin, long end) 
+            { 
+                return cumsum[end]-cumsum[begin]; 
+            };
+
+            // If we split the pixels into two groups, those < thresh (the left group) and
+            // those >= thresh (the right group), what would the sum of absolute deviations of
+            // each pixel from the mean of its group be?  total_abs(thresh) computes that
+            // value.
+            unsigned long left_idx = 0;
+            unsigned long right_idx = 0;
+            auto total_abs = [&](unsigned long thresh)
+            {
+                auto left_avg = histsumi(0,thresh);
+                auto tmp = histsum(0,thresh);
+                if (tmp != 0)
+                    left_avg /= tmp;
+                auto right_avg = histsumi(thresh,img.size());
+                tmp = histsum(thresh,img.size());
+                if (tmp != 0)
+                    right_avg /= tmp;
+
+
+                while(left_idx+1 < sorted.size() && sorted[left_idx] <= left_avg)
+                    ++left_idx;
+                while(right_idx+1 < sorted.size() && sorted[right_idx] <= right_avg)
+                    ++right_idx;
+
+                double score = 0;
+                score += left_avg*histsum(0,left_idx) - histsumi(0,left_idx); 
+                score -= left_avg*histsum(left_idx,thresh) - histsumi(left_idx,thresh); 
+                score += right_avg*histsum(thresh,right_idx) - histsumi(thresh,right_idx); 
+                score -= right_avg*histsum(right_idx,img.size()) - histsumi(right_idx,img.size()); 
+                return score;
+            };
+
+
+            unsigned long thresh = 0;
+            double min_sad = std::numeric_limits<double>::infinity();
+            for (unsigned long i = 0; i < img.size(); ++i)
+            {
+                // You can't drop a threshold in-between pixels with identical values.  So
+                // skip thresholds corresponding to this degenerate case.
+                if (i > 0 && sorted[i-1]==sorted[i])
+                    continue;
+
+                double sad = total_abs(i);
+                if (sad <= min_sad)
+                {
+                    min_sad = sad;
+                    thresh = i;
+                }
+            }
+
+            return sorted[thresh];
+        }
+
+
+        template <typename image_type>
+        struct is_u16img
+        {
+            typedef typename image_traits<image_type>::pixel_type pixel_type;
+            typedef typename pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
+
+            const static bool value = sizeof(basic_pixel_type) <= 2 && pixel_traits<pixel_type>::is_unsigned;
+        };
+    }
 
     template <
         typename image_type
         >
-    typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type 
+    typename disable_if<impl::is_u16img<image_type>, typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type>::type
+    partition_pixels (
+        const image_type& img
+    ) 
+    {
+        return impl::partition_pixels_float(img);
+    }
+
+    template <
+        typename image_type
+        >
+    typename enable_if<impl::is_u16img<image_type>, typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type>::type
     partition_pixels (
         const image_type& img
     ) 
@@ -84,11 +213,7 @@ namespace dlib
         for (long i = 0; i < hist.size(); ++i)
         {
             double sad = total_abs(i);
-            // The 1e-13 here is to avoid jumping to a higher threshold because of rounding
-            // error in total_abs() reporting a very slightly larger value.  Really this
-            // probably doesn't matter for any real application, but it makes the behavior
-            // of the code more stable which is always nice.
-            if (sad+1e-13*sad < min_sad)
+            if (sad <= min_sad)
             {
                 min_sad = sad;
                 thresh = i;
@@ -140,6 +265,18 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void threshold_image (
+        const in_image_type& in_img,
+        out_image_type& out_img
+    )
+    {
+        threshold_image(in_img,out_img,partition_pixels(in_img));
+    }
 
     template <
         typename image_type
@@ -304,11 +441,8 @@ namespace dlib
 
         COMPILE_TIME_ASSERT(pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale);
 
-        DLIB_ASSERT( lower_thresh <= upper_thresh && is_same_object(in_img_, out_img_) == false,
+        DLIB_ASSERT(is_same_object(in_img_, out_img_) == false,
             "\tvoid hysteresis_threshold(in_img_, out_img_, lower_thresh, upper_thresh)"
-            << "\n\tYou can't use an upper_thresh that is less than your lower_thresh"
-            << "\n\tlower_thresh: " << lower_thresh 
-            << "\n\tupper_thresh: " << upper_thresh 
             << "\n\tis_same_object(in_img_,out_img_): " << is_same_object(in_img_,out_img_) 
             );
 
