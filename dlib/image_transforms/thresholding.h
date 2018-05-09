@@ -418,11 +418,6 @@ namespace dlib
                     } // end while (pos >= 0)
 
                 }
-                else
-                {
-                    out_img[r][c] = off_pixel;
-                }
-
             }
         }
     }
