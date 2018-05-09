@@ -184,6 +184,19 @@ namespace dlib
         padding_mode_t get_padding_mode (
         ) const { return _padding_mode; }
 
+        void set_initial_shape (
+            const matrix<float, 0, 1>& mat
+        )
+        {
+            _initial_shape = mat;
+        }
+
+        const matrix<float, 0, 1>& get_initial_shape (
+        )
+        {
+            return _initial_shape;
+        }
+
         double get_feature_pool_region_padding (
         ) const { return _feature_pool_region_padding; }
         void set_feature_pool_region_padding (
@@ -287,7 +300,10 @@ namespace dlib
             rnd.set_seed(get_random_seed());
 
             std::vector<training_sample<feature_type>> samples;
-            const matrix<float,0,1> initial_shape = populate_training_sample_shapes(objects, samples);
+            matrix<float,0,1> initial_shape = populate_training_sample_shapes(objects, samples);
+            if (_initial_shape.size() != 0) {
+                initial_shape = _initial_shape;
+            }
             const std::vector<std::vector<dlib::vector<float,2> > > pixel_coordinates = randomly_sample_pixel_coordinates(initial_shape);
 
             unsigned long trees_fit_so_far = 0;
@@ -795,6 +811,7 @@ namespace dlib
         bool _verbose;
         unsigned long _num_threads;
         padding_mode_t _padding_mode;
+        matrix<float, 0, 1> _initial_shape;
     };
 
 // ----------------------------------------------------------------------------------------
