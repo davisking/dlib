@@ -178,12 +178,12 @@ namespace dlib
                     Quadratic models for curved line detection in SAR CCD by Davis E. King
                     and Rhonda D. Phillips
 
-
                 This technique gives very accurate gradient estimates and is also very fast
                 since the entire gradient estimation procedure, for each type of gradient,
-                is accomplished with a single separable filter.  This means you can compute
-                gradients at very large scales (e.g. by fitting the quadratic to a large
-                window like a 99x99 window) and it still runs very quickly.
+                is accomplished by cross-correlating the image with a single separable
+                filter.  This means you can compute gradients at very large scales (e.g. by
+                fitting the quadratic to a large window, like a 99x99 window) and it still
+                runs very quickly.
         !*/
 
     public:
