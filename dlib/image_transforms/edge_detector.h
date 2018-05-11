@@ -8,6 +8,7 @@
 #include "../array2d.h"
 #include "../geometry.h"
 #include <vector>
+#include "../image_keypoint/build_separable_poly_filters.h"
 
 namespace dlib
 {
@@ -391,6 +392,233 @@ namespace dlib
                 newpixels.push_back(p);
         }
         return newpixels;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    class image_gradients
+    {
+
+    public:
+
+        image_gradients (
+        ) : image_gradients(1) {}
+
+        image_gradients (
+            long scale
+        ) : the_scale(scale)
+        {
+            DLIB_CASSERT(scale >= 1);
+
+            scale = 2*scale+1;
+
+            auto dfilters = build_separable_poly_filters(2,scale); 
+            DLIB_CASSERT(dfilters[1].size() == 1);
+            DLIB_CASSERT(dfilters[2].size() == 1);
+            DLIB_CASSERT(dfilters[3].size() == 1);
+            DLIB_CASSERT(dfilters[4].size() == 1);
+            DLIB_CASSERT(dfilters[5].size() == 1);
+
+            filter_x.first = matrix_cast<float>(dfilters[1][0].first);
+            filter_x.second = matrix_cast<float>(dfilters[1][0].second);
+
+            filter_y.first = matrix_cast<float>(dfilters[2][0].first);
+            filter_y.second = matrix_cast<float>(dfilters[2][0].second);
+
+            // We multiply by 2 so that the filter gives the gradient rather than the x^2
+            // polynomial coefficient.
+            filter_xx.first = 2*matrix_cast<float>(dfilters[3][0].first);
+            filter_xx.second = matrix_cast<float>(dfilters[3][0].second);
+
+            filter_xy.first = matrix_cast<float>(dfilters[4][0].first);
+            filter_xy.second = matrix_cast<float>(dfilters[4][0].second);
+
+            // We multiply by 2 so that the filter gives the gradient rather than the y^2
+            // polynomial coefficient.
+            filter_yy.first = 2*matrix_cast<float>(dfilters[5][0].first);
+            filter_yy.second = matrix_cast<float>(dfilters[5][0].second);
+        }
+
+
+        long get_scale() const { return the_scale; }
+
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        rectangle gradient_x(
+            const in_image_type& img,
+            out_image_type& out
+        ) const 
+        { 
+            return spatially_filter_image_separable(img, out, filter_x.second, filter_x.first); 
+        }
+
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        rectangle gradient_y(
+            const in_image_type& img,
+            out_image_type& out
+        ) const 
+        { 
+            return spatially_filter_image_separable(img, out, filter_y.second, filter_y.first); 
+        }
+
+
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        rectangle gradient_xx(
+            const in_image_type& img,
+            out_image_type& out
+        )  const
+        { 
+            return spatially_filter_image_separable(img, out, filter_xx.second, filter_xx.first); 
+        }
+
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        rectangle gradient_xy(
+            const in_image_type& img,
+            out_image_type& out
+        ) const 
+        { 
+            return spatially_filter_image_separable(img, out, filter_xy.second, filter_xy.first); 
+        }
+
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        rectangle gradient_yy(
+            const in_image_type& img,
+            out_image_type& out
+        ) const
+        { 
+            return spatially_filter_image_separable(img, out, filter_yy.second, filter_yy.first); 
+        }
+
+        matrix<float> get_x_filter()  const { return filter_x.first*trans(filter_x.second); }
+        matrix<float> get_y_filter()  const { return filter_y.first*trans(filter_y.second); }
+        matrix<float> get_xx_filter() const { return filter_xx.first*trans(filter_xx.second); }
+        matrix<float> get_xy_filter() const { return filter_xy.first*trans(filter_xy.second); }
+        matrix<float> get_yy_filter() const { return filter_yy.first*trans(filter_yy.second); }
+
+    private:
+        std::pair<matrix<float,0,1>,matrix<float,0,1>> filter_x;
+        std::pair<matrix<float,0,1>,matrix<float,0,1>> filter_y;
+        std::pair<matrix<float,0,1>,matrix<float,0,1>> filter_xx;
+        std::pair<matrix<float,0,1>,matrix<float,0,1>> filter_xy;
+        std::pair<matrix<float,0,1>,matrix<float,0,1>> filter_yy;
+
+        long the_scale;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <
+            typename in_image_type,
+            typename out_image_type
+            >
+        void find_lines(
+            const in_image_type& xx_,
+            const in_image_type& xy_,
+            const in_image_type& yy_,
+            out_image_type& horz_,
+            out_image_type& vert_,
+            double positive_if_should_find_dark_lines
+        )
+        {
+            typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+            static_assert(std::is_same<float,out_pixel_type>::value || std::is_same<double,out_pixel_type>::value,
+                "Output images must contain either float or double valued pixels");
+
+            const_image_view<in_image_type> xx(xx_);
+            const_image_view<in_image_type> xy(xy_);
+            const_image_view<in_image_type> yy(yy_);
+
+            DLIB_CASSERT(xx.nr() == xy.nr());
+            DLIB_CASSERT(xx.nr() == yy.nr());
+            DLIB_CASSERT(xx.nc() == xy.nc());
+            DLIB_CASSERT(xx.nc() == yy.nc());
+
+
+            image_view<out_image_type> x(horz_);
+            image_view<out_image_type> y(vert_);
+
+            x.set_size(xx.nr(), xx.nc());
+            y.set_size(xx.nr(), xx.nc());
+
+
+            // store the max eigenvalue into xy and then the associated eigen vector into [xx,yy]
+            for (long r = 0; r < xx.nr(); ++r)
+            {
+                for (long c = 0; c < xx.nc(); ++c)
+                {
+                    // negate to that lambda will be the *minimum* eigenvalue
+                    double w1 = positive_if_should_find_dark_lines*xx[r][c]/2.0;
+                    double w2 = positive_if_should_find_dark_lines*yy[r][c]/2.0;
+                    double w3 = positive_if_should_find_dark_lines*xy[r][c];
+
+
+                    auto lambda = w1 + w2 + std::sqrt((w1-w2)*(w1-w2) + w3*w3);
+                    if (lambda < 0)
+                        lambda = 0;
+
+                    if (2*w1!=lambda)
+                    {
+                        x[r][c] = -w3/(2*w1-lambda);
+                        y[r][c] = 1;
+
+                        double norm = std::sqrt(x[r][c]*x[r][c] + y[r][c]*y[r][c]);
+                        x[r][c] *= lambda/norm;
+                        y[r][c] *= lambda/norm;
+                    }
+                    else
+                    {
+                        x[r][c] = lambda;
+                        y[r][c] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void find_bright_lines(
+        const in_image_type& xx,
+        const in_image_type& xy,
+        const in_image_type& yy,
+        out_image_type& horz,
+        out_image_type& vert
+    )
+    {
+        impl::find_lines(xx,xy,yy,horz,vert,-1);
+    }
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void find_dark_lines(
+        const in_image_type& xx,
+        const in_image_type& xy,
+        const in_image_type& yy,
+        out_image_type& horz,
+        out_image_type& vert
+    )
+    {
+        impl::find_lines(xx,xy,yy,horz,vert,+1);
     }
 
 // ----------------------------------------------------------------------------------------
