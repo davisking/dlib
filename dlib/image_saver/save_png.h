@@ -80,7 +80,7 @@ namespace dlib
 
             impl::impl_save_png(file_name, row_pointers, img.nc(), impl::png_type_rgb_alpha, 8);
         }
-        else if (pixel_traits<pixel_type>::lab || pixel_traits<pixel_type>::hsi || pixel_traits<pixel_type>::rgb)
+        else if (pixel_traits<pixel_type>::lab || pixel_traits<pixel_type>::hsi || pixel_traits<pixel_type>::rgb || pixel_traits<pixel_type>::rgb_normalized)
         {
             // convert from Lab or HSI to RGB (Or potentially RGB pixels that aren't laid out as R G B)
             array2d<rgb_pixel> temp_img;

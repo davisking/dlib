@@ -34,6 +34,7 @@ namespace dlib
         This traits class will define the following public static members:
             - bool grayscale
             - bool rgb
+            - bool rgb_normalized
             - bool rgb_alpha
             - bool hsi
             - bool lab
@@ -48,7 +49,7 @@ namespace dlib
             - is_unsigned
 
         The above public constants are subject to the following constraints:
-            - only one of grayscale, rgb, rgb_alpha, hsi or lab is true
+            - only one of grayscale, rgb, rgb_normalized, rgb_alpha, hsi or lab is true
             - if (rgb == true) then
                 - The type T will be a struct with 3 public members of type 
                   unsigned char named "red" "green" and "blue".  
@@ -59,6 +60,17 @@ namespace dlib
                 - min() == 0 
                 - max() == 255
                 - is_unsigned == true
+            - if (rgb_normalized == true) then
+                - The type T will be a struct with 3 public members of type 
+                  float named "red" "green" and "blue".  
+                - This type of pixel represents the RGB color space with values
+                  normalized between -0.5 to +0.5.
+                - num == 3
+                - has_alpha == false
+                - basic_pixel_type == float
+                - min() == -0.5
+                - max() == 0.5
+                - is_unsigned == false
             - if (rgb_alpha == true) then
                 - The type T will be a struct with 4 public members of type 
                   unsigned char named "red" "green" "blue" and "alpha".  
@@ -125,6 +137,31 @@ namespace dlib
         unsigned char red;
         unsigned char green;
         unsigned char blue;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    struct rgb_normalized_pixel
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is a simple struct that represents an RGB colored graphical pixel that
+                is normalized to a value ranging from -0.5 to +0.5 by mean subtraction followed
+                by division by 256.0
+        !*/
+
+        rgb_normalized_pixel (
+        ) {}
+
+        rgb_normalized_pixel (
+            float red_,
+            float green_,
+            float blue_
+        ) : red(red_), green(green_), blue(blue_) {}
+
+        float red;
+        float green;
+        float blue;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -324,6 +361,26 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     inline void serialize (
+        const rgb_normalized_pixel& item, 
+        std::ostream& out 
+    );   
+    /*!
+        provides serialization support for the rgb_normalized_pixel struct
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline void deserialize (
+        rgb_normalized_pixel& item, 
+        std::istream& in
+    );   
+    /*!
+        provides deserialization support for the rgb_normalized_pixel struct
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    inline void serialize (
         const bgr_pixel& item, 
         std::ostream& out 
     );   
@@ -411,11 +468,31 @@ namespace dlib
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;
+        constexpr static bool rgb_normalized = false;
         enum { num = 3};
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
         static basic_pixel_type max() { return 255;}
         constexpr static bool is_unsigned = true;
+        constexpr static bool has_alpha = false;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    template <>
+    struct pixel_traits<rgb_normalized_pixel>
+    {
+        constexpr static bool rgb  = false;
+        constexpr static bool rgb_alpha  = false;
+        constexpr static bool grayscale = false;
+        constexpr static bool hsi = false;
+        constexpr static bool lab = false;
+        constexpr static bool rgb_normalized = true;
+        enum { num = 3};
+        typedef float basic_pixel_type;
+        static basic_pixel_type min() { return -0.5;}
+        static basic_pixel_type max() { return 0.5;}
+        constexpr static bool is_unsigned = false;
         constexpr static bool has_alpha = false;
     };
 
@@ -429,6 +506,7 @@ namespace dlib
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;
+        constexpr static bool rgb_normalized = false;
         constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
@@ -447,6 +525,7 @@ namespace dlib
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;
+        constexpr static bool rgb_normalized = false;
         constexpr static long num = 4;
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
@@ -466,6 +545,7 @@ namespace dlib
         constexpr static bool grayscale = false;
         constexpr static bool hsi = true;
         constexpr static bool lab = false;
+        constexpr static bool rgb_normalized = false;
         constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
@@ -485,6 +565,7 @@ namespace dlib
         constexpr static bool grayscale = false;
         constexpr static bool hsi = false;
         constexpr static bool lab = true;
+        constexpr static bool rgb_normalized = false;
         constexpr static long num = 3;
         typedef unsigned char basic_pixel_type;
         static basic_pixel_type min() { return 0;}
@@ -503,6 +584,7 @@ namespace dlib
         constexpr static bool grayscale = true;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;
+        constexpr static bool rgb_normalized = false;
         constexpr static long num = 1;
         constexpr static bool has_alpha = false;
         typedef T basic_pixel_type;
@@ -535,6 +617,7 @@ namespace dlib
         constexpr static bool grayscale = true;
         constexpr static bool hsi = false;
         constexpr static bool lab = false;
+        constexpr static bool rgb_normalized = false;
         constexpr static long num = 1;
         constexpr static bool has_alpha = false;
         typedef T basic_pixel_type;
@@ -559,7 +642,34 @@ namespace dlib
 
     namespace assign_pixel_helpers
     {
+        const float red_average = 122.782;
+        const float green_average = 117.001;
+        const float blue_average = 104.298;
 
+    // -----------------------------
+        inline float normalize_red(unsigned char red) {
+            return (((float) red) - assign_pixel_helpers::red_average) / 256.0;
+        }
+
+        inline float normalize_green(unsigned char green) {
+            return (((float) green) - assign_pixel_helpers::green_average) / 256.0;
+        }
+
+        inline float normalize_blue(unsigned char blue) {
+            return (((float) blue) - assign_pixel_helpers::blue_average) / 256.0;
+        }
+
+        inline unsigned char denormalize_red(float red) {
+            return (unsigned char) ((red * 256.0) + assign_pixel_helpers::red_average);
+        }
+
+        inline unsigned char denormalize_green(float green) {
+            return (unsigned char) ((green * 256.0) + assign_pixel_helpers::green_average);
+        }
+
+        inline unsigned char denormalize_blue(float blue) {
+            return (unsigned char) ((blue * 256.0) + assign_pixel_helpers::blue_average);
+        }
     // -----------------------------
         // all the same kind 
 
@@ -675,6 +785,15 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb_normalized && pixel_traits<P2>::rgb_normalized>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            dest.red = src.red; 
+            dest.green = src.green; 
+            dest.blue = src.blue; 
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::rgb_alpha>::type
         assign(P1& dest, const P2& src) 
         { 
@@ -702,7 +821,7 @@ namespace dlib
             dest.b = src.b;
         }
 
-    // -----------------------------
+        // -----------------------------
         // dest is a grayscale
 
         template < typename P1, typename P2 >
@@ -713,6 +832,19 @@ namespace dlib
                                         static_cast<unsigned int>(src.green) +  
                                         static_cast<unsigned int>(src.blue))/3);
             assign_pixel(dest, temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::grayscale && pixel_traits<P2>::rgb_normalized>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            // Temporarily assign source pixel to rgb
+            rgb_pixel temp;
+            assign_pixel(temp, src);
+
+            // now we can just go assign the new rgb value to the
+            // grayscale pixel
+            assign_pixel(dest,temp);
         }
 
         template < typename P1, typename P2 >
@@ -1034,6 +1166,15 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::rgb_normalized>::type
+        assign(P1& dest, const P2& src) 
+        {
+            dest.red = assign_pixel_helpers::denormalize_red(src.red);
+            dest.green = assign_pixel_helpers::denormalize_green(src.green);
+            dest.blue = assign_pixel_helpers::denormalize_blue(src.blue);
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb && pixel_traits<P2>::grayscale>::type
         assign(P1& dest, const P2& src) 
         { 
@@ -1157,6 +1298,20 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::rgb_normalized>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            rgb_pixel temp;
+
+            // convert to temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // rgb_alpha pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::rgb_alpha && pixel_traits<P2>::hsi>::type
         assign(P1& dest, const P2& src) 
         { 
@@ -1229,6 +1384,18 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::rgb_normalized>::type
+        assign(P1& dest, const P2& src) 
+        { 
+            rgb_pixel temp;
+            // convert source rgb_normalized_pixel to rgb
+            assign_pixel_helpers::assign(temp,src);
+            // now we can just go assign the new rgb value to the
+            // hsi pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::hsi && pixel_traits<P2>::rgb_alpha>::type
         assign(P1& dest, const P2& src) 
         { 
@@ -1294,6 +1461,17 @@ namespace dlib
         }
 
         template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::rgb_normalized>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+            // convert source rgb_normalized pixel to rgb
+            assign_pixel_helpers::assign(temp,src);
+            // Now just assign
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
         typename enable_if_c<pixel_traits<P1>::lab && pixel_traits<P2>::rgb_alpha>::type
         assign(P1& dest, const P2& src)
         {
@@ -1320,6 +1498,87 @@ namespace dlib
 
             // now we can just go assign the new rgb value to the
             // lab pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+    // -----------------------------
+        // dest is an rgb_normalized pixel
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb_normalized && pixel_traits<P2>::rgb>::type
+        assign(P1& dest, const P2& src)
+        {
+            dest.red = assign_pixel_helpers::normalize_red(src.red);
+            dest.green = assign_pixel_helpers::normalize_green(src.green);
+            dest.blue = assign_pixel_helpers::normalize_blue(src.blue);
+        }
+
+        template < typename P1>
+        typename enable_if_c<pixel_traits<P1>::rgb_normalized>::type
+        assign(P1& dest, const unsigned char& src)
+        {
+            rgb_pixel temp;
+
+            // convert to temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // rgb_normalized pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb_normalized && pixel_traits<P2>::grayscale>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+
+            // convert grayscale value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb_normalized && pixel_traits<P2>::rgb_alpha>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+
+            // convert rgb_alpha value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb_normalized && pixel_traits<P2>::hsi>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+
+            // convert hsi value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // pixel
+            assign_pixel_helpers::assign(dest,temp);
+        }
+
+        template < typename P1, typename P2 >
+        typename enable_if_c<pixel_traits<P1>::rgb_normalized && pixel_traits<P2>::lab>::type
+        assign(P1& dest, const P2& src)
+        {
+            rgb_pixel temp;
+
+            // convert lab value to our temp rgb pixel
+            assign_pixel_helpers::assign(temp,src);
+
+            // now we can just go assign the new rgb value to the
+            // pixel
             assign_pixel_helpers::assign(dest,temp);
         }
     }
@@ -1524,6 +1783,44 @@ namespace dlib
         catch (serialization_error& e)
         {
             throw serialization_error(e.info + "\n   while deserializing object of type rgb_pixel"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void serialize (
+        const rgb_normalized_pixel& item, 
+        std::ostream& out 
+    )   
+    {
+        try
+        {
+            serialize(item.red,out);
+            serialize(item.green,out);
+            serialize(item.blue,out);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while serializing object of type rgb_normalized_pixel"); 
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline void deserialize (
+        rgb_normalized_pixel& item, 
+        std::istream& in
+    )   
+    {
+        try
+        {
+            deserialize(item.red,in);
+            deserialize(item.green,in);
+            deserialize(item.blue,in);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while deserializing object of type rgb_normalized_pixel"); 
         }
     }
 

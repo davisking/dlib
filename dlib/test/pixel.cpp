@@ -9,6 +9,7 @@
 #include <dlib/pixel.h>
 #include <dlib/matrix.h>
 #include <dlib/image_io.h>
+#include <cmath>        // std::abs
 
 #include "tester.h"
 
@@ -40,6 +41,67 @@ namespace
         hsi_pixel p_hsi, p_hsi2;
         rgb_alpha_pixel p_rgba;
         lab_pixel p_lab, p_lab2;
+
+        // Basic tests for rgb_normalized_pixel
+        rgb_normalized_pixel p_norm_rgb, p_norm_rgb2;
+        // Constant assignment
+        assign_pixel(p_norm_rgb, 10);
+        DLIB_TEST(p_norm_rgb.red == dlib::assign_pixel_helpers::normalize_red(10));
+        DLIB_TEST(p_norm_rgb.green == dlib::assign_pixel_helpers::normalize_green(10));
+        DLIB_TEST(p_norm_rgb.blue == dlib::assign_pixel_helpers::normalize_blue(10));
+        // Assignment from other pixel types
+        p_rgb.red = 255;
+        p_rgb.green = 127;
+        p_rgb.blue = 0;
+        // Assigment from rgb
+        assign_pixel(p_norm_rgb, p_rgb);
+        DLIB_TEST(p_norm_rgb.red == dlib::assign_pixel_helpers::normalize_red(255));
+        DLIB_TEST(p_norm_rgb.green == dlib::assign_pixel_helpers::normalize_green(127));
+        DLIB_TEST(p_norm_rgb.blue == dlib::assign_pixel_helpers::normalize_blue(0));
+        // Assigment from rgb_alpha
+        assign_pixel(p_rgba, p_rgb);
+        assign_pixel(p_norm_rgb, p_rgba);
+        DLIB_TEST(p_norm_rgb.red == dlib::assign_pixel_helpers::normalize_red(255));
+        DLIB_TEST(p_norm_rgb.green == dlib::assign_pixel_helpers::normalize_green(127));
+        DLIB_TEST(p_norm_rgb.blue == dlib::assign_pixel_helpers::normalize_blue(0));
+        // Assignment from HSI
+        DLIB_TEST(abs(p_norm_rgb.red - dlib::assign_pixel_helpers::normalize_red(255)) < 0.006);
+        DLIB_TEST(abs(p_norm_rgb.green - dlib::assign_pixel_helpers::normalize_green(127)) < 0.006);
+        DLIB_TEST(abs(p_norm_rgb.blue - dlib::assign_pixel_helpers::normalize_blue(0)) < 0.006);
+        // Assignment from Lab
+        assign_pixel(p_lab, p_rgb);
+        assign_pixel(p_norm_rgb, p_lab);
+        DLIB_TEST(abs(p_norm_rgb.red - dlib::assign_pixel_helpers::normalize_red(255)) < 0.006);
+        DLIB_TEST(abs(p_norm_rgb.green - dlib::assign_pixel_helpers::normalize_green(127)) < 0.006);
+        DLIB_TEST(abs(p_norm_rgb.blue - dlib::assign_pixel_helpers::normalize_blue(0)) < 0.006);
+        // Assignment to other types
+        p_rgb.red = 1;
+        p_rgb.green = 120;
+        p_rgb.blue = 200;
+        assign_pixel(p_norm_rgb, p_rgb);
+        // Assignment to RGB
+        assign_pixel(p_rgb2, p_norm_rgb);
+        DLIB_TEST(p_rgb.red == p_rgb2.red);
+        DLIB_TEST(p_rgb.green == p_rgb2.green);
+        DLIB_TEST(p_rgb.blue == p_rgb2.blue);
+        // Assignment to rgb_alpha
+        assign_pixel(p_rgba, p_norm_rgb);
+        DLIB_TEST(p_rgba.red == 1);
+        DLIB_TEST(p_rgba.green == 120);
+        DLIB_TEST(p_rgba.blue == 200);
+        // Assignment to lab
+        assign_pixel(p_lab, p_norm_rgb);
+        assign_pixel(p_rgb2, p_lab);
+        DLIB_TEST(abs(p_rgb.red - p_rgb2.red) < 2);
+        DLIB_TEST(abs(p_rgb.green - p_rgb2.green) < 2);
+        DLIB_TEST(abs(p_rgb.blue - p_rgb2.blue) < 2);
+        // Assignment to hsi
+        assign_pixel(p_hsi, p_norm_rgb);
+        assign_pixel(p_rgb2, p_hsi);
+        DLIB_TEST(abs(p_rgb.red - p_rgb2.red) < 2);
+        DLIB_TEST(abs(p_rgb.green - p_rgb2.green) < 2);
+        DLIB_TEST(abs(p_rgb.blue - p_rgb2.blue) < 2);
+
 
         assign_pixel(p_int, 0.0f);
         assign_pixel(p_float, 0.0f);
@@ -459,6 +521,10 @@ namespace
         p_lab.a = 9;
         p_lab.b = 8;
 
+        p_norm_rgb.red = -0.25;
+        p_norm_rgb.green = 0;
+        p_norm_rgb.blue = 0.25;
+
         ostringstream sout;
         serialize(p_rgb,sout);
         serialize(p_rgba,sout);
@@ -468,6 +534,7 @@ namespace
         serialize(p_float,sout);
         serialize(p_hsi,sout);
         serialize(p_lab,sout);
+        serialize(p_norm_rgb,sout);
 
         assign_pixel(p_rgb,0);
         assign_pixel(p_rgba,0);
@@ -477,6 +544,7 @@ namespace
         assign_pixel(p_float,0);
         assign_pixel(p_hsi,0);
         assign_pixel(p_lab,0);
+        assign_pixel(p_norm_rgb,0);
 
         istringstream sin(sout.str());
 
@@ -488,6 +556,7 @@ namespace
         deserialize(p_float,sin);
         deserialize(p_hsi,sin);
         deserialize(p_lab,sin);
+        deserialize(p_norm_rgb,sin);
 
         DLIB_TEST(p_rgb.red == 1);
         DLIB_TEST(p_rgb.green == 2);
@@ -511,9 +580,14 @@ namespace
         DLIB_TEST(p_lab.a == 9);
         DLIB_TEST(p_lab.b == 8);
 
+        DLIB_TEST(p_norm_rgb.red == -0.25);
+        DLIB_TEST(p_norm_rgb.green == 0);
+        DLIB_TEST(p_norm_rgb.blue == 0.25);
+        assign_pixel(p_norm_rgb, p_rgb);
+
         {
             matrix<double,1,1> m_gray, m_schar, m_int, m_float;
-            matrix<double,3,1> m_rgb, m_hsi, m_lab;
+            matrix<double,3,1> m_rgb, m_hsi, m_lab, m_norm_rgb;
 
             m_gray = pixel_to_vector<double>(p_gray);
             m_schar = pixel_to_vector<double>(p_schar);
@@ -523,6 +597,7 @@ namespace
             m_hsi = pixel_to_vector<double>(p_hsi);
             m_rgb = pixel_to_vector<double>(p_rgb);
             m_lab = pixel_to_vector<double>(p_lab);
+            m_norm_rgb = pixel_to_vector<double>(p_norm_rgb);
 
             DLIB_TEST(m_gray(0) == p_gray);
             DLIB_TEST(m_float(0) == p_float);
@@ -538,6 +613,13 @@ namespace
             DLIB_TEST(m_lab(0) == p_lab.l);
             DLIB_TEST(m_lab(1) == p_lab.a);
             DLIB_TEST(m_lab(2) == p_lab.b);
+            DLIB_TEST(m_norm_rgb(0) == dlib::assign_pixel_helpers::normalize_red(p_rgb.red));
+            DLIB_TEST(m_norm_rgb(1) == dlib::assign_pixel_helpers::normalize_green(p_rgb.green));
+            DLIB_TEST(m_norm_rgb(2) == dlib::assign_pixel_helpers::normalize_blue(p_rgb.blue));
+
+            DLIB_TEST(p_norm_rgb.red == dlib::assign_pixel_helpers::normalize_red(1));
+            DLIB_TEST(p_norm_rgb.green == dlib::assign_pixel_helpers::normalize_green(2));
+            DLIB_TEST(p_norm_rgb.blue == dlib::assign_pixel_helpers::normalize_blue(3));
 
             DLIB_TEST(p_rgb.red == 1);
             DLIB_TEST(p_rgb.green == 2);
@@ -570,6 +652,7 @@ namespace
             vector_to_pixel(p_hsi, m_hsi);
             vector_to_pixel(p_rgb, m_rgb);
             vector_to_pixel(p_lab, m_lab);
+            vector_to_pixel(p_norm_rgb, m_norm_rgb);
 
             DLIB_TEST(p_rgb.red == 1);
             DLIB_TEST(p_rgb.green == 2);
@@ -589,6 +672,10 @@ namespace
             DLIB_TEST(p_lab.l == 10);
             DLIB_TEST(p_lab.a == 9);
             DLIB_TEST(p_lab.b == 8);
+
+            DLIB_TEST(p_norm_rgb.red == dlib::assign_pixel_helpers::normalize_red(1));
+            DLIB_TEST(p_norm_rgb.green == dlib::assign_pixel_helpers::normalize_green(2));
+            DLIB_TEST(p_norm_rgb.blue == dlib::assign_pixel_helpers::normalize_blue(3));
         }
 
 
@@ -601,6 +688,7 @@ namespace
             float p_float;
             signed char p_schar;
             rgb_pixel p_rgb;
+            rgb_normalized_pixel p_norm_rgb;
             hsi_pixel p_hsi, p_hsi2;
             rgb_alpha_pixel p_rgba;
             lab_pixel p_lab;
@@ -612,6 +700,7 @@ namespace
             assign_pixel(p_float, 0);
             assign_pixel(p_schar, 0);
             assign_pixel(p_rgb, 0);
+            assign_pixel(p_norm_rgb, 0);
             assign_pixel(p_hsi, 0);
             assign_pixel(p_lab, 0);
 
@@ -635,6 +724,11 @@ namespace
             DLIB_TEST(p_rgb.green == 200);
             DLIB_TEST(p_rgb.blue == 200);
 
+            assign_pixel(p_norm_rgb, p_float);
+            DLIB_TEST(p_norm_rgb.red == dlib::assign_pixel_helpers::normalize_red(200));
+            DLIB_TEST(p_norm_rgb.green == dlib::assign_pixel_helpers::normalize_green(200));
+            DLIB_TEST(p_norm_rgb.blue == dlib::assign_pixel_helpers::normalize_blue(200));
+
             p_schar = 0;
             assign_pixel(p_schar, p_rgb);
             DLIB_TEST(p_schar == std::numeric_limits<signed char>::max());
@@ -654,6 +748,11 @@ namespace
             DLIB_TEST(p_rgb.red == 0);
             DLIB_TEST(p_rgb.green == 0);
             DLIB_TEST(p_rgb.blue == 0);
+
+            assign_pixel(p_norm_rgb, p_schar);
+            DLIB_TEST(p_norm_rgb.red == dlib::assign_pixel_helpers::normalize_red(0));
+            DLIB_TEST(p_norm_rgb.green == dlib::assign_pixel_helpers::normalize_green(0));
+            DLIB_TEST(p_norm_rgb.blue == dlib::assign_pixel_helpers::normalize_blue(0));
             
             assign_pixel(p_gray16, p_schar);
             DLIB_TEST(p_gray16 == 0);
