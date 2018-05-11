@@ -169,6 +169,7 @@
          <item>threshold_image</item>
          <item>partition_pixels</item>
          <item>hough_transform</item>
+         <item>image_gradients</item>
       </section>
 
       <section>
@@ -1399,6 +1400,51 @@
          <examples>
             <example>image_ex.cpp.html</example>
          </examples>
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>image_gradients</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>        
+                This class is a tool for computing first and second derivatives of an
+                image.  It does this by fitting a quadratic surface around each pixel and
+                then computing the gradients of that quadratic surface.  For the details
+                see the paper:
+                <blockquote>
+                  <a href="quadratic_image_models_IGARSS2013.pdf">Quadratic models for curved line detection in SAR CCD by Davis E. King
+                     and Rhonda D. Phillips</a>
+                </blockquote>
+
+                This technique gives very accurate gradient estimates and is
+                also very fast since the entire gradient estimation procedure,
+                for each type of gradient, is accomplished by cross-correlating
+                the image with a single separable filter.  This means you can
+                compute gradients at very large scales (e.g. by fitting the
+                quadratic to a large window, like a 99x99 window) and it still
+                runs very quickly.
+
+                <p>
+                   For example, the filters used to compute the X, Y, XX, XY,
+                   and YY gradients at a scale of 130 are shown below:
+                  <table>
+                     <tr> 
+                        <td>X:</td> <td><img src="image_gradient_x.jpg"/></td> 
+                        <td>Y:</td> <td><img src="image_gradient_y.jpg"/></td> 
+                     </tr>
+                     <tr> 
+                        <td>XX:</td> <td><img src="image_gradient_xx.jpg"/></td> 
+                        <td>XY:</td> <td><img src="image_gradient_xy.jpg"/></td> 
+                        <td>YY:</td> <td><img src="image_gradient_yy.jpg"/></td> 
+                     </tr>
+                  </table>
+                </p>
+                
+
+         </description>
+                                 
       </component>
             
    <!-- ************************************************************************* -->

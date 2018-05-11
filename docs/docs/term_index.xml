@@ -1429,6 +1429,7 @@
          <term file="imaging.html" name="get_pixel_intensity"        include="dlib/pixel.h"/>
          <term file="imaging.html" name="hysteresis_threshold"       include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="sobel_edge_detector"        include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="image_gradients"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="suppress_non_maximum_edges" include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="zero_border_pixels"         include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="binary_close"               include="dlib/image_transforms.h"/>
