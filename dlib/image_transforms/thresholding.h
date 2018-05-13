@@ -21,11 +21,127 @@ namespace dlib
     namespace impl
     {
         template <
-            typename image_type
+            typename U,
+            typename V,
+            typename basic_pixel_type
             >
-        typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type 
-        partition_pixels_float (
-            const image_type& img_
+        void partition_pixels_float_work (
+            unsigned long begin,
+            unsigned long end,
+            U&& cumsum,
+            V&& sorted,
+            basic_pixel_type& pix_thresh,
+            unsigned long& int_thresh
+        ) 
+        {
+
+            auto histsum = [&](long begin, long end) 
+            { 
+                return end-begin;
+            };
+            auto histsumi = [&](long begin, long end) 
+            { 
+                return cumsum[end]-cumsum[begin]; 
+            };
+
+            // If we split the pixels into two groups, those < thresh (the left group) and
+            // those >= thresh (the right group), what would the sum of absolute deviations of
+            // each pixel from the mean of its group be?  total_abs(thresh) computes that
+            // value.
+            unsigned long left_idx = 0;
+            unsigned long right_idx = 0;
+            auto total_abs = [&](unsigned long thresh)
+            {
+                auto left_avg = histsumi(begin,thresh);
+                auto tmp = histsum(begin,thresh);
+                if (tmp != 0)
+                    left_avg /= tmp;
+                auto right_avg = histsumi(thresh,end);
+                tmp = histsum(thresh,end);
+                if (tmp != 0)
+                    right_avg /= tmp;
+
+
+                while(left_idx+1 < sorted.size() && sorted[left_idx] <= left_avg)
+                    ++left_idx;
+                while(right_idx+1 < sorted.size() && sorted[right_idx] <= right_avg)
+                    ++right_idx;
+
+                double score = 0;
+                score += left_avg*histsum(begin,left_idx) - histsumi(begin,left_idx); 
+                score -= left_avg*histsum(left_idx,thresh) - histsumi(left_idx,thresh); 
+                score += right_avg*histsum(thresh,right_idx) - histsumi(thresh,right_idx); 
+                score -= right_avg*histsum(right_idx,end) - histsumi(right_idx,end); 
+                return score;
+            };
+
+
+
+            int_thresh = begin;
+            double min_sad = std::numeric_limits<double>::infinity();
+            for (unsigned long i = begin; i < end; ++i)
+            {
+                // You can't drop a threshold in-between pixels with identical values.  So
+                // skip thresholds corresponding to this degenerate case.
+                if (i > 0 && sorted[i-1]==sorted[i])
+                    continue;
+
+                double sad = total_abs(i);
+                if (sad <= min_sad)
+                {
+                    min_sad = sad;
+                    int_thresh = i;
+                }
+            }
+
+            pix_thresh = sorted[int_thresh];
+        }
+
+        template <
+            typename U,
+            typename V,
+            typename basic_pixel_type
+            >
+        void recursive_partition_pixels_float (
+            unsigned long begin,
+            unsigned long end,
+            U&& cumsum,
+            V&& sorted,
+            basic_pixel_type& pix_thresh
+        ) 
+        {
+            unsigned long int_thresh;
+            partition_pixels_float_work(begin, end, cumsum, sorted, pix_thresh, int_thresh);
+        }
+
+        template <
+            typename U,
+            typename V,
+            typename basic_pixel_type,
+            typename ...T
+            >
+        void recursive_partition_pixels_float (
+            unsigned long begin,
+            unsigned long end,
+            U&& cumsum,
+            V&& sorted,
+            basic_pixel_type& pix_thresh,
+            T&& ...more_thresholds
+        ) 
+        {
+            unsigned long int_thresh;
+            partition_pixels_float_work(begin, end, cumsum, sorted, pix_thresh, int_thresh);
+            recursive_partition_pixels_float(int_thresh, end, cumsum, sorted, more_thresholds...);
+        }
+
+        template <
+            typename image_type,
+            typename ...T
+            >
+        void partition_pixels_float (
+            const image_type& img_,
+            typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type& pix_thresh,
+            T&& ...more_thresholds
         ) 
         {
             /*
@@ -33,9 +149,6 @@ namespace dlib
               perform a radix sort but rather uses std::sort() as the first processing
               step.  It is therefor useful in cases where the range of possible pixels is
               too large for the faster histogram version.
-
-              Also, the reason we have this function in namespace impl is so we can call it
-              for easy testing in dlib's unit tests.  
             */
 
             COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false );
@@ -63,70 +176,14 @@ namespace dlib
                 cumsum.emplace_back(cumsum.back()+v);
 
 
-            auto histsum = [&](long begin, long end) 
-            { 
-                return end-begin;
-            };
-            auto histsumi = [&](long begin, long end) 
-            { 
-                return cumsum[end]-cumsum[begin]; 
-            };
 
-            // If we split the pixels into two groups, those < thresh (the left group) and
-            // those >= thresh (the right group), what would the sum of absolute deviations of
-            // each pixel from the mean of its group be?  total_abs(thresh) computes that
-            // value.
-            unsigned long left_idx = 0;
-            unsigned long right_idx = 0;
-            auto total_abs = [&](unsigned long thresh)
-            {
-                auto left_avg = histsumi(0,thresh);
-                auto tmp = histsum(0,thresh);
-                if (tmp != 0)
-                    left_avg /= tmp;
-                auto right_avg = histsumi(thresh,img.size());
-                tmp = histsum(thresh,img.size());
-                if (tmp != 0)
-                    right_avg /= tmp;
+            recursive_partition_pixels_float(0, img.size(), cumsum, sorted, pix_thresh, more_thresholds...);
 
-
-                while(left_idx+1 < sorted.size() && sorted[left_idx] <= left_avg)
-                    ++left_idx;
-                while(right_idx+1 < sorted.size() && sorted[right_idx] <= right_avg)
-                    ++right_idx;
-
-                double score = 0;
-                score += left_avg*histsum(0,left_idx) - histsumi(0,left_idx); 
-                score -= left_avg*histsum(left_idx,thresh) - histsumi(left_idx,thresh); 
-                score += right_avg*histsum(thresh,right_idx) - histsumi(thresh,right_idx); 
-                score -= right_avg*histsum(right_idx,img.size()) - histsumi(right_idx,img.size()); 
-                return score;
-            };
-
-
-            unsigned long thresh = 0;
-            double min_sad = std::numeric_limits<double>::infinity();
-            for (unsigned long i = 0; i < img.size(); ++i)
-            {
-                // You can't drop a threshold in-between pixels with identical values.  So
-                // skip thresholds corresponding to this degenerate case.
-                if (i > 0 && sorted[i-1]==sorted[i])
-                    continue;
-
-                double sad = total_abs(i);
-                if (sad <= min_sad)
-                {
-                    min_sad = sad;
-                    thresh = i;
-                }
-            }
-
-            return sorted[thresh];
         }
 
 
         template <typename image_type>
-        struct is_u16img
+        struct is_u16img_or_less
         {
             typedef typename image_traits<image_type>::pixel_type pixel_type;
             typedef typename pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
@@ -136,22 +193,95 @@ namespace dlib
     }
 
     template <
-        typename image_type
+        typename image_type,
+        typename ...T
         >
-    typename disable_if<impl::is_u16img<image_type>, typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type>::type
+    typename disable_if<impl::is_u16img_or_less<image_type>>::type
     partition_pixels (
-        const image_type& img
+        const image_type& img,
+        typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type& pix_thresh,
+        T&& ...more_thresholds
     ) 
     {
-        return impl::partition_pixels_float(img);
+        impl::partition_pixels_float(img, pix_thresh, more_thresholds...);
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace impl 
+    {
+        template <
+            typename U,
+            typename basic_pixel_type
+            >
+        void partition_pixels_work (
+            unsigned long begin,
+            unsigned long end,
+            U&& total_abs,
+            basic_pixel_type& pix_thresh,
+            unsigned long& int_thresh
+        ) 
+        {
+            int_thresh = begin;
+            double min_sad = std::numeric_limits<double>::infinity();
+            for (unsigned long i = begin; i < end; ++i)
+            {
+                double sad = total_abs(begin, i);
+                if (sad <= min_sad)
+                {
+                    min_sad = sad;
+                    int_thresh = i;
+                }
+            }
+
+            pix_thresh = int_thresh;
+        }
+
+        template <
+            typename U,
+            typename basic_pixel_type
+            >
+        void recursive_partition_pixels (
+            unsigned long begin,
+            unsigned long end,
+            U&& total_abs,
+            basic_pixel_type& pix_thresh
+        ) 
+        {
+            unsigned long int_thresh;
+            partition_pixels_work(begin, end, total_abs, pix_thresh, int_thresh);
+        }
+
+        template <
+            typename U,
+            typename basic_pixel_type,
+            typename ...T
+            >
+        void recursive_partition_pixels (
+            unsigned long begin,
+            unsigned long end,
+            U&& total_abs,
+            basic_pixel_type& pix_thresh,
+            T&& ...more_thresholds
+        ) 
+        {
+            unsigned long int_thresh;
+            partition_pixels_work(begin, end, total_abs, pix_thresh, int_thresh);
+            recursive_partition_pixels(int_thresh, end, total_abs, more_thresholds...);
+        }
+
     }
 
     template <
-        typename image_type
+        typename image_type,
+        typename ...T
         >
-    typename enable_if<impl::is_u16img<image_type>, typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type>::type
+    typename enable_if<impl::is_u16img_or_less<image_type>>::type
     partition_pixels (
-        const image_type& img
+        const image_type& img,
+        typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type& pix_thresh,
+        T&& ...more_thresholds
     ) 
     {
         COMPILE_TIME_ASSERT( pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false );
@@ -184,10 +314,10 @@ namespace dlib
         // those >= thresh (the right group), what would the sum of absolute deviations of
         // each pixel from the mean of its group be?  total_abs(thresh) computes that
         // value.
-        auto total_abs = [&](unsigned long thresh)
+        auto total_abs = [&](unsigned long begin, unsigned long thresh)
         {
-            auto left_avg = histsumi(0,thresh);
-            auto tmp = histsum(0,thresh);
+            auto left_avg = histsumi(begin,thresh);
+            auto tmp = histsum(begin,thresh);
             if (tmp != 0)
                 left_avg /= tmp;
             auto right_avg = histsumi(thresh,hist.size());
@@ -200,7 +330,7 @@ namespace dlib
             const long right_idx = (long)std::ceil(right_avg);
 
             double score = 0;
-            score += left_avg*histsum(0,left_idx) - histsumi(0,left_idx); 
+            score += left_avg*histsum(begin,left_idx) - histsumi(begin,left_idx); 
             score -= left_avg*histsum(left_idx,thresh) - histsumi(left_idx,thresh); 
             score += right_avg*histsum(thresh,right_idx) - histsumi(thresh,right_idx); 
             score -= right_avg*histsum(right_idx,hist.size()) - histsumi(right_idx,hist.size()); 
@@ -208,21 +338,26 @@ namespace dlib
         };
 
 
-        unsigned long thresh = 0;
-        double min_sad = std::numeric_limits<double>::infinity();
-        for (long i = 0; i < hist.size(); ++i)
-        {
-            double sad = total_abs(i);
-            if (sad <= min_sad)
-            {
-                min_sad = sad;
-                thresh = i;
-            }
-        }
+        impl::recursive_partition_pixels(0, hist.size(), total_abs, pix_thresh, more_thresholds...);
+    }
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type
+    partition_pixels (
+        const image_type& img
+    ) 
+    {
+        typedef typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type basic_pixel_type;
+        basic_pixel_type thresh;
+        partition_pixels(img, thresh);
         return thresh;
     }
 
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     template <

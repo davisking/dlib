@@ -34,6 +34,35 @@ namespace dlib
               deviations between each pixel and the mean of its group is minimized.
     !*/
 
+    template <
+        typename image_type,
+        typename ...T
+        >
+    void partition_pixels (
+        const image_type& img,
+        typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type& pix_thresh,
+        T&& ...more_thresholds
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+            - more_thresholds == a bunch of parameters of the same type as pix_thresh.
+        ensures
+            - This version of partition_pixels() finds multiple partitions rather than just
+              one partition.  It does this by first partitioning the pixels just as the
+              above partition_pixels(img) does.  Then it forms a new image with only pixels
+              >= that first partition value and recursively partitions this new image.
+              However, the recursion is implemented in an efficient way which is faster than
+              explicitly forming these images and calling partition_pixels(), but the
+              output is the same as if you did.  For example, suppose you called
+              partition_pixels(img, t1, t2, t3).  Then we would have:
+                - t1 == partition_pixels(img)
+                - t2 == partition_pixels(an image with only pixels with values >= t1 in it)
+                - t3 == partition_pixels(an image with only pixels with values >= t2 in it)
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <

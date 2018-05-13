@@ -1904,10 +1904,39 @@ namespace
                 p = rnd.get_random_8bit_number();
 
             DLIB_TEST(simple_partition_pixels(img) == partition_pixels(img));
-            DLIB_TEST(simple_partition_pixels(img) == impl::partition_pixels_float(img));
+            unsigned char thresh;
+            impl::partition_pixels_float(img,thresh);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
 
             matrix<float> fimg = matrix_cast<float>(img);
             DLIB_TEST(simple_partition_pixels(img) == partition_pixels(fimg));
+
+
+            std::vector<unsigned char> tmp;
+            for (auto& v : img)
+                if (v >= thresh)
+                    tmp.push_back(v);
+            matrix<unsigned char> img2 = mat(tmp);
+            unsigned char thresh2;
+            impl::partition_pixels_float(img,thresh, thresh2);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+            DLIB_TEST(simple_partition_pixels(img2) == thresh2);
+
+            partition_pixels(img,thresh, thresh2);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+            DLIB_TEST(simple_partition_pixels(img2) == thresh2);
+
+
+
+            std::vector<float> ftmp;
+            for (auto& v : fimg)
+                if (v >= thresh)
+                    ftmp.push_back(v);
+            matrix<float> fimg2 = mat(ftmp);
+            float fthresh, fthresh2;
+            partition_pixels(fimg,fthresh, fthresh2);
+            DLIB_TEST(simple_partition_pixels(img) == fthresh);
+            DLIB_TEST(simple_partition_pixels(img2) == fthresh2);
         }
 
 
@@ -1919,10 +1948,42 @@ namespace
                 p = rnd.get_random_8bit_number();
 
             DLIB_TEST(simple_partition_pixels(img) == partition_pixels(img));
-            DLIB_TEST(simple_partition_pixels(img) == impl::partition_pixels_float(img));
+            unsigned char thresh;
+            impl::partition_pixels_float(img,thresh);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
 
             matrix<float> fimg = matrix_cast<float>(img);
             DLIB_TEST(simple_partition_pixels(img) == partition_pixels(fimg));
+
+
+
+
+            std::vector<unsigned char> tmp;
+            for (auto& v : img)
+                if (v >= thresh)
+                    tmp.push_back(v);
+            matrix<unsigned char> img2 = mat(tmp);
+            unsigned char thresh2;
+            impl::partition_pixels_float(img,thresh, thresh2);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+            DLIB_TEST(simple_partition_pixels(img2) == thresh2);
+
+            partition_pixels(img,thresh, thresh2);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+            DLIB_TEST(simple_partition_pixels(img2) == thresh2);
+
+
+
+            std::vector<float> ftmp;
+            for (auto& v : fimg)
+                if (v >= thresh)
+                    ftmp.push_back(v);
+            matrix<float> fimg2 = mat(ftmp);
+            float fthresh, fthresh2;
+            partition_pixels(fimg,fthresh, fthresh2);
+            DLIB_TEST(simple_partition_pixels(img) == fthresh);
+            DLIB_TEST(simple_partition_pixels(img2) == fthresh2);
+
         }
     }
 
