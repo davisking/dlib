@@ -691,6 +691,22 @@ namespace dlib
         }
     }
 
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void hysteresis_threshold (
+        const in_image_type& in_img,
+        out_image_type& out_img
+    )
+    {
+        using basic_pixel_type = typename pixel_traits<typename image_traits<in_image_type>::pixel_type>::basic_pixel_type;
+
+        basic_pixel_type t1, t2;
+        partition_pixels(in_img, t1, t2);
+        hysteresis_threshold(in_img, out_img, t1, t2);
+    }
+
 // ----------------------------------------------------------------------------------------
 
 }

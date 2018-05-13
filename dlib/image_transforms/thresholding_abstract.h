@@ -167,6 +167,29 @@ namespace dlib
             - #out_img.nr() == in_img.nr()
     !*/
 
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void hysteresis_threshold (
+        const in_image_type& in_img,
+        out_image_type& out_img
+    );
+    /*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale == true  
+            - pixel_traits<typename image_traits<in_image_type>::pixel_type>::has_alpha == false
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::has_alpha == false 
+            - is_same_object(in_img, out_img) == false
+        ensures
+            - performs: hysteresis_threshold(in_img, out_img, t1, t2) where the thresholds
+              are first obtained by calling partition_pixels(in_img, t1, t2).
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
 }
