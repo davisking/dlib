@@ -175,6 +175,7 @@
       <section>
          <name>Morphology</name>
          <item>label_connected_blobs</item>
+         <item>label_connected_blobs_watershed</item>
          <item>segment_image</item>
          <item>binary_dilation</item>
          <item>binary_erosion</item>
@@ -902,7 +903,8 @@
               a colored version an image. 
               <p>
                  This function is useful for displaying the results of some image 
-                 segmentation.  For example, the output of <a href="#label_connected_blobs">label_connected_blobs</a>
+                 segmentation.  For example, the output of <a href="#label_connected_blobs">label_connected_blobs</a>,
+                 <a href="label_connected_blobs_watershed">label_connected_blobs_watershed</a>, 
                  or <a href="#segment_image">segment_image</a>.
               </p>
          </description>
@@ -1950,6 +1952,36 @@
          <spec_file link="true">dlib/image_transforms/label_connected_blobs_abstract.h</spec_file>
          <description>        
               This function labels each of the connected blobs in an image with a unique integer label.  
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>label_connected_blobs_watershed</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/label_connected_blobs_abstract.h</spec_file>
+         <description>        
+            This function performs a watershed segmentation of an image and
+            labels each resulting flooding region with a unique integer label.
+
+            <p>
+               For example, given an image like this, which shows part of the Hubble ultra deep field:
+               <center><img src="hubble_ultra_deep_field.jpg"/></center>
+               <br/>
+               The algorithm would flood fill it and produce the following segmentation.  If you play
+               the video you can see the actual execution of the algorithm where it starts by flooding
+               from the brightest areas and progressively fills each region.
+               <br/>
+               <br/>
+               <center>
+               <video src="watershed">
+                  Video of optimizer running
+               </video>
+               </center>
+            </p>
+               
          </description>
                                  
       </component>
