@@ -127,16 +127,17 @@ namespace dlib
     template <
         typename image_array
         >
-    double test_shape_predictor (
-        const shape_predictor& sp,
-        const image_array& images,
-        const std::vector<std::vector<full_object_detection> >& objects,
-        const std::vector<std::vector<double> >& scales
+    dlib::tuple< running_statistics<double>, std::vector<running_statistics<double>> >
+        test_shape_predictor_with_detailed_statistics (
+            const shape_predictor& sp,
+            const image_array& images,
+            const std::vector<std::vector<full_object_detection> >& objects,
+            const std::vector<std::vector<double> >& scales
     );
     /*!
         requires
             - image_array is a dlib::array of image objects where each image object
-              implements the interface defined in dlib/image_processing/generic_image.h 
+              implements the interface defined in dlib/image_processing/generic_image.h
             - images.size() == objects.size()
             - for all valid i and j:
                 - objects[i][j].num_parts() == sp.num_parts()
@@ -148,12 +149,14 @@ namespace dlib
                         - scales[i].size() == objects[i].size()
         ensures
             - Tests the given shape_predictor by running it on each of the given objects and
-              checking how well it recovers the part positions.  In particular, for all 
+              checking how well it recovers the part positions.  In particular, for all
               valid i and j we perform:
                 sp(images[i], objects[i][j].get_rect())
-              and compare the result with the truth part positions in objects[i][j].  We
-              then return the average distance (measured in pixels) between a predicted
-              part location and its true position.  
+              and compare the result with the truth part positions in objects[i][j].
+              The first member of the returned tuple tracks the error statistics across
+              all landmarks, the second member tracks the error statistics for each
+              landmark individually. The error is measured in pixels, unless scales
+              are provided (for scaled error, see below).
             - Note that any parts in objects that are set to OBJECT_PART_NOT_PRESENT are
               simply ignored.
             - if (scales.size() != 0) then
@@ -164,6 +167,58 @@ namespace dlib
                   the returned value to be something else like the average distance
                   normalized by some feature of each object (e.g. the interocular distance)
                   then you can supply those normalizing values via scales.
+    !*/
+
+    template <
+        typename image_array
+        >
+    dlib::tuple< running_statistics<double>, std::vector<running_statistics<double>> >
+        test_shape_predictor_with_detailed_statistics (
+            const shape_predictor& sp,
+            const image_array& images,
+            const std::vector<std::vector<full_object_detection> >& objects
+    );
+    /*!
+        requires
+            - image_array is a dlib::array of image objects where each image object
+              implements the interface defined in dlib/image_processing/generic_image.h
+            - images.size() == objects.size()
+            - for all valid i and j:
+                - objects[i][j].num_parts() == sp.num_parts()
+        ensures
+            - returns test_shape_predictor_with_detailed_statistics(sp, images, objects, no_scales)
+              where no_scales is an empty vector.  So this is just a convenience function for
+              calling the above test_shape_predictor_with_detailed_statistics() routine without a
+              scales argument.
+    !*/
+
+
+    template <
+        typename image_array
+        >
+    double test_shape_predictor (
+        const shape_predictor& sp,
+        const image_array& images,
+        const std::vector<std::vector<full_object_detection> >& objects,
+        const std::vector<std::vector<double> >& scales
+    );
+    /*!
+        requires
+            - image_array is a dlib::array of image objects where each image object
+              implements the interface defined in dlib/image_processing/generic_image.h
+            - images.size() == objects.size()
+            - for all valid i and j:
+                - objects[i][j].num_parts() == sp.num_parts()
+            - if (scales.size() != 0) then
+                - There must be a scale value for each full_object_detection in objects.
+                  That is, it must be the case that:
+                    - scales.size() == objects.size()
+                    - for all valid i:
+                        - scales[i].size() == objects[i].size()
+        ensures
+            - returns the average error across all landmarks, as computed by
+              test_shape_predictor_with_detailed_statistics(sp, images, objects, scales). This
+              is just a convenience function for backwards compatibility.
     !*/
 
     template <

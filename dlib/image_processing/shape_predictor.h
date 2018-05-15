@@ -9,6 +9,7 @@
 #include "../matrix.h"
 #include "../geometry.h"
 #include "../pixel.h"
+#include "../tuple.h"
 #include "../statistics.h"
 #include <utility>
 
@@ -438,11 +439,12 @@ namespace dlib
     template <
         typename image_array
         >
-    double test_shape_predictor (
-        const shape_predictor& sp,
-        const image_array& images,
-        const std::vector<std::vector<full_object_detection> >& objects,
-        const std::vector<std::vector<double> >& scales
+    dlib::tuple<running_stats<double>, std::vector<running_stats<double>>>
+        test_shape_predictor_with_detailed_statistics (
+            const shape_predictor& sp,
+            const image_array& images,
+            const std::vector<std::vector<full_object_detection> >& objects,
+            const std::vector<std::vector<double> >& scales
     )
     {
         // make sure requires clause is not broken
@@ -477,6 +479,7 @@ namespace dlib
         }
 #endif
 
+        std::vector<running_stats<double>> rs_by_landmark(sp.num_parts());
         running_stats<double> rs;
         for (unsigned long i = 0; i < objects.size(); ++i)
         {
@@ -493,12 +496,53 @@ namespace dlib
                     if (objects[i][j].part(k) != OBJECT_PART_NOT_PRESENT)
                     {
                         double score = length(det.part(k) - objects[i][j].part(k))/scale;
+
+                        rs_by_landmark.at(k).add(score);
                         rs.add(score);
                     }
                 }
             }
         }
-        return rs.mean();
+
+        dlib::tuple<running_stats<double>, std::vector<running_stats<double>>> result;
+        result.get<0>() = rs;
+        result.get<1>() = rs_by_landmark;
+
+        return result;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_array
+        >
+    dlib::tuple<running_stats<double>, std::vector<running_stats<double>>>
+        test_shape_predictor_with_detailed_statistics (
+        const shape_predictor& sp,
+        const image_array& images,
+        const std::vector<std::vector<full_object_detection> >& objects
+    )
+    {
+        std::vector<std::vector<double> > no_scales;
+        return test_shape_predictor_with_detailed_statistics(sp, images, objects, no_scales);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_array
+        >
+    double test_shape_predictor (
+        const shape_predictor& sp,
+        const image_array& images,
+        const std::vector<std::vector<full_object_detection> >& objects,
+        const std::vector<std::vector<double> >& scales
+    )
+    {
+        dlib::tuple<running_stats<double>, std::vector<running_stats<double>>> result =
+            test_shape_predictor_with_detailed_statistics(sp, images, objects, scales);
+        running_stats<double> overall_statistics = result.get<0>();
+        return overall_statistics.mean();
     }
 
 // ----------------------------------------------------------------------------------------

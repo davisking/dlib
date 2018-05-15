@@ -72,6 +72,16 @@ namespace
 
             print_spinner();
 
+            dlib::tuple< running_stats<double>, std::vector< running_stats<double> > >
+                full_stats = test_shape_predictor_with_detailed_statistics(sp, images, objects);
+
+            double mean_overall_error = full_stats.get<0>().mean();
+            long landmark_error_count = full_stats.get<1>().size();
+            DLIB_TEST(mean_overall_error == 0);
+            DLIB_TEST(landmark_error_count == 68);
+
+            print_spinner();
+
             // While we are here, make sure the default face detector works
             std::vector<rectangle> dets = detector(images[0]);
             DLIB_TEST(dets.size() == 3);
