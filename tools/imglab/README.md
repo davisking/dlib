@@ -31,7 +31,7 @@ This will create a file called mydataset.xml which simply lists the images in
 and a window will appear showing all the images.  
 
 ### Movement  
-You can use the up and down arrow keys to cycle though the images  
+You can use the up and down arrow keys to cycle though the images.  
 
 ### Labeling
 Labelling is done via mouse, in particular, holding the shift key, left clicking, and dragging the mouse will
@@ -42,16 +42,16 @@ Suppose you wish to add parts to the objects, for e.g. add features like eyebrow
 
 To do so, in the command line type:
 
-    ./imglab mydataset.xml --parts "26 27 28 29 30"  
-where 26, 27, 28, 29 are the respective values that you wish to annotate the parts in the objects with.
+    ./imglab mydataset.xml --parts "eyes forehead nose left_cheek right_cheek"  
+where 'eyes forehead nose left_cheek right_cheek' are the hypothetical names to the parts in the objects.
 
 When the GUI window open,  
-1. first label the object, 
-2. Double click on the box and right click on the positions where you wish those values to be added.
-3. A popup menu will show up to choose the label from.  
+1. First, label the object 
+2. Double click on the box and right click on the positions where you wish those values to be added
+3. A popup menu will show up to choose the label from  
 
-### Deleting un-needed labels
-At times you might make some unwanted labels; to delete them -- double click on the label and press DEL i.e. delete key.  
+### Deleting unwanted labels
+At times you might create some unwanted labels; to delete them -- double click on the label and press DEL i.e. delete key.  
 
 ### Saving the labels
 Once you finish labeling objects go to the file menu, click save, and then
