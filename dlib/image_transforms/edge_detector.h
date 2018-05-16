@@ -394,6 +394,23 @@ namespace dlib
         return newpixels;
     }
 
+    template <
+        typename image_type
+        >
+    std::vector<std::vector<point>> remove_incoherent_edge_pixels (
+        const std::vector<std::vector<point>>& line_pixels,
+        const image_type& horz_gradient_,
+        const image_type& vert_gradient_,
+        const double angle_threshold
+    )
+    {
+        std::vector<std::vector<point>> temp;
+        temp.reserve(line_pixels.size());
+        for (auto& line : line_pixels)
+            temp.emplace_back(remove_incoherent_edge_pixels(line, horz_gradient_, vert_gradient_, angle_threshold));
+        return temp;
+    }
+
 // ----------------------------------------------------------------------------------------
 
     class image_gradients
@@ -619,6 +636,96 @@ namespace dlib
     )
     {
         impl::find_lines(xx,xy,yy,horz,vert,+1);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void find_bright_keypoints(
+        const in_image_type& xx_,
+        const in_image_type& xy_,
+        const in_image_type& yy_,
+        out_image_type& saliency_
+    )
+    {
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        static_assert(std::is_same<float,out_pixel_type>::value || std::is_same<double,out_pixel_type>::value,
+            "Output images must contain either float or double valued pixels");
+
+        const_image_view<in_image_type> xx(xx_);
+        const_image_view<in_image_type> xy(xy_);
+        const_image_view<in_image_type> yy(yy_);
+
+        DLIB_CASSERT(xx.nr() == xy.nr());
+        DLIB_CASSERT(xx.nr() == yy.nr());
+        DLIB_CASSERT(xx.nc() == xy.nc());
+        DLIB_CASSERT(xx.nc() == yy.nc());
+
+
+        image_view<out_image_type> saliency(saliency_);
+        saliency.set_size(xx.nr(), xx.nc());
+
+
+        for (long r = 0; r < xx.nr(); ++r)
+        {
+            for (long c = 0; c < xx.nc(); ++c)
+            {
+                matrix<double,2,2> tmp;
+                tmp = xx[r][c], xy[r][c],
+                      xy[r][c], yy[r][c];
+
+                matrix<double,2,1> e = real_eigenvalues(tmp);
+                saliency[r][c] = prod(upperbound(e,0));
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void find_dark_keypoints(
+        const in_image_type& xx_,
+        const in_image_type& xy_,
+        const in_image_type& yy_,
+        out_image_type& saliency_
+    )
+    {
+        typedef typename image_traits<out_image_type>::pixel_type out_pixel_type;
+        static_assert(std::is_same<float,out_pixel_type>::value || std::is_same<double,out_pixel_type>::value,
+            "Output images must contain either float or double valued pixels");
+
+        const_image_view<in_image_type> xx(xx_);
+        const_image_view<in_image_type> xy(xy_);
+        const_image_view<in_image_type> yy(yy_);
+
+        DLIB_CASSERT(xx.nr() == xy.nr());
+        DLIB_CASSERT(xx.nr() == yy.nr());
+        DLIB_CASSERT(xx.nc() == xy.nc());
+        DLIB_CASSERT(xx.nc() == yy.nc());
+
+
+        image_view<out_image_type> saliency(saliency_);
+        saliency.set_size(xx.nr(), xx.nc());
+
+
+        for (long r = 0; r < xx.nr(); ++r)
+        {
+            for (long c = 0; c < xx.nc(); ++c)
+            {
+                matrix<double,2,2> tmp;
+                tmp = xx[r][c], xy[r][c],
+                      xy[r][c], yy[r][c];
+
+                matrix<double,2,1> e = real_eigenvalues(tmp);
+                saliency[r][c] = prod(lowerbound(e,0));
+            }
+        }
     }
 
 // ----------------------------------------------------------------------------------------

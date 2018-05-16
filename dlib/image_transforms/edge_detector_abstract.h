@@ -165,6 +165,33 @@ namespace dlib
                 - PTS is just line with some elements removed.
     !*/
 
+    template <
+        typename image_type
+        >
+    std::vector<std::vector<point>> remove_incoherent_edge_pixels (
+        const std::vector<std::vector<point>>& lines,
+        const image_type& horz_gradient,
+        const image_type& vert_gradient,
+        const double angle_threshold
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - image_type contains float, double, or long double pixels.
+            - horz_gradient.nr() == vert_gradient.nr()
+            - horz_gradient.nc() == vert_gradient.nc()
+            - horz_gradient and vert_gradient represent unit normalized vectors.  That is,
+              you should have called normalize_image_gradients(horz_gradient,vert_gradient)
+              or otherwise caused all the gradients to have unit norm.
+            - for all valid i,j:
+                get_rect(horz_gradient).contains(lines[i][j])
+        ensures
+            - Returns a vector LINES where:
+                - LINES.size() == lines.size()
+                - LINES[i] == remove_incoherent_edge_pixels(lines[i], horz_gradient, vert_gradient, angle_threshold)
+    !*/
+
 // ----------------------------------------------------------------------------------------
 
     class image_gradients
@@ -394,9 +421,8 @@ namespace dlib
               direction.  Moreover, if the second derivative is positive then the output
               vector is zero.  This zeroing if positive gradients causes the output to be
               sensitive only to bright lines surrounded by darker pixels.
-            - We assume that xx, xy, and yy are the 3 different second order gradients of
-              the image in question.  You can obtain these gradients using the
-              image_gradients class.
+            - We assume that xx, xy, and yy are the 3 second order gradients of the image
+              in question.  You can obtain these gradients using the image_gradients class.
             - The output images will have the same sizes as the input images, that is:
                 - #num_rows(horz) == #num_rows(vert) == num_rows(xx)
                 - #num_columns(horz) == #num_columns(vert) == num_columns(xx)
@@ -436,12 +462,87 @@ namespace dlib
               direction.  Moreover, if the second derivative is negative then the output
               vector is zero.  This zeroing if negative gradients causes the output to be
               sensitive only to dark lines surrounded by light pixels.
-            - We assume that xx, xy, and yy are the 3 different second order gradients of
-              the image in question.  You can obtain these gradients using the
-              image_gradients class.
+            - We assume that xx, xy, and yy are the 3 second order gradients of the image
+              in question.  You can obtain these gradients using the image_gradients class.
             - The output images will have the same sizes as the input images, that is:
                 - #num_rows(horz) == #num_rows(vert) == num_rows(xx)
                 - #num_columns(horz) == #num_columns(vert) == num_columns(xx)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void find_bright_keypoints(
+        const in_image_type& xx,
+        const in_image_type& xy,
+        const in_image_type& yy,
+        out_image_type& saliency
+    );
+    /*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - All images are grayscale and the saliency image must contain float or double
+              pixel types.
+            - num_rows(xx) == num_rows(xy) == num_rows(yy)
+            - num_columns(xx) == num_columns(xy) == num_columns(yy)
+        ensures
+            - This routine finds bright "keypoints" in an image.  In general, these are
+              bright/white localized blobs.  It does this by computing the determinant of
+              the image Hessian at each location and storing this value into the output
+              saliency image if both eigenvalues of the Hessian are negative.  If either
+              eigenvalue is positive then the saliency for that pixel is 0.  I.e.
+                - for all valid r,c:
+                    - #saliency[r][c] == a number >= 0 and larger values indicate the
+                      presence of a keypoint at this pixel location.
+            - We assume that xx, xy, and yy are the 3 second order gradients of the image
+              in question.  You can obtain these gradients using the image_gradients class.
+            - The output image will have the same size as the input images, that is:
+                - #num_rows(saliency) == num_rows(xx)
+                - #num_columns(saliency) == num_columns(xx)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void find_dark_keypoints(
+        const in_image_type& xx,
+        const in_image_type& xy,
+        const in_image_type& yy,
+        out_image_type& saliency
+    );
+    /*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - All images are grayscale and the saliency image must contain float or double
+              pixel types.
+            - num_rows(xx) == num_rows(xy) == num_rows(yy)
+            - num_columns(xx) == num_columns(xy) == num_columns(yy)
+        ensures
+            - This routine finds dark "keypoints" in an image.  In general, these are dark
+              localized blobs.  It does this by computing the determinant of the image
+              Hessian at each location and storing this value into the output saliency
+              image if both eigenvalues of the Hessian are positive.  If either eigenvalue
+              is negative then the saliency for that pixel is 0.  I.e.
+                - for all valid r,c:
+                    - #saliency[r][c] == a number >= 0 and larger values indicate the
+                      presence of a keypoint at this pixel location.
+            - We assume that xx, xy, and yy are the 3 second order gradients of the image
+              in question.  You can obtain these gradients using the image_gradients class.
+            - The output image will have the same size as the input images, that is:
+                - #num_rows(saliency) == num_rows(xx)
+                - #num_columns(saliency) == num_columns(xx)
     !*/
 
 // ----------------------------------------------------------------------------------------
