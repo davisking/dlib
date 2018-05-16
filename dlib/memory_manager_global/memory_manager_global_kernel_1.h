@@ -43,7 +43,7 @@ namespace dlib
             virtual ~memory_manager_global_kernel_1(
             )  {}
 
-            unsigned long get_number_of_allocations (
+            size_t get_number_of_allocations (
             ) const { return global_mm->get_number_of_allocations(); }
 
             mm_global_type& get_global_memory_manager (
@@ -63,7 +63,7 @@ namespace dlib
             }
 
             T* allocate_array (
-                unsigned long size
+                size_t size
             ) 
             { 
                 return global_mm->allocate_array(size); 

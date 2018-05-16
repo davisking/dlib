@@ -106,6 +106,7 @@ namespace std
 #include <algorithm>    // for std::swap
 #include <new>          // for std::bad_alloc
 #include <cstdlib>
+#include <stddef.h>
 #include <limits> // for std::numeric_limits for is_finite()
 #include "assert.h"
 #include "error.h"

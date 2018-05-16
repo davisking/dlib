@@ -60,7 +60,7 @@ namespace dlib
             }
 
             T* allocate_array (
-                unsigned long size
+                size_t size
             ) 
             { 
                 auto_mutex M(global_mutex());

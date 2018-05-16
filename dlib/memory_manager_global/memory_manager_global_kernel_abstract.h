@@ -81,7 +81,7 @@ namespace dlib
                       get_global_memory_manager().
             !*/
 
-            unsigned long get_number_of_allocations (
+            size_t get_number_of_allocations (
             ) const;
             /*!
                 ensures
@@ -122,7 +122,7 @@ namespace dlib
             !*/
 
             T* allocate_array (
-                unsigned long size
+                size_t size
             );
             /*!
                 ensures
