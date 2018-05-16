@@ -1643,8 +1643,8 @@ namespace dlib
             const T val
         )
         {
-            const long size = nr()*nc();
-            for (long i = 0; i < size; ++i)
+            const size_t size = nr()*(size_t)nc();
+            for (size_t i = 0; i < size; ++i)
                 data(i) += val;
 
             return *this;
@@ -1654,8 +1654,8 @@ namespace dlib
             const T val
         )
         {
-            const long size = nr()*nc();
-            for (long i = 0; i < size; ++i)
+            const size_t size = nr()*(size_t)nc();
+            for (size_t i = 0; i < size; ++i)
                 data(i) -= val;
 
             return *this;
@@ -1824,8 +1824,8 @@ namespace dlib
         ) 
         {  
             // assign the given value to every spot in this matrix
-            const long size = nr()*nc();
-            for (long i = 0; i < size; ++i)
+            const size_t size = nr()*(size_t)nc();
+            for (size_t i = 0; i < size; ++i)
                 data(i) = val;
 
             // Now return the literal_assign_helper so that the user

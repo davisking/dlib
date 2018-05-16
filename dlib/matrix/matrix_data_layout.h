@@ -42,21 +42,21 @@ namespace dlib
             public:
 
                 T& operator() (
-                    long r, 
-                    long c
+                    size_t r, 
+                    size_t c
                 );
 
                 const T& operator() (
-                    long r, 
-                    long c
+                    size_t r, 
+                    size_t c
                 );
 
                 T& operator() (
-                    long i 
+                    size_t i 
                 );
 
                 const T& operator() (
-                    long i
+                    size_t i
                 ) const;
 
                 void swap(
@@ -70,8 +70,8 @@ namespace dlib
                 ) const;
 
                 void set_size (
-                    long nr_,
-                    long nc_
+                    size_t nr_,
+                    size_t nc_
                 );
             };
         };
@@ -141,21 +141,21 @@ namespace dlib
             layout() {}
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return *(data+r*num_cols + c); }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return *(data+r*num_cols + c); }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i
+                size_t i
             ) const { return data[i]; }
 
             void swap(
@@ -178,8 +178,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long ,
-                long 
+                size_t ,
+                size_t 
             )
             {
             }
@@ -216,21 +216,21 @@ namespace dlib
             { pool.deallocate_array(data); }
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[r*num_cols + c]; }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[r*num_cols + c]; }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void swap(
@@ -248,8 +248,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long ,
-                long 
+                size_t ,
+                size_t 
             )
             {
             }
@@ -291,21 +291,21 @@ namespace dlib
             }
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[r*num_cols + c]; }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[r*num_cols + c]; }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void swap(
@@ -324,8 +324,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long nr,
-                long nc
+                size_t nr,
+                size_t nc
             )
             {
                 if (data) 
@@ -384,21 +384,21 @@ namespace dlib
             }
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[r*nc_ + c]; }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[r*nc_ + c]; }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void swap(
@@ -417,8 +417,8 @@ namespace dlib
             ) const { return nc_; }
 
             void set_size (
-                long nr,
-                long nc
+                size_t nr,
+                size_t nc
             )
             {
                 if (data) 
@@ -477,21 +477,21 @@ namespace dlib
             }
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[r*nc_ + c]; }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[r*nc_ + c]; }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void swap(
@@ -511,8 +511,8 @@ namespace dlib
             ) const { return nc_; }
 
             void set_size (
-                long nr,
-                long nc
+                size_t nr,
+                size_t nc
             )
             {
                 if (data) 
@@ -613,21 +613,21 @@ namespace dlib
             layout() {}
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return *(data+c*num_rows + r); }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return *(data+c*num_rows + r); }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i
+                size_t i
             ) const { return data[i]; }
 
             void swap(
@@ -650,8 +650,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long,
-                long 
+                size_t,
+                size_t 
             )
             {
             }
@@ -688,21 +688,21 @@ namespace dlib
             { pool.deallocate_array(data); }
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[c*num_rows + r]; }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[c*num_rows + r]; }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void swap(
@@ -720,8 +720,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long ,
-                long 
+                size_t ,
+                size_t 
             )
             {
             }
@@ -763,21 +763,21 @@ namespace dlib
             }
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[c*nr_ + r]; }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[c*nr_ + r]; }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void swap(
@@ -796,8 +796,8 @@ namespace dlib
             ) const { return num_cols; }
 
             void set_size (
-                long nr,
-                long nc
+                size_t nr,
+                size_t nc
             )
             {
                 if (data) 
@@ -856,21 +856,21 @@ namespace dlib
             }
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[c*num_rows + r]; }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[c*num_rows + r]; }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void swap(
@@ -889,8 +889,8 @@ namespace dlib
             ) const { return nc_; }
 
             void set_size (
-                long nr,
-                long nc
+                size_t nr,
+                size_t nc
             )
             {
                 if (data) 
@@ -949,21 +949,21 @@ namespace dlib
             }
 
             T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[c*nr_ + r]; }
 
             const T& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[c*nr_ + r]; }
 
             T& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const T& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void swap(
@@ -990,8 +990,8 @@ namespace dlib
             ) const { return nc_; }
 
             void set_size (
-                long nr,
-                long nc
+                size_t nr,
+                size_t nc
             )
             {
                 if (data) 
@@ -1052,21 +1052,21 @@ namespace dlib
             }
 
             double& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[c*nr_ + r]; }
 
             const double& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[c*nr_ + r]; }
 
             double& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const double& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void _private_set_mxArray (
@@ -1125,8 +1125,8 @@ namespace dlib
             ) const { return nc_; }
 
             void set_size (
-                long nr,
-                long nc
+                size_t nr,
+                size_t nc
             )
             {
                 if (owned_by_matlab)
@@ -1205,21 +1205,21 @@ namespace dlib
             }
 
             float& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) { return data[c*nr_ + r]; }
 
             const float& operator() (
-                long r, 
-                long c
+                size_t r, 
+                size_t c
             ) const { return data[c*nr_ + r]; }
 
             float& operator() (
-                long i 
+                size_t i 
             ) { return data[i]; }
 
             const float& operator() (
-                long i 
+                size_t i 
             ) const { return data[i]; }
 
             void _private_set_mxArray (
@@ -1278,8 +1278,8 @@ namespace dlib
             ) const { return nc_; }
 
             void set_size (
-                long nr,
-                long nc
+                size_t nr,
+                size_t nc
             )
             {
                 if (owned_by_matlab)
