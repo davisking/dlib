@@ -124,11 +124,18 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    struct shape_predictor_statistics {
+        shape_predictor_statistics( running_stats<double> error_across_landmarks,
+                                    std::vector< running_stats<double> > error_by_landmark );
+        running_stats<double>                error_across_landmarks;
+        std::vector< running_stats<double> > error_by_landmark;
+    };
+
+
     template <
         typename image_array
         >
-    dlib::tuple< running_statistics<double>, std::vector<running_statistics<double>> >
-        test_shape_predictor_with_detailed_statistics (
+    shape_predictor_statistics test_shape_predictor_with_detailed_statistics (
             const shape_predictor& sp,
             const image_array& images,
             const std::vector<std::vector<full_object_detection> >& objects,
@@ -153,10 +160,10 @@ namespace dlib
               valid i and j we perform:
                 sp(images[i], objects[i][j].get_rect())
               and compare the result with the truth part positions in objects[i][j].
-              The first member of the returned tuple tracks the error statistics across
-              all landmarks, the second member tracks the error statistics for each
-              landmark individually. The error is measured in pixels, unless scales
-              are provided (for scaled error, see below).
+              The returned struct captures the error distribution for each landmark
+              separately, and also separately tracks the error distribution across
+              landmarks.  The error is measured in pixels, unless scales are provided
+              (for scaled error, see below).
             - Note that any parts in objects that are set to OBJECT_PART_NOT_PRESENT are
               simply ignored.
             - if (scales.size() != 0) then
@@ -172,8 +179,7 @@ namespace dlib
     template <
         typename image_array
         >
-    dlib::tuple< running_statistics<double>, std::vector<running_statistics<double>> >
-        test_shape_predictor_with_detailed_statistics (
+    shape_predictor_statistics test_shape_predictor_with_detailed_statistics (
             const shape_predictor& sp,
             const image_array& images,
             const std::vector<std::vector<full_object_detection> >& objects

@@ -67,18 +67,42 @@ namespace
 
             print_spinner();
 
-            // It should have been able to perfectly fit the data
-            DLIB_TEST(test_shape_predictor(sp, images, objects) == 0);
+            shape_predictor_statistics full_stats =
+                test_shape_predictor_with_detailed_statistics(sp, images, objects);
+
+            double summary_mean =
+                test_shape_predictor(sp, images, objects);
 
             print_spinner();
 
-            dlib::tuple< running_stats<double>, std::vector< running_stats<double> > >
-                full_stats = test_shape_predictor_with_detailed_statistics(sp, images, objects);
+            // It should have been able to perfectly fit the data
+            DLIB_TEST(summary_mean == 0);
+            DLIB_TEST(summary_mean == full_stats.error_across_landmarks.mean());
 
-            double mean_overall_error = full_stats.get<0>().mean();
-            long landmark_error_count = full_stats.get<1>().size();
-            DLIB_TEST(mean_overall_error == 0);
-            DLIB_TEST(landmark_error_count == 68);
+            print_spinner();
+
+            long landmark_error_count = full_stats.error_by_landmark.size();
+            int number_of_landmarks = 68;
+            DLIB_TEST(landmark_error_count == number_of_landmarks);
+
+            print_spinner();
+
+            int number_of_samples = 0;
+            for (unsigned long i = 0; i < objects.size(); ++i)
+            {
+                number_of_samples += objects[i].size();
+            }
+
+            print_spinner();
+
+            DLIB_TEST(full_stats.error_across_landmarks.current_n() ==
+                                    (number_of_landmarks * number_of_samples));
+            for (unsigned long k = 0; k < 68; ++k)
+            {
+                running_stats<double> landmark_stats = full_stats.error_by_landmark.at(k);
+                DLIB_TEST(landmark_stats.current_n() == number_of_samples);
+                DLIB_TEST(landmark_stats.mean()      == 0);
+            }
 
             print_spinner();
 
@@ -86,6 +110,7 @@ namespace
             std::vector<rectangle> dets = detector(images[0]);
             DLIB_TEST(dets.size() == 3);
 
+            print_spinner();
 
             /*
             // visualize the detections

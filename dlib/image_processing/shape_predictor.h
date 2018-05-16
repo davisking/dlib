@@ -9,7 +9,6 @@
 #include "../matrix.h"
 #include "../geometry.h"
 #include "../pixel.h"
-#include "../tuple.h"
 #include "../statistics.h"
 #include <utility>
 
@@ -436,11 +435,23 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
+    struct shape_predictor_statistics
+    {
+        shape_predictor_statistics( running_stats<double> error_across_landmarks,
+                                    std::vector< running_stats<double> > error_by_landmark)
+                                        : error_across_landmarks(error_across_landmarks),
+                                          error_by_landmark(error_by_landmark)
+        {}
+
+        running_stats<double> error_across_landmarks;
+        std::vector< running_stats<double> > error_by_landmark;
+    };
+
+
     template <
         typename image_array
         >
-    dlib::tuple<running_stats<double>, std::vector<running_stats<double>>>
-        test_shape_predictor_with_detailed_statistics (
+    shape_predictor_statistics test_shape_predictor_with_detailed_statistics (
             const shape_predictor& sp,
             const image_array& images,
             const std::vector<std::vector<full_object_detection> >& objects,
@@ -504,11 +515,7 @@ namespace dlib
             }
         }
 
-        dlib::tuple<running_stats<double>, std::vector<running_stats<double>>> result;
-        result.get<0>() = rs;
-        result.get<1>() = rs_by_landmark;
-
-        return result;
+        return shape_predictor_statistics(rs, rs_by_landmark);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -516,8 +523,7 @@ namespace dlib
     template <
         typename image_array
         >
-    dlib::tuple<running_stats<double>, std::vector<running_stats<double>>>
-        test_shape_predictor_with_detailed_statistics (
+    shape_predictor_statistics test_shape_predictor_with_detailed_statistics (
         const shape_predictor& sp,
         const image_array& images,
         const std::vector<std::vector<full_object_detection> >& objects
@@ -539,9 +545,9 @@ namespace dlib
         const std::vector<std::vector<double> >& scales
     )
     {
-        dlib::tuple<running_stats<double>, std::vector<running_stats<double>>> result =
+        shape_predictor_statistics result =
             test_shape_predictor_with_detailed_statistics(sp, images, objects, scales);
-        running_stats<double> overall_statistics = result.get<0>();
+        running_stats<double> overall_statistics = result.error_across_landmarks;
         return overall_statistics.mean();
     }
 
