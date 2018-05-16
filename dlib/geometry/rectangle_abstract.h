@@ -454,6 +454,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline std::vector<rectangle> centered_rects (
+        const std::vector<point>& pts,
+        unsigned long width,
+        unsigned long height
+    );
+    /*!
+        ensures
+            - returns an array ARR where:
+                - #ARR.size() == pts.size()
+                - #ARR[i] == centered_rect(pts[i], width, height)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const rectangle centered_rect (
         long x,
         long y,

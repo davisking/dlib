@@ -573,6 +573,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline std::vector<rectangle> centered_rects (
+        const std::vector<point>& pts,
+        unsigned long width,
+        unsigned long height
+    )
+    {
+        std::vector<rectangle> tmp;
+        tmp.reserve(pts.size());
+        for (auto& p : pts)
+            tmp.emplace_back(centered_rect(p, width, height));
+        return tmp;
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline const rectangle centered_rect (
         const rectangle& rect,
         unsigned long width,
