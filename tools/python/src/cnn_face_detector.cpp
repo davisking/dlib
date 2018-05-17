@@ -135,7 +135,7 @@ void bind_cnn_face_detection(py::module& m)
 {
     {
     py::class_<cnn_face_detection_model_v1>(m, "cnn_face_detection_model_v1", "This object detects human faces in an image.  The constructor loads the face detection model from a file. You can download a pre-trained model from http://dlib.net/files/mmod_human_face_detector.dat.bz2.")
-        .def(py::init<std::string>())
+        .def(py::init<std::string>(), py::arg("filename"))
         .def(
             "__call__", 
             &cnn_face_detection_model_v1::detect_mult, 
