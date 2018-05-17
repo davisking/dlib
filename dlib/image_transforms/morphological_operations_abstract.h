@@ -356,7 +356,7 @@ namespace dlib
               (i.e. it must be a binary image)
         ensures
             - This routine finds endpoints of lines in a thinned binary image.  For
-              example, if the image was produced by skeleton() or something like a canny
+              example, if the image was produced by skeleton() or something like a Canny
               edge detector then you can use find_line_endpoints() to find the pixels
               sitting on the ends of lines.
     !*/
