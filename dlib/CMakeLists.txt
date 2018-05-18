@@ -9,6 +9,7 @@ project(dlib)
 
 
 include(cmake_utils/set_compiler_specific_options.cmake)
+include(CMakePackageConfigHelpers)
 
 
 # Adhere to GNU filesystem layout conventions
@@ -829,7 +830,7 @@ if (NOT TARGET dlib)
          NAMESPACE dlib::
          DESTINATION ${ConfigPackageLocation})
 
-      configure_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" @ONLY)
+      configure_package_config_file(cmake_utils/dlibConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" INSTALL_DESTINATION ${ConfigPackageLocation})
 
       include(CMakePackageConfigHelpers)
       write_basic_package_version_file(
