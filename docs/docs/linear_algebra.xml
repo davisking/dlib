@@ -617,6 +617,7 @@
          <item>drectangle</item> 
          <item>vector</item> 
          <item>point</item> 
+         <item>dpoint</item> 
          <item>rotate_point</item> 
          <item>rotate_around_x</item> 
          <item>rotate_around_y</item> 
@@ -634,6 +635,10 @@
          <item>rotation_matrix</item> 
          <item>get_rect</item> 
          <item>centered_rect</item> 
+         <item>
+            <name>centered_rects</name>
+            <link>dlib/geometry/rectangle_abstract.h.html#centered_rects</link>
+         </item> 
          <item>set_aspect_ratio</item> 
          <item>set_rect_area</item> 
          <item>center</item> 
@@ -651,6 +656,13 @@
          <item>distance_to_rect_edge</item> 
          <item>clip_line_to_rectangle</item> 
          <item>distance_to_line</item> 
+
+         <item>line</item> 
+         <item>signed_distance_to_line</item> 
+         <item>reverse</item> 
+         <item>intersect</item> 
+         <item>count_points_on_side_of_line</item> 
+         <item>count_points_between_lines</item> 
       </section>
 
 
@@ -738,6 +750,81 @@
    <components>
    
    <!-- ************************************************************************* -->
+
+      <component>
+         <name>line</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/line_abstract.h</spec_file>
+         <description>
+            This object represents a line in the 2D plane.  The line is defined by two
+            <a href="#dpoint">points</a> running through it.  This object also includes a
+            unit normal vector that is perpendicular to the line.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>signed_distance_to_line</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/line_abstract.h</spec_file>
+         <description>
+            This function returns how far a point is from a <a href="#line">line</a>.
+            This is a signed distance.  The sign indicates which side of the line the point
+            is on and the magnitude is the distance.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>reverse</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/line_abstract.h</spec_file>
+         <description>
+            This function returns a <a href="#line">line</a> object that represents the
+            same line but with the endpoints and normal vector flipped.  
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>intersect</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/line_abstract.h</spec_file>
+         <description>
+            This routine finds the point at the intersection of two <a href="#line">lines</a>.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>count_points_on_side_of_line</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/line_abstract.h</spec_file>
+         <description>
+            This routine takes a <a href="#line">line</a> and an array of points and counts how many
+            points are on one side of the line.  Which side of the line is of interest is
+            selected by the user.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>count_points_between_lines</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/line_abstract.h</spec_file>
+         <description>
+            This routine takes a pair of <a href="#line">lines</a> and an array of points
+            and counts how many points are between the lines. 
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
 
       <component>
          <name>sparse_to_dense</name>
@@ -1367,6 +1454,19 @@
                This object represents a point inside a Cartesian coordinate system.
                Note that a point is simply a typedef for a <a href="#vector">vector</a>
                that is 2D and uses longs to represent coordinate values.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>dpoint</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <description>
+               This object represents a point inside a Cartesian coordinate system.
+               Note that a dpoint is simply a typedef for a <a href="#vector">vector</a>
+               that is 2D and uses doubles to represent coordinate values.
          </description>
       </component>
       

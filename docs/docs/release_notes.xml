@@ -12,6 +12,70 @@
 
 <current>
 New Features and Improvements:
+   - Deep Learning
+      - Added resize_to layer.
+      - Made loss_multiclass_log_per_pixel use CUDA. This greatly accelerates 
+        training with this loss layer.
+   - Image Processing
+      - Added normalize_image_gradients() and remove_incoherent_edge_pixels().
+      - Added neighbors_24 (for use with label_connected_blobs())
+      - Added partition_pixels() and made threshold_image() use it to find the
+        default threshold if none is given. Also depreciated
+        auto_threshold_image() since using partition_pixels() to pick the
+        threshold is superior.
+      - Added overload of hysteresis_threshold() that uses partition_pixels()
+        to select thresholds.
+      - Added encode_8_pixel_neighbors() and find_line_endpoints().
+      - Added image_gradients, a tool for computing multi-scale first and
+        second order image gradients. 
+      - Added find_bright_lines(), find_dark_lines(), find_bright_keypoints(),
+        and find_dark_keypoints(). 
+      - Added label_connected_blobs_watershed().
+      - Added find_peaks().
+      - Added find_pixels_voting_for_lines(), find_strong_hough_points(),
+        and perform_generic_hough_transform() to the hough_transform.
+   - Improved the stopping condition of the solve_qp_box_constrained() and
+     solve_qp_box_constrained_blockdiag() quadratic program solvers.
+   - Made find_min_single_variable() more numerically stable.
+   - Make visual studio build with all cores when building dlib.
+   - Added steal_memory() to the matrix.
+   - Improved the workflow for adding part annotations in imglab.  You can now
+     use shift+click to rapidly add parts to an object.  Each part will
+     automatically receive an integer label.
+   - Added .begin() and .end() to array2d.
+   - Added the line class and some related utility functions.
+   - Added centered_rects().
+   - Added numpy_image, which is a simple type safe interface to numpy arrays.
+     It is also a fully functional dlib image class, making interfacing dlib's
+     image processing to Python much cleaner.  
+
+Non-Backwards Compatible Changes:
+   - All CUDA code in dlib was moved to dlib/cuda.
+
+Bug fixes:
+   - Replaced all the old Python C APIs interfacing to numpy with the new
+     numpy_image.  This fixed some reference counting errors as a result.
+   - Fixed load_bmp() not loading certain types of BMP images. 
+   - Fixed compile time bugs when trying to use CBLAS in some unusual environments.
+   - Fixed bug in global_function_search's constructor that takes initial function
+     evaluations. It wasn't assigning these values into the entire state of the
+     solver.
+   - Fixed compile time error in the matlab bindings.  Also, fixed cell arrays
+     of complex types not binding correctly.
+   - Renamed BOOST_JOIN to DLIB_BOOST_JOIN to prevent name clashes when working
+     with boost.
+   - Fixed bug in hysteresis_threshold() that could cause incorrect output.
+   - The last release of dlib added more ODR violation checks.  However, these
+     could erroneously trigger when using Visual Studio and CUDA in certain
+     workflows.  This has been fixed.
+   - Fixed matrix objects not working correctly when sized greater than 4GB in
+     Visual Studio.
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.10" date="Mar 19, 2018">
+New Features and Improvements:
    - Deep Learning:
       - Added scale_ layer, allowing implementation of squeeze-and-excitation networks.
       - Added loss_multimulticlass_log: used for learning a collection of multi-class classifiers.
@@ -60,7 +124,7 @@ Bug fixes:
      really bad training data or parameters have been added.
    - Fixed the decayed running stats objects so they use unbiased estimators.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
