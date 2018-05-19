@@ -8,7 +8,7 @@
 
    <questions group="Python">
 
-      <question text="I compiled with CUDA enabled, why isn't it using CUDA?">
+      <question text="I compiled dlib's Python interface with CUDA enabled, why isn't it using CUDA?">
          Either you are using a part of dlib that just doesn't use CUDA, of which there
          are many parts, or you are mistaken about compiling dlib with CUDA enabled.
          In particular, many users report that "dlib isn't using CUDA even though 
@@ -17,11 +17,12 @@
          they are using a non-CUDA build. 
          <p>
             You can check if dlib is compiled to use CUDA by looking at the <tt>dlib.DLIB_USE_CUDA</tt>
-            boolean.  <b>If dlib.DLIB_USE_CUDA is false then you didn't compile it with CUDA enabled</b>.
+            boolean.  <b>If dlib.DLIB_USE_CUDA is false then you didn't compile it with CUDA enabled, but if it's true then
+            dlib is using all the CUDA it's going to use</b>.
          </p>
       </question>
 
-      <question text="Why is dlib.image_window missing?">
+      <question text="Why is dlib.image_window missing from the Python module?">
          If you are getting the error <tt>module 'dlib' has no attribute 'image_window'</tt>
          it is because you compiled dlib without GUI support (or you are using a copy of
          dlib someone else compiled and they built it without GUI support).  So note that
@@ -36,7 +37,7 @@
          </p>
       </question>
 
-      <question text="Why is some function missing from the dlib module?">
+      <question text="Why is some function missing from the dlib Python module?">
          If you are missing dlib.image_window then read <a href="#Whyisdlib.imagewindowmissing">the FAQ about that</a>.
          If you are missing any other function then <b>it's because you are using an old version of dlib
          that just doesn't have that function</b>.  You need to install a newer version
@@ -245,10 +246,22 @@ row_vect.set_size(5);
       <!-- ****************************************** -->
 
       <question text="Where is the documentation for &lt;object/function&gt;?">
+         Every class and function in dlib is documented in detail.  
          If you can't find something then check the <a href="term_index.html">index</a>.
          <br/><br/>
-         Also, the bulk of the documentation can be found by following the 
-         <more_details/> links.   
+         Also, the bulk of the documentation can be found by clicking the 
+         <more_details/> buttons.  <b>So you should click on the "more details" buttons and read the documentation</b>.  
+         
+         <p>A lot of people
+         post questions like "There is no documentation for some_random_function(), how do I use it?", when
+         in reality the function is documented in detail.  Between the index, site search, and main website which 
+         breaks down functions/classes into topical categories there is no excuse for not being able to find 
+         the documentation for a function or class.  This is especially true if you know its name because you can
+         jump right to it using the <a href="term_index.html">index</a> or even a simple google search.  
+         So if you are posting a question like "I don't understand how something works" and obviously haven't read the
+         documentation then you are just going to get referred to this FAQ.  So please read the documentation before
+         asking questions.
+         </p>
       </question>
 
 
