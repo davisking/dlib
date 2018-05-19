@@ -12,6 +12,20 @@
 
 <current>
 New Features and Improvements:
+   - Added Python interface to threshold_image() and partition_pixels().
+
+Non-Backwards Compatible Changes:
+   - In the Python API, renamed dlib.save_rgb_image() to dlib.save_image().
+
+Bug fixes:
+   - Dlib 19.11 had a bug that caused the Python interface to reject grayscale images.
+     This has been fixed.
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.11" date="May 17, 2018">
+New Features and Improvements:
    - Deep Learning
       - Added resize_to layer.
       - Made loss_multiclass_log_per_pixel use CUDA. This greatly accelerates 
@@ -70,7 +84,7 @@ Bug fixes:
      workflows.  This has been fixed.
    - Fixed matrix objects not working correctly when sized greater than 4GB in
      Visual Studio.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
