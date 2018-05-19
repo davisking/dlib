@@ -133,7 +133,7 @@ above partition_pixels(img) does.  Then it forms a new image with only pixels \n
 However, the recursion is implemented in an efficient way which is faster than \n\
 explicitly forming these images and calling partition_pixels(), but the \n\
 output is the same as if you did.  For example, suppose you called \n\
-[t1,t2,t2] = partition_pixels(img).  Then we would have: \n\
+[t1,t2,t2] = partition_pixels(img,3).  Then we would have: \n\
    - t1 == partition_pixels(img) \n\
    - t2 == partition_pixels(an image with only pixels with values >= t1 in it) \n\
    - t3 == partition_pixels(an image with only pixels with values >= t2 in it)" ;
