@@ -26,6 +26,7 @@ def get_test_face_chip():
     rgb_img, shape = get_test_image_and_shape()
     return dlib.get_face_chip(rgb_img, shape)
 
+@pytest.mark.skipif(not utils.is_numpy_installed(), reason="requires numpy")
 def test_partition_pixels():
     truth = (102, 159, 181);
     img, shape = get_test_image_and_shape()
