@@ -26,6 +26,22 @@ def get_test_face_chip():
     rgb_img, shape = get_test_image_and_shape()
     return dlib.get_face_chip(rgb_img, shape)
 
+def test_partition_pixels():
+    truth = (102, 159, 181);
+    img, shape = get_test_image_and_shape()
+
+    assert(dlib.partition_pixels(img) == truth[0])
+    assert(dlib.partition_pixels(img,3) == truth)
+
+    # Call all these versions of this mainly to make sure binding to
+    # various image types works.
+    assert(dlib.partition_pixels(img[:,:,0]) == 125)
+    assert(dlib.partition_pixels(img[:,:,0].astype('float32')) == 125)
+    assert(dlib.partition_pixels(img[:,:,0].astype('float64')) == 125)
+    assert(dlib.partition_pixels(img[:,:,0].astype('uint16')) == 125)
+    assert(dlib.partition_pixels(img[:,:,0].astype('uint32')) == 125)
+
+
 # The tests below will be skipped if Numpy is not installed
 @pytest.mark.skipif(not utils.is_numpy_installed(), reason="requires numpy")
 def test_get_face_chip():
