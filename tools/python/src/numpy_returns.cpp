@@ -30,7 +30,8 @@ bool has_ending (std::string const full_string, std::string const &ending) {
 
 // ----------------------------------------------------------------------------------------
 
-void save_rgb_image(numpy_image<rgb_pixel> img, const std::string &path)
+template <typename T>
+void save_image(numpy_image<T> img, const std::string &path)
 {
     std::string lowered_path = path;
     std::transform(lowered_path.begin(), lowered_path.end(), lowered_path.begin(), ::tolower);
@@ -123,8 +124,12 @@ void bind_numpy_returns(py::module &m)
 	py::arg("path")
     );
 
-    m.def("save_rgb_image", &save_rgb_image, 
-	"Saves the given (RGB) image to the specified path. Determines the file type from the file extension specified in the path",
+    m.def("save_image", &save_image<rgb_pixel>, 
+	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
+	py::arg("img"), py::arg("path")
+    );
+    m.def("save_image", &save_image<unsigned char>, 
+	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
 	py::arg("img"), py::arg("path")
     );
 
