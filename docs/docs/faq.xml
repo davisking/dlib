@@ -8,6 +8,19 @@
 
    <questions group="Python">
 
+      <question text="I compiled with CUDA enabled, why isn't it using CUDA?">
+         Either you are using a part of dlib that just doesn't use CUDA, of which there
+         are many parts, or you are mistaken about compiling dlib with CUDA enabled.
+         In particular, many users report that "dlib isn't using CUDA even though 
+         I definitely compiled it with CUDA" and in every case either they are not using part of dlib that uses CUDA or they 
+         have installed multiple copies of dlib on their computer, some with CUDA disabled, and
+         they are using a non-CUDA build. 
+         <p>
+            You can check if dlib is compiled to use CUDA by looking at the <tt>dlib.DLIB_USE_CUDA</tt>
+            boolean.  <b>If dlib.DLIB_USE_CUDA is false then you didn't compile it with CUDA enabled</b>.
+         </p>
+      </question>
+
       <question text="Why is dlib.image_window missing?">
          If you are getting the error <tt>module 'dlib' has no attribute 'image_window'</tt>
          it is because you compiled dlib without GUI support (or you are using a copy of
