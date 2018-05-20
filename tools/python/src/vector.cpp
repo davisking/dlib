@@ -216,4 +216,9 @@ void bind_vector(py::module& m)
         .def("extend", extend_vector_with_python_list<dpoint>)
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
+
+    m.def("length", [](const point& p){return length(p); }, 
+        "returns the distance from p to the origin, i.e. the L2 norm of p.", py::arg("p"));
+    m.def("length", [](const dpoint& p){return length(p); }, 
+        "returns the distance from p to the origin, i.e. the L2 norm of p.", py::arg("p"));
 }
