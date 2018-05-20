@@ -606,7 +606,7 @@ ensures \n\
   the input image. \n\
 - The returned filter has get_scale()*2+1 rows and columns." ;
 
-    py::class_<image_gradients>(m, "image_gradients",
+    const char* class_docs = 
 "This class is a tool for computing first and second derivatives of an \n\
 image.  It does this by fitting a quadratic surface around each pixel and \n\
 then computing the gradients of that quadratic surface.  For the details \n\
@@ -619,8 +619,9 @@ since the entire gradient estimation procedure, for each type of gradient, \n\
 is accomplished by cross-correlating the image with a single separable \n\
 filter.  This means you can compute gradients at very large scales (e.g. by \n\
 fitting the quadratic to a large window, like a 99x99 window) and it still \n\
-runs very quickly." 
-        )
+runs very quickly.";
+
+    py::class_<image_gradients>(m, "image_gradients", class_docs)
         .def(py::init<long>(), "Creates this class with the provided scale. i.e. get_scale()==scale. \nscale must be >= 1.", py::arg("scale"))
         .def(py::init<>(), "Creates this class with a scale of 1. i.e. get_scale()==1")
         .def("gradient_x", [](image_gradients& g, const numpy_image<unsigned char>& img){
