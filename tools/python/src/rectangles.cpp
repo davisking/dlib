@@ -119,6 +119,8 @@ void bind_rectangles(py::module& m)
     typedef rectangle type;
     py::class_<type>(m, "rectangle", "This object represents a rectangular area of an image.")
         .def(py::init<long,long,long,long>(), py::arg("left"),py::arg("top"),py::arg("right"),py::arg("bottom"))
+        .def(py::init<drectangle>(), py::arg("rect"))
+        .def(py::init<rectangle>(), py::arg("rect"))
         .def(py::init())
         .def("area",   &::area)
         .def("left",   &::left)
@@ -127,6 +129,10 @@ void bind_rectangles(py::module& m)
         .def("bottom", &::bottom)
         .def("width",  &::width)
         .def("height", &::height)
+        .def("tl_corner", &type::tl_corner, "Returns the top left corner of the rectangle.")
+        .def("tr_corner", &type::tr_corner, "Returns the top right corner of the rectangle.")
+        .def("bl_corner", &type::bl_corner, "Returns the bottom left corner of the rectangle.")
+        .def("br_corner", &type::br_corner, "Returns the bottom right corner of the rectangle.")
         .def("is_empty", &::is_empty<type>)
         .def("center", &::center<type>)
         .def("dcenter", &::dcenter<type>)
@@ -148,6 +154,9 @@ void bind_rectangles(py::module& m)
     typedef drectangle type;
     py::class_<type>(m, "drectangle", "This object represents a rectangular area of an image with floating point coordinates.")
         .def(py::init<double,double,double,double>(), py::arg("left"), py::arg("top"), py::arg("right"), py::arg("bottom"))
+        .def(py::init<rectangle>(), py::arg("rect"))
+        .def(py::init<drectangle>(), py::arg("rect"))
+        .def(py::init<>())
         .def("area",   &::darea)
         .def("left",   &::dleft)
         .def("top",    &::dtop)
@@ -158,6 +167,10 @@ void bind_rectangles(py::module& m)
         .def("is_empty", &::is_empty<type>)
         .def("center", &::center<type>)
         .def("dcenter", &::dcenter<type>)
+        .def("tl_corner", &type::tl_corner, "Returns the top left corner of the rectangle.")
+        .def("tr_corner", &type::tr_corner, "Returns the top right corner of the rectangle.")
+        .def("bl_corner", &type::bl_corner, "Returns the bottom left corner of the rectangle.")
+        .def("br_corner", &type::br_corner, "Returns the bottom right corner of the rectangle.")
         .def("contains", &::contains<type>, py::arg("point"))
         .def("contains", &::contains_xy<type>, py::arg("x"), py::arg("y"))
         .def("contains", &::contains_rec<type>, py::arg("rectangle"))
@@ -274,6 +287,13 @@ ensures \n\
   (i.e. grows the given rectangle by expanding its border by num)",
         py::arg("rect"), py::arg("num"));
 
+    m.def("centered_rect", [](const point& p, unsigned long width, unsigned long height) {
+        return centered_rect(p, width, height); },
+        py::arg("p"), py::arg("width"), py::arg("height"));
+
+    m.def("centered_rects", [](const std::vector<point>& p, unsigned long width, unsigned long height) {
+        return centered_rects(p, width, height); },
+        py::arg("pts"), py::arg("width"), py::arg("height"));
 }
 
 // ----------------------------------------------------------------------------------------
