@@ -50,6 +50,7 @@ PYBIND11_MAKE_OPAQUE(sparse_ranking_pairs);
 
 
 PYBIND11_MAKE_OPAQUE(std::vector<dlib::point>);
+PYBIND11_MAKE_OPAQUE(std::vector<dlib::dpoint>);
 
 #endif // DLIB_PyTHON_OPAQUE_TYPES_H_
 

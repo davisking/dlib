@@ -138,8 +138,24 @@ string point__str__(const point& p)
     return sout.str();
 }
 
+string dpoint__repr__ (const dpoint& p)
+{
+    std::ostringstream sout;
+    sout << "dpoint(" << p.x() << ", " << p.y() << ")";
+    return sout.str();
+}
+
+string dpoint__str__(const dpoint& p)
+{
+    std::ostringstream sout;
+    sout << "(" << p.x() << ", " << p.y() << ")";
+    return sout.str();
+}
+
 long point_x(const point& p) { return p.x(); }
 long point_y(const point& p) { return p.y(); }
+double dpoint_x(const dpoint& p) { return p.x(); }
+double dpoint_y(const dpoint& p) { return p.y(); }
 
 // ----------------------------------------------------------------------------------------
 void bind_vector(py::module& m)
@@ -177,6 +193,25 @@ void bind_vector(py::module& m)
         .def("clear", &type::clear)
         .def("resize", resize<type>)
         .def("extend", extend_vector_with_python_list<point>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
+
+    {
+    typedef dpoint type;
+    py::class_<type>(m, "dpoint", "This object represents a single point of floating point coordinates that maps directly to a dlib::dpoint.")
+            .def(py::init<double,double>(), py::arg("x"), py::arg("y"))
+            .def("__repr__", &dpoint__repr__)
+            .def("__str__", &dpoint__str__)
+            .def_property("x", &dpoint_x, [](dpoint& p, double x){p.x()=x;}, "The x-coordinate of the dpoint.")
+            .def_property("y", &dpoint_y, [](dpoint& p, double y){p.x()=y;}, "The y-coordinate of the dpoint.")
+            .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
+    {
+    typedef std::vector<dpoint> type;
+    py::bind_vector<type>(m, "dpoints", "An array of dpoint objects.")
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def("extend", extend_vector_with_python_list<dpoint>)
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 }
