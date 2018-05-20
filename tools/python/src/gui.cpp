@@ -33,17 +33,13 @@ void image_window_set_image_simple_detector_py (
 
 // ----------------------------------------------------------------------------------------
 
+template <typename T>
 void image_window_set_image (
     image_window& win,
-    py::array img
+    const numpy_image<T>& img
 )
 {
-    if (is_image<unsigned char>(img))
-        return win.set_image(numpy_image<unsigned char>(img));
-    else if (is_image<rgb_pixel>(img))
-        return win.set_image(numpy_image<rgb_pixel>(img));
-    else
-        throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
+    win.set_image(img);
 }
 
 void add_overlay_rect (
@@ -74,14 +70,16 @@ void add_overlay_parts (
     win.add_overlay(render_face_detections(detection, color));
 }
 
-std::shared_ptr<image_window> make_image_window_from_image(py::array img)
+template <typename T>
+std::shared_ptr<image_window> make_image_window_from_image(const numpy_image<T>& img)
 {
     auto win = std::make_shared<image_window>();
     image_window_set_image(*win, img);
     return win;
 }
 
-std::shared_ptr<image_window> make_image_window_from_image_and_title(py::array img, const string& title)
+template <typename T>
+std::shared_ptr<image_window> make_image_window_from_image_and_title(const numpy_image<T>& img, const string& title)
 {
     auto win = std::make_shared<image_window>();
     image_window_set_image(*win, img);
@@ -100,15 +98,21 @@ void bind_gui(py::module& m)
     py::class_<type, std::shared_ptr<type>>(m, "image_window",
         "This is a GUI window capable of showing images on the screen.")
         .def(py::init())
-        .def(py::init(&make_image_window_from_image),
+        .def(py::init(&make_image_window_from_image<uint8_t>), 
             "Create an image window that displays the given numpy image.")
-        .def(py::init(&make_image_window_from_image_and_title),
+        .def(py::init(&make_image_window_from_image<rgb_pixel>), 
+            "Create an image window that displays the given numpy image.")
+        .def(py::init(&make_image_window_from_image_and_title<uint8_t>), 
+            "Create an image window that displays the given numpy image and also has the given title.")
+        .def(py::init(&make_image_window_from_image_and_title<rgb_pixel>), 
             "Create an image window that displays the given numpy image and also has the given title.")
         .def("set_image", image_window_set_image_simple_detector_py, py::arg("detector"),
             "Make the image_window display the given HOG detector's filters.")
         .def("set_image", image_window_set_image_fhog_detector, py::arg("detector"),
             "Make the image_window display the given HOG detector's filters.")
-        .def("set_image", image_window_set_image, py::arg("image"),
+        .def("set_image", image_window_set_image<uint8_t>, py::arg("image"),
+            "Make the image_window display the given image.")
+        .def("set_image", image_window_set_image<rgb_pixel>, py::arg("image"),
             "Make the image_window display the given image.")
         .def("set_title", (set_title_funct)&type::set_title, py::arg("title"),
             "Set the title of the window to the given value.")
