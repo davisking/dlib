@@ -223,6 +223,9 @@ namespace dlib
 
         struct watershed_points
         {
+            watershed_points() = default;
+            watershed_points(const point& p_, float score_, unsigned int label_): p(p_), score(score_), label(label_) {}
+
             point p;
             float score = 0;
             unsigned int label = std::numeric_limits<unsigned int>::max();
@@ -286,7 +289,7 @@ namespace dlib
                     continue;
                 }
 
-                next.push({point(c,r), val, std::numeric_limits<unsigned int>::max()});
+                next.push(watershed_points(point(c,r), val, std::numeric_limits<unsigned int>::max()));
             }
         }
 
@@ -322,7 +325,7 @@ namespace dlib
                     continue;
 
                 labels[n.y()][n.x()] = label;
-                next.push({n, img2[n.y()][n.x()], label});
+                next.push(watershed_points(n, img2[n.y()][n.x()], label));
             }
         }
 
@@ -338,7 +341,7 @@ namespace dlib
         out_image_type& labels
     )
     {
-        return segment_image_watersheds(img, labels, partition_pixels(img));
+        return label_connected_blobs_watershed(img, labels, partition_pixels(img));
     }
 
 // ----------------------------------------------------------------------------------------
