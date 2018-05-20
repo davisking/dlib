@@ -163,7 +163,7 @@ namespace dlib
             const py::object& rhs
         )
         {
-            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style> arr = rhs.cast<py::array>();
+            py::array arr = rhs.cast<py::array>();
             assert_is_image<pixel_type>(arr);
             py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>::operator=(arr);
             return *this;
