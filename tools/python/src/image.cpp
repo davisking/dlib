@@ -146,6 +146,30 @@ py::tuple py_label_connected_blobs (
 // ----------------------------------------------------------------------------------------
 
 template <typename T>
+py::tuple py_label_connected_blobs_watershed (
+    const numpy_image<T>& img,
+    const T& background_thresh, 
+    const double smoothing
+)
+{
+    numpy_image<uint32_t> labels;
+    auto num_blobs = label_connected_blobs_watershed(img, labels, background_thresh, smoothing);
+    return py::make_tuple(labels, num_blobs);
+}
+
+template <typename T>
+py::tuple py_label_connected_blobs_watershed2 (
+    const numpy_image<T>& img
+)
+{
+    numpy_image<uint32_t> labels;
+    auto num_blobs = label_connected_blobs_watershed(img, labels);
+    return py::make_tuple(labels, num_blobs);
+}
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
 numpy_image<rgb_pixel> py_randomly_color_image (
     const numpy_image<T>& img
 )
@@ -165,6 +189,61 @@ numpy_image<rgb_pixel> py_jet (
     numpy_image<rgb_pixel> temp;
     assign_image(temp, jet(img));
     return temp;
+}
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+py::array convert_image (
+    const numpy_image<T>& img,
+    const string& dtype
+)
+{
+    if (dtype == "uint8")    {numpy_image<uint8_t>   out; assign_image(out, img); return out;}
+    if (dtype == "uint16")   {numpy_image<uint16_t>  out; assign_image(out, img); return out;}
+    if (dtype == "uint32")   {numpy_image<uint32_t>  out; assign_image(out, img); return out;}
+    if (dtype == "uint64")   {numpy_image<uint64_t>  out; assign_image(out, img); return out;}
+    if (dtype == "int8")     {numpy_image<int8_t>    out; assign_image(out, img); return out;}
+    if (dtype == "int16")    {numpy_image<int16_t>   out; assign_image(out, img); return out;}
+    if (dtype == "int32")    {numpy_image<int32_t>   out; assign_image(out, img); return out;}
+    if (dtype == "int64")    {numpy_image<int64_t>   out; assign_image(out, img); return out;}
+    if (dtype == "float32")  {numpy_image<float>     out; assign_image(out, img); return out;}
+    if (dtype == "float64")  {numpy_image<double>    out; assign_image(out, img); return out;}
+    if (dtype == "float")    {numpy_image<float>     out; assign_image(out, img); return out;}
+    if (dtype == "double")   {numpy_image<double>    out; assign_image(out, img); return out;}
+    if (dtype == "rgb_pixel"){numpy_image<rgb_pixel> out; assign_image(out, img); return out;}
+
+
+    throw dlib::error("convert_image() called with invalid dtype, must be one of these strings: \n"
+        "uint8, int8, uint16, int16, uint32, int32, uint64, int64, float32, float, float64, double, or rgb_pixel");
+}
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+py::array convert_image_scaled (
+    const numpy_image<T>& img,
+    const string& dtype,
+    const double thresh = 4
+)
+{
+    if (dtype == "uint8")    {numpy_image<uint8_t>   out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "uint16")   {numpy_image<uint16_t>  out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "uint32")   {numpy_image<uint32_t>  out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "uint64")   {numpy_image<uint64_t>  out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "int8")     {numpy_image<int8_t>    out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "int16")    {numpy_image<int16_t>   out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "int32")    {numpy_image<int32_t>   out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "int64")    {numpy_image<int64_t>   out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "float32")  {numpy_image<float>     out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "float64")  {numpy_image<double>    out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "float")    {numpy_image<float>     out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "double")   {numpy_image<double>    out; assign_image_scaled(out, img, thresh); return out;}
+    if (dtype == "rgb_pixel"){numpy_image<rgb_pixel> out; assign_image_scaled(out, img, thresh); return out;}
+
+
+    throw dlib::error("convert_image() called with invalid dtype, must be one of these strings: \n"
+        "uint8, int8, uint16, int16, uint32, int32, uint64, int64, float32, float, float64, double, or rgb_pixel");
 }
 
 // ----------------------------------------------------------------------------------------
@@ -378,6 +457,85 @@ ensures \n\
     m.def("label_connected_blobs", py_label_connected_blobs<uint32_t>, docs, py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
 
 
+    docs =
+"requires \n\
+    - smoothing >= 0 \n\
+ensures \n\
+    - This routine performs a watershed segmentation of the given input image and \n\
+      labels each resulting flooding region with a unique integer label. It does \n\
+      this by marking the brightest pixels as sources of flooding and then flood \n\
+      fills the image outward from those sources.  Each flooded area is labeled \n\
+      with the identity of the source pixel and flooding stops when another flooded \n\
+      area is reached or pixels with values < background_thresh are encountered.   \n\
+    - The flooding will also overrun a source pixel if that source pixel has yet to \n\
+      label any neighboring pixels.  This behavior helps to mitigate spurious \n\
+      splits of objects due to noise.  You can further control this behavior by \n\
+      setting the smoothing parameter.  The flooding will take place on an image \n\
+      that has been Gaussian blurred with a sigma==smoothing.  So setting smoothing \n\
+      to a larger number will in general cause more regions to be merged together. \n\
+      Note that the smoothing parameter has no effect on the interpretation of \n\
+      background_thresh since the decision of \"background or not background\" is \n\
+      always made relative to the unsmoothed input image. \n\
+    - This function returns a tuple of the labeled image and number of blobs found.  \n\
+      i.e. you can call it like this: \n\
+        label_img, num_blobs = label_connected_blobs_watershed(img,background_thresh,smoothing) \n\
+    - The returned label_img will have the same dimensions as img.  \n\
+    - for all valid r and c: \n\
+        - if (img[r][c] < background_thresh) then \n\
+            - label_img[r][c] == 0, (i.e. the pixel is labeled as background) \n\
+        - else \n\
+            - label_img[r][c] == an integer value indicating the identity of the segment \n\
+              containing the pixel img[r][c].   \n\
+    - The returned num_blobs is the number of labeled segments, including the \n\
+      background segment.  Therefore, the returned number is 1+(the max value in \n\
+      label_img).";
+    /*!
+        requires
+            - smoothing >= 0
+        ensures
+            - This routine performs a watershed segmentation of the given input image and
+              labels each resulting flooding region with a unique integer label. It does
+              this by marking the brightest pixels as sources of flooding and then flood
+              fills the image outward from those sources.  Each flooded area is labeled
+              with the identity of the source pixel and flooding stops when another flooded
+              area is reached or pixels with values < background_thresh are encountered.  
+            - The flooding will also overrun a source pixel if that source pixel has yet to
+              label any neighboring pixels.  This behavior helps to mitigate spurious
+              splits of objects due to noise.  You can further control this behavior by
+              setting the smoothing parameter.  The flooding will take place on an image
+              that has been Gaussian blurred with a sigma==smoothing.  So setting smoothing
+              to a larger number will in general cause more regions to be merged together.
+              Note that the smoothing parameter has no effect on the interpretation of
+              background_thresh since the decision of "background or not background" is
+              always made relative to the unsmoothed input image.
+            - This function returns a tuple of the labeled image and number of blobs found. 
+              i.e. you can call it like this:
+                label_img, num_blobs = label_connected_blobs_watershed(img,background_thresh,smoothing)
+            - The returned label_img will have the same dimensions as img. 
+            - for all valid r and c:
+                - if (img[r][c] < background_thresh) then
+                    - label_img[r][c] == 0, (i.e. the pixel is labeled as background)
+                - else
+                    - label_img[r][c] == an integer value indicating the identity of the segment
+                      containing the pixel img[r][c].  
+            - The returned num_blobs is the number of labeled segments, including the
+              background segment.  Therefore, the returned number is 1+(the max value in
+              label_img).
+    !*/
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed<unsigned char>, py::arg("img"),py::arg("background_thresh"),py::arg("smoothing")=0);
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed<uint16_t>, py::arg("img"),py::arg("background_thresh"),py::arg("smoothing")=0);
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed<uint32_t>, py::arg("img"),py::arg("background_thresh"),py::arg("smoothing")=0);
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed<float>, py::arg("img"),py::arg("background_thresh"),py::arg("smoothing")=0);
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed<double>, docs, py::arg("img"),py::arg("background_thresh"),py::arg("smoothing")=0);
+
+    docs = "This version of label_connected_blobs_watershed simple invokes: \n"
+           "   return label_connected_blobs_watershed(img, partition_pixels(img))";
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed2<unsigned char>, py::arg("img"));
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed2<uint16_t>, py::arg("img"));
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed2<uint32_t>, py::arg("img"));
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed2<float>, py::arg("img"));
+    m.def("label_connected_blobs_watershed", py_label_connected_blobs_watershed2<double>, docs, py::arg("img"));
+
 
     docs = 
 "Converts a grayscale image into a jet colored image.  This is an image where dark \n\
@@ -526,8 +684,105 @@ get_scale()*2+1 centered on each pixel.  Therefore, the scale parameter controls
 of gradients we will find.  For example, a very large scale will cause the gradient_xx() \n\
 to be insensitive to high frequency noise in the image while smaller scales would be more \n\
 sensitive to such fluctuations in the image." 
-            );
+        );
 
+
+    docs = 
+"Converts an image to a target pixel type.  dtype must be a string containing one of the following: \n\
+    uint8, int8, uint16, int16, uint32, int32, uint64, int64, float32, float, float64, double, or rgb_pixel \n\
+ \n\
+When converting from a color space with more than 255 values the pixel intensity is \n\
+saturated at the minimum and maximum pixel values of the target pixel type.  For \n\
+example, if you convert a float valued image to uint8 then float values will be \n\
+truncated to integers and values larger than 255 are converted to 255 while values less \n\
+than 0 are converted to 0.";
+    /*!
+    Converts an image to a target pixel type.  dtype must be a string containing one of the following:
+        uint8, int8, uint16, int16, uint32, int32, uint64, int64, float32, float, float64, double, or rgb_pixel
+
+    When converting from a color space with more than 255 values the pixel intensity is
+    saturated at the minimum and maximum pixel values of the target pixel type.  For
+    example, if you convert a float valued image to uint8 then float values will be
+    truncated to integers and values larger than 255 are converted to 255 while values less
+    than 0 are converted to 0.
+    !*/
+    m.def("convert_image", convert_image<uint8_t>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<uint16_t>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<uint32_t>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<uint64_t>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<int8_t>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<int16_t>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<int32_t>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<int64_t>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<float>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<double>, py::arg("img"), py::arg("dtype"));
+    m.def("convert_image", convert_image<rgb_pixel>, docs, py::arg("img"), py::arg("dtype"));
+
+
+    docs = "";
+"requires \n\
+    - thresh > 0 \n\
+ensures \n\
+    - Converts an image to a target pixel type.  dtype must be a string containing one of the following: \n\
+      uint8, int8, uint16, int16, uint32, int32, uint64, int64, float32, float, float64, double, or rgb_pixel \n\
+ \n\
+      The contents of img will be scaled to fit the dynamic range of the target \n\
+      pixel type.  The thresh parameter is used to filter source pixel values which \n\
+      are outliers.  These outliers will saturate at the edge of the destination \n\
+      image's dynamic range. \n\
+    - Specifically, for all valid r and c: \n\
+        - We scale img[r][c] into the dynamic range of the target pixel type.  This \n\
+          is done using the mean and standard deviation of img. Call the mean M and \n\
+          the standard deviation D.  Then the scaling from source to destination is \n\
+          performed using the following mapping: \n\
+            let SRC_UPPER  = min(M + thresh*D, max(img)) \n\
+            let SRC_LOWER  = max(M - thresh*D, min(img)) \n\
+            let DEST_UPPER = max value possible for the selected dtype.  \n\
+            let DEST_LOWER = min value possible for the selected dtype. \n\
+ \n\
+            MAPPING: [SRC_LOWER, SRC_UPPER] -> [DEST_LOWER, DEST_UPPER] \n\
+ \n\
+          Where this mapping is a linear mapping of values from the left range \n\
+          into the right range of values.  Source pixel values outside the left \n\
+          range are modified to be at the appropriate end of the range.";
+    /*!
+        requires
+            - thresh > 0
+        ensures
+            - Converts an image to a target pixel type.  dtype must be a string containing one of the following:
+              uint8, int8, uint16, int16, uint32, int32, uint64, int64, float32, float, float64, double, or rgb_pixel
+
+              The contents of img will be scaled to fit the dynamic range of the target
+              pixel type.  The thresh parameter is used to filter source pixel values which
+              are outliers.  These outliers will saturate at the edge of the destination
+              image's dynamic range.
+            - Specifically, for all valid r and c:
+                - We scale img[r][c] into the dynamic range of the target pixel type.  This
+                  is done using the mean and standard deviation of img. Call the mean M and
+                  the standard deviation D.  Then the scaling from source to destination is
+                  performed using the following mapping:
+                    let SRC_UPPER  = min(M + thresh*D, max(img))
+                    let SRC_LOWER  = max(M - thresh*D, min(img))
+                    let DEST_UPPER = max value possible for the selected dtype. 
+                    let DEST_LOWER = min value possible for the selected dtype.
+
+                    MAPPING: [SRC_LOWER, SRC_UPPER] -> [DEST_LOWER, DEST_UPPER]
+
+                  Where this mapping is a linear mapping of values from the left range
+                  into the right range of values.  Source pixel values outside the left
+                  range are modified to be at the appropriate end of the range.
+    !*/
+    m.def("convert_image_scaled", convert_image_scaled<uint8_t>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<uint16_t>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<uint32_t>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<uint64_t>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<int8_t>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<int16_t>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<int32_t>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<int64_t>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<float>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<double>, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
+    m.def("convert_image_scaled", convert_image_scaled<rgb_pixel>, docs, py::arg("img"), py::arg("dtype"), py::arg("thresh")=4);
 
 }
 
