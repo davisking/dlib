@@ -358,6 +358,15 @@ namespace pybind11
             using type = dlib::numpy_image<pixel_type>;
 
             bool load(handle src, bool convert) {
+                // If passed a tuple where the first element of the tuple is a valid
+                // numpy_image then bind the numpy_image to that element of the tuple.
+                // We do this because there is a pattern of returning an image and some
+                // associated metadata.  This allows the returned tuple from such functions
+                // to also be treated as an image without needing to unpack the first
+                // argument.
+                if (PyTuple_Check(src.ptr()) && PyTuple_Size(src.ptr()) >= 1)
+                    src = reinterpret_borrow<py::tuple>(src)[0];
+
                 if (!type::check_(src))
                     return false;
                 // stash the output of ensure into a temp variable since assigning it to
