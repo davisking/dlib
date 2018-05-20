@@ -138,10 +138,19 @@ namespace dlib
         numpy_image() = default;
 
         numpy_image(
-            py::array& img
+            const py::array& img
         ) : py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>(img)
         {
             assert_is_image<pixel_type>(img);
+        }
+
+        numpy_image (
+            const py::object& img
+        ) 
+        {
+            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style> arr = img.cast<py::array>();
+            assert_is_image<pixel_type>(arr);
+            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>::operator=(arr);
         }
 
         numpy_image(
@@ -154,8 +163,9 @@ namespace dlib
             const py::object& rhs
         )
         {
-            assert_is_image<pixel_type>(rhs);
-            *this = rhs.cast<py::array>();
+            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style> arr = rhs.cast<py::array>();
+            assert_is_image<pixel_type>(arr);
+            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>::operator=(arr);
             return *this;
         }
 
