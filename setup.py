@@ -15,7 +15,8 @@ To package the wheel (after pip installing twine and wheel):
 To upload the binary wheel to PyPi
     twine upload dist/*.whl
 To upload the source distribution to PyPi
-    python setup.py sdist upload
+    python setup.py sdist 
+    twine upload dist/dlib-*.tar.gz
 To exclude/include certain options in the cmake config use --yes and --no:
     for example:
     --yes USE_AVX_INSTRUCTIONS: will set -DUSE_AVX_INSTRUCTIONS=yes
