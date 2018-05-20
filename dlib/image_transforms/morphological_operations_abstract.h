@@ -349,7 +349,7 @@ namespace dlib
     );
     /*!
         requires
-            - image_type is an object that implement the interface defined in
+            - image_type is an object that implements the interface defined in
               dlib/image_processing/generic_image.h 
             - img must contain a grayscale pixel type.
             - all pixels in img are set to either on_pixel or off_pixel.
