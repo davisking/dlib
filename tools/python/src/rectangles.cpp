@@ -263,6 +263,17 @@ ensures \n\
         .def("extend", extend_vector_with_python_list<rectangle>)
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
+
+    m.def("shrink_rect", [](const rectangle& rect, long num){return shrink_rect(rect,num);},
+" returns rectangle(rect.left()+num, rect.top()+num, rect.right()-num, rect.bottom()-num) \n\
+  (i.e. shrinks the given rectangle by shrinking its border by num)",
+        py::arg("rect"), py::arg("num"));
+
+    m.def("grow_rect", [](const rectangle& rect, long num){return grow_rect(rect,num);},
+"- return shrink_rect(rect, -num) \n\
+  (i.e. grows the given rectangle by expanding its border by num)",
+        py::arg("rect"), py::arg("num"));
+
 }
 
 // ----------------------------------------------------------------------------------------

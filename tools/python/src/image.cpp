@@ -81,11 +81,99 @@ py::tuple py_partition_pixels2 (
     DLIB_CASSERT(false, "This should never happen.");
 }
 
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+py::tuple py_gaussian_blur (
+    const numpy_image<T>& img,
+    double sigma = 1,
+    int max_size = 1001
+)
+{
+    numpy_image<T> out;
+    auto rect = gaussian_blur(img, out, sigma, max_size);
+    return py::make_tuple(out, rect);
+}
+
+template <typename T>
+py::tuple py_label_connected_blobs (
+    const numpy_image<T>& img,
+    bool zero_pixels_are_background,
+    int neighborhood_connectivity,
+    bool connected_if_both_not_zero
+)
+{
+    DLIB_CASSERT(neighborhood_connectivity == 4 ||
+                 neighborhood_connectivity == 8 ||
+                 neighborhood_connectivity == 24);
+
+    unsigned long num_blobs = 0;
+
+    numpy_image<uint32_t> labels;
+
+    if (zero_pixels_are_background && neighborhood_connectivity == 4 && connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, ::zero_pixels_are_background(), neighbors_4(), ::connected_if_both_not_zero(), labels);
+    else if (zero_pixels_are_background && neighborhood_connectivity == 4 && !connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, ::zero_pixels_are_background(), neighbors_4(), connected_if_equal(), labels);
+    else if (!zero_pixels_are_background && neighborhood_connectivity == 4 && connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, nothing_is_background(), neighbors_4(), ::connected_if_both_not_zero(), labels);
+    else if (!zero_pixels_are_background && neighborhood_connectivity == 4 && !connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, nothing_is_background(), neighbors_4(), connected_if_equal(), labels);
+
+    else if (zero_pixels_are_background && neighborhood_connectivity == 8 && connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, ::zero_pixels_are_background(), neighbors_8(), ::connected_if_both_not_zero(), labels);
+    else if (zero_pixels_are_background && neighborhood_connectivity == 8 && !connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, ::zero_pixels_are_background(), neighbors_8(), connected_if_equal(), labels);
+    else if (!zero_pixels_are_background && neighborhood_connectivity == 8 && connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, nothing_is_background(), neighbors_8(), ::connected_if_both_not_zero(), labels);
+    else if (!zero_pixels_are_background && neighborhood_connectivity == 8 && !connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, nothing_is_background(), neighbors_8(), connected_if_equal(), labels);
+
+    else if (zero_pixels_are_background && neighborhood_connectivity == 24 && connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, ::zero_pixels_are_background(), neighbors_24(), ::connected_if_both_not_zero(), labels);
+    else if (zero_pixels_are_background && neighborhood_connectivity == 24 && !connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, ::zero_pixels_are_background(), neighbors_24(), connected_if_equal(), labels);
+    else if (!zero_pixels_are_background && neighborhood_connectivity == 24 && connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, nothing_is_background(), neighbors_24(), ::connected_if_both_not_zero(), labels);
+    else if (!zero_pixels_are_background && neighborhood_connectivity == 24 && !connected_if_both_not_zero )
+        num_blobs = label_connected_blobs(img, nothing_is_background(), neighbors_24(), connected_if_equal(), labels);
+    else
+        DLIB_CASSERT(false, "this should never happen");
+
+    return py::make_tuple(labels, num_blobs);
+}
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+numpy_image<rgb_pixel> py_randomly_color_image (
+    const numpy_image<T>& img
+)
+{
+    numpy_image<rgb_pixel> temp;
+    assign_image(temp, randomly_color_image(img));
+    return temp;
+}
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+numpy_image<rgb_pixel> py_jet (
+    const numpy_image<T>& img
+)
+{
+    numpy_image<rgb_pixel> temp;
+    assign_image(temp, jet(img));
+    return temp;
+}
 
 // ----------------------------------------------------------------------------------------
 
 void bind_image_classes(py::module& m)
 {
+
+
+
     py::class_<rgb_pixel>(m, "rgb_pixel")
         .def(py::init<unsigned char,unsigned char,unsigned char>(), py::arg("red"), py::arg("green"), py::arg("blue"))
         .def("__str__", &print_rgb_pixel_str)
@@ -143,5 +231,303 @@ output is the same as if you did.  For example, suppose you called \n\
     m.def("partition_pixels", &py_partition_pixels2<uint32_t>, py::arg("img"), py::arg("num_thresholds") );
     m.def("partition_pixels", &py_partition_pixels2<float>, py::arg("img"), py::arg("num_thresholds") );
     m.def("partition_pixels", &py_partition_pixels2<double>,docs, py::arg("img"), py::arg("num_thresholds") );
+
+    docs = 
+"requires \n\
+    - sigma > 0 \n\
+    - max_size > 0 \n\
+    - max_size is an odd number \n\
+ensures \n\
+    - Filters img with a Gaussian filter of sigma width.  The actual spatial filter will \n\
+      be applied to pixel blocks that are at most max_size wide and max_size tall (note that \n\
+      this function will automatically select a smaller block size as appropriate).  The  \n\
+      results are returned.  We also return a rectangle which indicates what pixels \n\
+      in the returned image are considered non-border pixels and therefore contain \n\
+      output from the filter.  E.g. \n\
+        - filtered_img,rect = gaussian_blur(img) \n\
+      would give you the filtered image and the rectangle in question. \n\
+    - The filter is applied to each color channel independently. \n\
+    - Pixels close enough to the edge of img to not have the filter still fit  \n\
+      inside the image are set to zero. \n\
+    - The returned image has the same dimensions as the input image.";
+    /*!
+        requires
+            - sigma > 0
+            - max_size > 0
+            - max_size is an odd number
+        ensures
+            - Filters img with a Gaussian filter of sigma width.  The actual spatial filter will
+              be applied to pixel blocks that are at most max_size wide and max_size tall (note that
+              this function will automatically select a smaller block size as appropriate).  The 
+              results are returned.  We also return a rectangle which indicates what pixels
+              in the returned image are considered non-border pixels and therefore contain
+              output from the filter.  E.g.
+                - filtered_img,rect = gaussian_blur(img)
+              would give you the filtered image and the rectangle in question.
+            - The filter is applied to each color channel independently.
+            - Pixels close enough to the edge of img to not have the filter still fit 
+              inside the image are set to zero.
+            - The returned image has the same dimensions as the input image.
+    !*/
+    m.def("gaussian_blur", &py_gaussian_blur<rgb_pixel>,py::arg("img"), py::arg("sigma"), py::arg("max_size")=1000 );
+    m.def("gaussian_blur", &py_gaussian_blur<unsigned char>,py::arg("img"), py::arg("sigma"), py::arg("max_size")=1000 );
+    m.def("gaussian_blur", &py_gaussian_blur<uint16>,py::arg("img"), py::arg("sigma"), py::arg("max_size")=1000 );
+    m.def("gaussian_blur", &py_gaussian_blur<uint32>,py::arg("img"), py::arg("sigma"), py::arg("max_size")=1000 );
+    m.def("gaussian_blur", &py_gaussian_blur<float>, py::arg("img"), py::arg("sigma"), py::arg("max_size")=1000 );
+    m.def("gaussian_blur", &py_gaussian_blur<double>,docs, py::arg("img"), py::arg("sigma"), py::arg("max_size")=1000 );
+
+
+
+    docs = 
+"requires \n\
+    - all pixels in img are set to either 255 or 0. \n\
+ensures \n\
+    - This function computes the skeletonization of img and stores the result in \n\
+      #img.  That is, given a binary image, we progressively thin the binary blobs \n\
+      (composed of on_pixel values) until only a single pixel wide skeleton of the \n\
+      original blobs remains. \n\
+    - Doesn't change the shape or size of img.";
+    /*!
+        requires
+            - all pixels in img are set to either 255 or 0.
+        ensures
+            - This function computes the skeletonization of img and stores the result in
+              #img.  That is, given a binary image, we progressively thin the binary blobs
+              (composed of on_pixel values) until only a single pixel wide skeleton of the
+              original blobs remains.
+            - Doesn't change the shape or size of img.
+    !*/
+    m.def("skeleton", skeleton<numpy_image<unsigned char>>, docs, py::arg("img"));
+
+
+
+
+    docs = 
+"requires \n\
+    - neighborhood_connectivity == 4, 8, or 24 \n\
+ensures \n\
+    - This function labels each of the connected blobs in img with a unique integer  \n\
+      label.   \n\
+    - An image can be thought of as a graph where pixels A and B are connected if \n\
+      they are close to each other and satisfy some criterion like having the same \n\
+      value or both being non-zero.  Then this function can be understood as \n\
+      labeling all the connected components of this pixel graph such that all \n\
+      pixels in a component get the same label while pixels in different components \n\
+      get different labels.   \n\
+    - If zero_pixels_are_background==true then there is a special background component \n\
+      and all pixels with value 0 are assigned to it. Moreover, all such background pixels \n\
+      will always get a blob id of 0 regardless of any other considerations. \n\
+    - This function returns a label image and a count of the number of blobs found. \n\
+      I.e., if you ran this function like: \n\
+        label_img, num_blobs = label_connected_blobs(img) \n\
+      You would obtain the noted label image and number of blobs. \n\
+    - The output label_img has the same dimensions as the input image. \n\
+    - for all valid r and c: \n\
+        - label_img[r][c] == the blob label number for pixel img[r][c].   \n\
+        - label_img[r][c] >= 0 \n\
+        - if (img[r][c]==0) then \n\
+            - label_img[r][c] == 0 \n\
+        - else \n\
+            - label_img[r][c] != 0 \n\
+    - if (len(img) != 0) then  \n\
+        - The returned num_blobs will be == label_img.max()+1 \n\
+          (i.e. returns a number one greater than the maximum blob id number,  \n\
+          this is the number of blobs found.) \n\
+    - else \n\
+        - num_blobs will be 0. \n\
+    - blob labels are contiguous, therefore, the number returned by this function is \n\
+      the number of blobs in the image (including the background blob).";
+    /*!
+        requires
+            - neighborhood_connectivity == 4, 8, or 24
+        ensures
+            - This function labels each of the connected blobs in img with a unique integer 
+              label.  
+            - An image can be thought of as a graph where pixels A and B are connected if
+              they are close to each other and satisfy some criterion like having the same
+              value or both being non-zero.  Then this function can be understood as
+              labeling all the connected components of this pixel graph such that all
+              pixels in a component get the same label while pixels in different components
+              get different labels.  
+            - If zero_pixels_are_background==true then there is a special background component
+              and all pixels with value 0 are assigned to it. Moreover, all such background pixels
+              will always get a blob id of 0 regardless of any other considerations.
+            - This function returns a label image and a count of the number of blobs found.
+              I.e., if you ran this function like:
+                label_img, num_blobs = label_connected_blobs(img)
+              You would obtain the noted label image and number of blobs.
+            - The output label_img has the same dimensions as the input image.
+            - for all valid r and c:
+                - label_img[r][c] == the blob label number for pixel img[r][c].  
+                - label_img[r][c] >= 0
+                - if (img[r][c]==0) then
+                    - label_img[r][c] == 0
+                - else
+                    - label_img[r][c] != 0
+            - if (len(img) != 0) then 
+                - The returned num_blobs will be == label_img.max()+1
+                  (i.e. returns a number one greater than the maximum blob id number, 
+                  this is the number of blobs found.)
+            - else
+                - num_blobs will be 0.
+            - blob labels are contiguous, therefore, the number returned by this function is
+              the number of blobs in the image (including the background blob).
+    !*/
+    m.def("label_connected_blobs", py_label_connected_blobs<unsigned char>, py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
+    m.def("label_connected_blobs", py_label_connected_blobs<uint16_t>, py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
+    m.def("label_connected_blobs", py_label_connected_blobs<uint32_t>, docs, py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
+
+
+
+    docs = 
+"Converts a grayscale image into a jet colored image.  This is an image where dark \n\
+pixels are dark blue and larger values become light blue, then yellow, and then \n\
+finally red as they approach the maximum pixel values." ;
+    m.def("jet", py_jet<unsigned char>, py::arg("img"));
+    m.def("jet", py_jet<uint16_t>, py::arg("img"));
+    m.def("jet", py_jet<uint32_t>, py::arg("img"));
+    m.def("jet", py_jet<float>, py::arg("img"));
+    m.def("jet", py_jet<double>, docs, py::arg("img"));
+
+    docs = 
+"- randomly generates a mapping from gray level pixel values \n\
+  to the RGB pixel space and then uses this mapping to create \n\
+  a colored version of img.  Returns an image which represents \n\
+  this colored version of img. \n\
+- black pixels in img will remain black in the output image.  ";
+    /*!
+        - randomly generates a mapping from gray level pixel values
+          to the RGB pixel space and then uses this mapping to create
+          a colored version of img.  Returns an image which represents
+          this colored version of img.
+        - black pixels in img will remain black in the output image.  
+    !*/
+    m.def("randomly_color_image", py_randomly_color_image<unsigned char>, py::arg("img"));
+    m.def("randomly_color_image", py_randomly_color_image<uint16_t>, py::arg("img"));
+    m.def("randomly_color_image", py_randomly_color_image<uint32_t>, docs, py::arg("img"));
+
+
+
+    docs =
+"requires \n\
+    - all pixels in img are set to either 255 or 0. \n\
+      (i.e. it must be a binary image) \n\
+ensures \n\
+    - This routine finds endpoints of lines in a thinned binary image.  For \n\
+      example, if the image was produced by skeleton() or something like a Canny \n\
+      edge detector then you can use find_line_endpoints() to find the pixels \n\
+      sitting on the ends of lines.";
+    /*!
+        requires
+            - all pixels in img are set to either 255 or 0.
+              (i.e. it must be a binary image)
+        ensures
+            - This routine finds endpoints of lines in a thinned binary image.  For
+              example, if the image was produced by skeleton() or something like a Canny
+              edge detector then you can use find_line_endpoints() to find the pixels
+              sitting on the ends of lines.
+    !*/
+    m.def("find_line_endpoints", find_line_endpoints<numpy_image<unsigned char>>, docs, py::arg("img"));
+
+
+    m.def("get_rect", [](const py::array& img){ return rectangle(0,0,(long)img.shape(1)-1,(long)img.shape(0)-1); },
+        "returns a rectangle(0,0,img.shape(1)-1,img.shape(0)-1).  Therefore, it is the rectangle that bounds the image.", 
+        py::arg("img")  );
+
+
+    const char* grad_docs =
+"- Let VALID_AREA = shrink_rect(get_rect(img),get_scale()). \n\
+- This routine computes the requested gradient of img at each location in VALID_AREA. \n\
+  The gradients are returned in a new image of the same dimensions as img.  All pixels \n\
+  outside VALID_AREA are set to 0.  VALID_AREA is also returned.  I.e. we return a tuple \n\
+  where the first element is the gradient image and the second is VALID_AREA.";
+
+    const char* filt_docs =
+"- Returns the filter used by the indicated derivative to compute the image gradient. \n\
+  That is, the output gradients are found by cross correlating the returned filter with \n\
+  the input image. \n\
+- The returned filter has get_scale()*2+1 rows and columns." ;
+
+    py::class_<image_gradients>(m, "image_gradients",
+"This class is a tool for computing first and second derivatives of an \n\
+image.  It does this by fitting a quadratic surface around each pixel and \n\
+then computing the gradients of that quadratic surface.  For the details \n\
+see the paper: \n\
+    Quadratic models for curved line detection in SAR CCD by Davis E. King \n\
+    and Rhonda D. Phillips \n\
+ \n\
+This technique gives very accurate gradient estimates and is also very fast \n\
+since the entire gradient estimation procedure, for each type of gradient, \n\
+is accomplished by cross-correlating the image with a single separable \n\
+filter.  This means you can compute gradients at very large scales (e.g. by \n\
+fitting the quadratic to a large window, like a 99x99 window) and it still \n\
+runs very quickly." 
+        )
+        .def(py::init<long>(), "Creates this class with the provided scale. i.e. get_scale()==scale. \nscale must be >= 1.", py::arg("scale"))
+        .def(py::init<>(), "Creates this class with a scale of 1. i.e. get_scale()==1")
+        .def("gradient_x", [](image_gradients& g, const numpy_image<unsigned char>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_x(img,out); 
+            return py::make_tuple(out,rect);
+            },  py::arg("img"))
+        .def("gradient_x", [](image_gradients& g, const numpy_image<float>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_x(img,out); 
+            return py::make_tuple(out,rect);
+            }, grad_docs, py::arg("img"))
+        .def("gradient_y", [](image_gradients& g, const numpy_image<unsigned char>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_y(img,out); 
+            return py::make_tuple(out,rect);
+            },  py::arg("img"))
+        .def("gradient_y", [](image_gradients& g, const numpy_image<float>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_y(img,out); 
+            return py::make_tuple(out,rect);
+            }, grad_docs, py::arg("img"))
+        .def("gradient_xx", [](image_gradients& g, const numpy_image<unsigned char>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_xx(img,out); 
+            return py::make_tuple(out,rect);
+            }, py::arg("img"))
+        .def("gradient_xx", [](image_gradients& g, const numpy_image<float>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_xx(img,out); 
+            return py::make_tuple(out,rect);
+            }, grad_docs, py::arg("img"))
+        .def("gradient_xy", [](image_gradients& g, const numpy_image<unsigned char>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_xy(img,out); 
+            return py::make_tuple(out,rect);
+            }, py::arg("img"))
+        .def("gradient_xy", [](image_gradients& g, const numpy_image<float>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_xy(img,out); 
+            return py::make_tuple(out,rect);
+            }, grad_docs, py::arg("img"))
+        .def("gradient_yy", [](image_gradients& g, const numpy_image<unsigned char>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_yy(img,out); 
+            return py::make_tuple(out,rect);
+            }, py::arg("img"))
+        .def("gradient_yy", [](image_gradients& g, const numpy_image<float>& img){
+            numpy_image<float> out;
+            auto rect=g.gradient_yy(img,out); 
+            return py::make_tuple(out,rect);
+            }, grad_docs, py::arg("img"))
+        .def("get_x_filter", [](image_gradients& g){ return numpy_image<float>(g.get_x_filter()); }, filt_docs)
+        .def("get_y_filter", [](image_gradients& g){ return numpy_image<float>(g.get_y_filter()); }, filt_docs)
+        .def("get_xx_filter", [](image_gradients& g){ return numpy_image<float>(g.get_xx_filter()); }, filt_docs)
+        .def("get_xy_filter", [](image_gradients& g){ return numpy_image<float>(g.get_xy_filter()); }, filt_docs)
+        .def("get_yy_filter", [](image_gradients& g){ return numpy_image<float>(g.get_yy_filter()); }, filt_docs)
+        .def("get_scale", &image_gradients::get_scale, 
+"When we estimate a gradient we do so by fitting a quadratic filter so a window of size \n\
+get_scale()*2+1 centered on each pixel.  Therefore, the scale parameter controls the size \n\
+of gradients we will find.  For example, a very large scale will cause the gradient_xx() \n\
+to be insensitive to high frequency noise in the image while smaller scales would be more \n\
+sensitive to such fluctuations in the image." 
+            );
+
+
 }
 
