@@ -95,25 +95,50 @@ void bind_gui(py::module& m)
     typedef image_window type;
     typedef void (image_window::*set_title_funct)(const std::string&);
     typedef void (image_window::*add_overlay_funct)(const std::vector<rectangle>& r, rgb_pixel p);
+
+    const char* docs1 = "Create an image window that displays the given numpy image.";
+    const char* docs2 = "Create an image window that displays the given numpy image and also has the given title.";
+    const char* docs3 = "Make the image_window display the given image.";
     py::class_<type, std::shared_ptr<type>>(m, "image_window",
         "This is a GUI window capable of showing images on the screen.")
         .def(py::init())
-        .def(py::init(&make_image_window_from_image<uint8_t>), 
-            "Create an image window that displays the given numpy image.")
-        .def(py::init(&make_image_window_from_image<rgb_pixel>), 
-            "Create an image window that displays the given numpy image.")
-        .def(py::init(&make_image_window_from_image_and_title<uint8_t>), 
-            "Create an image window that displays the given numpy image and also has the given title.")
-        .def(py::init(&make_image_window_from_image_and_title<rgb_pixel>), 
-            "Create an image window that displays the given numpy image and also has the given title.")
+        .def(py::init(&make_image_window_from_image<uint8_t>))
+        .def(py::init(&make_image_window_from_image<uint16_t>))
+        .def(py::init(&make_image_window_from_image<uint32_t>))
+        .def(py::init(&make_image_window_from_image<uint64_t>))
+        .def(py::init(&make_image_window_from_image<int8_t>))
+        .def(py::init(&make_image_window_from_image<int16_t>))
+        .def(py::init(&make_image_window_from_image<int32_t>))
+        .def(py::init(&make_image_window_from_image<int64_t>))
+        .def(py::init(&make_image_window_from_image<float>))
+        .def(py::init(&make_image_window_from_image<double>))
+        .def(py::init(&make_image_window_from_image<rgb_pixel>), docs1)
+        .def(py::init(&make_image_window_from_image_and_title<uint8_t>))
+        .def(py::init(&make_image_window_from_image_and_title<uint16_t>))
+        .def(py::init(&make_image_window_from_image_and_title<uint32_t>))
+        .def(py::init(&make_image_window_from_image_and_title<uint64_t>))
+        .def(py::init(&make_image_window_from_image_and_title<int8_t>))
+        .def(py::init(&make_image_window_from_image_and_title<int16_t>))
+        .def(py::init(&make_image_window_from_image_and_title<int32_t>))
+        .def(py::init(&make_image_window_from_image_and_title<int64_t>))
+        .def(py::init(&make_image_window_from_image_and_title<float>))
+        .def(py::init(&make_image_window_from_image_and_title<double>))
+        .def(py::init(&make_image_window_from_image_and_title<rgb_pixel>), docs2)
         .def("set_image", image_window_set_image_simple_detector_py, py::arg("detector"),
             "Make the image_window display the given HOG detector's filters.")
         .def("set_image", image_window_set_image_fhog_detector, py::arg("detector"),
             "Make the image_window display the given HOG detector's filters.")
-        .def("set_image", image_window_set_image<uint8_t>, py::arg("image"),
-            "Make the image_window display the given image.")
-        .def("set_image", image_window_set_image<rgb_pixel>, py::arg("image"),
-            "Make the image_window display the given image.")
+        .def("set_image", image_window_set_image<uint8_t>, py::arg("image"))
+        .def("set_image", image_window_set_image<uint16_t>, py::arg("image"))
+        .def("set_image", image_window_set_image<uint32_t>, py::arg("image"))
+        .def("set_image", image_window_set_image<uint64_t>, py::arg("image"))
+        .def("set_image", image_window_set_image<int8_t>, py::arg("image"))
+        .def("set_image", image_window_set_image<int16_t>, py::arg("image"))
+        .def("set_image", image_window_set_image<int32_t>, py::arg("image"))
+        .def("set_image", image_window_set_image<int64_t>, py::arg("image"))
+        .def("set_image", image_window_set_image<float>, py::arg("image"))
+        .def("set_image", image_window_set_image<double>, py::arg("image"))
+        .def("set_image", image_window_set_image<rgb_pixel>, py::arg("image"), docs3)
         .def("set_title", (set_title_funct)&type::set_title, py::arg("title"),
             "Set the title of the window to the given value.")
         .def("clear_overlay", &type::clear_overlay, "Remove all overlays from the image_window.")
