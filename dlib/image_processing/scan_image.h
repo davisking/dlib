@@ -285,7 +285,7 @@ namespace dlib
         using pt = std::pair<basic_pixel_type,point>;
         // First sort the peaks so the strongest peaks come first.  We will greedily accept
         // them and then do the normal peak sorting/non-max suppression thing.
-        std::sort(peaks.rbegin(), peaks.rend(), [](pt& a, pt&b ){ return a.first < b.first; });
+        std::sort(peaks.rbegin(), peaks.rend(), [](const pt& a, const pt&b ){ return a.first < b.first; });
         std::vector<point> final_peaks;
         const double radius_sqr = non_max_suppression_radius*non_max_suppression_radius;
 
