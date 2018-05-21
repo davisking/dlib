@@ -515,6 +515,16 @@ numpy_image<float> py_find_dark_keypoints (
     return sal;
 }
 
+template <typename T>
+py::tuple py_sobel_edge_detector (
+    const numpy_image<T>& img
+)
+{
+    numpy_image<float> horz, vert;
+    sobel_edge_detector(img, horz, vert);
+    return py::make_tuple(horz,vert);
+}
+
 numpy_image<float> py_suppress_non_maximum_edges (
     const numpy_image<float>& horz,
     const numpy_image<float>& vert
@@ -555,6 +565,30 @@ std::vector<point> py_find_peaks2 (
     return find_peaks(img, non_max_suppression_radius, partition_pixels(img));
 }
 
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+numpy_image<T> py_hysteresis_threshold (
+    const numpy_image<T>& img,
+    T lower_thresh,
+    T upper_thresh
+)
+{
+    numpy_image<T> out;
+    hysteresis_threshold(img, out, lower_thresh, upper_thresh);
+    return out;
+}
+
+template <typename T>
+numpy_image<T> py_hysteresis_threshold2 (
+    const numpy_image<T>& img
+)
+{
+    numpy_image<T> out;
+    hysteresis_threshold(img, out);
+    return out;
+}
 
 // ----------------------------------------------------------------------------------------
 
@@ -1462,5 +1496,72 @@ ensures \n\
     m.def("find_peaks", &py_find_peaks2<int64_t>, py::arg("img"),
         "performs: return find_peaks(img, non_max_suppression_radius, partition_pixels(img))",
         py::arg("non_max_suppression_radius")=0);
+
+
+
+    docs =
+"Applies the sobel edge detector to the given input image and returns two gradient \n\
+images in a tuple.  The first contains the x gradients and the second contains the \n\
+y gradients of the image.";
+    /*!
+         Applies the sobel edge detector to the given input image and returns two gradient
+         images in a tuple.  The first contains the x gradients and the second contains the
+         y gradients of the image.
+    !*/
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<uint8_t>, py::arg("img"));
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<uint16_t>, py::arg("img"));
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<uint32_t>, py::arg("img"));
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<uint64_t>, py::arg("img"));
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<int8_t>, py::arg("img"));
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<int16_t>, py::arg("img"));
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<int32_t>, py::arg("img"));
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<int64_t>, py::arg("img"));
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<float>, py::arg("img"));
+    m.def("sobel_edge_detector", &py_sobel_edge_detector<double>, docs, py::arg("img"));
+
+
+    docs =
+"Applies hysteresis thresholding to img and returns the results.  In particular, \n\
+pixels in img with values >= upper_thresh have an output value of 255 and all \n\
+others have a value of 0 unless they are >= lower_thresh and are connected to a \n\
+pixel with a value >= upper_thresh, in which case they have a value of 255.  Here \n\
+pixels are connected if there is a path between them composed of pixels that would \n\
+receive an output of 255.";
+    /*!
+        Applies hysteresis thresholding to img and returns the results.  In particular,
+        pixels in img with values >= upper_thresh have an output value of 255 and all
+        others have a value of 0 unless they are >= lower_thresh and are connected to a
+        pixel with a value >= upper_thresh, in which case they have a value of 255.  Here
+        pixels are connected if there is a path between them composed of pixels that would
+        receive an output of 255.
+    !*/
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<uint8_t>, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<uint16_t>, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<uint32_t>, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<uint64_t>, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<int8_t>, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<int16_t>, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<int32_t>, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<int64_t>, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<float>, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold<double>, docs, py::arg("img"), py::arg("lower_thresh"), py::arg("upper_thresh"));
+
+    docs =
+"performs: return hysteresis_threshold(img, t1, t2) where the thresholds \n\
+are first obtained by calling [t1, t2]=partition_pixels(img).";
+    /*!
+        performs: return hysteresis_threshold(img, t1, t2) where the thresholds
+        are first obtained by calling [t1, t2]=partition_pixels(img).
+    !*/
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<uint8_t>, py::arg("img"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<uint16_t>, py::arg("img"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<uint32_t>, py::arg("img"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<uint64_t>, py::arg("img"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<int8_t>, py::arg("img"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<int16_t>, py::arg("img"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<int32_t>, py::arg("img"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<int64_t>, py::arg("img"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<float>, py::arg("img"));
+    m.def("hysteresis_threshold", &py_hysteresis_threshold2<double>, docs, py::arg("img"));
 }
 
