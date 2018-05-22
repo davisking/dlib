@@ -3,6 +3,9 @@
 #undef DLIB_LInE_ABSTRACT_H_
 #ifdef DLIB_LInE_ABSTRACT_H_
 
+#include "../vector_abstract.h"
+#include <vector>
+
 namespace dlib
 {
 
