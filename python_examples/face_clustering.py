@@ -17,11 +17,6 @@
 #   Alternatively, if you want to compile dlib yourself then go into the dlib
 #   root folder and run:
 #       python setup.py install
-#   or
-#       python setup.py install --yes USE_AVX_INSTRUCTIONS
-#   if you have a CPU that supports AVX instructions, since this makes some
-#   things run faster.  This code will also use CUDA if you have CUDA and cuDNN
-#   installed.
 #
 #   Compiling dlib should work on any operating system so long as you have
 #   CMake installed.  On Ubuntu, this can be done easily by running the
