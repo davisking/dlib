@@ -299,7 +299,7 @@ namespace dlib
                   within angle_nms_thresh degrees of a stronger line or within
                   radius_nms_thresh distance (in terms of radius as defined by
                   get_line_properties()) to a stronger Hough point.
-                - The identified lines is returned as a list of coordinates in himg.
+                - The identified lines are returned as a list of coordinates in himg.
         !*/
 
         template <

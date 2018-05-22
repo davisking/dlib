@@ -127,7 +127,7 @@ namespace dlib
             - This function assumes img1 and img2 are the two gradient images produced by a
               function like sobel_edge_detector().  It then unit normalizes the gradient
               vectors. That is, for all valid r and c, this function ensures that:
-                - #img1[r][c]*img1[r][c] + #img2[r][c]*img2[r][c] == 1 
+                - img1[r][c]*img1[r][c] + img2[r][c]*img2[r][c] == 1 
                   unless both img1[r][c] and img2[r][c] were 0 initially, then they stay zero.
     !*/
 
