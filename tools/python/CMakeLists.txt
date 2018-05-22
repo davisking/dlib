@@ -1,13 +1,6 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
-set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
-
-include(../../dlib/cmake_utils/check_if_avx_instructions_executable_on_host.cmake)
-if (AVX_IS_AVAILABLE_ON_HOST)
-   set(USE_AVX_INSTRUCTIONS ON CACHE BOOL "Use AVX instructions")
-endif()
-
 # Set this to disable link time optimization. The only reason for
 # doing this to make the compile faster which is nice when developing
 # new modules.
@@ -29,26 +22,13 @@ if (MSVC)
     include(${CMAKE_CURRENT_LIST_DIR}/../../dlib/cmake_utils/tell_visual_studio_to_use_static_runtime.cmake)
 endif()
 
-add_subdirectory(../../dlib/external/pybind11 ./pybind11_build)
-add_subdirectory(../../dlib ./dlib_build)
+add_subdirectory(../../dlib/external/pybind11 pybind11_build)
+add_subdirectory(../../dlib dlib_build)
 
 if (USING_OLD_VISUAL_STUDIO_COMPILER)
    message(FATAL_ERROR "You have to use a version of Visual Studio that supports C++11.  As of December 2017, the only versions that have good enough C++11 support to compile the dlib Python API is a fully updated Visual Studio 2015 or a fully updated Visual Studio 2017.  Older versions of either of these compilers have bad C++11 support and will fail to compile the Python extension. ***SO UPDATE YOUR VISUAL STUDIO TO MAKE THIS ERROR GO AWAY***")
 endif()
 
-
-# Test for numpy
-find_package(PythonInterp)
-if(PYTHONINTERP_FOUND)
-   execute_process( COMMAND ${PYTHON_EXECUTABLE} -c "import numpy" OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE NUMPYRC)
-   if(NUMPYRC EQUAL 1)
-      message(WARNING "Numpy not found. Functions that return numpy arrays will not work without Numpy installed!")
-   else()
-      message(STATUS "Found Python with installed numpy package")
-   endif()
-else()
-   message(WARNING "Numpy not found. Functions that return numpy arrays will not work without Numpy installed!")
-endif()
 
 add_definitions(-DDLIB_VERSION=${DLIB_VERSION})
 
