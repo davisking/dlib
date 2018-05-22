@@ -29,6 +29,7 @@
 #include "../misc_api.h"
 #include "../any.h"
 #include "../image_processing/full_object_detection.h"
+#include "../geometry/line.h"
 
 #ifdef _MSC_VER
 // This #pragma directive is also located in the algs.h file but for whatever
@@ -4052,6 +4053,17 @@ namespace dlib
         void add_overlay (
             const overlay_line& overlay
         );
+
+        template <typename pixel_type>
+        void add_overlay(const line& l, pixel_type p) 
+        { 
+            add_overlay(image_display::overlay_line(l.p1(),l.p2(),p)); 
+        }
+
+        void add_overlay(const line& l) 
+        {
+            add_overlay(l, rgb_pixel(255,0,0));
+        }
 
         void add_overlay (
             const overlay_circle& overlay

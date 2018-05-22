@@ -14,6 +14,7 @@
 #include "../interfaces/enumerable.h"
 #include "style_abstract.h"
 #include "../image_processing/full_object_detection_abstract.h"
+#include "../geometry/line_abstract.h"
 
 namespace dlib
 {
@@ -3017,6 +3018,16 @@ namespace dlib
             ensures
                 - adds the given overlay line into this object such
                   that it will be displayed. 
+        !*/
+
+        template <typename pixel_type>
+        void add_overlay(
+            const line& l, 
+            pixel_type p
+        );
+        /*!
+            ensures
+                - performs: add_overlay(overlay_line(l.p1(),l.p2(),p)); 
         !*/
 
         void add_overlay (
