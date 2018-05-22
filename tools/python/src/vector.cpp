@@ -184,6 +184,7 @@ void bind_vector(py::module& m)
             .def(py::init<dpoint>(), py::arg("p"))
             .def("__repr__", &point__repr__)
             .def("__str__", &point__str__)
+            .def("normalize", &type::normalize, "Returns a unit normalized copy of this vector.")
             .def_property("x", &point_x, [](point& p, long x){p.x()=x;}, "The x-coordinate of the point.")
             .def_property("y", &point_y, [](point& p, long y){p.x()=y;}, "The y-coordinate of the point.")
             .def(py::pickle(&getstate<type>, &setstate<type>));
@@ -204,6 +205,7 @@ void bind_vector(py::module& m)
             .def(py::init<point>(), py::arg("p"))
             .def("__repr__", &dpoint__repr__)
             .def("__str__", &dpoint__str__)
+            .def("normalize", &type::normalize, "Returns a unit normalized copy of this vector.")
             .def_property("x", &dpoint_x, [](dpoint& p, double x){p.x()=x;}, "The x-coordinate of the dpoint.")
             .def_property("y", &dpoint_y, [](dpoint& p, double y){p.x()=y;}, "The y-coordinate of the dpoint.")
             .def(py::pickle(&getstate<type>, &setstate<type>));
@@ -221,4 +223,8 @@ void bind_vector(py::module& m)
         "returns the distance from p to the origin, i.e. the L2 norm of p.", py::arg("p"));
     m.def("length", [](const dpoint& p){return length(p); }, 
         "returns the distance from p to the origin, i.e. the L2 norm of p.", py::arg("p"));
+
+    m.def("dot", [](const point& a, const point& b){return dot(a,b); },  "Returns the dot product of the points a and b.", py::arg("a"), py::arg("b"));
+    m.def("dot", [](const dpoint& a, const dpoint& b){return dot(a,b); },  "Returns the dot product of the points a and b.", py::arg("a"), py::arg("b"));
+
 }

@@ -70,6 +70,15 @@ void add_overlay_parts (
     win.add_overlay(render_face_detections(detection, color));
 }
 
+void add_overlay_line (
+    image_window& win,
+    const line& l,
+    const rgb_pixel& color
+)
+{
+    win.add_overlay(l,color);
+}
+
 template <typename T>
 std::shared_ptr<image_window> make_image_window_from_image(const numpy_image<T>& img)
 {
@@ -150,6 +159,8 @@ void bind_gui(py::module& m)
             "Add a rectangle to the image_window.  It will be displayed as a red box by default, but the color can be passed.")
         .def("add_overlay", add_overlay_parts, py::arg("detection"), py::arg("color")=rgb_pixel(0, 0, 255),
             "Add full_object_detection parts to the image window. They will be displayed as blue lines by default, but the color can be passed.")
+        .def("add_overlay", add_overlay_line, py::arg("line"), py::arg("color")=rgb_pixel(255, 0, 0),
+            "Add line to the image window.")
         .def("wait_until_closed", &type::wait_until_closed,
             "This function blocks until the window is closed.");
     }

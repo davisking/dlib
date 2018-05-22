@@ -29,6 +29,7 @@ void bind_cnn_face_detection(py::module& m);
 void bind_global_optimization(py::module& m);
 void bind_numpy_returns(py::module& m);
 void bind_image_dataset_metadata(py::module& m);
+void bind_line(py::module& m);
 
 #ifndef DLIB_NO_GUI_SUPPORT
 void bind_gui(py::module& m);
@@ -85,15 +86,16 @@ PYBIND11_MODULE(dlib, m)
     bind_vector(m);
     bind_basic_types(m);
     bind_other(m);
+    bind_line(m);
 
     bind_svm_rank_trainer(m);
     bind_decision_functions(m);
     bind_cca(m);
     bind_sequence_segmenter(m);
     bind_svm_struct(m);
+    bind_rectangles(m);
     bind_image_classes(m);
     bind_image_classes2(m);
-    bind_rectangles(m);
     bind_object_detection(m);
     bind_shape_predictors(m);
     bind_correlation_tracker(m);
