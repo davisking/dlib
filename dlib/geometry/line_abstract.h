@@ -23,7 +23,7 @@ namespace dlib
         );
         /*!
             ensures
-                - p1(), p2, and normal() are all the 0 vector.
+                - p1(), p2(), and normal() are all the 0 vector.
         !*/
 
         line(
@@ -35,7 +35,8 @@ namespace dlib
                 - #p1() == a
                 - #p2() == b
                 - #normal() == A vector normal to the line passing through points a and b.
-                  In particular, it is given by: (a-b).cross(dlib::vector<double,3>(0,0,1)).normalize()
+                  In particular, it is given by: (a-b).cross(dlib::vector<double,3>(0,0,1)).normalize().
+                  Therefore, the normal vector is the vector (a-b) but unit normalized and rotated clockwise 90 degrees.
         !*/
 
         template <typename T>
