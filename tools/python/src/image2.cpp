@@ -519,6 +519,26 @@ std::vector<point> py_remove_incoherent_edge_pixels (
 
 // ----------------------------------------------------------------------------------------
 
+template <typename T>
+numpy_image<T> py_transform_image (
+    const numpy_image<T>& img,
+    const point_transform_projective& map_point,
+    long rows,
+    long columns
+)
+{
+    DLIB_CASSERT(rows > 0 && columns > 0, "The requested output image dimensions are invalid.");
+    numpy_image<T> out_;
+    image_view<numpy_image<T>> out(out_);
+    out.set_size(rows, columns);
+
+    transform_image(img, out_, interpolate_bilinear(), map_point);
+
+    return out_;
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_image_classes2(py::module& m)
 {
 
@@ -535,6 +555,7 @@ void bind_image_classes2(py::module& m)
     m.def("resize_image", &py_resize_image<int64_t>, py::arg("img"), py::arg("rows"), py::arg("cols"));
     m.def("resize_image", &py_resize_image<float>, py::arg("img"), py::arg("rows"), py::arg("cols"));
     m.def("resize_image", &py_resize_image<double>, docs, py::arg("img"), py::arg("rows"), py::arg("cols"));
+    m.def("resize_image", &py_resize_image<rgb_pixel>, docs, py::arg("img"), py::arg("rows"), py::arg("cols"));
 
 
     docs = "Returns a histogram equalized version of img.";
@@ -602,6 +623,43 @@ ensures \n\
                 - len(PTS) <= len(line)
                 - PTS is just line with some elements removed.
     !*/
+
+
+
+    m.def("transform_image", &py_transform_image<uint8_t>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<uint16_t>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<uint32_t>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<uint64_t>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<int8_t>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<int16_t>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<int32_t>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<int64_t>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<float>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<double>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
+    m.def("transform_image", &py_transform_image<rgb_pixel>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"),
+"requires \n\
+    - rows > 0 \n\
+    - columns > 0 \n\
+ensures \n\
+    - Returns an image that is the given rows by columns in size and contains a \n\
+      transformed part of img.  To do this, we interpret map_point as a mapping \n\
+      from pixels in the returned image to pixels in the input img.  transform_image()  \n\
+      uses this mapping and bilinear interpolation to fill the output image with an \n\
+      interpolated copy of img.   \n\
+    - Any locations in the output image that map to pixels outside img are set to 0." 
+    /*!
+        requires
+            - rows > 0
+            - columns > 0
+        ensures
+            - Returns an image that is the given rows by columns in size and contains a
+              transformed part of img.  To do this, we interpret map_point as a mapping
+              from pixels in the returned image to pixels in the input img.  transform_image() 
+              uses this mapping and bilinear interpolation to fill the output image with an
+              interpolated copy of img.  
+            - Any locations in the output image that map to pixels outside img are set to 0.
+    !*/
+        );
 
 }
 
