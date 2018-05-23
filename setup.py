@@ -117,13 +117,16 @@ class CMakeBuild(build_ext):
         try:
             out = subprocess.check_output(['cmake', '--version'])
         except OSError:
-            raise RuntimeError("CMake must be installed to build the following extensions: " +
-                               ", ".join(e.name for e in self.extensions))
+            raise RuntimeError("\n*******************************************************************\n" +
+                                  " CMake must be installed to build the following extensions: " +
+                               ", ".join(e.name for e in self.extensions) + 
+                               "\n*******************************************************************\n")
         return re.search(r'version\s*([\d.]+)', out.decode()).group(1)
 
     def run(self):
+        cmake_version = self.get_cmake_version()
         if platform.system() == "Windows":
-            if LooseVersion(self.get_cmake_version()) < '3.1.0':
+            if LooseVersion(cmake_version) < '3.1.0':
                 raise RuntimeError("CMake >= 3.1.0 is required on Windows")
 
         for ext in self.extensions:
