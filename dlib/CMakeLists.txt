@@ -24,6 +24,7 @@ endif()
 include(cmake_utils/release_build_by_default)
 include(cmake_utils/use_cpp_11.cmake)
 
+set(CPACK_PACKAGE_NAME "dlib")
 
 set(CPACK_PACKAGE_VERSION_MAJOR "19")
 set(CPACK_PACKAGE_VERSION_MINOR "12")
@@ -38,6 +39,13 @@ if(has_parent)
    endif()
 endif()
 
+# If we are directly building dlib with cmake, and not as part of an external
+# project, add a cpack "package" target. This will create an archive containing
+# the built library file, the header files, and cmake and pkgconfig
+# configuration files.
+if(NOT DLIB_IN_PROJECT_BUILD)
+  include(CPack)
+endif()
 
 if (DLIB_IN_PROJECT_BUILD)
 
