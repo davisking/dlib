@@ -284,9 +284,10 @@ struct py_pyramid_down
 
     template <typename T>
     dlib::vector<double,2> point_down (
-        const dlib::vector<T,2>& p
+        const dlib::vector<T,2>& pp
     ) const
     {
+        dpoint p = pp;
         switch(N)
         {
             case 1: return pyr1.point_down(p);
@@ -316,9 +317,10 @@ struct py_pyramid_down
 
     template <typename T>
     dlib::vector<double,2> point_up (
-        const dlib::vector<T,2>& p
+        const dlib::vector<T,2>& pp
     ) const
     {
+        dpoint p = pp;
         switch(N)
         {
             case 1: return pyr1.point_up(p);
@@ -1068,7 +1070,7 @@ than 0 are converted to 0.";
     m.def("convert_rgb_to_grayscale", &convert_rgb_to_grayscale, 
         "Convert a RGB image to a uint8 grayscale image.", py::arg("img"));
 
-    docs = "";
+    docs = 
 "requires \n\
     - thresh > 0 \n\
 ensures \n\
