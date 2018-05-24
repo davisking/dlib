@@ -39,14 +39,6 @@ if(has_parent)
    endif()
 endif()
 
-# If we are directly building dlib with cmake, and not as part of an external
-# project, add a cpack "package" target. This will create an archive containing
-# the built library file, the header files, and cmake and pkgconfig
-# configuration files.
-if(NOT DLIB_IN_PROJECT_BUILD)
-  include(CPack)
-endif()
-
 if (DLIB_IN_PROJECT_BUILD)
 
    # Check if we are being built as part of a pybind11 module. 
@@ -856,6 +848,11 @@ if (NOT TARGET dlib)
       configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
       install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
          DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+      # Add a cpack "package" target. This will create an archive containing
+      # the built library file, the header files, and cmake and pkgconfig
+      # configuration files.
+      include(CPack)
 
    endif()
 
