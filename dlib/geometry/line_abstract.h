@@ -147,6 +147,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    double angle_between_lines (
+        const line& a,
+        const line& b
+    );
+    /*!
+        ensures
+            - returns the angle, in degrees, between the given lines.  This is a number in
+              the range [0 90].
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <typename T>
     dpoint intersect(
         const std::pair<vector<T,2>,vector<T,2>>& a,

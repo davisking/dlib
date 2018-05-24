@@ -6,6 +6,7 @@
 #include "line_abstract.h"
 #include "vector.h"
 #include <utility>
+#include "../numeric_constants.h"
 
 namespace dlib
 {
@@ -170,6 +171,17 @@ namespace dlib
                 ++cnt;
         }
         return cnt;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    inline double angle_between_lines (
+        const line& a,
+        const line& b
+    )
+    {
+        auto tmp = put_in_range(0.0, 1.0, std::abs(dot(a.normal(),b.normal()))); 
+        return std::acos(tmp)*180/pi;
     }
 
 // ----------------------------------------------------------------------------------------
