@@ -1,6 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include <pybind11/stl.h>
 #include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/geometry.h>
@@ -227,6 +228,12 @@ ensures \n\
       a single full_object_detection.")
         .def("save", save_shape_predictor, py::arg("predictor_output_filename"), "Save a shape_predictor to the provided path.")
         .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
+    {
+    py::class_<shape_predictor_statistics>(m, "shape_predictor_statistics")
+        .def(py::init<running_stats<double>, std::vector<running_stats<double>>>())
+        .def_readwrite("error_across_landmarks", &shape_predictor_statistics::error_across_landmarks)
+        .def_readwrite("error_by_landmark",      &shape_predictor_statistics::error_by_landmark);
     }
     {
     m.def("train_shape_predictor", train_shape_predictor_on_images_py,
