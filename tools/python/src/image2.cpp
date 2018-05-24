@@ -536,6 +536,39 @@ numpy_image<T> py_transform_image (
 
     return out_;
 }
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+numpy_image<T> py_extract_image_4points (
+    const numpy_image<T>& img,
+    const py::list& corners,
+    long rows,
+    long columns
+)
+{
+    DLIB_CASSERT(rows >= 0);
+    DLIB_CASSERT(columns >= 0);
+    DLIB_CASSERT(len(corners) == 4);
+
+    numpy_image<T> out;
+    set_image_size(out, rows, columns);
+    try
+    {
+        extract_image_4points(img, out, python_list_to_vector<dpoint>(corners));
+        return out;
+    } 
+    catch (py::cast_error&){}
+
+    try
+    {
+        extract_image_4points(img, out, python_list_to_vector<line>(corners));
+        return out;
+    }
+    catch(py::cast_error&)
+    {
+        throw dlib::error("extract_image_4points() requires the corners argument to be a list of 4 dpoints or 4 lines.");
+    }
+}
 
 // ----------------------------------------------------------------------------------------
 
@@ -624,6 +657,73 @@ ensures \n\
                 - PTS is just line with some elements removed.
     !*/
 
+
+    m.def("extract_image_4points", &py_extract_image_4points<uint8_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<uint16_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<uint32_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<uint64_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<int8_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<int16_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<int32_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<int64_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<float>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<double>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
+    m.def("extract_image_4points", &py_extract_image_4points<rgb_pixel>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"),
+"requires \n\
+    - corners is a list of dpoint or line objects. \n\
+    - len(corners) == 4 \n\
+    - rows >= 0 \n\
+    - columns >= 0 \n\
+ensures \n\
+    - The returned image has the given number of rows and columns. \n\
+    - if (corners contains dpoints) then \n\
+        - The 4 points in corners define a convex quadrilateral and this function \n\
+          extracts that part of the input image img and returns it.  Therefore, \n\
+          each corner of the quadrilateral is associated to a corner of the \n\
+          extracted image and bilinear interpolation and a projective mapping is \n\
+          used to transform the pixels in the quadrilateral into the output image. \n\
+          To determine which corners of the quadrilateral map to which corners of \n\
+          the returned image we fit the tightest possible rectangle to the \n\
+          quadrilateral and map its vertices to their nearest rectangle corners. \n\
+          These corners are then trivially mapped to the output image (i.e.  upper \n\
+          left corner to upper left corner, upper right corner to upper right \n\
+          corner, etc.). \n\
+    - else \n\
+        - This routine simply finds the 4 intersecting points of the given lines \n\
+          and uses them as described above to extract an image.   i.e. It just then \n\
+          calls: extract_image_4points(img, intersections_between_lines, rows, columns). \n\
+        - Since 4 lines might intersect at more than 4 locations, we select the \n\
+          intersections that give a quadrilateral with opposing sides that are as \n\
+          parallel as possible." 
+    /*!
+        requires
+            - corners is a list of dpoint or line objects.
+            - len(corners) == 4
+            - rows >= 0
+            - columns >= 0
+        ensures
+            - The returned image has the given number of rows and columns.
+            - if (corners contains dpoints) then
+                - The 4 points in corners define a convex quadrilateral and this function
+                  extracts that part of the input image img and returns it.  Therefore,
+                  each corner of the quadrilateral is associated to a corner of the
+                  extracted image and bilinear interpolation and a projective mapping is
+                  used to transform the pixels in the quadrilateral into the output image.
+                  To determine which corners of the quadrilateral map to which corners of
+                  the returned image we fit the tightest possible rectangle to the
+                  quadrilateral and map its vertices to their nearest rectangle corners.
+                  These corners are then trivially mapped to the output image (i.e.  upper
+                  left corner to upper left corner, upper right corner to upper right
+                  corner, etc.).
+            - else
+                - This routine simply finds the 4 intersecting points of the given lines
+                  and uses them as described above to extract an image.   i.e. It just then
+                  calls: extract_image_4points(img, intersections_between_lines, rows, columns).
+                - Since 4 lines might intersect at more than 4 locations, we select the
+                  intersections that give a quadrilateral with opposing sides that are as
+                  parallel as possible.
+    !*/
+          );
 
 
     m.def("transform_image", &py_transform_image<uint8_t>, py::arg("img"), py::arg("map_point"), py::arg("rows"), py::arg("columns"));
