@@ -1453,6 +1453,60 @@ namespace dlib
     template <
         typename image_type
         >
+    void extract_image_4points (
+        const image_type& img,
+        image_type& out,
+        const std::vector<dpoint>& pts
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+            - pts.size() == 4
+        ensures
+            - The 4 points in pts define a convex quadrilateral and this function extracts
+              that part of the image and stores it into #out.  Therefore, each corner of
+              the quadrilateral is associated to a corner of #out and bilinear
+              interpolation and a projective mapping is used to transform the pixels in the
+              quadrilateral in img into #out.  To determine which corners of the
+              quadrilateral map to which corners of #out we fit the tightest possible
+              rectangle to the quadrilateral and map its vertices to their nearest
+              rectangle corners.  These corners are then trivially mapped to #out (i.e.
+              upper left corner to upper left corner, upper right corner to upper right
+              corner, etc.).
+            - #out.nr() == out.nr() && #out.nc() == out.nc().  
+              I.e. out should already be sized to whatever size you want it to be.
+    !*/
+
+    template <
+        typename image_type
+        >
+    void extract_image_4points (
+        const image_type& img,
+        image_type& out,
+        const std::vector<line>& lines 
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+            - lines.size() == 4
+        ensures
+            - This routine simply finds the 4 intersecting points of the given lines and
+              uses them in a call to the version of extract_image_4points() defined above.
+              i.e. extract_image_chips(img, out, intersections_between_lines)
+            - Since 4 lines might intersect at more than 4 locations, we select the
+              intersections that give a quadrilateral with opposing sides that are as
+              parallel as possible.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
     image_type jitter_image(
         const image_type& img,
         dlib::rand& rnd

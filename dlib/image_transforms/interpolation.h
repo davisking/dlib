@@ -2150,6 +2150,98 @@ namespace dlib
     template <
         typename image_type
         >
+    void extract_image_4points (
+        const image_type& img_,
+        image_type& out_,
+        const std::vector<dpoint>& pts
+    )
+    {
+        DLIB_CASSERT(pts.size() == 4);
+
+        const_image_view<image_type> img(img_);
+        image_view<image_type> out(out_);
+        if (out.size() == 0)
+            return;
+
+        drectangle bounding_box;
+        for (auto& p : pts)
+            bounding_box += p;
+
+        const std::array<dpoint,4> corners = {bounding_box.tl_corner(), bounding_box.tr_corner(),
+                                              bounding_box.bl_corner(), bounding_box.br_corner()};
+
+        matrix<double> dists(4,4);
+        for (long r = 0; r < dists.nr(); ++r)
+        {
+            for (long c = 0; c < dists.nc(); ++c)
+            {
+                dists(r,c) = length_squared(corners[r] - pts[c]);
+            }
+        }
+
+        matrix<long long> idists = matrix_cast<long long>(-round(std::numeric_limits<long long>::max()*(dists/max(dists))));
+
+
+        const drectangle area = get_rect(out);
+        std::vector<dpoint> from_points = {area.tl_corner(), area.tr_corner(),
+                                           area.bl_corner(), area.br_corner()};
+
+        // find the assignment of corners to pts
+        auto assignment = max_cost_assignment(idists);
+        std::vector<dpoint> to_points(4);
+        for (size_t i = 0; i < assignment.size(); ++i)
+            to_points[i] = pts[assignment[i]];
+
+        auto tform = find_projective_transform(from_points, to_points);
+        transform_image(img_, out_, interpolate_bilinear(), tform);
+    }
+
+    template <
+        typename image_type
+        >
+    void extract_image_4points (
+        const image_type& img,
+        image_type& out,
+        const std::vector<line>& lines 
+    )
+    {
+        DLIB_CASSERT(lines.size() == 4);
+
+        // first find the pair of lines that are most parallel to each other
+        size_t best_i=0, best_j=1;
+        double best_angle = 1000; 
+        for (size_t i = 0; i < lines.size(); ++i)
+        {
+            for (size_t j = i+1; j < lines.size(); ++j)
+            {
+                double angle = angle_between_lines(lines[i],lines[j]);
+                if (angle < best_angle)
+                {
+                    best_angle = angle;
+                    best_i = i;
+                    best_j = j;
+                }
+            }
+        }
+
+        std::vector<dpoint> pts;
+        // now find the corners of the best quadrilateral we can make from these lines.
+        for (size_t k = 0; k < lines.size(); ++k)
+        {
+            if (k == best_i || k == best_j)
+                continue;
+            pts.emplace_back(intersect(lines[k], lines[best_i]));
+            pts.emplace_back(intersect(lines[k], lines[best_j]));
+        }
+
+        extract_image_4points(img, out, pts);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
     image_type jitter_image(
         const image_type& img,
         dlib::rand& rnd
