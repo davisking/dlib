@@ -121,6 +121,17 @@ is perpendicular to the line.";
     !*/
         );
 
+    m.def("angle_between_lines", [](const line& a, const line& b){return angle_between_lines(a,b);}, py::arg("a"), py::arg("b"),
+"ensures \n\
+    - returns the angle, in degrees, between the given lines.  This is a number in \n\
+      the range [0 90]." 
+    /*!
+        ensures
+            - returns the angle, in degrees, between the given lines.  This is a number in
+              the range [0 90].
+    !*/
+        );
+
     m.def("count_points_on_side_of_line", &count_points_on_side_of_line<long>, py::arg("l"), py::arg("reference_point"), py::arg("pts"), py::arg("dist_thresh"));
     m.def("count_points_on_side_of_line", &count_points_on_side_of_line<double>, py::arg("l"), py::arg("reference_point"), py::arg("pts"), py::arg("dist_thresh"),
 "ensures \n\
