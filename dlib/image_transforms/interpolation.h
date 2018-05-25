@@ -14,6 +14,7 @@
 #include "../simd.h"
 #include "../image_processing/full_object_detection.h"
 #include <limits>
+#include <array>
 #include "../rand.h"
 
 namespace dlib
@@ -2146,6 +2147,7 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+    
 
     template <
         typename image_type
@@ -2153,11 +2155,9 @@ namespace dlib
     void extract_image_4points (
         const image_type& img_,
         image_type& out_,
-        const std::vector<dpoint>& pts
+        const std::array<dpoint,4>& pts
     )
     {
-        DLIB_CASSERT(pts.size() == 4);
-
         const_image_view<image_type> img(img_);
         image_view<image_type> out(out_);
         if (out.size() == 0)
@@ -2202,39 +2202,10 @@ namespace dlib
     void extract_image_4points (
         const image_type& img,
         image_type& out,
-        const std::vector<line>& lines 
+        const std::array<line,4>& lines 
     )
     {
-        DLIB_CASSERT(lines.size() == 4);
-
-        // first find the pair of lines that are most parallel to each other
-        size_t best_i=0, best_j=1;
-        double best_angle = 1000; 
-        for (size_t i = 0; i < lines.size(); ++i)
-        {
-            for (size_t j = i+1; j < lines.size(); ++j)
-            {
-                double angle = angle_between_lines(lines[i],lines[j]);
-                if (angle < best_angle)
-                {
-                    best_angle = angle;
-                    best_i = i;
-                    best_j = j;
-                }
-            }
-        }
-
-        std::vector<dpoint> pts;
-        // now find the corners of the best quadrilateral we can make from these lines.
-        for (size_t k = 0; k < lines.size(); ++k)
-        {
-            if (k == best_i || k == best_j)
-                continue;
-            pts.emplace_back(intersect(lines[k], lines[best_i]));
-            pts.emplace_back(intersect(lines[k], lines[best_j]));
-        }
-
-        extract_image_4points(img, out, pts);
+        extract_image_4points(img, out, find_convex_quadrilateral(lines));
     }
 
 // ----------------------------------------------------------------------------------------

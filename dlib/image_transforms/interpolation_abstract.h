@@ -6,6 +6,7 @@
 #include "../pixel.h"
 #include "../image_processing/full_object_detection_abstract.h"
 #include "../image_processing/generic_image.h"
+#include <array>
 
 namespace dlib
 {
@@ -1456,14 +1457,13 @@ namespace dlib
     void extract_image_4points (
         const image_type& img,
         image_type& out,
-        const std::vector<dpoint>& pts
+        const std::array<dpoint,4>& pts
     );
     /*!
         requires
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
             - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
-            - pts.size() == 4
         ensures
             - The 4 points in pts define a convex quadrilateral and this function extracts
               that part of the input image img and stores it into #out.  Therefore, each
@@ -1484,21 +1484,21 @@ namespace dlib
     void extract_image_4points (
         const image_type& img,
         image_type& out,
-        const std::vector<line>& lines 
+        const std::array<line,4>& lines 
     );
     /*!
         requires
             - image_type == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h 
             - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
-            - lines.size() == 4
         ensures
-            - This routine simply finds the 4 intersecting points of the given lines and
-              uses them in a call to the version of extract_image_4points() defined above.
-              i.e. extract_image_4points(img, out, intersections_between_lines)
-            - Since 4 lines might intersect at more than 4 locations, we select the
-              intersections that give a quadrilateral with opposing sides that are as
-              parallel as possible.
+            - This routine finds the 4 intersecting points of the given lines which form a
+              convex quadrilateral and uses them in a call to the version of
+              extract_image_4points() defined above.  i.e. extract_image_4points(img, out,
+              intersections_between_lines)
+        throws 
+            - no_convex_quadrilateral: this is thrown if you can't make a convex
+              quadrilateral out of the given lines.
     !*/
 
 // ----------------------------------------------------------------------------------------
