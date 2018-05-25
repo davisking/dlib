@@ -4,6 +4,7 @@
 #define DLIB_GeNERIC_IMAGE_Hh_
 
 #include "../assert.h"
+#include "../pixel.h"
 
 namespace dlib
 {
@@ -127,6 +128,13 @@ namespace dlib
             the pixel type contained within an image via an expression of the form:
                 image_traits<image_type>::pixel_type
     !*/
+
+    template <typename image_type>
+    struct is_rgb_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::rgb; };
+
+    template <typename image_type>
+    struct is_grayscale_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::grayscale; };
+
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

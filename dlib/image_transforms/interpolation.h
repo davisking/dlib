@@ -705,11 +705,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename image_type>
-    struct is_rgb_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::rgb; };
-    template <typename image_type>
-    struct is_grayscale_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::grayscale; };
-
     // This is an optimized version of resize_image for the case where bilinear
     // interpolation is used.
     template <
