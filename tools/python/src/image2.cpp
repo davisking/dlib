@@ -554,14 +554,14 @@ numpy_image<T> py_extract_image_4points (
     set_image_size(out, rows, columns);
     try
     {
-        extract_image_4points(img, out, python_list_to_vector<dpoint>(corners));
+        extract_image_4points(img, out, python_list_to_array<dpoint,4>(corners));
         return out;
     } 
     catch (py::cast_error&){}
 
     try
     {
-        extract_image_4points(img, out, python_list_to_vector<line>(corners));
+        extract_image_4points(img, out, python_list_to_array<line,4>(corners));
         return out;
     }
     catch(py::cast_error&)
@@ -657,6 +657,7 @@ ensures \n\
                 - PTS is just line with some elements removed.
     !*/
 
+    py::register_exception<no_convex_quadrilateral>(m, "no_convex_quadrilateral");
 
     m.def("extract_image_4points", &py_extract_image_4points<uint8_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
     m.def("extract_image_4points", &py_extract_image_4points<uint16_t>, py::arg("img"), py::arg("corners"), py::arg("rows"), py::arg("columns"));
@@ -689,12 +690,12 @@ ensures \n\
           left corner to upper left corner, upper right corner to upper right \n\
           corner, etc.). \n\
     - else \n\
-        - This routine simply finds the 4 intersecting points of the given lines \n\
-          and uses them as described above to extract an image.   i.e. It just then \n\
-          calls: extract_image_4points(img, intersections_between_lines, rows, columns). \n\
-        - Since 4 lines might intersect at more than 4 locations, we select the \n\
-          intersections that give a quadrilateral with opposing sides that are as \n\
-          parallel as possible." 
+        - This routine finds the 4 intersecting points of the given lines which \n\
+          form a convex quadrilateral and uses them as described above to extract \n\
+          an image.   i.e. It just then calls: extract_image_4points(img, \n\
+          intersections_between_lines, rows, columns). \n\
+        - If no convex quadrilateral can be made from the given lines then this \n\
+          routine throws no_convex_quadrilateral." 
     /*!
         requires
             - corners is a list of dpoint or line objects.
@@ -716,12 +717,12 @@ ensures \n\
                   left corner to upper left corner, upper right corner to upper right
                   corner, etc.).
             - else
-                - This routine simply finds the 4 intersecting points of the given lines
-                  and uses them as described above to extract an image.   i.e. It just then
-                  calls: extract_image_4points(img, intersections_between_lines, rows, columns).
-                - Since 4 lines might intersect at more than 4 locations, we select the
-                  intersections that give a quadrilateral with opposing sides that are as
-                  parallel as possible.
+                - This routine finds the 4 intersecting points of the given lines which
+                  form a convex quadrilateral and uses them as described above to extract
+                  an image.   i.e. It just then calls: extract_image_4points(img,
+                  intersections_between_lines, rows, columns).
+                - If no convex quadrilateral can be made from the given lines then this
+                  routine throws no_convex_quadrilateral.
     !*/
           );
 
