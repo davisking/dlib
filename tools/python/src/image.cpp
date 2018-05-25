@@ -603,6 +603,16 @@ numpy_image<T> py_hysteresis_threshold2 (
 
 // ----------------------------------------------------------------------------------------
 
+numpy_image<unsigned char> py_skeleton(
+    numpy_image<unsigned char>& img
+)
+{
+    skeleton(img);
+    return img;
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_image_classes(py::module& m)
 {
 
@@ -726,12 +736,15 @@ ensures \n\
             - all pixels in img are set to either 255 or 0.
         ensures
             - This function computes the skeletonization of img and stores the result in
-              #img.  That is, given a binary image, we progressively thin the binary blobs
-              (composed of on_pixel values) until only a single pixel wide skeleton of the
-              original blobs remains.
+              img (i.e. it works in place and therefore modifies the supplied img).  That
+              is, given a binary image, we progressively thin the binary blobs (composed of
+              on_pixel values) until only a single pixel wide skeleton of the original
+              blobs remains.
             - Doesn't change the shape or size of img.
+            - Returns img.  Note that the returned object is the same object as the input
+              object.
     !*/
-    m.def("skeleton", skeleton<numpy_image<unsigned char>>, docs, py::arg("img"));
+    m.def("skeleton", py_skeleton, docs, py::arg("img"));
 
 
 
