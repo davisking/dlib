@@ -572,6 +572,32 @@ numpy_image<T> py_extract_image_4points (
 
 // ----------------------------------------------------------------------------------------
 
+template <typename T>
+numpy_image<T> py_mbd (
+    const numpy_image<T>& img,
+    size_t iterations,
+    bool do_left_right_scans 
+)
+{
+    numpy_image<T> out;
+    min_barrier_distance(img, out, iterations, do_left_right_scans);
+    return out;
+}
+
+numpy_image<unsigned char> py_mbd2 (
+    const numpy_image<rgb_pixel>& img,
+    size_t iterations,
+    bool do_left_right_scans 
+)
+{
+    numpy_image<unsigned char> out;
+    min_barrier_distance(img, out, iterations, do_left_right_scans);
+    return out;
+}
+
+
+// ----------------------------------------------------------------------------------------
+
 void bind_image_classes2(py::module& m)
 {
 
@@ -595,6 +621,54 @@ void bind_image_classes2(py::module& m)
     m.def("equalize_histogram", &py_equalize_histogram<uint8_t>, py::arg("img"));
     m.def("equalize_histogram", &py_equalize_histogram<uint16_t>, docs, py::arg("img"));
 
+    m.def("min_barrier_distance", &py_mbd<uint8_t>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd<uint16_t>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd<uint32_t>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd<uint64_t>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd<int8_t>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd<int16_t>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd<int32_t>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd<int64_t>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd<float>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd<double>, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true);
+    m.def("min_barrier_distance", &py_mbd2, py::arg("img"), py::arg("iterations")=10, py::arg("do_left_right_scans")=true,
+"requires \n\
+    - iterations > 0 \n\
+ensures \n\
+    - This function implements the salient object detection method described in the paper: \n\
+        \"Minimum barrier salient object detection at 80 fps\" by Zhang, Jianming, et al.  \n\
+      In particular, we compute the minimum barrier distance between the borders of \n\
+      the image and all the other pixels.  The resulting image is returned.  Note that \n\
+      the paper talks about a bunch of other things you could do beyond computing \n\
+      the minimum barrier distance, but this function doesn't do any of that. It's \n\
+      just the vanilla MBD. \n\
+    - We will perform iterations iterations of MBD passes over the image.  Larger \n\
+      values might give better results but run slower. \n\
+    - During each MBD iteration we make raster scans over the image.  These pass \n\
+      from top->bottom, bottom->top, left->right, and right->left.  If \n\
+      do_left_right_scans==false then the left/right passes are not executed. \n\
+      Skipping them makes the algorithm about 2x faster but might reduce the \n\
+      quality of the output." 
+    /*!
+        requires
+            - iterations > 0
+        ensures
+            - This function implements the salient object detection method described in the paper:
+                "Minimum barrier salient object detection at 80 fps" by Zhang, Jianming, et al. 
+              In particular, we compute the minimum barrier distance between the borders of
+              the image and all the other pixels.  The resulting image is returned.  Note that
+              the paper talks about a bunch of other things you could do beyond computing
+              the minimum barrier distance, but this function doesn't do any of that. It's
+              just the vanilla MBD.
+            - We will perform iterations iterations of MBD passes over the image.  Larger
+              values might give better results but run slower.
+            - During each MBD iteration we make raster scans over the image.  These pass
+              from top->bottom, bottom->top, left->right, and right->left.  If
+              do_left_right_scans==false then the left/right passes are not executed.
+              Skipping them makes the algorithm about 2x faster but might reduce the
+              quality of the output.
+    !*/
+    );
 
     register_hough_transform(m);
 
