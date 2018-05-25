@@ -11,6 +11,8 @@
 #include <memory>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <dlib/image_transforms/assign_image.h>
+#include <stdint.h>
 
 namespace py = pybind11;
 
@@ -245,6 +247,29 @@ namespace dlib
         }
 
     };
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename pixel_type>
+    void assign_image (
+        numpy_image<pixel_type>& dest,
+        const py::array& src
+    )
+    {
+        if (is_image<pixel_type>(src))     dest = src;
+        else if (is_image<uint8_t>(src))   assign_image(dest, numpy_image<uint8_t>(src));
+        else if (is_image<uint16_t>(src))  assign_image(dest, numpy_image<uint16_t>(src));
+        else if (is_image<uint32_t>(src))  assign_image(dest, numpy_image<uint32_t>(src));
+        else if (is_image<uint64_t>(src))  assign_image(dest, numpy_image<uint64_t>(src));
+        else if (is_image<int8_t>(src))    assign_image(dest, numpy_image<int8_t>(src));
+        else if (is_image<int16_t>(src))   assign_image(dest, numpy_image<int16_t>(src));
+        else if (is_image<int32_t>(src))   assign_image(dest, numpy_image<int32_t>(src));
+        else if (is_image<int64_t>(src))   assign_image(dest, numpy_image<int64_t>(src));
+        else if (is_image<float>(src))     assign_image(dest, numpy_image<float>(src));
+        else if (is_image<double>(src))    assign_image(dest, numpy_image<double>(src));
+        else if (is_image<rgb_pixel>(src)) assign_image(dest, numpy_image<rgb_pixel>(src));
+        else DLIB_CASSERT(false, "Unsupported pixel type used in assign_image().");
+    }
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
