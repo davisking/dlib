@@ -20,6 +20,13 @@ numpy_image<rgb_pixel> load_rgb_image (const std::string &path)
     return img; 
 }
 
+numpy_image<unsigned char> load_grayscale_image (const std::string &path)
+{
+    numpy_image<unsigned char> img;
+    load_image(img, path);
+    return img; 
+}
+
 bool has_ending (std::string const full_string, std::string const &ending) {
     if(full_string.length() >= ending.length()) {
         return (0 == full_string.compare(full_string.length() - ending.length(), ending.length(), ending));
@@ -121,16 +128,21 @@ void bind_numpy_returns(py::module &m)
 {
     m.def("load_rgb_image", &load_rgb_image, 
 	"Takes a path and returns a numpy array (RGB) containing the image",
-	py::arg("path")
+	py::arg("filename")
+    );
+
+    m.def("load_grayscale_image", &load_grayscale_image, 
+	"Takes a path and returns a numpy array containing the image, as an 8bit grayscale image.",
+	py::arg("filename")
     );
 
     m.def("save_image", &save_image<rgb_pixel>, 
 	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
-	py::arg("img"), py::arg("path")
+	py::arg("img"), py::arg("filename")
     );
     m.def("save_image", &save_image<unsigned char>, 
 	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
-	py::arg("img"), py::arg("path")
+	py::arg("img"), py::arg("filename")
     );
 
     m.def("jitter_image", &get_jitter_images, 
