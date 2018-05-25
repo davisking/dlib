@@ -7,6 +7,7 @@
 #include "vector.h"
 #include <utility>
 #include "../numeric_constants.h"
+#include <array>
 
 namespace dlib
 {
@@ -182,6 +183,48 @@ namespace dlib
     {
         auto tmp = put_in_range(0.0, 1.0, std::abs(dot(a.normal(),b.normal()))); 
         return std::acos(tmp)*180/pi;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    struct no_convex_quadrilateral : dlib::error
+    {
+        no_convex_quadrilateral() : dlib::error("Lines given to find_convex_quadrilateral() don't form any convex quadrilateral.") {}
+    };
+
+    inline std::array<dpoint,4> find_convex_quadrilateral (
+        const std::array<line,4>& lines
+    )
+    {
+        const dpoint v01 = intersect(lines[0],lines[1]);
+        const dpoint v02 = intersect(lines[0],lines[2]);
+        const dpoint v03 = intersect(lines[0],lines[3]);
+        const dpoint v12 = intersect(lines[1],lines[2]);
+        const dpoint v13 = intersect(lines[1],lines[3]);
+        const dpoint v23 = intersect(lines[2],lines[3]);
+        const auto& v10 = v01;
+        const auto& v20 = v02;
+        const auto& v30 = v03;
+        const auto& v21 = v12;
+        const auto& v31 = v13;
+        const auto& v32 = v23;
+
+        if (is_convex_quadrilateral({v01, v12, v23, v30}))
+                             return {v01, v12, v23, v30};
+        if (is_convex_quadrilateral({v01, v13, v32, v20}))
+                             return {v01, v13, v32, v20};
+
+        if (is_convex_quadrilateral({v02, v23, v31, v10}))
+                             return {v02, v23, v31, v10};
+        if (is_convex_quadrilateral({v02, v21, v13, v30}))
+                             return {v02, v21, v13, v30};
+
+        if (is_convex_quadrilateral({v03, v32, v21, v10}))
+                             return {v03, v32, v21, v10};
+        if (is_convex_quadrilateral({v03, v31, v12, v20}))
+                             return {v03, v31, v12, v20};
+
+        throw no_convex_quadrilateral();
     }
 
 // ----------------------------------------------------------------------------------------

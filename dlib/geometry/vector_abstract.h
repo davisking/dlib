@@ -446,6 +446,18 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    bool is_convex_quadrilateral (
+        const std::array<dpoint,4>& pts
+    );
+    /*!
+        ensures
+            - If you walk the points in pts in order pts[0], pts[1], pts[2], pts[3], pts[0]
+              does it draw a convex quadrilateral?  This routine returns true if yes and
+              false if not.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 namespace std

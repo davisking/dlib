@@ -204,6 +204,32 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct no_convex_quadrilateral : dlib::error
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is the exception thrown by find_convex_quadrilateral() if the inputs
+                can't form a convex quadrilateral.
+        !*/
+        no_convex_quadrilateral(
+        ) : dlib::error("Lines given to find_convex_quadrilateral() don't form any convex quadrilateral.") 
+        {}
+    };
+
+    std::array<dpoint,4> find_convex_quadrilateral (
+        const std::array<line,4>& lines
+    );
+    /*!
+        ensures
+            - Is there a set of 4 points, made up of the intersections of the given lines,
+              that forms a convex quadrilateral?  If yes then this routine returns those 4
+              points and if not throws no_convex_quadrilateral.
+        throws
+            - no_convex_quadrilateral
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_LInE_ABSTRACT_H_
