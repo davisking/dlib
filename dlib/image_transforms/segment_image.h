@@ -8,6 +8,7 @@
 #include <vector>
 #include "../geometry.h"
 #include "../disjoint_subsets.h"
+#include "assign_image.h"
 #include "../set.h"
 
 namespace dlib
@@ -720,6 +721,245 @@ namespace dlib
     )
     {
         find_candidate_object_locations(in_img, rects, linspace(50, 200, 3));
+    }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T>
+        void mbd_raster_scan(
+            const T& img,
+            array2d<rgb_pixel>& dist,
+            array2d<rgb_pixel>& lower,
+            array2d<rgb_pixel>& upper,
+            bool do_left_right_scans
+        )
+        {
+            auto area = shrink_rect(get_rect(img),1);
+
+            auto check_neighbor = [&](long r, long c, long neighbor_r, long neighbor_c) 
+            {
+                auto l = std::min(lower[neighbor_r][neighbor_c].red, img[r][c].red);
+                auto u = std::max(upper[neighbor_r][neighbor_c].red, img[r][c].red);
+                auto d = u-l;
+                if (d < dist[r][c].red)
+                {
+                    lower[r][c].red = l;
+                    upper[r][c].red = u;
+                    dist[r][c].red = d;
+                }
+
+                l = std::min(lower[neighbor_r][neighbor_c].green, img[r][c].green);
+                u = std::max(upper[neighbor_r][neighbor_c].green, img[r][c].green);
+                d = u-l;
+                if (d < dist[r][c].green)
+                {
+                    lower[r][c].green = l;
+                    upper[r][c].green = u;
+                    dist[r][c].green = d;
+                }
+
+                l = std::min(lower[neighbor_r][neighbor_c].blue, img[r][c].blue);
+                u = std::max(upper[neighbor_r][neighbor_c].blue, img[r][c].blue);
+                d = u-l;
+                if (d < dist[r][c].blue)
+                {
+                    lower[r][c].blue = l;
+                    upper[r][c].blue = u;
+                    dist[r][c].blue = d;
+                }
+            };
+
+            // scan top to bottom
+            for (long r = area.top(); r <= area.bottom(); ++r)
+            {
+                for (long c = area.left(); c <= area.right(); ++c)
+                {
+                    check_neighbor(r,c, r-1,c);
+                    check_neighbor(r,c, r,c-1);
+                }
+            }
+
+            // scan bottom to top
+            for (long r = area.bottom(); r >= area.top(); --r)
+            {
+                for (long c = area.right(); c >= area.left(); --c)
+                {
+                    check_neighbor(r,c, r+1,c);
+                    check_neighbor(r,c, r,c+1);
+                }
+            }
+
+            if (do_left_right_scans)
+            {
+                // scan left to right 
+                for (long c = area.left(); c <= area.right(); ++c)
+                {
+                    for (long r = area.top(); r <= area.bottom(); ++r)
+                    {
+                        check_neighbor(r,c, r-1,c);
+                        check_neighbor(r,c, r,c-1);
+                    }
+                }
+
+                // scan right to left 
+                for (long c = area.right(); c >= area.left(); --c)
+                {
+                    for (long r = area.bottom(); r >= area.top(); --r)
+                    {
+                        check_neighbor(r,c, r+1,c);
+                        check_neighbor(r,c, r,c+1);
+                    }
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
+        template <typename T, typename U, typename pixel_type>
+        void mbd_raster_scan(
+            const T& img,
+            U& dist,
+            array2d<pixel_type>& lower,
+            array2d<pixel_type>& upper,
+            bool do_left_right_scans
+        )
+        {
+            auto area = shrink_rect(get_rect(img),1);
+
+            auto check_neighbor = [&](long r, long c, long neighbor_r, long neighbor_c) 
+            {
+                auto l = std::min(lower[neighbor_r][neighbor_c], get_pixel_intensity(img[r][c]));
+                auto u = std::max(upper[neighbor_r][neighbor_c], get_pixel_intensity(img[r][c]));
+                auto d = u-l;
+                if (d < dist[r][c])
+                {
+                    lower[r][c] = l;
+                    upper[r][c] = u;
+                    dist[r][c] = d;
+                }
+            };
+
+            // scan top to bottom
+            for (long r = area.top(); r <= area.bottom(); ++r)
+            {
+                for (long c = area.left(); c <= area.right(); ++c)
+                {
+                    check_neighbor(r,c, r-1,c);
+                    check_neighbor(r,c, r,c-1);
+                }
+            }
+
+            // scan bottom to top
+            for (long r = area.bottom(); r >= area.top(); --r)
+            {
+                for (long c = area.right(); c >= area.left(); --c)
+                {
+                    check_neighbor(r,c, r+1,c);
+                    check_neighbor(r,c, r,c+1);
+                }
+            }
+
+            if (do_left_right_scans)
+            {
+                // scan left to right 
+                for (long c = area.left(); c <= area.right(); ++c)
+                {
+                    for (long r = area.top(); r <= area.bottom(); ++r)
+                    {
+                        check_neighbor(r,c, r-1,c);
+                        check_neighbor(r,c, r,c-1);
+                    }
+                }
+
+                // scan right to left 
+                for (long c = area.right(); c >= area.left(); --c)
+                {
+                    for (long r = area.bottom(); r >= area.top(); --r)
+                    {
+                        check_neighbor(r,c, r+1,c);
+                        check_neighbor(r,c, r,c+1);
+                    }
+                }
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    typename disable_if_c<is_rgb_image<in_image_type>::value>::type min_barrier_distance(
+        const in_image_type& img_,
+        out_image_type& dist_,
+        size_t iterations = 10,
+        bool do_left_right_scans = true
+    )
+    {
+        DLIB_CASSERT(iterations > 0);
+
+        static_assert(pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale, 
+            "min_barrier_distance() requires a grayscale output image.");
+
+        const_image_view<in_image_type> img(img_);
+        image_view<out_image_type> dist(dist_);
+
+        typedef typename image_traits<in_image_type>::pixel_type pixel_type;
+        typedef typename pixel_traits<pixel_type>::basic_pixel_type basic_pixel_type;
+
+
+        dist.set_size(img.nr(), img.nc());
+        array2d<basic_pixel_type> lower, upper;
+        assign_all_pixels(dist, pixel_traits<pixel_type>::max());
+        zero_border_pixels(dist,1,1);
+        assign_image(lower, img);
+        assign_image(upper, img);
+
+        for (size_t i = 0; i < iterations; ++i)
+            impl::mbd_raster_scan(img, dist, lower, upper, do_left_right_scans);
+
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    typename enable_if_c<is_rgb_image<in_image_type>::value>::type min_barrier_distance(
+        const in_image_type& img_,
+        out_image_type& dist_,
+        size_t iterations = 10,
+        bool do_left_right_scans = true
+    )
+    {
+        DLIB_CASSERT(iterations > 0);
+
+        static_assert(pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale, 
+            "min_barrier_distance() requires a grayscale output image.");
+
+        const_image_view<in_image_type> img(img_);
+        image_view<out_image_type> dist(dist_);
+
+        typedef typename image_traits<in_image_type>::pixel_type pixel_type;
+
+
+        array2d<rgb_pixel> temp_dist(img.nr(), img.nc());
+        array2d<rgb_pixel> lower, upper;
+        assign_all_pixels(temp_dist, pixel_traits<pixel_type>::max());
+        zero_border_pixels(temp_dist,1,1);
+        assign_image(lower, img);
+        assign_image(upper, img);
+
+        for (size_t i = 0; i < iterations; ++i)
+            impl::mbd_raster_scan(img, temp_dist, lower, upper, do_left_right_scans);
+
+        // convert to grayscale for output.
+        assign_image(dist,temp_dist);
     }
 
 // ----------------------------------------------------------------------------------------

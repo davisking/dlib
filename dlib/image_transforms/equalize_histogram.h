@@ -22,6 +22,45 @@ namespace dlib
         >
     void get_histogram (
         const in_image_type& in_img_,
+        matrix<unsigned long,R,C,MM>& hist,
+        size_t hist_size
+    )
+    {
+        typedef typename image_traits<in_image_type>::pixel_type pixel_type;
+        COMPILE_TIME_ASSERT( pixel_traits<pixel_type>::is_unsigned == true );
+
+        // make sure hist is the right size
+        if (R == 1)
+            hist.set_size(1,hist_size);
+        else
+            hist.set_size(hist_size,1);
+
+
+        set_all_elements(hist,0);
+
+        const_image_view<in_image_type> in_img(in_img_);
+        // compute the histogram 
+        for (long r = 0; r < in_img.nr(); ++r)
+        {
+            for (long c = 0; c < in_img.nc(); ++c)
+            {
+                auto p = get_pixel_intensity(in_img[r][c]);
+                if (p < hist_size)
+                    ++hist(p);
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        long R,
+        long C,
+        typename MM
+        >
+    void get_histogram (
+        const in_image_type& in_img_,
         matrix<unsigned long,R,C,MM>& hist
     )
     {

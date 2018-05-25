@@ -70,7 +70,7 @@ namespace dlib
             - Let pixel_type denote the type of pixel in in_img, then we must have:
                 - pixel_traits<pixel_type>::is_unsigned == true 
                 - pixel_traits<pixel_type>::max() <= 65535 
-            - hist must be capable of representing a column vector of length 
+            - hist must be capable of representing a column or row vector of length 
               pixel_traits<typename in_image_type>::max(). I.e. if R and C are nonzero
               then they must be values that don't conflict with the previous sentence.
         ensures
@@ -78,6 +78,37 @@ namespace dlib
             - #hist.nc() == 1 || #hist.nr() == 1 (i.e. hist is either a row or column vector)
             - #hist == the histogram for in_img.  I.e. it is the case that for all
               valid i:
+                - hist(i) == the number of times a pixel with intensity i appears
+                  in in_img
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        long R,
+        long C,
+        typename MM
+        >
+    void get_histogram (
+        const in_image_type& in_img,
+        matrix<unsigned long,R,C,MM>& hist,
+        size_t hist_size
+    );
+    /*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - Let pixel_type denote the type of pixel in in_img, then we must have:
+                - pixel_traits<pixel_type>::is_unsigned == true 
+            - hist must be capable of representing a column or row vector of length
+              hist_size. I.e. if R and C are nonzero then they must be values that don't
+              conflict with the previous sentence.
+        ensures
+            - #hist.size() == hist_size 
+            - #hist.nc() == 1 || #hist.nr() == 1 (i.e. hist is either a row or column vector)
+            - #hist == the histogram for in_img, except pixel values >= hist_size are
+              ignored.  I.e. it is the case that for all valid i:
                 - hist(i) == the number of times a pixel with intensity i appears
                   in in_img
     !*/
