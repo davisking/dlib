@@ -31,7 +31,7 @@ void images_and_nested_params_to_dlib(
         for (py::iterator param_it = params_it->begin(); param_it != params_it->end(); ++param_it)
             params[image_idx].push_back(param_it->cast<param_type>());
 
-        images[image_idx] = image_it->cast<py::object>();
+        assign_image(images[image_idx], image_it->cast<py::array>());
     }
 }
 

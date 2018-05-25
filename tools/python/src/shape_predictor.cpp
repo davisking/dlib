@@ -128,7 +128,7 @@ inline double test_shape_predictor_with_images_py (
              ++det_it)
           detections[i].push_back(det_it->cast<full_object_detection>());
 
-        images[i] = pyimages[i];
+        assign_image(images[i], pyimages[i].cast<py::array>());
         if (num_scales > 0)
         {
             if (num_boxes != py::len(pyscales[i]))
