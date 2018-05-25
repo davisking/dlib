@@ -79,6 +79,17 @@ void add_overlay_line (
     win.add_overlay(l,color);
 }
 
+template <typename point_type>
+void add_overlay_circle (
+    image_window& win,
+    const point_type& c,
+    const double radius,
+    const rgb_pixel& color
+)
+{
+    win.add_overlay(image_window::overlay_circle(c,std::round(radius),color));
+}
+
 template <typename T>
 std::shared_ptr<image_window> make_image_window_from_image(const numpy_image<T>& img)
 {
@@ -161,6 +172,10 @@ void bind_gui(py::module& m)
             "Add full_object_detection parts to the image window. They will be displayed as blue lines by default, but the color can be passed.")
         .def("add_overlay", add_overlay_line, py::arg("line"), py::arg("color")=rgb_pixel(255, 0, 0),
             "Add line to the image window.")
+        .def("add_overlay_circle", add_overlay_circle<point>, py::arg("center"), py::arg("radius"), py::arg("color")=rgb_pixel(255, 0, 0),
+            "Add circle to the image window.")
+        .def("add_overlay_circle", add_overlay_circle<dpoint>, py::arg("center"), py::arg("radius"), py::arg("color")=rgb_pixel(255, 0, 0),
+            "Add circle to the image window.")
         .def("wait_until_closed", &type::wait_until_closed,
             "This function blocks until the window is closed.");
     }
