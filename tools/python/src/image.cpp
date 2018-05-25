@@ -225,13 +225,20 @@ py::array convert_image (
         "uint8, int8, uint16, int16, uint32, int32, uint64, int64, float32, float, float64, double, or rgb_pixel");
 }
 
-numpy_image<unsigned char> convert_rgb_to_grayscale(
-    const numpy_image<rgb_pixel>& img
+py::array as_grayscale(
+    const py::array& img
 )
 {
-    numpy_image<unsigned char> out;
-    assign_image(out, img);
-    return out;
+    if (is_image<rgb_pixel>(img))
+    {
+        numpy_image<unsigned char> out;
+        assign_image(out, numpy_image<rgb_pixel>(img));
+        return out;
+    }
+    else
+    {
+        return img;
+    }
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1067,8 +1074,8 @@ than 0 are converted to 0.";
     m.def("convert_image", convert_image<double>, py::arg("img"), py::arg("dtype"));
     m.def("convert_image", convert_image<rgb_pixel>, docs, py::arg("img"), py::arg("dtype"));
 
-    m.def("convert_rgb_to_grayscale", &convert_rgb_to_grayscale, 
-        "Convert a RGB image to a uint8 grayscale image.", py::arg("img"));
+    m.def("as_grayscale", &as_grayscale, 
+        "Convert an image to 8bit grayscale.  If it's already a grayscale image do nothing and just return img.", py::arg("img"));
 
     docs = 
 "requires \n\
