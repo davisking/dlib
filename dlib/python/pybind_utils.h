@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <dlib/serialize.h>
+#include <array>
 
 namespace py = pybind11;
 
@@ -26,6 +27,24 @@ namespace dlib
         for (unsigned long i = 0; i < vect.size(); ++i)
         {
             vect[i] = obj[i].cast<T>();
+        }
+        return vect;
+    }
+
+    template <typename T,size_t N>
+    std::array<T,N> python_list_to_array (
+        const py::list& the_list
+    )
+    /*!
+        ensures
+            - converts a python object into a std::array<T,N> and returns it.
+    !*/
+    {
+        DLIB_CASSERT(len(the_list) == N, "Expected a list of " << N << " things.");
+        std::array<T,N> vect;
+        for (unsigned long i = 0; i < vect.size(); ++i)
+        {
+            vect[i] = the_list[i].cast<T>();
         }
         return vect;
     }
