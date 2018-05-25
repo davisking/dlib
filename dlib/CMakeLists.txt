@@ -24,6 +24,7 @@ endif()
 include(cmake_utils/release_build_by_default)
 include(cmake_utils/use_cpp_11.cmake)
 
+set(CPACK_PACKAGE_NAME "dlib")
 
 set(CPACK_PACKAGE_VERSION_MAJOR "19")
 set(CPACK_PACKAGE_VERSION_MINOR "12")
@@ -37,7 +38,6 @@ if(has_parent)
       set(DLIB_IN_PROJECT_BUILD true)
    endif()
 endif()
-
 
 if (DLIB_IN_PROJECT_BUILD)
 
@@ -848,6 +848,11 @@ if (NOT TARGET dlib)
       configure_file("cmake_utils/dlib.pc.in" "dlib-1.pc" @ONLY)
       install(FILES "${CMAKE_CURRENT_BINARY_DIR}/dlib-1.pc"
          DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+      # Add a cpack "package" target. This will create an archive containing
+      # the built library file, the header files, and cmake and pkgconfig
+      # configuration files.
+      include(CPack)
 
    endif()
 
