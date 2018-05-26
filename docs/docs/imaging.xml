@@ -107,6 +107,7 @@
          <item>scan_fhog_pyramid</item>
          <item>scan_image_custom</item>
          <item>find_candidate_object_locations</item>
+         <item>min_barrier_distance</item>
          <item>test_box_overlap</item>
          <item>remove_unobtainable_rectangles</item>
          <item>setup_hashed_features</item>
@@ -233,6 +234,7 @@
          <item>flip_image_dataset_left_right</item> 
          <item>rotate_image_dataset</item> 
          <item>extract_image_chips</item> 
+         <item>extract_image_4points</item> 
          <item>random_cropper</item> 
          <item>jitter_image</item> 
          <item>sub_image</item> 
@@ -1901,6 +1903,29 @@
    <!-- ************************************************************************* -->
 
       <component>
+         <name>extract_image_4points</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This function allows you to extract an arbitrary quadrilateral patch from
+            an image.  For example, given the image on the left and the 4 corners of the
+            red box you can extract the image on the right:
+            <br/>
+            <br/>
+            <center>
+            <table>
+               <tr> 
+                  <td><img src="images/extract_image_4points_source.jpg"/></td> 
+                  <td><img src="images/extract_image_4points_crop.jpg"/></td> 
+               </tr>
+            </table>
+            </center>
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>random_cropper</name>
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/random_cropper_abstract.h</spec_file>
@@ -2167,6 +2192,34 @@
          <examples>
             <example>find_candidate_object_locations.py.html</example>
          </examples>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>min_barrier_distance</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/segment_image_abstract.h</spec_file>
+         <description>        
+            This function implements the salient object detection method described in the paper:
+            <blockquote>
+               "Minimum barrier salient object detection at 80 fps" by Zhang, Jianming, et al. 
+            </blockquote>
+            This routine takes an image as input and creates a new image where objects that are
+            visually distinct from the borders of the image have bright pixels while everything else is
+            dark.  This is useful because you can then threshold the resulting image to detect objects.
+            For example, given the left image as input you get the right image as output:
+            <br/>
+            <br/>
+            <center>
+            <table>
+               <tr> 
+                  <td><img src="images/mbd_example_in.jpg"/></td> 
+                  <td><img src="images/mbd_example_out.jpg"/></td> 
+               </tr>
+            </table>
+            </center>
+         </description>
       </component>
             
    <!-- ************************************************************************* -->

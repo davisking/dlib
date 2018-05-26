@@ -433,6 +433,10 @@
          <term file="linear_algebra.html" name="intersect"                       include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="count_points_on_side_of_line"    include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="count_points_between_lines"      include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="angle_between_lines"             include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="is_convex_quadrilateral"         include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="find_convex_quadrilateral"       include="dlib/geometry.h"/>
+         <term file="dlib/geometry/line_abstract.h.html" name="no_convex_quadrilateral"       include="dlib/geometry.h"/>
 
 
          <term file="algorithms.html" name="running_stats"                 include="dlib/statistics.h"/>
@@ -1514,6 +1518,7 @@
          <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="image_to_tiled_pyramid"               include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="tiled_pyramid_to_image"               include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="threshold_image"            include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="min_barrier_distance"       include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="partition_pixels"           include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="png_loader"                 include="dlib/image_io.h"/>
          <term file="imaging.html" name="jpeg_loader"                include="dlib/image_io.h"/>
@@ -1525,6 +1530,7 @@
          <term file="imaging.html" name="rotate_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="resize_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="extract_image_chips"     include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="extract_image_4points"   include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="random_cropper"          include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="sub_image"               include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="sub_image_proxy"     include="dlib/image_transforms.h"/>

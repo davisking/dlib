@@ -663,6 +663,9 @@
          <item>intersect</item> 
          <item>count_points_on_side_of_line</item> 
          <item>count_points_between_lines</item> 
+         <item>angle_between_lines</item> 
+         <item>is_convex_quadrilateral</item> 
+         <item>find_convex_quadrilateral</item> 
       </section>
 
 
@@ -820,6 +823,42 @@
          <description>
             This routine takes a pair of <a href="#line">lines</a> and an array of points
             and counts how many points are between the lines. 
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>angle_between_lines</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/line_abstract.h</spec_file>
+         <description>
+            This routine returns the angle, in degrees, between two <a
+            href="#line">lines</a>.  This is a number in the range [0 90].
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>is_convex_quadrilateral</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/vector_abstract.h</spec_file>
+         <description>
+            This routine tests if 4 points define a convex quadrilateral.
+         </description>
+      </component>
+      
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_convex_quadrilateral</name>
+         <file>dlib/geometry.h</file>
+         <spec_file link="true">dlib/geometry/line_abstract.h</spec_file>
+         <description>
+            This routine takes 4 <a href="#line">lines</a> as input and determines if their
+            intersections form a convex quadrilateral.  If so it returns the 4 corners of
+            this quadrilateral.
          </description>
       </component>
       

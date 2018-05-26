@@ -184,6 +184,8 @@ makedocs ()
     cp docs/ml_guide.svg docs/chm/docs
     cp -r docs/guipics docs/web
     cp -r docs/guipics docs/chm/docs
+    cp -r docs/images docs/web
+    cp -r docs/images docs/chm/docs
     cp docs/*.html docs/web
     cp docs/*.html docs/chm/docs
     cp docs/*.css docs/web

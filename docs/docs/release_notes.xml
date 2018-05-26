@@ -12,6 +12,49 @@
 
 <current>
 New Features and Improvements:
+   - Added a lot of new Python bindings.  You can now use these things from Python:
+      - gaussian_blur(), label_connected_blobs(), randomly_color_image(), jet(),
+        skeleton(), find_line_endpoints(), get_rect(), shrink_rect(), grow_rect(),
+        image_gradients, label_connected_blobs_watershed(), convert_image(),
+        convert_image_scaled(), dpoint, centered_rect(), centered_rects(), length(),
+        as_grayscale(), pyramid_down, find_bright_keypoints(), find_bright_lines(),
+        find_dark_lines(), find_dark_keypoints(), suppress_non_maximum_edges(),
+        find_peaks(), hysteresis_threshold(), sobel_edge_detector(), equalize_histogram(),
+        resize_image(), hough_transform, remove_incoherent_edge_pixels(),
+        normalize_image_gradients(), line, signed_distance_to_line(), distance_to_line(),
+        reverse(), intersect(), count_points_on_side_of_line(),
+        count_points_between_lines(), dot(), normalize(), point_transform_projective,
+        find_projective_transform(), inv(), transform_image(), angle_between_lines(),
+        extract_image_4points(), load_grayscale_image(), min_barrier_distance(). 
+      - Added a .add_overlay_circle() to dlib.image_window.  Also made .add_overlay()
+        take lines.
+      - Added the *_corner() routines to rectangle and drectangle and made these 
+        objects constructable from instances of each other.
+   - Made the Python extension module automatically enable AVX instructions if the host
+     machine supports them.  So you never need to say --yes USE_AVX_INSTRUCTIONS anymore
+     when installing dlib.
+
+   - New C++ routines:
+      - Added an image_window::add_overlay() overload for line object.
+      - Added angle_between_lines()
+      - Added extract_image_4points()
+      - Added is_convex_quadrilateral(), find_convex_quadrilateral(), and no_convex_quadrilateral.
+      - Added python_list_to_array()
+      - Added min_barrier_distance() 
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed numpy_image and pybind11 crashing python sometimes when certain types of
+     conversions are attempted.
+   - Fixed some python functions not taking as wide a range of image types as they did in
+     previous dlib versions.
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.12" date="May 19, 2018">
+New Features and Improvements:
    - Added Python interface to threshold_image() and partition_pixels().
 
 Non-Backwards Compatible Changes:
@@ -20,7 +63,7 @@ Non-Backwards Compatible Changes:
 Bug fixes:
    - Dlib 19.11 had a bug that caused the Python interface to reject grayscale images.
      This has been fixed.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
