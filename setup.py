@@ -221,7 +221,7 @@ setup(
     name='dlib',
     version=read_version_from_cmakelists('dlib/CMakeLists.txt'),
     description='A toolkit for making real world machine learning and data analysis applications',
-    long_description=read_entire_file('README.md'),
+    long_description='See http://dlib.net for documentation.',
     author='Davis King',
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',
