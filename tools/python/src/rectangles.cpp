@@ -87,29 +87,6 @@ string print_rect_filter(const rect_filter& r)
 }
 
 
-rectangle add_point_to_rect(const rectangle& r, const point& p)
-{
-    return r + p;
-}
-
-rectangle add_rect_to_rect(const rectangle& r, const rectangle& p)
-{
-    return r + p;
-}
-
-rectangle& iadd_point_to_rect(rectangle& r, const point& p)
-{
-    r += p;
-    return r;
-}
-
-rectangle& iadd_rect_to_rect(rectangle& r, const rectangle& p)
-{
-    r += p;
-    return r;
-}
-
-
 
 // ----------------------------------------------------------------------------------------
 
@@ -142,10 +119,10 @@ void bind_rectangles(py::module& m)
         .def("intersect", &::intersect<type>, py::arg("rectangle"))
         .def("__str__", &::print_rectangle_str<type>)
         .def("__repr__", &::print_rectangle_repr)
-        .def("__add__", &::add_point_to_rect)
-        .def("__add__", &::add_rect_to_rect)
-        .def("__iadd__", &::iadd_point_to_rect)
-        .def("__iadd__", &::iadd_rect_to_rect)
+        .def(py::self += point())
+        .def(py::self + point())
+        .def(py::self += rectangle())
+        .def(py::self + rectangle())
         .def(py::self == py::self)
         .def(py::self != py::self)
         .def(py::pickle(&getstate<type>, &setstate<type>));
