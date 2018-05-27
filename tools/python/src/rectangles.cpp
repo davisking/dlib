@@ -271,6 +271,24 @@ ensures \n\
     m.def("centered_rects", [](const std::vector<point>& p, unsigned long width, unsigned long height) {
         return centered_rects(p, width, height); },
         py::arg("pts"), py::arg("width"), py::arg("height"));
+
+    m.def("centered_rect", [](const dpoint& p, unsigned long width, unsigned long height) {
+        return centered_rect(p, width, height); },
+        py::arg("p"), py::arg("width"), py::arg("height"));
+
+    m.def("centered_rect", [](const rectangle& rect, unsigned long width, unsigned long height) {
+        return centered_rect(rect, width, height); },
+        py::arg("rect"), py::arg("width"), py::arg("height"));
+
+    m.def("centered_rect", [](const drectangle& rect, unsigned long width, unsigned long height) {
+        return centered_rect(rect, width, height); },
+        py::arg("rect"), py::arg("width"), py::arg("height"));
+
+
+    m.def("center", [](const rectangle& rect){return center(rect); }, py::arg("rect"),
+        "    returns the center of the given rectangle");
+    m.def("center", [](const drectangle& rect){return center(rect); }, py::arg("rect"),
+        "    returns the center of the given rectangle");
 }
 
 // ----------------------------------------------------------------------------------------
