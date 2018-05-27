@@ -1758,11 +1758,18 @@ namespace dlib
             unsigned long size
         ) 
         {
-            const double relative_size = std::sqrt(size/(double)rect.area());
-            rows = static_cast<unsigned long>(rect.height()*relative_size + 0.5);
-            cols  = static_cast<unsigned long>(size/(double)rows + 0.5);
-            rows = std::max(1ul,rows);
-            cols = std::max(1ul,cols);
+            if (rect.is_empty())
+            {
+                cols = rows = std::round(std::sqrt((double)size));
+            }
+            else
+            {
+                const double relative_size = std::sqrt(size/(double)rect.area());
+                rows = static_cast<unsigned long>(rect.height()*relative_size + 0.5);
+                cols  = static_cast<unsigned long>(size/(double)rows + 0.5);
+                rows = std::max(1ul,rows);
+                cols = std::max(1ul,cols);
+            }
         }
     };
 
