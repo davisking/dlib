@@ -595,6 +595,348 @@ numpy_image<unsigned char> py_mbd2 (
     return out;
 }
 
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+numpy_image<T> py_extract_image_chip (
+    const numpy_image<T>& img,
+    const chip_details& chip_location 
+)
+{
+    numpy_image<T> out;
+    extract_image_chip(img, chip_location, out);
+    return out;
+}
+
+template <typename T>
+py::list py_extract_image_chips (
+    const numpy_image<T>& img,
+    const py::list& chip_locations
+)
+{
+    dlib::array<numpy_image<T>> out;
+    extract_image_chips(img, python_list_to_vector<chip_details>(chip_locations), out);
+    py::list ret;
+    for (auto& i : out)
+        ret.append(i);
+    return ret;
+}
+
+// ----------------------------------------------------------------------------------------
+
+void register_extract_image_chip (py::module& m)
+{
+    const char* class_docs = 
+"WHAT THIS OBJECT REPRESENTS \n\
+    This is a simple tool for passing in a pair of row and column values to the \n\
+    chip_details constructor.";
+
+
+    auto print_chip_dims_str = [](const chip_dims& d)
+    {
+        std::ostringstream sout;
+        sout << "rows="<< d.rows << ", cols=" << d.cols; 
+        return sout.str();
+    };
+    auto print_chip_dims_repr = [](const chip_dims& d)
+    {
+        std::ostringstream sout;
+        sout << "chip_dims(rows="<< d.rows << ", cols=" << d.cols << ")"; 
+        return sout.str();
+    };
+
+    py::class_<chip_dims>(m, "chip_dims", class_docs)
+        .def(py::init<unsigned long, unsigned long>(), py::arg("rows"), py::arg("cols"))
+        .def("__str__", print_chip_dims_str)
+        .def("__repr__", print_chip_dims_repr)
+        .def_readwrite("rows", &chip_dims::rows)
+        .def_readwrite("cols", &chip_dims::cols);
+
+
+
+    auto print_chip_details_str = [](const chip_details& d)
+    {
+        std::ostringstream sout;
+        sout << "rect=" << d.rect << ", angle="<< d.angle << ", rows="<< d.rows << ", cols=" << d.cols; 
+        return sout.str();
+    };
+    auto print_chip_details_repr = [](const chip_details& d)
+    {
+        std::ostringstream sout;
+        sout << "chip_details(rect=drectangle(" 
+            << d.rect.left()<<","<<d.rect.top()<<","<<d.rect.right()<<","<<d.rect.bottom()
+            <<"), angle="<< d.angle << ", dims=chip_dims(rows="<< d.rows << ", cols=" << d.cols << "))"; 
+        return sout.str();
+    };
+
+
+    class_docs =
+"WHAT THIS OBJECT REPRESENTS \n\
+    This object describes where an image chip is to be extracted from within \n\
+    another image.  In particular, it specifies that the image chip is \n\
+    contained within the rectangle self.rect and that prior to extraction the \n\
+    image should be rotated counter-clockwise by self.angle radians.  Finally, \n\
+    the extracted chip should have self.rows rows and self.cols columns in it \n\
+    regardless of the shape of self.rect.  This means that the extracted chip \n\
+    will be stretched to fit via bilinear interpolation when necessary." ;
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object describes where an image chip is to be extracted from within
+                another image.  In particular, it specifies that the image chip is
+                contained within the rectangle self.rect and that prior to extraction the
+                image should be rotated counter-clockwise by self.angle radians.  Finally,
+                the extracted chip should have self.rows rows and self.cols columns in it
+                regardless of the shape of self.rect.  This means that the extracted chip
+                will be stretched to fit via bilinear interpolation when necessary.
+        !*/
+    py::class_<chip_details>(m, "chip_details", class_docs)
+        .def(py::init<drectangle>(), py::arg("rect"))
+        .def(py::init<rectangle>(), py::arg("rect"),
+"ensures \n\
+    - self.rect == rect_ \n\
+    - self.angle == 0 \n\
+    - self.rows == rect.height() \n\
+    - self.cols == rect.width()" 
+        /*!
+            ensures
+                - self.rect == rect_
+                - self.angle == 0
+                - self.rows == rect.height()
+                - self.cols == rect.width()
+        !*/
+            )
+        .def(py::init<drectangle,unsigned long>(), py::arg("rect"), py::arg("size"))
+        .def(py::init<rectangle,unsigned long>(), py::arg("rect"), py::arg("size"),
+"ensures \n\
+    - self.rect == rect \n\
+    - self.angle == 0 \n\
+    - self.rows and self.cols is set such that the total size of the chip is as close \n\
+      to size as possible but still matches the aspect ratio of rect. \n\
+    - As long as size and the aspect ratio of of rect stays constant then \n\
+      self.rows and self.cols will always have the same values.  This means \n\
+      that, for example, if you want all your chips to have the same dimensions \n\
+      then ensure that size is always the same and also that rect always has \n\
+      the same aspect ratio.  Otherwise the calculated values of self.rows and \n\
+      self.cols may be different for different chips.  Alternatively, you can \n\
+      use the chip_details constructor below that lets you specify the exact \n\
+      values for rows and cols." 
+        /*!
+            ensures
+                - self.rect == rect
+                - self.angle == 0
+                - self.rows and self.cols is set such that the total size of the chip is as close
+                  to size as possible but still matches the aspect ratio of rect.
+                - As long as size and the aspect ratio of of rect stays constant then
+                  self.rows and self.cols will always have the same values.  This means
+                  that, for example, if you want all your chips to have the same dimensions
+                  then ensure that size is always the same and also that rect always has
+                  the same aspect ratio.  Otherwise the calculated values of self.rows and
+                  self.cols may be different for different chips.  Alternatively, you can
+                  use the chip_details constructor below that lets you specify the exact
+                  values for rows and cols.
+        !*/
+            )
+        .def(py::init<drectangle,unsigned long,double>(), py::arg("rect"), py::arg("size"), py::arg("angle"))
+        .def(py::init<rectangle,unsigned long,double>(), py::arg("rect"), py::arg("size"), py::arg("angle"),
+"ensures \n\
+    - self.rect == rect \n\
+    - self.angle == angle \n\
+    - self.rows and self.cols is set such that the total size of the chip is as \n\
+      close to size as possible but still matches the aspect ratio of rect. \n\
+    - As long as size and the aspect ratio of of rect stays constant then \n\
+      self.rows and self.cols will always have the same values.  This means \n\
+      that, for example, if you want all your chips to have the same dimensions \n\
+      then ensure that size is always the same and also that rect always has \n\
+      the same aspect ratio.  Otherwise the calculated values of self.rows and \n\
+      self.cols may be different for different chips.  Alternatively, you can \n\
+      use the chip_details constructor below that lets you specify the exact \n\
+      values for rows and cols." 
+        /*!
+            ensures
+                - self.rect == rect
+                - self.angle == angle
+                - self.rows and self.cols is set such that the total size of the chip is as
+                  close to size as possible but still matches the aspect ratio of rect.
+                - As long as size and the aspect ratio of of rect stays constant then
+                  self.rows and self.cols will always have the same values.  This means
+                  that, for example, if you want all your chips to have the same dimensions
+                  then ensure that size is always the same and also that rect always has
+                  the same aspect ratio.  Otherwise the calculated values of self.rows and
+                  self.cols may be different for different chips.  Alternatively, you can
+                  use the chip_details constructor below that lets you specify the exact
+                  values for rows and cols.
+        !*/
+            )
+        .def(py::init<drectangle,chip_dims>(), py::arg("rect"), py::arg("dims"))
+        .def(py::init<rectangle,chip_dims>(), py::arg("rect"), py::arg("dims"),
+"ensures \n\
+    - self.rect == rect \n\
+    - self.angle == 0 \n\
+    - self.rows == dims.rows \n\
+    - self.cols == dims.cols" 
+        /*!
+            ensures
+                - self.rect == rect
+                - self.angle == 0
+                - self.rows == dims.rows
+                - self.cols == dims.cols
+        !*/
+            )
+        .def(py::init<drectangle,chip_dims,double>(), py::arg("rect"), py::arg("dims"), py::arg("angle"))
+        .def(py::init<rectangle,chip_dims,double>(), py::arg("rect"), py::arg("dims"), py::arg("angle"),
+"ensures \n\
+    - self.rect == rect \n\
+    - self.angle == angle \n\
+    - self.rows == dims.rows \n\
+    - self.cols == dims.cols" 
+        /*!
+            ensures
+                - self.rect == rect
+                - self.angle == angle
+                - self.rows == dims.rows
+                - self.cols == dims.cols
+        !*/
+            )
+        .def(py::init<std::vector<dpoint>,std::vector<dpoint>,chip_dims>(), py::arg("chip_points"), py::arg("img_points"), py::arg("dims"))
+        .def(py::init<std::vector<point>,std::vector<point>,chip_dims>(), py::arg("chip_points"), py::arg("img_points"), py::arg("dims"),
+"requires \n\
+    - len(chip_points) == len(img_points) \n\
+    - len(chip_points) >= 2  \n\
+ensures \n\
+    - The chip will be extracted such that the pixel locations chip_points[i] \n\
+      in the chip are mapped to img_points[i] in the original image by a \n\
+      similarity transform.  That is, if you know the pixelwize mapping you \n\
+      want between the chip and the original image then you use this function \n\
+      of chip_details constructor to define the mapping. \n\
+    - self.rows == dims.rows \n\
+    - self.cols == dims.cols \n\
+    - self.rect and self.angle are computed based on the given size of the output chip \n\
+      (specified by dims) and the similarity transform between the chip and \n\
+      image (specified by chip_points and img_points)." 
+        /*!
+            requires
+                - len(chip_points) == len(img_points)
+                - len(chip_points) >= 2 
+            ensures
+                - The chip will be extracted such that the pixel locations chip_points[i]
+                  in the chip are mapped to img_points[i] in the original image by a
+                  similarity transform.  That is, if you know the pixelwize mapping you
+                  want between the chip and the original image then you use this function
+                  of chip_details constructor to define the mapping.
+                - self.rows == dims.rows
+                - self.cols == dims.cols
+                - self.rect and self.angle are computed based on the given size of the output chip
+                  (specified by dims) and the similarity transform between the chip and
+                  image (specified by chip_points and img_points).
+        !*/
+            )
+        .def("__str__", print_chip_details_str)
+        .def("__repr__", print_chip_details_repr)
+        .def_readwrite("rect", &chip_details::rect)
+        .def_readwrite("angle", &chip_details::angle)
+        .def_readwrite("rows", &chip_details::rows)
+        .def_readwrite("cols", &chip_details::cols);
+
+
+    m.def("extract_image_chip", &py_extract_image_chip<uint8_t>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<uint16_t>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<uint32_t>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<uint64_t>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<int8_t>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<int16_t>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<int32_t>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<int64_t>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<float>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<double>, py::arg("img"), py::arg("chip_location"));
+    m.def("extract_image_chip", &py_extract_image_chip<rgb_pixel>, py::arg("img"), py::arg("chip_location"),
+        "    This routine is just like extract_image_chips() except it takes a single \n"
+        "    chip_details object and returns a single chip image rather than a list of images."
+        );
+
+    m.def("extract_image_chips", &py_extract_image_chips<uint8_t>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<uint16_t>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<uint32_t>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<uint64_t>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<int8_t>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<int16_t>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<int32_t>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<int64_t>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<float>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<double>, py::arg("img"), py::arg("chip_locations"));
+    m.def("extract_image_chips", &py_extract_image_chips<rgb_pixel>, py::arg("img"), py::arg("chip_locations"),
+"requires \n\
+    - for all valid i:  \n\
+        - chip_locations[i].rect.is_empty() == false \n\
+        - chip_locations[i].rows*chip_locations[i].cols != 0 \n\
+ensures \n\
+    - This function extracts \"chips\" from an image.  That is, it takes a list of \n\
+      rectangular sub-windows (i.e. chips) within an image and extracts those \n\
+      sub-windows, storing each into its own image.  It also scales and rotates the \n\
+      image chips according to the instructions inside each chip_details object. \n\
+      It uses bilinear interpolation. \n\
+    - The extracted image chips are returned in a python list of numpy arrays.  The \n\
+      length of the returned array is len(chip_locations). \n\
+    - Let CHIPS be the returned array, then we have: \n\
+        - for all valid i: \n\
+            - #CHIPS[i] == The image chip extracted from the position \n\
+              chip_locations[i].rect in img. \n\
+            - #CHIPS[i].shape(0) == chip_locations[i].rows \n\
+            - #CHIPS[i].shape(1) == chip_locations[i].cols \n\
+            - The image will have been rotated counter-clockwise by \n\
+              chip_locations[i].angle radians, around the center of \n\
+              chip_locations[i].rect, before the chip was extracted.  \n\
+    - Any pixels in an image chip that go outside img are set to 0 (i.e. black)." 
+    /*!
+        requires
+            - for all valid i: 
+                - chip_locations[i].rect.is_empty() == false
+                - chip_locations[i].rows*chip_locations[i].cols != 0
+        ensures
+            - This function extracts "chips" from an image.  That is, it takes a list of
+              rectangular sub-windows (i.e. chips) within an image and extracts those
+              sub-windows, storing each into its own image.  It also scales and rotates the
+              image chips according to the instructions inside each chip_details object.
+              It uses bilinear interpolation.
+            - The extracted image chips are returned in a python list of numpy arrays.  The
+              length of the returned array is len(chip_locations).
+            - Let CHIPS be the returned array, then we have:
+                - for all valid i:
+                    - #CHIPS[i] == The image chip extracted from the position
+                      chip_locations[i].rect in img.
+                    - #CHIPS[i].shape(0) == chip_locations[i].rows
+                    - #CHIPS[i].shape(1) == chip_locations[i].cols
+                    - The image will have been rotated counter-clockwise by
+                      chip_locations[i].angle radians, around the center of
+                      chip_locations[i].rect, before the chip was extracted. 
+            - Any pixels in an image chip that go outside img are set to 0 (i.e. black).
+    !*/
+        );
+
+}
+
+// ----------------------------------------------------------------------------------------
+
+py::array py_tile_images (
+    const py::list& images
+)
+{
+    DLIB_CASSERT(len(images) > 0);
+
+    if (is_image<rgb_pixel>(images[0].cast<py::array>()))
+    {
+        std::vector<numpy_image<rgb_pixel>> tmp(len(images));
+        for (size_t i = 0; i < tmp.size(); ++i)
+            assign_image(tmp[i], images[i].cast<py::array>());
+        return numpy_image<rgb_pixel>(tile_images(tmp));
+    }
+    else
+    {
+        std::vector<numpy_image<unsigned char>> tmp(len(images));
+        for (size_t i = 0; i < tmp.size(); ++i)
+            assign_image(tmp[i], images[i].cast<py::array>());
+        return numpy_image<unsigned char>(tile_images(tmp));
+    }
+}
 
 // ----------------------------------------------------------------------------------------
 
@@ -616,6 +958,26 @@ void bind_image_classes2(py::module& m)
     m.def("resize_image", &py_resize_image<double>, docs, py::arg("img"), py::arg("rows"), py::arg("cols"));
     m.def("resize_image", &py_resize_image<rgb_pixel>, docs, py::arg("img"), py::arg("rows"), py::arg("cols"));
 
+    register_extract_image_chip(m);
+
+    m.def("tile_images", py_tile_images, py::arg("images"),
+"requires \n\
+    - images is a list of numpy arrays that can be interpreted as images.  They \n\
+      must all be the same type of image as well. \n\
+ensures \n\
+    - This function takes the given images and tiles them into a single large \n\
+      square image and returns this new big tiled image.  Therefore, it is a \n\
+      useful method to visualize many small images at once." 
+        /*!
+            requires
+                - images is a list of numpy arrays that can be interpreted as images.  They
+                  must all be the same type of image as well.
+            ensures
+                - This function takes the given images and tiles them into a single large
+                  square image and returns this new big tiled image.  Therefore, it is a
+                  useful method to visualize many small images at once.
+        !*/
+        );
 
     docs = "Returns a histogram equalized version of img.";
     m.def("equalize_histogram", &py_equalize_histogram<uint8_t>, py::arg("img"));
