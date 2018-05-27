@@ -217,20 +217,22 @@ namespace dlib
             << "\n\t The input images can't be the same object."
             );
 
+        using label_pixel_type = typename image_traits<out_image_type>::pixel_type;
+
         DLIB_ASSERT(smoothing >= 0);
-        COMPILE_TIME_ASSERT(is_unsigned_type<typename image_traits<out_image_type>::pixel_type>::value);
+        COMPILE_TIME_ASSERT(is_unsigned_type<label_pixel_type>::value);
 
 
         struct watershed_points
         {
             watershed_points() = default;
-            watershed_points(const point& p_, float score_, unsigned int label_): p(p_), score(score_), label(label_) {}
+            watershed_points(const point& p_, float score_, label_pixel_type label_): p(p_), score(score_), label(label_) {}
 
             point p;
             float score = 0;
-            unsigned int label = std::numeric_limits<unsigned int>::max();
+            label_pixel_type label = std::numeric_limits<label_pixel_type>::max();
 
-            bool is_seed() const { return label == std::numeric_limits<unsigned int>::max(); }
+            bool is_seed() const { return label == std::numeric_limits<label_pixel_type>::max(); }
 
             bool operator< (const watershed_points& rhs) const
             {
@@ -289,7 +291,7 @@ namespace dlib
                     continue;
                 }
 
-                next.push(watershed_points(point(c,r), val, std::numeric_limits<unsigned int>::max()));
+                next.push(watershed_points(point(c,r), val, std::numeric_limits<label_pixel_type>::max()));
             }
         }
 
@@ -297,7 +299,7 @@ namespace dlib
         const rectangle area = get_rect(img);
 
 
-        unsigned int next_label = 1;
+        label_pixel_type next_label = 1;
 
 
         std::vector<point> neighbors;
@@ -307,14 +309,19 @@ namespace dlib
             auto p = next.top();
             next.pop();
 
-            unsigned int label;
+            label_pixel_type label;
             // If the next pixel is a seed of a new blob and is still labeled as a
             // background pixel (i.e. it hasn't been flooded over by a neighboring blob and
             // consumed by it) then we create a new label for this new blob.
             if (p.is_seed() && labels[p.p.y()][p.p.x()] == 0)
+            {
                 label = next_label++;
+                labels[p.p.y()][p.p.x()] = label;
+            }
             else
+            {
                 label = p.label;
+            }
 
 
             neighbors.clear();
