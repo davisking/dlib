@@ -188,15 +188,17 @@ namespace dlib
             return *this;
         }
 
+        template <long NR, long NC>
         numpy_image (
-            matrix<pixel_type>&& rhs
+            matrix<pixel_type,NR,NC>&& rhs
         )
         {
             *this = convert_to_numpy(std::move(rhs));
         }
 
+        template <long NR, long NC>
         numpy_image& operator= (
-            matrix<pixel_type>&& rhs
+            matrix<pixel_type,NR,NC>&& rhs
         )
         {
             *this = convert_to_numpy(std::move(rhs));
