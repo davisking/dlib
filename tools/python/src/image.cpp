@@ -820,9 +820,18 @@ ensures \n\
             - blob labels are contiguous, therefore, the number returned by this function is
               the number of blobs in the image (including the background blob).
     !*/
-    m.def("label_connected_blobs", py_label_connected_blobs<unsigned char>, py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
-    m.def("label_connected_blobs", py_label_connected_blobs<uint16_t>, py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
-    m.def("label_connected_blobs", py_label_connected_blobs<uint32_t>, docs, py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
+    m.def("label_connected_blobs", py_label_connected_blobs<unsigned char>, 
+        py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
+    m.def("label_connected_blobs", py_label_connected_blobs<uint16_t>, 
+        py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
+    m.def("label_connected_blobs", py_label_connected_blobs<uint32_t>,  
+        py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
+    m.def("label_connected_blobs", py_label_connected_blobs<uint64_t>,  
+        py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
+    m.def("label_connected_blobs", py_label_connected_blobs<float>,  
+        py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
+    m.def("label_connected_blobs", py_label_connected_blobs<double>, docs, 
+        py::arg("img"),py::arg("zero_pixels_are_background")=true,py::arg("neighborhood_connectivity")=8,py::arg("connected_if_both_not_zero")=false);
 
 
     docs =

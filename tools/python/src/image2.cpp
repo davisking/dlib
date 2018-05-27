@@ -940,6 +940,20 @@ py::array py_tile_images (
 
 // ----------------------------------------------------------------------------------------
 
+template <typename T>
+py::array_t<unsigned long> py_get_histogram (
+    const numpy_image<T>& img,
+    size_t hist_size
+)
+{
+    matrix<unsigned long,1> hist;
+    get_histogram(img,hist,hist_size);
+
+    return numpy_image<unsigned long>(std::move(hist)).squeeze();
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_image_classes2(py::module& m)
 {
 
@@ -959,6 +973,27 @@ void bind_image_classes2(py::module& m)
     m.def("resize_image", &py_resize_image<rgb_pixel>, docs, py::arg("img"), py::arg("rows"), py::arg("cols"));
 
     register_extract_image_chip(m);
+
+    m.def("get_histogram", &py_get_histogram<uint8_t>, py::arg("img"), py::arg("hist_size"));
+    m.def("get_histogram", &py_get_histogram<uint16_t>, py::arg("img"), py::arg("hist_size"));
+    m.def("get_histogram", &py_get_histogram<uint32_t>, py::arg("img"), py::arg("hist_size"));
+    m.def("get_histogram", &py_get_histogram<uint64_t>, py::arg("img"), py::arg("hist_size"),
+"ensures \n\
+    - Returns a numpy array, HIST, that contains a histogram of the pixels in img. \n\
+      In particular, we will have: \n\
+        - len(HIST) == hist_size \n\
+        - for all valid i:  \n\
+            - HIST[i] == the number of times a pixel with intensity i appears in img." 
+    /*!
+        ensures
+            - Returns a numpy array, HIST, that contains a histogram of the pixels in img.
+              In particular, we will have:
+                - len(HIST) == hist_size
+                - for all valid i: 
+                    - HIST[i] == the number of times a pixel with intensity i appears in img.
+    !*/
+        );
+
 
     m.def("tile_images", py_tile_images, py::arg("images"),
 "requires \n\
