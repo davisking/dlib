@@ -728,57 +728,26 @@ namespace dlib
 
     namespace impl
     {
-        template <typename T>
-        void mbd_raster_scan(
-            const T& img,
-            array2d<rgb_pixel>& dist,
-            array2d<rgb_pixel>& lower,
-            array2d<rgb_pixel>& upper,
-            bool do_left_right_scans
+
+    // ------------------------------------------------------------------------------------
+
+        template <
+            typename funct1_t,
+            typename funct2_t
+            >
+        inline void mbd_raster_scan_top_bottom(
+            const rectangle& area,
+            funct1_t funct1,
+            funct2_t funct2
         )
         {
-            auto area = shrink_rect(get_rect(img),1);
-
-            auto check_neighbor = [&](long r, long c, long neighbor_r, long neighbor_c) 
-            {
-                auto l = std::min(lower[neighbor_r][neighbor_c].red, img[r][c].red);
-                auto u = std::max(upper[neighbor_r][neighbor_c].red, img[r][c].red);
-                auto d = u-l;
-                if (d < dist[r][c].red)
-                {
-                    lower[r][c].red = l;
-                    upper[r][c].red = u;
-                    dist[r][c].red = d;
-                }
-
-                l = std::min(lower[neighbor_r][neighbor_c].green, img[r][c].green);
-                u = std::max(upper[neighbor_r][neighbor_c].green, img[r][c].green);
-                d = u-l;
-                if (d < dist[r][c].green)
-                {
-                    lower[r][c].green = l;
-                    upper[r][c].green = u;
-                    dist[r][c].green = d;
-                }
-
-                l = std::min(lower[neighbor_r][neighbor_c].blue, img[r][c].blue);
-                u = std::max(upper[neighbor_r][neighbor_c].blue, img[r][c].blue);
-                d = u-l;
-                if (d < dist[r][c].blue)
-                {
-                    lower[r][c].blue = l;
-                    upper[r][c].blue = u;
-                    dist[r][c].blue = d;
-                }
-            };
-
             // scan top to bottom
             for (long r = area.top(); r <= area.bottom(); ++r)
             {
                 for (long c = area.left(); c <= area.right(); ++c)
                 {
-                    check_neighbor(r,c, r-1,c);
-                    check_neighbor(r,c, r,c-1);
+                    funct1(r,c, r-1,c);
+                    funct2(r,c, r,c-1);
                 }
             }
 
@@ -787,101 +756,37 @@ namespace dlib
             {
                 for (long c = area.right(); c >= area.left(); --c)
                 {
-                    check_neighbor(r,c, r+1,c);
-                    check_neighbor(r,c, r,c+1);
-                }
-            }
-
-            if (do_left_right_scans)
-            {
-                // scan left to right 
-                for (long c = area.left(); c <= area.right(); ++c)
-                {
-                    for (long r = area.top(); r <= area.bottom(); ++r)
-                    {
-                        check_neighbor(r,c, r-1,c);
-                        check_neighbor(r,c, r,c-1);
-                    }
-                }
-
-                // scan right to left 
-                for (long c = area.right(); c >= area.left(); --c)
-                {
-                    for (long r = area.bottom(); r >= area.top(); --r)
-                    {
-                        check_neighbor(r,c, r+1,c);
-                        check_neighbor(r,c, r,c+1);
-                    }
+                    funct2(r,c, r+1,c);
+                    funct2(r,c, r,c+1);
                 }
             }
         }
 
-    // ------------------------------------------------------------------------------------
-
-        template <typename T, typename U, typename pixel_type>
-        void mbd_raster_scan(
-            const T& img,
-            U& dist,
-            array2d<pixel_type>& lower,
-            array2d<pixel_type>& upper,
-            bool do_left_right_scans
+        template <
+            typename funct_t
+            >
+        inline void mbd_raster_scan_left_right(
+            const rectangle& area,
+            funct_t funct
         )
         {
-            auto area = shrink_rect(get_rect(img),1);
-
-            auto check_neighbor = [&](long r, long c, long neighbor_r, long neighbor_c) 
+            // scan left to right 
+            for (long c = area.left(); c <= area.right(); ++c)
             {
-                auto l = std::min(lower[neighbor_r][neighbor_c], get_pixel_intensity(img[r][c]));
-                auto u = std::max(upper[neighbor_r][neighbor_c], get_pixel_intensity(img[r][c]));
-                auto d = u-l;
-                if (d < dist[r][c])
+                for (long r = area.top(); r <= area.bottom(); ++r)
                 {
-                    lower[r][c] = l;
-                    upper[r][c] = u;
-                    dist[r][c] = d;
-                }
-            };
-
-            // scan top to bottom
-            for (long r = area.top(); r <= area.bottom(); ++r)
-            {
-                for (long c = area.left(); c <= area.right(); ++c)
-                {
-                    check_neighbor(r,c, r-1,c);
-                    check_neighbor(r,c, r,c-1);
+                    funct(r,c, r-1,c);
+                    funct(r,c, r,c-1);
                 }
             }
 
-            // scan bottom to top
-            for (long r = area.bottom(); r >= area.top(); --r)
+            // scan right to left 
+            for (long c = area.right(); c >= area.left(); --c)
             {
-                for (long c = area.right(); c >= area.left(); --c)
+                for (long r = area.bottom(); r >= area.top(); --r)
                 {
-                    check_neighbor(r,c, r+1,c);
-                    check_neighbor(r,c, r,c+1);
-                }
-            }
-
-            if (do_left_right_scans)
-            {
-                // scan left to right 
-                for (long c = area.left(); c <= area.right(); ++c)
-                {
-                    for (long r = area.top(); r <= area.bottom(); ++r)
-                    {
-                        check_neighbor(r,c, r-1,c);
-                        check_neighbor(r,c, r,c-1);
-                    }
-                }
-
-                // scan right to left 
-                for (long c = area.right(); c >= area.left(); --c)
-                {
-                    for (long r = area.bottom(); r >= area.top(); --r)
-                    {
-                        check_neighbor(r,c, r+1,c);
-                        check_neighbor(r,c, r,c+1);
-                    }
+                    funct(r,c, r+1,c);
+                    funct(r,c, r,c+1);
                 }
             }
         }
@@ -919,9 +824,45 @@ namespace dlib
         assign_image(lower, img);
         assign_image(upper, img);
 
-        for (size_t i = 0; i < iterations; ++i)
-            impl::mbd_raster_scan(img, dist, lower, upper, do_left_right_scans);
 
+        auto check_neighbor = [&](long r, long c, long neighbor_r, long neighbor_c) 
+        {
+            auto l = std::min(lower[neighbor_r][neighbor_c], get_pixel_intensity(img[r][c]));
+            auto u = std::max(upper[neighbor_r][neighbor_c], get_pixel_intensity(img[r][c]));
+            auto d = u-l;
+            if (d < dist[r][c])
+            {
+                lower[r][c] = l;
+                upper[r][c] = u;
+                dist[r][c] = d;
+            }
+        };
+
+        // The very first pass we make needs to use this version.  We do this because the
+        // initial setting of dist is the max pixel value, but that value might naturally
+        // occur in the data, especially for 8bit images.  So we use this version on the
+        // first pass to make sure that the lower and upper bounds get set with real data.
+        auto check_neighbor_init = [&](long r, long c, long neighbor_r, long neighbor_c) 
+        {
+            auto l = std::min(lower[neighbor_r][neighbor_c], get_pixel_intensity(img[r][c]));
+            auto u = std::max(upper[neighbor_r][neighbor_c], get_pixel_intensity(img[r][c]));
+            auto d = u-l;
+            lower[r][c] = l;
+            upper[r][c] = u;
+            dist[r][c] = d;
+        };
+
+        auto area = shrink_rect(get_rect(img),1);
+
+        impl::mbd_raster_scan_top_bottom(area, check_neighbor_init, check_neighbor);
+        if (do_left_right_scans)
+            impl::mbd_raster_scan_left_right(area, check_neighbor);
+        for (size_t i = 1; i < iterations; ++i)
+        {
+            impl::mbd_raster_scan_top_bottom(area, check_neighbor, check_neighbor);
+            if (do_left_right_scans)
+                impl::mbd_raster_scan_left_right(area, check_neighbor);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -943,23 +884,92 @@ namespace dlib
             "min_barrier_distance() requires a grayscale output image.");
 
         const_image_view<in_image_type> img(img_);
-        image_view<out_image_type> dist(dist_);
 
         typedef typename image_traits<in_image_type>::pixel_type pixel_type;
 
 
-        array2d<rgb_pixel> temp_dist(img.nr(), img.nc());
+        array2d<rgb_pixel> dist(img.nr(), img.nc());
         array2d<rgb_pixel> lower, upper;
-        assign_all_pixels(temp_dist, pixel_traits<pixel_type>::max());
-        zero_border_pixels(temp_dist,1,1);
+        assign_all_pixels(dist, pixel_traits<pixel_type>::max());
+        zero_border_pixels(dist,1,1);
         assign_image(lower, img);
         assign_image(upper, img);
 
-        for (size_t i = 0; i < iterations; ++i)
-            impl::mbd_raster_scan(img, temp_dist, lower, upper, do_left_right_scans);
+        auto check_neighbor = [&](long r, long c, long neighbor_r, long neighbor_c) 
+        {
+            auto l = std::min(lower[neighbor_r][neighbor_c].red, img[r][c].red);
+            auto u = std::max(upper[neighbor_r][neighbor_c].red, img[r][c].red);
+            auto d = u-l;
+            if (d < dist[r][c].red)
+            {
+                lower[r][c].red = l;
+                upper[r][c].red = u;
+                dist[r][c].red = d;
+            }
+
+            l = std::min(lower[neighbor_r][neighbor_c].green, img[r][c].green);
+            u = std::max(upper[neighbor_r][neighbor_c].green, img[r][c].green);
+            d = u-l;
+            if (d < dist[r][c].green)
+            {
+                lower[r][c].green = l;
+                upper[r][c].green = u;
+                dist[r][c].green = d;
+            }
+
+            l = std::min(lower[neighbor_r][neighbor_c].blue, img[r][c].blue);
+            u = std::max(upper[neighbor_r][neighbor_c].blue, img[r][c].blue);
+            d = u-l;
+            if (d < dist[r][c].blue)
+            {
+                lower[r][c].blue = l;
+                upper[r][c].blue = u;
+                dist[r][c].blue = d;
+            }
+        };
+
+        // The very first pass we make needs to use this version.  We do this because the
+        // initial setting of dist is the max pixel value, but that value might naturally
+        // occur in the data, especially for 8bit images.  So we use this version on the
+        // first pass to make sure that the lower and upper bounds get set with real data.
+        auto check_neighbor_init = [&](long r, long c, long neighbor_r, long neighbor_c) 
+        {
+            auto l = std::min(lower[neighbor_r][neighbor_c].red, img[r][c].red);
+            auto u = std::max(upper[neighbor_r][neighbor_c].red, img[r][c].red);
+            auto d = u-l;
+            lower[r][c].red = l;
+            upper[r][c].red = u;
+            dist[r][c].red = d;
+
+            l = std::min(lower[neighbor_r][neighbor_c].green, img[r][c].green);
+            u = std::max(upper[neighbor_r][neighbor_c].green, img[r][c].green);
+            d = u-l;
+            lower[r][c].green = l;
+            upper[r][c].green = u;
+            dist[r][c].green = d;
+
+            l = std::min(lower[neighbor_r][neighbor_c].blue, img[r][c].blue);
+            u = std::max(upper[neighbor_r][neighbor_c].blue, img[r][c].blue);
+            d = u-l;
+            lower[r][c].blue = l;
+            upper[r][c].blue = u;
+            dist[r][c].blue = d;
+        };
+
+        auto area = shrink_rect(get_rect(img),1);
+
+        impl::mbd_raster_scan_top_bottom(area, check_neighbor_init, check_neighbor);
+        if (do_left_right_scans)
+            impl::mbd_raster_scan_left_right(area, check_neighbor);
+        for (size_t i = 1; i < iterations; ++i)
+        {
+            impl::mbd_raster_scan_top_bottom(area, check_neighbor, check_neighbor);
+            if (do_left_right_scans)
+                impl::mbd_raster_scan_left_right(area, check_neighbor);
+        }
 
         // convert to grayscale for output.
-        assign_image(dist,temp_dist);
+        assign_image(dist_,dist);
     }
 
 // ----------------------------------------------------------------------------------------
