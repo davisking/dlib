@@ -159,15 +159,14 @@ public:
 
     std::vector<point> find_strong_hough_points(
         const numpy_image<float>& himg,
-        const float hough_count_threshold,
+        const float hough_count_thresh,
         const double angle_nms_thresh,
         const double radius_nms_thresh
     )
     {
-        return ht.find_strong_hough_points(himg, hough_count_threshold, angle_nms_thresh, radius_nms_thresh);
+        return ht.find_strong_hough_points(himg, hough_count_thresh, angle_nms_thresh, radius_nms_thresh);
     }
 
-private:
     hough_transform ht;
 };
 
@@ -462,7 +461,7 @@ ensures \n\
 "    performs: return find_pixels_voting_for_lines(img, get_rect(img), hough_points, angle_window_size, radius_window_size); \n\
 That is, just runs the routine on the whole input image." )
 
-        .def("find_strong_hough_points", &py_hough_transform::find_strong_hough_points, py::arg("himg"), py::arg("hough_count_threshold"), py::arg("angle_nms_thresh"), py::arg("radius_nms_thresh"),
+        .def("find_strong_hough_points", &py_hough_transform::find_strong_hough_points, py::arg("himg"), py::arg("hough_count_thresh"), py::arg("angle_nms_thresh"), py::arg("radius_nms_thresh"),
 "requires \n\
     - himg has size() rows and columns. \n\
     - angle_nms_thresh >= 0 \n\
@@ -472,7 +471,7 @@ ensures \n\
       non-maximum suppression on the detected lines.  Recall that each point in \n\
       Hough space is associated with a line. Therefore, this routine finds all \n\
       the pixels in himg (a Hough transform image) with values >= \n\
-      hough_count_threshold and performs non-maximum suppression on the \n\
+      hough_count_thresh and performs non-maximum suppression on the \n\
       identified list of pixels.  It does this by discarding lines that are \n\
       within angle_nms_thresh degrees of a stronger line or within \n\
       radius_nms_thresh distance (in terms of radius as defined by \n\
@@ -488,7 +487,7 @@ ensures \n\
               non-maximum suppression on the detected lines.  Recall that each point in
               Hough space is associated with a line. Therefore, this routine finds all
               the pixels in himg (a Hough transform image) with values >=
-              hough_count_threshold and performs non-maximum suppression on the
+              hough_count_thresh and performs non-maximum suppression on the
               identified list of pixels.  It does this by discarding lines that are
               within angle_nms_thresh degrees of a stronger line or within
               radius_nms_thresh distance (in terms of radius as defined by
@@ -496,6 +495,10 @@ ensures \n\
             - The identified lines are returned as a list of coordinates in himg.
     !*/
 
+
+    m.def("get_rect", [](const py_hough_transform& ht){ return get_rect(ht.ht); },
+        "returns a rectangle(0,0,ht.size()-1,ht.size()-1).  Therefore, it is the rectangle that bounds the Hough transform image.", 
+        py::arg("ht")  );
 }
 
 // ----------------------------------------------------------------------------------------
@@ -954,6 +957,49 @@ py::array_t<unsigned long> py_get_histogram (
 
 // ----------------------------------------------------------------------------------------
 
+py::array py_sub_image (
+    const py::array& img,
+    const rectangle& win
+)
+{
+    DLIB_CASSERT(img.ndim() >= 2);
+
+    auto width_step = img.strides(0);
+
+    const long nr = img.shape(0);
+    const long nc = img.shape(1);
+    rectangle rect(0,0,nc-1,nr-1);
+    rect = rect.intersect(win);
+
+    std::vector<size_t> shape(img.ndim()), strides(img.ndim());
+    for (size_t i = 0; i < shape.size(); ++i)
+    {
+        shape[i] = img.shape(i);
+        strides[i] = img.strides(i);
+    }
+
+    shape[0] = rect.height();
+    shape[1] = rect.width();
+
+    size_t itemsize = img.itemsize();
+    for (size_t i = 1; i < strides.size(); ++i)
+        itemsize *= strides[i];
+
+    const void* data = (char*)img.data() + itemsize*rect.left() + rect.top()*strides[0];
+
+    return py::array(img.dtype(), shape, strides, data, img);
+}
+
+py::array py_sub_image2 (
+    const py::tuple& image_and_rect_tuple
+)
+{
+    DLIB_CASSERT(len(image_and_rect_tuple) == 2);
+    return py_sub_image(image_and_rect_tuple[0].cast<py::array>(), image_and_rect_tuple[1].cast<rectangle>());
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_image_classes2(py::module& m)
 {
 
@@ -973,6 +1019,24 @@ void bind_image_classes2(py::module& m)
     m.def("resize_image", &py_resize_image<rgb_pixel>, docs, py::arg("img"), py::arg("rows"), py::arg("cols"));
 
     register_extract_image_chip(m);
+
+    m.def("sub_image", &py_sub_image, py::arg("img"), py::arg("rect"),
+"Returns a new numpy array that references the sub window in img defined by rect. \n\
+If rect is larger than img then rect is cropped so that it does not go outside img. \n\
+Therefore, this routine is equivalent to performing: \n\
+    win = get_rect(img).intersect(rect) \n\
+    subimg = img[win.top():win.bottom()-1,win.left():win.right()-1]" 
+    /*!
+        Returns a new numpy array that references the sub window in img defined by rect.
+        If rect is larger than img then rect is cropped so that it does not go outside img.
+        Therefore, this routine is equivalent to performing:
+            win = get_rect(img).intersect(rect)
+            subimg = img[win.top():win.bottom()-1,win.left():win.right()-1]
+    !*/
+        );
+    m.def("sub_image", &py_sub_image2, py::arg("image_and_rect_tuple"),
+        "Performs: return sub_image(image_and_rect_tuple[0], image_and_rect_tuple[1])");
+
 
     m.def("get_histogram", &py_get_histogram<uint8_t>, py::arg("img"), py::arg("hist_size"));
     m.def("get_histogram", &py_get_histogram<uint16_t>, py::arg("img"), py::arg("hist_size"));
