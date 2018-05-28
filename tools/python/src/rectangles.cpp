@@ -41,8 +41,8 @@ point center(const rect_type& r) { return center(r); }
 template <typename rect_type>
 point dcenter(const rect_type& r) { return dcenter(r); }
 
-template <typename rect_type>
-bool contains(const rect_type& r, const point& p) { return r.contains(p); }
+template <typename rect_type, typename ptype>
+bool contains(const rect_type& r, const ptype& p) { return r.contains(p); }
 
 template <typename rect_type>
 bool contains_xy(const rect_type& r, const long x, const long y) { return r.contains(point(x, y)); }
@@ -113,7 +113,8 @@ void bind_rectangles(py::module& m)
         .def("is_empty", &::is_empty<type>)
         .def("center", &::center<type>)
         .def("dcenter", &::dcenter<type>)
-        .def("contains", &::contains<type>, py::arg("point"))
+        .def("contains", &::contains<type,point>, py::arg("point"))
+        .def("contains", &::contains<type,dpoint>, py::arg("point"))
         .def("contains", &::contains_xy<type>, py::arg("x"), py::arg("y"))
         .def("contains", &::contains_rec<type>, py::arg("rectangle"))
         .def("intersect", &::intersect<type>, py::arg("rectangle"))
@@ -148,7 +149,8 @@ void bind_rectangles(py::module& m)
         .def("tr_corner", &type::tr_corner, "Returns the top right corner of the rectangle.")
         .def("bl_corner", &type::bl_corner, "Returns the bottom left corner of the rectangle.")
         .def("br_corner", &type::br_corner, "Returns the bottom right corner of the rectangle.")
-        .def("contains", &::contains<type>, py::arg("point"))
+        .def("contains", &::contains<type,point>, py::arg("point"))
+        .def("contains", &::contains<type,dpoint>, py::arg("point"))
         .def("contains", &::contains_xy<type>, py::arg("x"), py::arg("y"))
         .def("contains", &::contains_rec<type>, py::arg("rectangle"))
         .def("intersect", &::intersect<type>, py::arg("rectangle"))
