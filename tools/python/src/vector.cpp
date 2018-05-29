@@ -376,6 +376,26 @@ ensures \n\
 
 // ----------------------------------------------------------------------------------------
 
+double py_polygon_area(
+    const std::vector<dpoint>& pts
+)
+{
+    return polygon_area(pts);
+}
+
+double py_polygon_area2(
+    const py::list& pts
+)
+{
+    std::vector<dpoint> temp(len(pts));
+    for (size_t i = 0; i < temp.size(); ++i)
+        temp[i] = pts[i].cast<dpoint>();
+
+    return polygon_area(temp);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_vector(py::module& m)
 {
     {
@@ -462,6 +482,20 @@ void bind_vector(py::module& m)
     m.def("dot", [](const dpoint& a, const dpoint& b){return dot(a,b); },  "Returns the dot product of the points a and b.", py::arg("a"), py::arg("b"));
 
     register_point_transform_projective(m);
+
+    m.def("polygon_area", &py_polygon_area, py::arg("pts"));
+    m.def("polygon_area", &py_polygon_area2, py::arg("pts"),
+"ensures \n\
+    - If you walk the points pts in order to make a closed polygon, what is its \n\
+      area?  This function returns that area.  It uses the shoelace formula to \n\
+      compute the result and so works for general non-self-intersecting polygons." 
+    /*!
+        ensures
+            - If you walk the points pts in order to make a closed polygon, what is its
+              area?  This function returns that area.  It uses the shoelace formula to
+              compute the result and so works for general non-self-intersecting polygons.
+    !*/
+        );
 
 }
 
