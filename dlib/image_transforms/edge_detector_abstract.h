@@ -236,7 +236,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - When we estimate a gradient we do so by fitting a quadratic filter so a
+                - When we estimate a gradient we do so by fitting a quadratic filter to a
                   window of size get_scale()*2+1 centered on each pixel.  Therefore, the
                   scale parameter controls the size of gradients we will find.  For
                   example, a very large scale will cause the gradient_xx() to be
