@@ -1306,6 +1306,29 @@ namespace dlib
         return (s0>0&&s1>0&&s2>0&&s3>0) || (s0<0&&s1<0&&s2<0&&s3<0);
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename array_of_dpoints
+        >
+    inline double polygon_area (
+        const array_of_dpoints& pts
+    )
+    {
+        if (pts.size() <= 2)
+            return 0;
+
+        double val = 0;
+
+
+        for (size_t i = 1; i < pts.size(); ++i)
+            val += (double)pts[i].x()*pts[i-1].y() - pts[i].y()*pts[i-1].x();
+
+        const size_t end = pts.size()-1;
+        val += (double)pts[0].x()*pts[end].y() - pts[0].y()*pts[end].x();
+
+        return std::abs(val)/2.0;
+    }
 
 // ----------------------------------------------------------------------------------------
 
