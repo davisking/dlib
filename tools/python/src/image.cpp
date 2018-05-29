@@ -1057,7 +1057,7 @@ runs very quickly.";
         .def("get_xy_filter", [](image_gradients& g){ return numpy_image<float>(g.get_xy_filter()); }, filt_docs)
         .def("get_yy_filter", [](image_gradients& g){ return numpy_image<float>(g.get_yy_filter()); }, filt_docs)
         .def("get_scale", &image_gradients::get_scale, 
-"When we estimate a gradient we do so by fitting a quadratic filter so a window of size \n\
+"When we estimate a gradient we do so by fitting a quadratic filter to a window of size \n\
 get_scale()*2+1 centered on each pixel.  Therefore, the scale parameter controls the size \n\
 of gradients we will find.  For example, a very large scale will cause the gradient_xx() \n\
 to be insensitive to high frequency noise in the image while smaller scales would be more \n\
