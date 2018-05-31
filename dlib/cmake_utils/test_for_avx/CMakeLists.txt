@@ -14,7 +14,7 @@ try_run(run_result compile_result ${PROJECT_BINARY_DIR}/avx_test_try_run_build $
 message(STATUS "run_result = ${run_result}")
 message(STATUS "compile_result = ${compile_result}")
 
-if (${run_result} EQUAL 0 AND compile_result)
+if ("${run_result}" EQUAL 0 AND compile_result)
    message(STATUS "Ran AVX test program successfully, you have AVX available.")
 else()
    message(STATUS "Unable to run AVX test program, you don't seem to have AVX instructions available.")
