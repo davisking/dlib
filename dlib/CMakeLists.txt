@@ -7,6 +7,17 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(dlib)
 
+set(CPACK_PACKAGE_NAME "dlib")
+set(CPACK_PACKAGE_VERSION_MAJOR "19")
+set(CPACK_PACKAGE_VERSION_MINOR "13")
+set(CPACK_PACKAGE_VERSION_PATCH "99")
+set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+# Only print these messages once, even if dlib is added multiple times via add_subdirectory()
+if (NOT TARGET dlib)
+   message(STATUS "Using CMake version: ${CMAKE_VERSION}")
+   message(STATUS "Compiling dlib version: ${VERSION}")
+endif()
+
 
 include(cmake_utils/set_compiler_specific_options.cmake)
 
@@ -24,12 +35,6 @@ endif()
 include(cmake_utils/release_build_by_default)
 include(cmake_utils/use_cpp_11.cmake)
 
-set(CPACK_PACKAGE_NAME "dlib")
-
-set(CPACK_PACKAGE_VERSION_MAJOR "19")
-set(CPACK_PACKAGE_VERSION_MINOR "13")
-set(CPACK_PACKAGE_VERSION_PATCH "99")
-set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 # Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want. 
 get_directory_property(has_parent PARENT_DIRECTORY)
 if(has_parent)
@@ -122,8 +127,6 @@ endif()
 # once.  This most often happens when the top level of a project depends on two
 # or more other things which both depend on dlib. 
 if (NOT TARGET dlib)
-   message(STATUS "Using CMake version: ${CMAKE_VERSION}")
-   message(STATUS "Compiling dlib version: ${VERSION}")
 
    set (DLIB_ISO_CPP_ONLY_STR 
       "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)" )
