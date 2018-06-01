@@ -518,13 +518,11 @@ numpy_image<T> py_transform_image (
 )
 {
     DLIB_CASSERT(rows > 0 && columns > 0, "The requested output image dimensions are invalid.");
-    numpy_image<T> out_;
-    image_view<numpy_image<T>> out(out_);
-    out.set_size(rows, columns);
+    numpy_image<T> out(rows, columns);
 
-    transform_image(img, out_, interpolate_bilinear(), map_point);
+    transform_image(img, out, interpolate_bilinear(), map_point);
 
-    return out_;
+    return out;
 }
 // ----------------------------------------------------------------------------------------
 
