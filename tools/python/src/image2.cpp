@@ -40,135 +40,122 @@ numpy_image<T> py_equalize_histogram (
 
 // ----------------------------------------------------------------------------------------
 
-class py_hough_transform
+line ht_get_line (
+    const hough_transform& ht,
+    const point& p
+)  
+{ 
+    DLIB_CASSERT(get_rect(ht).contains(p));
+    auto temp = ht.get_line(p); 
+    return line(temp.first, temp.second);
+}
+
+double ht_get_line_angle_in_degrees (
+    const hough_transform& ht,
+    const point& p 
+)  
+{ 
+    DLIB_CASSERT(get_rect(ht).contains(p));
+    return ht.get_line_angle_in_degrees(p); 
+}
+
+py::tuple ht_get_line_properties (
+    const hough_transform& ht,
+    const point& p
+)  
+{ 
+    DLIB_CASSERT(get_rect(ht).contains(p));
+    double angle_in_degrees;
+    double radius;
+    ht.get_line_properties(p, angle_in_degrees, radius);
+    return py::make_tuple(angle_in_degrees, radius);
+}
+
+point ht_get_best_hough_point (
+    hough_transform& ht,
+    const point& p,
+    const numpy_image<float>& himg
+) 
+{ 
+    DLIB_ASSERT(himg.nr() == size() && himg.nc() == ht.size() &&
+        get_rect(ht).contains(p) == true,
+        "\t point hough_transform::get_best_hough_point()"
+        << "\n\t Invalid arguments given to this function."
+        << "\n\t himg.nr(): " << himg.nr()
+        << "\n\t himg.nc(): " << himg.nc()
+        << "\n\t size():    " << size()
+        << "\n\t p:         " << p 
+    );
+    return ht.get_best_hough_point(p,himg); 
+}
+
+template <
+    typename T 
+    >
+numpy_image<float> compute_ht (
+    const hough_transform& ht,
+    const numpy_image<T>& img,
+    const rectangle& box
+) 
 {
-public:
+    numpy_image<float> out;
+    ht(img, box, out);
+    return out;
+}
 
-    py_hough_transform(
-        unsigned long size
-    ) : ht(size) 
-    {
-        DLIB_CASSERT(size > 0);
-    }
+template <
+    typename T 
+    >
+numpy_image<float> compute_ht2 (
+    const hough_transform& ht,
+    const numpy_image<T>& img
+) 
+{
+    numpy_image<float> out;
+    ht(img, out);
+    return out;
+}
 
-    unsigned long size(
-    ) const { return ht.size(); }
+template <
+    typename T 
+    >
+py::list ht_find_pixels_voting_for_lines (
+    const hough_transform& ht,
+    const numpy_image<T>& img,
+    const rectangle& box,
+    const std::vector<point>& hough_points,
+    const unsigned long angle_window_size = 1,
+    const unsigned long radius_window_size = 1
+) 
+{
+    return vector_to_python_list(ht.find_pixels_voting_for_lines(img, box, hough_points, angle_window_size, radius_window_size));
+}
 
-    long nr(
-    ) const { return ht.nr(); }
+template <
+    typename T 
+    >
+py::list ht_find_pixels_voting_for_lines2 (
+    const hough_transform& ht,
+    const numpy_image<T>& img,
+    const std::vector<point>& hough_points,
+    const unsigned long angle_window_size = 1,
+    const unsigned long radius_window_size = 1
+) 
+{
+    return vector_to_python_list(ht.find_pixels_voting_for_lines(img, hough_points, angle_window_size, radius_window_size));
+}
 
-    long nc(
-    ) const { return ht.nc(); }
+std::vector<point> ht_find_strong_hough_points(
+    hough_transform& ht,
+    const numpy_image<float>& himg,
+    const float hough_count_thresh,
+    const double angle_nms_thresh,
+    const double radius_nms_thresh
+)
+{
+    return ht.find_strong_hough_points(himg, hough_count_thresh, angle_nms_thresh, radius_nms_thresh);
+}
 
-    line get_line (
-        const point& p
-    ) const 
-    { 
-        DLIB_CASSERT(rectangle(0,0,size()-1,size()-1).contains(p));
-        auto temp = ht.get_line(p); 
-        return line(temp.first, temp.second);
-    }
-
-    double get_line_angle_in_degrees (
-        const point& p 
-    ) const 
-    { 
-        DLIB_CASSERT(rectangle(0,0,size()-1,size()-1).contains(p));
-        return ht.get_line_angle_in_degrees(p); 
-    }
-
-    py::tuple get_line_properties (
-        const point& p
-    ) const 
-    { 
-        DLIB_CASSERT(rectangle(0,0,size()-1,size()-1).contains(p));
-        double angle_in_degrees;
-        double radius;
-        ht.get_line_properties(p, angle_in_degrees, radius);
-        return py::make_tuple(angle_in_degrees, radius);
-    }
-
-    point get_best_hough_point (
-        const point& p,
-        const numpy_image<float>& himg
-    ) 
-    { 
-        DLIB_ASSERT(himg.nr() == size() && himg.nc() == size() &&
-            rectangle(0,0,size()-1,size()-1).contains(p) == true,
-            "\t point hough_transform::get_best_hough_point()"
-            << "\n\t Invalid arguments given to this function."
-            << "\n\t himg.nr(): " << himg.nr()
-            << "\n\t himg.nc(): " << himg.nc()
-            << "\n\t size():    " << size()
-            << "\n\t p:         " << p 
-        );
-        return ht.get_best_hough_point(p,himg); 
-    }
-
-    template <
-        typename T 
-        >
-    numpy_image<float> compute_ht (
-        const numpy_image<T>& img,
-        const rectangle& box
-    ) const
-    {
-        numpy_image<float> out;
-        ht(img, box, out);
-        return out;
-    }
-
-    template <
-        typename T 
-        >
-    numpy_image<float> compute_ht2 (
-        const numpy_image<T>& img
-    ) const
-    {
-        numpy_image<float> out;
-        ht(img, out);
-        return out;
-    }
-
-    template <
-        typename T 
-        >
-    py::list find_pixels_voting_for_lines (
-        const numpy_image<T>& img,
-        const rectangle& box,
-        const std::vector<point>& hough_points,
-        const unsigned long angle_window_size = 1,
-        const unsigned long radius_window_size = 1
-    ) const
-    {
-        return vector_to_python_list(ht.find_pixels_voting_for_lines(img, box, hough_points, angle_window_size, radius_window_size));
-    }
-
-    template <
-        typename T 
-        >
-    py::list find_pixels_voting_for_lines2 (
-        const numpy_image<T>& img,
-        const std::vector<point>& hough_points,
-        const unsigned long angle_window_size = 1,
-        const unsigned long radius_window_size = 1
-    ) const
-    {
-        return vector_to_python_list(ht.find_pixels_voting_for_lines(img, hough_points, angle_window_size, radius_window_size));
-    }
-
-    std::vector<point> find_strong_hough_points(
-        const numpy_image<float>& himg,
-        const float hough_count_thresh,
-        const double angle_nms_thresh,
-        const double radius_nms_thresh
-    )
-    {
-        return ht.find_strong_hough_points(himg, hough_count_thresh, angle_nms_thresh, radius_nms_thresh);
-    }
-
-    hough_transform ht;
-};
 
 // ----------------------------------------------------------------------------------------
 
@@ -200,11 +187,11 @@ ensures \n\
                 - size() == size_
         !*/
 
-    py::class_<py_hough_transform>(m, "hough_transform", class_docs)
+    py::class_<hough_transform>(m, "hough_transform", class_docs)
         .def(py::init<unsigned long>(), doc_constr, py::arg("size_"))
-        .def("size", &py_hough_transform::size,
+        .def("size", &hough_transform::size,
             "returns the size of the Hough transforms generated by this object.  In particular, this object creates Hough transform images that are size() by size() pixels in size.")
-        .def("get_line", &py_hough_transform::get_line, py::arg("p"),
+        .def("get_line", &ht_get_line, py::arg("p"),
 "requires \n\
     - rectangle(0,0,size()-1,size()-1).contains(p) == true \n\
       (i.e. p must be a point inside the Hough accumulator array) \n\
@@ -222,7 +209,7 @@ ensures \n\
             - The returned points are inside rectangle(0,0,size()-1,size()-1).
     !*/
 
-        .def("get_line_angle_in_degrees", &py_hough_transform::get_line_angle_in_degrees, py::arg("p"),
+        .def("get_line_angle_in_degrees", &ht_get_line_angle_in_degrees, py::arg("p"),
 "requires \n\
     - rectangle(0,0,size()-1,size()-1).contains(p) == true \n\
       (i.e. p must be a point inside the Hough accumulator array) \n\
@@ -239,7 +226,7 @@ ensures \n\
     !*/
 
 
-        .def("get_line_properties", &py_hough_transform::get_line_properties, py::arg("p"),
+        .def("get_line_properties", &ht_get_line_properties, py::arg("p"),
 "requires \n\
     - rectangle(0,0,size()-1,size()-1).contains(p) == true \n\
       (i.e. p must be a point inside the Hough accumulator array) \n\
@@ -267,7 +254,7 @@ ensures \n\
             - returns a tuple of (ANGLE_IN_DEGREES, RADIUS)
     !*/
 
-        .def("get_best_hough_point", &py_hough_transform::get_best_hough_point, py::arg("p"), py::arg("himg"),
+        .def("get_best_hough_point", &ht_get_best_hough_point, py::arg("p"), py::arg("himg"),
 "requires \n\
     - himg has size() rows and columns. \n\
     - rectangle(0,0,size()-1,size()-1).contains(p) == true \n\
@@ -291,16 +278,16 @@ ensures \n\
             - returns a point X such that get_rect(himg).contains(X) == true
     !*/
 
-        .def("__call__", &py_hough_transform::compute_ht<uint8_t>, py::arg("img"), py::arg("box"))
-        .def("__call__", &py_hough_transform::compute_ht<uint16_t>, py::arg("img"), py::arg("box"))
-        .def("__call__", &py_hough_transform::compute_ht<uint32_t>, py::arg("img"), py::arg("box"))
-        .def("__call__", &py_hough_transform::compute_ht<uint64_t>, py::arg("img"), py::arg("box"))
-        .def("__call__", &py_hough_transform::compute_ht<int8_t>, py::arg("img"), py::arg("box"))
-        .def("__call__", &py_hough_transform::compute_ht<int16_t>, py::arg("img"), py::arg("box"))
-        .def("__call__", &py_hough_transform::compute_ht<int32_t>, py::arg("img"), py::arg("box"))
-        .def("__call__", &py_hough_transform::compute_ht<int64_t>, py::arg("img"), py::arg("box"))
-        .def("__call__", &py_hough_transform::compute_ht<float>, py::arg("img"), py::arg("box"))
-        .def("__call__", &py_hough_transform::compute_ht<double>, py::arg("img"), py::arg("box"),
+        .def("__call__", &compute_ht<uint8_t>, py::arg("img"), py::arg("box"))
+        .def("__call__", &compute_ht<uint16_t>, py::arg("img"), py::arg("box"))
+        .def("__call__", &compute_ht<uint32_t>, py::arg("img"), py::arg("box"))
+        .def("__call__", &compute_ht<uint64_t>, py::arg("img"), py::arg("box"))
+        .def("__call__", &compute_ht<int8_t>, py::arg("img"), py::arg("box"))
+        .def("__call__", &compute_ht<int16_t>, py::arg("img"), py::arg("box"))
+        .def("__call__", &compute_ht<int32_t>, py::arg("img"), py::arg("box"))
+        .def("__call__", &compute_ht<int64_t>, py::arg("img"), py::arg("box"))
+        .def("__call__", &compute_ht<float>, py::arg("img"), py::arg("box"))
+        .def("__call__", &compute_ht<double>, py::arg("img"), py::arg("box"),
 "requires \n\
     - box.width() == size() \n\
     - box.height() == size() \n\
@@ -346,28 +333,28 @@ ensures \n\
               obtained by calling get_line_properties().
     !*/
 
-        .def("__call__", &py_hough_transform::compute_ht2<uint8_t>, py::arg("img"))
-        .def("__call__", &py_hough_transform::compute_ht2<uint16_t>, py::arg("img"))
-        .def("__call__", &py_hough_transform::compute_ht2<uint32_t>, py::arg("img"))
-        .def("__call__", &py_hough_transform::compute_ht2<uint64_t>, py::arg("img"))
-        .def("__call__", &py_hough_transform::compute_ht2<int8_t>, py::arg("img"))
-        .def("__call__", &py_hough_transform::compute_ht2<int16_t>, py::arg("img"))
-        .def("__call__", &py_hough_transform::compute_ht2<int32_t>, py::arg("img"))
-        .def("__call__", &py_hough_transform::compute_ht2<int64_t>, py::arg("img"))
-        .def("__call__", &py_hough_transform::compute_ht2<float>, py::arg("img"))
-        .def("__call__", &py_hough_transform::compute_ht2<double>, py::arg("img"),
+        .def("__call__", &compute_ht2<uint8_t>, py::arg("img"))
+        .def("__call__", &compute_ht2<uint16_t>, py::arg("img"))
+        .def("__call__", &compute_ht2<uint32_t>, py::arg("img"))
+        .def("__call__", &compute_ht2<uint64_t>, py::arg("img"))
+        .def("__call__", &compute_ht2<int8_t>, py::arg("img"))
+        .def("__call__", &compute_ht2<int16_t>, py::arg("img"))
+        .def("__call__", &compute_ht2<int32_t>, py::arg("img"))
+        .def("__call__", &compute_ht2<int64_t>, py::arg("img"))
+        .def("__call__", &compute_ht2<float>, py::arg("img"))
+        .def("__call__", &compute_ht2<double>, py::arg("img"),
             "    simply performs: return self(img, get_rect(img)).  That is, just runs the hough transform on the whole input image.")
 
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<uint8_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<uint16_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<uint32_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<uint64_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<int8_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<int16_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<int32_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<int64_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<float>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines<double>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1,
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<uint8_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<uint16_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<uint32_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<uint64_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<int8_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<int16_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<int32_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<int64_t>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<float>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines<double>, py::arg("img"), py::arg("box"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1,
 "requires \n\
     - box.width() == size() \n\
     - box.height() == size() \n\
@@ -448,20 +435,20 @@ ensures \n\
                       there is no overlap in points between any two elements of
                       CONSTITUENT_POINTS.
     !*/
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<uint8_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<uint16_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<uint32_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<uint64_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<int8_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<int16_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<int32_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<int64_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<float>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
-        .def("find_pixels_voting_for_lines", &py_hough_transform::find_pixels_voting_for_lines2<double>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1,
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<uint8_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<uint16_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<uint32_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<uint64_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<int8_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<int16_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<int32_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<int64_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<float>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
+        .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<double>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1,
 "    performs: return find_pixels_voting_for_lines(img, get_rect(img), hough_points, angle_window_size, radius_window_size); \n\
 That is, just runs the routine on the whole input image." )
 
-        .def("find_strong_hough_points", &py_hough_transform::find_strong_hough_points, py::arg("himg"), py::arg("hough_count_thresh"), py::arg("angle_nms_thresh"), py::arg("radius_nms_thresh"),
+        .def("find_strong_hough_points", &ht_find_strong_hough_points, py::arg("himg"), py::arg("hough_count_thresh"), py::arg("angle_nms_thresh"), py::arg("radius_nms_thresh"),
 "requires \n\
     - himg has size() rows and columns. \n\
     - angle_nms_thresh >= 0 \n\
@@ -496,7 +483,7 @@ ensures \n\
     !*/
 
 
-    m.def("get_rect", [](const py_hough_transform& ht){ return get_rect(ht.ht); },
+    m.def("get_rect", [](const hough_transform& ht){ return get_rect(ht); },
         "returns a rectangle(0,0,ht.size()-1,ht.size()-1).  Therefore, it is the rectangle that bounds the Hough transform image.", 
         py::arg("ht")  );
 }
