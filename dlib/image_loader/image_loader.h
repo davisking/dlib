@@ -44,7 +44,7 @@ namespace dlib
             unsigned long bfReserved;
             unsigned long biSize;
             unsigned long biWidth;
-            long biHeight;
+            int32 biHeight;
             unsigned short biBitCount;
             unsigned long biCompression;
             /*
