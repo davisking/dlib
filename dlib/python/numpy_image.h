@@ -147,6 +147,14 @@ namespace dlib
         }
 
         numpy_image (
+            long rows,
+            long cols
+        )
+        {
+            set_size(rows,cols);
+        }
+
+        numpy_image (
             const py::object& img
         ) : numpy_image(img.cast<py::array>()) {}
 
