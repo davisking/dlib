@@ -148,26 +148,17 @@ namespace dlib
 
         numpy_image (
             const py::object& img
-        ) 
-        {
-            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style> arr = img.cast<py::array>();
-            assert_is_image<pixel_type>(arr);
-            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>::operator=(arr);
-        }
+        ) : numpy_image(img.cast<py::array>()) {}
 
         numpy_image(
             const numpy_image& img
-        ) : py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>(img)
-        {
-        }
+        ) = default;
 
         numpy_image& operator= (
             const py::object& rhs
         )
         {
-            py::array arr = rhs.cast<py::array>();
-            assert_is_image<pixel_type>(arr);
-            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>::operator=(arr);
+            *this = numpy_image(rhs);
             return *this;
         }
 
@@ -175,33 +166,25 @@ namespace dlib
             const py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>& rhs
         )
         {
-            assert_is_image<pixel_type>(rhs);
-            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>::operator=(rhs);
+            *this = numpy_image(rhs);
             return *this;
         }
 
         numpy_image& operator= (
             const numpy_image& rhs
-        )
-        {
-            py::array_t<typename pixel_traits<pixel_type>::basic_pixel_type, py::array::c_style>::operator=(rhs);
-            return *this;
-        }
+        ) = default;
 
         template <long NR, long NC>
         numpy_image (
             matrix<pixel_type,NR,NC>&& rhs
-        )
-        {
-            *this = convert_to_numpy(std::move(rhs));
-        }
+        ) : numpy_image(convert_to_numpy(std::move(rhs))) {}
 
         template <long NR, long NC>
         numpy_image& operator= (
             matrix<pixel_type,NR,NC>&& rhs
         )
         {
-            *this = convert_to_numpy(std::move(rhs));
+            *this = numpy_image(rhs);
             return *this;
         }
 
