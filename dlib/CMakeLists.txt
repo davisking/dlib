@@ -140,6 +140,8 @@ if (NOT TARGET dlib)
       "Disable this if you don't want to use a LAPACK library" )
    set (DLIB_USE_CUDA_STR
       "Disable this if you don't want to use NVIDIA CUDA" )
+   set (DLIB_USE_MKL_SEQUENTIAL_STR
+      "Enable this if you have MKL installed and want to use the sequential version" )
    set (DLIB_PNG_SUPPORT_STR
       "Disable this if you don't want to link against libpng" )
    set (DLIB_GIF_SUPPORT_STR
@@ -162,6 +164,7 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_NO_GUI_SUPPORT)
    option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
    toggle_preprocessor_switch(DLIB_ENABLE_STACK_TRACE)
+   option(DLIB_USE_MKL_SEQUENTIAL ${DLIB_USE_MKL_SEQUENTIAL_STR} OFF)
 
    if(DLIB_ENABLE_ASSERTS)
       # Set these variables so they are set in the config.h.in file when dlib
