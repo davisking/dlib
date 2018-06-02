@@ -443,6 +443,23 @@ namespace dlib
               objects should provide their own overload of num_rows() if needed.
     !*/
 
+    template <typename image_type1, typename image_type2>
+    bool have_same_dimensions (
+        const image_type1& img1,
+        const image_type2& img2
+    ) { return num_rows(img1)==num_rows(img2) && num_columns(img1)==num_columns(img2); }
+    /*!
+        ensures
+            - returns true if and only if the two given images have the same dimensions.
+    !*/
+
+    template <typename image_type1, typename image_type2, typename ...T>
+    bool have_same_dimensions (
+        const image_type1& img1,
+        const image_type2& img2,
+        T&& ...args
+    ) { return have_same_dimensions(img1,img2) && have_same_dimensions(img1,args...); }
+
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 //            Make the image views implement the generic image interface
