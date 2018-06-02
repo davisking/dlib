@@ -241,6 +241,7 @@ ensures \n\
     {
     typedef std::vector<rectangle> type;
     py::bind_vector<type>(m, "rectangles", "An array of rectangle objects.")
+        .def(py::init<size_t>(), py::arg("initial_size"))
         .def("clear", &type::clear)
         .def("resize", resize<type>)
         .def("extend", extend_vector_with_python_list<rectangle>)
@@ -250,6 +251,7 @@ ensures \n\
     {
     typedef std::vector<std::vector<rectangle>> type;
     py::bind_vector<type>(m, "rectangless", "An array of arrays of rectangle objects.")
+        .def(py::init<size_t>(), py::arg("initial_size"))
         .def("clear", &type::clear)
         .def("resize", resize<type>)
         .def("extend", extend_vector_with_python_list<rectangle>)

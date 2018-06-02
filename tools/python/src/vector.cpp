@@ -438,6 +438,7 @@ void bind_vector(py::module& m)
     {
     typedef std::vector<point> type;
     py::bind_vector<type>(m, "points", "An array of point objects.")
+        .def(py::init<size_t>(), py::arg("initial_size"))
         .def("clear", &type::clear)
         .def("resize", resize<type>)
         .def("extend", extend_vector_with_python_list<point>)
@@ -467,6 +468,7 @@ void bind_vector(py::module& m)
     {
     typedef std::vector<dpoint> type;
     py::bind_vector<type>(m, "dpoints", "An array of dpoint objects.")
+        .def(py::init<size_t>(), py::arg("initial_size"))
         .def("clear", &type::clear)
         .def("resize", resize<type>)
         .def("extend", extend_vector_with_python_list<dpoint>)
