@@ -45,6 +45,15 @@ void add_df (
     typedef decision_function<kernel_type> df_type;
     py::class_<df_type>(m, name.c_str())
         .def("__call__", &predict<df_type>)
+        .def_property_readonly("alpha", [](const df_type& df) {return df.alpha;})
+        .def_property_readonly("b", [](const df_type& df) {return df.b;})
+        .def_property_readonly("kernel_function", [](const df_type& df) {return df.kernel_function;})
+        .def_property_readonly("basis_vectors", [](const df_type& df) {
+            std::vector<matrix<double,0,1>> temp;
+            for (long i = 0; i < df.basis_vectors.size(); ++i)
+                temp.push_back(sparse_to_dense(df.basis_vectors(i)));
+            return temp;
+        })
         .def(py::pickle(&getstate<df_type>, &setstate<df_type>));
 }
 
@@ -101,6 +110,22 @@ void add_linear_df (
         .def_property_readonly("weights", &get_weights<df_type>)
         .def_property("bias", get_bias<df_type>, set_bias<df_type>)
         .def(py::pickle(&getstate<df_type>, &setstate<df_type>));
+}
+
+// ----------------------------------------------------------------------------------------
+
+std::string radial_basis_kernel__repr__(const radial_basis_kernel<sample_type>& item)
+{
+    std::ostringstream sout;
+    sout << "radial_basis_kernel(gamma="<< item.gamma<<")"; 
+    return sout.str();
+}
+
+std::string linear_kernel__repr__(const linear_kernel<sample_type>& item)
+{
+    std::ostringstream sout;
+    sout << "linear_kernel()"; 
+    return sout.str();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -169,6 +194,14 @@ void bind_decision_functions(py::module &m)
 
     add_df<polynomial_kernel<sample_type> >(m, "_decision_function_polynomial");
     add_df<sparse_polynomial_kernel<sparse_vect> >(m, "_decision_function_sparse_polynomial");
+
+
+    py::class_<radial_basis_kernel<sample_type>>(m, "_radial_basis_kernel")
+        .def("__repr__", radial_basis_kernel__repr__)
+        .def_property_readonly("gamma", [](const radial_basis_kernel<sample_type>& k){return k.gamma; });
+
+    py::class_<linear_kernel<sample_type>>(m, "_linear_kernel")
+        .def("__repr__", linear_kernel__repr__);
 
     add_df<radial_basis_kernel<sample_type> >(m, "_decision_function_radial_basis");
     add_df<sparse_radial_basis_kernel<sparse_vect> >(m, "_decision_function_sparse_radial_basis");
