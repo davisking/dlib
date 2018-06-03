@@ -41,10 +41,9 @@ namespace dlib
             unsigned long bytes_read_so_far = 0;
             unsigned long bfSize;
             unsigned long bfOffBits;
-            unsigned long bfReserved;
             unsigned long biSize;
             unsigned long biWidth;
-            long biHeight;
+            int32 biHeight;
             unsigned short biBitCount;
             unsigned long biCompression;
             /*
@@ -79,19 +78,11 @@ namespace dlib
             a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
             bfSize = a | (b<<8) | (c<<16) | (d<<24);
 
-            i = 4;
-            a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
-            bfReserved = a | (b<<8) | (c<<16) | (d<<24);
+            // Ignore the next 4 bytes (Reserved Area)
 
             i = 8;
             a = buf[i]; b = buf[i+1]; c = buf[i+2]; d = buf[i+3];
             bfOffBits = a | (b<<8) | (c<<16) | (d<<24);
-
-            // if this value isn't zero then there is something wrong
-            // with this bitmap.
-            if (bfReserved != 0)
-                throw image_load_error("bmp load error 4: reserved area not zero");
-
 
             // load the BITMAPINFOHEADER
             if (in.sgetn(reinterpret_cast<char*>(buf),40) != 40)
