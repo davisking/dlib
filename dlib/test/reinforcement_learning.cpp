@@ -3,6 +3,7 @@
 
 #include "tester.h"
 #include <dlib/control.h>
+#include <dlib/serialize.h>
 #include <vector>
 #include <sstream>
 #include <ctime>
@@ -12,7 +13,7 @@ namespace
     using namespace test;
     using namespace dlib;
     using namespace std;
-    dlib::logger dlog("test.rl");
+    logger dlog("test.rl");
 
     template <
             int height,
@@ -34,11 +35,13 @@ namespace
         typedef int state_type;
         typedef actions action_type;
 
-        // Constructor
+        // Constructors
         explicit cliff_model(
             int seed = 0
         ) : gen(seed){}
 
+        cliff_model(const cliff_model<height, width>&) = default;
+        cliff_model<height, width>& operator=(const cliff_model<height, width>&) = default;
 
         // Functions that will use the agent
 
@@ -71,7 +74,7 @@ namespace
         ) const
         {
             auto best = numeric_limits<double>::lowest();
-            auto best_indexes = std::vector<int>();
+            std::vector<int> best_indexes;
 
             for(auto i = 0; i < num_actions; i++)
             {
@@ -133,6 +136,9 @@ namespace
             const state_type& state
         ) const { return is_success(state) || is_failure(state); }
 
+        const std::default_random_engine& get_generator(
+        ) const { return gen; }
+
     private:
 
         bool out_of_bounds(
@@ -161,8 +167,34 @@ namespace
             return result;
         }
 
+        template < int H, int W>
+        friend void serialize(const cliff_model<H, W>& item, std::ostream& out);
+
+        template < int H, int W>
+        friend void deserialize(cliff_model<H, W>& item, std::istream& in);
+
         mutable default_random_engine gen; //mutable because it doesn't changes the model state
     };
+
+    template < int height, int width >
+    inline void serialize(const cliff_model<height, width>& item, std::ostream& out)
+    {
+        int version = 1;
+        dlib::serialize(version, out);
+        dlib::serialize(item.gen, out);
+    }
+
+    template < int height, int width >
+    inline void deserialize(cliff_model<height, width>& item, std::istream& in)
+    {
+        int version = 0;
+        dlib::deserialize(version, in);
+        if (version != 1)
+            throw serialization_error("Unexpected version found while deserializing reinforcement learning test model object.");
+
+        item = cliff_model<height, width>();
+        dlib::deserialize(item.gen, in);
+    }
 
     template <
         int height,
@@ -203,6 +235,58 @@ namespace
         DLIB_TEST(r > 0);
     }
 
+    void policy_serialization_test(){
+        cliff_model<3, 5> model(8);
+        policy<decltype(model)> gp(model), gres;
+
+        for(uint i = 0u; i < gp.get_weights().size(); i++)
+            gp.get_weights()(i) = i;
+
+        ostringstream sout;
+        serialize(gp, sout);
+        istringstream sin(sout.str());
+
+        deserialize(gres, sin);
+        dlog << LINFO << "policy serializing:  " <<
+                (gp.get_weights() == gres.get_weights() && gp.get_model().get_generator() == gres.get_model().get_generator());
+        DLIB_TEST(gp.get_weights() == gres.get_weights() && gp.get_model().get_generator() == gres.get_model().get_generator());
+    }
+
+    void epsilon_policy_serialization_test(){
+        cliff_model<3, 5> model(11);
+        policy<decltype(model)> gp(model);
+
+        for(uint i = 0u; i < gp.get_weights().size(); i++)
+            gp.get_weights()(i) = i;
+
+        epsilon_policy<decltype(gp)> ep(0.3, gp);
+        auto eres = ep; // epsilon_policy is not default constructible
+
+        auto state = ep.get_model().initial_state();
+        for(uint i = 0u; i < 3; i++)
+            state = ep.get_model().step(state, ep(state));
+
+        ostringstream sout;
+        serialize(ep, sout);
+        istringstream sin(sout.str());
+
+        auto cstate = state;
+        for(uint i = 0; i < 5; i++)
+            state = ep.get_model().step(state, ep(state));
+
+        deserialize(eres, sin);
+        for(uint i = 0; i < 5; i++)
+            cstate = eres.get_model().step(cstate, eres(cstate));
+
+        dlog << LINFO << "epsilon policy serializing:  " <<
+                (ep.get_weights() == eres.get_weights() && ep.get_generator() == eres.get_generator() &&
+                 ep.get_model().get_generator() == eres.get_model().get_generator() ? "True" : "False");
+        dlog << LINFO << "same state stepping after serializing:  " << (state == cstate ? "True" : "False");
+        DLIB_TEST(state == cstate);
+        DLIB_TEST(ep.get_weights() == eres.get_weights() && ep.get_generator() == eres.get_generator() &&
+                  ep.get_model().get_generator() == eres.get_model().get_generator());
+    }
+
     class rl_tester : public tester
     {
     public:
@@ -228,6 +312,9 @@ namespace
             test<5,5,sarsa>();
             test<4,7,sarsa>();
             test<5,10,sarsa>();
+
+            policy_serialization_test();
+            epsilon_policy_serialization_test();
         }
     };
 

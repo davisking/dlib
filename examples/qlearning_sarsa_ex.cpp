@@ -7,6 +7,7 @@
 
 #include <dlib/matrix.h>
 #include <dlib/control.h>
+#include <dlib/serialize.h>
 #include <limits>
 #include <cmath>
 #include <vector>
@@ -73,6 +74,8 @@ public:
         int seed = 0
     ) : gen(seed){}
 
+    cliff_model(const cliff_model<height, width>&) = default;
+    cliff_model<height, width>& operator=(const cliff_model<height, width>&) = default;
 
     // Functions that will use the agent
 
@@ -106,7 +109,7 @@ public:
     ) const
     {
         auto best = numeric_limits<double>::lowest();
-        auto best_indexes = std::vector<int>();
+        std::vector<int> best_indexes;
 
         for(auto i = 0; i < num_actions; i++)
         {
@@ -196,8 +199,32 @@ private:
         return result;
     }
 
+    // for accessing to gen on serialization functions (alternatively we could define a getter method)
+    template < int H, int W> friend void serialize(const cliff_model<H, W>& item, std::ostream& out);
+    template < int H, int W> friend void deserialize(cliff_model<H, W>& item, std::istream& in);
+
     mutable default_random_engine gen; //mutable because it doesn't changes the model state
 };
+
+template < int height, int width >
+inline void serialize(const cliff_model<height, width>& item, std::ostream& out)
+{
+    int version = 1;
+    dlib::serialize(version, out);
+    dlib::serialize(item.gen, out);
+}
+
+template < int height, int width >
+inline void deserialize(cliff_model<height, width>& item, std::istream& in)
+{
+    int version = 0;
+    dlib::deserialize(version, in);
+    if (version != 1)
+        throw serialization_error("Unexpected version found while deserializing reinforcement learning test model object.");
+
+    item = cliff_model<height, width>();
+    dlib::deserialize(item.gen, in);
+}
 
 // This is just a helper function to pretty-print the agent's state.
 template <

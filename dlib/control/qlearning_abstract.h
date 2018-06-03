@@ -30,11 +30,9 @@ namespace dlib
                 then the learning function has the form:
                     Q(s, a) = (1 - lr) * Q(s,a) + lr * (reward + disc * max_a' Q(s', a'))
                 where lr is the learning_rate and disc is the discount factor.
-                That formula means that it takes a convex combination of the current qvalue,
-                that is, the current expected reward from there, and the new expected qvalue.
 
-                Note that it is an off-policy reinforcement learning algorithm meaning
-                that it doesn't take the policy is using into account in the learning process.
+                The formula above means that it takes a convex combination of the current
+                qvalue, that is, the current expected reward, and the new expected qvalue.
         !*/
 
     public:
@@ -161,7 +159,7 @@ namespace dlib
             typename prng_engine = std::default_random_engine
             >
         policy<model_type> train(
-            policy<model_type> policy = policy<model_type>()
+            const policy<model_type>& policy = policy<model_type>()
             const prng_engine& gen = prng_engine()
         ) const;
         /*!
@@ -169,8 +167,9 @@ namespace dlib
                 - prng_engine is a pseudo-random number generator class like the ones
                   defined in std::random. By default it is the standard one.
             ensures
-                - returns the policy resulting of applying the learning function over
-                  and over according to the parameters previously fed into this object.
+                - returns the policy obtained by applying to the given policy the learning
+                  function several times according to the parameters previously fed
+                  into this object.
         !*/
 
     };

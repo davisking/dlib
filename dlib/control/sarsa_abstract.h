@@ -30,9 +30,6 @@ namespace dlib
                 where lr is the learning_rate and disc is the discount factor.
                 That formula means that it takes a convex combination of the current qvalue,
                 that is, the current expected reward from there, and the new expected qvalue.
-
-                Note that, unlike qlearning, sarsa is an on-policy reinforcement learning
-                algorithm meaning that it takes the policy into account while learning.
         !*/
 
     public:
@@ -159,16 +156,17 @@ namespace dlib
             typename prng_engine = std::default_random_engine
             >
         policy_type train(
-            policy<model_type> policy = policy<model_type>(),
-            const prng_engine &gen = prng_engine()
+            const policy<model_type>& policy = policy<model_type>(),
+            const prng_engine& gen = prng_engine()
         ) const;
         /*!
             requires
                 - prng_engine is a pseudo-random number generator class like the ones
                   defined in std::random. By default it is the standard one.
             ensures
-                - returns the policy resulting of applying the learning function over
-                  and over according to the parameters previously fed into this object.
+                - returns the policy obtained by applying to the given policy the learning
+                  function several times according to the parameters previously fed
+                  into this object.
         !*/
 
     };

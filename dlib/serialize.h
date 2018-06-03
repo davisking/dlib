@@ -74,6 +74,7 @@
         - enumerable<T> where T is a serializable type
         - map_pair<D,R> where D and R are both serializable types.
         - C style arrays of serializable types
+        - the random devices defined in std::random like std::default_random_engine
         - Google protocol buffer objects.
 
     This file provides deserialization support to the following object types:
@@ -91,6 +92,7 @@
         - dlib::int64
         - float_details
         - C style arrays of serializable types
+        - the random devices defined in std::random like std::default_random_engine
         - Google protocol buffer objects.
 
     Support for deserialization of objects which implement the enumerable or
@@ -156,6 +158,8 @@
 #include <limits>
 #include <type_traits>
 #include <utility>
+#include <random>
+#include <sstream>
 #include "uintn.h"
 #include "interfaces/enumerable.h"
 #include "interfaces/map_pair.h"
@@ -1540,6 +1544,53 @@ namespace dlib
             throw serialization_error(e.info + "\n   while deserializing an object of type std::complex");
         }
     }
+
+// ----------------------------------------------------------------------------------------
+
+    #define USE_SERIALIZATION_THROUGH_IOSTREAM(T) \
+    inline void serialize ( \
+        const T& item, \
+        std::ostream& out \
+    ) \
+    { \
+        std::stringstream ss; \
+        ss.setf(std::ios_base::dec, std::ios_base::basefield); \
+        ss.setf(std::ios_base::left, std::ios_base::adjustfield); \
+        ss.fill(' '); \
+        ss << item; \
+        \
+        try{ serialize(ss.str(),out); } \
+        catch (serialization_error& e) \
+        { throw serialization_error(e.info + "\n   while serializing object of type std::default_random_engine"); } \
+    } \
+    \
+    inline void deserialize ( \
+        T& item, \
+        std::istream& in \
+    ) \
+    { \
+        std::string str; \
+        try { deserialize(str,in); } \
+        catch (serialization_error& e) \
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::default_random_engine"); } \
+        \
+        std::stringstream ss(str); \
+        ss.setf(std::ios_base::dec, std::ios_base::basefield); \
+        ss.setf(std::ios_base::left, std::ios_base::adjustfield); \
+        ss.fill(' '); \
+        ss >> item; \
+    }
+
+    //USE_SERIALIZATION_THROUGH_IOSTREAM(std::default_random_engine)
+    USE_SERIALIZATION_THROUGH_IOSTREAM(std::minstd_rand)
+    USE_SERIALIZATION_THROUGH_IOSTREAM(std::minstd_rand0)
+    USE_SERIALIZATION_THROUGH_IOSTREAM(std::mt19937)
+    USE_SERIALIZATION_THROUGH_IOSTREAM(std::mt19937_64)
+    USE_SERIALIZATION_THROUGH_IOSTREAM(std::ranlux24_base)
+    USE_SERIALIZATION_THROUGH_IOSTREAM(std::ranlux48_base)
+    USE_SERIALIZATION_THROUGH_IOSTREAM(std::ranlux24)
+    USE_SERIALIZATION_THROUGH_IOSTREAM(std::ranlux48)
+    USE_SERIALIZATION_THROUGH_IOSTREAM(std::knuth_b)
 
 // ----------------------------------------------------------------------------------------
 

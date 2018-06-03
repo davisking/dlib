@@ -94,8 +94,8 @@ namespace dlib
             typename prng_engine = std::default_random_engine
             >
         policy<model_type> train(
-            policy<model_type> training_policy = policy<model_type>(),
-            const prng_engine &gen = prng_engine()
+            const policy<model_type>& training_policy = policy<model_type>(),
+            const prng_engine& gen = prng_engine()
         ) const
         {
             if(verbose)
@@ -150,7 +150,7 @@ namespace dlib
             if(verbose)
                 std::cout << "Training finished." << std::endl;
 
-            return training_policy;
+            return eps_pol.get_policy();
         }
 
     private:

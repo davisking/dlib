@@ -15,23 +15,16 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object defines the inferface that any model has to implement if it
-                is to be used in an offline fashion along with some method like the lspi
-                method defined in the file lspi_abstract.h. Being offline only means that
-                it already holds the data and will not interact with the environment to get
-                them.
+                is to be used in an offline fashion along with some class like the lspi
+                class defined in the file lspi_abstract.h.
 
                 In particular, this object models a Q(state, action) function where
                     Q(state, action) == dot(w, PSI(state, action))
                 where PSI(state, action) is a feature vector and w is a parameter vector.
 
-                Therefore, an offline model defines how the PSI(x,y) feature vector is
-                calculated. It also defines the types used to represent the state and
-                action objects.
-
-            THREAD SAFETY
-                Instances of this object are required to be threadsafe, that is, it should
-                be safe for multiple threads to make concurrent calls to the member
-                functions of this object.
+                Therefore, an offline model object defines how a model is represented by
+                defining its actions, states, calculating the feature vectors. However, it
+                does not provide any way to interactively interact with it.
         !*/
 
         // The states and actions can be any type as long as you provide typedefs for them.
@@ -85,25 +78,22 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This object defines the inferface that any model has to implement if it
-                is to be used in an online fashion along with some method like the qlearning
-                method defined in the file qlearning_abstract.h.
+                is to be used by an object such as the qlearning class defined in the
+                file qlearning_abstract.h.
 
-                Being online means that the model doesn't hold prior data but it interacts
-                with the environment and performing actions from some given state turning
-                that state into a new one as well as getting some reward for doing so.
+                Instances of this object differ from the offline model in the way they
+                interact with the environment. This object expands the interface of the
+                offline model with methods that make it suitable for simulations:
+                going from one state to another, detecting special states and getting
+                the reward for performing those steps.
 
                 In particular, this object models a Q(state, action) function where
                     Q(state, action) == dot(w, PSI(state, action))
                 where PSI(state, action) is a feature vector and w is a parameter vector.
 
-                Therefore, an online model defines how the PSI(x,y) feature vector is
-                calculated, the types used to represent the state, action and reward
-                objects as well as how to interact with the environment.
-
-            THREAD SAFETY
-                Instances of this object are required to be threadsafe, that is, it should
-                be safe for multiple threads to make concurrent calls to the member
-                functions of this object.
+                Therefore, an online model object defines how a model is represented by
+                defining its actions, states, calculating the feature vectors. Besides, it
+                provides methods to interact with that environment on the fly.
         !*/
 
         // The states and actions can be any type as long as you provide typedefs for them.
@@ -160,12 +150,9 @@ namespace dlib
             const state_type& new_state
         ) const;
         /*!
-            requires
-                - action is a pausible action from state.
-                - new_state is a possible outcome when performing action on state.
             ensures
                 - returns the reward obtained by reaching new_state from state
-                  doing action.
+                  after you do action.
         !*/
 
         state_type initial_state(
@@ -180,11 +167,9 @@ namespace dlib
             const action_type& action
         ) const;
         /*!
-            requires
-                - action is a plausible action when we are in state.
             ensures
-                - returns a new state result of being on the given state and doing the given
-                  action.
+                - returns a new state result of doing the given action over the
+                  given state.
         !*/
 
         bool is_success(
@@ -224,7 +209,8 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON model_type
-                model_type should implement one of the interfaces defined above this file.
+                model_type should implement one of the two interfaces defined above, that is,
+                example_offline_model or example_online_model.
 
             WHAT THIS OBJECT REPRESENTS
                 This object holds a training sample for a reinforcement learning algorithm.
@@ -268,7 +254,8 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON model_type
-                model_type should implement one of the interfaces defined above this file.
+                model_type should implement one of the two interfaces defined above, that is,
+                example_offline_model or example_online_model.
 
             WHAT THIS OBJECT REPRESENTS
                 This class represents a greedy policy, that is, it is a policy that given a
@@ -307,7 +294,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns get_model().find_best_action(state, this->weights);
+                - returns get_model().find_best_action(state, get_weights());
         !*/
 
         const model_type& get_model (

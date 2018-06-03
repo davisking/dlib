@@ -78,6 +78,12 @@ namespace dlib
             const model_type &model_
         ) : weights(weights_), model(model_) {}
 
+        policy(const policy<model_type>&) = default;
+        policy<model_type>& operator=(const policy<model_type>&) = default;
+
+        policy(policy<model_type>&&) = default;
+        policy<model_type>& operator=(policy<model_type>&&) = default;
+
         action_type operator() (
             const state_type& state
         ) const
@@ -96,7 +102,7 @@ namespace dlib
 
     private:
         matrix<double,0,1> weights;
-        const model_type model;
+        model_type model;
     };
 
     template < typename model_type >
@@ -135,23 +141,29 @@ namespace dlib
 
         epsilon_policy (
             double epsilon_,
-            policy_type &policy_,
+            const policy_type& policy_,
             const prng_engine &gen_ = prng_engine()
         ) : underlying_policy(policy_), epsilon(epsilon_), gen(gen_) {}
+
+        epsilon_policy(const epsilon_policy<policy_type, prng_engine>&) = default;
+        epsilon_policy<policy_type, prng_engine>& operator=(const epsilon_policy<policy_type, prng_engine>&) = default;
+
+        epsilon_policy(epsilon_policy<policy_type, prng_engine>&&) = default;
+        epsilon_policy<policy_type, prng_engine>& operator=(epsilon_policy<policy_type, prng_engine>&&) = default;
 
         action_type operator() (
             const state_type& state
         ) const
         {
             std::bernoulli_distribution d(epsilon);
-            return d(gen) ? get_model().random_action(state) : underlying_policy(state);
+            return d(gen) ? underlying_policy.get_model().random_action(state) : underlying_policy(state);
         }
 
         const policy_type& get_policy(
         ) const { return underlying_policy; }
 
         auto get_model (
-        ) const -> decltype(this->get_policy().get_model()) { return underlying_policy.get_model(); }
+        ) const -> decltype(get_policy().get_model()) { return underlying_policy.get_model(); }
 
         matrix<double,0,1>& get_weights (
         ) { return underlying_policy.get_weights(); }
@@ -166,7 +178,7 @@ namespace dlib
         ) const { return gen; }
 
     private:
-        policy_type& underlying_policy;
+        policy_type underlying_policy;
         double epsilon;
 
         mutable prng_engine gen;
