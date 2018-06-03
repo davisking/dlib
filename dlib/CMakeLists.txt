@@ -141,7 +141,7 @@ if (NOT TARGET dlib)
    set (DLIB_USE_CUDA_STR
       "Disable this if you don't want to use NVIDIA CUDA" )
    set (DLIB_USE_MKL_SEQUENTIAL_STR
-      "Enable this if you have MKL installed and want to use the sequential version" )
+      "Enable this if you have MKL installed and want to use the sequential version instead of the multi-core version." )
    set (DLIB_PNG_SUPPORT_STR
       "Disable this if you don't want to link against libpng" )
    set (DLIB_GIF_SUPPORT_STR
