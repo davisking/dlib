@@ -239,7 +239,7 @@ namespace
         cliff_model<3, 5> model(8);
         policy<decltype(model)> gp(model), gres;
 
-        for(uint i = 0u; i < gp.get_weights().size(); i++)
+        for(int i = 0; i < gp.get_weights().size(); i++)
             gp.get_weights()(i) = i;
 
         ostringstream sout;
@@ -256,14 +256,14 @@ namespace
         cliff_model<3, 5> model(11);
         policy<decltype(model)> gp(model);
 
-        for(uint i = 0u; i < gp.get_weights().size(); i++)
+        for(int i = 0; i < gp.get_weights().size(); i++)
             gp.get_weights()(i) = i;
 
         epsilon_policy<decltype(gp)> ep(0.3, gp);
         auto eres = ep; // epsilon_policy is not default constructible
 
         auto state = ep.get_model().initial_state();
-        for(uint i = 0u; i < 3; i++)
+        for(int i = 0; i < 3; i++)
             state = ep.get_model().step(state, ep(state));
 
         ostringstream sout;
@@ -271,11 +271,11 @@ namespace
         istringstream sin(sout.str());
 
         auto cstate = state;
-        for(uint i = 0; i < 5; i++)
+        for(int i = 0; i < 5; i++)
             state = ep.get_model().step(state, ep(state));
 
         deserialize(eres, sin);
-        for(uint i = 0; i < 5; i++)
+        for(int i = 0; i < 5; i++)
             cstate = eres.get_model().step(cstate, eres(cstate));
 
         dlog << LINFO << "epsilon policy serializing:  " <<
