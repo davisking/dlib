@@ -90,6 +90,7 @@
 #include "../data_io/mnist.cpp"
 #include "../global_optimization/global_function_search.cpp"
 #include "../filtering/kalman_filter.cpp"
+#include "../svm/auto.cpp"
 
 
 #define DLIB_ALL_SOURCE_END

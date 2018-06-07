@@ -54,6 +54,7 @@
 #include "svm/active_learning.h"
 #include "svm/svr_linear_trainer.h"
 #include "svm/sequence_segmenter.h"
+#include "svm/auto.h"
 
 #endif // DLIB_SVm_HEADER
 

@@ -243,6 +243,7 @@ if (NOT TARGET dlib)
       global_optimization/global_function_search.cpp
       filtering/kalman_filter.cpp
       test_for_odr_violations.cpp
+      svm/auto.cpp
       )
 
 
