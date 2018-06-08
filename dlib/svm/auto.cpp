@@ -70,7 +70,8 @@ namespace dlib
         };
 
 
-        std::cout << "Searching for best RBF-SVM training parameters..." << std::endl;
+        if (be_verbose)
+            std::cout << "Searching for best RBF-SVM training parameters..." << std::endl;
         auto result = find_max_global(
             default_thread_pool(),
             cross_validation_score, 
@@ -82,15 +83,20 @@ namespace dlib
         double best_c1    = result.x(1);
         double best_c2    = result.x(2);
 
-        std::cout << " best cross-validation score: " << result.y << std::endl;
-        std::cout << " best gamma: " << best_gamma << "   best c1: " << best_c1 << "    best c2: "<< best_c2  << std::endl;
+        if (be_verbose)
+        {
+            std::cout << " best cross-validation score: " << result.y << std::endl;
+            std::cout << " best gamma: " << best_gamma << "   best c1: " << best_c1 << "    best c2: "<< best_c2  << std::endl;
+        }
 
         svm_c_trainer<kernel_type> trainer;
         trainer.set_kernel(kernel_type(best_gamma));
         trainer.set_c_class1(best_c1);
         trainer.set_c_class2(best_c2);
 
-        std::cout << "Training final classifier with best parameters..." << std::endl;
+        if (be_verbose)
+            std::cout << "Training final classifier with best parameters..." << std::endl;
+
         df.function = trainer.train(x,y);
 
         return df;
