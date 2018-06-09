@@ -189,6 +189,8 @@ void bind_shape_predictors(py::module &m)
                        cause overfitting.  The value must be in the range (0, 1].")
         .def_readwrite("oversampling_amount", &type::oversampling_amount,
                       "The number of randomly selected initial starting points sampled for each training example")
+        .def_readwrite("oversampling_translation_jitter", &type::oversampling_translation_jitter,
+                      "The amount of translation jittering to apply to bounding boxes, a good value is in in the range [0 0.5].")
         .def_readwrite("feature_pool_size", &type::feature_pool_size,
                       "Number of pixels used to generate features for the random trees.")
         .def_readwrite("lambda_param", &type::lambda_param,
