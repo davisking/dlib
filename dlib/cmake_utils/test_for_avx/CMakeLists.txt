@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(avx_test)
 
-set(USE_AVX_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
+set(USE_AVX_INSTRUCTIONS ON CACHE BOOL "Use AVX instructions")
 
 # Pull this in since it sets the AVX compile options by putting that kind of stuff into the active_compile_opts list.
 include(../set_compiler_specific_options.cmake)
