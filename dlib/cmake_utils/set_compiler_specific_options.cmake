@@ -9,8 +9,11 @@ endif()
 
 # Check if we are being built as part of a pybind11 module. 
 if (COMMAND pybind11_add_module)
-   # For python users, assume they have SSE4 at least and then if the host machine has AVX use that too.
-   set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
+   # For python users, enable SSE4 and AVX if they have these instructions.
+   include(${CMAKE_CURRENT_LIST_DIR}/check_if_sse4_instructions_executable_on_host.cmake)
+   if (SSE4_IS_AVAILABLE_ON_HOST)
+      set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
+   endif()
    include(${CMAKE_CURRENT_LIST_DIR}/check_if_avx_instructions_executable_on_host.cmake)
    if (AVX_IS_AVAILABLE_ON_HOST)
       set(USE_AVX_INSTRUCTIONS ON CACHE BOOL "Use AVX instructions")
