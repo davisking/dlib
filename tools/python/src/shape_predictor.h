@@ -105,22 +105,22 @@ namespace dlib
         }
     }
 
-    string print_shape_predictor_training_options(const shape_predictor_training_options& o)
+    inline string print_shape_predictor_training_options(const shape_predictor_training_options& o)
     {
         std::ostringstream sout;
         sout << "shape_predictor_training_options("
-            << "be_verbose=" << o.be_verbose << ","
-            << "cascade_depth=" << o.cascade_depth << ","
-            << "tree_depth=" << o.tree_depth << ","
-            << "num_trees_per_cascade_level=" << o.num_trees_per_cascade_level << ","
-            << "nu=" << o.nu << ","
-            << "oversampling_amount=" << o.oversampling_amount << ","
-            << "oversampling_translation_jitter=" << o.oversampling_translation_jitter << ","
-            << "feature_pool_size=" << o.feature_pool_size << ","
-            << "lambda_param=" << o.lambda_param << ","
-            << "num_test_splits=" << o.num_test_splits << ","
-            << "feature_pool_region_padding=" << o.feature_pool_region_padding << ","
-            << "random_seed=" << o.random_seed << ","
+            << "be_verbose=" << o.be_verbose << ", "
+            << "cascade_depth=" << o.cascade_depth << ", "
+            << "tree_depth=" << o.tree_depth << ", "
+            << "num_trees_per_cascade_level=" << o.num_trees_per_cascade_level << ", "
+            << "nu=" << o.nu << ", "
+            << "oversampling_amount=" << o.oversampling_amount << ", "
+            << "oversampling_translation_jitter=" << o.oversampling_translation_jitter << ", "
+            << "feature_pool_size=" << o.feature_pool_size << ", "
+            << "lambda_param=" << o.lambda_param << ", "
+            << "num_test_splits=" << o.num_test_splits << ", "
+            << "feature_pool_region_padding=" << o.feature_pool_region_padding << ", "
+            << "random_seed=" << o.random_seed << ", "
             << "num_threads=" << o.num_threads
         << ")";
         return sout.str();

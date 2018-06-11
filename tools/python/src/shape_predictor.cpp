@@ -205,6 +205,7 @@ void bind_shape_predictors(py::module &m)
         .def_readwrite("num_threads", &type::num_threads,
                         "Use this many threads/CPU cores for training.")
         .def("__str__", &::print_shape_predictor_training_options)
+        .def("__repr__", &::print_shape_predictor_training_options)
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
     {
