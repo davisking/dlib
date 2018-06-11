@@ -985,6 +985,23 @@ py::array py_sub_image2 (
 
 // ----------------------------------------------------------------------------------------
 
+template <typename T>
+dpoint py_max_point(const numpy_image<T>& img)
+{
+    DLIB_CASSERT(img.size() != 0);
+    return max_point(mat(img));
+}
+
+template <typename T>
+dpoint py_max_point_interpolated(const numpy_image<T>& img)
+{
+    DLIB_CASSERT(img.size() != 0);
+    return max_point_interpolated(mat(img));
+}
+
+
+// ----------------------------------------------------------------------------------------
+
 void bind_image_classes2(py::module& m)
 {
 
@@ -1282,6 +1299,57 @@ ensures \n\
     !*/
         );
 
+    m.def("max_point", &py_max_point<uint8_t>, py::arg("img"));
+    m.def("max_point", &py_max_point<uint16_t>, py::arg("img"));
+    m.def("max_point", &py_max_point<uint32_t>, py::arg("img"));
+    m.def("max_point", &py_max_point<uint64_t>, py::arg("img"));
+    m.def("max_point", &py_max_point<int8_t>, py::arg("img"));
+    m.def("max_point", &py_max_point<int16_t>, py::arg("img"));
+    m.def("max_point", &py_max_point<int32_t>, py::arg("img"));
+    m.def("max_point", &py_max_point<int64_t>, py::arg("img"));
+    m.def("max_point", &py_max_point<float>, py::arg("img"));
+    m.def("max_point", &py_max_point<double>, py::arg("img"),
+"requires \n\
+    - m.size > 0 \n\
+ensures \n\
+    - returns the location of the maximum element of the array, that is, if the \n\
+      returned point is P then it will be the case that: img[P.y,P.x] == img.max()." 
+    /*!
+        requires
+            - m.size > 0
+        ensures
+            - returns the location of the maximum element of the array, that is, if the
+              returned point is P then it will be the case that: img[P.y,P.x] == img.max().
+    !*/
+        );
+
+    m.def("max_point_interpolated", &py_max_point_interpolated<uint8_t>, py::arg("img"));
+    m.def("max_point_interpolated", &py_max_point_interpolated<uint16_t>, py::arg("img"));
+    m.def("max_point_interpolated", &py_max_point_interpolated<uint32_t>, py::arg("img"));
+    m.def("max_point_interpolated", &py_max_point_interpolated<uint64_t>, py::arg("img"));
+    m.def("max_point_interpolated", &py_max_point_interpolated<int8_t>, py::arg("img"));
+    m.def("max_point_interpolated", &py_max_point_interpolated<int16_t>, py::arg("img"));
+    m.def("max_point_interpolated", &py_max_point_interpolated<int32_t>, py::arg("img"));
+    m.def("max_point_interpolated", &py_max_point_interpolated<int64_t>, py::arg("img"));
+    m.def("max_point_interpolated", &py_max_point_interpolated<float>, py::arg("img"));
+    m.def("max_point_interpolated", &py_max_point_interpolated<double>, py::arg("img"),
+"requires \n\
+    - m.size > 0 \n\
+ensures \n\
+    - Like max_point(), this function finds the location in m with the largest \n\
+      value.  However, we additionally use some quadratic interpolation to find the \n\
+      location of the maximum point with sub-pixel accuracy.  Therefore, the \n\
+      returned point is equal to max_point(m) + some small sub-pixel delta." 
+    /*!
+        requires
+            - m.size > 0
+        ensures
+            - Like max_point(), this function finds the location in m with the largest
+              value.  However, we additionally use some quadratic interpolation to find the
+              location of the maximum point with sub-pixel accuracy.  Therefore, the
+              returned point is equal to max_point(m) + some small sub-pixel delta.
+    !*/
+        );
 }
 
 
