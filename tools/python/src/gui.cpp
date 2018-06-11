@@ -107,6 +107,36 @@ std::shared_ptr<image_window> make_image_window_from_image_and_title(const numpy
     return win;
 }
 
+std::shared_ptr<image_window> make_image_window_from_detector(const simple_object_detector& detector)
+{
+    auto win = std::make_shared<image_window>();
+    win->set_image(draw_fhog(detector));
+    return win;
+}
+
+std::shared_ptr<image_window> make_image_window_from_detector_py(const simple_object_detector_py& detector)
+{
+    auto win = std::make_shared<image_window>();
+    win->set_image(draw_fhog(detector.detector));
+    return win;
+}
+
+std::shared_ptr<image_window> make_image_window_from_detector_and_title(const simple_object_detector& detector, const string& title)
+{
+    auto win = std::make_shared<image_window>();
+    win->set_image(draw_fhog(detector));
+    win->set_title(title);
+    return win;
+}
+
+std::shared_ptr<image_window> make_image_window_from_detector_py_and_title(const simple_object_detector_py& detector, const string& title)
+{
+    auto win = std::make_shared<image_window>();
+    win->set_image(draw_fhog(detector.detector));
+    win->set_title(title);
+    return win;
+}
+
 // ----------------------------------------------------------------------------------------
 
 void bind_gui(py::module& m)
@@ -122,6 +152,10 @@ void bind_gui(py::module& m)
     py::class_<type, std::shared_ptr<type>>(m, "image_window",
         "This is a GUI window capable of showing images on the screen.")
         .def(py::init())
+        .def(py::init(&make_image_window_from_detector))
+        .def(py::init(&make_image_window_from_detector_py))
+        .def(py::init(&make_image_window_from_detector_and_title))
+        .def(py::init(&make_image_window_from_detector_py_and_title))
         .def(py::init(&make_image_window_from_image<uint8_t>))
         .def(py::init(&make_image_window_from_image<uint16_t>))
         .def(py::init(&make_image_window_from_image<uint32_t>))
