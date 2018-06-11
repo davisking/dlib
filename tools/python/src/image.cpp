@@ -38,7 +38,7 @@ numpy_image<unsigned char> py_threshold_image2(
 )
 {
     numpy_image<unsigned char> out_img;
-    threshold_image(in_img, out_img);
+    threshold_image(in_img, out_img, thresh);
     return out_img;
 }
 
