@@ -675,7 +675,7 @@ if (NOT TARGET dlib)
             # Intel MKL, hasn't already decided what to use.  This is because
             # it makes the MKL bug out if you link to another openmp lib other
             # than Intel's when you use the MKL.
-            if (NOT openmp_libraries AND NOT MSVC AND NOT XCODE)
+            if (NOT openmp_libraries AND NOT MSVC AND NOT XCODE AND NOT APPLE)
                find_package(OpenMP)
                if (OPENMP_FOUND)
                   set(openmp_libraries ${OpenMP_CXX_FLAGS}) 
