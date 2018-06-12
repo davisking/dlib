@@ -360,7 +360,7 @@ namespace pybind11
             template <size_t channels> 
             static PYBIND11_DESCR getname(typename std::enable_if<channels==1,int>::type) {
                 return _("numpy.ndarray[(rows,cols),") + npy_format_descriptor<basic_pixel_type>::name() + _("]");
-            };
+            }
             template <size_t channels> 
             static PYBIND11_DESCR getname(typename std::enable_if<channels!=1,int>::type) {
                 if (channels == 2)
@@ -369,7 +369,7 @@ namespace pybind11
                     return _("numpy.ndarray[(rows,cols,3),") + npy_format_descriptor<basic_pixel_type>::name() + _("]");
                 else if (channels == 4)
                     return _("numpy.ndarray[(rows,cols,4),") + npy_format_descriptor<basic_pixel_type>::name() + _("]");
-            };
+            }
 
             static PYBIND11_DESCR name() {
                 constexpr size_t channels = dlib::pixel_traits<pixel_type>::num;
