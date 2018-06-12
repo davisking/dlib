@@ -178,15 +178,31 @@ namespace dlib
             }
 
             friend void memcpy(
-                cuda_data_ptr& src,
-                const std::vector<T>& dest
+                cuda_data_ptr& dest,
+                const std::vector<T>& src
             )
             {
-                if (dest.size() != src.size())
-                    dest = cuda_data_ptr<T>(src.size());
+                if (src.size() != dest.size())
+                    src = cuda_data_ptr<T>(dest.size());
 
-                if (src.size() != 0)
-                    memcpy(src.pdata, dest.data());
+                if (dest.size() != 0)
+                    memcpy(dest.pdata, src.data());
+            }
+
+            friend void memcpy(
+                cuda_data_ptr& dest,
+                const float* src
+            )
+            {
+                memcpy(dest.pdata, src);
+            }
+
+            friend void memcpy(
+                float* dest, 
+                const cuda_data_ptr& src
+            )
+            {
+                memcpy(dest, src.pdata);
             }
 
         private:
