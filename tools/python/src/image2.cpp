@@ -1002,6 +1002,27 @@ dpoint py_max_point_interpolated(const numpy_image<T>& img)
 
 // ----------------------------------------------------------------------------------------
 
+template <typename T>
+void py_zero_border_pixels (
+    numpy_image<T>& img,
+    long x_border_size,
+    long y_border_size
+)
+{
+    zero_border_pixels(img, x_border_size, y_border_size);
+}
+
+template <typename T>
+void py_zero_border_pixels2 (
+    numpy_image<T>& img,
+    const rectangle& inside
+)
+{
+    zero_border_pixels(img, inside);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_image_classes2(py::module& m)
 {
 
@@ -1350,6 +1371,65 @@ ensures \n\
               returned point is equal to max_point(m) + some small sub-pixel delta.
     !*/
         );
+
+    m.def("zero_border_pixels", &py_zero_border_pixels<uint8_t>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<uint16_t>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<uint32_t>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<uint64_t>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<int8_t>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<int16_t>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<int32_t>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<int64_t>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<float>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<double>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"));
+    m.def("zero_border_pixels", &py_zero_border_pixels<rgb_pixel>, py::arg("img"), py::arg("x_border_size"), py::arg("y_border_size"),
+"requires \n\
+    - x_border_size >= 0 \n\
+    - y_border_size >= 0 \n\
+ensures \n\
+    - The size and shape of img isn't changed by this function. \n\
+    - for all valid r such that r+y_border_size or r-y_border_size gives an invalid row \n\
+        - for all valid c such that c+x_border_size or c-x_border_size gives an invalid column  \n\
+            - assigns the pixel img[r][c] to 0.  \n\
+              (i.e. assigns 0 to every pixel in the border of img)" 
+    /*!
+        requires
+            - x_border_size >= 0
+            - y_border_size >= 0
+        ensures
+            - The size and shape of img isn't changed by this function.
+            - for all valid r such that r+y_border_size or r-y_border_size gives an invalid row
+                - for all valid c such that c+x_border_size or c-x_border_size gives an invalid column 
+                    - assigns the pixel img[r][c] to 0. 
+                      (i.e. assigns 0 to every pixel in the border of img)
+    !*/
+        );
+
+    m.def("zero_border_pixels", &py_zero_border_pixels2<uint8_t>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<uint16_t>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<uint32_t>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<uint64_t>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<int8_t>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<int16_t>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<int32_t>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<int64_t>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<float>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<double>, py::arg("img"), py::arg("inside"));
+    m.def("zero_border_pixels", &py_zero_border_pixels2<rgb_pixel>, py::arg("img"), py::arg("inside"),
+"ensures \n\
+    - The size and shape of img isn't changed by this function. \n\
+    - All the pixels in img that are not contained inside the inside rectangle \n\
+      given to this function are set to 0.  That is, anything not \"inside\" is on \n\
+      the border and set to 0." 
+    /*!
+        ensures
+            - The size and shape of img isn't changed by this function.
+            - All the pixels in img that are not contained inside the inside rectangle
+              given to this function are set to 0.  That is, anything not "inside" is on
+              the border and set to 0.
+    !*/
+        );
+
 }
 
 
