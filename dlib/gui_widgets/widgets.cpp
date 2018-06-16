@@ -6383,8 +6383,8 @@ namespace dlib
         // now draw all the overlay circles 
         for (unsigned long i = 0; i < overlay_circles.size(); ++i)
         {
-            const point center = zoom_in_scale*overlay_circles[i].center/zoom_out_scale + origin;
-            const int radius = zoom_in_scale*overlay_circles[i].radius/zoom_out_scale;
+            const dpoint center = (double)zoom_in_scale*(overlay_circles[i].center+dpoint(0.5,0.5))/zoom_out_scale + origin;
+            const double radius = zoom_in_scale*overlay_circles[i].radius/zoom_out_scale;
             draw_circle(c, 
                       center, 
                       radius, 
@@ -6392,7 +6392,7 @@ namespace dlib
 
             if (overlay_circles[i].label.size() != 0)
             {
-                const point temp = center + point(0,radius);
+                const point temp = center + dpoint(0,radius);
 
                 // make a rectangle that is at the spot we want to draw our string
                 rectangle r(temp,  c.br_corner());

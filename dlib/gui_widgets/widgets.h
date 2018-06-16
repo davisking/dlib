@@ -3350,15 +3350,15 @@ namespace dlib
             overlay_circle():radius(0) { assign_pixel(color, 0);}
 
             template <typename pixel_type>
-            overlay_circle(const point& center_, const int radius_, pixel_type p) 
+            overlay_circle(const point& center_, const double radius_, pixel_type p) 
                 : center(center_), radius(radius_) { assign_pixel(color, p); }
 
             template <typename pixel_type>
-            overlay_circle(const point& center_, const int radius_, pixel_type p, const std::string& l) 
+            overlay_circle(const point& center_, const double radius_, pixel_type p, const std::string& l) 
                 : center(center_), radius(radius_), label(l) { assign_pixel(color, p); }
 
             point center;
-            int radius;
+            double radius;
             rgb_alpha_pixel color;
             std::string label;
         };
