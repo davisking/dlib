@@ -197,9 +197,42 @@ void bind_shape_predictors(py::module &m)
                       "Controls how tight the feature sampling should be. Lower values enforce closer features.")
         .def_readwrite("num_test_splits", &type::num_test_splits,
                       "Number of split features at each node to sample. The one that gives the best split is chosen.")
+        .def_readwrite("landmark_relative_padding_mode", &type::landmark_relative_padding_mode,
+                      "If True then features are drawn only from the box around the landmarks, otherwise they come from the bounding box and landmarks together.  See feature_pool_region_padding doc for more details.")
         .def_readwrite("feature_pool_region_padding", &type::feature_pool_region_padding,
-                      "Size of region within which to sample features for the feature pool, \
-                      e.g a padding of 0.5 would cause the algorithm to sample pixels from a box that was 2x2 pixels")
+            /*!
+                  This algorithm works by comparing the relative intensity of pairs of
+                  pixels in the input image.  To decide which pixels to look at, the
+                  training algorithm randomly selects pixels from a box roughly centered
+                  around the object of interest.  We call this box the feature pool region
+                  box.  
+                  
+                  Each object of interest is defined by a full_object_detection, which
+                  contains a bounding box and a list of landmarks.  If
+                  landmark_relative_padding_mode==True then the feature pool region box is
+                  the tightest box that contains the landmarks inside the
+                  full_object_detection.  In this mode the full_object_detection's bounding
+                  box is ignored.  Otherwise, if the padding mode is bounding_box_relative
+                  then the feature pool region box is the tightest box that contains BOTH
+                  the landmarks and the full_object_detection's bounding box.
+
+                  Additionally, you can adjust the size of the feature pool padding region
+                  by setting feature_pool_region_padding to some value.  If
+                  feature_pool_region_padding then the feature pool region box is
+                  unmodified and defined exactly as stated above. However, you can expand
+                  the size of the box by setting the padding > 0 or shrink it by setting it
+                  to something < 0.
+
+                  To explain this precisely, for a padding of 0 we say that the pixels are
+                  sampled from a box of size 1x1.  The padding value is added to each side
+                  of the box.  So a padding of 0.5 would cause the algorithm to sample
+                  pixels from a box that was 2x2, effectively multiplying the area pixels
+                  are sampled from by 4.  Similarly, setting the padding to -0.2 would
+                  cause it to sample from a box 0.6x0.6 in size.
+            !*/
+                      "Size of region within which to sample features for the feature pool. \
+                      positive values increase the sampling region while negative values decrease it. E.g. padding of 0 means we \
+                      sample fr")
         .def_readwrite("random_seed", &type::random_seed,
                       "The random seed used by the internal random number generator")
         .def_readwrite("num_threads", &type::num_threads,

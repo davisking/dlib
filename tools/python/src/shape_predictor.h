@@ -32,6 +32,7 @@ namespace dlib
             feature_pool_region_padding = 0;
             random_seed = "";
             num_threads = 0;
+            landmark_relative_padding_mode = true;
         }
 
         bool be_verbose;
@@ -46,6 +47,7 @@ namespace dlib
         unsigned long num_test_splits;
         double feature_pool_region_padding;
         std::string random_seed;
+        bool landmark_relative_padding_mode;
 
         // not serialized
         unsigned long num_threads;
@@ -58,7 +60,7 @@ namespace dlib
     {
         try
         {
-            serialize("shape_predictor_training_options", out);
+            serialize("shape_predictor_training_options_v2", out);
             serialize(item.be_verbose,out);
             serialize(item.cascade_depth,out);
             serialize(item.tree_depth,out);
@@ -71,6 +73,7 @@ namespace dlib
             serialize(item.num_test_splits,out);
             serialize(item.feature_pool_region_padding,out);
             serialize(item.random_seed,out);
+            serialize(item.landmark_relative_padding_mode,out);
         }
         catch (serialization_error& e)
         {
@@ -85,7 +88,7 @@ namespace dlib
     {
         try
         {
-            check_serialized_version("shape_predictor_training_options", in);
+            check_serialized_version("shape_predictor_training_options_v2", in);
             deserialize(item.be_verbose,in);
             deserialize(item.cascade_depth,in);
             deserialize(item.tree_depth,in);
@@ -98,6 +101,7 @@ namespace dlib
             deserialize(item.num_test_splits,in);
             deserialize(item.feature_pool_region_padding,in);
             deserialize(item.random_seed,in);
+            deserialize(item.landmark_relative_padding_mode,in);
         }
         catch (serialization_error& e)
         {
@@ -122,6 +126,7 @@ namespace dlib
             << "feature_pool_region_padding=" << o.feature_pool_region_padding << ", "
             << "random_seed=" << o.random_seed << ", "
             << "num_threads=" << o.num_threads
+            << "landmark_relative_padding_mode=" << o.landmark_relative_padding_mode
         << ")";
         return sout.str();
     }
@@ -179,6 +184,10 @@ namespace dlib
         trainer.set_lambda(options.lambda_param);
         trainer.set_num_test_splits(options.num_test_splits);
         trainer.set_num_threads(options.num_threads);
+        if (options.landmark_relative_padding_mode)
+            trainer.set_padding_mode(shape_predictor_trainer::landmark_relative);
+        else
+            trainer.set_padding_mode(shape_predictor_trainer::bounding_box_relative);
 
         if (options.be_verbose)
         {
@@ -189,6 +198,7 @@ namespace dlib
             std::cout << "Training with random seed: " << options.random_seed << std::endl;
             std::cout << "Training with oversampling amount: " << options.oversampling_amount << std::endl;
             std::cout << "Training with oversampling translation jitter: " << options.oversampling_translation_jitter << std::endl;
+            std::cout << "Training with landmark_relative_padding_mode: " << options.landmark_relative_padding_mode << std::endl;
             std::cout << "Training with feature pool size: " << options.feature_pool_size << std::endl;
             std::cout << "Training with feature pool region padding: " << options.feature_pool_region_padding << std::endl;
             std::cout << "Training with " << options.num_threads << " threads." << std::endl;
