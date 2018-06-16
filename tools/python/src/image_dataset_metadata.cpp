@@ -137,6 +137,7 @@ void bind_image_dataset_metadata(py::module &m_)
     auto datasetrepr = [datasetstr](const dataset& item) { return "<"+datasetstr(item)+">"; };
     py::class_<dataset>(m, "dataset",
                     "This object represents a labeled set of images.  In particular, it contains the filename for each image as well as annotated boxes.")
+        .def(py::init())
         .def("__str__", datasetstr)
         .def("__repr__", datasetrepr)
         .def_readwrite("images", &dataset::images)
@@ -146,11 +147,29 @@ void bind_image_dataset_metadata(py::module &m_)
     auto imagestr  = [](const image& item) { return  "dlib.image_dataset_metadata.image: boxes:"+to_string(item.boxes.size())+ ", " + item.filename; };
     auto imagerepr = [imagestr](const image& item) { return "<"+imagestr(item)+">"; };
     py::class_<image>(m, "image", "This object represents an annotated image.")
+        .def(py::init())
         .def_readwrite("filename", &image::filename)
         .def("__str__", imagestr)
         .def("__repr__", imagerepr)
         .def_readwrite("boxes", &image::boxes);
 
+    auto imagesstr = [imagerepr](const std::vector<image>& images) 
+    { 
+        std::ostringstream sout; 
+        for (size_t i = 0; i < images.size(); ++i)
+        {
+            if (i == 0)
+                sout << "[" << imagerepr(images[i]) << ",\n";
+            else if (i+1 == images.size())
+                sout << " " << imagerepr(images[i]) << "]";
+            else
+                sout << " " << imagerepr(images[i]) << ",\n";
+        }
+        return sout.str();
+    };
+    py::bind_vector<std::vector<image>>(m, "images", "An array of dlib::image_dataset_metadata::image objects.")
+        .def("__str__", imagesstr)
+        .def("__repr__", imagesstr);
 
     auto partsstr = [](const std::map<std::string,point>& item) {
         std::ostringstream sout;
@@ -190,6 +209,7 @@ void bind_image_dataset_metadata(py::module &m_)
         "\n"
         "The main variable of interest is rect.  It gives the location of \n"
         "the box.  All the other variables are optional." ); pybox
+        .def(py::init())
         .def("__str__", boxstr)
         .def("__repr__", boxrepr)
         .def_readwrite("rect",            &box::rect)
@@ -204,6 +224,24 @@ void bind_image_dataset_metadata(py::module &m_)
         .def_readwrite("angle",           &box::angle)
         .def_readwrite("gender",          &box::gender)
         .def_readwrite("age",             &box::age);
+
+    auto boxesstr = [boxrepr](const std::vector<box>& boxes) 
+    { 
+        std::ostringstream sout; 
+        for (size_t i = 0; i < boxes.size(); ++i)
+        {
+            if (i == 0)
+                sout << "[" << boxrepr(boxes[i]) << ",\n";
+            else if (i+1 == boxes.size())
+                sout << " " << boxrepr(boxes[i]) << "]";
+            else
+                sout << " " << boxrepr(boxes[i]) << ",\n";
+        }
+        return sout.str();
+    };
+    py::bind_vector<std::vector<box>>(m, "boxes", "An array of dlib::image_dataset_metadata::box objects.")
+        .def("__str__", boxesstr)
+        .def("__repr__", boxesstr);
 
     py::enum_<gender_t>(pybox,"gender_type")
         .value("MALE", gender_t::MALE)
