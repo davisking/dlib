@@ -67,7 +67,18 @@ void add_overlay_parts (
     const rgb_pixel& color
 )
 {
-    win.add_overlay(render_face_detections(detection, color));
+    if (detection.num_parts() == 5 || detection.num_parts() == 68)
+    {
+        win.add_overlay(render_face_detections(detection, color));
+    }
+    else
+    {
+        std::vector<image_display::overlay_circle> tmp;
+        for (unsigned long i = 0; i < detection.num_parts(); ++i)
+            tmp.emplace_back(detection.part(i), 0.5, color, std::to_string(i));
+        win.add_overlay(tmp);
+        win.add_overlay(detection.get_rect());
+    }
 }
 
 void add_overlay_line (
@@ -87,7 +98,7 @@ void add_overlay_circle (
     const rgb_pixel& color
 )
 {
-    win.add_overlay(image_window::overlay_circle(c,std::round(radius),color));
+    win.add_overlay(image_window::overlay_circle(c,radius,color));
 }
 
 template <typename T>
