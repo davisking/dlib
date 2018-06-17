@@ -258,6 +258,28 @@ ensures \n\
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 
+    m.def("translate_rect", [](const rectangle& rect, const point& p){return translate_rect(rect,p);},
+" returns rectangle(rect.left()+p.x, rect.top()+p.y, rect.right()+p.x, rect.bottom()+p.y) \n\
+  (i.e. moves the location of the rectangle but doesn't change its shape)",
+        py::arg("rect"), py::arg("p"));
+
+    m.def("translate_rect", [](const drectangle& rect, const point& p){return translate_rect(rect,p);},
+" returns rectangle(rect.left()+p.x, rect.top()+p.y, rect.right()+p.x, rect.bottom()+p.y) \n\
+  (i.e. moves the location of the rectangle but doesn't change its shape)",
+        py::arg("rect"), py::arg("p"));
+
+    m.def("translate_rect", [](const rectangle& rect, const dpoint& p){return translate_rect(rect,point(p));},
+" returns rectangle(rect.left()+p.x, rect.top()+p.y, rect.right()+p.x, rect.bottom()+p.y) \n\
+  (i.e. moves the location of the rectangle but doesn't change its shape)",
+        py::arg("rect"), py::arg("p"));
+
+    m.def("translate_rect", [](const drectangle& rect, const dpoint& p){return translate_rect(rect,p);},
+" returns rectangle(rect.left()+p.x, rect.top()+p.y, rect.right()+p.x, rect.bottom()+p.y) \n\
+  (i.e. moves the location of the rectangle but doesn't change its shape)",
+        py::arg("rect"), py::arg("p"));
+
+
+
     m.def("shrink_rect", [](const rectangle& rect, long num){return shrink_rect(rect,num);},
 " returns rectangle(rect.left()+num, rect.top()+num, rect.right()-num, rect.bottom()-num) \n\
   (i.e. shrinks the given rectangle by shrinking its border by num)",
