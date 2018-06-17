@@ -125,7 +125,7 @@ namespace dlib
             << "num_test_splits=" << o.num_test_splits << ", "
             << "feature_pool_region_padding=" << o.feature_pool_region_padding << ", "
             << "random_seed=" << o.random_seed << ", "
-            << "num_threads=" << o.num_threads
+            << "num_threads=" << o.num_threads << ", "
             << "landmark_relative_padding_mode=" << o.landmark_relative_padding_mode
         << ")";
         return sout.str();
