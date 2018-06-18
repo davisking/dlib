@@ -123,6 +123,23 @@ inline void find_candidate_object_locations_py (
 
 // ----------------------------------------------------------------------------------------
 
+std::shared_ptr<simple_object_detector_py> merge_simple_object_detectors (
+    const py::list& detectors
+)
+{
+    DLIB_CASSERT(len(detectors) > 0);
+    std::vector<simple_object_detector> temp;
+    for (auto& d : detectors)
+        temp.push_back(d.cast<simple_object_detector_py>().detector);
+
+    simple_object_detector_py result;
+    result.detector = simple_object_detector(temp);
+    result.upsampling_amount = detectors[0].cast<simple_object_detector_py>().upsampling_amount;
+    return std::make_shared<simple_object_detector_py>(result);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_object_detection(py::module& m)
 {
     {
@@ -385,6 +402,20 @@ ensures \n\
     typedef simple_object_detector_py type;
     py::class_<type, std::shared_ptr<type>>(m, "simple_object_detector",
         "This object represents a sliding window histogram-of-oriented-gradients based object detector.")
+        .def(py::init(&merge_simple_object_detectors), py::arg("detectors"), 
+"This version of the constructor builds a simple_object_detector from a \n\
+bunch of other simple_object_detectors.  It essentially packs them together \n\
+so that when you run the detector it's like calling run_multiple().  Except \n\
+in this case the non-max suppression is applied to them all as a group.  So \n\
+unlike run_multiple(), each detector competes in the non-max suppression." 
+            /*!
+                This version of the constructor builds a simple_object_detector from a
+                bunch of other simple_object_detectors.  It essentially packs them together
+                so that when you run the detector it's like calling run_multiple().  Except
+                in this case the non-max suppression is applied to them all as a group.  So
+                unlike run_multiple(), each detector competes in the non-max suppression.
+            !*/
+            )
         .def(py::init(&load_object_from_file<type>),
 "Loads a simple_object_detector from a file that contains the output of the \n\
 train_simple_object_detector() routine.")
