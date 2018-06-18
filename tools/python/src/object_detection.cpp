@@ -409,6 +409,17 @@ ensures \n\
       a list of detections.")
         .def("save", save_simple_object_detector_py, py::arg("detector_output_filename"), "Save a simple_object_detector to the provided path.")
         .def_readwrite("upsampling_amount", &type::upsampling_amount, "The detector upsamples the image this many times before running.")
+        .def_static("run_multiple", run_multiple_rect_detectors, py::arg("detectors"),  py::arg("image"), py::arg("upsample_num_times")=0, py::arg("adjust_threshold")=0.0,
+"requires \n\
+    - detectors is a list of detectors. \n\
+    - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
+      image. \n\
+    - upsample_num_times >= 0 \n\
+ensures \n\
+    - This function runs the list of object detectors at once on the input image and returns \n\
+      a tuple of (list of detections, list of scores, list of weight_indices).   \n\
+    - Upsamples the image upsample_num_times before running the basic \n\
+      detector.")
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
 

@@ -232,37 +232,6 @@ namespace dlib
                               vector_to_python_list(weight_indices));
     }
 
-    inline py::tuple run_multiple_rect_detectors (
-        py::list& detectors,
-        py::array img,
-        const unsigned int upsampling_amount,
-        const double adjust_threshold)
-    {
-        py::tuple t;
-
-        std::vector<simple_object_detector > vector_detectors;
-        const unsigned long num_detectors = len(detectors);
-        // Now copy the data into dlib based objects.
-        for (unsigned long i = 0; i < num_detectors; ++i)
-        {
-            vector_detectors.push_back(detectors[i].cast<simple_object_detector >());
-        }
-
-        std::vector<double> detection_confidences;
-        std::vector<unsigned long> weight_indices;
-        std::vector<rectangle> rectangles;
-
-        rectangles = run_detectors_with_upscale1(vector_detectors, img, upsampling_amount,
-                                                adjust_threshold,
-                                                detection_confidences, weight_indices);
-
-        return py::make_tuple(rectangles,
-                              vector_to_python_list(detection_confidences),
-                              vector_to_python_list(weight_indices));
-    }
-
-
-
     struct simple_object_detector_py
     {
         simple_object_detector detector;
@@ -285,6 +254,44 @@ namespace dlib
 
 
     };
+
+    inline py::tuple run_multiple_rect_detectors (
+        py::list& detectors,
+        py::array img,
+        const unsigned int upsampling_amount,
+        const double adjust_threshold)
+    {
+        py::tuple t;
+
+        std::vector<simple_object_detector> vector_detectors;
+        const unsigned long num_detectors = len(detectors);
+        // Now copy the data into dlib based objects.
+        for (unsigned long i = 0; i < num_detectors; ++i)
+        {
+            try
+            {
+                vector_detectors.push_back(detectors[i].cast<simple_object_detector>());
+            } catch(py::cast_error&)
+            {
+                vector_detectors.push_back(detectors[i].cast<simple_object_detector_py>().detector);
+            }
+        }
+
+        std::vector<double> detection_confidences;
+        std::vector<unsigned long> weight_indices;
+        std::vector<rectangle> rectangles;
+
+        rectangles = run_detectors_with_upscale1(vector_detectors, img, upsampling_amount,
+                                                adjust_threshold,
+                                                detection_confidences, weight_indices);
+
+        return py::make_tuple(rectangles,
+                              vector_to_python_list(detection_confidences),
+                              vector_to_python_list(weight_indices));
+    }
+
+
+
 }
 
 #endif // DLIB_SIMPLE_OBJECT_DETECTOR_PY_H__
