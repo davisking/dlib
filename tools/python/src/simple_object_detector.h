@@ -36,7 +36,7 @@ namespace dlib
             epsilon = 0.01;
             upsample_limit = 2;
             nuclear_norm_regularization_strength = 0;
-            max_runtime_seconds = 86400*365*100; // 100 years
+            max_runtime_seconds = 86400.0*365.0*100.0; // 100 years
         }
 
         bool be_verbose;
