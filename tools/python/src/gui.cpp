@@ -90,6 +90,23 @@ void add_overlay_line (
     win.add_overlay(l,color);
 }
 
+void add_overlay_pylist (
+    image_window& win,
+    const py::list& objs,
+    const rgb_pixel& color
+)
+{
+    std::vector<rectangle> rects;
+    for (auto& obj : objs)
+    {
+        try { rects.push_back(obj.cast<rectangle>()); continue; } catch(py::cast_error&) { }
+        try { rects.push_back(obj.cast<drectangle>()); continue; } catch(py::cast_error&) { }
+        try { win.add_overlay(obj.cast<line>(), color); continue; } catch(py::cast_error&) { }
+        add_overlay_parts(win, obj.cast<full_object_detection>(), color); 
+    }
+    win.add_overlay(rects, color);
+}
+
 template <typename point_type>
 void add_overlay_circle (
     image_window& win,
@@ -221,6 +238,8 @@ void bind_gui(py::module& m)
             "Add circle to the image window.")
         .def("add_overlay_circle", add_overlay_circle<dpoint>, py::arg("center"), py::arg("radius"), py::arg("color")=rgb_pixel(255, 0, 0),
             "Add circle to the image window.")
+        .def("add_overlay", add_overlay_pylist, py::arg("objects"), py::arg("color")=rgb_pixel(255,0,0),
+            "Adds all the overlayable objects, uses the given color.")
         .def("wait_until_closed", &type::wait_until_closed,
             "This function blocks until the window is closed.");
     }
