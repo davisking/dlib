@@ -177,6 +177,8 @@ process take significantly longer, so be patient when using it."
             process take significantly longer, so be patient when using it.
             !*/
                                                )
+        .def_readwrite("max_runtime_seconds", &type::max_runtime_seconds,
+            "Don't let the solver run for longer than this many seconds.")
         .def_readwrite("C", &type::C,
 "C is the usual SVM C regularization parameter.  So it is passed to \n\
 structural_object_detection_trainer::set_c().  Larger values of C \n\
@@ -407,13 +409,23 @@ ensures \n\
 bunch of other simple_object_detectors.  It essentially packs them together \n\
 so that when you run the detector it's like calling run_multiple().  Except \n\
 in this case the non-max suppression is applied to them all as a group.  So \n\
-unlike run_multiple(), each detector competes in the non-max suppression." 
+unlike run_multiple(), each detector competes in the non-max suppression. \n\
+ \n\
+Also, the non-max suppression settings used for this whole thing are \n\
+the settings used by detectors[0].  So if you have a preference,  \n\
+put the detector that uses the type of non-max suppression you like first \n\
+in the list." 
             /*!
                 This version of the constructor builds a simple_object_detector from a
                 bunch of other simple_object_detectors.  It essentially packs them together
                 so that when you run the detector it's like calling run_multiple().  Except
                 in this case the non-max suppression is applied to them all as a group.  So
                 unlike run_multiple(), each detector competes in the non-max suppression.
+
+                Also, the non-max suppression settings used for this whole thing are
+                the settings used by detectors[0].  So if you have a preference, 
+                put the detector that uses the type of non-max suppression you like first
+                in the list.
             !*/
             )
         .def(py::init(&load_object_from_file<type>),

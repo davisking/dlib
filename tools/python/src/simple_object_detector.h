@@ -36,6 +36,7 @@ namespace dlib
             epsilon = 0.01;
             upsample_limit = 2;
             nuclear_norm_regularization_strength = 0;
+            max_runtime_seconds = 86400*365*100; // 100 years
         }
 
         bool be_verbose;
@@ -46,7 +47,7 @@ namespace dlib
         double epsilon;
         unsigned long upsample_limit;
         double nuclear_norm_regularization_strength;
-
+        double max_runtime_seconds;
     };
 
     inline std::string print_simple_object_detector_training_options(const simple_object_detector_training_options& o)
@@ -59,6 +60,7 @@ namespace dlib
             << "detection_window_size=" << o.detection_window_size << ", "
             << "C=" << o.C << ", "
             << "epsilon=" << o.epsilon << ", "
+            << "max_runtime_seconds=" << o.max_runtime_seconds << ", "
             << "upsample_limit=" << o.upsample_limit << ", "
             << "nuclear_norm_regularization_strength=" << o.nuclear_norm_regularization_strength 
             << ")";
@@ -162,6 +164,8 @@ namespace dlib
             throw error("Invalid C value given to train_simple_object_detector(), C must be > 0.");
         if (options.epsilon <= 0)
             throw error("Invalid epsilon value given to train_simple_object_detector(), epsilon must be > 0.");
+        if (options.max_runtime_seconds <= 0)
+            throw error("Invalid max_runtime_seconds value given to train_simple_object_detector(), max_runtime_seconds must be > 0.");
 
         if (options.nuclear_norm_regularization_strength < 0)
             throw error("Invalid nuclear_norm_regularization_strength value given to train_simple_object_detector(), it must be must be >= 0.");
@@ -184,6 +188,7 @@ namespace dlib
         trainer.set_num_threads(options.num_threads);  
         trainer.set_c(options.C);
         trainer.set_epsilon(options.epsilon);
+        trainer.set_max_runtime(std::chrono::milliseconds((int64_t)std::round(options.max_runtime_seconds*1000)));
         if (options.be_verbose)
         {
             std::cout << "Training with C: " << options.C << std::endl;
