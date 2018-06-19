@@ -7,6 +7,7 @@
 #include "../image_processing/object_detector_abstract.h"
 #include "../image_processing/box_overlap_testing_abstract.h"
 #include "../image_processing/full_object_detection_abstract.h"
+#include <chrono>
 
 
 namespace dlib
@@ -63,6 +64,8 @@ namespace dlib
                   (note that only the "configuration" of scanner is copied.
                   I.e. the copy is done using copy_configuration())
                 - #auto_set_overlap_tester() == true
+                - #get_max_runtime() == std::chrono::hours(24*356*290)
+                  (i.e. 290 years, so basically forever)
         !*/
 
         const image_scanner_type& get_scanner (
@@ -142,6 +145,22 @@ namespace dlib
                   to train.  You can think of this epsilon value as saying "solve the 
                   optimization problem until the average loss per sample is within epsilon 
                   of its optimal value".
+        !*/
+
+        void set_max_runtime (
+            const std::chrono::nanoseconds& max_runtime
+        ); 
+        /*!
+            ensures
+                - #get_max_runtime() == max_runtime
+        !*/
+
+        std::chrono::nanoseconds get_max_runtime (
+        ) const;
+        /*!
+            ensures
+                - returns the maximum amount of time we will let .train() run before 
+                  making it terminate.
         !*/
 
         void set_max_cache_size (
