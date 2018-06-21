@@ -390,7 +390,7 @@ ensures \n\
               voted for any of the lines HP[i] in Hough space.  Note, however, \n\
               that if angle_window_size or radius_window_size are made so large \n\
               that HP[i] overlaps HP[j] for i!=j then the overlapping regions \n\
-              of Hough space are assign to HP[i] or HP[j] arbitrarily. \n\
+              of Hough space are assigned to HP[i] or HP[j] arbitrarily. \n\
               Therefore, all points in CONSTITUENT_POINTS are unique, that is, \n\
               there is no overlap in points between any two elements of \n\
               CONSTITUENT_POINTS." )
@@ -430,7 +430,7 @@ ensures \n\
                       voted for any of the lines HP[i] in Hough space.  Note, however,
                       that if angle_window_size or radius_window_size are made so large
                       that HP[i] overlaps HP[j] for i!=j then the overlapping regions
-                      of Hough space are assign to HP[i] or HP[j] arbitrarily.
+                      of Hough space are assigned to HP[i] or HP[j] arbitrarily.
                       Therefore, all points in CONSTITUENT_POINTS are unique, that is,
                       there is no overlap in points between any two elements of
                       CONSTITUENT_POINTS.
