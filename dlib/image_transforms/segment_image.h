@@ -595,22 +595,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename alloc>
+    template <typename T, typename alloc>
     void remove_duplicates (
-        std::vector<rectangle,alloc>& rects
+        std::vector<T,alloc>& items
     )
     {
-        std::sort(rects.begin(), rects.end(), std::less<rectangle>());
+        std::sort(items.begin(), items.end(), std::less<T>());
         unsigned long num_unique = 1;
-        for (unsigned long i = 1; i < rects.size(); ++i)
+        for (unsigned long i = 1; i < items.size(); ++i)
         {
-            if (rects[i] != rects[i-1])
+            if (items[i] != items[i-1])
             {
-                rects[num_unique++] = rects[i];
+                items[num_unique++] = items[i];
             }
         }
-        if (rects.size() != 0)
-            rects.resize(num_unique);
+        if (items.size() != 0)
+            items.resize(num_unique);
     }
 
 // ----------------------------------------------------------------------------------------

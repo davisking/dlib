@@ -105,16 +105,20 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        template T,
         typename alloc
         >
     void remove_duplicates (
-        std::vector<rectangle,alloc>& rects
+        std::vector<T,alloc>& items 
     );
     /*!
+        requires
+            - T is comparable via operator != and std::less.
         ensures
-            - This function finds any duplicate rectangles in rects and removes the extra
-              instances.  This way, the result is that rects contains only unique rectangle
-              instances.
+            - This function finds any duplicate objects in items and removes the extra
+              instances.  This way, the result is that items contains only unique
+              instances.  It does this by sorting items and removing neighboring elements
+              unless they compare != according to operator !=.
     !*/
 
 // ----------------------------------------------------------------------------------------
