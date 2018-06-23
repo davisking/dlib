@@ -2489,8 +2489,8 @@ namespace dlib
                     its two end points (p1 and p2) as well as a color.
             !*/
 
-            point p1;
-            point p2;
+            dpoint p1;
+            dpoint p2;
             rgb_alpha_pixel color;
 
             overlay_line(
@@ -2504,8 +2504,8 @@ namespace dlib
 
             template <typename pixel_type>
             overlay_line(
-                const point& p1_,
-                const point& p2_,
+                const dpoint& p1_,
+                const dpoint& p2_,
                 pixel_type p
             ); 
             /*!

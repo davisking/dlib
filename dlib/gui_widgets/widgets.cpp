@@ -6375,8 +6375,8 @@ namespace dlib
         for (unsigned long i = 0; i < overlay_lines.size(); ++i)
         {
             draw_line(c, 
-                      zoom_in_scale*overlay_lines[i].p1/zoom_out_scale + origin, 
-                      zoom_in_scale*overlay_lines[i].p2/zoom_out_scale + origin, 
+                      zoom_in_scale*(overlay_lines[i].p1+dpoint(0.5,0.5))/zoom_out_scale + origin, 
+                      zoom_in_scale*(overlay_lines[i].p2+dpoint(0.5,0.5))/zoom_out_scale + origin, 
                       overlay_lines[i].color, area);
         }
 

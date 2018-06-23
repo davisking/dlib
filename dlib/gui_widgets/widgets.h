@@ -3337,11 +3337,11 @@ namespace dlib
             overlay_line() { assign_pixel(color, 0);}
 
             template <typename pixel_type>
-            overlay_line(const point& p1_, const point& p2_, pixel_type p) 
+            overlay_line(const dpoint& p1_, const dpoint& p2_, pixel_type p) 
                 : p1(p1_), p2(p2_) { assign_pixel(color, p); }
 
-            point p1;
-            point p2;
+            dpoint p1;
+            dpoint p2;
             rgb_alpha_pixel color;
         };
 
