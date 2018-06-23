@@ -873,11 +873,11 @@ namespace
 
 
         DLIB_TEST(count_points_between_lines(l1,l2,reference_point,pts) == 3);
-        DLIB_TEST(count_points_on_side_of_line(l1,reference_point,pts,10) == 4);
+        DLIB_TEST(count_points_on_side_of_line(l1,reference_point,pts) == 4);
 
         reference_point = dpoint(0,0.5);
         DLIB_TEST(count_points_between_lines(l1,l2,reference_point,pts) == 0);
-        DLIB_TEST(count_points_on_side_of_line(l1,reference_point,pts,10) == 1);
+        DLIB_TEST(count_points_on_side_of_line(l1,reference_point,pts) == 1);
 
 
     }
