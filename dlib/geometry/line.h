@@ -134,7 +134,8 @@ namespace dlib
         line l,
         const dpoint& reference_point,
         const std::vector<vector<T,2>>& pts,
-        const double& dist_thresh
+        const double& dist_thresh_min = 0,
+        const double& dist_thresh_max = std::numeric_limits<double>::infinity()
     )
     {
         if (signed_distance_to_line(l,reference_point) < 0)
@@ -144,7 +145,7 @@ namespace dlib
         for (auto& p : pts)
         {
             double dist = signed_distance_to_line(l,p);
-            if (0 <= dist && dist <= dist_thresh)
+            if (dist_thresh_min <= dist && dist <= dist_thresh_max)
                 ++cnt;
         }
         return cnt;

@@ -176,12 +176,18 @@ namespace dlib
         const line& l,
         const dpoint& reference_point,
         const std::vector<vector<T,2>>& pts,
-        const double& dist_thresh
+        const double& dist_thresh_min = 0,
+        const double& dist_thresh_max = std::numeric_limits<double>::infinity()
     );
     /*!
         ensures
-            - Returns a count of how many points in pts are on the same side of l as
-              reference_point, but also no more than dist_thresh distance from the line.
+            - Returns a count of how many points in pts have a distance from the line l
+              that is in the range [dist_thresh_min, dist_thresh_max].  This distance is a
+              signed value that indicates how far a point is from the line. Moreover, if
+              the point is on the same side as reference_point then the distance is
+              positive, otherwise it is negative.  So for example, If this range is [0,
+              infinity] then this function counts how many points are on the same side of l
+              as reference_point.
     !*/
 
 // ----------------------------------------------------------------------------------------
