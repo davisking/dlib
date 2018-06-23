@@ -444,12 +444,13 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline const point nearest_point (
+    template <typename T>
+    inline const dlib::vector<T,2> nearest_point (
         const rectangle& rect,
-        const point& p
+        const dlib::vector<T,2>& p
     )
     {
-        point temp(p);
+        dlib::vector<T,2> temp(p);
         if (temp.x() < rect.left())
             temp.x() = rect.left();
         else if (temp.x() > rect.right())
@@ -495,10 +496,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
     inline void clip_line_to_rectangle (
         const rectangle& box,
-        point& p1,
-        point& p2
+        dlib::vector<T,2>& p1,
+        dlib::vector<T,2>& p2
     )
     {
         // Now clip the line segment so it is contained inside box.
@@ -525,16 +527,16 @@ namespace dlib
             //box.left()  == alpha1*(p1.x()-p2.x()) + p2.x();
             //box.right() == alpha2*(p1.x()-p2.x()) + p2.x();
 
-            const point d = p1-p2;
+            const dlib::vector<T,2> d = p1-p2;
             double alpha1 = (box.left()  -p2.x())/(double)d.x();
             double alpha2 = (box.right() -p2.x())/(double)d.x();
             double alpha3 = (box.top()   -p2.y())/(double)d.y();
             double alpha4 = (box.bottom()-p2.y())/(double)d.y();
 
-            const point c1 = alpha1*d + p2;
-            const point c2 = alpha2*d + p2;
-            const point c3 = alpha3*d + p2;
-            const point c4 = alpha4*d + p2;
+            const dlib::vector<T,2> c1 = alpha1*d + p2;
+            const dlib::vector<T,2> c2 = alpha2*d + p2;
+            const dlib::vector<T,2> c3 = alpha3*d + p2;
+            const dlib::vector<T,2> c4 = alpha4*d + p2;
 
             if (!box.contains(p1))
                 p1 = c1;

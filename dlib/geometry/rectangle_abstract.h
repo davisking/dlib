@@ -723,9 +723,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    inline const point nearest_point (
+    template <typename T>
+    inline const dlib::vector<T,2> nearest_point (
         const rectangle& rect,
-        const point& p
+        const dlib::vector<T,2>& p
     );
     /*!
         ensures
@@ -764,10 +765,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
     void clip_line_to_rectangle (
         const rectangle& box,
-        point& p1,
-        point& p2
+        dlib::vector<T,2>& p1,
+        dlib::vector<T,2>& p2
     );
     /*!
         ensures
