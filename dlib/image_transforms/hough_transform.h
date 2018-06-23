@@ -365,7 +365,11 @@ namespace dlib
             {
                 auto idx = hmap(hough_point.y(), hough_point.x());
                 if (idx < constituent_points.size())
-                    constituent_points[idx].push_back(img_point);
+                {
+                    // don't add img_point if it's already in the list.
+                    if (constituent_points[idx].size() == 0 || constituent_points[idx].back() != img_point)
+                        constituent_points[idx].push_back(img_point);
+                }
             };
 
             perform_generic_hough_transform(img, box, record_hit);

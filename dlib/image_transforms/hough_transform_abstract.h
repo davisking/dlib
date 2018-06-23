@@ -240,9 +240,9 @@ namespace dlib
                           that if angle_window_size or radius_window_size are made so large
                           that HP[i] overlaps HP[j] for i!=j then the overlapping regions
                           of Hough space are assigned to HP[i] or HP[j] arbitrarily.
-                          Therefore, all points in CONSTITUENT_POINTS are unique, that is,
-                          there is no overlap in points between any two elements of
-                          CONSTITUENT_POINTS.
+                          That is, we treat HP[i] and HP[j] as disjoint even if their boxes
+                          overlap.  In this case, the overlapping region is assigned to
+                          either HP[i] or HP[j] in an arbitrary manner.
         !*/
 
         template <
