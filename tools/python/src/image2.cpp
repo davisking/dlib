@@ -391,9 +391,9 @@ ensures \n\
               that if angle_window_size or radius_window_size are made so large \n\
               that HP[i] overlaps HP[j] for i!=j then the overlapping regions \n\
               of Hough space are assigned to HP[i] or HP[j] arbitrarily. \n\
-              Therefore, all points in CONSTITUENT_POINTS are unique, that is, \n\
-              there is no overlap in points between any two elements of \n\
-              CONSTITUENT_POINTS." )
+              That is, we treat HP[i] and HP[j] as disjoint even if their boxes \n\
+              overlap.  In this case, the overlapping region is assigned to \n\
+              either HP[i] or HP[j] in an arbitrary manner." )
     /*!
         requires
             - box.width() == size
@@ -431,9 +431,9 @@ ensures \n\
                       that if angle_window_size or radius_window_size are made so large
                       that HP[i] overlaps HP[j] for i!=j then the overlapping regions
                       of Hough space are assigned to HP[i] or HP[j] arbitrarily.
-                      Therefore, all points in CONSTITUENT_POINTS are unique, that is,
-                      there is no overlap in points between any two elements of
-                      CONSTITUENT_POINTS.
+                      That is, we treat HP[i] and HP[j] as disjoint even if their boxes
+                      overlap.  In this case, the overlapping region is assigned to
+                      either HP[i] or HP[j] in an arbitrary manner.
     !*/
         .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<uint8_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
         .def("find_pixels_voting_for_lines", &ht_find_pixels_voting_for_lines2<uint16_t>, py::arg("img"), py::arg("hough_points"), py::arg("angle_window_size")=1, py::arg("radius_window_size")=1)
