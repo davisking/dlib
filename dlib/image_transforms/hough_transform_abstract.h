@@ -65,8 +65,8 @@ namespace dlib
                 - returns size()
         !*/
 
-        std::pair<point, point> get_line (
-            const point& p
+        std::pair<dpoint, dpoint> get_line (
+            const dpoint& p
         ) const;
         /*!
             requires
@@ -79,7 +79,7 @@ namespace dlib
         !*/
 
         double get_line_angle_in_degrees (
-            const point& p 
+            const dpoint& p 
         ) const;
         /*!
             requires
@@ -91,7 +91,7 @@ namespace dlib
         !*/
 
         void get_line_properties (
-            const point& p,
+            const dpoint& p,
             double& angle_in_degrees,
             double& radius
         ) const;
@@ -107,6 +107,10 @@ namespace dlib
                 - #radius == the distance from the center of the input image, measured in
                   pixels, and the line corresponding to the Hough transform point p.
                   Moreover: -sqrt(size()*size()/2) <= #radius <= sqrt(size()*size()/2)
+                - Note that the line properties are calculated to sub-pixel accuracy.  That
+                  is, p doesn't have to contain integer values, it can reference locations
+                  between pixels and the appropriate calculation will be done to find the
+                  corresponding line.
         !*/
 
         template <
