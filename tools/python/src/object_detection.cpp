@@ -376,6 +376,9 @@ ensures \n\
       a list of detections.   \n\
     - Upsamples the image upsample_num_times before running the basic \n\
       detector.")
+       .def_property_readonly("detection_window_height", [](const type& item){return item.get_scanner().get_detection_window_height();})
+       .def_property_readonly("detection_window_width", [](const type& item){return item.get_scanner().get_detection_window_width();})
+        .def_property_readonly("num_detectors", [](const type& item){return item.num_detectors();})
        .def("run", run_rect_detector, py::arg("image"), py::arg("upsample_num_times")=0, py::arg("adjust_threshold")=0.0,
 "requires \n\
     - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
@@ -443,6 +446,9 @@ ensures \n\
       detector.  If you don't know how many times you want to upsample then \n\
       don't provide a value for upsample_num_times and an appropriate \n\
       default will be used.")
+        .def_property_readonly("detection_window_height", [](const type& item){return item.detector.get_scanner().get_detection_window_height();})
+        .def_property_readonly("detection_window_width", [](const type& item){return item.detector.get_scanner().get_detection_window_width();})
+        .def_property_readonly("num_detectors", [](const type& item){return item.detector.num_detectors();})
         .def("__call__", &type::run_detector2, py::arg("image"),
 "requires \n\
     - image is a numpy ndarray containing either an 8bit grayscale or RGB \n\
