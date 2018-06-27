@@ -405,8 +405,9 @@ if (NOT TARGET dlib)
          # try to find libpng 
          find_package(PNG QUIET)
          # Make sure there isn't something wrong with the version of LIBPNG
-         # installed on this system.  
-         if (PNG_FOUND)
+         # installed on this system.  Also never link to anything from anaconda
+         # since it's probably broken.
+         if (PNG_FOUND AND NOT ("${PNG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)"))
             set(CMAKE_REQUIRED_LIBRARIES ${PNG_LIBRARIES})
             CHECK_FUNCTION_EXISTS(png_create_read_struct LIBPNG_IS_GOOD)
          endif()
