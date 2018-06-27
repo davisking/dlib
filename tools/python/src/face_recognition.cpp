@@ -114,8 +114,7 @@ public:
             {
                 for (int j = 0; j < batch_faces[i].size(); ++j)
                 {
-                    auto& r = matrix_cast<double>(mean(mat(net(
-                                    jitter_image(*fimg++, num_jitters), 16))));
+                    auto& r = mean(mat(net(jitter_image(*fimg++, num_jitters), 16)));
                     face_descriptors[i].push_back(matrix_cast<double>(r));
                 }
             }
