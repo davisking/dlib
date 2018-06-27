@@ -250,6 +250,15 @@ void save_face_chip (
 void bind_face_recognition(py::module &m)
 {
     {
+    typedef std::vector<full_object_detection> type;
+    py::bind_vector<type>(m, "full_object_detections", "An array of full_object_detection objects.")
+        .def("clear", &type::clear)
+        .def("resize", resize<type>)
+        .def("extend", extend_vector_with_python_list<full_object_detection>)
+        .def(py::pickle(&getstate<type>, &setstate<type>));
+    }
+
+    {
     py::class_<face_recognition_model_v1>(m, "face_recognition_model_v1", "This object maps human faces into 128D vectors where pictures of the same person are mapped near to each other and pictures of different people are mapped far apart.  The constructor loads the face recognition model from a file. The model file is available here: http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2")
         .def(py::init<std::string>())
         .def("compute_face_descriptor", &face_recognition_model_v1::compute_face_descriptor, py::arg("img"),py::arg("face"),py::arg("num_jitters")=0,
@@ -278,13 +287,5 @@ void bind_face_recognition(py::module &m)
     m.def("chinese_whispers_clustering", &chinese_whispers_clustering, py::arg("descriptors"), py::arg("threshold"),
         "Takes a list of descriptors and returns a list that contains a label for each descriptor. Clustering is done using dlib::chinese_whispers."
         );
-    {
-    typedef std::vector<full_object_detection> type;
-    py::bind_vector<type>(m, "full_object_detections", "An array of full_object_detection objects.")
-        .def("clear", &type::clear)
-        .def("resize", resize<type>)
-        .def("extend", extend_vector_with_python_list<full_object_detection>)
-        .def(py::pickle(&getstate<type>, &setstate<type>));
-    }
 }
 
