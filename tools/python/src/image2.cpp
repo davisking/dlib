@@ -80,13 +80,13 @@ point ht_get_best_hough_point (
     const numpy_image<float>& himg
 ) 
 { 
-    DLIB_ASSERT(himg.nr() == size() && himg.nc() == ht.size() &&
+    DLIB_CASSERT(num_rows(himg) == ht.size() && num_columns(himg) == ht.size() &&
         get_rect(ht).contains(p) == true,
         "\t point hough_transform::get_best_hough_point()"
         << "\n\t Invalid arguments given to this function."
-        << "\n\t himg.nr(): " << himg.nr()
-        << "\n\t himg.nc(): " << himg.nc()
-        << "\n\t size():    " << size()
+        << "\n\t num_rows(himg): " << num_rows(himg)
+        << "\n\t num_columns(himg): " << num_columns(himg)
+        << "\n\t size():    " << ht.size()
         << "\n\t p:         " << p 
     );
     return ht.get_best_hough_point(p,himg); 
