@@ -600,6 +600,12 @@ if (NOT TARGET dlib)
                # Grab all the -D flags from CMAKE_CXX_FLAGS so we can pass them
                # to nvcc.
                string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC "${CMAKE_CXX_FLAGS}")
+
+               # Check if we are being built as part of a pybind11 module. 
+               if (COMMAND pybind11_add_module)
+                  # Don't export unnecessary symbols.
+                  list(APPEND FLAGS_FOR_NVCC "-Xcompiler=-fvisibility=hidden")
+               endif()
             endif()
 
 
@@ -884,6 +890,7 @@ endif()
 if (COMMAND pybind11_add_module)
    # Don't export unnecessary symbols.
    set_target_properties(dlib PROPERTIES CXX_VISIBILITY_PRESET "hidden")
+   set_target_properties(dlib PROPERTIES CUDA_VISIBILITY_PRESET "hidden")
 endif()
 
 add_library(dlib::dlib ALIAS dlib)
