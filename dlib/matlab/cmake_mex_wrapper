@@ -70,7 +70,14 @@ INCLUDE(InstallRequiredSystemLibraries)
 
 
 MACRO(add_mex_function name )
-    ADD_LIBRARY(${name} MODULE ${name}.cpp )
+    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.C")
+        ADD_LIBRARY(${name} MODULE ${name}.C)
+    elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.c")
+        ADD_LIBRARY(${name} MODULE ${name}.c)
+    else()
+        ADD_LIBRARY(${name} MODULE ${name}.cpp )
+    endif()
+
     target_compile_definitions(${name} PRIVATE -DMEX_FILENAME=${name})
     if (UNIX)
         # Doing this prevents our mex function from exporting any symbols
