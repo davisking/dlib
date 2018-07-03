@@ -217,11 +217,11 @@ namespace dlib
             dpoint tr = r.tr_corner();
             dpoint bl = r.bl_corner();
             dpoint br = r.br_corner();
-            // The new rectangle wouold ideally have this area if we could actually rotrate
+            // The new rectangle would ideally have this area if we could actually rotate
             // the box.
             double new_area = length(tform(tl)-tform(tr))*length(tform(tl)-tform(bl));
 
-            // But if we rotate the coners of the rectangle and then find the rectangle
+            // But if we rotate the corners of the rectangle and then find the rectangle
             // that contains them we get this, which might have a much larger area than we
             // want.
             drectangle temp;
