@@ -342,25 +342,13 @@ void rotate_dataset(const command_line_parser& parser)
             save_png(temp, filename);
         }
 
+        rectangle_transform rtran = tran;
         for (unsigned long j = 0; j < metadata.images[i].boxes.size(); ++j)
         {
-            const rectangle rect = metadata.images[i].boxes[j].rect;
-            rectangle newrect;
-            newrect += tran(rect.tl_corner());
-            newrect += tran(rect.tr_corner());
-            newrect += tran(rect.bl_corner());
-            newrect += tran(rect.br_corner());
-            // now make newrect have the same area as the starting rect.
-            double ratio = std::sqrt(rect.area()/(double)newrect.area());
-            newrect = centered_rect(newrect, newrect.width()*ratio, newrect.height()*ratio);
-            metadata.images[i].boxes[j].rect = newrect;
+            metadata.images[i].boxes[j].rect = rtran(metadata.images[i].boxes[j].rect);
 
-            // rotate all the object parts
-            std::map<std::string,point>::iterator k;
-            for (k = metadata.images[i].boxes[j].parts.begin(); k != metadata.images[i].boxes[j].parts.end(); ++k)
-            {
-                k->second = tran(k->second); 
-            }
+            for (auto& p : metadata.images[i].boxes[j].parts)
+                p.second = tran(p.second);
         }
 
         metadata.images[i].filename = filename;
