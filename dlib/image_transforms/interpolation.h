@@ -1156,15 +1156,15 @@ namespace dlib
         }
 
         inline rectangle tform_object (
-            const point_transform_affine& tran,
+            const rectangle_transform& tran,
             const rectangle& rect
         )
         {
-            return centered_rect(tran(center(rect)), rect.width(), rect.height());
+            return tran(rect);
         }
 
         inline mmod_rect tform_object (
-            const point_transform_affine& tran,
+            const rectangle_transform& tran,
             mmod_rect rect
         )
         {
@@ -1468,12 +1468,12 @@ namespace dlib
         typename image_array_type::value_type temp;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            const point_transform_affine tran = rotate_image(images[i], temp, angle);
+            const rectangle_transform tran = rotate_image(images[i], temp, angle);
             swap(temp, images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
                 const rectangle rect = objects[i][j];
-                objects[i][j] = centered_rect(tran(center(rect)), rect.width(), rect.height());
+                objects[i][j] = tran(rect);
             }
         }
     }
@@ -1499,17 +1499,17 @@ namespace dlib
         typename image_array_type::value_type temp;
         for (unsigned long i = 0; i < images.size(); ++i)
         {
-            const point_transform_affine tran = rotate_image(images[i], temp, angle);
+            const rectangle_transform tran = rotate_image(images[i], temp, angle);
             swap(temp, images[i]);
             for (unsigned long j = 0; j < objects[i].size(); ++j)
             {
                 const rectangle rect = objects[i][j];
-                objects[i][j] = centered_rect(tran(center(rect)), rect.width(), rect.height());
+                objects[i][j] = tran(rect);
             }
             for (unsigned long j = 0; j < objects2[i].size(); ++j)
             {
                 const rectangle rect = objects2[i][j];
-                objects2[i][j] = centered_rect(tran(center(rect)), rect.width(), rect.height());
+                objects2[i][j] = tran(rect);
             }
         }
     }
