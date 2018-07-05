@@ -1029,6 +1029,56 @@ void py_zero_border_pixels2 (
 
 // ----------------------------------------------------------------------------------------
 
+template <typename T>
+py::tuple py_spatially_filter_image (
+    const numpy_image<T>& img,
+    const numpy_image<T>& filter
+)
+{
+    DLIB_CASSERT(filter.size() != 0);
+    numpy_image<T> out;
+    auto rect = spatially_filter_image(img, out, mat(filter));
+    return py::make_tuple(out, rect);
+}
+
+template <typename T>
+bool is_vector(
+    const py::array_t<T>& m
+)
+{
+    const size_t dims = m.ndim();
+    const size_t size = m.size();
+    if (dims == 1)
+        return true;
+
+    for (size_t i = 0; i < dims; ++i)
+    {
+        if (m.shape(i) != 1 && m.shape(i) != size)
+            return false;
+    }
+
+    return true;
+}
+
+template <typename T>
+py::tuple py_spatially_filter_image_separable (
+    const numpy_image<T>& img,
+    const py::array_t<T>& row_filter,
+    const py::array_t<T>& col_filter
+)
+{
+    DLIB_CASSERT(row_filter.size() != 0);
+    DLIB_CASSERT(col_filter.size() != 0);
+    DLIB_CASSERT(is_vector(row_filter), "The row filter must be either a row or column vector.");
+    DLIB_CASSERT(is_vector(col_filter), "The column filter must be either a row or column vector.");
+
+    numpy_image<T> out;
+    auto rect = spatially_filter_image_separable(img, out, mat(row_filter.data(),row_filter.size()), mat(col_filter.data(),col_filter.size()));
+    return py::make_tuple(out, rect);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void bind_image_classes2(py::module& m)
 {
 
@@ -1436,6 +1486,85 @@ ensures \n\
     !*/
         );
 
+
+
+    m.def("spatially_filter_image", &py_spatially_filter_image<uint8_t>, py::arg("img"), py::arg("filter"));
+    m.def("spatially_filter_image", &py_spatially_filter_image<float>,   py::arg("img"), py::arg("filter"));
+    m.def("spatially_filter_image", &py_spatially_filter_image<double>,  py::arg("img"), py::arg("filter"),
+"requires \n\
+    - filter.size != 0 \n\
+ensures \n\
+    - Applies the given spatial filter to img and returns the result (i.e. we  \n\
+      cross-correlate img with filter).  We also return a rectangle which \n\
+      indicates what pixels in the returned image are considered non-border pixels \n\
+      and therefore contain output from the filter.  E.g. \n\
+        - filtered_img,rect = spatially_filter_image(img, filter) \n\
+      would give you the filtered image and the rectangle in question.  Since the \n\
+      returned image has the same shape as img we fill the border pixels by setting \n\
+      them to 0. \n\
+ \n\
+    - The filter is applied such that it's centered over the pixel it writes its \n\
+      output into.  For centering purposes, we consider the center element of the \n\
+      filter to be filter[filter.shape[0]/2,filter.shape[1]/2].  This means that \n\
+      the filter that writes its output to a pixel at location point(c,r) and is W \n\
+      by H (width by height) pixels in size operates on exactly the pixels in the \n\
+      rectangle centered_rect(point(c,r),W,H) within img." 
+    /*!
+        requires
+            - filter.size != 0
+        ensures
+            - Applies the given spatial filter to img and returns the result (i.e. we 
+              cross-correlate img with filter).  We also return a rectangle which
+              indicates what pixels in the returned image are considered non-border pixels
+              and therefore contain output from the filter.  E.g.
+                - filtered_img,rect = spatially_filter_image(img, filter)
+              would give you the filtered image and the rectangle in question.  Since the
+              returned image has the same shape as img we fill the border pixels by setting
+              them to 0.
+
+            - The filter is applied such that it's centered over the pixel it writes its
+              output into.  For centering purposes, we consider the center element of the
+              filter to be filter[filter.shape[0]/2,filter.shape[1]/2].  This means that
+              the filter that writes its output to a pixel at location point(c,r) and is W
+              by H (width by height) pixels in size operates on exactly the pixels in the
+              rectangle centered_rect(point(c,r),W,H) within img.
+    !*/
+        );
+
+    m.def("spatially_filter_image_separable", &py_spatially_filter_image_separable<uint8_t>, py::arg("img"), py::arg("row_filter"), py::arg("col_filter"));
+    m.def("spatially_filter_image_separable", &py_spatially_filter_image_separable<float>,   py::arg("img"), py::arg("row_filter"), py::arg("col_filter"));
+    m.def("spatially_filter_image_separable", &py_spatially_filter_image_separable<double>,  py::arg("img"), py::arg("row_filter"), py::arg("col_filter"),
+"requires \n\
+    - row_filter.size != 0 \n\
+    - col_filter.size != 0 \n\
+    - row_filter and col_filter are both either row or column vectors.  \n\
+ensures \n\
+    - Applies the given separable spatial filter to img and returns the result \n\
+      (i.e. we cross-correlate img with the filters).  In particular, calling this \n\
+      function has the same effect as calling the regular spatially_filter_image() \n\
+      routine with a filter, FILT, defined as follows:  \n\
+        - FILT(r,c) == col_filter(r)*row_filter(c) \n\
+      Therefore, the return value of this routine is the same as if it were \n\
+      implemented as:    \n\
+        return spatially_filter_image(img, FILT) \n\
+      Except that this version should be faster for separable filters." 
+    /*!
+        requires
+            - row_filter.size != 0
+            - col_filter.size != 0
+            - row_filter and col_filter are both either row or column vectors. 
+        ensures
+            - Applies the given separable spatial filter to img and returns the result
+              (i.e. we cross-correlate img with the filters).  In particular, calling this
+              function has the same effect as calling the regular spatially_filter_image()
+              routine with a filter, FILT, defined as follows: 
+                - FILT(r,c) == col_filter(r)*row_filter(c)
+              Therefore, the return value of this routine is the same as if it were
+              implemented as:   
+                return spatially_filter_image(img, FILT)
+              Except that this version should be faster for separable filters.
+    !*/
+        );
 }
 
 
