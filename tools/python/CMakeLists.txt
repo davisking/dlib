@@ -49,6 +49,7 @@ set(python_srcs
    src/image.cpp
    src/image2.cpp
    src/image3.cpp
+   src/image4.cpp
    src/rectangles.cpp
    src/object_detection.cpp
    src/shape_predictor.cpp

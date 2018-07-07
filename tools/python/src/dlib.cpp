@@ -21,6 +21,7 @@ void bind_svm_struct(py::module& m);
 void bind_image_classes(py::module& m);
 void bind_image_classes2(py::module& m);
 void bind_image_classes3(py::module& m);
+void bind_image_classes4(py::module& m);
 void bind_rectangles(py::module& m);
 void bind_object_detection(py::module& m);
 void bind_shape_predictors(py::module& m);
@@ -98,6 +99,7 @@ PYBIND11_MODULE(dlib, m)
     bind_image_classes(m);
     bind_image_classes2(m);
     bind_image_classes3(m);
+    bind_image_classes4(m);
     bind_object_detection(m);
     bind_shape_predictors(m);
     bind_correlation_tracker(m);
