@@ -107,7 +107,11 @@
          <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor_const_instance" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="image_plane" include="dlib/cuda/tensor.h"/>
-         <term file="dlib/cuda/tensor_abstract.h.html" name="have_same_dimensions" include="dlib/cuda/tensor.h"/>
+         <term name="have_same_dimensions">
+            <term link="dlib/cuda/tensor_abstract.h.html#have_same_dimensions" name="for tensors" include="dlib/cuda/tensor.h"/>
+            <term link="dlib/image_processing/generic_image.h.html#have_same_dimensions" name="for images" include="dlib/image_processing/generic_image.h"/>
+         </term>
+
          <term file="dlib/cuda/gpu_data_abstract.h.html" name="gpu_data" include="dlib/cuda/gpu_data.h"/>
          <term name="memcpy">
             <term link="dlib/cuda/tensor_abstract.h.html#memcpy" name="for tensors"   include="dlib/cuda/tensor.h" />
@@ -435,6 +439,7 @@
          <term file="linear_algebra.html" name="count_points_between_lines"      include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="angle_between_lines"             include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="is_convex_quadrilateral"         include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="polygon_area"                    include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="find_convex_quadrilateral"       include="dlib/geometry.h"/>
          <term file="dlib/geometry/line_abstract.h.html" name="no_convex_quadrilateral"       include="dlib/geometry.h"/>
 
@@ -661,6 +666,7 @@
          <term file="ml.html" name="polynomial_kernel"               include="dlib/svm.h"/>
          <term file="ml.html" name="sigmoid_kernel"                  include="dlib/svm.h"/>
          <term file="ml.html" name="radial_basis_kernel"             include="dlib/svm.h"/>
+         <term file="ml.html" name="auto_train_rbf_classifier"       include="dlib/svm.h"/>
 
 
          <term link="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors" name="unsorted sparse vectors"/>

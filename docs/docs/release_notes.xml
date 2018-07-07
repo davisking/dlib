@@ -12,6 +12,55 @@
 
 <current>
 New Features and Improvements:
+   - Added a --split-train-test option to imglab.
+   - Added a max runtime option to the oca solver and structural object
+     detection trainer.
+   - Added an option to do translational jittering of the bounding boxes in the
+     shape_predictor_trainer.  Using this option allows you to train
+     shape_predictors that are somewhat more robust against variation in
+     detection box placement. 
+   - Added an optional thread_pool argument to find_max_global() and
+     find_min_global() to allow for parallel execution of objective function calls.
+   - Added auto_train_rbf_classifier(), a tool that trains a RBF-SVM without requiring the user
+     to supply any hyperparameters.
+   - Added polygon_area()
+   - The image view objects now implement the generic image interface.
+   - Updates to the Python API:
+       - Added Python bindings for: extract_image_chip(),
+         extract_image_chips(), center(), get_histogram(), sub_image(),
+         polygon_area(), auto_train_rbf_classifier(), reduced(),
+         translate_rect(), spatially_filter_image(),
+         spatially_filter_image_separable(), num_separable_filters(),
+         threshold_filter_singular_values(), max_point(),
+         max_point_interpolated(), zero_border_pixels().  Also added an option
+         for training nuclear norm regularized HOG detectors.
+       - Added a bunch of new overloads and operators for existing Python types.
+       - Made decision functions more viewable from python.  You can now inspect
+         the contents of the functions rather than them being completely opaque.
+       - Made it so you can call the std::vector&lt;detectors&gt; version of
+         the object_detector constructor from python. So now you can pack
+         multiple detectors into one object via the python API.
+       - Allow batched face recognition for greater performance.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed the point and dpoint operator + doing subtraction in the Python API.
+   - Fixed label_connected_blobs_watershed() not giving contiguous labels as outputs. 
+   - Fixed AVX detection not working correctly on some systems.
+   - Fixed dlib.threshold_image() ignoring the optional thresh argument in the Python API.
+   - Fixed hough_transform::find_pixels_voting_for_lines(). It would sometimes
+     include a pixel multiple times in the output lists.
+   - Made the routines that rotate image datasets use the rectangle_transform
+     instead of the bad old way that only really worked for square boxes.  This
+     improves placement of such rotated rectangular boxes.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.13" date="May 26, 2018">
+New Features and Improvements:
    - Added a lot of new Python bindings.  You can now use these things from Python:
       - gaussian_blur(), label_connected_blobs(), randomly_color_image(), jet(),
         skeleton(), find_line_endpoints(), get_rect(), shrink_rect(), grow_rect(),
@@ -49,7 +98,7 @@ Bug fixes:
      conversions are attempted.
    - Fixed some python functions not taking as wide a range of image types as they did in
      previous dlib versions.
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
