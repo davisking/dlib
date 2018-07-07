@@ -1,10 +1,11 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 
-# Set this to disable link time optimization. The only reason for
-# doing this to make the compile faster which is nice when developing
-# new modules.
-# set(PYBIND11_LTO_CXX_FLAGS "")
+# Pybind11's cmake scripts enable link time optimization by default.  However,
+# it makes linking take a really long time and doesn't seem to substantively
+# improve runtime performance.  So we disable LTO here to make building dlib
+# faster.
+set(PYBIND11_LTO_CXX_FLAGS "")
 
 
 # Avoid cmake warnings about changes in behavior of some Mac OS X path 
