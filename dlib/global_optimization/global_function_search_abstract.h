@@ -297,7 +297,10 @@ namespace dlib
                 function_evaluation_request::set().  You could even spread the work across
                 a compute cluster if you have one.  Note that find_max_global() optionally
                 supports this type of parallel execution, however you get more flexibility
-                with the global_function_search's API.
+                with the global_function_search's API.  As another example, it's possible
+                to save the state of the solver to disk so you can restart the optimization
+                from that point at a later date when using global_function_search, but not
+                with find_max_global().
 
                 So what happens if you have N outstanding function evaluation requests?
                 Or in other words, what happens if you called get_next_x() N times and
