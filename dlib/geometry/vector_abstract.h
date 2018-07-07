@@ -465,6 +465,9 @@ namespace dlib
         const array_of_dpoints& pts
     );
     /*!
+        requires
+            - array_of_dpoints is something with an interface compatible with
+              std::vector<dpoint> or std::array<dpoint,N>.
         ensures
             - If you walk the points pts in order to make a closed polygon, what is its
               area?  This function returns that area.  It uses the shoelace formula to
