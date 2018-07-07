@@ -295,7 +295,9 @@ namespace dlib
                 for processing.  Those separate threads can run the functions being
                 optimized (e.g. F and G or whatever) and report back by calling
                 function_evaluation_request::set().  You could even spread the work across
-                a compute cluster if you have one.
+                a compute cluster if you have one.  Note that find_max_global() optionally
+                supports this type of parallel execution, however you get more flexibility
+                with the global_function_search's API.
 
                 So what happens if you have N outstanding function evaluation requests?
                 Or in other words, what happens if you called get_next_x() N times and
