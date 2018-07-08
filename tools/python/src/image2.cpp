@@ -499,11 +499,11 @@ py::array py_sub_image (
     shape[0] = rect.height();
     shape[1] = rect.width();
 
-    size_t itemsize = img.itemsize();
+    size_t col_stride = 1;
     for (size_t i = 1; i < strides.size(); ++i)
-        itemsize *= strides[i];
+        col_stride *= strides[i];
 
-    const void* data = (char*)img.data() + itemsize*rect.left() + rect.top()*strides[0];
+    const void* data = (char*)img.data() + col_stride*rect.left() + rect.top()*strides[0];
 
     return py::array(img.dtype(), shape, strides, data, img);
 }
