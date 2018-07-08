@@ -304,6 +304,8 @@ namespace dlib
                   radius_nms_thresh distance (in terms of radius as defined by
                   get_line_properties()) to a stronger Hough point.
                 - The identified lines are returned as a list of coordinates in himg.
+                - The returned points are sorted so that points with larger Hough transform
+                  values come first.
         !*/
 
         template <

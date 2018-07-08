@@ -442,7 +442,9 @@ ensures \n\
       within angle_nms_thresh degrees of a stronger line or within \n\
       radius_nms_thresh distance (in terms of radius as defined by \n\
       get_line_properties()) to a stronger Hough point. \n\
-    - The identified lines are returned as a list of coordinates in himg." );
+    - The identified lines are returned as a list of coordinates in himg. \n\
+    - The returned points are sorted so that points with larger Hough transform \n\
+      values come first." 
     /*!
         requires
             - himg has size() rows and columns.
@@ -459,6 +461,8 @@ ensures \n\
               radius_nms_thresh distance (in terms of radius as defined by
               get_line_properties()) to a stronger Hough point.
             - The identified lines are returned as a list of coordinates in himg.
+            - The returned points are sorted so that points with larger Hough transform
+              values come first.
     !*/
 
 
