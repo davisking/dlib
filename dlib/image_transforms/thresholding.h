@@ -7,6 +7,7 @@
 #include "thresholding_abstract.h"
 #include "equalize_histogram.h"
 #include "../enable_if.h"
+#include <vector>
 
 namespace dlib
 {
@@ -594,9 +595,8 @@ namespace dlib
         out_img.set_size(in_img.nr(),in_img.nc());
         assign_all_pixels(out_img, off_pixel);
 
-        const long size = 1000;
-        long rstack[size];
-        long cstack[size];
+        std::vector<std::pair<long,long>> stack;
+        using std::make_pair;
 
         // now do the thresholding
         for (long r = 0; r < in_img.nr(); ++r)
@@ -609,15 +609,13 @@ namespace dlib
                 {
                     // now do line following for pixels >= lower_thresh.
                     // set the stack position to 0.
-                    long pos = 1;
-                    rstack[0] = r;
-                    cstack[0] = c;
+                    stack.push_back(make_pair(r,c));
 
-                    while (pos > 0)
+                    while (stack.size() > 0)
                     {
-                        --pos;
-                        const long r = rstack[pos];
-                        const long c = cstack[pos];
+                        const long r = stack.back().first;
+                        const long c = stack.back().second;
+                        stack.pop_back();
 
                         // This is the base case of our recursion.  We want to stop if we hit a
                         // pixel we have already visited.
@@ -629,63 +627,30 @@ namespace dlib
                         // put the neighbors of this pixel on the stack if they are bright enough
                         if (r-1 >= 0)
                         {
-                            if (pos < size && get_pixel_intensity(in_img[r-1][c]) >= lower_thresh)
-                            {
-                                rstack[pos] = r-1;
-                                cstack[pos] = c;
-                                ++pos;
-                            }
-                            if (pos < size && c-1 >= 0 && get_pixel_intensity(in_img[r-1][c-1]) >= lower_thresh)
-                            {
-                                rstack[pos] = r-1;
-                                cstack[pos] = c-1;
-                                ++pos;
-                            }
-                            if (pos < size && c+1 < in_img.nc() && get_pixel_intensity(in_img[r-1][c+1]) >= lower_thresh)
-                            {
-                                rstack[pos] = r-1;
-                                cstack[pos] = c+1;
-                                ++pos;
-                            }
+                            if (get_pixel_intensity(in_img[r-1][c]) >= lower_thresh)
+                                stack.push_back(make_pair(r-1, c));
+                            if (c-1 >= 0 && get_pixel_intensity(in_img[r-1][c-1]) >= lower_thresh)
+                                stack.push_back(make_pair(r-1, c-1));
+                            if (c+1 < in_img.nc() && get_pixel_intensity(in_img[r-1][c+1]) >= lower_thresh)
+                                stack.push_back(make_pair(r-1, c+1));
                         }
 
-                        if (pos < size && c-1 >= 0 && get_pixel_intensity(in_img[r][c-1]) >= lower_thresh)
-                        {
-                            rstack[pos] = r;
-                            cstack[pos] = c-1;
-                            ++pos;
-                        }
-                        if (pos < size && c+1 < in_img.nc() && get_pixel_intensity(in_img[r][c+1]) >= lower_thresh)
-                        {
-                            rstack[pos] = r;
-                            cstack[pos] = c+1;
-                            ++pos;
-                        }
+                        if (c-1 >= 0 && get_pixel_intensity(in_img[r][c-1]) >= lower_thresh)
+                            stack.push_back(make_pair(r,c-1));
+                        if (c+1 < in_img.nc() && get_pixel_intensity(in_img[r][c+1]) >= lower_thresh)
+                            stack.push_back(make_pair(r,c+1));
 
                         if (r+1 < in_img.nr())
                         {
-                            if (pos < size && get_pixel_intensity(in_img[r+1][c]) >= lower_thresh)
-                            {
-                                rstack[pos] = r+1;
-                                cstack[pos] = c;
-                                ++pos;
-                            }
-                            if (pos < size && c-1 >= 0 && get_pixel_intensity(in_img[r+1][c-1]) >= lower_thresh)
-                            {
-                                rstack[pos] = r+1;
-                                cstack[pos] = c-1;
-                                ++pos;
-                            }
-                            if (pos < size && c+1 < in_img.nc() && get_pixel_intensity(in_img[r+1][c+1]) >= lower_thresh)
-                            {
-                                rstack[pos] = r+1;
-                                cstack[pos] = c+1;
-                                ++pos;
-                            }
+                            if (get_pixel_intensity(in_img[r+1][c]) >= lower_thresh)
+                                stack.push_back(make_pair(r+1,c));
+                            if (c-1 >= 0 && get_pixel_intensity(in_img[r+1][c-1]) >= lower_thresh)
+                                stack.push_back(make_pair(r+1,c-1));
+                            if (c+1 < in_img.nc() && get_pixel_intensity(in_img[r+1][c+1]) >= lower_thresh)
+                                stack.push_back(make_pair(r+1,c+1));
                         }
 
-                    } // end while (pos >= 0)
-
+                    } // end while (stack.size() > 0)
                 }
             }
         }
