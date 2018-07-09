@@ -210,20 +210,20 @@ namespace dlib
         const auto& v31 = v13;
         const auto& v32 = v23;
 
-        if (is_convex_quadrilateral({v01, v12, v23, v30}))
-                             return {v01, v12, v23, v30};
-        if (is_convex_quadrilateral({v01, v13, v32, v20}))
-                             return {v01, v13, v32, v20};
+        if (is_convex_quadrilateral({{v01, v12, v23, v30}}))
+                             return {{v01, v12, v23, v30}};
+        if (is_convex_quadrilateral({{v01, v13, v32, v20}}))
+                             return {{v01, v13, v32, v20}};
 
-        if (is_convex_quadrilateral({v02, v23, v31, v10}))
-                             return {v02, v23, v31, v10};
-        if (is_convex_quadrilateral({v02, v21, v13, v30}))
-                             return {v02, v21, v13, v30};
+        if (is_convex_quadrilateral({{v02, v23, v31, v10}}))
+                             return {{v02, v23, v31, v10}};
+        if (is_convex_quadrilateral({{v02, v21, v13, v30}}))
+                             return {{v02, v21, v13, v30}};
 
-        if (is_convex_quadrilateral({v03, v32, v21, v10}))
-                             return {v03, v32, v21, v10};
-        if (is_convex_quadrilateral({v03, v31, v12, v20}))
-                             return {v03, v31, v12, v20};
+        if (is_convex_quadrilateral({{v03, v32, v21, v10}}))
+                             return {{v03, v32, v21, v10}};
+        if (is_convex_quadrilateral({{v03, v31, v12, v20}}))
+                             return {{v03, v31, v12, v20}};
 
         throw no_convex_quadrilateral();
     }
