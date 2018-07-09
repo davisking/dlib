@@ -464,6 +464,7 @@ ensures \n\
             - The returned points are sorted so that points with larger Hough transform
               values come first.
     !*/
+        );
 
 
     m.def("get_rect", [](const hough_transform& ht){ return get_rect(ht); },
