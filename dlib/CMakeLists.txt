@@ -825,8 +825,21 @@ if (NOT TARGET dlib)
          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
-         FILES_MATCHING PATTERN "*.h" PATTERN "*.cmake"
-         REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
+         FILES_MATCHING 
+            PATTERN "*.h" 
+            PATTERN "*.cmake"
+            PATTERN "*_tutorial.txt"
+            PATTERN "cassert"
+            PATTERN "cstring"
+            PATTERN "fstream"
+            PATTERN "iomanip"
+            PATTERN "iosfwd"
+            PATTERN "iostream"
+            PATTERN "istream"
+            PATTERN "locale"
+            PATTERN "ostream"
+            PATTERN "sstream"
+            REGEX "${CMAKE_CURRENT_BINARY_DIR}" EXCLUDE)
 
 
       configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
