@@ -5,6 +5,7 @@
 
 #include "../assert.h"
 #include "../pixel.h"
+#include <type_traits>
 
 namespace dlib
 {
@@ -135,6 +136,12 @@ namespace dlib
     template <typename image_type>
     struct is_grayscale_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::grayscale; };
 
+
+    // Check if T has image_traits<T> defined for it.
+    template <typename T, typename enabled = void>
+    struct is_image_type : public std::false_type{};
+    template <typename T>
+    struct is_image_type<T, image_traits<typename std::decay<T>::type>> : public std::true_type{};
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -444,7 +451,8 @@ namespace dlib
     !*/
 
     template <typename image_type1, typename image_type2>
-    bool have_same_dimensions (
+    typename std::enable_if<is_image_type<image_type1>::value&&is_image_type<image_type2>::value, bool>::type 
+    have_same_dimensions (
         const image_type1& img1,
         const image_type2& img2
     ) { return num_rows(img1)==num_rows(img2) && num_columns(img1)==num_columns(img2); }
@@ -454,7 +462,8 @@ namespace dlib
     !*/
 
     template <typename image_type1, typename image_type2, typename ...T>
-    bool have_same_dimensions (
+    typename std::enable_if<is_image_type<image_type1>::value&&is_image_type<image_type2>::value, bool>::type 
+    have_same_dimensions (
         const image_type1& img1,
         const image_type2& img2,
         T&& ...args
