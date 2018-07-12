@@ -2169,8 +2169,8 @@ namespace dlib
         for (auto& p : pts)
             bounding_box += p;
 
-        const std::array<dpoint,4> corners = {bounding_box.tl_corner(), bounding_box.tr_corner(),
-                                              bounding_box.bl_corner(), bounding_box.br_corner()};
+        const std::array<dpoint,4> corners = {{bounding_box.tl_corner(), bounding_box.tr_corner(),
+                                               bounding_box.bl_corner(), bounding_box.br_corner()}};
 
         matrix<double> dists(4,4);
         for (long r = 0; r < dists.nr(); ++r)

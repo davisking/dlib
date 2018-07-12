@@ -118,7 +118,7 @@ namespace dlib { namespace tt
         if (m.size() == 0 && v.size() == 0)
             return;
         DLIB_CASSERT(m.size() != 0);
-        DLIB_CASSERT(m.num_samples() == v.size());
+        DLIB_CASSERT(m.num_samples() == static_cast<long long>(v.size()));
 
 #ifdef DLIB_USE_CUDA
         cuda::scale_rows(out, m, v);
@@ -140,7 +140,7 @@ namespace dlib { namespace tt
         DLIB_CASSERT(have_same_dimensions(out,m2));
         DLIB_CASSERT(have_same_dimensions(v1,v2));
         DLIB_CASSERT(is_vector(mat(v1))); 
-        DLIB_CASSERT(v1.size() == m1.num_samples());
+        DLIB_CASSERT(static_cast<long long>(v1.size()) == m1.num_samples());
 
 #ifdef DLIB_USE_CUDA
         cuda::scale_rows2(beta, out, m1, m2, v1, v2);
