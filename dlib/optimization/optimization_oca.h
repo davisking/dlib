@@ -62,6 +62,7 @@ namespace dlib
             sub_max_iter = 50000;
 
             inactive_thresh = 20;
+            max_runtime = std::chrono::hours(24*356*290); // 290 years
         }
 
         void set_subproblem_epsilon (
@@ -417,7 +418,7 @@ namespace dlib
 
         unsigned long inactive_thresh;
 
-        std::chrono::nanoseconds max_runtime = std::chrono::hours(24*356*290); // 290 years
+        std::chrono::nanoseconds max_runtime;
     };
 }
 
