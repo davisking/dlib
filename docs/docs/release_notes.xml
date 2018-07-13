@@ -12,6 +12,21 @@
 
 <current>
 New Features and Improvements:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed sub_image() in the Python API not working correctly for non-8bit images.
+   - Last release broke have_same_dimensions(). The version specific to images
+     was being used for tensors, which is incorrect and caused some of the DNN
+     tooling to malfunction.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.14" date="Jul 07, 2018">
+New Features and Improvements:
    - Added a --split-train-test option to imglab.
    - Added a max runtime option to the oca solver and structural object
      detection trainer.
@@ -55,7 +70,7 @@ Bug fixes:
      instead of the bad old way that only really worked for square boxes.  This
      improves placement of such rotated rectangular boxes.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
