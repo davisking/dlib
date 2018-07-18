@@ -46,12 +46,9 @@ namespace dlib
         #define DLIB_TEST_BLAS_BINDING_SCAL
 #endif
 
-#ifndef CBLAS_H
+#ifdef DLIB_DEFINE_CBLAS_API
         extern "C"
         {
-#ifndef CBLAS_INT_TYPE
-#define CBLAS_INT_TYPE int 
-#endif
             // Here we declare the prototypes for the CBLAS calls used by the BLAS bindings below
 
             void cblas_saxpy(const CBLAS_INT_TYPE N, const float alpha, const float *X,
@@ -139,7 +136,7 @@ namespace dlib
                              const void *alpha, const void *X, const CBLAS_INT_TYPE incX,
                              const void *Y, const CBLAS_INT_TYPE incY, void *A, const CBLAS_INT_TYPE lda);
         }
-#endif // if not CBLAS_H
+#endif // if DLIB_DEFINE_CBLAS_API
 
     // ----------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------

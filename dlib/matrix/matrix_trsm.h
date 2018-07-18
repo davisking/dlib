@@ -10,11 +10,7 @@ namespace dlib
     namespace blas_bindings
     {
 #ifdef DLIB_USE_BLAS
-#ifndef CBLAS_H
-
-#ifndef CBLAS_INT_TYPE
-#define CBLAS_INT_TYPE int 
-#endif
+#ifdef DLIB_DEFINE_CBLAS_API
         extern "C"
         {
             void cblas_strsm(const CBLAS_ORDER Order, const CBLAS_SIDE Side,
@@ -29,7 +25,7 @@ namespace dlib
                              const double alpha, const double *A, const CBLAS_INT_TYPE lda,
                              double *B, const CBLAS_INT_TYPE ldb);
         }
-#endif // if not CBLAS_H
+#endif // if DLIB_DEFINE_CBLAS_API 
 #endif // if DLIB_USE_BLAS
 
     // ------------------------------------------------------------------------------------
