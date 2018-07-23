@@ -39,6 +39,12 @@
 // is not possible because the division operation is inside "if (NR!=0)" block.
 #pragma warning(disable : 4723)
 
+// "warning C4724: potential mod by 0" - This warning is triggered in
+// matrix(const std::initializer_list<T>& l) where the compiler can see that
+// matrix<> was templated in a way making NR ending up 0, but mod by 0 at runtime
+// is not possible because the mod operation is inside "if (NR!=0)" block.
+#pragma warning(disable : 4724)
+
 #endif
 
 namespace dlib
@@ -2162,6 +2168,7 @@ namespace dlib
 // put warnings back to their default settings
 #pragma warning(default : 4355)
 #pragma warning(default : 4723)
+#pragma warning(default : 4724)
 #endif
 
 #endif // DLIB_MATRIx_
