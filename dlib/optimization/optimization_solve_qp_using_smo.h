@@ -511,7 +511,7 @@ namespace dlib
         // We need to get an upper bound on the Lipschitz constant for this QP. Since that
         // is just the max eigenvalue of Q we can do it using Gershgorin disks.
         const T lipschitz_bound = max(diag(Q) + (sum_cols(abs(Q)) - abs(diag(Q))));
-        double lambda = 0;
+        double lambda = 1;
         unsigned long iter;
         for (iter = 0; iter < max_iter; ++iter)
         {
@@ -829,7 +829,7 @@ namespace dlib
 
 
         std::vector<matrix<T,NR,NC,MM,L>> v(alphas), v_old(alphas.size());
-        double lambda = 0;
+        double lambda = 1;
         unsigned long iter;
         // Now do the main iteration block of this solver.  The coordinate descent method
         // we used above can improve the objective rapidly in the beginning.  However,
