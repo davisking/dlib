@@ -110,7 +110,12 @@ namespace dlib
 
     void png_loader::read_image( const char* filename )
     {
-        ld_.reset(new LibpngData);
+        LibpngData *pLdTmp = new LibpngData;
+        if ( pLdTmp == NULL )
+        {
+            throw image_load_error("png_loader: cannot create a new LibpngData");
+        }
+        ld_.reset(pLdTmp);
         if ( filename == NULL )
         {
             throw image_load_error("png_loader: invalid filename, it is NULL");
