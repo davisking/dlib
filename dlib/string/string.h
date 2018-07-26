@@ -463,21 +463,21 @@ namespace dlib
             typename traits,
             typename alloc
             >
-        string_assign_helper<charT,traits,alloc> &operator=(
+        string_assign_helper<charT,traits,alloc> operator=(
             const std::basic_string<charT,traits,alloc>& str
         ) const
         {
             return string_assign_helper<charT,traits,alloc>(str);
         }
 
-        char_assign_helper &operator= (
+        char_assign_helper operator= (
             const char* str
         ) const 
         {
             return char_assign_helper(str);
         }
 
-        wchar_t_assign_helper &operator= (
+        wchar_t_assign_helper operator= (
             const wchar_t* str
         ) const 
         {
