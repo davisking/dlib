@@ -152,10 +152,16 @@ namespace dlib
 
         const type eps = std::numeric_limits<type>::epsilon();
 
+        const type eps2 = max(abs(diag(A)))*std::sqrt(std::numeric_limits<type>::epsilon())/100;
+
+
+
         // compute the upper left corner
         if (A(0,0) > 0)
         {
             L_(0,0) = std::sqrt(A(0,0));
+            if (A(0,0) <= eps2)
+                isspd = false;
         }
         else
         {
@@ -177,7 +183,7 @@ namespace dlib
                 L_(r,0) = 0;
             }
 
-            isspd = isspd && (std::abs(A(r,0) - A(0,r)) < eps*A(r,0) ); 
+            isspd = isspd && (std::abs(A(r,0) - A(0,r)) <= eps*std::abs(A(r,0)) ); 
         }
 
         // now compute all the other columns
@@ -191,6 +197,8 @@ namespace dlib
             if (temp > 0)
             {
                 L_(c,c) = std::sqrt(temp);
+                if (temp <= eps2)
+                    isspd = false;
             }
             else
             {
@@ -221,7 +229,7 @@ namespace dlib
                     L_(r,c) = 0;
                 }
 
-                isspd = isspd && (std::abs(A(r,c) - A(c,r)) < eps*A(r,c) ); 
+                isspd = isspd && (std::abs(A(r,c) - A(c,r)) <= eps*std::abs(A(r,c)) ); 
             }
         }
 
