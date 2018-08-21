@@ -228,12 +228,6 @@ namespace dlib
 
     class interpolate_bilinear
     {
-        template <typename T>
-        struct is_rgb_image 
-        {
-            const static bool value = pixel_traits<typename T::pixel_type>::rgb;
-        };
-
     public:
 
         template <typename T, typename image_view_type, typename pixel_type>
@@ -330,11 +324,6 @@ namespace dlib
 
     class interpolate_quadratic
     {
-        template <typename T>
-        struct is_rgb_image 
-        {
-            const static bool value = pixel_traits<typename T::pixel_type>::rgb;
-        };
 
     public:
 
@@ -907,11 +896,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type
+        typename image_type1,
+        typename image_type2
         >
-    typename enable_if<is_rgb_image<image_type> >::type resize_image (
-        const image_type& in_img_,
-        image_type& out_img_,
+    typename enable_if_c<is_rgb_image<image_type1>::value && is_rgb_image<image_type2>::value >::type resize_image (
+        const image_type1& in_img_,
+        image_type2& out_img_,
         interpolate_bilinear
     )
     {
@@ -922,14 +912,14 @@ namespace dlib
             << "\n\t is_same_object(in_img_, out_img_):  " << is_same_object(in_img_, out_img_)
             );
 
-        const_image_view<image_type> in_img(in_img_);
-        image_view<image_type> out_img(out_img_);
+        const_image_view<image_type1> in_img(in_img_);
+        image_view<image_type2> out_img(out_img_);
 
         if (out_img.size() == 0 || in_img.size() == 0)
             return;
 
 
-        typedef typename image_traits<image_type>::pixel_type T;
+        typedef typename image_traits<image_type1>::pixel_type T;
         const double x_scale = (in_img.nc()-1)/(double)std::max<long>((out_img.nc()-1),1);
         const double y_scale = (in_img.nr()-1)/(double)std::max<long>((out_img.nr()-1),1);
         double y = -y_scale;
