@@ -138,10 +138,10 @@ namespace dlib
 
 
     // Check if T has image_traits<T> defined for it.
-    template <typename T, typename enabled = void>
+    template <typename T, typename enabled = size_t>
     struct is_image_type : public std::false_type{};
     template <typename T>
-    struct is_image_type<T, image_traits<typename std::decay<T>::type>> : public std::true_type{};
+    struct is_image_type<T, decltype(sizeof(image_traits<typename std::decay<T>::type>))> : public std::true_type{};
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
