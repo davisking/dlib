@@ -681,8 +681,14 @@ if (NOT TARGET dlib)
             # look for one to link to if our use of BLAS, specifically the
             # Intel MKL, hasn't already decided what to use.  This is because
             # it makes the MKL bug out if you link to another openmp lib other
-            # than Intel's when you use the MKL.
-            if (NOT openmp_libraries AND NOT MSVC AND NOT XCODE AND NOT APPLE)
+            # than Intel's when you use the MKL. I'm also not really sure when
+            # explicit linking to openmp became unnecessary, but for
+            # sufficiently older versions of cuda it was needed.  Then in
+            # versions of cmake newer than 3.11 linking to openmp started to
+            # mess up the switches passed to nvcc, so you can't just leave
+            # these "try to link to openmp" statements here going forward.  Fun
+            # times.
+            if (CUDA_VERSION VERSION_LESS "9.1" AND NOT openmp_libraries AND NOT MSVC AND NOT XCODE AND NOT APPLE)
                find_package(OpenMP)
                if (OPENMP_FOUND)
                   set(openmp_libraries ${OpenMP_CXX_FLAGS}) 
