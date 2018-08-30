@@ -2,17 +2,44 @@
 <?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
 
 <doc>
-    <title>How to compile</title>
-
-
-
-
 
     <!-- ************************************************************************* -->
 
     <body>
-        
-        <h2>Compiling C++ Example Programs on Any Operating System Using CMake</h2>
+
+      <center><h1>Using dlib from Python</h1></center>
+            <p>
+               Go to the base folder of the dlib repository and run <tt>python setup.py install</tt>.  
+               Once that command finishes running
+               you are ready to use dlib from Python.  Note that you need to
+               have CMake and a working C++ compiler installed for this to
+               work.  </p>
+               
+               <p>Also note that various optional features like GUI support (e.g.
+                  dlib.image_window) and CUDA acceleration will be either enabled or
+                  disabled based on what is available on your computer.  When you run
+                  the install command it will print messages telling you what it is
+                  using.  Read those messages and take appropriate action if you
+                  don't like the results.  For example, Linux and OSX users may have
+                  to install libX11 to use the GUI tools.  If you care about this
+                  then read the messages since they tell you how to get these
+                  optional features installed.
+            </p>
+            <p>
+               Alternatively, if you want to add more python bindings to dlib's
+               python interface then you probably want to avoid the setup.py file
+               and work directly using CMake.  In particular, dlib's python API is
+               built by the CMake project in the tools/python folder.  You build
+               this project using the usual CMake commands and when compiled it
+               outputs the dlib shared library that defines the python API for dlib.
+            </p>
+
+
+      <br/>
+      <hr/>
+      <br/>
+      <center><h1>Using dlib from C++</h1></center>
+
         The best way to compile a program that uses dlib is to use <a href="http://www.cmake.org">CMake</a>.  For
         example, the following commands will compile the example programs on any operating
         system:
@@ -45,31 +72,6 @@ tell CMake which one you want it to use via the -G option.
 </p>
             
 
-<br/>
-        <h2>Compiling Dlib's Python Interface</h2>
-        <p>
-           Go to the base folder of the dlib repository and run <tt>python setup.py install</tt>.  That
-           should compile and install the dlib python API on your system.   Note that you need to have CMake
-           and a working C++ compiler installed for this to work.  </p>
-           
-         <p>Also note that various optional features like GUI support (e.g.
-            dlib.image_window) and CUDA acceleration will be either enabled or
-            disabled based on what is available on your computer.  When you run
-            the install process it will print messages telling you what it is
-            using.  Read those messages and take appropriate action if you
-            don't like the results.  For example, Linux and OSX users may have
-            to install libX11 to use the GUI tools.  If you care about this
-            then read the messages since they tell you how to get these
-            optional features installed.
-        </p>
-        <p>
-           Alternatively, if you want to add more python bindings to dlib's
-           python interface then you probably want to avoid the setup.py file
-           and work directly using CMake.  In particular, dlib's python API is
-           built by the CMake project in the tools/python folder.  You build
-           this project using the usual CMake commands and when compiled it
-           outputs the dlib shared library that defines the python API for dlib.
-        </p>
 <br/>
 
 
@@ -151,12 +153,13 @@ sudo apt-get install libx11-dev
         <p>
            Dlib's cmake scripts contain the standard install target.  So you
            can use CMake to install dlib system wide as a precompiled static or
-           shared library just like you would with any other C++ library.  
-           However, most users should use CMake as described at the top of this page since that's
-           the simplest method.  In particular, it allows you to turn dlib's
-           debugging modes on and off whenever you want, which is something you
-           really should use since dlib's debugging modes are one of its
-           strongest features.  
+           shared library just like you would any other C++ library.  
+           However, most users should use CMake as described at the top of this
+           page (specifically as shown in the <a href="examples/CMakeLists.txt.html">examples project</a>) since
+           that's the simplest method.  In particular, it allows you to turn
+           dlib's debugging modes on and off whenever you want, which is
+           something you really should use since dlib's debugging modes are one
+           of its strongest features.  
          </p>
 
          <p>
