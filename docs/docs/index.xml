@@ -13,7 +13,7 @@
       It is used in both industry and academia in a wide range of domains 
       including robotics, embedded devices, mobile phones, and large high
       performance computing environments. Dlib's <a href="license.html">open source licensing</a> 
-      allows you to use it in any application, free of charge.
+      allows you to use it in any application, free of charge.  
       </p>
 
       <p>
@@ -21,6 +21,11 @@
          Also be sure to read the <a href="howto_contribute.html">how to contribute</a> page if you intend to 
          submit code to the project.
       </p>
+
+      <p>
+         To quickly get started using dlib, <a href="compile.html">follow these instructions to build dlib</a>.
+      </p>
+
 
       <br/>
 

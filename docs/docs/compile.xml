@@ -149,7 +149,7 @@ sudo apt-get install libx11-dev
         </p>
 
 <br/>
-        <h2>Installing dlib as a system wide library</h2>
+        <h2>Installing dlib as a precompiled library</h2>
         <p>
            Dlib's cmake scripts contain the standard install target.  So you
            can use CMake to install dlib system wide as a precompiled static or
