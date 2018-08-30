@@ -197,7 +197,7 @@ sudo apt-get install libx11-dev
         <p>
            To summarize, if you don't understand what the above paragraphs are talking
            about then you absolutely should not be installing dlib as a precompiled library
-           in Visual Studio.  Instead, go to the very top of this page and read the instructions
+           in Visual Studio.  Instead, go to the top of this page and read the instructions
            there.  Follow those instructions, it's super easy. 
         </p>
 
