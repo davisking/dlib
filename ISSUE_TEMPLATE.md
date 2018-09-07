@@ -20,7 +20,7 @@ If you aren't reporting a bug or problem with dlib then delete this template and
 <!--- Tell us what happens instead of the expected behavior.  If you get an error, include the entire error message in the bug report.  DO NOT POST SCREEN SHOTS.  Paste in the text instead.   If the issue is some kind of build problem, include the entire CMake output along with the error message. -->
 
 ## Steps to Reproduce
-<!--- Provide an unambiguous set of steps to reproduce this problem. Include code to reproduce, if relevant -->
+<!--- Provide an unambiguous set of steps to reproduce this problem.  What exactly do I have to type to reproduce your error?  If you don't post complete instructions you are much less likely to get help. -->
 
 
 
