@@ -1,4 +1,5 @@
 /build/
+/build_.*/
 /build2/
 /build_clang/
 \.swp$
