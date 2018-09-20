@@ -643,6 +643,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    inline const rectangle scale_rect (
+        const rectangle& rect,
+        double scale
+    )
+    {
+        DLIB_ASSERT(scale > 0, "scale factor must be > 0");
+
+        long l = (long)std::round(rect.left()*scale);
+        long t = (long)std::round(rect.top()*scale);
+        long r = (long)std::round(rect.right()*scale);
+        long b = (long)std::round(rect.bottom()*scale);
+        return rectangle(l, t, r, b);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     inline const rectangle translate_rect (
         const rectangle& rect,
         const point& p

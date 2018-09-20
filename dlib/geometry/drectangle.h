@@ -441,6 +441,20 @@ namespace dlib
         return shrink_rect(rect, -width, -height);
     }
 
+    inline const drectangle scale_rect (
+        const drectangle& rect,
+        double scale
+    )
+    {
+        DLIB_ASSERT(scale > 0, "scale factor must be > 0");
+
+        long l = (long)std::round(rect.left()*scale);
+        long t = (long)std::round(rect.top()*scale);
+        long r = (long)std::round(rect.right()*scale);
+        long b = (long)std::round(rect.bottom()*scale);
+        return drectangle(l, t, r, b);
+    }
+
     inline drectangle set_rect_area (
         const drectangle& rect,
         double area

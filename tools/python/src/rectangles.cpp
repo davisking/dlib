@@ -290,6 +290,11 @@ ensures \n\
   (i.e. grows the given rectangle by expanding its border by num)",
         py::arg("rect"), py::arg("num"));
 
+    m.def("scale_rect", [](const rectangle& rect, double scale){return scale_rect(rect,scale);},
+"- return scale_rect(rect, scale) \n\
+(i.e. resizes the given rectangle by a scale factor)",
+        py::arg("rect"), py::arg("scale"));
+
     m.def("centered_rect", [](const point& p, unsigned long width, unsigned long height) {
         return centered_rect(p, width, height); },
         py::arg("p"), py::arg("width"), py::arg("height"));
