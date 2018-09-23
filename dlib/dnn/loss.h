@@ -1009,7 +1009,7 @@ namespace dlib
                 double detection_confidence_,
                 size_t tensor_offset_,
                 long channel
-            ) : rect(rect_), rect_bbr(rect_), detection_confidence(detection_confidence_), tensor_offset(tensor_offset_), tensor_channel(channel) {}
+            ) : rect(rect_), detection_confidence(detection_confidence_), tensor_offset(tensor_offset_), tensor_channel(channel), rect_bbr(rect_) {}
 
             // rect is the rectangle you get without any bounding box regression.  So it's
             // the basic sliding window box (aka, the "anchor box").
@@ -1428,7 +1428,7 @@ namespace dlib
             const float* out_data = output_tensor.host() + output_tensor.k()*output_tensor.nr()*output_tensor.nc()*i;
             // scan the final layer and output the positive scoring locations
             dets_accum.clear();
-            for (long k = 0; k < options.detector_windows.size(); ++k)
+            for (long k = 0; k < (long)options.detector_windows.size(); ++k)
             {
                 for (long r = 0; r < output_tensor.nr(); ++r)
                 {
