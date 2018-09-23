@@ -30,6 +30,9 @@ if (POLICY CMP0063)
    # ignore it for backwards compatibility.
    cmake_policy(SET CMP0063 NEW)
 endif()
+if (POLICY CMP0075)
+   cmake_policy(SET CMP0075 NEW)
+endif()
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
 include(cmake_utils/release_build_by_default)
@@ -583,6 +586,12 @@ if (NOT TARGET dlib)
 
       if (DLIB_USE_CUDA)
          find_package(CUDA 7.5)
+
+         if (CUDA_VERSION VERSION_GREATER 9.1 AND CMAKE_VERSION VERSION_LESS 3.12.2)
+            # This bit of weirdness is to work around a bug in cmake 
+            list(REMOVE_ITEM CUDA_CUBLAS_LIBRARIES "CUDA_cublas_device_LIBRARY-NOTFOUND")
+         endif()
+
 
          if (CUDA_FOUND AND MSVC AND NOT CUDA_CUBLAS_LIBRARIES AND "${CMAKE_SIZEOF_VOID_P}" EQUAL "4")
             message(WARNING "You have CUDA installed, but we can't use it unless you put visual studio in 64bit mode.")
