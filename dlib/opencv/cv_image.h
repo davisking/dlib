@@ -34,7 +34,12 @@ namespace dlib
                          << "\n\t img.channels(): " << img.channels() 
                          << "\n\t img.pixel_traits<pixel_type>::num: " << pixel_traits<pixel_type>::num 
                          );
+#if CV_VERSION_MAJOR < 4
             IplImage temp = img;
+#else
+            IplImage temp;
+            temp = cvIplImage(img);
+#endif
             init(&temp);
         }
 
@@ -133,7 +138,12 @@ namespace dlib
 
         cv_image& operator=( const cv::Mat img)
         {
+#if CV_VERSION_MAJOR < 4
             IplImage temp = img;
+#else
+            IplImage temp;
+            temp = cvIplImage(img);
+#endif
             init(&temp);
             return *this;
         }
