@@ -549,15 +549,14 @@ void bind_image_classes2(py::module& m)
     m.def("resize_image", &py_resize_image<float>, py::arg("img"), py::arg("rows"), py::arg("cols"));
     m.def("resize_image", &py_resize_image<double>, docs, py::arg("img"), py::arg("rows"), py::arg("cols"));
     m.def("resize_image", &py_resize_image<rgb_pixel>, docs, py::arg("img"), py::arg("rows"), py::arg("cols"));
-
-    m.def("scale_image", &py_scale_image<int8_t>, py::arg("img"), py::arg("scale"));
-    m.def("scale_image", &py_scale_image<int16_t>, py::arg("img"), py::arg("scale"));
-    m.def("scale_image", &py_scale_image<int32_t>, py::arg("img"), py::arg("scale"));
-    m.def("scale_image", &py_scale_image<int64_t>, py::arg("img"), py::arg("scale"));
-    m.def("scale_image", &py_scale_image<float>, py::arg("img"), py::arg("scale"));
-    m.def("scale_image", &py_scale_image<double>, py::arg("img"), py::arg("scale"));
-    m.def("scale_image", &py_scale_image<rgb_pixel>, py::arg("img"), py::arg("scale"),
-        "Return img resized by scale factor"
+    m.def("resize_image", &py_scale_image<int8_t>, py::arg("img"), py::arg("scale"));
+    m.def("resize_image", &py_scale_image<int16_t>, py::arg("img"), py::arg("scale"));
+    m.def("resize_image", &py_scale_image<int32_t>, py::arg("img"), py::arg("scale"));
+    m.def("resize_image", &py_scale_image<int64_t>, py::arg("img"), py::arg("scale"));
+    m.def("resize_image", &py_scale_image<float>, py::arg("img"), py::arg("scale"));
+    m.def("resize_image", &py_scale_image<double>, py::arg("img"), py::arg("scale"));
+    m.def("resize_image", &py_scale_image<rgb_pixel>, py::arg("img"), py::arg("scale"),
+        "Resizes img, using bilinear interpolation, to have the new size (img rows * scale, img cols * scale)"
         );
 
     register_extract_image_chip(m);

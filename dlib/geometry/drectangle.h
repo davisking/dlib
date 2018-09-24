@@ -448,10 +448,10 @@ namespace dlib
     {
         DLIB_ASSERT(scale > 0, "scale factor must be > 0");
 
-        long l = (long)std::round(rect.left()*scale);
-        long t = (long)std::round(rect.top()*scale);
-        long r = (long)std::round(rect.right()*scale);
-        long b = (long)std::round(rect.bottom()*scale);
+        double l = rect.left() * scale;
+        double t = rect.top() * scale;
+        double r = rect.right() * scale;
+        double b = rect.bottom() * scale;
         return drectangle(l, t, r, b);
     }
 
