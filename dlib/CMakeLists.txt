@@ -82,6 +82,11 @@ if (DLIB_IN_PROJECT_BUILD)
 
    # Tell cmake to build dlib as a static library
    set(BUILD_SHARED_LIBS false)
+
+elseif(BUILD_SHARED_LIBS)
+   if (MSVC)
+      message(FATAL_ERROR "Building dlib as a standalone dll is not supported when using Visual Studio.  You are highly encouraged to use static linking instead.  See https://github.com/davisking/dlib/issues/1483 for a discussion.") 
+   endif()
 endif()
 
 
