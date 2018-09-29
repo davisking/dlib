@@ -233,7 +233,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename image_array>
-    inline double test_shape_predictor_with_images (
+    inline shape_predictor_statistics test_shape_predictor_with_images (
             image_array& images,
             std::vector<std::vector<full_object_detection> >& detections,
             std::vector<std::vector<double> >& scales,
@@ -246,12 +246,12 @@ namespace dlib
             throw error("The list of scales must have the same length as the list of detections.");
 
         if (scales.size() > 0)
-            return test_shape_predictor(predictor, images, detections, scales);
+            return test_shape_predictor_with_detailed_statistics(predictor, images, detections, scales);
         else
-            return test_shape_predictor(predictor, images, detections);
+            return test_shape_predictor_with_detailed_statistics(predictor, images, detections);
     }
 
-    inline double test_shape_predictor_py (
+    inline shape_predictor_statistics test_shape_predictor_py (
         const std::string& dataset_filename,
         const std::string& predictor_filename
     )
@@ -269,6 +269,16 @@ namespace dlib
 
         return test_shape_predictor_with_images(images, objects, scales, predictor);
     }
+
+    inline double simple_test_shape_predictor_py (
+        const std::string& dataset_filename,
+        const std::string& predictor_filename
+    )
+    {
+        shape_predictor_statistics result = test_shape_predictor_py(dataset_filename, predictor_filename);
+        return result.error_across_landmarks.mean();
+    }
+
 
 // ----------------------------------------------------------------------------------------
 

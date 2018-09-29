@@ -32,6 +32,7 @@ void bind_global_optimization(py::module& m);
 void bind_numpy_returns(py::module& m);
 void bind_image_dataset_metadata(py::module& m);
 void bind_line(py::module& m);
+void bind_statistics(py::module& m);
 
 #ifndef DLIB_NO_GUI_SUPPORT
 void bind_gui(py::module& m);
@@ -108,6 +109,7 @@ PYBIND11_MODULE(dlib, m)
     bind_global_optimization(m);
     bind_numpy_returns(m);
     bind_svm_c_trainer(m);
+    bind_statistics(m);
 #ifndef DLIB_NO_GUI_SUPPORT
     bind_gui(m);
 #endif

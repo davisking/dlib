@@ -91,11 +91,26 @@ testing_xml_path = os.path.join(faces_folder, "testing_with_face_landmarks.xml")
 print("Testing accuracy: {}".format(
     dlib.test_shape_predictor(testing_xml_path, "predictor.dat")))
 
+
+# You can also ask it for more detailed statistics. The returned object provides
+# statistics for the total error as well as for each individual landmark separately.
+stats = dlib.test_shape_predictor_with_stats(testing_xml_path, "predictor.dat")
+print("Mean error across landmarks: {}".format(stats.error_across_landmarks.mean()))
+print("Standard deviation of error across all landmarks: {}".format(
+    stats.error_across_landmarks.stddev()))
+for idx, landmark_stats in enumerate(stats.error_by_landmark):
+    print("Landmark [{}]: mean: {}, std-dev: {}".format(
+        idx, landmark_stats.mean(), landmark_stats.stddev()))
+    # Just an example, don't fill the screen
+    if idx > 9:
+        break
+
 # Now let's use it as you would in a normal application.  First we will load it
 # from disk. We also need to load a face detector to provide the initial
 # estimate of the facial location.
 predictor = dlib.shape_predictor("predictor.dat")
 detector = dlib.get_frontal_face_detector()
+
 
 # Now let's run the detector and shape_predictor over the images in the faces
 # folder and display the results.

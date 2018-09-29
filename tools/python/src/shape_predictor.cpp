@@ -1,6 +1,7 @@
 // Copyright (C) 2014  Davis E. King (davis@dlib.net)
 // License: Boost Software License   See LICENSE.txt for the full license.
 
+#include <pybind11/stl.h>
 #include "opaque_types.h"
 #include <dlib/python.h>
 #include <dlib/geometry.h>
@@ -98,7 +99,7 @@ inline shape_predictor train_shape_predictor_on_images_py (
 }
 
 
-inline double test_shape_predictor_with_images_py (
+inline shape_predictor_statistics test_shape_predictor_with_images_py (
         const py::list& pyimages,
         const py::list& pydetections,
         const py::list& pyscales,
@@ -141,7 +142,20 @@ inline double test_shape_predictor_with_images_py (
     return test_shape_predictor_with_images(images, detections, scales, predictor);
 }
 
-inline double test_shape_predictor_with_images_no_scales_py (
+inline double simple_test_shape_predictor_with_images_py (
+        const py::list& pyimages,
+        const py::list& pydetections,
+        const py::list& pyscales,
+        const shape_predictor& predictor
+)
+{
+    shape_predictor_statistics result =
+        test_shape_predictor_with_images_py( pyimages, pydetections, pyscales, predictor );
+    return result.error_across_landmarks.mean();
+}
+
+
+inline shape_predictor_statistics test_shape_predictor_with_images_no_scales_py (
         const py::list& pyimages,
         const py::list& pydetections,
         const shape_predictor& predictor
@@ -150,6 +164,18 @@ inline double test_shape_predictor_with_images_no_scales_py (
     py::list pyscales;
     return test_shape_predictor_with_images_py(pyimages, pydetections, pyscales, predictor);
 }
+
+inline double simple_test_shape_predictor_with_images_no_scales_py (
+        const py::list& pyimages,
+        const py::list& pydetections,
+        const shape_predictor& predictor
+)
+{
+    shape_predictor_statistics result =
+        test_shape_predictor_with_images_no_scales_py( pyimages, pydetections, predictor );
+    return result.error_across_landmarks.mean();
+}
+
 
 // ----------------------------------------------------------------------------------------
 
@@ -265,6 +291,12 @@ ensures \n\
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
     {
+    py::class_<shape_predictor_statistics>(m, "shape_predictor_statistics")
+        .def(py::init<running_stats<double>, std::vector<running_stats<double>>>())
+        .def_readwrite("error_across_landmarks", &shape_predictor_statistics::error_across_landmarks)
+        .def_readwrite("error_by_landmark",      &shape_predictor_statistics::error_by_landmark);
+    }
+    {
     m.def("train_shape_predictor", train_shape_predictor_on_images_py,
         py::arg("images"), py::arg("object_detections"), py::arg("options"),
 "requires \n\
@@ -293,7 +325,7 @@ ensures \n\
       XML format produced by dlib's save_image_dataset_metadata() routine. \n\
     - The trained shape predictor is serialized to the file predictor_output_filename.");
 
-    m.def("test_shape_predictor", test_shape_predictor_py,
+    m.def("test_shape_predictor", simple_test_shape_predictor_py,
         py::arg("dataset_filename"), py::arg("predictor_filename"),
 "ensures \n\
     - Loads an image dataset from dataset_filename.  We assume dataset_filename is \n\
@@ -307,7 +339,7 @@ ensures \n\
       shape_predictor_trainer() routine.  Therefore, see the documentation \n\
       for shape_predictor_trainer() for a detailed definition of the mean average error.");
 
-    m.def("test_shape_predictor", test_shape_predictor_with_images_no_scales_py,
+    m.def("test_shape_predictor", simple_test_shape_predictor_with_images_no_scales_py,
             py::arg("images"), py::arg("detections"), py::arg("shape_predictor"),
 "requires \n\
     - len(images) == len(object_detections) \n\
@@ -324,7 +356,7 @@ ensures \n\
       for shape_predictor_trainer() for a detailed definition of the mean average error.");
 
 
-    m.def("test_shape_predictor", test_shape_predictor_with_images_py,
+    m.def("test_shape_predictor", simple_test_shape_predictor_with_images_py,
             py::arg("images"), py::arg("detections"), py::arg("scales"), py::arg("shape_predictor"),
 "requires \n\
     - len(images) == len(object_detections) \n\
@@ -343,5 +375,57 @@ ensures \n\
       return value of this function is identical to that of dlib's \n\
       shape_predictor_trainer() routine.  Therefore, see the documentation \n\
       for shape_predictor_trainer() for a detailed definition of the mean average error.");
+    }
+    {
+    m.def("test_shape_predictor_with_stats", test_shape_predictor_py,
+        py::arg("dataset_filename"), py::arg("predictor_filename"),
+"ensures \n\
+    - Loads an image dataset from dataset_filename.  We assume dataset_filename is \n\
+      a file using the XML format written by save_image_dataset_metadata(). \n\
+    - Loads a shape_predictor from the file predictor_filename.  This means \n\
+      predictor_filename should be a file produced by the train_shape_predictor() \n\
+      routine. \n\
+    - This function tests the predictor against the dataset and returns a \n\
+      shape_predictor_statistics object. This encapsulates the error across \n\
+      all landmarks, as well as the error for each individual landmark. Error \n\
+      is reported as a running_stats object (instead of just mean), so you can \n\
+      better understand the distribution of the prediction error.");
+
+    m.def("test_shape_predictor_with_stats", test_shape_predictor_with_images_no_scales_py,
+            py::arg("images"), py::arg("detections"), py::arg("shape_predictor"),
+"requires \n\
+    - len(images) == len(object_detections) \n\
+    - images should be a list of numpy matrices that represent images, either RGB or grayscale. \n\
+    - object_detections should be a list of lists of dlib.full_object_detection objects. \
+      Each dlib.full_object_detection contains the bounding box and the lists of points that make up the object parts.\n\
+ ensures \n\
+    - shape_predictor should be a file produced by the train_shape_predictor()  \n\
+      routine. \n\
+    - This function tests the predictor against the dataset and returns a \n\
+      shape_predictor_statistics object. This encapsulates the error across \n\
+      all landmarks, as well as the error for each individual landmark. Error \n\
+      is reported as a running_stats object (instead of just mean), so you can \n\
+      better understand the distribution of the prediction error.");
+
+
+    m.def("test_shape_predictor_with_stats", test_shape_predictor_with_images_py,
+            py::arg("images"), py::arg("detections"), py::arg("scales"), py::arg("shape_predictor"),
+"requires \n\
+    - len(images) == len(object_detections) \n\
+    - len(object_detections) == len(scales) \n\
+    - for every sublist in object_detections: len(object_detections[i]) == len(scales[i]) \n\
+    - scales is a list of floating point scales that each predicted part location \
+      should be divided by. Useful for normalization. \n\
+    - images should be a list of numpy matrices that represent images, either RGB or grayscale. \n\
+    - object_detections should be a list of lists of dlib.full_object_detection objects. \
+      Each dlib.full_object_detection contains the bounding box and the lists of points that make up the object parts.\n\
+ ensures \n\
+    - shape_predictor should be a file produced by the train_shape_predictor()  \n\
+      routine. \n\
+    - This function tests the predictor against the dataset and returns a \n\
+      shape_predictor_statistics object. This encapsulates the error across \n\
+      all landmarks, as well as the error for each individual landmark. Error \n\
+      is reported as a running_stats object (instead of just mean), so you can \n\
+      better understand the distribution of the prediction error.");
     }
 }
