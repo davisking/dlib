@@ -1,33 +1,18 @@
 
 environment:
   matrix:
-    - PYTHON: "C:\\Python27"
-      PYTHON_VERSION: "2.7.x"
-      PYTHON_ARCH: "32"
-
-    - PYTHON: "C:\\Python27-x64"
-      PYTHON_VERSION: "2.7.x"
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python33"
-      PYTHON_VERSION: "3.3.x"
-      PYTHON_ARCH: "32"
-
-    - PYTHON: "C:\\Python33-x64"
-      PYTHON_VERSION: "3.3.x"
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python35"
-      PYTHON_VERSION: "3.5.x"
-      PYTHON_ARCH: "32"
-
-    - PYTHON: "C:\\Python35-x64"
-      PYTHON_VERSION: "3.5.x"
-      PYTHON_ARCH: "64"
+    - PATH: C:\Python35;%PATH%
+    - PATH: C:\Python35-x64;%PATH%
+    - PATH: C:\Python36;%PATH%
+    - PATH: C:\Python36-x64;%PATH%
+    - PATH: C:\Python37;%PATH%
+    - PATH: C:\Python37-x64;%PATH%
+    - PATH: C:\Python27;%PATH%
+    - PATH: C:\Python27-x64;%PATH%
 
 
 build_script:
-  - python setup.py build
+  - python setup.py build --clean
 
 test_script:
   - python setup.py test

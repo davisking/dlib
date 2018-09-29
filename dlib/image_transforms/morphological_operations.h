@@ -838,6 +838,90 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    unsigned char encode_8_pixel_neighbors (
+        const const_image_view<image_type>& img,
+        const point& p
+    )
+    {
+        unsigned char ch = 0;
+
+        const rectangle area = get_rect(img);
+
+        auto check = [&](long r, long c) 
+        {
+            ch <<= 1;
+            if (area.contains(c,r) && img[r][c]) 
+                ch |= 1;
+        };
+
+        long r = p.y();
+        long c = p.x();
+
+        check(r-1,c-1);
+        check(r-1,c);
+        check(r-1,c+1);
+        check(r,c+1);
+        check(r+1,c+1);
+        check(r+1,c);
+        check(r+1,c-1);
+        check(r,c-1);
+
+        return ch;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    std::vector<point> find_line_endpoints (
+        const image_type& img_
+    )
+    {
+        const_image_view<image_type> img(img_);
+
+        std::array<bool,256> line_ending_patterns;
+        line_ending_patterns.fill(false);
+        line_ending_patterns[0b00000001] = true;
+        line_ending_patterns[0b00000010] = true;
+        line_ending_patterns[0b00000100] = true;
+        line_ending_patterns[0b00001000] = true;
+        line_ending_patterns[0b00010000] = true;
+        line_ending_patterns[0b00100000] = true;
+        line_ending_patterns[0b01000000] = true;
+        line_ending_patterns[0b10000000] = true;
+        line_ending_patterns[0b00000011] = true;
+        line_ending_patterns[0b00000110] = true;
+        line_ending_patterns[0b00001100] = true;
+        line_ending_patterns[0b00011000] = true;
+        line_ending_patterns[0b00110000] = true;
+        line_ending_patterns[0b01100000] = true;
+        line_ending_patterns[0b11000000] = true;
+        line_ending_patterns[0b10000001] = true;
+
+
+        std::vector<point> results;
+
+        for (long r = 0; r < img.nr(); ++r)
+        {
+            for (long c = 0; c < img.nc(); ++c)
+            {
+                if (img[r][c] && line_ending_patterns[encode_8_pixel_neighbors(img,point(c,r))])
+                {
+                    results.emplace_back(c,r);
+                }
+            }
+        }
+
+        return results;
+    }
+
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
 }

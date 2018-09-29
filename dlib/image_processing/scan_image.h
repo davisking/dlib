@@ -11,6 +11,7 @@
 #include "../rand.h"
 #include "../array2d.h"
 #include "../image_transforms/spatial_filtering.h"
+#include "../image_transforms/thresholding.h"
 
 namespace dlib
 {
@@ -233,6 +234,143 @@ namespace dlib
                 }
             }
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    std::vector<point> find_peaks (
+        const image_type& img_,
+        const double non_max_suppression_radius,
+        const typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type& thresh
+    )
+    {
+        DLIB_CASSERT(non_max_suppression_radius >= 0);
+        const_image_view<image_type> img(img_);
+
+        using basic_pixel_type = typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type;
+
+        std::vector<std::pair<basic_pixel_type,point>> peaks;
+
+        for (long r = 1; r+1 < img.nr(); ++r)
+        {
+            for (long c = 1; c+1 < img.nc(); ++c)
+            {
+                auto val = img[r][c];
+                if (val < thresh)
+                    continue;
+
+                if (
+                    val <= img[r-1][c] ||
+                    val <= img[r+1][c] ||
+                    val <= img[r][c+1] ||
+                    val <= img[r][c-1] ||
+                    val <= img[r-1][c-1] ||
+                    val <= img[r+1][c+1] ||
+                    val <= img[r-1][c+1] ||
+                    val <= img[r+1][c-1]
+                )
+                {
+                    continue;
+                }
+
+                peaks.emplace_back(val,point(c,r));
+            }
+        }
+
+
+        // now do non-max suppression of the peaks according to the supplied radius.
+        using pt = std::pair<basic_pixel_type,point>;
+        // First sort the peaks so the strongest peaks come first.  We will greedily accept
+        // them and then do the normal peak sorting/non-max suppression thing.
+        std::sort(peaks.rbegin(), peaks.rend(), [](const pt& a, const pt&b ){ return a.first < b.first; });
+        std::vector<point> final_peaks;
+        const double radius_sqr = non_max_suppression_radius*non_max_suppression_radius;
+
+        // If there are a lot of peaks then we will make a mask image and use that to do
+        // the non-max suppression since this is fast when peaks.size() is large.  Otherwise we
+        // will do the simpler thing in the else block that doesn't require us to allocate a
+        // temporary mask image.
+        if (peaks.size() > 500 && radius_sqr != 0)
+        {
+            // hit will record which areas of the image have already been accounted for by some
+            // peak.  So it is our mask image.
+            matrix<unsigned char> hit(img.nr(), img.nc());
+            // initially nothing has been hit.
+            hit = 0;
+            const unsigned long win_size = std::round(2*non_max_suppression_radius);
+            const rectangle area = get_rect(img);
+            for (auto& pp : peaks)
+            {
+                auto& p = pp.second;
+                if (!hit(p.y(),p.x()))
+                {
+                    final_peaks.emplace_back(p);
+
+                    // mask out a circle around this new peak
+                    rectangle win = centered_rect(p, win_size, win_size).intersect(area); 
+                    for (long r = win.top(); r <= win.bottom(); ++r)
+                    {
+                        for (long c = win.left(); c <= win.right(); ++c)
+                        {
+                            if (length_squared(point(c,r)-p) <= radius_sqr)
+                                hit(r,c) = 1;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // if peaks.size() is relatively small then this is a faster way to do the non-max
+            // suppression.
+            for (auto& p : peaks)
+            {
+                bool hits_any_existing_peak = false;
+                // If the user set the radius to 0 then just copy the peaks to the output without
+                // checking anything.
+                if (radius_sqr != 0)
+                {
+                    for (auto& v : final_peaks)
+                    {
+                        if (length_squared(p.second-v) <= radius_sqr)
+                        {
+                            hits_any_existing_peak = true;
+                            break;
+                        }
+                    }
+                }
+                if (!hits_any_existing_peak)
+                {
+                    final_peaks.emplace_back(p.second);
+                }
+            }
+        }
+
+        return final_peaks;
+    }
+
+    template <
+        typename image_type
+        >
+    std::vector<point> find_peaks (
+        const image_type& img
+    )
+    {
+        return find_peaks(img, 0, partition_pixels(img));
+    }
+
+    template <
+        typename image_type
+        >
+    std::vector<point> find_peaks (
+        const image_type& img,
+        const double non_max_suppression_radius
+    )
+    {
+        return find_peaks(img, non_max_suppression_radius, partition_pixels(img));
     }
 
 // ----------------------------------------------------------------------------------------

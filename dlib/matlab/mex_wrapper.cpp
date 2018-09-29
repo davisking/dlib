@@ -348,6 +348,24 @@ namespace mex_binding
         T& arg
     ); 
 
+    void validate_and_populate_arg(
+        long arg_idx,
+        const mxArray *prhs,
+        matlab_struct& arg
+    );
+
+    void validate_and_populate_arg(
+        long arg_idx,
+        const mxArray *prhs,
+        matlab_object& arg
+    );
+
+    void validate_and_populate_arg(
+        long arg_idx,
+        const mxArray *prhs,
+        std::string& arg
+    );
+
 // -------------------------------------------------------
 
     template <typename T>

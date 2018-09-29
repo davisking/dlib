@@ -15,7 +15,8 @@ To package the wheel (after pip installing twine and wheel):
 To upload the binary wheel to PyPi
     twine upload dist/*.whl
 To upload the source distribution to PyPi
-    python setup.py sdist upload
+    python setup.py sdist 
+    twine upload dist/dlib-*.tar.gz
 To exclude/include certain options in the cmake config use --yes and --no:
     for example:
     --yes USE_AVX_INSTRUCTIONS: will set -DUSE_AVX_INSTRUCTIONS=yes
@@ -116,13 +117,16 @@ class CMakeBuild(build_ext):
         try:
             out = subprocess.check_output(['cmake', '--version'])
         except OSError:
-            raise RuntimeError("CMake must be installed to build the following extensions: " +
-                               ", ".join(e.name for e in self.extensions))
+            raise RuntimeError("\n*******************************************************************\n" +
+                                  " CMake must be installed to build the following extensions: " +
+                               ", ".join(e.name for e in self.extensions) + 
+                               "\n*******************************************************************\n")
         return re.search(r'version\s*([\d.]+)', out.decode()).group(1)
 
     def run(self):
+        cmake_version = self.get_cmake_version()
         if platform.system() == "Windows":
-            if LooseVersion(self.get_cmake_version()) < '3.1.0':
+            if LooseVersion(cmake_version) < '3.1.0':
                 raise RuntimeError("CMake >= 3.1.0 is required on Windows")
 
         for ext in self.extensions:
@@ -143,7 +147,8 @@ class CMakeBuild(build_ext):
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
             if sys.maxsize > 2**32:
                 cmake_args += ['-A', 'x64']
-            build_args += ['--', '/m']
+            # Do a parallel build
+            build_args += ['--', '/m'] 
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
             # Do a parallel build
@@ -159,9 +164,12 @@ class CMakeBuild(build_ext):
         cmake_setup = ['cmake', ext.sourcedir] + cmake_args
         cmake_build = ['cmake', '--build', '.'] + build_args
 
+        print("Building extension for Python {}".format(sys.version.split('\n',1)[0]))
         print("Invoking CMake setup: '{}'".format(' '.join(cmake_setup)))
+        sys.stdout.flush()
         subprocess.check_call(cmake_setup, cwd=build_folder)
         print("Invoking CMake build: '{}'".format(' '.join(cmake_build)))
+        sys.stdout.flush()
         subprocess.check_call(cmake_build, cwd=build_folder)
 
 def num_available_cpu_cores(ram_per_build_process_in_gb):
@@ -214,7 +222,7 @@ setup(
     name='dlib',
     version=read_version_from_cmakelists('dlib/CMakeLists.txt'),
     description='A toolkit for making real world machine learning and data analysis applications',
-    long_description=read_entire_file('README.md'),
+    long_description='See http://dlib.net for documentation.',
     author='Davis King',
     author_email='davis@dlib.net',
     url='https://github.com/davisking/dlib',

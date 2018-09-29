@@ -135,6 +135,62 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename image_type
+        >
+    std::vector<point> find_peaks (
+        const image_type& img,
+        const double non_max_suppression_radius,
+        const typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type& thresh
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h.  Moreover, these it must contain a
+              scalar pixel type (e.g. int rather than rgb_pixel)
+            - non_max_suppression_radius >= 0
+        ensures
+            - Scans the given image and finds all pixels with values >= thresh that are
+              also local maximums within their 8-connected neighborhood of the image.  Such
+              pixels are collected, sorted in decreasing order of their pixel values, and
+              then non-maximum suppression is applied to this list of points using the
+              given non_max_suppression_radius.  The final list of peaks is then returned.
+
+              Therefore, the returned list, V, will have these properties:
+                - V.size() == the number of peaks found in the image.
+                - When measured in image coordinates, no elements of V are within
+                  non_max_suppression_radius distance of each other.  That is, for all valid i!=j
+                  it is true that length(V[i]-V[j]) > non_max_suppression_radius.
+                - For each element of V, that element has the maximum pixel value of all
+                  pixels in the ball centered on that pixel with radius
+                  non_max_suppression_radius.
+    !*/
+
+    template <
+        typename image_type
+        >
+    std::vector<point> find_peaks (
+        const image_type& img
+    );
+    /*!
+        ensures
+            - performs: return find_peaks(img, 0, partition_pixels(img))
+    !*/
+
+    template <
+        typename image_type
+        >
+    std::vector<point> find_peaks (
+        const image_type& img,
+        const double non_max_suppression_radius
+    );
+    /*!
+        ensures
+            - performs: return find_peaks(img, non_max_suppression_radius, partition_pixels(img))
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_array_type
         >
     void scan_image (

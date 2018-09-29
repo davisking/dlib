@@ -26,7 +26,7 @@ public:
     }
 
     std::vector<mmod_rect> detect (
-        py::object pyimage,
+        py::array pyimage,
         const int upsample_num_times
     )
     {
@@ -35,10 +35,10 @@ public:
 
         // Copy the data into dlib based objects
         matrix<rgb_pixel> image;
-        if (is_gray_python_image(pyimage))
-            assign_image(image, numpy_gray_image(pyimage));
-        else if (is_rgb_python_image(pyimage))
-            assign_image(image, numpy_rgb_image(pyimage));
+        if (is_image<unsigned char>(pyimage))
+            assign_image(image, numpy_image<unsigned char>(pyimage));
+        else if (is_image<rgb_pixel>(pyimage))
+            assign_image(image, numpy_image<rgb_pixel>(pyimage));
         else
             throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
 
@@ -63,25 +63,25 @@ public:
         return rects;
     }
 
-    std::vector<std::vector<mmod_rect> > detect_mult (
+    std::vector<std::vector<mmod_rect>> detect_mult (
         py::list imgs,
         const int upsample_num_times,
         const int batch_size = 128
     )
     {
         pyramid_down<2> pyr;
-        std::vector<matrix<rgb_pixel> > dimgs;
+        std::vector<matrix<rgb_pixel>> dimgs;
         dimgs.reserve(len(imgs));
 
         for(int i = 0; i < len(imgs); i++)
         {
             // Copy the data into dlib based objects
             matrix<rgb_pixel> image;
-            py::object tmp = imgs[i].cast<py::object>();
-            if (is_gray_python_image(tmp))
-                assign_image(image, numpy_gray_image(tmp));
-            else if (is_rgb_python_image(tmp))
-                assign_image(image, numpy_rgb_image(tmp));
+            py::array tmp = imgs[i].cast<py::array>();
+            if (is_image<unsigned char>(tmp))
+                assign_image(image, numpy_image<unsigned char>(tmp));
+            else if (is_image<rgb_pixel>(tmp))
+                assign_image(image, numpy_image<rgb_pixel>(tmp));
             else
                 throw dlib::error("Unsupported image type, must be 8bit gray or RGB image.");
 
@@ -89,16 +89,12 @@ public:
             {
                 pyramid_up(image);
             }
-            dimgs.push_back(image);
+            dimgs.emplace_back(std::move(image));
         }
 
         for(int i = 1; i < dimgs.size(); i++)
         {
-            if
-            (
-                dimgs[i - 1].nc() != dimgs[i].nc() ||
-                dimgs[i - 1].nr() != dimgs[i].nr()
-            )
+            if (dimgs[i - 1].nc() != dimgs[i].nc() || dimgs[i - 1].nr() != dimgs[i].nr())
                 throw dlib::error("Images in list must all have the same dimensions.");
             
         }        
@@ -139,7 +135,7 @@ void bind_cnn_face_detection(py::module& m)
 {
     {
     py::class_<cnn_face_detection_model_v1>(m, "cnn_face_detection_model_v1", "This object detects human faces in an image.  The constructor loads the face detection model from a file. You can download a pre-trained model from http://dlib.net/files/mmod_human_face_detector.dat.bz2.")
-        .def(py::init<std::string>())
+        .def(py::init<std::string>(), py::arg("filename"))
         .def(
             "__call__", 
             &cnn_face_detection_model_v1::detect_mult, 

@@ -70,10 +70,10 @@ namespace dlib
                   at the edge of the destination image's dynamic range.
                 - Specifically, for all valid r and c:
                     - scales get_pixel_intensity(src_img[r][c]) into the dynamic range
-                      of the dest_img.  This is done by computing the mean and standard
-                      deviation of src_img. Call the mean M and the standard deviation
-                      D.  Then the scaling from src_img to dest_img is performed using
-                      the following mapping:
+                      of the dest_img.  This is done using the mean and standard deviation
+                      of src_img. Call the mean M and the standard deviation D.  Then the
+                      scaling from src_img to dest_img is performed using the following
+                      mapping:
                         let SRC_UPPER  = min(M + thresh*D, max(mat(src_img)))
                         let SRC_LOWER  = max(M - thresh*D, min(mat(src_img)))
                         let DEST_UPPER = pixel_traits<image_traits<dest_image_type>::pixel_type>::max()

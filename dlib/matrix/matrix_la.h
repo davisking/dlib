@@ -1203,68 +1203,68 @@ convergence:
 
         if (A.nr() > 4) // Only test for banded matrix if matrix is big enough
         {
-           // Detect if matrix is banded and, if so, matrix bandwidth
-           banded = true;
-           for (long r = 0; r < A.nr(); ++r)
-              for (long c = (r + bandwidth + 1); c < A.nc(); ++c)
-                 if (A(r, c) != 0)
-                 {
-                    bandwidth = c - r;
-                    if (bandwidth > A.nr() / 2)
+            // Detect if matrix is banded and, if so, matrix bandwidth
+            banded = true;
+            for (long r = 0; r < A.nr(); ++r)
+                for (long c = (r + bandwidth + 1); c < A.nc(); ++c)
+                    if (A(r, c) != 0)
                     {
-                       banded = false;
-                       goto escape_banded_detection;
+                        bandwidth = c - r;
+                        if (bandwidth > A.nr() / 2)
+                        {
+                            banded = false;
+                            goto escape_banded_detection;
+                        }
                     }
-                 }
         }
 escape_banded_detection:
 
         if (banded)
         {
-           // Store in compact form - use column major for LAPACK
-           matrix<T,0,0,default_memory_manager,column_major_layout> B(bandwidth + 1, A.nc());
-           set_all_elements(B, 0);
+            // Store in compact form - use column major for LAPACK
+            matrix<T,0,0,default_memory_manager,column_major_layout> B(bandwidth + 1, A.nc());
+            set_all_elements(B, 0);
 
-           for (long r = 0; r < A.nr(); ++r)
-              for (long c = r; c < std::min(r + bandwidth + 1, A.nc()); ++c)
-                 B(c - r, r) = A(r, c);
+            for (long r = 0; r < A.nr(); ++r)
+                for (long c = r; c < std::min(r + bandwidth + 1, A.nc()); ++c)
+                    B(c - r, r) = A(r, c);
 
 #ifdef DLIB_USE_LAPACK 
 
-           lapack::pbtrf('L', B);
-           
+            lapack::pbtrf('L', B);
+
 #else
 
-           // Peform compact Cholesky
-           for (long k = 0; k < A.nr(); ++k)
-           {
-              long last = std::min(k + bandwidth, A.nr() - 1) - k;
-              for (long j = 1; j <= last; ++j)
-              {
-                 long i = k + j;
-                 for (long c = 0; c <= (last - j); ++c)
-                    B(c, i) -= B(j, k) / B(0, k) * B(c + j, k);
-              }
-              T norm = std::sqrt(B(0, k));
-              for (long i = 0; i <= bandwidth; ++i)
-                 B(i, k) /= norm;
-           }
-           for (long c = A.nc() - bandwidth + 1; c < A.nc(); ++c)
-              B(bandwidth, c) = 0;
+            // Perform compact Cholesky
+            for (long k = 0; k < A.nr(); ++k)
+            {
+                long last = std::min(k + bandwidth, A.nr() - 1) - k;
+                for (long j = 1; j <= last; ++j)
+                {
+                    long i = k + j;
+                    for (long c = 0; c <= (last - j); ++c)
+                        B(c, i) -= B(j, k) / B(0, k) * B(c + j, k);
+                }
+                T norm = std::sqrt(B(0, k));
+                for (long i = 0; i <= bandwidth; ++i)
+                    B(i, k) /= norm;
+            }
+            for (long c = A.nc() - bandwidth + 1; c < A.nc(); ++c)
+                B(bandwidth, c) = 0;
 
 #endif
 
-           // Unpack lower triangular area
-           set_all_elements(L, 0);
-           for (long c = 0; c < A.nc(); ++c)
-              for (long i = 0; i <= bandwidth; ++i)
-              {
-                 long ind = c + i;
-                 if (ind < A.nc())
-                    L(ind, c) = B(i, c);
-              }
+            // Unpack lower triangular area
+            set_all_elements(L, 0);
+            for (long c = 0; c < A.nc(); ++c)
+                for (long i = 0; i <= bandwidth; ++i)
+                {
+                    long ind = c + i;
+                    if (ind < A.nc())
+                        L(ind, c) = B(i, c);
+                }
 
-           return L;
+            return L;
         }
 
 #ifdef DLIB_USE_LAPACK        

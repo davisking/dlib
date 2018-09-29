@@ -17,27 +17,20 @@
 #   Alternatively, if you want to compile dlib yourself then go into the dlib
 #   root folder and run:
 #       python setup.py install
-#   or
-#       python setup.py install --yes USE_AVX_INSTRUCTIONS
-#   if you have a CPU that supports AVX instructions, since this makes some
-#   things run faster.  This code will also use CUDA if you have CUDA and cuDNN
-#   installed.
 #
 #   Compiling dlib should work on any operating system so long as you have
 #   CMake installed.  On Ubuntu, this can be done easily by running the
 #   command:
 #       sudo apt-get install cmake
 #
-#   Also note that this example requires scikit-image which can be installed
+#   Also note that this example requires Numpy which can be installed
 #   via the command:
-#       pip install scikit-image
-#   Or downloaded from http://scikit-image.org/download.html. 
+#       pip install numpy
 
 import sys
 import os
 import dlib
 import glob
-from skimage import io
 
 if len(sys.argv) != 5:
     print(
@@ -66,7 +59,7 @@ images = []
 # Now find all the faces and compute 128D face descriptors for each face.
 for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
     print("Processing file: {}".format(f))
-    img = io.imread(f)
+    img = dlib.load_rgb_image(f)
 
     # Ask the detector to find the bounding boxes of each face. The 1 in the
     # second argument indicates that we should upsample the image 1 time. This

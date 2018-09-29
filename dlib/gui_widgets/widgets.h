@@ -29,6 +29,7 @@
 #include "../misc_api.h"
 #include "../any.h"
 #include "../image_processing/full_object_detection.h"
+#include "../geometry/line.h"
 
 #ifdef _MSC_VER
 // This #pragma directive is also located in the algs.h file but for whatever
@@ -3336,11 +3337,11 @@ namespace dlib
             overlay_line() { assign_pixel(color, 0);}
 
             template <typename pixel_type>
-            overlay_line(const point& p1_, const point& p2_, pixel_type p) 
+            overlay_line(const dpoint& p1_, const dpoint& p2_, pixel_type p) 
                 : p1(p1_), p2(p2_) { assign_pixel(color, p); }
 
-            point p1;
-            point p2;
+            dpoint p1;
+            dpoint p2;
             rgb_alpha_pixel color;
         };
 
@@ -3349,15 +3350,15 @@ namespace dlib
             overlay_circle():radius(0) { assign_pixel(color, 0);}
 
             template <typename pixel_type>
-            overlay_circle(const point& center_, const int radius_, pixel_type p) 
+            overlay_circle(const point& center_, const double radius_, pixel_type p) 
                 : center(center_), radius(radius_) { assign_pixel(color, p); }
 
             template <typename pixel_type>
-            overlay_circle(const point& center_, const int radius_, pixel_type p, const std::string& l) 
+            overlay_circle(const point& center_, const double radius_, pixel_type p, const std::string& l) 
                 : center(center_), radius(radius_), label(l) { assign_pixel(color, p); }
 
             point center;
-            int radius;
+            double radius;
             rgb_alpha_pixel color;
             std::string label;
         };
@@ -4052,6 +4053,17 @@ namespace dlib
         void add_overlay (
             const overlay_line& overlay
         );
+
+        template <typename pixel_type>
+        void add_overlay(const line& l, pixel_type p) 
+        { 
+            add_overlay(image_display::overlay_line(l.p1(),l.p2(),p)); 
+        }
+
+        void add_overlay(const line& l) 
+        {
+            add_overlay(l, rgb_pixel(255,0,0));
+        }
 
         void add_overlay (
             const overlay_circle& overlay

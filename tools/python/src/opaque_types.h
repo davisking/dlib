@@ -11,6 +11,7 @@
 #include <dlib/image_processing/full_object_detection.h>
 #include <map>
 #include <dlib/svm/ranking_tools.h>
+#include <dlib/data_io.h>
 
 // All uses of PYBIND11_MAKE_OPAQUE need to be in this common header to avoid ODR
 // violations.
@@ -50,6 +51,10 @@ PYBIND11_MAKE_OPAQUE(sparse_ranking_pairs);
 
 
 PYBIND11_MAKE_OPAQUE(std::vector<dlib::point>);
+PYBIND11_MAKE_OPAQUE(std::vector<dlib::dpoint>);
+
+PYBIND11_MAKE_OPAQUE(std::vector<dlib::image_dataset_metadata::box>);
+PYBIND11_MAKE_OPAQUE(std::vector<dlib::image_dataset_metadata::image>);
 
 #endif // DLIB_PyTHON_OPAQUE_TYPES_H_
 

@@ -116,8 +116,19 @@ namespace dlib
             }
         };
 
+        // MSVC with the /vms option, we get C2287 since the dummy class requires virtual
+        // inheritance. Adding the __virtual_inheritance specifier explicitly fixes the issue,
+        // but then Clang-CL no longer accepts it.
+        #if defined(_MSC_VER) && !defined(__clang__)
+            #define DLIB_MSVC_INHERITANCE_VIRTUAL __virtual_inheritance
+        #else
+            #define DLIB_MSVC_INHERITANCE_VIRTUAL
+        #endif
+
         struct dummy_base { virtual void nonnull() {}; virtual ~dummy_base(){}; int a; };
-        struct dummy : virtual public dummy_base{ void nonnull() {}; };
+        struct DLIB_MSVC_INHERITANCE_VIRTUAL dummy : virtual public dummy_base{ void nonnull() {}; };
+
+        #undef DLIB_MSVC_INHERITANCE_VIRTUAL
 
         typedef mp_impl_T<mp_null<dummy> > mp_null_impl;
     public:

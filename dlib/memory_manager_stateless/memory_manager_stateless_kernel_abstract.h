@@ -82,7 +82,7 @@ namespace dlib
             !*/
 
             T* allocate_array (
-                unsigned long size
+                size_t size
             );
             /*!
                 ensures

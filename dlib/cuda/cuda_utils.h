@@ -3,12 +3,13 @@
 #ifndef DLIB_CUDA_UtILS_H_
 #define DLIB_CUDA_UtILS_H_
 
+#include "../algs.h"
+
 #ifndef DLIB_USE_CUDA
 #error "This file shouldn't be #included unless DLIB_USE_CUDA is #defined"
 #endif
 
 #include "cuda_errors.h"
-#include "../algs.h"
 #include <cmath>
 
 #include <cuda_runtime.h>

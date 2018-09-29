@@ -17,18 +17,17 @@ namespace py = pybind11;
 
 full_object_detection run_predictor (
         shape_predictor& predictor,
-        py::object img,
-        py::object rect
+        py::array img,
+        const rectangle& box
 )
 {
-    rectangle box = rect.cast<rectangle>();
-    if (is_gray_python_image(img))
+    if (is_image<unsigned char>(img))
     {
-        return predictor(numpy_gray_image(img), box);
+        return predictor(numpy_image<unsigned char>(img), box);
     }
-    else if (is_rgb_python_image(img))
+    else if (is_image<rgb_pixel>(img))
     {
-        return predictor(numpy_rgb_image(img), box);
+        return predictor(numpy_image<rgb_pixel>(img), box);
     }
     else
     {
@@ -69,17 +68,12 @@ std::vector<point> full_obj_det_parts (const full_object_detection& detection)
     return parts;
 }
 
-std::shared_ptr<full_object_detection> full_obj_det_init(py::object& pyrect, py::object& pyparts)
+std::shared_ptr<full_object_detection> full_obj_det_init(const rectangle& rect, py::list& pyparts)
 {
     const unsigned long num_parts = py::len(pyparts);
-    std::vector<point> parts(num_parts);
-    rectangle rect = pyrect.cast<rectangle>();
-    py::iterator parts_it = pyparts.begin();
-
-    for (unsigned long j = 0;
-         parts_it != pyparts.end();
-         ++j, ++parts_it)
-        parts[j] = parts_it->cast<point>();
+    std::vector<point> parts;
+    for (auto& item : pyparts)
+        parts.push_back(item.cast<point>());
 
     return std::make_shared<full_object_detection>(rect, parts);
 }
@@ -97,7 +91,7 @@ inline shape_predictor train_shape_predictor_on_images_py (
         throw dlib::error("The length of the detections list must match the length of the images list.");
 
     std::vector<std::vector<full_object_detection> > detections(num_images);
-    dlib::array<array2d<unsigned char> > images(num_images);
+    dlib::array<numpy_image<unsigned char>> images(num_images);
     images_and_nested_params_to_dlib(pyimages, pydetections, images, detections);
 
     return train_shape_predictor_on_images(images, detections, options);
@@ -123,7 +117,7 @@ inline double test_shape_predictor_with_images_py (
     std::vector<std::vector<double> > scales;
     if (num_scales > 0)
         scales.resize(num_scales);
-    dlib::array<array2d<unsigned char> > images(num_images);
+    dlib::array<numpy_image<unsigned char>> images(num_images);
 
     // Now copy the data into dlib based objects so we can call the testing routine.
     for (unsigned long i = 0; i < num_images; ++i)
@@ -134,14 +128,12 @@ inline double test_shape_predictor_with_images_py (
              ++det_it)
           detections[i].push_back(det_it->cast<full_object_detection>());
 
-        pyimage_to_dlib_image(pyimages[i], images[i]);
+        assign_image(images[i], pyimages[i].cast<py::array>());
         if (num_scales > 0)
         {
             if (num_boxes != py::len(pyscales[i]))
                 throw dlib::error("The length of the scales list must match the length of the detections list.");
-            for (py::iterator scale_it = pyscales[i].begin();
-                 scale_it != pyscales[i].end();
-                 ++scale_it)
+            for (py::iterator scale_it = pyscales[i].begin(); scale_it != pyscales[i].end(); ++scale_it)
                 scales[i].push_back(scale_it->cast<double>());
         }
     }
@@ -197,20 +189,56 @@ void bind_shape_predictors(py::module &m)
                        cause overfitting.  The value must be in the range (0, 1].")
         .def_readwrite("oversampling_amount", &type::oversampling_amount,
                       "The number of randomly selected initial starting points sampled for each training example")
+        .def_readwrite("oversampling_translation_jitter", &type::oversampling_translation_jitter,
+                      "The amount of translation jittering to apply to bounding boxes, a good value is in in the range [0 0.5].")
         .def_readwrite("feature_pool_size", &type::feature_pool_size,
                       "Number of pixels used to generate features for the random trees.")
         .def_readwrite("lambda_param", &type::lambda_param,
                       "Controls how tight the feature sampling should be. Lower values enforce closer features.")
         .def_readwrite("num_test_splits", &type::num_test_splits,
                       "Number of split features at each node to sample. The one that gives the best split is chosen.")
+        .def_readwrite("landmark_relative_padding_mode", &type::landmark_relative_padding_mode,
+                      "If True then features are drawn only from the box around the landmarks, otherwise they come from the bounding box and landmarks together.  See feature_pool_region_padding doc for more details.")
         .def_readwrite("feature_pool_region_padding", &type::feature_pool_region_padding,
-                      "Size of region within which to sample features for the feature pool, \
-                      e.g a padding of 0.5 would cause the algorithm to sample pixels from a box that was 2x2 pixels")
+            /*!
+                  This algorithm works by comparing the relative intensity of pairs of
+                  pixels in the input image.  To decide which pixels to look at, the
+                  training algorithm randomly selects pixels from a box roughly centered
+                  around the object of interest.  We call this box the feature pool region
+                  box.  
+                  
+                  Each object of interest is defined by a full_object_detection, which
+                  contains a bounding box and a list of landmarks.  If
+                  landmark_relative_padding_mode==True then the feature pool region box is
+                  the tightest box that contains the landmarks inside the
+                  full_object_detection.  In this mode the full_object_detection's bounding
+                  box is ignored.  Otherwise, if the padding mode is bounding_box_relative
+                  then the feature pool region box is the tightest box that contains BOTH
+                  the landmarks and the full_object_detection's bounding box.
+
+                  Additionally, you can adjust the size of the feature pool padding region
+                  by setting feature_pool_region_padding to some value.  If
+                  feature_pool_region_padding then the feature pool region box is
+                  unmodified and defined exactly as stated above. However, you can expand
+                  the size of the box by setting the padding > 0 or shrink it by setting it
+                  to something < 0.
+
+                  To explain this precisely, for a padding of 0 we say that the pixels are
+                  sampled from a box of size 1x1.  The padding value is added to each side
+                  of the box.  So a padding of 0.5 would cause the algorithm to sample
+                  pixels from a box that was 2x2, effectively multiplying the area pixels
+                  are sampled from by 4.  Similarly, setting the padding to -0.2 would
+                  cause it to sample from a box 0.6x0.6 in size.
+            !*/
+                      "Size of region within which to sample features for the feature pool. \
+                      positive values increase the sampling region while negative values decrease it. E.g. padding of 0 means we \
+                      sample fr")
         .def_readwrite("random_seed", &type::random_seed,
                       "The random seed used by the internal random number generator")
         .def_readwrite("num_threads", &type::num_threads,
                         "Use this many threads/CPU cores for training.")
         .def("__str__", &::print_shape_predictor_training_options)
+        .def("__repr__", &::print_shape_predictor_training_options)
         .def(py::pickle(&getstate<type>, &setstate<type>));
     }
     {

@@ -101,11 +101,13 @@
          <item>scan_image</item>
          <item>scan_image_movable_parts</item>
          <item>find_points_above_thresh</item>
+         <item>find_peaks</item>
          <item>scan_image_pyramid</item>
          <item>scan_image_boxes</item>
          <item>scan_fhog_pyramid</item>
          <item>scan_image_custom</item>
          <item>find_candidate_object_locations</item>
+         <item>min_barrier_distance</item>
          <item>test_box_overlap</item>
          <item>remove_unobtainable_rectangles</item>
          <item>setup_hashed_features</item>
@@ -144,6 +146,9 @@
             </sub>
          </item>
 
+         <item>find_bright_keypoints</item>
+         <item>find_dark_keypoints</item>
+
          <item>hog_image</item>
          <item>extract_fhog_features</item>
          <item>fine_hog_image</item>
@@ -166,14 +171,20 @@
          <item>hysteresis_threshold</item> 
          <item>sobel_edge_detector</item> 
          <item>suppress_non_maximum_edges</item> 
+         <item>normalize_image_gradients</item> 
+         <item>remove_incoherent_edge_pixels</item> 
          <item>threshold_image</item>
-         <item>auto_threshold_image</item>
+         <item>partition_pixels</item>
          <item>hough_transform</item>
+         <item>image_gradients</item>
+         <item>find_bright_lines</item>
+         <item>find_dark_lines</item>
       </section>
 
       <section>
          <name>Morphology</name>
          <item>label_connected_blobs</item>
+         <item>label_connected_blobs_watershed</item>
          <item>segment_image</item>
          <item>binary_dilation</item>
          <item>binary_erosion</item>
@@ -184,6 +195,8 @@
          <item>binary_difference</item>
          <item>binary_complement</item>
          <item>skeleton</item>
+         <item>encode_8_pixel_neighbors</item>
+         <item>find_line_endpoints</item>
       </section>
 
       <section>
@@ -221,6 +234,7 @@
          <item>flip_image_dataset_left_right</item> 
          <item>rotate_image_dataset</item> 
          <item>extract_image_chips</item> 
+         <item>extract_image_4points</item> 
          <item>random_cropper</item> 
          <item>jitter_image</item> 
          <item>sub_image</item> 
@@ -300,6 +314,34 @@
               given a binary image, we progressively thin the binary blobs
               until only a single pixel wide skeleton of the original blobs
               remains.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>encode_8_pixel_neighbors</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>
+            This routine looks at the 8 pixels immediately surrounding a pixel
+            and encodes their on/off pattern into the 8 bits of an unsigned char.
+            Needless to say, this routine only makes sense for binary images.
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_line_endpoints</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/morphological_operations_abstract.h</spec_file>
+         <description>
+            This routine finds endpoints of lines in a thinned binary image.
+            For example, if the image was produced by <a href="#skeleton">skeleton()</a> 
+            or something like a Canny edge detector then you can use
+            find_line_endpoints() to find the pixels sitting on the ends of
+            lines.
          </description>
       </component>
 
@@ -502,6 +544,37 @@
 
    <!-- ************************************************************************* -->
 
+      <component>
+         <name>find_bright_keypoints</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>
+             This routine finds bright "keypoints" in an image.  In general,
+             these are bright/white localized blobs.  It does this by computing
+             the determinant of the image Hessian at each location and storing
+             this value into an output saliency image if both eigenvalues of
+             the Hessian are negative.  If either eigenvalue is positive then
+             the saliency for that pixel is 0.  
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>find_dark_keypoints</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>
+              This routine finds dark "keypoints" in an image.  In general, these are dark
+              localized blobs.  It does this by computing the determinant of the image
+              Hessian at each location and storing this value into an output saliency
+              image if both eigenvalues of the Hessian are positive.  If either eigenvalue
+              is negative then the saliency for that pixel is 0.  
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+      
       <component>
          <name>hog_image</name>
          <file>dlib/image_keypoint.h</file>
@@ -901,7 +974,8 @@
               a colored version an image. 
               <p>
                  This function is useful for displaying the results of some image 
-                 segmentation.  For example, the output of <a href="#label_connected_blobs">label_connected_blobs</a>
+                 segmentation.  For example, the output of <a href="#label_connected_blobs">label_connected_blobs</a>,
+                 <a href="label_connected_blobs_watershed">label_connected_blobs_watershed</a>, 
                  or <a href="#segment_image">segment_image</a>.
               </p>
          </description>
@@ -1402,6 +1476,81 @@
       </component>
             
    <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_bright_lines</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>        
+            This routine is similar to <a href="#sobel_edge_detector">sobel_edge_detector()</a>,
+            except instead of finding an edge it finds a bright/white line.
+            For example, the border between a black piece of paper and a white
+            table is an edge, but a curve drawn with a pencil on a piece of
+            paper makes a line.  
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_dark_lines</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>        
+            This routine is similar to <a href="#sobel_edge_detector">sobel_edge_detector()</a>,
+            except instead of finding an edge it finds a dark line.
+            For example, the border between a black piece of paper and a white
+            table is an edge, but a curve drawn with a pencil on a piece of
+            paper makes a line.  
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>image_gradients</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>        
+                This class is a tool for computing first and second derivatives of an
+                image.  It does this by fitting a quadratic surface around each pixel and
+                then computing the gradients of that quadratic surface.  For the details
+                see the paper:
+                <blockquote>
+                  <a href="quadratic_image_models_IGARSS2013.pdf">Quadratic models for curved line detection in SAR CCD by Davis E. King
+                     and Rhonda D. Phillips</a>
+                </blockquote>
+
+                This technique gives very accurate gradient estimates and is
+                also very fast since the entire gradient estimation procedure,
+                for each type of gradient, is accomplished by cross-correlating
+                the image with a single separable filter.  This means you can
+                compute gradients at very large scales (e.g. by fitting the
+                quadratic to a large window, like a 99x99 window) and it still
+                runs very quickly.
+
+                <p>
+                   For example, the filters used to compute the X, Y, XX, XY,
+                   and YY gradients at a scale of 130 are shown below:
+                  <table>
+                     <tr> 
+                        <td>X:</td> <td><img src="image_gradient_x.jpg"/></td> 
+                        <td>Y:</td> <td><img src="image_gradient_y.jpg"/></td> 
+                     </tr>
+                     <tr> 
+                        <td>XX:</td> <td><img src="image_gradient_xx.jpg"/></td> 
+                        <td>XY:</td> <td><img src="image_gradient_xy.jpg"/></td> 
+                        <td>YY:</td> <td><img src="image_gradient_yy.jpg"/></td> 
+                     </tr>
+                  </table>
+                </p>
+                
+
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
       
       <component>
          <name>suppress_non_maximum_edges</name>
@@ -1416,6 +1565,35 @@
             <example>image_ex.cpp.html</example>
          </examples>
                                  
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>normalize_image_gradients</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>        
+            This function takes two gradient images produced by a function like
+            <a href="#sobel_edge_detector">sobel_edge_detector</a> and then
+            unit normalizes the gradient vectors.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>remove_incoherent_edge_pixels</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/edge_detector_abstract.h</spec_file>
+         <description>        
+            This routine takes a list of edge pixels and discards the ones that
+            have outlying gradient directions. In particular, it finds the
+            largest group of pixels in an edge that are all within a user
+            specified angle of each other.  Therefore, if you are looking for
+            straight lines then this routine is a useful tool since it allows
+            you to discard noisy edge pixels with inconsistent angles.
+         </description>
       </component>
             
    <!-- ************************************************************************* -->
@@ -1725,6 +1903,29 @@
    <!-- ************************************************************************* -->
 
       <component>
+         <name>extract_image_4points</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/interpolation_abstract.h</spec_file>
+         <description>        
+            This function allows you to extract an arbitrary quadrilateral patch from
+            an image.  For example, given the image on the left and the 4 corners of the
+            red box you can extract the image on the right:
+            <br/>
+            <br/>
+            <center>
+            <table>
+               <tr> 
+                  <td><img src="images/extract_image_4points_source.jpg"/></td> 
+                  <td><img src="images/extract_image_4points_crop.jpg"/></td> 
+               </tr>
+            </table>
+            </center>
+         </description>
+      </component>
+
+   <!-- ************************************************************************* -->
+
+      <component>
          <name>random_cropper</name>
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/random_cropper_abstract.h</spec_file>
@@ -1871,13 +2072,14 @@
    <!-- ************************************************************************* -->
       
       <component>
-         <name>auto_threshold_image</name>
+         <name>partition_pixels</name>
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/thresholding_abstract.h</spec_file>
          <description>        
-            This global function performs a simple binary thresholding on an image.  
-            Instead of taking a user supplied threshold
-            it computes one from the image using k-means clustering.
+              This function finds a threshold value that would be reasonable to use with
+              <a href="#threshold_image">threshold_image</a>.  It does this by finding the threshold that
+              partitions the pixels in an image into two groups such that the sum of absolute
+              deviations between each pixel and the mean of its group is minimized.
          </description>
                                  
       </component>
@@ -1898,11 +2100,56 @@
    <!-- ************************************************************************* -->
       
       <component>
+         <name>partition_pixels</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/thresholding_abstract.h</spec_file>
+         <description>        
+              Finds a threshold value that would be reasonable to use with
+              <a href="#threshold_image">threshold_image</a>.  It does this by
+              finding the threshold that partitions the pixels in an image into
+              two groups such that the sum of absolute deviations between each
+              pixel and the mean of its group is minimized.
+         </description>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
          <name>label_connected_blobs</name>
          <file>dlib/image_transforms.h</file>
          <spec_file link="true">dlib/image_transforms/label_connected_blobs_abstract.h</spec_file>
          <description>        
               This function labels each of the connected blobs in an image with a unique integer label.  
+         </description>
+                                 
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>label_connected_blobs_watershed</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/label_connected_blobs_abstract.h</spec_file>
+         <description>        
+            This function performs a watershed segmentation of an image and
+            labels each resulting flooding region with a unique integer label.
+
+            <p>
+               For example, given an image like this, which shows part of the Hubble ultra deep field:
+               <center><img src="hubble_ultra_deep_field.jpg"/></center>
+               <br/>
+               The algorithm would flood fill it and produce the following segmentation.  If you play
+               the video you can see the actual execution of the algorithm where it starts by flooding
+               from the brightest areas and progressively fills each region.
+               <br/>
+               <br/>
+               <center>
+               <video src="watershed">
+                  Video of optimizer running
+               </video>
+               </center>
+            </p>
+               
          </description>
                                  
       </component>
@@ -1945,6 +2192,34 @@
          <examples>
             <example>find_candidate_object_locations.py.html</example>
          </examples>
+      </component>
+            
+   <!-- ************************************************************************* -->
+      
+      <component>
+         <name>min_barrier_distance</name>
+         <file>dlib/image_transforms.h</file>
+         <spec_file link="true">dlib/image_transforms/segment_image_abstract.h</spec_file>
+         <description>        
+            This function implements the salient object detection method described in the paper:
+            <blockquote>
+               "Minimum barrier salient object detection at 80 fps" by Zhang, Jianming, et al. 
+            </blockquote>
+            This routine takes an image as input and creates a new image where objects that are
+            visually distinct from the borders of the image have bright pixels while everything else is
+            dark.  This is useful because you can then threshold the resulting image to detect objects.
+            For example, given the left image as input you get the right image as output:
+            <br/>
+            <br/>
+            <center>
+            <table>
+               <tr> 
+                  <td><img src="images/mbd_example_in.jpg"/></td> 
+                  <td><img src="images/mbd_example_out.jpg"/></td> 
+               </tr>
+            </table>
+            </center>
+         </description>
       </component>
             
    <!-- ************************************************************************* -->
@@ -2088,6 +2363,18 @@
             subsample of such points if the number of them is very large.
          </description>
                                  
+      </component>
+            
+   <!-- ************************************************************************* -->
+
+      <component>
+         <name>find_peaks</name>
+         <file>dlib/image_processing.h</file>
+         <spec_file link="true">dlib/image_processing/scan_image_abstract.h</spec_file>
+         <description>        
+            This routine finds all the points in an image with a pixel value
+            above a user supplied threshold that are also local maximizers.
+         </description>
       </component>
             
    <!-- ************************************************************************* -->

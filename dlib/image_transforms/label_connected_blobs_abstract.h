@@ -12,6 +12,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    struct neighbors_24
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object is a pixel neighborhood generating functor for 
+                use with the label_connected_blobs() routine defined below.
+        !*/
+
+        void operator() (
+            const point& p,
+            std::vector<point>& neighbors
+        ) const;
+        /*!
+            ensures
+                - adds the 24 neighboring pixels surrounding p into neighbors
+        !*/
+    };
+
     struct neighbors_8 
     {
         /*!
@@ -189,6 +207,68 @@ namespace dlib
               the number of blobs in the image (including the background blob).
             - It is guaranteed that is_connected() and is_background() will never be 
               called with points outside the image.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    unsigned long label_connected_blobs_watershed (
+        const in_image_type& img,
+        out_image_type& labels,
+        typename pixel_traits<typename image_traits<in_image_type>::pixel_type>::basic_pixel_type background_thresh,
+        const double smoothing = 0
+    );
+    /*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - in_image_type must contain a grayscale pixel type. 
+            - out_image_type must contain an unsigned integer pixel type.
+            - is_same_object(img, labels) == false
+            - smoothing >= 0
+        ensures
+            - This routine performs a watershed segmentation of the given input image and
+              labels each resulting flooding region with a unique integer label. It does
+              this by marking the brightest pixels as sources of flooding and then flood
+              fills the image outward from those sources.  Each flooded area is labeled
+              with the identity of the source pixel and flooding stops when another flooded
+              area is reached or pixels with values < background_thresh are encountered.  
+            - The flooding will also overrun a source pixel if that source pixel has yet to
+              label any neighboring pixels.  This behavior helps to mitigate spurious
+              splits of objects due to noise.  You can further control this behavior by
+              setting the smoothing parameter.  The flooding will take place on an image
+              that has been Gaussian blurred with a sigma==smoothing.  So setting smoothing
+              to a larger number will in general cause more regions to be merged together.
+              Note that the smoothing parameter has no effect on the interpretation of
+              background_thresh since the decision of "background or not background" is
+              always made relative to the unsmoothed input image.
+            - #labels.nr() == img.nr()
+            - #labels.nc() == img.nc()
+            - for all valid r and c:
+                - if (img[r][c] < background_thresh) then
+                    - #labels[r][c] == 0, (i.e. the pixel is labeled as background)
+                - else
+                    - #labels[r][c] == an integer value indicating the identity of the segment
+                      containing the pixel img[r][c].  
+            - returns the number of labeled segments, including the background segment.
+              Therefore, the returned number is 1+(the max value in #labels).
+    !*/
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    unsigned long label_connected_blobs_watershed (
+        const in_image_type& img,
+        out_image_type& labels
+    );
+    /*!
+        simply invokes: return label_connected_blobs_watershed(img, labels, partition_pixels(img));
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -115,7 +115,7 @@ namespace dlib
         /*!
             ensures
                 - returns drectangle(point_down(rect.tl_corner()), point_down(rect.br_corner()));
-                  (i.e. maps rect into a downsampled)
+                  (i.e. maps rect into a downsampled image)
         !*/
 
         drectangle rect_up (

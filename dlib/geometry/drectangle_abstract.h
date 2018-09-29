@@ -587,6 +587,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const drectangle scale_rect (
+        const drectangle& rect,
+        double scale
+    );
+    /*!
+        requires
+            - scale > 0
+        ensures
+            - return drectangle(rect.left() * scale, rect.top() * scale, rect.right() * scale, rect.bottom() * scale)
+              (i.e. resizes the given rectangle by multiplying all side coordinates with a scale factor)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     drectangle set_rect_area (
         const drectangle& rect,
         double area

@@ -133,6 +133,19 @@ namespace dlib
         scalar_type get_epsilon (
         ) const { return eps; }
 
+        void set_max_runtime (
+            const std::chrono::nanoseconds& max_runtime
+        ) 
+        {
+            solver.set_max_runtime(max_runtime);
+        }
+
+        std::chrono::nanoseconds get_max_runtime (
+        ) const
+        {
+            return solver.get_max_runtime();
+        }
+
         void set_max_cache_size (
             unsigned long max_size
         )

@@ -15,28 +15,21 @@
 #   Alternatively, if you want to compile dlib yourself then go into the dlib
 #   root folder and run:
 #       python setup.py install
-#   or
-#       python setup.py install --yes USE_AVX_INSTRUCTIONS
-#   if you have a CPU that supports AVX instructions, since this makes some
-#   things run faster.  
 #
 #   Compiling dlib should work on any operating system so long as you have
 #   CMake installed.  On Ubuntu, this can be done easily by running the
 #   command:
 #       sudo apt-get install cmake
 #
-#   Also note that this example requires scikit-image which can be installed
+#   Also note that this example requires Numpy which can be installed
 #   via the command:
-#       pip install scikit-image
-#   Or downloaded from http://scikit-image.org/download.html. 
+#       pip install numpy
 
 import os
 import sys
 import glob
 
 import dlib
-from skimage import io
-
 
 # In this example we are going to train a face detector based on the small
 # faces dataset in the examples/faces directory.  This means you need to supply
@@ -116,7 +109,7 @@ print("Showing detections on the images in the faces folder...")
 win = dlib.image_window()
 for f in glob.glob(os.path.join(faces_folder, "*.jpg")):
     print("Processing file: {}".format(f))
-    img = io.imread(f)
+    img = dlib.load_rgb_image(f)
     dets = detector(img)
     print("Number of faces detected: {}".format(len(dets)))
     for k, d in enumerate(dets):
@@ -128,9 +121,6 @@ for f in glob.glob(os.path.join(faces_folder, "*.jpg")):
     win.add_overlay(dets)
     dlib.hit_enter_to_continue()
 
-
-
-
 # Next, suppose you have trained multiple detectors and you want to run them
 # efficiently as a group.  You can do this as follows:
 detector1 = dlib.fhog_object_detector("detector.svm")
@@ -140,13 +130,10 @@ detector2 = dlib.fhog_object_detector("detector.svm")
 # make a list of all the detectors you wan to run.  Here we have 2, but you
 # could have any number.
 detectors = [detector1, detector2]
-image = io.imread(faces_folder + '/2008_002506.jpg')
+image = dlib.load_rgb_image(faces_folder + '/2008_002506.jpg')
 [boxes, confidences, detector_idxs] = dlib.fhog_object_detector.run_multiple(detectors, image, upsample_num_times=1, adjust_threshold=0.0)
 for i in range(len(boxes)):
     print("detector {} found box {} with confidence {}.".format(detector_idxs[i], boxes[i], confidences[i]))
-
-
-
 
 # Finally, note that you don't have to use the XML based input to
 # train_simple_object_detector().  If you have already loaded your training
@@ -154,8 +141,8 @@ for i in range(len(boxes)):
 # below.
 
 # You just need to put your images into a list.
-images = [io.imread(faces_folder + '/2008_002506.jpg'),
-          io.imread(faces_folder + '/2009_004587.jpg')]
+images = [dlib.load_rgb_image(faces_folder + '/2008_002506.jpg'),
+          dlib.load_rgb_image(faces_folder + '/2009_004587.jpg')]
 # Then for each image you make a list of rectangles which give the pixel
 # locations of the edges of the boxes.
 boxes_img1 = ([dlib.rectangle(left=329, top=78, right=437, bottom=186),

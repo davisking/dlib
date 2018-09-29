@@ -105,16 +105,58 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        template T,
         typename alloc
         >
     void remove_duplicates (
-        std::vector<rectangle,alloc>& rects
+        std::vector<T,alloc>& items 
     );
     /*!
+        requires
+            - T is comparable via operator != and std::less.
         ensures
-            - This function finds any duplicate rectangles in rects and removes the extra
-              instances.  This way, the result is that rects contains only unique rectangle
-              instances.
+            - This function finds any duplicate objects in items and removes the extra
+              instances.  This way, the result is that items contains only unique
+              instances.  It does this by sorting items and removing neighboring elements
+              unless they compare != according to operator !=.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename in_image_type,
+        typename out_image_type
+        >
+    void min_barrier_distance(
+        const in_image_type& img,
+        out_image_type& dist,
+        size_t iterations = 10,
+        bool do_left_right_scans = true
+    );
+    /*!
+        requires
+            - in_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - out_image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<out_image_type>::pixel_type>::grayscale == true
+              (i.e. dist must be a grayscale image)
+            - iterations > 0
+        ensures
+            - This function implements the salient object detection method described in the paper:
+                "Minimum barrier salient object detection at 80 fps" by Zhang, Jianming, et al. 
+              In particular, we compute the minimum barrier distance between the borders of
+              the image and all the other pixels.  The result is stored in dist.  Note that
+              the paper talks about a bunch of other things you could do beyond computing
+              the minimum barrier distance, but this function doesn't do any of that. It's
+              just the vanilla MBD.
+            - We will perform iterations iterations of MBD passes over the image.  Larger
+              values might give better results but run slower.
+            - During each MBD iteration we make raster scans over the image.  These pass
+              from top->bottom, bottom->top, left->right, and right->left.  If
+              do_left_right_scans==false then the left/right passes are not executed.
+              Skipping them makes the algorithm about 2x faster but might reduce the
+              quality of the output.
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -1814,6 +1814,181 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type
+        >
+    typename pixel_traits<typename image_traits<image_type>::pixel_type>::basic_pixel_type 
+    simple_partition_pixels (
+        const image_type& img
+    ) 
+    {
+        matrix<unsigned long,1> hist;
+        get_histogram(img,hist);
+
+        auto average1 = [&](unsigned long thresh)
+        {
+            double accum = 0;
+            double cnt = 0;
+            for (unsigned long i = 0; i < thresh; ++i)
+            {
+                accum += hist(i)*i;
+                cnt += hist(i);
+            }
+
+            if (cnt != 0)
+                return accum/cnt;
+            else
+                return 0.0;
+        };
+
+        auto average2 = [&](unsigned long thresh)
+        {
+            double accum = 0;
+            double cnt = 0;
+            for (long i = thresh; i < hist.size(); ++i)
+            {
+                accum += hist(i)*i;
+                cnt += hist(i);
+            }
+
+            if (cnt != 0)
+                return accum/cnt;
+            else
+                return 0.0;
+        };
+
+
+        auto total_abs = [&](unsigned long thresh)
+        {
+            auto a = average1(thresh);
+            auto b = average2(thresh);
+
+            double score = 0;
+            for (long i = 0; i < hist.size(); ++i)
+            {
+                if (i < (long)thresh)
+                    score += std::abs(a-i)*hist(i);
+                else
+                    score += std::abs(b-i)*hist(i);
+            }
+            return score;
+        };
+
+
+        unsigned long thresh = 0;
+        double min_sad = total_abs(0);
+        for (long i = 1; i < hist.size(); ++i)
+        {
+            double sad = total_abs(i);
+            //cout << "TRUTH: i:" << i << "  total: "<< total_abs(i) << endl;
+            if (sad <= min_sad)
+            {
+                //cout << "CHANGE TRUTH: i:" << i << "  total: "<< total_abs(i)-min_sad << endl;
+                min_sad = sad;
+                thresh = i;
+            }
+        }
+
+        return thresh;
+    }
+
+    void test_partition_pixels()
+    {
+        matrix<unsigned char> img(4,7);
+
+        dlib::rand rnd;
+        for (int round = 0; round < 100; ++round)
+        {
+            print_spinner();
+            for (auto& p : img)
+                p = rnd.get_random_8bit_number();
+
+            DLIB_TEST(simple_partition_pixels(img) == partition_pixels(img));
+            unsigned char thresh;
+            impl::partition_pixels_float(img,thresh);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+
+            matrix<float> fimg = matrix_cast<float>(img);
+            DLIB_TEST(simple_partition_pixels(img) == partition_pixels(fimg));
+
+
+            std::vector<unsigned char> tmp;
+            for (auto& v : img)
+                if (v >= thresh)
+                    tmp.push_back(v);
+            matrix<unsigned char> img2 = mat(tmp);
+            unsigned char thresh2;
+            impl::partition_pixels_float(img,thresh, thresh2);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+            DLIB_TEST(simple_partition_pixels(img2) == thresh2);
+
+            partition_pixels(img,thresh, thresh2);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+            DLIB_TEST(simple_partition_pixels(img2) == thresh2);
+
+
+
+            std::vector<float> ftmp;
+            for (auto& v : fimg)
+                if (v >= thresh)
+                    ftmp.push_back(v);
+            matrix<float> fimg2 = mat(ftmp);
+            float fthresh, fthresh2;
+            partition_pixels(fimg,fthresh, fthresh2);
+            DLIB_TEST(simple_partition_pixels(img) == fthresh);
+            DLIB_TEST(simple_partition_pixels(img2) == fthresh2);
+        }
+
+
+        img.set_size(245,123);
+        for (int round = 0; round < 100; ++round)
+        {
+            print_spinner();
+            for (auto& p : img)
+                p = rnd.get_random_8bit_number();
+
+            DLIB_TEST(simple_partition_pixels(img) == partition_pixels(img));
+            unsigned char thresh;
+            impl::partition_pixels_float(img,thresh);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+
+            matrix<float> fimg = matrix_cast<float>(img);
+            DLIB_TEST(simple_partition_pixels(img) == partition_pixels(fimg));
+
+
+
+
+            std::vector<unsigned char> tmp;
+            for (auto& v : img)
+                if (v >= thresh)
+                    tmp.push_back(v);
+            matrix<unsigned char> img2 = mat(tmp);
+            unsigned char thresh2;
+            impl::partition_pixels_float(img,thresh, thresh2);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+            DLIB_TEST(simple_partition_pixels(img2) == thresh2);
+
+            partition_pixels(img,thresh, thresh2);
+            DLIB_TEST(simple_partition_pixels(img) == thresh);
+            DLIB_TEST(simple_partition_pixels(img2) == thresh2);
+
+
+
+            std::vector<float> ftmp;
+            for (auto& v : fimg)
+                if (v >= thresh)
+                    ftmp.push_back(v);
+            matrix<float> fimg2 = mat(ftmp);
+            float fthresh, fthresh2;
+            partition_pixels(fimg,fthresh, fthresh2);
+            DLIB_TEST(simple_partition_pixels(img) == fthresh);
+            DLIB_TEST(simple_partition_pixels(img2) == fthresh2);
+
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class image_tester : public tester
     {
     public:
@@ -1894,6 +2069,23 @@ namespace
                 draw_line(img, point(20,19), point(59,19), 00);
                 DLIB_TEST(sum(matrix_cast<int>(mat(img))) == 0);
             }
+
+            {
+                matrix<int> a(3,4);
+                array2d<unsigned char> b(3,4);
+                DLIB_TEST(have_same_dimensions(a,b));
+            }
+
+            {
+                matrix<int> a(4,4);
+                array2d<unsigned char> b(3,4);
+                DLIB_TEST(!have_same_dimensions(a,b));
+
+                static_assert(is_image_type<matrix<int>>::value, "should be true");
+                static_assert(!is_image_type<int>::value, "should be false");
+            }
+
+            test_partition_pixels();
         }
     } a;
 

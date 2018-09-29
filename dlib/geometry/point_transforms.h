@@ -12,6 +12,7 @@
 #include "rectangle.h"
 #include "drectangle.h"
 #include <vector>
+#include <cmath>
 
 namespace dlib
 {
@@ -217,11 +218,12 @@ namespace dlib
             dpoint tr = r.tr_corner();
             dpoint bl = r.bl_corner();
             dpoint br = r.br_corner();
-            // The new rectangle wouold ideally have this area if we could actually rotrate
-            // the box.
-            double new_area = length(tform(tl)-tform(tr))*length(tform(tl)-tform(bl));
+            // The new rectangle would ideally have this area if we could actually rotate
+            // the box.  Note the 1+ is because that's how the rectangles calculate their
+            // width and height.
+            double new_area = (1+length(tform(tl)-tform(tr)))*(1+length(tform(tl)-tform(bl)));
 
-            // But if we rotate the coners of the rectangle and then find the rectangle
+            // But if we rotate the corners of the rectangle and then find the rectangle
             // that contains them we get this, which might have a much larger area than we
             // want.
             drectangle temp;
@@ -233,7 +235,7 @@ namespace dlib
             // the above box.
             double scale = std::sqrt(new_area/temp.area());
 
-            return centered_rect(center(temp), static_cast<long>(temp.width()*scale+0.5), static_cast<long>(temp.height()*scale+0.5));
+            return centered_rect(center(temp), std::round(temp.width()*scale), std::round(temp.height()*scale));
         }
 
         rectangle operator() (

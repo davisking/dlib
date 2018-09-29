@@ -3,6 +3,8 @@
 #undef DLIB_OPTIMIZATION_OCA_ABsTRACT_Hh_
 #ifdef DLIB_OPTIMIZATION_OCA_ABsTRACT_Hh_
 
+#include <chrono>
+
 // ----------------------------------------------------------------------------------------
 
 namespace dlib
@@ -131,6 +133,8 @@ namespace dlib
                 - get_subproblem_epsilon() == 1e-2
                 - get_subproblem_max_iterations() == 50000
                 - get_inactive_plane_threshold() == 20
+                - get_max_runtime() == std::chrono::hours(24*356*290)
+                  (i.e. 290 years, so basically forever)
 
             WHAT THIS OBJECT REPRESENTS
                 This object is a tool for solving the optimization problem defined above
@@ -322,6 +326,22 @@ namespace dlib
                   cutting planes become inactive after a certain point and can then
                   be removed.  This function returns the number of iterations of
                   inactivity required before a cutting plane is removed.
+        !*/
+
+        void set_max_runtime (
+            const std::chrono::nanoseconds& max_runtime
+        ) const;
+        /*!
+            ensures
+                - #get_max_runtime() == max_runtime
+        !*/
+
+        std::chrono::nanoseconds get_max_runtime (
+        ) const;
+        /*!
+            ensures
+                - returns the maximum amount of time we will let the solver run before 
+                  making it terminate.
         !*/
 
     };

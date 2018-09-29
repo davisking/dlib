@@ -184,6 +184,8 @@ makedocs ()
     cp docs/ml_guide.svg docs/chm/docs
     cp -r docs/guipics docs/web
     cp -r docs/guipics docs/chm/docs
+    cp -r docs/images docs/web
+    cp -r docs/images docs/chm/docs
     cp docs/*.html docs/web
     cp docs/*.html docs/chm/docs
     cp docs/*.css docs/web
@@ -191,10 +193,12 @@ makedocs ()
     cp docs/*.js docs/web
     cp docs/*.js docs/chm/docs
     cp docs/*.png docs/web
+    cp docs/*.pdf docs/web
     cp docs/*.jpg docs/web
     cp docs/*.webm docs/web
     cp docs/*.ico docs/web
     cp docs/*.png docs/chm/docs
+    cp docs/*.pdf docs/chm/docs
     cp docs/*.jpg docs/chm/docs
     cp docs/*.webm docs/chm/docs
     cp docs/*.ico docs/chm/docs

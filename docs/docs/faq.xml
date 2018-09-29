@@ -5,6 +5,55 @@
    <title>Frequently Asked Questions</title>
 
    <!-- ************************************************************************* -->
+
+   <questions group="Python">
+
+      <question text="I compiled dlib's Python interface with CUDA enabled, why isn't it using CUDA?">
+         Either you are using a part of dlib that just doesn't use CUDA, of which there
+         are many parts, or you are mistaken about compiling dlib with CUDA enabled.
+         In particular, many users report that "dlib isn't using CUDA even though 
+         I definitely compiled it with CUDA" and in every case either they are not using part of dlib that uses CUDA or they 
+         have installed multiple copies of dlib on their computer, some with CUDA disabled, and
+         they are using a non-CUDA build. 
+         <p>
+            You can check if dlib is compiled to use CUDA by looking at the <tt>dlib.DLIB_USE_CUDA</tt>
+            boolean.  <b>If dlib.DLIB_USE_CUDA is false then you didn't compile it with CUDA enabled, but if it's true then
+            dlib is using all the CUDA it's going to use</b>.
+         </p>
+      </question>
+
+      <question text="Why is dlib.image_window missing from the Python module?">
+         If you are getting the error <tt>module 'dlib' has no attribute 'image_window'</tt>
+         it is because you compiled dlib without GUI support (or you are using a copy of
+         dlib someone else compiled and they built it without GUI support).  So note that
+         it is possible to compile dlib with any GUI tools.  Some people want to do this because
+         they run dlib on systems that don't have any kind of GUI framework installed.
+         <p>
+            But since you are reading this you obviously want to use the GUI tools.  The solution
+            is to get a copy of dlib and <tt>python setup.py install</tt> it yourself.  It's easy.
+            Note that you might get a warning in the build output about X11 not being installed. Maybe that's
+            why you are getting this error in the first place.  <b>READ THAT MESSAGE AND FOLLOW ITS INSTRUCTIONS</b>
+            since it tells you what to do to fix this.
+         </p>
+      </question>
+
+      <question text="Why is some function missing from the dlib Python module?">
+         If you are missing dlib.image_window then read <a href="#Whyisdlib.imagewindowmissing">the FAQ about that</a>.
+         If you are missing any other function then <b>it's because you are using an old version of dlib
+         that just doesn't have that function</b>.  You need to install a newer version
+         of dlib.  Please don't post questions about this on any of dlib's forums or
+         email me about it.  Just install a new dlib.  The only way to use features in 
+         a new version of dlib is to get the new version of dlib.  Often people think they have the
+         new version of dlib installed when really they have some old version installed.  
+         You can see what version of dlib you are using by checking <tt>dlib.__version__</tt>.
+      </question>
+
+   </questions>
+
+
+
+
+
    <questions group="General">
 
       <question text="Why do I get USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1?">
@@ -35,6 +84,17 @@
             For reference, the code that generates this error is: 
             <a href="dlib/test_for_odr_violations.h.html">dlib/test_for_odr_violations.h</a> and 
             <a href="dlib/test_for_odr_violations.cpp.html">dlib/test_for_odr_violations.cpp</a>.
+         </p>
+
+         <p> 
+            Finally, most users who get this error are using Visual Studio.
+            You probably compiled dlib and then went into Visual Studio's
+            output folder, grabbed the .lib file, and then tried to
+            create a project using that .lib file and dlib's .h files from
+            github.  THIS IS WRONG, DO NOT DO THIS.  Instead, <a href="compile.html#Using%20dlib%20from%20C++">read the
+            instructions for using dlib and follow them</a>.  I promise they are
+            much simpler than any process that involves manually copying files
+            around in the file explorer.
          </p>
       </question>
 
@@ -197,10 +257,22 @@ row_vect.set_size(5);
       <!-- ****************************************** -->
 
       <question text="Where is the documentation for &lt;object/function&gt;?">
+         Every class and function in dlib is documented in detail.  
          If you can't find something then check the <a href="term_index.html">index</a>.
          <br/><br/>
-         Also, the bulk of the documentation can be found by following the 
-         <more_details/> links.   
+         Also, the bulk of the documentation can be found by clicking the 
+         <more_details/> buttons.  <b>So you should click on the "more details" buttons and read the documentation</b>.  
+         
+         <p>A lot of people
+         post questions like "There is no documentation for some_random_function(), how do I use it?", when
+         in reality the function is documented in detail.  Between the index, site search, and main website which 
+         breaks down functions/classes into topical categories there is no excuse for not being able to find 
+         the documentation for a function or class.  This is especially true if you know its name because you can
+         jump right to it using the <a href="term_index.html">index</a> or even a simple google search.  
+         So if you are posting a question like "I don't understand how something works" and obviously haven't read the
+         documentation then you are just going to get referred to this FAQ.  So please read the documentation before
+         asking questions.
+         </p>
       </question>
 
 

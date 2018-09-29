@@ -5,6 +5,23 @@ if (POLICY CMP0054)
    cmake_policy(SET CMP0054 NEW)
 endif()
 
+
+
+# Check if we are being built as part of a pybind11 module. 
+if (COMMAND pybind11_add_module)
+   # For python users, enable SSE4 and AVX if they have these instructions.
+   include(${CMAKE_CURRENT_LIST_DIR}/check_if_sse4_instructions_executable_on_host.cmake)
+   if (SSE4_IS_AVAILABLE_ON_HOST)
+      set(USE_SSE4_INSTRUCTIONS ON CACHE BOOL "Use SSE4 instructions")
+   endif()
+   include(${CMAKE_CURRENT_LIST_DIR}/check_if_avx_instructions_executable_on_host.cmake)
+   if (AVX_IS_AVAILABLE_ON_HOST)
+      set(USE_AVX_INSTRUCTIONS ON CACHE BOOL "Use AVX instructions")
+   endif()
+endif()
+
+
+
 set(USING_OLD_VISUAL_STUDIO_COMPILER 0)
 if(MSVC AND MSVC_VERSION VERSION_LESS 1900)
    message(FATAL_ERROR "C++11 is required to use dlib, but the version of Visual Studio you are using is too old and doesn't support C++11.  You need Visual Studio 2015 or newer. ")

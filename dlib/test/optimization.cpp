@@ -1204,6 +1204,23 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_find_min_single_variable()
+    {
+        auto f = [](double x) { return (x-0.2)*(x-0.2); };
+        double x = 0.8;
+        try
+        {
+            find_min_single_variable(f, x, 0, 1, 1e-9);
+            DLIB_TEST(std::abs(x-0.2) < 1e-7);
+        }
+        catch(optimize_single_variable_failure&)
+        {
+            DLIB_TEST(false);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class optimization_tester : public tester
     {
     public:
@@ -1223,6 +1240,7 @@ namespace
             test_poly_min_extract_2nd();
             optimization_test();
             test_solve_trust_region_subproblem_bounded();
+            test_find_min_single_variable();
         }
     } a;
 

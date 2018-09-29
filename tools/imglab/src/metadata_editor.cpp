@@ -644,7 +644,11 @@ display_about(
     sout << wrap_string("It is also possible to label object parts by selecting a rectangle and "
                         "then right clicking.  A popup menu will appear and you can select a part label. "
                         "Note that you must define the allowable part labels by giving --parts on the "
-                        "command line.  An example would be '--parts \"leye reye nose mouth\"'."
+                        "command line.  An example would be '--parts \"leye reye nose mouth\"'. "
+                        "Alternatively, if you don't give --parts you can simply select a rectangle and shift+left "
+                        "click to add parts. Parts added this way will be labeled with integer labels starting from 0. "
+                        "You can only use this simpler part adding mode if all the parts in a rectangle are already "
+                        "labeled with integer labels or the rectangle has no parts at all."
                         ,0,0) << endl << endl;
 
     sout << wrap_string("Press the down or s key to select the next image in the list and the up or w "

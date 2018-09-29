@@ -652,6 +652,21 @@ namespace dlib
         // However, sometimes scale-invariance may not be desired.
         use_image_pyramid assume_image_pyramid = use_image_pyramid::yes;
 
+        // By default, the mmod loss doesn't train any bounding box regression model.  But
+        // if you set use_bounding_box_regression == true then it expects the network to
+        // output a tensor with detector_windows.size()*5 channels rather than just
+        // detector_windows.size() channels.  The 4 extra channels per window are trained
+        // to give a bounding box regression output that improves the positioning of the
+        // output detection box.
+        bool use_bounding_box_regression = false; 
+        // When using bounding box regression, bbr_lambda determines how much you care
+        // about getting the bounding box shape correct vs just getting the detector to
+        // find objects.  That is, the objective function being optimized is
+        // basic_mmod_loss + bbr_lambda*bounding_box_regression_loss.  So setting
+        // bbr_lambda to a larger value will cause the overall loss to care more about
+        // getting the bounding box shape correct.
+        double bbr_lambda = 100; 
+
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,
             const unsigned long target_size,      

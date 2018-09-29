@@ -37,7 +37,7 @@ namespace dlib
 
     inline std::vector<dlib::rectangle> run_detector_with_upscale1 (
         dlib::simple_object_detector& detector,
-        py::object img,
+        py::array img,
         const unsigned int upsampling_amount,
         const double adjust_threshold,
         std::vector<double>& detection_confidences,
@@ -49,19 +49,19 @@ namespace dlib
         std::vector<rectangle> rectangles;
         std::vector<rect_detection> rect_detections;
 
-        if (is_gray_python_image(img))
+        if (is_image<unsigned char>(img))
         {
             array2d<unsigned char> temp;
             if (upsampling_amount == 0)
             {
-                detector(numpy_gray_image(img), rect_detections, adjust_threshold);
+                detector(numpy_image<unsigned char>(img), rect_detections, adjust_threshold);
                 split_rect_detections(rect_detections, rectangles,
                                       detection_confidences, weight_indices);
                 return rectangles;
             }
             else
             {
-                pyramid_up(numpy_gray_image(img), temp, pyr);
+                pyramid_up(numpy_image<unsigned char>(img), temp, pyr);
                 unsigned int levels = upsampling_amount-1;
                 while (levels > 0)
                 {
@@ -79,19 +79,19 @@ namespace dlib
                 return rectangles;
             }
         }
-        else if (is_rgb_python_image(img))
+        else if (is_image<rgb_pixel>(img))
         {
             array2d<rgb_pixel> temp;
             if (upsampling_amount == 0)
             {
-                detector(numpy_rgb_image(img), rect_detections, adjust_threshold);
+                detector(numpy_image<rgb_pixel>(img), rect_detections, adjust_threshold);
                 split_rect_detections(rect_detections, rectangles,
                                       detection_confidences, weight_indices);
                 return rectangles;
             }
             else
             {
-                pyramid_up(numpy_rgb_image(img), temp, pyr);
+                pyramid_up(numpy_image<rgb_pixel>(img), temp, pyr);
                 unsigned int levels = upsampling_amount-1;
                 while (levels > 0)
                 {
@@ -117,7 +117,7 @@ namespace dlib
 
     inline std::vector<dlib::rectangle> run_detectors_with_upscale1 (
         std::vector<simple_object_detector >& detectors,
-        py::object img,
+        py::array img,
         const unsigned int upsampling_amount,
         const double adjust_threshold,
         std::vector<double>& detection_confidences,
@@ -129,19 +129,19 @@ namespace dlib
         std::vector<rectangle> rectangles;
         std::vector<rect_detection> rect_detections;
 
-        if (is_gray_python_image(img))
+        if (is_image<unsigned char>(img))
         {
             array2d<unsigned char> temp;
             if (upsampling_amount == 0)
             {
-                evaluate_detectors(detectors, numpy_gray_image(img), rect_detections, adjust_threshold);
+                evaluate_detectors(detectors, numpy_image<unsigned char>(img), rect_detections, adjust_threshold);
                 split_rect_detections(rect_detections, rectangles,
                                       detection_confidences, weight_indices);
                 return rectangles;
             }
             else
             {
-                pyramid_up(numpy_gray_image(img), temp, pyr);
+                pyramid_up(numpy_image<unsigned char>(img), temp, pyr);
                 unsigned int levels = upsampling_amount-1;
                 while (levels > 0)
                 {
@@ -159,19 +159,19 @@ namespace dlib
                 return rectangles;
             }
         }
-        else if (is_rgb_python_image(img))
+        else if (is_image<rgb_pixel>(img))
         {
             array2d<rgb_pixel> temp;
             if (upsampling_amount == 0)
             {
-                evaluate_detectors(detectors, numpy_rgb_image(img), rect_detections, adjust_threshold);
+                evaluate_detectors(detectors, numpy_image<rgb_pixel>(img), rect_detections, adjust_threshold);
                 split_rect_detections(rect_detections, rectangles,
                                       detection_confidences, weight_indices);
                 return rectangles;
             }
             else
             {
-                pyramid_up(numpy_rgb_image(img), temp, pyr);
+                pyramid_up(numpy_image<rgb_pixel>(img), temp, pyr);
                 unsigned int levels = upsampling_amount-1;
                 while (levels > 0)
                 {
@@ -197,7 +197,7 @@ namespace dlib
 
     inline std::vector<dlib::rectangle> run_detector_with_upscale2 (
         dlib::simple_object_detector& detector,
-        py::object img,
+        py::array img,
         const unsigned int upsampling_amount
 
     )
@@ -213,7 +213,7 @@ namespace dlib
 
     inline py::tuple run_rect_detector (
         dlib::simple_object_detector& detector,
-        py::object img,
+        py::array img,
         const unsigned int upsampling_amount,
         const double adjust_threshold)
     {
@@ -232,20 +232,49 @@ namespace dlib
                               vector_to_python_list(weight_indices));
     }
 
+    struct simple_object_detector_py
+    {
+        simple_object_detector detector;
+        unsigned int upsampling_amount;
+
+        simple_object_detector_py() {}
+        simple_object_detector_py(simple_object_detector& _detector, unsigned int _upsampling_amount) :
+            detector(_detector), upsampling_amount(_upsampling_amount) {}
+
+        std::vector<dlib::rectangle> run_detector1 (py::array img,
+                                                    const unsigned int upsampling_amount_)
+        {
+            return run_detector_with_upscale2(detector, img, upsampling_amount_);
+        }
+
+        std::vector<dlib::rectangle> run_detector2 (py::array img)
+        {
+            return run_detector_with_upscale2(detector, img, upsampling_amount);
+        }
+
+
+    };
+
     inline py::tuple run_multiple_rect_detectors (
         py::list& detectors,
-        py::object img,
+        py::array img,
         const unsigned int upsampling_amount,
         const double adjust_threshold)
     {
         py::tuple t;
 
-        std::vector<simple_object_detector > vector_detectors;
+        std::vector<simple_object_detector> vector_detectors;
         const unsigned long num_detectors = len(detectors);
         // Now copy the data into dlib based objects.
         for (unsigned long i = 0; i < num_detectors; ++i)
         {
-            vector_detectors.push_back(detectors[i].cast<simple_object_detector >());
+            try
+            {
+                vector_detectors.push_back(detectors[i].cast<simple_object_detector>());
+            } catch(py::cast_error&)
+            {
+                vector_detectors.push_back(detectors[i].cast<simple_object_detector_py>().detector);
+            }
         }
 
         std::vector<double> detection_confidences;
@@ -263,28 +292,6 @@ namespace dlib
 
 
 
-    struct simple_object_detector_py
-    {
-        simple_object_detector detector;
-        unsigned int upsampling_amount;
-
-        simple_object_detector_py() {}
-        simple_object_detector_py(simple_object_detector& _detector, unsigned int _upsampling_amount) :
-            detector(_detector), upsampling_amount(_upsampling_amount) {}
-
-        std::vector<dlib::rectangle> run_detector1 (py::object img,
-                                                    const unsigned int upsampling_amount_)
-        {
-            return run_detector_with_upscale2(detector, img, upsampling_amount_);
-        }
-
-        std::vector<dlib::rectangle> run_detector2 (py::object img)
-        {
-            return run_detector_with_upscale2(detector, img, upsampling_amount);
-        }
-
-
-    };
 }
 
 #endif // DLIB_SIMPLE_OBJECT_DETECTOR_PY_H__

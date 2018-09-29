@@ -182,6 +182,7 @@ void bind_basic_types(py::module& m)
     typedef pair<unsigned long,unsigned long> range_type;
     py::class_<range_type>(m, "range", "This object is used to represent a range of elements in an array.")
         .def(py::init<unsigned long,unsigned long>())
+        .def(py::init([](unsigned long end){return range_type(0,end); }))
         .def_readwrite("begin",&range_type::first, "The index of the first element in the range.  This is represented using an unsigned integer.")
         .def_readwrite("end",&range_type::second, "One past the index of the last element in the range.  This is represented using an unsigned integer.")
         .def("__str__", range__str__)

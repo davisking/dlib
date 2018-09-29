@@ -849,6 +849,40 @@ namespace
     }
 
 // ----------------------------------------------------------------------------------------
+    
+    void test_line()
+    {
+        print_spinner();
+        line l1(point(0,1),point(1,0));
+        line l2(point(0,0),point(1,1));
+
+        DLIB_TEST(length(intersect(l1,l2) - dpoint(0.5,0.5)) < 1e-12);
+
+        DLIB_TEST(std::abs(distance_to_line(l1, l1.p1())) < 1e-12);
+
+        DLIB_TEST(std::abs(distance_to_line(l1, dpoint(0,0)) - sqrt(0.5)) < 1e-12);
+        DLIB_TEST(std::abs(distance_to_line(l1, dpoint(1,1)) - sqrt(0.5)) < 1e-12);
+
+        DLIB_TEST(std::abs(signed_distance_to_line(l1, dpoint(0,0)) + sqrt(0.5)) < 1e-12);
+        DLIB_TEST(std::abs(signed_distance_to_line(l1, dpoint(1,1)) - sqrt(0.5)) < 1e-12);
+        DLIB_TEST(std::abs(signed_distance_to_line(reverse(l1), dpoint(1,1)) + sqrt(0.5)) < 1e-12);
+
+
+        dpoint reference_point(0.7,0.5);
+        std::vector<dpoint> pts = {dpoint(0.01,0), dpoint(1,0.5), dpoint(0.9, 0.3), dpoint(0.4, 2), dpoint(1.3, 0.9)};
+
+
+        DLIB_TEST(count_points_between_lines(l1,l2,reference_point,pts) == 3);
+        DLIB_TEST(count_points_on_side_of_line(l1,reference_point,pts) == 4);
+
+        reference_point = dpoint(0,0.5);
+        DLIB_TEST(count_points_between_lines(l1,l2,reference_point,pts) == 0);
+        DLIB_TEST(count_points_on_side_of_line(l1,reference_point,pts) == 1);
+
+
+    }
+
+// ----------------------------------------------------------------------------------------
 
     class geometry_tester : public tester
     {
@@ -874,6 +908,7 @@ namespace
             test_find_similarity_transform2<double>(); 
             test_find_similarity_transform<float>(); 
             test_find_similarity_transform2<float>(); 
+            test_line();
         }
     } a;
 

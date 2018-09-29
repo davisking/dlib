@@ -14,7 +14,7 @@ namespace dlib
 
     template <
         typename T,
-        unsigned long max_pool_size
+        size_t max_pool_size
         >
     class memory_manager_kernel_1
     {
@@ -86,11 +86,11 @@ namespace dlib
             }
         }
 
-        unsigned long get_number_of_allocations (
+        size_t get_number_of_allocations (
         ) const { return allocations; }
 
         T* allocate_array (
-            unsigned long size
+            size_t size
         )
         {
             T* temp = new T[size];
@@ -183,9 +183,9 @@ namespace dlib
     private:
 
         // data members
-        unsigned long allocations;
+        size_t allocations;
         node* next;
-        unsigned long pool_size;
+        size_t pool_size;
 
         // restricted functions
         memory_manager_kernel_1(memory_manager_kernel_1&);        // copy constructor
@@ -231,11 +231,11 @@ namespace dlib
         {
         }
 
-        unsigned long get_number_of_allocations (
+        size_t get_number_of_allocations (
         ) const { return allocations; }
 
         T* allocate_array (
-            unsigned long size
+            size_t size
         )
         {
             T* temp = new T[size];
@@ -277,7 +277,7 @@ namespace dlib
     private:
 
         // data members
-        unsigned long allocations;
+        size_t allocations;
 
         // restricted functions
         memory_manager_kernel_1(memory_manager_kernel_1&);        // copy constructor
@@ -288,7 +288,7 @@ namespace dlib
 
     template <
         typename T,
-        unsigned long max_pool_size
+        size_t max_pool_size
         >
     inline void swap (
         memory_manager_kernel_1<T,max_pool_size>& a, 

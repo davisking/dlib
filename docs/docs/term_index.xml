@@ -107,7 +107,11 @@
          <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor_const_instance" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="alias_tensor" include="dlib/cuda/tensor.h"/>
          <term file="dlib/cuda/tensor_abstract.h.html" name="image_plane" include="dlib/cuda/tensor.h"/>
-         <term file="dlib/cuda/tensor_abstract.h.html" name="have_same_dimensions" include="dlib/cuda/tensor.h"/>
+         <term name="have_same_dimensions">
+            <term link="dlib/cuda/tensor_abstract.h.html#have_same_dimensions" name="for tensors" include="dlib/cuda/tensor.h"/>
+            <term link="dlib/image_processing/generic_image.h.html#have_same_dimensions" name="for images" include="dlib/image_processing/generic_image.h"/>
+         </term>
+
          <term file="dlib/cuda/gpu_data_abstract.h.html" name="gpu_data" include="dlib/cuda/gpu_data.h"/>
          <term name="memcpy">
             <term link="dlib/cuda/tensor_abstract.h.html#memcpy" name="for tensors"   include="dlib/cuda/tensor.h" />
@@ -149,6 +153,7 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="EXAMPLE_COMPUTATIONAL_LAYER_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="fc_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="con_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="resize_to_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="mult_prev_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="extract_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="upsample_" include="dlib/dnn.h"/>
@@ -184,6 +189,7 @@
          <term file="linear_algebra.html" name="resize_rect_width" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="resize_rect_height" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="centered_rect" include="dlib/geometry.h"/>
+         <term file="dlib/geometry/rectangle_abstract.h.html" name="centered_rects" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="set_aspect_ratio" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="set_rect_area" include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="center" include="dlib/geometry.h"/>
@@ -407,7 +413,7 @@
          <term file="algorithms.html" name="square_root"                   include="dlib/algs.h"/>
          <term file="linear_algebra.html" name="vector"                    include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point"                     include="dlib/geometry.h"/>
-         <term file="dlib/geometry/vector_abstract.h.html" name="dpoint"   include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="dpoint"                    include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="rotate_point"              include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_rotator"             include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="point_transform"           include="dlib/geometry.h"/>
@@ -424,6 +430,20 @@
          <term file="linear_algebra.html" name="point_transform_projective"    include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="find_projective_transform"     include="dlib/geometry.h"/>
          <term file="linear_algebra.html" name="rotation_matrix"           include="dlib/geometry.h"/>
+
+         <term file="linear_algebra.html" name="line"                            include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="signed_distance_to_line"         include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="reverse"                         include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="intersect"                       include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="count_points_on_side_of_line"    include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="count_points_between_lines"      include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="angle_between_lines"             include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="is_convex_quadrilateral"         include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="polygon_area"                    include="dlib/geometry.h"/>
+         <term file="linear_algebra.html" name="find_convex_quadrilateral"       include="dlib/geometry.h"/>
+         <term file="dlib/geometry/line_abstract.h.html" name="no_convex_quadrilateral"       include="dlib/geometry.h"/>
+
+
          <term file="algorithms.html" name="running_stats"                 include="dlib/statistics.h"/>
          <term file="algorithms.html" name="running_stats_decayed"                 include="dlib/statistics.h"/>
          <term file="algorithms.html" name="running_scalar_covariance_decayed"                 include="dlib/statistics.h"/>
@@ -646,6 +666,7 @@
          <term file="ml.html" name="polynomial_kernel"               include="dlib/svm.h"/>
          <term file="ml.html" name="sigmoid_kernel"                  include="dlib/svm.h"/>
          <term file="ml.html" name="radial_basis_kernel"             include="dlib/svm.h"/>
+         <term file="ml.html" name="auto_train_rbf_classifier"       include="dlib/svm.h"/>
 
 
          <term link="dlib/svm/sparse_vector_abstract.h.html#sparse_vectors" name="unsorted sparse vectors"/>
@@ -1429,7 +1450,12 @@
          <term file="imaging.html" name="get_pixel_intensity"        include="dlib/pixel.h"/>
          <term file="imaging.html" name="hysteresis_threshold"       include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="sobel_edge_detector"        include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="find_dark_lines"            include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="find_bright_lines"          include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="image_gradients"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="suppress_non_maximum_edges" include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="normalize_image_gradients"  include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="remove_incoherent_edge_pixels"  include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="zero_border_pixels"         include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="binary_close"               include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="edge_orientation"           include="dlib/image_transforms.h"/>
@@ -1438,9 +1464,11 @@
          <term file="imaging.html" name="binary_difference"          include="dlib/image_transforms.h"/>
 
          <term file="imaging.html" name="label_connected_blobs"               include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="label_connected_blobs_watershed"     include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="segment_image"                       include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="find_candidate_object_locations"     include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/segment_image_abstract.h.html" name="remove_duplicates"                   include="dlib/image_transforms.h"/>
+         <term file="dlib/image_transforms/label_connected_blobs_abstract.h.html" name="neighbors_24"                 include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/label_connected_blobs_abstract.h.html" name="neighbors_8"                 include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/label_connected_blobs_abstract.h.html" name="neighbors_4"                 include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/label_connected_blobs_abstract.h.html" name="connected_if_both_not_zero"  include="dlib/image_transforms.h"/>
@@ -1496,7 +1524,8 @@
          <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="image_to_tiled_pyramid"               include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/image_pyramid_abstract.h.html" name="tiled_pyramid_to_image"               include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="threshold_image"            include="dlib/image_transforms.h"/>
-         <term file="imaging.html" name="auto_threshold_image"       include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="min_barrier_distance"       include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="partition_pixels"           include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="png_loader"                 include="dlib/image_io.h"/>
          <term file="imaging.html" name="jpeg_loader"                include="dlib/image_io.h"/>
 
@@ -1507,6 +1536,7 @@
          <term file="imaging.html" name="rotate_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="resize_image"            include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="extract_image_chips"     include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="extract_image_4points"   include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="random_cropper"          include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="sub_image"               include="dlib/image_transforms.h"/>
          <term file="dlib/image_transforms/interpolation_abstract.h.html" name="sub_image_proxy"     include="dlib/image_transforms.h"/>
@@ -1540,6 +1570,8 @@
          <term file="imaging.html" name="random_color_transform"  include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="hough_transform"         include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="skeleton"                include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="encode_8_pixel_neighbors"                include="dlib/image_transforms.h"/>
+         <term file="imaging.html" name="find_line_endpoints"                include="dlib/image_transforms.h"/>
          <term file="imaging.html" name="hessian_pyramid"         include="dlib/image_keypoint.h"/>
          <term file="imaging.html" name="compute_dominant_angle"  include="dlib/image_keypoint.h"/>
          <term file="imaging.html" name="draw_surf_points"        include="dlib/image_keypoint/draw_surf_points.h"/>
@@ -1589,6 +1621,7 @@
 
          <term file="imaging.html" name="scan_image_movable_parts" include="dlib/image_processing.h"/>
          <term file="imaging.html" name="find_points_above_thresh" include="dlib/image_processing.h"/>
+         <term file="imaging.html" name="find_peaks" include="dlib/image_processing.h"/>
 
          <term file="dlib/image_processing/scan_fhog_pyramid_abstract.h.html" name="default_fhog_feature_extractor" include="dlib/image_processing.h"/>
          <term file="dlib/image_processing/scan_fhog_pyramid_abstract.h.html" name="num_separable_filters" include="dlib/image_processing.h"/>
@@ -1596,6 +1629,8 @@
          <term file="imaging.html" name="evaluate_detectors"                     include="dlib/image_processing.h"/>
          <term file="imaging.html" name="scan_fhog_pyramid"                      include="dlib/image_processing.h"/>
 
+         <term file="imaging.html" name="find_dark_keypoints"                    include="dlib/image_processing.h"/>
+         <term file="imaging.html" name="find_bright_keypoints"                  include="dlib/image_processing.h"/>
          <term file="imaging.html" name="scan_image"                             include="dlib/image_processing.h"/>
          <term file="imaging.html" name="scan_image_pyramid"                     include="dlib/image_processing.h"/>
          <term file="imaging.html" name="scan_image_boxes"                       include="dlib/image_processing.h"/>

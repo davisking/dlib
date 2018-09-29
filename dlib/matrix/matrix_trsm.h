@@ -10,22 +10,22 @@ namespace dlib
     namespace blas_bindings
     {
 #ifdef DLIB_USE_BLAS
-#ifndef CBLAS_H
+#ifdef DLIB_DEFINE_CBLAS_API
         extern "C"
         {
             void cblas_strsm(const CBLAS_ORDER Order, const CBLAS_SIDE Side,
                              const CBLAS_UPLO Uplo, const CBLAS_TRANSPOSE TransA,
-                             const CBLAS_DIAG Diag, const int M, const int N,
-                             const float alpha, const float *A, const int lda,
-                             float *B, const int ldb);
+                             const CBLAS_DIAG Diag, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const float alpha, const float *A, const CBLAS_INT_TYPE lda,
+                             float *B, const CBLAS_INT_TYPE ldb);
 
             void cblas_dtrsm(const CBLAS_ORDER Order, const CBLAS_SIDE Side,
                              const CBLAS_UPLO Uplo, const CBLAS_TRANSPOSE TransA,
-                             const CBLAS_DIAG Diag, const int M, const int N,
-                             const double alpha, const double *A, const int lda,
-                             double *B, const int ldb);
+                             const CBLAS_DIAG Diag, const CBLAS_INT_TYPE M, const CBLAS_INT_TYPE N,
+                             const double alpha, const double *A, const CBLAS_INT_TYPE lda,
+                             double *B, const CBLAS_INT_TYPE ldb);
         }
-#endif // if not CBLAS_H
+#endif // if DLIB_DEFINE_CBLAS_API 
 #endif // if DLIB_USE_BLAS
 
     // ------------------------------------------------------------------------------------

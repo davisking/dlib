@@ -2,52 +2,79 @@
 #include <dlib/python.h>
 #include "dlib/pixel.h"
 #include <dlib/image_transforms.h>
-
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include <numpy/ndarrayobject.h>
-
+#include <dlib/image_io.h>
+#include <pybind11/numpy.h>
 
 using namespace dlib;
 using namespace std;
 
 namespace py = pybind11;
 
+
+// -------------------------------- Basic Image IO ----------------------------------------
+
+numpy_image<rgb_pixel> load_rgb_image (const std::string &path)
+{
+    numpy_image<rgb_pixel> img;
+    load_image(img, path);
+    return img; 
+}
+
+numpy_image<unsigned char> load_grayscale_image (const std::string &path)
+{
+    numpy_image<unsigned char> img;
+    load_image(img, path);
+    return img; 
+}
+
+bool has_ending (std::string const full_string, std::string const &ending) {
+    if(full_string.length() >= ending.length()) {
+        return (0 == full_string.compare(full_string.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
 // ----------------------------------------------------------------------------------------
 
-py::list get_jitter_images(py::object img, size_t num_jitters = 1, bool disturb_colors = false)
+template <typename T>
+void save_image(numpy_image<T> img, const std::string &path)
+{
+    std::string lowered_path = path;
+    std::transform(lowered_path.begin(), lowered_path.end(), lowered_path.begin(), ::tolower);
+
+    if(has_ending(lowered_path, ".bmp")) {
+        save_bmp(img, path);
+    } else if(has_ending(lowered_path, ".dng")) {
+        save_dng(img, path);
+    } else if(has_ending(lowered_path, ".png")) {
+        save_png(img, path);
+    } else if(has_ending(lowered_path, ".jpg") || has_ending(lowered_path, ".jpeg")) {
+        save_jpeg(img, path);
+    } else {
+        throw dlib::error("Unsupported image type, image path must end with one of [.bmp, .png, .dng, .jpg, .jpeg]");
+    }
+    return;
+}
+
+// ----------------------------------------------------------------------------------------
+
+py::list get_jitter_images(numpy_image<rgb_pixel> img, size_t num_jitters = 1, bool disturb_colors = false)
 {
     static dlib::rand rnd_jitter;
-    if (!is_rgb_python_image(img))
-        throw dlib::error("Unsupported image type, must be RGB image.");
-
-    // Convert the image to matrix<rgb_pixel> for processing
-    matrix<rgb_pixel> img_mat;
-    assign_image(img_mat, numpy_rgb_image(img));
 
     // The top level list (containing 1 or more images) to return to python
     py::list jitter_list;
 
-    size_t rows = num_rows(img_mat);
-    size_t cols = num_columns(img_mat);
-
-    // Size of the numpy array
-    npy_intp dims[3] = { num_rows(img_mat), num_columns(img_mat), 3};
-
     for (int i = 0; i < num_jitters; ++i) {
         // Get a jittered crop
-        matrix<rgb_pixel> crop = dlib::jitter_image(img_mat, rnd_jitter);
+        numpy_image<rgb_pixel> crop = dlib::jitter_image(img, rnd_jitter);
         // If required disturb colors of the image
         if(disturb_colors)
             dlib::disturb_colors(crop, rnd_jitter);
         
-        PyObject *arr = PyArray_SimpleNew(3, dims, NPY_UINT8);
-        npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject*) arr);
-        memcpy(outdata, image_data(crop), rows * width_step(crop));
-                
-        py::handle handle = arr;
         // Append image to jittered image list
-        jitter_list.append(handle);
-        Py_DECREF(arr);
+        jitter_list.append(crop);
     }
            
     return jitter_list;
@@ -56,14 +83,12 @@ py::list get_jitter_images(py::object img, size_t num_jitters = 1, bool disturb_
 // ----------------------------------------------------------------------------------------
 
 py::list get_face_chips (
-    py::object img,
+    numpy_image<rgb_pixel> img,
     const std::vector<full_object_detection>& faces,
     size_t size = 150,
     float padding = 0.25
 )
 {
-    if (!is_rgb_python_image(img))
-        throw dlib::error("Unsupported image type, must be RGB image.");
 
     if (faces.size() < 1) {
         throw dlib::error("No face were specified in the faces array.");
@@ -74,71 +99,51 @@ py::list get_face_chips (
     std::vector<chip_details> dets;
     for (auto& f : faces)
         dets.push_back(get_face_chip_details(f, size, padding));
-    dlib::array<matrix<rgb_pixel>> face_chips;
-    extract_image_chips(numpy_rgb_image(img), dets, face_chips);
-
-    npy_intp rows = size;
-    npy_intp cols = size;
-
-    // Size of the numpy array
-    npy_intp dims[3] = { rows, cols, 3};
+    dlib::array<numpy_image<rgb_pixel>> face_chips;
+    extract_image_chips(img, dets, face_chips);
 
     for (auto& chip : face_chips) 
     {
-        PyObject *arr = PyArray_SimpleNew(3, dims, NPY_UINT8);
-        npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject*) arr);
-        memcpy(outdata, image_data(chip), rows * width_step(chip));
-        py::handle handle = arr;
-
         // Append image to chips list
-        chips_list.append(handle);
-        Py_DECREF(arr);
+        chips_list.append(chip);
     }
     return chips_list;
 }
 
-py::object get_face_chip (
-    py::object img,
+numpy_image<rgb_pixel> get_face_chip (
+    numpy_image<rgb_pixel> img,
     const full_object_detection& face,
     size_t size = 150,
     float padding = 0.25
 )
 {
-    if (!is_rgb_python_image(img))
-        throw dlib::error("Unsupported image type, must be RGB image.");
-
-    matrix<rgb_pixel> chip;
-    extract_image_chip(numpy_rgb_image(img), get_face_chip_details(face, size, padding), chip);
-
-    // Size of the numpy array
-    npy_intp dims[3] = { num_rows(chip), num_columns(chip), 3};
-
-    PyObject *arr = PyArray_SimpleNew(3, dims, NPY_UINT8);
-    npy_uint8 *outdata = (npy_uint8 *) PyArray_DATA((PyArrayObject *) arr);
-    memcpy(outdata, image_data(chip), num_rows(chip) * width_step(chip));
-    return py::reinterpret_steal<py::object>(arr);
+    numpy_image<rgb_pixel> chip;
+    extract_image_chip(img, get_face_chip_details(face, size, padding), chip);
+    return chip;
 }
 
 // ----------------------------------------------------------------------------------------
 
-// we need this wonky stuff because different versions of numpy's import_array macro
-// contain differently typed return statements inside import_array().
-#if PY_VERSION_HEX >= 0x03000000
-#define DLIB_NUMPY_IMPORT_ARRAY_RETURN_TYPE void* 
-#define DLIB_NUMPY_IMPORT_RETURN return 0
-#else
-#define DLIB_NUMPY_IMPORT_ARRAY_RETURN_TYPE void
-#define DLIB_NUMPY_IMPORT_RETURN return
-#endif
-DLIB_NUMPY_IMPORT_ARRAY_RETURN_TYPE import_numpy_stuff()
-{
-    import_array();
-    DLIB_NUMPY_IMPORT_RETURN;
-}
-
 void bind_numpy_returns(py::module &m)
 {
-    import_numpy_stuff();
+    m.def("load_rgb_image", &load_rgb_image, 
+	"Takes a path and returns a numpy array (RGB) containing the image",
+	py::arg("filename")
+    );
+
+    m.def("load_grayscale_image", &load_grayscale_image, 
+	"Takes a path and returns a numpy array containing the image, as an 8bit grayscale image.",
+	py::arg("filename")
+    );
+
+    m.def("save_image", &save_image<rgb_pixel>, 
+	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
+	py::arg("img"), py::arg("filename")
+    );
+    m.def("save_image", &save_image<unsigned char>, 
+	"Saves the given image to the specified path. Determines the file type from the file extension specified in the path",
+	py::arg("img"), py::arg("filename")
+    );
 
     m.def("jitter_image", &get_jitter_images, 
     "Takes an image and returns a list of jittered images."

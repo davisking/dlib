@@ -309,6 +309,60 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        typename image_type
+        >
+    unsigned char encode_8_pixel_neighbors (
+        const const_image_view<image_type>& img,
+        const point& p
+    );
+    /*!
+        requires
+            - image_type is an object that implement the interface defined in
+              dlib/image_processing/generic_image.h 
+            - img must contain a grayscale pixel type.
+            - all pixels in img are set to either on_pixel or off_pixel.
+              (i.e. it must be a binary image)
+            - get_rect(img).contains(p) == true
+        ensures
+            - This routine looks at the 8 pixels immediately surrounding the pixel
+              img[p.y()][p.x()] and encodes their on/off pattern into the bits of an
+              unsigned char and returns it.  To be specific, the neighbors are read
+              clockwise starting from the upper left and written to the unsigned char
+              starting with the high order bits.  Therefore, the mapping between
+              neighboring pixels to bits is:
+                 7 6 5
+                 0   4
+                 1 2 3
+              Where 0 refers to the lowest order bit in the unsigned char and 7 to the
+              highest order bit.  Finally, a bit in the unsigned char is 1 if and only if
+              the corresponding pixel is on_pixel.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    std::vector<point> find_line_endpoints (
+        const image_type& img
+    );
+    /*!
+        requires
+            - image_type is an object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - img must contain a grayscale pixel type.
+            - all pixels in img are set to either on_pixel or off_pixel.
+              (i.e. it must be a binary image)
+        ensures
+            - This routine finds endpoints of lines in a thinned binary image.  For
+              example, if the image was produced by skeleton() or something like a Canny
+              edge detector then you can use find_line_endpoints() to find the pixels
+              sitting on the ends of lines.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_MORPHOLOGICAL_OPERATIONs_ABSTRACT_

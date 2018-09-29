@@ -23,28 +23,21 @@
 #   Alternatively, if you want to compile dlib yourself then go into the dlib
 #   root folder and run:
 #       python setup.py install
-#   or
-#       python setup.py install --yes USE_AVX_INSTRUCTIONS
-#   if you have a CPU that supports AVX instructions, since this makes some
-#   things run faster.  
 #
 #   Compiling dlib should work on any operating system so long as you have
 #   CMake installed.  On Ubuntu, this can be done easily by running the
 #   command:
 #       sudo apt-get install cmake
 #
-#   Also note that this example requires scikit-image which can be installed
+#   Also note that this example requires Numpy which can be installed
 #   via the command:
-#       pip install scikit-image
-#   Or downloaded from http://scikit-image.org/download.html. 
+#       pip install numpy
 
 import os
 import sys
 import glob
 
 import dlib
-from skimage import io
-
 
 # In this example we are going to train a face detector based on the small
 # faces dataset in the examples/faces directory.  This means you need to supply
@@ -110,7 +103,7 @@ print("Showing detections and predictions on the images in the faces folder...")
 win = dlib.image_window()
 for f in glob.glob(os.path.join(faces_folder, "*.jpg")):
     print("Processing file: {}".format(f))
-    img = io.imread(f)
+    img = dlib.load_rgb_image(f)
 
     win.clear_overlay()
     win.set_image(img)

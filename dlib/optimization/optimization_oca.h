@@ -9,6 +9,7 @@
 #include "optimization_solve_qp_using_smo.h"
 #include <vector>
 #include "../sequence.h"
+#include <chrono>
 
 // ----------------------------------------------------------------------------------------
 
@@ -61,6 +62,7 @@ namespace dlib
             sub_max_iter = 50000;
 
             inactive_thresh = 20;
+            max_runtime = std::chrono::hours(24*356*290); // 290 years
         }
 
         void set_subproblem_epsilon (
@@ -87,6 +89,19 @@ namespace dlib
 
         unsigned long get_subproblem_max_iterations (
         ) const { return sub_max_iter; }
+
+        void set_max_runtime (
+            const std::chrono::nanoseconds& max_runtime_
+        ) 
+        {
+            max_runtime = max_runtime_;
+        }
+
+        std::chrono::nanoseconds get_max_runtime (
+        ) const
+        {
+            return max_runtime;
+        }
 
         void set_inactive_plane_threshold (
             unsigned long inactive_thresh_
@@ -249,6 +264,8 @@ namespace dlib
 
             const double prior_norm = have_prior ?  0.5*dot(prior,prior) : 0;
 
+            const auto time_to_stop = std::chrono::steady_clock::now() + max_runtime;
+
             unsigned long counter = 0;
             while (true)
             {
@@ -297,6 +314,8 @@ namespace dlib
                 {
                     break;
                 }
+                if (std::chrono::steady_clock::now() >= time_to_stop)
+                    break;
 
                 // compute kernel matrix for all the planes
                 K.swap(Ktmp);
@@ -398,6 +417,8 @@ namespace dlib
         unsigned long sub_max_iter;
 
         unsigned long inactive_thresh;
+
+        std::chrono::nanoseconds max_runtime;
     };
 }
 

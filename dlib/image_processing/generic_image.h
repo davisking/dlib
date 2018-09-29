@@ -4,6 +4,8 @@
 #define DLIB_GeNERIC_IMAGE_Hh_
 
 #include "../assert.h"
+#include "../pixel.h"
+#include <type_traits>
 
 namespace dlib
 {
@@ -127,6 +129,19 @@ namespace dlib
             the pixel type contained within an image via an expression of the form:
                 image_traits<image_type>::pixel_type
     !*/
+
+    template <typename image_type>
+    struct is_rgb_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::rgb; };
+
+    template <typename image_type>
+    struct is_grayscale_image { const static bool value = pixel_traits<typename image_traits<image_type>::pixel_type>::grayscale; };
+
+
+    // Check if T has image_traits<T> defined for it.
+    template <typename T, typename enabled = size_t>
+    struct is_image_type : public std::false_type{};
+    template <typename T>
+    struct is_image_type<T, decltype(sizeof(image_traits<typename std::decay<T>::type>))> : public std::true_type{};
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
@@ -285,6 +300,8 @@ namespace dlib
                 - sets the image to have 0 pixels in it.
         !*/
 
+        long get_width_step() const { return _width_step; }
+
     private:
 
         char* _data;
@@ -354,6 +371,8 @@ namespace dlib
         }
 #endif
 
+        long get_width_step() const { return _width_step; }
+
     private:
         const char* _data;
         long _width_step;
@@ -384,6 +403,14 @@ namespace dlib
         ensures
             - constructs a const_image_view from an image object
     !*/
+
+
+    // Don't stack image views on image views since that's pointless and just slows the
+    // compilation.
+    template <typename T> image_view<T>&             make_image_view ( image_view<T>& img)             { return img; }
+    template <typename T> const image_view<T>&       make_image_view ( const image_view<T>& img)       { return img; }
+    template <typename T> const_image_view<T>&       make_image_view ( const_image_view<T>& img)       { return img; }
+    template <typename T> const const_image_view<T>& make_image_view ( const const_image_view<T>& img) { return img; }
 
 // ----------------------------------------------------------------------------------------
 
@@ -422,6 +449,105 @@ namespace dlib
               of columns in an image.  However, as stated at the top of this file, image
               objects should provide their own overload of num_rows() if needed.
     !*/
+
+    template <typename image_type1, typename image_type2>
+    typename std::enable_if<is_image_type<image_type1>::value&&is_image_type<image_type2>::value, bool>::type 
+    have_same_dimensions (
+        const image_type1& img1,
+        const image_type2& img2
+    ) { return num_rows(img1)==num_rows(img2) && num_columns(img1)==num_columns(img2); }
+    /*!
+        ensures
+            - returns true if and only if the two given images have the same dimensions.
+    !*/
+
+    template <typename image_type1, typename image_type2, typename ...T>
+    typename std::enable_if<is_image_type<image_type1>::value&&is_image_type<image_type2>::value, bool>::type 
+    have_same_dimensions (
+        const image_type1& img1,
+        const image_type2& img2,
+        T&& ...args
+    ) { return have_same_dimensions(img1,img2) && have_same_dimensions(img1,args...); }
+
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+//            Make the image views implement the generic image interface
+// ----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    struct image_traits<image_view<T>>
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
+    template <typename T>
+    struct image_traits<const image_view<T>>
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
+
+    template <typename T>
+    inline long num_rows( const image_view<T>& img) { return img.nr(); }
+    template <typename T>
+    inline long num_columns( const image_view<T>& img) { return img.nc(); }
+
+    template <typename T>
+    inline void set_image_size( image_view<T>& img, long rows, long cols ) { img.set_size(rows,cols); }
+
+    template <typename T>
+    inline void* image_data( image_view<T>& img)
+    {
+        if (img.size() != 0)
+            return &img[0][0];
+        else
+            return 0;
+    }
+
+    template <typename T>
+    inline const void* image_data(
+        const image_view<T>& img
+    )
+    {
+        if (img.size() != 0)
+            return &img[0][0];
+        else
+            return 0;
+    }
+
+    template <typename T>
+    inline long width_step( const image_view<T>& img) { return img.get_width_step(); }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    struct image_traits<const_image_view<T>>
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
+    template <typename T>
+    struct image_traits<const const_image_view<T>>
+    {
+        typedef typename image_traits<T>::pixel_type pixel_type;
+    };
+
+    template <typename T>
+    inline long num_rows( const const_image_view<T>& img) { return img.nr(); }
+    template <typename T>
+    inline long num_columns( const const_image_view<T>& img) { return img.nc(); }
+
+    template <typename T>
+    inline const void* image_data(
+        const const_image_view<T>& img
+    )
+    {
+        if (img.size() != 0)
+            return &img[0][0];
+        else
+            return 0;
+    }
+
+    template <typename T>
+    inline long width_step( const const_image_view<T>& img) { return img.get_width_step(); }
 
 // ----------------------------------------------------------------------------------------
 

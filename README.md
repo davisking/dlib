@@ -38,15 +38,6 @@ Before you can run the Python example programs you must compile dlib. Type:
 python setup.py install
 ```
 
-or type
-
-```bash
-python setup.py install --yes USE_AVX_INSTRUCTIONS
-```
-
-if you have a CPU that supports AVX instructions, since this makes some things run faster.  
-
-
 
 ## Running the unit test suite
 

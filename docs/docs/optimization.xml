@@ -1221,9 +1221,8 @@ Or it can use the elastic net regularizer:
             essentially a simple wrapper around the global_function_search object and exists to
             provide a convenient interface.  Most users will therefore want to call find_max_global
             rather than global_function_search.  However, the API of global_function_search
-            is more general and allows for of a wider set of usage patterns, for example, executing
-            objective function evaluations in parallel.  So more advanced users may want to use
-            global_function_search directly rather than find_max_global.  But try to use find_max_global() first.
+            is more general and allows for of a wider set of usage patterns.  So if find_max_global() isn't general enough
+            for you then you can use the global_function_search API.
             </p>
 
          </description>

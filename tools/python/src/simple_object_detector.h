@@ -12,6 +12,7 @@
 #include "dlib/image_processing/remove_unobtainable_rectangles.h"
 #include "serialize_object_detector.h"
 #include "dlib/svm.h"
+#include <sstream>
 
 
 namespace dlib
@@ -34,6 +35,8 @@ namespace dlib
             C = 1;
             epsilon = 0.01;
             upsample_limit = 2;
+            nuclear_norm_regularization_strength = 0;
+            max_runtime_seconds = 86400.0*365.0*100.0; // 100 years
         }
 
         bool be_verbose;
@@ -43,7 +46,26 @@ namespace dlib
         double C;
         double epsilon;
         unsigned long upsample_limit;
+        double nuclear_norm_regularization_strength;
+        double max_runtime_seconds;
     };
+
+    inline std::string print_simple_object_detector_training_options(const simple_object_detector_training_options& o)
+    {
+        std::ostringstream sout;
+        sout << "simple_object_detector_training_options("
+            << "be_verbose=" << o.be_verbose << ", "
+            << "add_left_right_image_flips=" << o.add_left_right_image_flips << ", "
+            << "num_threads=" << o.num_threads << ", "
+            << "detection_window_size=" << o.detection_window_size << ", "
+            << "C=" << o.C << ", "
+            << "epsilon=" << o.epsilon << ", "
+            << "max_runtime_seconds=" << o.max_runtime_seconds << ", "
+            << "upsample_limit=" << o.upsample_limit << ", "
+            << "nuclear_norm_regularization_strength=" << o.nuclear_norm_regularization_strength 
+            << ")";
+        return sout.str();
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -142,6 +164,11 @@ namespace dlib
             throw error("Invalid C value given to train_simple_object_detector(), C must be > 0.");
         if (options.epsilon <= 0)
             throw error("Invalid epsilon value given to train_simple_object_detector(), epsilon must be > 0.");
+        if (options.max_runtime_seconds <= 0)
+            throw error("Invalid max_runtime_seconds value given to train_simple_object_detector(), max_runtime_seconds must be > 0.");
+
+        if (options.nuclear_norm_regularization_strength < 0)
+            throw error("Invalid nuclear_norm_regularization_strength value given to train_simple_object_detector(), it must be must be >= 0.");
 
         if (images.size() != boxes.size())
             throw error("The list of images must have the same length as the list of boxes.");
@@ -156,10 +183,12 @@ namespace dlib
         unsigned long width, height;
         impl::pick_best_window_size(boxes, width, height, options.detection_window_size);
         scanner.set_detection_window_size(width, height); 
+        scanner.set_nuclear_norm_regularization_strength(options.nuclear_norm_regularization_strength);
         structural_object_detection_trainer<image_scanner_type> trainer(scanner);
         trainer.set_num_threads(options.num_threads);  
         trainer.set_c(options.C);
         trainer.set_epsilon(options.epsilon);
+        trainer.set_max_runtime(std::chrono::milliseconds((int64_t)std::round(options.max_runtime_seconds*1000)));
         if (options.be_verbose)
         {
             std::cout << "Training with C: " << options.C << std::endl;
@@ -265,12 +294,30 @@ namespace dlib
         return ret;
     }
 
+    inline const simple_test_results test_simple_object_detector2 (
+        const std::string& dataset_filename,
+        simple_object_detector_py& detector,
+        const int upsample_amount
+    )
+    {
+        // Load all the testing images
+        dlib::array<array2d<rgb_pixel> > images;
+        std::vector<std::vector<rectangle> > boxes, ignore;
+        ignore = load_image_dataset(images, boxes, dataset_filename);
+        unsigned int final_upsampling_amount = 0;
+        if (upsample_amount < 0)
+            final_upsampling_amount = detector.upsampling_amount;
+
+        return test_simple_object_detector_with_images(images, final_upsampling_amount, boxes, ignore, detector.detector);
+    }
+
     inline const simple_test_results test_simple_object_detector (
         const std::string& dataset_filename,
         const std::string& detector_filename,
         const int upsample_amount
     )
     {
+
         // Load all the testing images
         dlib::array<array2d<rgb_pixel> > images;
         std::vector<std::vector<rectangle> > boxes, ignore;

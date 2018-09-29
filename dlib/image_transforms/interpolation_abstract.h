@@ -6,6 +6,7 @@
 #include "../pixel.h"
 #include "../image_processing/full_object_detection_abstract.h"
 #include "../image_processing/generic_image.h"
+#include <array>
 
 namespace dlib
 {
@@ -1446,6 +1447,58 @@ namespace dlib
             - This function is identical to the version of get_face_chip_details() defined
               above except that it creates and returns an array of chip_details objects,
               one for each input full_object_detection.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type
+        >
+    void extract_image_4points (
+        const image_type& img,
+        image_type& out,
+        const std::array<dpoint,4>& pts
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+        ensures
+            - The 4 points in pts define a convex quadrilateral and this function extracts
+              that part of the input image img and stores it into #out.  Therefore, each
+              corner of the quadrilateral is associated to a corner of #out and bilinear
+              interpolation and a projective mapping is used to transform the pixels in the
+              quadrilateral into #out.  To determine which corners of the quadrilateral map
+              to which corners of #out we fit the tightest possible rectangle to the
+              quadrilateral and map its vertices to their nearest rectangle corners.  These
+              corners are then trivially mapped to #out (i.e.  upper left corner to upper
+              left corner, upper right corner to upper right corner, etc.).
+            - #out.nr() == out.nr() && #out.nc() == out.nc().  
+              I.e. out should already be sized to whatever size you want it to be.
+    !*/
+
+    template <
+        typename image_type
+        >
+    void extract_image_4points (
+        const image_type& img,
+        image_type& out,
+        const std::array<line,4>& lines 
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+            - pixel_traits<typename image_traits<image_type>::pixel_type>::has_alpha == false
+        ensures
+            - This routine finds the 4 intersecting points of the given lines which form a
+              convex quadrilateral and uses them in a call to the version of
+              extract_image_4points() defined above.  i.e. extract_image_4points(img, out,
+              intersections_between_lines)
+        throws 
+            - no_convex_quadrilateral: this is thrown if you can't make a convex
+              quadrilateral out of the given lines.
     !*/
 
 // ----------------------------------------------------------------------------------------

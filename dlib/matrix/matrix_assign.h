@@ -372,12 +372,12 @@ namespace dlib
         // This is a macro to help us add overloads for the matrix_assign_blas_helper template.  
         // Using this macro it is easy to add overloads for arbitrary matrix expressions.
 #define DLIB_ADD_BLAS_BINDING(src_expression)                                               \
-    template <typename T, typename L> struct BOOST_JOIN(blas,__LINE__)                      \
+    template <typename T, typename L> struct DLIB_BOOST_JOIN(blas,__LINE__)                      \
     { const static bool value = sizeof(yes_type) == sizeof(test<T,L>(src_expression)); };   \
                                                                                             \
     template < typename dest_exp, typename src_exp >                                       \
     struct matrix_assign_blas_helper<dest_exp, src_exp,                                    \
-    typename enable_if<BOOST_JOIN(blas,__LINE__)<src_exp,typename dest_exp::layout_type> >::type > {   \
+    typename enable_if<DLIB_BOOST_JOIN(blas,__LINE__)<src_exp,typename dest_exp::layout_type> >::type > {   \
         static void assign (                                                                \
             dest_exp& dest,                                                                \
             const src_exp& src,                                                             \

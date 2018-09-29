@@ -424,13 +424,6 @@ namespace dlib
         };
 
         template <typename image_type>
-        struct is_rgb_image
-        {
-            typedef typename image_traits<image_type>::pixel_type pixel_type;
-            const static bool value = pixel_traits<pixel_type>::rgb;
-        };
-
-        template <typename image_type>
         struct save_dng_helper<image_type,typename enable_if<is_rgb_image<image_type> >::type>
         {
             static void save_dng (

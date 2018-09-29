@@ -20,10 +20,11 @@
 //  (C) Copyright Gennaro Prota 2003.
 //  (C) Copyright Eric Friedman 2003.
 // License: Boost Software License   See LICENSE.txt for the full license.
-#ifndef BOOST_JOIN
-#define BOOST_JOIN( X, Y ) BOOST_DO_JOIN( X, Y )
-#define BOOST_DO_JOIN( X, Y ) BOOST_DO_JOIN2(X,Y)
-#define BOOST_DO_JOIN2( X, Y ) X##Y
+// 
+#ifndef DLIB_BOOST_JOIN
+#define DLIB_BOOST_JOIN( X, Y ) DLIB_BOOST_DO_JOIN( X, Y )
+#define DLIB_BOOST_DO_JOIN( X, Y ) DLIB_BOOST_DO_JOIN2(X,Y)
+#define DLIB_BOOST_DO_JOIN2( X, Y ) X##Y
 #endif
 
 // figure out if the compiler has rvalue references. 
@@ -99,13 +100,13 @@ namespace dlib
     #define ASSERT_ARE_NOT_SAME_TYPE(type1, type2) static_assert(!::dlib::assert_types_match<type1,type2>::value, "These types should NOT be the same.")
 #else
     #define COMPILE_TIME_ASSERT(expression) \
-        DLIB_NO_WARN_UNUSED typedef char BOOST_JOIN(DLIB_CTA, __LINE__)[::dlib::compile_time_assert<(bool)(expression)>::value] 
+        DLIB_NO_WARN_UNUSED typedef char DLIB_BOOST_JOIN(DLIB_CTA, __LINE__)[::dlib::compile_time_assert<(bool)(expression)>::value] 
 
     #define ASSERT_ARE_SAME_TYPE(type1, type2) \
-        DLIB_NO_WARN_UNUSED typedef char BOOST_JOIN(DLIB_AAST, __LINE__)[::dlib::assert_are_same_type<type1,type2>::value] 
+        DLIB_NO_WARN_UNUSED typedef char DLIB_BOOST_JOIN(DLIB_AAST, __LINE__)[::dlib::assert_are_same_type<type1,type2>::value] 
 
     #define ASSERT_ARE_NOT_SAME_TYPE(type1, type2) \
-        DLIB_NO_WARN_UNUSED typedef char BOOST_JOIN(DLIB_AANST, __LINE__)[::dlib::assert_are_not_same_type<type1,type2>::value] 
+        DLIB_NO_WARN_UNUSED typedef char DLIB_BOOST_JOIN(DLIB_AANST, __LINE__)[::dlib::assert_are_not_same_type<type1,type2>::value] 
 #endif
 
 // -----------------------------
@@ -187,8 +188,8 @@ namespace dlib
     !*/
     // Use the fact that in C++03 you can't put non-PODs into a union.
 #define DLIB_ASSERT_HAS_STANDARD_LAYOUT(type)   \
-    union  BOOST_JOIN(DAHSL_,__LINE__) { type TYPE_NOT_STANDARD_LAYOUT; };  \
-    DLIB_NO_WARN_UNUSED typedef char BOOST_JOIN(DAHSL2_,__LINE__)[sizeof(BOOST_JOIN(DAHSL_,__LINE__))]; 
+    union  DLIB_BOOST_JOIN(DAHSL_,__LINE__) { type TYPE_NOT_STANDARD_LAYOUT; };  \
+    DLIB_NO_WARN_UNUSED typedef char DLIB_BOOST_JOIN(DAHSL2_,__LINE__)[sizeof(DLIB_BOOST_JOIN(DAHSL_,__LINE__))]; 
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

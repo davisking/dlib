@@ -12,6 +12,210 @@
 
 <current>
 New Features and Improvements:
+   - Allow 64bit seeds for murmur hash.
+   - Some code paths are a little faster.
+   - Added an option to do bounding box regression to the loss_mmod layer.
+   - Added resize_image(img,scale) to Python API.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed build errors in some environments.
+   - Make older versions of CMake work with CUDA 10.
+   - Fixed is_image_type template always reporting false. This also caused
+     have_same_dimensions() to be uncallable for images, so that's fixed now too.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.15" date="Jul 13, 2018">
+New Features and Improvements:
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed sub_image() in the Python API not working correctly for non-8bit images.
+   - Last release broke have_same_dimensions(). The version specific to images
+     was being used for tensors, which is incorrect and caused some of the DNN
+     tooling to malfunction.
+
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.14" date="Jul 07, 2018">
+New Features and Improvements:
+   - Added a --split-train-test option to imglab.
+   - Added a max runtime option to the oca solver and structural object
+     detection trainer.
+   - Added an option to do translational jittering of the bounding boxes in the
+     shape_predictor_trainer.  Using this option allows you to train
+     shape_predictors that are somewhat more robust against variation in
+     detection box placement. 
+   - Added an optional thread_pool argument to find_max_global() and
+     find_min_global() to allow for parallel execution of objective function calls.
+   - Added auto_train_rbf_classifier(), a tool that trains a RBF-SVM without requiring the user
+     to supply any hyperparameters.
+   - Added polygon_area()
+   - The image view objects now implement the generic image interface.
+   - Updates to the Python API:
+       - Added Python bindings for: extract_image_chip(),
+         extract_image_chips(), center(), get_histogram(), sub_image(),
+         polygon_area(), auto_train_rbf_classifier(), reduced(),
+         translate_rect(), spatially_filter_image(),
+         spatially_filter_image_separable(), num_separable_filters(),
+         threshold_filter_singular_values(), max_point(),
+         max_point_interpolated(), zero_border_pixels().  Also added an option
+         for training nuclear norm regularized HOG detectors.
+       - Added a bunch of new overloads and operators for existing Python types.
+       - Made decision functions more viewable from python.  You can now inspect
+         the contents of the functions rather than them being completely opaque.
+       - Made it so you can call the std::vector&lt;detectors&gt; version of
+         the object_detector constructor from python. So now you can pack
+         multiple detectors into one object via the python API.
+       - Allow batched face recognition for greater performance.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed the point and dpoint operator + doing subtraction in the Python API.
+   - Fixed label_connected_blobs_watershed() not giving contiguous labels as outputs. 
+   - Fixed AVX detection not working correctly on some systems.
+   - Fixed dlib.threshold_image() ignoring the optional thresh argument in the Python API.
+   - Fixed hough_transform::find_pixels_voting_for_lines(). It would sometimes
+     include a pixel multiple times in the output lists.
+   - Made the routines that rotate image datasets use the rectangle_transform
+     instead of the bad old way that only really worked for square boxes.  This
+     improves placement of such rotated rectangular boxes.
+
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.13" date="May 26, 2018">
+New Features and Improvements:
+   - Added a lot of new Python bindings.  You can now use these things from Python:
+      - gaussian_blur(), label_connected_blobs(), randomly_color_image(), jet(),
+        skeleton(), find_line_endpoints(), get_rect(), shrink_rect(), grow_rect(),
+        image_gradients, label_connected_blobs_watershed(), convert_image(),
+        convert_image_scaled(), dpoint, centered_rect(), centered_rects(), length(),
+        as_grayscale(), pyramid_down, find_bright_keypoints(), find_bright_lines(),
+        find_dark_lines(), find_dark_keypoints(), suppress_non_maximum_edges(),
+        find_peaks(), hysteresis_threshold(), sobel_edge_detector(), equalize_histogram(),
+        resize_image(), hough_transform, remove_incoherent_edge_pixels(),
+        normalize_image_gradients(), line, signed_distance_to_line(), distance_to_line(),
+        reverse(), intersect(), count_points_on_side_of_line(),
+        count_points_between_lines(), dot(), normalize(), point_transform_projective,
+        find_projective_transform(), inv(), transform_image(), angle_between_lines(),
+        extract_image_4points(), load_grayscale_image(), min_barrier_distance(). 
+      - Added a .add_overlay_circle() to dlib.image_window.  Also made .add_overlay()
+        take lines.
+      - Added the *_corner() routines to rectangle and drectangle and made these 
+        objects constructable from instances of each other.
+   - Made the Python extension module automatically enable AVX instructions if the host
+     machine supports them.  So you never need to say --yes USE_AVX_INSTRUCTIONS anymore
+     when installing dlib.
+
+   - New C++ routines:
+      - Added an image_window::add_overlay() overload for line object.
+      - Added angle_between_lines()
+      - Added extract_image_4points()
+      - Added is_convex_quadrilateral(), find_convex_quadrilateral(), and no_convex_quadrilateral.
+      - Added python_list_to_array()
+      - Added min_barrier_distance() 
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed numpy_image and pybind11 crashing python sometimes when certain types of
+     conversions are attempted.
+   - Fixed some python functions not taking as wide a range of image types as they did in
+     previous dlib versions.
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.12" date="May 19, 2018">
+New Features and Improvements:
+   - Added Python interface to threshold_image() and partition_pixels().
+
+Non-Backwards Compatible Changes:
+   - In the Python API, renamed dlib.save_rgb_image() to dlib.save_image().
+
+Bug fixes:
+   - Dlib 19.11 had a bug that caused the Python interface to reject grayscale images.
+     This has been fixed.
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.11" date="May 17, 2018">
+New Features and Improvements:
+   - Deep Learning
+      - Added resize_to layer.
+      - Made loss_multiclass_log_per_pixel use CUDA. This greatly accelerates 
+        training with this loss layer.
+   - Image Processing
+      - Added normalize_image_gradients() and remove_incoherent_edge_pixels().
+      - Added neighbors_24 (for use with label_connected_blobs())
+      - Added partition_pixels() and made threshold_image() use it to find the
+        default threshold if none is given. Also depreciated
+        auto_threshold_image() since using partition_pixels() to pick the
+        threshold is superior.
+      - Added overload of hysteresis_threshold() that uses partition_pixels()
+        to select thresholds.
+      - Added encode_8_pixel_neighbors() and find_line_endpoints().
+      - Added image_gradients, a tool for computing multi-scale first and
+        second order image gradients. 
+      - Added find_bright_lines(), find_dark_lines(), find_bright_keypoints(),
+        and find_dark_keypoints(). 
+      - Added label_connected_blobs_watershed().
+      - Added find_peaks().
+      - Added find_pixels_voting_for_lines(), find_strong_hough_points(),
+        and perform_generic_hough_transform() to the hough_transform.
+   - Improved the stopping condition of the solve_qp_box_constrained() and
+     solve_qp_box_constrained_blockdiag() quadratic program solvers.
+   - Made find_min_single_variable() more numerically stable.
+   - Make visual studio build with all cores when building dlib.
+   - Added steal_memory() to the matrix.
+   - Improved the workflow for adding part annotations in imglab.  You can now
+     use shift+click to rapidly add parts to an object.  Each part will
+     automatically receive an integer label.
+   - Added .begin() and .end() to array2d.
+   - Added the line class and some related utility functions.
+   - Added centered_rects().
+   - Added numpy_image, which is a simple type safe interface to numpy arrays.
+     It is also a fully functional dlib image class, making interfacing dlib's
+     image processing to Python much cleaner.  
+
+Non-Backwards Compatible Changes:
+   - All CUDA code in dlib was moved to dlib/cuda.
+
+Bug fixes:
+   - Replaced all the old Python C APIs interfacing to numpy with the new
+     numpy_image.  This fixed some reference counting errors as a result.
+   - Fixed load_bmp() not loading certain types of BMP images. 
+   - Fixed compile time bugs when trying to use CBLAS in some unusual environments.
+   - Fixed bug in global_function_search's constructor that takes initial function
+     evaluations. It wasn't assigning these values into the entire state of the
+     solver.
+   - Fixed compile time error in the matlab bindings.  Also, fixed cell arrays
+     of complex types not binding correctly.
+   - Renamed BOOST_JOIN to DLIB_BOOST_JOIN to prevent name clashes when working
+     with boost.
+   - Fixed bug in hysteresis_threshold() that could cause incorrect output.
+   - The last release of dlib added more ODR violation checks.  However, these
+     could erroneously trigger when using Visual Studio and CUDA in certain
+     workflows.  This has been fixed.
+   - Fixed matrix objects not working correctly when sized greater than 4GB in
+     Visual Studio.
+</old>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.10" date="Mar 19, 2018">
+New Features and Improvements:
    - Deep Learning:
       - Added scale_ layer, allowing implementation of squeeze-and-excitation networks.
       - Added loss_multimulticlass_log: used for learning a collection of multi-class classifiers.
@@ -60,7 +264,7 @@ Bug fixes:
      really bad training data or parameters have been added.
    - Fixed the decayed running stats objects so they use unbiased estimators.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
