@@ -789,6 +789,8 @@ if (NOT TARGET dlib)
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
 
+   # OpenCV4 is cleaning up the old C API compat.
+   target_compile_definitions(dlib PRIVATE -DCV__DISABLE_C_API_CTORS)
 
    target_include_directories(dlib
       INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
