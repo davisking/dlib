@@ -118,6 +118,22 @@ namespace dlib
         }
     }
 
+    // This should be pretty much the same as cudaStreamSynchronize, which for some
+    // reason makes training freeze on GeForce RTX 2080 Ti hardware.
+    void synchronize_stream(cudaStream_t stream)
+    {
+        while (true)
+        {
+            cudaError_t err = cudaStreamQuery(stream);
+            switch (err)
+            {
+            case cudaSuccess: return;      // now we are synchronized
+            case cudaErrorNotReady: break; // continue waiting
+            default: CHECK_CUDA(err);      // unexpected error: throw
+            }
+        }
+    }
+
     void gpu_data::
     async_copy_to_device() const
     {
@@ -127,7 +143,9 @@ namespace dlib
             {
                 // Wait for any possible CUDA kernels that might be using our memory block to
                 // complete before we overwrite the memory.
-                CHECK_CUDA(cudaStreamSynchronize(0));
+                synchronize_stream(0);
+                //CHECK_CUDA(cudaStreamSynchronize(0));
+
                 device_in_use = false;
             }
             CHECK_CUDA(cudaMemcpyAsync(data_device.get(), data_host.get(), data_size*sizeof(float), cudaMemcpyHostToDevice, (cudaStream_t)cuda_stream.get()));
