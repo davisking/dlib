@@ -259,12 +259,12 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
 
 int main(int argc, char** argv) try
 {
-    if (argc != 2)
+    if (argc < 2 || argc > 3)
     {
         cout << "To run this program you need a copy of the PASCAL VOC2012 dataset." << endl;
         cout << endl;
         cout << "You call this program like this: " << endl;
-        cout << "./dnn_semantic_segmentation_train_ex /path/to/VOC2012" << endl;
+        cout << "./dnn_semantic_segmentation_train_ex /path/to/VOC2012 [minibatch-size]" << endl;
         return 1;
     }
 
@@ -277,7 +277,9 @@ int main(int argc, char** argv) try
         cout << "Didn't find the VOC2012 dataset. " << endl;
         return 1;
     }
-        
+ 
+    // a mini-batch smaller than the default can be used with GPUs having less memory
+    const int minibatch_size = argc == 3 ? std::stoi(argv[2]) : 30;
 
     const double initial_learning_rate = 0.1;
     const double weight_decay = 0.0001;
@@ -345,9 +347,9 @@ int main(int argc, char** argv) try
         samples.clear();
         labels.clear();
 
-        // make a 30-image mini-batch
+        // make a mini-batch
         training_sample temp;
-        while(samples.size() < 30)
+        while(samples.size() < minibatch_size)
         {
             data.dequeue(temp);
 
