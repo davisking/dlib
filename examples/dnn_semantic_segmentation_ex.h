@@ -179,21 +179,35 @@ template <typename SUBNET> using alevel4t = dlib::repeat<2,ares64,ares_up<64,SUB
 
 // training network type
 using net_type = dlib::loss_multiclass_log_per_pixel<
-                            dlib::cont<class_count,7,7,2,2,
-                            level4t<level3t<level2t<level1t<
-                            level1<level2<level3<level4<
-                            dlib::max_pool<3,3,2,2,dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
+                            dlib::con<class_count,1,1,1,1,
+                            dlib::concat_prev7<dlib::cont<class_count,7,7,2,2,
+                            dlib::concat_prev6<level4t<
+                            dlib::concat_prev5<level3t<
+                            dlib::concat_prev4<level2t<
+                            dlib::concat_prev3<level1t<
+                            level1<dlib::tag3<
+                            level2<dlib::tag4<
+                            level3<dlib::tag5<
+                            level4<dlib::max_pool<3,3,2,2,dlib::tag6<
+                            dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,dlib::tag7<
                             dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                            >>>>>>>>>>>>>>;
+                            >>>>>>>>>>>>>>>>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
 using anet_type = dlib::loss_multiclass_log_per_pixel<
-                            dlib::cont<class_count,7,7,2,2,
-                            alevel4t<alevel3t<alevel2t<alevel1t<
-                            alevel1<alevel2<alevel3<alevel4<
-                            dlib::max_pool<3,3,2,2,dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
+                            dlib::con<class_count,1,1,1,1,
+                            dlib::concat_prev7<dlib::cont<class_count,7,7,2,2,
+                            dlib::concat_prev6<alevel4t<
+                            dlib::concat_prev5<alevel3t<
+                            dlib::concat_prev4<alevel2t<
+                            dlib::concat_prev3<alevel1t<
+                            alevel1<dlib::tag3<
+                            alevel2<dlib::tag4<
+                            alevel3<dlib::tag5<
+                            alevel4<dlib::max_pool<3,3,2,2,dlib::tag6<
+                            dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,dlib::tag7<
                             dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                            >>>>>>>>>>>>>>;
+                            >>>>>>>>>>>>>>>>>>>>>>>>>;
 
 // ----------------------------------------------------------------------------------------
 
