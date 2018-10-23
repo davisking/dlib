@@ -2311,15 +2311,25 @@ namespace dlib
             auto&& t2 = layer<tag>(sub).get_output();
 
             DLIB_CASSERT(t1.num_samples() == t2.num_samples());
-            DLIB_CASSERT(t1.nr() == t2.nr());
-            DLIB_CASSERT(t1.nc() == t2.nc());
 
-            output.set_size(t1.num_samples(),
-                            t1.k()+t2.k(),
-                            t1.nr(),
-                            t1.nc());
+            output.set_size(t2.num_samples(),
+                            t1.k() + t2.k(),
+                            t2.nr(),
+                            t2.nc());
 
-            tt::copy_tensor(false, output, 0, t1, 0, t1.k());
+            if (t1.nr() != t2.nr() || t1.nc() != t2.nc())
+            {
+                // resize t1 to size of t2 - TODO: try to optimize this maybe?
+                dlib::resizable_tensor temp;
+                temp.set_size(t1.num_samples(), t1.k(), t2.nr(), t2.nc());
+                tt::resize_bilinear(temp, t1);
+                tt::copy_tensor(false, output, 0, temp, 0, t1.k());
+            }
+            else
+            {
+                tt::copy_tensor(false, output, 0, t1, 0, t1.k());
+            }
+
             tt::copy_tensor(false, output, t1.k(), t2, 0, t2.k());
         }
 
