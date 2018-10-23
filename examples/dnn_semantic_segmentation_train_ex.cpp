@@ -279,7 +279,7 @@ int main(int argc, char** argv) try
     }
  
     // a mini-batch smaller than the default can be used with GPUs having less memory
-    const int minibatch_size = argc == 3 ? std::stoi(argv[2]) : 30;
+    const int minibatch_size = argc == 3 ? std::stoi(argv[2]) : 24;
 
     const double initial_learning_rate = 0.1;
     const double weight_decay = 0.0001;
