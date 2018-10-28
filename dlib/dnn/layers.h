@@ -2317,10 +2317,7 @@ namespace dlib
                             t2.nr(),
                             t2.nc());
 
-            // tt::resize_bilinear is overloaded, so let's resolve the ambiguity
-            const auto resize = [](tensor& d, const tensor& s) { tt::resize_bilinear(d, s); };
-
-            tt::copy_tensor(false, output, 0, resize_if_needed(t1, t2.nr(), t2.nc(), resize), 0, t1.k());
+            tt::copy_tensor(false, output, 0, resize_if_needed(t1, t2.nr(), t2.nc(), direction::forward), 0, t1.k());
             tt::copy_tensor(false, output, t1.k(), t2, 0, t2.k());
         }
 
@@ -2335,11 +2332,8 @@ namespace dlib
             const auto nr = gradient_input.nr();
             const auto nc = gradient_input.nc();
 
-            // tt::resize_bilinear_gradient is overloaded, so let's resolve the ambiguity
-            const auto resize = [](tensor& d, const tensor& s) { tt::resize_bilinear_gradient(d, s); };
-
-            tt::copy_tensor(true, resize_if_needed(t1, nr, nc, resize), 0, gradient_input, 0, t1.k());
-            tt::copy_tensor(true, resize_if_needed(t2, nr, nc, resize), 0, gradient_input, t1.k(), t2.k());
+            tt::copy_tensor(true, resize_if_needed(t1, nr, nc, direction::backward), 0, gradient_input, 0, t1.k());
+            tt::copy_tensor(true, resize_if_needed(t2, nr, nc, direction::backward), 0, gradient_input, t1.k(), t2.k());
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -2375,9 +2369,11 @@ namespace dlib
     private:
         resizable_tensor params;
 
+        enum class direction { forward, backward };
+
         // Handle both tensor& and const tensor& inputs and outputs using this template function.
         template <typename TENSOR>
-        TENSOR& resize_if_needed(TENSOR& input, int nr, int nc, const std::function<void(tensor&,const tensor&)>& resize)
+        TENSOR& resize_if_needed(TENSOR& input, int nr, int nc, direction direction)
         {
             if (input.nr() == nr && input.nc() == nc) {
                 // Great - we don't need to do anything at all!
@@ -2390,7 +2386,19 @@ namespace dlib
             DLIB_CASSERT(std::abs(input.nc() - nc) <= 1);
 
             resize_temp.set_size(input.num_samples(), input.k(), nr, nc);
-            resize(resize_temp, input);
+
+            if (direction == direction::forward) {
+                tt::resize_bilinear(resize_temp, input);
+            }
+            else if (direction == direction::backward) {
+                std::fill(resize_temp.begin(), resize_temp.end(), 0.f);
+                tt::resize_bilinear_gradient(resize_temp, input);
+            }
+            else {
+                DLIB_CASSERT(direction == direction::forward
+                          || direction == direction::backward);
+            }
+
             return resize_temp;
         }
 
