@@ -2317,7 +2317,7 @@ namespace dlib
                             t2.nr(),
                             t2.nc());
 
-            tt::copy_tensor(false, output, 0, resize_if_needed(t1, t2.nr(), t2.nc()), 0, t1.k());
+            tt::copy_tensor(false, output, 0, resize_if_needed(t1, t2.nr(), t2.nc(), tt::resize_bilinear), 0, t1.k());
             tt::copy_tensor(false, output, t1.k(), t2, 0, t2.k());
         }
 
@@ -2332,8 +2332,8 @@ namespace dlib
             const auto nr = gradient_input.nr();
             const auto nc = gradient_input.nc();
 
-            tt::copy_tensor(true, resize_if_needed(t1, nr, nc), 0, gradient_input, 0, t1.k()); 
-            tt::copy_tensor(true, resize_if_needed(t2, nr, nc), 0, gradient_input, t1.k(), t2.k());
+            tt::copy_tensor(true, resize_if_needed(t1, nr, nc, tt::resize_bilinear_gradient), 0, gradient_input, 0, t1.k());
+            tt::copy_tensor(true, resize_if_needed(t2, nr, nc, tt::resize_bilinear_gradient), 0, gradient_input, t1.k(), t2.k());
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -2371,7 +2371,7 @@ namespace dlib
 
         // Handle both tensor& and const tensor& inputs and outputs using this template function.
         template <typename TENSOR>
-        TENSOR& resize_if_needed(TENSOR& input, int nr, int nc)
+        TENSOR& resize_if_needed(TENSOR& input, int nr, int nc, const std::function<void(tensor&,const tensor&)>& resize)
         {
             if (input.nr() == nr && input.nc() == nc) {
                 // Great - we don't need to do anything at all!
@@ -2384,7 +2384,7 @@ namespace dlib
             DLIB_CASSERT(std::abs(input.nc() - nc) <= 1);
 
             resize_temp.set_size(input.num_samples(), input.k(), nr, nc);
-            tt::resize_bilinear(resize_temp, input);
+            resize(resize_temp, input);
             return resize_temp;
         }
 
