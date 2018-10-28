@@ -2317,7 +2317,10 @@ namespace dlib
                             t2.nr(),
                             t2.nc());
 
-            tt::copy_tensor(false, output, 0, resize_if_needed(t1, t2.nr(), t2.nc(), tt::resize_bilinear), 0, t1.k());
+            // tt::resize_bilinear is overloaded, so let's resolve the ambiguity
+            const auto resize = [](tensor& d, const tensor& s) { tt::resize_bilinear(d, s); };
+
+            tt::copy_tensor(false, output, 0, resize_if_needed(t1, t2.nr(), t2.nc(), resize), 0, t1.k());
             tt::copy_tensor(false, output, t1.k(), t2, 0, t2.k());
         }
 
@@ -2332,8 +2335,11 @@ namespace dlib
             const auto nr = gradient_input.nr();
             const auto nc = gradient_input.nc();
 
-            tt::copy_tensor(true, resize_if_needed(t1, nr, nc, tt::resize_bilinear_gradient), 0, gradient_input, 0, t1.k());
-            tt::copy_tensor(true, resize_if_needed(t2, nr, nc, tt::resize_bilinear_gradient), 0, gradient_input, t1.k(), t2.k());
+            // tt::resize_bilinear_gradient is overloaded, so let's resolve the ambiguity
+            const auto resize = [](tensor& d, const tensor& s) { tt::resize_bilinear_gradient(d, s); };
+
+            tt::copy_tensor(true, resize_if_needed(t1, nr, nc, resize), 0, gradient_input, 0, t1.k());
+            tt::copy_tensor(true, resize_if_needed(t2, nr, nc, resize), 0, gradient_input, t1.k(), t2.k());
         }
 
         const tensor& get_layer_params() const { return params; }
