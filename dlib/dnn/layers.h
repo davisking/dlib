@@ -2317,19 +2317,7 @@ namespace dlib
                             t2.nr(),
                             t2.nc());
 
-            if (t1.nr() != t2.nr() || t1.nc() != t2.nc())
-            {
-                // resize t1 to size of t2 - TODO: try to optimize this maybe?
-                dlib::resizable_tensor temp;
-                temp.set_size(t1.num_samples(), t1.k(), t2.nr(), t2.nc());
-                tt::resize_bilinear(temp, t1);
-                tt::copy_tensor(false, output, 0, temp, 0, t1.k());
-            }
-            else
-            {
-                tt::copy_tensor(false, output, 0, t1, 0, t1.k());
-            }
-
+            tt::copy_tensor(false, output, 0, resize_if_needed(t1, t2.nr(), t2.nc()), 0, t1.k());
             tt::copy_tensor(false, output, t1.k(), t2, 0, t2.k());
         }
 
@@ -2341,8 +2329,11 @@ namespace dlib
 
             DLIB_CASSERT(t1.k() + t2.k() == gradient_input.k());
 
-            tt::copy_tensor(true, t1, 0, gradient_input, 0, t1.k());
-            tt::copy_tensor(true, t2, 0, gradient_input, t1.k(), t2.k());
+            const auto nr = gradient_input.nr();
+            const auto nc = gradient_input.nc();
+
+            tt::copy_tensor(true, resize_if_needed(t1, nr, nc), 0, gradient_input, 0, t1.k()); 
+            tt::copy_tensor(true, resize_if_needed(t2, nr, nc), 0, gradient_input, t1.k(), t2.k());
         }
 
         const tensor& get_layer_params() const { return params; }
@@ -2377,6 +2368,27 @@ namespace dlib
 
     private:
         resizable_tensor params;
+
+        // Handle both tensor& and const tensor& inputs and outputs using this template function.
+        template <typename TENSOR>
+        TENSOR& resize_if_needed(TENSOR& input, int nr, int nc)
+        {
+            if (input.nr() == nr && input.nc() == nc) {
+                // Great - we don't need to do anything at all!
+                return input;
+            }
+
+            // In U-net style usage, the matrix sizes should differ only very little, if at all.
+            // In other possible applications however, this requirement may need to be relaxed.
+            DLIB_CASSERT(std::abs(input.nr() - nr) <= 1);
+            DLIB_CASSERT(std::abs(input.nc() - nc) <= 1);
+
+            resize_temp.set_size(input.num_samples(), input.k(), nr, nc);
+            tt::resize_bilinear(resize_temp, input);
+            return resize_temp;
+        }
+
+        resizable_tensor resize_temp;
     };
 
     template <
