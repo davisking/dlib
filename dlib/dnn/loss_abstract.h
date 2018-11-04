@@ -233,8 +233,8 @@ namespace dlib
                 This object implements the loss layer interface defined above by
                 EXAMPLE_LOSS_LAYER_.  In particular, it implements the log loss, which is
                 appropriate for binary classification problems.  Therefore, there are two possible
-                classes of labels: positive (> 0) and negative (< 0) when using this loss. The absolute
-                of the label represents a weight.
+                classes of labels: positive (> 0) and negative (< 0) when using this loss.
+                The absolute of the label represents its weight.
                 Moreover, it will cause the  network to produce outputs > 0 when predicting a
                 member of the positive class and  values < 0 otherwise.
 
