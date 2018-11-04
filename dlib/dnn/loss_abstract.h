@@ -234,10 +234,11 @@ namespace dlib
                 EXAMPLE_LOSS_LAYER_.  In particular, it implements the log loss, which is
                 appropriate for binary classification problems.  Therefore, there are two possible
                 classes of labels: positive (> 0) and negative (< 0) when using this loss.
-                The absolute of tvalue he label represents its weight.  Putting a larger weight
-                on a sample increases the importance of getting its prediction correct during training.
-                A good rule of thumb is to use weights with absolute value 1 unless you have a very
-                unbalanced training dataset.
+                The absolute value of the label represents its weight.  Putting a larger weight
+                on a sample increases the importance of getting its prediction correct during 
+                training.  A good rule of thumb is to use weights with absolute value 1 unless 
+                you have a very unbalanced training dataset, in that case, give larger weight
+                to the class with less training examples.
                 
                 This loss will cause the network to produce outputs > 0 when predicting a
                 member of the positive class and values < 0 otherwise.
