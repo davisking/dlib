@@ -85,6 +85,17 @@
             <a href="dlib/test_for_odr_violations.h.html">dlib/test_for_odr_violations.h</a> and 
             <a href="dlib/test_for_odr_violations.cpp.html">dlib/test_for_odr_violations.cpp</a>.
          </p>
+
+         <p> 
+            Finally, most users who get this error are using Visual Studio.
+            You probably compiled dlib and then went into Visual Studio's
+            output folder, grabbed the .lib file, and then tried to
+            create a project using that .lib file and dlib's .h files from
+            github.  THIS IS WRONG, DO NOT DO THIS.  Instead, <a href="compile.html#Using%20dlib%20from%20C++">read the
+            instructions for using dlib and follow them</a>.  I promise they are
+            much simpler than any process that involves manually copying files
+            around in the file explorer.
+         </p>
       </question>
 
       <question text="It doesn't work?">

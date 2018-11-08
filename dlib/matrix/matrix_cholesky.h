@@ -145,46 +145,94 @@ namespace dlib
         const long n = A.nc();
         L_.set_size(n,n); 
 
-        const type eps = max(abs(diag(A)))*std::sqrt(std::numeric_limits<type>::epsilon())/100;
 
-        // Main loop.
-        for (long j = 0; j < n; j++) 
+        // do nothing if the matrix is empty
+        if (A.size() == 0)
+            return;
+
+        const type eps = std::numeric_limits<type>::epsilon();
+
+        const type eps2 = max(abs(diag(A)))*std::sqrt(std::numeric_limits<type>::epsilon())/100;
+
+
+
+        // compute the upper left corner
+        if (A(0,0) > 0)
         {
-            type d(0.0);
-            for (long k = 0; k < j; k++) 
+            L_(0,0) = std::sqrt(A(0,0));
+            if (A(0,0) <= eps2)
+                isspd = false;
+        }
+        else
+        {
+            isspd = false;
+            L_(0,0) = 0;
+        }
+
+        // compute the first column
+        for (long r = 1; r < A.nr(); ++r)
+        {
+            // if (L_(0,0) > 0)
+            if (L_(0,0) > eps*std::abs(A(r,0)))
             {
-                type s(0.0);
-                for (long i = 0; i < k; i++) 
+                L_(r,0) = A(r,0)/L_(0,0);
+            }
+            else
+            {
+                isspd = false;
+                L_(r,0) = 0;
+            }
+
+            isspd = isspd && (std::abs(A(r,0) - A(0,r)) <= eps*std::abs(A(r,0)) ); 
+        }
+
+        // now compute all the other columns
+        for (long c = 1; c < A.nc(); ++c)
+        {
+            // compute the diagonal element
+            type temp = A(c,c);
+            for (long i = 0; i < c; ++i)
+                temp -= L_(c,i)*L_(c,i);
+
+            if (temp > 0)
+            {
+                L_(c,c) = std::sqrt(temp);
+                if (temp <= eps2)
+                    isspd = false;
+            }
+            else
+            {
+                L_(c,c) = 0;
+                isspd = false;
+            }
+
+            for (long r = 0; r < c; ++r)
+                L_(r,c) = 0;
+
+            // compute the non diagonal elements
+            for (long r = c+1; r < A.nr(); ++r)
+            {
+                temp = A(r,c);
+                for (long i = 0; i < c; ++i)
                 {
-                    s += L_(k,i)*L_(j,i);
+                    temp -= L_(r,i)*L_(c,i);
                 }
 
-                // if L_(k,k) != 0
-                if (std::abs(L_(k,k)) > eps)
+                // if (L_(c,c) > 0)
+                if (L_(c,c) > eps*std::abs(temp))
                 {
-                    s = (A(j,k) - s)/L_(k,k);
+                    L_(r,c) = temp/L_(c,c);
                 }
                 else
                 {
-                    s = (A(j,k) - s);
                     isspd = false;
+                    L_(r,c) = 0;
                 }
 
-                L_(j,k) = s;
-
-                d = d + s*s;
-
-                // this is approximately doing: isspd = isspd && ( A(k,j) == A(j,k))
-                isspd = isspd && (std::abs(A(k,j) - A(j,k)) < eps ); 
-            }
-            d = A(j,j) - d;
-            isspd = isspd && (d > eps);
-            L_(j,j) = sqrt(d > 0.0 ? d : 0.0);
-            for (long k = j+1; k < n; k++) 
-            {
-                L_(j,k) = 0.0;
+                isspd = isspd && (std::abs(A(r,c) - A(c,r)) <= eps*std::abs(A(r,c)) ); 
             }
         }
+
 #endif
     }
 

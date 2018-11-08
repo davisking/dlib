@@ -65,7 +65,7 @@ namespace dlib
     std::pair<uint64,uint64> murmur_hash3_128bit ( 
         const void* key, 
         const int len,
-        const uint32 seed = 0
+        const uint64 seed = 0
     );
     /*!
         requires

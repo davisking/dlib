@@ -2070,6 +2070,21 @@ namespace
                 DLIB_TEST(sum(matrix_cast<int>(mat(img))) == 0);
             }
 
+            {
+                matrix<int> a(3,4);
+                array2d<unsigned char> b(3,4);
+                DLIB_TEST(have_same_dimensions(a,b));
+            }
+
+            {
+                matrix<int> a(4,4);
+                array2d<unsigned char> b(3,4);
+                DLIB_TEST(!have_same_dimensions(a,b));
+
+                static_assert(is_image_type<matrix<int>>::value, "should be true");
+                static_assert(!is_image_type<int>::value, "should be false");
+            }
+
             test_partition_pixels();
         }
     } a;

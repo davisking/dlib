@@ -611,6 +611,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const rectangle scale_rect (
+        const rectangle& rect,
+        double scale
+    );
+    /*!
+        requires
+            - scale > 0
+        ensures
+            - return rectangle(rect.left() * scale, rect.top() * scale, rect.right() * scale, rect.bottom() * scale)
+              (i.e. resizes the given rectangle by multiplying all side coordinates with a scale factor)
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const rectangle translate_rect (
         const rectangle& rect,
         const point& p

@@ -2,17 +2,44 @@
 <?xml-stylesheet type="text/xsl" href="stylesheet.xsl"?>
 
 <doc>
-    <title>How to compile</title>
-
-
-
-
 
     <!-- ************************************************************************* -->
 
     <body>
-        
-        <h2>Compiling C++ Example Programs on Any Operating System Using CMake</h2>
+
+      <center><h1>Using dlib from Python</h1></center>
+            <p>
+               Go to the base folder of the dlib repository and run <tt>python setup.py install</tt>.  
+               Once that command finishes running
+               you are ready to use dlib from Python.  Note that you need to
+               have CMake and a working C++ compiler installed for this to
+               work.  </p>
+               
+               <p>Also note that various optional features like GUI support (e.g.
+                  dlib.image_window) and CUDA acceleration will be either enabled or
+                  disabled based on what is available on your computer.  When you run
+                  the install command it will print messages telling you what it is
+                  using.  Read those messages and take appropriate action if you
+                  don't like the results.  For example, Linux and OSX users may have
+                  to install libX11 to use the GUI tools.  If you care about this
+                  then read the messages since they tell you how to get these
+                  optional features installed.
+            </p>
+            <p>
+               Alternatively, if you want to add more python bindings to dlib's
+               python interface then you probably want to avoid the setup.py file
+               and work directly using CMake.  In particular, dlib's python API is
+               built by the CMake project in the tools/python folder.  You build
+               this project using the usual CMake commands and when compiled it
+               outputs the dlib shared library that defines the python API for dlib.
+            </p>
+
+
+      <br/>
+      <hr/>
+      <br/>
+      <center><h1>Using dlib from C++</h1></center>
+
         The best way to compile a program that uses dlib is to use <a href="http://www.cmake.org">CMake</a>.  For
         example, the following commands will compile the example programs on any operating
         system:
@@ -45,20 +72,6 @@ tell CMake which one you want it to use via the -G option.
 </p>
             
 
-<br/>
-        <h2>Compiling Dlib's Python Interface</h2>
-        <p>
-           Go to the base folder of the dlib repository and run <tt>python setup.py install</tt>.  That
-           should compile and install the dlib python API on your system. 
-        </p>
-        <p>
-           Alternatively, if you want to add more python bindings to dlib's
-           python interface then you probably want to avoid the setup.py file
-           and work directly using CMake.  In particular, dlib's python API is
-           built by the CMake project in the tools/python folder.  You build
-           this project using the usual CMake commands and when compiled it
-           outputs the dlib shared library that defines the python API for dlib.
-        </p>
 <br/>
 
 
@@ -135,6 +148,58 @@ sudo apt-get install libx11-dev
            take care of everything automatically.
         </p>
 
+<br/>
+        <h2>Installing dlib as a precompiled library</h2>
+        <p>
+           Dlib's cmake scripts contain the standard install target.  So you
+           can use CMake to install dlib system wide as a precompiled static or
+           shared library just like you would any other C++ library.  
+           However, most users should use CMake as described at the top of this
+           page (specifically as shown in the <a href="examples/CMakeLists.txt.html">examples project</a>) since
+           that's the simplest method.  In particular, it allows you to turn
+           dlib's debugging modes on and off whenever you want, which is
+           something you really should use since dlib's debugging modes are one
+           of its strongest features.  
+         </p>
+
+         <p>
+            We should also make a special note of the problems associated with
+            using precompiled C++ libraries with Visual Studio.  <b>The TLDR is
+            that you should not use precompiled libraries (i.e. .lib files)
+            with Visual Studio unless you really know what you are doing.</b>
+            This is not a dlib limitation.  It has nothing to do with dlib.
+            It's just how Visual Studio works.  Please do not ask me about it.
+            If you want to understand this you should read the Visual Studio
+            documentation and <a href="http://siomsystems.com/mixing-visual-studio-versions/">this excellent overview</a> in particular.  
+         </p>
+         <p>
+            However, for the lazy, I'll summarize the issue with Visual Studio here.
+            The problem is that Visual Studio has multiple incompatible
+            runtimes and it is illegal to mix object code compiled with
+            different runtimes in a single application.  For example, if you
+            compile a C++ library in Visual Studio's "Release" mode then it is
+            illegal to use in an application compiled in Visual Studio's
+            "Debug" mode.  
+         <p>
+         </p>
+            This is made especially bad since each version of
+            Visual Studio contains its own set of runtimes, at least
+            8 different runtimes per each version of Visual Studio, and all of
+            them are incompatible with each other.  Most Visual Studio users
+            seem to be completely unaware of this, many who contact me demonstrably 
+            do not even understand what the words "runtime" or "object code" even
+            refer to.  So the issue of ensuring that all object code (and
+            precompiled libraries) in an application use the same runtimes
+            is made extremely difficult when using precompiled libraries.
+            However, if you just use CMake as described at the top of this
+            page then it will never be an issue, which is one of the reasons I recommend it.
+        </p>
+        <p>
+           To summarize, if you don't understand what the above paragraphs are talking
+           about then you absolutely should not be installing dlib as a precompiled library
+           in Visual Studio.  Instead, go to the top of this page and read the instructions
+           there.  Follow those instructions, it's super easy. 
+        </p>
 
          <br/>
         <center><h1>Miscellaneous Preprocessor Directives</h1></center>

@@ -12,6 +12,25 @@
 
 <current>
 New Features and Improvements:
+   - Allow 64bit seeds for murmur hash.
+   - Some code paths are a little faster.
+   - Added an option to do bounding box regression to the loss_mmod layer.
+   - Added resize_image(img,scale) to Python API.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fixed build errors in some environments.
+   - Make older versions of CMake work with CUDA 10.
+   - Fixed is_image_type template always reporting false. This also caused
+     have_same_dimensions() to be uncallable for images, so that's fixed now too.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.15" date="Jul 13, 2018">
+New Features and Improvements:
 
 Non-Backwards Compatible Changes:
 
@@ -21,7 +40,7 @@ Bug fixes:
      was being used for tensors, which is incorrect and caused some of the DNN
      tooling to malfunction.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 

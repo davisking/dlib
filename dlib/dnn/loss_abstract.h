@@ -232,10 +232,16 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object implements the loss layer interface defined above by
                 EXAMPLE_LOSS_LAYER_.  In particular, it implements the log loss, which is
-                appropriate for binary classification problems.  Therefore, the possible
-                labels when using this loss are +1 and -1.  Moreover, it will cause the
-                network to produce outputs > 0 when predicting a member of the +1 class and
-                values < 0 otherwise.
+                appropriate for binary classification problems.  Therefore, there are two possible
+                classes of labels: positive (> 0) and negative (< 0) when using this loss.
+                The absolute value of the label represents its weight.  Putting a larger weight
+                on a sample increases the importance of getting its prediction correct during 
+                training.  A good rule of thumb is to use weights with absolute value 1 unless 
+                you have a very unbalanced training dataset, in that case, give larger weight
+                to the class with less training examples.
+                
+                This loss will cause the network to produce outputs > 0 when predicting a
+                member of the positive class and values < 0 otherwise.
 
                 To be more specific, this object contains a sigmoid layer followed by a 
                 cross-entropy layer.  
@@ -651,6 +657,21 @@ namespace dlib
         // Usually the detector would be scale-invariant, and used with an image pyramid.
         // However, sometimes scale-invariance may not be desired.
         use_image_pyramid assume_image_pyramid = use_image_pyramid::yes;
+
+        // By default, the mmod loss doesn't train any bounding box regression model.  But
+        // if you set use_bounding_box_regression == true then it expects the network to
+        // output a tensor with detector_windows.size()*5 channels rather than just
+        // detector_windows.size() channels.  The 4 extra channels per window are trained
+        // to give a bounding box regression output that improves the positioning of the
+        // output detection box.
+        bool use_bounding_box_regression = false; 
+        // When using bounding box regression, bbr_lambda determines how much you care
+        // about getting the bounding box shape correct vs just getting the detector to
+        // find objects.  That is, the objective function being optimized is
+        // basic_mmod_loss + bbr_lambda*bounding_box_regression_loss.  So setting
+        // bbr_lambda to a larger value will cause the overall loss to care more about
+        // getting the bounding box shape correct.
+        double bbr_lambda = 100; 
 
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,

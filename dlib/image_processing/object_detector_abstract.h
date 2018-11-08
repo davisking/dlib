@@ -283,7 +283,7 @@ namespace dlib
             >
         std::vector<rectangle> operator() (
             const image_type& img,
-            const adjust_threshold = 0
+            double adjust_threshold = 0
         );
         /*!
             requires

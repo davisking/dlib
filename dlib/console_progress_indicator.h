@@ -150,7 +150,7 @@ namespace dlib
             double seconds = delta_t/delta_val * std::abs(target_val - cur);
 
             std::ios::fmtflags oldflags = std::cout.flags();  
-            std::cout.flags(); 
+
             std::cout.setf(std::ios::fixed,std::ios::floatfield);
             std::streamsize ss;
 

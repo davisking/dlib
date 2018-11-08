@@ -9,7 +9,7 @@ project(dlib)
 
 set(CPACK_PACKAGE_NAME "dlib")
 set(CPACK_PACKAGE_VERSION_MAJOR "19")
-set(CPACK_PACKAGE_VERSION_MINOR "15")
+set(CPACK_PACKAGE_VERSION_MINOR "16")
 set(CPACK_PACKAGE_VERSION_PATCH "99")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 # Only print these messages once, even if dlib is added multiple times via add_subdirectory()
@@ -29,6 +29,9 @@ if (POLICY CMP0063)
    # This policy tells cmake to really honor CXX_VISIBILITY_PRESET rather than
    # ignore it for backwards compatibility.
    cmake_policy(SET CMP0063 NEW)
+endif()
+if (POLICY CMP0075)
+   cmake_policy(SET CMP0075 NEW)
 endif()
 
 # default to a Release build (except if CMAKE_BUILD_TYPE is set)
@@ -79,6 +82,11 @@ if (DLIB_IN_PROJECT_BUILD)
 
    # Tell cmake to build dlib as a static library
    set(BUILD_SHARED_LIBS false)
+
+elseif(BUILD_SHARED_LIBS)
+   if (MSVC)
+      message(FATAL_ERROR "Building dlib as a standalone dll is not supported when using Visual Studio.  You are highly encouraged to use static linking instead.  See https://github.com/davisking/dlib/issues/1483 for a discussion.") 
+   endif()
 endif()
 
 
@@ -584,6 +592,12 @@ if (NOT TARGET dlib)
       if (DLIB_USE_CUDA)
          find_package(CUDA 7.5)
 
+         if (CUDA_VERSION VERSION_GREATER 9.1 AND CMAKE_VERSION VERSION_LESS 3.12.2)
+            # This bit of weirdness is to work around a bug in cmake 
+            list(REMOVE_ITEM CUDA_CUBLAS_LIBRARIES "CUDA_cublas_device_LIBRARY-NOTFOUND")
+         endif()
+
+
          if (CUDA_FOUND AND MSVC AND NOT CUDA_CUBLAS_LIBRARIES AND "${CMAKE_SIZEOF_VOID_P}" EQUAL "4")
             message(WARNING "You have CUDA installed, but we can't use it unless you put visual studio in 64bit mode.")
             set(CUDA_FOUND 0)
@@ -681,8 +695,14 @@ if (NOT TARGET dlib)
             # look for one to link to if our use of BLAS, specifically the
             # Intel MKL, hasn't already decided what to use.  This is because
             # it makes the MKL bug out if you link to another openmp lib other
-            # than Intel's when you use the MKL.
-            if (NOT openmp_libraries AND NOT MSVC AND NOT XCODE AND NOT APPLE)
+            # than Intel's when you use the MKL. I'm also not really sure when
+            # explicit linking to openmp became unnecessary, but for
+            # sufficiently older versions of cuda it was needed.  Then in
+            # versions of cmake newer than 3.11 linking to openmp started to
+            # mess up the switches passed to nvcc, so you can't just leave
+            # these "try to link to openmp" statements here going forward.  Fun
+            # times.
+            if (CUDA_VERSION VERSION_LESS "9.1" AND NOT openmp_libraries AND NOT MSVC AND NOT XCODE AND NOT APPLE)
                find_package(OpenMP)
                if (OPENMP_FOUND)
                   set(openmp_libraries ${OpenMP_CXX_FLAGS}) 

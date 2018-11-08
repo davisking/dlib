@@ -3,11 +3,12 @@
 #ifndef DLIB_DNN_CuDA_DATA_PTR_H_
 #define DLIB_DNN_CuDA_DATA_PTR_H_
 
+#include "../assert.h"
+
 #ifdef DLIB_USE_CUDA
 
 #include <memory>
 #include <vector>
-#include "../assert.h"
 
 namespace dlib
 {

@@ -441,6 +441,20 @@ namespace dlib
         return shrink_rect(rect, -width, -height);
     }
 
+    inline const drectangle scale_rect (
+        const drectangle& rect,
+        double scale
+    )
+    {
+        DLIB_ASSERT(scale > 0, "scale factor must be > 0");
+
+        double l = rect.left() * scale;
+        double t = rect.top() * scale;
+        double r = rect.right() * scale;
+        double b = rect.bottom() * scale;
+        return drectangle(l, t, r, b);
+    }
+
     inline drectangle set_rect_area (
         const drectangle& rect,
         double area
