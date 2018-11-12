@@ -47,6 +47,18 @@ if(has_parent)
    endif()
 endif()
 
+if (COMMAND pybind11_add_module AND MSVC)
+   # True when building a python extension module using Visual Studio.  We care
+   # about this because a huge number of windows users have broken systems, and
+   # in particular, they have broken or incompatibly installed copies of things
+   # like libjpeg or libpng.  So if we detect we are in this mode we will never
+   # ever link to those libraries.  Instead, we link to the copy included with
+   # dlib.
+   set (BUILDING_PYTHON_IN_MSVC true)
+else()
+   set (BUILDING_PYTHON_IN_MSVC false)
+endif()
+
 if (DLIB_IN_PROJECT_BUILD)
 
    # Check if we are being built as part of a pybind11 module. 
@@ -415,7 +427,7 @@ if (NOT TARGET dlib)
          # Make sure there isn't something wrong with the version of LIBPNG
          # installed on this system.  Also never link to anything from anaconda
          # since it's probably broken.
-         if (PNG_FOUND AND NOT ("${PNG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)"))
+         if (PNG_FOUND AND NOT ("${PNG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)") AND NOT BUILDING_PYTHON_IN_MSVC)
             set(CMAKE_REQUIRED_LIBRARIES ${PNG_LIBRARIES})
             CHECK_FUNCTION_EXISTS(png_create_read_struct LIBPNG_IS_GOOD)
          endif()
@@ -484,7 +496,7 @@ if (NOT TARGET dlib)
          # Make sure there isn't something wrong with the version of libjpeg 
          # installed on this system.  Also don't use the installed libjpeg
          # if this is an APPLE system because apparently it's broken (as of 2015/01/01).
-         if (JPEG_FOUND AND NOT ("${JPEG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)"))
+         if (JPEG_FOUND AND NOT ("${JPEG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)") AND NOT BUILDING_PYTHON_IN_MSVC)
             set(CMAKE_REQUIRED_LIBRARIES ${JPEG_LIBRARY})
             CHECK_FUNCTION_EXISTS(jpeg_read_header LIBJPEG_IS_GOOD)
          endif()
