@@ -129,7 +129,7 @@ std::shared_ptr<simple_object_detector_py> merge_simple_object_detectors (
 {
     DLIB_CASSERT(len(detectors) > 0);
     std::vector<simple_object_detector> temp;
-    for (auto& d : detectors)
+    for (const auto& d : detectors)
         temp.push_back(d.cast<simple_object_detector_py>().detector);
 
     simple_object_detector_py result;
