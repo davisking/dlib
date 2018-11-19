@@ -312,6 +312,20 @@ elseif(WIN32 AND NOT MINGW)
 
    INCLUDE (CheckFunctionExists)
 
+   # Get mkl_include_dir
+   set(mkl_include_search_path
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/include"
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/include"
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/include"
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/include"
+      "C:/Program Files (x86)/Intel/Composer XE/mkl/include"
+      "C:/Program Files (x86)/Intel/Composer XE/compiler/include"
+      "C:/Program Files/Intel/Composer XE/mkl/include"
+      "C:/Program Files/Intel/Composer XE/compiler/include"
+      )
+   find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
+   mark_as_advanced(mkl_include_dir)
+
    # Search for the needed libraries from the MKL.  
    find_library(mkl_core mkl_core ${mkl_search_path})
    set(mkl_libs ${mkl_intel} ${mkl_core})
@@ -333,6 +347,7 @@ elseif(WIN32 AND NOT MINGW)
       set(lapack_libraries ${mkl_libs})
       set(blas_found 1)
       set(lapack_found 1)
+      set(found_intel_mkl 1)
       message(STATUS "Found Intel MKL BLAS/LAPACK library")
 
       # Make sure the version of the Intel MKL we found is compatible with
@@ -346,6 +361,11 @@ elseif(WIN32 AND NOT MINGW)
          set(lapack_found 0)
       endif()
    endif()
+
+   if (found_intel_mkl AND mkl_include_dir)
+      set(found_intel_mkl_headers 1)
+   endif()
+
 endif()
 
 
