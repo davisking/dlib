@@ -97,7 +97,7 @@ void add_overlay_pylist (
 )
 {
     std::vector<rectangle> rects;
-    for (auto& obj : objs)
+    for (const auto& obj : objs)
     {
         try { rects.push_back(obj.cast<rectangle>()); continue; } catch(py::cast_error&) { }
         try { rects.push_back(obj.cast<drectangle>()); continue; } catch(py::cast_error&) { }

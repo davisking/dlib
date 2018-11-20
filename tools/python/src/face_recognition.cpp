@@ -64,10 +64,10 @@ public:
             throw dlib::error("The array of images and the array of array of locations must be of the same size");
 
         int total_chips = 0;
-        for (auto& faces : batch_faces)
+        for (const auto& faces : batch_faces)
         {
             total_chips += faces.size();
-            for (auto& f : faces)
+            for (const auto& f : faces)
             {
                 if (f.num_parts() != 68 && f.num_parts() != 5)
                     throw dlib::error("The full_object_detection must use the iBUG 300W 68 point face landmark style or dlib's 5 point style.");
@@ -82,7 +82,7 @@ public:
             auto& img = batch_imgs[i];
 
             std::vector<chip_details> dets;
-            for (auto& f : faces)
+            for (const auto& f : faces)
                 dets.push_back(get_face_chip_details(f, 150, 0.25));
             dlib::array<matrix<rgb_pixel>> this_img_face_chips;
             extract_image_chips(img, dets, this_img_face_chips);
@@ -214,12 +214,12 @@ void save_face_chips (
 
     int num_faces = faces.size();
     std::vector<chip_details> dets;
-    for (auto& f : faces)
+    for (const auto& f : faces)
         dets.push_back(get_face_chip_details(f, size, padding));
     dlib::array<matrix<rgb_pixel>> face_chips;
     extract_image_chips(numpy_image<rgb_pixel>(img), dets, face_chips);
     int i=0;
-    for (auto& chip : face_chips) 
+    for (const auto& chip : face_chips) 
     {
         i++;
         if(num_faces > 1) 

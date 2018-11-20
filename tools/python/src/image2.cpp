@@ -65,7 +65,7 @@ std::vector<point> py_remove_incoherent_edge_pixels (
     DLIB_CASSERT(num_rows(horz_gradient) == num_rows(vert_gradient));
     DLIB_CASSERT(num_columns(horz_gradient) == num_columns(vert_gradient));
     DLIB_CASSERT(angle_threshold >= 0);
-    for (auto& p : line)
+    for (const auto& p : line)
         DLIB_CASSERT(get_rect(horz_gradient).contains(p), "All line points must be inside the given images.");
 
     return remove_incoherent_edge_pixels(line, horz_gradient, vert_gradient, angle_threshold);
@@ -152,7 +152,7 @@ py::list py_extract_image_chips (
     dlib::array<numpy_image<T>> out;
     extract_image_chips(img, python_list_to_vector<chip_details>(chip_locations), out);
     py::list ret;
-    for (auto& i : out)
+    for (const auto& i : out)
         ret.append(i);
     return ret;
 }

@@ -203,7 +203,7 @@ std::shared_ptr<global_function_search> py_global_function_search1 (
 )
 {
     std::vector<function_spec> tmp;
-    for (auto i : functions)
+    for (const auto& i : functions)
         tmp.emplace_back(i.cast<function_spec>());
 
     return std::make_shared<global_function_search>(tmp);
@@ -216,14 +216,14 @@ std::shared_ptr<global_function_search> py_global_function_search2 (
 )
 {
     std::vector<function_spec> specs;
-    for (auto i : functions)
+    for (const auto& i : functions)
         specs.emplace_back(i.cast<function_spec>());
 
     std::vector<std::vector<function_evaluation>> func_evals;
-    for (auto i : initial_function_evals)
+    for (const auto& i : initial_function_evals)
     {
         std::vector<function_evaluation> evals;
-        for (auto j : i)
+        for (const auto& j : i)
         {
             evals.emplace_back(j.cast<function_evaluation>());
         }
@@ -410,12 +410,12 @@ simply a struct that records x and the scalar value F(x). )RAW")
             std::vector<std::vector<function_evaluation>> function_evals;
             self.get_function_evaluations(specs,function_evals); 
             py::list py_specs, py_func_evals;
-            for (auto& s : specs)
+            for (const auto& s : specs)
                 py_specs.append(s);
-            for (auto& i : function_evals)
+            for (const auto& i : function_evals)
             {
                 py::list tmp;
-                for (auto& j : i)
+                for (const auto& j : i)
                     tmp.append(j);
                 py_func_evals.append(tmp);
             }
