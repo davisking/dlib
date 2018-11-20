@@ -344,26 +344,30 @@ template <typename SUBNET> using alevel4t = dlib::repeat<2,ares64,ares_up<64,SUB
 // training network type
 using bnet_type = dlib::loss_multiclass_log_per_pixel<
                               dlib::cont<class_count,7,7,2,2,concat_utag1<
-                              level4t<
-                              level3t<
-                              level2t<
-                              level1t<level1<
-                              level2<
-                              level3<
+                              level4t<concat_utag2<
+                              level3t<concat_utag3<
+                              level2t<concat_utag4<
+                              level1t<level1<utag4<
+                              level2<utag3<
+                              level3<utag2<
                               level4<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                              >>>>>>>>>>>>>>>>;
+                              >>>>>>>>>>>>>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
 using anet_type = dlib::loss_multiclass_log_per_pixel<
                               dlib::cont<class_count,7,7,2,2,concat_utag1<
-                              alevel4t<alevel3t<alevel2t<alevel1t<
-                              alevel1<alevel2<alevel3<alevel4<
-                              dlib::max_pool<3,3,2,2,utag1<
+                              alevel4t<concat_utag2<
+                              alevel3t<concat_utag3<
+                              alevel2t<concat_utag4<
+                              alevel1t<alevel1<utag4<
+                              alevel2<utag3<
+                              alevel3<utag2<
+                              alevel4<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                              >>>>>>>>>>>>>>>>;
+                              >>>>>>>>>>>>>>>>>>>>>>;
 #endif // fallback
 
 // ----------------------------------------------------------------------------------------
