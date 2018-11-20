@@ -23,7 +23,7 @@
        ./dnn_semantic_segmentation_ex /path/to/VOC2012-or-other-images
 
     An alternative to steps 2-4 above is to download a pre-trained network
-    from here: http://dlib.net/files/semantic_segmentation_voc2012net.dnn
+    from here: http://dlib.net/files/semantic_segmentation_voc2012net_v2.dnn
 
     It would be a good idea to become familiar with dlib's DNN tooling before reading this
     example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
@@ -115,97 +115,256 @@ const Voc2012class& find_voc2012_class(Predicate predicate)
 // ----------------------------------------------------------------------------------------
 
 // Introduce the building blocks used to define the segmentation network.
-// The network first does downsampling, and then upsampling, using
-// DenseNet-style blocks. In addition, U-net style skip connections are
-// employed.
+// The network first does downsampling, and then upsampling, using DenseNet
+// blocks. In addition, U-net style skip connections are employed.
 
 template <int N, template <typename> class BN, typename SUBNET>
-using dense_layer = BN<dlib::relu<dlib::con<N,3,3,1,1,SUBNET>>>;
+using dense_block_layer = dlib::relu<BN<dlib::con<N,3,3,1,1,SUBNET>>>;
 
-template <int N, template <typename> class BN, typename SUBNET>
-using dense_block = dlib::concat_prev1<dense_layer<N,BN,
-                    dlib::concat_prev2<dense_layer<N,BN,
-                    dlib::concat_prev3<dense_layer<N,BN,
-                    dlib::concat_prev4<dense_layer<N,BN,
-                    dlib::tag4<dlib::tag3<dlib::tag2<dlib::tag1<dense_layer<N,BN,SUBNET>>>>>>>>>>>>>;
-
-template <int N, template <typename> class BN, typename SUBNET>
-using transition_down = BN<dlib::relu<dlib::con<N,1,1,1,1,dlib::max_pool<3,3,2,2,SUBNET>>>>;
-
-template <int N, template <typename> class BN, typename SUBNET> 
-using transition_up = dlib::cont<N,3,3,2,2,SUBNET>;
-
-template <int N, typename SUBNET> using dense     = dense_block<N,dlib::bn_con,SUBNET>;
-template <int N, typename SUBNET> using adense    = dense_block<N,dlib::affine,SUBNET>;
-template <int N, typename SUBNET> using down	  = transition_down<N,dlib::bn_con,SUBNET>;
-template <int N, typename SUBNET> using adown     = transition_down<N,dlib::affine,SUBNET>;
-template <int N, typename SUBNET> using up        = dlib::cont<N,3,3,2,2,SUBNET>;
+template <
+    template<typename> class TAG1,
+    template<typename> class TAG2,
+    typename SUBNET
+>
+using concat = dlib::add_layer<dlib::concat_<TAG1,TAG2>,TAG2<SUBNET>>;
 
 // ----------------------------------------------------------------------------------------
 
-template <typename SUBNET> using dense64 = dense<64,SUBNET>;
-template <typename SUBNET> using dense48 = dense<48,SUBNET>;
-template <typename SUBNET> using dense32 = dense<32,SUBNET>;
-template <typename SUBNET> using dense16  = dense<16,SUBNET>;
-template <typename SUBNET> using adense64 = dense<64,SUBNET>;
-template <typename SUBNET> using adense48 = dense<48,SUBNET>;
-template <typename SUBNET> using adense32 = dense<32,SUBNET>;
-template <typename SUBNET> using adense16  = dense<16,SUBNET>;
+template <typename SUBNET> using dintag = dlib::add_tag_layer<2000+0,SUBNET>; // input to the dense block
+template <typename SUBNET> using dotag0 = dlib::add_tag_layer<2000+1,SUBNET>; // output of the first layer of the dense block
+template <typename SUBNET> using dctag0 = dlib::add_tag_layer<2000+2,SUBNET>; // dintag and dotag0 concatenated
+template <typename SUBNET> using dotag1 = dlib::add_tag_layer<2000+3,SUBNET>; // output of the second layer of the dense block
+template <typename SUBNET> using dctag1 = dlib::add_tag_layer<2000+4,SUBNET>; // dctag0 and dotag1 concatenated
+template <typename SUBNET> using dotag2 = dlib::add_tag_layer<2000+5,SUBNET>; // output of the third layer of the dense block
 
+// ----------------------------------------------------------------------------------------
 
-template <typename SUBNET> using level1 = dlib::repeat<2,dense64,down<64,SUBNET>>;
-template <typename SUBNET> using level2 = dlib::repeat<2,dense48,down<48,SUBNET>>;
-template <typename SUBNET> using level3 = dlib::repeat<2,dense32,down<32,SUBNET>>;
-template <typename SUBNET> using level4 = dlib::repeat<2,dense16,down<16,SUBNET>>;
+// The following dense block is modeled after Figure 2 of the tiramisu
+// paper (Jegou et al 2017, https://arxiv.org/pdf/1611.09326.pdf).
 
-template <typename SUBNET> using alevel1 = dlib::repeat<2,adense64,adown<64,SUBNET>>;
-template <typename SUBNET> using alevel2 = dlib::repeat<2,adense48,adown<48,SUBNET>>;
-template <typename SUBNET> using alevel3 = dlib::repeat<2,adense32,adown<32,SUBNET>>;
-template <typename SUBNET> using alevel4 = dlib::repeat<2,adense16,adown<16,SUBNET>>;
+template <int N, template <typename> class BN, typename SUBNET>
+using dense_block4 = dlib::concat3<dotag0,dotag1,dotag2,dense_block_layer<N,BN,
+                            concat<dctag1,dotag2,dense_block_layer<N,BN,
+                     dctag1<concat<dctag0,dotag1,dense_block_layer<N,BN,
+                     dctag0<concat<dintag,dotag0,dense_block_layer<N,BN,
+                     dintag<SUBNET>
+                     >>>>>>>>>>;
 
-template <typename SUBNET> using level1t = dlib::repeat<2,dense64,up<64,SUBNET>>;
-template <typename SUBNET> using level2t = dlib::repeat<2,dense48,up<48,SUBNET>>;
-template <typename SUBNET> using level3t = dlib::repeat<2,dense32,up<32,SUBNET>>;
-template <typename SUBNET> using level4t = dlib::repeat<2,dense16,up<16,SUBNET>>;
+// What follows is more light-weight versions of the above.
+// (Note that more heavy-weight versions are rather easy to extrapolate as well.)
 
-template <typename SUBNET> using alevel1t = dlib::repeat<2,adense64,up<64,SUBNET>>;
-template <typename SUBNET> using alevel2t = dlib::repeat<2,adense48,up<48,SUBNET>>;
-template <typename SUBNET> using alevel3t = dlib::repeat<2,adense32,up<32,SUBNET>>;
-template <typename SUBNET> using alevel4t = dlib::repeat<2,adense16,up<16,SUBNET>>;
+template <int N, template <typename> class BN, typename SUBNET>
+using dense_block3 = dlib::concat2<dotag0,dotag1,dense_block_layer<N,BN,
+                            concat<dctag0,dotag1,dense_block_layer<N,BN,
+                     dctag0<concat<dintag,dotag0,dense_block_layer<N,BN,
+                     dintag<SUBNET>
+                     >>>>>>>;
+
+template <int N, template <typename> class BN, typename SUBNET>
+using dense_block2 = dlib::concat2<dotag0,dotag1,dotag1<dense_block_layer<N,BN,
+                     dlib::concat2<dintag,dotag0,dotag0<dense_block_layer<N,BN,
+                     dintag<SUBNET>
+                     >>>>>>;
+
+template <int N, template <typename> class BN, typename SUBNET>
+using dense_block1 = dlib::concat2<dintag,dotag0,dotag0<dense_block_layer<N,BN,
+                     dintag<SUBNET>
+                     >>>;
+
+template <int N, template <typename> class BN, typename SUBNET>
+using dense_block0 = dense_block_layer<N,BN,SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+template <int N, template <typename> class BN, typename SUBNET>
+using transition_down = dlib::relu<BN<dlib::con<N,1,1,1,1,dlib::max_pool<3,3,2,2,SUBNET>>>>;
+
+// ----------------------------------------------------------------------------------------
+
+template <int N, typename SUBNET> using bdense4    = dense_block4<N,dlib::bn_con,SUBNET>;
+template <int N, typename SUBNET> using adense4    = dense_block4<N,dlib::affine,SUBNET>;
+template <int N, typename SUBNET> using bdense3    = dense_block3<N,dlib::bn_con,SUBNET>;
+template <int N, typename SUBNET> using adense3    = dense_block3<N,dlib::affine,SUBNET>;
+template <int N, typename SUBNET> using bdense2    = dense_block2<N,dlib::bn_con,SUBNET>;
+template <int N, typename SUBNET> using adense2    = dense_block2<N,dlib::affine,SUBNET>;
+template <int N, typename SUBNET> using bdense1    = dense_block1<N,dlib::bn_con,SUBNET>;
+template <int N, typename SUBNET> using adense1    = dense_block1<N,dlib::affine,SUBNET>;
+template <int N, typename SUBNET> using bdense0    = dense_block0<N,dlib::bn_con,SUBNET>;
+template <int N, typename SUBNET> using adense0    = dense_block0<N,dlib::affine,SUBNET>;
+
+template <int N, typename SUBNET> using bdown      = transition_down<N,dlib::bn_con,SUBNET>;
+template <int N, typename SUBNET> using adown      = transition_down<N,dlib::affine,SUBNET>;
+
+template <int N, typename SUBNET> using up         = dlib::cont<N,3,3,2,2,SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+template <
+    template<typename> class TAG1,
+    template<typename> class TAG2,
+    typename SUBNET
+>
+using resize_and_concat = dlib::add_layer<
+                          dlib::concat_<TAG1,TAG2>,
+                          TAG2<dlib::resize_to_prev<TAG1,SUBNET>>>;
+
+template <typename SUBNET> using utag0 = dlib::add_tag_layer<2100+0,SUBNET>;
+template <typename SUBNET> using utag1 = dlib::add_tag_layer<2100+1,SUBNET>;
+template <typename SUBNET> using utag2 = dlib::add_tag_layer<2100+2,SUBNET>;
+template <typename SUBNET> using utag3 = dlib::add_tag_layer<2100+3,SUBNET>;
+template <typename SUBNET> using utag4 = dlib::add_tag_layer<2100+4,SUBNET>;
+
+template <typename SUBNET> using utag0_ = dlib::add_tag_layer<2110+0,SUBNET>;
+template <typename SUBNET> using utag1_ = dlib::add_tag_layer<2110+1,SUBNET>;
+template <typename SUBNET> using utag2_ = dlib::add_tag_layer<2110+2,SUBNET>;
+template <typename SUBNET> using utag3_ = dlib::add_tag_layer<2110+3,SUBNET>;
+template <typename SUBNET> using utag4_ = dlib::add_tag_layer<2110+4,SUBNET>;
+
+template <typename SUBNET> using concat_utag0 = resize_and_concat<utag0,utag0_,SUBNET>;
+template <typename SUBNET> using concat_utag1 = resize_and_concat<utag1,utag1_,SUBNET>;
+template <typename SUBNET> using concat_utag2 = resize_and_concat<utag2,utag2_,SUBNET>;
+template <typename SUBNET> using concat_utag3 = resize_and_concat<utag3,utag3_,SUBNET>;
+template <typename SUBNET> using concat_utag4 = resize_and_concat<utag4,utag4_,SUBNET>;
+
+#if 0
+// ----------------------------------------------------------------------------------------
+
+constexpr int k = 40;
+
+template <typename SUBNET> using blevel1 = bdown<k,utag1<bdense1<k,SUBNET>>>;
+template <typename SUBNET> using blevel2 = bdown<k,utag2<bdense2<k,SUBNET>>>;
+template <typename SUBNET> using blevel3 = bdown<k,utag3<bdense3<k,SUBNET>>>;
+template <typename SUBNET> using blevel4 = bdown<k,utag4<bdense4<k,SUBNET>>>;
+
+template <typename SUBNET> using alevel1 = adown<k,utag1<adense1<k,SUBNET>>>;
+template <typename SUBNET> using alevel2 = adown<k,utag2<adense2<k,SUBNET>>>;
+template <typename SUBNET> using alevel3 = adown<k,utag3<adense3<k,SUBNET>>>;
+template <typename SUBNET> using alevel4 = adown<k,utag4<adense4<k,SUBNET>>>;
+
+template <typename SUBNET> using blevel1t = bdense1<k,concat_utag1<up<k,SUBNET>>>;
+template <typename SUBNET> using blevel2t = bdense2<k,concat_utag2<up<k,SUBNET>>>;
+template <typename SUBNET> using blevel3t = bdense3<k,concat_utag3<up<k,SUBNET>>>;
+template <typename SUBNET> using blevel4t = bdense4<k,concat_utag4<up<k,SUBNET>>>;
+
+template <typename SUBNET> using alevel1t = adense1<k,concat_utag1<up<k,SUBNET>>>;
+template <typename SUBNET> using alevel2t = adense2<k,concat_utag2<up<k,SUBNET>>>;
+template <typename SUBNET> using alevel3t = adense3<k,concat_utag3<up<k,SUBNET>>>;
+template <typename SUBNET> using alevel4t = adense4<k,concat_utag4<up<k,SUBNET>>>;
+
+template <typename SUBNET> using blevel0  = dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,utag0<bdense0<k,SUBNET>>>>>;
+template <typename SUBNET> using alevel0  = dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,utag0<adense0<k,SUBNET>>>>>;
+template <typename SUBNET> using blevel0t = bdense0<k,concat_utag0<dlib::relu<dlib::bn_con<dlib::cont<k,7,7,2,2,SUBNET>>>>>;
+template <typename SUBNET> using alevel0t = adense0<k,concat_utag0<dlib::relu<dlib::affine<dlib::cont<k,7,7,2,2,SUBNET>>>>>;
 
 // ----------------------------------------------------------------------------------------
 
 // training network type
-using net_type = dlib::loss_multiclass_log_per_pixel<
+using bnet_type = dlib::loss_multiclass_log_per_pixel<
                             dlib::con<class_count,1,1,1,1,
-                            dlib::concat_prev9<dlib::cont<class_count,7,7,2,2,
-                            dlib::concat_prev8<level4t<
-                            dlib::concat_prev7<level3t<
-                            dlib::concat_prev6<level2t<
-                            dlib::concat_prev5<level1t<
-                            level1<dlib::tag5<
-                            level2<dlib::tag6<
-                            level3<dlib::tag7<
-                            level4<dlib::tag8<
-                            dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,dlib::tag9<
+                            blevel0t<blevel1t<blevel2t<blevel3t<blevel4t<
+                            bdense4<k,
+                            blevel4<blevel3<blevel2<blevel1<blevel0<
                             dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                            >>>>>>>>>>>>>>>>>>>>>>>>;
+                            >>>>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
 using anet_type = dlib::loss_multiclass_log_per_pixel<
                             dlib::con<class_count,1,1,1,1,
-                            dlib::concat_prev9<dlib::cont<class_count,7,7,2,2,
-                            dlib::concat_prev8<alevel4t<
-                            dlib::concat_prev7<alevel3t<
-                            dlib::concat_prev6<alevel2t<
-                            dlib::concat_prev5<alevel1t<
-                            alevel1<dlib::tag5<
-                            alevel2<dlib::tag6<
-                            alevel3<dlib::tag7<
-                            alevel4<dlib::tag8<
-                            dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,dlib::tag9<
+                            alevel0t<alevel1t<alevel2t<alevel3t<alevel4t<
+                            adense4<k,
+                            alevel4<alevel3<alevel2<alevel1<alevel0<
                             dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                            >>>>>>>>>>>>>>>>>>>>>>>>;
+                            >>>>>>>>>>>>>;
+#endif
+
+#if 1
+// Introduce the building blocks used to define the segmentation network.
+// The network first does residual downsampling (similar to the dnn_imagenet_(train_)ex
+// example program), and then residual upsampling. The network could be improved e.g.
+// by introducing skip connections from the input image, and/or the first layers, to the
+// last layer(s).  (See Long et al., Fully Convolutional Networks for Semantic Segmentation,
+// https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf)
+
+template <int N, template <typename> class BN, int stride, typename SUBNET>
+using block = BN<dlib::con<N,3,3,1,1,dlib::relu<BN<dlib::con<N,3,3,stride,stride,SUBNET>>>>>;
+
+template <int N, template <typename> class BN, int stride, typename SUBNET>
+using blockt = BN<dlib::cont<N,3,3,1,1,dlib::relu<BN<dlib::cont<N,3,3,stride,stride,SUBNET>>>>>;
+
+template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
+using residual = dlib::add_prev1<block<N,BN,1,dlib::tag1<SUBNET>>>;
+
+template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
+using residual_down = dlib::add_prev2<dlib::avg_pool<2,2,2,2,dlib::skip1<dlib::tag2<block<N,BN,2,dlib::tag1<SUBNET>>>>>>;
+
+template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
+using residual_up = dlib::add_prev2<dlib::cont<N,2,2,2,2,dlib::skip1<dlib::tag2<blockt<N,BN,2,dlib::tag1<SUBNET>>>>>>;
+
+template <int N, typename SUBNET> using res       = dlib::relu<residual<block,N,dlib::bn_con,SUBNET>>;
+template <int N, typename SUBNET> using ares      = dlib::relu<residual<block,N,dlib::affine,SUBNET>>;
+template <int N, typename SUBNET> using res_down  = dlib::relu<residual_down<block,N,dlib::bn_con,SUBNET>>;
+template <int N, typename SUBNET> using ares_down = dlib::relu<residual_down<block,N,dlib::affine,SUBNET>>;
+template <int N, typename SUBNET> using res_up    = dlib::relu<residual_up<block,N,dlib::bn_con,SUBNET>>;
+template <int N, typename SUBNET> using ares_up   = dlib::relu<residual_up<block,N,dlib::affine,SUBNET>>;
+
+// ----------------------------------------------------------------------------------------
+
+template <typename SUBNET> using res512 = res<512, SUBNET>;
+template <typename SUBNET> using res256 = res<256, SUBNET>;
+template <typename SUBNET> using res128 = res<128, SUBNET>;
+template <typename SUBNET> using res64  = res<64, SUBNET>;
+template <typename SUBNET> using ares512 = ares<512, SUBNET>;
+template <typename SUBNET> using ares256 = ares<256, SUBNET>;
+template <typename SUBNET> using ares128 = ares<128, SUBNET>;
+template <typename SUBNET> using ares64  = ares<64, SUBNET>;
+
+
+template <typename SUBNET> using level1 = dlib::repeat<2,res512,res_down<512,SUBNET>>;
+template <typename SUBNET> using level2 = dlib::repeat<2,res256,res_down<256,SUBNET>>;
+template <typename SUBNET> using level3 = dlib::repeat<2,res128,res_down<128,SUBNET>>;
+template <typename SUBNET> using level4 = dlib::repeat<2,res64,res<64,SUBNET>>;
+
+template <typename SUBNET> using alevel1 = dlib::repeat<2,ares512,ares_down<512,SUBNET>>;
+template <typename SUBNET> using alevel2 = dlib::repeat<2,ares256,ares_down<256,SUBNET>>;
+template <typename SUBNET> using alevel3 = dlib::repeat<2,ares128,ares_down<128,SUBNET>>;
+template <typename SUBNET> using alevel4 = dlib::repeat<2,ares64,ares<64,SUBNET>>;
+
+template <typename SUBNET> using level1t = dlib::repeat<2,res512,res_up<512,SUBNET>>;
+template <typename SUBNET> using level2t = dlib::repeat<2,res256,res_up<256,SUBNET>>;
+template <typename SUBNET> using level3t = dlib::repeat<2,res128,res_up<128,SUBNET>>;
+template <typename SUBNET> using level4t = dlib::repeat<2,res64,res_up<64,SUBNET>>;
+
+template <typename SUBNET> using alevel1t = dlib::repeat<2,ares512,ares_up<512,SUBNET>>;
+template <typename SUBNET> using alevel2t = dlib::repeat<2,ares256,ares_up<256,SUBNET>>;
+template <typename SUBNET> using alevel3t = dlib::repeat<2,ares128,ares_up<128,SUBNET>>;
+template <typename SUBNET> using alevel4t = dlib::repeat<2,ares64,ares_up<64,SUBNET>>;
+
+// ----------------------------------------------------------------------------------------
+
+// training network type
+using bnet_type = dlib::loss_multiclass_log_per_pixel<
+                              dlib::cont<class_count,7,7,2,2,concat_utag1<
+                              level4t<
+                              level3t<
+                              level2t<
+                              level1t<level1<
+                              level2<
+                              level3<
+                              level4<dlib::max_pool<3,3,2,2,utag1<
+                              dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
+                              dlib::input<dlib::matrix<dlib::rgb_pixel>>
+                              >>>>>>>>>>>>>>>>;
+
+// testing network type (replaced batch normalization with fixed affine transforms)
+using anet_type = dlib::loss_multiclass_log_per_pixel<
+                              dlib::cont<class_count,7,7,2,2,concat_utag1<
+                              alevel4t<alevel3t<alevel2t<alevel1t<
+                              alevel1<alevel2<alevel3<alevel4<
+                              dlib::max_pool<3,3,2,2,utag1<
+                              dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
+                              dlib::input<dlib::matrix<dlib::rgb_pixel>>
+                              >>>>>>>>>>>>>>>>;
+#endif // fallback
 
 // ----------------------------------------------------------------------------------------
 
