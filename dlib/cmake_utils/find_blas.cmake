@@ -3,17 +3,17 @@
 # information about it at http://www.cmake.org
 #
 #
-# This cmake file tries to find installed BLAS and LAPACK libraries.  
+# This cmake file tries to find installed BLAS and LAPACK libraries.
 # It looks for an installed copy of the Intel MKL library first and then
-# attempts to find some other BLAS and LAPACK libraries if you don't have 
+# attempts to find some other BLAS and LAPACK libraries if you don't have
 # the Intel MKL.
 #
 #  blas_found               - True if BLAS is available
 #  lapack_found             - True if LAPACK is available
 #  found_intel_mkl          - True if the Intel MKL library is available
 #  found_intel_mkl_headers  - True if Intel MKL headers are available
-#  blas_libraries           - link against these to use BLAS library 
-#  lapack_libraries         - link against these to use LAPACK library 
+#  blas_libraries           - link against these to use BLAS library
+#  lapack_libraries         - link against these to use LAPACK library
 #  mkl_libraries            - link against these to use the MKL library
 #  mkl_include_dir          - add to the include path to use the MKL library
 #  openmp_libraries         - Set to Intel's OpenMP library if and only if we
@@ -114,9 +114,9 @@ if (UNIX OR MINGW)
       # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
       # file first since this way avoids linking bugs in some cases.
       find_library(mkl_rt mkl_rt ${mkl_search_path})
-      find_library(openmp_libraries iomp5 ${mkl_search_path}) 
+      find_library(openmp_libraries iomp5 ${mkl_search_path})
       mark_as_advanced(mkl_rt  openmp_libraries)
-      # if we found the MKL 
+      # if we found the MKL
       if (mkl_rt)
          set(mkl_libraries  ${mkl_rt} )
          set(blas_libraries  ${mkl_rt} )
@@ -127,7 +127,7 @@ if (UNIX OR MINGW)
          message(STATUS "Found Intel MKL BLAS/LAPACK library")
       endif()
    endif()
-   
+
 
    if (NOT found_intel_mkl)
       # Search for the needed libraries from the MKL.  This time try looking for a different
@@ -146,8 +146,8 @@ if (UNIX OR MINGW)
          mark_as_advanced(mkl_thread mkl_iomp mkl_pthread)
          list(APPEND mkl_libs ${mkl_thread} ${mkl_iomp} ${mkl_pthread})
       endif()
-   
-      # If we found the MKL 
+
+      # If we found the MKL
       if (mkl_intel AND mkl_core AND ((mkl_thread AND mkl_iomp AND mkl_pthread) OR mkl_sequential))
          set(mkl_libraries ${mkl_libs})
          set(blas_libraries ${mkl_libs})
@@ -189,11 +189,11 @@ if (UNIX OR MINGW)
          set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
          # If you compiled OpenBLAS with LAPACK in it then it should have the
          # sgetrf_single function in it.  So if we find that function in
-         # OpenBLAS then just use OpenBLAS's LAPACK. 
+         # OpenBLAS then just use OpenBLAS's LAPACK.
          CHECK_FUNCTION_EXISTS(sgetrf_single OPENBLAS_HAS_LAPACK)
          if (OPENBLAS_HAS_LAPACK)
             message(STATUS "Using OpenBLAS's built in LAPACK")
-            # set(lapack_libraries gfortran) 
+            # set(lapack_libraries gfortran)
             set(lapack_found 1)
          endif()
       endif()
@@ -286,25 +286,33 @@ elseif(WIN32 AND NOT MINGW)
    check_type_size( "void*" SIZE_OF_VOID_PTR)
    if (SIZE_OF_VOID_PTR EQUAL 8)
       set( mkl_search_path
-         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/intel64" 
-         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64" 
-         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/intel64"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/tbb/lib/intel64/vc14"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64"
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/intel64"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/lib/intel64/vc14"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64"
          "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
+         "C:/Program Files (x86)/Intel/Composer XE/tbb/lib/intel64/vc14"
          "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
          "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
+         "C:/Program Files/Intel/Composer XE/tbb/lib/intel64/vc14"
          "C:/Program Files/Intel/Composer XE/compiler/lib/intel64"
          )
       find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
    else()
       set( mkl_search_path
-         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/ia32" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/ia32"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/tbb/lib/ia32/vc14"
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/ia32"
-         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/ia32" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/ia32"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/lib/ia32/vc14"
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/ia32"
          "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
+         "C:/Program Files (x86)/Intel/Composer XE/tbb/lib/ia32/vc14"
          "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/ia32"
          "C:/Program Files/Intel/Composer XE/mkl/lib/ia32"
+         "C:/Program Files/Intel/Composer XE/tbb/lib/ia32/vc14"
          "C:/Program Files/Intel/Composer XE/compiler/lib/ia32"
          )
       find_library(mkl_intel  mkl_intel_c ${mkl_search_path})
@@ -315,34 +323,43 @@ elseif(WIN32 AND NOT MINGW)
    # Get mkl_include_dir
    set(mkl_include_search_path
       "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/include"
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/tbb/include"
       "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/include"
-      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/include"
       "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/include"
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/include"
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/include"
       "C:/Program Files (x86)/Intel/Composer XE/mkl/include"
+      "C:/Program Files (x86)/Intel/Composer XE/tbb/include"
       "C:/Program Files (x86)/Intel/Composer XE/compiler/include"
       "C:/Program Files/Intel/Composer XE/mkl/include"
+      "C:/Program Files/Intel/Composer XE/tbb/include"
       "C:/Program Files/Intel/Composer XE/compiler/include"
       )
    find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
    mark_as_advanced(mkl_include_dir)
 
-   # Search for the needed libraries from the MKL.  
+   # Search for the needed libraries from the MKL.
    find_library(mkl_core mkl_core ${mkl_search_path})
    set(mkl_libs ${mkl_intel} ${mkl_core})
    mark_as_advanced(mkl_libs mkl_intel mkl_core)
-   if (DLIB_USE_MKL_SEQUENTIAL)
-     find_library(mkl_sequential mkl_sequential ${mkl_search_path})
-     mark_as_advanced(mkl_sequential)
-     list(APPEND mkl_libs ${mkl_sequential})
+   if (DLIB_USE_MKL_WITH_TBB)
+      find_library(mkl_tbb_thread mkl_tbb_thread ${mkl_search_path})
+      find_library(mkl_tbb tbb ${mkl_search_path})
+      mark_as_advanced(mkl_tbb_thread mkl_tbb)
+      list(APPEND mkl_libs ${mkl_tbb_thread} ${mkl_tbb})
+   elseif (DLIB_USE_MKL_SEQUENTIAL)
+      find_library(mkl_sequential mkl_sequential ${mkl_search_path})
+      mark_as_advanced(mkl_sequential)
+      list(APPEND mkl_libs ${mkl_sequential})
    else()
-     find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
-     find_library(mkl_iomp libiomp5md ${mkl_search_path})
-     mark_as_advanced(mkl_thread mkl_iomp)
-     list(APPEND mkl_libs ${mkl_thread} ${mkl_iomp})
+      find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
+      find_library(mkl_iomp libiomp5md ${mkl_search_path})
+      mark_as_advanced(mkl_thread mkl_iomp)
+      list(APPEND mkl_libs ${mkl_thread} ${mkl_iomp})
    endif()
 
-   # If we found the MKL 
-   if (mkl_intel AND mkl_core AND ((mkl_thread AND mkl_iomp) OR mkl_sequential))
+   # If we found the MKL
+   if (mkl_intel AND mkl_core AND ((mkl_tbb_thread AND mkl_tbb) OR mkl_sequential OR (mkl_thread AND mkl_iomp)))
       set(blas_libraries ${mkl_libs})
       set(lapack_libraries ${mkl_libs})
       set(blas_found 1)
@@ -373,7 +390,7 @@ endif()
 if (NOT blas_found)
    find_package(BLAS QUIET)
    if (${BLAS_FOUND})
-      set(blas_libraries ${BLAS_LIBRARIES})      
+      set(blas_libraries ${BLAS_LIBRARIES})
       set(blas_found 1)
       if (NOT lapack_found)
          find_package(LAPACK QUIET)
@@ -420,4 +437,3 @@ if (UNIX OR MINGW)
       message(" *****************************************************************************")
    endif()
 endif()
-

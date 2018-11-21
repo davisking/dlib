@@ -43,7 +43,7 @@ endif()
 include(cmake_utils/release_build_by_default)
 include(cmake_utils/use_cpp_11.cmake)
 
-# Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want. 
+# Set DLIB_VERSION in the including CMake file so they can use it to do whatever they want.
 get_directory_property(has_parent PARENT_DIRECTORY)
 if(has_parent)
    set(DLIB_VERSION ${VERSION} PARENT_SCOPE)
@@ -66,7 +66,7 @@ endif()
 
 if (DLIB_IN_PROJECT_BUILD)
 
-   # Check if we are being built as part of a pybind11 module. 
+   # Check if we are being built as part of a pybind11 module.
    if (COMMAND pybind11_add_module)
       set(CMAKE_POSITION_INDEPENDENT_CODE True)
       if (CMAKE_COMPILER_IS_GNUCXX)
@@ -102,7 +102,7 @@ if (DLIB_IN_PROJECT_BUILD)
 
 elseif(BUILD_SHARED_LIBS)
    if (MSVC)
-      message(FATAL_ERROR "Building dlib as a standalone dll is not supported when using Visual Studio.  You are highly encouraged to use static linking instead.  See https://github.com/davisking/dlib/issues/1483 for a discussion.") 
+      message(FATAL_ERROR "Building dlib as a standalone dll is not supported when using Visual Studio.  You are highly encouraged to use static linking instead.  See https://github.com/davisking/dlib/issues/1483 for a discussion.")
    endif()
 endif()
 
@@ -150,14 +150,14 @@ endif()
 # because it avoids getting warnings/errors about cmake policy CMP0002.  This
 # happens when a project tries to call add_subdirectory() on dlib more than
 # once.  This most often happens when the top level of a project depends on two
-# or more other things which both depend on dlib. 
+# or more other things which both depend on dlib.
 if (NOT TARGET dlib)
 
-   set (DLIB_ISO_CPP_ONLY_STR 
+   set (DLIB_ISO_CPP_ONLY_STR
       "Enable this if you don't want to compile any non-ISO C++ code (i.e. you don't use any of the API Wrappers)" )
-   set (DLIB_NO_GUI_SUPPORT_STR 
+   set (DLIB_NO_GUI_SUPPORT_STR
       "Enable this if you don't want to compile any of the dlib GUI code" )
-   set (DLIB_ENABLE_STACK_TRACE_STR 
+   set (DLIB_ENABLE_STACK_TRACE_STR
       "Enable this if you want to turn on the DLIB_STACK_TRACE macros" )
    set (DLIB_USE_BLAS_STR
       "Disable this if you don't want to use a BLAS library" )
@@ -167,6 +167,8 @@ if (NOT TARGET dlib)
       "Disable this if you don't want to use NVIDIA CUDA" )
    set (DLIB_USE_MKL_SEQUENTIAL_STR
       "Enable this if you have MKL installed and want to use the sequential version instead of the multi-core version." )
+   set (DLIB_USE_MKL_WITH_TBB_STR
+      "Enable this if you have MKL installed and want to use the tbb version instead of the openmp version." )
    set (DLIB_PNG_SUPPORT_STR
       "Disable this if you don't want to link against libpng" )
    set (DLIB_GIF_SUPPORT_STR
@@ -190,19 +192,20 @@ if (NOT TARGET dlib)
    option(DLIB_ENABLE_STACK_TRACE ${DLIB_ENABLE_STACK_TRACE_STR} OFF)
    toggle_preprocessor_switch(DLIB_ENABLE_STACK_TRACE)
    option(DLIB_USE_MKL_SEQUENTIAL ${DLIB_USE_MKL_SEQUENTIAL_STR} OFF)
+   option(DLIB_USE_MKL_WITH_TBB ${DLIB_USE_MKL_WITH_TBB_STR} OFF)
 
    if(DLIB_ENABLE_ASSERTS)
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS false)
-      set (ENABLE_ASSERTS true) 
+      set (ENABLE_ASSERTS true)
       enable_preprocessor_switch(ENABLE_ASSERTS)
       disable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
    else()
       # Set these variables so they are set in the config.h.in file when dlib
       # is installed.
       set (DLIB_DISABLE_ASSERTS true)
-      set (ENABLE_ASSERTS false) 
+      set (ENABLE_ASSERTS false)
       disable_preprocessor_switch(ENABLE_ASSERTS)
       # Never force the asserts off when doing an in project build.  The only
       # time this matters is when using visual studio.  The visual studio IDE
@@ -214,7 +217,7 @@ if (NOT TARGET dlib)
       # we make a point to not do that kind of severe disabling when in a
       # project build.  It should also be pointed out that DLIB_DISABLE_ASSERTS
       # is only needed when building and installing dlib as a separately
-      # installed library.  It doesn't matter when doing an in project build. 
+      # installed library.  It doesn't matter when doing an in project build.
       if (NOT DLIB_IN_PROJECT_BUILD)
          enable_preprocessor_switch(DLIB_DISABLE_ASSERTS)
       endif()
@@ -245,13 +248,13 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_USE_BLAS)
    toggle_preprocessor_switch(DLIB_USE_LAPACK)
    toggle_preprocessor_switch(DLIB_USE_CUDA)
-   toggle_preprocessor_switch(DLIB_PNG_SUPPORT) 
-   toggle_preprocessor_switch(DLIB_GIF_SUPPORT) 
+   toggle_preprocessor_switch(DLIB_PNG_SUPPORT)
+   toggle_preprocessor_switch(DLIB_GIF_SUPPORT)
    #toggle_preprocessor_switch(DLIB_USE_FFTW)
    toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
 
 
-   set(source_files 
+   set(source_files
       base64/base64_kernel_1.cpp
       bigint/bigint_kernel_1.cpp
       bigint/bigint_kernel_2.cpp
@@ -317,7 +320,7 @@ if (NOT TARGET dlib)
          set(dlib_needed_libraries ${dlib_needed_libraries} ${CMAKE_THREAD_LIBS_INIT})
       endif()
 
-      # we want to link to the right stuff depending on our platform.  
+      # we want to link to the right stuff depending on our platform.
       if (WIN32 AND NOT CYGWIN) ###############################################################################
          if (DLIB_NO_GUI_SUPPORT)
             set (dlib_needed_libraries ws2_32 winmm)
@@ -344,7 +347,7 @@ if (NOT TARGET dlib)
                # Xlocale.h rather than Xlib.h because it avoids finding a partial
                # copy of the X11 headers on systems with anaconda installed.
                find_path(xlib_path Xlocale.h
-                  PATHS 
+                  PATHS
                   /Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include
                   /opt/local/include
                   PATH_SUFFIXES X11
@@ -369,7 +372,7 @@ if (NOT TARGET dlib)
 
          mark_as_advanced(pthreadlib xlib xlib_path x11_path)
       else () ##################################################################################
-         # link to the nsl library if it exists.  this is something you need sometimes 
+         # link to the nsl library if it exists.  this is something you need sometimes
          find_library(nsllib nsl)
          if (nsllib)
             set (dlib_needed_libraries ${dlib_needed_libraries} ${nsllib})
@@ -427,7 +430,7 @@ if (NOT TARGET dlib)
       endif()
 
       if (DLIB_PNG_SUPPORT)
-         # try to find libpng 
+         # try to find libpng
          find_package(PNG QUIET)
          # Make sure there isn't something wrong with the version of LIBPNG
          # installed on this system.  Also never link to anything from anaconda
@@ -496,9 +499,9 @@ if (NOT TARGET dlib)
       endif()
 
       if (DLIB_JPEG_SUPPORT)
-         # try to find libjpeg 
+         # try to find libjpeg
          find_package(JPEG QUIET)
-         # Make sure there isn't something wrong with the version of libjpeg 
+         # Make sure there isn't something wrong with the version of libjpeg
          # installed on this system.  Also don't use the installed libjpeg
          # if this is an APPLE system because apparently it's broken (as of 2015/01/01).
          if (JPEG_FOUND AND NOT ("${JPEG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)") AND NOT BUILDING_PYTHON_IN_MSVC)
@@ -537,7 +540,7 @@ if (NOT TARGET dlib)
                external/libjpeg/jmemnobs.cpp
                external/libjpeg/jquant1.cpp
                external/libjpeg/jquant2.cpp
-               external/libjpeg/jutils.cpp  
+               external/libjpeg/jutils.cpp
                external/libjpeg/jcapimin.cpp
                external/libjpeg/jdatadst.cpp
                external/libjpeg/jcparam.cpp
@@ -546,12 +549,12 @@ if (NOT TARGET dlib)
                external/libjpeg/jcinit.cpp
                external/libjpeg/jcmaster.cpp
                external/libjpeg/jcdctmgr.cpp
-               external/libjpeg/jccoefct.cpp  
-               external/libjpeg/jccolor.cpp  
-               external/libjpeg/jchuff.cpp  
-               external/libjpeg/jcmainct.cpp  
-               external/libjpeg/jcphuff.cpp  
-               external/libjpeg/jcprepct.cpp  
+               external/libjpeg/jccoefct.cpp
+               external/libjpeg/jccolor.cpp
+               external/libjpeg/jchuff.cpp
+               external/libjpeg/jcmainct.cpp
+               external/libjpeg/jcphuff.cpp
+               external/libjpeg/jcprepct.cpp
                external/libjpeg/jcsample.cpp
                external/libjpeg/jfdctint.cpp
                external/libjpeg/jfdctflt.cpp
@@ -566,6 +569,12 @@ if (NOT TARGET dlib)
 
 
       if (DLIB_USE_BLAS OR DLIB_USE_LAPACK OR DLIB_USE_MKL_FFT)
+         if (DLIB_USE_MKL_WITH_TBB AND DLIB_USE_MKL_SEQUENTIAL)
+            set(DLIB_USE_MKL_SEQUENTIAL OFF CACHE STRING ${DLIB_USE_MKL_SEQUENTIAL_STR} FORCE )
+            toggle_preprocessor_switch(DLIB_USE_MKL_SEQUENTIAL)
+            message(STATUS "Disabling DLIB_USE_MKL_SEQUENTIAL. It cannot be used simultaneously with DLIB_USE_MKL_WITH_TBB.")
+         endif()
+
          # Try to find BLAS, LAPACK and MKL
          include(cmake_utils/find_blas.cmake)
 
@@ -610,7 +619,7 @@ if (NOT TARGET dlib)
          find_package(CUDA 7.5)
 
          if (CUDA_VERSION VERSION_GREATER 9.1 AND CMAKE_VERSION VERSION_LESS 3.12.2)
-            # This bit of weirdness is to work around a bug in cmake 
+            # This bit of weirdness is to work around a bug in cmake
             list(REMOVE_ITEM CUDA_CUBLAS_LIBRARIES "CUDA_cublas_device_LIBRARY-NOTFOUND")
          endif()
 
@@ -632,7 +641,7 @@ if (NOT TARGET dlib)
                # to nvcc.
                string(REGEX MATCHALL "-D[^ ]*" FLAGS_FOR_NVCC "${CMAKE_CXX_FLAGS}")
 
-               # Check if we are being built as part of a pybind11 module. 
+               # Check if we are being built as part of a pybind11 module.
                if (COMMAND pybind11_add_module)
                   # Don't export unnecessary symbols.
                   list(APPEND FLAGS_FOR_NVCC "-Xcompiler=-fvisibility=hidden")
@@ -666,7 +675,7 @@ if (NOT TARGET dlib)
                # make sure cuda is really working by doing a test compile
                message(STATUS "Building a CUDA test project to see if your compiler is compatible with CUDA...")
 
-               set(CUDA_TEST_CMAKE_FLAGS 
+               set(CUDA_TEST_CMAKE_FLAGS
                   "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
                   "-DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}"
                   "-DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}")
@@ -675,8 +684,8 @@ if (NOT TARGET dlib)
                   list(APPEND CUDA_TEST_CMAKE_FLAGS "-DCUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
                endif()
 
-               try_compile(cuda_test_compile_worked 
-                  ${PROJECT_BINARY_DIR}/cuda_test_build 
+               try_compile(cuda_test_compile_worked
+                  ${PROJECT_BINARY_DIR}/cuda_test_build
                   ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cuda cuda_test
                   CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
                   OUTPUT_VARIABLE try_compile_output_message
@@ -690,8 +699,8 @@ if (NOT TARGET dlib)
                   message(STATUS "*****************************************************************************************************************")
                else()
                   message(STATUS "Checking if you have the right version of cuDNN installed.")
-                  try_compile(cudnn_test_compile_worked 
-                     ${PROJECT_BINARY_DIR}/cudnn_test_build 
+                  try_compile(cudnn_test_compile_worked
+                     ${PROJECT_BINARY_DIR}/cudnn_test_build
                      ${PROJECT_SOURCE_DIR}/cmake_utils/test_for_cudnn cudnn_test
                      CMAKE_FLAGS ${CUDA_TEST_CMAKE_FLAGS}
                      )
@@ -722,7 +731,7 @@ if (NOT TARGET dlib)
             if (CUDA_VERSION VERSION_LESS "9.1" AND NOT openmp_libraries AND NOT MSVC AND NOT XCODE AND NOT APPLE)
                find_package(OpenMP)
                if (OPENMP_FOUND)
-                  set(openmp_libraries ${OpenMP_CXX_FLAGS}) 
+                  set(openmp_libraries ${OpenMP_CXX_FLAGS})
                else()
                   message(STATUS "*** Didn't find OpenMP, which is required to use CUDA. ***")
                   set(CUDA_FOUND 0)
@@ -731,8 +740,8 @@ if (NOT TARGET dlib)
          endif()
 
          if (CUDA_FOUND AND cudnn AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER) AND cuda_test_compile_worked AND cudnn_test_compile_worked AND cudnn_include)
-            set(source_files ${source_files} 
-               cuda/cuda_dlib.cu 
+            set(source_files ${source_files}
+               cuda/cuda_dlib.cu
                cuda/cudnn_dlibapi.cpp
                cuda/cublas_dlibapi.cpp
                cuda/cusolver_dlibapi.cu
@@ -740,8 +749,8 @@ if (NOT TARGET dlib)
                cuda/cuda_data_ptr.cpp
                cuda/gpu_data.cpp
                )
-            set(dlib_needed_libraries ${dlib_needed_libraries} 
-               ${CUDA_CUBLAS_LIBRARIES} 
+            set(dlib_needed_libraries ${dlib_needed_libraries}
+               ${CUDA_CUBLAS_LIBRARIES}
                ${cudnn}
                ${CUDA_curand_LIBRARY}
                ${cusolver}
@@ -828,7 +837,7 @@ if (NOT TARGET dlib)
       # Do this so that dlib/config.h can record the version of dlib it's configured with
       # and ultimately issue a linker error to people who try to use a binary dlib that is
       # the wrong version.
-      set(DLIB_CHECK_FOR_VERSION_MISMATCH 
+      set(DLIB_CHECK_FOR_VERSION_MISMATCH
          DLIB_VERSION_MISMATCH_CHECK__EXPECTED_VERSION_${CPACK_PACKAGE_VERSION_MAJOR}_${CPACK_PACKAGE_VERSION_MINOR}_${CPACK_PACKAGE_VERSION_PATCH})
       target_compile_options(dlib PRIVATE "-DDLIB_CHECK_FOR_VERSION_MISMATCH=${DLIB_CHECK_FOR_VERSION_MISMATCH}")
    endif()
@@ -836,7 +845,7 @@ if (NOT TARGET dlib)
 
    # Allow the unit tests to ask us to compile the all/source.cpp file just to make sure it compiles.
    if (DLIB_TEST_COMPILE_ALL_SOURCE_CPP)
-      add_library(dlib_all_source_cpp STATIC all/source.cpp) 
+      add_library(dlib_all_source_cpp STATIC all/source.cpp)
       target_link_libraries(dlib_all_source_cpp dlib)
       target_compile_options(dlib_all_source_cpp PUBLIC ${active_preprocessor_switches})
       enable_cpp11_for_target(dlib_all_source_cpp)
@@ -856,14 +865,14 @@ if (NOT TARGET dlib)
       set_target_properties(dlib PROPERTIES
          VERSION ${VERSION})
       install(TARGETS dlib
-         EXPORT dlib 
+         EXPORT dlib
          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # Windows considers .dll to be runtime artifacts
          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
       install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dlib
-         FILES_MATCHING 
-            PATTERN "*.h" 
+         FILES_MATCHING
+            PATTERN "*.h"
             PATTERN "*.cmake"
             PATTERN "*_tutorial.txt"
             PATTERN "cassert"
@@ -902,9 +911,9 @@ if (NOT TARGET dlib)
          COMPATIBILITY AnyNewerVersion
          )
 
-      install(FILES 
-         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake" 
-         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake" 
+      install(FILES
+         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfig.cmake"
+         "${CMAKE_CURRENT_BINARY_DIR}/config/dlibConfigVersion.cmake"
          DESTINATION ${ConfigPackageLocation})
 
       ## dlib-1.pc generation and installation
@@ -936,7 +945,7 @@ if (MSVC)
    set_target_properties(dlib PROPERTIES RELWITHDEBINFO_POSTFIX "${VERSION}_relwithdebinfo_${numbits}bit_msvc${MSVC_VERSION}")
 endif()
 
-# Check if we are being built as part of a pybind11 module. 
+# Check if we are being built as part of a pybind11 module.
 if (COMMAND pybind11_add_module)
    # Don't export unnecessary symbols.
    set_target_properties(dlib PROPERTIES CXX_VISIBILITY_PRESET "hidden")
