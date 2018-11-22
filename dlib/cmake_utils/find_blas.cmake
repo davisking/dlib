@@ -85,6 +85,9 @@ if (UNIX OR MINGW)
          /opt/intel/mkl/lib/intel64
          /opt/intel/lib/intel64
          /opt/intel/mkl/lib
+         /opt/intel/tbb/*/lib/em64t/gcc4.7
+         /opt/intel/tbb/lib/intel64/gcc4.7
+         /opt/intel/tbb/lib/gcc4.7
          )
 
       find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
@@ -94,6 +97,8 @@ if (UNIX OR MINGW)
          /opt/intel/mkl/*/lib/32
          /opt/intel/mkl/lib/ia32
          /opt/intel/lib/ia32
+         /opt/intel/tbb/*/lib/32/gcc4.7
+         /opt/intel/tbb/lib/ia32/gcc4.7
          )
 
       find_library(mkl_intel mkl_intel ${mkl_search_path})
@@ -110,7 +115,7 @@ if (UNIX OR MINGW)
    find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
    mark_as_advanced(mkl_include_dir)
 
-   if(NOT DLIB_USE_MKL_SEQUENTIAL)
+   if(NOT DLIB_USE_MKL_SEQUENTIAL AND NOT DLIB_USE_MKL_WITH_TBB)
       # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
       # file first since this way avoids linking bugs in some cases.
       find_library(mkl_rt mkl_rt ${mkl_search_path})
@@ -135,7 +140,13 @@ if (UNIX OR MINGW)
       find_library(mkl_core mkl_core ${mkl_search_path})
       set(mkl_libs ${mkl_intel} ${mkl_core})
       mark_as_advanced(mkl_libs mkl_intel mkl_core)
-      if (DLIB_USE_MKL_SEQUENTIAL)
+
+      if (DLIB_USE_MKL_WITH_TBB)
+         find_library(mkl_tbb_thread mkl_tbb_thread ${mkl_search_path})
+         find_library(mkl_tbb tbb ${mkl_search_path})
+         mark_as_advanced(mkl_tbb_thread mkl_tbb)
+         list(APPEND mkl_libs ${mkl_tbb_thread} ${mkl_tbb})
+      elseif (DLIB_USE_MKL_SEQUENTIAL)
          find_library(mkl_sequential mkl_sequential ${mkl_search_path})
          mark_as_advanced(mkl_sequential)
          list(APPEND mkl_libs ${mkl_sequential})
@@ -148,7 +159,7 @@ if (UNIX OR MINGW)
       endif()
 
       # If we found the MKL
-      if (mkl_intel AND mkl_core AND ((mkl_thread AND mkl_iomp AND mkl_pthread) OR mkl_sequential))
+      if (mkl_intel AND mkl_core AND ((mkl_tbb_thread AND mkl_tbb) OR (mkl_thread AND mkl_iomp AND mkl_pthread) OR mkl_sequential))
          set(mkl_libraries ${mkl_libs})
          set(blas_libraries ${mkl_libs})
          set(lapack_libraries ${mkl_libs})
