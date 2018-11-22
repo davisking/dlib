@@ -334,16 +334,12 @@ elseif(WIN32 AND NOT MINGW)
    # Get mkl_include_dir
    set(mkl_include_search_path
       "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/include"
-      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/tbb/include"
       "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/include"
       "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/include"
-      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/include"
       "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/include"
       "C:/Program Files (x86)/Intel/Composer XE/mkl/include"
-      "C:/Program Files (x86)/Intel/Composer XE/tbb/include"
       "C:/Program Files (x86)/Intel/Composer XE/compiler/include"
       "C:/Program Files/Intel/Composer XE/mkl/include"
-      "C:/Program Files/Intel/Composer XE/tbb/include"
       "C:/Program Files/Intel/Composer XE/compiler/include"
       )
    find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
