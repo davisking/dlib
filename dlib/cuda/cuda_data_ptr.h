@@ -184,7 +184,7 @@ namespace dlib
             )
             {
                 if (src.size() != dest.size())
-                    src = cuda_data_ptr<T>(dest.size());
+                    dest = cuda_data_ptr<T>(dest.size());
 
                 if (dest.size() != 0)
                     memcpy(dest.pdata, src.data());
