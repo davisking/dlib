@@ -447,6 +447,8 @@ if (NOT TARGET dlib)
             # If we can't find libpng then statically compile it in.
             include_directories(external/libpng external/zlib)
             set(source_files ${source_files}
+               external/libpng/arm/arm_init.c
+               external/libpng/arm/filter_neon_intrinsics.c
                external/libpng/png.c
                external/libpng/pngerror.c
                external/libpng/pngget.c
