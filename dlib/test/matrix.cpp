@@ -1164,6 +1164,10 @@ namespace
             DLIB_TEST((complex_matrix(ones_matrix<double>(3,3), zeros_matrix<double>(3,3)) == complex_matrix(ones_matrix<double>(3,3))));
             DLIB_TEST((pointwise_multiply(complex_matrix(ones_matrix<double>(3,3)), ones_matrix<double>(3,3)*2) ==
                        complex_matrix(2*ones_matrix<double>(3,3))));
+            DLIB_TEST((pointwise_divide(complex_matrix(ones_matrix<double>(3,3)), ones_matrix<double>(3,3)) ==
+                       complex_matrix(ones_matrix<double>(3,3))));
+            DLIB_TEST((pointwise_divide(complex_matrix(zeros_matrix<double>(3,3)), ones_matrix<double>(3,3)) ==
+                       complex_matrix(zeros_matrix<double>(3,3))));
         }
 
         {
