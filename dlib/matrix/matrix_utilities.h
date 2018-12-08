@@ -2869,7 +2869,7 @@ namespace dlib
 	// ----------------------------------------------------------------------------------------
 
 	template <typename M1, typename M2, typename M3, typename M4>
-	struct op_pointwise_divide4 : basic_op_mmmm<M1 M2,M3,M4>
+	struct op_pointwise_divide4 : basic_op_mmmm<M1,M2,M3,M4>
 	{
 		op_pointwise_divide4( const M1& m1_, const M2& m2_, const M3& m3_, const M4& m4_) :
 			basic_op_mmmm<M1,M2,M3,M4>(m1_,m2_,m3_,m4_) {}
