@@ -136,6 +136,7 @@ namespace
         DLIB_TEST(cubed(m4) == pointwise_multiply(m4,m4,m4));
         DLIB_TEST(m4 == pointwise_divide(squared(m4),m4));
         DLIB_TEST(m4 == pointwise_divide(cubed(m4),m4,m4));
+        DLIB_TEST(m4 == pointwise_divide(pointwise_multiply(cubed(m4),m4),m4,m4,m4));
         DLIB_TEST(squared(m4) == pointwise_divide(cubed(m4),m4));
         DLIB_TEST(pow(matrix_cast<double>(m4),2) == squared(matrix_cast<double>(m4)));
         DLIB_TEST(pow(matrix_cast<double>(m4),3) == cubed(matrix_cast<double>(m4)));
