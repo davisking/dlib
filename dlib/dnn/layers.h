@@ -2039,7 +2039,7 @@ namespace dlib
             auto sg = gamma(temp,0);
             auto sb = beta(temp,gamma.size());
 
-            g = pointwise_multiply(mat(sg), 1.0f/sqrt(mat(item.running_variances)+item.get_eps()));
+            g = pointwise_divide(mat(sg), sqrt(mat(item.running_variances)+item.get_eps()));
             b = mat(sb) - pointwise_multiply(mat(g), mat(item.running_means));
         }
 

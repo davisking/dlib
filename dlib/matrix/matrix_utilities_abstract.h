@@ -802,6 +802,46 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const matrix_exp pointwise_divide(
+        const matrix_exp& a,
+        const matrix_exp& b
+    );
+    /*!
+        requires
+            - a.nr() == b.nr()
+            - a.nc() == b.nc()
+            - a and b both contain the same type of element (one or both
+              can also be of type std::complex so long as the underlying type
+              in them is the same)
+        ensures
+            - returns a matrix R such that:
+                - R::type == the same type that was in a and b.
+                - R has the same dimensions as a and b.
+                - for all valid r and c:
+                  R(r,c) == a(r,c) / b(r,c)
+    !*/
+
+    const matrix_exp pointwise_divide(
+        const matrix_exp& a,
+        const matrix_exp& b,
+        const matrix_exp& c
+    );
+    /*!
+        performs pointwise_divide(pointwise_divide(a,b),c);
+    !*/
+
+    const matrix_exp pointwise_divide(
+        const matrix_exp& a,
+        const matrix_exp& b,
+        const matrix_exp& c,
+        const matrix_exp& d
+    );
+    /*!
+        performs pointwise_divide(pointwise_divide(pointwise_divide(pointwise_divide(a,b),c),d));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     const matrix_exp join_rows (
         const matrix_exp& a,
         const matrix_exp& b 
