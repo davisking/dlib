@@ -17,6 +17,8 @@
 
     An alternative to steps 2-4 above is to download a pre-trained network
     from here: http://dlib.net/files/semantic_segmentation_voc2012net_v2.dnn
+    (or http://dlib.net/files/semantic_segmentation_voc2012net_v2_limited_layer_count.dnn,
+     if using a Microsoft Visual C++ compiler)
 
     It would be a good idea to become familiar with dlib's DNN tooling before reading this
     example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
@@ -111,16 +113,16 @@ int main(int argc, char** argv) try
         cout << "You call this program like this: " << endl;
         cout << "./dnn_semantic_segmentation_train_ex /path/to/images" << endl;
         cout << endl;
-        cout << "You will also need a trained 'semantic_segmentation_voc2012net_v2.dnn' file." << endl;
+        cout << "You will also need a trained '" << semantic_segmentation_net_filename << "' file." << endl;
         cout << "You can either train it yourself (see example program" << endl;
         cout << "dnn_semantic_segmentation_train_ex), or download a" << endl;
-        cout << "copy from here: http://dlib.net/files/semantic_segmentation_voc2012net_v2.dnn" << endl;
+        cout << "copy from here: http://dlib.net/files/" << semantic_segmentation_net_filename << endl;
         return 1;
     }
 
     // Read the file containing the trained network from the working directory.
     anet_type net;
-    deserialize("semantic_segmentation_voc2012net_v2.dnn") >> net;
+    deserialize(semantic_segmentation_net_filename) >> net;
 
     // Show inference results in a window.
     image_window win;

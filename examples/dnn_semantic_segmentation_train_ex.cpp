@@ -374,7 +374,7 @@ int main(int argc, char** argv) try
 
     bnet.clean();
     cout << "saving network" << endl;
-    serialize("semantic_segmentation_voc2012net_v2.dnn") << bnet;
+    serialize(semantic_segmentation_net_filename) << bnet;
 
 
     // Make a copy of the network to use it for inference.

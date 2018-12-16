@@ -211,8 +211,10 @@ template <typename SUBNET> using concat_utag4 = resize_and_concat<utag4,utag4_,S
 
 #ifdef _MSC_VER
 #define LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES 1
+static const char* semantic_segmentation_net_filename = "semantic_segmentation_voc2012net_v2_limited_layer_count.dnn";
 #else
 #define LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES 0
+static const char* semantic_segmentation_net_filename = "semantic_segmentation_voc2012net_v2.dnn";
 #endif
 
 // training network type
