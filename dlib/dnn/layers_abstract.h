@@ -2387,6 +2387,56 @@ namespace dlib
     template <
         template<typename> class tag
         >
+    class resize_to_prev_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  This layer resizes the output channels of the tagged layer to
+                have the same number of rows and columns as the output of the previous layer.
+
+                This layer uses bilinear interpolation. If the sizes match already, then it
+                simply copies the data.
+
+                Therefore, you supply a tag via resize_to_prev's template argument that tells
+                it what layer to use for the target size.
+
+                If tensor A is resized to size of tensor B, then a tensor C is produced such
+                that:
+                    - C.num_samples() == A.num_samples()
+                    - C.k()  == A.k()
+                    - C.nr() == B.nr()
+                    - C.nc() == B.nc()
+        !*/
+
+    public:
+        resize_to_prev_(
+        ); 
+
+        template <typename SUBNET> void setup(const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using resize_to_prev = add_layer<resize_to_prev_<tag>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        template<typename> class tag
+        >
     class scale_
     {
         /*!

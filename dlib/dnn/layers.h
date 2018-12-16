@@ -2290,106 +2290,6 @@ namespace dlib
     template <
         template<typename> class tag
         >
-    class resize_to_prev_
-    {
-    public:
-        const static unsigned long id = tag_id<tag>::id;
-
-        resize_to_prev_()
-        {
-        }
-
-        template <typename SUBNET>
-        void setup (const SUBNET& /*sub*/)
-        {
-        }
-
-        template <typename SUBNET>
-        void forward(const SUBNET& sub, resizable_tensor& output)
-        {
-            auto& t = sub.get_output();
-            auto& prev = layer<tag>(sub).get_output();
-
-            DLIB_CASSERT(t.num_samples() == prev.num_samples());
-
-            output.set_size(t.num_samples(),
-                            t.k(),
-                            prev.nr(),
-                            prev.nc());
-
-            if (t.nr() == prev.nr() && t.nc() == prev.nc())
-            {
-                tt::copy_tensor(false, output, 0, t, 0, t.k());
-            }
-            else
-            {
-                tt::resize_bilinear(output, t);
-            }
-        }
-
-        template <typename SUBNET>
-        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
-        {
-            auto& t = sub.get_gradient_input();
-
-            DLIB_CASSERT(t.k() == gradient_input.k());
-            DLIB_CASSERT(t.num_samples() == gradient_input.num_samples());
-
-            if (t.nr() == gradient_input.nr() && t.nc() == gradient_input.nc())
-            {
-                tt::copy_tensor(true, t, 0, gradient_input, 0, t.k());
-            }
-            else
-            {
-                tt::resize_bilinear_gradient(t, gradient_input);
-            }
-        }
-
-        const tensor& get_layer_params() const { return params; }
-        tensor& get_layer_params() { return params; }
-
-        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
-        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
-
-        friend void serialize(const resize_to_prev_& , std::ostream& out)
-        {
-            serialize("resize_to_prev_", out);
-        }
-
-        friend void deserialize(resize_to_prev_& , std::istream& in)
-        {
-            std::string version;
-            deserialize(version, in);
-            if (version != "resize_to_prev_")
-                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::resize_to_prev_.");
-        }
-
-        friend std::ostream& operator<<(std::ostream& out, const resize_to_prev_& item)
-        {
-            out << "resize_to_prev"<<id;
-            return out;
-        }
-
-        friend void to_xml(const resize_to_prev_& item, std::ostream& out)
-        {
-            out << "<resize_to_prev tag='"<<id<<"'/>\n";
-        }
-
-    private:
-        resizable_tensor params;
-    };
-
-    template <
-        template<typename> class tag,
-        typename SUBNET
-        >
-    using resize_to_prev = add_layer<resize_to_prev_<tag>, SUBNET>;
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        template<typename> class tag
-        >
     class mult_prev_
     {
     public:
@@ -2485,6 +2385,106 @@ namespace dlib
     using mult_prev8_  = mult_prev_<tag8>;
     using mult_prev9_  = mult_prev_<tag9>;
     using mult_prev10_ = mult_prev_<tag10>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        template<typename> class tag
+        >
+    class resize_to_prev_
+    {
+    public:
+        const static unsigned long id = tag_id<tag>::id;
+
+        resize_to_prev_()
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            auto& t = sub.get_output();
+            auto& prev = layer<tag>(sub).get_output();
+
+            DLIB_CASSERT(t.num_samples() == prev.num_samples());
+
+            output.set_size(t.num_samples(),
+                            t.k(),
+                            prev.nr(),
+                            prev.nc());
+
+            if (t.nr() == prev.nr() && t.nc() == prev.nc())
+            {
+                tt::copy_tensor(false, output, 0, t, 0, t.k());
+            }
+            else
+            {
+                tt::resize_bilinear(output, t);
+            }
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& /*params_grad*/)
+        {
+            auto& t = sub.get_gradient_input();
+
+            DLIB_CASSERT(t.k() == gradient_input.k());
+            DLIB_CASSERT(t.num_samples() == gradient_input.num_samples());
+
+            if (t.nr() == gradient_input.nr() && t.nc() == gradient_input.nc())
+            {
+                tt::copy_tensor(true, t, 0, gradient_input, 0, t.k());
+            }
+            else
+            {
+                tt::resize_bilinear_gradient(t, gradient_input);
+            }
+        }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        friend void serialize(const resize_to_prev_& , std::ostream& out)
+        {
+            serialize("resize_to_prev_", out);
+        }
+
+        friend void deserialize(resize_to_prev_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "resize_to_prev_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::resize_to_prev_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const resize_to_prev_& item)
+        {
+            out << "resize_to_prev"<<id;
+            return out;
+        }
+
+        friend void to_xml(const resize_to_prev_& item, std::ostream& out)
+        {
+            out << "<resize_to_prev tag='"<<id<<"'/>\n";
+        }
+
+    private:
+        resizable_tensor params;
+    };
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using resize_to_prev = add_layer<resize_to_prev_<tag>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
