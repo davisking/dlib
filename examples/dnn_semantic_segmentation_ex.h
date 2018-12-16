@@ -115,175 +115,11 @@ const Voc2012class& find_voc2012_class(Predicate predicate)
 // ----------------------------------------------------------------------------------------
 
 // Introduce the building blocks used to define the segmentation network.
-// The network first does downsampling, and then upsampling, using DenseNet
-// blocks. In addition, U-net style skip connections are employed.
-
-template <int N, template <typename> class BN, typename SUBNET>
-using dense_block_layer = dlib::relu<BN<dlib::con<N,3,3,1,1,SUBNET>>>;
-
-template <
-    template<typename> class TAG1,
-    template<typename> class TAG2,
-    typename SUBNET
->
-using concat = dlib::add_layer<dlib::concat_<TAG1,TAG2>,TAG2<SUBNET>>;
-
-// ----------------------------------------------------------------------------------------
-
-template <typename SUBNET> using dintag = dlib::add_tag_layer<2000+0,SUBNET>; // input to the dense block
-template <typename SUBNET> using dotag0 = dlib::add_tag_layer<2000+1,SUBNET>; // output of the first layer of the dense block
-template <typename SUBNET> using dctag0 = dlib::add_tag_layer<2000+2,SUBNET>; // dintag and dotag0 concatenated
-template <typename SUBNET> using dotag1 = dlib::add_tag_layer<2000+3,SUBNET>; // output of the second layer of the dense block
-template <typename SUBNET> using dctag1 = dlib::add_tag_layer<2000+4,SUBNET>; // dctag0 and dotag1 concatenated
-template <typename SUBNET> using dotag2 = dlib::add_tag_layer<2000+5,SUBNET>; // output of the third layer of the dense block
-
-// ----------------------------------------------------------------------------------------
-
-// The following dense block is modeled after Figure 2 of the tiramisu
-// paper (Jegou et al 2017, https://arxiv.org/pdf/1611.09326.pdf).
-
-template <int N, template <typename> class BN, typename SUBNET>
-using dense_block4 = dlib::concat3<dotag0,dotag1,dotag2,dense_block_layer<N,BN,
-                            concat<dctag1,dotag2,dense_block_layer<N,BN,
-                     dctag1<concat<dctag0,dotag1,dense_block_layer<N,BN,
-                     dctag0<concat<dintag,dotag0,dense_block_layer<N,BN,
-                     dintag<SUBNET>
-                     >>>>>>>>>>;
-
-// What follows is more light-weight versions of the above.
-// (Note that more heavy-weight versions are rather easy to extrapolate as well.)
-
-template <int N, template <typename> class BN, typename SUBNET>
-using dense_block3 = dlib::concat2<dotag0,dotag1,dense_block_layer<N,BN,
-                            concat<dctag0,dotag1,dense_block_layer<N,BN,
-                     dctag0<concat<dintag,dotag0,dense_block_layer<N,BN,
-                     dintag<SUBNET>
-                     >>>>>>>;
-
-template <int N, template <typename> class BN, typename SUBNET>
-using dense_block2 = dlib::concat2<dotag0,dotag1,dotag1<dense_block_layer<N,BN,
-                     dlib::concat2<dintag,dotag0,dotag0<dense_block_layer<N,BN,
-                     dintag<SUBNET>
-                     >>>>>>;
-
-template <int N, template <typename> class BN, typename SUBNET>
-using dense_block1 = dlib::concat2<dintag,dotag0,dotag0<dense_block_layer<N,BN,
-                     dintag<SUBNET>
-                     >>>;
-
-template <int N, template <typename> class BN, typename SUBNET>
-using dense_block0 = dense_block_layer<N,BN,SUBNET>;
-
-// ----------------------------------------------------------------------------------------
-
-template <int N, template <typename> class BN, typename SUBNET>
-using transition_down = dlib::relu<BN<dlib::con<N,1,1,1,1,dlib::max_pool<3,3,2,2,SUBNET>>>>;
-
-// ----------------------------------------------------------------------------------------
-
-template <int N, typename SUBNET> using bdense4    = dense_block4<N,dlib::bn_con,SUBNET>;
-template <int N, typename SUBNET> using adense4    = dense_block4<N,dlib::affine,SUBNET>;
-template <int N, typename SUBNET> using bdense3    = dense_block3<N,dlib::bn_con,SUBNET>;
-template <int N, typename SUBNET> using adense3    = dense_block3<N,dlib::affine,SUBNET>;
-template <int N, typename SUBNET> using bdense2    = dense_block2<N,dlib::bn_con,SUBNET>;
-template <int N, typename SUBNET> using adense2    = dense_block2<N,dlib::affine,SUBNET>;
-template <int N, typename SUBNET> using bdense1    = dense_block1<N,dlib::bn_con,SUBNET>;
-template <int N, typename SUBNET> using adense1    = dense_block1<N,dlib::affine,SUBNET>;
-template <int N, typename SUBNET> using bdense0    = dense_block0<N,dlib::bn_con,SUBNET>;
-template <int N, typename SUBNET> using adense0    = dense_block0<N,dlib::affine,SUBNET>;
-
-template <int N, typename SUBNET> using bdown      = transition_down<N,dlib::bn_con,SUBNET>;
-template <int N, typename SUBNET> using adown      = transition_down<N,dlib::affine,SUBNET>;
-
-template <int N, typename SUBNET> using up         = dlib::cont<N,3,3,2,2,SUBNET>;
-
-// ----------------------------------------------------------------------------------------
-
-template <
-    template<typename> class TAG1,
-    template<typename> class TAG2,
-    typename SUBNET
->
-using resize_and_concat = dlib::add_layer<
-                          dlib::concat_<TAG1,TAG2>,
-                          TAG2<dlib::resize_to_prev<TAG1,SUBNET>>>;
-
-template <typename SUBNET> using utag0 = dlib::add_tag_layer<2100+0,SUBNET>;
-template <typename SUBNET> using utag1 = dlib::add_tag_layer<2100+1,SUBNET>;
-template <typename SUBNET> using utag2 = dlib::add_tag_layer<2100+2,SUBNET>;
-template <typename SUBNET> using utag3 = dlib::add_tag_layer<2100+3,SUBNET>;
-template <typename SUBNET> using utag4 = dlib::add_tag_layer<2100+4,SUBNET>;
-
-template <typename SUBNET> using utag0_ = dlib::add_tag_layer<2110+0,SUBNET>;
-template <typename SUBNET> using utag1_ = dlib::add_tag_layer<2110+1,SUBNET>;
-template <typename SUBNET> using utag2_ = dlib::add_tag_layer<2110+2,SUBNET>;
-template <typename SUBNET> using utag3_ = dlib::add_tag_layer<2110+3,SUBNET>;
-template <typename SUBNET> using utag4_ = dlib::add_tag_layer<2110+4,SUBNET>;
-
-template <typename SUBNET> using concat_utag0 = resize_and_concat<utag0,utag0_,SUBNET>;
-template <typename SUBNET> using concat_utag1 = resize_and_concat<utag1,utag1_,SUBNET>;
-template <typename SUBNET> using concat_utag2 = resize_and_concat<utag2,utag2_,SUBNET>;
-template <typename SUBNET> using concat_utag3 = resize_and_concat<utag3,utag3_,SUBNET>;
-template <typename SUBNET> using concat_utag4 = resize_and_concat<utag4,utag4_,SUBNET>;
-
-#if 0
-// ----------------------------------------------------------------------------------------
-
-constexpr int k = 40;
-
-template <typename SUBNET> using blevel1 = bdown<k,utag1<bdense1<k,SUBNET>>>;
-template <typename SUBNET> using blevel2 = bdown<k,utag2<bdense2<k,SUBNET>>>;
-template <typename SUBNET> using blevel3 = bdown<k,utag3<bdense3<k,SUBNET>>>;
-template <typename SUBNET> using blevel4 = bdown<k,utag4<bdense4<k,SUBNET>>>;
-
-template <typename SUBNET> using alevel1 = adown<k,utag1<adense1<k,SUBNET>>>;
-template <typename SUBNET> using alevel2 = adown<k,utag2<adense2<k,SUBNET>>>;
-template <typename SUBNET> using alevel3 = adown<k,utag3<adense3<k,SUBNET>>>;
-template <typename SUBNET> using alevel4 = adown<k,utag4<adense4<k,SUBNET>>>;
-
-template <typename SUBNET> using blevel1t = bdense1<k,concat_utag1<up<k,SUBNET>>>;
-template <typename SUBNET> using blevel2t = bdense2<k,concat_utag2<up<k,SUBNET>>>;
-template <typename SUBNET> using blevel3t = bdense3<k,concat_utag3<up<k,SUBNET>>>;
-template <typename SUBNET> using blevel4t = bdense4<k,concat_utag4<up<k,SUBNET>>>;
-
-template <typename SUBNET> using alevel1t = adense1<k,concat_utag1<up<k,SUBNET>>>;
-template <typename SUBNET> using alevel2t = adense2<k,concat_utag2<up<k,SUBNET>>>;
-template <typename SUBNET> using alevel3t = adense3<k,concat_utag3<up<k,SUBNET>>>;
-template <typename SUBNET> using alevel4t = adense4<k,concat_utag4<up<k,SUBNET>>>;
-
-template <typename SUBNET> using blevel0  = dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,utag0<bdense0<k,SUBNET>>>>>;
-template <typename SUBNET> using alevel0  = dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,utag0<adense0<k,SUBNET>>>>>;
-template <typename SUBNET> using blevel0t = bdense0<k,concat_utag0<dlib::relu<dlib::bn_con<dlib::cont<k,7,7,2,2,SUBNET>>>>>;
-template <typename SUBNET> using alevel0t = adense0<k,concat_utag0<dlib::relu<dlib::affine<dlib::cont<k,7,7,2,2,SUBNET>>>>>;
-
-// ----------------------------------------------------------------------------------------
-
-// training network type
-using bnet_type = dlib::loss_multiclass_log_per_pixel<
-                            dlib::con<class_count,1,1,1,1,
-                            blevel0t<blevel1t<blevel2t<blevel3t<blevel4t<
-                            bdense4<k,
-                            blevel4<blevel3<blevel2<blevel1<blevel0<
-                            dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                            >>>>>>>>>>>>>;
-
-// testing network type (replaced batch normalization with fixed affine transforms)
-using anet_type = dlib::loss_multiclass_log_per_pixel<
-                            dlib::con<class_count,1,1,1,1,
-                            alevel0t<alevel1t<alevel2t<alevel3t<alevel4t<
-                            adense4<k,
-                            alevel4<alevel3<alevel2<alevel1<alevel0<
-                            dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                            >>>>>>>>>>>>>;
-#endif
-
-#if 1
-// Introduce the building blocks used to define the segmentation network.
 // The network first does residual downsampling (similar to the dnn_imagenet_(train_)ex
-// example program), and then residual upsampling. The network could be improved e.g.
-// by introducing skip connections from the input image, and/or the first layers, to the
-// last layer(s).  (See Long et al., Fully Convolutional Networks for Semantic Segmentation,
-// https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf)
+// example program), and then residual upsampling. In addition, U-Net style skip
+// connections are used, so that not every simple detail needs to reprented on the low
+// levels. (See Ronneberger et al. (2015), U-Net: Convolutional Networks for Biomedical
+// Image Segmentation, https://arxiv.org/pdf/1505.04597.pdf)
 
 template <int N, template <typename> class BN, int stride, typename SUBNET>
 using block = BN<dlib::con<N,3,3,1,1,dlib::relu<BN<dlib::con<N,3,3,stride,stride,SUBNET>>>>>;
@@ -318,7 +154,6 @@ template <typename SUBNET> using ares256 = ares<256, SUBNET>;
 template <typename SUBNET> using ares128 = ares<128, SUBNET>;
 template <typename SUBNET> using ares64  = ares<64, SUBNET>;
 
-
 template <typename SUBNET> using level1 = dlib::repeat<2,res512,res_down<512,SUBNET>>;
 template <typename SUBNET> using level2 = dlib::repeat<2,res256,res_down<256,SUBNET>>;
 template <typename SUBNET> using level3 = dlib::repeat<2,res128,res_down<128,SUBNET>>;
@@ -341,34 +176,120 @@ template <typename SUBNET> using alevel4t = dlib::repeat<2,ares64,ares_up<64,SUB
 
 // ----------------------------------------------------------------------------------------
 
+template <
+    template<typename> class TAG1,
+    template<typename> class TAG2,
+    typename SUBNET
+>
+using resize_and_concat = dlib::add_layer<
+                          dlib::concat_<TAG1,TAG2>,
+                          TAG2<dlib::resize_to_prev<TAG1,SUBNET>>>;
+
+template <typename SUBNET> using utag0 = dlib::add_tag_layer<2100+0,SUBNET>;
+template <typename SUBNET> using utag1 = dlib::add_tag_layer<2100+1,SUBNET>;
+template <typename SUBNET> using utag2 = dlib::add_tag_layer<2100+2,SUBNET>;
+template <typename SUBNET> using utag3 = dlib::add_tag_layer<2100+3,SUBNET>;
+template <typename SUBNET> using utag4 = dlib::add_tag_layer<2100+4,SUBNET>;
+
+template <typename SUBNET> using utag0_ = dlib::add_tag_layer<2110+0,SUBNET>;
+template <typename SUBNET> using utag1_ = dlib::add_tag_layer<2110+1,SUBNET>;
+template <typename SUBNET> using utag2_ = dlib::add_tag_layer<2110+2,SUBNET>;
+template <typename SUBNET> using utag3_ = dlib::add_tag_layer<2110+3,SUBNET>;
+template <typename SUBNET> using utag4_ = dlib::add_tag_layer<2110+4,SUBNET>;
+
+template <typename SUBNET> using concat_utag0 = resize_and_concat<utag0,utag0_,SUBNET>;
+template <typename SUBNET> using concat_utag1 = resize_and_concat<utag1,utag1_,SUBNET>;
+template <typename SUBNET> using concat_utag2 = resize_and_concat<utag2,utag2_,SUBNET>;
+template <typename SUBNET> using concat_utag3 = resize_and_concat<utag3,utag3_,SUBNET>;
+template <typename SUBNET> using concat_utag4 = resize_and_concat<utag4,utag4_,SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+// Microsoft Visual C++ compilers choke when trying to build networks that are too deep.
+// So let's limit the depth a little. On the PASCAL VOC 2012 data, the accuracy hit is
+// not even very significant.
+
+#ifdef _MSC_VER
+#define LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES 1
+#else
+#define LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES 0
+#endif
+
 // training network type
 using bnet_type = dlib::loss_multiclass_log_per_pixel<
-                              dlib::cont<class_count,7,7,2,2,concat_utag1<
-                              level4t<concat_utag2<
+                              dlib::cont<class_count,1,1,1,1,
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              dlib::relu<dlib::bn_con<dlib::cont<32,3,3,1,1,concat_utag0<
+#endif
+                              dlib::relu<dlib::bn_con<dlib::cont<64,7,7,2,2,concat_utag1<
+                              level4t<
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              concat_utag2<
+#endif
                               level3t<concat_utag3<
-                              level2t<concat_utag4<
-                              level1t<level1<utag4<
+                              level2t<
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              concat_utag4<
+#endif
+                              level1t<level1<
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              utag4<
+#endif
                               level2<utag3<
-                              level3<utag2<
+                              level3<
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              utag2<
+#endif
                               level4<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              utag0<
+                              dlib::relu<dlib::bn_con<dlib::cont<16,3,3,1,1,
+#endif
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                              >>>>>>>>>>>>>>>>>>>>>>;
+                              >>>>>>>>>>>>>>>>>>>>>
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              >>>>>>>>>>>>
+#endif
+                              ;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
 using anet_type = dlib::loss_multiclass_log_per_pixel<
-                              dlib::cont<class_count,7,7,2,2,concat_utag1<
-                              alevel4t<concat_utag2<
+                              dlib::cont<class_count,1,1,1,1,
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              dlib::relu<dlib::affine<dlib::cont<32,3,3,1,1,concat_utag0<
+#endif
+                              dlib::relu<dlib::affine<dlib::cont<64,7,7,2,2,concat_utag1<
+                              alevel4t<
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              concat_utag2<
+#endif
                               alevel3t<concat_utag3<
-                              alevel2t<concat_utag4<
-                              alevel1t<alevel1<utag4<
+                              alevel2t<
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              concat_utag4<
+#endif
+                              alevel1t<alevel1<
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              utag4<
+#endif
                               alevel2<utag3<
-                              alevel3<utag2<
+                              alevel3<
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              utag2<
+#endif
                               alevel4<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              utag0<
+                              dlib::relu<dlib::affine<dlib::cont<16,3,3,1,1,
+#endif
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                              >>>>>>>>>>>>>>>>>>>>>>;
-#endif // fallback
+                              >>>>>>>>>>>>>>>>>>>>>
+#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
+                              >>>>>>>>>>>>
+#endif
+                              ;
 
 // ----------------------------------------------------------------------------------------
 
