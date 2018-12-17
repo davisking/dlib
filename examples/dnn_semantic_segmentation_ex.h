@@ -228,8 +228,7 @@ using bnet_type = dlib::loss_multiclass_log_per_pixel<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               concat_utag2<
 #endif
-                              level3t<concat_utag3<
-                              level2t<
+                              level3t<concat_utag3<level2t<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               concat_utag4<
 #endif
@@ -237,16 +236,14 @@ using bnet_type = dlib::loss_multiclass_log_per_pixel<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag4<
 #endif
-                              level2<utag3<
-                              level3<
+                              level2<utag3<level3<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag2<
 #endif
                               level4<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
-                              utag0<
-                              dlib::relu<dlib::bn_con<dlib::cont<16,3,3,1,1,
+                              utag0<dlib::relu<dlib::bn_con<dlib::cont<16,3,3,1,1,
 #endif
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
                               >>>>>>>>>>>>>>>>>>>>>
@@ -266,8 +263,7 @@ using anet_type = dlib::loss_multiclass_log_per_pixel<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               concat_utag2<
 #endif
-                              alevel3t<concat_utag3<
-                              alevel2t<
+                              alevel3t<concat_utag3<alevel2t<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               concat_utag4<
 #endif
@@ -275,16 +271,14 @@ using anet_type = dlib::loss_multiclass_log_per_pixel<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag4<
 #endif
-                              alevel2<utag3<
-                              alevel3<
+                              alevel2<utag3<alevel3<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag2<
 #endif
                               alevel4<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
-                              utag0<
-                              dlib::relu<dlib::affine<dlib::cont<16,3,3,1,1,
+                              utag0<dlib::relu<dlib::affine<dlib::cont<16,3,3,1,1,
 #endif
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
                               >>>>>>>>>>>>>>>>>>>>>
