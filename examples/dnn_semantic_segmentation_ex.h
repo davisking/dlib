@@ -145,34 +145,34 @@ template <int N, typename SUBNET> using ares_up   = dlib::relu<residual_up<block
 
 // ----------------------------------------------------------------------------------------
 
-template <typename SUBNET> using res512 = res<512, SUBNET>;
-template <typename SUBNET> using res256 = res<256, SUBNET>;
-template <typename SUBNET> using res128 = res<128, SUBNET>;
-template <typename SUBNET> using res64  = res<64, SUBNET>;
-template <typename SUBNET> using ares512 = ares<512, SUBNET>;
-template <typename SUBNET> using ares256 = ares<256, SUBNET>;
-template <typename SUBNET> using ares128 = ares<128, SUBNET>;
-template <typename SUBNET> using ares64  = ares<64, SUBNET>;
+template <typename SUBNET> using res64 = res<64,SUBNET>;
+template <typename SUBNET> using res128 = res<128,SUBNET>;
+template <typename SUBNET> using res256 = res<256,SUBNET>;
+template <typename SUBNET> using res512 = res<512,SUBNET>;
+template <typename SUBNET> using ares64 = ares<64,SUBNET>;
+template <typename SUBNET> using ares128 = ares<128,SUBNET>;
+template <typename SUBNET> using ares256 = ares<256,SUBNET>;
+template <typename SUBNET> using ares512 = ares<512,SUBNET>;
 
-template <typename SUBNET> using level1 = dlib::repeat<2,res512,res_down<512,SUBNET>>;
-template <typename SUBNET> using level2 = dlib::repeat<2,res256,res_down<256,SUBNET>>;
-template <typename SUBNET> using level3 = dlib::repeat<2,res128,res_down<128,SUBNET>>;
-template <typename SUBNET> using level4 = dlib::repeat<2,res64,res<64,SUBNET>>;
+template <typename SUBNET> using level1 = dlib::repeat<2,res64,res<64,SUBNET>>;
+template <typename SUBNET> using level2 = dlib::repeat<2,res128,res_down<128,SUBNET>>;
+template <typename SUBNET> using level3 = dlib::repeat<2,res256,res_down<256,SUBNET>>;
+template <typename SUBNET> using level4 = dlib::repeat<2,res512,res_down<512,SUBNET>>;
 
-template <typename SUBNET> using alevel1 = dlib::repeat<2,ares512,ares_down<512,SUBNET>>;
-template <typename SUBNET> using alevel2 = dlib::repeat<2,ares256,ares_down<256,SUBNET>>;
-template <typename SUBNET> using alevel3 = dlib::repeat<2,ares128,ares_down<128,SUBNET>>;
-template <typename SUBNET> using alevel4 = dlib::repeat<2,ares64,ares<64,SUBNET>>;
+template <typename SUBNET> using alevel1 = dlib::repeat<2,ares64,ares<64,SUBNET>>;
+template <typename SUBNET> using alevel2 = dlib::repeat<2,ares128,ares_down<128,SUBNET>>;
+template <typename SUBNET> using alevel3 = dlib::repeat<2,ares256,ares_down<256,SUBNET>>;
+template <typename SUBNET> using alevel4 = dlib::repeat<2,ares512,ares_down<512,SUBNET>>;
 
-template <typename SUBNET> using level1t = dlib::repeat<2,res512,res_up<512,SUBNET>>;
-template <typename SUBNET> using level2t = dlib::repeat<2,res256,res_up<256,SUBNET>>;
-template <typename SUBNET> using level3t = dlib::repeat<2,res128,res_up<128,SUBNET>>;
-template <typename SUBNET> using level4t = dlib::repeat<2,res64,res_up<64,SUBNET>>;
+template <typename SUBNET> using level1t = dlib::repeat<2,res64,res_up<64,SUBNET>>;
+template <typename SUBNET> using level2t = dlib::repeat<2,res128,res_up<128,SUBNET>>;
+template <typename SUBNET> using level3t = dlib::repeat<2,res256,res_up<256,SUBNET>>;
+template <typename SUBNET> using level4t = dlib::repeat<2,res512,res_up<512,SUBNET>>;
 
-template <typename SUBNET> using alevel1t = dlib::repeat<2,ares512,ares_up<512,SUBNET>>;
-template <typename SUBNET> using alevel2t = dlib::repeat<2,ares256,ares_up<256,SUBNET>>;
-template <typename SUBNET> using alevel3t = dlib::repeat<2,ares128,ares_up<128,SUBNET>>;
-template <typename SUBNET> using alevel4t = dlib::repeat<2,ares64,ares_up<64,SUBNET>>;
+template <typename SUBNET> using alevel1t = dlib::repeat<2,ares64,ares_up<64,SUBNET>>;
+template <typename SUBNET> using alevel2t = dlib::repeat<2,ares128,ares_up<128,SUBNET>>;
+template <typename SUBNET> using alevel3t = dlib::repeat<2,ares256,ares_up<256,SUBNET>>;
+template <typename SUBNET> using alevel4t = dlib::repeat<2,ares512,ares_up<512,SUBNET>>;
 
 // ----------------------------------------------------------------------------------------
 
@@ -224,23 +224,23 @@ using bnet_type = dlib::loss_multiclass_log_per_pixel<
                               dlib::relu<dlib::bn_con<dlib::cont<32,3,3,1,1,concat_utag0<
 #endif
                               dlib::relu<dlib::bn_con<dlib::cont<64,7,7,2,2,concat_utag1<
-                              level4t<
+                              level1t<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               concat_utag2<
 #endif
-                              level3t<concat_utag3<level2t<
+                              level2t<concat_utag3<level3t<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               concat_utag4<
 #endif
-                              level1t<level1<
+                              level4t<level4<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag4<
 #endif
-                              level2<utag3<level3<
+                              level3<utag3<level2<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag2<
 #endif
-                              level4<dlib::max_pool<3,3,2,2,utag1<
+                              level1<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag0<dlib::relu<dlib::bn_con<dlib::cont<16,3,3,1,1,
@@ -259,23 +259,23 @@ using anet_type = dlib::loss_multiclass_log_per_pixel<
                               dlib::relu<dlib::affine<dlib::cont<32,3,3,1,1,concat_utag0<
 #endif
                               dlib::relu<dlib::affine<dlib::cont<64,7,7,2,2,concat_utag1<
-                              alevel4t<
+                              alevel1t<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               concat_utag2<
 #endif
-                              alevel3t<concat_utag3<alevel2t<
+                              alevel2t<concat_utag3<alevel3t<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               concat_utag4<
 #endif
-                              alevel1t<alevel1<
+                              alevel4t<alevel4<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag4<
 #endif
-                              alevel2<utag3<alevel3<
+                              alevel3<utag3<alevel2<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag2<
 #endif
-                              alevel4<dlib::max_pool<3,3,2,2,utag1<
+                              alevel1<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag0<dlib::relu<dlib::affine<dlib::cont<16,3,3,1,1,
