@@ -79,11 +79,12 @@ namespace dlib
     }
 // ----------------------------------------------------------------------------------------
 
-    // This should be pretty much the same as cudaStreamSynchronize, which for some
-    // reason makes training freeze in some cases.
-    // (see https://github.com/davisking/dlib/issues/1513)
     void synchronize_stream(cudaStream_t stream)
     {
+#if CUDA_VERSION == 10000
+        // This should be pretty much the same as cudaStreamSynchronize, which for some
+        // reason makes training freeze in some cases.
+        // (see https://github.com/davisking/dlib/issues/1513)
         while (true)
         {
             cudaError_t err = cudaStreamQuery(stream);
@@ -94,6 +95,9 @@ namespace dlib
             default: CHECK_CUDA(err);      // unexpected error: throw
             }
         }
+#else // CUDA_VERSION
+        cudaStreamSynchronize(stream);
+#endif // CUDA_VERSION
     }
 
     void gpu_data::
