@@ -96,7 +96,7 @@ namespace dlib
             }
         }
 #else // CUDA_VERSION
-        cudaStreamSynchronize(stream);
+        CHECK_CUDA(cudaStreamSynchronize(stream));
 #endif // CUDA_VERSION
     }
 
