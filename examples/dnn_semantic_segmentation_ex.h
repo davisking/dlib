@@ -223,15 +223,14 @@ using bnet_type = dlib::loss_multiclass_log_per_pixel<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               dlib::relu<dlib::bn_con<dlib::cont<32,3,3,1,1,concat_utag0<
 #endif
-                              dlib::relu<dlib::bn_con<dlib::cont<64,7,7,2,2,concat_utag1<
-                              level1t<
-                              concat_utag2<
-                              level2t<concat_utag3<level3t<
-                              concat_utag4<
-                              level4t<level4<
-                              utag4<
-                              level3<utag3<level2<
-                              utag2<
+                              dlib::relu<dlib::bn_con<dlib::cont<64,7,7,2,2,
+                              concat_utag1<level1t<
+                              concat_utag2<level2t<
+                              concat_utag3<level3t<
+                              concat_utag4<level4t<
+                              level4<utag4<
+                              level3<utag3<
+                              level2<utag2<
                               level1<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
@@ -250,15 +249,14 @@ using anet_type = dlib::loss_multiclass_log_per_pixel<
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               dlib::relu<dlib::affine<dlib::cont<32,3,3,1,1,concat_utag0<
 #endif
-                              dlib::relu<dlib::affine<dlib::cont<64,7,7,2,2,concat_utag1<
-                              alevel1t<
-                              concat_utag2<
-                              alevel2t<concat_utag3<alevel3t<
-                              concat_utag4<
-                              alevel4t<alevel4<
-                              utag4<
-                              alevel3<utag3<alevel2<
-                              utag2<
+                              dlib::relu<dlib::affine<dlib::cont<64,7,7,2,2,
+                              concat_utag1<alevel1t<
+                              concat_utag2<alevel2t<
+                              concat_utag3<alevel3t<
+                              concat_utag4<alevel4t<
+                              alevel4<utag4<
+                              alevel3<utag3<
+                              alevel2<utag2<
                               alevel1<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
 #if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
