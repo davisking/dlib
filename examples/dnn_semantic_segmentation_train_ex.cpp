@@ -342,8 +342,8 @@ int main(int argc, char** argv) try
     std::thread data_loader4([f](){ f(4); });
 
     // The main training loop.  Keep making mini-batches and giving them to the trainer.
-    // We will run until the learning rate has dropped by a factor of 1e-8.
-    while(trainer.get_learning_rate() >= 1e-8)
+    // We will run until the learning rate has dropped by a factor of 1e-4.
+    while(trainer.get_learning_rate() >= 1e-4)
     {
         samples.clear();
         labels.clear();
