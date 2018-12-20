@@ -205,24 +205,14 @@ template <typename SUBNET> using concat_utag4 = resize_and_concat<utag4,utag4_,S
 
 // ----------------------------------------------------------------------------------------
 
-// Microsoft Visual C++ compilers choke when trying to build networks that are too deep.
-// So let's limit the depth a little. On the PASCAL VOC 2012 data, the accuracy hit is
-// not even very significant.
-
-#ifdef _MSC_VER
-#define LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES 1
-static const char* semantic_segmentation_net_filename = "semantic_segmentation_voc2012net_v2_limited_layer_count.dnn";
-#else
-#define LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES 0
 static const char* semantic_segmentation_net_filename = "semantic_segmentation_voc2012net_v2.dnn";
-#endif
+
+// ----------------------------------------------------------------------------------------
 
 // training network type
 using bnet_type = dlib::loss_multiclass_log_per_pixel<
                               dlib::cont<class_count,1,1,1,1,
-#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               dlib::relu<dlib::bn_con<dlib::cont<32,3,3,1,1,concat_utag0<
-#endif
                               dlib::relu<dlib::bn_con<dlib::cont<64,7,7,2,2,
                               concat_utag1<level1t<
                               concat_utag2<level2t<
@@ -233,22 +223,14 @@ using bnet_type = dlib::loss_multiclass_log_per_pixel<
                               level2<utag2<
                               level1<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
-#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag0<dlib::relu<dlib::bn_con<dlib::cont<16,3,3,1,1,
-#endif
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                              >>>>>>>>>>>>>>>>>>>>>>>>>
-#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
-                              >>>>>>>>
-#endif
-                              ;
+                              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
 using anet_type = dlib::loss_multiclass_log_per_pixel<
                               dlib::cont<class_count,1,1,1,1,
-#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               dlib::relu<dlib::affine<dlib::cont<32,3,3,1,1,concat_utag0<
-#endif
                               dlib::relu<dlib::affine<dlib::cont<64,7,7,2,2,
                               concat_utag1<alevel1t<
                               concat_utag2<alevel2t<
@@ -259,15 +241,9 @@ using anet_type = dlib::loss_multiclass_log_per_pixel<
                               alevel2<utag2<
                               alevel1<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
-#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
                               utag0<dlib::relu<dlib::affine<dlib::cont<16,3,3,1,1,
-#endif
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                              >>>>>>>>>>>>>>>>>>>>>>>>>
-#if LIMIT_LAYER_COUNT_BECAUSE_OF_COMPILER_ISSUES == 0
-                              >>>>>>>>
-#endif
-                              ;
+                              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>;
 
 // ----------------------------------------------------------------------------------------
 
