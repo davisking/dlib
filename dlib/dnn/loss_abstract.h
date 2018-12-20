@@ -232,10 +232,16 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This object implements the loss layer interface defined above by
                 EXAMPLE_LOSS_LAYER_.  In particular, it implements the log loss, which is
-                appropriate for binary classification problems.  Therefore, the possible
-                labels when using this loss are +1 and -1.  Moreover, it will cause the
-                network to produce outputs > 0 when predicting a member of the +1 class and
-                values < 0 otherwise.
+                appropriate for binary classification problems.  Therefore, there are two possible
+                classes of labels: positive (> 0) and negative (< 0) when using this loss.
+                The absolute value of the label represents its weight.  Putting a larger weight
+                on a sample increases the importance of getting its prediction correct during 
+                training.  A good rule of thumb is to use weights with absolute value 1 unless 
+                you have a very unbalanced training dataset, in that case, give larger weight
+                to the class with less training examples.
+                
+                This loss will cause the network to produce outputs > 0 when predicting a
+                member of the positive class and values < 0 otherwise.
 
                 To be more specific, this object contains a sigmoid layer followed by a 
                 cross-entropy layer.  

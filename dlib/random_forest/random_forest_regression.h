@@ -420,14 +420,14 @@ namespace dlib
                 // pick a random bootstrap of the data.
                 std::vector<std::pair<float,uint32_t>> idxs(y.size());
                 for (auto& idx : idxs)
-                    idx = std::make_pair(0,rnd.get_integer(y.size()));
+                    idx = std::make_pair(0.0f, static_cast<uint32_t>(rnd.get_integer(y.size())));
 
                 // We are going to use ranges_to_process as a stack that tracks which
                 // range of samples we are going to split next.
                 std::vector<range_t> ranges_to_process;
                 // start with the root of the tree, i.e. the entire range of training
                 // samples.
-                ranges_to_process.emplace_back(sumy,0,y.size());
+                ranges_to_process.emplace_back(sumy, 0, static_cast<uint32_t>(y.size()));
                 // push an unpopulated root node into the tree.  We will populate it
                 // when we process its corresponding range. 
                 tree.emplace_back();
@@ -477,7 +477,7 @@ namespace dlib
                         // Add to leaves.  Don't forget to set the pointer in the
                         // parent node to the newly allocated leaf node.
                         tree[range.tree_idx].left = leaves.size() + max_num_nodes;
-                        leaves.emplace_back(left_split.avg()); 
+                        leaves.emplace_back(static_cast<float>(left_split.avg()));
                     }
 
 
@@ -501,7 +501,7 @@ namespace dlib
                         // Add to leaves.  Don't forget to set the pointer in the
                         // parent node to the newly allocated leaf node.
                         tree[range.tree_idx].right = leaves.size() + max_num_nodes;
-                        leaves.emplace_back(right_split.avg()); 
+                        leaves.emplace_back(static_cast<float>(right_split.avg()));
                     }
                 } // end while (still building tree)
 

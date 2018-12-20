@@ -97,12 +97,12 @@ py::list get_face_chips (
     py::list chips_list;
 
     std::vector<chip_details> dets;
-    for (auto& f : faces)
+    for (const auto& f : faces)
         dets.push_back(get_face_chip_details(f, size, padding));
     dlib::array<numpy_image<rgb_pixel>> face_chips;
     extract_image_chips(img, dets, face_chips);
 
-    for (auto& chip : face_chips) 
+    for (const auto& chip : face_chips) 
     {
         // Append image to chips list
         chips_list.append(chip);

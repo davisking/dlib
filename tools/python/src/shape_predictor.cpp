@@ -72,7 +72,7 @@ std::shared_ptr<full_object_detection> full_obj_det_init(const rectangle& rect, 
 {
     const unsigned long num_parts = py::len(pyparts);
     std::vector<point> parts;
-    for (auto& item : pyparts)
+    for (const auto& item : pyparts)
         parts.push_back(item.cast<point>());
 
     return std::make_shared<full_object_detection>(rect, parts);

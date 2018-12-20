@@ -97,7 +97,7 @@ dataset py_load_image_dataset_metadata(
 std::shared_ptr<std::map<std::string,point>> map_from_object(py::dict obj)
 {
     auto ret = std::make_shared<std::map<std::string,point>>();
-    for (auto& v : obj)
+    for (const auto& v : obj)
     {
         (*ret)[v.first.cast<std::string>()] = v.second.cast<point>();
     }
@@ -121,7 +121,7 @@ image_dataset_metadata::dataset py_make_bounding_box_regression_training_data (
         // otherwise, detections should be a list of std::vectors.
         py::list dets(detections);
         std::vector<std::vector<rectangle>> temp;
-        for (auto& d : dets)
+        for (const auto& d : dets)
             temp.emplace_back(d.cast<const std::vector<rectangle>&>());
         return make_bounding_box_regression_training_data(truth, temp);
     }
@@ -174,7 +174,7 @@ void bind_image_dataset_metadata(py::module &m_)
     auto partsstr = [](const std::map<std::string,point>& item) {
         std::ostringstream sout;
         sout << "{";
-        for (auto& v : item) 
+        for (const auto& v : item) 
             sout << "'" << v.first << "': " << v.second << ", ";
         sout << "}";
         return sout.str();
@@ -182,7 +182,7 @@ void bind_image_dataset_metadata(py::module &m_)
     auto partsrepr = [](const std::map<std::string,point>& item) {
         std::ostringstream sout;
         sout << "dlib.image_dataset_metadata.parts({\n";
-        for (auto& v : item) 
+        for (const auto& v : item) 
             sout << "'" << v.first << "': dlib.point" << v.second << ",\n";
         sout << "})";
         return sout.str();

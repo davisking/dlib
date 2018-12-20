@@ -85,6 +85,9 @@ if (UNIX OR MINGW)
          /opt/intel/mkl/lib/intel64
          /opt/intel/lib/intel64
          /opt/intel/mkl/lib
+         /opt/intel/tbb/*/lib/em64t/gcc4.7
+         /opt/intel/tbb/lib/intel64/gcc4.7
+         /opt/intel/tbb/lib/gcc4.7
          )
 
       find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
@@ -94,6 +97,8 @@ if (UNIX OR MINGW)
          /opt/intel/mkl/*/lib/32
          /opt/intel/mkl/lib/ia32
          /opt/intel/lib/ia32
+         /opt/intel/tbb/*/lib/32/gcc4.7
+         /opt/intel/tbb/lib/ia32/gcc4.7
          )
 
       find_library(mkl_intel mkl_intel ${mkl_search_path})
@@ -110,7 +115,7 @@ if (UNIX OR MINGW)
    find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
    mark_as_advanced(mkl_include_dir)
 
-   if(NOT DLIB_USE_MKL_SEQUENTIAL)
+   if(NOT DLIB_USE_MKL_SEQUENTIAL AND NOT DLIB_USE_MKL_WITH_TBB)
       # Search for the needed libraries from the MKL.  We will try to link against the mkl_rt
       # file first since this way avoids linking bugs in some cases.
       find_library(mkl_rt mkl_rt ${mkl_search_path})
@@ -135,7 +140,13 @@ if (UNIX OR MINGW)
       find_library(mkl_core mkl_core ${mkl_search_path})
       set(mkl_libs ${mkl_intel} ${mkl_core})
       mark_as_advanced(mkl_libs mkl_intel mkl_core)
-      if (DLIB_USE_MKL_SEQUENTIAL)
+
+      if (DLIB_USE_MKL_WITH_TBB)
+         find_library(mkl_tbb_thread mkl_tbb_thread ${mkl_search_path})
+         find_library(mkl_tbb tbb ${mkl_search_path})
+         mark_as_advanced(mkl_tbb_thread mkl_tbb)
+         list(APPEND mkl_libs ${mkl_tbb_thread} ${mkl_tbb})
+      elseif (DLIB_USE_MKL_SEQUENTIAL)
          find_library(mkl_sequential mkl_sequential ${mkl_search_path})
          mark_as_advanced(mkl_sequential)
          list(APPEND mkl_libs ${mkl_sequential})
@@ -148,7 +159,7 @@ if (UNIX OR MINGW)
       endif()
    
       # If we found the MKL 
-      if (mkl_intel AND mkl_core AND ((mkl_thread AND mkl_iomp AND mkl_pthread) OR mkl_sequential))
+      if (mkl_intel AND mkl_core AND ((mkl_tbb_thread AND mkl_tbb) OR (mkl_thread AND mkl_iomp AND mkl_pthread) OR mkl_sequential))
          set(mkl_libraries ${mkl_libs})
          set(blas_libraries ${mkl_libs})
          set(lapack_libraries ${mkl_libs})
@@ -287,24 +298,32 @@ elseif(WIN32 AND NOT MINGW)
    if (SIZE_OF_VOID_PTR EQUAL 8)
       set( mkl_search_path
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/intel64" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/tbb/lib/intel64/vc14" 
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64" 
-         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64" 
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/intel64"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/lib/intel64/vc14"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64" 
          "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
+         "C:/Program Files (x86)/Intel/Composer XE/tbb/lib/intel64/vc14"
          "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/intel64"
          "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
+         "C:/Program Files/Intel/Composer XE/tbb/lib/intel64/vc14"
          "C:/Program Files/Intel/Composer XE/compiler/lib/intel64"
          )
       find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
    else()
       set( mkl_search_path
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/lib/ia32" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/tbb/lib/ia32/vc14" 
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/ia32"
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/ia32" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/lib/ia32/vc14" 
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/ia32"
          "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
+         "C:/Program Files (x86)/Intel/Composer XE/tbb/lib/ia32/vc14"
          "C:/Program Files (x86)/Intel/Composer XE/compiler/lib/ia32"
          "C:/Program Files/Intel/Composer XE/mkl/lib/ia32"
+         "C:/Program Files/Intel/Composer XE/tbb/lib/ia32/vc14"
          "C:/Program Files/Intel/Composer XE/compiler/lib/ia32"
          )
       find_library(mkl_intel  mkl_intel_c ${mkl_search_path})
@@ -312,14 +331,33 @@ elseif(WIN32 AND NOT MINGW)
 
    INCLUDE (CheckFunctionExists)
 
+   # Get mkl_include_dir
+   set(mkl_include_search_path
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/mkl/include"
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/include"
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/include"
+      "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/include"
+      "C:/Program Files (x86)/Intel/Composer XE/mkl/include"
+      "C:/Program Files (x86)/Intel/Composer XE/compiler/include"
+      "C:/Program Files/Intel/Composer XE/mkl/include"
+      "C:/Program Files/Intel/Composer XE/compiler/include"
+      )
+   find_path(mkl_include_dir mkl_version.h ${mkl_include_search_path})
+   mark_as_advanced(mkl_include_dir)
+
    # Search for the needed libraries from the MKL.  
    find_library(mkl_core mkl_core ${mkl_search_path})
    set(mkl_libs ${mkl_intel} ${mkl_core})
    mark_as_advanced(mkl_libs mkl_intel mkl_core)
-   if (DLIB_USE_MKL_SEQUENTIAL)
-     find_library(mkl_sequential mkl_sequential ${mkl_search_path})
-     mark_as_advanced(mkl_sequential)
-     list(APPEND mkl_libs ${mkl_sequential})
+   if (DLIB_USE_MKL_WITH_TBB)
+      find_library(mkl_tbb_thread mkl_tbb_thread ${mkl_search_path})
+      find_library(mkl_tbb tbb ${mkl_search_path})
+      mark_as_advanced(mkl_tbb_thread mkl_tbb)
+      list(APPEND mkl_libs ${mkl_tbb_thread} ${mkl_tbb})
+   elseif (DLIB_USE_MKL_SEQUENTIAL)
+      find_library(mkl_sequential mkl_sequential ${mkl_search_path})
+      mark_as_advanced(mkl_sequential)
+      list(APPEND mkl_libs ${mkl_sequential})
    else()
      find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
      find_library(mkl_iomp libiomp5md ${mkl_search_path})
@@ -328,11 +366,12 @@ elseif(WIN32 AND NOT MINGW)
    endif()
 
    # If we found the MKL 
-   if (mkl_intel AND mkl_core AND ((mkl_thread AND mkl_iomp) OR mkl_sequential))
+   if (mkl_intel AND mkl_core AND ((mkl_tbb_thread AND mkl_tbb) OR mkl_sequential OR (mkl_thread AND mkl_iomp)))
       set(blas_libraries ${mkl_libs})
       set(lapack_libraries ${mkl_libs})
       set(blas_found 1)
       set(lapack_found 1)
+      set(found_intel_mkl 1)
       message(STATUS "Found Intel MKL BLAS/LAPACK library")
 
       # Make sure the version of the Intel MKL we found is compatible with
@@ -346,6 +385,11 @@ elseif(WIN32 AND NOT MINGW)
          set(lapack_found 0)
       endif()
    endif()
+
+   if (found_intel_mkl AND mkl_include_dir)
+      set(found_intel_mkl_headers 1)
+   endif()
+
 endif()
 
 
@@ -400,4 +444,3 @@ if (UNIX OR MINGW)
       message(" *****************************************************************************")
    endif()
 endif()
-

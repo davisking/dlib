@@ -122,7 +122,7 @@ std::vector<double> normalized_predict_vec (
 {
     std::vector<double> out;
     out.reserve(samps.size());
-    for (auto& x : samps)
+    for (const auto& x : samps)
         out.push_back(normalized_predict(df,x));
     return out;
 }
