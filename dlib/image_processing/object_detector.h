@@ -112,6 +112,9 @@ namespace dlib
         const test_box_overlap& get_overlap_tester (
         ) const;
 
+		void set_overlap_tester(test_box_overlap boxes_overlap_
+		);
+
         const image_scanner_type& get_scanner (
         ) const;
 
@@ -604,6 +607,17 @@ namespace dlib
     {
         return boxes_overlap;
     }
+
+	template <
+		typename image_scanner_type
+	>
+		void object_detector<image_scanner_type>::
+		set_overlap_tester(test_box_overlap boxes_overlap_
+		)
+	{
+		boxes_overlap = boxes_overlap_;
+	}
+
 
 // ----------------------------------------------------------------------------------------
 
