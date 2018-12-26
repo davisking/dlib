@@ -185,19 +185,16 @@ using resize_and_concat = dlib::add_layer<
                           dlib::concat_<TAG1,TAG2>,
                           TAG2<dlib::resize_to_prev<TAG1,SUBNET>>>;
 
-template <typename SUBNET> using utag0 = dlib::add_tag_layer<2100+0,SUBNET>;
 template <typename SUBNET> using utag1 = dlib::add_tag_layer<2100+1,SUBNET>;
 template <typename SUBNET> using utag2 = dlib::add_tag_layer<2100+2,SUBNET>;
 template <typename SUBNET> using utag3 = dlib::add_tag_layer<2100+3,SUBNET>;
 template <typename SUBNET> using utag4 = dlib::add_tag_layer<2100+4,SUBNET>;
 
-template <typename SUBNET> using utag0_ = dlib::add_tag_layer<2110+0,SUBNET>;
 template <typename SUBNET> using utag1_ = dlib::add_tag_layer<2110+1,SUBNET>;
 template <typename SUBNET> using utag2_ = dlib::add_tag_layer<2110+2,SUBNET>;
 template <typename SUBNET> using utag3_ = dlib::add_tag_layer<2110+3,SUBNET>;
 template <typename SUBNET> using utag4_ = dlib::add_tag_layer<2110+4,SUBNET>;
 
-template <typename SUBNET> using concat_utag0 = resize_and_concat<utag0,utag0_,SUBNET>;
 template <typename SUBNET> using concat_utag1 = resize_and_concat<utag1,utag1_,SUBNET>;
 template <typename SUBNET> using concat_utag2 = resize_and_concat<utag2,utag2_,SUBNET>;
 template <typename SUBNET> using concat_utag3 = resize_and_concat<utag3,utag3_,SUBNET>;
@@ -212,7 +209,6 @@ static const char* semantic_segmentation_net_filename = "semantic_segmentation_v
 // training network type
 using bnet_type = dlib::loss_multiclass_log_per_pixel<
                               dlib::cont<class_count,1,1,1,1,
-                              dlib::relu<dlib::bn_con<dlib::cont<32,3,3,1,1,concat_utag0<
                               dlib::relu<dlib::bn_con<dlib::cont<64,7,7,2,2,
                               concat_utag1<level1t<
                               concat_utag2<level2t<
@@ -223,14 +219,12 @@ using bnet_type = dlib::loss_multiclass_log_per_pixel<
                               level2<utag2<
                               level1<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::bn_con<dlib::con<64,7,7,2,2,
-                              utag0<dlib::relu<dlib::bn_con<dlib::cont<16,3,3,1,1,
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>;
+                              >>>>>>>>>>>>>>>>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
 using anet_type = dlib::loss_multiclass_log_per_pixel<
                               dlib::cont<class_count,1,1,1,1,
-                              dlib::relu<dlib::affine<dlib::cont<32,3,3,1,1,concat_utag0<
                               dlib::relu<dlib::affine<dlib::cont<64,7,7,2,2,
                               concat_utag1<alevel1t<
                               concat_utag2<alevel2t<
@@ -241,9 +235,8 @@ using anet_type = dlib::loss_multiclass_log_per_pixel<
                               alevel2<utag2<
                               alevel1<dlib::max_pool<3,3,2,2,utag1<
                               dlib::relu<dlib::affine<dlib::con<64,7,7,2,2,
-                              utag0<dlib::relu<dlib::affine<dlib::cont<16,3,3,1,1,
                               dlib::input<dlib::matrix<dlib::rgb_pixel>>
-                              >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>;
+                              >>>>>>>>>>>>>>>>>>>>>>>>>;
 
 // ----------------------------------------------------------------------------------------
 
