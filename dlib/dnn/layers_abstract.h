@@ -2387,30 +2387,30 @@ namespace dlib
     template <
         template<typename> class tag
         >
-    class resize_to_prev_
+    class resize_prev_to_tagged_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  This layer resizes the output channels of the tagged layer to
-                have the same number of rows and columns as the output of the previous layer.
+                defined above.  This layer resizes the output channels of the previous layer
+                to have the same number of rows and columns as the output of the tagged layer.
 
                 This layer uses bilinear interpolation. If the sizes match already, then it
                 simply copies the data.
 
-                Therefore, you supply a tag via resize_to_prev's template argument that tells
-                it what layer to use for the target size.
+                Therefore, you supply a tag via resize_prev_to_tagged's template argument that
+                tells it what layer to use for the target size.
 
-                If tensor A is resized to size of tensor B, then a tensor C is produced such
-                that:
-                    - C.num_samples() == A.num_samples()
-                    - C.k()  == A.k()
-                    - C.nr() == B.nr()
-                    - C.nc() == B.nc()
+                If tensor PREV is resized to size of tensor TAGGED, then a tensor OUT is
+                produced such that:
+                    - OUT.num_samples() == PREV.num_samples()
+                    - OUT.k()  == PREV.k()
+                    - OUT.nr() == TAGGED.nr()
+                    - OUT.nc() == TAGGED.nc()
         !*/
 
     public:
-        resize_to_prev_(
+        resize_prev_to_tagged_(
         ); 
 
         template <typename SUBNET> void setup(const SUBNET& sub);
@@ -2430,7 +2430,7 @@ namespace dlib
         template<typename> class tag,
         typename SUBNET
         >
-    using resize_to_prev = add_layer<resize_to_prev_<tag>, SUBNET>;
+    using resize_prev_to_tagged = add_layer<resize_prev_to_tagged_<tag>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

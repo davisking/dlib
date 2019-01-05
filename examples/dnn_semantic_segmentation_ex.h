@@ -177,13 +177,13 @@ template <typename SUBNET> using alevel4t = dlib::repeat<2,ares512,ares_up<512,S
 // ----------------------------------------------------------------------------------------
 
 template <
-    template<typename> class TAG1,
-    template<typename> class TAG2,
+    template<typename> class TAGGED,
+    template<typename> class PREV_RESIZED,
     typename SUBNET
 >
 using resize_and_concat = dlib::add_layer<
-                          dlib::concat_<TAG1,TAG2>,
-                          TAG2<dlib::resize_to_prev<TAG1,SUBNET>>>;
+                          dlib::concat_<TAGGED,PREV_RESIZED>,
+                          PREV_RESIZED<dlib::resize_prev_to_tagged<TAGGED,SUBNET>>>;
 
 template <typename SUBNET> using utag1 = dlib::add_tag_layer<2100+1,SUBNET>;
 template <typename SUBNET> using utag2 = dlib::add_tag_layer<2100+2,SUBNET>;
