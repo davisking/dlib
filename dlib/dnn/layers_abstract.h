@@ -2387,6 +2387,56 @@ namespace dlib
     template <
         template<typename> class tag
         >
+    class resize_prev_to_tagged_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  This layer resizes the output channels of the previous layer
+                to have the same number of rows and columns as the output of the tagged layer.
+
+                This layer uses bilinear interpolation. If the sizes match already, then it
+                simply copies the data.
+
+                Therefore, you supply a tag via resize_prev_to_tagged's template argument that
+                tells it what layer to use for the target size.
+
+                If tensor PREV is resized to size of tensor TAGGED, then a tensor OUT is
+                produced such that:
+                    - OUT.num_samples() == PREV.num_samples()
+                    - OUT.k()  == PREV.k()
+                    - OUT.nr() == TAGGED.nr()
+                    - OUT.nc() == TAGGED.nc()
+        !*/
+
+    public:
+        resize_prev_to_tagged_(
+        ); 
+
+        template <typename SUBNET> void setup(const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const; 
+        tensor& get_layer_params(); 
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using resize_prev_to_tagged = add_layer<resize_prev_to_tagged_<tag>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        template<typename> class tag
+        >
     class scale_
     {
         /*!
