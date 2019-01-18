@@ -293,7 +293,7 @@ jpeg_make_d_derived_tbl (j_decompress_ptr cinfo, int isDC, int tblno,
 
 GLOBAL(int)
 jpeg_fill_bit_buffer (bitread_working_state * state,
-		      bit_buf_type get_buffer, register int bits_left,
+		      bit_buf_type get_buffer, int bits_left,
 		      int nbits)
 /* Load up the bit buffer to a depth of at least nbits */
 {
@@ -399,7 +399,7 @@ jpeg_fill_bit_buffer (bitread_working_state * state,
 
 GLOBAL(int)
 jpeg_huff_decode (bitread_working_state * state,
-		  bit_buf_type get_buffer, register int bits_left,
+		  bit_buf_type get_buffer, int bits_left,
 		  d_derived_tbl * htbl, int min_bits)
 {
   int l = min_bits;

@@ -134,6 +134,10 @@ namespace
 
         DLIB_TEST(squared(m4) == pointwise_multiply(m4,m4));
         DLIB_TEST(cubed(m4) == pointwise_multiply(m4,m4,m4));
+        DLIB_TEST(m4 == pointwise_divide(squared(m4),m4));
+        DLIB_TEST(m4 == pointwise_divide(cubed(m4),m4,m4));
+        DLIB_TEST(m4 == pointwise_divide(pointwise_multiply(cubed(m4),m4),m4,m4,m4));
+        DLIB_TEST(squared(m4) == pointwise_divide(cubed(m4),m4));
         DLIB_TEST(pow(matrix_cast<double>(m4),2) == squared(matrix_cast<double>(m4)));
         DLIB_TEST(pow(matrix_cast<double>(m4),3) == cubed(matrix_cast<double>(m4)));
 
@@ -323,7 +327,11 @@ namespace
 
 
         set_all_elements(v,2);
-        v2 =  pointwise_multiply(v, v*2);
+        v2 = pointwise_divide(v*2,v);
+        DLIB_TEST(v == v2);
+        DLIB_TEST(v == tmp(v2));
+
+        v2 = pointwise_multiply(v,v*2);
         set_all_elements(v,8);
         DLIB_TEST(v == v2);
         DLIB_TEST(v == tmp(v2));
@@ -336,6 +344,8 @@ namespace
         m5 = array2;
         DLIB_TEST((m5*2 == pointwise_multiply(m5,uniform_matrix<int,3,3,2>())));
         DLIB_TEST((tmp(m5*2) == tmp(pointwise_multiply(m5,uniform_matrix<int,3,3,2>()))));
+        DLIB_TEST((m5/2 == pointwise_divide(m5,uniform_matrix<int,3,3,2>())));
+        DLIB_TEST((tmp(m5/2) == tmp(pointwise_divide(m5,uniform_matrix<int,3,3,2>()))));
 
         v = tmp(v);
 
@@ -535,10 +545,10 @@ namespace
             set_all_elements(bt1,2);
             set_all_elements(bt2,3);
 
-			float val = trans(bt1)*bt2;
+            float val = trans(bt1)*bt2;
             DLIB_TEST((float)(trans(bt1)*bt2) == 18);
             DLIB_TEST((float)(trans(bt1)*bt2) != 19);
-			DLIB_TEST(val == 18);
+            DLIB_TEST(val == 18);
         }
         {
             matrix<float,3,1> bt1;
@@ -546,10 +556,10 @@ namespace
             set_all_elements(bt1,2);
             set_all_elements(bt2,3);
 
-			float val = trans(bt1)*bt2;
+            float val = trans(bt1)*bt2;
             DLIB_TEST((float)(trans(bt1)*bt2) == 18);
             DLIB_TEST((float)(trans(bt1)*bt2) != 19);
-			DLIB_TEST(val == 18);
+            DLIB_TEST(val == 18);
         }
         {
             matrix<float> bt1(3,1);
@@ -557,10 +567,10 @@ namespace
             set_all_elements(bt1,2);
             set_all_elements(bt2,3);
 
-			float val = trans(bt1)*bt2;
+            float val = trans(bt1)*bt2;
             DLIB_TEST((float)(trans(bt1)*bt2) == 18);
             DLIB_TEST((float)(trans(bt1)*bt2) != 19);
-			DLIB_TEST(val == 18);
+            DLIB_TEST(val == 18);
         }
         {
             matrix<float,3,1> bt1;
@@ -568,10 +578,10 @@ namespace
             set_all_elements(bt1,2);
             set_all_elements(bt2,3);
 
-			float val = trans(bt1)*bt2;
+            float val = trans(bt1)*bt2;
             DLIB_TEST((float)(trans(bt1)*bt2) == 18);
             DLIB_TEST((float)(trans(bt1)*bt2) != 19);
-			DLIB_TEST(val == 18);
+            DLIB_TEST(val == 18);
         }
 
 
@@ -968,7 +978,8 @@ namespace
             m = val1;
             m2 = val2;
 
-            DLIB_TEST(equal(reciprocal(m) , m2));
+            DLIB_TEST(equal(reciprocal(m),m2));
+            DLIB_TEST(equal(pointwise_multiply(m,m2),pointwise_divide(m,m)));
         }
         {
             matrix<complex<float> > m(2,2), m2(2,2);
@@ -976,7 +987,8 @@ namespace
             m = val1;
             m2 = val2;
 
-            DLIB_TEST(equal(reciprocal(m) , m2));
+            DLIB_TEST(equal(reciprocal(m),m2));
+            DLIB_TEST(equal(pointwise_multiply(m,m2),pointwise_divide(m,m)));
         }
 
         {

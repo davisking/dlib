@@ -129,7 +129,7 @@
     { 
         std::array<unsigned int,4> info;
         // Load EAX, EBX, ECX, EDX into info
-        __cpuid(function_id, info[0], info[1], info[2], info[3]);
+        __cpuid_count(function_id, 0, info[0], info[1], info[2], info[3]);
         return info;
     }
 

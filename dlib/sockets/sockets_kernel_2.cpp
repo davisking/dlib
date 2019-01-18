@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include "../set.h"
 #include <netinet/tcp.h>
+#include <string.h>
 
 
 

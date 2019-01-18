@@ -511,7 +511,7 @@ py::list py_extract_image_chips (
     dlib::array<numpy_image<T>> out;
     extract_image_chips(img, python_list_to_vector<chip_details>(chip_locations), out);
     py::list ret;
-    for (auto& i : out)
+    for (const auto& i : out)
         ret.append(i);
     return ret;
 }

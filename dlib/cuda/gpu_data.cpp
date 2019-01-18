@@ -79,12 +79,33 @@ namespace dlib
     }
 // ----------------------------------------------------------------------------------------
 
+    void synchronize_stream(cudaStream_t stream)
+    {
+#if CUDA_VERSION >= 9020 && CUDA_VERSION <= 10000
+        // This should be pretty much the same as cudaStreamSynchronize, which for some
+        // reason makes training freeze in some cases.
+        // (see https://github.com/davisking/dlib/issues/1513)
+        while (true)
+        {
+            cudaError_t err = cudaStreamQuery(stream);
+            switch (err)
+            {
+            case cudaSuccess: return;      // now we are synchronized
+            case cudaErrorNotReady: break; // continue waiting
+            default: CHECK_CUDA(err);      // unexpected error: throw
+            }
+        }
+#else // CUDA_VERSION
+        CHECK_CUDA(cudaStreamSynchronize(stream));
+#endif // CUDA_VERSION
+    }
+
     void gpu_data::
     wait_for_transfer_to_finish() const
     {
         if (have_active_transfer)
         {
-            CHECK_CUDA(cudaStreamSynchronize((cudaStream_t)cuda_stream.get()));
+            synchronize_stream((cudaStream_t)cuda_stream.get());
             have_active_transfer = false;
             // Check for errors.  These calls to cudaGetLastError() are what help us find
             // out if our kernel launches have been failing.
@@ -127,7 +148,7 @@ namespace dlib
             {
                 // Wait for any possible CUDA kernels that might be using our memory block to
                 // complete before we overwrite the memory.
-                CHECK_CUDA(cudaStreamSynchronize(0));
+                synchronize_stream(0);
                 device_in_use = false;
             }
             CHECK_CUDA(cudaMemcpyAsync(data_device.get(), data_host.get(), data_size*sizeof(float), cudaMemcpyHostToDevice, (cudaStream_t)cuda_stream.get()));
@@ -147,7 +168,7 @@ namespace dlib
             {
                 // Wait for any possible CUDA kernels that might be using our memory block to
                 // complete before we free the memory.
-                CHECK_CUDA(cudaStreamSynchronize(0));
+                synchronize_stream(0);
                 device_in_use = false;
             }
             wait_for_transfer_to_finish();
@@ -164,7 +185,7 @@ namespace dlib
             {
                 // Wait for any possible CUDA kernels that might be using our memory block to
                 // complete before we free the memory.
-                CHECK_CUDA(cudaStreamSynchronize(0));
+                synchronize_stream(0);
                 device_in_use = false;
             }
             wait_for_transfer_to_finish();

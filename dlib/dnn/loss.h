@@ -195,19 +195,19 @@ namespace dlib
             for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
                 const float y = *truth++;
-                DLIB_CASSERT(y == +1 || y == -1, "y: " << y);
+                DLIB_CASSERT(y != 0, "y: " << y);
                 float temp;
                 if (y > 0)
                 {
                     temp = log1pexp(-out_data[i]);
-                    loss += scale*temp;
-                    g[i] = scale*(g[i]-1);
+                    loss += y*scale*temp;
+                    g[i] = y*scale*(g[i]-1);
                 }
                 else
                 {
                     temp = -(-out_data[i]-log1pexp(-out_data[i]));
-                    loss += scale*temp;
-                    g[i] = scale*g[i];
+                    loss += -y*scale*temp;
+                    g[i] = -y*scale*g[i];
                 }
             }
             return loss;

@@ -154,6 +154,7 @@
          <term file="dlib/dnn/layers_abstract.h.html" name="fc_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="con_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="resize_to_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/layers_abstract.h.html" name="resize_prev_to_tagged_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="mult_prev_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="extract_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/layers_abstract.h.html" name="upsample_" include="dlib/dnn.h"/>

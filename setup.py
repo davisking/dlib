@@ -230,7 +230,8 @@ setup(
     ext_modules=[CMakeExtension('dlib','tools/python')],
     cmdclass=dict(build_ext=CMakeBuild, test=PyTest),
     zip_safe=False,
-    tests_require=['pytest'],
+    tests_require=['pytest==3.8'],
+    install_requires=['cmake'],
     packages=['dlib'],
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     classifiers=[

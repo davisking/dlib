@@ -21,7 +21,7 @@
 #include <dlib/dir_nav.h>
 
 
-const char* VERSION = "1.15";
+const char* VERSION = "1.16";
 
 
 
@@ -565,6 +565,7 @@ int main(int argc, char** argv)
                                     "the md5 hash of each image file and removing duplicate images. " );
         parser.add_option("rmdiff","Set the ignored flag to true for boxes marked as difficult.");
         parser.add_option("rmtrunc","Set the ignored flag to true for boxes that are partially outside the image.");
+        parser.add_option("box-images","Add a box to each image that contains the entire image.");
         parser.add_option("sort-num-objects","Sort the images listed an XML file so images with many objects are listed first.");
         parser.add_option("sort","Alphabetically sort the images in an XML file.");
         parser.add_option("shuffle","Randomly shuffle the order of the images listed in an XML file.");
@@ -611,7 +612,7 @@ int main(int argc, char** argv)
         const char* singles[] = {"h","c","r","l","files","convert","parts","rmdiff", "rmtrunc", "rmdupes", "seed", "shuffle", "split", "add", 
                                  "flip-basic", "flip", "rotate", "tile", "size", "cluster", "resample", "min-object-size", "rmempty",
                                  "crop-size", "cropped-object-size", "rmlabel", "rm-other-labels", "rm-if-overlaps", "sort-num-objects", 
-                                 "one-object-per-image", "jpg", "rmignore", "sort", "split-train-test"};
+                                 "one-object-per-image", "jpg", "rmignore", "sort", "split-train-test", "box-images"};
         parser.check_one_time_options(singles);
         const char* c_sub_ops[] = {"r", "convert"};
         parser.check_sub_options("c", c_sub_ops);
@@ -630,6 +631,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("c", "rm-if-overlaps");
         parser.check_incompatible_options("c", "rmdupes");
         parser.check_incompatible_options("c", "rmtrunc");
+        parser.check_incompatible_options("c", "box-images");
         parser.check_incompatible_options("c", "add");
         parser.check_incompatible_options("c", "flip");
         parser.check_incompatible_options("c", "flip-basic");
@@ -698,6 +700,8 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("rmdupes", "ignore");
         parser.check_incompatible_options("rmtrunc", "rename");
         parser.check_incompatible_options("rmtrunc", "ignore");
+        parser.check_incompatible_options("box-images", "rename");
+        parser.check_incompatible_options("box-images", "ignore");
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
         parser.check_option_arg_range("cluster", 2, 999);
@@ -982,6 +986,29 @@ int main(int argc, char** argv)
                 }
             }
             save_image_dataset_metadata(data_out, parser[0]);
+            return EXIT_SUCCESS;
+        }
+
+        if (parser.option("box-images"))
+        {
+            if (parser.number_of_arguments() != 1)
+            {
+                cerr << "The --box-images option requires you to give one XML file on the command line." << endl;
+                return EXIT_FAILURE;
+            }
+
+            dlib::image_dataset_metadata::dataset   data;
+            load_image_dataset_metadata(data, parser[0]);
+            {
+                locally_change_current_dir chdir(get_parent_directory(file(parser[0])));
+                parallel_for(0, data.images.size(), [&](long i) 
+                {
+                    array2d<unsigned char> img;
+                    load_image(img, data.images[i].filename);
+                    data.images[i].boxes.emplace_back(get_rect(img));
+                });
+            }
+            save_image_dataset_metadata(data, parser[0]+".boxed.xml");
             return EXIT_SUCCESS;
         }
 
