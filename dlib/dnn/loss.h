@@ -1135,7 +1135,7 @@ namespace dlib
                 // Prevent calls to tensor_to_dets() from running for a really long time
                 // due to the production of an obscene number of detections.
                 const unsigned long max_num_initial_dets = max_num_dets*100;
-                if (dets.size() >= max_num_initial_dets)
+                if (dets.size() > max_num_initial_dets)
                 {
                     det_thresh_speed_adjust = std::max(det_thresh_speed_adjust,dets[max_num_initial_dets].detection_confidence + options.loss_per_false_alarm);
                 }
