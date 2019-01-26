@@ -294,6 +294,9 @@ int main(int argc, char** argv)
 
     // Now, just to show an example of how you would use the network, let's check how well
     // it performs on the training data.
+    //
+    // Here a mini batch of 5 images of 5 people i.e 25 images in all are prepared
+    // for this test.
     dlib::rand rnd(time(0));
     load_mini_batch(5, 5, rnd, objs, images, labels);
 
@@ -304,14 +307,22 @@ int main(int argc, char** argv)
     // Run all the images through the network to get their vector embeddings.
     std::vector<matrix<float,0,1>> embedded = testing_net(images);
 
+    DLIB_CASSERT(images.size() == embedded.size());
+
     // Now, check if the embedding puts images with the same labels near each other and
     // images with different labels far apart.
     int num_right = 0;
-    int num_wrong = 0;
+    int num_wrong = 0;    
     for (size_t i = 0; i < embedded.size(); ++i)
     {
-        for (size_t j = i+1; j < embedded.size(); ++j)
+        for (size_t j = 0; j < embedded.size(); ++j)
         {
+            if (i == j) {
+                // skip comparison of image with itself
+                // as the distance would be 0.
+                continue;
+            }
+
             if (labels[i] == labels[j])
             {
                 // The loss_metric layer will cause images with the same label to be less
@@ -332,6 +343,7 @@ int main(int argc, char** argv)
         }
     }
 
+    cout << "images_tested: " << images.size() << endl;    
     cout << "num_right: "<< num_right << endl;
     cout << "num_wrong: "<< num_wrong << endl;
 
