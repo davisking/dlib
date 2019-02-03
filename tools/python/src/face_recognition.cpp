@@ -216,15 +216,16 @@ py::list chinese_whispers_raw(py::list edges)
     for (size_t idx = 0; idx < num_edges; ++idx)
     {
         py::tuple t = edges[idx].cast<py::tuple>();
-        if (len(t) != 2)
+        if ((len(t) != 2) && (len(t) != 3))
         {
-            PyErr_SetString( PyExc_IndexError, "Input must be a list of tuples with exactly 2 elements.");
+            PyErr_SetString( PyExc_IndexError, "Input must be a list of tuples with 2 or 3 elements.");
             throw py::error_already_set();
         }
         size_t i = t[0].cast<size_t>();
         size_t j = t[1].cast<size_t>();
+        double distance = (len(t) == 3) ? t[2].cast<double>(): 1;
 
-        edges_pairs.push_back(sample_pair(i,j));
+        edges_pairs.push_back(sample_pair(i, j, distance));
     }
 
     chinese_whispers(edges_pairs, labels);
@@ -326,7 +327,9 @@ void bind_face_recognition(py::module &m)
         "Takes a list of descriptors and returns a list that contains a label for each descriptor. Clustering is done using dlib::chinese_whispers."
         );
     m.def("chinese_whispers", &chinese_whispers_raw, py::arg("edges"),
-        "Takes a list of edges (edges are pairs of connected vertices presented as tuples) and returns a list that contains a label for each vertex. Offers direct access to dlib::chinese_whispers."
+        "Given a graph with vertices represented as numbers indexed from 0, this algorithm takes a list of edges and returns back a list that contains a labels (found clusters) for each vertex. "
+        "Edges are tuples with either 2 elements (integers presenting indexes of connected vertices) or 3 elements, where additional one element is float which presents distance weight of the edge). "
+        "Offers direct access to dlib::chinese_whispers."
         );
 }
 
