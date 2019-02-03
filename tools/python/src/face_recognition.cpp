@@ -206,6 +206,35 @@ py::list chinese_whispers_clustering(py::list descriptors, float threshold)
     return clusters;
 }
 
+py::list chinese_whispers_raw(py::list edges)
+{
+    py::list clusters;
+    size_t num_edges = py::len(edges);
+
+    std::vector<sample_pair> edges_pairs;
+    std::vector<unsigned long> labels;
+    for (size_t idx = 0; idx < num_edges; ++idx)
+    {
+        py::tuple t = edges[idx].cast<py::tuple>();
+        if (len(t) != 2)
+        {
+            PyErr_SetString( PyExc_IndexError, "Input must be a list of tuples with exactly 2 elements.");
+            throw py::error_already_set();
+        }
+        size_t i = t[0].cast<size_t>();
+        size_t j = t[1].cast<size_t>();
+
+        edges_pairs.push_back(sample_pair(i,j));
+    }
+
+    chinese_whispers(edges_pairs, labels);
+    for (size_t i = 0; i < labels.size(); ++i)
+    {
+        clusters.append(labels[i]);
+    }
+    return clusters;
+}
+
 void save_face_chips (
     numpy_image<rgb_pixel> img,
     const std::vector<full_object_detection>& faces,
@@ -295,6 +324,9 @@ void bind_face_recognition(py::module &m)
     );
     m.def("chinese_whispers_clustering", &chinese_whispers_clustering, py::arg("descriptors"), py::arg("threshold"),
         "Takes a list of descriptors and returns a list that contains a label for each descriptor. Clustering is done using dlib::chinese_whispers."
+        );
+    m.def("chinese_whispers", &chinese_whispers_raw, py::arg("edges"),
+        "Takes a list of edges (edges are pairs of connected vertices presented as tuples) and returns a list that contains a label for each vertex. Offers direct access to dlib::chinese_whispers."
         );
 }
 
