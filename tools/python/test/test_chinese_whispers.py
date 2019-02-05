@@ -8,16 +8,26 @@ def test_chinese_whispers():
     assert len(chinese_whispers([])) == 0
     assert len(chinese_whispers([(0, 0), (1, 1)])) == 2
 
-    # Test that values from edges are actually used
-    chinese_whispers([(0, 0), (0, 1), (1, 1)]) != chinese_whispers([(0, 0), (1, 1)])
+    # Test that values from edges are actually used and that correct values are returned
+    labels = chinese_whispers([(0, 0), (0, 1), (1, 1)])
+    assert len(labels) == 2
+    assert labels[0] == labels[1]
+    labels = chinese_whispers([(0, 0), (1, 1)])
+    assert len(labels) == 2
+    assert labels[0] != labels[1]
 
 
 def test_chinese_whispers_with_distance():
     assert len(chinese_whispers([(0, 0, 1)])) == 1
     assert len(chinese_whispers([(0, 0, 1), (0, 1, 0.5), (1, 1, 1)])) == 2
 
-    # Test that values from distances are actually used
-    chinese_whispers([(0, 0, 1), (0, 1, 1), (1, 1, 1)]) != chinese_whispers([(0, 0, 1), (0, 1, 0.0), (1, 1, 1)])
+    # Test that values from edges and distances are actually used and that correct values are returned
+    labels = chinese_whispers([(0, 0, 1), (0, 1, 1), (1, 1, 1)])
+    assert len(labels) == 2
+    assert labels[0] == labels[1]
+    labels = chinese_whispers([(0, 0, 1), (0, 1, 0.0), (1, 1, 1)])
+    assert len(labels) == 2
+    assert labels[0] != labels[1]
 
     # Non-trivial test
     edges = []
