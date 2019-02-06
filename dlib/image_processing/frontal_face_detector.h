@@ -20,8 +20,6 @@ namespace dlib
         std::istringstream sin(get_serialized_frontal_faces());
         frontal_face_detector detector;
         deserialize(detector, sin);
-		test_box_overlap overlap(0.15, 0.75);
-		detector.set_overlap_tester(overlap);
         return detector;
     }
 
