@@ -232,6 +232,7 @@ setup(
     zip_safe=False,
     tests_require=['pytest==3.8'],
     install_requires=['cmake'],
+    setup_requires=['scikit-build'],
     packages=['dlib'],
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     classifiers=[
