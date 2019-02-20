@@ -231,7 +231,7 @@ setup(
     cmdclass=dict(build_ext=CMakeBuild, test=PyTest),
     zip_safe=False,
     tests_require=['pytest==3.8'],
-    install_requires=['cmake'],
+    #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
     packages=['dlib'],
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
     classifiers=[
