@@ -11,7 +11,7 @@
 #include <iostream>
 #include "cuda_utils.h"
 #include <cstring>
-
+#include <cuda.h>
 
 namespace dlib
 {
@@ -81,7 +81,9 @@ namespace dlib
 
     void synchronize_stream(cudaStream_t stream)
     {
-#if CUDA_VERSION >= 9020 && CUDA_VERSION <= 10000
+#if !defined CUDA_VERSION
+#error CUDA_VERSION not defined
+#elif CUDA_VERSION >= 9020 && CUDA_VERSION <= 10000
         // This should be pretty much the same as cudaStreamSynchronize, which for some
         // reason makes training freeze in some cases.
         // (see https://github.com/davisking/dlib/issues/1513)
