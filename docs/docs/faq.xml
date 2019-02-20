@@ -57,8 +57,9 @@
    <questions group="General">
 
       <question text="Why do I get USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1?">
-         You are getting this error because you are not compiling all the C++
-         code in your program with consistent settings. This is a violation of
+         You are getting this error because you either forgot to link to dlib,
+         or are not compiling all the C++ code in your program with consistent
+         settings. The latter is wrong because it is a violation of
          <a href="https://en.wikipedia.org/wiki/One_Definition_Rule">C++'s One Definition Rule</a>. 
          In this case, you are compiling some translation units with dlib's
          assert macros enabled and others with them disabled.
