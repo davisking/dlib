@@ -115,28 +115,23 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
         # would triple it, and so forth.
 
         # There is another overload of compute_face_descriptor that can take
-        # as an input aligned image of size 150x150. 
+        # as an input an aligned image. 
+        #
+        # Note that it is important to generate the aligned image as
+        # dlib.get_face_chip would do it i.e. the size must be 150x150, 
+        # centered and scaled.
         #
         # Here is a sample usage of that
 
         print("Computing descriptor on aligned image ..")
         
-        # We will first generate the aligned image
+        # Let's generate the aligned image using get_face_chip
         face_chip = dlib.get_face_chip(img, shape)        
 
-        assert face_chip.shape[0] == face_chip.shape[1]
-        assert face_chip.shape[0] == 150        
-
-        # Now we simply pass this chip to the api
+        # Now we simply pass this chip (aligned image) to the api
         face_descriptor_from_prealigned_image = facerec.compute_face_descriptor(face_chip)                
         print(face_descriptor_from_prealigned_image)        
         
-        # Some checks to ensure that the descriptor is same whether you pass
-        # an aligned image or ask the api to perform the alignment
-        assert len(face_descriptor_from_prealigned_image) == len(face_descriptor)        
-        assert face_descriptor_from_prealigned_image[0] == face_descriptor[0]
-        assert face_descriptor_from_prealigned_image[-1] == face_descriptor[-1]
-
         dlib.hit_enter_to_continue()
 
 
