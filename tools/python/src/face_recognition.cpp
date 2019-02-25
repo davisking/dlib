@@ -154,7 +154,8 @@ public:
 
             // Check for the size of the image
             if ((image.nr() != 150) || (image.nc() != 150)) {
-                throw dlib::error("Unsupported image size, it should be of size 150x150.");
+                throw dlib::error("Unsupported image size, it should be of size 150x150. Also cropping must be done as `dlib.get_face_chip` would do it. \
+                That is, centered and scaled essentially the same way.");
             }
 
             face_chips.push_back(image);        
@@ -164,25 +165,19 @@ public:
         if (num_jitters <= 1)
         {
             // extract descriptors and convert from float vectors to double vectors
-            auto descriptors = net(face_chips, 16);            
+            auto descriptors = net(face_chips, 16);      
 
-            auto next = std::begin(descriptors);
-            for (int i = 0; i < face_chips.size(); ++i)
-            {                   
-                face_descriptors.push_back(matrix_cast<double>(*next++));                
-            }
-            DLIB_ASSERT(next == std::end(descriptors));            
+            for (auto& des: descriptors) {
+                face_descriptors.push_back(matrix_cast<double>(des));
+            }       
         }
         else
         {
             // extract descriptors and convert from float vectors to double vectors
-            auto fimg = std::begin(face_chips);
-            for (int i = 0; i < face_chips.size(); ++i)
-            {                
-                auto& r = mean(mat(net(jitter_image(*fimg++, num_jitters), 16)));
-                face_descriptors.push_back(matrix_cast<double>(r));                
+            for (auto& fimg : face_chips) {
+                auto& r = mean(mat(net(jitter_image(fimg, num_jitters), 16)));
+                face_descriptors.push_back(matrix_cast<double>(r)); 
             }
-            DLIB_ASSERT(fimg == std::end(face_chips));
         }        
         return face_descriptors;        
     }
@@ -362,7 +357,8 @@ void bind_face_recognition(py::module &m)
             )
         .def("compute_face_descriptor", &face_recognition_model_v1::compute_face_descriptor_from_aligned_image,
             py::arg("img"), py::arg("num_jitters")=0,
-            "Takes an aligned face image of size 150x150 and converts it into a 128D face descriptor. "
+            "Takes an aligned face image of size 150x150 and converts it into a 128D face descriptor."
+            "Note that the alignment should be done in the same way dlib.get_face_chip does it."
             "If num_jitters>1 then image will be randomly jittered slightly num_jitters times, each run through the 128D projection, and the average used as the face descriptor. "            
             )
         .def("compute_face_descriptor", &face_recognition_model_v1::compute_face_descriptors,
@@ -381,6 +377,7 @@ void bind_face_recognition(py::module &m)
         .def("compute_face_descriptor", &face_recognition_model_v1::batch_compute_face_descriptors_from_aligned_images,
             py::arg("batch_img"), py::arg("num_jitters")=0,
             "Takes an array of aligned images of faces of size 150_x_150."
+            "Note that the alignment should be done in the same way dlib.get_face_chip does it."
             "Every face will be converted into 128D face descriptors.  "
             "If num_jitters>1 then each face will be randomly jittered slightly num_jitters times, each run through the 128D projection, and the average used as the face descriptor. "            
             );
