@@ -114,7 +114,24 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
         # In particular, a padding of 0.5 would double the width of the cropped area, a value of 1.
         # would triple it, and so forth.
 
+        # There is another overload of compute_face_descriptor that can take
+        # as an input an aligned image. 
+        #
+        # Note that it is important to generate the aligned image as
+        # dlib.get_face_chip would do it i.e. the size must be 150x150, 
+        # centered and scaled.
+        #
+        # Here is a sample usage of that
 
+        print("Computing descriptor on aligned image ..")
+        
+        # Let's generate the aligned image using get_face_chip
+        face_chip = dlib.get_face_chip(img, shape)        
+
+        # Now we simply pass this chip (aligned image) to the api
+        face_descriptor_from_prealigned_image = facerec.compute_face_descriptor(face_chip)                
+        print(face_descriptor_from_prealigned_image)        
+        
         dlib.hit_enter_to_continue()
 
 
