@@ -21,13 +21,25 @@ namespace dlib
         cg_search_strategy() : been_used(false) {}
 
         double get_wolfe_rho (
-        ) const { return 0.001; }
+        ) const { return wolfe_rho; }
 
-        double get_wolfe_sigma (
-        ) const { return 0.01; }
+        void set_wolfe_rho (
+          double value
+        ) { wolfe_rho = value; }
 
         unsigned long get_max_line_search_iterations (
-        ) const { return 100; }
+        ) const { return max_line_search_iterations; }
+
+        void set_max_line_search_iterations (
+          unsigned long value
+        ) { max_line_search_iterations = value; }
+
+        double get_wolfe_sigma (
+        ) const { return wolfe_sigma; }
+
+        void set_wolfe_sigma (
+          double value
+        ) { wolfe_sigma = value; }
 
         template <typename T>
         const matrix<double,0,1>& get_next_direction (
@@ -66,6 +78,9 @@ namespace dlib
         bool been_used;
         matrix<double,0,1> prev_derivative;
         matrix<double,0,1> prev_direction;
+        double wolfe_rho = 0.001;
+        double wolfe_sigma = 0.01;
+        unsigned long max_line_search_iterations = 100;
     };
 
 // ----------------------------------------------------------------------------------------

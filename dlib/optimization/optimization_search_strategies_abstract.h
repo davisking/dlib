@@ -51,6 +51,15 @@ namespace dlib
                   this search strategy is used with the line_search() function.
         !*/
 
+        void set_wolfe_rho (
+          double
+        );
+        /*!
+            ensures
+                - sets the value of the Wolfe rho parameter that should be used when
+                  this search strategy is used with the line_search() function.
+        !*/
+
         double get_wolfe_sigma (
         ) const; 
         /*!
@@ -59,11 +68,29 @@ namespace dlib
                   this search strategy is used with the line_search() function.
         !*/
 
+        void set_wolfe_sigma (
+          double
+        );
+        /*!
+            ensures
+                - sets the value of the Wolfe sigma parameter that should be used when
+                  this search strategy is used with the line_search() function.
+        !*/
+
         unsigned long get_max_line_search_iterations (
         ) const; 
         /*!
             ensures
                 - returns the value of the max iterations parameter that should be used when 
+                  this search strategy is used with the line_search() function.
+        !*/
+
+        void set_max_line_search_iterations (
+          unsigned long
+        ) const;
+        /*!
+            ensures
+                - sets the value of the max iterations parameter that should be used when
                   this search strategy is used with the line_search() function.
         !*/
 
