@@ -716,10 +716,12 @@ if (NOT TARGET dlib)
             endif()
 
             # Find where cuSOLVER is since the FindCUDA cmake package doesn't
-            # bother to look for it.
-            get_filename_component(cuda_blas_path "${CUDA_CUBLAS_LIBRARIES}" DIRECTORY)
-            find_library(cusolver cusolver HINTS ${cuda_blas_path})
-            mark_as_advanced(cusolver)
+            # bother to look for it in older versions of cmake.
+            if (NOT CUDA_cusolver_LIBRARY)
+               get_filename_component(cuda_blas_path "${CUDA_CUBLAS_LIBRARIES}" DIRECTORY)
+               find_library(CUDA_cusolver_LIBRARY cusolver HINTS ${cuda_blas_path})
+               mark_as_advanced(CUDA_cusolver_LIBRARY)
+            endif()
             # Also find OpenMP since cuSOLVER needs it.  Importantly, we only
             # look for one to link to if our use of BLAS, specifically the
             # Intel MKL, hasn't already decided what to use.  This is because
@@ -756,7 +758,7 @@ if (NOT TARGET dlib)
                ${CUDA_CUBLAS_LIBRARIES} 
                ${cudnn}
                ${CUDA_curand_LIBRARY}
-               ${cusolver}
+               ${CUDA_cusolver_LIBRARY}
                )
             if(openmp_libraries)
                list(APPEND dlib_needed_libraries ${openmp_libraries})
