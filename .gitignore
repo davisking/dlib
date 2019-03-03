@@ -5,6 +5,7 @@
 *.so
 *.pyc
 build
+build2
 dist
 *.egg-info/
 docs/release/
