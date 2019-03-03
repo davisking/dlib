@@ -3,7 +3,15 @@
 *.swp
 *.o
 *.so
+*.pyc
 build
 dist
 *.egg-info/
+docs/release/
+docs/docs/web/
+docs/docs/chm/
+docs/docs/cache/
+docs/docs/git-logs.xml
+docs/docs/python/classes.txt
+docs/docs/python/functions.txt
 

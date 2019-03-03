@@ -16,7 +16,7 @@ report_failure ()
 
 
 REVNUM_FILE=.logger_revnum
-CHANGESET_ID=`hg id -i | sed -e 's/\+//'`
+CHANGESET_ID=`git rev-parse HEAD`
 
 rm -rf release || report_failure
 mkdir release || report_failure
@@ -35,15 +35,15 @@ set_dlib_version PATCH 0
 
 RELEASE=${MAJOR_NUM}.${MINOR_NUM} 
 # Commit changes to the version numbers so that the makedocs script will use them.
-echo Create Mercurial tags and commit release
-hg commit -m "Created release v$RELEASE" || report_failure
-hg tag v$RELEASE || report_failure
+echo Create git tags and commit release
+git commit -a -m "Created release v$RELEASE" || report_failure
+git tag v$RELEASE || report_failure
 
 ./makedocs makerel || exit 1
 
 echo $CHANGESET_ID > $REVNUM_FILE
 set_dlib_version PATCH 99 
-hg commit -m "Record last changeset and set PATCH version to 99"
+git commit -a -m "Record last changeset and set PATCH version to 99"
 
 
 cd release || report_failure

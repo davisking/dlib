@@ -266,6 +266,14 @@ video
    border-bottom: black solid 2px;
 }
 
+.files_changed
+{
+   color: black;
+   margin: 1em 0.15in;
+   padding: 0.5em;
+   background: rgb(246,246,255);
+}
+
 tt 
 {
    padding: 0.3em;

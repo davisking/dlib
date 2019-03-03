@@ -3,14 +3,12 @@
 # This script defines some helper functions used by other scripts in the docs
 # folder.
 
-get_short_revision_number()
-{    
-    RESULT=`hg log -r $1 | grep changeset | awk '{print $2}' | sed -e 's/:.*//'`  
-}
 
+# Get the time the given filename was last modified.
 get_last_modified_date()
 {
-    RESULT=`hg log $1 -l1 --template '{date|date}\n' | awk '{ print $2" "$3", " $5}'`
+    local filename=$1
+    RESULT=`git log -1 --format="%ad"  --date=format:'%b %d, %Y' -- $filename`
 }
 
 get_dlib_version()
@@ -18,8 +16,29 @@ get_dlib_version()
     cat ../dlib/CMakeLists.txt | awk '/set\(CPACK_PACKAGE_VERSION_'$1'/{ match($2,"\"(.*)\"",a); print a[1]}'
 }
 
+# Dump a copy of the repo contents to $1
+dump_repo_to() 
+{
+    mkdir -p $1
+    git archive HEAD `git rev-parse --show-toplevel`  | tar -xC $1 
+}
 
-# call like: set_dlib_version MAJOR 42
+# Call like git_logs_as_xml HEAD~4..HEAD out.xml to write the logs in that range to out.xml
+git_logs_as_xml()
+{
+    local logrange=$1
+    local outfile=$2
+
+    # What paths to include in the logs
+    local paths="../dlib ../examples ../tools ../python_examples"
+
+    (echo "<log>"; git log --stat=80 --date=iso-strict --pretty=format:"</files_changed></logentry>%n<logentry revision=\"%H\">%n<author email=\"%ae\">%an</author>%n<date>%ad</date>%n<msg>%s</msg>%n<files_changed>%n" $logrange $paths | tail -n+2 ; echo; echo '</files_changed></logentry>' ; echo "</log>" ) > $outfile
+
+    # trim whitespace at start and end of <files_changed> tags.
+    sed -e ':a' -e 'N' -e '$!ba'  -e "s/<files_changed>[ \n]*/<files_changed> /g" -e "s/[ \n]*<\/files_changed>/<\/files_changed>/g" -i $outfile
+}
+
+# call like: set_dlib_version MAJOR 42 to set MAJOR version to 42.
 set_dlib_version()
 {
     sed -i -e 's/\(set(CPACK_PACKAGE_VERSION_'$1' *"\).*\(".*\)/\1'$2'\2/' ../dlib/CMakeLists.txt
