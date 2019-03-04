@@ -16,7 +16,7 @@ namespace dlib
         struct token_text_pair
         {
             std::string token;
-            int type;
+            int type=0;
         };        
 
     }
