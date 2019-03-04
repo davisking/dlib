@@ -151,7 +151,7 @@ namespace dlib
                 item.add(temp);
             }
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type hash_set_kernel_1"); 

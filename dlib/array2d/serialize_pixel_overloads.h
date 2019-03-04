@@ -43,7 +43,7 @@ namespace dlib
             if (item.size() != 0)
                 out.write((char*)&item[0][0], sizeof(rgb_pixel)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
         }
@@ -81,7 +81,7 @@ namespace dlib
             if (item.size() != 0)
                 in.read((char*)&item[0][0], sizeof(rgb_pixel)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
@@ -112,7 +112,7 @@ namespace dlib
             if (item.size() != 0)
                 out.write((char*)&item[0][0], sizeof(bgr_pixel)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
         }
@@ -151,7 +151,7 @@ namespace dlib
             if (item.size() != 0)
                 in.read((char*)&item[0][0], sizeof(bgr_pixel)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
@@ -182,7 +182,7 @@ namespace dlib
             if (item.size() != 0)
                 out.write((char*)&item[0][0], sizeof(hsi_pixel)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
         }
@@ -221,7 +221,7 @@ namespace dlib
             if (item.size() != 0)
                 in.read((char*)&item[0][0], sizeof(hsi_pixel)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
@@ -252,7 +252,7 @@ namespace dlib
             if (item.size() != 0)
                 out.write((char*)&item[0][0], sizeof(rgb_alpha_pixel)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
         }
@@ -291,7 +291,7 @@ namespace dlib
             if (item.size() != 0)
                 in.read((char*)&item[0][0], sizeof(rgb_alpha_pixel)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
@@ -320,7 +320,7 @@ namespace dlib
             if (item.size() != 0)
                 out.write((char*)&item[0][0], sizeof(unsigned char)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
         }
@@ -356,7 +356,7 @@ namespace dlib
             if (item.size() != 0)
                 in.read((char*)&item[0][0], sizeof(unsigned char)*item.size());
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 

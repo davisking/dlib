@@ -148,7 +148,7 @@ namespace dlib
                 serialize(item.points[i].y,out);
             }
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type letter"); 
         }
@@ -178,7 +178,7 @@ namespace dlib
                 deserialize(item.points[i].y,in);
             }
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.w = 0;
             item.count = 0;

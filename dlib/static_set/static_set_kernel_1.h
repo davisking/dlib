@@ -61,7 +61,7 @@ namespace dlib
                     deserialize(item.d[i],in);
                 }
             }
-            catch (serialization_error e)
+            catch (serialization_error& e)
             { 
                 item.set_size = 0;
                 if (item.d)

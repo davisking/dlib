@@ -215,7 +215,7 @@ namespace dlib
                     deserialize(item[i],in);
             }
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type sliding_buffer_kernel_1"); 

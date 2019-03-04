@@ -199,7 +199,7 @@ namespace dlib
                 item.add(i,temp);
             }
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type sequence_kernel_2"); 

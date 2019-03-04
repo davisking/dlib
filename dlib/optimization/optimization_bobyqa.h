@@ -289,7 +289,7 @@ namespace dlib
             doublereal ratio = 0, dnorm = 0, vquad = 0, pqold = 0, tenth = 0;
             integer itest;
             doublereal sumpq, scaden;
-            doublereal errbig, cauchy, fracsq, biglsq, densav;
+            doublereal errbig, cauchy=0, fracsq, biglsq, densav;
             doublereal bdtest;
             doublereal crvmin, frhosq;
             doublereal distsq;

@@ -394,7 +394,7 @@ namespace dlib
                 serialize(item.element(),out);
             item.reset();
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             throw serialization_error(e.info + "\n   while serializing object of type array2d"); 
         }
@@ -432,7 +432,7 @@ namespace dlib
                 deserialize(item.element(),in); 
             item.reset();
         }
-        catch (serialization_error e)
+        catch (serialization_error& e)
         { 
             item.clear();
             throw serialization_error(e.info + "\n   while deserializing object of type array2d"); 
