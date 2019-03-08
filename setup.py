@@ -17,17 +17,17 @@ To upload the binary wheel to PyPi
 To upload the source distribution to PyPi
     python setup.py sdist 
     twine upload dist/dlib-*.tar.gz
-To exclude/include certain options in the cmake config use --yes and --no:
+To exclude certain options in the cmake config use --no:
     for example:
-    --yes USE_AVX_INSTRUCTIONS: will set -DUSE_AVX_INSTRUCTIONS=yes
     --no USE_AVX_INSTRUCTIONS: will set -DUSE_AVX_INSTRUCTIONS=no
 Additional options:
     --compiler-flags: pass flags onto the compiler, e.g. --compiler-flags "-Os -Wall" passes -Os -Wall onto GCC.
     -G: Set the CMake generator.  E.g. -G "Visual Studio 14 2015"
     --clean: delete any previous build folders and rebuild.  You should do this if you change any build options
-             by setting --compiler-flags or --yes or --no since last time you ran a build to make sure the changes
-             take effect.
-    --set: set arbitrary options e.g. --set CUDA_HOST_COMPILER=/usr/bin/gcc-6.4.0
+             by setting --compiler-flags or --no since the last time you ran a build.  This will
+             ensure the changes take effect.
+    --set: set arbitrary cmake options e.g. --set CUDA_HOST_COMPILER=/usr/bin/gcc-6.4.0
+           passes -DCUDA_HOST_COMPILER=/usr/bin/gcc-6.4.0 to CMake.
 """
 import os
 import re
@@ -45,7 +45,7 @@ from distutils.version import LooseVersion
 
 
 def get_extra_cmake_options():
-    """read --clean, --yes, --no, --set, --compiler-flags, and -G options from the command line and add them as cmake switches.
+    """read --clean, --no, --set, --compiler-flags, and -G options from the command line and add them as cmake switches.
     """
     _cmake_extra_options = []
     _clean_build_folder = False
@@ -59,8 +59,6 @@ def get_extra_cmake_options():
             _cmake_extra_options.append('-DCMAKE_CXX_FLAGS={arg}'.format(arg=arg.strip()))
         elif opt_key == 'G':
             _cmake_extra_options += ['-G', arg.strip()]
-        elif opt_key == 'yes':
-            _cmake_extra_options.append('-D{arg}=yes'.format(arg=arg.strip()))
         elif opt_key == 'no':
             _cmake_extra_options.append('-D{arg}=no'.format(arg=arg.strip()))
         elif opt_key == 'set':
@@ -76,7 +74,11 @@ def get_extra_cmake_options():
             sys.argv.remove(arg)
             continue
 
-        if arg in ['--yes', '--no', '--set', '--compiler-flags']:
+        if arg == '--yes':
+            print("The --yes options to dlib's setup.py don't do anything since all these options ")
+            print("are on by default.  So --yes has been removed.  Do not give it to setup.py.")
+            sys.exit(1)
+        if arg in ['--no', '--set', '--compiler-flags']:
             opt_key = arg[2:].lower()
             sys.argv.remove(arg)
             continue
