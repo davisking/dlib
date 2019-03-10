@@ -35,7 +35,7 @@ Bug fixes:
 
 <!-- **************************************************************************************  -->
 
-<old name="19.15" date="Sep 29, 2018">
+<old name="19.16" date="Sep 29, 2018">
 New Features and Improvements:
    - Allow 64bit seeds for murmur hash.
    - Some code paths are a little faster.
