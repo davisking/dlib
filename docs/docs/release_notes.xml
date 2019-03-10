@@ -12,16 +12,16 @@
 
 <current>
 New Features and Improvements:
-   - Added weighted labels to loss_binary_log layer
-   - Added padding argument support for Python compute_face_descriptor methods
-   - Added pointwise_divide function
-   - Added U-net style skip connections to the semantic-segmentation example
+   - Added weighted labels to loss_binary_log layer.
+   - Added padding option to Python compute_face_descriptor() methods.
+   - Added pointwise_divide function.
+   - Added U-net style skip connections to the semantic-segmentation example.
    - Exposed dlib::chinese_whispers() directly in Python API.
-   - Added python api that generates desciptor(s) from the aligned image(s) 
-   - Added support for CUDA 10.1
+   - Added python api that generates desciptor(s) from the aligned image(s).
+   - Added support for CUDA 10.1.
    - Dlib's python install process always automatically enables all supported features.  
-     So --yes &lt;option&gt; was removed as it would do nothing.
-   - Added --box-images to imglab
+     So --yes &lt;option&gt; was removed as it does nothing.
+   - Added --box-images to imglab.
 
 Non-Backwards Compatible Changes:
 

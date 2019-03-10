@@ -99,6 +99,11 @@
          </p>
       </question>
 
+      <question text="How do I install/compile dlib?">
+         Follow the <a href="compile.html">official instructions</a>. 
+         They tell you <b>exactly what to type</b> to use dlib.  
+      </question>
+
       <question text="It doesn't work?">
          Do not post a question like "I'm using dlib, and it doesn't work?" or
          "I'm using the object detector and it doesn't work, what do I do?".

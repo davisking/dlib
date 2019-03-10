@@ -16,7 +16,7 @@
                work.  </p>
                
                <p>Also note that various optional features like GUI support (e.g.
-                  dlib.image_window) and CUDA acceleration will be either enabled or
+                  dlib.image_window) and CUDA acceleration will be automatically enabled or
                   disabled based on what is available on your computer.  When you run
                   the install command it will print messages telling you what it is
                   using.  Read those messages and take appropriate action if you
@@ -50,7 +50,7 @@ cd build
 cmake ..
 cmake --build . --config Release
 </code_box>
-Note that you also need to have a C++11 compiler installed on your system.  There are free C++11 compilers
+Note that you need to have a C++11 compiler installed on your system.  There are free C++11 compilers
 for most operating systems.  For example, Visual Studio is free on Windows and GCC is free and
 works well on Mac OS X and Linux systems.  If you have multiple compilers/IDEs installed then you can
 tell CMake which one you want it to use via the -G option.
@@ -198,7 +198,7 @@ sudo apt-get install libx11-dev
            To summarize, if you don't understand what the above paragraphs are talking
            about then you absolutely should not be installing dlib as a precompiled library
            in Visual Studio.  Instead, go to the top of this page and read the instructions
-           there.  Follow those instructions, it's super easy. 
+           there.  Follow those instructions, it's super easy and will Just Work. 
         </p>
 
          <br/>
