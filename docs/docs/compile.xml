@@ -9,21 +9,24 @@
 
       <center><h1>Using dlib from Python</h1></center>
             <p>
-               Go to the base folder of the dlib repository and run <tt>python setup.py install</tt>.  
-               Once that command finishes running
-               you are ready to use dlib from Python.  Note that you need to
-               have CMake and a working C++ compiler installed for this to
-               work.  </p>
+               Either run <tt>pip install dlib --verbose</tt> or grab the latest sources
+               from github, go to the base folder of the dlib repository,
+               and run <tt>python setup.py install</tt>.  Once either of these commands
+               finishes running you are ready to use dlib from Python.  Note
+               that you need to have CMake and a working C++ compiler
+               installed for this to work.  
+            </p>
                
-               <p>Also note that various optional features like GUI support (e.g.
-                  dlib.image_window) and CUDA acceleration will be automatically enabled or
-                  disabled based on what is available on your computer.  When you run
-                  the install command it will print messages telling you what it is
-                  using.  Read those messages and take appropriate action if you
-                  don't like the results.  For example, Linux and OSX users may have
-                  to install libX11 to use the GUI tools.  If you care about this
-                  then read the messages since they tell you how to get these
-                  optional features installed.
+            <p>
+               Also note that various optional features like GUI support (e.g.
+               dlib.image_window) and CUDA acceleration will be automatically
+               enabled or disabled based on what is available on your computer.
+               When you run the install command it will print messages telling
+               you what it is using.  Read those messages and take appropriate
+               action if you don't like the results.  For example, Linux and
+               OSX users may have to install libX11 to use the GUI tools.  If
+               you care about this then read the messages since they tell you
+               how to get these optional features installed.
             </p>
             <p>
                Alternatively, if you want to add more python bindings to dlib's
