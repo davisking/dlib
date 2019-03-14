@@ -129,7 +129,7 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
         face_chip = dlib.get_face_chip(img, shape)        
 
         # Now we simply pass this chip (aligned image) to the api
-        face_descriptor_from_prealigned_image = facerec.compute_face_descriptor(face_chip)                
+        face_descriptor_from_prealigned_image = facerec.compute_face_descriptor(face_chip, shape)                
         print(face_descriptor_from_prealigned_image)        
         
         dlib.hit_enter_to_continue()
