@@ -430,16 +430,8 @@ if (NOT TARGET dlib)
       endif()
 
       if (DLIB_PNG_SUPPORT)
-         # try to find libpng 
-         find_package(PNG QUIET)
-         # Make sure there isn't something wrong with the version of LIBPNG
-         # installed on this system.  Also never link to anything from anaconda
-         # since it's probably broken.
-         if (PNG_FOUND AND NOT ("${PNG_INCLUDE_DIR}" MATCHES "(.*)(Ana|ana|mini)conda(.*)") AND NOT BUILDING_PYTHON_IN_MSVC)
-            set(CMAKE_REQUIRED_LIBRARIES ${PNG_LIBRARIES})
-            CHECK_FUNCTION_EXISTS(png_create_read_struct LIBPNG_IS_GOOD)
-         endif()
-         if (PNG_FOUND AND LIBPNG_IS_GOOD)
+         include(cmake_utils/find_libpng.cmake)
+         if (PNG_FOUND)
             include_directories(${PNG_INCLUDE_DIR})
             set (dlib_needed_libraries ${dlib_needed_libraries} ${PNG_LIBRARIES})
             set(REQUIRES_LIBS " libpng")
