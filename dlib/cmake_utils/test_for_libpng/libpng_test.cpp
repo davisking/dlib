@@ -16,7 +16,11 @@ void png_loader_user_warning_fn_silent(png_structp , png_const_charp )
 
 // This code doesn't really make a lot of sense.  It's just calling all the libpng functions to make
 // sure they can be compiled and linked.  
-int main() {
+int main() 
+{
+    std::cerr << "This program is just for build system testing.  Don't actually run it." << std::endl;
+    abort();
+
     png_bytep* row_pointers_;
     png_structp png_ptr_;
     png_infop info_ptr_;
@@ -47,8 +51,4 @@ int main() {
 
     fclose(fp);
     png_destroy_read_struct(&png_ptr_, &info_ptr_, &end_info_);
-
-    
-    std::cerr << "This program is just for build system testing.  Don't actually run it." << std::endl;
-    abort();
 }
