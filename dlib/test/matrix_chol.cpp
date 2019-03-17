@@ -6,7 +6,6 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
-#include <ctime>
 #include <vector>
 #include "../stl_checked.h"
 #include "../array.h"
@@ -161,7 +160,7 @@ namespace
             tester ("test_matrix_chol",
                     "Runs tests on the matrix cholesky component.")
         {
-            rnd.set_seed(cast_to_string(time(0)));
+            //rnd.set_seed(cast_to_string(time(0)));
         }
 
         void perform_test (
