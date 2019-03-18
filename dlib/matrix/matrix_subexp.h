@@ -386,16 +386,20 @@ namespace dlib
         // the rows matrix must contain integer elements 
         COMPILE_TIME_ASSERT(std::numeric_limits<typename EXP2::type>::is_integer);
 
-        DLIB_ASSERT(0 <= min(rows) && max(rows) < m.nr() && (rows.nr() == 1 || rows.nc() == 1), 
-            "\tconst matrix_exp rowm(const matrix_exp& m, const matrix_exp& rows)"
-            << "\n\tYou have given invalid arguments to this function"
-            << "\n\tm.nr():     " << m.nr()
-            << "\n\tm.nc():     " << m.nc() 
-            << "\n\tmin(rows):  " << min(rows) 
-            << "\n\tmax(rows):  " << max(rows) 
-            << "\n\trows.nr():  " << rows.nr()
-            << "\n\trows.nc():  " << rows.nc()
+#ifdef ENABLE_ASSERTS
+        if (rows.size() != 0) {
+            DLIB_ASSERT(0 <= min(rows) && max(rows) < m.nr() && (rows.nr() == 1 || rows.nc() == 1), 
+                "\tconst matrix_exp rowm(const matrix_exp& m, const matrix_exp& rows)"
+                << "\n\tYou have given invalid arguments to this function"
+                << "\n\tm.nr():     " << m.nr()
+                << "\n\tm.nc():     " << m.nc() 
+                << "\n\tmin(rows):  " << min(rows) 
+                << "\n\tmax(rows):  " << max(rows) 
+                << "\n\trows.nr():  " << rows.nr()
+                << "\n\trows.nc():  " << rows.nc()
             );
+        }
+#endif // ENABLE_ASSERTS
 
         typedef op_rowm_range<EXP1,EXP2> op;
         return matrix_op<op>(op(m.ref(),rows.ref()));
@@ -541,16 +545,20 @@ namespace dlib
         // the rows matrix must contain integer elements 
         COMPILE_TIME_ASSERT(std::numeric_limits<typename EXP2::type>::is_integer);
 
-        DLIB_ASSERT(0 <= min(cols) && max(cols) < m.nc() && (cols.nr() == 1 || cols.nc() == 1), 
-            "\tconst matrix_exp colm(const matrix_exp& m, const matrix_exp& cols)"
-            << "\n\tYou have given invalid arguments to this function"
-            << "\n\tm.nr():     " << m.nr()
-            << "\n\tm.nc():     " << m.nc() 
-            << "\n\tmin(cols):  " << min(cols) 
-            << "\n\tmax(cols):  " << max(cols) 
-            << "\n\tcols.nr():  " << cols.nr()
-            << "\n\tcols.nc():  " << cols.nc()
+#ifdef ENABLE_ASSERTS
+        if (cols.size() != 0) {
+            DLIB_ASSERT(0 <= min(cols) && max(cols) < m.nc() && (cols.nr() == 1 || cols.nc() == 1), 
+                "\tconst matrix_exp colm(const matrix_exp& m, const matrix_exp& cols)"
+                << "\n\tYou have given invalid arguments to this function"
+                << "\n\tm.nr():     " << m.nr()
+                << "\n\tm.nc():     " << m.nc() 
+                << "\n\tmin(cols):  " << min(cols) 
+                << "\n\tmax(cols):  " << max(cols) 
+                << "\n\tcols.nr():  " << cols.nr()
+                << "\n\tcols.nc():  " << cols.nc()
             );
+        }
+#endif // ENABLE_ASSERTS
 
         typedef op_colm_range<EXP1,EXP2> op;
         return matrix_op<op>(op(m.ref(),cols.ref()));

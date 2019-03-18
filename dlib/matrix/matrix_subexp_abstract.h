@@ -239,8 +239,8 @@ namespace dlib
         requires
             - rows contains integral elements (e.g. int, long)
             - 0 <= min(rows) && max(rows) < m.nr() 
-            - rows.nr() == 1 || rows.nc() == 1
-              (i.e. rows must be a vector)
+            - rows.nr() == 1 || rows.nc() == 1 || rows.size() == 0
+              (i.e. rows must be a vector, or just empty)
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
@@ -326,8 +326,8 @@ namespace dlib
         requires
             - cols contains integral elements (e.g. int, long)
             - 0 <= min(cols) && max(cols) < m.nc() 
-            - cols.nr() == 1 || cols.nc() == 1
-              (i.e. cols must be a vector)
+            - cols.nr() == 1 || cols.nc() == 1 || cols.size() == 0
+              (i.e. cols must be a vector, or just empty)
         ensures
             - returns a matrix R such that:
                 - R::type == the same type that was in m
