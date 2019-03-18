@@ -20,7 +20,7 @@ fi
 if [ "$VARIANT" = "test-debug" ]; then
   mkdir build
   cd build
-  cmake ../dlib/test --DDLIB_ENABLE_ASSERTS=1
+  cmake ../dlib/test -DDLIB_ENABLE_ASSERTS=1
   cmake --build . --target dtest -- -j 2
   ./dtest --runall
 fi
@@ -74,7 +74,7 @@ fi
 if [ "$VARIANT" = "examples-debug" ]; then
   mkdir build
   cd build
-  cmake ../examples --DDLIB_ENABLE_ASSERTS=1
+  cmake ../examples -DDLIB_ENABLE_ASSERTS=1
   cmake --build . -- -j 1
 fi
 
