@@ -3,7 +3,7 @@
 set -eux
 
 # execute the contents of MATRIX_EVAL if it's set
-if [[ -v MATRIX_EVAL ]]; then
+if [ -n "${MATRIX_EVAL+set}" ]; then
     eval "${MATRIX_EVAL}"
 fi
 
