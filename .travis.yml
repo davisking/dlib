@@ -16,7 +16,7 @@ matrix:
       compiler: clang
       os: linux
       env:
-        - VARIANT=examples
+        - VARIANT=examples-debug
       script:
         - dlib/travis/build-and-test.sh
 
@@ -25,7 +25,7 @@ matrix:
       compiler: gcc
       os: linux
       env:
-        - VARIANT=test
+        - VARIANT=test-debug
       script:
         - dlib/travis/build-and-test.sh
 
