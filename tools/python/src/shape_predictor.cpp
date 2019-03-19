@@ -160,7 +160,7 @@ void bind_shape_predictors(py::module &m)
     py::class_<type, std::shared_ptr<type>>(m, "full_object_detection",
     "This object represents the location of an object in an image along with the \
     positions of each of its constituent parts.")
-        .def(py::init(&full_obj_det_init),
+        .def(py::init(&full_obj_det_init), py::arg("rect"), py::arg("parts"),
 "requires \n\
     - rect: dlib rectangle \n\
     - parts: list of dlib points")
