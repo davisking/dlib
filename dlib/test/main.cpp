@@ -39,6 +39,8 @@ int main (int argc, char** argv)
         {
             tester& test = *testers().element().value();
             parser.add_option(test.cmd_line_switch(), test.description(), test.num_of_args());
+            if (test.num_of_args()==0) 
+                parser.add_option("no_"+test.cmd_line_switch(), "Don't run this option when using --runall.");
         }
 
         parser.parse(argc,argv);
@@ -117,10 +119,13 @@ int main (int argc, char** argv)
                 // run the test for this option as many times as the user has requested.
                 for (unsigned long j = 0; j < parser.option("runall").count() + opt.count(); ++j)
                 {
-                    // quit this loop if this option has arguments and this round through the loop is
-                    // from the runall option being present.
-                    if (test.num_of_args() > 0 && j == opt.count())
-                        break;
+                    // If this round through the loop is from the runall option being present.
+                    if (j == opt.count())
+                    {
+                        // Don't run options that take arguments or have had --no_ applied to them.
+                        if (test.num_of_args() > 0 || parser.option("no_"+test.cmd_line_switch()))
+                            break;
+                    }
 
                     if (be_verbose)
                         cout << "Running " << test.cmd_line_switch() << "   " << flush;
