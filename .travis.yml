@@ -8,6 +8,7 @@ matrix:
       os: linux
       env:
         - VARIANT=test
+        - DISABLED_TESTS=""
       script:
         - dlib/travis/build-and-test.sh
 
@@ -26,6 +27,7 @@ matrix:
       os: linux
       env:
         - VARIANT=test-debug
+        - DISABLED_TESTS=""
       script:
         - dlib/travis/build-and-test.sh
 
@@ -71,6 +73,7 @@ matrix:
           # think you could just set them in the env area like any other, but
           # travis is wonky about CC and CXX vars so you have to do it this way.
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - DISABLED_TESTS=""
       addons:
         apt:
           sources:
