@@ -13,7 +13,7 @@ if [ "$VARIANT" = "test" ]; then
   cd build
   cmake ../dlib/test 
   cmake --build . --target dtest -- -j 2
-  ./dtest --runall
+  ./dtest --runall $DISABLED_TESTS
 fi
 
 # build dlib and tests
@@ -22,7 +22,7 @@ if [ "$VARIANT" = "test-debug" ]; then
   cd build
   cmake ../dlib/test -DDLIB_ENABLE_ASSERTS=1
   cmake --build . --target dtest -- -j 2
-  ./dtest --runall
+  ./dtest --runall $DISABLED_TESTS
 fi
 
 if [ "$VARIANT" = "dlib_all_source_cpp" ]; then
