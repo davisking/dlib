@@ -118,11 +118,3 @@ matrix:
       script:
         - dlib/travis/build-and-test.sh
 
-    ###################
-    - language: cpp
-      os: osx
-      osx_image: xcode9.2
-      env:
-        - VARIANT=python-api
-      script:
-        - dlib/travis/build-and-test.sh
