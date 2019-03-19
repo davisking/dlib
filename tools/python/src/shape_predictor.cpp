@@ -68,14 +68,25 @@ std::vector<point> full_obj_det_parts (const full_object_detection& detection)
     return parts;
 }
 
-std::shared_ptr<full_object_detection> full_obj_det_init(const rectangle& rect, py::list& pyparts)
+std::shared_ptr<full_object_detection> full_obj_det_init(const rectangle& rect, const py::object& pyparts_)
 {
-    const unsigned long num_parts = py::len(pyparts);
-    std::vector<point> parts;
-    for (const auto& item : pyparts)
-        parts.push_back(item.cast<point>());
+    try 
+    {
+        auto&& pyparts = pyparts_.cast<py::list>();
 
-    return std::make_shared<full_object_detection>(rect, parts);
+        const unsigned long num_parts = py::len(pyparts);
+        std::vector<point> parts;
+        for (const auto& item : pyparts)
+            parts.push_back(item.cast<point>());
+
+        return std::make_shared<full_object_detection>(rect, parts);
+    }
+    catch (py::cast_error&)
+    {
+        // if it's not a py::list it better be a vector<point>.
+        auto&& parts = pyparts_.cast<const std::vector<point>&>();
+        return std::make_shared<full_object_detection>(rect, parts);
+    }
 }
 
 // ----------------------------------------------------------------------------------------
@@ -163,7 +174,7 @@ void bind_shape_predictors(py::module &m)
         .def(py::init(&full_obj_det_init), py::arg("rect"), py::arg("parts"),
 "requires \n\
     - rect: dlib rectangle \n\
-    - parts: list of dlib points")
+    - parts: list of dlib.point, or a dlib.points object.")
         .def_property_readonly("rect", &full_obj_det_get_rect, "Bounding box from the underlying detector. Parts can be outside box if appropriate.")
         .def_property_readonly("num_parts", &full_obj_det_num_parts, "The number of parts of the object.")
         .def("part", &full_obj_det_part, py::arg("idx"), "A single part of the object as a dlib point.")
