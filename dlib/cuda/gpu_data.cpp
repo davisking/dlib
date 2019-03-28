@@ -83,7 +83,7 @@ namespace dlib
     {
 #if !defined CUDA_VERSION
 #error CUDA_VERSION not defined
-#elif CUDA_VERSION >= 9020 && CUDA_VERSION <= 10000
+#elif CUDA_VERSION >= 9020 && CUDA_VERSION <= 10010
         // This should be pretty much the same as cudaStreamSynchronize, which for some
         // reason makes training freeze in some cases.
         // (see https://github.com/davisking/dlib/issues/1513)
