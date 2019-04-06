@@ -438,7 +438,11 @@ namespace dlib
                 const size_t bytes_per_plane = subnetwork_output.nr()*subnetwork_output.nc()*sizeof(uint16_t);
                 // Allocate a cuda buffer to store all the truth images and also one float
                 // for the scalar loss output.
-                cuda_data_void_ptr buf = device_global_buffer()->get(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
+                if (!work)
+                {
+                    work = device_global_buffer();
+                }
+                cuda_data_void_ptr buf = work->get(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
 
                 cuda_data_void_ptr loss_buf = buf;
                 buf = buf+sizeof(float);
@@ -465,7 +469,8 @@ namespace dlib
                 tensor& gradient,
                 double& loss
             );
-
+            
+            mutable std::shared_ptr<resizable_cuda_buffer> work;
         };
 
     // ------------------------------------------------------------------------------------
