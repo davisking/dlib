@@ -59,7 +59,7 @@ std::shared_ptr<cv> cv_from_object(py::object obj)
         auto temp = std::make_shared<cv>(nr);
         *temp = 0;
         return temp;
-    } catch(py::cast_error &e) {
+    } catch(py::cast_error&) {
         py::list li = obj.cast<py::list>();
         const long nr = len(obj);
         auto temp = std::make_shared<cv>(nr);
