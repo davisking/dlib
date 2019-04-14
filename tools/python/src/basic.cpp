@@ -19,7 +19,7 @@ std::shared_ptr<std::vector<double> > array_from_object(py::object obj)
     try {
         long nr = obj.cast<long>();
         return std::make_shared<std::vector<double>>(nr);
-    } catch (py::cast_error &e) {
+    } catch (py::cast_error&) {
         py::list li = obj.cast<py::list>();
         const long nr = len(li);
         auto temp = std::make_shared<std::vector<double>>(nr);

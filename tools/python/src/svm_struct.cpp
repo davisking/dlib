@@ -56,7 +56,7 @@ public:
         try {
             loss = t[0].cast<scalar_type>();
             psi = t[1].cast<feature_vector_type&>();
-        } catch(py::cast_error &e) {
+        } catch(py::cast_error&) {
             psi = t[0].cast<feature_vector_type&>();
             loss = t[1].cast<scalar_type>();
        }
