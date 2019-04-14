@@ -302,6 +302,7 @@ elseif(WIN32 AND NOT MINGW)
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/intel64" 
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/intel64"
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/lib/intel64/vc14"
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/lib/intel64/vc_mt"
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/intel64" 
          "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/intel64"
          "C:/Program Files (x86)/Intel/Composer XE/tbb/lib/intel64/vc14"
@@ -309,6 +310,9 @@ elseif(WIN32 AND NOT MINGW)
          "C:/Program Files/Intel/Composer XE/mkl/lib/intel64"
          "C:/Program Files/Intel/Composer XE/tbb/lib/intel64/vc14"
          "C:/Program Files/Intel/Composer XE/compiler/lib/intel64"
+         )
+      set (mkl_redist_path
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/redist/intel64/compiler" 
          )
       find_library(mkl_intel  mkl_intel_lp64 ${mkl_search_path})
    else()
@@ -318,6 +322,7 @@ elseif(WIN32 AND NOT MINGW)
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries_*/windows/compiler/lib/ia32"
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/mkl/lib/ia32" 
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/lib/ia32/vc14" 
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/tbb/lib/ia32/vc_mt"
          "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/compiler/lib/ia32"
          "C:/Program Files (x86)/Intel/Composer XE/mkl/lib/ia32"
          "C:/Program Files (x86)/Intel/Composer XE/tbb/lib/ia32/vc14"
@@ -325,6 +330,9 @@ elseif(WIN32 AND NOT MINGW)
          "C:/Program Files/Intel/Composer XE/mkl/lib/ia32"
          "C:/Program Files/Intel/Composer XE/tbb/lib/ia32/vc14"
          "C:/Program Files/Intel/Composer XE/compiler/lib/ia32"
+         )
+      set (mkl_redist_path
+         "C:/Program Files (x86)/IntelSWTools/compilers_and_libraries/windows/redist/ia32/compiler" 
          )
       find_library(mkl_intel  mkl_intel_c ${mkl_search_path})
    endif()
@@ -363,6 +371,18 @@ elseif(WIN32 AND NOT MINGW)
      find_library(mkl_iomp libiomp5md ${mkl_search_path})
      mark_as_advanced(mkl_thread mkl_iomp)
      list(APPEND mkl_libs ${mkl_thread} ${mkl_iomp})
+     if (mkl_iomp)
+        # See if we can find the dll that goes with this, so we can copy it to
+        # the output folder, since a very large number of windows users don't
+        # understand that they need to add the Intel MKL's folders to their
+        # PATH to use the Intel MKL.  They then complain on the dlib forums.
+        # Copying the Intel MKL dlls to the output directory removes the need
+        # to add the Intel MKL to the PATH.
+        find_file(mkl_iomp_dll "libiomp5md.dll" ${mkl_redist_path})
+        if (mkl_iomp_dll)
+            message(STATUS "FOUND libiomp5md.dll: ${mkl_iomp_dll}")
+        endif()
+     endif()
    endif()
 
    # If we found the MKL 

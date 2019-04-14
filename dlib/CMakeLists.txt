@@ -9,6 +9,9 @@ cmake_minimum_required(VERSION 2.8.12)
 if(POLICY CMP0048)
    cmake_policy(SET CMP0048 NEW)
 endif()
+if(POLICY CMP0077)
+   cmake_policy(SET CMP0077 NEW)
+endif()
 
 project(dlib)
 
@@ -952,6 +955,24 @@ if (COMMAND pybind11_add_module)
    # Don't export unnecessary symbols.
    set_target_properties(dlib PROPERTIES CXX_VISIBILITY_PRESET "hidden")
    set_target_properties(dlib PROPERTIES CUDA_VISIBILITY_PRESET "hidden")
+endif()
+
+if (WIN32 AND mkl_iomp_dll)
+   # If we are using the Intel MKL on windows then try and copy the iomp dll
+   # file to the output folder.  We do this since a very large number of
+   # windows users don't understand that they need to add the Intel MKL's
+   # folders to their PATH to use the Intel MKL.  They then complain on the
+   # dlib forums.  Copying the Intel MKL dlls to the output directory removes
+   # the need to add the Intel MKL to the PATH.
+   if (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+      add_custom_command(TARGET dlib POST_BUILD
+         COMMAND ${CMAKE_COMMAND} -E copy "${mkl_iomp_dll}" ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+         )
+   else()
+      add_custom_command(TARGET dlib POST_BUILD
+         COMMAND ${CMAKE_COMMAND} -E copy "${mkl_iomp_dll}" ${CMAKE_BINARY_DIR}/$<CONFIG>
+         )
+   endif()
 endif()
 
 add_library(dlib::dlib ALIAS dlib)
