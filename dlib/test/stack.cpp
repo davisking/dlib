@@ -15,7 +15,6 @@ namespace
 
     using namespace test;
     using namespace dlib;
-    using namespace std;
 
     logger dlog("test.stack");
 
@@ -220,10 +219,10 @@ namespace
 
             // serialize the state of a2, then clear a2, then
             // load the state back into a2.
-            ostringstream sout;
+            std::ostringstream sout;
             serialize(a2,sout);
             DLIB_TEST(a2.at_start() == true);
-            istringstream sin(sout.str());
+            std::istringstream sin(sout.str());
             a2.clear();
             deserialize(a2,sin);
 
