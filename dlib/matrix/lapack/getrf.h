@@ -14,11 +14,11 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dgetrf) (integer* m, integer *n, double *a, 
-                                             integer* lda, integer *ipiv, integer *info);
+                void DLIB_FORTRAN_ID(dgetrf) (const integer *m, const integer *n, double *a, 
+                                              const integer *lda, integer *ipiv, integer *info);
 
-                void DLIB_FORTRAN_ID(sgetrf) (integer* m, integer *n, float *a, 
-                                             integer* lda, integer *ipiv, integer *info);
+                void DLIB_FORTRAN_ID(sgetrf) (const integer *m, const integer *n, float *a, 
+                                              const integer *lda, integer *ipiv, integer *info);
 
             }
 

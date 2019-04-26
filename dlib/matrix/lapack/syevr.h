@@ -14,17 +14,17 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dsyevr) (char *jobz, char *range, char *uplo, integer *n, 
-                                              double *a, integer *lda, double *vl, double *vu, integer * il, 
-                                              integer *iu, double *abstol, integer *m, double *w, 
-                                              double *z_, integer *ldz, integer *isuppz, double *work, 
-                                              integer *lwork, integer *iwork, integer *liwork, integer *info);
+                void DLIB_FORTRAN_ID(dsyevr) (const char *jobz, const char *range, const char *uplo, const integer *n, 
+                                              double *a, const integer *lda, const double *vl, const double *vu, const integer *il, 
+                                              const integer *iu, const double *abstol, integer *m, double *w, 
+                                              double *z_, const integer *ldz, integer *isuppz, double *work, 
+                                              const integer *lwork, integer *iwork, const integer *liwork, integer *info);
 
-                void DLIB_FORTRAN_ID(ssyevr) (char *jobz, char *range, char *uplo, integer *n, 
-                                              float *a, integer *lda, float *vl, float *vu, integer * il, 
-                                              integer *iu, float *abstol, integer *m, float *w, 
+                void DLIB_FORTRAN_ID(ssyevr) (const char *jobz, const char *range, const char *uplo, const integer *n, 
+                                              float *a, const integer *lda, const float *vl, const float *vu, const integer *il, 
+                                              const integer *iu, const float *abstol, integer *m, float *w, 
                                               float *z_, integer *ldz, integer *isuppz, float *work, 
-                                              integer *lwork, integer *iwork, integer *liwork, integer *info);
+                                              const integer *lwork, integer *iwork, const integer *liwork, integer *info);
             }
 
             inline int syevr (char jobz, char range, char uplo, integer n, 

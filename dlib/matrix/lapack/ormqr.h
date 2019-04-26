@@ -14,14 +14,14 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dormqr) (char *side, char *trans, integer *m, integer *n, 
-                                              integer *k, const double *a, integer *lda, const double *tau, 
-                                              double * c_, integer *ldc, double *work, integer *lwork, 
+                void DLIB_FORTRAN_ID(dormqr) (const char *side, const char *trans, const integer *m, const integer *n, 
+                                              const integer *k, const double *a, const integer *lda, const double *tau, 
+                                              double * c_, const integer *ldc, double *work, const integer *lwork, 
                                               integer *info);
 
-                void DLIB_FORTRAN_ID(sormqr) (char *side, char *trans, integer *m, integer *n, 
-                                              integer *k, const float *a, integer *lda, const float *tau, 
-                                              float * c_, integer *ldc, float *work, integer *lwork, 
+                void DLIB_FORTRAN_ID(sormqr) (const char *side, const char *trans, const integer *m, const integer *n, 
+                                              const integer *k, const float *a, const integer *lda, const float *tau, 
+                                              float * c_, const integer *ldc, float *work, const integer *lwork, 
                                               integer *info);
 
             }

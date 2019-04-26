@@ -14,15 +14,15 @@ namespace dlib
         {
             extern "C"
             {
-                void DLIB_FORTRAN_ID(dgeev) (char *jobvl, char *jobvr, integer *n, double * a, 
-                                             integer *lda, double *wr, double *wi, double *vl, 
-                                             integer *ldvl, double *vr, integer *ldvr, double *work, 
-                                             integer *lwork, integer *info);
+                void DLIB_FORTRAN_ID(dgeev) (const char *jobvl, const char *jobvr, const integer *n, double * a, 
+                                             const integer *lda, double *wr, double *wi, double *vl, 
+                                             const integer *ldvl, double *vr, const integer *ldvr, double *work, 
+                                             const integer *lwork, integer *info);
 
-                void DLIB_FORTRAN_ID(sgeev) (char *jobvl, char *jobvr, integer *n, float * a, 
-                                             integer *lda, float *wr, float *wi, float *vl, 
-                                             integer *ldvl, float *vr, integer *ldvr, float *work, 
-                                             integer *lwork, integer *info);
+                void DLIB_FORTRAN_ID(sgeev) (const char *jobvl, const char *jobvr, const integer *n, float * a, 
+                                             const integer *lda, float *wr, float *wi, float *vl, 
+                                             const integer *ldvl, float *vr, const integer *ldvr, float *work, 
+                                             const integer *lwork, integer *info);
 
             }
 
