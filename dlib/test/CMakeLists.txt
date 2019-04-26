@@ -168,6 +168,9 @@ ADD_EXECUTABLE(${target_name} main.cpp tester.cpp ${tests})
 # Turn on all warnings when using gcc.
 if (CMAKE_COMPILER_IS_GNUCXX)
    add_definitions("-W -Wall")
+   # I don't care about unused testing functions though.  I like to keep them
+   # around.  Don't warn about it.
+   add_definitions("-Wno-unused-function")
 endif()
 
 
