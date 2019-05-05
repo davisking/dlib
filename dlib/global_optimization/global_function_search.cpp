@@ -896,7 +896,6 @@ namespace dlib
         size_t num
     )
     {
-        DLIB_CASSERT(0 <= num);
         num_random_samples = num;
     }
 
