@@ -293,7 +293,6 @@ namespace dlib
 
         typedef matrix<unsigned char> input_type;
         typedef PYRAMID_TYPE pyramid_type;
-
         input_grayscale_image_pyramid (
         );
         /*!
