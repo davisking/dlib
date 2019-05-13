@@ -105,7 +105,7 @@ namespace dlib
             double, 
             compute_object_score,
             ( const matrix<double,0,1>& w, const rectangle& obj) const
-        );
+        )
 
         template <typename fe_type>
         typename enable_if<has_compute_object_score<fe_type> >::type compute_all_rect_scores (
