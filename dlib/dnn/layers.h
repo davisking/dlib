@@ -2241,12 +2241,14 @@ namespace dlib
             if (version != "add_prev_")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::add_prev_.");
         }
-
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-parameter"
         friend std::ostream& operator<<(std::ostream& out, const add_prev_& item)
         {
             out << "add_prev"<<id;
             return out;
         }
+        #pragma GCC diagnostic pop
 
         friend void to_xml(const add_prev_& item, std::ostream& out)
         {
