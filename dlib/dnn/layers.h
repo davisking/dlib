@@ -2241,8 +2241,7 @@ namespace dlib
             if (version != "add_prev_")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::add_prev_.");
         }
-
-        friend std::ostream& operator<<(std::ostream& out, const add_prev_& item)
+        friend std::ostream& operator<<(std::ostream& out, const add_prev_& )
         {
             out << "add_prev"<<id;
             return out;

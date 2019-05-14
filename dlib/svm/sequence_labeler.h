@@ -64,7 +64,7 @@ namespace dlib
             bool, 
             template reject_labeling<matrix<unsigned long> >,
             (const typename T::sequence_type&, const matrix_exp<matrix<unsigned long> >&, unsigned long)const
-        );
+        )
 
         template <typename feature_extractor, typename EXP, typename sequence_type>
         typename enable_if<has_reject_labeling<feature_extractor>,bool>::type call_reject_labeling_if_exists (
