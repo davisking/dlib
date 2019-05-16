@@ -2464,13 +2464,13 @@ namespace dlib
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::resize_prev_to_tagged_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const resize_prev_to_tagged_& item)
+        friend std::ostream& operator<<(std::ostream& out, const resize_prev_to_tagged_& )
         {
             out << "resize_prev_to_tagged"<<id;
             return out;
         }
 
-        friend void to_xml(const resize_prev_to_tagged_& item, std::ostream& out)
+        friend void to_xml(const resize_prev_to_tagged_& , std::ostream& out)
         {
             out << "<resize_prev_to_tagged tag='"<<id<<"'/>\n";
         }
@@ -3127,14 +3127,14 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const concat_& item, std::ostream& out)
+        friend void serialize(const concat_& , std::ostream& out)
         {
             serialize("concat_", out);
             size_t count = tag_count();
             serialize(count, out);
         }
 
-        friend void deserialize(concat_& item, std::istream& in)
+        friend void deserialize(concat_& , std::istream& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3148,7 +3148,7 @@ namespace dlib
                                                   " found while deserializing dlib::concat_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const concat_& item)
+        friend std::ostream& operator<<(std::ostream& out, const concat_& )
         {
             out << "concat\t (";
             list_tags(out);
@@ -3156,7 +3156,7 @@ namespace dlib
             return out;
         }
 
-        friend void to_xml(const concat_& item, std::ostream& out)
+        friend void to_xml(const concat_& , std::ostream& out)
         {
             out << "<concat tags='";
             list_tags(out);
