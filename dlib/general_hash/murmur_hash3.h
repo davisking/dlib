@@ -24,7 +24,7 @@ namespace dlib
     // Microsoft Visual Studio
 
 
-#if (defined(__GNUC__) || defined(__clang__))
+#if ((defined(__GNUC__) && __GNUC__ >= 7) || defined(__clang__))
 #define DLIB_FALLTHROUGH [[fallthrough]]
 #else
 #define DLIB_FALLTHROUGH 
