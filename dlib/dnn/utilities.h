@@ -136,7 +136,7 @@ namespace dlib
             dpoint& p;
 
             template<typename input_layer_type>
-            void operator()(const input_layer_type& net) 
+            void operator()(const input_layer_type& ) 
             {
             }
 
@@ -196,7 +196,7 @@ namespace dlib
             dpoint& p;
 
             template<typename input_layer_type>
-            void operator()(const input_layer_type& net) 
+            void operator()(const input_layer_type& ) 
             {
             }
 
