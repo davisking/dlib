@@ -65,6 +65,19 @@ namespace dlib
                   us from loading the given JPEG file.
         !*/
 
+        jpeg_loader( 
+            unsigned char* imgbuffer,
+            size_t buffersize
+        );
+        /*!
+            ensures
+                - loads the JPEG from memory imgbuffer of size buffersize into this object
+            throws
+                - image_load_error
+                  This exception is thrown if there is some error that prevents
+                  us from loading the given JPEG buffer.
+        !*/
+
         ~jpeg_loader(
         );
         /*!
@@ -123,6 +136,22 @@ namespace dlib
               dlib/image_processing/generic_image.h 
         ensures
             - performs: jpeg_loader(file_name).get_image(image);
+    !*/
+
+    template <
+        typename image_type
+        >
+    void load_jpeg (
+        image_type& image,
+        unsigned char* imgbuff,
+        size_t imgbuffsize
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+        ensures
+            - performs: jpeg_loader(imgbuff, imgbuffsize).get_image(image);
     !*/
 
 // ----------------------------------------------------------------------------------------

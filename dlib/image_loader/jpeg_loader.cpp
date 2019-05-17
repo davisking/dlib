@@ -27,7 +27,7 @@ namespace dlib
     jpeg_loader::
     jpeg_loader( const char* filename ) : height_( 0 ), width_( 0 ), output_components_(0)
     {
-        read_image( filename );
+        read_image( check_file( filename ), NULL, 0L );
     }
 
 // ----------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ namespace dlib
     jpeg_loader::
     jpeg_loader( const std::string& filename ) : height_( 0 ), width_( 0 ), output_components_(0)
     {
-        read_image( filename.c_str() );
+        read_image( check_file( filename.c_str() ), NULL, 0L );
     }
 
 // ----------------------------------------------------------------------------------------
@@ -43,7 +43,15 @@ namespace dlib
     jpeg_loader::
     jpeg_loader( const dlib::file& f ) : height_( 0 ), width_( 0 ), output_components_(0)
     {
-        read_image( f.full_name().c_str() );
+        read_image( check_file( f.full_name().c_str() ), NULL, 0L );
+    }
+
+// ----------------------------------------------------------------------------------------
+    
+    jpeg_loader::
+    jpeg_loader( unsigned char* imgbuffer, size_t imgbuffersize ) : height_( 0 ), width_( 0 ), output_components_(0)
+    {
+        read_image( NULL, imgbuffer, imgbuffersize );
     }
 
 // ----------------------------------------------------------------------------------------
@@ -85,19 +93,25 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-
-    void jpeg_loader::read_image( const char* filename )
+    FILE * jpeg_loader::check_file( const char* filename )
     {
-        if ( filename == NULL )
-        {
-            throw image_load_error("jpeg_loader: invalid filename, it is NULL");
-        }
-        FILE *fp = fopen( filename, "rb" );
-        if ( !fp )
-        {
-            throw image_load_error(std::string("jpeg_loader: unable to open file ") + filename);
-        }
+      if ( filename == NULL )
+      {
+          throw image_load_error("jpeg_loader: invalid filename, it is NULL");
+      }
+      FILE *fp = fopen( filename, "rb" );
+      if ( !fp )
+      {
+          throw image_load_error(std::string("jpeg_loader: unable to open file ") + filename);
+      }
+      return fp;
+    }
 
+// ----------------------------------------------------------------------------------------
+
+    void jpeg_loader::read_image( FILE * file, unsigned char* imgbuffer, size_t imgbuffersize )
+    {
+        
         jpeg_decompress_struct cinfo;
         jpeg_loader_error_mgr jerr;
 
@@ -109,17 +123,19 @@ namespace dlib
         if (setjmp(jerr.setjmp_buffer)) 
         {
             /* If we get here, the JPEG code has signaled an error.
-             * We need to clean up the JPEG object, close the input file, and return.
+             * We need to clean up the JPEG object, and return.
              */
             jpeg_destroy_decompress(&cinfo);
-            fclose(fp);
-            throw image_load_error(std::string("jpeg_loader: error while reading ") + filename);
+            if (file != NULL) fclose(file);
+            throw image_load_error(std::string("jpeg_loader: error while loading image"));
         }
 
 
         jpeg_create_decompress(&cinfo);
-
-        jpeg_stdio_src(&cinfo, fp);
+        
+        if (file != NULL) jpeg_stdio_src(&cinfo, file);
+        else if (imgbuffer != NULL) jpeg_mem_src(&cinfo, imgbuffer, imgbuffersize);
+        else throw image_load_error(std::string("jpeg_loader: no valid image source"));
 
         jpeg_read_header(&cinfo, TRUE);
 
@@ -133,10 +149,10 @@ namespace dlib
             output_components_ != 3 &&
             output_components_ != 4)
         {
-            fclose( fp );
+            if (file != NULL) fclose(file);
             jpeg_destroy_decompress(&cinfo);
             std::ostringstream sout;
-            sout << "jpeg_loader: Unsupported number of colors (" << output_components_ << ") in file " << filename;
+            sout << "jpeg_loader: Unsupported number of colors (" << output_components_ << ") in image";
             throw image_load_error(sout.str());
         }
 
@@ -159,7 +175,7 @@ namespace dlib
         jpeg_finish_decompress(&cinfo);
         jpeg_destroy_decompress(&cinfo);
 
-        fclose( fp );
+        if (file != NULL) fclose(file);
     }
 
 // ----------------------------------------------------------------------------------------
