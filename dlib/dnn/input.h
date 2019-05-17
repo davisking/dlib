@@ -721,7 +721,7 @@ namespace dlib
                 resizable_tensor& data
         ) const
         {
-	        this->to_tensor_init(ibegin, iend, data, 1);
+            this->to_tensor_init(ibegin, iend, data, 1);
 
             const auto rects = data.annotation().get<std::vector<rectangle>>();
             if (rects.size() == 0)
@@ -729,7 +729,7 @@ namespace dlib
 
             // copy the first raw image into the top part of the tiled pyramid.  We need to
             // do this for each of the input images/samples in the tensor.
-	        auto ptr = data.host_write_only();
+            auto ptr = data.host_write_only();
             for (auto i = ibegin; i != iend; ++i)
             {
                 auto& img = *i;
@@ -820,15 +820,15 @@ namespace dlib
             resizable_tensor& data
         ) const
         {
-	        this->to_tensor_init(ibegin, iend, data, 3);
+            this->to_tensor_init(ibegin, iend, data, 3);
 
-	        const auto rects = data.annotation().get<std::vector<rectangle>>();
-	        if (rects.size() == 0)
-		        return;
+            const auto rects = data.annotation().get<std::vector<rectangle>>();
+            if (rects.size() == 0)
+                return;
 
-	        // copy the first raw image into the top part of the tiled pyramid.  We need to
+            // copy the first raw image into the top part of the tiled pyramid.  We need to
             // do this for each of the input images/samples in the tensor.
-	        auto ptr = data.host_write_only();
+            auto ptr = data.host_write_only();
             for (auto i = ibegin; i != iend; ++i)
             {
                 auto& img = *i;
@@ -863,7 +863,7 @@ namespace dlib
                 ptr += data.nc()*(data.nr()-rects[0].bottom()-1);
             }
 
-	        this->create_tiled_pyramid(rects, data);
+            this->create_tiled_pyramid(rects, data);
         }
 
         friend void serialize(const input_rgb_image_pyramid& item, std::ostream& out)
