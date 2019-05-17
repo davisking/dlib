@@ -591,10 +591,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename PYRAMID_TYPE>
-    class input_grayscale_image_pyramid
+    class input_image_pyramid
     {
     public:
-        typedef matrix<unsigned char> input_type;
+
+        virtual ~input_image_pyramid() = 0;
+
         typedef PYRAMID_TYPE pyramid_type;
 
         unsigned long get_pyramid_padding () const { return pyramid_padding; }
@@ -632,6 +634,23 @@ namespace dlib
             auto&& rects = any_cast<std::vector<rectangle>>(data.annotation());
             return image_to_tiled_pyramid<pyramid_type>(rects, scale, r);
         }
+
+    protected:
+        unsigned long pyramid_padding = 10;
+        unsigned long pyramid_outer_padding = 11;
+    };
+
+    template <typename PYRAMID_TYPE>
+    input_image_pyramid<PYRAMID_TYPE>::~input_image_pyramid() {}
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename PYRAMID_TYPE>
+    class input_grayscale_image_pyramid : public input_image_pyramid<PYRAMID_TYPE>
+    {
+    public:
+        typedef matrix<unsigned char> input_type;
+        typedef PYRAMID_TYPE pyramid_type;
 
         template <typename forward_iterator>
         void to_tensor (
@@ -739,14 +758,14 @@ namespace dlib
         }
 
     private:
-        unsigned long pyramid_padding = 10;
-        unsigned long pyramid_outer_padding = 11;
+        using input_image_pyramid<PYRAMID_TYPE>::pyramid_padding;
+        using input_image_pyramid<PYRAMID_TYPE>::pyramid_outer_padding;
     };
 
 // ----------------------------------------------------------------------------------------
 
     template <typename PYRAMID_TYPE>
-    class input_rgb_image_pyramid
+    class input_rgb_image_pyramid : public input_image_pyramid<PYRAMID_TYPE>
     {
     public:
         typedef matrix<rgb_pixel> input_type;
@@ -770,42 +789,6 @@ namespace dlib
         float get_avg_red()   const { return avg_red; }
         float get_avg_green() const { return avg_green; }
         float get_avg_blue()  const { return avg_blue; }
-
-        unsigned long get_pyramid_padding () const { return pyramid_padding; }
-        void set_pyramid_padding (unsigned long value) { pyramid_padding = value; }
-
-        unsigned long get_pyramid_outer_padding () const { return pyramid_outer_padding; }
-        void set_pyramid_outer_padding (unsigned long value) { pyramid_outer_padding = value; }
-
-        bool image_contained_point (
-            const tensor& data,
-            const point& p
-        ) const
-        {
-            auto&& rects = any_cast<std::vector<rectangle>>(data.annotation());
-            DLIB_CASSERT(rects.size() > 0);
-            return rects[0].contains(p+rects[0].tl_corner());
-        }
-
-        drectangle tensor_space_to_image_space (
-            const tensor& data,
-            drectangle r
-        ) const
-        {
-            auto&& rects = any_cast<std::vector<rectangle>>(data.annotation());
-            return tiled_pyramid_to_image<pyramid_type>(rects, r);
-        }
-
-        drectangle image_space_to_tensor_space (
-            const tensor& data,
-            double scale,
-            drectangle r 
-        ) const
-        {
-            DLIB_CASSERT(0 < scale && scale <= 1 , "scale: "<< scale);
-            auto&& rects = any_cast<std::vector<rectangle>>(data.annotation());
-            return image_to_tiled_pyramid<pyramid_type>(rects, scale, r);
-        }
 
         template <typename forward_iterator>
         void to_tensor (
@@ -948,11 +931,12 @@ namespace dlib
         }
 
     private:
+        using input_image_pyramid<PYRAMID_TYPE>::pyramid_padding;
+        using input_image_pyramid<PYRAMID_TYPE>::pyramid_outer_padding;
+
         float avg_red;
         float avg_green;
         float avg_blue;
-        unsigned long pyramid_padding = 10;
-        unsigned long pyramid_outer_padding = 11;
     };
 
 // ----------------------------------------------------------------------------------------
