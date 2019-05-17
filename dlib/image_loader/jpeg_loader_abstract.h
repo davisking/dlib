@@ -67,7 +67,7 @@ namespace dlib
 
         jpeg_loader( 
             unsigned char* imgbuffer,
-            long buffersize
+            size_t buffersize
         );
         /*!
             ensures
@@ -144,7 +144,7 @@ namespace dlib
     void load_jpeg (
         image_type& image,
         unsigned char* imgbuff,
-        long imgbuffsize
+        size_t imgbuffsize
     );
     /*!
         requires
