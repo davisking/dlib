@@ -81,12 +81,16 @@ namespace dlib
     {
         jpeg_error_mgr pub;    /* "public" fields */
         jmp_buf setjmp_buffer;  /* for return to caller */
+        char jpegLastErrorMsg[JMSG_LENGTH_MAX];
     };
 
     void jpeg_loader_error_exit (j_common_ptr cinfo)
     {
         /* cinfo->err really points to a jpeg_loader_error_mgr struct, so coerce pointer */
         jpeg_loader_error_mgr* myerr = (jpeg_loader_error_mgr*) cinfo->err;
+        
+        /* Create the message */
+        ( *( cinfo->err->format_message ) ) ( cinfo, myerr->jpegLastErrorMsg );
 
         /* Return control to the setjmp point */
         longjmp(myerr->setjmp_buffer, 1);
@@ -127,7 +131,7 @@ namespace dlib
              */
             jpeg_destroy_decompress(&cinfo);
             if (file != NULL) fclose(file);
-            throw image_load_error(std::string("jpeg_loader: error while loading image"));
+            throw image_load_error(std::string("jpeg_loader: error while loading image: ") + jerr.jpegLastErrorMsg);
         }
 
 
