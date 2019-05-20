@@ -520,7 +520,6 @@ if (NOT TARGET dlib)
               external/libjpeg/jcparam.c
               external/libjpeg/jcprepct.c
               external/libjpeg/jcsample.c
-              external/libjpeg/jctrans.c
               external/libjpeg/jdapimin.c
               external/libjpeg/jdapistd.c
               external/libjpeg/jdarith.c
@@ -537,37 +536,18 @@ if (NOT TARGET dlib)
               external/libjpeg/jdmerge.c
               external/libjpeg/jdpostct.c
               external/libjpeg/jdsample.c
-              external/libjpeg/jdtrans.c
               external/libjpeg/jerror.c
-              external/libjpeg/jerror.h
               external/libjpeg/jfdctflt.c
               external/libjpeg/jfdctfst.c
               external/libjpeg/jfdctint.c
               external/libjpeg/jidctflt.c
               external/libjpeg/jidctfst.c
               external/libjpeg/jidctint.c
-              external/libjpeg/jinclude.h
               external/libjpeg/jmemmgr.c
               external/libjpeg/jmemnobs.c
-              external/libjpeg/jpegtran.c
               external/libjpeg/jquant1.c
               external/libjpeg/jquant2.c
               external/libjpeg/jutils.c
-              external/libjpeg/rdbmp.c
-              external/libjpeg/rdcolmap.c
-              external/libjpeg/rdgif.c
-              external/libjpeg/rdjpgcom.c
-              external/libjpeg/rdppm.c
-              external/libjpeg/rdrle.c
-              external/libjpeg/rdswitch.c
-              external/libjpeg/rdtarga.c
-              external/libjpeg/transupp.c
-              external/libjpeg/wrbmp.c
-              external/libjpeg/wrgif.c
-              external/libjpeg/wrjpgcom.c
-              external/libjpeg/wrppm.c
-              external/libjpeg/wrrle.c
-              external/libjpeg/wrtarga.c
                )
          endif()
          set(source_files ${source_files}
