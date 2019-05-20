@@ -547,9 +547,7 @@ if (NOT TARGET dlib)
               external/libjpeg/jidctfst.c
               external/libjpeg/jidctint.c
               external/libjpeg/jinclude.h
-              external/libjpeg/jmemansi.c
               external/libjpeg/jmemmgr.c
-              external/libjpeg/jmemname.c
               external/libjpeg/jmemnobs.c
               external/libjpeg/jpegtran.c
               external/libjpeg/jquant1.c
