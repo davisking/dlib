@@ -284,7 +284,7 @@ namespace dlib
 
             WHAT THIS OBJECT REPRESENTS
                 This input layer works with gray scale images of type matrix<unsigned char>.
-                It is identical to input except that it outputs a tensor containing a tiled
+                It is identical to input layer except that it outputs a tensor containing a tiled
                 image pyramid of each input image rather than a simple copy of each image.
                 The tiled image pyramid is created using create_tiled_pyramid().
         !*/
