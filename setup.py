@@ -232,8 +232,7 @@ setup(
     ext_modules=[CMakeExtension('dlib','tools/python')],
     cmdclass=dict(build_ext=CMakeBuild, test=PyTest),
     zip_safe=False,
-    # We need an older more-itertools version because v6 broke pytest (for everyone, not just dlib)
-    tests_require=['pytest==3.8', 'more-itertools<6.0.0'],
+    tests_require=['pytest==3.8'],
     #install_requires=['cmake'], # removed because the pip cmake package is busted, maybe someday it will be usable.
     packages=['dlib'],
     keywords=['dlib', 'Computer Vision', 'Machine Learning'],
