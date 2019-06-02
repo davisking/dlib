@@ -13,5 +13,5 @@ recursive-include dlib **
 recursive-include python_examples *.txt *.py 
 recursive-include tools/python **
 
-prune tools/python/build*/
-prune dlib/test/
+prune tools/python/build*
+prune dlib/test
