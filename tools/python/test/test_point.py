@@ -16,6 +16,14 @@ def test_point():
     assert deser.x == p.x
     assert deser.y == p.y
 
+def test_point_assignment():
+    p = point(27, 42)
+    p.x = 16
+    assert p.x == 16
+    assert p.y == 42
+    p.y = 31
+    assert p.x == 16
+    assert p.y == 31
 
 def test_point_init_kwargs():
     p = point(y=27, x=42)

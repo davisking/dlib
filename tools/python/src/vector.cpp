@@ -432,7 +432,7 @@ void bind_vector(py::module& m)
             .def(double() * py::self)
             .def("normalize", &type::normalize, "Returns a unit normalized copy of this vector.")
             .def_property("x", &point_x, [](point& p, long x){p.x()=x;}, "The x-coordinate of the point.")
-            .def_property("y", &point_y, [](point& p, long y){p.x()=y;}, "The y-coordinate of the point.")
+            .def_property("y", &point_y, [](point& p, long y){p.y()=y;}, "The y-coordinate of the point.")
             .def(py::pickle(&getstate<type>, &setstate<type>));
     }
     {
