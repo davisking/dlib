@@ -131,7 +131,7 @@ namespace dlib
             _oversampling_amount = amount;
         }
 
-        unsigned long get_oversampling_translation_jitter (
+        double get_oversampling_translation_jitter (
         ) const { return _oversampling_translation_jitter; }
 
         void set_oversampling_translation_jitter (

@@ -163,7 +163,7 @@ namespace dlib
                 - #get_oversampling_amount() == amount
         !*/
 
-        unsigned long get_oversampling_translation_jitter (
+        double get_oversampling_translation_jitter (
         ) const; 
         /*!
             ensures
