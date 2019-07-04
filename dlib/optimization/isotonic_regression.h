@@ -60,7 +60,7 @@ namespace dlib
             // Unpack blocks to output, but here instead of producing the step function
             // output we linearly interpolate.  Note that this actually fits the data less
             // than the step-function, but in many applications might be closer to what you
-            // really when when using isotonic_regression than the step function.
+            // really want when using isotonic_regression than the step function.
             for (size_t i = 0; i < blocks.size(); ++i)
             {
                 auto& block = blocks[i];

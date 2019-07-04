@@ -34,7 +34,7 @@ namespace dlib
             requires
                 - [begin,end) is an iterator range of float or doubles or a range of
                   std::pair<T,double> or std::pair<T,float> where T an be anything.
-                - obegin points to an iterator range at least std::distance(begin,end). 
+                - obegin points to an iterator range at least std::distance(begin,end) elements. 
                 - obegin points to an iterator range of objects of type float, double, std::pair<T,float>, or std::pair<T,double>.
             ensures
                 - Given the range of real values stored in [begin,end), this method performs isotonic regression
@@ -91,7 +91,7 @@ namespace dlib
                 - obegin points to an iterator range of objects of type float, double, std::pair<T,float>, or std::pair<T,double>.
             ensures
                 - This function behaves just like (*this)(begin,end,obegin) except that the
-                  output is interpolated.  To explain, not that the optimal output of
+                  output is interpolated.  To explain, note that the optimal output of
                   isotonic regression is a step function.  However, in many applications
                   that isn't really what you want.  You want something smoother.  So
                   fit_with_linear_output_interpolation() does isotonic regression and then
