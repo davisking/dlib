@@ -6,6 +6,7 @@
 #include "isotonic_regression_abstract.h"
 #include <vector>
 #include <utility>
+#include <cstddef>
 
 namespace dlib
 {
