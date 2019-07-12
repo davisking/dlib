@@ -50,7 +50,7 @@ namespace dlib
         typedef uint64 result_type;
 
         template <typename vector_type>
-        result_type perator() (
+        result_type operator() (
             const vector_type& v
         ) const;
         /*!
@@ -116,7 +116,7 @@ namespace dlib
         typedef std::pair<uint64,uint64> result_type;
 
         template <typename vector_type>
-        result_type perator() (
+        result_type operator() (
             const vector_type& v
         ) const;
         /*!
@@ -184,7 +184,7 @@ namespace dlib
         typedef std::pair<hash128_type,hash128_type> result_type;
 
         template <typename vector_type>
-        result_type perator() (
+        result_type operator() (
             const vector_type& v
         ) const;
         /*!
@@ -252,7 +252,7 @@ namespace dlib
         typedef std::pair<hash256_type,hash256_type> result_type;
 
         template <typename vector_type>
-        result_type perator() (
+        result_type operator() (
             const vector_type& v
         ) const;
         /*!
