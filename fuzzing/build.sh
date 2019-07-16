@@ -13,14 +13,14 @@ echo $me: root=$root
 
 here=$(pwd)
 
-CXXFLAGSALL="-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION= -g"
+CXXFLAGSALL="-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION= -g -std=c++1z"
 CMAKEFLAGSALL="$root -GNinja -DCMAKE_BUILD_TYPE=Debug"
 
 #builds fuzzers for local fuzzing with libfuzzer with asan+usan
 builddir=$here/build-fuzzers-libfuzzer
 mkdir -p $builddir
 cd $builddir
-CXX="clang++" \
+CXX="clang++-7" \
 CXXFLAGS="$CXXFLAGSALL -fsanitize=fuzzer-no-link,address,undefined" \
 cmake $CMAKEFLAGSALL -DCMAKE_BUILD_TYPE=Debug $fuzzdir
 
