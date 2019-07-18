@@ -1223,6 +1223,7 @@ namespace dlib
             c1.b = src.blue/255.0;
             c2 = RGB2HSL(c1);
 
+            // runtime error: -14.6786 is outside the range of representable values of type 'unsigned char'
             dest.h = static_cast<unsigned char>(c2.h/360.0*255.0 + 0.5);
             dest.s = static_cast<unsigned char>(c2.s*255.0 + 0.5);
             dest.i = static_cast<unsigned char>(c2.l*255.0 + 0.5);

@@ -111,7 +111,7 @@ namespace dlib
                     << "\n\tcolumn:  " << column 
                     << "\n\tnc(): " << nc()
                 );
-
+                DLIB_ASSERT(data);
                 return data[column]; 
             }
 
