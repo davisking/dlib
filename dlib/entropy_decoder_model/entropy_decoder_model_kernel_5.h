@@ -244,6 +244,20 @@ namespace dlib
 
         inline void clear_exclusions (
         );
+
+        struct HangChecker {
+            // returns true if the process seems to have hung
+            bool operator()() {
+                ++count;
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+                if(count > 10000) {
+                    throw std::runtime_error("fuzzing - hangchecker triggered");
+                }
+#endif
+                return false;
+            }
+          std::size_t count=0;
+        };
         /*!
             ensures
                 - for all symbols #is_excluded(symbol) == false
@@ -251,7 +265,8 @@ namespace dlib
         !*/
 
         inline void scale_counts (
-            node* n
+            node* n,
+            HangChecker& hangcheck
         );
         /*!
             ensures
@@ -357,6 +372,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+
     template <
         unsigned long alphabet_size,
         typename entropy_decoder,
@@ -368,6 +384,7 @@ namespace dlib
         unsigned long& symbol
     )
     {        
+        HangChecker hangcheck;
         node* temp = cur;
         cur = 0;
         unsigned long low_count, high_count, total_count;
@@ -385,7 +402,7 @@ namespace dlib
         if (something_is_excluded())
             clear_exclusions();
 
-        while (true)
+        while (!hangcheck())
         {            
             high_count = 0;
             if (space_left())
@@ -397,7 +414,7 @@ namespace dlib
                     // check if we need to scale the counts
                     if (total_count > 10000)
                     {
-                        scale_counts(temp);
+                        scale_counts(temp,hangcheck);
                         total_count = temp->total;
                     }
 
@@ -405,7 +422,7 @@ namespace dlib
                     {
                         node* n = temp->child_context;
                         total_count = temp->escapes;
-                        while (true)
+                        while (!hangcheck())
                         {
                             if (is_excluded(n->symbol) == false)
                             {
@@ -425,7 +442,7 @@ namespace dlib
                     // end of the context set
                     node* n = temp->child_context;
                     node* last = 0;   
-                    while (true)
+                    while (!hangcheck())
                     {
                         if (is_excluded(n->symbol) == false)
                         {
@@ -574,7 +591,7 @@ namespace dlib
         // initialize the counts and symbol for any new nodes we have added
         // to the tree.
         node* n, *nc;
-        while (stack_size > 0)
+        while (stack_size > 0 && !hangcheck())
         {            
             pop(n,nc);        
 
@@ -602,10 +619,10 @@ namespace dlib
                 nc->escapes = 4;
                 nc->total = n->count + 4;
             }
-        
-            while (nc->total > 10000)
+
+            while (nc->total > 10000 && !hangcheck())
             {
-                scale_counts(nc);
+                scale_counts(nc,hangcheck);
             }
         }
     }
@@ -766,7 +783,8 @@ namespace dlib
         >
     void entropy_decoder_model_kernel_5<alphabet_size,entropy_decoder,total_nodes,order>::
     scale_counts (
-        node* temp
+        node* temp,
+        HangChecker& hangchecker
     )
     {
         if (temp->escapes > 1)
@@ -774,7 +792,7 @@ namespace dlib
         temp->total = temp->escapes;
 
         node* n = temp->child_context;
-        while (n != 0)
+        while (n != 0 && !hangchecker())
         {
             if (n->count > 1)
                 n->count >>= 1;
