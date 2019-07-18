@@ -250,7 +250,7 @@ namespace dlib
             bool operator()() {
                 ++count;
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
-                if(count > 10000) {
+                if(count > 1000) {
                     throw std::runtime_error("fuzzing - hangchecker triggered");
                 }
 #endif
