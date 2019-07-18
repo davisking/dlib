@@ -25,7 +25,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size) {
 
     dlib::array2d<dlib::rgb_pixel> img;
 
-    TempFile tmpfile(Data,Size,".bmp");
+    TempFile tmpfile(Data,Size,"bin");
 
     try {
         dlib::load_image(img, tmpfile.m_name.c_str());
