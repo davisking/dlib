@@ -245,6 +245,18 @@ namespace dlib
         inline void clear_exclusions (
         );
 
+        /*!
+            Helper for making sure parsing is not stuck -
+            problematic input may appear to hang the image parser
+            and during fuzzing, one wants to cut out early, to get
+            the fuzzing speed up. In production, one might want to
+            set a finite but high value for the limit.
+
+            Instead of while(true){...} use while(!checker()) {...}
+            and each time the counter is incremented, until the point it
+            the counter exceeds some threshold.
+        !*/
+
         struct HangChecker {
             // returns true if the process seems to have hung
             bool operator()() {
@@ -253,11 +265,14 @@ namespace dlib
                 if(count > 1000) {
                     throw std::runtime_error("fuzzing - hangchecker triggered");
                 }
+#else
+                // production - no limit as of now.
 #endif
                 return false;
             }
           std::size_t count=0;
         };
+
         /*!
             ensures
                 - for all symbols #is_excluded(symbol) == false
