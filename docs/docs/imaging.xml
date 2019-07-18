@@ -1175,8 +1175,8 @@
          <file>dlib/image_io.h</file>
          <spec_file link="true">dlib/image_loader/load_image_abstract.h</spec_file>
          <description>        
-            This global function takes a file name, looks at its extension, and 
-            then loads it into an <a href="containers.html#array2d">array2d</a> of 
+            This global function takes a file name and
+            loads it into an <a href="containers.html#array2d">array2d</a> of
             <a href="dlib/pixel.h.html">pixels</a> using the appropriate image 
             loading routine.  The supported types are BMP, PNG, JPEG, GIF, and the dlib DNG file format. 
 
