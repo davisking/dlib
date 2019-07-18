@@ -1081,6 +1081,13 @@ namespace dlib
         { 
             unsigned long size;
             deserialize(size,in); 
+            // size can be anything here - don't blindly allocate
+            // that much memory.
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+            if(size>1000000) {
+            throw std::runtime_error("wont allocate that much memory");
+            }
+#endif
             item.resize(size);
             if (item.size() != 0)
                 in.read(&item[0], item.size());
