@@ -1080,9 +1080,13 @@ namespace dlib
         try 
         { 
             unsigned long size;
-            deserialize(size,in); 
+            deserialize(size,in);
+            // Possible bug:
             // size can be anything here - don't blindly allocate
-            // that much memory.
+            // that much memory - maybe the file isn't even that long.
+            // Perhaps it would be wise to allocate up to a certain amount,
+            // and if the file is still not exhausted, keep growing
+            // block wise.
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
             if(size>1000000) {
             throw std::runtime_error("wont allocate that much memory");
@@ -1091,6 +1095,8 @@ namespace dlib
             item.resize(size);
             if (item.size() != 0)
                 in.read(&item[0], item.size());
+            // Possible bug: wouldn't it be sane to check that the number
+            // of bytes actually read (in.gcount()) matches size?
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std::vector"); }

@@ -429,7 +429,7 @@ namespace dlib
                     // check if we need to scale the counts
                     if (total_count > 10000)
                     {
-                        scale_counts(temp,hangcheck);
+                        scale_counts(temp, hangcheck);
                         total_count = temp->total;
                     }
 

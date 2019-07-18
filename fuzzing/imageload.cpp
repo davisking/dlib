@@ -2,6 +2,11 @@
 #include <string>
 #include <fstream>
 
+/**
+ * @brief The TempFile struct
+ * A RAII temporary file, filled with the binary data given to it
+ * during construction. When the object is destroyed, the file is removed.
+ */
 struct TempFile {
     TempFile(const uint8_t* Data, std::size_t Size, const char* suffix) {
         static unsigned int count=0;
@@ -23,11 +28,13 @@ struct TempFile {
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size) {
 
-    if(Size >200) {
+    // prevent large input, just to keep the fuzzing speed up.
+    if(Size > 200) {
         return 0;
     }
     dlib::array2d<dlib::rgb_pixel> img;
 
+    // the file suffix is irrelevant, hence the .bin for "binary data".
     TempFile tmpfile(Data,Size,"bin");
 
     try {

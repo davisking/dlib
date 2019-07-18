@@ -20,7 +20,7 @@ long safe_multiply(long a, long b) {
     using large=std::intmax_t;
     if(sizeof(small)<sizeof(large)) {
         // fallback: promoting to a larger type
-        // This works for visual studio.
+        // This works for MSVC (yet only tested on compiler explorer).
         auto tmp=large{a}*b;
         if(tmp<=std::numeric_limits<small>::max() && tmp>=std::numeric_limits<small>::min()) {
             overflow=false;

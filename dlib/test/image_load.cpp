@@ -5,9 +5,10 @@
 #include <dlib/image_io.h>
 
 
-// until c++17 filesystem is available, we resort to handicapping
-// the functionality to only work on systems with dirent.h available.
-// Pulling in boost just for this seems to be overkill.
+// Finding files recursively in the filesystem is easy if C++17 or boost
+// can be used. However, none of those can be required, so instead the posix
+// API is used (dirent.h). If that is not available, there is no recursive finding,
+// instead the input argument is assumed to be a file.
 #if defined(unix) || defined(__unix__) || defined(__unix)
 # include <unistd.h>
 #endif
@@ -46,7 +47,6 @@ namespace
             const std::string& arg
         )
         {
-            dlog << dlib::LINFO << "hello world";
             dlog << dlib::LINFO << "the argument passed to this test was " << arg;
 
             m_arg=arg;
