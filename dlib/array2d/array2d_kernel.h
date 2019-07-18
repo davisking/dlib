@@ -8,6 +8,7 @@
 #include "../interfaces/enumerable.h"
 #include "../serialize.h"
 #include "../geometry/rectangle.h"
+#include "../internal/integer_utils.h"
 
 namespace dlib
 {
@@ -489,8 +490,9 @@ namespace dlib
         {
             if (nr_ > 0)
             {
-                data = pool.allocate_array(nr_*nc_);
-                last = data + nr_*nc_ - 1;
+                const auto prod = dlib::detail::safe_multiply(nr_,nc_);
+                data = pool.allocate_array(prod);
+                last = data + prod - 1;
             }
         }
         catch (...)

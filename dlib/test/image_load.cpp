@@ -73,8 +73,8 @@ namespace
                    try {
                        dlib::load_image(img, filename);
                        dlog << dlib::LINFO << "successfully parsed image "<<filename;
-                   } catch(...) {
-                       dlog << dlib::LERROR << "got an exception while loading image "<<filename;
+                   } catch(std::exception& e) {
+                       dlog << dlib::LERROR << "got an exception while loading image "<<filename<<": "<<e.what();
                    }
         }
         std::string m_arg;
