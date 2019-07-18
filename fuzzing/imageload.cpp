@@ -23,6 +23,9 @@ struct TempFile {
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size) {
 
+    if(Size >200) {
+        return 0;
+    }
     dlib::array2d<dlib::rgb_pixel> img;
 
     TempFile tmpfile(Data,Size,"bin");
