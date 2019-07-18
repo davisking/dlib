@@ -4,7 +4,18 @@
 #include "tester.h"
 #include <dlib/image_io.h>
 
-#include <dirent.h>
+
+// until c++17 filesystem is available, we resort to handicapping
+// the functionality to only work on systems with dirent.h available.
+// Pulling in boost just for this seems to be overkill.
+#if defined(unix) || defined(__unix__) || defined(__unix)
+# include <unistd.h>
+#endif
+
+#if _POSIX_VERSION >= 200112L
+# include <dirent.h>
+# define HAVE_DIRENT_H 1
+#endif
 
 namespace  
 {
@@ -22,7 +33,11 @@ namespace
         ) :
             tester (
                 "test_image_load",                // the command line argument name for this test
-                "Runs image files recursively found in arg through the image load routines.", // the command line argument description
+        #ifdef HAVE_DIRENT_H
+                "Runs image files recursively found in arg through the image load routine.", // the command line argument description
+        #else
+                "Runs the image file found in arg through the image load routine.", // the command line argument description
+        #endif
                 1                                   // the number of command line arguments for this test
             )
         {}
@@ -36,12 +51,18 @@ namespace
 
             m_arg=arg;
 
-              // make sure 3 is bigger than 2
-            //DLIB_TEST_MSG(3 > 2,"This message prints if your compiler doesn't know 3 is bigger than 2");
            print_spinner();
+#ifdef HAVE_DIRENT_H
+           // recursively load files
            invoke_on_file_or_dir(m_arg);
+#else
+           // load the single file given
+           invoke_on_file((m_arg);
+#endif
         }
      private:
+#ifdef HAVE_DIRENT_H
+        // switch to C++17 filesystem, when that is available
         void invoke_on_file_or_dir(const std::string& dir) {
             DIR* pDir=opendir(dir.c_str());
             if(pDir) {
@@ -65,6 +86,7 @@ namespace
              invoke_on_file(dir);
             }
         }
+#endif
         void invoke_on_file(const std::string& filename) {
             print_spinner();
             dlog << dlib::LINFO << "attempting to parse image "<<filename;
@@ -76,6 +98,8 @@ namespace
                    } catch(std::exception& e) {
                        dlog << dlib::LERROR << "got an exception while loading image "<<filename<<": "<<e.what();
                    }
+                   // get text output, so the user sees something happened
+                   DLIB_TEST_MSG(true,"survived loading an image");
         }
         std::string m_arg;
     };
