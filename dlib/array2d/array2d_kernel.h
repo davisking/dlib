@@ -491,6 +491,11 @@ namespace dlib
             if (nr_ > 0)
             {
                 const auto prod = dlib::detail::safe_multiply(nr_,nc_);
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+                if(prod>200*200) {
+                 throw std::runtime_error("fuzzer: large memory allocation avoided");
+                }
+#endif
                 data = pool.allocate_array(prod);
                 last = data + prod - 1;
             }
