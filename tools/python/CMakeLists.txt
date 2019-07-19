@@ -1,5 +1,6 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
+project(dlib_python_bindings)
 
 # Pybind11's cmake scripts enable link time optimization by default.  However,
 # it makes linking take a really long time and doesn't seem to substantively
