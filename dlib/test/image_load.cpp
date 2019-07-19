@@ -39,10 +39,14 @@ namespace
            invoke_on_file_or_dir(m_arg);
         }
      private:
-        void invoke_on_file_or_dir(const std::string& dir) {
-            const auto files=dlib::get_files_in_directory_tree(dir,dlib::match_all{});
+        void invoke_on_file_or_dir(const std::string& dir_or_file) {
+            if(dlib::file_exists(dir_or_file)) {
+                invoke_on_file(dir_or_file);
+            } else {
+            const auto files=dlib::get_files_in_directory_tree(dir_or_file,dlib::match_all{});
             for(const auto& file: files) {
                 invoke_on_file(file);
+            }
             }
         }
         void invoke_on_file(const std::string& filename) {
