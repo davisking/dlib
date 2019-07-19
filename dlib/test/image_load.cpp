@@ -4,20 +4,6 @@
 #include "tester.h"
 #include <dlib/image_io.h>
 
-
-// Finding files recursively in the filesystem is easy if C++17 or boost
-// can be used. However, none of those can be required, so instead the posix
-// API is used (dirent.h). If that is not available, there is no recursive finding,
-// instead the input argument is assumed to be a file.
-#if defined(unix) || defined(__unix__) || defined(__unix)
-# include <unistd.h>
-#endif
-
-#if _POSIX_VERSION >= 200112L
-# include <dirent.h>
-# define HAVE_DIRENT_H 1
-#endif
-
 namespace  
 {
     dlib::logger dlog("test.image_load");
@@ -34,11 +20,7 @@ namespace
         ) :
             tester (
                 "test_image_load",                // the command line argument name for this test
-        #ifdef HAVE_DIRENT_H
                 "Runs image files recursively found in arg through the image load routine.", // the command line argument description
-        #else
-                "Runs the image file found in arg through the image load routine.", // the command line argument description
-        #endif
                 1                                   // the number of command line arguments for this test
             )
         {}
@@ -52,41 +34,17 @@ namespace
             m_arg=arg;
 
            print_spinner();
-#ifdef HAVE_DIRENT_H
+
            // recursively load files
            invoke_on_file_or_dir(m_arg);
-#else
-           // load the single file given
-           invoke_on_file((m_arg);
-#endif
         }
      private:
-#ifdef HAVE_DIRENT_H
-        // switch to C++17 filesystem, when that is available
         void invoke_on_file_or_dir(const std::string& dir) {
-            DIR* pDir=opendir(dir.c_str());
-            if(pDir) {
-                struct dirent *entry;
-                   while ((entry = readdir(pDir))) {
-                       const std::string bare_name(entry->d_name);
-                           switch(entry->d_type) {
-                           case DT_DIR:
-                           if(bare_name=="." || bare_name=="..") {
-                               continue;
-                           }
-                           invoke_on_file_or_dir(dir + "/" + bare_name);
-                           break;
-                           case DT_REG:
-                           invoke_on_file(dir + "/" + bare_name);
-                           break;
-                           }
-                   }
-             closedir (pDir);
-            } else {
-             invoke_on_file(dir);
+            const auto files=dlib::get_files_in_directory_tree(dir,dlib::match_all{});
+            for(const auto& file: files) {
+                invoke_on_file(file);
             }
         }
-#endif
         void invoke_on_file(const std::string& filename) {
             print_spinner();
             dlog << dlib::LINFO << "attempting to parse image "<<filename;
