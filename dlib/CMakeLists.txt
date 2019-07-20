@@ -823,6 +823,7 @@ if (NOT TARGET dlib)
       endif()
 
       # see if it is possible to use builtins for overflow detection
+      include(CheckCXXSourceCompiles)
       check_cxx_source_compiles("int main() {int a,b,c;a=b=c=0; __builtin_mul_overflow(a,b,&c);}"   HAS_BUILTIN_MUL_OVERFLOW)
       if(HAS_BUILTIN_MUL_OVERFLOW)
         target_compile_definitions(dlib PRIVATE DLIB_HAS_BUILTIN_MUL_OVERFLOW=1)
