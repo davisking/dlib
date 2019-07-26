@@ -1,4 +1,8 @@
+// Copyright (C) 2019  Paul Dreik (github@pauldreik.se)
+// License: Boost Software License   See LICENSE.txt for the full license.
+
 #include <dlib/xml_parser.h>
+#include <sstream>
 
 namespace {
 
@@ -25,6 +29,7 @@ public:
         atts.reset();
         while (atts.move_next())
         {
+            // do something with atts, to access the data.
             //cout << "\tattribute: " << atts.element().key() << " = " << atts.element().value() << endl;
         }
     }
@@ -49,8 +54,9 @@ public:
     )
     {
     }
-};
-}
+
+}; // class
+} // anon. namespace
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size) {
 
@@ -66,8 +72,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size) {
         dlib::xml_parser parser;
         doc_handler dh;
         parser.add_document_handler(dh);
-        //impl::default_xml_error_handler eh(filename);
-        //parser.add_error_handler(eh);
         parser.parse(iss);
     } catch(...) {
     }
