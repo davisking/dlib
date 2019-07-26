@@ -34,7 +34,7 @@ namespace dlib
             if (!file)
                 throw image_load_error("Unable to open file: " + file_name);
 
-            char buffer[9];
+            char buffer[9]={};
             file.read((char*)buffer, 8);
             buffer[8] = 0;
 
