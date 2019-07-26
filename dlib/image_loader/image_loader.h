@@ -103,8 +103,10 @@ namespace dlib
             biHeight = a | (b<<8) | (c<<16) | (d<<24);
             
             bool bottomUp = biHeight < 0;
-            if (bottomUp)
+            if (bottomUp) {
+                // overflow, if biHeight is INT_MIN
                 biHeight = 0 - biHeight;
+            }
             
             i += 4+2;
             a = buf[i]; b = buf[i+1];
