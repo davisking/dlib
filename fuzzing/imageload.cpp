@@ -1,3 +1,6 @@
+// Copyright (C) 2019  Paul Dreik (github@pauldreik.se)
+// License: Boost Software License   See LICENSE.txt for the full license.
+
 #include <dlib/image_io.h>
 #include <string>
 #include <fstream>
