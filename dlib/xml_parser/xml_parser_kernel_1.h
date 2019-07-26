@@ -1210,12 +1210,12 @@ namespace dlib
         target.erase();
         data.erase();
 
-        std::istream::int_type ch = token[2];
+        std::istream::int_type ch = token.at(2);
         std::string::size_type i = 3;
         while (ch != ' ' && ch != '?' && ch != '\t' && ch != '\n' && ch!='\r')
         {
             target += ch;
-            ch = token[i];
+            ch = token.at(i);
             ++i;
         }
         if (target.size() == 0)
@@ -1224,7 +1224,7 @@ namespace dlib
         // if we aren't at a ? character then go to the next character
         if (ch != '?' )
         {
-            ch = token[i];
+            ch = token.at(i);
             ++i;
         }
 
@@ -1233,7 +1233,7 @@ namespace dlib
         while (ch != '?')
         {
             data += ch;
-            ch = token[i];
+            ch = token.at(i);
             ++i;
         }
 
