@@ -277,6 +277,11 @@ if (NOT TARGET dlib)
       svm/auto.cpp
       )
 
+   # internal files, not publicly visible. 
+   set(source_files ${source_files}
+      internal/integer_utils.h
+      internal/integer_utils.cpp
+      )
 
    set(dlib_needed_libraries)
    set(dlib_needed_includes)
@@ -815,6 +820,13 @@ if (NOT TARGET dlib)
          cuda_add_library(dlib ${source_files} )
       else()
          add_library(dlib ${source_files} )
+      endif()
+
+      # see if it is possible to use builtins for overflow detection
+      include(CheckCXXSourceCompiles)
+      check_cxx_source_compiles("int main() {int a,b,c;a=b=c=0; __builtin_mul_overflow(a,b,&c);}"   HAS_BUILTIN_MUL_OVERFLOW)
+      if(HAS_BUILTIN_MUL_OVERFLOW)
+        target_compile_definitions(dlib PRIVATE DLIB_HAS_BUILTIN_MUL_OVERFLOW=1)
       endif()
 
    endif ()  ##### end of if NOT DLIB_ISO_CPP_ONLY ##########################################################
