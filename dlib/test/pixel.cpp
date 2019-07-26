@@ -753,6 +753,17 @@ namespace
         }
 
 
+        {
+            // bad pixel example, found through fuzzing
+            rgb_pixel src;
+            src.red=246;
+            src.green=170;
+            src.blue=245;
+            hsi_pixel dest;
+            assign_pixel(dest,src);
+            DLIB_TEST(dest.h>=0);
+            DLIB_TEST(dest.h<=360);
+        }
     }
 
 

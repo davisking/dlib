@@ -809,8 +809,12 @@ namespace dlib
                 c2.s = delta / (c2.l < 0.5 ? (2*c2.l) : (2-2*c2.l));
             c2.h = 0;
             if (delta > 0) {
-                if (themax == c1.r && themax != c1.g)
+                if (themax == c1.r && themax != c1.g) {
                     c2.h += (c1.g - c1.b) / delta;
+                    if(c1.g < c1.b) {
+                        c2.h += 6;
+                    }
+                }
                 if (themax == c1.g && themax != c1.b)
                     c2.h += (2 + (c1.b - c1.r) / delta);
                 if (themax == c1.b && themax != c1.r)
