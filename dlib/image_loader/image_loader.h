@@ -105,6 +105,10 @@ namespace dlib
             bool bottomUp = biHeight < 0;
             if (bottomUp) {
                 // overflow, if biHeight is INT_MIN
+                using limit=std::numeric_limits<decltype(biHeight)>;
+                if(limit::is_signed && biHeight==limit::min())
+                      throw image_load_error("bmp load error: bad height");
+
                 biHeight = 0 - biHeight;
             }
             
