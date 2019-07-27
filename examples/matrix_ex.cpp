@@ -34,7 +34,7 @@ int main()
 
     // First let's declare these 3 matrices.
     // This declares a matrix that contains doubles and has 3 rows and 1 column.
-    // Moreover, it's size is a compile time constant since we put it inside the <>.
+    // Moreover, its size is a compile time constant since we put it inside the <>.
     matrix<double,3,1> y;
     // Make a 3 by 3 matrix of doubles for the M matrix.  In this case, M is
     // sized at runtime and can therefore be resized later by calling M.set_size(). 
@@ -170,7 +170,7 @@ int main()
     // MATLAB: E = A * B
     E = A*B;
 
-    // MATLAB: E = A + B
+    // MATLAB: E = A + C
     E = A + C;
 
     // MATLAB: E = A + 5

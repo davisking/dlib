@@ -247,7 +247,7 @@ struct example_op_vector_to_matrix
     /*!
         This object defines a matrix expression that holds a reference to a std::vector<T>
         and makes it look like a column vector.  Thus it enables you to use a std::vector
-        as if it was a dlib::matrix.
+        as if it were a dlib::matrix.
 
     !*/
     example_op_vector_to_matrix( const std::vector<T>& vect_) : vect(vect_){}
