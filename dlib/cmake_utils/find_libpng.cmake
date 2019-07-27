@@ -3,6 +3,12 @@
 
 cmake_minimum_required(VERSION 2.8.12)
 
+if (BUILDING_PYTHON_IN_MSVC)
+   # Never use any system copy of libpng when building python in visual studio
+   set(PNG_FOUND 0)
+   return()
+endif()
+
 # Don't rerun this script if its already been executed.
 if (DEFINED PNG_FOUND)
    return()
