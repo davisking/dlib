@@ -113,18 +113,21 @@ list(GET _PYTHON_VALUES 7 PYTHON_LIBRARY_SUFFIX)
 list(GET _PYTHON_VALUES 8 PYTHON_LIBDIR)
 list(GET _PYTHON_VALUES 9 PYTHON_MULTIARCH)
 
-# Make sure the Python has the same pointer-size as the chosen compiler
-# Skip if CMAKE_SIZEOF_VOID_P is not defined
-if(CMAKE_SIZEOF_VOID_P AND (NOT "${PYTHON_SIZEOF_VOID_P}" STREQUAL "${CMAKE_SIZEOF_VOID_P}"))
-    if(PythonLibsNew_FIND_REQUIRED)
-        math(EXPR _PYTHON_BITS "${PYTHON_SIZEOF_VOID_P} * 8")
-        math(EXPR _CMAKE_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
-        message(FATAL_ERROR
-            "Python config failure: Python is ${_PYTHON_BITS}-bit, "
-            "chosen compiler is  ${_CMAKE_BITS}-bit")
+# Ignore this test while crosscompiling otherwise it will use the host python.
+IF(NOT CMAKE_CROSSCOMPILING)
+    # Make sure the Python has the same pointer-size as the chosen compiler
+    # Skip if CMAKE_SIZEOF_VOID_P is not defined
+    if(CMAKE_SIZEOF_VOID_P AND (NOT "${PYTHON_SIZEOF_VOID_P}" STREQUAL "${CMAKE_SIZEOF_VOID_P}"))
+        if(PythonLibsNew_FIND_REQUIRED)
+            math(EXPR _PYTHON_BITS "${PYTHON_SIZEOF_VOID_P} * 8")
+            math(EXPR _CMAKE_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
+            message(FATAL_ERROR
+                "Python config failure: Python is ${_PYTHON_BITS}-bit, "
+                "chosen compiler is  ${_CMAKE_BITS}-bit")
+        endif()
+        set(PYTHONLIBS_FOUND FALSE)
+        return()
     endif()
-    set(PYTHONLIBS_FOUND FALSE)
-    return()
 endif()
 
 # The built-in FindPython didn't always give the version numbers
