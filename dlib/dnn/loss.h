@@ -2581,12 +2581,17 @@ namespace dlib
             serialize("loss_multiclass_log_per_pixel_", out);
         }
 
-        friend void deserialize(loss_multiclass_log_per_pixel_& , std::istream& in)
+        friend void deserialize(loss_multiclass_log_per_pixel_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
             if (version != "loss_multiclass_log_per_pixel_")
                 throw serialization_error("Unexpected version found while deserializing dlib::loss_multiclass_log_per_pixel_.");
+
+#ifdef DLIB_USE_CUDA
+            // Reset the cuda_compute object to fix https://github.com/davisking/dlib/issues/1849
+            item.cuda_compute = cuda::compute_loss_multiclass_log_per_pixel();
+#endif
         }
 
         friend std::ostream& operator<<(std::ostream& out, const loss_multiclass_log_per_pixel_& )
