@@ -23,7 +23,7 @@ namespace dlib
                 void DLIB_FORTRAN_ID(ssyevr) (const char *jobz, const char *range, const char *uplo, const integer *n, 
                                               float *a, const integer *lda, const float *vl, const float *vu, const integer *il, 
                                               const integer *iu, const float *abstol, integer *m, float *w, 
-                                              float *z_, integer *ldz, integer *isuppz, float *work, 
+                                              float *z_, const integer *ldz, integer *isuppz, float *work, 
                                               const integer *lwork, integer *iwork, const integer *liwork, integer *info);
             }
 
