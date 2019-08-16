@@ -442,7 +442,7 @@ namespace dlib
                 {
                     work = device_global_buffer();
                 }
-                cuda_data_void_ptr buf = work->get(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
+                buf = work->get(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
 
                 cuda_data_void_ptr loss_buf = buf;
                 buf = buf+sizeof(float);
@@ -471,6 +471,7 @@ namespace dlib
             );
             
             mutable std::shared_ptr<resizable_cuda_buffer> work;
+            mutable cuda_data_void_ptr buf;
         };
 
     // ------------------------------------------------------------------------------------
