@@ -438,15 +438,11 @@ namespace dlib
                 const size_t bytes_per_plane = subnetwork_output.nr()*subnetwork_output.nc()*sizeof(uint16_t);
                 // Allocate a cuda buffer to store all the truth images and also one float
                 // for the scalar loss output.
-                if (!work)
-                {
-                    work = device_global_buffer();
-                }
+                work = device_global_buffer();
                 buf = work->get(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
 
                 cuda_data_void_ptr loss_buf = buf;
                 buf = buf+sizeof(float);
-
 
                 // copy the truth data into a cuda buffer.
                 for (long i = 0; i < subnetwork_output.num_samples(); ++i, ++truth)
