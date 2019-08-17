@@ -749,7 +749,6 @@ namespace dlib
             forward_workspace.reset();
             backward_data_workspace.reset();
             backward_filters_workspace.reset();
-            workspace.reset();
         }
 
         void tensor_conv::
@@ -919,8 +918,6 @@ namespace dlib
                         (const cudnnFilterDescriptor_t)filter_handle,
                         backward_filters_best_algo,
                         &backward_filters_workspace_size_in_bytes));
-
-                workspace = device_global_buffer();
             }
             catch(...)
             {
@@ -989,7 +986,7 @@ namespace dlib
             // while the function is still executing on the device.  But each time we come
             // here, we make sure to grab the latest workspace buffer so that, globally, we
             // minimize the number of such buffers.
-            forward_workspace = workspace->get(forward_workspace_size_in_bytes);
+            forward_workspace = device_global_buffer(forward_workspace_size_in_bytes);
 
             CHECK_CUDNN(cudnnConvolutionForward(
                     context(),
@@ -1022,7 +1019,7 @@ namespace dlib
             // while the function is still executing on the device.  But each time we come
             // here, we make sure to grab the latest workspace buffer so that, globally, we
             // minimize the number of such buffers.
-            backward_data_workspace = workspace->get(backward_data_workspace_size_in_bytes);
+            backward_data_workspace = device_global_buffer(backward_data_workspace_size_in_bytes);
 
 
             CHECK_CUDNN(cudnnConvolutionBackwardData(context(),
@@ -1056,7 +1053,7 @@ namespace dlib
             // while the function is still executing on the device.  But each time we come
             // here, we make sure to grab the latest workspace buffer so that, globally, we
             // minimize the number of such buffers.
-            backward_filters_workspace = workspace->get(backward_filters_workspace_size_in_bytes);
+            backward_filters_workspace = device_global_buffer(backward_filters_workspace_size_in_bytes);
 
             CHECK_CUDNN(cudnnConvolutionBackwardFilter(context(),
                                                     &alpha,

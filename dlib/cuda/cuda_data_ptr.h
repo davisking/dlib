@@ -17,6 +17,37 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        class cuda_data_void_ptr;
+        class weak_cuda_data_void_ptr 
+        {
+            /*!
+                WHAT THIS OBJECT REPRESENTS
+                    This is just like a std::weak_ptr version of cuda_data_void_ptr.  It allows you
+                    to hold a non-owning reference to a cuda_data_void_ptr.
+            !*/
+        public:
+            weak_cuda_data_void_ptr() = default;
+
+            weak_cuda_data_void_ptr(const cuda_data_void_ptr& ptr);
+
+            void reset() { pdata.reset(); num = 0; }
+
+            cuda_data_void_ptr lock() const;
+            /*!
+                ensures
+                    - if (the memory block referenced by this object hasn't been deleted) then
+                        - returns a cuda_data_void_ptr referencing that memory block
+                    - else
+                        - returns a default initialized cuda_data_void_ptr (i.e. an empty one).
+            !*/
+
+        private:
+            size_t num = 0;
+            std::weak_ptr<void> pdata;
+        };
+
+    // ----------------------------------------------------------------------------------------
+
         class cuda_data_void_ptr
         {
             /*!
@@ -64,6 +95,7 @@ namespace dlib
 
         private:
 
+            friend class weak_cuda_data_void_ptr;
             size_t num = 0;
             std::shared_ptr<void> pdata;
         };
@@ -214,40 +246,7 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        class resizable_cuda_buffer
-        {
-            /*!
-                WHAT THIS OBJECT REPRESENTS
-                    This is a block of memory on a CUDA device that will be automatically
-                    resized if requested size is larger than allocated.
-            !*/
-        public:
-            cuda_data_void_ptr get(size_t size)
-            /*!
-                ensures
-                    - This object will return the buffer of requested size or larger.
-                    - buffer.size() >= size
-                    - Client code should not hold the returned cuda_data_void_ptr for long
-                      durations, but instead should call get() whenever the buffer is
-                      needed.  Doing so ensures that multiple buffers are not kept around
-                      in the event of a resize.
-            !*/
-            {
-                if (buffer.size() < size)
-                {
-                    buffer.reset();
-                    buffer = cuda_data_void_ptr(size);
-                }
-                return buffer;
-            }
-        private:
-            cuda_data_void_ptr buffer;
-        };
-
-    // ----------------------------------------------------------------------------------------
-
-        std::shared_ptr<resizable_cuda_buffer> device_global_buffer(
-        );
+        cuda_data_void_ptr device_global_buffer(size_t size);
         /*!
             ensures
                 - Returns a pointer to a globally shared CUDA memory buffer on the
@@ -256,10 +255,28 @@ namespace dlib
                   as scratch space for CUDA computations that all take place on the default
                   stream.  Using it in this way ensures that there aren't any race conditions
                   involving the use of the buffer.
-                - The global buffer is deallocated once all references to it are
-                  destructed.  It will be reallocated as required.  So if you want to avoid
-                  these reallocations then hold a copy of the shared_ptr returned by this
-                  function.
+                - The returned pointer will point to at least size bytes.  It may point to more.
+                - The global buffer is deallocated once all references to it are destructed.
+                  However, if device_global_buffer() is called before then with a size <= the last
+                  size requested, then the previously returned global buffer pointer is returned.
+                  This avoids triggering expensive CUDA reallocations.  So if you want to avoid
+                  these reallocations then hold a copy of the pointer returned by this function.
+                  However, as a general rule, client code should not hold the returned
+                  cuda_data_void_ptr for long durations, but instead should call
+                  device_global_buffer() whenever the buffer is needed, and overwrite the previously
+                  returned pointer with the new pointer.  Doing so ensures multiple buffers are not
+                  kept around in the event that multiple sized buffers are requested.  To explain
+                  this, consider this code, assumed to execute at program startup:
+                    auto ptr1 = device_global_buffer(1);
+                    auto ptr2 = device_global_buffer(2);
+                    auto ptr3 = device_global_buffer(3);
+                  since the sizes increased at each call 3 separate buffers were allocated.  First
+                  one of size 1, then of size 2, then of size 3.  If we then executed:
+                    ptr1 = device_global_buffer(1);
+                    ptr2 = device_global_buffer(2);
+                    ptr3 = device_global_buffer(3);
+                  all three of these pointers would now point to the same buffer, since the smaller
+                  requests can be satisfied by returning the size 3 buffer in each case.
         !*/
 
     // ----------------------------------------------------------------------------------------
