@@ -2892,7 +2892,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template<long _num_channels>
-    class loss_mean_squared_per_channel_
+    class loss_mean_squared_per_channel_and_pixel_
     {
     public:
 
@@ -2953,14 +2953,14 @@ namespace dlib
             DLIB_CASSERT(input_tensor.num_samples() % sub.sample_expansion_factor() == 0);
             DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
             DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
-            DLIB_CASSERT(output_tensor.k() >= 1);
-            DLIB_CASSERT(output_tensor.k() < std::numeric_limits<uint16_t>::max());
+            DLIB_CASSERT(output_tensor.k() == _num_channels);
             DLIB_CASSERT(output_tensor.nr() == grad.nr() &&
                 output_tensor.nc() == grad.nc() &&
                 output_tensor.k() == grad.k());
             for (long idx = 0; idx < output_tensor.num_samples(); ++idx)
             {
                 const_label_iterator truth_matrix_ptr = (truth + idx);
+                DLIB_CASSERT((*truth_matrix_ptr).size() == _num_channels);
                 for (long k = 0; k < output_tensor.k(); ++k)
                 {
                     DLIB_CASSERT((*truth_matrix_ptr)[k].nr() == output_tensor.nr() &&
@@ -2996,28 +2996,28 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_mean_squared_per_channel_& , std::ostream& out)
+        friend void serialize(const loss_mean_squared_per_channel_and_pixel_& , std::ostream& out)
         {
-            serialize("loss_mean_squared_per_channel_", out);
+            serialize("loss_mean_squared_per_channel_and_pixel_", out);
         }
 
-        friend void deserialize(loss_mean_squared_per_channel_& , std::istream& in)
+        friend void deserialize(loss_mean_squared_per_channel_and_pixel_& , std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "loss_mean_squared_per_channel_")
-                throw serialization_error("Unexpected version found while deserializing dlib::loss_mean_squared_per_channel_.");
+            if (version != "loss_mean_squared_per_channel_and_pixel_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_mean_squared_per_channel_and_pixel_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const loss_mean_squared_per_channel_& )
+        friend std::ostream& operator<<(std::ostream& out, const loss_mean_squared_per_channel_and_pixel_& )
         {
-            out << "loss_mean_squared_per_channel";
+            out << "loss_mean_squared_per_channel_and_pixel";
             return out;
         }
 
-        friend void to_xml(const loss_mean_squared_per_channel_& /*item*/, std::ostream& out)
+        friend void to_xml(const loss_mean_squared_per_channel_and_pixel_& /*item*/, std::ostream& out)
         {
-            out << "<loss_mean_squared_per_channel/>";
+            out << "<loss_mean_squared_per_channel_and_pixel/>";
         }
 
     private:
@@ -3029,7 +3029,7 @@ namespace dlib
     };
 
     template <long num_channels, typename SUBNET>
-    using loss_mean_squared_per_channel = add_loss_layer<loss_mean_squared_per_channel_<num_channels>, SUBNET>;
+    using loss_mean_squared_per_channel_and_pixel = add_loss_layer<loss_mean_squared_per_channel_and_pixel_<num_channels>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 

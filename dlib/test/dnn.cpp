@@ -2497,7 +2497,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    void test_loss_multiclass_per_channel()
+    void test_loss_mean_squared_per_channel_and_pixel()
     {
         print_spinner();
 
@@ -2521,7 +2521,7 @@ namespace
         // the main thing to notice when using this layer is that the output of
         // the subnetwork needs to have the same number of channels as the
         // channels we specify
-        using net_type = loss_mean_squared_per_channel<num_channels,
+        using net_type = loss_mean_squared_per_channel_and_pixel<num_channels,
                             htan<con<num_channels, 1, 1, 1, 1,
                             relu<cont<32, 2, 2, 2, 2,
                             relu<con<32, 2, 2, 2, 2,
@@ -3359,7 +3359,7 @@ namespace
             test_simple_linear_regression_with_mult_prev();
             test_multioutput_linear_regression();
             test_simple_autoencoder();
-            test_loss_multiclass_per_channel();
+            test_loss_mean_squared_per_channel_and_pixel();
             test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_outputs_on_trivial_task();

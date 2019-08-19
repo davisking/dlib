@@ -1496,7 +1496,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template<long _num_channels>
-    class loss_mean_squared_per_channel_
+    class loss_mean_squared_per_channel_and_pixel_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -1552,7 +1552,7 @@ namespace dlib
     };
 
     template <long num_channels, typename SUBNET>
-    using loss_mean_squared_per_channel = add_loss_layer<loss_mean_squared_per_channel_<num_channels>, SUBNET>;
+    using loss_mean_squared_per_channel_and_pixel = add_loss_layer<loss_mean_squared_per_channel_and_pixel_<num_channels>, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 
