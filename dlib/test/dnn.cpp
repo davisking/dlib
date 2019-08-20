@@ -2569,7 +2569,7 @@ namespace
             }
         }
 
-        const auto compute_error = [&inputs, &labels, &net]()
+        const auto compute_error = [&inputs, &labels, &net, num_channels]()
         {
             const auto out = net(inputs);
             double error = 0.0;
@@ -2580,9 +2580,9 @@ namespace
                     auto diff = out[i][c] - labels[i][c];
                     auto sqerror = pointwise_multiply(diff, diff);
                     double mse = 0.0;
-                    for (const auto el : sqerror)
+                    for (const auto elem : sqerror)
                     {
-                        mse += el;
+                        mse += elem;
                     }
                     mse /= sqerror.size();
                     error += mse;
