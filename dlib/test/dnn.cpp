@@ -2527,7 +2527,7 @@ namespace
                             relu<con<32, 2, 2, 2, 2,
                             input<matrix<float>>>>>>>>>;
         net_type net;
-        matrix<float> background = zeros_matrix<float>(num_rows, num_cols);
+        matrix<float> background = -ones_matrix<float>(num_rows, num_cols);
         ::std::array<matrix<float>, num_channels> backgrounds;
         for (size_t i = 0; i < backgrounds.size(); ++i)
         {
