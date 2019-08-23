@@ -186,7 +186,7 @@ namespace dlib
         image_view(
             image_type& img
         ) : 
-            _data((char*)image_data(img)), 
+            _data(reinterpret_cast<char*>(image_data(img))), 
             _width_step(width_step(img)),
             _nr(num_rows(img)),
             _nc(num_columns(img)),
@@ -332,7 +332,7 @@ namespace dlib
         const_image_view(
             const image_type& img
         ) : 
-            _data((char*)image_data(img)), 
+            _data(reinterpret_cast<const char*>(image_data(img))), 
             _width_step(width_step(img)),
             _nr(num_rows(img)),
             _nc(num_columns(img))
