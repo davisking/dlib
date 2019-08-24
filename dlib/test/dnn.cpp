@@ -2497,6 +2497,75 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_loss_mean_squared_per_channel_and_pixel_simple()
+    {
+        print_spinner();
+
+        const int num_samples = 1000;
+        const long num_channels = 10;
+        const long dimension = 1000;
+        ::std::vector<matrix<float>> inputs;
+        ::std::vector<::std::array<matrix<float>, num_channels>> labels;
+        for (int i = 0; i < num_samples; ++i)
+        {
+            matrix<float> x = matrix_cast<float>(randm(5, dimension));
+            matrix<float> w = matrix_cast<float>(randm(num_channels, 5));
+            matrix<float> y = w * x;
+            DLIB_CASSERT(y.nr() == num_channels);
+            ::std::array<matrix<float>, num_channels> y_arr;
+            // convert y to an array of matrices
+            for (long c = 0; c < num_channels; ++c)
+            {
+                y_arr[c] = rowm(y, c);
+            }
+            inputs.push_back(::std::move(x));
+            labels.push_back(::std::move(y_arr));
+        }
+
+        const long num_outputs = num_channels * dimension;
+        using net_type = loss_mean_squared_per_channel_and_pixel<num_channels,
+                            extract<0, num_channels, 1, dimension,
+                            fc<num_outputs,
+                            input<matrix<float>>>>>;
+        net_type net;
+
+        const auto compute_error = [&inputs, &labels, &net, num_channels]()
+        {
+            const auto out = net(inputs);
+            double error = 0.0;
+            for (size_t i = 0; i < out.size(); ++i)
+            {
+                for (size_t c = 0; c < num_channels; ++c)
+                {
+                    auto diff = out[i][c] - labels[i][c];
+                    auto sqerror = pointwise_multiply(diff, diff);
+                    double mse = 0.0;
+                    for (const auto elem : sqerror)
+                    {
+                        mse += elem;
+                    }
+                    mse /= sqerror.size();
+                    error += mse;
+                }
+            }
+            return error / out.size() / num_channels;
+        };
+
+        const auto error_before = compute_error();
+
+        dnn_trainer<net_type> trainer(net);
+        trainer.set_learning_rate(0.1);
+        trainer.set_iterations_without_progress_threshold(100);
+        trainer.set_min_learning_rate(1e-6);
+        trainer.set_mini_batch_size(50);
+        trainer.set_max_num_epochs(160);
+        trainer.train(inputs, labels);
+        const auto error_after = compute_error();
+        DLIB_TEST_MSG(error_after < error_before, "multi channel error increased after training");
+
+    }
+
+// ----------------------------------------------------------------------------------------
     void test_loss_mean_squared_per_channel_and_pixel()
     {
         print_spinner();
@@ -2589,7 +2658,6 @@ namespace
                 }
             }
             return error / out.size() / num_channels;
-
         };
 
         const auto error_before = compute_error();
@@ -3359,6 +3427,7 @@ namespace
             test_simple_linear_regression_with_mult_prev();
             test_multioutput_linear_regression();
             test_simple_autoencoder();
+            test_loss_mean_squared_per_channel_and_pixel_simple();
             test_loss_mean_squared_per_channel_and_pixel();
             test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task();
