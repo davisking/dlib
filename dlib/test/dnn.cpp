@@ -2502,8 +2502,8 @@ namespace
         print_spinner();
 
         const int num_samples = 1000;
-        const long num_channels = 10;
-        const long dimension = 1000;
+        const long num_channels = 2;
+        const long dimension = 3;
         ::std::vector<matrix<float>> inputs;
         ::std::vector<::std::array<matrix<float>, num_channels>> labels;
         for (int i = 0; i < num_samples; ++i)
@@ -2537,32 +2537,22 @@ namespace
             {
                 for (size_t c = 0; c < num_channels; ++c)
                 {
-                    auto diff = out[i][c] - labels[i][c];
-                    auto sqerror = pointwise_multiply(diff, diff);
-                    double mse = 0.0;
-                    for (const auto elem : sqerror)
-                    {
-                        mse += elem;
-                    }
-                    mse /= sqerror.size();
-                    error += mse;
+                    error += mean(squared(out[i][c] - labels[i][c]));
                 }
             }
             return error / out.size() / num_channels;
         };
 
         const auto error_before = compute_error();
-
         dnn_trainer<net_type> trainer(net);
         trainer.set_learning_rate(0.1);
-        trainer.set_iterations_without_progress_threshold(100);
+        trainer.set_iterations_without_progress_threshold(500);
         trainer.set_min_learning_rate(1e-6);
         trainer.set_mini_batch_size(50);
         trainer.set_max_num_epochs(160);
         trainer.train(inputs, labels);
         const auto error_after = compute_error();
         DLIB_TEST_MSG(error_after < error_before, "multi channel error increased after training");
-
     }
 
 // ----------------------------------------------------------------------------------------
@@ -2646,15 +2636,7 @@ namespace
             {
                 for (size_t c = 0; c < num_channels; ++c)
                 {
-                    auto diff = out[i][c] - labels[i][c];
-                    auto sqerror = pointwise_multiply(diff, diff);
-                    double mse = 0.0;
-                    for (const auto elem : sqerror)
-                    {
-                        mse += elem;
-                    }
-                    mse /= sqerror.size();
-                    error += mse;
+                    error += mean(squared(out[i][c] - labels[i][c]));
                 }
             }
             return error / out.size() / num_channels;
