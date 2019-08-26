@@ -2526,7 +2526,8 @@ namespace
         using net_type = loss_mean_squared_per_channel_and_pixel<num_channels,
                             extract<0, num_channels, 1, dimension,
                             fc<num_outputs,
-                            input<matrix<float>>>>>;
+                            relu<bn_fc<fc<500,
+                            input<matrix<float>>>>>>>>;
         net_type net;
 
         const auto compute_error = [&inputs, &labels, &net, num_channels]()
@@ -2549,7 +2550,6 @@ namespace
         trainer.set_iterations_without_progress_threshold(500);
         trainer.set_min_learning_rate(1e-6);
         trainer.set_mini_batch_size(50);
-        trainer.set_max_num_epochs(160);
         trainer.train(inputs, labels);
         const auto error_after = compute_error();
         DLIB_TEST_MSG(error_after < error_before, "multi channel error increased after training");
