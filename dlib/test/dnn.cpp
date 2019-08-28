@@ -2497,7 +2497,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    void test_loss_mean_squared_per_channel_and_pixel_simple()
+    void test_loss_mean_squared_per_channel_and_pixel()
     {
         print_spinner();
 
@@ -2550,103 +2550,6 @@ namespace
         trainer.set_iterations_without_progress_threshold(500);
         trainer.set_min_learning_rate(1e-6);
         trainer.set_mini_batch_size(50);
-        trainer.train(inputs, labels);
-        const auto error_after = compute_error();
-        DLIB_TEST_MSG(error_after < error_before, "multi channel error increased after training");
-    }
-
-// ----------------------------------------------------------------------------------------
-    void test_loss_mean_squared_per_channel_and_pixel()
-    {
-        print_spinner();
-
-        dlib::rand rnd;
-        const long num_channels = 9;
-        const int num_rows = 8;
-        const int num_cols = 8;
-        const int num_samples = 1000;
-
-        // In this test, we are going to generate an image black image with 9
-        // white pixels and set up a network to output each pixel in a separate
-        // channel. The pixel numbering goes as follows (we assume padding at
-        // the borders and between pixels:
-        //
-        //  -------      -------
-        // | * * * |    | 0 1 2 |
-        // | * * * |    | 3 4 5 |
-        // | * * * |    | 6 7 8 |
-        //  -------      -------
-        //
-        // the main thing to notice when using this layer is that the output of
-        // the subnetwork needs to have the same number of channels as the
-        // channels we specify
-        using net_type = loss_mean_squared_per_channel_and_pixel<num_channels,
-                            htan<con<num_channels, 1, 1, 1, 1,
-                            relu<cont<32, 2, 2, 2, 2,
-                            relu<con<32, 2, 2, 2, 2,
-                            input<matrix<float>>>>>>>>>;
-        net_type net;
-        matrix<float> background = -ones_matrix<float>(num_rows, num_cols);
-        ::std::array<matrix<float>, num_channels> backgrounds;
-        for (size_t i = 0; i < backgrounds.size(); ++i)
-        {
-            backgrounds[i] = background;
-        }
-        std::array<matrix<float>, num_channels> dot_planes;
-        int k = 0;
-        // generate the 9 dot positions for ground truth
-        for (auto i : {1, 3, 5})
-        {
-            for (auto j : {1, 3, 5})
-            {
-                dot_planes[k] = background;
-                dot_planes[k](i, j) = 1.f;
-                ++k;
-            }
-        }
-        // initialize all inputs and labels to 0
-        ::std::vector<matrix<float>> inputs(num_samples, background);
-        ::std::vector<::std::array<matrix<float>, num_channels>> labels(num_samples, backgrounds);
-        for (auto n = 0; n < num_samples; ++n)
-        {
-            // generate a random sample (which will have up to 9 white dots)
-            for (long i = 0; i < num_channels; ++i)
-            {
-                auto x = rnd.get_integer_in_range(0, 3) * 2 + 1;
-                auto y = rnd.get_integer_in_range(0, 3) * 2 + 1;
-                auto idx = (x - 1) / 2 * 3 + (y - 1) / 2;
-                inputs[n] = max_pointwise(dot_planes[idx], inputs[n]);
-                labels[n][idx] = dot_planes[idx];
-            }
-            ::std::vector<matrix<float>> planes;
-            for (size_t i = 0; i < labels[n].size(); ++i)
-            {
-                // std::cout << labels[n][i] << std::endl;
-                matrix<float> plane;
-                dlib::assign_image(plane, labels[n][i]);
-                planes.push_back(plane);
-            }
-        }
-
-        const auto compute_error = [&inputs, &labels, &net, num_channels]()
-        {
-            const auto out = net(inputs);
-            double error = 0.0;
-            for (size_t i = 0; i < out.size(); ++i)
-            {
-                for (size_t c = 0; c < num_channels; ++c)
-                {
-                    error += mean(squared(out[i][c] - labels[i][c]));
-                }
-            }
-            return error / out.size() / num_channels;
-        };
-
-        const auto error_before = compute_error();
-        dnn_trainer<net_type> trainer(net);
-        trainer.set_learning_rate(0.01);
-        trainer.set_max_num_epochs(1000);
-        trainer.set_mini_batch_size(32);
         trainer.train(inputs, labels);
         const auto error_after = compute_error();
         DLIB_TEST_MSG(error_after < error_before, "multi channel error increased after training");
@@ -3409,7 +3312,6 @@ namespace
             test_simple_linear_regression_with_mult_prev();
             test_multioutput_linear_regression();
             test_simple_autoencoder();
-            test_loss_mean_squared_per_channel_and_pixel_simple();
             test_loss_mean_squared_per_channel_and_pixel();
             test_loss_multiclass_per_pixel_learned_params_on_trivial_single_pixel_task();
             test_loss_multiclass_per_pixel_activations_on_trivial_single_pixel_task();
