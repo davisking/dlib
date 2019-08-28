@@ -1495,7 +1495,68 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_dot_ 
+    template<long _num_channels>
+    class loss_mean_squared_per_channel_and_pixel_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the mean squared loss,
+                which is appropriate for regression problems.  It is basically just like
+                loss_mean_squared_per_pixel_ except that it computes the loss over all
+                channels, not just the first one.
+        !*/
+    public:
+
+        typedef std::array<matrix<float>, _num_channels> training_label_type;
+        typedef std::array<matrix<float>, _num_channels> output_label_type;
+
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that:
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.get_output().k() == _num_channels
+                - sub.sample_expansion_factor() == 1
+            and the output labels are the predicted continuous variables.
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient()
+            except it has the additional calling requirements that:
+                - sub.get_output().k() == _num_channels
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+                - for all idx such that 0 <= idx < sub.get_output().num_samples():
+                    - sub.get_output().nr() == (*(truth + idx)).nr()
+                    - sub.get_output().nc() == (*(truth + idx)).nc()
+        !*/
+    };
+
+    template <long num_channels, typename SUBNET>
+    using loss_mean_squared_per_channel_and_pixel = add_loss_layer<loss_mean_squared_per_channel_and_pixel_<num_channels>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_dot_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
