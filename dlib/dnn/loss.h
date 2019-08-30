@@ -1240,7 +1240,7 @@ namespace dlib
 
                 hit_truth_table.assign(hit_truth_table.size(), false);
                 final_dets.clear();
-
+                truth_idxs.clear();
 
                 // Now figure out which detections jointly maximize the loss and detection score sum.  We
                 // need to take into account the fact that allowing a true detection in the output, while 
