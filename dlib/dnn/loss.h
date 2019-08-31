@@ -1139,7 +1139,8 @@ namespace dlib
                     det_thresh_speed_adjust = std::max(det_thresh_speed_adjust,dets[max_num_initial_dets].detection_confidence + options.loss_per_false_alarm);
                 }
 
-                std::vector<size_t> truth_idxs;  truth_idxs.reserve(truth->size());
+                std::vector<size_t> truth_idxs;
+                truth_idxs.reserve(truth->size());
 
                 // The loss will measure the number of incorrect detections.  A detection is
                 // incorrect if it doesn't hit a truth rectangle or if it is a duplicate detection
@@ -1155,6 +1156,7 @@ namespace dlib
                         {
                             // Ignore boxes that can't be detected by the CNN.
                             loss -= options.loss_per_missed_target;
+                            truth_idxs.push_back(0);
                             continue;
                         }
                         const size_t idx = (k*output_tensor.nr() + p.y())*output_tensor.nc() + p.x();
