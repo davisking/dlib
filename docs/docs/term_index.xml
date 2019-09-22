@@ -123,6 +123,7 @@
          <term file="ml.html" name="input_rgb_image" include="dlib/dnn.h"/>
          <term file="ml.html" name="input_rgb_image_sized" include="dlib/dnn.h"/>
          <term file="ml.html" name="input_rgb_image_pyramid" include="dlib/dnn.h"/>
+         <term file="ml.html" name="input_grayscale_image_pyramid" include="dlib/dnn.h"/>
 
          <term file="ml.html" name="dnn_trainer" include="dlib/dnn.h"/>
 
@@ -134,7 +135,8 @@
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_multiclass_log_per_pixel_weighted_" include="dlib/dnn.h"/>
-         <term file="dlib/dnn/loss_abstract.h.html" name="loss_mean_squared_per_pixel_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_mean_squared_per_channel_and_pixel_" include="dlib/dnn.h"/>
+         <term file="dlib/dnn/loss_abstract.h.html" name="loss_mean_squared_per_channel_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_ranking_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_dot_" include="dlib/dnn.h"/>
          <term file="dlib/dnn/loss_abstract.h.html" name="loss_epsilon_insensitive_" include="dlib/dnn.h"/>

@@ -12,6 +12,35 @@
 
 <current>
 New Features and Improvements:
+   - Make dlib.full_object_detection take list of dlib.point or dlib.points.
+   - CMake scripts will automatically include the Intel MKL's iomp dll in the
+     output folder to reduce confusion for windows users who haven't added the
+     Intel MKL to their PATH.  This avoids a dll not found error that would
+     otherwise result in that situation.
+   - load_jpeg() now supports loading from a memory buffer.
+   - Added input_grayscale_image_pyramid DNN input layer.
+   - Added loss_mean_squared_per_channel DNN input layer.
+   - Added methods for getting keyboard and mouse clicks to image_window's python API.
+   - Made pkg-config report all needed include and link settings to use dlib.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Setting a point's y coordinate changed x instead, when done from Python.
+     This has been fixed.
+   - Fixed global_function_search's initialization being wrong if explicitly
+     given an empty list of initial function evaluations.
+   - Fixed compile time errors on some uncommon system configurations.
+   - Work around bugs in CUDA runtime on some systems.
+   - Various improvements to CMake built scripts to handle unusual system configurations.
+   - Fixed bug in multi-GPU training of semantic segmentation models.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.17" date="Mar 10, 2019">
+New Features and Improvements:
    - Added weighted labels to loss_binary_log layer.
    - Added padding option to Python compute_face_descriptor() methods.
    - Added pointwise_divide function.
@@ -31,7 +60,7 @@ Bug fixes:
    - Fixed broken CUDA memcpy overload.
    - Fixed CMake not finding cusolver in CUDA 10.1. 
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
