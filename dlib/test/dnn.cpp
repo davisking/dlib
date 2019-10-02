@@ -2536,7 +2536,7 @@ namespace
             double error = 0.0;
             for (size_t i = 0; i < out.size(); ++i)
             {
-                for (size_t c = 0; c < num_channels; ++c)
+                for (long c = 0; c < num_channels; ++c)
                 {
                     error += mean(squared(out[i][c] - labels[i][c]));
                 }

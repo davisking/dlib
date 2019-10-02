@@ -3382,7 +3382,7 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const extract_& item, std::ostream& out)
+        friend void serialize(const extract_& /*item*/, std::ostream& out)
         {
             serialize("extract_", out);
             serialize(_offset, out);
@@ -3391,7 +3391,7 @@ namespace dlib
             serialize(_nc, out);
         }
 
-        friend void deserialize(extract_& item, std::istream& in)
+        friend void deserialize(extract_& /*item*/, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3413,7 +3413,7 @@ namespace dlib
             if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::extract_");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const extract_& item)
+        friend std::ostream& operator<<(std::ostream& out, const extract_& /*item*/)
         {
             out << "extract\t ("
                 << "offset="<<_offset
@@ -3424,7 +3424,7 @@ namespace dlib
             return out;
         }
 
-        friend void to_xml(const extract_& item, std::ostream& out)
+        friend void to_xml(const extract_& /*item*/, std::ostream& out)
         {
             out << "<extract";
             out << " offset='"<<_offset<<"'";
