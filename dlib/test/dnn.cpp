@@ -3233,6 +3233,131 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    // adapted from dnn_mmod_train_find_cars_ex.cpp
+    int ignore_overlapped_boxes(
+        std::vector<dlib::mmod_rect>& boxes,
+        const dlib::test_box_overlap& overlaps
+    )
+        /*!
+            ensures
+                - Whenever two rectangles in boxes overlap, according to overlaps(), we set the
+                  _second_ box to ignore.
+                - returns the number of newly ignored boxes.
+        !*/
+    {
+        int num_ignored = 0;
+        for (size_t i = 0; i < boxes.size(); ++i)
+        {
+            if (boxes[i].ignore)
+                continue;
+            for (size_t j = i + 1; j < boxes.size(); ++j)
+            {
+                if (boxes[j].ignore)
+                    continue;
+                if (overlaps(boxes[i], boxes[j]))
+                {
+                    ++num_ignored;
+                    boxes[j].ignore = true;
+                }
+            }
+        }
+        return num_ignored;
+    }
+
+    void test_loss_mmod()
+    {
+        print_spinner();
+
+        // Define input image size.
+        constexpr int nc = 20;
+        constexpr int nr = 20;
+
+        // Create a checkerboard pattern.
+        std::deque<point> labeled_points;
+        for (int y = 0; y < nr; ++y)
+            for (int x = y % 2 + 1; x < nc; x += 2)
+                labeled_points.emplace_back(x, y);
+
+        // Create training data that follows the generated pattern.
+        typedef matrix<float> input_image_type;
+
+        const auto generate_input_image = [&labeled_points, nr, nc]()
+        {
+            input_image_type sample(nr, nc);
+            sample = -1.0;
+
+            for (const auto& point : labeled_points)
+                sample(point.y(), point.x()) = 1.0;
+
+            return sample;
+        };
+
+        const auto generate_labels = [&labeled_points]()
+        {
+            const auto point_to_rect = [](const point& point) {
+                constexpr int rect_size = 5;
+                return centered_rect(
+                    point.x(), point.y(),
+                    rect_size, rect_size
+                );
+            };
+
+            std::vector<mmod_rect> labels;
+
+            std::transform(
+                labeled_points.begin(),
+                labeled_points.end(),
+                std::back_inserter(labels),
+                point_to_rect
+            );
+
+            return labels;
+        };
+
+        const input_image_type input_image = generate_input_image();
+        const std::vector<mmod_rect> original_labels = generate_labels();
+
+        // For simplicity, using no image pyramid. But the problem can be
+        // reproduced with an image pyramid as well:
+        // mmod_options options({ original_labels }, 5, 5);
+        mmod_options options(use_image_pyramid::no, { original_labels });
+
+        // Our labeled boxes overlap a lot. In some applications, reliable
+        // detection is not really feasible, if only a very small part of the
+        // object is visible. So we set the bar a little lower, and only allow
+        // a certain amount of overlap.
+        options.overlaps_nms = test_box_overlap(0.4);
+ 
+        // Define a simple network.
+        using net_type = loss_mmod<con<1,5,5,1,1,input<input_image_type>>>;
+        net_type net(options);
+        dnn_trainer<net_type> trainer(net, sgd(0.1));
+
+        // Train the network. The loss is not supposed to go negative.
+        for (int i = 0; i < 100; ++i) {
+            print_spinner();
+
+            // Because only a certain amount of overlap is allowed, we
+            // randomly set some of the labels to be ignored. Note that the
+            // truth boxes are still _correct_, and therefore it is important
+            // to preserve them (so that the corresponding locations are not
+            // trained as background).
+            auto labels = original_labels;
+            std::random_shuffle(labels.begin(), labels.end());
+            ignore_overlapped_boxes(labels, options.overlaps_nms);
+
+            // Train one epoch.
+            trainer.train_one_step({ input_image }, { labels });
+            DLIB_TEST(trainer.get_average_loss() >= 0.0);
+        }
+
+        // Inference should return something for the training data.
+        const auto dets = net(input_image);
+        DLIB_TEST(dets.size() > 0);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -3321,6 +3446,7 @@ namespace
             test_serialization();
             test_loss_dot();
             test_loss_multimulticlass_log();
+            test_loss_mmod();
         }
 
         void perform_test()
