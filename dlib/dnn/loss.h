@@ -13,6 +13,7 @@
 #include "../svm/ranking_tools.h"
 #include <sstream>
 #include <map>
+#include <unordered_set>
 
 namespace dlib
 {
@@ -1142,6 +1143,8 @@ namespace dlib
                 std::vector<size_t> truth_idxs;
                 truth_idxs.reserve(truth->size());
 
+                std::unordered_set<size_t> unique_truth_idxs;
+
                 // The loss will measure the number of incorrect detections.  A detection is
                 // incorrect if it doesn't hit a truth rectangle or if it is a duplicate detection
                 // on a truth rectangle.
@@ -1156,27 +1159,28 @@ namespace dlib
                         {
                             // Ignore boxes that can't be detected by the CNN.
                             loss -= options.loss_per_missed_target;
-                            truth_idxs.push_back(-1);
+                            truth_idxs.push_back(0);
                             continue;
                         }
                         const size_t idx = (k*output_tensor.nr() + p.y())*output_tensor.nc() + p.x();
-                        if (std::find(truth_idxs.begin(), truth_idxs.end(), idx) != truth_idxs.end())
+                        if (unique_truth_idxs.find(idx) != unique_truth_idxs.end())
                         {
                             // Ignore duplicate truth box in feature coordinates.
                             loss -= options.loss_per_missed_target;
-                            truth_idxs.push_back(-1);
+                            truth_idxs.push_back(0);
                             continue;
                         }
                         loss -= out_data[idx];
                         // compute gradient
                         g[idx] = -scale;
                         truth_idxs.push_back(idx);
+                        unique_truth_idxs.insert(idx);
                     }
                     else
                     {
                         // This box was ignored so shouldn't have been counted in the loss.
                         loss -= options.loss_per_missed_target;
-                        truth_idxs.push_back(-1);
+                        truth_idxs.push_back(0);
                     }
                 }
 
@@ -1233,7 +1237,6 @@ namespace dlib
                         if (options.overlaps_nms(best_matching_truth_box, (*truth)[i]))
                         {
                             const size_t idx = truth_idxs[i];
-                            assert(idx != -1);
                             // We are ignoring this box so we shouldn't have counted it in the
                             // loss in the first place.  So we subtract out the loss values we
                             // added for it in the code above.
