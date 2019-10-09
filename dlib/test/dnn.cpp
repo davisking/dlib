@@ -3233,37 +3233,6 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    // adapted from dnn_mmod_train_find_cars_ex.cpp
-    int ignore_overlapped_boxes(
-        std::vector<dlib::mmod_rect>& boxes,
-        const dlib::test_box_overlap& overlaps
-    )
-        /*!
-            ensures
-                - Whenever two rectangles in boxes overlap, according to overlaps(), we set the
-                  _second_ box to ignore.
-                - returns the number of newly ignored boxes.
-        !*/
-    {
-        int num_ignored = 0;
-        for (size_t i = 0; i < boxes.size(); ++i)
-        {
-            if (boxes[i].ignore)
-                continue;
-            for (size_t j = i + 1; j < boxes.size(); ++j)
-            {
-                if (boxes[j].ignore)
-                    continue;
-                if (overlaps(boxes[i], boxes[j]))
-                {
-                    ++num_ignored;
-                    boxes[j].ignore = true;
-                }
-            }
-        }
-        return num_ignored;
-    }
-
     void test_loss_mmod()
     {
         print_spinner();
@@ -3272,10 +3241,12 @@ namespace
         constexpr int nc = 20;
         constexpr int nr = 20;
 
+        constexpr int margin = 3;
+
         // Create a checkerboard pattern.
         std::deque<point> labeled_points;
-        for (int y = 0; y < nr; ++y)
-            for (int x = y % 2 + 1; x < nc; x += 2)
+        for (int y = margin; y < nr - margin; ++y)
+            for (int x = margin + 1 - y % 2; x < nc - margin; x += 2)
                 labeled_points.emplace_back(x, y);
 
         // Create training data that follows the generated pattern.
@@ -3315,38 +3286,21 @@ namespace
         };
 
         const input_image_type input_image = generate_input_image();
-        const std::vector<mmod_rect> original_labels = generate_labels();
+        const std::vector<mmod_rect> labels = generate_labels();
 
         // For simplicity, using no image pyramid. But the problem can be
         // reproduced with an image pyramid as well:
         // mmod_options options({ original_labels }, 5, 5);
-        mmod_options options(use_image_pyramid::no, { original_labels });
+        mmod_options options(use_image_pyramid::no, { labels });
 
-        // Our labeled boxes overlap a lot. In some applications, reliable
-        // detection is not really feasible, if only a very small part of the
-        // object is visible. So we set the bar a little lower, and only allow
-        // a certain amount of overlap.
-        options.overlaps_nms = test_box_overlap(0.4);
- 
         // Define a simple network.
-        using net_type = loss_mmod<con<1,5,5,1,1,input<input_image_type>>>;
+        using net_type = loss_mmod<con<1,5,5,1,1,con<1,5,5,2,2,input<input_image_type>>>>;
         net_type net(options);
         dnn_trainer<net_type> trainer(net, sgd(0.1));
 
         // Train the network. The loss is not supposed to go negative.
         for (int i = 0; i < 100; ++i) {
             print_spinner();
-
-            // Because only a certain amount of overlap is allowed, we
-            // randomly set some of the labels to be ignored. Note that the
-            // truth boxes are still _correct_, and therefore it is important
-            // to preserve them (so that the corresponding locations are not
-            // trained as background).
-            auto labels = original_labels;
-            std::random_shuffle(labels.begin(), labels.end());
-            ignore_overlapped_boxes(labels, options.overlaps_nms);
-
-            // Train one epoch.
             trainer.train_one_step({ input_image }, { labels });
             DLIB_TEST(trainer.get_average_loss() >= 0.0);
         }
@@ -3354,6 +3308,10 @@ namespace
         // Inference should return something for the training data.
         const auto dets = net(input_image);
         DLIB_TEST(dets.size() > 0);
+
+        // Indeed most of the truth objects should be found.
+        const auto approximate_expected_det_count = (nr - 2 * margin) * (nc - 2 * margin) / 4.0;
+        DLIB_TEST(fabs(dets.size() / approximate_expected_det_count - 1.0) < 0.1);
     }
 
 // ----------------------------------------------------------------------------------------
