@@ -13,7 +13,7 @@
 #include "../svm/ranking_tools.h"
 #include <sstream>
 #include <map>
-#include <unordered_set>
+#include <unordered_map>
 
 namespace dlib
 {
@@ -1143,7 +1143,7 @@ namespace dlib
                 std::vector<size_t> truth_idxs;
                 truth_idxs.reserve(truth->size());
 
-                std::unordered_set<size_t> unique_truth_idxs;
+                std::unordered_map<size_t, std::deque<rectangle>> truth_idx_to_truth_rects;
 
                 // The loss will measure the number of incorrect detections.  A detection is
                 // incorrect if it doesn't hit a truth rectangle or if it is a duplicate detection
@@ -1159,28 +1159,34 @@ namespace dlib
                         {
                             // Ignore boxes that can't be detected by the CNN.
                             loss -= options.loss_per_missed_target;
-                            truth_idxs.push_back(0);
+                            truth_idxs.push_back(-1);
                             continue;
                         }
                         const size_t idx = (k*output_tensor.nr() + p.y())*output_tensor.nc() + p.x();
-                        if (unique_truth_idxs.find(idx) != unique_truth_idxs.end())
+                        const auto i = truth_idx_to_truth_rects.find(idx);
+                        if (i != truth_idx_to_truth_rects.end())
                         {
                             // Ignore duplicate truth box in feature coordinates.
+                            std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << x.rect;
+                            std::cout << " because it maps to the exact same feature coordinates as another truth rectangle located at ";
+                            std::cout << i->second.front() << "." << std::endl;
+
                             loss -= options.loss_per_missed_target;
-                            truth_idxs.push_back(0);
+                            truth_idxs.push_back(-1);
+                            i->second.push_back(x.rect);
                             continue;
                         }
                         loss -= out_data[idx];
                         // compute gradient
                         g[idx] = -scale;
                         truth_idxs.push_back(idx);
-                        unique_truth_idxs.insert(idx);
+                        truth_idx_to_truth_rects[idx].push_back(x.rect);
                     }
                     else
                     {
                         // This box was ignored so shouldn't have been counted in the loss.
                         loss -= options.loss_per_missed_target;
-                        truth_idxs.push_back(0);
+                        truth_idxs.push_back(-1);
                     }
                 }
 
@@ -1237,16 +1243,19 @@ namespace dlib
                         if (options.overlaps_nms(best_matching_truth_box, (*truth)[i]))
                         {
                             const size_t idx = truth_idxs[i];
-                            // We are ignoring this box so we shouldn't have counted it in the
-                            // loss in the first place.  So we subtract out the loss values we
-                            // added for it in the code above.
-                            loss -= options.loss_per_missed_target-out_data[idx];
-                            g[idx] = 0;
-                            std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << (*truth)[i].rect;
-                            std::cout << " that is suppressed by non-max-suppression ";
-                            std::cout << "because it is overlapped by another truth rectangle located at " << best_matching_truth_box 
-                                      << " (IoU:"<< box_intersection_over_union(best_matching_truth_box,(*truth)[i]) <<", Percent covered:" 
-                                      << box_percent_covered(best_matching_truth_box,(*truth)[i]) << ")." << std::endl;
+                            if (idx != -1)
+                            {
+                                // We are ignoring this box so we shouldn't have counted it in the
+                                // loss in the first place.  So we subtract out the loss values we
+                                // added for it in the code above.
+                                loss -= options.loss_per_missed_target-out_data[idx];
+                                g[idx] = 0;
+                                std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << (*truth)[i].rect;
+                                std::cout << " that is suppressed by non-max-suppression ";
+                                std::cout << "because it is overlapped by another truth rectangle located at " << best_matching_truth_box 
+                                          << " (IoU:"<< box_intersection_over_union(best_matching_truth_box,(*truth)[i]) <<", Percent covered:" 
+                                          << box_percent_covered(best_matching_truth_box,(*truth)[i]) << ")." << std::endl;
+                            }
                         }
                     }
                 }
