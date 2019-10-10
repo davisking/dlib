@@ -3288,9 +3288,6 @@ namespace
         const input_image_type input_image = generate_input_image();
         const std::vector<mmod_rect> labels = generate_labels();
 
-        // For simplicity, using no image pyramid. But the problem can be
-        // reproduced with an image pyramid as well:
-        // mmod_options options({ original_labels }, 5, 5);
         mmod_options options(use_image_pyramid::no, { labels });
 
         // Define a simple network.
