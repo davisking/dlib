@@ -3306,9 +3306,10 @@ namespace
         const auto dets = net(input_image);
         DLIB_TEST(dets.size() > 0);
 
-        // Indeed most of the truth objects should be found.
-        const auto approximate_expected_det_count = (nr - 2 * margin) * (nc - 2 * margin) / 4.0;
-        DLIB_TEST(fabs(dets.size() / approximate_expected_det_count - 1.0) < 0.1);
+        // Indeed many truth objects should be found.
+        const auto approximate_desired_det_count = (nr - 2 * margin) * (nc - 2 * margin) / 2.0;
+        DLIB_TEST(dets.size() > approximate_desired_det_count * 0.45);
+        DLIB_TEST(dets.size() < approximate_desired_det_count * 1.05);
     }
 
 // ----------------------------------------------------------------------------------------
