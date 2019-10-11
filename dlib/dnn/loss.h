@@ -1143,7 +1143,7 @@ namespace dlib
                 std::vector<size_t> truth_idxs;
                 truth_idxs.reserve(truth->size());
 
-                std::unordered_map<size_t, std::deque<rectangle>> truth_idx_to_truth_rects;
+                std::unordered_map<size_t, rectangle> idx_to_truth_rect;
 
                 // The loss will measure the number of incorrect detections.  A detection is
                 // incorrect if it doesn't hit a truth rectangle or if it is a duplicate detection
@@ -1163,24 +1163,23 @@ namespace dlib
                             continue;
                         }
                         const size_t idx = (k*output_tensor.nr() + p.y())*output_tensor.nc() + p.x();
-                        const auto i = truth_idx_to_truth_rects.find(idx);
-                        if (i != truth_idx_to_truth_rects.end())
+                        const auto i = idx_to_truth_rect.find(idx);
+                        if (i != idx_to_truth_rect.end())
                         {
                             // Ignore duplicate truth box in feature coordinates.
                             std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << x.rect;
-                            std::cout << " because it maps to the exact same feature coordinates as another truth rectangle located at ";
-                            std::cout << i->second.front() << "." << std::endl;
+                            std::cout << ", and we are ignoring it because it maps to the exact same feature coordinates ";
+                            std::cout << "as another truth rectangle located at " << i->second << "." << std::endl;
 
                             loss -= options.loss_per_missed_target;
                             truth_idxs.push_back(-1);
-                            i->second.push_back(x.rect);
                             continue;
                         }
                         loss -= out_data[idx];
                         // compute gradient
                         g[idx] = -scale;
                         truth_idxs.push_back(idx);
-                        truth_idx_to_truth_rects[idx].push_back(x.rect);
+                        idx_to_truth_rect[idx] = x.rect;
                     }
                     else
                     {
