@@ -3233,6 +3233,87 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_loss_mmod()
+    {
+        print_spinner();
+
+        // Define input image size.
+        constexpr int nc = 20;
+        constexpr int nr = 20;
+
+        constexpr int margin = 3;
+
+        // Create a checkerboard pattern.
+        std::deque<point> labeled_points;
+        for (int y = margin; y < nr - margin; ++y)
+            for (int x = margin + 1 - y % 2; x < nc - margin; x += 2)
+                labeled_points.emplace_back(x, y);
+
+        // Create training data that follows the generated pattern.
+        typedef matrix<float> input_image_type;
+
+        const auto generate_input_image = [&labeled_points, nr, nc]()
+        {
+            input_image_type sample(nr, nc);
+            sample = -1.0;
+
+            for (const auto& point : labeled_points)
+                sample(point.y(), point.x()) = 1.0;
+
+            return sample;
+        };
+
+        const auto generate_labels = [&labeled_points]()
+        {
+            const auto point_to_rect = [](const point& point) {
+                constexpr int rect_size = 5;
+                return centered_rect(
+                    point.x(), point.y(),
+                    rect_size, rect_size
+                );
+            };
+
+            std::vector<mmod_rect> labels;
+
+            std::transform(
+                labeled_points.begin(),
+                labeled_points.end(),
+                std::back_inserter(labels),
+                point_to_rect
+            );
+
+            return labels;
+        };
+
+        const input_image_type input_image = generate_input_image();
+        const std::vector<mmod_rect> labels = generate_labels();
+
+        mmod_options options(use_image_pyramid::no, { labels });
+
+        // Define a simple network.
+        using net_type = loss_mmod<con<1,5,5,1,1,con<1,5,5,2,2,input<input_image_type>>>>;
+        net_type net(options);
+        dnn_trainer<net_type> trainer(net, sgd(0.1));
+
+        // Train the network. The loss is not supposed to go negative.
+        for (int i = 0; i < 100; ++i) {
+            print_spinner();
+            trainer.train_one_step({ input_image }, { labels });
+            DLIB_TEST(trainer.get_average_loss() >= 0.0);
+        }
+
+        // Inference should return something for the training data.
+        const auto dets = net(input_image);
+        DLIB_TEST(dets.size() > 0);
+
+        // Indeed many truth objects should be found.
+        const auto approximate_desired_det_count = (nr - 2 * margin) * (nc - 2 * margin) / 2.0;
+        DLIB_TEST(dets.size() > approximate_desired_det_count * 0.45);
+        DLIB_TEST(dets.size() < approximate_desired_det_count * 1.05);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class dnn_tester : public tester
     {
     public:
@@ -3321,6 +3402,7 @@ namespace
             test_serialization();
             test_loss_dot();
             test_loss_multimulticlass_log();
+            test_loss_mmod();
         }
 
         void perform_test()
