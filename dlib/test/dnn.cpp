@@ -3232,7 +3232,9 @@ namespace
     }
 
 // ----------------------------------------------------------------------------------------
-
+    
+    // This test really just checks if the mmod loss goes negative when a whole lot of overlapping
+    // truth rectangles are given.  
     void test_loss_mmod()
     {
         print_spinner();
