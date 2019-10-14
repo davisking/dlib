@@ -1204,7 +1204,7 @@ namespace dlib
 
                     const auto& det_label = options.detector_windows[dets[i].tensor_channel].label;
 
-                    const std::pair<double,unsigned int> hittruth = find_best_match(*truth, dets[i].rect, det_label);
+                    const std::pair<double,unsigned int> hittruth = find_best_match(*truth, hit_truth_table, dets[i].rect, det_label);
 
                     final_dets.push_back(dets[i].rect);
 
@@ -1273,7 +1273,7 @@ namespace dlib
 
                     const auto& det_label = options.detector_windows[dets[i].tensor_channel].label;
 
-                    const std::pair<double,unsigned int> hittruth = find_best_match(*truth, dets[i].rect, det_label);
+                    const std::pair<double,unsigned int> hittruth = find_best_match(*truth, hit_truth_table, dets[i].rect, det_label);
 
                     const double truth_match = hittruth.first;
                     if (truth_match > options.truth_match_iou_threshold)
@@ -1633,22 +1633,29 @@ namespace dlib
 
         std::pair<double,unsigned int> find_best_match(
             const std::vector<mmod_rect>& boxes,
+            const std::vector<bool>& hit_truth_table,
             const rectangle& rect,
             const std::string& label
         ) const
         {
             double match = 0;
             unsigned int best_idx = 0;
-            for (unsigned long i = 0; i < boxes.size(); ++i)
-            {
-                if (boxes[i].ignore || boxes[i].label != label)
-                    continue;
 
-                const double new_match = box_intersection_over_union(rect, boxes[i]);
-                if (new_match > match)
+            for (int allow_duplicate_hit = 0; allow_duplicate_hit <= 1 && match == 0; ++allow_duplicate_hit)
+            {
+                for (unsigned long i = 0; i < boxes.size(); ++i)
                 {
-                    match = new_match;
-                    best_idx = i;
+                    if (boxes[i].ignore || boxes[i].label != label)
+                        continue;
+                    if (!allow_duplicate_hit && hit_truth_table[i])
+                        continue;
+
+                    const double new_match = box_intersection_over_union(rect, boxes[i]);
+                    if (new_match > match)
+                    {
+                        match = new_match;
+                        best_idx = i;
+                    }
                 }
             }
 
