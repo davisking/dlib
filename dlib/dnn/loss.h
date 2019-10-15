@@ -1140,7 +1140,7 @@ namespace dlib
                     det_thresh_speed_adjust = std::max(det_thresh_speed_adjust,dets[max_num_initial_dets].detection_confidence + options.loss_per_false_alarm);
                 }
 
-                std::vector<size_t> truth_idxs;
+                std::vector<int> truth_idxs;
                 truth_idxs.reserve(truth->size());
 
                 std::unordered_map<size_t, rectangle> idx_to_truth_rect;
@@ -1197,7 +1197,7 @@ namespace dlib
 
                 std::vector<intermediate_detection> final_dets;
                 // The point of this loop is to fill out the truth_score_hits array. 
-                for (unsigned long i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
+                for (size_t i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
                 {
                     if (overlaps_any_box_nms(final_dets, dets[i].rect))
                         continue;
@@ -1241,7 +1241,7 @@ namespace dlib
                         rectangle best_matching_truth_box = (*truth)[hittruth.second];
                         if (options.overlaps_nms(best_matching_truth_box, (*truth)[i]))
                         {
-                            const size_t idx = truth_idxs[i];
+                            const int idx = truth_idxs[i];
                             if (idx != -1)
                             {
                                 // We are ignoring this box so we shouldn't have counted it in the
