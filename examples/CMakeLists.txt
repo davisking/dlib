@@ -42,6 +42,17 @@ project(examples)
 # cmake needs is the dlib source code folder and it will take care of everything.
 add_subdirectory(../dlib dlib_build)
 
+# If you have cmake 3.11 or newer you can even use FetchContent instead of
+# add_subdirectory() to pull in dlib as a dependency.  So instead of using the
+# above add_subdirectory() command, you could use the following three commands
+# to make dlib available:
+#  include(FetchContent)
+#  FetchContent_Declare(dlib
+#      GIT_REPOSITORY https://github.com/davisking/dlib.git
+#      GIT_TAG        v19.18
+#  )
+#  FetchContent_MakeAvailable(dlib)
+
 
 # The next thing we need to do is tell CMake about the code you want to
 # compile.  We do this with the add_executable() statement which takes the name
