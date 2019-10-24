@@ -26,7 +26,7 @@ if(JPEG_FOUND)
       ${PROJECT_BINARY_DIR}/test_for_libjpeg_build  
       ${CMAKE_CURRENT_LIST_DIR}/test_for_libjpeg
       test_if_libjpeg_is_broken
-      CMAKE_FLAGS ${JPEG_TEST_CMAKE_FLAGS})
+      CMAKE_FLAGS "${JPEG_TEST_CMAKE_FLAGS}")
 
    message (STATUS "Found system copy of libjpeg: ${JPEG_LIBRARY}")
    if(NOT test_for_libjpeg_worked)
