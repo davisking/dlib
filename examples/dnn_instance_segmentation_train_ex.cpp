@@ -190,6 +190,8 @@ det_bnet_type train_detection_network(
     mmod_options options(mmod_rects, 70, 30);
     det_bnet_type det_net(options);
 
+    det_net.subnet().layer_details().set_num_filters(options.detector_windows.size());
+
     dlib::pipe<det_training_sample> data(200);
     auto f = [&data, &listing, &mmod_rects](time_t seed)
     {
