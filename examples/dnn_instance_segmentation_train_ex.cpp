@@ -190,6 +190,9 @@ det_bnet_type train_detection_network(
     const double momentum = 0.9;
 
     mmod_options options(mmod_rects, 70, 30);
+    
+    options.overlaps_ignore = test_box_overlap(0.5, 0.95);
+
     det_bnet_type det_net(options);
 
     det_net.subnet().layer_details().set_num_filters(options.detector_windows.size());
