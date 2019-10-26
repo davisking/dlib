@@ -372,6 +372,8 @@ seg_bnet_type train_segmentation_network(
                 const auto& mmod_rect = image_rects[rnd.get_random_32bit_number() % image_rects.size()];
                 const chip_details chip_details(mmod_rect.rect, chip_dims(seg_dim, seg_dim));
 
+                // TODO: expand the rect by 20% or so (by a hard-coded value that will be available for inference as well)
+
                 // Crop the input image.
                 extract_image_chip(input_image, chip_details, temp.input_image, interpolate_bilinear());
 

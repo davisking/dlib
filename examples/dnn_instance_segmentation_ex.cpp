@@ -81,6 +81,8 @@ int main(int argc, char** argv) try
 
         for (const auto& instance : instances)
         {
+            // TODO: expand the rect by 20% or so (by the same value that was used in training)
+
             const chip_details chip_details(instance.rect, chip_dims(seg_dim, seg_dim));
             extract_image_chip(input_image, chip_details, input_chip, interpolate_bilinear());
 
