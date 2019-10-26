@@ -292,12 +292,13 @@ rgb_pixel decide_main_instance(const matrix<rgb_pixel>& rgb_label_image)
 
 matrix<uint16_t> keep_only_main_instance(const matrix<rgb_pixel>& rgb_label_image)
 {
-    matrix<uint16_t> result;
+    const auto nr = rgb_label_image.nr();
+    const auto nc = rgb_label_image.nc();
+
+    matrix<uint16_t> result(nr, nc);
 
     const auto main_instance = decide_main_instance(rgb_label_image);
 
-    const auto nr = rgb_label_image.nr();
-    const auto nc = rgb_label_image.nc();
     for (long r = 0; r < nr; ++r)
     {
         for (long c = 0; c < nc; ++c)
