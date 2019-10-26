@@ -125,6 +125,13 @@ namespace dlib
         unsigned char red;
         unsigned char green;
         unsigned char blue;
+
+        inline bool operator == (const rgb_pixel& that) const
+        {
+            return this->red   == that.red
+                && this->green == that.green
+                && this->blue  == that.blue;
+        }
     };
 
 // ----------------------------------------------------------------------------------------

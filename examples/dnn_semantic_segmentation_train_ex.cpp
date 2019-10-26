@@ -216,7 +216,7 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
         // that is not exactly the same size as the input.
         const matrix<uint16_t> temp = anet(input_image);
 
-        // Convert the indexes to RGB values.
+        // Convert the RGB values to indexes.
         rgb_label_image_to_index_label_image(rgb_label_image, index_label_image);
 
         // Crop the net output to be exactly the same size as the input.
@@ -326,7 +326,7 @@ int main(int argc, char** argv) try
             // Load the ground-truth (RGB) labels.
             load_image(rgb_label_image, image_info.label_filename);
 
-            // Convert the indexes to RGB values.
+            // Convert the RGB values to indexes.
             rgb_label_image_to_index_label_image(rgb_label_image, index_label_image);
 
             // Randomly pick a part of the image.
