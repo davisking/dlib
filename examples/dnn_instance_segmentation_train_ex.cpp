@@ -155,6 +155,8 @@ std::vector<dlib::mmod_rect> rgb_label_image_to_mmod_rects(
                 // Encountered a new instance
                 instance_indexes[rgb_label] = mmod_rects.size();
                 mmod_rects.emplace_back(dlib::rectangle(c, r, c, r));
+
+                // TODO: read the instance's class from the other png!
             }
             else
             {
@@ -460,7 +462,7 @@ std::vector<std::vector<dlib::mmod_rect>> load_all_mmod_rects(const std::vector<
 
 int main(int argc, char** argv) try
 {
-    if (argc < 2 || argc > 3)
+    if (argc < 2 || argc > 4)
     {
         cout << "To run this program you need a copy of the PASCAL VOC2012 dataset." << endl;
         cout << endl;
@@ -480,7 +482,7 @@ int main(int argc, char** argv) try
     }
 
     // mini-batches smaller than the default can be used with GPUs having less memory
-    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 87;
+    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 75;
     const unsigned int seg_minibatch_size = argc >= 4 ? std::stoi(argv[3]) : 25;
     cout << "det mini-batch size: " << det_minibatch_size << endl;
     cout << "seg mini-batch size: " << seg_minibatch_size << endl;
