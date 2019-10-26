@@ -28,6 +28,7 @@
 #include <dlib/dir_nav.h>
 #include <iterator>
 #include <thread>
+#include <execution>
 
 using namespace std;
 using namespace dlib;
@@ -174,81 +175,21 @@ std::vector<dlib::mmod_rect> rgb_label_image_to_mmod_rects(
 
 // ----------------------------------------------------------------------------------------
 
-class cached_mmod_rects
-{
-public:
-    // returns true if found in cache, false if not
-    bool get(const std::string& filename, std::vector<mmod_rect>& result) const
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-
-        const auto i = mmod_rects.find(filename);
-
-        if (i == mmod_rects.end())
-            return false; // Not found in cache
-
-        result = i->second;
-        return true;
-    };
-
-    void keep(const std::string& filename, std::vector<mmod_rect> new_mmod_rects)
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        mmod_rects[filename] = new_mmod_rects;
-    }
-
-private:
-    mutable std::mutex mutex;
-    std::unordered_map<std::string, std::vector<mmod_rect>> mmod_rects;
-};
-
-// Get MMOD rects from cache, if available.
-// If not available in the cache, read the label image from disk and extract the rects
-// (and put them in cache so that they will be readily available next time around).
-std::vector<mmod_rect> get_mmod_rects(
-    const std::string& label_filename,
-    cached_mmod_rects& cached_mmod_rects,
-    matrix<rgb_pixel> rgb_label_image = matrix<rgb_pixel>()
-)
-{
-    std::vector<mmod_rect> result;
-
-    const bool found_in_cache = cached_mmod_rects.get(label_filename, result);
-
-    if (found_in_cache)
-    {
-        return result;
-    }
-
-    if (rgb_label_image.size() == 0)
-    {
-        // Load the ground-truth (RGB) labels.
-        load_image(rgb_label_image, label_filename);
-    }
-
-    // Find bounding rects of individual objects.
-    result = rgb_label_image_to_mmod_rects(rgb_label_image);
-
-    // Cache the values so they need not be re-calculated over and over again.
-    cached_mmod_rects.keep(label_filename, result);
-
-    return result;
-};
-
 det_bnet_type train_detection_network(
     const std::vector<image_info>& listing,
-    cached_mmod_rects& cached_mmod_rects,
+    const std::vector<std::vector<mmod_rect>>& mmod_rects,
     unsigned int det_minibatch_size
 )
 {
-    det_bnet_type det_net;
-
     const double initial_learning_rate = 0.1;
     const double weight_decay = 0.0001;
     const double momentum = 0.9;
 
+    mmod_options options(mmod_rects, 70, 30);
+    det_bnet_type det_net(options);
+
     dlib::pipe<det_training_sample> data(200);
-    auto f = [&data, &listing, &cached_mmod_rects](time_t seed)
+    auto f = [&data, &listing, &mmod_rects](time_t seed)
     {
         dlib::rand rnd(time(0) + seed);
         matrix<rgb_pixel> input_image;
@@ -267,16 +208,14 @@ det_bnet_type train_detection_network(
         while (data.is_enabled())
         {
             // Pick a random input image.
-            const image_info& image_info = listing[rnd.get_random_32bit_number() % listing.size()];
+            const auto random_index = rnd.get_random_32bit_number() % listing.size();
+            const image_info& image_info = listing[random_index];
 
             // Load the input image.
             load_image(input_image, image_info.image_filename);
 
-            // Get the MMOD rects from the label image.
-            const auto mmod_rects = get_mmod_rects(image_info.label_filename, cached_mmod_rects);
-
             // Get a random crop of the input.
-            cropper(input_image, mmod_rects, temp.input_image, temp.mmod_rects);
+            cropper(input_image, mmod_rects[random_index], temp.input_image, temp.mmod_rects);
 
             // Push the result to be used by the trainer.
             data.enqueue(temp);
@@ -366,7 +305,7 @@ matrix<uint16_t> keep_only_main_instance(const matrix<rgb_pixel>& rgb_label_imag
 
 seg_bnet_type train_segmentation_network(
     const std::vector<image_info>& listing,
-    cached_mmod_rects& cached_mmod_rects,
+    const std::vector<std::vector<mmod_rect>>& mmod_rects,
     unsigned int seg_minibatch_size
 )
 {
@@ -397,7 +336,7 @@ seg_bnet_type train_segmentation_network(
     // thread for this kind of data preparation helps us do that.  Each thread puts the
     // crops into the data queue.
     dlib::pipe<seg_training_sample> data(200);
-    auto f = [&data, &listing, &cached_mmod_rects](time_t seed)
+    auto f = [&data, &listing, &mmod_rects](time_t seed)
     {
         dlib::rand rnd(time(0) + seed);
         matrix<rgb_pixel> input_image;
@@ -407,21 +346,23 @@ seg_bnet_type train_segmentation_network(
         while (data.is_enabled())
         {
             // Pick a random input image.
-            const image_info& image_info = listing[rnd.get_random_32bit_number() % listing.size()];
-
-            // Load the input image.
-            load_image(input_image, image_info.image_filename);
-
-            // Load the ground-truth (RGB) labels.
-            load_image(rgb_label_image, image_info.label_filename);
+            const auto random_index = rnd.get_random_32bit_number() % listing.size();
 
             // Get the MMOD rects from the label image.
-            const auto mmod_rects = get_mmod_rects(image_info.label_filename, cached_mmod_rects, rgb_label_image);
+            const auto image_rects = mmod_rects[random_index];
             
-            if (!mmod_rects.empty())
+            if (!image_rects.empty())
             {
+                const image_info& image_info = listing[random_index];
+
+                // Load the input image.
+                load_image(input_image, image_info.image_filename);
+
+                // Load the ground-truth (RGB) labels.
+                load_image(rgb_label_image, image_info.label_filename);
+
                 // Pick a random training instance.
-                const auto& mmod_rect = mmod_rects[rnd.get_random_32bit_number() % mmod_rects.size()];
+                const auto& mmod_rect = image_rects[rnd.get_random_32bit_number() % image_rects.size()];
                 const chip_details chip_details(mmod_rect.rect, chip_dims(seg_dim, seg_dim));
 
                 // Crop the input image.
@@ -489,6 +430,32 @@ seg_bnet_type train_segmentation_network(
 
 // ----------------------------------------------------------------------------------------
 
+std::vector<mmod_rect> load_mmod_rects(const image_info& image_info)
+{
+    matrix<rgb_pixel> rgb_label_image;
+    load_image(rgb_label_image, image_info.label_filename);
+    return rgb_label_image_to_mmod_rects(rgb_label_image);
+};
+
+std::vector<std::vector<dlib::mmod_rect>> load_all_mmod_rects(const std::vector<image_info>& listing)
+{
+    std::vector<std::vector<mmod_rect>> mmod_rects(listing.size());
+
+    std::transform(
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+        std::execution::par,
+#endif // __cplusplus >= 201703L
+        listing.begin(),
+        listing.end(),
+        mmod_rects.begin(),
+        load_mmod_rects
+    );
+
+    return mmod_rects;
+}
+
+// ----------------------------------------------------------------------------------------
+
 int main(int argc, char** argv) try
 {
     if (argc < 2 || argc > 3)
@@ -516,12 +483,12 @@ int main(int argc, char** argv) try
     cout << "det mini-batch size: " << det_minibatch_size << endl;
     cout << "seg mini-batch size: " << seg_minibatch_size << endl;
 
-    // keep a cache of the MMOD rects, because they will be needed over and over again
-    cached_mmod_rects cached_mmod_rects;
+    // extract the MMOD rects
+    const auto mmod_rects = load_all_mmod_rects(listing);
 
     // First train a detection network (loss_mmod), and then a mask segmentation network (loss_log_per_pixel)
-    const auto det_net = train_detection_network    (listing, cached_mmod_rects, det_minibatch_size);
-    const auto seg_net = train_segmentation_network (listing, cached_mmod_rects, seg_minibatch_size);
+    const auto det_net = train_detection_network    (listing, mmod_rects, det_minibatch_size);
+    const auto seg_net = train_segmentation_network (listing, mmod_rects, seg_minibatch_size);
 
     cout << "saving network" << endl;
     serialize(instance_segmentation_net_filename) << det_net << seg_net;
