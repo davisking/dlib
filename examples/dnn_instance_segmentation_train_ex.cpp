@@ -28,7 +28,9 @@
 #include <dlib/dir_nav.h>
 #include <iterator>
 #include <thread>
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
 #include <execution>
+#endif // __cplusplus >= 201703L
 
 using namespace std;
 using namespace dlib;
@@ -227,12 +229,13 @@ det_bnet_type train_detection_network(
     std::thread data_loader4([f]() { f(4); });
 
     dnn_trainer<det_bnet_type> det_trainer(det_net, sgd(weight_decay, momentum));
-
     det_trainer.be_verbose();
     det_trainer.set_learning_rate(initial_learning_rate);
     det_trainer.set_synchronization_file("pascal_voc2012_det_trainer_state_file.dat", std::chrono::minutes(10));
-
     det_trainer.set_iterations_without_progress_threshold(5000);
+
+    // Output training parameters.
+    cout << "Training detector network:" << endl << det_trainer << endl;
 
     std::vector<matrix<rgb_pixel>> samples;
     std::vector<std::vector<mmod_rect>> labels;
@@ -319,14 +322,11 @@ seg_bnet_type train_segmentation_network(
     seg_trainer.be_verbose();
     seg_trainer.set_learning_rate(initial_learning_rate);
     seg_trainer.set_synchronization_file("pascal_voc2012_seg_trainer_state_file.dat", std::chrono::minutes(10));
-    // This threshold is probably excessively large.
     seg_trainer.set_iterations_without_progress_threshold(5000);
-    // Since the progress threshold is so large might as well set the batch normalization
-    // stats window to something big too.
     set_all_bn_running_stats_window_sizes(seg_net, 1000);
 
     // Output training parameters.
-    cout << endl << seg_trainer << endl;
+    cout << "Training segmentation network:" << endl << seg_trainer << endl;
 
     std::vector<matrix<rgb_pixel>> samples;
     std::vector<matrix<uint16_t>> labels;
@@ -484,7 +484,9 @@ int main(int argc, char** argv) try
     cout << "seg mini-batch size: " << seg_minibatch_size << endl;
 
     // extract the MMOD rects
+    cout << "\nExtracting all MMOD rects...";
     const auto mmod_rects = load_all_mmod_rects(listing);
+    cout << " Done!" << endl << endl;
 
     // First train a detection network (loss_mmod), and then a mask segmentation network (loss_log_per_pixel)
     const auto det_net = train_detection_network    (listing, mmod_rects, det_minibatch_size);
