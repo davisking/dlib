@@ -470,9 +470,17 @@ int ignore_overlapped_boxes(
 std::vector<mmod_rect> load_mmod_rects(const image_info& image_info)
 {
     matrix<rgb_pixel> rgb_label_image;
+
     load_image(rgb_label_image, image_info.label_filename);
+
     auto mmod_rects = rgb_label_image_to_mmod_rects(rgb_label_image);
+
     ignore_overlapped_boxes(mmod_rects, test_box_overlap(0.50, 0.95));
+
+    for (auto& rect : mmod_rects)
+        if (rect.rect.width() < 35 && rect.rect.height() < 35)
+            rect.ignore = true;
+
     return mmod_rects;
 };
 
