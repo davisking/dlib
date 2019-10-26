@@ -434,11 +434,46 @@ seg_bnet_type train_segmentation_network(
 
 // ----------------------------------------------------------------------------------------
 
+int ignore_overlapped_boxes(
+    std::vector<mmod_rect>& boxes,
+    const test_box_overlap& overlaps
+)
+/*!
+    ensures
+        - Whenever two rectangles in boxes overlap, according to overlaps(), we set the
+          smallest box to ignore.
+        - returns the number of newly ignored boxes.
+!*/
+{
+    int num_ignored = 0;
+    for (size_t i = 0; i < boxes.size(); ++i)
+    {
+        if (boxes[i].ignore)
+            continue;
+        for (size_t j = i+1; j < boxes.size(); ++j)
+        {
+            if (boxes[j].ignore)
+                continue;
+            if (overlaps(boxes[i], boxes[j]))
+            {
+                ++num_ignored;
+                if(boxes[i].rect.area() < boxes[j].rect.area())
+                    boxes[i].ignore = true;
+                else
+                    boxes[j].ignore = true;
+            }
+        }
+    }
+    return num_ignored;
+}
+
 std::vector<mmod_rect> load_mmod_rects(const image_info& image_info)
 {
     matrix<rgb_pixel> rgb_label_image;
     load_image(rgb_label_image, image_info.label_filename);
-    return rgb_label_image_to_mmod_rects(rgb_label_image);
+    auto mmod_rects = rgb_label_image_to_mmod_rects(rgb_label_image);
+    ignore_overlapped_boxes(mmod_rects, test_box_overlap(0.50, 0.95));
+    return mmod_rects;
 };
 
 std::vector<std::vector<dlib::mmod_rect>> load_all_mmod_rects(const std::vector<image_info>& listing)
