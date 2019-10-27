@@ -264,6 +264,8 @@ det_bnet_type train_detection_network(
             // Get a random crop of the input.
             cropper(input_image, extract_mmod_rects(truth_instances[random_index]), temp.input_image, temp.mmod_rects);
 
+            disturb_colors(temp.input_image, rnd);
+
             // Push the result to be used by the trainer.
             data.enqueue(temp);
         }
@@ -403,10 +405,24 @@ seg_bnet_type train_segmentation_network(
                 // Pick a random training instance.
                 const auto& truth_instance = image_truths[rnd.get_random_32bit_number() % image_truths.size()];
                 const auto cropping_rect = get_cropping_rect(truth_instance.mmod_rect.rect);
-                const chip_details chip_details(cropping_rect, chip_dims(seg_dim, seg_dim));
+
+                // Pick a random crop around the instance.
+                const auto max_dim = static_cast<long>(std::max(cropping_rect.width(), cropping_rect.height()));
+                const auto max_x_translate_amount = (max_dim - static_cast<long>(truth_instance.mmod_rect.rect.width())) / 2;
+                const auto max_y_translate_amount = (max_dim - static_cast<long>(truth_instance.mmod_rect.rect.height())) / 2;
+
+                const auto random_translate = point(
+                    rnd.get_integer_in_range(-max_x_translate_amount, max_x_translate_amount),
+                    rnd.get_integer_in_range(-max_y_translate_amount, max_y_translate_amount)
+                );
+
+                const auto random_rect = move_rect(cropping_rect, random_translate);
+                const chip_details chip_details(random_rect, chip_dims(seg_dim, seg_dim));
 
                 // Crop the input image.
                 extract_image_chip(input_image, chip_details, temp.input_image, interpolate_bilinear());
+
+                disturb_colors(temp.input_image, rnd);
 
                 // Crop the labels correspondingly. However, note that here bilinear
                 // interpolation would make absolutely no sense - you wouldn't say that
@@ -415,8 +431,6 @@ seg_bnet_type train_segmentation_network(
 
                 // Clear pixels not related to the current instance.
                 temp.label_image = keep_only_current_instance(rgb_label_chip, truth_instance.rgb_label);
-
-                // TODO: Add some perturbation to the inputs.
 
                 // Push the result to be used by the trainer.
                 data.enqueue(temp);
