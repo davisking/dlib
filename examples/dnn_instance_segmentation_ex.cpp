@@ -71,8 +71,18 @@ int main(int argc, char** argv) try
         // Load the input image.
         load_image(input_image, file.full_name());
 
+        // Draw largest objects last
+        const auto sort_instances = [](const std::vector<mmod_rect>& input) {
+            auto output = input;
+            const auto compare_area = [](const mmod_rect& lhs, const mmod_rect& rhs) {
+                return lhs.rect.area() < rhs.rect.area();
+            };
+            std::sort(output.rbegin(), output.rend(), compare_area);
+            return output;
+        };
+
         // Find instances in the input image
-        const auto instances = det_net(input_image);
+        const auto instances = sort_instances(det_net(input_image));
 
         matrix<rgb_pixel> rgb_label_image;
         matrix<rgb_pixel> input_chip;
