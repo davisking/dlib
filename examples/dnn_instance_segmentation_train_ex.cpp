@@ -129,11 +129,17 @@ namespace std {
     };
 }
 
-std::vector<dlib::mmod_rect> rgb_label_image_to_mmod_rects(
+struct truth_instance
+{
+    dlib::mmod_rect mmod_rect;
+    dlib::rgb_pixel rgb_label;
+};
+
+std::deque<truth_instance> rgb_label_image_to_truth_instances(
     const dlib::matrix<dlib::rgb_pixel>& rgb_label_image
 )
 {
-    std::deque<dlib::mmod_rect> mmod_rects;
+    std::deque<truth_instance> results;
 
     std::unordered_map<dlib::rgb_pixel, int> instance_indexes;
 
@@ -153,15 +159,18 @@ std::vector<dlib::mmod_rect> rgb_label_image_to_mmod_rects(
             if (i == instance_indexes.end())
             {
                 // Encountered a new instance
-                instance_indexes[rgb_label] = mmod_rects.size();
-                mmod_rects.emplace_back(dlib::rectangle(c, r, c, r));
+                instance_indexes[rgb_label] = results.size();
+                results.emplace_back(truth_instance{
+                    dlib::rectangle(c, r, c, r),
+                    rgb_label
+                });
 
                 // TODO: read the instance's class from the other png!
             }
             else
             {
                 // Not the first occurrence - update the rect
-                auto& rect = mmod_rects[i->second].rect;
+                auto& rect = results[i->second].mmod_rect.rect;
 
                 if (c < rect.left())
                     rect.set_left(c);
@@ -174,14 +183,46 @@ std::vector<dlib::mmod_rect> rgb_label_image_to_mmod_rects(
         }
     }
 
-    return std::vector<dlib::mmod_rect>(mmod_rects.begin(), mmod_rects.end());
+    return results;
 }
 
 // ----------------------------------------------------------------------------------------
 
+std::vector<mmod_rect> extract_mmod_rects(
+    const std::deque<truth_instance>& truth_instances
+)
+{
+    std::vector<mmod_rect> mmod_rects(truth_instances.size());
+
+    std::transform(
+        truth_instances.begin(),
+        truth_instances.end(),
+        mmod_rects.begin(),
+        [](const truth_instance& truth) { return truth.mmod_rect; }
+    );
+
+    return mmod_rects;
+};
+
+std::vector<std::vector<mmod_rect>> extract_mmod_rect_vectors(
+    const std::vector<std::deque<truth_instance>>& truth_instances
+)
+{
+    std::vector<std::vector<mmod_rect>> mmod_rects(truth_instances.size());
+
+    std::transform(
+        truth_instances.begin(),
+        truth_instances.end(),
+        mmod_rects.begin(),
+        extract_mmod_rects
+    );
+
+    return mmod_rects;
+}
+
 det_bnet_type train_detection_network(
     const std::vector<image_info>& listing,
-    const std::vector<std::vector<mmod_rect>>& mmod_rects,
+    const std::vector<std::deque<truth_instance>>& truth_instances,
     unsigned int det_minibatch_size
 )
 {
@@ -189,13 +230,13 @@ det_bnet_type train_detection_network(
     const double weight_decay = 0.0001;
     const double momentum = 0.9;
 
-    mmod_options options(mmod_rects, 70, 30);
+    mmod_options options(extract_mmod_rect_vectors(truth_instances), 70, 30);
     det_bnet_type det_net(options);
 
     det_net.subnet().layer_details().set_num_filters(options.detector_windows.size());
 
     dlib::pipe<det_training_sample> data(200);
-    auto f = [&data, &listing, &mmod_rects](time_t seed)
+    auto f = [&data, &listing, &truth_instances](time_t seed)
     {
         dlib::rand rnd(time(0) + seed);
         matrix<rgb_pixel> input_image;
@@ -221,7 +262,7 @@ det_bnet_type train_detection_network(
             load_image(input_image, image_info.image_filename);
 
             // Get a random crop of the input.
-            cropper(input_image, mmod_rects[random_index], temp.input_image, temp.mmod_rects);
+            cropper(input_image, extract_mmod_rects(truth_instances[random_index]), temp.input_image, temp.mmod_rects);
 
             // Push the result to be used by the trainer.
             data.enqueue(temp);
@@ -282,29 +323,19 @@ det_bnet_type train_detection_network(
 
 // ----------------------------------------------------------------------------------------
 
-rgb_pixel decide_main_instance(const matrix<rgb_pixel>& rgb_label_image)
-{
-    // TODO: should perhaps consider other aspects as well - not just the center pixel?
-    const auto nr = rgb_label_image.nr();
-    const auto nc = rgb_label_image.nc();
-    return rgb_label_image(nr / 2, nc / 2);
-}
-
-matrix<uint16_t> keep_only_main_instance(const matrix<rgb_pixel>& rgb_label_image)
+matrix<uint16_t> keep_only_current_instance(const matrix<rgb_pixel>& rgb_label_image, const rgb_pixel rgb_label)
 {
     const auto nr = rgb_label_image.nr();
     const auto nc = rgb_label_image.nc();
 
     matrix<uint16_t> result(nr, nc);
 
-    const auto main_instance = decide_main_instance(rgb_label_image);
-
     for (long r = 0; r < nr; ++r)
     {
         for (long c = 0; c < nc; ++c)
         {
             const auto& index = rgb_label_image(r, c);
-            if (index == main_instance)
+            if (index == rgb_label)
                 result(r, c) = 1;
             else if (index == dlib::rgb_pixel(224, 224, 192))
                 result(r, c) = dlib::loss_multiclass_log_per_pixel_::label_to_ignore;
@@ -318,7 +349,7 @@ matrix<uint16_t> keep_only_main_instance(const matrix<rgb_pixel>& rgb_label_imag
 
 seg_bnet_type train_segmentation_network(
     const std::vector<image_info>& listing,
-    const std::vector<std::vector<mmod_rect>>& mmod_rects,
+    const std::vector<std::deque<truth_instance>>& truth_instances,
     unsigned int seg_minibatch_size
 )
 {
@@ -346,7 +377,7 @@ seg_bnet_type train_segmentation_network(
     // thread for this kind of data preparation helps us do that.  Each thread puts the
     // crops into the data queue.
     dlib::pipe<seg_training_sample> data(200);
-    auto f = [&data, &listing, &mmod_rects](time_t seed)
+    auto f = [&data, &listing, &truth_instances](time_t seed)
     {
         dlib::rand rnd(time(0) + seed);
         matrix<rgb_pixel> input_image;
@@ -357,11 +388,9 @@ seg_bnet_type train_segmentation_network(
         {
             // Pick a random input image.
             const auto random_index = rnd.get_random_32bit_number() % listing.size();
-
-            // Get the MMOD rects from the label image.
-            const auto image_rects = mmod_rects[random_index];
+            const auto image_truths = truth_instances[random_index];
             
-            if (!image_rects.empty())
+            if (!image_truths.empty())
             {
                 const image_info& image_info = listing[random_index];
 
@@ -372,8 +401,8 @@ seg_bnet_type train_segmentation_network(
                 load_image(rgb_label_image, image_info.label_filename);
 
                 // Pick a random training instance.
-                const auto& mmod_rect = image_rects[rnd.get_random_32bit_number() % image_rects.size()];
-                const auto cropping_rect = get_cropping_rect(mmod_rect.rect);
+                const auto& truth_instance = image_truths[rnd.get_random_32bit_number() % image_truths.size()];
+                const auto cropping_rect = get_cropping_rect(truth_instance.mmod_rect.rect);
                 const chip_details chip_details(cropping_rect, chip_dims(seg_dim, seg_dim));
 
                 // Crop the input image.
@@ -384,8 +413,8 @@ seg_bnet_type train_segmentation_network(
                 // a bicycle is half-way between an aeroplane and a bird, would you?
                 extract_image_chip(rgb_label_image, chip_details, rgb_label_chip, interpolate_nearest_neighbor());
 
-                // Clear pixels not related to the main instance.
-                temp.label_image = keep_only_main_instance(rgb_label_chip);
+                // Clear pixels not related to the current instance.
+                temp.label_image = keep_only_current_instance(rgb_label_chip, truth_instance.rgb_label);
 
                 // TODO: Add some perturbation to the inputs.
 
@@ -442,7 +471,7 @@ seg_bnet_type train_segmentation_network(
 // ----------------------------------------------------------------------------------------
 
 int ignore_overlapped_boxes(
-    std::vector<mmod_rect>& boxes,
+    std::deque<truth_instance>& truth_instances,
     const test_box_overlap& overlaps
 )
 /*!
@@ -453,47 +482,52 @@ int ignore_overlapped_boxes(
 !*/
 {
     int num_ignored = 0;
-    for (size_t i = 0; i < boxes.size(); ++i)
+    for (size_t i = 0, end = truth_instances.size(); i < end; ++i)
     {
-        if (boxes[i].ignore)
+        auto& box_i = truth_instances[i].mmod_rect;
+        if (box_i.ignore)
             continue;
-        for (size_t j = i+1; j < boxes.size(); ++j)
+        for (size_t j = i+1; j < end; ++j)
         {
-            if (boxes[j].ignore)
+            auto& box_j = truth_instances[j].mmod_rect;
+            if (box_j.ignore)
                 continue;
-            if (overlaps(boxes[i], boxes[j]))
+            if (overlaps(box_i, box_j))
             {
                 ++num_ignored;
-                if(boxes[i].rect.area() < boxes[j].rect.area())
-                    boxes[i].ignore = true;
+                if(box_i.rect.area() < box_j.rect.area())
+                    box_i.ignore = true;
                 else
-                    boxes[j].ignore = true;
+                    box_j.ignore = true;
             }
         }
     }
     return num_ignored;
 }
 
-std::vector<mmod_rect> load_mmod_rects(const image_info& image_info)
+std::deque<truth_instance> load_truth_instances(const image_info& image_info)
 {
     matrix<rgb_pixel> rgb_label_image;
 
     load_image(rgb_label_image, image_info.label_filename);
 
-    auto mmod_rects = rgb_label_image_to_mmod_rects(rgb_label_image);
+    auto truth_instances = rgb_label_image_to_truth_instances(rgb_label_image);
 
-    ignore_overlapped_boxes(mmod_rects, test_box_overlap(0.50, 0.95));
+    ignore_overlapped_boxes(truth_instances, test_box_overlap(0.50, 0.95));
 
-    for (auto& rect : mmod_rects)
-        if (rect.rect.width() < 35 && rect.rect.height() < 35)
-            rect.ignore = true;
+    for (auto& truth : truth_instances)
+    {
+        const auto& rect = truth.mmod_rect.rect;
+        if (rect.width() < 35 && rect.height() < 35)
+            truth.mmod_rect.ignore = true;
+    }
 
-    return mmod_rects;
+    return truth_instances;
 };
 
-std::vector<std::vector<dlib::mmod_rect>> load_all_mmod_rects(const std::vector<image_info>& listing)
+std::vector<std::deque<truth_instance>> load_all_truth_instances(const std::vector<image_info>& listing)
 {
-    std::vector<std::vector<mmod_rect>> mmod_rects(listing.size());
+    std::vector<std::deque<truth_instance>> truth_instances(listing.size());
 
     std::transform(
 #if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
@@ -501,11 +535,11 @@ std::vector<std::vector<dlib::mmod_rect>> load_all_mmod_rects(const std::vector<
 #endif // __cplusplus >= 201703L
         listing.begin(),
         listing.end(),
-        mmod_rects.begin(),
-        load_mmod_rects
+        truth_instances.begin(),
+        load_truth_instances
     );
 
-    return mmod_rects;
+    return truth_instances;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -538,13 +572,13 @@ int main(int argc, char** argv) try
     cout << "seg mini-batch size: " << seg_minibatch_size << endl;
 
     // extract the MMOD rects
-    cout << "\nExtracting all MMOD rects...";
-    const auto mmod_rects = load_all_mmod_rects(listing);
+    cout << "\nExtracting all truth instances...";
+    const auto truth_instances = load_all_truth_instances(listing);
     cout << " Done!" << endl << endl;
 
     // First train a detection network (loss_mmod), and then a mask segmentation network (loss_log_per_pixel)
-    const auto det_net = train_detection_network    (listing, mmod_rects, det_minibatch_size);
-    const auto seg_net = train_segmentation_network (listing, mmod_rects, seg_minibatch_size);
+    const auto det_net = train_detection_network    (listing, truth_instances, det_minibatch_size);
+    const auto seg_net = train_segmentation_network (listing, truth_instances, seg_minibatch_size);
 
     cout << "saving network" << endl;
     serialize(instance_segmentation_net_filename) << det_net << seg_net;
