@@ -77,6 +77,7 @@ int main(int argc, char** argv) try
         matrix<rgb_pixel> rgb_label_image;
         matrix<rgb_pixel> input_chip;
 
+        rgb_label_image.set_size(input_image.nr(), input_image.nc());
         rgb_label_image = rgb_pixel(0, 0, 0);
 
         for (const auto& instance : instances)
