@@ -131,17 +131,15 @@ namespace std {
 
 struct truth_instance
 {
-    dlib::mmod_rect mmod_rect;
     dlib::rgb_pixel rgb_label;
+    dlib::mmod_rect mmod_rect;
 };
 
-std::deque<truth_instance> rgb_label_image_to_truth_instances(
+std::vector<truth_instance> rgb_label_image_to_truth_instances(
     const dlib::matrix<dlib::rgb_pixel>& rgb_label_image
 )
 {
-    std::deque<truth_instance> results;
-
-    std::unordered_map<dlib::rgb_pixel, int> instance_indexes;
+    std::unordered_map<dlib::rgb_pixel, mmod_rect> result_map;
 
     const auto nr = rgb_label_image.nr();
     const auto nc = rgb_label_image.nc();
@@ -155,22 +153,18 @@ std::deque<truth_instance> rgb_label_image_to_truth_instances(
             if (!is_instance_pixel(rgb_label))
                 continue;
 
-            const auto i = instance_indexes.find(rgb_label);
-            if (i == instance_indexes.end())
+            const auto i = result_map.find(rgb_label);
+            if (i == result_map.end())
             {
                 // Encountered a new instance
-                instance_indexes[rgb_label] = results.size();
-                results.emplace_back(truth_instance{
-                    dlib::rectangle(c, r, c, r),
-                    rgb_label
-                });
+                result_map[rgb_label] = rectangle(c, r, c, r);
 
                 // TODO: read the instance's class from the other png!
             }
             else
             {
                 // Not the first occurrence - update the rect
-                auto& rect = results[i->second].mmod_rect.rect;
+                auto& rect = i->second.rect;
 
                 if (c < rect.left())
                     rect.set_left(c);
@@ -183,13 +177,22 @@ std::deque<truth_instance> rgb_label_image_to_truth_instances(
         }
     }
 
-    return results;
+    std::vector<truth_instance> flat_result;
+    flat_result.reserve(result_map.size());
+
+    for (const auto& i : result_map) {
+        flat_result.push_back(truth_instance{
+            i.first, i.second
+        });
+    }
+
+    return flat_result;
 }
 
 // ----------------------------------------------------------------------------------------
 
 std::vector<mmod_rect> extract_mmod_rects(
-    const std::deque<truth_instance>& truth_instances
+    const std::vector<truth_instance>& truth_instances
 )
 {
     std::vector<mmod_rect> mmod_rects(truth_instances.size());
@@ -205,7 +208,7 @@ std::vector<mmod_rect> extract_mmod_rects(
 };
 
 std::vector<std::vector<mmod_rect>> extract_mmod_rect_vectors(
-    const std::vector<std::deque<truth_instance>>& truth_instances
+    const std::vector<std::vector<truth_instance>>& truth_instances
 )
 {
     std::vector<std::vector<mmod_rect>> mmod_rects(truth_instances.size());
@@ -222,7 +225,7 @@ std::vector<std::vector<mmod_rect>> extract_mmod_rect_vectors(
 
 det_bnet_type train_detection_network(
     const std::vector<image_info>& listing,
-    const std::vector<std::deque<truth_instance>>& truth_instances,
+    const std::vector<std::vector<truth_instance>>& truth_instances,
     unsigned int det_minibatch_size
 )
 {
@@ -351,7 +354,7 @@ matrix<uint16_t> keep_only_current_instance(const matrix<rgb_pixel>& rgb_label_i
 
 seg_bnet_type train_segmentation_network(
     const std::vector<image_info>& listing,
-    const std::vector<std::deque<truth_instance>>& truth_instances,
+    const std::vector<std::vector<truth_instance>>& truth_instances,
     unsigned int seg_minibatch_size
 )
 {
@@ -404,19 +407,25 @@ seg_bnet_type train_segmentation_network(
 
                 // Pick a random training instance.
                 const auto& truth_instance = image_truths[rnd.get_random_32bit_number() % image_truths.size()];
-                const auto cropping_rect = get_cropping_rect(truth_instance.mmod_rect.rect);
+                const auto& truth_rect = truth_instance.mmod_rect.rect;
+                const auto cropping_rect = get_cropping_rect(truth_rect);
 
                 // Pick a random crop around the instance.
-                const auto max_dim = static_cast<long>(std::max(cropping_rect.width(), cropping_rect.height()));
-                const auto max_x_translate_amount = (max_dim - static_cast<long>(truth_instance.mmod_rect.rect.width())) / 2;
-                const auto max_y_translate_amount = (max_dim - static_cast<long>(truth_instance.mmod_rect.rect.height())) / 2;
+                const auto max_x_translate_amount = static_cast<long>(truth_rect.width() / 10.0);
+                const auto max_y_translate_amount = static_cast<long>(truth_rect.height() / 10.0);
 
                 const auto random_translate = point(
-                    rnd.get_integer_in_range(-max_x_translate_amount, max_x_translate_amount),
-                    rnd.get_integer_in_range(-max_y_translate_amount, max_y_translate_amount)
+                    rnd.get_integer_in_range(-max_x_translate_amount, max_x_translate_amount + 1),
+                    rnd.get_integer_in_range(-max_y_translate_amount, max_y_translate_amount + 1)
                 );
 
-                const auto random_rect = move_rect(cropping_rect, random_translate);
+                const rectangle random_rect(
+                    cropping_rect.left()   + random_translate.x(),
+                    cropping_rect.top()    + random_translate.y(),
+                    cropping_rect.right()  + random_translate.x(),
+                    cropping_rect.bottom() + random_translate.y()
+                );
+
                 const chip_details chip_details(random_rect, chip_dims(seg_dim, seg_dim));
 
                 // Crop the input image.
@@ -485,7 +494,7 @@ seg_bnet_type train_segmentation_network(
 // ----------------------------------------------------------------------------------------
 
 int ignore_overlapped_boxes(
-    std::deque<truth_instance>& truth_instances,
+    std::vector<truth_instance>& truth_instances,
     const test_box_overlap& overlaps
 )
 /*!
@@ -519,7 +528,7 @@ int ignore_overlapped_boxes(
     return num_ignored;
 }
 
-std::deque<truth_instance> load_truth_instances(const image_info& image_info)
+std::vector<truth_instance> load_truth_instances(const image_info& image_info)
 {
     matrix<rgb_pixel> rgb_label_image;
 
@@ -539,9 +548,9 @@ std::deque<truth_instance> load_truth_instances(const image_info& image_info)
     return truth_instances;
 };
 
-std::vector<std::deque<truth_instance>> load_all_truth_instances(const std::vector<image_info>& listing)
+std::vector<std::vector<truth_instance>> load_all_truth_instances(const std::vector<image_info>& listing)
 {
-    std::vector<std::deque<truth_instance>> truth_instances(listing.size());
+    std::vector<std::vector<truth_instance>> truth_instances(listing.size());
 
     std::transform(
 #if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
