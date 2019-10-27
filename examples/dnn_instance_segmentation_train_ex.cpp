@@ -304,7 +304,12 @@ matrix<uint16_t> keep_only_main_instance(const matrix<rgb_pixel>& rgb_label_imag
         for (long c = 0; c < nc; ++c)
         {
             const auto& index = rgb_label_image(r, c);
-            result(r, c) = (index == main_instance) ? 1 : 0;
+            if (index == main_instance)
+                result(r, c) = 1;
+            else if (index == dlib::rgb_pixel(224, 224, 192))
+                result(r, c) = dlib::loss_multiclass_log_per_pixel_::label_to_ignore;
+            else
+                result(r, c) = 0;
         }
     }
 
