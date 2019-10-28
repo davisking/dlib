@@ -550,7 +550,7 @@ int main(int argc, char** argv) try
     }
 
     // mini-batches smaller than the default can be used with GPUs having less memory
-    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 75;
+    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 40;
     const unsigned int seg_minibatch_size = argc >= 4 ? std::stoi(argv[3]) : 25;
     cout << "det mini-batch size: " << det_minibatch_size << endl;
     cout << "seg mini-batch size: " << seg_minibatch_size << endl;
