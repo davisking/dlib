@@ -552,8 +552,16 @@ void filter_listing(
         );
 
         if (has_desired_class) {
+            std::vector<truth_instance> temp;
+            std::copy_if(
+                truth_instances[i].begin(),
+                truth_instances[i].end(),
+                std::back_inserter(temp),
+                represents_desired_class
+            );
+
             filtered_listing.push_back(listing[i]);
-            filtered_truth_instances.push_back(truth_instances[i]);
+            filtered_truth_instances.push_back(temp);
         }
     }
 
@@ -583,7 +591,7 @@ int main(int argc, char** argv) try
     }
 
     // mini-batches smaller than the default can be used with GPUs having less memory
-    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 60;
+    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 75;
     const unsigned int seg_minibatch_size = argc >= 4 ? std::stoi(argv[3]) : 25;
     cout << "det mini-batch size: " << det_minibatch_size << endl;
     cout << "seg mini-batch size: " << seg_minibatch_size << endl;
