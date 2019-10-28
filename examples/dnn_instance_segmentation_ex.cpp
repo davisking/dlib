@@ -127,8 +127,11 @@ int main(int argc, char** argv) try
         // Show the input image on the left, and the predicted RGB labels on the right.
         win.set_image(join_rows(input_image, rgb_label_image));
 
-        cout << file.name() << " - hit enter to process the next image";
-        cin.get();
+        if (!instances.empty())
+        {
+            cout << file.name() << " - hit enter to process the next image";
+            cin.get();
+        }
     }
 }
 catch(std::exception& e)
