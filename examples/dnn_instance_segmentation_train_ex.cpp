@@ -21,6 +21,7 @@
 */
 
 #include "dnn_instance_segmentation_ex.h"
+#include "pascal_voc_2012.h"
 
 #include <iostream>
 #include <dlib/data_io.h>
@@ -35,6 +36,8 @@
 using namespace std;
 using namespace dlib;
 
+// ----------------------------------------------------------------------------------------
+
 // A single training sample for detection. A mini-batch comprises many of these.
 struct det_training_sample
 {
@@ -48,60 +51,6 @@ struct seg_training_sample
     matrix<rgb_pixel> input_image;
     matrix<uint16_t> label_image; // The ground-truth label of each pixel.
 };
-
-// ----------------------------------------------------------------------------------------
-
-// The names of the input image and the associated RGB label image in the PASCAL VOC 2012
-// data set.
-struct image_info
-{
-    string image_filename;
-    string label_filename;
-};
-
-// Read the list of image files belonging to either the "train", "trainval", or "val" set
-// of the PASCAL VOC2012 data.
-std::vector<image_info> get_pascal_voc2012_listing(
-    const std::string& voc2012_folder,
-    const std::string& file = "train" // "train", "trainval", or "val"
-)
-{
-    std::ifstream in(voc2012_folder + "/ImageSets/Segmentation/" + file + ".txt");
-
-    std::vector<image_info> results;
-
-    while (in)
-    {
-        std::string basename;
-        in >> basename;
-
-        if (!basename.empty())
-        {
-            image_info image_info;
-            image_info.image_filename = voc2012_folder + "/JPEGImages/" + basename + ".jpg";
-            image_info.label_filename = voc2012_folder + "/SegmentationObject/" + basename + ".png";
-            results.push_back(image_info);
-        }
-    }
-
-    return results;
-}
-
-// Read the list of image files belong to the "train" set of the PASCAL VOC2012 data.
-std::vector<image_info> get_pascal_voc2012_train_listing(
-    const std::string& voc2012_folder
-)
-{
-    return get_pascal_voc2012_listing(voc2012_folder, "train");
-}
-
-// Read the list of image files belong to the "val" set of the PASCAL VOC2012 data.
-std::vector<image_info> get_pascal_voc2012_val_listing(
-    const std::string& voc2012_folder
-)
-{
-    return get_pascal_voc2012_listing(voc2012_folder, "val");
-}
 
 // ----------------------------------------------------------------------------------------
 
@@ -135,30 +84,38 @@ struct truth_instance
     dlib::mmod_rect mmod_rect;
 };
 
-std::vector<truth_instance> rgb_label_image_to_truth_instances(
-    const dlib::matrix<dlib::rgb_pixel>& rgb_label_image
+std::vector<truth_instance> rgb_label_images_to_truth_instances(
+    const dlib::matrix<dlib::rgb_pixel>& instance_label_image,
+    const dlib::matrix<dlib::rgb_pixel>& class_label_image
 )
 {
     std::unordered_map<dlib::rgb_pixel, mmod_rect> result_map;
 
-    const auto nr = rgb_label_image.nr();
-    const auto nc = rgb_label_image.nc();
+    DLIB_CASSERT(instance_label_image.nr() == class_label_image.nr());
+    DLIB_CASSERT(instance_label_image.nc() == class_label_image.nc());
+
+    const auto nr = instance_label_image.nr();
+    const auto nc = instance_label_image.nc();
 
     for (int r = 0; r < nr; ++r)
     {
         for (int c = 0; c < nc; ++c)
         {
-            const auto rgb_label = rgb_label_image(r, c);
+            const auto rgb_instance_label = instance_label_image(r, c);
 
-            if (!is_instance_pixel(rgb_label))
+            if (!is_instance_pixel(rgb_instance_label))
                 continue;
 
-            const auto i = result_map.find(rgb_label);
+            const auto rgb_class_label = class_label_image(r, c);
+            const auto class_label_index = rgb_label_to_index_label(rgb_class_label);
+            const Voc2012class& voc2012_class = classes[class_label_index];
+
+            const auto i = result_map.find(rgb_instance_label);
             if (i == result_map.end())
             {
                 // Encountered a new instance
-                result_map[rgb_label] = rectangle(c, r, c, r);
-
+                result_map[rgb_instance_label] = rectangle(c, r, c, r);
+                result_map[rgb_instance_label].label = voc2012_class.classlabel;
                 // TODO: read the instance's class from the other png!
             }
             else
@@ -173,6 +130,8 @@ std::vector<truth_instance> rgb_label_image_to_truth_instances(
 
                 if (r > rect.bottom())
                     rect.set_bottom(r);
+
+                DLIB_CASSERT(i->second.label == voc2012_class.classlabel);
             }
         }
     }
@@ -402,8 +361,8 @@ seg_bnet_type train_segmentation_network(
                 // Load the input image.
                 load_image(input_image, image_info.image_filename);
 
-                // Load the ground-truth (RGB) labels.
-                load_image(rgb_label_image, image_info.label_filename);
+                // Load the ground-truth (RGB) instance labels.
+                load_image(rgb_label_image, image_info.instance_label_filename);
 
                 // Pick a random training instance.
                 const auto& truth_instance = image_truths[rnd.get_random_32bit_number() % image_truths.size()];
@@ -530,11 +489,13 @@ int ignore_overlapped_boxes(
 
 std::vector<truth_instance> load_truth_instances(const image_info& image_info)
 {
-    matrix<rgb_pixel> rgb_label_image;
+    matrix<rgb_pixel> instance_label_image;
+    matrix<rgb_pixel> class_label_image;
 
-    load_image(rgb_label_image, image_info.label_filename);
+    load_image(instance_label_image, image_info.instance_label_filename);
+    load_image(class_label_image, image_info.class_label_filename);
 
-    auto truth_instances = rgb_label_image_to_truth_instances(rgb_label_image);
+    auto truth_instances = rgb_label_images_to_truth_instances(instance_label_image, class_label_image);
 
     ignore_overlapped_boxes(truth_instances, test_box_overlap(0.50, 0.95));
 
