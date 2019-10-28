@@ -116,7 +116,6 @@ std::vector<truth_instance> rgb_label_images_to_truth_instances(
                 // Encountered a new instance
                 result_map[rgb_instance_label] = rectangle(c, r, c, r);
                 result_map[rgb_instance_label].label = voc2012_class.classlabel;
-                // TODO: read the instance's class from the other png!
             }
             else
             {
