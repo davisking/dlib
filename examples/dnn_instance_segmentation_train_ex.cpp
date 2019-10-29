@@ -529,7 +529,7 @@ std::vector<std::vector<truth_instance>> load_all_truth_instances(const std::vec
 void filter_listing(
     std::vector<image_info>& listing,
     std::vector<std::vector<truth_instance>>& truth_instances,
-    const std::string& desired_classlabel
+    const std::vector<std::string>& desired_classlabels
 )
 {
     DLIB_CASSERT(listing.size() == truth_instances.size());
@@ -537,8 +537,12 @@ void filter_listing(
     std::vector<image_info> filtered_listing;
     std::vector<std::vector<truth_instance>> filtered_truth_instances;
 
-    const auto represents_desired_class = [desired_classlabel](const truth_instance& truth_instance) {
-        return truth_instance.mmod_rect.label == desired_classlabel;
+    const auto represents_desired_class = [&desired_classlabels](const truth_instance& truth_instance) {
+        return std::find(
+            desired_classlabels.begin(),
+            desired_classlabels.end(),
+            truth_instance.mmod_rect.label
+        ) != desired_classlabels.end();
     };
 
     for (int i = 0, end = listing.size(); i < end; ++i)
@@ -550,6 +554,10 @@ void filter_listing(
         );
 
         if (has_desired_class) {
+
+            // NB: This keeps only MMOD rects belonging to any of the desired classes.
+            //     A reasonable alternative could be to keep all rects, but mark those
+            //     belonging in other classes to be ignored during training.
             std::vector<truth_instance> temp;
             std::copy_if(
                 truth_instances[i].begin(),
@@ -569,12 +577,12 @@ void filter_listing(
 
 int main(int argc, char** argv) try
 {
-    if (argc < 2 || argc > 5)
+    if (argc < 2)
     {
         cout << "To run this program you need a copy of the PASCAL VOC2012 dataset." << endl;
         cout << endl;
         cout << "You call this program like this: " << endl;
-        cout << "./dnn_instance_segmentation_train_ex /path/to/VOC2012 [det-minibatch-size] [seg-minibatch-size] [class-label]" << endl;
+        cout << "./dnn_instance_segmentation_train_ex /path/to/VOC2012 [det-minibatch-size] [seg-minibatch-size] [class-1] [class-2] [class-3] ..." << endl;
         return 1;
     }
 
@@ -594,15 +602,28 @@ int main(int argc, char** argv) try
     cout << "det mini-batch size: " << det_minibatch_size << endl;
     cout << "seg mini-batch size: " << seg_minibatch_size << endl;
 
-    const std::string desired_classlabel = argc >= 5 ? argv[4] : "sheep";
-    cout << "desired classlabel: " << desired_classlabel << endl;
+    std::vector<std::string> desired_classlabels;
+
+    for (int arg = 4; arg < argc; ++arg)
+        desired_classlabels.push_back(argv[arg]);
+
+    if (desired_classlabels.empty())
+    {
+        desired_classlabels.push_back("aeroplane");
+        desired_classlabels.push_back("bicycle");
+    }
+
+    cout << "desired classlabels:";
+    for (const auto& desired_classlabel : desired_classlabels)
+        cout << " " << desired_classlabel;
+    cout << endl;
 
     // extract the MMOD rects
     cout << endl << "Extracting all truth instances...";
     auto truth_instances = load_all_truth_instances(listing);
     cout << " Done!" << endl << endl;
 
-    filter_listing(listing, truth_instances, desired_classlabel);
+    filter_listing(listing, truth_instances, desired_classlabels);
 
     cout << "images in dataset filtered by class: " << listing.size() << endl << endl;
 
