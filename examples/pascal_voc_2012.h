@@ -142,9 +142,9 @@ const Voc2012class& find_voc2012_class(const dlib::rgb_pixel& rgb_label)
 {
     return find_voc2012_class(
         [&rgb_label](const Voc2012class& voc2012class)
-    {
-        return rgb_label == voc2012class.rgb_label;
-    }
+        {
+            return rgb_label == voc2012class.rgb_label;
+        }
     );
 }
 
