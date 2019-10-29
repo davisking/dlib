@@ -90,8 +90,21 @@ int main(int argc, char** argv) try
         rgb_label_image.set_size(input_image.nr(), input_image.nc());
         rgb_label_image = rgb_pixel(0, 0, 0);
 
+        bool found_something = false;
+
         for (const auto& instance : instances)
         {
+            if (!found_something)
+            {
+                cout << "Found ";
+                found_something = true;
+            }
+            else
+            {
+                cout << ", ";
+            }
+            cout << instance.label;
+
             const auto cropping_rect = get_cropping_rect(instance.rect);
             const chip_details chip_details(cropping_rect, chip_dims(seg_dim, seg_dim));
             extract_image_chip(input_image, chip_details, input_chip, interpolate_bilinear());
@@ -129,7 +142,7 @@ int main(int argc, char** argv) try
 
         if (!instances.empty())
         {
-            cout << file.name() << " - hit enter to process the next image";
+            cout << " in " << file.name() << " - hit enter to process the next image";
             cin.get();
         }
     }
