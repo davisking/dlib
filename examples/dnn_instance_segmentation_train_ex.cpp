@@ -501,7 +501,7 @@ std::vector<truth_instance> load_truth_instances(const image_info& image_info)
 
     auto truth_instances = rgb_label_images_to_truth_instances(instance_label_image, class_label_image);
 
-    ignore_overlapped_boxes(truth_instances, test_box_overlap(0.50, 0.95));
+    ignore_overlapped_boxes(truth_instances, test_box_overlap(0.90, 0.95));
 
     for (auto& truth : truth_instances)
     {
