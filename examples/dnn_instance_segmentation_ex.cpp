@@ -24,6 +24,7 @@
 */
 
 #include "dnn_instance_segmentation_ex.h"
+#include "pascal_voc_2012.h"
 
 #include <iostream>
 #include <dlib/data_io.h>
@@ -134,7 +135,13 @@ int main(int argc, char** argv) try
                             rgb_label_image(y, x) = random_color;
                     }
 
-            dlib::draw_rectangle(rgb_label_image, instance.rect, dlib::rgb_pixel(255, 255, 255), 1);
+            const Voc2012class& voc2012_class = find_voc2012_class(
+                [&instance](const Voc2012class& candidate) {
+                    return candidate.classlabel == instance.label;
+                }
+            );
+
+            dlib::draw_rectangle(rgb_label_image, instance.rect, voc2012_class.rgb_label, 1);
         }
 
         // Show the input image on the left, and the predicted RGB labels on the right.
