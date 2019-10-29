@@ -1397,12 +1397,34 @@ namespace dlib
 
             out << "detector_windows:(";
             auto& opts = item.options;
-            for (size_t i = 0; i < opts.detector_windows.size(); ++i)
+
             {
-                out << opts.detector_windows[i].width << "x" << opts.detector_windows[i].height;
-                if (i+1 < opts.detector_windows.size())
-                    out << ",";
+                // write detector windows grouped by label
+                // example output: detector_windows:(aeroplane:74x30,131x30,70x45,54x70,198x30;bicycle:70x57,32x70,70x32,51x70,128x30,30x121;car:70x36,70x60,99x30,52x70,30x83,30x114,30x200)
+                typedef std::deque<const dlib::mmod_options::detector_window_details*> detector_windows;
+                std::map<std::string, detector_windows> detector_windows_by_label;
+                for (const auto& detector_window : opts.detector_windows)
+                    detector_windows_by_label[detector_window.label].push_back(&detector_window);
+
+                size_t label_count = 0;
+                for (const auto& i : detector_windows_by_label)
+                {
+                    const auto& label = i.first;
+                    const auto& detector_windows = i.second;
+
+                    if (label_count++ > 0)
+                        out << ";";
+                    out << label << ":";
+
+                    for (size_t i = 0; i < detector_windows.size(); ++i)
+                    {
+                        out << detector_windows[i]->width << "x" << detector_windows[i]->height;
+                        if (i+1 < detector_windows.size())
+                            out << ",";
+                    }
+                }
             }
+
             out << ")";
             out << ", loss per FA:" << opts.loss_per_false_alarm;
             out << ", loss per miss:" << opts.loss_per_missed_target;
