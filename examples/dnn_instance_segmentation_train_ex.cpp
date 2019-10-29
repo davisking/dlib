@@ -242,7 +242,7 @@ det_bnet_type train_detection_network(
     det_trainer.set_iterations_without_progress_threshold(5000);
 
     // Output training parameters.
-    cout << "Training detector network:" << endl << det_trainer << endl;
+    cout << det_trainer << endl;
 
     std::vector<matrix<rgb_pixel>> samples;
     std::vector<std::vector<mmod_rect>> labels;
@@ -329,7 +329,7 @@ seg_bnet_type train_segmentation_network(
     set_all_bn_running_stats_window_sizes(seg_net, 1000);
 
     // Output training parameters.
-    cout << "Training segmentation network:" << endl << seg_trainer << endl;
+    cout << seg_trainer << endl;
 
     std::vector<matrix<rgb_pixel>> samples;
     std::vector<matrix<uint16_t>> labels;
@@ -611,6 +611,7 @@ int main(int argc, char** argv) try
     {
         desired_classlabels.push_back("aeroplane");
         desired_classlabels.push_back("bicycle");
+        desired_classlabels.push_back("car");
     }
 
     cout << "desired classlabels:";
@@ -628,11 +629,35 @@ int main(int argc, char** argv) try
     cout << "images in dataset filtered by class: " << listing.size() << endl << endl;
 
     // First train a detection network (loss_mmod), and then a mask segmentation network (loss_log_per_pixel)
+    cout << "Training detector network:" << endl;
     const auto det_net = train_detection_network    (listing, truth_instances, det_minibatch_size);
-    const auto seg_net = train_segmentation_network (listing, truth_instances, seg_minibatch_size);
 
-    cout << "saving network" << endl;
-    serialize(instance_segmentation_net_filename) << det_net << seg_net;
+    std::map<std::string, seg_bnet_type> seg_nets_by_class;
+    constexpr bool separate_seg_net_for_each_class = true;
+
+    if (separate_seg_net_for_each_class)
+    {
+        for (const auto& classlabel : desired_classlabels)
+        {
+            // Consider only the truth instances belonging to this class
+            auto listing_for_classlabel = listing;
+            auto truth_instances_for_classlabel = truth_instances;
+            filter_listing(listing_for_classlabel, truth_instances_for_classlabel, { classlabel });
+
+            cout << "Training segmentation network for class " << classlabel << ":" << endl;
+            seg_nets_by_class[classlabel] = train_segmentation_network(
+                listing_for_classlabel, truth_instances_for_classlabel, seg_minibatch_size
+            );
+        }
+    }
+    else
+    {
+        cout << "Training a single segmentation network:" << endl;
+        seg_nets_by_class[""] = train_segmentation_network(listing, truth_instances, seg_minibatch_size);
+    }
+
+    cout << "Saving networks" << endl;
+    serialize(instance_segmentation_net_filename) << det_net << seg_nets_by_class;
 }
 
 catch(std::exception& e)

@@ -51,8 +51,8 @@ int main(int argc, char** argv) try
 
     // Read the file containing the trained networks from the working directory.
     det_anet_type det_net;
-    seg_anet_type seg_net;
-    deserialize(instance_segmentation_net_filename) >> det_net >> seg_net;
+    std::map<std::string, seg_bnet_type> seg_nets_by_class;
+    deserialize(instance_segmentation_net_filename) >> det_net >> seg_nets_by_class;
 
     // Show inference results in a window.
     image_window win;
@@ -109,6 +109,19 @@ int main(int argc, char** argv) try
             const auto cropping_rect = get_cropping_rect(instance.rect);
             const chip_details chip_details(cropping_rect, chip_dims(seg_dim, seg_dim));
             extract_image_chip(input_image, chip_details, input_chip, interpolate_bilinear());
+
+            const auto i = seg_nets_by_class.find(instance.label);
+            if (i == seg_nets_by_class.end())
+            {
+                // per-class segmentation net not found, so we must be using the same net for all classes
+                // (see bool separate_seg_net_for_each_class in dnn_instance_segmentation_train_ex.cpp)
+                DLIB_CASSERT(seg_nets_by_class.size() == 1);
+                DLIB_CASSERT(seg_nets_by_class.begin()->first == "");
+            }
+
+            auto& seg_net = i != seg_nets_by_class.end()
+                ? i->second // use the segmentation net trained for this class
+                : seg_nets_by_class.begin()->second; // use the same segmentation net for all classes
 
             const auto mask = seg_net(input_chip);
 
