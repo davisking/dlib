@@ -107,8 +107,7 @@ std::vector<truth_instance> rgb_label_images_to_truth_instances(
                 continue;
 
             const auto rgb_class_label = class_label_image(r, c);
-            const auto class_label_index = rgb_label_to_index_label(rgb_class_label);
-            const Voc2012class& voc2012_class = classes[class_label_index];
+            const Voc2012class& voc2012_class = find_voc2012_class(rgb_class_label);
 
             const auto i = result_map.find(rgb_instance_label);
             if (i == result_map.end())
