@@ -634,18 +634,24 @@ int main(int argc, char** argv) try
 
     cout << "images in dataset filtered by class: " << listing.size() << endl;
 
-    // First train a detection network (loss_mmod), and then a mask segmentation network (loss_log_per_pixel)
+    // First train an object detector network (loss_mmod).
     cout << endl << "Training detector network:" << endl;
     const auto det_net = train_detection_network    (listing, truth_instances, det_minibatch_size);
 
+    // Then train mask predictors (segmentation).
     std::map<std::string, seg_bnet_type> seg_nets_by_class;
+
+    // This flag controls if a separate mask predictor is trained for each class.
+    // Note that it would also be possible to train a separate mask predictor for
+    // class groups, each containing somehow similar classes -- for example, one
+    // mask predictor for cars and buses, another for cats and dogs, and so on.
     constexpr bool separate_seg_net_for_each_class = true;
 
     if (separate_seg_net_for_each_class)
     {
         for (const auto& classlabel : desired_classlabels)
         {
-            // Consider only the truth instances belonging to this class
+            // Consider only the truth instances belonging to this class.
             auto listing_for_classlabel = listing;
             auto truth_instances_for_classlabel = truth_instances;
             filter_listing(listing_for_classlabel, truth_instances_for_classlabel, { classlabel });
