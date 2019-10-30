@@ -125,7 +125,7 @@ int main(int argc, char** argv) try
 
             const auto mask = seg_net(input_chip);
 
-            rgb_pixel random_color(
+            const rgb_pixel random_color(
                 rnd.get_random_8bit_number(),
                 rnd.get_random_8bit_number(),
                 rnd.get_random_8bit_number()
@@ -136,7 +136,7 @@ int main(int argc, char** argv) try
                 static_cast<int>(chip_details.rect.width())
             );
 
-            dlib::resize_image(mask, resized_mask);
+            dlib::resize_image(mask, resized_mask, interpolate_nearest_neighbor());
 
             for (int r = 0; r < resized_mask.nr(); ++r)
                 for (int c = 0; c < resized_mask.nc(); ++c)
