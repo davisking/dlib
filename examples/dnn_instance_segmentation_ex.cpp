@@ -78,7 +78,7 @@ int main(int argc, char** argv) try
             const auto compare_area = [](const mmod_rect& lhs, const mmod_rect& rhs) {
                 return lhs.rect.area() < rhs.rect.area();
             };
-            std::sort(output.rbegin(), output.rend(), compare_area);
+            std::sort(output.begin(), output.end(), compare_area);
             return output;
         };
 
