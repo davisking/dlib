@@ -136,7 +136,7 @@ int main(int argc, char** argv) try
                 static_cast<int>(chip_details.rect.width())
             );
 
-            dlib::resize_image(mask, resized_mask, interpolate_nearest_neighbor());
+            dlib::resize_image(mask, resized_mask);
 
             for (int r = 0; r < resized_mask.nr(); ++r)
                 for (int c = 0; c < resized_mask.nc(); ++c)
