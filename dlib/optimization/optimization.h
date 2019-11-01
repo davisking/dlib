@@ -272,6 +272,10 @@ namespace dlib
                 throw error("The objective function generated non-finite outputs");
             if (!is_finite(g))
                 throw error("The objective function generated non-finite outputs");
+
+            // Gradient is zero, no more progress is possible.  So stop.
+            if (alpha == 0)
+                break;
         }
 
         return -f_value;
