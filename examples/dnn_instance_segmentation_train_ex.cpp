@@ -148,6 +148,12 @@ std::vector<truth_instance> rgb_label_images_to_truth_instances(
 
 // ----------------------------------------------------------------------------------------
 
+struct truth_image
+{
+    image_info image_info;
+    std::vector<truth_instance> truth_instances;
+};
+
 std::vector<mmod_rect> extract_mmod_rects(
     const std::vector<truth_instance>& truth_instances
 )
@@ -165,38 +171,53 @@ std::vector<mmod_rect> extract_mmod_rects(
 };
 
 std::vector<std::vector<mmod_rect>> extract_mmod_rect_vectors(
-    const std::vector<std::vector<truth_instance>>& truth_instances
+    const std::vector<truth_image>& truth_images
 )
 {
-    std::vector<std::vector<mmod_rect>> mmod_rects(truth_instances.size());
+    std::vector<std::vector<mmod_rect>> mmod_rects(truth_images.size());
+
+    const auto extract_mmod_rects_from_truth_image = [](const auto& truth_image)
+    {
+        return extract_mmod_rects(truth_image.truth_instances);
+    };
 
     std::transform(
-        truth_instances.begin(),
-        truth_instances.end(),
+        truth_images.begin(),
+        truth_images.end(),
         mmod_rects.begin(),
-        extract_mmod_rects
+        extract_mmod_rects_from_truth_image
     );
 
     return mmod_rects;
 }
 
 det_bnet_type train_detection_network(
-    const std::vector<image_info>& listing,
-    const std::vector<std::vector<truth_instance>>& truth_instances,
+    const std::vector<truth_image>& truth_images,
     unsigned int det_minibatch_size
 )
 {
     const double initial_learning_rate = 0.1;
     const double weight_decay = 0.0001;
     const double momentum = 0.9;
+    const double min_detector_window_overlap_iou = 0.65;
 
-    mmod_options options(extract_mmod_rect_vectors(truth_instances), 70, 30);
+    const int target_size = 70;
+    const int min_target_size = 30;
+
+    mmod_options options(
+        extract_mmod_rect_vectors(truth_images),
+        target_size, min_target_size,
+        min_detector_window_overlap_iou
+    );
+
+    options.overlaps_ignore = test_box_overlap(0.5, 0.9);
+
     det_bnet_type det_net(options);
 
     det_net.subnet().layer_details().set_num_filters(options.detector_windows.size());
 
     dlib::pipe<det_training_sample> data(200);
-    auto f = [&data, &listing, &truth_instances](time_t seed)
+    auto f = [&data, &truth_images, target_size, min_target_size](time_t seed)
     {
         dlib::rand rnd(time(0) + seed);
         matrix<rgb_pixel> input_image;
@@ -207,7 +228,7 @@ det_bnet_type train_detection_network(
 
         // Usually you want to give the cropper whatever min sizes you passed to the
         // mmod_options constructor, or very slightly smaller sizes, which is what we do here.
-        cropper.set_min_object_size(69, 28);
+        cropper.set_min_object_size(target_size - 2, min_target_size - 2);
         cropper.set_max_rotation_degrees(2);
 
         det_training_sample temp;
@@ -215,14 +236,15 @@ det_bnet_type train_detection_network(
         while (data.is_enabled())
         {
             // Pick a random input image.
-            const auto random_index = rnd.get_random_32bit_number() % listing.size();
-            const image_info& image_info = listing[random_index];
+            const auto random_index = rnd.get_random_32bit_number() % truth_images.size();
+            const auto& truth_image = truth_images[random_index];
 
             // Load the input image.
-            load_image(input_image, image_info.image_filename);
+            load_image(input_image, truth_image.image_info.image_filename);
 
             // Get a random crop of the input.
-            cropper(input_image, extract_mmod_rects(truth_instances[random_index]), temp.input_image, temp.mmod_rects);
+            const auto mmod_rects = extract_mmod_rects(truth_image.truth_instances);
+            cropper(input_image, mmod_rects, temp.input_image, temp.mmod_rects);
 
             disturb_colors(temp.input_image, rnd);
 
@@ -248,7 +270,7 @@ det_bnet_type train_detection_network(
     std::vector<std::vector<mmod_rect>> labels;
 
     // The main training loop.  Keep making mini-batches and giving them to the trainer.
-    // We will run until the learning rate has dropped by a factor of 1e-4.
+    // We will run until the learning rate becomes small enough.
     while (det_trainer.get_learning_rate() >= 1e-4)
     {
         samples.clear();
@@ -310,8 +332,7 @@ matrix<uint16_t> keep_only_current_instance(const matrix<rgb_pixel>& rgb_label_i
 }
 
 seg_bnet_type train_segmentation_network(
-    const std::vector<image_info>& listing,
-    const std::vector<std::vector<truth_instance>>& truth_instances,
+    const std::vector<truth_image>& truth_images,
     unsigned int seg_minibatch_size,
     const std::string& classlabel
 )
@@ -345,7 +366,7 @@ seg_bnet_type train_segmentation_network(
     // thread for this kind of data preparation helps us do that.  Each thread puts the
     // crops into the data queue.
     dlib::pipe<seg_training_sample> data(200);
-    auto f = [&data, &listing, &truth_instances](time_t seed)
+    auto f = [&data, &truth_images](time_t seed)
     {
         dlib::rand rnd(time(0) + seed);
         matrix<rgb_pixel> input_image;
@@ -355,12 +376,13 @@ seg_bnet_type train_segmentation_network(
         while (data.is_enabled())
         {
             // Pick a random input image.
-            const auto random_index = rnd.get_random_32bit_number() % listing.size();
-            const auto image_truths = truth_instances[random_index];
-            
+            const auto random_index = rnd.get_random_32bit_number() % truth_images.size();
+            const auto& truth_image = truth_images[random_index];
+            const auto image_truths = truth_image.truth_instances;
+
             if (!image_truths.empty())
             {
-                const image_info& image_info = listing[random_index];
+                const image_info& image_info = truth_image.image_info;
 
                 // Load the input image.
                 load_image(input_image, image_info.image_filename);
@@ -499,18 +521,7 @@ std::vector<truth_instance> load_truth_instances(const image_info& image_info)
     load_image(instance_label_image, image_info.instance_label_filename);
     load_image(class_label_image, image_info.class_label_filename);
 
-    auto truth_instances = rgb_label_images_to_truth_instances(instance_label_image, class_label_image);
-
-    ignore_overlapped_boxes(truth_instances, test_box_overlap(0.90, 0.95));
-
-    for (auto& truth : truth_instances)
-    {
-        const auto& rect = truth.mmod_rect.rect;
-        if (rect.width() < 35 && rect.height() < 35)
-            truth.mmod_rect.ignore = true;
-    }
-
-    return truth_instances;
+    return rgb_label_images_to_truth_instances(instance_label_image, class_label_image);
 };
 
 std::vector<std::vector<truth_instance>> load_all_truth_instances(const std::vector<image_info>& listing)
@@ -532,16 +543,12 @@ std::vector<std::vector<truth_instance>> load_all_truth_instances(const std::vec
 
 // ----------------------------------------------------------------------------------------
 
-void filter_listing(
-    std::vector<image_info>& listing,
-    std::vector<std::vector<truth_instance>>& truth_instances,
+std::vector<truth_image> filter_based_on_classlabel(
+    const std::vector<truth_image>& truth_images,
     const std::vector<std::string>& desired_classlabels
 )
 {
-    DLIB_CASSERT(listing.size() == truth_instances.size());
-
-    std::vector<image_info> filtered_listing;
-    std::vector<std::vector<truth_instance>> filtered_truth_instances;
+    std::vector<truth_image> result;
 
     const auto represents_desired_class = [&desired_classlabels](const truth_instance& truth_instance) {
         return std::find(
@@ -551,11 +558,11 @@ void filter_listing(
         ) != desired_classlabels.end();
     };
 
-    for (int i = 0, end = listing.size(); i < end; ++i)
+    for (const auto& input : truth_images)
     {
         const auto has_desired_class = std::any_of(
-            truth_instances[i].begin(),
-            truth_instances[i].end(),
+            input.truth_instances.begin(),
+            input.truth_instances.end(),
             represents_desired_class
         );
 
@@ -566,19 +573,71 @@ void filter_listing(
             //     belonging in other classes to be ignored during training.
             std::vector<truth_instance> temp;
             std::copy_if(
-                truth_instances[i].begin(),
-                truth_instances[i].end(),
+                input.truth_instances.begin(),
+                input.truth_instances.end(),
                 std::back_inserter(temp),
                 represents_desired_class
             );
 
-            filtered_listing.push_back(listing[i]);
-            filtered_truth_instances.push_back(temp);
+            result.push_back(truth_image{ input.image_info, temp });
         }
     }
 
-    std::swap(listing, filtered_listing);
-    std::swap(truth_instances, filtered_truth_instances);
+    return result;
+}
+
+// Ignore truth boxes that overlap too much, are too small, or have a large aspect ratio.
+void ignore_some_truth_boxes(std::vector<truth_image>& truth_images)
+{
+    for (auto& i : truth_images)
+    {
+        auto& truth_instances = i.truth_instances;
+
+        ignore_overlapped_boxes(truth_instances, test_box_overlap(0.90, 0.95));
+
+        for (auto& truth : truth_instances)
+        {
+            if (truth.mmod_rect.ignore)
+                continue;
+
+            const auto& rect = truth.mmod_rect.rect;
+
+            constexpr unsigned long min_width  = 35;
+            constexpr unsigned long min_height = 35;
+            if (rect.width() < min_width && rect.height() < min_height)
+            {
+                truth.mmod_rect.ignore = true;
+                continue;
+            }
+
+            constexpr double max_aspect_ratio_width_to_height = 3.0;
+            constexpr double max_aspect_ratio_height_to_width = 1.5;
+            const double aspect_ratio_width_to_height = rect.width() / static_cast<double>(rect.height());
+            const double aspect_ratio_height_to_width = 1.0 / aspect_ratio_width_to_height;
+            const bool is_aspect_ratio_too_large
+                =  aspect_ratio_width_to_height > max_aspect_ratio_width_to_height
+                || aspect_ratio_height_to_width > max_aspect_ratio_height_to_width;
+
+            if (is_aspect_ratio_too_large)
+                truth.mmod_rect.ignore = true;
+        }
+    }
+}
+
+// Filter images that have no (non-ignored) truth
+std::vector<truth_image> filter_images_with_no_truth(const std::vector<truth_image>& truth_images)
+{
+    std::vector<truth_image> result;
+
+    for (const auto& truth_image : truth_images)
+    {
+        const auto ignored = [](const auto& truth) { return truth.mmod_rect.ignore; };
+        const auto& truth_instances = truth_image.truth_instances;
+        if (!std::all_of(truth_instances.begin(), truth_instances.end(), ignored))
+            result.push_back(truth_image);
+    }
+
+    return result;
 }
 
 int main(int argc, char** argv) try
@@ -594,7 +653,7 @@ int main(int argc, char** argv) try
 
     cout << "\nSCANNING PASCAL VOC2012 DATASET\n" << endl;
 
-    auto listing = get_pascal_voc2012_train_listing(argv[1]);
+    const auto listing = get_pascal_voc2012_train_listing(argv[1]);
     cout << "images in entire dataset: " << listing.size() << endl;
     if (listing.size() == 0)
     {
@@ -603,8 +662,8 @@ int main(int argc, char** argv) try
     }
 
     // mini-batches smaller than the default can be used with GPUs having less memory
-    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 75;
-    const unsigned int seg_minibatch_size = argc >= 4 ? std::stoi(argv[3]) : 25;
+    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 60;
+    const unsigned int seg_minibatch_size = argc >= 4 ? std::stoi(argv[3]) : 20;
     cout << "det mini-batch size: " << det_minibatch_size << endl;
     cout << "seg mini-batch size: " << seg_minibatch_size << endl;
 
@@ -627,16 +686,31 @@ int main(int argc, char** argv) try
 
     // extract the MMOD rects
     cout << endl << "Extracting all truth instances...";
-    auto truth_instances = load_all_truth_instances(listing);
+    const auto truth_instances = load_all_truth_instances(listing);
     cout << " Done!" << endl << endl;
 
-    filter_listing(listing, truth_instances, desired_classlabels);
+    DLIB_CASSERT(listing.size() == truth_instances.size());
 
-    cout << "images in dataset filtered by class: " << listing.size() << endl;
+    std::vector<truth_image> original_truth_images;
+    for (size_t i = 0, end = listing.size(); i < end; ++i)
+    {
+        original_truth_images.push_back(truth_image{
+            listing[i], truth_instances[i]
+        });
+    }
+
+    auto truth_images_filtered_by_class = filter_based_on_classlabel(original_truth_images, desired_classlabels);
+
+    cout << "images in dataset filtered by class: " << truth_images_filtered_by_class.size() << endl;
+
+    ignore_some_truth_boxes(truth_images_filtered_by_class);
+    const auto truth_images = filter_images_with_no_truth(truth_images_filtered_by_class);
+
+    cout << "images in dataset after ignoring some truth boxes: " << truth_images.size() << endl;
 
     // First train an object detector network (loss_mmod).
     cout << endl << "Training detector network:" << endl;
-    const auto det_net = train_detection_network    (listing, truth_instances, det_minibatch_size);
+    const auto det_net = train_detection_network(truth_images, det_minibatch_size);
 
     // Then train mask predictors (segmentation).
     std::map<std::string, seg_bnet_type> seg_nets_by_class;
@@ -651,21 +725,17 @@ int main(int argc, char** argv) try
     {
         for (const auto& classlabel : desired_classlabels)
         {
-            // Consider only the truth instances belonging to this class.
-            auto listing_for_classlabel = listing;
-            auto truth_instances_for_classlabel = truth_instances;
-            filter_listing(listing_for_classlabel, truth_instances_for_classlabel, { classlabel });
+            // Consider only the truth images belonging to this class.
+            const auto class_images = filter_based_on_classlabel(truth_images, { classlabel });
 
             cout << endl << "Training segmentation network for class " << classlabel << ":" << endl;
-            seg_nets_by_class[classlabel] = train_segmentation_network(
-                listing_for_classlabel, truth_instances_for_classlabel, seg_minibatch_size, classlabel
-            );
+            seg_nets_by_class[classlabel] = train_segmentation_network(class_images, seg_minibatch_size, classlabel);
         }
     }
     else
     {
         cout << "Training a single segmentation network:" << endl;
-        seg_nets_by_class[""] = train_segmentation_network(listing, truth_instances, seg_minibatch_size, "");
+        seg_nets_by_class[""] = train_segmentation_network(truth_images, seg_minibatch_size, "");
     }
 
     cout << "Saving networks" << endl;
