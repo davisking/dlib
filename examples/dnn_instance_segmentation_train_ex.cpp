@@ -257,45 +257,59 @@ det_bnet_type train_detection_network(
     std::thread data_loader3([f]() { f(3); });
     std::thread data_loader4([f]() { f(4); });
 
-    dnn_trainer<det_bnet_type> det_trainer(det_net, sgd(weight_decay, momentum));
-    det_trainer.be_verbose();
-    det_trainer.set_learning_rate(initial_learning_rate);
-    det_trainer.set_synchronization_file("pascal_voc2012_det_trainer_state_file.dat", std::chrono::minutes(10));
-    det_trainer.set_iterations_without_progress_threshold(5000);
-
-    // Output training parameters.
-    cout << det_trainer << endl;
-
-    std::vector<matrix<rgb_pixel>> samples;
-    std::vector<std::vector<mmod_rect>> labels;
-
-    // The main training loop.  Keep making mini-batches and giving them to the trainer.
-    // We will run until the learning rate becomes small enough.
-    while (det_trainer.get_learning_rate() >= 1e-4)
+    const auto stop_data_loaders = [&]()
     {
-        samples.clear();
-        labels.clear();
+        data.disable();
+        data_loader1.join();
+        data_loader2.join();
+        data_loader3.join();
+        data_loader4.join();
+    };
 
-        // make a mini-batch
-        det_training_sample temp;
-        while (samples.size() < det_minibatch_size)
+    dnn_trainer<det_bnet_type> det_trainer(det_net, sgd(weight_decay, momentum));
+
+    try
+    {
+        det_trainer.be_verbose();
+        det_trainer.set_learning_rate(initial_learning_rate);
+        det_trainer.set_synchronization_file("pascal_voc2012_det_trainer_state_file.dat", std::chrono::minutes(10));
+        det_trainer.set_iterations_without_progress_threshold(5000);
+
+        // Output training parameters.
+        cout << det_trainer << endl;
+
+        std::vector<matrix<rgb_pixel>> samples;
+        std::vector<std::vector<mmod_rect>> labels;
+
+        // The main training loop.  Keep making mini-batches and giving them to the trainer.
+        // We will run until the learning rate becomes small enough.
+        while (det_trainer.get_learning_rate() >= 1e-4)
         {
-            data.dequeue(temp);
+            samples.clear();
+            labels.clear();
 
-            samples.push_back(std::move(temp.input_image));
-            labels.push_back(std::move(temp.mmod_rects));
+            // make a mini-batch
+            det_training_sample temp;
+            while (samples.size() < det_minibatch_size)
+            {
+                data.dequeue(temp);
+
+                samples.push_back(std::move(temp.input_image));
+                labels.push_back(std::move(temp.mmod_rects));
+            }
+
+            det_trainer.train_one_step(samples, labels);
         }
-
-        det_trainer.train_one_step(samples, labels);
+    }
+    catch (std::exception&)
+    {
+        stop_data_loaders();
+        throw;
     }
 
     // Training done, tell threads to stop and make sure to wait for them to finish before
     // moving on.
-    data.disable();
-    data_loader1.join();
-    data_loader2.join();
-    data_loader3.join();
-    data_loader4.join();
+    stop_data_loaders();
 
     // also wait for threaded processing to stop in the trainer.
     det_trainer.get_net();
@@ -440,33 +454,46 @@ seg_bnet_type train_segmentation_network(
     std::thread data_loader3([f]() { f(3); });
     std::thread data_loader4([f]() { f(4); });
 
-    // The main training loop.  Keep making mini-batches and giving them to the trainer.
-    // We will run until the learning rate has dropped by a factor of 1e-4.
-    while (seg_trainer.get_learning_rate() >= 1e-4)
+    const auto stop_data_loaders = [&]()
     {
-        samples.clear();
-        labels.clear();
+        data.disable();
+        data_loader1.join();
+        data_loader2.join();
+        data_loader3.join();
+        data_loader4.join();
+    };
 
-        // make a mini-batch
-        seg_training_sample temp;
-        while (samples.size() < seg_minibatch_size)
+    try
+    {
+        // The main training loop.  Keep making mini-batches and giving them to the trainer.
+        // We will run until the learning rate has dropped by a factor of 1e-4.
+        while (seg_trainer.get_learning_rate() >= 1e-4)
         {
-            data.dequeue(temp);
+            samples.clear();
+            labels.clear();
 
-            samples.push_back(std::move(temp.input_image));
-            labels.push_back(std::move(temp.label_image));
+            // make a mini-batch
+            seg_training_sample temp;
+            while (samples.size() < seg_minibatch_size)
+            {
+                data.dequeue(temp);
+
+                samples.push_back(std::move(temp.input_image));
+                labels.push_back(std::move(temp.label_image));
+            }
+
+            seg_trainer.train_one_step(samples, labels);
         }
-
-        seg_trainer.train_one_step(samples, labels);
+    }
+    catch (std::exception&)
+    {
+        stop_data_loaders();
+        throw;
     }
 
     // Training done, tell threads to stop and make sure to wait for them to finish before
     // moving on.
-    data.disable();
-    data_loader1.join();
-    data_loader2.join();
-    data_loader3.join();
-    data_loader4.join();
+    stop_data_loaders();
 
     // also wait for threaded processing to stop in the trainer.
     seg_trainer.get_net();
