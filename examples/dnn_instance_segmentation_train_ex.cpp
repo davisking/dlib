@@ -366,7 +366,7 @@ seg_bnet_type train_segmentation_network(
     seg_trainer.be_verbose();
     seg_trainer.set_learning_rate(initial_learning_rate);
     seg_trainer.set_synchronization_file(synchronization_file_name, std::chrono::minutes(10));
-    seg_trainer.set_iterations_without_progress_threshold(5000);
+    seg_trainer.set_iterations_without_progress_threshold(2000);
     set_all_bn_running_stats_window_sizes(seg_net, 1000);
 
     // Output training parameters.
@@ -689,7 +689,7 @@ int main(int argc, char** argv) try
     }
 
     // mini-batches smaller than the default can be used with GPUs having less memory
-    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 60;
+    const unsigned int det_minibatch_size = argc >= 3 ? std::stoi(argv[2]) : 35;
     const unsigned int seg_minibatch_size = argc >= 4 ? std::stoi(argv[3]) : 100;
     cout << "det mini-batch size: " << det_minibatch_size << endl;
     cout << "seg mini-batch size: " << seg_minibatch_size << endl;
