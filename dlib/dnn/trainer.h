@@ -1065,9 +1065,12 @@ namespace dlib
                     return true;
             }
 
-            // if we haven't seen much data yet then just say false.  Or, alternatively, if
-            // it's been too long since the last sync then don't reload either.
-            if (gradient_updates_since_last_sync < 30 || previous_loss_values.size() < 2*gradient_updates_since_last_sync)
+            // if we haven't seen much data yet then just say false.
+            if (gradient_updates_since_last_sync < 30)
+                return false;
+
+            // if it's been too long since the last sync then don't reload either.
+            if (previous_loss_values.size() + previous_loss_values_dump_amount < 2 * gradient_updates_since_last_sync)
                 return false;
 
             // Now look at the data since a little before the last disk sync.  We will
