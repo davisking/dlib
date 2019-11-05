@@ -1078,13 +1078,16 @@ namespace dlib
 
             // if the loss is very likely to be increasing then return true
             const double prob = g.probability_gradient_greater_than(0);
-            if (prob > prob_loss_increasing_thresh && prob_loss_increasing_thresh <= prob_loss_increasing_thresh_max_value)
+            if (prob > prob_loss_increasing_thresh)
             {
                 // Exponentially decay the threshold towards 1 so that if we keep finding
                 // the loss to be increasing over and over we will make the test
                 // progressively harder and harder until it fails, therefore ensuring we
                 // can't get stuck reloading from a previous state over and over. 
-                prob_loss_increasing_thresh = 0.1*prob_loss_increasing_thresh + 0.9*1;
+                prob_loss_increasing_thresh = std::min(
+                    0.1*prob_loss_increasing_thresh + 0.9*1,
+                    prob_loss_increasing_thresh_max_value
+                );
                 return true;
             }
             else
