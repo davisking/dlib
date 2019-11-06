@@ -196,6 +196,7 @@ if (UNIX OR MINGW)
       if (cblas_lib)
          set(blas_libraries ${cblas_lib})
          set(blas_found 1)
+         add_definitions("-DUSING_OPENBLAS")
          message(STATUS "Found OpenBLAS library")
          set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
          # If you compiled OpenBLAS with LAPACK in it then it should have the

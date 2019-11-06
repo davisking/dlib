@@ -3,6 +3,16 @@
 #ifndef DLIB_CBLAS_CONSTAnTS_Hh_
 #define DLIB_CBLAS_CONSTAnTS_Hh_
 
+#ifdef USING_OPENBLAS
+#error using blas
+#include <cblas.h>
+#define CBLAS_DOUBLE_TYPE openblas_complex_double
+#define CBLAS_FLOAT_TYPE openblas_complex_float
+#else
+#define CBLAS_DOUBLE_TYPE double
+#define CBLAS_FLOAT_TYPE float
+#endif
+
 #if !(defined(__GSL_CBLAS_H__) || defined(CBLAS_H))
 
 // Setting this tells other headers to define their own copy of the cblas API so we can

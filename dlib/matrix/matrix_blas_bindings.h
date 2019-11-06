@@ -356,7 +356,7 @@ namespace dlib
         {
             DLIB_TEST_BLAS_BINDING_DOT;
             std::complex<float> result;
-            cblas_cdotu_sub(N, (float*)X, incX, (float*)Y, incY, (float*)&result);
+            cblas_cdotu_sub(N, (float*)X, incX, (float*)Y, incY, (CBLAS_FLOAT_TYPE*)&result);
             return result;
         }
 
@@ -365,7 +365,7 @@ namespace dlib
         {
             DLIB_TEST_BLAS_BINDING_DOT;
             std::complex<double> result;
-            cblas_zdotu_sub(N, (double*)X, incX, (double*)Y, incY, (double*)&result);
+            cblas_zdotu_sub(N, (double*)X, incX, (double*)Y, incY, (CBLAS_DOUBLE_TYPE*)&result);
             return result;
         }
 
@@ -376,7 +376,7 @@ namespace dlib
         {
             DLIB_TEST_BLAS_BINDING_DOT;
             std::complex<float> result;
-            cblas_cdotc_sub(N, (float*)X, incX, (float*)Y, incY, (float*)&result);
+            cblas_cdotc_sub(N, (float*)X, incX, (float*)Y, incY, (CBLAS_FLOAT_TYPE*)&result);
             return result;
         }
 
@@ -385,7 +385,7 @@ namespace dlib
         {
             DLIB_TEST_BLAS_BINDING_DOT;
             std::complex<double> result;
-            cblas_zdotc_sub(N, (double*)X, incX, (double*)Y, incY, (double*)&result);
+            cblas_zdotc_sub(N, (double*)X, incX, (double*)Y, incY, (CBLAS_DOUBLE_TYPE*)&result);
             return result;
         }
 
