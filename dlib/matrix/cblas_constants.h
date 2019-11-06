@@ -4,7 +4,6 @@
 #define DLIB_CBLAS_CONSTAnTS_Hh_
 
 #ifdef USING_OPENBLAS
-#error using blas
 #include <cblas.h>
 #define CBLAS_DOUBLE_TYPE openblas_complex_double
 #define CBLAS_FLOAT_TYPE openblas_complex_float
