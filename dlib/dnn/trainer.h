@@ -1020,6 +1020,9 @@ namespace dlib
                     sync_file_reloaded = true;
                     if (verbose)
                         std::cout << "Loss has been increasing, reloading saved state from " << newest_syncfile() << std::endl;
+
+                    if (prob_loss_increasing_thresh >= prob_loss_increasing_thresh_max_value)
+                        learning_rate = learning_rate_shrink * learning_rate;
                 }
                 else
                 {
@@ -1069,14 +1072,14 @@ namespace dlib
             if (gradient_updates_since_last_sync < 30)
                 return false;
 
-            // if it's been too long since the last sync then don't reload either.
-            if (previous_loss_values.size() + previous_loss_values_dump_amount < 2 * gradient_updates_since_last_sync)
-                return false;
-
             // Now look at the data since a little before the last disk sync.  We will
-            // check if the loss is getting bettor or worse.
+            // check if the loss is getting better or worse.
             running_gradient g;
-            for (size_t i = previous_loss_values.size() - 2*gradient_updates_since_last_sync; i < previous_loss_values.size(); ++i)
+            const size_t first_index
+                = previous_loss_values.size() < 2 * gradient_updates_since_last_sync
+                ? 0
+                : previous_loss_values.size() - 2 * gradient_updates_since_last_sync;
+            for (size_t i = first_index; i < previous_loss_values.size(); ++i)
                 g.add(previous_loss_values[i]);
 
             // if the loss is very likely to be increasing then return true
