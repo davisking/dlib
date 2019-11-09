@@ -460,7 +460,7 @@ namespace dlib
                 test_steps_without_progress = 0;
                 previous_loss_values.clear();
                 test_previous_loss_values.clear();
-                previous_loss_values_to_effectively_disregard = 0;
+                additional_previous_loss_values_to_keep_until_disk_sync.clear();
             }
             learning_rate = lr;
             lr_schedule.set_size(0);
@@ -600,21 +600,13 @@ namespace dlib
 
             rs.add(loss);
             previous_loss_values.push_back(loss);
-            if (sync_filename.empty())
+            // discard really old loss values.
+            while (previous_loss_values.size() > iter_without_progress_thresh)
             {
-                // discard really old loss values, if disk sync is disabled
-                // (if disk sync is enabled, then these values will be discarded
-                //  only after we've made sure that loss hasn't increased since
-                //  last disk sync)
-                while (previous_loss_values.size() > iter_without_progress_thresh)
-                {
-                    previous_loss_values.pop_front();
-                    if (previous_loss_values_to_effectively_disregard > 0)
-                        previous_loss_values_to_effectively_disregard--;
-                }
+                if (!sync_filename.empty())
+                    additional_previous_loss_values_to_keep_until_disk_sync.push_back(previous_loss_values.front());
+                previous_loss_values.pop_front();
             }
-            else if (previous_loss_values.size() > iter_without_progress_thresh)
-                previous_loss_values_to_effectively_disregard++;
         }
 
         template <typename T>
@@ -813,13 +805,7 @@ namespace dlib
                 if (gradient_check_budget > iter_without_progress_thresh && learning_rate_shrink != 1)
                 {
                     gradient_check_budget = 0;
-
-                    const std::vector<double> previous_non_dumped_loss_values(
-                        previous_loss_values.begin() + previous_loss_values_to_effectively_disregard,
-                        previous_loss_values.end()
-                    );
-
-                    steps_without_progress = count_steps_without_decrease(previous_non_dumped_loss_values);
+                    steps_without_progress = count_steps_without_decrease(previous_loss_values);
                     if (steps_without_progress >= iter_without_progress_thresh)
                     {
                         // Double check that we aren't seeing decrease.  This second check
@@ -833,17 +819,20 @@ namespace dlib
                         // because the most recent loss values have suddenly been large,
                         // then we shouldn't stop or lower the learning rate.  We should
                         // keep going until whatever disturbance we hit is damped down.  
-                        steps_without_progress = count_steps_without_decrease_robust(previous_non_dumped_loss_values);
+                        steps_without_progress = count_steps_without_decrease_robust(previous_loss_values);
                         if (steps_without_progress >= iter_without_progress_thresh)
                         {
                             // optimization has flattened out, so drop the learning rate. 
                             learning_rate = learning_rate_shrink*learning_rate;
                             steps_without_progress = 0;
-                            // Disregard some of the previous loss values so that steps_without_progress 
-                            // will decrease below iter_without_progress_thresh.
-                            previous_loss_values_to_effectively_disregard += previous_loss_values_dump_amount + iter_without_progress_thresh / 10;
-                            if (previous_loss_values_to_effectively_disregard > previous_loss_values.size())
-                                previous_loss_values_to_effectively_disregard = previous_loss_values.size();
+                            // Empty out some of the previous loss values so that steps_without_progress 
+                            // will decrease below iter_without_progress_thresh.  
+                            for (unsigned long cnt = 0; cnt < previous_loss_values_dump_amount+iter_without_progress_thresh/10 && previous_loss_values.size() > 0; ++cnt)
+                            {
+                                if (!sync_filename.empty())
+                                    additional_previous_loss_values_to_keep_until_disk_sync.push_back(previous_loss_values.front());
+                                previous_loss_values.pop_front();
+                            }
                         }
                     }
                 }
@@ -902,7 +891,6 @@ namespace dlib
             sync_file_reloaded = false;
             previous_loss_values_dump_amount = 400;
             test_previous_loss_values_dump_amount = 100;
-            previous_loss_values_to_effectively_disregard = 0;
 
             rs_test = running_stats_decayed<double>(200);
 
@@ -945,7 +933,7 @@ namespace dlib
             serialize(item.test_previous_loss_values, out);
             serialize(item.previous_loss_values_dump_amount, out);
             serialize(item.test_previous_loss_values_dump_amount, out);
-            serialize(item.previous_loss_values_to_effectively_disregard, out);
+            serialize(item.additional_previous_loss_values_to_keep_until_disk_sync, out);
         }
         friend void deserialize(dnn_trainer& item, std::istream& in)
         {
@@ -991,7 +979,7 @@ namespace dlib
             deserialize(item.test_previous_loss_values, in);
             deserialize(item.previous_loss_values_dump_amount, in);
             deserialize(item.test_previous_loss_values_dump_amount, in);
-            deserialize(item.previous_loss_values_to_effectively_disregard, in);
+            deserialize(item.additional_previous_loss_values_to_keep_until_disk_sync, in);
 
             if (item.devices.size() > 1)
             {
@@ -1088,7 +1076,42 @@ namespace dlib
             if (!std::ifstream(newest_syncfile(), std::ios::binary))
                 return false;
 
-            for (auto x : previous_loss_values)
+            // if we haven't seen much data yet then just say false.
+            if (gradient_updates_since_last_sync < 30)
+                return false;
+
+            // how long a loss history do we actually need to maintain?
+            const size_t max_previous_loss_values_to_consider = 2 * gradient_updates_since_last_sync;
+            const auto total_previous_loss_values = [this]()
+            {
+                return additional_previous_loss_values_to_keep_until_disk_sync.size()
+                     + previous_loss_values.size();
+            };
+            const auto can_drop_an_additional_previous_loss_value = [&]() {
+                return !additional_previous_loss_values_to_keep_until_disk_sync.empty()
+                    && total_previous_loss_values() > max_previous_loss_values_to_consider;
+            };
+
+            while (can_drop_an_additional_previous_loss_value())
+                additional_previous_loss_values_to_keep_until_disk_sync.pop_front();
+
+            // collect all previous loss values we want to consider
+            std::deque<double> previous_loss_values_to_consider;
+            std::copy(
+                additional_previous_loss_values_to_keep_until_disk_sync.begin(),
+                additional_previous_loss_values_to_keep_until_disk_sync.end(),
+                std::back_inserter(previous_loss_values_to_consider)
+            );
+            std::copy(
+                previous_loss_values.begin(),
+                previous_loss_values.end(),
+                std::back_inserter(previous_loss_values_to_consider)
+            );
+
+            while (previous_loss_values_to_consider.size() > max_previous_loss_values_to_consider)
+                previous_loss_values_to_consider.pop_front();
+
+            for (auto x : previous_loss_values_to_consider)
             {
                 // If we get a NaN value of loss assume things have gone horribly wrong and
                 // we should reload the state of the trainer.
@@ -1096,28 +1119,11 @@ namespace dlib
                     return true;
             }
 
-            // if we haven't seen much data yet then just say false.
-            if (gradient_updates_since_last_sync < 30)
-                return false;
-
-            // Now we know how many of the very old loss values we can drop. So let's drop them.
-            const size_t max_previous_loss_values_to_consider = 2 * gradient_updates_since_last_sync;
-            const size_t previous_loss_values_needed = std::max(
-                max_previous_loss_values_to_consider,
-                static_cast<size_t>(iter_without_progress_thresh)
-            );
-            while (previous_loss_values.size() > previous_loss_values_needed)
-                previous_loss_values.pop_front();
-
             // Now look at the data since a little before the last disk sync.  We will
             // check if the loss is getting better or worse.
             running_gradient g;
-            const size_t first_index
-                = previous_loss_values.size() < max_previous_loss_values_to_consider
-                ? 0
-                : previous_loss_values.size() - max_previous_loss_values_to_consider;
-            for (size_t i = first_index; i < previous_loss_values.size(); ++i)
-                g.add(previous_loss_values[i]);
+            for (size_t i = 0; i < previous_loss_values_to_consider.size(); ++i)
+                g.add(previous_loss_values_to_consider[i]);
 
             // if the loss is very likely to be increasing then return true
             const double prob = g.probability_gradient_greater_than(0);
@@ -1139,13 +1145,6 @@ namespace dlib
                 prob_loss_increasing_thresh = std::pow(prob_loss_increasing_thresh, 10.0);
                 // but don't decay below the default value
                 prob_loss_increasing_thresh = std::max(prob_loss_increasing_thresh, prob_loss_increasing_thresh_default_value);
-
-                // we may be able to drop even more of the very old loss values
-                while (previous_loss_values.size() > iter_without_progress_thresh)
-                {
-                    previous_loss_values.pop_front();
-                    previous_loss_values_to_effectively_disregard--;
-                }
 
                 return false;
             }
@@ -1300,6 +1299,8 @@ namespace dlib
         std::atomic<unsigned long> test_steps_without_progress;
         std::deque<double> test_previous_loss_values;
 
+        std::deque<double> additional_previous_loss_values_to_keep_until_disk_sync;
+
         std::atomic<double> learning_rate_shrink;
         std::chrono::time_point<std::chrono::system_clock> last_sync_time;
         std::string sync_filename;
@@ -1333,7 +1334,6 @@ namespace dlib
         bool sync_file_reloaded;
         unsigned long previous_loss_values_dump_amount;
         unsigned long test_previous_loss_values_dump_amount;
-        unsigned long previous_loss_values_to_effectively_disregard;
     };
 
 // ----------------------------------------------------------------------------------------
