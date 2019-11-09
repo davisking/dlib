@@ -701,9 +701,9 @@ int main(int argc, char** argv) try
 
     if (desired_classlabels.empty())
     {
-        desired_classlabels.push_back("aeroplane");
         desired_classlabels.push_back("bicycle");
         desired_classlabels.push_back("car");
+        desired_classlabels.push_back("cat");
     }
 
     cout << "desired classlabels:";
