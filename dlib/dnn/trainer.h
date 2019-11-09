@@ -460,7 +460,7 @@ namespace dlib
                 test_steps_without_progress = 0;
                 previous_loss_values.clear();
                 test_previous_loss_values.clear();
-                previous_loss_values_dumped_amount = 0;
+                previous_loss_values_to_effectively_disregard = 0;
             }
             learning_rate = lr;
             lr_schedule.set_size(0);
@@ -609,10 +609,12 @@ namespace dlib
                 while (previous_loss_values.size() > iter_without_progress_thresh)
                 {
                     previous_loss_values.pop_front();
-                    if (previous_loss_values_dumped_amount > 0)
-                        previous_loss_values_dumped_amount--;
+                    if (previous_loss_values_to_effectively_disregard > 0)
+                        previous_loss_values_to_effectively_disregard--;
                 }
             }
+            else if (previous_loss_values.size() > iter_without_progress_thresh)
+                previous_loss_values_to_effectively_disregard++;
         }
 
         template <typename T>
@@ -813,7 +815,7 @@ namespace dlib
                     gradient_check_budget = 0;
 
                     const std::vector<double> previous_non_dumped_loss_values(
-                        previous_loss_values.begin() + previous_loss_values_dumped_amount,
+                        previous_loss_values.begin() + previous_loss_values_to_effectively_disregard,
                         previous_loss_values.end()
                     );
 
@@ -839,9 +841,9 @@ namespace dlib
                             steps_without_progress = 0;
                             // Disregard some of the previous loss values so that steps_without_progress 
                             // will decrease below iter_without_progress_thresh.
-                            previous_loss_values_dumped_amount += previous_loss_values_dump_amount + iter_without_progress_thresh / 10;
-                            if (previous_loss_values_dumped_amount > previous_loss_values.size())
-                                previous_loss_values_dumped_amount = previous_loss_values.size();
+                            previous_loss_values_to_effectively_disregard += previous_loss_values_dump_amount + iter_without_progress_thresh / 10;
+                            if (previous_loss_values_to_effectively_disregard > previous_loss_values.size())
+                                previous_loss_values_to_effectively_disregard = previous_loss_values.size();
                         }
                     }
                 }
@@ -900,7 +902,7 @@ namespace dlib
             sync_file_reloaded = false;
             previous_loss_values_dump_amount = 400;
             test_previous_loss_values_dump_amount = 100;
-            previous_loss_values_dumped_amount = 0;
+            previous_loss_values_to_effectively_disregard = 0;
 
             rs_test = running_stats_decayed<double>(200);
 
@@ -943,7 +945,7 @@ namespace dlib
             serialize(item.test_previous_loss_values, out);
             serialize(item.previous_loss_values_dump_amount, out);
             serialize(item.test_previous_loss_values_dump_amount, out);
-            serialize(item.previous_loss_values_dumped_amount, out);
+            serialize(item.previous_loss_values_to_effectively_disregard, out);
         }
         friend void deserialize(dnn_trainer& item, std::istream& in)
         {
@@ -989,7 +991,7 @@ namespace dlib
             deserialize(item.test_previous_loss_values, in);
             deserialize(item.previous_loss_values_dump_amount, in);
             deserialize(item.test_previous_loss_values_dump_amount, in);
-            deserialize(item.previous_loss_values_dumped_amount, in);
+            deserialize(item.previous_loss_values_to_effectively_disregard, in);
 
             if (item.devices.size() > 1)
             {
@@ -1137,7 +1139,10 @@ namespace dlib
 
                 // we may be able to drop even more of the very old loss values
                 while (previous_loss_values.size() > iter_without_progress_thresh)
+                {
                     previous_loss_values.pop_front();
+                    previous_loss_values_to_effectively_disregard--;
+                }
 
                 return false;
             }
@@ -1325,7 +1330,7 @@ namespace dlib
         bool sync_file_reloaded;
         unsigned long previous_loss_values_dump_amount;
         unsigned long test_previous_loss_values_dump_amount;
-        unsigned long previous_loss_values_dumped_amount;
+        unsigned long previous_loss_values_to_effectively_disregard;
     };
 
 // ----------------------------------------------------------------------------------------
