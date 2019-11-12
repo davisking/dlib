@@ -867,11 +867,7 @@ namespace dlib
 
                 const auto convert_to_output_type = [](float value)
                 {
-                    if
-#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
-                    constexpr
-#endif // __cplusplus >= 201703L
-                    (std::is_integral<T>::value)
+                    if (std::is_integral<T>::value)
                         return static_cast<T>(value + 0.5);
                     else
                         return static_cast<T>(value);
