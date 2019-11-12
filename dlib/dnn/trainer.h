@@ -458,7 +458,6 @@ namespace dlib
             {
                 steps_without_progress = 0;
                 test_steps_without_progress = 0;
-                steps_since_last_learning_rate_shrink = 0;
                 previous_loss_values.clear();
                 test_previous_loss_values.clear();
                 previous_loss_values_to_keep_until_disk_sync.clear();
@@ -561,7 +560,6 @@ namespace dlib
             learning_rate_shrink = shrink;
             steps_without_progress = 0;
             test_steps_without_progress = 0;
-            steps_since_last_learning_rate_shrink = 0;
         }
 
         double get_learning_rate_shrink_factor (
@@ -697,7 +695,7 @@ namespace dlib
 
                     // Check if we should shrink the learning rate based on how the test
                     // error has been doing lately.
-                    if (learning_rate_shrink != 1 && steps_since_last_learning_rate_shrink > iter_without_progress_thresh)
+                    if (learning_rate_shrink != 1)
                     {
                         test_steps_without_progress = count_steps_without_decrease(test_previous_loss_values);
                         if (test_steps_without_progress >= test_iter_without_progress_thresh)
@@ -708,13 +706,10 @@ namespace dlib
                                 // optimization has flattened out, so drop the learning rate. 
                                 learning_rate = learning_rate_shrink*learning_rate;
                                 test_steps_without_progress = 0;
-
-                                // Decrease steps_since_last_learning_rate_shrink, so that we
-                                // do not get here again right away.
-                                steps_since_last_learning_rate_shrink -= std::min(
-                                    test_previous_loss_values_dump_amount + test_iter_without_progress_thresh / 10,
-                                    steps_since_last_learning_rate_shrink
-                                );
+                                // Empty out some of the previous loss values so that test_steps_without_progress 
+                                // will decrease below test_iter_without_progress_thresh.  
+                                for (unsigned long cnt = 0; cnt < test_previous_loss_values_dump_amount+test_iter_without_progress_thresh/10 && test_previous_loss_values.size() > 0; ++cnt)
+                                    test_previous_loss_values.pop_front();
                             }
                         }
                     }
@@ -723,7 +718,6 @@ namespace dlib
 
                 updated_net_since_last_sync = true;
                 ++main_iteration_counter;
-                ++steps_since_last_learning_rate_shrink;
                 // Call compute_parameter_gradients() and update_parameters() but pick the
                 // right version for unsupervised or supervised training based on the type
                 // of training_label_type.
@@ -809,9 +803,7 @@ namespace dlib
                 // have a "budget" that prevents us from calling
                 // count_steps_without_decrease() every iteration.  We do this because
                 // it can be expensive to compute when previous_loss_values is large.
-                if (gradient_check_budget > iter_without_progress_thresh
-                    && learning_rate_shrink != 1
-                    && steps_since_last_learning_rate_shrink > iter_without_progress_thresh)
+                if (gradient_check_budget > iter_without_progress_thresh && learning_rate_shrink != 1)
                 {
                     gradient_check_budget = 0;
                     steps_without_progress = count_steps_without_decrease(previous_loss_values);
@@ -834,13 +826,10 @@ namespace dlib
                             // optimization has flattened out, so drop the learning rate. 
                             learning_rate = learning_rate_shrink*learning_rate;
                             steps_without_progress = 0;
-
-                            // Decrease steps_since_last_learning_rate_shrink, so that we
-                            // do not get here again right away.
-                            steps_since_last_learning_rate_shrink -= std::min(
-                                previous_loss_values_dump_amount + iter_without_progress_thresh / 10,
-                                steps_since_last_learning_rate_shrink
-                            );
+                            // Empty out some of the previous loss values so that steps_without_progress 
+                            // will decrease below iter_without_progress_thresh.  
+                            for (unsigned long cnt = 0; cnt < previous_loss_values_dump_amount+iter_without_progress_thresh/10 && previous_loss_values.size() > 0; ++cnt)
+                                previous_loss_values.pop_front();
                         }
                     }
                 }
@@ -879,7 +868,6 @@ namespace dlib
             min_learning_rate = 1e-5;
             iter_without_progress_thresh = 2000;
             steps_without_progress = 0;
-            steps_since_last_learning_rate_shrink = 0;
             test_iter_without_progress_thresh = 500;
             test_steps_without_progress = 0;
 
@@ -942,7 +930,6 @@ namespace dlib
             serialize(item.test_previous_loss_values, out);
             serialize(item.previous_loss_values_dump_amount, out);
             serialize(item.test_previous_loss_values_dump_amount, out);
-            serialize(item.steps_since_last_learning_rate_shrink, out);
             serialize(item.previous_loss_values_to_keep_until_disk_sync, out);
         }
         friend void deserialize(dnn_trainer& item, std::istream& in)
@@ -989,7 +976,6 @@ namespace dlib
             deserialize(item.test_previous_loss_values, in);
             deserialize(item.previous_loss_values_dump_amount, in);
             deserialize(item.test_previous_loss_values_dump_amount, in);
-            deserialize(item.steps_since_last_learning_rate_shrink, in);
             deserialize(item.previous_loss_values_to_keep_until_disk_sync, in);
 
             if (item.devices.size() > 1)
@@ -1049,12 +1035,11 @@ namespace dlib
                     {
                         std::cout << "(and while at it, also shrinking the learning rate)" << std::endl;
                         learning_rate = learning_rate_shrink * learning_rate;
-
                         steps_without_progress = 0;
-                        steps_since_last_learning_rate_shrink -= std::min(
-                            previous_loss_values_dump_amount + iter_without_progress_thresh / 10,
-                            steps_since_last_learning_rate_shrink
-                        );
+                        // Empty out some of the previous loss values so that steps_without_progress 
+                        // will decrease below iter_without_progress_thresh.  
+                        for (unsigned long cnt = 0; cnt < previous_loss_values_dump_amount + iter_without_progress_thresh / 10 && previous_loss_values.size() > 0; ++cnt)
+                            previous_loss_values.pop_front();
                     }
                 }
                 else
@@ -1228,15 +1213,9 @@ namespace dlib
             if (lr_schedule.size() == 0)
             {
                 if (test_previous_loss_values.size() == 0)
-                    if (steps_since_last_learning_rate_shrink < iter_without_progress_thresh)
-                        std::cout << "steps since last learning rate shrink: " << steps_since_last_learning_rate_shrink;
-                    else
-                        std::cout << "steps without apparent progress: " << steps_without_progress;
+                    std::cout << "steps without apparent progress: " << steps_without_progress;
                 else
-                    if (steps_since_last_learning_rate_shrink < iter_without_progress_thresh && steps_since_last_learning_rate_shrink < test_iter_without_progress_thresh)
-                        std::cout << "steps since last learning rate shrink: " << steps_since_last_learning_rate_shrink;
-                    else
-                        std::cout << "steps without apparent progress: train=" << steps_without_progress << ", test=" << test_steps_without_progress;
+                    std::cout << "steps without apparent progress: train=" << steps_without_progress << ", test=" << test_steps_without_progress;
             }
             else
             {
@@ -1308,7 +1287,6 @@ namespace dlib
         matrix<double,0,1> lr_schedule;
         long lr_schedule_pos;
         unsigned long gradient_check_budget;
-        unsigned long steps_since_last_learning_rate_shrink;
 
         std::exception_ptr eptr = nullptr;
         mutable std::mutex eptr_mutex;
