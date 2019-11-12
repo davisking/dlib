@@ -1226,9 +1226,15 @@ namespace dlib
             if (lr_schedule.size() == 0)
             {
                 if (test_previous_loss_values.size() == 0)
-                    std::cout << "steps without apparent progress: " << steps_without_progress;
+                    if (steps_since_last_learning_rate_shrink < iter_without_progress_thresh)
+                        std::cout << "steps since last learning rate shrink: " << steps_since_last_learning_rate_shrink;
+                    else
+                        std::cout << "steps without apparent progress: " << steps_without_progress;
                 else
-                    std::cout << "steps without apparent progress: train=" << steps_without_progress << ", test=" << test_steps_without_progress;
+                    if (steps_since_last_learning_rate_shrink < iter_without_progress_thresh && steps_since_last_learning_rate_shrink < test_iter_without_progress_thresh)
+                        std::cout << "steps since last learning rate shrink: " << steps_since_last_learning_rate_shrink;
+                    else
+                        std::cout << "steps without apparent progress: train=" << steps_without_progress << ", test=" << test_steps_without_progress;
             }
             else
             {
