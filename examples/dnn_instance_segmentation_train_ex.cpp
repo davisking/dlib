@@ -150,7 +150,7 @@ std::vector<truth_instance> rgb_label_images_to_truth_instances(
 
 struct truth_image
 {
-    image_info image_info;
+    image_info info;
     std::vector<truth_instance> truth_instances;
 };
 
@@ -240,7 +240,7 @@ det_bnet_type train_detection_network(
             const auto& truth_image = truth_images[random_index];
 
             // Load the input image.
-            load_image(input_image, truth_image.image_info.image_filename);
+            load_image(input_image, truth_image.info.image_filename);
 
             // Get a random crop of the input.
             const auto mmod_rects = extract_mmod_rects(truth_image.truth_instances);
@@ -396,13 +396,13 @@ seg_bnet_type train_segmentation_network(
 
             if (!image_truths.empty())
             {
-                const image_info& image_info = truth_image.image_info;
+                const image_info& info = truth_image.info;
 
                 // Load the input image.
-                load_image(input_image, image_info.image_filename);
+                load_image(input_image, info.image_filename);
 
                 // Load the ground-truth (RGB) instance labels.
-                load_image(rgb_label_image, image_info.instance_label_filename);
+                load_image(rgb_label_image, info.instance_label_filename);
 
                 // Pick a random training instance.
                 const auto& truth_instance = image_truths[rnd.get_random_32bit_number() % image_truths.size()];
@@ -540,13 +540,13 @@ int ignore_overlapped_boxes(
     return num_ignored;
 }
 
-std::vector<truth_instance> load_truth_instances(const image_info& image_info)
+std::vector<truth_instance> load_truth_instances(const image_info& info)
 {
     matrix<rgb_pixel> instance_label_image;
     matrix<rgb_pixel> class_label_image;
 
-    load_image(instance_label_image, image_info.instance_label_filename);
-    load_image(class_label_image, image_info.class_label_filename);
+    load_image(instance_label_image, info.instance_label_filename);
+    load_image(class_label_image, info.class_label_filename);
 
     return rgb_label_images_to_truth_instances(instance_label_image, class_label_image);
 };
@@ -606,7 +606,7 @@ std::vector<truth_image> filter_based_on_classlabel(
                 represents_desired_class
             );
 
-            result.push_back(truth_image{ input.image_info, temp });
+            result.push_back(truth_image{ input.info, temp });
         }
     }
 

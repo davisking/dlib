@@ -109,11 +109,11 @@ std::vector<image_info> get_pascal_voc2012_listing(
 
         if (!basename.empty())
         {
-            image_info image_info;
-            image_info.image_filename          = voc2012_folder + "/JPEGImages/"         + basename + ".jpg";
-            image_info.class_label_filename    = voc2012_folder + "/SegmentationClass/"  + basename + ".png";
-            image_info.instance_label_filename = voc2012_folder + "/SegmentationObject/" + basename + ".png";
-            results.push_back(image_info);
+            image_info info;
+            info.image_filename          = voc2012_folder + "/JPEGImages/"         + basename + ".jpg";
+            info.class_label_filename    = voc2012_folder + "/SegmentationClass/"  + basename + ".png";
+            info.instance_label_filename = voc2012_folder + "/SegmentationObject/" + basename + ".png";
+            results.push_back(info);
         }
     }
 
