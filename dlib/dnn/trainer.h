@@ -706,10 +706,10 @@ namespace dlib
                                 // optimization has flattened out, so drop the learning rate. 
                                 learning_rate = learning_rate_shrink*learning_rate;
                                 test_steps_without_progress = 0;
+
                                 // Empty out some of the previous loss values so that test_steps_without_progress 
                                 // will decrease below test_iter_without_progress_thresh.  
-                                for (unsigned long cnt = 0; cnt < test_previous_loss_values_dump_amount+test_iter_without_progress_thresh/10 && test_previous_loss_values.size() > 0; ++cnt)
-                                    test_previous_loss_values.pop_front();
+                                drop_some_test_previous_loss_values();
                             }
                         }
                     }
@@ -826,10 +826,10 @@ namespace dlib
                             // optimization has flattened out, so drop the learning rate. 
                             learning_rate = learning_rate_shrink*learning_rate;
                             steps_without_progress = 0;
+
                             // Empty out some of the previous loss values so that steps_without_progress 
                             // will decrease below iter_without_progress_thresh.  
-                            for (unsigned long cnt = 0; cnt < previous_loss_values_dump_amount+iter_without_progress_thresh/10 && previous_loss_values.size() > 0; ++cnt)
-                                previous_loss_values.pop_front();
+                            drop_some_previous_loss_values();
                         }
                     }
                 }
@@ -994,6 +994,20 @@ namespace dlib
             }
         }
 
+        // Empty out some of the previous loss values so that steps_without_progress will decrease below iter_without_progress_thresh.  
+        void drop_some_previous_loss_values()
+        {
+            for (unsigned long cnt = 0; cnt < previous_loss_values_dump_amount + iter_without_progress_thresh / 10 && previous_loss_values.size() > 0; ++cnt)
+                previous_loss_values.pop_front();
+        }
+
+        // Empty out some of the previous test loss values so that test_steps_without_progress will decrease below test_iter_without_progress_thresh.  
+        void drop_some_test_previous_loss_values()
+        {
+            for (unsigned long cnt = 0; cnt < test_previous_loss_values_dump_amount + test_iter_without_progress_thresh / 10 && test_previous_loss_values.size() > 0; ++cnt)
+                test_previous_loss_values.pop_front();
+        }
+
         void sync_to_disk (
             bool do_it_now = false
         ) 
@@ -1037,12 +1051,9 @@ namespace dlib
                         learning_rate = learning_rate_shrink * learning_rate;
                         steps_without_progress = 0;
                         test_steps_without_progress = 0;
-                        // Empty out some of the previous loss values so that steps_without_progress and test_steps_without_progress
-                        // will decrease below iter_without_progress_thresh.  
-                        for (unsigned long cnt = 0; cnt < previous_loss_values_dump_amount+iter_without_progress_thresh/10 && previous_loss_values.size() > 0; ++cnt)
-                            previous_loss_values.pop_front();
-                        for (unsigned long cnt = 0; cnt < test_previous_loss_values_dump_amount+test_iter_without_progress_thresh/10 && test_previous_loss_values.size() > 0; ++cnt)
-                            test_previous_loss_values.pop_front();
+
+                        drop_some_previous_loss_values();
+                        drop_some_test_previous_loss_values();
                     }
                 }
                 else
@@ -1081,14 +1092,12 @@ namespace dlib
             if (!std::ifstream(newest_syncfile(), std::ios::binary))
                 return false;
 
-            // if we haven't seen much data yet then just say false.
-            if (gradient_updates_since_last_sync < 30)
-                return false;
-
             // Now look at the data since a little before the last disk sync.  We will
             // check if the loss is getting better or worse.
             while (previous_loss_values_to_keep_until_disk_sync.size() > 2 * gradient_updates_since_last_sync)
                 previous_loss_values_to_keep_until_disk_sync.pop_front();
+
+            running_gradient g;
 
             for (auto x : previous_loss_values_to_keep_until_disk_sync)
             {
@@ -1096,11 +1105,13 @@ namespace dlib
                 // we should reload the state of the trainer.
                 if (std::isnan(x))
                     return true;
+
+                g.add(x);
             }
 
-            running_gradient g;
-            for (size_t i = 0; i < previous_loss_values_to_keep_until_disk_sync.size(); ++i)
-                g.add(previous_loss_values_to_keep_until_disk_sync[i]);
+            // if we haven't seen much data yet then just say false.
+            if (gradient_updates_since_last_sync < 30)
+                return false;
 
             // if the loss is very likely to be increasing then return true
             const double prob = g.probability_gradient_greater_than(0);

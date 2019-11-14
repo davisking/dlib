@@ -139,7 +139,9 @@ int main(int argc, char** argv) try
             dlib::resize_image(mask, resized_mask);
 
             for (int r = 0; r < resized_mask.nr(); ++r)
+            {
                 for (int c = 0; c < resized_mask.nc(); ++c)
+                {
                     if (resized_mask(r, c))
                     {
                         const auto y = chip_details.rect.top() + r;
@@ -147,6 +149,8 @@ int main(int argc, char** argv) try
                         if (y >= 0 && y < rgb_label_image.nr() && x >= 0 && x < rgb_label_image.nc())
                             rgb_label_image(y, x) = random_color;
                     }
+                }
+            }
 
             const Voc2012class& voc2012_class = find_voc2012_class(
                 [&instance](const Voc2012class& candidate) {
