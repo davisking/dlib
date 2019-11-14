@@ -176,7 +176,7 @@ std::vector<std::vector<mmod_rect>> extract_mmod_rect_vectors(
 {
     std::vector<std::vector<mmod_rect>> mmod_rects(truth_images.size());
 
-    const auto extract_mmod_rects_from_truth_image = [](const auto& truth_image)
+    const auto extract_mmod_rects_from_truth_image = [](const truth_image& truth_image)
     {
         return extract_mmod_rects(truth_image.truth_instances);
     };
@@ -658,7 +658,7 @@ std::vector<truth_image> filter_images_with_no_truth(const std::vector<truth_ima
 
     for (const auto& truth_image : truth_images)
     {
-        const auto ignored = [](const auto& truth) { return truth.mmod_rect.ignore; };
+        const auto ignored = [](const truth_instance& truth) { return truth.mmod_rect.ignore; };
         const auto& truth_instances = truth_image.truth_instances;
         if (!std::all_of(truth_instances.begin(), truth_instances.end(), ignored))
             result.push_back(truth_image);
