@@ -91,107 +91,6 @@ void randomly_crop_image (
 
 // ----------------------------------------------------------------------------------------
 
-// The names of the input image and the associated RGB label image in the PASCAL VOC 2012
-// data set.
-struct image_info
-{
-    string image_filename;
-    string label_filename;
-};
-
-// Read the list of image files belonging to either the "train", "trainval", or "val" set
-// of the PASCAL VOC2012 data.
-std::vector<image_info> get_pascal_voc2012_listing(
-    const std::string& voc2012_folder,
-    const std::string& file = "train" // "train", "trainval", or "val"
-)
-{
-    std::ifstream in(voc2012_folder + "/ImageSets/Segmentation/" + file + ".txt");
-
-    std::vector<image_info> results;
-
-    while (in)
-    {
-        std::string basename;
-        in >> basename;
-
-        if (!basename.empty())
-        {
-            image_info image_info;
-            image_info.image_filename = voc2012_folder + "/JPEGImages/" + basename + ".jpg";
-            image_info.label_filename = voc2012_folder + "/SegmentationClass/" + basename + ".png";
-            results.push_back(image_info);
-        }
-    }
-
-    return results;
-}
-
-// Read the list of image files belong to the "train" set of the PASCAL VOC2012 data.
-std::vector<image_info> get_pascal_voc2012_train_listing(
-    const std::string& voc2012_folder
-)
-{
-    return get_pascal_voc2012_listing(voc2012_folder, "train");
-}
-
-// Read the list of image files belong to the "val" set of the PASCAL VOC2012 data.
-std::vector<image_info> get_pascal_voc2012_val_listing(
-    const std::string& voc2012_folder
-)
-{
-    return get_pascal_voc2012_listing(voc2012_folder, "val");
-}
-
-// ----------------------------------------------------------------------------------------
-
-// The PASCAL VOC2012 dataset contains 20 ground-truth classes + background.  Each class
-// is represented using an RGB color value.  We associate each class also to an index in the
-// range [0, 20], used internally by the network.  To convert the ground-truth data to
-// something that the network can efficiently digest, we need to be able to map the RGB
-// values to the corresponding indexes.
-
-// Given an RGB representation, find the corresponding PASCAL VOC2012 class
-// (e.g., 'dog').
-const Voc2012class& find_voc2012_class(const dlib::rgb_pixel& rgb_label)
-{
-    return find_voc2012_class(
-        [&rgb_label](const Voc2012class& voc2012class)
-        {
-            return rgb_label == voc2012class.rgb_label;
-        }
-    );
-}
-
-// Convert an RGB class label to an index in the range [0, 20].
-inline uint16_t rgb_label_to_index_label(const dlib::rgb_pixel& rgb_label)
-{
-    return find_voc2012_class(rgb_label).index;
-}
-
-// Convert an image containing RGB class labels to a corresponding
-// image containing indexes in the range [0, 20].
-void rgb_label_image_to_index_label_image(
-    const dlib::matrix<dlib::rgb_pixel>& rgb_label_image,
-    dlib::matrix<uint16_t>& index_label_image
-)
-{
-    const long nr = rgb_label_image.nr();
-    const long nc = rgb_label_image.nc();
-
-    index_label_image.set_size(nr, nc);
-
-    for (long r = 0; r < nr; ++r)
-    {
-        for (long c = 0; c < nc; ++c)
-        {
-            index_label_image(r, c) = rgb_label_to_index_label(rgb_label_image(r, c));
-        }
-    }
-}
-
-// ----------------------------------------------------------------------------------------
-
 // Calculate the per-pixel accuracy on a dataset whose file names are supplied as a parameter.
 double calculate_accuracy(anet_type& anet, const std::vector<image_info>& dataset)
 {
@@ -209,14 +108,14 @@ double calculate_accuracy(anet_type& anet, const std::vector<image_info>& datase
         load_image(input_image, image_info.image_filename);
 
         // Load the ground-truth (RGB) labels.
-        load_image(rgb_label_image, image_info.label_filename);
+        load_image(rgb_label_image, image_info.class_label_filename);
 
         // Create predictions for each pixel. At this point, the type of each prediction
         // is an index (a value between 0 and 20). Note that the net may return an image
         // that is not exactly the same size as the input.
         const matrix<uint16_t> temp = anet(input_image);
 
-        // Convert the indexes to RGB values.
+        // Convert the RGB values to indexes.
         rgb_label_image_to_index_label_image(rgb_label_image, index_label_image);
 
         // Crop the net output to be exactly the same size as the input.
@@ -324,9 +223,9 @@ int main(int argc, char** argv) try
             load_image(input_image, image_info.image_filename);
 
             // Load the ground-truth (RGB) labels.
-            load_image(rgb_label_image, image_info.label_filename);
+            load_image(rgb_label_image, image_info.class_label_filename);
 
-            // Convert the indexes to RGB values.
+            // Convert the RGB values to indexes.
             rgb_label_image_to_index_label_image(rgb_label_image, index_label_image);
 
             // Randomly pick a part of the image.
