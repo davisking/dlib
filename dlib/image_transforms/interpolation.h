@@ -865,10 +865,18 @@ namespace dlib
                 float fout[4];
                 out.store(fout);
 
-                out_img[r][c]   = static_cast<T>(fout[0]);
-                out_img[r][c+1] = static_cast<T>(fout[1]);
-                out_img[r][c+2] = static_cast<T>(fout[2]);
-                out_img[r][c+3] = static_cast<T>(fout[3]);
+                const auto convert_to_output_type = [](float value)
+                {
+                    if (std::is_integral<T>::value)
+                        return static_cast<T>(value + 0.5);
+                    else
+                        return static_cast<T>(value);
+                };
+
+                out_img[r][c]   = convert_to_output_type(fout[0]);
+                out_img[r][c+1] = convert_to_output_type(fout[1]);
+                out_img[r][c+2] = convert_to_output_type(fout[2]);
+                out_img[r][c+3] = convert_to_output_type(fout[3]);
             }
             x = -x_scale + c*x_scale;
             for (; c < out_img.nc(); ++c)

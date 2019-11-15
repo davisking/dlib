@@ -993,6 +993,36 @@ namespace dlib
         }
     }
 
+    inline std::ostream& operator<<(std::ostream& out, const std::vector<mmod_options::detector_window_details>& detector_windows)
+    {
+        // write detector windows grouped by label
+        // example output: aeroplane:74x30,131x30,70x45,54x70,198x30;bicycle:70x57,32x70,70x32,51x70,128x30,30x121;car:70x36,70x60,99x30,52x70,30x83,30x114,30x200
+
+        std::map<std::string, std::deque<mmod_options::detector_window_details>> detector_windows_by_label;
+        for (const auto& detector_window : detector_windows)
+            detector_windows_by_label[detector_window.label].push_back(detector_window);
+
+        size_t label_count = 0;
+        for (const auto& i : detector_windows_by_label)
+        {
+            const auto& label = i.first;
+            const auto& detector_windows = i.second;
+
+            if (label_count++ > 0)
+                out << ";";
+            out << label << ":";
+
+            for (size_t j = 0; j < detector_windows.size(); ++j)
+            {
+                out << detector_windows[j].width << "x" << detector_windows[j].height;
+                if (j + 1 < detector_windows.size())
+                    out << ",";
+            }
+        }
+
+        return out;
+    }
+
 // ----------------------------------------------------------------------------------------
 
     class loss_mmod_ 
@@ -1140,7 +1170,7 @@ namespace dlib
                     det_thresh_speed_adjust = std::max(det_thresh_speed_adjust,dets[max_num_initial_dets].detection_confidence + options.loss_per_false_alarm);
                 }
 
-                std::vector<size_t> truth_idxs;
+                std::vector<int> truth_idxs;
                 truth_idxs.reserve(truth->size());
 
                 std::unordered_map<size_t, rectangle> idx_to_truth_rect;
@@ -1197,7 +1227,7 @@ namespace dlib
 
                 std::vector<intermediate_detection> final_dets;
                 // The point of this loop is to fill out the truth_score_hits array. 
-                for (unsigned long i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
+                for (size_t i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
                 {
                     if (overlaps_any_box_nms(final_dets, dets[i].rect))
                         continue;
@@ -1241,7 +1271,7 @@ namespace dlib
                         rectangle best_matching_truth_box = (*truth)[hittruth.second];
                         if (options.overlaps_nms(best_matching_truth_box, (*truth)[i]))
                         {
-                            const size_t idx = truth_idxs[i];
+                            const int idx = truth_idxs[i];
                             if (idx != -1)
                             {
                                 // We are ignoring this box so we shouldn't have counted it in the
@@ -1395,15 +1425,10 @@ namespace dlib
         {
             out << "loss_mmod\t (";
 
-            out << "detector_windows:(";
             auto& opts = item.options;
-            for (size_t i = 0; i < opts.detector_windows.size(); ++i)
-            {
-                out << opts.detector_windows[i].width << "x" << opts.detector_windows[i].height;
-                if (i+1 < opts.detector_windows.size())
-                    out << ",";
-            }
-            out << ")";
+
+            out << "detector_windows:(" << opts.detector_windows << ")";
+
             out << ", loss per FA:" << opts.loss_per_false_alarm;
             out << ", loss per miss:" << opts.loss_per_missed_target;
             out << ", truth match IOU thresh:" << opts.truth_match_iou_threshold;

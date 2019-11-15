@@ -970,11 +970,19 @@ if (WIN32 AND mkl_iomp_dll)
    # the need to add the Intel MKL to the PATH.
    if (CMAKE_LIBRARY_OUTPUT_DIRECTORY)
       add_custom_command(TARGET dlib POST_BUILD
-         COMMAND ${CMAKE_COMMAND} -E copy "${mkl_iomp_dll}" ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+         # In some newer versions of windows/visual studio the output Config folder doesn't
+         # exist at first, so you can't copy to it unless you make it yourself.  So make
+         # sure the target folder exists first.
+         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/"
+         COMMAND ${CMAKE_COMMAND} -E copy "${mkl_iomp_dll}" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/"
          )
    else()
       add_custom_command(TARGET dlib POST_BUILD
-         COMMAND ${CMAKE_COMMAND} -E copy "${mkl_iomp_dll}" ${CMAKE_BINARY_DIR}/$<CONFIG>
+         # In some newer versions of windows/visual studio the output Config folder doesn't
+         # exist at first, so you can't copy to it unless you make it yourself.  So make
+         # sure the target folder exists first.
+         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/$<CONFIG>/"
+         COMMAND ${CMAKE_COMMAND} -E copy "${mkl_iomp_dll}" "${CMAKE_BINARY_DIR}/$<CONFIG>/"
          )
    endif()
 endif()

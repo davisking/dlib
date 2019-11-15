@@ -41,6 +41,10 @@ int main()
     jpeg_create_decompress(&cinfo);
 
     jpeg_stdio_src(&cinfo, fp);
+    if (false) {
+        unsigned char imgbuffer[1234];
+        jpeg_mem_src(&cinfo, imgbuffer, sizeof(imgbuffer));
+    }
 
     jpeg_read_header(&cinfo, TRUE);
 

@@ -125,6 +125,13 @@ namespace dlib
         unsigned char red;
         unsigned char green;
         unsigned char blue;
+
+        bool operator == (const rgb_pixel& that) const
+        {
+            return this->red   == that.red
+                && this->green == that.green
+                && this->blue  == that.blue;
+        }
     };
 
 // ----------------------------------------------------------------------------------------
@@ -151,6 +158,13 @@ namespace dlib
         unsigned char blue;
         unsigned char green;
         unsigned char red;
+
+        bool operator == (const bgr_pixel& that) const
+        {
+            return this->blue  == that.blue
+                && this->green == that.green
+                && this->red   == that.red;
+        }
     };
 
 // ----------------------------------------------------------------------------------------
@@ -177,6 +191,14 @@ namespace dlib
         unsigned char green;
         unsigned char blue;
         unsigned char alpha;
+
+        bool operator == (const rgb_alpha_pixel& that) const
+        {
+            return this->red   == that.red
+                && this->green == that.green
+                && this->blue  == that.blue
+                && this->alpha == that.alpha;
+        }
     };
 
 // ----------------------------------------------------------------------------------------
@@ -200,6 +222,13 @@ namespace dlib
         unsigned char h;
         unsigned char s;
         unsigned char i;
+
+        bool operator == (const hsi_pixel& that) const
+        {
+            return this->h == that.h
+                && this->s == that.s
+                && this->i == that.i;
+        }
     };
     // ----------------------------------------------------------------------------------------
 
@@ -222,6 +251,13 @@ namespace dlib
         unsigned char l;
         unsigned char a;
         unsigned char b;
+
+        bool operator == (const lab_pixel& that) const
+        {
+            return this->l == that.l
+                && this->a == that.a
+                && this->b == that.b;
+        }
     };
 
 // ----------------------------------------------------------------------------------------
