@@ -304,7 +304,8 @@ int main() try
     auto result = find_min_global(complex_holder_table, 
                                   {-10,-10}, // lower bounds
                                   {10,10}, // upper bounds
-                                  max_function_calls(300));
+                                  std::chrono::milliseconds(500) // run this long
+                                  );
 
     cout.precision(9);
     // These cout statements will show that find_min_global() found the
