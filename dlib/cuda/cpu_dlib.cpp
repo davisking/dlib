@@ -1469,6 +1469,48 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        void mish (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            const auto d = dest.host();
+            const auto s = src.host();
+            for (size_t i = 0; i < src.size(); ++i)
+                d[i] = s[i] * std::tanh(std::log(1+std::exp(s[i])));
+        }
+
+        void mish_gradient(
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input
+        )
+        {
+            const auto g = grad.host();
+            const auto d = dest.host();
+            const auto in = gradient_input.host();
+            if (is_same_object(gradient_input, grad))
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    auto delta = 2*std::exp(d[i]) + std::exp(2*d[i]) + 2;
+                    auto omega = 4*(d[i] + 1) + 4*std::exp(2*d[i]) + std::exp(3*d[i]) + std::exp(d[i])*(4*d[i] + 6);
+                    g[i] = in[i]*std::exp(d[i])*delta/(omega*omega);
+                }
+            }
+            else
+            {
+                for (size_t i = 0; i < dest.size(); ++i)
+                {
+                    auto delta = 2*std::exp(d[i]) + std::exp(2*d[i]) + 2;
+                    auto omega = 4*(d[i] + 1) + 4*std::exp(2*d[i]) + std::exp(3*d[i]) + std::exp(d[i])*(4*d[i] + 6);
+                    g[i] += in[i]*std::exp(d[i])*delta/(omega*omega);
+                }
+            }
+        }
+
+    // ------------------------------------------------------------------------------------
+
         void relu (
             tensor& dest,
             const tensor& src

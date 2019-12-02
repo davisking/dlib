@@ -2831,6 +2831,74 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class mish_
+    {
+    public:
+        mish_()
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::mish(output, input);
+        }
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor&
+        )
+        {
+            tt::mish_gradient(data_grad, computed_output, gradient_input);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const sig_& , std::ostream& out)
+        {
+            serialize("mish_", out);
+        }
+
+        friend void deserialize(sig_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "mish_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::mish_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const sig_& )
+        {
+            out << "mish";
+            return out;
+        }
+
+        friend void to_xml(const sig_& /*item*/, std::ostream& out)
+        {
+            out << "<mish/>\n";
+        }
+
+
+    private:
+        resizable_tensor params;
+    };
+
+
+    template <typename SUBNET>
+    using mish = add_layer<mish_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class htan_
     {
     public:

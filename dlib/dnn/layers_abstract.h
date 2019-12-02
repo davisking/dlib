@@ -2127,6 +2127,41 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class mish_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a mish layer.  Therefore, it
+                passes its inputs through the function
+                    f(x)= x*tanh(log(1+exp(x)))
+                where f() is applied pointwise across the input tensor.
+        !*/
+
+    public:
+
+        mish_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        void forward_inplace(const tensor& input, tensor& output);
+        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
+        !*/
+    };
+
+    template <typename SUBNET>
+    using mish = add_layer<mish_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class htan_
     {
         /*!
