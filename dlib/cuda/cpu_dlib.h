@@ -283,6 +283,19 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
+        void mish (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void mish_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input
+        );
+
+    // ------------------------------------------------------------------------------------
+
         void relu (
             tensor& dest,
             const tensor& src

@@ -2831,6 +2831,79 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class mish_
+    {
+    public:
+        mish_()
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& data_output
+        )
+        {
+            data_output.copy_size(sub.get_output());
+            tt::mish(data_output, sub.get_output());
+        }
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor&
+        )
+        {
+            tt::mish_gradient(sub.get_gradient_input(), sub.get_output(), gradient_input);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const mish_& , std::ostream& out)
+        {
+            serialize("mish_", out);
+        }
+
+        friend void deserialize(mish_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "mish_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::mish_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const mish_& )
+        {
+            out << "mish";
+            return out;
+        }
+
+        friend void to_xml(const mish_& /*item*/, std::ostream& out)
+        {
+            out << "<mish/>\n";
+        }
+
+
+    private:
+        resizable_tensor params;
+    };
+
+
+    template <typename SUBNET>
+    using mish = add_layer<mish_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class htan_
     {
     public:
