@@ -2864,12 +2864,12 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const sig_& , std::ostream& out)
+        friend void serialize(const mish_& , std::ostream& out)
         {
             serialize("mish_", out);
         }
 
-        friend void deserialize(sig_& , std::istream& in)
+        friend void deserialize(mish_& , std::istream& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2877,13 +2877,13 @@ namespace dlib
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::mish_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const sig_& )
+        friend std::ostream& operator<<(std::ostream& out, const mish_& )
         {
             out << "mish";
             return out;
         }
 
-        friend void to_xml(const sig_& /*item*/, std::ostream& out)
+        friend void to_xml(const mish_& /*item*/, std::ostream& out)
         {
             out << "<mish/>\n";
         }
