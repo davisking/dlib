@@ -828,6 +828,33 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void mish (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::mish(dest,src);
+#else
+        cpu::mish(dest,src);
+#endif
+    }
+
+    void mish_gradient (
+        tensor& grad,
+        const tensor& src,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::mish_gradient(grad, src, gradient_input);
+#else
+        cpu::mish_gradient(grad, src, gradient_input);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void relu (
         tensor& dest,
         const tensor& src

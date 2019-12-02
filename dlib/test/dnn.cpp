@@ -172,7 +172,7 @@ namespace
         print_spinner();
         const long nr = 3;
         const long nc = 3;
-        resizable_tensor src(5,5,nr,nr), dest(5,5,nr,nc), gradient_input(5,5,nr,nc);
+        resizable_tensor src(5,5,nr,nc), dest(5,5,nr,nc), gradient_input(5,5,nr,nc);
         tt::tensor_rand rnd;
         rnd.fill_uniform(src);
         rnd.fill_uniform(dest);
@@ -215,6 +215,32 @@ namespace
         cpu::softmax_all(dest2, src2);
         DLIB_TEST_MSG(max(abs(mat(dest1)-mat(dest2))) < 1e-5, max(abs(mat(dest1)-mat(dest2))));
 #endif
+    }
+
+    void test_mish()
+    {
+#ifdef DLIB_USE_CUDA
+        // make sure that cuda::mish and cpu::mish return the same results
+        using namespace dlib::tt;
+        print_spinner();
+        const long n = 5;
+        const long k = 5;
+        const long nr = 3;
+        const long nc = 3;
+        resizable_tensor src(n,k,nr,nc);
+        tt::tensor_rand rnd;
+        rnd.fill_uniform(src);
+
+        resizable_tensor dest1, dest2;
+        dest1.copy_size(src);
+        dest2.copy_size(src);
+        // initialize to different values in order to make sure the output is actually changed
+        dest1 = 1;
+        dest2 = 2;
+        cuda::mish(dest1, src);
+        cpu::mish(dest2, src);
+        DLIB_TEST_MSG(max(abs(mat(dest1) - mat(dest2))) < 1e-7, max(abs(mat(dest1) - mat(dest2))));
+#endif // DLIB_USE_CUDA
     }
 
     void test_batch_normalize()
@@ -1834,6 +1860,12 @@ namespace
         }
         {
             print_spinner();
+            mish_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             htan_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
@@ -3382,6 +3414,7 @@ namespace
             test_softmax();
             test_softmax_all();
             test_sigmoid();
+            test_mish();
             test_batch_normalize();
             test_batch_normalize_conv();
             test_basic_tensor_ops();

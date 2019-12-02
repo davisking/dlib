@@ -1353,6 +1353,63 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_mish(const float* s, float* d, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                const auto e = std::exp(s[i]);
+                const auto delta = 2*e + e*e + 2;
+                d[i] = s[i] - 2*s[i]/delta;
+            }
+        }
+
+        void mish (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            launch_kernel(_cuda_mish, max_jobs(dest.size()), src.device(), dest.device(), src.size());
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_mish_gradient(float* out, const float* s, const float* gi, size_t n)
+        {
+            const auto calculate_gradient = [](float x)
+            {
+                if (x >= 8)
+                    return 1.f;
+                if (x <= -8)
+                    return 0.f;
+
+                const auto e = std::exp(x);
+                const auto delta = 2*e + e*e + 2;
+                const auto omega = 4*(x + 1) + 4*e*e + e*e*e + e*(4*x + 6);
+                return e*omega/(delta*delta);
+            };
+
+            if (out == gi)
+            {
+                for (auto i : grid_stride_range(0, n))
+                    out[i] = gi[i]*calculate_gradient(s[i]);
+            }
+            else
+            {
+                for (auto i : grid_stride_range(0, n))
+                    out[i] += gi[i]*calculate_gradient(s[i]);
+            }
+        }
+
+        void mish_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input
+        )
+        {
+            launch_kernel(_cuda_mish_gradient, max_jobs(grad.size()), grad.device(), src.device(), gradient_input.device(), grad.size());
+        }
+    // ----------------------------------------------------------------------------------------
+
         __global__ void _cuda_resize_bilinear(size_t dsize, size_t dchan_size, size_t dnc, float* d, 
                                               size_t schan_size, int snr, int snc, const float* s, 
                                               const float x_scale, const float y_scale)
