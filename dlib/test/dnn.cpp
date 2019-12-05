@@ -1834,6 +1834,12 @@ namespace
         }
         {
             print_spinner();
+            mish_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             htan_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
