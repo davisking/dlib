@@ -1474,10 +1474,13 @@ namespace dlib
             const tensor& src
         )
         {
-            const auto d = dest.host();
+            const auto d = dest.host_write_only();
             const auto s = src.host();
             for (size_t i = 0; i < src.size(); ++i)
-                d[i] = s[i] * std::tanh(std::log(1+std::exp(s[i])));
+            {
+                auto delta = 2*std::exp(s[i]) + std::exp(2*s[i]) + 2;
+                d[i] = s[i] - 2*s[i]/delta;
+            }
         }
 
         void mish_gradient(

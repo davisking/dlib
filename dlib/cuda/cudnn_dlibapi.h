@@ -440,34 +440,12 @@ namespace dlib
             tensor& dest,
             const tensor& src
         );
-        /*!
-            requires
-                - have_same_dimensions(dest, src) == true
-            ensures
-                - for all valid i:
-                    - #dest.host()[i] == src.host()[i]*std::tanh(std::log(1+std::exp(src.host()[i])))
-                - This function supports in-place operation, i.e. having
-                  is_same_object(dest, src)==true
-        !*/
 
         void mish_gradient (
             tensor& grad,
             const tensor& dest,
             const tensor& gradient_input
         );
-        /*!
-            requires
-                - have_same_dimensions(dest,gradient_input) == true
-                - have_same_dimensions(dest,grad) == true
-                - is_same_object(grad,dest) == false
-            ensures
-                - Recalling that dest is the output of mish(dest,SRC) for some SRC tensor,
-                  let f(SRC) == dot(gradient_input,dest)
-                - Then this function computes the gradient of f() with respect to SRC and
-                  assigns it to grad.
-                - This function supports in-place operation, i.e. having
-                  is_same_object(grad, gradient_input)==true
-        !*/
 
     // ------------------------------------------------------------------------------------
 
