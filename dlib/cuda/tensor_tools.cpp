@@ -828,7 +828,7 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-        void mish (
+    void mish (
         tensor& dest,
         const tensor& src
     )
