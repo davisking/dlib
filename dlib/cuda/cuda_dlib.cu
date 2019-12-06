@@ -1390,6 +1390,8 @@ namespace dlib
                 }
                 else if(gi[i] >= 8)
                 {
+                    auto delta = 2*std::exp(gi[i]) + std::exp(2*gi[i]) + 2;
+                    out[i] += gi[i] - 2*gi[i]/delta;
                     pgrad += s[i];
                 }
                 else
