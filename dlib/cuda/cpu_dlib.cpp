@@ -1496,9 +1496,16 @@ namespace dlib
             {
                 for (size_t i = 0; i < dest.size(); ++i)
                 {
-                    auto delta = 2*std::exp(d[i]) + std::exp(2*d[i]) + 2;
-                    auto omega = 4*(d[i] + 1) + 4*std::exp(2*d[i]) + std::exp(3*d[i]) + std::exp(d[i])*(4*d[i] + 6);
-                    g[i] = in[i]*std::exp(d[i])*delta/(omega*omega);
+                    if(d[i] < 8 && d[i] > -8)
+                    {
+                        auto delta = 2*std::exp(d[i]) + std::exp(2*d[i]) + 2;
+                        auto omega = 4*(d[i] + 1) + 4*std::exp(2*d[i]) + std::exp(3*d[i]) + std::exp(d[i])*(4*d[i] + 6);
+                        g[i] = in[i]*std::exp(d[i])*delta/(omega*omega);
+                    }
+                    else
+                    {
+                        g[i] = 0;
+                    }
                 }
             }
             else
