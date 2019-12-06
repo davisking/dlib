@@ -1375,52 +1375,6 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_mish_gradient(float* out, const float* s, const float* gi, size_t n, const float* pp, float* ppgrad)
-        {
-            const float p = *pp;
-            float pgrad = 0;
-            for(auto i : grid_stride_range(0, n))
-            {
-                if(gi[i] < 8 && gi[i] > -8)
-                {
-                    auto delta = 2*std::exp(gi[i]) + std::exp(2*gi[i]) + 2;
-                    auto omega = 4*(gi[i] + 1) + 4*std::exp(2*gi[i]) + std::exp(3*gi[i]) + std::exp(gi[i])*(4*gi[i] + 6);
-                    out[i] += gi[i] - 2*gi[i]/delta;
-                    pgrad += s[i]*std::exp(gi[i])*delta/(omega*omega);
-                }
-                else if(gi[i] >= 8)
-                {
-                    auto delta = 2*std::exp(gi[i]) + std::exp(2*gi[i]) + 2;
-                    out[i] += gi[i] - 2*gi[i]/delta;
-                    pgrad += s[i];
-                }
-                else
-                {
-                    auto delta = 2*std::exp(gi[i]) + std::exp(2*gi[i]) + 2;
-                    out[i] += gi[i] - 2*gi[i]/delta;
-                }
-            }
-
-            // Then do the warp reduce add thing to merge into one output value.
-            warp_reduce_atomic_add(*ppgrad, pgrad);
-        }
-
-        void mish_gradient (
-            tensor& grad,
-            const tensor& src,
-            const tensor& gradient_input,
-            const tensor& param,
-            tensor& params_grad 
-        )
-        {
-            params_grad = 0;
-            launch_kernel(_cuda_mish_gradient, max_jobs(grad.size()), 
-                grad.device(), src.device(), gradient_input.device(), grad.size(),
-                param.device(), params_grad.device());
-        }
-
-    // ----------------------------------------------------------------------------------------
-
         __global__ void _cuda_resize_bilinear(size_t dsize, size_t dchan_size, size_t dnc, float* d, 
                                               size_t schan_size, int snr, int snc, const float* s, 
                                               const float x_scale, const float y_scale)
