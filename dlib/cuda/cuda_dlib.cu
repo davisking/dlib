@@ -1386,7 +1386,11 @@ namespace dlib
                     auto delta = 2*std::exp(gi[i]) + std::exp(2*gi[i]) + 2;
                     auto omega = 4*(gi[i] + 1) + 4*std::exp(2*gi[i]) + std::exp(3*gi[i]) + std::exp(gi[i])*(4*gi[i] + 6);
                     out[i] += gi[i] - 2*gi[i]/delta;
-                    pgrad += s[i]*gi[i]*std::exp(gi[i])*delta/(omega*omega);
+                    pgrad += s[i]*std::exp(gi[i])*delta/(omega*omega);
+                }
+                else if(gi[i] >= 8)
+                {
+                    pgrad += s[i];
                 }
                 else
                 {

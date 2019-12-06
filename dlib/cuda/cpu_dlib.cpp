@@ -1502,10 +1502,12 @@ namespace dlib
                         auto omega = 4*(d[i] + 1) + 4*std::exp(2*d[i]) + std::exp(3*d[i]) + std::exp(d[i])*(4*d[i] + 6);
                         g[i] = in[i]*std::exp(d[i])*delta/(omega*omega);
                     }
-                    else
+                    else if (d[i] >= 8)
                     {
-                        g[i] = 0;
+                        g[i] = in[i];
                     }
+                    else
+                        g[i] = 0;
                 }
             }
             else
