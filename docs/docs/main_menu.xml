@@ -257,6 +257,14 @@
                   <link>dnn_semantic_segmentation_ex.cpp.html</link>
                </item>
                <item>
+                  <name>Deep Learning Instance Segmentation</name>
+                  <link>dnn_instance_segmentation_ex.cpp.html</link>
+               </item>
+               <item>
+                  <name>Deep Learning Instance Segmentation Trainer</name>
+                  <link>dnn_instance_segmentation_train_ex.cpp.html</link>
+               </item>
+               <item>
                   <name>Deep Learning Vehicle Detection</name>
                   <link>dnn_mmod_find_cars_ex.cpp.html</link>
                </item>
