@@ -34,7 +34,11 @@ namespace dlib
                          << "\n\t img.channels(): " << img.channels() 
                          << "\n\t img.pixel_traits<pixel_type>::num: " << pixel_traits<pixel_type>::num 
                          );
+#if CV_VERSION_MAJOR > 3
+            IplImage temp = cvIplImage(img);
+#else
             IplImage temp = img;
+#endif
             init(&temp);
         }
 
