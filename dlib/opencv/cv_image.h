@@ -34,7 +34,12 @@ namespace dlib
                          << "\n\t img.channels(): " << img.channels() 
                          << "\n\t img.pixel_traits<pixel_type>::num: " << pixel_traits<pixel_type>::num 
                          );
-#if CV_VERSION_MAJOR > 3
+// Note, do NOT use CV_VERSION_MAJOR because in OpenCV 2 CV_VERSION_MAJOR actually held
+// CV_VERSION_MINOR and instead they used CV_VERSION_EPOCH.  So for example, in OpenCV
+// 2.4.9.1 CV_VERSION_MAJOR==4 and CV_VERSION_EPOCH==2.  However, CV_MAJOR_VERSION has always
+// (seemingly) held the actual major version number, so we use that to test for the OpenCV major
+// version.
+#if CV_MAJOR_VERSION > 3
             IplImage temp = cvIplImage(img);
 #else
             IplImage temp = img;
