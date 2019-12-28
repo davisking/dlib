@@ -23,7 +23,7 @@ namespace dlib
         typedef pixel_type type;
         typedef default_memory_manager mem_manager_type;
 
-        cv_image (const cv::Mat img) 
+        cv_image (const cv::Mat &img) 
         {
             DLIB_CASSERT(img.depth() == cv::DataType<typename pixel_traits<pixel_type>::basic_pixel_type>::depth &&
                          img.channels() == pixel_traits<pixel_type>::num, 
@@ -118,34 +118,6 @@ namespace dlib
         long nr() const { return _nr; }
         long nc() const { return _nc; }
         long width_step() const { return _widthStep; }
-
-        cv_image& operator=( const cv_image& item)
-        {
-            _data = item._data;
-            _widthStep = item._widthStep;
-            _nr = item._nr;
-            _nc = item._nc;
-            return *this;
-        }
-
-        cv_image& operator=( const IplImage* img)
-        {
-            init(img);
-            return *this;
-        }
-
-        cv_image& operator=( const IplImage img)
-        {
-            init(&img);
-            return *this;
-        }
-
-        cv_image& operator=( const cv::Mat img)
-        {
-            IplImage temp = img;
-            init(&temp);
-            return *this;
-        }
 
     private:
 
