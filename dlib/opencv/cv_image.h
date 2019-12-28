@@ -23,7 +23,7 @@ namespace dlib
         typedef pixel_type type;
         typedef default_memory_manager mem_manager_type;
 
-        cv_image (const cv::Mat &img) 
+        cv_image (const cv::Mat& img) 
         {
             DLIB_CASSERT(img.depth() == cv::DataType<typename pixel_traits<pixel_type>::basic_pixel_type>::depth &&
                          img.channels() == pixel_traits<pixel_type>::num, 
