@@ -142,7 +142,11 @@ namespace dlib
 
         cv_image& operator=( const cv::Mat img)
         {
+#if CV_MAJOR_VERSION > 3
+            IplImage temp = cvIplImage(img);
+#else
             IplImage temp = img;
+#endif
             init(&temp);
             return *this;
         }
