@@ -95,8 +95,8 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the size of the history buffer.  This is the number of points which
-                  are linearly combine to make the predictions returned by get_predicted_next_state().
+                - returns the size of the history buffer.  This is the number of points which are
+                  linearly combined to make the predictions returned by get_predicted_next_state().
         !*/
 
         void update (
