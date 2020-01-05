@@ -83,7 +83,7 @@ namespace dlib
     {
 #if !defined CUDA_VERSION
 #error CUDA_VERSION not defined
-#elif CUDA_VERSION >= 9020 && CUDA_VERSION <= 11000
+#elif CUDA_VERSION >= 9020 && CUDA_VERSION < 11000
         // We will stop using this alternative version with cuda V11, hopefully the bug in
         // cudaStreamSynchronize is fixed by then.
         //
