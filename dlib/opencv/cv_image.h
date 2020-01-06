@@ -39,7 +39,7 @@ namespace dlib
 // 2.4.9.1 CV_VERSION_MAJOR==4 and CV_VERSION_EPOCH==2.  However, CV_MAJOR_VERSION has always
 // (seemingly) held the actual major version number, so we use that to test for the OpenCV major
 // version.
-#if CV_MAJOR_VERSION > 3
+#if CV_MAJOR_VERSION > 3 || (CV_MAJOR_VERSION == 3 && CV_SUBMINOR_VERSION >= 9)
             IplImage temp = cvIplImage(img);
 #else
             IplImage temp = img;
