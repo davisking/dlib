@@ -1113,6 +1113,10 @@ namespace dlib
             if (gradient_updates_since_last_sync < 30)
                 return false;
 
+            // if learning rate was changed from outside during training, for example
+            if (g.current_n() <= 2)
+                return false;
+
             // if the loss is very likely to be increasing then return true
             const double prob = g.probability_gradient_greater_than(0);
             if (prob > prob_loss_increasing_thresh)
