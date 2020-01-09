@@ -1358,7 +1358,8 @@ namespace dlib
             const float p = *pp;
             for (auto i : grid_stride_range(0, n))
             {
-                auto delta = 2*std::exp(s[i]) + std::exp(2*s[i]) + 2;
+                auto e = std::exp(s[i]);
+                auto delta = 2*e + e*e + 2;
                 d[i] = s[i] - 2*s[i]/delta;
             }
         }

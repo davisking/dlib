@@ -162,12 +162,6 @@ namespace dlib
             return des.get_handle();
         }
 
-        static cudnnActivationDescriptor_t mish_activation_descriptor()
-        {
-            thread_local cudnn_activation_descriptor des(CUDNN_ACTIVATION_MISH, CUDNN_PROPAGATE_NAN,0);
-            return des.get_handle();
-        }
-
         static cudnnActivationDescriptor_t tanh_activation_descriptor()
         {
             thread_local cudnn_activation_descriptor des(CUDNN_ACTIVATION_TANH, CUDNN_PROPAGATE_NAN,0);
