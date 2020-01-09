@@ -1478,7 +1478,8 @@ namespace dlib
             const auto s = src.host();
             for (size_t i = 0; i < src.size(); ++i)
             {
-                auto delta = 2*std::exp(s[i]) + std::exp(2*s[i]) + 2;
+                const auto e = std::exp(s[i]);
+                const auto delta = 2*e + e*e + 2;
                 d[i] = s[i] - 2*s[i]/delta;
             }
         }
@@ -1498,9 +1499,10 @@ namespace dlib
                 {
                     if(d[i] < 8 && d[i] > -8)
                     {
-                        auto delta = 2*std::exp(d[i]) + std::exp(2*d[i]) + 2;
-                        auto omega = 4*(d[i] + 1) + 4*std::exp(2*d[i]) + std::exp(3*d[i]) + std::exp(d[i])*(4*d[i] + 6);
-                        g[i] = in[i]*std::exp(d[i])*delta/(omega*omega);
+                        const auto e = std::exp(d[i]);
+                        const auto delta = 2*e + e*e + 2;
+                        const auto omega = 4*(d[i] + 1) + 4*e*e + e*e*e + e*(4*d[i] + 6);
+                        g[i] = in[i]*e*delta/(omega*omega);
                     }
                     else if(d[i] >= 8)
                     {
@@ -1516,9 +1518,10 @@ namespace dlib
                 {
                     if(d[i] < 8 && d[i] > -8)
                     {
-                        auto delta = 2*std::exp(d[i]) + std::exp(2*d[i]) + 2;
-                        auto omega = 4*(d[i] + 1) + 4*std::exp(2*d[i]) + std::exp(3*d[i]) + std::exp(d[i])*(4*d[i] + 6);
-                        g[i] += in[i]*std::exp(d[i])*delta/(omega*omega);
+                        const auto e = std::exp(d[i]);
+                        const auto delta = 2*e + e*e + 2;
+                        const auto omega = 4*(d[i] + 1) + 4*e*e + e*e*e + e*(4*d[i] + 6);
+                        g[i] += in[i]*e*delta/(omega*omega);
                     }
                     else if(d[i] >= 8)
                     {

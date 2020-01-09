@@ -1353,27 +1353,52 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        __global__ void _cuda_mish(const float* s, float* d, size_t n, const float* pp)
+        __global__ void _cuda_mish(const float* s, float* d, size_t n)
         {
-            const float p = *pp;
             for (auto i : grid_stride_range(0, n))
             {
-                auto e = std::exp(s[i]);
-                auto delta = 2*e + e*e + 2;
+                const auto e = std::exp(s[i]);
+                const auto delta = 2*e + e*e + 2;
                 d[i] = s[i] - 2*s[i]/delta;
             }
         }
 
         void mish (
             tensor& dest,
-            const tensor& src,
-            const tensor& param
+            const tensor& src
         )
         {
-            launch_kernel(_cuda_mish, max_jobs(dest.size()), 
-                src.device(), dest.device(), src.size(), param.device());
+            launch_kernel(_cuda_mish, max_jobs(dest.size()), src.device(), dest.device(), src.size());
         }
 
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_mish_gradient(float* out, const float* s, const float* gi, size_t n)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] < 8 && s[i] > -8)
+                {
+                    const auto e = std::exp(s[i]);
+                    const auto delta = 2*e + e*e + 2;
+                    const auto omega = 4*(s[i] + 1) + 4*e*e + e*e*e + e*(4*s[i] + 6);
+                    out[i] += gi[i]*e*delta/(omega*omega);
+                }
+                else if (s[i] >= 8)
+                {
+                    out[i] += gi[i];
+                }
+            }
+        }
+
+        void mish_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input
+        )
+        {
+            launch_kernel(_cuda_mish_gradient, max_jobs(grad.size()), grad.device(), src.device(), gradient_input.device(), grad.size());
+        }
     // ----------------------------------------------------------------------------------------
 
         __global__ void _cuda_resize_bilinear(size_t dsize, size_t dchan_size, size_t dnc, float* d, 
