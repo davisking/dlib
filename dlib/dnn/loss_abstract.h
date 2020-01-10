@@ -290,7 +290,8 @@ namespace dlib
                 - sub.get_output().k() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
-                - all values pointed to by truth are +1 or -1.
+                - all values pointed to by truth are non-zero.  Nominally they should be +1 or -1,
+                  each indicating the desired class label.
         !*/
 
     };
