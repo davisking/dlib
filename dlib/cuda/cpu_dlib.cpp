@@ -1498,7 +1498,7 @@ namespace dlib
             {
                 if (x >= 8)
                     return 1.f;
-                if (x < -8)
+                if (x <= -8)
                     return 0.f;
 
                 const auto e = std::exp(x);
