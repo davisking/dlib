@@ -1375,20 +1375,25 @@ namespace dlib
 
         __global__ void _cuda_mish_gradient(float* out, const float* s, const float* gi, size_t n)
         {
-            for (auto i : grid_stride_range(0, n))
+            const auto calculate_gradient = [](float x)
             {
-                if (s[i] < 8 && s[i] > -8)
-                {
-                    const auto e = std::exp(s[i]);
-                    const auto delta = 2*e + e*e + 2;
-                    const auto omega = 4*(s[i] + 1) + 4*e*e + e*e*e + e*(4*s[i] + 6);
-                    out[i] += gi[i]*e*delta/(omega*omega);
-                }
-                else if (s[i] >= 8)
-                {
-                    out[i] += gi[i];
-                }
-            }
+                if (x >= 8)
+                    return 1.f;
+                if (x < -8)
+                    return 0.f;
+
+                const auto e = std::exp(x);
+                const auto delta = 2*e + e*e + 2;
+                const auto omega = 4*(x + 1) + 4*e*e + e*e*e + e*(4*x + 6);
+                return e*delta/(omega*omega);
+            };
+
+            if (out == gi)
+                for (auto i : grid_stride_range(0, n))
+                    out[i] = gi[i]*calculate_gradient(s[i]);
+            else
+                for (auto i : grid_stride_range(0, n))
+                    out[i] += gi[i]*calculate_gradient(s[i]);
         }
 
         void mish_gradient (

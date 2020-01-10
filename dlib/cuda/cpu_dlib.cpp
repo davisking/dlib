@@ -1493,42 +1493,26 @@ namespace dlib
             const auto g = grad.host();
             const auto d = dest.host();
             const auto in = gradient_input.host();
+
+            const auto calculate_gradient = [](float x)
+            {
+                if (x >= 8)
+                    return 1.f;
+                if (x < -8)
+                    return 0.f;
+
+                const auto e = std::exp(x);
+                const auto delta = 2*e + e*e + 2;
+                const auto omega = 4*(x + 1) + 4*e*e + e*e*e + e*(4*x + 6);
+                return e*delta/(omega*omega);
+            };
+
             if (is_same_object(gradient_input, grad))
-            {
                 for (size_t i = 0; i < dest.size(); ++i)
-                {
-                    if(d[i] < 8 && d[i] > -8)
-                    {
-                        const auto e = std::exp(d[i]);
-                        const auto delta = 2*e + e*e + 2;
-                        const auto omega = 4*(d[i] + 1) + 4*e*e + e*e*e + e*(4*d[i] + 6);
-                        g[i] = in[i]*e*delta/(omega*omega);
-                    }
-                    else if(d[i] >= 8)
-                    {
-                        g[i] = in[i];
-                    }
-                    else
-                        g[i] = 0;
-                }
-            }
+                    g[i] = in[i]*calculate_gradient(d[i]);
             else
-            {
                 for (size_t i = 0; i < dest.size(); ++i)
-                {
-                    if(d[i] < 8 && d[i] > -8)
-                    {
-                        const auto e = std::exp(d[i]);
-                        const auto delta = 2*e + e*e + 2;
-                        const auto omega = 4*(d[i] + 1) + 4*e*e + e*e*e + e*(4*d[i] + 6);
-                        g[i] += in[i]*e*delta/(omega*omega);
-                    }
-                    else if(d[i] >= 8)
-                    {
-                        g[i] += in[i];
-                    }
-                }
-            }
+                    g[i] += in[i]*calculate_gradient(d[i]);
         }
 
     // ------------------------------------------------------------------------------------
