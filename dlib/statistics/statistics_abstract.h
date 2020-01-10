@@ -1068,10 +1068,6 @@ namespace dlib
                 of column vectors.  In particular, normalized column vectors should 
                 have zero mean and a variance of one.  
 
-                Also, if desired, this object can use principal component 
-                analysis for the purposes of reducing the number of elements in a 
-                vector.  
-
             THREAD SAFETY
                 Note that this object contains a cached matrix object it uses 
                 to store intermediate results for normalization.  This avoids
