@@ -1385,7 +1385,7 @@ namespace dlib
                 const auto e = std::exp(x);
                 const auto delta = 2*e + e*e + 2;
                 const auto omega = 4*(x + 1) + 4*e*e + e*e*e + e*(4*x + 6);
-                return e*delta/(omega*omega);
+                return e*omega/(delta*delta);
             };
 
             if (out == gi)
