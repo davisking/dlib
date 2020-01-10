@@ -842,14 +842,14 @@ namespace dlib { namespace tt
 
     void mish_gradient (
         tensor& grad,
-        const tensor& dest,
+        const tensor& src,
         const tensor& gradient_input
     )
     {
 #ifdef DLIB_USE_CUDA
-        cuda::mish_gradient(grad, dest, gradient_input);
+        cuda::mish_gradient(grad, src, gradient_input);
 #else
-        cpu::mish_gradient(grad, dest, gradient_input);
+        cpu::mish_gradient(grad, src, gradient_input);
 #endif
     }
 

@@ -2144,8 +2144,8 @@ namespace dlib
         );
 
         template <typename SUBNET> void setup (const SUBNET& sub);
-        void forward_inplace(const tensor& input, tensor& output);
-        void backward_inplace(const tensor& computed_output, const tensor& gradient_input, tensor& data_grad, tensor& params_grad);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& data_output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor&);
         dpoint map_input_to_output(dpoint p) const;
         dpoint map_output_to_input(dpoint p) const;
         const tensor& get_layer_params() const;

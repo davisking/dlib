@@ -1478,54 +1478,41 @@ namespace dlib
             const auto s = src.host();
             for (size_t i = 0; i < src.size(); ++i)
             {
-                auto delta = 2*std::exp(s[i]) + std::exp(2*s[i]) + 2;
+                const auto e = std::exp(s[i]);
+                const auto delta = 2*e + e*e + 2;
                 d[i] = s[i] - 2*s[i]/delta;
             }
         }
 
         void mish_gradient(
             tensor& grad,
-            const tensor& dest,
+            const tensor& src,
             const tensor& gradient_input
         )
         {
             const auto g = grad.host();
-            const auto d = dest.host();
+            const auto s = src.host();
             const auto in = gradient_input.host();
+
+            const auto calculate_gradient = [](float x)
+            {
+                if (x >= 8)
+                    return 1.f;
+                if (x <= -8)
+                    return 0.f;
+
+                const auto e = std::exp(x);
+                const auto delta = 2*e + e*e + 2;
+                const auto omega = 4*(x + 1) + 4*e*e + e*e*e + e*(4*x + 6);
+                return e*omega/(delta*delta);
+            };
+
             if (is_same_object(gradient_input, grad))
-            {
-                for (size_t i = 0; i < dest.size(); ++i)
-                {
-                    if(d[i] < 8 && d[i] > -8)
-                    {
-                        auto delta = 2*std::exp(d[i]) + std::exp(2*d[i]) + 2;
-                        auto omega = 4*(d[i] + 1) + 4*std::exp(2*d[i]) + std::exp(3*d[i]) + std::exp(d[i])*(4*d[i] + 6);
-                        g[i] = in[i]*std::exp(d[i])*delta/(omega*omega);
-                    }
-                    else if(d[i] >= 8)
-                    {
-                        g[i] = in[i];
-                    }
-                    else
-                        g[i] = 0;
-                }
-            }
+                for (size_t i = 0; i < src.size(); ++i)
+                    g[i] = in[i]*calculate_gradient(s[i]);
             else
-            {
-                for (size_t i = 0; i < dest.size(); ++i)
-                {
-                    if(d[i] < 8 && d[i] > -8)
-                    {
-                        auto delta = 2*std::exp(d[i]) + std::exp(2*d[i]) + 2;
-                        auto omega = 4*(d[i] + 1) + 4*std::exp(2*d[i]) + std::exp(3*d[i]) + std::exp(d[i])*(4*d[i] + 6);
-                        g[i] += in[i]*std::exp(d[i])*delta/(omega*omega);
-                    }
-                    else if(d[i] >= 8)
-                    {
-                        g[i] += in[i];
-                    }
-                }
-            }
+                for (size_t i = 0; i < src.size(); ++i)
+                    g[i] += in[i]*calculate_gradient(s[i]);
         }
 
     // ------------------------------------------------------------------------------------
