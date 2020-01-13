@@ -23,7 +23,7 @@
        ./dnn_instance_segmentation_ex /path/to/VOC2012-or-other-images
 
     An alternative to steps 2-4 above is to download a pre-trained network
-    from here: http://dlib.net/files/instance_segmentation_voc2012net.dnn
+    from here: http://dlib.net/files/instance_segmentation_voc2012net_v2.dnn
 
     It would be a good idea to become familiar with dlib's DNN tooling before reading this
     example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
@@ -159,13 +159,13 @@ template <typename SUBNET> using concat_utag4 = resize_and_concat<utag4,utag4_,S
 
 // ----------------------------------------------------------------------------------------
 
-static const char* instance_segmentation_net_filename = "instance_segmentation_voc2012net.dnn";
+static const char* instance_segmentation_net_filename = "instance_segmentation_voc2012net_v2.dnn";
 
 // ----------------------------------------------------------------------------------------
 
 // training network type
-using seg_bnet_type = dlib::loss_multiclass_log_per_pixel<
-                              dlib::cont<2,1,1,1,1,
+using seg_bnet_type = dlib::loss_binary_log_per_pixel<
+                              dlib::cont<1,1,1,1,1,
                               dlib::relu<dlib::bn_con<dlib::cont<16,7,7,2,2,
                               concat_utag1<level1t<
                               concat_utag2<level2t<
@@ -180,8 +180,8 @@ using seg_bnet_type = dlib::loss_multiclass_log_per_pixel<
                               >>>>>>>>>>>>>>>>>>>>>>>>>;
 
 // testing network type (replaced batch normalization with fixed affine transforms)
-using seg_anet_type = dlib::loss_multiclass_log_per_pixel<
-                              dlib::cont<2,1,1,1,1,
+using seg_anet_type = dlib::loss_binary_log_per_pixel<
+                              dlib::cont<1,1,1,1,1,
                               dlib::relu<dlib::affine<dlib::cont<16,7,7,2,2,
                               concat_utag1<alevel1t<
                               concat_utag2<alevel2t<
