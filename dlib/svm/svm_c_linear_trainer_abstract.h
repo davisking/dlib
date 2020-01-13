@@ -50,6 +50,7 @@ namespace dlib
                 - #get_c_class1() == 1
                 - #get_c_class2() == 1
                 - #get_epsilon() == 0.001
+                - #get_relative_epsilon() == 0.0001
                 - this object will not be verbose unless be_verbose() is called
                 - #get_max_iterations() == 10000
                 - #learns_nonnegative_weights() == false
@@ -70,6 +71,7 @@ namespace dlib
                 - #get_c_class1() == C
                 - #get_c_class2() == C
                 - #get_epsilon() == 0.001
+                - #get_relative_epsilon() == 0.0001
                 - this object will not be verbose unless be_verbose() is called
                 - #get_max_iterations() == 10000
                 - #learns_nonnegative_weights() == false
@@ -96,6 +98,34 @@ namespace dlib
                   train.  You can think of this epsilon value as saying "solve the
                   optimization problem until the probability of misclassification is within
                   epsilon of its optimal value".  
+
+                  In particular, the solver will terminate when the risk is within eps of optimal.
+                  I.e. it stops if the "risk gap" is less than eps.
+        !*/
+
+        void set_relative_epsilon (
+            scalar_type eps
+        );
+        /*!
+            requires
+                - eps > 0
+            ensures
+                - #get_relative_epsilon() == eps 
+        !*/
+
+        const scalar_type get_relative_epsilon (
+        ) const;
+        /*!
+            ensures
+                - returns the relative error epsilon that determines when training should stop.
+                  Smaller values may result in a more accurate solution but take longer to
+                  train.  In particular, when the ratio of the risk gap to current risk is less than
+                  get_relative_epsilon() the solver will terminate. 
+
+                  This means that, unlike get_epsilon(), get_relative_epsilon() is a relative
+                  measure of accuracy.  To say this another way, the solver terminates when the
+                  possible improvement in risk is less than get_relative_epsilon() fraction of the
+                  current risk. 
         !*/
 
         void set_max_iterations (
