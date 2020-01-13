@@ -44,6 +44,7 @@ namespace dlib
             const in_scalar_vector_type& labels_,
             const bool be_verbose_,
             const scalar_type eps_,
+            const scalar_type relative_eps_,
             const unsigned long max_iter,
             const unsigned long dims_
         ) :
@@ -54,6 +55,7 @@ namespace dlib
             Cneg(C_neg/C),
             be_verbose(be_verbose_),
             eps(eps_),
+            relative_eps(relative_eps_),
             max_iterations(max_iter),
             dims(dims_)
         {
@@ -98,6 +100,11 @@ namespace dlib
             if (num_iterations >= max_iterations)
                 return true;
 
+            // relative eps test
+            if (current_risk_gap <= relative_eps * current_risk_value)
+                return true;
+
+            // absolute eps test
             if (current_risk_gap < eps)
                 return true;
 
@@ -301,6 +308,7 @@ namespace dlib
 
         const bool be_verbose;
         const scalar_type eps;
+        const scalar_type relative_eps;
         const unsigned long max_iterations;
         const unsigned long dims;
     };
@@ -320,12 +328,13 @@ namespace dlib
         const in_scalar_vector_type& labels,
         const bool be_verbose,
         const scalar_type eps,
+        const scalar_type relative_eps,
         const unsigned long max_iterations,
         const unsigned long dims
     )
     {
         return oca_problem_c_svm<matrix_type, in_sample_vector_type, in_scalar_vector_type>(
-            C_pos, C_neg, samples, labels, be_verbose, eps, max_iterations, dims);
+            C_pos, C_neg, samples, labels, be_verbose, eps, relative_eps, max_iterations, dims);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -350,16 +359,7 @@ namespace dlib
                              is_same_type<K, sparse_linear_kernel<sample_type> >::value ));
 
         svm_c_linear_trainer (
-        )
-        {
-            Cpos = 1;
-            Cneg = 1;
-            verbose = false;
-            eps = 0.001;
-            max_iterations = 10000;
-            learn_nonnegative_weights = false;
-            last_weight_1 = false;
-        }
+        ) : svm_c_linear_trainer(1.0) {}
 
         explicit svm_c_linear_trainer (
             const scalar_type& C 
@@ -377,6 +377,7 @@ namespace dlib
             Cneg = C;
             verbose = false;
             eps = 0.001;
+            relative_eps = 0.0001;
             max_iterations = 10000;
             learn_nonnegative_weights = false;
             last_weight_1 = false;
@@ -399,6 +400,24 @@ namespace dlib
 
         const scalar_type get_epsilon (
         ) const { return eps; }
+
+        void set_relative_epsilon (
+            scalar_type eps_
+        )
+        {
+            // make sure requires clause is not broken
+            DLIB_ASSERT(eps_ > 0,
+                "\t void svm_c_linear_trainer::set_relative_epsilon()"
+                << "\n\t eps_ must be greater than 0"
+                << "\n\t eps_: " << eps_ 
+                << "\n\t this: " << this
+                );
+
+            relative_eps = eps_;
+        }
+
+        const scalar_type get_relative_epsilon (
+        ) const { return relative_eps; }
 
         unsigned long get_max_iterations (
         ) const { return max_iterations; }
@@ -654,14 +673,14 @@ namespace dlib
                                                                          mat(prior_b));
 
                 svm_objective = solver(
-                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations, dims), 
+                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, relative_eps, max_iterations, dims), 
                     w,
                     prior_temp);
             }
             else
             {
                 svm_objective = solver(
-                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, max_iterations, num_dims), 
+                    make_oca_problem_c_svm<w_type>(Cpos, Cneg, x, y, verbose, eps, relative_eps, max_iterations, num_dims), 
                     w,
                     num_nonnegative,
                     force_weight_1_idx);
@@ -687,6 +706,7 @@ namespace dlib
         scalar_type Cneg;
         oca solver;
         scalar_type eps;
+        scalar_type relative_eps;
         bool verbose;
         unsigned long max_iterations;
         bool learn_nonnegative_weights;
