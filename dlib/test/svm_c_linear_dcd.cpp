@@ -37,6 +37,7 @@ namespace
         const double C = 0.2;
         linear_trainer.set_epsilon(1e-10);
         linear_trainer_cpa.set_epsilon(1e-10);
+        linear_trainer_cpa.set_relative_epsilon(0);
 
 
         std::vector<sample_type> samples;
