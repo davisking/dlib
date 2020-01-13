@@ -37,7 +37,7 @@ namespace
         const double C = 0.2;
         linear_trainer.set_epsilon(1e-10);
         linear_trainer_cpa.set_epsilon(1e-10);
-        linear_trainer_cpa.set_relative_epsilon(0);
+        linear_trainer_cpa.set_relative_epsilon(1e-10);
 
 
         std::vector<sample_type> samples;
@@ -110,7 +110,7 @@ namespace
         const double C = 1.0;
         linear_trainer.set_epsilon(1e-10);
         linear_trainer_cpa.set_epsilon(1e-10);
-        linear_trainer_cpa.set_relative_epsilon(0);
+        linear_trainer_cpa.set_relative_epsilon(1e-10);
 
         linear_trainer.include_bias(false);
 
@@ -189,7 +189,7 @@ namespace
         const double C = 1;
         linear_trainer.set_epsilon(1e-10);
         linear_trainer_cpa.set_epsilon(1e-10);
-        linear_trainer_cpa.set_relative_epsilon(0);
+        linear_trainer_cpa.set_relative_epsilon(1e-10);
 
         std::vector<sample_type> samples;
         std::vector<double> labels;
@@ -262,7 +262,7 @@ namespace
         const double C = 1;
         linear_trainer.set_epsilon(1e-10);
         linear_trainer_cpa.set_epsilon(1e-11);
-        linear_trainer_cpa.set_relative_epsilon(0);
+        linear_trainer_cpa.set_relative_epsilon(1e-11);
 
         linear_trainer_cpa.force_last_weight_to_1(force_weight);
 
