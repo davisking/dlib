@@ -1628,11 +1628,11 @@ namespace dlib
 
         __device__ float cuda_log1pexp(float x)
         {
-            if (x <= -37)
+            if (x <= -18)
                 return std::exp(x);
-            else if (-37 < x && x <= 18)
+            else if (-18 < x && x <= 9)
                 return std::log1p(std::exp(x));
-            else if (18 < x && x <= 33.3)
+            else if (9 < x && x <= 16)
                 return x + std::exp(-x);
             else
                 return x;
