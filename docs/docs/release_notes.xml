@@ -12,6 +12,29 @@
 
 <current>
 New Features and Improvements:
+   - Made find_min_global() and find_max_global() much faster when using them
+     to optimize inexpensive functions.  These tools now measure the runtime of
+     the objective function and automatically tune themselves to balance solver
+     overhead vs objective function execution time.
+   - Improved handling of label and ignore boxes in loss_mmod layer.
+     See here for more details: https://github.com/davisking/dlib/issues/1894
+   - Better auto-detection of build configurations on some platforms.
+   - Shiny new deep instance segmentation examples:
+     dnn_instance_segmentation_ex.cpp and dnn_instance_segmentation_train_ex.cpp.  
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Fix build error in some versions of visual studio in some setups.
+   - Fix find_max() going into an infinite loop in some cases when a
+     non-differentiable function is given.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.18" date="Sep 22, 2019">
+New Features and Improvements:
    - Make dlib.full_object_detection take list of dlib.point or dlib.points.
    - CMake scripts will automatically include the Intel MKL's iomp dll in the
      output folder to reduce confusion for windows users who haven't added the
@@ -35,7 +58,7 @@ Bug fixes:
    - Various improvements to CMake built scripts to handle unusual system configurations.
    - Fixed bug in multi-GPU training of semantic segmentation models.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 

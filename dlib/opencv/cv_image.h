@@ -23,7 +23,7 @@ namespace dlib
         typedef pixel_type type;
         typedef default_memory_manager mem_manager_type;
 
-        cv_image (const cv::Mat img) 
+        cv_image (const cv::Mat& img) 
         {
             DLIB_CASSERT(img.depth() == cv::DataType<typename pixel_traits<pixel_type>::basic_pixel_type>::depth &&
                          img.channels() == pixel_traits<pixel_type>::num, 
@@ -34,7 +34,16 @@ namespace dlib
                          << "\n\t img.channels(): " << img.channels() 
                          << "\n\t img.pixel_traits<pixel_type>::num: " << pixel_traits<pixel_type>::num 
                          );
+// Note, do NOT use CV_VERSION_MAJOR because in OpenCV 2 CV_VERSION_MAJOR actually held
+// CV_VERSION_MINOR and instead they used CV_VERSION_EPOCH.  So for example, in OpenCV
+// 2.4.9.1 CV_VERSION_MAJOR==4 and CV_VERSION_EPOCH==2.  However, CV_MAJOR_VERSION has always
+// (seemingly) held the actual major version number, so we use that to test for the OpenCV major
+// version.
+#if CV_MAJOR_VERSION > 3 || (CV_MAJOR_VERSION == 3 && CV_SUBMINOR_VERSION >= 9)
+            IplImage temp = cvIplImage(img);
+#else
             IplImage temp = img;
+#endif
             init(&temp);
         }
 
@@ -109,34 +118,6 @@ namespace dlib
         long nr() const { return _nr; }
         long nc() const { return _nc; }
         long width_step() const { return _widthStep; }
-
-        cv_image& operator=( const cv_image& item)
-        {
-            _data = item._data;
-            _widthStep = item._widthStep;
-            _nr = item._nr;
-            _nc = item._nc;
-            return *this;
-        }
-
-        cv_image& operator=( const IplImage* img)
-        {
-            init(img);
-            return *this;
-        }
-
-        cv_image& operator=( const IplImage img)
-        {
-            init(&img);
-            return *this;
-        }
-
-        cv_image& operator=( const cv::Mat img)
-        {
-            IplImage temp = img;
-            init(&temp);
-            return *this;
-        }
 
     private:
 

@@ -1389,11 +1389,15 @@ namespace dlib
             };
 
             if (out == gi)
+            {
                 for (auto i : grid_stride_range(0, n))
                     out[i] = gi[i]*calculate_gradient(s[i]);
+            }
             else
+            {
                 for (auto i : grid_stride_range(0, n))
                     out[i] += gi[i]*calculate_gradient(s[i]);
+            }
         }
 
         void mish_gradient (

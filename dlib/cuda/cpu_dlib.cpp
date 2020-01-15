@@ -1508,11 +1508,15 @@ namespace dlib
             };
 
             if (is_same_object(gradient_input, grad))
+            {
                 for (size_t i = 0; i < src.size(); ++i)
                     g[i] = in[i]*calculate_gradient(s[i]);
+            }
             else
+            {
                 for (size_t i = 0; i < src.size(); ++i)
                     g[i] += in[i]*calculate_gradient(s[i]);
+            }
         }
 
     // ------------------------------------------------------------------------------------

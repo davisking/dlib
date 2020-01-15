@@ -344,6 +344,7 @@ namespace
                 svm_c_linear_trainer<K> trainer;
                 trainer.set_c(1.0);
                 trainer.set_epsilon(1e-13);
+                trainer.set_relative_epsilon(1e-13);
                 trainer.force_last_weight_to_1(true);
                 //trainer.be_verbose();
                 decision_function<K> df = trainer.train(samples, labels);

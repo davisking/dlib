@@ -83,7 +83,10 @@ namespace dlib
     {
 #if !defined CUDA_VERSION
 #error CUDA_VERSION not defined
-#elif CUDA_VERSION >= 9020 && CUDA_VERSION <= 10010
+#elif CUDA_VERSION >= 9020 && CUDA_VERSION < 11000
+        // We will stop using this alternative version with cuda V11, hopefully the bug in
+        // cudaStreamSynchronize is fixed by then.
+        //
         // This should be pretty much the same as cudaStreamSynchronize, which for some
         // reason makes training freeze in some cases.
         // (see https://github.com/davisking/dlib/issues/1513)
