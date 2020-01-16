@@ -21,6 +21,11 @@ mkdir build; cd build; cmake .. -DUSE_AVX_INSTRUCTIONS=1; cmake --build .
 
 Doing so will make some things run faster.
 
+Alternatively, if you are using the [vcpkg](https://github.com/Microsoft/vcpkg/) dependency manager you can download and install dlib with CMake integration in a single command:
+```bash
+vcpkg install dlib
+```
+
 Finally, Visual Studio users should usually do everything in 64bit mode.  By default Visual Studio is 32bit, both in its outputs and its own execution, so you have to explicitly tell it to use 64bits.  Since it's not the 1990s anymore you probably want to use 64bits.  Do that with a cmake invocation like this:
 ```bash
 cmake .. -G "Visual Studio 14 2015 Win64" -T host=x64 
