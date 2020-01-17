@@ -416,7 +416,7 @@ namespace dlib
         {
             /*!
                 The point of this class is to compute the loss computed by
-                loss_binary_log_per_pixel, but to do so with CUDA.
+                loss_binary_log_per_pixel_, but to do so with CUDA.
             !*/
         public:
 
@@ -452,13 +452,13 @@ namespace dlib
                     memcpy(buf + i*bytes_per_plane, &t(0,0), bytes_per_plane);
                 }
 
-                do_work(static_cast<float*>(loss_buf.data()), static_cast<float*>(buf.data()), subnetwork_output, gradient, loss);
+                do_work(loss_buf, static_cast<float*>(buf.data()), subnetwork_output, gradient, loss);
             }
 
         private:
 
             static void do_work(
-                float* loss_cuda_work_buffer,
+                cuda_data_void_ptr loss_cuda_work_buffer,
                 const float* truth_buffer,
                 const tensor& subnetwork_output,
                 tensor& gradient,
@@ -472,7 +472,7 @@ namespace dlib
         {
             /*!
                 The point of this class is to compute the loss computed by
-                loss_multiclass_log_per_pixel, but to do so with CUDA.
+                loss_multiclass_log_per_pixel_, but to do so with CUDA.
             !*/
         public:
 
@@ -508,13 +508,13 @@ namespace dlib
                     memcpy(buf + i*bytes_per_plane, &t(0,0), bytes_per_plane);
                 }
 
-                do_work(static_cast<float*>(loss_buf.data()), static_cast<uint16_t*>(buf.data()), subnetwork_output, gradient, loss);
+                do_work(loss_buf, static_cast<uint16_t*>(buf.data()), subnetwork_output, gradient, loss);
             }
 
         private:
 
             static void do_work(
-                float* loss_cuda_work_buffer,
+                cuda_data_void_ptr loss_cuda_work_buffer,
                 const uint16_t* truth_buffer,
                 const tensor& subnetwork_output,
                 tensor& gradient,
