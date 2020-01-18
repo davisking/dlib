@@ -49,7 +49,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
     
     jpeg_loader::
-    jpeg_loader( unsigned char* imgbuffer, size_t imgbuffersize ) : height_( 0 ), width_( 0 ), output_components_(0)
+    jpeg_loader( const unsigned char* imgbuffer, size_t imgbuffersize ) : height_( 0 ), width_( 0 ), output_components_(0)
     {
         read_image( NULL, imgbuffer, imgbuffersize );
     }
@@ -113,7 +113,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void jpeg_loader::read_image( FILE * file, unsigned char* imgbuffer, size_t imgbuffersize )
+    void jpeg_loader::read_image( FILE * file, const unsigned char* imgbuffer, size_t imgbuffersize )
     {
         
         jpeg_decompress_struct cinfo;
@@ -138,7 +138,7 @@ namespace dlib
         jpeg_create_decompress(&cinfo);
         
         if (file != NULL) jpeg_stdio_src(&cinfo, file);
-        else if (imgbuffer != NULL) jpeg_mem_src(&cinfo, imgbuffer, imgbuffersize);
+        else if (imgbuffer != NULL) jpeg_mem_src(&cinfo, (unsigned char*)imgbuffer, imgbuffersize);
         else throw image_load_error(std::string("jpeg_loader: no valid image source"));
 
         jpeg_read_header(&cinfo, TRUE);

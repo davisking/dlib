@@ -417,7 +417,7 @@ namespace dlib
         typedef matrix<scalar_type,0,1,mem_manager_type> scalar_vector_type;
 
         // make sure requires clause is not broken
-        DLIB_ASSERT(is_binary_classification_problem(x,y) == true &&
+        DLIB_CASSERT(is_binary_classification_problem(x,y) == true &&
                     1 < folds && folds <= std::min(sum(y>0),sum(y<0)),
             "\tmatrix cross_validate_trainer()"
             << "\n\t invalid inputs were given to this function"

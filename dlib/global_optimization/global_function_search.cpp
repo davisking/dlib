@@ -584,7 +584,7 @@ namespace dlib
                 info->radius = 0;
             }
             info->best_objective_value = y;
-            info->best_x = std::move(req.x);
+            info->best_x = req.x;
         }
     }
 

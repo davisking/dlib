@@ -120,6 +120,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename net_type>
+    inline size_t count_parameters(
+        const net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+        ensures
+            - Returns the number of allocated parameters in the network. E.g. if the network has not
+              been trained then, since nothing has been allocated yet, it will return 0.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 }
 
 #endif // DLIB_DNn_UTILITIES_ABSTRACT_H_ 

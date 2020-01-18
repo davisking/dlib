@@ -273,6 +273,35 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        class visitor_count_parameters
+        {
+        public:
+            visitor_count_parameters(size_t& num_parameters_): num_parameters(num_parameters_) {}
+
+            void operator()(size_t, const tensor& t)
+            {
+                num_parameters += t.size();
+            }
+
+        private:
+            size_t& num_parameters;
+        };
+    }
+
+    template <typename net_type>
+    inline size_t count_parameters(
+        const net_type& net
+    )
+    {
+        size_t num_parameters = 0;
+        impl::visitor_count_parameters temp(num_parameters);
+        visit_layer_parameters(net, temp);
+        return num_parameters;
+    }
+
+// ----------------------------------------------------------------------------------------
 }
 
 #endif // DLIB_DNn_UTILITIES_H_ 
