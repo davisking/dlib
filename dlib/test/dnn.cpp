@@ -2653,7 +2653,7 @@ namespace
 
         dnn_trainer<net_type> trainer(net, sgd(0, 0.9));
         trainer.set_learning_rate(1);
-        trainer.set_max_num_epochs(200);
+        trainer.set_max_num_epochs(400);
         trainer.train(x, y);
 
         // The learning task is easy, so the net should have no problem
