@@ -1766,7 +1766,7 @@ namespace dlib
 
         void compute_loss_binary_log_per_pixel::
         do_work(
-            cuda_data_void_ptr loss_cuda_work_buffer,
+            cuda_data_ptr<float> loss_cuda_work_buffer,
             const float* truth_buffer,
             const tensor& subnetwork_output,
             tensor& gradient,
@@ -1780,7 +1780,7 @@ namespace dlib
             const double scale = 1.0 / (subnetwork_output.num_samples() * subnetwork_output.nr() * subnetwork_output.nc());
 
             launch_kernel(_cuda_compute_loss_binary_log_per_pixel, max_jobs(gradient.size()),
-                static_cast<float*>(loss_cuda_work_buffer.data()), gradient.device(), truth_buffer, subnetwork_output.device(), gradient.size(), scale);
+                loss_cuda_work_buffer.data(), gradient.device(), truth_buffer, subnetwork_output.device(), gradient.size(), scale);
 
             float floss;
             dlib::cuda::memcpy(&floss, loss_cuda_work_buffer, sizeof(float));
@@ -1789,7 +1789,7 @@ namespace dlib
 
         void compute_loss_multiclass_log_per_pixel::
         do_work(
-            cuda_data_void_ptr loss_cuda_work_buffer,
+            cuda_data_ptr<float> loss_cuda_work_buffer,
             const uint16_t* truth_buffer,
             const tensor& subnetwork_output,
             tensor& gradient,
@@ -1804,7 +1804,7 @@ namespace dlib
             const double scale = 1.0 / (subnetwork_output.num_samples() * subnetwork_output.nr() * subnetwork_output.nc());
 
             launch_kernel(_cuda_compute_loss_multiclass_log_per_pixel, max_jobs(gradient.size()),
-                static_cast<float*>(loss_cuda_work_buffer.data()), gradient.device(), truth_buffer, gradient.size(), gradient.nr()*gradient.nc(), gradient.nr()*gradient.nc()*gradient.k(), gradient.k(), label_to_ignore, scale);
+                loss_cuda_work_buffer.data(), gradient.device(), truth_buffer, gradient.size(), gradient.nr()*gradient.nc(), gradient.nr()*gradient.nc()*gradient.k(), gradient.k(), label_to_ignore, scale);
 
             float floss;
             dlib::cuda::memcpy(&floss, loss_cuda_work_buffer, sizeof(float));

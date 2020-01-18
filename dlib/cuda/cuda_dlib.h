@@ -452,7 +452,7 @@ namespace dlib
                 // for the scalar loss output.
                 buf = device_global_buffer(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
 
-                cuda_data_void_ptr loss_buf = buf;
+                cuda_data_ptr<float> loss_buf = static_pointer_cast<float>(buf, 1);
                 buf = buf+sizeof(float);
 
                 // copy the truth data into a cuda buffer.
@@ -470,7 +470,7 @@ namespace dlib
         private:
 
             static void do_work(
-                cuda_data_void_ptr loss_cuda_work_buffer,
+                cuda_data_ptr<float> loss_cuda_work_buffer,
                 const float* truth_buffer,
                 const tensor& subnetwork_output,
                 tensor& gradient,
@@ -508,7 +508,7 @@ namespace dlib
                 // for the scalar loss output.
                 buf = device_global_buffer(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
 
-                cuda_data_void_ptr loss_buf = buf;
+                cuda_data_ptr<float> loss_buf = static_pointer_cast<float>(buf, 1);
                 buf = buf+sizeof(float);
 
                 // copy the truth data into a cuda buffer.
@@ -526,7 +526,7 @@ namespace dlib
         private:
 
             static void do_work(
-                cuda_data_void_ptr loss_cuda_work_buffer,
+                cuda_data_ptr<float> loss_cuda_work_buffer,
                 const uint16_t* truth_buffer,
                 const tensor& subnetwork_output,
                 tensor& gradient,
