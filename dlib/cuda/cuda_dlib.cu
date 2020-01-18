@@ -1783,7 +1783,7 @@ namespace dlib
                 loss_cuda_work_buffer.data(), gradient.device(), truth_buffer, subnetwork_output.device(), gradient.size(), scale);
 
             float floss;
-            dlib::cuda::memcpy(&floss, loss_cuda_work_buffer, sizeof(float));
+            dlib::cuda::memcpy(&floss, loss_cuda_work_buffer);
             loss = scale*floss;
         }
 
@@ -1807,7 +1807,7 @@ namespace dlib
                 loss_cuda_work_buffer.data(), gradient.device(), truth_buffer, gradient.size(), gradient.nr()*gradient.nc(), gradient.nr()*gradient.nc()*gradient.k(), gradient.k(), label_to_ignore, scale);
 
             float floss;
-            dlib::cuda::memcpy(&floss, loss_cuda_work_buffer, sizeof(float));
+            dlib::cuda::memcpy(&floss, loss_cuda_work_buffer);
             loss = scale*floss;
         }
 
