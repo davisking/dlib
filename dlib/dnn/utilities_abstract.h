@@ -129,8 +129,8 @@ namespace dlib
             - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
               add_tag_layer.
         ensures
-            - This function returns the number of parameters of net if it has been properly
-              initialized and 0 otherwise.
+            - Returns the number of allocated parameters in the network. E.g. if the network has not
+              been trained then, since nothing has been allocated yet, it will return 0.
     !*/
 
 // ----------------------------------------------------------------------------------------
