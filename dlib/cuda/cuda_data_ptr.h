@@ -93,6 +93,20 @@ namespace dlib
                 return temp;
             }
 
+            void shrink(size_t new_size) 
+            /*!
+                requires
+                    - new_size <= num
+                ensures
+                    - #size() == new_size
+                    - Doesn't actually deallocate anything, just changes the size() metadata to a
+                      smaller number and only for this instance of the pointer.
+            !*/
+            {
+                DLIB_CASSERT(new_size <= num);
+                num = new_size;
+            }
+
         private:
 
             friend class weak_cuda_data_void_ptr;
@@ -198,51 +212,106 @@ namespace dlib
             void reset() { pdata.reset(); }
 
             size_t size() const { return num; }
+            /*!
+                ensures
+                    - returns the number of T instances pointed to by *this.
+            !*/
 
-
-            friend void memcpy(
-                std::vector<T>& dest,
-                const cuda_data_ptr& src
-            )
-            {
-                dest.resize(src.size());
-                if (src.size() != 0)
-                    memcpy(dest.data(), src.pdata);
-            }
-
-            friend void memcpy(
-                cuda_data_ptr& dest,
-                const std::vector<T>& src
-            )
-            {
-                if (src.size() != dest.size())
-                    dest = cuda_data_ptr<T>(src.size());
-
-                if (dest.size() != 0)
-                    memcpy(dest.pdata, src.data());
-            }
-
-            friend void memcpy(
-                cuda_data_ptr& dest,
-                const float* src
-            )
-            {
-                memcpy(dest.pdata, src);
-            }
-
-            friend void memcpy(
-                float* dest, 
-                const cuda_data_ptr& src
-            )
-            {
-                memcpy(dest, src.pdata);
+            operator cuda_data_void_ptr() const 
+            /*!
+                ensures
+                    - returns *this as a cuda_data_void_ptr.  Importantly, the returned size() will
+                      reflect the number of bytes referenced by *this.  To be clear, let P be the
+                      returned pointer.  Then:
+                        - P.get() == get()
+                        - P.size() == size() * sizeof(T)
+            !*/
+            { 
+                cuda_data_void_ptr temp = pdata;
+                temp.shrink(size() * sizeof(T));
+                return temp;
             }
 
         private:
+            template <typename U>
+            friend cuda_data_ptr<U> static_pointer_cast(const cuda_data_void_ptr &ptr);
+            template <typename U>
+            friend cuda_data_ptr<U> static_pointer_cast(const cuda_data_void_ptr &ptr, size_t num);
 
             size_t num = 0;
             cuda_data_void_ptr pdata;
         };
+
+        template <typename T>
+        cuda_data_ptr<T> static_pointer_cast(const cuda_data_void_ptr &ptr) 
+        {
+            DLIB_CASSERT(ptr.size() % sizeof(T) == 0, 
+                "Size of memory buffer in ptr doesn't match sizeof(T). "
+                << "\nptr.size(): "<< ptr.size() 
+                << "\nsizeof(T): "<< sizeof(T));
+            cuda_data_ptr<T> result;
+            result.pdata = ptr;
+            result.num = ptr.size() / sizeof(T);
+            return result;
+        }
+
+        template <typename T>
+        cuda_data_ptr<T> static_pointer_cast(const cuda_data_void_ptr &ptr, size_t num) 
+        {
+            DLIB_CASSERT(num*sizeof(T) <= ptr.size(), 
+                "Size of memory buffer in ptr isn't big enough to represent this many T objects. "
+                << "\nnum: "<< num 
+                << "\nnum*sizeof(T): "<< num*sizeof(T)
+                << "\nsizeof(T): "<< sizeof(T)
+                << "\nptr.size(): "<< ptr.size());
+
+            cuda_data_ptr<T> result;
+            result.pdata = ptr;
+            result.num = num;
+            return result;
+        }
+
+        template <typename T>
+        void memcpy(std::vector<T>& dest, const cuda_data_ptr<T>& src)
+        {
+            dest.resize(src.size());
+            if (src.size() != 0)
+                memcpy(dest.data(), static_cast<cuda_data_void_ptr>(src));
+        }
+
+        template <typename T>
+        void memcpy(cuda_data_ptr<T>& dest, const std::vector<T>& src)
+        {
+            if (src.size() != dest.size())
+                dest = cuda_data_ptr<T>(src.size());
+
+            if (dest.size() != 0)
+                memcpy(static_cast<cuda_data_void_ptr>(dest), src.data());
+        }
+
+        template <typename T>
+        void memcpy(cuda_data_ptr<T>& dest, const T* src)
+        {
+            memcpy(static_cast<cuda_data_void_ptr>(dest), src);
+        }
+        template <typename T>
+        void memcpy(cuda_data_ptr<T>& dest, const T* src, size_t num)
+        {
+            DLIB_CASSERT(num <= dest.size());
+            memcpy(static_cast<cuda_data_void_ptr>(dest), src, num*sizeof(T));
+        }
+
+        template <typename T>
+        void memcpy(T* dest, const cuda_data_ptr<T>& src)
+        {
+            memcpy(dest, static_cast<cuda_data_void_ptr>(src));
+        }
+        template <typename T>
+        void memcpy(T* dest, const cuda_data_ptr<T>& src, size_t num)
+        {
+            DLIB_CASSERT(num <= src.size());
+            memcpy(dest, static_cast<cuda_data_void_ptr>(src), num*sizeof(T));
+        }
 
     // ------------------------------------------------------------------------------------
 
