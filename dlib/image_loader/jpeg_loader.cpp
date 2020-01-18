@@ -138,7 +138,7 @@ namespace dlib
         jpeg_create_decompress(&cinfo);
         
         if (file != NULL) jpeg_stdio_src(&cinfo, file);
-        else if (imgbuffer != NULL) jpeg_mem_src(&cinfo, imgbuffer, imgbuffersize);
+        else if (imgbuffer != NULL) jpeg_mem_src(&cinfo, (unsigned char*)imgbuffer, imgbuffersize);
         else throw image_load_error(std::string("jpeg_loader: no valid image source"));
 
         jpeg_read_header(&cinfo, TRUE);
