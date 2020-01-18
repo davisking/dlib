@@ -66,7 +66,7 @@ namespace dlib
         !*/
 
         jpeg_loader( 
-            unsigned char* imgbuffer,
+            const unsigned char* imgbuffer,
             size_t buffersize
         );
         /*!
@@ -143,7 +143,7 @@ namespace dlib
         >
     void load_jpeg (
         image_type& image,
-        unsigned char* imgbuff,
+        const unsigned char* imgbuff,
         size_t imgbuffsize
     );
     /*!
@@ -152,6 +152,22 @@ namespace dlib
               dlib/image_processing/generic_image.h 
         ensures
             - performs: jpeg_loader(imgbuff, imgbuffsize).get_image(image);
+    !*/
+
+    template <
+        typename image_type
+        >
+    void load_jpeg (
+        image_type& image,
+        const char* imgbuff,
+        size_t imgbuffsize
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+        ensures
+            - performs: jpeg_loader((unsigned char*)imgbuff, imgbuffsize).get_image(image);
     !*/
 
 // ----------------------------------------------------------------------------------------

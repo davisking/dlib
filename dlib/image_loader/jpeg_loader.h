@@ -21,7 +21,7 @@ namespace dlib
         jpeg_loader( const char* filename );
         jpeg_loader( const std::string& filename );
         jpeg_loader( const dlib::file& f );
-        jpeg_loader( unsigned char* imgbuffer, size_t buffersize );
+        jpeg_loader( const unsigned char* imgbuffer, size_t buffersize );
 
         bool is_gray() const;
         bool is_rgb() const;
@@ -78,7 +78,7 @@ namespace dlib
         }
         
         FILE * check_file(const char* filename );
-        void read_image( FILE *file, unsigned char* imgbuffer, size_t imgbuffersize );
+        void read_image( FILE *file, const unsigned char* imgbuffer, size_t imgbuffersize );
         unsigned long height_; 
         unsigned long width_;
         unsigned long output_components_;
@@ -97,16 +97,29 @@ namespace dlib
     {
         jpeg_loader(file_name).get_image(image);
     }
+
     template <
         typename image_type
         >
     void load_jpeg (
         image_type& image,
-        unsigned char* imgbuff,
+        const unsigned char* imgbuff,
         size_t imgbuffsize
     )
     {
         jpeg_loader(imgbuff, imgbuffsize).get_image(image);
+    }
+
+    template <
+        typename image_type
+        >
+    void load_jpeg (
+        image_type& image,
+        const char* imgbuff,
+        size_t imgbuffsize
+    )
+    {
+        jpeg_loader(reinterpret_cast<const unsigned char*>(imgbuff), imgbuffsize).get_image(image);
     }
 
 // ----------------------------------------------------------------------------------------

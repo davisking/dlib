@@ -49,7 +49,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
     
     jpeg_loader::
-    jpeg_loader( unsigned char* imgbuffer, size_t imgbuffersize ) : height_( 0 ), width_( 0 ), output_components_(0)
+    jpeg_loader( const unsigned char* imgbuffer, size_t imgbuffersize ) : height_( 0 ), width_( 0 ), output_components_(0)
     {
         read_image( NULL, imgbuffer, imgbuffersize );
     }
@@ -113,7 +113,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    void jpeg_loader::read_image( FILE * file, unsigned char* imgbuffer, size_t imgbuffersize )
+    void jpeg_loader::read_image( FILE * file, const unsigned char* imgbuffer, size_t imgbuffersize )
     {
         
         jpeg_decompress_struct cinfo;
