@@ -120,6 +120,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename net_type>
+    inline size_t count_parameters(
+        const net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+        ensures
+            - This function returns the number of parameters of net if it has been properly
+              initialized and 0 otherwise.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 }
 
 #endif // DLIB_DNn_UTILITIES_ABSTRACT_H_ 
