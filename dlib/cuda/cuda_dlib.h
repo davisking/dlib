@@ -447,7 +447,8 @@ namespace dlib
                 double& loss
             ) const
             {
-                const size_t bytes_per_plane = subnetwork_output.nr()*subnetwork_output.nc()*sizeof(float);
+                const auto image_size = subnetwork_output.nr()*subnetwork_output.nc();
+                const size_t bytes_per_plane = image_size*sizeof(float);
                 // Allocate a cuda buffer to store all the truth images and also one float
                 // for the scalar loss output.
                 buf = device_global_buffer(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
@@ -464,14 +465,16 @@ namespace dlib
                     memcpy(buf + i*bytes_per_plane, &t(0,0), bytes_per_plane);
                 }
 
-                do_work(loss_buf, static_cast<float*>(buf.data()), subnetwork_output, gradient, loss);
+                auto truth_buf = static_pointer_cast<const float>(buf, subnetwork_output.num_samples()*image_size);
+
+                do_work(loss_buf, truth_buf, subnetwork_output, gradient, loss);
             }
 
         private:
 
             static void do_work(
                 cuda_data_ptr<float> loss_work_buffer,
-                const float* truth_buffer,
+                cuda_data_ptr<const float> truth_buffer,
                 const tensor& subnetwork_output,
                 tensor& gradient,
                 double& loss
@@ -503,7 +506,8 @@ namespace dlib
                 double& loss
             ) const
             {
-                const size_t bytes_per_plane = subnetwork_output.nr()*subnetwork_output.nc()*sizeof(uint16_t);
+                const auto image_size = subnetwork_output.nr()*subnetwork_output.nc();
+                const size_t bytes_per_plane = image_size*sizeof(uint16_t);
                 // Allocate a cuda buffer to store all the truth images and also one float
                 // for the scalar loss output.
                 buf = device_global_buffer(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
@@ -520,14 +524,16 @@ namespace dlib
                     memcpy(buf + i*bytes_per_plane, &t(0,0), bytes_per_plane);
                 }
 
-                do_work(loss_buf, static_cast<uint16_t*>(buf.data()), subnetwork_output, gradient, loss);
+                auto truth_buf = static_pointer_cast<const uint16_t>(buf, subnetwork_output.num_samples()*image_size);
+
+                do_work(loss_buf, truth_buf, subnetwork_output, gradient, loss);
             }
 
         private:
 
             static void do_work(
                 cuda_data_ptr<float> loss_work_buffer,
-                const uint16_t* truth_buffer,
+                cuda_data_ptr<const uint16_t> truth_buffer,
                 const tensor& subnetwork_output,
                 tensor& gradient,
                 double& loss
