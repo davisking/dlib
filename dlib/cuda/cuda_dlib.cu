@@ -1766,37 +1766,37 @@ namespace dlib
 
         void compute_loss_binary_log_per_pixel::
         do_work(
-            cuda_data_ptr<float> loss_cuda_work_buffer,
+            cuda_data_ptr<float> loss_work_buffer,
             const float* truth_buffer,
             const tensor& subnetwork_output,
             tensor& gradient,
             double& loss
         )
         {
-            CHECK_CUDA(cudaMemset(loss_cuda_work_buffer, 0, sizeof(float)));
+            CHECK_CUDA(cudaMemset(loss_work_buffer, 0, sizeof(float)));
             sigmoid(gradient, subnetwork_output);
 
             // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0 / (subnetwork_output.num_samples() * subnetwork_output.nr() * subnetwork_output.nc());
 
             launch_kernel(_cuda_compute_loss_binary_log_per_pixel, max_jobs(gradient.size()),
-                loss_cuda_work_buffer.data(), gradient.device(), truth_buffer, subnetwork_output.device(), gradient.size(), scale);
+                loss_work_buffer.data(), gradient.device(), truth_buffer, subnetwork_output.device(), gradient.size(), scale);
 
             float floss;
-            dlib::cuda::memcpy(&floss, loss_cuda_work_buffer);
+            dlib::cuda::memcpy(&floss, loss_work_buffer);
             loss = scale*floss;
         }
 
         void compute_loss_multiclass_log_per_pixel::
         do_work(
-            cuda_data_ptr<float> loss_cuda_work_buffer,
+            cuda_data_ptr<float> loss_work_buffer,
             const uint16_t* truth_buffer,
             const tensor& subnetwork_output,
             tensor& gradient,
             double& loss
         )
         {
-            CHECK_CUDA(cudaMemset(loss_cuda_work_buffer, 0, sizeof(float)));
+            CHECK_CUDA(cudaMemset(loss_work_buffer, 0, sizeof(float)));
             softmax(gradient, subnetwork_output);
             static const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
 
@@ -1804,10 +1804,10 @@ namespace dlib
             const double scale = 1.0 / (subnetwork_output.num_samples() * subnetwork_output.nr() * subnetwork_output.nc());
 
             launch_kernel(_cuda_compute_loss_multiclass_log_per_pixel, max_jobs(gradient.size()),
-                loss_cuda_work_buffer.data(), gradient.device(), truth_buffer, gradient.size(), gradient.nr()*gradient.nc(), gradient.nr()*gradient.nc()*gradient.k(), gradient.k(), label_to_ignore, scale);
+                loss_work_buffer.data(), gradient.device(), truth_buffer, gradient.size(), gradient.nr()*gradient.nc(), gradient.nr()*gradient.nc()*gradient.k(), gradient.k(), label_to_ignore, scale);
 
             float floss;
-            dlib::cuda::memcpy(&floss, loss_cuda_work_buffer);
+            dlib::cuda::memcpy(&floss, loss_work_buffer);
             loss = scale*floss;
         }
 

@@ -470,7 +470,7 @@ namespace dlib
         private:
 
             static void do_work(
-                cuda_data_ptr<float> loss_cuda_work_buffer,
+                cuda_data_ptr<float> loss_work_buffer,
                 const float* truth_buffer,
                 const tensor& subnetwork_output,
                 tensor& gradient,
@@ -526,7 +526,7 @@ namespace dlib
         private:
 
             static void do_work(
-                cuda_data_ptr<float> loss_cuda_work_buffer,
+                cuda_data_ptr<float> loss_work_buffer,
                 const uint16_t* truth_buffer,
                 const tensor& subnetwork_output,
                 tensor& gradient,
