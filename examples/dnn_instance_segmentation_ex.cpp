@@ -16,7 +16,7 @@
        ./dnn_instance_segmentation_ex /path/to/VOC2012-or-other-images
 
     An alternative to steps 2-4 above is to download a pre-trained network
-    from here: http://dlib.net/files/instance_segmentation_voc2012net.dnn
+    from here: http://dlib.net/files/instance_segmentation_voc2012net_v2.dnn
 
     It would be a good idea to become familiar with dlib's DNN tooling before reading this
     example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
@@ -71,25 +71,20 @@ int main(int argc, char** argv) try
     {
         // Load the input image.
         load_image(input_image, file.full_name());
-
-        // Draw largest objects last
-        const auto sort_instances = [](const std::vector<mmod_rect>& input) {
-            auto output = input;
-            const auto compare_area = [](const mmod_rect& lhs, const mmod_rect& rhs) {
-                return lhs.rect.area() < rhs.rect.area();
-            };
-            std::sort(output.begin(), output.end(), compare_area);
-            return output;
-        };
-
+        
         // Find instances in the input image
-        const auto instances = sort_instances(det_net(input_image));
+        const auto instances = det_net(input_image);
 
         matrix<rgb_pixel> rgb_label_image;
+        matrix<float> label_image_confidence;
+
         matrix<rgb_pixel> input_chip;
 
         rgb_label_image.set_size(input_image.nr(), input_image.nc());
         rgb_label_image = rgb_pixel(0, 0, 0);
+
+        label_image_confidence.set_size(input_image.nr(), input_image.nc());
+        label_image_confidence = 0.0;
 
         bool found_something = false;
 
@@ -131,7 +126,7 @@ int main(int argc, char** argv) try
                 rnd.get_random_8bit_number()
             );
 
-            dlib::matrix<uint16_t> resized_mask(
+            dlib::matrix<float> resized_mask(
                 static_cast<int>(chip_details.rect.height()),
                 static_cast<int>(chip_details.rect.width())
             );
@@ -142,12 +137,29 @@ int main(int argc, char** argv) try
             {
                 for (int c = 0; c < resized_mask.nc(); ++c)
                 {
-                    if (resized_mask(r, c))
+                    const auto new_confidence = resized_mask(r, c);
+                    if (new_confidence > 0)
                     {
                         const auto y = chip_details.rect.top() + r;
                         const auto x = chip_details.rect.left() + c;
                         if (y >= 0 && y < rgb_label_image.nr() && x >= 0 && x < rgb_label_image.nc())
-                            rgb_label_image(y, x) = random_color;
+                        {
+                            auto& current_confidence = label_image_confidence(y, x);
+                            if (new_confidence > current_confidence)
+                            {
+                                auto rgb_label = random_color;
+                                const auto baseline_confidence = 5;
+                                if (new_confidence < baseline_confidence)
+                                {
+                                    // Scale label intensity if confidence isn't high
+                                    rgb_label.red   *= new_confidence / baseline_confidence;
+                                    rgb_label.green *= new_confidence / baseline_confidence;
+                                    rgb_label.blue  *= new_confidence / baseline_confidence;
+                                }
+                                rgb_label_image(y, x) = rgb_label;
+                                current_confidence = new_confidence;
+                            }
+                        }
                     }
                 }
             }

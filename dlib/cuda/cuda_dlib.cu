@@ -1683,6 +1683,48 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __device__ float cuda_log1pexp(float x)
+        {
+            if (x <= -18)
+                return std::exp(x);
+            else if (-18 < x && x <= 9)
+                return std::log1p(std::exp(x));
+            else if (9 < x && x <= 16)
+                return x + std::exp(-x);
+            else
+                return x;
+        }
+
+        __global__ void _cuda_compute_loss_binary_log_per_pixel(float* loss_out, float* g, const float* truth, const float* out_data, size_t n, const float scale)
+        {
+            float loss = 0;
+            for(auto i : grid_stride_range(0, n))
+            {
+                const float y = truth[i];
+
+                if (y > 0.f)
+                {
+                    const float temp = cuda_log1pexp(-out_data[i]);
+                    loss += y*temp;
+                    g[i] = y*scale*(g[i]-1);
+                }
+                else if (y < 0.f)
+                {
+                    const float temp = -(-out_data[i]-cuda_log1pexp(-out_data[i]));
+                    loss += -y*temp;
+                    g[i] = -y*scale*g[i];
+                }
+                else
+                {
+                    g[i] = 0.f;
+                }
+            }
+
+            warp_reduce_atomic_add(*loss_out, loss);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         __device__ float cuda_safe_log(float x, float epsilon = 1e-10)
         {
             // Prevent trying to calculate the logarithm of a very small number (let alone zero)
@@ -1720,29 +1762,52 @@ namespace dlib
             warp_reduce_atomic_add(*loss_out, loss);
         }
 
+    // ----------------------------------------------------------------------------------------
 
-        void compute_loss_multiclass_log_per_pixel::
+        void compute_loss_binary_log_per_pixel::
         do_work(
-            float* loss_cuda_work_buffer,
-            const uint16_t* truth_buffer,
+            cuda_data_ptr<float> loss_work_buffer,
+            cuda_data_ptr<const float> truth_buffer,
             const tensor& subnetwork_output,
             tensor& gradient,
             double& loss
         )
         {
-            CHECK_CUDA(cudaMemset(loss_cuda_work_buffer, 0, sizeof(float)));
+            CHECK_CUDA(cudaMemset(loss_work_buffer, 0, sizeof(float)));
+            sigmoid(gradient, subnetwork_output);
+
+            // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
+            const double scale = 1.0 / (subnetwork_output.num_samples() * subnetwork_output.nr() * subnetwork_output.nc());
+
+            launch_kernel(_cuda_compute_loss_binary_log_per_pixel, max_jobs(gradient.size()),
+                loss_work_buffer.data(), gradient.device(), truth_buffer.data(), subnetwork_output.device(), gradient.size(), scale);
+
+            float floss;
+            dlib::cuda::memcpy(&floss, loss_work_buffer);
+            loss = scale*floss;
+        }
+
+        void compute_loss_multiclass_log_per_pixel::
+        do_work(
+            cuda_data_ptr<float> loss_work_buffer,
+            cuda_data_ptr<const uint16_t> truth_buffer,
+            const tensor& subnetwork_output,
+            tensor& gradient,
+            double& loss
+        )
+        {
+            CHECK_CUDA(cudaMemset(loss_work_buffer, 0, sizeof(float)));
             softmax(gradient, subnetwork_output);
             static const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
 
             // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0 / (subnetwork_output.num_samples() * subnetwork_output.nr() * subnetwork_output.nc());
 
-
             launch_kernel(_cuda_compute_loss_multiclass_log_per_pixel, max_jobs(gradient.size()),
-                loss_cuda_work_buffer, gradient.device(), truth_buffer, gradient.size(), gradient.nr()*gradient.nc(), gradient.nr()*gradient.nc()*gradient.k(), gradient.k(), label_to_ignore, scale);
+                loss_work_buffer.data(), gradient.device(), truth_buffer.data(), gradient.size(), gradient.nr()*gradient.nc(), gradient.nr()*gradient.nc()*gradient.k(), gradient.k(), label_to_ignore, scale);
 
             float floss;
-            CHECK_CUDA(cudaMemcpy(&floss, loss_cuda_work_buffer,  sizeof(float), cudaMemcpyDefault));
+            dlib::cuda::memcpy(&floss, loss_work_buffer);
             loss = scale*floss;
         }
 
