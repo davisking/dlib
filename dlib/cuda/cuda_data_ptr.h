@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <vector>
+#include <type_traits>
 
 namespace dlib
 {
@@ -203,6 +204,16 @@ namespace dlib
                 pdata = cuda_data_void_ptr(n*sizeof(T));
             }
 
+            cuda_data_ptr(
+                const cuda_data_ptr<typename std::remove_const<T>::type> &other
+            ) : num(other.num), pdata(other.pdata) {}
+            /*!
+                ensures
+                    - *this is a copy of other.  This version of the copy constructor allows
+                      assigning non-const pointers to const ones.  For instance, converting from
+                      cuda_data_ptr<float> to cuda_data_ptr<const float>.
+            !*/
+
             T* data() { return (T*)pdata.data(); }
             const T* data() const { return (T*)pdata.data(); }
 
@@ -237,6 +248,8 @@ namespace dlib
             friend cuda_data_ptr<U> static_pointer_cast(const cuda_data_void_ptr &ptr);
             template <typename U>
             friend cuda_data_ptr<U> static_pointer_cast(const cuda_data_void_ptr &ptr, size_t num);
+            template <typename U>
+            friend class cuda_data_ptr;
 
             size_t num = 0;
             cuda_data_void_ptr pdata;
