@@ -2622,8 +2622,6 @@ namespace
         constexpr int output_height = input_height;
         constexpr int output_width = input_width;
         constexpr int num_samples = 7;
-        constexpr int filter_height = 3;
-        constexpr int filter_width = 3;
 
         ::std::vector<matrix<double>> x(num_samples);
         ::std::vector<matrix<float>> y(num_samples);
