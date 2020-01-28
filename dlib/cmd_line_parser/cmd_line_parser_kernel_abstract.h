@@ -55,7 +55,7 @@ namespace dlib
                                      parameter to main() 
                 sword            ::= any suffix of a string from argv where argv is the 
                                      second parameter to main() 
-                bword            ::= This is an empty string which denotes the begining of a 
+                bword            ::= This is an empty string which denotes the beginning of a 
                                      <word>.
 
 

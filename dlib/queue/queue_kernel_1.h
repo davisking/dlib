@@ -134,7 +134,7 @@ namespace dlib
                 requires
                     - start points to a node in a singly linked list 
                     - start->last points to the next node in the list 
-                    - there are at least length nodes in the list begining with start
+                    - there are at least length nodes in the list beginning with start
                 ensures
                     - length nodes have been deleted starting with the node pointed 
                       to by start
