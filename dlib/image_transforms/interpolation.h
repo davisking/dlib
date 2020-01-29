@@ -1888,6 +1888,12 @@ namespace dlib
         }
 #endif 
 
+        // If nearest-neighbor interpolation is wanted, then don't use an image pyramid.
+        constexpr bool image_pyramid_enabled = !std::is_same<
+            std::remove_const_t<std::remove_reference_t<decltype(interp)>>,
+            interpolate_nearest_neighbor
+        >::value;
+
         pyramid_down<2> pyr;
         long max_depth = 0;
         // If the chip is supposed to be much smaller than the source subwindow then you
@@ -1902,7 +1908,7 @@ namespace dlib
             long depth = 0;
             double grow = 2;
             drectangle rect = pyr.rect_down(chip_locations[i].rect);
-            while (rect.area() > chip_locations[i].size())
+            while (rect.area() > chip_locations[i].size() && image_pyramid_enabled)
             {
                 rect = pyr.rect_down(rect);
                 ++depth;
@@ -1950,7 +1956,7 @@ namespace dlib
                 // figure out which level in the pyramid to use to extract the chip
                 int level = -1;
                 drectangle rect = translate_rect(chip_locations[i].rect, -bounding_box.tl_corner());
-                while (pyr.rect_down(rect).area() > chip_locations[i].size())
+                while (pyr.rect_down(rect).area() > chip_locations[i].size() && image_pyramid_enabled)
                 {
                     ++level;
                     rect = pyr.rect_down(rect);
