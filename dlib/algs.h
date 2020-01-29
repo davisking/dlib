@@ -977,7 +977,7 @@ namespace dlib
     /*!A wrap_function 
         
         This is a template that allows you to turn a global function into a 
-        function object.  The reason for this template's existance is so you can
+        function object.  The reason for this template's existence is so you can
         do stuff like this:
             
             template <typename T>
