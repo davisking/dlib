@@ -1890,7 +1890,7 @@ namespace dlib
 
         // If nearest-neighbor interpolation is wanted, then don't use an image pyramid.
         constexpr bool image_pyramid_enabled = !std::is_same<
-            std::remove_const_t<std::remove_reference_t<decltype(interp)>>,
+            typename std::remove_const<typename std::remove_reference<decltype(interp)>::type>::type,
             interpolate_nearest_neighbor
         >::value;
 
