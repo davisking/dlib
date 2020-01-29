@@ -375,12 +375,6 @@ if (NOT TARGET dlib)
 
          mark_as_advanced(xlib xlib_path x11_path)
       else () ##################################################################################
-         # link to the nsl library if it exists.  this is something you need sometimes 
-         find_library(nsllib nsl)
-         if (nsllib)
-            set (dlib_needed_libraries ${dlib_needed_libraries} ${nsllib})
-         endif ()
-
          # link to the socket library if it exists.  this is something you need on solaris
          find_library(socketlib socket)
          if (socketlib)
