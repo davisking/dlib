@@ -94,14 +94,6 @@ matrix:
 
     ###################
     - language: python
-      python: 2.7
-      env:
-        - VARIANT=python-api
-      script:
-        - dlib/travis/build-and-test.sh
-
-    ###################
-    - language: python
       python: 3.5
       env:
         - VARIANT=python-api
