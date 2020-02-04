@@ -153,6 +153,7 @@ if (NOT USING_OLD_VISUAL_STUDIO_COMPILER)
    add_example(dnn_semantic_segmentation_train_ex)
    add_example(dnn_instance_segmentation_train_ex)
    add_example(dnn_metric_learning_on_images_ex)
+   add_example(dnn_dcgan_ex)
 endif()
 
 
