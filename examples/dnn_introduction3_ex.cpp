@@ -130,7 +130,7 @@ int main() try
     visit_layers(net, visitor_learning_rate_multiplier(0.01));
 
     // Usually, we want to freeze the network, except for the top layers:
-    visit_layers(net.subnet().subnet(), visitor_learning_rate_multiplier(0.0001));
+    visit_layers(net.subnet().subnet(), visitor_learning_rate_multiplier(0));
 
     // However, sometimes we might want to adjust the learning rate differently thoughout the
     // network.  Here we show how to use the visit_layers_range to adjust the learning rate
