@@ -107,7 +107,7 @@ int main() try
     // automatically when leaving the scope.
     {
         // Now, let's define the classic ResNet50 network and load the pretrained model on ImageNet
-        resnet<bn_con>::l50 resnet50;
+        resnet<bn_con>::n50 resnet50;
         std::vector<string> labels;
         deserialize("resnet50_1000_imagenet_classifier.dnn") >> resnet50 >> labels;
         // For transfer learning, we are only interested in the ResNet50's backbone, which lays
@@ -124,7 +124,6 @@ int main() try
         net_type net2;
         net2.subnet().subnet() = backbone;
     }
-    cin.get();
 
     // We can use the visit_layers function to modify the learning rate of the whole network:
     visit_layers(net, visitor_learning_rate_multiplier(0.01));
@@ -135,11 +134,11 @@ int main() try
     // However, sometimes we might want to adjust the learning rate differently thoughout the
     // network.  Here we show how to use the visit_layers_range to adjust the learning rate
     // different at the different ResNet50's convolutional blocks:
-    visit_layers_range<  0,   2, decltype(net), visitor_learning_rate_multiplier>(net, visitor_learning_rate_multiplier(1));
-    visit_layers_range<  2,  38, decltype(net), visitor_learning_rate_multiplier>(net, visitor_learning_rate_multiplier(0.1));
-    visit_layers_range< 38, 107, decltype(net), visitor_learning_rate_multiplier>(net, visitor_learning_rate_multiplier(0.01));
-    visit_layers_range<107, 154, decltype(net), visitor_learning_rate_multiplier>(net, visitor_learning_rate_multiplier(0.001));
-    visit_layers_range<154, 193, decltype(net), visitor_learning_rate_multiplier>(net, visitor_learning_rate_multiplier(0.0001));
+    visit_layers_range<  0,   2>(net, visitor_learning_rate_multiplier(1));
+    visit_layers_range<  2,  38>(net, visitor_learning_rate_multiplier(0.1));
+    visit_layers_range< 38, 107>(net, visitor_learning_rate_multiplier(0.01));
+    visit_layers_range<107, 154>(net, visitor_learning_rate_multiplier(0.001));
+    visit_layers_range<154, 193>(net, visitor_learning_rate_multiplier(0.0001));
 
     // Finally, we can check the results by printing the network.  But before, if we forward
     // an image through the network, we will see tensors shape at every layer.
@@ -158,7 +157,6 @@ int main() try
 
     // We can also print the number of parameters of the network
     cout << "number of network parameters: " << count_parameters(net) << endl;
-    cin.get();
 
     // From this point on, we can finetune the new network using this pretrained backbone on another task,
     // such as the one showed in dnn_metric_learning_on_images_ex.cpp.
