@@ -51,6 +51,62 @@ namespace dlib
 
     namespace impl
     {
+        template <typename T, typename int_<decltype(&T::set_learning_rate_multiplier)>::type = 0>
+        void set_learning_rate_multiplier (
+            T& obj,
+            special_,
+            double new_learning_rate_multiplier
+        ) { obj.set_learning_rate_multiplier(new_learning_rate_multiplier); }
+
+        template <typename T>
+        void set_learning_rate_multiplier (T& , general_, double) { }
+    }
+    template <typename T>
+    void set_learning_rate_multiplier(
+        T& obj,
+        double new_learning_rate_multiplier
+    ) { impl::set_learning_rate_multiplier(obj, special_(), new_learning_rate_multiplier); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T, typename int_<decltype(&T::get_bias_learning_rate_multiplier)>::type = 0>
+        double get_bias_learning_rate_multiplier (
+            const T& obj,
+            special_
+        ) { return obj.get_bias_learning_rate_multiplier(); }
+
+        template <typename T>
+        double get_bias_learning_rate_multiplier ( const T& , general_) { return 1; }
+    }
+    template <typename T>
+    double get_bias_learning_rate_multiplier(const T& obj) { return impl::get_bias_learning_rate_multiplier(obj, special_()); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T, typename int_<decltype(&T::set_bias_learning_rate_multiplier)>::type = 0>
+        void set_bias_learning_rate_multiplier (
+            T& obj,
+            special_,
+            double new_bias_learning_rate_multiplier
+        ) { obj.set_bias_learning_rate_multiplier(new_bias_learning_rate_multiplier); }
+
+        template <typename T>
+        void set_bias_learning_rate_multiplier (T& , general_, double) { }
+    }
+    template <typename T>
+    void set_bias_learning_rate_multiplier(
+        T& obj,
+        double new_bias_learning_rate_multiplier
+    ) { impl::set_bias_learning_rate_multiplier(obj, special_(), new_bias_learning_rate_multiplier); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
         template <typename T, typename int_<decltype(&T::get_weight_decay_multiplier)>::type = 0>
         double get_weight_decay_multiplier (
             const T& obj,
@@ -62,6 +118,26 @@ namespace dlib
     }
     template <typename T>
     double get_weight_decay_multiplier(const T& obj) { return impl::get_weight_decay_multiplier(obj, special_()); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T, typename int_<decltype(&T::set_weight_decay_multiplier)>::type = 0>
+        void set_weight_decay_multiplier (
+            T& obj,
+            special_,
+            double new_weight_decay_multiplier
+        ) { obj.set_weight_decay_multiplier(new_weight_decay_multiplier); }
+
+        template <typename T>
+        void set_weight_decay_multiplier (T& , general_, double) { }
+    }
+    template <typename T>
+    void set_weight_decay_multiplier(
+        T& obj,
+        double new_weight_decay_multiplier
+    ) { impl::set_weight_decay_multiplier(obj, special_(), new_weight_decay_multiplier); }
 
 // ----------------------------------------------------------------------------------------
 

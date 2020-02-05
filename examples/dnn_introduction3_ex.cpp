@@ -39,9 +39,7 @@ namespace model
 }
 
 // Next, we define a layer visitor that will modify the learning rate of a network.
-// In particular, we have to define it for layers that implement the following methods:
-// - set_learning_rate_multiplier
-// - set_bias_learning_rate_multiplier
+// In particular, we will modify the learning rate and the bias learning rate multipliers
 class visitor_learning_rate_multiplier
 {
 public:
@@ -50,34 +48,10 @@ public:
         new_learning_rate_multiplier(new_learning_rate_multiplier_) {}
 
     template <typename T>
-    void set_learning_rate_multiplier(T&) const
+    void set_new_learning_rate_multiplier(T& l) const
     {
-        // ignore other layer detail types
-    }
-
-    // convolutional layers
-    template <long nf, long nr, long nc, int sx, int sy>
-    void set_learning_rate_multiplier(con_<nf,nr,nc,sx,sy>& l) const
-    {
-        l.set_learning_rate_multiplier(new_learning_rate_multiplier);
-        l.set_bias_learning_rate_multiplier(new_learning_rate_multiplier);
-    }
-
-    // batch normalization layers
-    template <layer_mode mode>
-    void set_learning_rate_multiplier(bn_<mode>& l) const
-    {
-        l.set_learning_rate_multiplier(new_learning_rate_multiplier);
-        l.set_bias_learning_rate_multiplier(new_learning_rate_multiplier);
-    }
-
-    // fully connected layers (with and without bias)
-    template<unsigned long num_outputs, fc_bias_mode bias_mode>
-    void set_learning_rate_multiplier(fc_<num_outputs, bias_mode>& l) const
-    {
-        l.set_learning_rate_multiplier(new_learning_rate_multiplier);
-        if (bias_mode == FC_HAS_BIAS)
-            l.set_bias_learning_rate_multiplier(new_learning_rate_multiplier);
+        set_learning_rate_multiplier(l, new_learning_rate_multiplier);
+        set_bias_learning_rate_multiplier(l, new_learning_rate_multiplier);
     }
 
     template<typename input_layer_type>
@@ -89,7 +63,7 @@ public:
     template <typename T, typename U, typename E>
     void operator()(size_t , add_layer<T,U,E>& l)  const
     {
-        set_learning_rate_multiplier(l.layer_details());
+        set_new_learning_rate_multiplier(l.layer_details());
     }
 
 private:
