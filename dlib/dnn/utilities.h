@@ -315,7 +315,6 @@ namespace dlib
             void set_new_learning_rate_multiplier(T& l) const
             {
                 set_learning_rate_multiplier(l, new_learning_rate_multiplier);
-                set_bias_learning_rate_multiplier(l, new_learning_rate_multiplier);
             }
 
             template <typename input_layer_type>
@@ -342,7 +341,7 @@ namespace dlib
         double learning_rate_multiplier
     )
     {
-        DLIB_CASSERT(learning_rate_multiplier >= 0 && learning_rate_multiplier <= 1);
+        DLIB_CASSERT(learning_rate_multiplier >= 0);
         impl::visitor_learning_rate_multiplier temp(learning_rate_multiplier);
         visit_layers(net, temp);
     }
@@ -355,7 +354,7 @@ namespace dlib
     {
         static_assert(begin <= end, "Invalid range");
         static_assert(end <= net_type::num_layers, "Invalid range");
-        DLIB_CASSERT(learning_rate_multiplier >= 0 && learning_rate_multiplier <= 1);
+        DLIB_CASSERT(learning_rate_multiplier >= 0);
         impl::visitor_learning_rate_multiplier temp(learning_rate_multiplier);
         visit_layers_range<begin, end>(net, temp);
     }

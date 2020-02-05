@@ -56,15 +56,95 @@ namespace dlib
     !*/
 
     template <typename T>
+    void set_learning_rate_multiplier(
+        T& obj,
+        double learning_rate_multiplier
+    )
+    /*!
+        ensures
+            - if (obj has a set_learning_rate_multiplier() member function) then
+                - calls obj.set_learning_rate_multiplier(learning_rate_multiplier)
+            - else
+                - does nothing
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    double get_bias_learning_rate_multiplier(
+        const T& obj
+    );
+    /*!
+        ensures
+            - returns a multiplier number.  The interpretation is that this object is
+              requesting that the learning rate used to optimize its bias parameters be
+              multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+    !*/
+
+    template <typename T>
+    void set_bias_learning_rate_multiplier(
+        T& obj,
+        double bias_learning_rate_multiplier
+    )
+    /*!
+        ensures
+            - if (obj has a set_bias_learning_rate_multiplier() member function) then
+                - calls obj.set_bias_learning_rate_multiplier(bias_learning_rate_multiplier)
+            - else
+                - does nothing
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
     double get_weight_decay_multiplier(
         const T& obj
-    ); 
+    );
     /*!
         ensures
             - if (obj has a get_weight_decay_multiplier() member function) then
                 - returns obj.get_weight_decay_multiplier()
             - else
                 - returns 1
+    !*/
+
+    template <typename T>
+    void set_weight_decay_multiplier(
+        T& obj,
+        double weight_decay_multiplier
+    );
+    /*!
+        ensures
+            - if (obj has a set_weight_decay_multiplier() member function) then
+                - calls obj.set_weight_decay_multiplier(weight_decay_multiplier)
+            - else
+                - does nothing
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    double get_bias_weight_decay_multiplier(
+        const T& obj
+    ); 
+    /*!
+        ensures
+            - returns a multiplier number.  The interpretation is that this object is
+              requesting that the weight decay used to optimize its bias parameters be
+              multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+    !*/
+
+    template <typename T>
+    void set_bias_weight_decay_multiplier(
+        T& obj,
+        double bias_weight_decay_multiplier
+    );
+    /*!
+        ensures
+            - if (obj has a set_bias_weight_decay_multiplier() member function) then
+                - calls obj.set_bias_weight_decay_multiplier(bias_weight_decay_multiplier)
+            - else
+                - does nothing
     !*/
 
 // ----------------------------------------------------------------------------------------

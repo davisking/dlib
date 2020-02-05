@@ -51,7 +51,6 @@ public:
     void set_new_weight_decay_mulitplier(T& l) const
     {
         set_weight_decay_multiplier(l, new_weight_decay_multiplier);
-        set_bias_weight_decay_multiplier(l, new_weight_decay_multiplier);
     }
 
     template<typename input_layer_type>
@@ -147,7 +146,7 @@ int main() try
        "nr:" << input.nr() << ", "
        "nc:" << input.nc() << ")" << endl;
 
-    // We can also print the number of parameters of the network
+    // We can also print the number of parameters of the network:
     cout << "number of network parameters: " << count_parameters(net) << endl;
 
     // From this point on, we can finetune the new network using this pretrained backbone
