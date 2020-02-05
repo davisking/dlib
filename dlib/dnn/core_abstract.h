@@ -76,9 +76,10 @@ namespace dlib
     );
     /*!
         ensures
-            - returns a multiplier number.  The interpretation is that this object is
-              requesting that the learning rate used to optimize its bias parameters be
-              multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+            - if (obj has a get_bias_learning_rate_multiplier() member function) then
+                - returns obj.get_bias_learning_rate_multiplier()
+            - else
+                - returns 1
     !*/
 
     template <typename T>
@@ -129,9 +130,10 @@ namespace dlib
     ); 
     /*!
         ensures
-            - returns a multiplier number.  The interpretation is that this object is
-              requesting that the weight decay used to optimize its bias parameters be
-              multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+            - if (obj has a get_bias_weight_decay_multiplier() member function) then
+                - returns obj.get_bias_weight_decay_multiplier()
+            - else
+                - returns 1
     !*/
 
     template <typename T>
