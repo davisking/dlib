@@ -143,6 +143,42 @@ namespace dlib
 
     namespace impl
     {
+        template <typename T, typename int_<decltype(&T::get_bias_weight_decay_multiplier)>::type = 0>
+        double get_bias_weight_decay_multiplier (
+            const T& obj,
+            special_
+        ) { return obj.get_bias_weight_decay_multiplier(); }
+
+        template <typename T>
+        double get_bias_weight_decay_multiplier ( const T& , general_) { return 1; }
+    }
+    template <typename T>
+    double get_bias_weight_decay_multiplier(const T& obj) { return impl::get_bias_weight_decay_multiplier(obj, special_()); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <typename T, typename int_<decltype(&T::set_bias_weight_decay_multiplier)>::type = 0>
+        void set_bias_weight_decay_multiplier (
+            T& obj,
+            special_,
+            double new_bias_weight_decay_multiplier
+        ) { obj.set_bias_weight_decay_multiplier(new_bias_weight_decay_multiplier); }
+
+        template <typename T>
+        void set_bias_weight_decay_multiplier (T& , general_, double) { }
+    }
+    template <typename T>
+    void set_bias_weight_decay_multiplier(
+        T& obj,
+        double new_bias_weight_decay_multiplier
+    ) { impl::set_bias_weight_decay_multiplier(obj, special_(), new_bias_weight_decay_multiplier); }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
         // The reason we return an int for this version rather than doing the more straight forward thing (like we do above) is to avoid a bug in visual studio 2015.
         template <typename T>
         auto call_clean_method_if_exists (
