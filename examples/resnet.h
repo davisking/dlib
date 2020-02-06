@@ -7,7 +7,7 @@
 template<template<typename> class BATCHNORM>
 struct resnet
 {
-    // the resnet basic block, where REG is bn_con or affine
+    // the resnet basic block, where BN is bn_con or affine
     template<long num_filters, template<typename> class BN, int stride, typename SUBNET>
     using basicblock = BN<dlib::con<num_filters, 3, 3, 1, 1,
                   dlib::relu<BN<dlib::con<num_filters, 3, 3, stride, stride, SUBNET>>>>>;

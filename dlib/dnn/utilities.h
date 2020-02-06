@@ -309,7 +309,7 @@ namespace dlib
         {
         public:
             visitor_learning_rate_multiplier(double new_learning_rate_multiplier_) :
-                new_learning_rate_multiplier(new_learning_rate_multiplier_) { }
+                new_learning_rate_multiplier(new_learning_rate_multiplier_) {}
 
             template <typename T>
             void set_new_learning_rate_multiplier(T& l) const
