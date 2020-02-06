@@ -61,6 +61,8 @@ namespace dlib
         double learning_rate_multiplier
     )
     /*!
+        requires
+            - learning_rate_multiplier >= 0
         ensures
             - if (obj has a set_learning_rate_multiplier() member function) then
                 - calls obj.set_learning_rate_multiplier(learning_rate_multiplier)
@@ -88,6 +90,8 @@ namespace dlib
         double bias_learning_rate_multiplier
     )
     /*!
+        requires
+            - bias_learning_rate_multiplier >= 0
         ensures
             - if (obj has a set_bias_learning_rate_multiplier() member function) then
                 - calls obj.set_bias_learning_rate_multiplier(bias_learning_rate_multiplier)
@@ -115,6 +119,8 @@ namespace dlib
         double weight_decay_multiplier
     );
     /*!
+        requires
+            - weight_decay_multiplier >= 0
         ensures
             - if (obj has a set_weight_decay_multiplier() member function) then
                 - calls obj.set_weight_decay_multiplier(weight_decay_multiplier)
@@ -142,6 +148,8 @@ namespace dlib
         double bias_weight_decay_multiplier
     );
     /*!
+        requires:
+            - bias_weight_decay_multiplier >= 0
         ensures
             - if (obj has a set_bias_weight_decay_multiplier() member function) then
                 - calls obj.set_bias_weight_decay_multiplier(bias_weight_decay_multiplier)

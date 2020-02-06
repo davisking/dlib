@@ -63,7 +63,11 @@ namespace dlib
     void set_learning_rate_multiplier(
         T& obj,
         double learning_rate_multiplier
-    ) { impl::set_learning_rate_multiplier(obj, special_(), learning_rate_multiplier); }
+    )
+    {
+        DLIB_CASSERT(learning_rate_multiplier >= 0);
+        impl::set_learning_rate_multiplier(obj, special_(), learning_rate_multiplier);
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -97,7 +101,11 @@ namespace dlib
     void set_bias_learning_rate_multiplier(
         T& obj,
         double bias_learning_rate_multiplier
-    ) { impl::set_bias_learning_rate_multiplier(obj, special_(), bias_learning_rate_multiplier); }
+    )
+    {
+        DLIB_CASSERT(bias_learning_rate_multiplier >= 0);
+        impl::set_bias_learning_rate_multiplier(obj, special_(), bias_learning_rate_multiplier);
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -131,7 +139,11 @@ namespace dlib
     void set_weight_decay_multiplier(
         T& obj,
         double weight_decay_multiplier
-    ) { impl::set_weight_decay_multiplier(obj, special_(), weight_decay_multiplier); }
+    )
+    {
+        DLIB_CASSERT(weight_decay_multiplier >= 0);
+        impl::set_weight_decay_multiplier(obj, special_(), weight_decay_multiplier);
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -165,7 +177,11 @@ namespace dlib
     void set_bias_weight_decay_multiplier(
         T& obj,
         double bias_weight_decay_multiplier
-    ) { impl::set_bias_weight_decay_multiplier(obj, special_(), bias_weight_decay_multiplier); }
+    )
+    {
+        DLIB_CASSERT(bias_weight_decay_multiplier >= 0);
+        impl::set_bias_weight_decay_multiplier(obj, special_(), bias_weight_decay_multiplier);
+    }
 
 // ----------------------------------------------------------------------------------------
 
