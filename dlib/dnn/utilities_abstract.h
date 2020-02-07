@@ -134,6 +134,42 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
+
+    template<typename net_type>
+    void set_all_learning_rate_multipliers(
+        net_type& net,
+        double learning_rate_multiplier
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - learning_rate_multiplier >= 0
+        ensures
+            - Sets all learning_rate_multipliers and bias_learning_rate_multipliers in net
+              to learning_rate_multiplier.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <size_t begin, size_t end, typename net_type>
+    void set_learning_rate_multipliers_range(
+        net_type& net,
+        double learning_rate_multiplier
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - learning_rate_multiplier >= 0
+            - begin <= end <= net_type::num_layers
+        ensures
+            - Loops over the layers in the range [begin,end) in net and calls
+              set_learning_rate_multiplier on them with the value of
+              learning_rate_multiplier.
+    !*/
+
+// ----------------------------------------------------------------------------------------
 }
 
 #endif // DLIB_DNn_UTILITIES_ABSTRACT_H_ 
