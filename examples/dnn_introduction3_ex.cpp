@@ -47,12 +47,6 @@ public:
     visitor_weight_decay_multiplier(double new_weight_decay_multiplier_) :
         new_weight_decay_multiplier(new_weight_decay_multiplier_) {}
 
-    template <typename T>
-    void set_new_weight_decay_mulitplier(T& l) const
-    {
-        set_weight_decay_multiplier(l, new_weight_decay_multiplier);
-    }
-
     template<typename input_layer_type>
     void operator()(size_t , input_layer_type& )  const
     {
@@ -62,7 +56,7 @@ public:
     template <typename T, typename U, typename E>
     void operator()(size_t , add_layer<T,U,E>& l)  const
     {
-        set_new_weight_decay_mulitplier(l.layer_details());
+        set_weight_decay_multiplier(l.layer_details(), new_weight_decay_multiplier);
     }
 
 private:

@@ -311,12 +311,6 @@ namespace dlib
             visitor_learning_rate_multiplier(double new_learning_rate_multiplier_) :
                 new_learning_rate_multiplier(new_learning_rate_multiplier_) {}
 
-            template <typename T>
-            void set_new_learning_rate_multiplier(T& l) const
-            {
-                set_learning_rate_multiplier(l, new_learning_rate_multiplier);
-            }
-
             template <typename input_layer_type>
             void operator()(size_t , input_layer_type& ) const
             {
@@ -326,7 +320,7 @@ namespace dlib
             template <typename T, typename U, typename E>
             void operator()(size_t , add_layer<T,U,E>& l) const
             {
-                set_new_learning_rate_multiplier(l.layer_details());
+                set_learning_rate_multiplier(l.layer_details(), new_learning_rate_multiplier);
             }
                 
         private:

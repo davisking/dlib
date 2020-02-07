@@ -59,7 +59,7 @@ namespace dlib
     void set_learning_rate_multiplier(
         T& obj,
         double learning_rate_multiplier
-    )
+    );
     /*!
         requires
             - learning_rate_multiplier >= 0
@@ -88,7 +88,7 @@ namespace dlib
     void set_bias_learning_rate_multiplier(
         T& obj,
         double bias_learning_rate_multiplier
-    )
+    );
     /*!
         requires
             - bias_learning_rate_multiplier >= 0
