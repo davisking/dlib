@@ -7065,25 +7065,9 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void image_display::
-    on_wheel_up (
-        unsigned long state
+    zoom_in (
     )
     {
-        // disable mouse wheel if the user is drawing a rectangle
-        if (drawing_rect)
-            return;
-
-        // if CONTROL is not being held down
-        if ((state & base_window::CONTROL) == 0)
-        {
-            scrollable_region::on_wheel_up(state);
-            return;
-        }
-
-        if (rect.contains(lastx,lasty) == false || hidden || !enabled)
-            return;
-
-
         if (zoom_in_scale < 100 && zoom_out_scale == 1)
         {
             const point mouse_loc(lastx, lasty);
@@ -7119,7 +7103,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     void image_display::
-    on_wheel_down (
+    on_wheel_up (
         unsigned long state
     )
     {
@@ -7130,14 +7114,22 @@ namespace dlib
         // if CONTROL is not being held down
         if ((state & base_window::CONTROL) == 0)
         {
-            scrollable_region::on_wheel_down(state);
+            scrollable_region::on_wheel_up(state);
             return;
         }
 
         if (rect.contains(lastx,lasty) == false || hidden || !enabled)
             return;
 
+        zoom_in();
+    }
 
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    zoom_out (
+    )
+    {
         if (zoom_in_scale != 1)
         {
             const point mouse_loc(lastx, lasty);
@@ -7168,6 +7160,30 @@ namespace dlib
             const point delta = total_rect().tl_corner() - (mouse_loc - pix_loc/zoom_out_scale);
             scroll_to_rect(translate_rect(display_rect(), delta)); 
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void image_display::
+    on_wheel_down (
+        unsigned long state
+    )
+    {
+        // disable mouse wheel if the user is drawing a rectangle
+        if (drawing_rect)
+            return;
+
+        // if CONTROL is not being held down
+        if ((state & base_window::CONTROL) == 0)
+        {
+            scrollable_region::on_wheel_down(state);
+            return;
+        }
+
+        if (rect.contains(lastx,lasty) == false || hidden || !enabled)
+            return;
+
+        zoom_out();
     }
 
 // ----------------------------------------------------------------------------------------
