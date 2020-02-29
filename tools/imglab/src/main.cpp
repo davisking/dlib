@@ -588,7 +588,7 @@ int main(int argc, char** argv)
                                         "The parts are instead simply mirrored to the flipped dataset.", 1);
         parser.add_option("rotate", "Read an XML image dataset and output a copy that is rotated counter clockwise by <arg> degrees. "
                                   "The output is saved to an XML file prefixed with rotated_<arg>.",1);
-        parser.add_option("cluster", "Cluster all the objects in an XML file into <arg> different clusters and save "
+        parser.add_option("cluster", "Cluster all the objects in an XML file into <arg> different clusters (pass 0 to find automatically) and save "
                                      "the results as cluster_###.xml and cluster_###.jpg files.",1);
         parser.add_option("ignore", "Mark boxes labeled as <arg> as ignored.  The resulting XML file is output as a separate file and the original is not modified.",1);
         parser.add_option("rmlabel","Remove all boxes labeled <arg> and save the results to a new XML file.",1);
@@ -704,7 +704,7 @@ int main(int argc, char** argv)
         parser.check_incompatible_options("box-images", "ignore");
         const char* convert_args[] = {"pascal-xml","pascal-v1","idl"};
         parser.check_option_arg_range("convert", convert_args);
-        parser.check_option_arg_range("cluster", 2, 999);
+        parser.check_option_arg_range("cluster", 0, 999);
         parser.check_option_arg_range("rotate", -360, 360);
         parser.check_option_arg_range("size", 10*10, 1000*1000);
         parser.check_option_arg_range("min-object-size", 1, 10000*10000);

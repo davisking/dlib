@@ -3493,6 +3493,12 @@ namespace dlib
         bool overlay_editing_is_enabled (
         ) const { auto_mutex M(m); return overlay_editing_enabled; }
 
+        void zoom_in (
+        );
+
+        void zoom_out (
+        );
+
     private:
 
         void draw (

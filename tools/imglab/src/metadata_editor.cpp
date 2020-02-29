@@ -343,6 +343,16 @@ on_keydown (
             last_keyboard_jump_pos_update = 0;
         }
 
+        if (key == '=')
+        {
+            display.zoom_in();
+        }
+
+        if (key == '-')
+        {
+            display.zoom_out();
+        }
+
         if (key == 'd' && (state&base_window::KBD_MOD_ALT))
         {
             remove_selected_images();
