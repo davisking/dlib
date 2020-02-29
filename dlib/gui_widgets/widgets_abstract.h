@@ -2732,6 +2732,20 @@ namespace dlib
                   If it returns false then the overlay is not user editable.
         !*/
 
+        void zoom_in (
+        );
+        /*!
+            ensures
+                - performs a zoom in as if the user tried to zoom by scrolling the mouse wheel.
+        !*/
+
+        void zoom_out (
+        );
+        /*!
+            ensures
+                - performs a zoom out as if the user tried to zoom by scrolling the mouse wheel.
+        !*/
+
         template <
             typename T
             >

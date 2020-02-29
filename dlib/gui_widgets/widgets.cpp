@@ -7068,6 +7068,7 @@ namespace dlib
     zoom_in (
     )
     {
+        auto_mutex M(m); 
         if (zoom_in_scale < 100 && zoom_out_scale == 1)
         {
             const point mouse_loc(lastx, lasty);
@@ -7130,6 +7131,7 @@ namespace dlib
     zoom_out (
     )
     {
+        auto_mutex M(m); 
         if (zoom_in_scale != 1)
         {
             const point mouse_loc(lastx, lasty);

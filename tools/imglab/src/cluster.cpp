@@ -41,19 +41,13 @@ std::vector<assignment> angular_cluster (
     }
 
     // find the centroid of feats
-    matrix<double,0,1> m;
-    for (unsigned long i = 0; i < feats.size(); ++i)
-        m += feats[i];
-    m /= feats.size();
+    const matrix<double,0,1> m = mean(mat(feats));
 
     // Now center feats and then project onto the unit sphere.  The reason for projecting
     // onto the unit sphere is so pick_initial_centers() works in a sensible way.
-    for (unsigned long i = 0; i < feats.size(); ++i)
+    for (auto& f : feats) 
     {
-        feats[i] -= m;
-        double len = length(feats[i]);
-        if (len != 0)
-            feats[i] /= len;
+        f = normalize(f-m);
     }
 
     // now do angular clustering of the points
@@ -78,20 +72,23 @@ std::vector<assignment> chinese_cluster (
     unsigned long &num_clusters
     )
 {
-    // try to find a good value to select if we should add a vertex in the graph
-    matrix<double,0,1> m;
-    for (unsigned long i = 0; i < feats.size(); ++i)
-        m += feats[i];
-    m /= feats.size();
-
+    DLIB_CASSERT(feats.size() != 0, "The dataset can't be empty");
     for (unsigned long i = 0; i < feats.size(); ++i)
     {
-        feats[i] -= m;
-        double len = length(feats[i]);
-        if (len != 0)
-            feats[i] /= len;
+        DLIB_CASSERT(feats[i].size() == feats[0].size(), "All feature vectors must have the same length.");
     }
 
+    // Try to find a good value to select if we should add a vertex in the graph.  First we
+    // normalize the features.
+    const matrix<double,0,1> m = mean(mat(feats));
+
+    for (auto& f : feats) 
+    {
+        f = normalize(f-m);
+    }
+
+    // Then we find the average distance between them, that average will be a good threshold to
+    // decide if pairs are connected.
     running_stats<double> rs;
     for (size_t i = 0; i < feats.size(); ++i) {
         for (size_t j = i; j < feats.size(); ++j) {
