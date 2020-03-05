@@ -3,68 +3,57 @@
 
 #include <dlib/dnn.h>
 
-// BATCHNORM must be bn_con or affine layer
-template<template<typename> class BATCHNORM>
+// ResNet model, where BN is bn_con or affine layer
+template<template<typename> class BN>
 struct resnet
 {
     // the resnet basic block, where BN is bn_con or affine
-    template<long num_filters, template<typename> class BN, int stride, typename SUBNET>
+    template<long num_filters, int stride, typename SUBNET>
     using basicblock = BN<dlib::con<num_filters, 3, 3, 1, 1,
-                  dlib::relu<BN<dlib::con<num_filters, 3, 3, stride, stride, SUBNET>>>>>;
+            dlib::relu<BN<dlib::con<num_filters, 3, 3, stride, stride, SUBNET>>>>>;
 
     // the resnet bottleneck block
-    template<long num_filters, template<typename> class BN, int stride, typename SUBNET>
+    template<long num_filters, int stride, typename SUBNET>
     using bottleneck = BN<dlib::con<4 * num_filters, 1, 1, 1, 1,
-                  dlib::relu<BN<dlib::con<num_filters, 3, 3, stride, stride,
-                  dlib::relu<BN<dlib::con<num_filters, 1, 1, 1, 1, SUBNET>>>>>>>>;
+            dlib::relu<BN<dlib::con<num_filters, 3, 3, stride, stride,
+            dlib::relu<BN<dlib::con<num_filters, 1, 1, 1, 1, SUBNET>>>>>>>>;
 
-    // the resnet residual
-    template<
-        template<long, template<typename> class, int, typename> class BLOCK, // basicblock or bottleneck
-        long num_filters,
-        template<typename> class BN, // bn_con or affine
-        typename SUBNET
-    > // adds the block to the result of tag1 (the subnet)
-    using residual = dlib::add_prev1<BLOCK<num_filters, BN, 1, dlib::tag1<SUBNET>>>;
+    // the resnet residual, where BLOCK is either basicblock or bottleneck
+    template<template<long, int, typename> class BLOCK, long num_filters, typename SUBNET>
+    using residual = dlib::add_prev1<BLOCK<num_filters, 1, dlib::tag1<SUBNET>>>;
 
     // a resnet residual that does subsampling on both paths
-    template<
-        template<long, template<typename> class, int, typename> class BLOCK, // basicblock or bottleneck
-        long num_filters,
-        template<typename> class BN, // bn_con or affine
-        typename SUBNET
-    >
+    template<template<long, int, typename> class BLOCK, long num_filters, typename SUBNET>
     using residual_down = dlib::add_prev2<dlib::avg_pool<2, 2, 2, 2,
-                          dlib::skip1<dlib::tag2<BLOCK<num_filters, BN, 2,
+                          dlib::skip1<dlib::tag2<BLOCK<num_filters, 2,
                           dlib::tag1<SUBNET>>>>>>;
 
-    // residual block with optional downsampling and custom regularization (bn_con or affine)
+    // residual block with optional downsampling
     template<
-        template<template<long, template<typename> class, int, typename> class, long, template<typename>class, typename> class RESIDUAL,
-        template<long, template<typename> class, int, typename> class BLOCK,
+        template<template<long, int, typename> class, long, typename> class RESIDUAL,
+        template<long, int, typename> class BLOCK,
         long num_filters,
-        template<typename> class BN, // bn_con or affine
         typename SUBNET
     >
-    using residual_block = dlib::relu<RESIDUAL<BLOCK, num_filters, BN, SUBNET>>;
+    using residual_block = dlib::relu<RESIDUAL<BLOCK, num_filters, SUBNET>>;
 
     template<long num_filters, typename SUBNET>
-    using resbasicblock_down = residual_block<residual_down, basicblock, num_filters, BATCHNORM, SUBNET>;
+    using resbasicblock_down = residual_block<residual_down, basicblock, num_filters, SUBNET>;
     template<long num_filters, typename SUBNET>
-    using resbottleneck_down = residual_block<residual_down, bottleneck, num_filters, BATCHNORM, SUBNET>;
+    using resbottleneck_down = residual_block<residual_down, bottleneck, num_filters, SUBNET>;
 
     // some definitions to allow the use of the repeat layer
-    template<typename SUBNET> using resbasicblock_512 = residual_block<residual, basicblock, 512, BATCHNORM, SUBNET>;
-    template<typename SUBNET> using resbasicblock_256 = residual_block<residual, basicblock, 256, BATCHNORM, SUBNET>;
-    template<typename SUBNET> using resbasicblock_128 = residual_block<residual, basicblock, 128, BATCHNORM, SUBNET>;
-    template<typename SUBNET> using resbasicblock_64  = residual_block<residual, basicblock,  64, BATCHNORM, SUBNET>;
-    template<typename SUBNET> using resbottleneck_512 = residual_block<residual, bottleneck, 512, BATCHNORM, SUBNET>;
-    template<typename SUBNET> using resbottleneck_256 = residual_block<residual, bottleneck, 256, BATCHNORM, SUBNET>;
-    template<typename SUBNET> using resbottleneck_128 = residual_block<residual, bottleneck, 128, BATCHNORM, SUBNET>;
-    template<typename SUBNET> using resbottleneck_64  = residual_block<residual, bottleneck,  64, BATCHNORM, SUBNET>;
+    template<typename SUBNET> using resbasicblock_512 = residual_block<residual, basicblock, 512, SUBNET>;
+    template<typename SUBNET> using resbasicblock_256 = residual_block<residual, basicblock, 256, SUBNET>;
+    template<typename SUBNET> using resbasicblock_128 = residual_block<residual, basicblock, 128, SUBNET>;
+    template<typename SUBNET> using resbasicblock_64  = residual_block<residual, basicblock,  64, SUBNET>;
+    template<typename SUBNET> using resbottleneck_512 = residual_block<residual, bottleneck, 512, SUBNET>;
+    template<typename SUBNET> using resbottleneck_256 = residual_block<residual, bottleneck, 256, SUBNET>;
+    template<typename SUBNET> using resbottleneck_128 = residual_block<residual, bottleneck, 128, SUBNET>;
+    template<typename SUBNET> using resbottleneck_64  = residual_block<residual, bottleneck,  64, SUBNET>;
 
     // common processing for standard resnet inputs
-    template<template<typename> class BN, typename INPUT>
+    template<typename INPUT>
     using input_processing = dlib::max_pool<3, 3, 2, 2, dlib::relu<BN<dlib::con<64, 7, 7, 2, 2, INPUT>>>>;
 
     // the resnet backbone with basicblocks
@@ -73,7 +62,7 @@ struct resnet
         dlib::repeat<nb_512, resbasicblock_512, resbasicblock_down<512,
         dlib::repeat<nb_256, resbasicblock_256, resbasicblock_down<256,
         dlib::repeat<nb_128, resbasicblock_128, resbasicblock_down<128,
-        dlib::repeat<nb_64,  resbasicblock_64, input_processing<BATCHNORM, INPUT>>>>>>>>;
+        dlib::repeat<nb_64,  resbasicblock_64, input_processing<INPUT>>>>>>>>;
 
     // the resnet backbone with bottlenecks
     template<long nb_512, long nb_256, long nb_128, long nb_64, typename INPUT>
@@ -81,7 +70,7 @@ struct resnet
         dlib::repeat<nb_512, resbottleneck_512, resbottleneck_down<512,
         dlib::repeat<nb_256, resbottleneck_256, resbottleneck_down<256,
         dlib::repeat<nb_128, resbottleneck_128, resbottleneck_down<128,
-        dlib::repeat<nb_64,  resbottleneck_64, input_processing<BATCHNORM, INPUT>>>>>>>>;
+        dlib::repeat<nb_64,  resbottleneck_64, input_processing<INPUT>>>>>>>>;
 
     // the backbones for the classic architectures
     template<typename INPUT> using backbone_18  = backbone_basicblock<1, 1, 1, 2, INPUT>;
