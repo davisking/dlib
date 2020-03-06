@@ -96,11 +96,11 @@ namespace resnet
     using train_101 = impl<bn_con>::n101;
     using train_152 = impl<bn_con>::n152;
 
-    using infer_train_18 = impl<affine>::n18;
-    using infer_train_34 = impl<affine>::n34;
-    using infer_train_50 = impl<affine>::n50;
-    using infer_train_101 = impl<affine>::n101;
-    using infer_train_152 = impl<affine>::n152;
+    using infer_18 = impl<affine>::n18;
+    using infer_34 = impl<affine>::n34;
+    using infer_50 = impl<affine>::n50;
+    using infer_101 = impl<affine>::n101;
+    using infer_152 = impl<affine>::n152;
 }
 
 #endif // ResNet_H
