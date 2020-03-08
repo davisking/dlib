@@ -8,7 +8,7 @@ namespace resnet
     using namespace dlib;
     // BN is bn_con or affine layer
     template<template<typename> class BN>
-    struct impl
+    struct def
     {
         // the resnet basic block, where BN is bn_con or affine
         template<long num_filters, int stride, typename SUBNET>
@@ -90,17 +90,17 @@ namespace resnet
         using n152 = loss_multiclass_log<fc<1000, avg_pool_everything<backbone_152<input_rgb_image>>>>;
     };
 
-    using train_18 = impl<bn_con>::n18;
-    using train_34 = impl<bn_con>::n34;
-    using train_50 = impl<bn_con>::n50;
-    using train_101 = impl<bn_con>::n101;
-    using train_152 = impl<bn_con>::n152;
+    using train_18 = def<bn_con>::n18;
+    using train_34 = def<bn_con>::n34;
+    using train_50 = def<bn_con>::n50;
+    using train_101 = def<bn_con>::n101;
+    using train_152 = def<bn_con>::n152;
 
-    using infer_18 = impl<affine>::n18;
-    using infer_34 = impl<affine>::n34;
-    using infer_50 = impl<affine>::n50;
-    using infer_101 = impl<affine>::n101;
-    using infer_152 = impl<affine>::n152;
+    using infer_18 = def<affine>::n18;
+    using infer_34 = def<affine>::n34;
+    using infer_50 = def<affine>::n50;
+    using infer_101 = def<affine>::n101;
+    using infer_152 = def<affine>::n152;
 }
 
 #endif // ResNet_H

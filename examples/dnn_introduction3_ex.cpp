@@ -29,7 +29,7 @@ namespace model
     using net_type = loss_metric<
         fc_no_bias<128,
         avg_pool_everything<
-        typename resnet::impl<BN>::template backbone_50<
+        typename resnet::def<BN>::template backbone_50<
         input_rgb_image
         >>>>;
 
