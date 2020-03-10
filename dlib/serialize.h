@@ -1722,7 +1722,7 @@ namespace dlib
             throw dlib::serialization_error("Error while serializing a Google Protocol Buffer object, message too large.");
 
         // write temp to the output stream
-        uint32 size = temp.size();
+        uint32 size = static_cast<uint32>(temp.size());
         bo.host_to_little(size);
         out.write((char*)&size, sizeof(size));
         out.write(temp.c_str(), temp.size());
