@@ -29,7 +29,7 @@ namespace model
     using net_type = loss_metric<
         fc_no_bias<128,
         avg_pool_everything<
-        typename resnet<BN>::template backbone_50<
+        typename resnet::def<BN>::template backbone_50<
         input_rgb_image
         >>>>;
 
@@ -75,7 +75,7 @@ int main() try
     {
         // Now, let's define the classic ResNet50 network and load the pretrained model on
         // ImageNet.
-        resnet<bn_con>::n50 resnet50;
+        resnet::train_50 resnet50;
         std::vector<string> labels;
         deserialize("resnet50_1000_imagenet_classifier.dnn") >> resnet50 >> labels;
 
