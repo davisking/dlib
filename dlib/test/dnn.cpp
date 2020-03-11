@@ -598,6 +598,20 @@ namespace
         }
 
         {
+            const int nr = 5;
+            const int nc = 6;
+            tensor_rand rnd;
+            resizable_tensor out1(nr,nc), m(nr,nc), v(nc), out2;
+            rnd.fill_uniform(out1);
+            rnd.fill_uniform(m);
+            rnd.fill_uniform(v);
+
+            tt::scale_columns(out1, m, v);
+            out2 = scale_columns(mat(m), mat(v));
+            DLIB_TEST(max(abs(mat(out1)-mat(out2))) < 1e-6);
+        }
+
+        {
             resizable_tensor A, B;
             A.set_size(11);
             B.copy_size(A);

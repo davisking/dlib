@@ -102,7 +102,6 @@ namespace dlib { namespace tt
 #ifdef DLIB_USE_CUDA
         cuda::scale_columns(out, m, v);
 #else
-        DLIB_CASSERT(false, "shouldn't be called right now");
         out = scale_columns(mat(m), mat(v));
 #endif
     }
