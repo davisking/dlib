@@ -3226,6 +3226,83 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_loss_multiclass_weighted()
+    {
+
+        print_spinner();
+
+        constexpr int input_height = 5;
+        constexpr int input_width = 7;
+        const size_t num_samples = 1000;
+        const size_t num_classes = 4;
+
+        ::std::vector<matrix<double>> x(num_samples);
+        ::std::vector<unsigned long> y(num_samples);
+
+        matrix<double> xtmp(input_height, input_width);
+
+        dlib::rand rnd;
+        // Generate input data
+        for (size_t ii = 0; ii < num_samples; ++ii)
+        {
+            for (int jj = 0; jj < input_height; ++jj)
+            {
+                for (int kk = 0; kk < input_width; ++kk)
+                {
+                    xtmp(jj, kk) = rnd.get_random_float();
+                }
+            }
+            x[ii] = xtmp;
+            y[ii] = rnd.get_integer_in_range(0, num_classes);
+        }
+
+        using net_type = loss_multiclass_log_weighted<fc<num_classes, input<matrix<double>>>>;
+        using weighted_label = loss_multiclass_log_weighted_::weighted_label;
+
+        ::std::vector<weighted_label> y_weighted(num_samples);
+
+        for (size_t weighted_class = 0; weighted_class < num_classes; ++weighted_class)
+        {
+
+            print_spinner();
+
+            // Assign weights
+            for (size_t ii = 0; ii < num_samples; ++ii)
+            {
+                const unsigned long label = y[ii];
+                const float weight
+                    = label == weighted_class
+                    ? 1.4f
+                    : 0.6f;
+                y_weighted[ii] = weighted_label(label, weight);
+            }
+
+            net_type net;
+            sgd defsolver(0, 0.9);
+            dnn_trainer<net_type> trainer(net, defsolver);
+            trainer.set_learning_rate(0.1);
+            trainer.set_min_learning_rate(0.01);
+            trainer.set_mini_batch_size(10);
+            trainer.set_max_num_epochs(10);
+            trainer.train(x, y_weighted);
+
+            const ::std::vector<unsigned long> predictions = net(x);
+
+            int num_weighted_class = 0;
+            int num_not_weighted_class = 0;
+
+            for (size_t ii = 0; ii < num_samples; ++ii)
+            {
+                if (predictions[ii] == weighted_class)
+                    ++num_weighted_class;
+                else
+                    ++num_not_weighted_class;
+            }
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_tensor_resize_bilinear(long samps, long k, long nr, long nc,  long onr, long onc)
     {
         resizable_tensor img(samps,k,nr,nc);
@@ -3645,6 +3722,7 @@ namespace
             test_loss_multiclass_per_pixel_outputs_on_trivial_task();
             test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
             test_loss_multiclass_per_pixel_weighted();
+            test_loss_multiclass_weighted();
             test_serialization();
             test_loss_dot();
             test_loss_multimulticlass_log();
