@@ -369,6 +369,137 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class loss_multiclass_log_weighted_ 
+    {
+    public:
+
+        struct weighted_label
+        {
+            weighted_label()
+            {}
+
+            weighted_label(unsigned long label, float weight = 1.f)
+                : label(label), weight(weight)
+            {}
+
+            unsigned long label = 0;
+            float weight = 1.f;
+        };
+
+        typedef weighted_label training_label_type;
+        typedef unsigned long output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1 );
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+
+            // Note that output_tensor.k() should match the number of labels.
+
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                // The index of the largest output for this sample is the label.
+                *iter++ = index_of_max(rowm(mat(output_tensor),i));
+            }
+        }
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples()%sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.nr() == 1 &&
+                         output_tensor.nc() == 1);
+            DLIB_CASSERT(grad.nr() == 1 &&
+                         grad.nc() == 1);
+
+            tt::softmax(grad, output_tensor);
+
+            // The loss we output is the average loss over the mini-batch.
+            const double scale = 1.0/output_tensor.num_samples();
+            double loss = 0;
+            float* g = grad.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                const weighted_label wl = (weighted_label)*truth++;
+                const long y = wl.label;
+                const float weight = wl.weight;
+                // The network must produce a number of outputs that is equal to the number
+                // of labels when using this type of loss.
+                DLIB_CASSERT(y < output_tensor.k(), "y: " << y << ", output_tensor.k(): " << output_tensor.k());
+                for (long k = 0; k < output_tensor.k(); ++k)
+                {
+                    const unsigned long idx = i*output_tensor.k()+k;
+                    if (k == y)
+                    {
+                        loss += weight*scale*-safe_log(g[idx]);
+                        g[idx] =weight*scale*(g[idx]-1);
+                    }
+                    else
+                    {
+                        g[idx] = weight*scale*g[idx];
+                    }
+                }
+            }
+            return loss;
+        }
+
+        friend void serialize(const loss_multiclass_log_weighted_& , std::ostream& out)
+        {
+            serialize("loss_multiclass_log_weighted_", out);
+        }
+
+        friend void deserialize(loss_multiclass_log_weighted_& , std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_multiclass_log_weighted_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_multiclass_log_weighted_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_multiclass_log_weighted_& )
+        {
+            out << "loss_multiclass_log_weighted";
+            return out;
+        }
+
+        friend void to_xml(const loss_multiclass_log_weighted_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_multiclass_log_weighted/>";
+        }
+
+    };
+
+    template <typename SUBNET>
+    using loss_multiclass_log_weighted = add_loss_layer<loss_multiclass_log_weighted_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class loss_multimulticlass_log_ 
     {
 
