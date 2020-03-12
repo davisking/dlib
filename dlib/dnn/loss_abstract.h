@@ -371,7 +371,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_multiclass_log_weighted 
+    class loss_multiclass_log_weighted_
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
