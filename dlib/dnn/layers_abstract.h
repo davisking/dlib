@@ -1631,7 +1631,7 @@ namespace dlib
                 where all operations are performed element wise and each sample in the
                 INPUT tensor is processed separately.
 
-                Moreover, this object has two modes that effect the dimensionalities of A
+                Moreover, this object has two modes that affect the dimensionalities of A
                 and B and how they are applied to compute A*INPUT+B.  If
                 get_mode()==FC_MODE then A and B each have the same dimensionality as the
                 input tensor, except their num_samples() dimensions are 1.  If
