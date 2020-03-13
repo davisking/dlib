@@ -267,7 +267,7 @@ namespace dlib
     )
     {
         std::ostringstream sout;
-        sout << std::setw(width) << std::setfill('0') << i;
+        sout << std::setw(static_cast<int>(std::min(width,static_cast<unsigned long>(std::numeric_limits<int>::max())))) << std::setfill('0') << i;
         return sout.str();
     }
 
