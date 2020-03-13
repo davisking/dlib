@@ -40,6 +40,19 @@ namespace dlib
             fun();
             prom.set_value();
         }
+
+        template <typename> struct result_of;
+
+#if (__cplusplus >= 201703L ||                          \
+     (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)) && \
+    __cpp_lib_is_invocable >= 201703L
+        template <typename F, typename... Args>
+        struct result_of<F(Args...)> : std::invoke_result<F, Args...> {};
+#else
+        template <typename F, typename... Args>
+        struct result_of<F(Args...)>
+                : std::result_of<F&&(Args&&...)> {};
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -52,21 +65,21 @@ namespace dlib
         typename Function, 
         typename ...Args
         >
-    std::future<typename std::result_of<Function(Args...)>::type> async(
+    std::future<typename impl::result_of<Function(Args...)>::type> async(
         thread_pool& tp, 
         Function&& f, 
         Args&&... args 
     )
     {
-        auto prom = std::make_shared<std::promise<typename std::result_of<Function(Args...)>::type>>();
-        std::future<typename std::result_of<Function(Args...)>::type> ret = prom->get_future();
+        auto prom = std::make_shared<std::promise<typename impl::result_of<Function(Args...)>::type>>();
+        std::future<typename impl::result_of<Function(Args...)>::type> ret = prom->get_future();
         using bind_t = decltype(std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
         auto fun = std::make_shared<bind_t>(std::bind(std::forward<Function>(f), std::forward<Args>(args)...));
         tp.add_task_by_value([fun, prom]()
         { 
             try
             {
-                impl::call_prom_set_value(*prom, *fun, impl::selector<typename std::result_of<Function(Args...)>::type>());
+                impl::call_prom_set_value(*prom, *fun, impl::selector<typename impl::result_of<Function(Args...)>::type>());
             }
             catch(...)
             {
@@ -82,7 +95,7 @@ namespace dlib
         typename Function, 
         typename ...Args
         >
-    std::future<typename std::result_of<Function(Args...)>::type> async(
+    std::future<typename impl::result_of<Function(Args...)>::type> async(
         Function&& f, 
         Args&&... args 
     )
