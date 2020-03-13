@@ -159,7 +159,7 @@ namespace dlib
 
         // forward data from a to b
         char buf[200];
-        int status;
+        long status;
         bool error = false; // becomes true if one of the connections returns an error
         while (true)
         {
@@ -287,7 +287,7 @@ namespace dlib
 
         // forward data from b to a
         char buf[200];
-        int status;
+        long status;
         bool error = false;
         while (true)
         {
