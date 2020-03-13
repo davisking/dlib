@@ -3226,7 +3226,7 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
-    void test_loss_multiclass_weighted()
+    void test_loss_multiclass_log_weighted()
     {
 
         print_spinner();
@@ -3722,7 +3722,7 @@ namespace
             test_loss_multiclass_per_pixel_outputs_on_trivial_task();
             test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
             test_loss_multiclass_per_pixel_weighted();
-            test_loss_multiclass_weighted();
+            test_loss_multiclass_log_weighted();
             test_serialization();
             test_loss_dot();
             test_loss_multimulticlass_log();
