@@ -384,7 +384,7 @@ namespace dlib
                 training.  (If the classification problem is difficult, a flat weight
                 structure may lead the network to always predict the most common label,
                 in particular if the degree of imbalance is high.  To emphasize a certain
-                class of classes, simply increase the weights of the corresponding samples,
+                class or classes, simply increase the weights of the corresponding samples,
                 relative to the weights of other pixels.)
 
                 Note that if you set all the weights equals to 1, then you essentially get
