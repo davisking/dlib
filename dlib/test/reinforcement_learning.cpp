@@ -61,7 +61,7 @@ namespace
         // It's possible that the allowed actions differ among states.
         // In this case all movements are always allowed so we don't need to use state.
         action_type random_action(
-            const state_type& state
+            const state_type& /*state*/
         ) const
         {
             uniform_int_distribution<int> dist(0,num_actions-1);
@@ -97,8 +97,8 @@ namespace
 
         // This functions gives the rewards, that is, tells the agent how good are its movements
         double reward(
-            const state_type &state,
-            const action_type &action,
+            const state_type &/*state*/,
+            const action_type &/*action*/,
             const state_type &new_state
         ) const
         {
@@ -146,7 +146,7 @@ namespace
             const action_type& action
         ) const
         {
-            bool result;
+            bool result = false;
 
             switch(action)
             {

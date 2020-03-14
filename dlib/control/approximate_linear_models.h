@@ -4,7 +4,7 @@
 #define DLIB_APPROXIMATE_LINEAR_MODELS_Hh_
 
 #include "approximate_linear_models_abstract.h"
-#include <dlib/matrix.h>
+#include "../matrix.h"
 #include <random>
 
 namespace dlib

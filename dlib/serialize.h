@@ -1561,7 +1561,7 @@ namespace dlib
         \
         try{ serialize(ss.str(),out); } \
         catch (serialization_error& e) \
-        { throw serialization_error(e.info + "\n   while serializing object of type std::default_random_engine"); } \
+        { throw serialization_error(e.info + "\n   while serializing object of type " + #T); } \
     } \
     \
     inline void deserialize ( \
@@ -1572,7 +1572,7 @@ namespace dlib
         std::string str; \
         try { deserialize(str,in); } \
         catch (serialization_error& e) \
-        { throw serialization_error(e.info + "\n   while deserializing object of type std::default_random_engine"); } \
+        { throw serialization_error(e.info + "\n   while deserializing object of type " + #T); } \
         \
         std::stringstream ss(str); \
         ss.setf(std::ios_base::dec, std::ios_base::basefield); \
