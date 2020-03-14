@@ -454,7 +454,7 @@ namespace dlib
 
 
 
-        unsigned long len = 0;
+        std::streamsize len = 0;
 
         // an array of 16 words
         uint32 x[16];
@@ -467,7 +467,7 @@ namespace dlib
         std::streambuf& inputbuf = *input.rdbuf();
         while(!at_end)
         {
-            int num = inputbuf.sgetn(reinterpret_cast<char*>(temp),64);
+            std::streamsize num = inputbuf.sgetn(reinterpret_cast<char*>(temp),64);
             len += num;
 
             // if we hit the end of the stream then pad and add length
