@@ -371,6 +371,36 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename label_type>
+    struct weighted_label
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the truth label of a single sample, together with
+                an associated weight (the higher the weight, the more emphasis the
+                corresponding sample is given during the training).
+                This object is used in the following loss layers:
+                    - loss_multiclass_log_weighted_ with unsigned long as label_type
+                    - loss_multiclass_log_per_pixel_weighted_ with uint16_t as label_type,
+                      since, in semantic segmentation, 65536 classes ought to be enough for
+                      anybody. 
+        !*/
+        weighted_label()
+        {}
+
+        weighted_label(label_type label, float weight = 1.f)
+            : label(label), weight(weight)
+        {}
+
+        // The ground truth label
+        label_type label{};
+
+        // The weight of the corresponding sample
+        float weight = 1.f;
+    };
+
+// ----------------------------------------------------------------------------------------
+
     class loss_multiclass_log_weighted_
     {
         /*!
@@ -393,29 +423,7 @@ namespace dlib
 
     public:
 
-        struct weighted_label
-        {
-            /*!
-                WHAT THIS OBJECT REPRESENTS
-                    This object represents the truth label of a single sample, together with
-                    an associated weight (the higher the weight, the more emphasis the
-                    corresponding sample is given during the training).
-            !*/
-            weighted_label()
-            {}
-
-            weighted_label(unsigned long label, float weight = 1.f)
-                : label(label), weight(weight)
-            {}
-
-            // The ground truth label
-            unsigned long label = 0;
-
-            // The weight of the corresponding sample
-            float weight = 1.f;
-        };
-
-        typedef weighted_label training_label_type;
+        typedef weighted_label<unsigned long> training_label_type;
         typedef unsigned long output_label_type;
 
         template <
@@ -461,6 +469,8 @@ namespace dlib
 
     template <typename SUBNET>
     using loss_multiclass_log_weighted = add_loss_layer<loss_multiclass_log_weighted_, SUBNET>;// ----------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------------
 
     class loss_multimulticlass_log_ 
     {
@@ -1525,27 +1535,7 @@ namespace dlib
         !*/
     public:
 
-        struct weighted_label
-        {
-            /*!
-                WHAT THIS OBJECT REPRESENTS
-                    This object represents the truth label of a single pixel, together with
-                    an associated weight (the higher the weight, the more emphasis the
-                    corresponding pixel is given during the training).
-            !*/
-
-            weighted_label();
-            weighted_label(uint16_t label, float weight = 1.f);
-
-            // The ground-truth label. In semantic segmentation, 65536 classes ought to be
-            // enough for anybody.
-            uint16_t label = 0;
-
-            // The weight of the corresponding pixel.
-            float weight = 1.f;
-        };
-
-        typedef matrix<weighted_label> training_label_type;
+        typedef matrix<weighted_label<uint16_t> training_label_type;
         typedef matrix<uint16_t> output_label_type;
 
         template <

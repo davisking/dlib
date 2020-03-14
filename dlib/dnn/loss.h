@@ -369,24 +369,27 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_multiclass_log_weighted_ 
+    template <typename label_type>
+    struct weighted_label
+    {
+        weighted_label()
+        {}
+
+        weighted_label(label_type label, float weight = 1.f)
+            : label(label), weight(weight)
+        {}
+
+        label_type label{};
+        float weight = 1.f;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_multiclass_log_weighted_
     {
     public:
 
-        struct weighted_label
-        {
-            weighted_label()
-            {}
-
-            weighted_label(unsigned long label, float weight = 1.f)
-                : label(label), weight(weight)
-            {}
-
-            unsigned long label = 0;
-            float weight = 1.f;
-        };
-
-        typedef weighted_label training_label_type;
+        typedef weighted_label<unsigned long> training_label_type;
         typedef unsigned long output_label_type;
 
         template <
@@ -446,7 +449,7 @@ namespace dlib
             float* g = grad.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
-                const weighted_label wl = (weighted_label)*truth++;
+                const weighted_label<unsigned long> wl = (weighted_label<unsigned long>)*truth++;
                 const long y = wl.label;
                 const float weight = wl.weight;
                 // The network must produce a number of outputs that is equal to the number
@@ -2963,21 +2966,7 @@ namespace dlib
     {
     public:
 
-        struct weighted_label
-        {
-            weighted_label()
-            {}
-
-            weighted_label(uint16_t label, float weight = 1.f)
-                : label(label), weight(weight)
-            {}
-
-            // In semantic segmentation, 65536 classes ought to be enough for anybody.
-            uint16_t label = 0;
-            float weight = 1.f;
-        };
-
-        typedef matrix<weighted_label> training_label_type;
+        typedef matrix<weighted_label<uint16_t>> training_label_type;
         typedef matrix<uint16_t> output_label_type;
 
         template <
@@ -3037,7 +3026,7 @@ namespace dlib
                 {
                     for (long c = 0; c < output_tensor.nc(); ++c)
                     {
-                        const weighted_label& weighted_label = truth->operator()(r, c);
+                        const weighted_label<uint16_t>& weighted_label = truth->operator()(r, c);
                         const uint16_t y = weighted_label.label;
                         const float weight = weighted_label.weight;
                         // The network must produce a number of outputs that is equal to the number
