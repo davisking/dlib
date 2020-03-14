@@ -2966,7 +2966,8 @@ namespace dlib
     {
     public:
 
-        typedef matrix<weighted_label<uint16_t>> training_label_type;
+        typedef weighted_label<uint16_t> weighted_label;
+        typedef matrix<weighted_label> training_label_type;
         typedef matrix<uint16_t> output_label_type;
 
         template <
@@ -3026,7 +3027,7 @@ namespace dlib
                 {
                     for (long c = 0; c < output_tensor.nc(); ++c)
                     {
-                        const weighted_label<uint16_t>& weighted_label = truth->operator()(r, c);
+                        const weighted_label& weighted_label = truth->operator()(r, c);
                         const uint16_t y = weighted_label.label;
                         const float weight = weighted_label.weight;
                         // The network must produce a number of outputs that is equal to the number

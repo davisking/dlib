@@ -3167,8 +3167,9 @@ namespace
         }
 
         using net_type = loss_multiclass_log_per_pixel_weighted<con<num_classes,1,1,1,1,input<matrix<double>>>>;
+        using weighted_label = loss_multiclass_log_per_pixel_weighted_::weighted_label;
 
-        ::std::vector<matrix<weighted_label<uint16_t>>> y_weighted(num_samples);
+        ::std::vector<matrix<weighted_label>> y_weighted(num_samples);
 
         for (int weighted_class = 0; weighted_class < num_classes; ++weighted_class) {
 
@@ -3186,7 +3187,7 @@ namespace
                             = label == weighted_class
                             ? 1.1f
                             : 0.9f;
-                        y_weighted[ii](jj, kk) = weighted_label<uint16_t>(label, weight);
+                        y_weighted[ii](jj, kk) = weighted_label(label, weight);
                     }
                 }
             }
