@@ -3297,6 +3297,10 @@ namespace
                 else
                     ++num_not_weighted_class;
             }
+
+            DLIB_TEST_MSG(num_weighted_class > num_not_weighted_class,
+                          "The weighted class (" << weighted_class << ") does not dominate: "
+                          << num_weighted_class << " <= " << num_not_weighted_class);
         }
     }
 

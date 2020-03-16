@@ -411,13 +411,13 @@ namespace dlib
                 for multiclass classification problems.  It is basically just like the
                 loss_multiclass_log except that it lets you define per-sample weights,
                 which might be useful e.g. if you want to emphasize rare classes while
-                training.  (If the classification problem is difficult, a flat weight
+                training.  If the classification problem is difficult, a flat weight
                 structure may lead the network to always predict the most common label,
                 in particular if the degree of imbalance is high.  To emphasize a certain
                 class or classes, simply increase the weights of the corresponding samples,
-                relative to the weights of other pixels.)
+                relative to the weights of other pixels.
 
-                Note that if you set all the weights equals to 1, then you essentially get
+                Note that if you set all the weights equals to 1, then you get
                 loss_multiclass_log_ as a special case.
         !*/
 

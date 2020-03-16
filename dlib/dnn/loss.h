@@ -449,7 +449,7 @@ namespace dlib
             float* g = grad.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i)
             {
-                const weighted_label<unsigned long> wl = (weighted_label<unsigned long>)*truth++;
+                const auto wl = *truth++;
                 const long y = wl.label;
                 const float weight = wl.weight;
                 // The network must produce a number of outputs that is equal to the number
