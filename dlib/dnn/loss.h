@@ -2966,7 +2966,7 @@ namespace dlib
     {
     public:
 
-        typedef weighted_label<uint16_t> weighted_label;
+        typedef dlib::weighted_label<uint16_t> weighted_label;
         typedef matrix<weighted_label> training_label_type;
         typedef matrix<uint16_t> output_label_type;
 
