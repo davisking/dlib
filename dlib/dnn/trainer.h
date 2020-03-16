@@ -75,6 +75,7 @@ namespace dlib
         typedef typename net_type::input_type input_type;
         const static size_t num_computational_layers = net_type::num_computational_layers;
         const static size_t num_layers = net_type::num_layers;
+        using threads = std::vector<std::shared_ptr<thread_pool>>;
     private:
         typedef impl::dnn_job_t<training_label_type> job_t;
     public:
@@ -104,8 +105,9 @@ namespace dlib
         dnn_trainer(
             net_type& net_, 
             const solver_type& solver_,
-            const std::vector<int>& cuda_extra_devices
-        ) : job_pipe(0), net(net_) 
+            const std::vector<int>& cuda_extra_devices,
+            std::shared_ptr<threads> thread_pools_ = std::shared_ptr<threads>()
+        ) : job_pipe(0), net(net_), thread_pools(thread_pools_)
         {
             devices.push_back(std::make_shared<device_data>(dlib::cuda::get_device(), net, solver_));
 
@@ -667,6 +669,14 @@ namespace dlib
             std::vector<tensor*> reference_params;
             visit_layer_parameters(devices[0]->net, [&](size_t, tensor& t) { reference_params.push_back(&t); });
 
+            // If no external thread pools vector was passed, then create one that will
+            // be automatically destructed as soon as the dnn_trainer object goes out of
+            // scope.
+            if (!thread_pools)
+                thread_pools = std::make_shared<threads>();
+
+            auto& tp = *thread_pools;
+
             // We make separate thread pools with just one thread in them because we want
             // to make sure each device is always executed on the same thread.  We care
             // about this because there are thread_local context variables for some cuda
@@ -674,8 +684,7 @@ namespace dlib
             // So if we make sure the same device always uses the same thread this will
             // reduce the number of contexts we allocate from num_devices*num_devices to
             // just num_devices. 
-            std::vector<std::shared_ptr<thread_pool>> tp;
-            for (size_t i = 0; i < devices.size(); ++i)
+            while (tp.size() < devices.size())
                 tp.push_back(std::make_shared<thread_pool>(1));
 
 
@@ -1274,6 +1283,7 @@ namespace dlib
 
         std::vector<std::shared_ptr<device_data>> devices;
         dlib::pipe<job_t> job_pipe;
+        std::shared_ptr<threads> thread_pools;
         job_t job;
 
 
