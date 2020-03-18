@@ -371,6 +371,107 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename label_type>
+    struct weighted_label
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the truth label of a single sample, together with
+                an associated weight (the higher the weight, the more emphasis the
+                corresponding sample is given during the training).
+                This object is used in the following loss layers:
+                    - loss_multiclass_log_weighted_ with unsigned long as label_type
+                    - loss_multiclass_log_per_pixel_weighted_ with uint16_t as label_type,
+                      since, in semantic segmentation, 65536 classes ought to be enough for
+                      anybody. 
+        !*/
+        weighted_label()
+        {}
+
+        weighted_label(label_type label, float weight = 1.f)
+            : label(label), weight(weight)
+        {}
+
+        // The ground truth label
+        label_type label{};
+
+        // The weight of the corresponding sample
+        float weight = 1.f;
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    class loss_multiclass_log_weighted_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements the multiclass logistic
+                regression loss (e.g. negative log-likelihood loss), which is appropriate
+                for multiclass classification problems.  It is basically just like the
+                loss_multiclass_log except that it lets you define per-sample weights,
+                which might be useful e.g. if you want to emphasize rare classes while
+                training.  If the classification problem is difficult, a flat weight
+                structure may lead the network to always predict the most common label,
+                in particular if the degree of imbalance is high.  To emphasize a certain
+                class or classes, simply increase the weights of the corresponding samples,
+                relative to the weights of other pixels.
+
+                Note that if you set all the weights equals to 1, then you get
+                loss_multiclass_log_ as a special case.
+        !*/
+
+    public:
+
+        typedef weighted_label<unsigned long> training_label_type;
+        typedef unsigned long output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that: 
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output label is the predicted class for each classified object.  The number
+            of possible output classes is sub.get_output().k().
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth, 
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
+            except it has the additional calling requirements that: 
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+                - all values pointed to by truth are < sub.get_output().k()
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_multiclass_log_weighted = add_loss_layer<loss_multiclass_log_weighted_, SUBNET>;// ----------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------------
+
     class loss_multimulticlass_log_ 
     {
         /*!
@@ -1434,27 +1535,7 @@ namespace dlib
         !*/
     public:
 
-        struct weighted_label
-        {
-            /*!
-                WHAT THIS OBJECT REPRESENTS
-                    This object represents the truth label of a single pixel, together with
-                    an associated weight (the higher the weight, the more emphasis the
-                    corresponding pixel is given during the training).
-            !*/
-
-            weighted_label();
-            weighted_label(uint16_t label, float weight = 1.f);
-
-            // The ground-truth label. In semantic segmentation, 65536 classes ought to be
-            // enough for anybody.
-            uint16_t label = 0;
-
-            // The weight of the corresponding pixel.
-            float weight = 1.f;
-        };
-
-        typedef matrix<weighted_label> training_label_type;
+        typedef matrix<weighted_label<uint16_t> training_label_type;
         typedef matrix<uint16_t> output_label_type;
 
         template <
