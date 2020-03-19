@@ -58,6 +58,8 @@ namespace dlib
         typedef typename net_type::input_type input_type;
         const static size_t num_computational_layers = net_type::num_computational_layers;
 
+        using threads = std::vector<std::shared_ptr<thread_pool>>;
+
         dnn_trainer() = delete;
         dnn_trainer(const dnn_trainer&) = delete;
         dnn_trainer& operator=(const dnn_trainer&) = delete;
@@ -65,7 +67,8 @@ namespace dlib
         dnn_trainer(
             net_type& net, 
             const solver_type& solver = solver_type(),
-            const std::vector<int>& cuda_extra_devices = {}
+            const std::vector<int>& cuda_extra_devices = {},
+            std::shared_ptr<threads> thread_pools = std::shared_ptr<threads>()
         ); 
         /*!
             requires
@@ -96,6 +99,19 @@ namespace dlib
                       cudaGetDevice()).  In addition, you can ask to use additional
                       devices, which you do by putting their device numbers into
                       cuda_extra_devices.
+                - if (thread_pools.get() != nullptr) then
+                    - Any new threads spun within the trainer will execute within the
+                      passed thread pools vector. This means that the same threads can
+                      be re-used across different dnn_trainer instances. Otherwise, the
+                      CUDA runtime may leak memory. This, however, is relevant only if
+                      your program is going to instantiate a large number of trainers,
+                      and generally stay up and running for a very long time. If not,
+                      then you need not worry about this.
+                      NB: Any particular thread pools vector should be passed to max
+                          one trainer instance at a time.
+                      NB: The mentioned leak isn't happening because dlib is or isn't
+                          doing something. Instead, it is a limitation of the CUDA
+                          runtime that dlib has no control over.
         !*/
 
         net_type& get_net (
