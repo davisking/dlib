@@ -192,7 +192,7 @@ if (UNIX OR MINGW)
    INCLUDE (CheckFunctionExists)
 
    if (NOT blas_found)
-      find_library(cblas_lib openblas PATHS ${extra_paths})
+      find_library(cblas_lib NAMES openblasp openblas PATHS ${extra_paths})
       if (cblas_lib)
          set(blas_libraries ${cblas_lib})
          set(blas_found 1)
