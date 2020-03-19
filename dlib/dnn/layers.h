@@ -2762,6 +2762,84 @@ namespace dlib
     using prelu = add_layer<prelu_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
+    class leaky_relu_
+    {
+    public:
+        explicit leaky_relu_(
+            float alpha_ = 0.01f
+        ) : alpha(alpha_)
+        {
+        }
+
+        float get_alpha(
+        ) const {
+            return alpha;
+        }
+
+        template <typename SUBNET>
+        void setup(const SUBNET& /*sub*/)
+        {
+        }
+
+        void forward_inplace(const tensor& input, tensor& output)
+        {
+            tt::leaky_relu(output, input, alpha);
+        }
+
+        void backward_inplace(
+            const tensor& computed_output,
+            const tensor& gradient_input,
+            tensor& data_grad,
+            tensor&
+        )
+        {
+            tt::leaky_relu_gradient(data_grad, computed_output, gradient_input, alpha);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const leaky_relu_& item, std::ostream& out)
+        {
+            serialize("leaky_relu_", out);
+            serialize(item.alpha, out);
+        }
+
+        friend void deserialize(leaky_relu_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "leaky_relu_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::leaky_relu_.");
+            deserialize(item.alpha, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const leaky_relu_& item)
+        {
+            out << "leaky_relu\t("
+                << "alpha=" << item.alpha
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const leaky_relu_& item, std::ostream& out)
+        {
+            out << "<leaky_relu alpha='"<< item.alpha << "'>\n";
+            out << "<leaky_relu/>\n";
+        }
+
+    private:
+        resizable_tensor params;
+        float alpha;
+    };
+
+    template <typename SUBNET>
+    using leaky_relu = add_layer<leaky_relu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
 
     class sig_
     {
