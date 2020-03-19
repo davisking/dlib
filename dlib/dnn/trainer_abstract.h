@@ -107,6 +107,11 @@ namespace dlib
                       your program is going to instantiate a large number of trainers,
                       and generally stay up and running for a very long time. If not,
                       then you need not worry about this.
+                      NB: Any particular thread pools vector should be passed to max
+                          one trainer instance at a time.
+                      NB: The mentioned leak isn't happening because dlib is or isn't
+                          doing something. Instead, it is a limitation of the CUDA
+                          runtime that dlib has no control over.
         !*/
 
         net_type& get_net (
