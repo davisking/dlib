@@ -2100,12 +2100,14 @@ namespace dlib
                 defined above.  In particular, it defines a leaky rectified linear
                 layer.  Therefore, it passes its inputs through the function
                     f(x) = x>0 ? x : alpha*x
-                where f() is applied pointwise across the input tensor and alpha is a scalar.
+                where f() is applied pointwise across the input tensor and alpha is a
+                non-learned scalar.
 
                 This is the layer type introduced in the paper:
                     A. L. Maas, A. Y. Hannun, and A. Y. Ng. "Rectifier nonlinearities improve
                     neural network acoustic models". In ICML, 2013.
         !*/
+
     public:
         explicit leaky_relu_(
             float alpha = 0.01f
