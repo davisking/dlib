@@ -1894,6 +1894,12 @@ namespace
         }
         {
             print_spinner();
+            leaky_relu_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             sig_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);

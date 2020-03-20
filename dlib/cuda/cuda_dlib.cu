@@ -1377,12 +1377,25 @@ namespace dlib
 
         __global__ void _cuda_leaky_relu_gradient(float* out, const float* s, const float* gi, size_t n, const float alpha)
         {
-            for (auto i : grid_stride_range(0, n))
+            if (out == gi)
             {
-                if (s[i] > 0)
-                    out[i] += gi[i];
-                else
-                    out[i] += alpha * gi[i];
+                for (auto i : grid_stride_range(0, n))
+                {
+                    if (s[i] > 0)
+                        out[i] = gi[i];
+                    else
+                        out[i] = alpha * gi[i];
+                }
+            }
+            else
+            {
+                for (auto i : grid_stride_range(0, n))
+                {
+                    if (s[i] > 0)
+                        out[i] += gi[i];
+                    else
+                        out[i] += alpha * gi[i];
+                }
             }
         }
 
