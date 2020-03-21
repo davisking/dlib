@@ -1375,27 +1375,25 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_leaky_relu_gradient_inplace(float* out, const float* s, const float* gi, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0)
+                    out[i] = gi[i];
+                else
+                    out[i] = alpha * gi[i];
+            }
+        }
+
         __global__ void _cuda_leaky_relu_gradient(float* out, const float* s, const float* gi, size_t n, const float alpha)
         {
-            if (out == gi)
+            for (auto i : grid_stride_range(0, n))
             {
-                for (auto i : grid_stride_range(0, n))
-                {
-                    if (s[i] > 0)
-                        out[i] = gi[i];
-                    else
-                        out[i] = alpha * gi[i];
-                }
-            }
-            else
-            {
-                for (auto i : grid_stride_range(0, n))
-                {
-                    if (s[i] > 0)
-                        out[i] += gi[i];
-                    else
-                        out[i] += alpha * gi[i];
-                }
+                if (s[i] > 0)
+                    out[i] += gi[i];
+                else
+                    out[i] += alpha * gi[i];
             }
         }
 
@@ -1406,8 +1404,18 @@ namespace dlib
             const float alpha
         )
         {
-            launch_kernel(_cuda_leaky_relu_gradient, max_jobs(grad.size()),
-                grad.device(), src.device(), gradient_input.device(), grad.size(), alpha);
+            float* out = grad.device();
+            const float *gi = gradient_input.device();
+            if (out == gi)
+            {
+                launch_kernel(_cuda_leaky_relu_gradient_inplace, max_jobs(grad.size()),
+                    out, src.device(), gi, grad.size(), alpha);
+            }
+            else
+            {
+                launch_kernel(_cuda_leaky_relu_gradient, max_jobs(grad.size()),
+                    out, src.device(), gi, grad.size(), alpha);
+            }
         }
 
     // ----------------------------------------------------------------------------------------
