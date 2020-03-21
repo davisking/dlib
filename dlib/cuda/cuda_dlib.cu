@@ -1350,6 +1350,73 @@ namespace dlib
                 grad.device(), src.device(), gradient_input.device(), grad.size(),
                 param.device(), params_grad.device());
         }
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_leaky_relu(const float* s, float* d, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0)
+                    d[i] = s[i];
+                else
+                    d[i] = alpha * s[i];
+            }
+        }
+
+        void leaky_relu(
+            tensor& dest,
+            const tensor &src,
+            const float alpha
+        )
+        {
+            launch_kernel(_cuda_leaky_relu, max_jobs(dest.size()),
+                src.device(), dest.device(), src.size(), alpha);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
+        __global__ void _cuda_leaky_relu_gradient_inplace(float* out, const float* s, const float* gi, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0)
+                    out[i] = gi[i];
+                else
+                    out[i] = alpha * gi[i];
+            }
+        }
+
+        __global__ void _cuda_leaky_relu_gradient(float* out, const float* s, const float* gi, size_t n, const float alpha)
+        {
+            for (auto i : grid_stride_range(0, n))
+            {
+                if (s[i] > 0)
+                    out[i] += gi[i];
+                else
+                    out[i] += alpha * gi[i];
+            }
+        }
+
+        void leaky_relu_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input,
+            const float alpha
+        )
+        {
+            float* out = grad.device();
+            const float *gi = gradient_input.device();
+            if (out == gi)
+            {
+                launch_kernel(_cuda_leaky_relu_gradient_inplace, max_jobs(grad.size()),
+                    out, src.device(), gi, grad.size(), alpha);
+            }
+            else
+            {
+                launch_kernel(_cuda_leaky_relu_gradient, max_jobs(grad.size()),
+                    out, src.device(), gi, grad.size(), alpha);
+            }
+        }
 
     // ----------------------------------------------------------------------------------------
 
@@ -1408,6 +1475,7 @@ namespace dlib
         {
             launch_kernel(_cuda_mish_gradient, max_jobs(grad.size()), grad.device(), src.device(), gradient_input.device(), grad.size());
         }
+
     // ----------------------------------------------------------------------------------------
 
         __global__ void _cuda_resize_bilinear(size_t dsize, size_t dchan_size, size_t dnc, float* d, 

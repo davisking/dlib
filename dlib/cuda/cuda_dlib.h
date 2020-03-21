@@ -369,6 +369,21 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void leaky_relu (
+            tensor& dest,
+            const tensor& src,
+            const float alpha
+        );
+
+        void leaky_relu_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input,
+            const float alpha
+        );
+
+    // ----------------------------------------------------------------------------------------
+
         void mish (
             tensor& dest,
             const tensor& src

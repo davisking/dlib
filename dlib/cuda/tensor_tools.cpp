@@ -911,6 +911,35 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void leaky_relu (
+        tensor& dest,
+        const tensor& src,
+        const float alpha
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::leaky_relu(dest, src, alpha);
+#else
+        cpu::leaky_relu(dest, src, alpha);
+#endif
+    }
+
+    void leaky_relu_gradient (
+        tensor& grad,
+        const tensor& dest,
+        const tensor& gradient_input,
+        const float alpha
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::leaky_relu_gradient(grad, dest, gradient_input, alpha);
+#else
+        cpu::leaky_relu_gradient(grad, dest, gradient_input, alpha);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void tanh (
         tensor& dest,
         const tensor& src
