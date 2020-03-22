@@ -1052,6 +1052,43 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    void test_std_generator() 
+    {
+        T rnd;
+
+        for (int i = 0; i < 10; ++i)
+            rnd();
+
+        std::stringstream ss;
+        const int val1 = 123;
+        const int val2 = 456;
+        dlib::serialize(val1, ss);
+        dlib::serialize(rnd, ss);
+        dlib::serialize(val2, ss);
+
+        T rnd2;
+        int val1_read, val2_read;
+        dlib::deserialize(val1_read, ss);
+        dlib::deserialize(rnd2, ss);
+        dlib::deserialize(val2_read, ss);
+
+        DLIB_TEST(val1_read == val1);
+        DLIB_TEST(val2_read == val2);
+
+        for (int i = 0; i < 100; ++i)
+            DLIB_TEST(rnd() == rnd2());
+    }
+
+    void random_generators() 
+    {
+        test_std_generator<std::default_random_engine>();
+        test_std_generator<std::mt19937>();
+        test_std_generator<std::ranlux24>();
+    }
+
+// ----------------------------------------------------------------------------------------
+
     class serialize_tester : public tester
     {
         /*!
@@ -1078,6 +1115,7 @@ namespace
             test_array2d_and_matrix_serialization();
             test_strings();
             test_std_array();
+            random_generators();
         }
     } a;
 

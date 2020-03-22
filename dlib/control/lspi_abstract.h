@@ -17,7 +17,7 @@ namespace dlib
     {
         /*!
             REQUIREMENTS ON feature_extractor
-                feature_extractor should implement the example_feature_extractor interface
+                feature_extractor should implement the example_offline_model interface
                 defined at the top of dlib/control/approximate_linear_models_abstract.h
 
             WHAT THIS OBJECT REPRESENTS

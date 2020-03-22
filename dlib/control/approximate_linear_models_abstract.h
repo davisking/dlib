@@ -3,46 +3,38 @@
 #undef DLIB_APPROXIMATE_LINEAR_MODELS_ABSTRACT_Hh_
 #ifdef DLIB_APPROXIMATE_LINEAR_MODELS_ABSTRACT_Hh_
 
-#include "../matrix.h"
+#include <../matrix_abstract.h>
+#include <random>
 
 namespace dlib
 {
 
 // ----------------------------------------------------------------------------------------
 
-    struct example_feature_extractor 
-    {
+    struct example_offline_model {
         /*!
             WHAT THIS OBJECT REPRESENTS
-                This object defines the interface a feature extractor must implement if it
-                is to be used with the process_sample and policy objects defined at the
-                bottom of this file.  Moreover, it is meant to represent the core part
-                of a model used in a reinforcement learning algorithm.
-                
-                In particular, this object models a Q(state,action) function where
-                    Q(state,action) == dot(w, PSI(state,action))
-                    where PSI(state,action) is a feature vector and w is a parameter
-                    vector.
+                This object defines the inferface that any model has to implement if it
+                is to be used in an offline fashion along with some class like the lspi
+                class defined in the file lspi_abstract.h.
 
-                Therefore, a feature extractor defines how the PSI(x,y) feature vector is
-                calculated.  It also defines the types used to represent the state and
-                action objects. 
+                In particular, this object models a Q(state, action) function where
+                    Q(state, action) == dot(w, PSI(state, action))
+                where PSI(state, action) is a feature vector and w is a parameter vector.
 
-
-            THREAD SAFETY
-                Instances of this object are required to be threadsafe, that is, it should
-                be safe for multiple threads to make concurrent calls to the member
-                functions of this object.
+                Therefore, an offline model object defines how a model is represented by
+                defining its actions, states, calculating the feature vectors. However, it
+                does not provide any way to interactively interact with it.
         !*/
 
-        // The state and actions can be any types so long as you provide typedefs for them.
-        typedef T state_type;
-        typedef U action_type; 
-        // We can also say that the last element in the weight vector w must be 1.  This
+        // The states and actions can be any type as long as you provide typedefs for them.
+        typedef U state_type;
+        typedef V action_type;
+        // We can also say that the last element in the weights vector w must be 1. This
         // can be useful for including a prior into your model.
         const static bool force_last_weight_to_1 = false;
 
-        example_feature_extractor(
+        example_offline_model(
         );
         /*!
             ensures
@@ -53,7 +45,7 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the dimensionality of the PSI() feature vector.  
+                - returns the dimensionality of the PSI() feature vector.
         !*/
 
         action_type find_best_action (
@@ -62,12 +54,12 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns the action A that maximizes Q(state,A) = dot(w,PSI(state,A)).
+                - returns the action A that maximizes Q(state, A) = dot(w,PSI(state,A)).
                   That is, this function finds the best action to take in the given state
                   when our model is parameterized by the given weight vector w.
         !*/
 
-        void get_features (
+        void get_features(
             const state_type& state,
             const action_type& action,
             matrix<double,0,1>& feats
@@ -75,22 +67,150 @@ namespace dlib
         /*!
             ensures
                 - #feats.size() == num_features()
-                - #feats == PSI(state,action)
+                - #feats == PSI(state, action)
+        */!
+    };
+
+// ----------------------------------------------------------------------------------------
+
+    struct example_online_model
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object defines the inferface that any model has to implement if it
+                is to be used by an object such as the qlearning class defined in the
+                file qlearning_abstract.h.
+
+                Instances of this object differ from the offline model in the way they
+                interact with the environment. This object expands the interface of the
+                offline model with methods that make it suitable for simulations:
+                going from one state to another, detecting special states and getting
+                the reward for performing those steps.
+
+                In particular, this object models a Q(state, action) function where
+                    Q(state, action) == dot(w, PSI(state, action))
+                where PSI(state, action) is a feature vector and w is a parameter vector.
+
+                Therefore, an online model object defines how a model is represented by
+                defining its actions, states, calculating the feature vectors. Besides, it
+                provides methods to interact with that environment on the fly.
         !*/
+
+        // The states and actions can be any type as long as you provide typedefs for them.
+        typedef U state_type;
+        typedef V action_type;
+
+        example_online_model(
+        );
+        /*!
+            ensures
+                - this object is properly initialized.
+        !*/
+
+        unsigned long num_features(
+        ) const;
+        /*!
+            ensures
+                - returns the dimensionality of the PSI vector.
+        !*/
+
+        action_type find_best_action(
+            const state_type& state,
+            const matrix<double,0,1>& w
+        ) const;
+        /*!
+            ensures
+                - returns the action A that maximizes Q(state, A) = dot(w,PSI(state,A)).
+                  That is, this function finds the best action to take in the given state
+                  when our model is parameterized by the given weight vector.
+        !*/
+
+        void get_features(
+            const state_type& state,
+            const action_type& action,
+            matrix<double,0,1>& feats
+        ) const;
+        /*!
+            ensures
+                - #feats.size() == num_features()
+                - #feats == PSI(state, action)
+        !*/
+
+        action_type random_action(
+            const state_type& state
+        ) const;
+        /*!
+            ensures
+                - returns a random plausible action assuming we are in the given state.
+        !*/
+
+        double reward(
+            const state_type& state,
+            const action_type& action,
+            const state_type& new_state
+        ) const;
+        /*!
+            ensures
+                - returns the reward obtained by reaching new_state from state
+                  after you do action.
+        !*/
+
+        state_type initial_state(
+        ) const;
+        /*!
+            ensures
+                - returns the initial state of the model.
+        !*/
+
+        state_type step(
+            const state_type& state,
+            const action_type& action
+        ) const;
+        /*!
+            ensures
+                - returns a new state result of doing the given action over the
+                  given state.
+        !*/
+
+        bool is_success(
+            const state_type& state
+        ) const;
+        /*!
+            ensures
+                - returns whether state is a goal state (the agent has finished properly).
+        !*/
+
+        bool is_failure(
+            const state_type& state
+        ) const;
+        /*!
+            ensures
+                - returns whether state is a failure state, i.e., a state where the agent has
+                  failed its task.
+        !*/
+
+        bool is_final(
+            const state_type& state
+        ) const;
+        /*!
+            ensures
+                - #is_final(state) == is_success(state) || is_failure(state)
+        !*/
+
 
     };
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename feature_extractor
+        typename model_type
         >
     struct process_sample
     {
         /*!
-            REQUIREMENTS ON feature_extractor
-                feature_extractor should implement the example_feature_extractor interface
-                defined at the top of this file.
+            REQUIREMENTS ON model_type
+                model_type should implement one of the two interfaces defined above, that is,
+                example_offline_model or example_online_model.
 
             WHAT THIS OBJECT REPRESENTS
                 This object holds a training sample for a reinforcement learning algorithm.
@@ -99,9 +219,8 @@ namespace dlib
                 receiving this->reward and ending up in the state this->next_state.
         !*/
 
-        typedef feature_extractor feature_extractor_type;
-        typedef typename feature_extractor::state_type state_type;
-        typedef typename feature_extractor::action_type action_type;
+        typedef typename model_type::state_type state_type;
+        typedef typename model_type::action_type action_type;
 
         process_sample(){}
 
@@ -118,10 +237,10 @@ namespace dlib
         double reward;
     };
 
-    template < typename feature_extractor >
-    void serialize (const process_sample<feature_extractor>& item, std::ostream& out);
-    template < typename feature_extractor >
-    void deserialize (process_sample<feature_extractor>& item, std::istream& in);
+    template < typename model_type >
+    void serialize (const process_sample<model_type>& item, std::ostream& out);
+    template < typename model_type >
+    void deserialize (process_sample<model_type>& item, std::istream& in);
     /*!
         provides serialization support.
     !*/
@@ -129,47 +248,44 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename feature_extractor
+        typename model_type
         >
     class policy
     {
         /*!
-            REQUIREMENTS ON feature_extractor
-                feature_extractor should implement the example_feature_extractor interface
-                defined at the top of this file.
+            REQUIREMENTS ON model_type
+                model_type should implement one of the two interfaces defined above, that is,
+                example_offline_model or example_online_model.
 
             WHAT THIS OBJECT REPRESENTS
-                This is a policy based on the supplied feature_extractor model.  In
-                particular, it maps from feature_extractor::state_type to the best action
-                to take in that state.
+                This class represents a greedy policy, that is, it is a policy that given a
+                state returns the best possible action based on its weight matrix.
         !*/
 
     public:
 
-        typedef feature_extractor feature_extractor_type;
-        typedef typename feature_extractor::state_type state_type;
-        typedef typename feature_extractor::action_type action_type;
-
+        typedef typename model_type::state_type state_type;
+        typedef typename model_type::action_type action_type;
 
         policy (
+            const model_type& model = model_type()
         );
         /*!
             ensures
-                - #get_feature_extractor() == feature_extractor() 
-                  (i.e. it will have its default value)
-                - #get_weights().size() == #get_feature_extractor().num_features()
+                - #get_model() == model
+                - #get_weights().size() == #get_model().num_features()
                 - #get_weights() == 0
         !*/
 
         policy (
             const matrix<double,0,1>& weights,
-            const feature_extractor& fe
-        ); 
+            const model_type& model
+        );
         /*!
             requires
-                - fe.num_features() == weights.size()
+                - model.num_features() == weights.size()
             ensures
-                - #get_feature_extractor() == fe
+                - #get_model() == model
                 - #get_weights() == weights
         !*/
 
@@ -178,36 +294,145 @@ namespace dlib
         ) const;
         /*!
             ensures
-                - returns get_feature_extractor().find_best_action(state,w);
+                - returns get_model().find_best_action(state, get_weights());
         !*/
 
-        const feature_extractor& get_feature_extractor (
-        ) const; 
+        const model_type& get_model (
+        ) const;
         /*!
             ensures
-                - returns the feature extractor used by this object
+                - returns the model used by this object
         !*/
 
         const matrix<double,0,1>& get_weights (
-        ) const; 
+        ) const;
         /*!
             ensures
-                - returns the parameter vector (w) associated with this object.  The length
-                  of the vector is get_feature_extractor().num_features().  
+                - returns the weights that the policy is using.
+        !*/
+
+        matrix<double,0,1>& get_weights (
+        );
+        /*!
+            ensures
+                - returns the weights that the policy is using.
+        !*/
+    };
+
+    template < typename model_type >
+    void serialize(const policy<model_type>& item, std::ostream& out);
+    template < typename model_type >
+    void deserialize(policy<model_type>& item, std::istream& in);
+    /*!
+        provides serialization support.
+    !*/
+
+    // ----------------------------------------------------------------------------------------
+
+    template <
+        typename policy_type,
+        typename prng_engine = std::default_random_engine()
+        >
+    class epsilon_policy
+    {
+        /*!
+            REQUIREMENTS ON policy_type
+                policy_type is an object with the same interface as the policy class defined
+                above.
+
+            REQUIREMENTS ON prng_engine
+                prng_engine should be a PRNG interface like the ones defined in std::random.
+
+            WHAT THIS OBJECT REPRESENTS
+                This is a special policy that returns the best action (according to the
+                underlying policy) for the given state with probability 1-epsilon
+                while it returns a valid random action with probability epsilon.
+
+                It is mainly used to add some exploration in the training process of the
+                online reinforcement learning methods such as qlearning and sarsa.
+        !*/
+
+    public:
+
+        typedef typename policy_type::state_type state_type;
+        typedef typename policy_type::action_type action_type;
+
+        epsilon_policy (
+            double epsilon,
+            const policy_type& policy,
+            const prng_engine& gen = prng_engine()
+        );
+        /*!
+            requires
+                - epsilon >= 0 and epsilon <= 1
+            ensures
+                - #get_epsilon() == epsilon
+                - #get_policy() == policy
+                - #get_generator() == gen
+        !*/
+
+        action_type operator() (
+            const state_type& state
+        ) const;
+        /*!
+            ensures
+                - returns get_policy()(state, w) with probability 1-epsilon
+                  and get_model().random_action(state) with probability epsilon.
+        !*/
+
+        const policy_type& get_policy(
+        ) const;
+        /*!
+            ensures
+                - returns the underlying policy used by the object.
+        !*/
+
+        model_type get_model (
+        ) const;
+        /*!
+            ensures
+                - returns the model used by the underlying policy.
+        !*/
+
+        const matrix<double,0,1>& get_weights (
+        ) const;
+        /*!
+            ensures
+                - returns the weights that the policy is using.
+        !*/
+
+        matrix<double,0,1>& get_weights (
+        );
+        /*!
+            ensures
+                - returns the weights that the policy is using.
+        !*/
+
+        double get_epsilon(
+        ) const;
+        /*!
+            ensures
+                - returns the epsilon value used by the policy.
+        !*/
+
+        const prng_engine& get_generator(
+        ) const;
+        /*!
+            ensures
+                - returns the generator used by the policy.
         !*/
 
     };
 
-    template < typename feature_extractor >
-    void serialize(const policy<feature_extractor>& item, std::ostream& out);
-    template < typename feature_extractor >
-    void deserialize(policy<feature_extractor>& item, std::istream& in);
+    template < typename policy_type, typename generator >
+    inline void serialize(const epsilon_policy<policy_type, generator>& item, std::ostream& out);
+    template < typename policy_type, typename generator >
+    inline void deserialize(epsilon_policy<policy_type, generator>& item, std::istream& in);
     /*!
         provides serialization support.
     !*/
 
 // ----------------------------------------------------------------------------------------
-
 
 #endif // DLIB_APPROXIMATE_LINEAR_MODELS_ABSTRACT_Hh_
  
