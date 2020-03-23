@@ -43,17 +43,17 @@ noise_t make_noise(dlib::rand& rnd)
     return noise;
 }
 
-// a custom convolution definition to allow for padding size specification
+// A convolution with custom padding
 template<long num_filters, long kernel_size, int stride, int padding, typename SUBNET>
 using conp = add_layer<con_<num_filters, kernel_size, kernel_size, stride, stride, padding, padding>, SUBNET>;
 
-// Let's define a transposed convolution to with custom padding
+// A transposed convolution to with custom padding
 template<long num_filters, long kernel_size, int stride, int padding, typename SUBNET>
 using contp = add_layer<cont_<num_filters, kernel_size, kernel_size, stride, stride, padding, padding>, SUBNET>;
 
 // The generator is made of a bunch of deconvolutional layers. Its input is a
-// 1 x 1 x k noise tensor, and the output is the score of the generated image
-// (decided by the discriminator, which we'll define afterwards)
+// 1 x 1 x k noise tensor, and the output is the generated image.
+// The loss layer does not matter, we just put one to be able to call it.
 using generator_type =
     loss_binary_log_per_pixel<
     htan<contp<1, 4, 2, 1,
@@ -67,15 +67,14 @@ using generator_type =
 // whether an image is fake or not.
 using discriminator_type =
     loss_binary_log<
-    htan<
-    conp<1, 3, 1, 0,
+    htan<conp<1, 3, 1, 0,
     leaky_relu<bn_con<conp<256, 4, 2, 1,
     leaky_relu<bn_con<conp<128, 4, 2, 1,
     leaky_relu<conp<64, 4, 2, 1,
     input<matrix<unsigned char>>
     >>>>>>>>>>>;
 
-// Now, let's define a way to easily get the generated image
+// Some helper functions to get the images from the generator
 matrix<unsigned char> generated_image(generator_type& net)
 {
     matrix<float> output = image_plane(layer<1>(net).get_output());
@@ -88,13 +87,12 @@ void generated_images(generator_type& net, std::vector<matrix<unsigned char>>& i
 {
     images.clear();
     const resizable_tensor& out = layer<1>(net).get_output();
-    // std::cout << out.num_samples() << 'x' << out.k() << 'x' << out.nr() << 'x' << out.nc() << '\n';
+    // cout << out.num_samples() << 'x' << out.k() << 'x' << out.nr() << 'x' << out.nc() << '\n';
     for (size_t n = 0; n < out.num_samples(); ++n)
     {
         matrix<float> output = image_plane(out, n);
         matrix<unsigned char> image;
         assign_image_scaled(image, output);
-        // dlib::save_png(image, "generated_image_" + std::to_string(n) + ".png");
         images.push_back(std::move(image));
     }
 }
@@ -120,36 +118,36 @@ int main(int argc, char** argv) try
     std::vector<unsigned long>         testing_labels;
     load_mnist_dataset(argv[1], training_images, training_labels, testing_images, testing_labels);
 
-    dlib::rand rnd(time(nullptr));
-    // instantiate both generator and discriminator
+    dlib::rand rnd;
+    // Instantiate both generator and discriminator
     generator_type generator;
     discriminator_type discriminator(
         leaky_relu_(0.2), leaky_relu_(0.2), leaky_relu_(0.2));
-    // set remove the bias learning from the networks
+    // Remove the bias learning from the networks
     visit_layers(generator, visitor_no_bias());
     visit_layers(discriminator, visitor_no_bias());
-    // forward random noise so that we see the tensor size at each layer
+    // Forward random noise so that we see the tensor size at each layer
     cout << "generator" << endl;
     generator(make_noise(rnd));
     cout << generator << endl;
-    // forward output of generator so that we see the tensor size at each layer
+    // Forward output of generator so that we see the tensor size at each layer
     cout << "discriminator" << endl;
-    discriminator(training_images[0]);
+    discriminator(generated_image(generator));
     cout << discriminator << endl;
 
-    // the solvers for the generator network
+    // The solvers for the generator network
     std::vector<adam> g_solvers(generator.num_computational_layers, adam(0, 0.5, 0.999));
     auto g_sstack = make_sstack(g_solvers);
     double g_learning_rate = 2e-4;
-    // the discriminator trainer
+    // The discriminator trainer
     dnn_trainer<discriminator_type, adam> d_trainer(discriminator, adam(0, 0.5, 0.999));
-    d_trainer.set_synchronization_file("dcgan_discriminator_sync", std::chrono::minutes(15));
+    // d_trainer.set_synchronization_file("dcgan_discriminator_sync", std::chrono::minutes(5));
     d_trainer.be_verbose();
     d_trainer.set_learning_rate(2e-4);
     d_trainer.set_learning_rate_shrink_factor(1);
     cout << d_trainer << endl;
 
-    const long minibatch_size = 64;
+    const size_t minibatch_size = 64;
     const auto mini_batch_real_labels = std::vector<float>(minibatch_size, 1.f);
     const auto mini_batch_fake_labels = std::vector<float>(minibatch_size, -1.f);
     while (true)
@@ -162,6 +160,7 @@ int main(int argc, char** argv) try
             mini_batch_real_samples.push_back(training_images[idx]);
         }
         d_trainer.train_one_step(mini_batch_real_samples, mini_batch_real_labels);
+        d_trainer.get_net(force_flush_to_disk::no);
 
         // train the discriminator with fake images
         // 1. generate some random noise
@@ -170,7 +169,6 @@ int main(int argc, char** argv) try
         {
             noises.push_back(std::move(make_noise(rnd)));
         }
-
         // 2. forward the noise through the generator
         resizable_tensor noises_tensor;
         generator.to_tensor(noises.begin(), noises.end(), noises_tensor);
@@ -180,10 +178,14 @@ int main(int argc, char** argv) try
         generated_images(generator, mini_batch_fake_samples);
         // 4. finally train the discriminator
         d_trainer.train_one_step(mini_batch_fake_samples, mini_batch_fake_labels);
+        d_trainer.get_net(force_flush_to_disk::no);
 
-        // train the generator
-        // ask the discriminator how the generator should update its parameters
-        d_trainer.test_one_step(mini_batch_fake_samples, mini_batch_real_labels);
+        // Train the generator
+        // Ask the discriminator how the generator should update its parameters
+        resizable_tensor images_tensor;
+        discriminator.subnet().to_tensor(mini_batch_fake_samples.begin(), mini_batch_fake_samples.end(), images_tensor);
+        discriminator.compute_loss(images_tensor, mini_batch_real_labels.begin());
+        discriminator.subnet().back_propagate_error(images_tensor);
         // get the gradient with regards to the input of the discriminator for the fake images
         const resizable_tensor& out_fake= discriminator.subnet().get_final_data_gradient();
         generator.subnet().back_propagate_error(noises_tensor, out_fake);
@@ -192,11 +194,12 @@ int main(int argc, char** argv) try
         auto iteration = d_trainer.get_train_one_step_calls();
         if (iteration % 10000 == 0)
         {
-            for (size_t i = 0; i < mini_batch_fake_samples.size(); ++i)
-            {
-                dlib::save_png(mini_batch_fake_samples[i], "fake_" + std::to_string(i) + ".png");
-                // dlib::save_png(mini_batch_real_samples[i], "real_" + std::to_string(i) + ".png");
-            }
+            save_png(tile_images(mini_batch_fake_samples), "fake_" + std::to_string(iteration) + ".png");
+            // for (size_t i = 0; i < mini_batch_fake_samples.size(); ++i)
+            // {
+            //     dlib::save_png(mini_batch_fake_samples[i], "fake_" + std::to_string(i) + ".png");
+            //     dlib::save_png(mini_batch_real_samples[i], "real_" + std::to_string(i) + ".png");
+            // }
         }
     }
 
