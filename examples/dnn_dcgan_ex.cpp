@@ -8,6 +8,25 @@
 using namespace std;
 using namespace dlib;
 
+class visitor_no_bias
+{
+public:
+    visitor_no_bias() = default;
+
+    template <typename input_layer_type>
+    void operator()(size_t, input_layer_type& ) const
+    {
+        // ignore other layers
+    }
+
+    template <typename T, typename U, typename E>
+    void operator()(size_t, add_layer<T, U, E>& l) const
+    {
+        set_bias_learning_rate_multiplier(l.layer_details(), 0.);
+        set_bias_weight_decay_multiplier(l.layer_details(), 0.);
+    }
+};
+
 // some helper definitions for the noise generation
 constexpr size_t noise_size = 100;
 using noise_t = std::array<matrix<float, 1, 1>, noise_size>;
@@ -31,7 +50,7 @@ using conp = add_layer<con_<num_filters, kernel_size, kernel_size, stride, strid
 template<long num_filters, long kernel_size, int stride, int padding, typename SUBNET>
 using contp = add_layer<cont_<num_filters, kernel_size, kernel_size, stride, stride, padding, padding>, SUBNET>;
 
-// The generator is made of a bunch of deconvolutional layers. It's input is a
+// The generator is made of a bunch of deconvolutional layers. Its input is a
 // 1 x 1 x k noise tensor, and the output is the score of the generated image
 // (decided by the discriminator, which we'll define afterwards)
 using generator_type =
@@ -47,10 +66,10 @@ using generator_type =
 // whether an image is fake or not.
 using discriminator_type =
     loss_binary_log<
-    bn_con<conp<1, 3, 1, 0,
-    prelu<bn_con<conp<256, 4, 2, 1,
-    prelu<bn_con<conp<128, 4, 2, 1,
-    prelu<conp<64, 4, 2, 1,
+    sig<conp<1, 3, 1, 0,
+    leaky_relu<bn_con<conp<256, 4, 2, 1,
+    leaky_relu<bn_con<conp<128, 4, 2, 1,
+    leaky_relu<conp<64, 4, 2, 1,
     input<matrix<unsigned char>>
     >>>>>>>>>>>;
 
@@ -99,12 +118,18 @@ int main(int argc, char** argv) try
     std::vector<unsigned long>         testing_labels;
     load_mnist_dataset(argv[1], training_images, training_labels, testing_images, testing_labels);
 
+    dlib::rand rnd(time(nullptr));
     generator_type generator;
+    visit_layers(generator, visitor_no_bias());
     discriminator_type discriminator(
-            prelu_(0.2), prelu_(0.2), prelu_(0.2));
+        leaky_relu_(0.2), leaky_relu_(0.2), leaky_relu_(0.2));
+    visit_layers(discriminator, visitor_no_bias());
+    // forward random noise
     cout << "generator" << endl;
     cout << generator << endl;
+    // forward output of generator
     cout << "discriminator" << endl;
+    discriminator(training_images[0]);
     cout << discriminator << endl;
 
     dnn_trainer<generator_type, adam> g_trainer(generator, adam(0, 0.5, 0.999));
@@ -121,9 +146,8 @@ int main(int argc, char** argv) try
     cout << d_trainer << endl;
 
     const long minibatch_size = 64;
-    const auto mini_batch_real_labels = std::vector<float>(minibatch_size, 1.0f);
-    const auto mini_batch_fake_labels = std::vector<float>(minibatch_size, -1.0f);
-    dlib::rand rnd(time(nullptr));
+    const auto mini_batch_real_labels = std::vector<float>(minibatch_size, 1.f);
+    const auto mini_batch_fake_labels = std::vector<float>(minibatch_size, -1.f);
     while (g_trainer.get_train_one_step_calls() < 1000)
     {
         // train the discriminator with real images
@@ -156,6 +180,9 @@ int main(int argc, char** argv) try
         // train the generator
         // get the gradient with regards to the input of the discriminator for the fake images
         const resizable_tensor& dis_grad_out = discriminator.subnet().get_final_data_gradient();
+        // std::cout << dis_grad_out.num_samples() << 'x' << dis_grad_out.k() << 'x'
+        //     << dis_grad_out.nr() << 'x' << dis_grad_out.nc() << '\n';
+        // std::cin.get();
         // check that the gradient hasn't been zeroed because we synced the network to the disk
         if (dis_grad_out.nr() > 0 && dis_grad_out.nc() > 0)
         {
