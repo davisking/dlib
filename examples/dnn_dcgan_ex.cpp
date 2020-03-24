@@ -83,11 +83,10 @@ matrix<unsigned char> generated_image(generator_type& net)
     return image;
 }
 
-void generated_images(generator_type& net, std::vector<matrix<unsigned char>>& images)
+std::vector<matrix<unsigned char>> get_generated_images(generator_type &net)
 {
-    images.clear();
-    const resizable_tensor& out = layer<1>(net).get_output();
-    // cout << out.num_samples() << 'x' << out.k() << 'x' << out.nr() << 'x' << out.nc() << '\n';
+    std::vector<matrix<unsigned char>> images;
+    const resizable_tensor &out = layer<1>(net).get_output();
     for (size_t n = 0; n < out.num_samples(); ++n)
     {
         matrix<float> output = image_plane(out, n);
@@ -95,6 +94,7 @@ void generated_images(generator_type& net, std::vector<matrix<unsigned char>>& i
         assign_image_scaled(image, output);
         images.push_back(std::move(image));
     }
+    return images;
 }
 
 int main(int argc, char** argv) try
@@ -142,27 +142,26 @@ int main(int argc, char** argv) try
     // The discriminator trainer
     dnn_trainer<discriminator_type, adam> d_trainer(discriminator, adam(0, 0.5, 0.999));
     // d_trainer.set_synchronization_file("dcgan_discriminator_sync", std::chrono::minutes(5));
-    d_trainer.be_verbose();
+    d_trainer.be_quiet();
     d_trainer.set_learning_rate(2e-4);
     d_trainer.set_learning_rate_shrink_factor(1);
     cout << d_trainer << endl;
 
     const size_t minibatch_size = 64;
-    const auto mini_batch_real_labels = std::vector<float>(minibatch_size, 1.f);
-    const auto mini_batch_fake_labels = std::vector<float>(minibatch_size, -1.f);
+    std::vector<float> real_labels(minibatch_size, 1.f);
+    std::vector<float> fake_labels(minibatch_size, -1.f);
     while (true)
     {
-        // train the discriminator with real images
-        std::vector<matrix<unsigned char>> mini_batch_real_samples;
-        while (mini_batch_real_samples.size() < minibatch_size)
+        // Train the discriminator with real images
+        std::vector<matrix<unsigned char>> real_samples;
+        while (real_samples.size() < minibatch_size)
         {
             auto idx = rnd.get_random_32bit_number() % training_images.size();
-            mini_batch_real_samples.push_back(training_images[idx]);
+            real_samples.push_back(training_images[idx]);
         }
-        d_trainer.train_one_step(mini_batch_real_samples, mini_batch_real_labels);
-        d_trainer.get_net(force_flush_to_disk::no);
+        d_trainer.train_one_step(real_samples, real_labels);
 
-        // train the discriminator with fake images
+        // Train the discriminator with fake images
         // 1. generate some random noise
         std::vector<noise_t> noises;
         while (noises.size() < minibatch_size)
@@ -174,32 +173,41 @@ int main(int argc, char** argv) try
         generator.to_tensor(noises.begin(), noises.end(), noises_tensor);
         generator.subnet().forward(noises_tensor);
         // 3. get the generated images from the generator
-        std::vector<matrix<unsigned char>> mini_batch_fake_samples;
-        generated_images(generator, mini_batch_fake_samples);
-        // 4. finally train the discriminator
-        d_trainer.train_one_step(mini_batch_fake_samples, mini_batch_fake_labels);
+        const auto fake_samples = get_generated_images(generator);
+        // 4. finally train the discriminator and wait for the threads to stop
+        d_trainer.train_one_step(fake_samples, fake_labels);
         d_trainer.get_net(force_flush_to_disk::no);
+        auto d_loss = d_trainer.get_average_loss();
 
         // Train the generator
-        // Ask the discriminator how the generator should update its parameters
-        resizable_tensor images_tensor;
-        discriminator.subnet().to_tensor(mini_batch_fake_samples.begin(), mini_batch_fake_samples.end(), images_tensor);
-        discriminator.compute_loss(images_tensor, mini_batch_real_labels.begin());
-        discriminator.subnet().back_propagate_error(images_tensor);
-        // get the gradient with regards to the input of the discriminator for the fake images
+        // This part is the essence of the Generative Adversarial Networks.
+        // Until now, we have just trained a binary classifier that the generator is not
+        // aware of. But now the discriminator is going to give feedback to the generator
+        // on how it should update itself to generate more realistic images.
+        // The following lines perform the same actions as train_one_step() except for the
+        // network update part. They can also be seen as test_one_step() plus the error
+        // back propagation.
+        resizable_tensor samples_tensor;
+        // Convert the fake samples to a tensor
+        discriminator.subnet().to_tensor(fake_samples.begin(), fake_samples.end(), samples_tensor);
+        // Forward the samples and compute the loss with real labels
+        auto g_loss = discriminator.compute_loss(samples_tensor, real_labels.begin());
+        // Back propagate the error to fill the final data gradient
+        discriminator.subnet().back_propagate_error(samples_tensor);
+        // Get the gradient that will tell the generator how to update itself
         const resizable_tensor& out_fake= discriminator.subnet().get_final_data_gradient();
         generator.subnet().back_propagate_error(noises_tensor, out_fake);
         generator.subnet().update_parameters(g_sstack, g_learning_rate);
 
-        auto iteration = d_trainer.get_train_one_step_calls();
-        if (iteration % 10000 == 0)
+        // The number of training iterations is half of the step calls
+        auto iteration = d_trainer.get_train_one_step_calls() / 2;
+        if (iteration % 1000 == 0)
         {
-            save_png(tile_images(mini_batch_fake_samples), "fake_" + std::to_string(iteration) + ".png");
-            // for (size_t i = 0; i < mini_batch_fake_samples.size(); ++i)
-            // {
-            //     dlib::save_png(mini_batch_fake_samples[i], "fake_" + std::to_string(i) + ".png");
-            //     dlib::save_png(mini_batch_real_samples[i], "real_" + std::to_string(i) + ".png");
-            // }
+            std::cout <<
+                "step#: " << iteration <<
+                "\tdiscriminator loss: " << d_loss <<
+                "\tgenerator loss: " << g_loss << '\n';
+            save_png(tile_images(fake_samples), "fake_" + std::to_string(iteration) + ".png");
         }
     }
 
