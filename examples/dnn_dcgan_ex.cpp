@@ -3,6 +3,7 @@
 
 #include <dlib/data_io.h>
 #include <dlib/dnn.h>
+#include <dlib/gui_widgets.h>
 #include <dlib/matrix.h>
 
 using namespace std;
@@ -53,7 +54,8 @@ using contp = add_layer<cont_<num_filters, kernel_size, kernel_size, stride, str
 
 // The generator is made of a bunch of deconvolutional layers. Its input is a
 // 1 x 1 x k noise tensor, and the output is the generated image.
-// The loss layer does not matter, we just put one to be able to call it.
+// The loss layer does not matter, we just put a compatible one to be able to
+// have a () operator on the generator.
 using generator_type =
     loss_binary_log_per_pixel<
     htan<contp<1, 4, 2, 1,
@@ -75,8 +77,9 @@ using discriminator_type =
     >>>>>>>>>>>;
 
 // Some helper functions to get the images from the generator
-matrix<unsigned char> generated_image(generator_type& net)
+matrix<unsigned char> generate_image(generator_type& net, const noise_t& noise)
 {
+    net(noise);
     matrix<float> output = image_plane(layer<1>(net).get_output());
     matrix<unsigned char> image;
     assign_image_scaled(image, output);
@@ -127,12 +130,10 @@ int main(int argc, char** argv) try
     visit_layers(generator, visitor_no_bias());
     visit_layers(discriminator, visitor_no_bias());
     // Forward random noise so that we see the tensor size at each layer
+    discriminator(generate_image(generator, make_noise(rnd)));
     cout << "generator" << endl;
-    generator(make_noise(rnd));
     cout << generator << endl;
-    // Forward output of generator so that we see the tensor size at each layer
     cout << "discriminator" << endl;
-    discriminator(generated_image(generator));
     cout << discriminator << endl;
 
     // The solvers for the generator network
@@ -141,16 +142,22 @@ int main(int argc, char** argv) try
     double g_learning_rate = 2e-4;
     // The discriminator trainer
     dnn_trainer<discriminator_type, adam> d_trainer(discriminator, adam(0, 0.5, 0.999));
-    // d_trainer.set_synchronization_file("dcgan_discriminator_sync", std::chrono::minutes(5));
     d_trainer.be_quiet();
     d_trainer.set_learning_rate(2e-4);
     d_trainer.set_learning_rate_shrink_factor(1);
     cout << d_trainer << endl;
 
+    if (file_exists("dcgan_sync"))
+    {
+        deserialize("dcgan_sync") >> generator >> d_trainer;
+    }
+
     const size_t minibatch_size = 64;
     std::vector<float> real_labels(minibatch_size, 1.f);
     std::vector<float> fake_labels(minibatch_size, -1.f);
-    while (true)
+    dlib::image_window win;
+    size_t iteration = 0;
+    while (iteration < 50'000)
     {
         // Train the discriminator with real images
         std::vector<matrix<unsigned char>> real_samples;
@@ -177,7 +184,7 @@ int main(int argc, char** argv) try
         // 4. finally train the discriminator and wait for the threads to stop
         d_trainer.train_one_step(fake_samples, fake_labels);
         d_trainer.get_net(force_flush_to_disk::no);
-        auto d_loss = d_trainer.get_average_loss();
+        const auto d_loss = d_trainer.get_average_loss();
 
         // Train the generator
         // This part is the essence of the Generative Adversarial Networks.
@@ -191,7 +198,7 @@ int main(int argc, char** argv) try
         // Convert the fake samples to a tensor
         discriminator.subnet().to_tensor(fake_samples.begin(), fake_samples.end(), samples_tensor);
         // Forward the samples and compute the loss with real labels
-        auto g_loss = discriminator.compute_loss(samples_tensor, real_labels.begin());
+        const auto g_loss = discriminator.compute_loss(samples_tensor, real_labels.begin());
         // Back propagate the error to fill the final data gradient
         discriminator.subnet().back_propagate_error(samples_tensor);
         // Get the gradient that will tell the generator how to update itself
@@ -200,15 +207,28 @@ int main(int argc, char** argv) try
         generator.subnet().update_parameters(g_sstack, g_learning_rate);
 
         // The number of training iterations is half of the step calls
-        auto iteration = d_trainer.get_train_one_step_calls() / 2;
+        iteration = d_trainer.get_train_one_step_calls() / 2;
         if (iteration % 1000 == 0)
         {
+            serialize("dcgan_sync") << generator << d_trainer;
             std::cout <<
                 "step#: " << iteration <<
                 "\tdiscriminator loss: " << d_loss <<
                 "\tgenerator loss: " << g_loss << '\n';
-            save_png(tile_images(fake_samples), "fake_" + std::to_string(iteration) + ".png");
+            win.set_image(tile_images(fake_samples));
+            win.set_title("DCGAN step#: " + to_string(iteration));
         }
+    }
+
+    // Once the training is finished, we don't need the generator any more. We just keep the generator.
+    generator.clean();
+    serialize("dcgan_mnist.dnn") << generator;
+
+    // To test the generator, we just forward some random noise through it and visualize the output.
+    while (not win.is_closed())
+    {
+        win.set_image(generate_image(generator, make_noise(rnd)));
+        cin.get();
     }
 
     return EXIT_SUCCESS;
