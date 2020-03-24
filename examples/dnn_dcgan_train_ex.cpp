@@ -246,7 +246,7 @@ int main(int argc, char** argv) try
         }
     }
 
-    // Once the training is finished, we don't need the generator any more. We just keep the generator.
+    // Once the training has finished, we don't need the generator any more. We just keep the generator.
     generator.clean();
     serialize("dcgan_mnist.dnn") << generator;
 
