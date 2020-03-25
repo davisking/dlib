@@ -145,7 +145,6 @@ int main(int argc, char** argv) try
     std::vector<unsigned long>         testing_labels;
     load_mnist_dataset(argv[1], training_images, training_labels, testing_images, testing_labels);
 
-    dlib::rand rnd;
     // Instantiate both generator and discriminator
     generator_type generator;
     discriminator_type discriminator(
@@ -153,6 +152,8 @@ int main(int argc, char** argv) try
     // Remove the bias learning from the networks
     visit_layers(generator, visitor_no_bias());
     visit_layers(discriminator, visitor_no_bias());
+    // Fix the random generator seed
+    dlib::rand rnd(time_t(1234));
     // Forward random noise so that we see the tensor size at each layer
     discriminator(generate_image(generator, make_noise(rnd)));
     cout << "generator" << endl;
@@ -231,8 +232,8 @@ int main(int argc, char** argv) try
         generator.subnet().back_propagate_error(noises_tensor, out_fake);
         generator.subnet().update_parameters(g_sstack, g_learning_rate);
 
-        // After around 20'000 iterations, we should see that the generated images start
-        // looking like MNIST digits.
+        // After around 5'000 iterations, we should see that the generated images look almost
+        // like samples taken directly from the MNIST dataset
         iteration = d_trainer.get_train_one_step_calls() / 2;
         if (iteration % 1000 == 0)
         {
