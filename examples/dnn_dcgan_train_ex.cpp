@@ -257,6 +257,7 @@ int main(int argc, char** argv) try
     while (not win.is_closed())
     {
         win.set_image(generate_image(generator, make_noise(rnd)));
+        cout << "Hit enter to generate a new image";
         cin.get();
     }
 
