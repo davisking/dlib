@@ -1,24 +1,27 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
-    This is an example illustrating the use of the deep learning tools from the
-    dlib C++ Library.  I'm assuming you have already read the dnn_introduction_ex.cpp,
-    the dnn_introduction2_ex.cpp and the dnn_introduction3_ex.cpp examples.  So in this
-    example program I'm going to go over how to train Generative Adversarial Networks (GANs).
-    In particular, we will train a Deep Convolutional Generative Adversarial Network (DCGAN)
-    like the one introduced in this paper:
+    This is an example illustrating the use of the deep learning tools from the dlib C++
+    Library.  I'm assuming you have already read the dnn_introduction_ex.cpp, the
+    dnn_introduction2_ex.cpp and the dnn_introduction3_ex.cpp examples.  In this example
+    program we are going to show how one can train Generative Adversarial Networks (GANs).  In
+    particular, we will train a Deep Convolutional Generative Adversarial Network (DCGAN) like
+    the one introduced in this paper:
     "Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks"
     by Alec Radford, Luke Metz, Soumith Chintala.
 
     The main idea is that there are two neural networks training at the same time:
-    - the generator is in charge of generating images that look as close as possible
-      from the ones in the dataset.
-    - the discriminator is in charge of deciding whether an image is fake (output by the generator)
-      or real (from the dataset).
+    - the generator is in charge of generating images that look as close as possible as the
+      ones from the dataset.
+    - the discriminator will decide whether an image is fake (created by the generator) or real
+      (selected from the dataset).
 
-    Each training iteration alternates between training the discriminator with real and fake images
-    and then using the gradient from the discriminator to update the generator.
+    Each training iteration alternates between training the discriminator and the generator.
+    We first train the discriminator with real and fake images and then use the gradient from
+    the discriminator to update the generator.
 
-    In this example, we are going to learn how to generate digits from the MNIST dataset.
+    In this example, we are going to learn how to generate digits from the MNIST dataset, but
+    the same code can be run using the Fashion MNIST datset:
+    https://github.com/zalandoresearch/fashion-mnist
 */
 
 #include <algorithm>
@@ -32,9 +35,8 @@
 using namespace std;
 using namespace dlib;
 
-// We start defining a simple visitor to disable bias learning in a network.
-// By default, biases are initialized to 0, so setting the multipliers to 0,
-// disables bias learning.
+// We start by defining a simple visitor to disable bias learning in a network.  By default,
+// biases are initialized to 0, so setting the multipliers to 0 disables bias learning.
 class visitor_no_bias
 {
 public:
@@ -52,8 +54,8 @@ public:
     }
 };
 
-// some helper definitions for the noise generation
-constexpr size_t noise_size = 100;
+// Some helper definitions for the noise generation
+const size_t noise_size = 100;
 using noise_t = std::array<matrix<float, 1, 1>, noise_size>;
 
 noise_t make_noise(dlib::rand& rnd)
@@ -75,10 +77,10 @@ using conp = add_layer<con_<num_filters, kernel_size, kernel_size, stride, strid
 template<long num_filters, long kernel_size, int stride, int padding, typename SUBNET>
 using contp = add_layer<cont_<num_filters, kernel_size, kernel_size, stride, stride, padding, padding>, SUBNET>;
 
-// The generator is made of a bunch of deconvolutional layers. Its input is a
-// 1 x 1 x k noise tensor, and the output is the generated image.
-// The loss layer does not matter, we just put a compatible one to be able to
-// have a () operator on the generator.
+// The generator is made of a bunch of deconvolutional layers.  Its input is a 1 x 1 x k noise
+// tensor, and the output is the generated image.  The loss layer does not matter for the
+// training, we just stack a compatible one on topi to be able to have a () operator on the
+// generator.
 using generator_type =
     loss_binary_log_per_pixel<
     htan<contp<1, 4, 2, 1,
@@ -88,8 +90,8 @@ using generator_type =
     input<noise_t>
     >>>>>>>>>>>>;
 
-// Now, let's proceed to define the discriminator, whose role will be to decide
-// whether an image is fake or not.
+// Now, let's proceed to define the discriminator, whose role will be to decide whether an
+// image is fake or not.
 using discriminator_type =
     loss_binary_log<
     htan<conp<1, 3, 1, 0,
@@ -134,9 +136,9 @@ int main(int argc, char** argv) try
         return EXIT_FAILURE;
     }
 
-    // MNIST is broken into two parts, a training set of 60000 images and a test set of
-    // 10000 images.  Each image is labeled so that we know what hand written digit is
-    // depicted.  These next statements load the dataset into memory.
+    // MNIST is broken into two parts, a training set of 60000 images and a test set of 10000
+    // images.  Each image is labeled so that we know what hand written digit is depicted.
+    // These next statements load the dataset into memory.
     std::vector<matrix<unsigned char>> training_images;
     std::vector<unsigned long>         training_labels;
     std::vector<matrix<unsigned char>> testing_images;
@@ -158,8 +160,8 @@ int main(int argc, char** argv) try
     cout << "discriminator" << endl;
     cout << discriminator << endl;
 
-    // The solvers for the generator network.  In this case, we don't need to use a
-    //  dnn_trainer for the generator
+    // The solvers for the generator network.  In this case, we don't need to use a dnn_trainer
+    // for the generator, since we are going to train it manually
     std::vector<adam> g_solvers(generator.num_computational_layers, adam(0, 0.5, 0.999));
     auto g_sstack = make_sstack(g_solvers);
     double g_learning_rate = 2e-4;
@@ -170,7 +172,7 @@ int main(int argc, char** argv) try
     d_trainer.set_learning_rate_shrink_factor(1);
     cout << d_trainer << endl;
 
-    // resume training from last sync file
+    // Resume training from last sync file
     if (file_exists("dcgan_sync"))
     {
         deserialize("dcgan_sync") >> generator >> d_trainer;
@@ -211,13 +213,12 @@ int main(int argc, char** argv) try
         const auto d_loss = d_trainer.get_average_loss();
 
         // Train the generator
-        // This part is the essence of the Generative Adversarial Networks.
-        // Until now, we have just trained a binary classifier that the generator is not
-        // aware of.  But now, the discriminator is going to give feedback to the generator
-        // on how it should update itself to generate more realistic images.
-        // The following lines perform the same actions as train_one_step() except for the
-        // network update part.  They can also be seen as test_one_step() plus the error
-        // back propagation.
+        // This part is the essence of the Generative Adversarial Networks.  Until now, we have
+        // just trained a binary classifier that the generator is not aware of.  But now, the
+        // discriminator is going to give feedback to the generator on how it should update
+        // itself to generate more realistic images.  The following lines perform the same
+        // actions as train_one_step() except for the network update part.  They can also be
+        // seen as test_one_step() plus the error back propagation.
         resizable_tensor samples_tensor;
         // Convert the fake samples to a tensor
         discriminator.subnet().to_tensor(fake_samples.begin(), fake_samples.end(), samples_tensor);
@@ -230,9 +231,8 @@ int main(int argc, char** argv) try
         generator.subnet().back_propagate_error(noises_tensor, out_fake);
         generator.subnet().update_parameters(g_sstack, g_learning_rate);
 
-        // The number of training iterations is half of the step calls number.
-        // After around 20'000 iterations, we should see that the generated
-        // images start looking like MNIST digits.
+        // After around 20'000 iterations, we should see that the generated images start
+        // looking like MNIST digits.
         iteration = d_trainer.get_train_one_step_calls() / 2;
         if (iteration % 1000 == 0)
         {
@@ -246,11 +246,13 @@ int main(int argc, char** argv) try
         }
     }
 
-    // Once the training has finished, we don't need the generator any more. We just keep the generator.
+    // Once the training has finished, we don't need the generator any more. We just keep the
+    // generator.
     generator.clean();
     serialize("dcgan_mnist.dnn") << generator;
 
-    // To test the generator, we just forward some random noise through it and visualize the output.
+    // To test the generator, we just forward some random noise through it and visualize the
+    // output.
     while (not win.is_closed())
     {
         win.set_image(generate_image(generator, make_noise(rnd)));
