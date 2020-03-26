@@ -145,6 +145,10 @@ int main(int argc, char** argv) try
     std::vector<unsigned long>         testing_labels;
     load_mnist_dataset(argv[1], training_images, training_labels, testing_images, testing_labels);
 
+    // Fix the random generator seeds for network initialization and noise
+    srand(314159);
+    dlib::rand rnd(std::rand());
+
     // Instantiate both generator and discriminator
     generator_type generator;
     discriminator_type discriminator(
@@ -152,8 +156,6 @@ int main(int argc, char** argv) try
     // Remove the bias learning from the networks
     visit_layers(generator, visitor_no_bias());
     visit_layers(discriminator, visitor_no_bias());
-    // Fix the random generator seed
-    dlib::rand rnd(time_t(1234));
     // Forward random noise so that we see the tensor size at each layer
     discriminator(generate_image(generator, make_noise(rnd)));
     cout << "generator" << endl;
@@ -165,11 +167,11 @@ int main(int argc, char** argv) try
     // for the generator, since we are going to train it manually
     std::vector<adam> g_solvers(generator.num_computational_layers, adam(0, 0.5, 0.999));
     auto g_sstack = make_sstack(g_solvers);
-    double g_learning_rate = 2e-4;
+    double learning_rate = 2e-4;
     // The discriminator trainer
     dnn_trainer<discriminator_type, adam> d_trainer(discriminator, adam(0, 0.5, 0.999));
     d_trainer.be_quiet();
-    d_trainer.set_learning_rate(2e-4);
+    d_trainer.set_learning_rate(learning_rate);
     d_trainer.set_learning_rate_shrink_factor(1);
     cout << d_trainer << endl;
 
@@ -220,8 +222,9 @@ int main(int argc, char** argv) try
         // itself to generate more realistic images.  The following lines perform the same
         // actions as train_one_step() except for the network update part.  They can also be
         // seen as test_one_step() plus the error back propagation.
-        resizable_tensor samples_tensor;
+
         // Convert the fake samples to a tensor
+        resizable_tensor samples_tensor;
         discriminator.subnet().to_tensor(fake_samples.begin(), fake_samples.end(), samples_tensor);
         // Forward the samples and compute the loss with real labels
         const auto g_loss = discriminator.compute_loss(samples_tensor, real_labels.begin());
@@ -230,10 +233,10 @@ int main(int argc, char** argv) try
         // Get the gradient that will tell the generator how to update itself
         const resizable_tensor& out_fake= discriminator.subnet().get_final_data_gradient();
         generator.subnet().back_propagate_error(noises_tensor, out_fake);
-        generator.subnet().update_parameters(g_sstack, g_learning_rate);
+        generator.subnet().update_parameters(g_sstack, learning_rate);
 
-        // After around 5'000 iterations, we should see that the generated images look almost
-        // like samples taken directly from the MNIST dataset
+        // At some point, we should see that the generated images start looking like samples from
+        // the MNIST dataset
         iteration = d_trainer.get_train_one_step_calls() / 2;
         if (iteration % 1000 == 0)
         {
