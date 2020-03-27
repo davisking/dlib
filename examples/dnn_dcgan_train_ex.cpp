@@ -223,15 +223,15 @@ int main(int argc, char** argv) try
         // seen as test_one_step() plus the error back propagation.
 
         // Convert the fake samples to a tensor
-        resizable_tensor samples_tensor;
-        discriminator.subnet().to_tensor(fake_samples.begin(), fake_samples.end(), samples_tensor);
+        resizable_tensor fake_samples_tensor;
+        discriminator.subnet().to_tensor(fake_samples.begin(), fake_samples.end(), fake_samples_tensor);
         // Forward the samples and compute the loss with real labels
-        const auto g_loss = discriminator.compute_loss(samples_tensor, real_labels.begin());
+        const auto g_loss = discriminator.compute_loss(fake_samples_tensor, real_labels.begin());
         // Back propagate the error to fill the final data gradient
-        discriminator.subnet().back_propagate_error(samples_tensor);
+        discriminator.subnet().back_propagate_error(fake_samples_tensor);
         // Get the gradient that will tell the generator how to update itself
-        const resizable_tensor& out_fake= discriminator.subnet().get_final_data_gradient();
-        generator.subnet().back_propagate_error(noises_tensor, out_fake);
+        const resizable_tensor& d_grad = discriminator.subnet().get_final_data_gradient();
+        generator.subnet().back_propagate_error(noises_tensor, d_grad);
         generator.subnet().update_parameters(g_solvers, learning_rate);
 
         // At some point, we should see that the generated images start looking like samples from
