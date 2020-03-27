@@ -249,7 +249,7 @@ int main(int argc, char** argv) try
         }
     }
 
-    // Once the training has finished, we don't need the generator any more. We just keep the
+    // Once the training has finished, we don't need the discriminator any more. We just keep the
     // generator.
     generator.clean();
     serialize("dcgan_mnist.dnn") << generator;
