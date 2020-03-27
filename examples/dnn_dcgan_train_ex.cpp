@@ -61,11 +61,10 @@ using noise_t = std::array<matrix<float, 1, 1>, noise_size>;
 noise_t make_noise(dlib::rand& rnd)
 {
     noise_t noise;
-    std::for_each(begin(noise), end(noise),
-        [&rnd] (matrix<float, 1, 1> &m)
-        {
-            m = rnd.get_random_gaussian();
-        });
+    for (auto& n : noise)
+    {
+        n = rnd.get_random_gaussian();
+    }
     return noise;
 }
 
@@ -79,7 +78,7 @@ using contp = add_layer<cont_<num_filters, kernel_size, kernel_size, stride, str
 
 // The generator is made of a bunch of deconvolutional layers.  Its input is a 1 x 1 x k noise
 // tensor, and the output is the generated image.  The loss layer does not matter for the
-// training, we just stack a compatible one on topi to be able to have a () operator on the
+// training, we just stack a compatible one on top to be able to have a () operator on the
 // generator.
 using generator_type =
     loss_binary_log_per_pixel<
@@ -104,9 +103,9 @@ using discriminator_type =
 // Some helper functions to generate and get the images from the generator
 matrix<unsigned char> generate_image(generator_type& net, const noise_t& noise)
 {
-    matrix<float> output = net(noise);
+    const matrix<float> output = net(noise);
     matrix<unsigned char> image;
-    assign_image_scaled(image, output);
+    assign_image(image, 127.5f * (output + 1.f));
     return image;
 }
 
@@ -118,7 +117,7 @@ std::vector<matrix<unsigned char>> get_generated_images(generator_type& net)
     {
         matrix<float> output = image_plane(out, n);
         matrix<unsigned char> image;
-        assign_image_scaled(image, output);
+        assign_image(image, 127.5f * (output + 1.f));
         images.push_back(std::move(image));
     }
     return images;
@@ -146,13 +145,13 @@ int main(int argc, char** argv) try
     load_mnist_dataset(argv[1], training_images, training_labels, testing_images, testing_labels);
 
     // Fix the random generator seeds for network initialization and noise
-    srand(314159);
+    srand(1234);
     dlib::rand rnd(std::rand());
 
     // Instantiate both generator and discriminator
     generator_type generator;
     discriminator_type discriminator(
-        leaky_relu_(0.2), leaky_relu_(0.2), leaky_relu_(0.2));
+        leaky_relu_(0.2f), leaky_relu_(0.2f), leaky_relu_(0.2f));
     // Remove the bias learning from the networks
     visit_layers(generator, visitor_no_bias());
     visit_layers(discriminator, visitor_no_bias());
@@ -165,11 +164,11 @@ int main(int argc, char** argv) try
 
     // The solvers for the generator network.  In this case, we don't need to use a dnn_trainer
     // for the generator, since we are going to train it manually
-    std::vector<adam> g_solvers(generator.num_computational_layers, adam(0, 0.5, 0.999));
-    auto g_sstack = make_sstack(g_solvers);
+    adam solver(0.f, 0.5f, 0.999f);
+    std::vector<adam> g_solvers(generator.num_computational_layers, solver);
     double learning_rate = 2e-4;
     // The discriminator trainer
-    dnn_trainer<discriminator_type, adam> d_trainer(discriminator, adam(0, 0.5, 0.999));
+    dnn_trainer<discriminator_type, adam> d_trainer(discriminator, solver);
     d_trainer.be_quiet();
     d_trainer.set_learning_rate(learning_rate);
     d_trainer.set_learning_rate_shrink_factor(1);
@@ -186,7 +185,7 @@ int main(int argc, char** argv) try
     const std::vector<float> fake_labels(minibatch_size, -1.f);
     dlib::image_window win;
     size_t iteration = 0;
-    while (iteration < 50'000)
+    while (iteration < 50000)
     {
         // Train the discriminator with real images
         std::vector<matrix<unsigned char>> real_samples;
@@ -233,7 +232,7 @@ int main(int argc, char** argv) try
         // Get the gradient that will tell the generator how to update itself
         const resizable_tensor& out_fake= discriminator.subnet().get_final_data_gradient();
         generator.subnet().back_propagate_error(noises_tensor, out_fake);
-        generator.subnet().update_parameters(g_sstack, learning_rate);
+        generator.subnet().update_parameters(g_solvers, learning_rate);
 
         // At some point, we should see that the generated images start looking like samples from
         // the MNIST dataset
