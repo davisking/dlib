@@ -82,7 +82,7 @@ using contp = add_layer<cont_<num_filters, kernel_size, kernel_size, stride, str
 // generator.
 using generator_type =
     loss_binary_log_per_pixel<
-    htan<contp<1, 4, 2, 1,
+    sig<contp<1, 4, 2, 1,
     relu<bn_con<contp<64, 4, 2, 1,
     relu<bn_con<contp<128, 3, 2, 1,
     relu<bn_con<contp<256, 4, 1, 0,
@@ -93,19 +93,19 @@ using generator_type =
 // image is fake or not.
 using discriminator_type =
     loss_binary_log<
-    htan<conp<1, 3, 1, 0,
+    conp<1, 3, 1, 0,
     leaky_relu<bn_con<conp<256, 4, 2, 1,
     leaky_relu<bn_con<conp<128, 4, 2, 1,
     leaky_relu<conp<64, 4, 2, 1,
     input<matrix<unsigned char>>
-    >>>>>>>>>>>;
+    >>>>>>>>>>;
 
 // Some helper functions to generate and get the images from the generator
 matrix<unsigned char> generate_image(generator_type& net, const noise_t& noise)
 {
     const matrix<float> output = net(noise);
     matrix<unsigned char> image;
-    assign_image(image, 127.5f * (output + 1.f));
+    assign_image(image, 255 * output);
     return image;
 }
 
@@ -117,7 +117,7 @@ std::vector<matrix<unsigned char>> get_generated_images(generator_type& net)
     {
         matrix<float> output = image_plane(out, n);
         matrix<unsigned char> image;
-        assign_image(image, 127.5f * (output + 1.f));
+        assign_image(image, 255 * output);
         images.push_back(std::move(image));
     }
     return images;
@@ -151,7 +151,7 @@ int main(int argc, char** argv) try
     // Instantiate both generator and discriminator
     generator_type generator;
     discriminator_type discriminator(
-        leaky_relu_(0.2f), leaky_relu_(0.2f), leaky_relu_(0.2f));
+        leaky_relu_(0.2), leaky_relu_(0.2), leaky_relu_(0.2));
     // Remove the bias learning from the networks
     visit_layers(generator, visitor_no_bias());
     visit_layers(discriminator, visitor_no_bias());
@@ -164,7 +164,7 @@ int main(int argc, char** argv) try
 
     // The solvers for the generator network.  In this case, we don't need to use a dnn_trainer
     // for the generator, since we are going to train it manually
-    adam solver(0.f, 0.5f, 0.999f);
+    adam solver(0, 0.5, 0.999);
     std::vector<adam> g_solvers(generator.num_computational_layers, solver);
     double learning_rate = 2e-4;
     // The discriminator trainer
@@ -181,8 +181,8 @@ int main(int argc, char** argv) try
     }
 
     const size_t minibatch_size = 64;
-    const std::vector<float> real_labels(minibatch_size, 1.f);
-    const std::vector<float> fake_labels(minibatch_size, -1.f);
+    const std::vector<float> real_labels(minibatch_size, 1);
+    const std::vector<float> fake_labels(minibatch_size, -1);
     dlib::image_window win;
     size_t iteration = 0;
     while (iteration < 50000)
@@ -201,7 +201,7 @@ int main(int argc, char** argv) try
         std::vector<noise_t> noises;
         while (noises.size() < minibatch_size)
         {
-            noises.push_back(std::move(make_noise(rnd)));
+            noises.push_back(make_noise(rnd));
         }
         // 2. forward the noise through the generator
         resizable_tensor noises_tensor;
