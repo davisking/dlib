@@ -256,7 +256,7 @@ int main(int argc, char** argv) try
 
     // To test the generator, we just forward some random noise through it and visualize the
     // output.
-    while (not win.is_closed())
+    while (!win.is_closed())
     {
         win.set_image(generate_image(generator, make_noise(rnd)));
         cout << "Hit enter to generate a new image";
