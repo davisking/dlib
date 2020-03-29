@@ -57,7 +57,7 @@ namespace dlib
 
     template <typename EXP> class matrix_exp;
     template <typename EXP>
-    class matrix_exp_iterator : public std::iterator<std::forward_iterator_tag, typename matrix_traits<EXP>::type>
+    class matrix_exp_iterator
     {
         friend class matrix_exp<EXP>;
         matrix_exp_iterator(const EXP& m_, long r_, long c_)
@@ -72,9 +72,13 @@ namespace dlib
 
         matrix_exp_iterator() : r(0), c(0), nc(0), m(0) {}
 
-        typedef typename matrix_traits<EXP>::type type;
-        typedef type value_type;
-        typedef typename matrix_traits<EXP>::const_ret_type const_ret_type;
+        using type = typename matrix_traits<EXP>::type;
+        using const_ret_type = typename matrix_traits<EXP>::const_ret_type;
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = type;
+        using difference_type = std::ptrdiff_t;
+        using pointer = value_type*;
+        using reference = value_type&;
 
 
         bool operator == ( const matrix_exp_iterator& itr) const
