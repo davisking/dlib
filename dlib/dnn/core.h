@@ -1000,6 +1000,12 @@ namespace dlib
             subnetwork->update_parameters(solvers.pop(), learning_rate);
         }
 
+        template <typename solver_type>
+        void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
+        {
+            subnetwork->update_parameters(make_sstack(solvers), learning_rate);
+        }
+
         const tensor& get_parameter_gradient(
         ) const { return params_grad; }
 

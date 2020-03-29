@@ -2132,7 +2132,9 @@ namespace dlib
         const tensor& get_layer_params() const;
         tensor& get_layer_params();
         /*!
-            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_
+            interface.  Note that this layer doesn't have any parameters, so the tensor
+            returned by get_layer_params() is always empty.
         !*/
     };
 
