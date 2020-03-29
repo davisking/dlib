@@ -639,6 +639,13 @@ namespace dlib
                 - The solvers use the given learning rate.
         !*/
 
+        template <typename solver_type>
+        void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
+        { update_parameters(make_sstack(solvers), learning_rate); }
+        /*!
+            Convenience method for calling update_parameters()
+        !*/
+
         void clean(
         );
         /*!
@@ -1153,6 +1160,13 @@ namespace dlib
                   solver object.  This produces a parameter delta vector which we add to
                   the layer's parameters.
                 - The solvers use the given learning rate.
+        !*/
+
+        template <typename solver_type>
+        void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
+        { update_parameters(make_sstack(solvers), learning_rate); }
+        /*!
+            Convenience method for calling update_parameters()
         !*/
 
     // -------------

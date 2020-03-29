@@ -1003,7 +1003,7 @@ namespace dlib
         template <typename solver_type>
         void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
         {
-            subnetwork->update_parameters(make_sstack(solvers), learning_rate);
+            update_parameters(make_sstack(solvers), learning_rate);
         }
 
         const tensor& get_parameter_gradient(
@@ -1369,6 +1369,12 @@ namespace dlib
             }
         }
 
+        template <typename solver_type>
+        void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
+        {
+            update_parameters(make_sstack(solvers), learning_rate);
+        }
+
         const tensor& get_parameter_gradient(
         ) const { return params_grad; }
 
@@ -1607,6 +1613,12 @@ namespace dlib
         void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
             subnetwork.update_parameters(solvers, learning_rate);
+        }
+
+        template <typename solver_type>
+        void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
+        {
+            update_parameters(make_sstack(solvers), learning_rate);
         }
 
         const tensor& get_parameter_gradient(
@@ -1905,6 +1917,12 @@ namespace dlib
             subnetwork.update_parameters(solvers.pop(comp_layers_in_each_group*details.size()),learning_rate);
         }
 
+        template <typename solver_type>
+        void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
+        {
+            update_parameters(make_sstack(solvers), learning_rate);
+        }
+
         const subnet_type& subnet() const { return subnetwork; }
         subnet_type& subnet() { return subnetwork; }
 
@@ -2133,6 +2151,12 @@ namespace dlib
         void update_parameters(sstack<solver_type> /*solvers*/, double /*learning_rate*/)
         {
             // nothing to do
+        }
+
+        template <typename solver_type>
+        void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
+        {
+            update_parameters(make_sstack(solvers), learning_rate);
         }
 
         const subnet_type& subnet() const { return input_layer; }
@@ -2550,6 +2574,12 @@ namespace dlib
             subnetwork.update_parameters(solvers, learning_rate);
         }
 
+        template <typename solver_type>
+        void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
+        {
+            update_parameters(make_sstack(solvers), learning_rate);
+        }
+
         const subnet_type& subnet() const { return subnetwork; }
         subnet_type& subnet() { return subnetwork; }
         const loss_details_type& loss_details() const { return loss; }
@@ -2938,6 +2968,12 @@ namespace dlib
         void update_parameters(sstack<solver_type> solvers, double learning_rate)
         {
             subnetwork.update_parameters(solvers, learning_rate);
+        }
+
+        template <typename solver_type>
+        void update_parameters(std::vector<solver_type>& solvers, double learning_rate)
+        {
+            update_parameters(make_sstack(solvers), learning_rate);
         }
 
         const tensor& get_parameter_gradient(
