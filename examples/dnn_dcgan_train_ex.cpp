@@ -162,29 +162,25 @@ int main(int argc, char** argv) try
     cout << "discriminator" << endl;
     cout << discriminator << endl;
 
-    // The solvers for the generator network.  In this case, we don't need to use a dnn_trainer
-    // for the generator, since we are going to train it manually
-    adam solver(0, 0.5, 0.999);
-    std::vector<adam> g_solvers(generator.num_computational_layers, solver);
+    // The solvers for the generator and discriminator networks.  In this example, we are going to
+    // train the networks manually, so we don't need to use a dnn_trainer.  Note that the
+    // discriminator could be trained using a dnn_trainer, but not the generator, since its
+    // training process is a bit particular.
+    std::vector<adam> g_solvers(generator.num_computational_layers, adam(0, 0.5, 0.999));
+    std::vector<adam> d_solvers(discriminator.num_computational_layers, adam(0, 0.5, 0.999));
     double learning_rate = 2e-4;
-    // The discriminator trainer
-    dnn_trainer<discriminator_type, adam> d_trainer(discriminator, solver);
-    d_trainer.be_quiet();
-    d_trainer.set_learning_rate(learning_rate);
-    d_trainer.set_learning_rate_shrink_factor(1);
-    cout << d_trainer << endl;
 
     // Resume training from last sync file
+    size_t iteration = 0;
     if (file_exists("dcgan_sync"))
     {
-        deserialize("dcgan_sync") >> generator >> d_trainer;
+        deserialize("dcgan_sync") >> generator >> discriminator >> iteration;
     }
 
     const size_t minibatch_size = 64;
     const std::vector<float> real_labels(minibatch_size, 1);
     const std::vector<float> fake_labels(minibatch_size, -1);
     dlib::image_window win;
-    size_t iteration = 0;
     resizable_tensor real_samples_tensor, fake_samples_tensor, noises_tensor;
     while (iteration < 50000)
     {
@@ -195,7 +191,11 @@ int main(int argc, char** argv) try
             auto idx = rnd.get_random_32bit_number() % training_images.size();
             real_samples.push_back(training_images[idx]);
         }
-        d_trainer.train_one_step(real_samples, real_labels);
+        // The following lines are equivalent to calling train_one_step(real_samples, real_labels)
+        discriminator.to_tensor(real_samples.begin(), real_samples.end(), real_samples_tensor);
+        double d_loss = discriminator.compute_loss(real_samples_tensor, real_labels.begin());
+        discriminator.subnet().back_propagate_error(real_samples_tensor);
+        discriminator.subnet().update_parameters(d_solvers, learning_rate);
 
         // Train the discriminator with fake images
         // 1. generate some random noise
@@ -209,10 +209,12 @@ int main(int argc, char** argv) try
         generator.subnet().forward(noises_tensor);
         // 3. get the generated images from the generator
         const auto fake_samples = get_generated_images(generator);
-        // 4. finally train the discriminator and wait for the threading to stop
-        d_trainer.train_one_step(fake_samples, fake_labels);
-        d_trainer.get_net(force_flush_to_disk::no);
-        const auto d_loss = d_trainer.get_average_loss();
+        // 4. finally train the discriminator and wait for the threading to stop.  The following
+        // lines are equivalent to calling train_one_step(fake_samples, fake_labels)
+        discriminator.to_tensor(fake_samples.begin(), fake_samples.end(), fake_samples_tensor);
+        d_loss += discriminator.compute_loss(fake_samples_tensor, fake_labels.begin());
+        discriminator.subnet().back_propagate_error(fake_samples_tensor);
+        discriminator.subnet().update_parameters(d_solvers, learning_rate);
 
         // Train the generator
         // This part is the essence of the Generative Adversarial Networks.  Until now, we have
@@ -222,9 +224,7 @@ int main(int argc, char** argv) try
         // actions as train_one_step() except for the network update part.  They can also be
         // seen as test_one_step() plus the error back propagation.
 
-        // Convert the fake samples to a tensor
-        discriminator.subnet().to_tensor(fake_samples.begin(), fake_samples.end(), fake_samples_tensor);
-        // Forward the samples and compute the loss with real labels
+        // Forward the fake samples and compute the loss with real labels
         const auto g_loss = discriminator.compute_loss(fake_samples_tensor, real_labels.begin());
         // Back propagate the error to fill the final data gradient
         discriminator.subnet().back_propagate_error(fake_samples_tensor);
@@ -235,10 +235,9 @@ int main(int argc, char** argv) try
 
         // At some point, we should see that the generated images start looking like samples from
         // the MNIST dataset
-        iteration = d_trainer.get_train_one_step_calls() / 2;
-        if (iteration % 1000 == 0)
+        if (++iteration % 1000 == 0)
         {
-            serialize("dcgan_sync") << generator << d_trainer;
+            serialize("dcgan_sync") << generator << discriminator << iteration;
             std::cout <<
                 "step#: " << iteration <<
                 "\tdiscriminator loss: " << d_loss <<
