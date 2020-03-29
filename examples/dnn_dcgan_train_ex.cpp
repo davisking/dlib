@@ -112,7 +112,7 @@ matrix<unsigned char> generate_image(generator_type& net, const noise_t& noise)
 std::vector<matrix<unsigned char>> get_generated_images(generator_type& net)
 {
     std::vector<matrix<unsigned char>> images;
-    const resizable_tensor &out = layer<1>(net).get_output();
+    const tensor& out = layer<1>(net).get_output();
     for (size_t n = 0; n < out.num_samples(); ++n)
     {
         matrix<float> output = image_plane(out, n);
@@ -185,6 +185,7 @@ int main(int argc, char** argv) try
     const std::vector<float> fake_labels(minibatch_size, -1);
     dlib::image_window win;
     size_t iteration = 0;
+    resizable_tensor real_samples_tensor, fake_samples_tensor, noises_tensor;
     while (iteration < 50000)
     {
         // Train the discriminator with real images
@@ -204,7 +205,6 @@ int main(int argc, char** argv) try
             noises.push_back(make_noise(rnd));
         }
         // 2. forward the noise through the generator
-        resizable_tensor noises_tensor;
         generator.to_tensor(noises.begin(), noises.end(), noises_tensor);
         generator.subnet().forward(noises_tensor);
         // 3. get the generated images from the generator
@@ -223,14 +223,13 @@ int main(int argc, char** argv) try
         // seen as test_one_step() plus the error back propagation.
 
         // Convert the fake samples to a tensor
-        resizable_tensor fake_samples_tensor;
         discriminator.subnet().to_tensor(fake_samples.begin(), fake_samples.end(), fake_samples_tensor);
         // Forward the samples and compute the loss with real labels
         const auto g_loss = discriminator.compute_loss(fake_samples_tensor, real_labels.begin());
         // Back propagate the error to fill the final data gradient
         discriminator.subnet().back_propagate_error(fake_samples_tensor);
         // Get the gradient that will tell the generator how to update itself
-        const resizable_tensor& d_grad = discriminator.subnet().get_final_data_gradient();
+        const tensor& d_grad = discriminator.subnet().get_final_data_gradient();
         generator.subnet().back_propagate_error(noises_tensor, d_grad);
         generator.subnet().update_parameters(g_solvers, learning_rate);
 
