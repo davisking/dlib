@@ -109,10 +109,9 @@ matrix<unsigned char> generate_image(generator_type& net, const noise_t& noise)
     return image;
 }
 
-std::vector<matrix<unsigned char>> get_generated_images(generator_type& net)
+std::vector<matrix<unsigned char>> get_generated_images(const tensor& out)
 {
     std::vector<matrix<unsigned char>> images;
-    const tensor& out = layer<1>(net).get_output();
     for (size_t n = 0; n < out.num_samples(); ++n)
     {
         matrix<float> output = image_plane(out, n);
@@ -194,8 +193,8 @@ int main(int argc, char** argv) try
         // The following lines are equivalent to calling train_one_step(real_samples, real_labels)
         discriminator.to_tensor(real_samples.begin(), real_samples.end(), real_samples_tensor);
         double d_loss = discriminator.compute_loss(real_samples_tensor, real_labels.begin());
-        discriminator.subnet().back_propagate_error(real_samples_tensor);
-        discriminator.subnet().update_parameters(d_solvers, learning_rate);
+        discriminator.back_propagate_error(real_samples_tensor);
+        discriminator.update_parameters(d_solvers, learning_rate);
 
         // Train the discriminator with fake images
         // 1. generate some random noise
@@ -204,17 +203,16 @@ int main(int argc, char** argv) try
         {
             noises.push_back(make_noise(rnd));
         }
-        // 2. forward the noise through the generator
+        // 2. convert noises into a tensor 
         generator.to_tensor(noises.begin(), noises.end(), noises_tensor);
-        generator.subnet().forward(noises_tensor);
-        // 3. get the generated images from the generator
-        const auto fake_samples = get_generated_images(generator);
+        // 3. Then forward the noise through the network and convert the outputs into images.
+        const auto fake_samples = get_generated_images(generator.forward(noises_tensor));
         // 4. finally train the discriminator and wait for the threading to stop.  The following
         // lines are equivalent to calling train_one_step(fake_samples, fake_labels)
         discriminator.to_tensor(fake_samples.begin(), fake_samples.end(), fake_samples_tensor);
         d_loss += discriminator.compute_loss(fake_samples_tensor, fake_labels.begin());
-        discriminator.subnet().back_propagate_error(fake_samples_tensor);
-        discriminator.subnet().update_parameters(d_solvers, learning_rate);
+        discriminator.back_propagate_error(fake_samples_tensor);
+        discriminator.update_parameters(d_solvers, learning_rate);
 
         // Train the generator
         // This part is the essence of the Generative Adversarial Networks.  Until now, we have
@@ -227,11 +225,11 @@ int main(int argc, char** argv) try
         // Forward the fake samples and compute the loss with real labels
         const auto g_loss = discriminator.compute_loss(fake_samples_tensor, real_labels.begin());
         // Back propagate the error to fill the final data gradient
-        discriminator.subnet().back_propagate_error(fake_samples_tensor);
+        discriminator.back_propagate_error(fake_samples_tensor);
         // Get the gradient that will tell the generator how to update itself
-        const tensor& d_grad = discriminator.subnet().get_final_data_gradient();
-        generator.subnet().back_propagate_error(noises_tensor, d_grad);
-        generator.subnet().update_parameters(g_solvers, learning_rate);
+        const tensor& d_grad = discriminator.get_final_data_gradient();
+        generator.back_propagate_error(noises_tensor, d_grad);
+        generator.update_parameters(g_solvers, learning_rate);
 
         // At some point, we should see that the generated images start looking like samples from
         // the MNIST dataset

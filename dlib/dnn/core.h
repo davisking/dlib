@@ -2461,6 +2461,27 @@ namespace dlib
             return results;
         }
 
+        void back_propagate_error(const tensor& x)
+        {
+            subnet().back_propagate_error(x);
+        }
+
+        void back_propagate_error(const tensor& x, const tensor& gradient_input) 
+        {
+            subnet().back_propagate_error(x, gradient_input);
+        }
+
+        const tensor& get_final_data_gradient(
+        ) const 
+        { 
+            return subnet().get_final_data_gradient(); 
+        }
+
+        const tensor& forward(const tensor& x)
+        {
+            return subnet().forward(x);
+        }
+
         template <typename iterable_type>
         std::vector<output_label_type> operator() (
             const iterable_type& data,
