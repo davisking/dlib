@@ -86,7 +86,7 @@ namespace dlib
                 prom->set_exception(std::current_exception());
             }
         });
-        return std::move(ret);
+        return ret;
     }
 
 // ----------------------------------------------------------------------------------------

@@ -112,7 +112,7 @@ matrix<unsigned char> generate_image(generator_type& net, const noise_t& noise)
 std::vector<matrix<unsigned char>> get_generated_images(const tensor& out)
 {
     std::vector<matrix<unsigned char>> images;
-    for (size_t n = 0; n < out.num_samples(); ++n)
+    for (long n = 0; n < out.num_samples(); ++n)
     {
         matrix<float> output = image_plane(out, n);
         matrix<unsigned char> image;

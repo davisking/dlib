@@ -168,7 +168,7 @@ std::vector<mmod_rect> extract_mmod_rects(
     );
 
     return mmod_rects;
-};
+}
 
 std::vector<std::vector<mmod_rect>> extract_mmod_rect_vectors(
     const std::vector<truth_image>& truth_images
@@ -549,7 +549,7 @@ std::vector<truth_instance> load_truth_instances(const image_info& info)
     load_image(class_label_image, info.class_label_filename);
 
     return rgb_label_images_to_truth_instances(instance_label_image, class_label_image);
-};
+}
 
 std::vector<std::vector<truth_instance>> load_all_truth_instances(const std::vector<image_info>& listing)
 {
