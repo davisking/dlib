@@ -1440,42 +1440,29 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __device__ float mish_compute_gradient(float x)
+        {
+            if (x >= 8)
+                return 1.f;
+            if (x <= -8)
+                return 0.f;
+
+            const auto e = std::exp(x);
+            const auto delta = 2*e + e*e + 2;
+            const auto omega = 4*(x + 1) + 4*e*e + e*e*e + e*(4*x + 6);
+            return e*omega/(delta*delta);
+        }
+
         __global__ void _cuda_mish_gradient_inplace(float* out, const float* s, const float* gi, size_t n)
         {
-            const auto calculate_gradient = [](float x)
-            {
-                if (x >= 8)
-                    return 1.f;
-                if (x <= -8)
-                    return 0.f;
-
-                const auto e = std::exp(x);
-                const auto delta = 2*e + e*e + 2;
-                const auto omega = 4*(x + 1) + 4*e*e + e*e*e + e*(4*x + 6);
-                return e*omega/(delta*delta);
-            };
-
             for (auto i : grid_stride_range(0, n))
-                out[i] = gi[i]*calculate_gradient(s[i]);
+                out[i] = gi[i]*mish_compute_gradient(s[i]);
         }
 
         __global__ void _cuda_mish_gradient(float* out, const float* s, const float* gi, size_t n)
         {
-            const auto calculate_gradient = [](float x)
-            {
-                if (x >= 8)
-                    return 1.f;
-                if (x <= -8)
-                    return 0.f;
-
-                const auto e = std::exp(x);
-                const auto delta = 2*e + e*e + 2;
-                const auto omega = 4*(x + 1) + 4*e*e + e*e*e + e*(4*x + 6);
-                return e*omega/(delta*delta);
-            };
-
             for (auto i : grid_stride_range(0, n))
-                out[i] += gi[i]*calculate_gradient(s[i]);
+                out[i] += gi[i]*mish_compute_gradient(s[i]);
         }
 
         void mish_gradient (
