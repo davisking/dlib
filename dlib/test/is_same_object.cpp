@@ -13,11 +13,11 @@ namespace
     using namespace std;
     dlib::logger dlog("test.is_same_object");
 
-    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_booya_template, void, template booya<int>, (std::string)const);
-    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_booya2_template, void, template booya2<int>, (int)const);
-    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_funct_int, void, funct, (int));
-    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_funct_double, void, funct, (double));
-    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_funct_f, float, funct_f, (int));
+    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_booya_template, void, template booya<int>, (std::string)const)
+    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_booya2_template, void, template booya2<int>, (int)const)
+    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_funct_int, void, funct, (int))
+    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_funct_double, void, funct, (double))
+    DLIB_MAKE_HAS_MEMBER_FUNCTION_TEST(has_funct_f, float, funct_f, (int))
 
     class htest
     {

@@ -2935,8 +2935,8 @@ namespace
 
         // Feed forward the training samples.
         resizable_tensor temp_tensor;
-        net.subnet().to_tensor(&x[0], &x[0] + num_samples, temp_tensor);
-        net.subnet().forward(temp_tensor);
+        net.to_tensor(&x[0], &x[0] + num_samples, temp_tensor);
+        net.forward(temp_tensor);
         const dimpl::subnet_wrapper<filter_type> wsub(net.subnet());
         const tensor& output_tensor = wsub.get_output();
         const float* const out_data = output_tensor.host();
