@@ -132,7 +132,7 @@ int main() try
     std::vector<matrix<rgb_pixel>> minibatch(1, image);
     resizable_tensor input;
     net.to_tensor(minibatch.begin(), minibatch.end(), input);
-    net.subnet().forward(input);
+    net.forward(input);
     cout << net << endl;
     cout << "input size=(" <<
        "num:" << input.num_samples() << ", " <<
