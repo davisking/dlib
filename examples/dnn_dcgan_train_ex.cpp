@@ -208,7 +208,7 @@ int main(int argc, char** argv) try
         generator.to_tensor(noises.begin(), noises.end(), noises_tensor);
         // 3. Forward the noise through the network and convert the outputs into images.
         const auto fake_samples = get_generated_images(generator.forward(noises_tensor));
-        // 4. Finally train the discriminator.  the following lines are equivalent to calling
+        // 4. Finally train the discriminator.  The following lines are equivalent to calling
         // train_one_step(fake_samples, fake_labels)
         discriminator.to_tensor(fake_samples.begin(), fake_samples.end(), fake_samples_tensor);
         d_loss.add(discriminator.compute_loss(fake_samples_tensor, fake_labels.begin()));
