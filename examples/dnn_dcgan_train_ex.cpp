@@ -198,18 +198,18 @@ int main(int argc, char** argv) try
         discriminator.update_parameters(d_solvers, learning_rate);
 
         // Train the discriminator with fake images
-        // 1. generate some random noise
+        // 1. Generate some random noise
         std::vector<noise_t> noises;
         while (noises.size() < minibatch_size)
         {
             noises.push_back(make_noise(rnd));
         }
-        // 2. convert noises into a tensor 
+        // 2. Convert noises into a tensor 
         generator.to_tensor(noises.begin(), noises.end(), noises_tensor);
-        // 3. Then forward the noise through the network and convert the outputs into images.
+        // 3. Forward the noise through the network and convert the outputs into images.
         const auto fake_samples = get_generated_images(generator.forward(noises_tensor));
-        // 4. finally train the discriminator and wait for the threading to stop.  The following
-        // lines are equivalent to calling train_one_step(fake_samples, fake_labels)
+        // 4. Finally train the discriminator.  The following lines are equivalent to calling
+        // train_one_step(fake_samples, fake_labels)
         discriminator.to_tensor(fake_samples.begin(), fake_samples.end(), fake_samples_tensor);
         d_loss.add(discriminator.compute_loss(fake_samples_tensor, fake_labels.begin()));
         discriminator.back_propagate_error(fake_samples_tensor);
