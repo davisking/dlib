@@ -107,7 +107,7 @@ namespace dlib
             const solver_type& solver_,
             const std::vector<int>& cuda_extra_devices,
             std::shared_ptr<threads> thread_pools_ = std::shared_ptr<threads>()
-        ) : job_pipe(0), net(net_), thread_pools(thread_pools_)
+        ) : job_pipe(0), thread_pools(thread_pools_), net(net_)
         {
             devices.push_back(std::make_shared<device_data>(dlib::cuda::get_device(), net, solver_));
 
