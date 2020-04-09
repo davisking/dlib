@@ -1842,9 +1842,8 @@ namespace dlib
             {
                 const float y = truth[i];
                 const float temp1 = y - out_data[i];
-                const float temp2 = scale * temp1;
-                loss += temp2 * temp1;
-                g[i] = -temp2;
+                loss += temp1 * temp1;
+                g[i] = -temp1 * scale;
             }
             warp_reduce_atomic_add(*loss_out, loss);
         }

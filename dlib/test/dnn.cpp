@@ -2534,7 +2534,7 @@ namespace
                             input<matrix<float>>>>>>;
         net_type net;
 
-        const auto autoencoder_error = [&x, &net, &output_height, &output_width]()
+        const auto autoencoder_error = [&x, &net]()
         {
             const auto y = net(x);
             double error = 0.0;
@@ -2580,7 +2580,7 @@ namespace
         print_spinner();
 
         const int num_samples = 1000;
-        const long num_channels = 2;
+        const long num_channels = 10;
         const long dimension = 3;
         ::std::vector<matrix<float>> inputs;
         ::std::vector<::std::array<matrix<float>, num_channels>> labels;
@@ -2628,6 +2628,7 @@ namespace
         trainer.set_iterations_without_progress_threshold(500);
         trainer.set_min_learning_rate(1e-6);
         trainer.set_mini_batch_size(50);
+        trainer.set_max_num_epochs(100);
         trainer.train(inputs, labels);
         const auto error_after = compute_error();
         DLIB_TEST_MSG(error_after < error_before, "multi channel error increased after training");
