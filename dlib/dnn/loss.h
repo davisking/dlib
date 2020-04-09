@@ -3301,6 +3301,12 @@ namespace dlib
                 }
             }
 
+#ifdef DLIB_USE_CUDA
+            double loss;
+            cuda_compute(truth, output_tensor, grad, loss);
+            return loss;
+#else
+
             // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.k() * output_tensor.nr() * output_tensor.nc());
             double loss = 0;
@@ -3325,6 +3331,7 @@ namespace dlib
                 }
             }
             return loss;
+#endif
         }
 
         friend void serialize(const loss_mean_squared_per_channel_and_pixel_& , std::ostream& out)
@@ -3357,6 +3364,9 @@ namespace dlib
             // See: https://github.com/davisking/dlib/blob/4dfeb7e186dd1bf6ac91273509f687293bd4230a/dlib/dnn/tensor_abstract.h#L38
             return ((sample * t.k() + k) * t.nr() + row) * t.nc() + column;
         }
+#ifdef DLIB_USE_CUDA
+        cuda::compute_loss_mean_squared_per_channel_and_pixel cuda_compute;
+#endif
     };
 
     template <long num_channels, typename SUBNET>

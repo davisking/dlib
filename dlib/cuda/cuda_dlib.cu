@@ -1835,6 +1835,22 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_compute_loss_mean_squared_per_channel_and_pixel(float* loss_out, float* g, const float* truth, const float* out_data, size_t n, const float scale)
+        {
+            float loss = 0;
+            for (auto i : grid_stride_range(0, n))
+            {
+                const float y = truth[i];
+                const float temp1 = y - out_data[i];
+                const float temp2 = scale * temp1;
+                loss += temp2 * temp1;
+                g[i] = -temp2;
+            }
+            warp_reduce_atomic_add(*loss_out, loss);
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         void compute_loss_binary_log_per_pixel::
         do_work(
             cuda_data_ptr<float> loss_work_buffer,
@@ -1876,6 +1892,29 @@ namespace dlib
 
             launch_kernel(_cuda_compute_loss_multiclass_log_per_pixel, max_jobs(gradient.size()),
                 loss_work_buffer.data(), gradient.device(), truth_buffer.data(), gradient.size(), gradient.nr()*gradient.nc(), gradient.nr()*gradient.nc()*gradient.k(), gradient.k(), label_to_ignore, scale);
+
+            float floss;
+            dlib::cuda::memcpy(&floss, loss_work_buffer);
+            loss = scale*floss;
+        }
+
+        void compute_loss_mean_squared_per_channel_and_pixel::
+        do_work
+        (
+            cuda_data_ptr<float> loss_work_buffer,
+            cuda_data_ptr<const float> truth_buffer,
+            const tensor& subnetwork_output,
+            tensor& gradient,
+            double& loss
+        )
+        {
+            CHECK_CUDA(cudaMemset(loss_work_buffer, 0, sizeof(float)));
+
+            // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
+            const double scale = 1.0 / (subnetwork_output.num_samples() * subnetwork_output.k() * subnetwork_output.nr() * subnetwork_output.nc());
+
+            launch_kernel(_cuda_compute_loss_mean_squared_per_channel_and_pixel , max_jobs(gradient.size()),
+                loss_work_buffer.data(), gradient.device(), truth_buffer.data(), subnetwork_output.device(), gradient.size(), scale);
 
             float floss;
             dlib::cuda::memcpy(&floss, loss_work_buffer);
