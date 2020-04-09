@@ -557,7 +557,6 @@ namespace dlib
             mutable cuda_data_void_ptr buf;
         };
 
-        template <long num_channels>
         class compute_loss_mean_squared_per_channel_and_pixel
         {
             /*!
@@ -593,7 +592,8 @@ namespace dlib
                 // copy the truth data into a cuda buffer.
                 for (long i = 0; i < subnetwork_output.num_samples(); ++i, ++truth)
                 {
-                    std::array<dlib::matrix<float>, num_channels>& t = *truth;
+                    typename std::remove_const<typename std::remove_reference<decltype(truth)>::type>::type& t = *truth;
+                    // const_label_iterator& t = *truth;
                     DLIB_ASSERT(t.nr() == subnetwork_output.nr());
                     DLIB_ASSERT(t.nc() == subnetwork_output.nc());
                     memcpy(buf + i*bytes_per_plane, &t, bytes_per_plane);
