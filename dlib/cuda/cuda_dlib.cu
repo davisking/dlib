@@ -1841,9 +1841,9 @@ namespace dlib
             for (auto i : grid_stride_range(0, n))
             {
                 const float y = truth[i];
-                const float temp1 = y - out_data[i];
-                loss += temp1 * temp1;
-                g[i] = -temp1 * scale;
+                const float temp = y - out_data[i];
+                loss += temp * temp;
+                g[i] = -temp * scale;
             }
             warp_reduce_atomic_add(*loss_out, loss);
         }
