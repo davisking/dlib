@@ -2534,7 +2534,7 @@ namespace
                             input<matrix<float>>>>>>;
         net_type net;
 
-        const auto autoencoder_error = [&x, &net]()
+        const auto autoencoder_error = [&x, &net, &output_height, &output_width]()
         {
             const auto y = net(x);
             double error = 0.0;
