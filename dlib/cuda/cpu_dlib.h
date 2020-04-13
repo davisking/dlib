@@ -541,7 +541,7 @@ namespace dlib
             const tensor& output_tensor,
             tensor& grad,
             double& loss
-        )
+        ) const
         {
             // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.k() * output_tensor.nr() * output_tensor.nc());
