@@ -2632,6 +2632,17 @@ namespace
         trainer.train(inputs, labels);
         const auto error_after = compute_error();
         DLIB_TEST_MSG(error_after < error_before, "multi channel error increased after training");
+#if DLIB_USE_CUDA
+        cuda::compute_loss_mean_squared_per_channel_and_pixel cuda_compute;
+        cpu::compute_loss_mean_squared_per_channel_and_pixel cpu_compute;
+        double cuda_loss, cpu_loss;
+        const tensor& output_tensor = net.subnet().get_output();
+        tensor& grad = net.subnet().get_gradient_input();
+        cuda_compute(labels.begin(), output_tensor, grad, cuda_loss);
+        cpu_compute(labels.begin(), output_tensor, grad, cpu_loss);
+        const auto diff = ::std::abs<double>(cuda_loss - cpu_loss);
+        DLIB_TEST_MSG(diff < 1e-6, "multi channel cuda and cpu losses differ");
+#endif
     }
 
 // ----------------------------------------------------------------------------------------

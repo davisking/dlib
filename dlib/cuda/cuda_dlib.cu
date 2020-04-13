@@ -1898,8 +1898,7 @@ namespace dlib
         }
 
         void compute_loss_mean_squared_per_channel_and_pixel::
-        do_work
-        (
+        do_work(
             cuda_data_ptr<float> loss_work_buffer,
             cuda_data_ptr<const float> truth_buffer,
             const tensor& subnetwork_output,

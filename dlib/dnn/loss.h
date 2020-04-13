@@ -3301,38 +3301,13 @@ namespace dlib
                         "output size = " << output_tensor.nr() << " x " << output_tensor.nc());
                 }
             }
-
-#ifdef DLIB_USE_CUDA
             double loss;
+#ifdef DLIB_USE_CUDA
             cuda_compute(truth, output_tensor, grad, loss);
-            return loss;
 #else
-
-            // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
-            const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.k() * output_tensor.nr() * output_tensor.nc());
-            double loss = 0;
-            float* const g = grad.host();
-            const float* out_data = output_tensor.host();
-            for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
-            {
-                for (long k = 0; k < output_tensor.k(); ++k)
-                {
-                    for (long r = 0; r < output_tensor.nr(); ++r)
-                    {
-                        for (long c = 0; c < output_tensor.nc(); ++c)
-                        {
-                            const float y = (*truth)[k].operator()(r, c);
-                            const size_t idx = tensor_index(output_tensor, i, k, r, c);
-                            const float temp1 = y - out_data[idx];
-                            const float temp2 = scale*temp1;
-                            loss += temp2*temp1;
-                            g[idx] = -temp2;
-                        }
-                    }
-                }
-            }
-            return loss;
+            cpu_compute(truth, output_tensor, grad, loss);
 #endif
+            return loss;
         }
 
         friend void serialize(const loss_mean_squared_per_channel_and_pixel_& , std::ostream& out)
@@ -3367,6 +3342,8 @@ namespace dlib
         }
 #ifdef DLIB_USE_CUDA
         cuda::compute_loss_mean_squared_per_channel_and_pixel cuda_compute;
+#else
+        cpu::compute_loss_mean_squared_per_channel_and_pixel cpu_compute;
 #endif
     };
 
