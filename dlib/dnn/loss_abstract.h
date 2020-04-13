@@ -423,7 +423,8 @@ namespace dlib
 
     public:
 
-        typedef weighted_label<unsigned long> training_label_type;
+        typedef dlib::weighted_label<unsigned long> weighted_label;
+        typedef weighted_label training_label_type;
         typedef unsigned long output_label_type;
 
         template <
@@ -1535,7 +1536,8 @@ namespace dlib
         !*/
     public:
 
-        typedef matrix<weighted_label<uint16_t> training_label_type;
+        typedef dlib::weighted_label<uint16_t> weighted_label;
+        typedef matrix<weighted_label> training_label_type;
         typedef matrix<uint16_t> output_label_type;
 
         template <
