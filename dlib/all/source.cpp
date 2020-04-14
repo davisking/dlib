@@ -81,16 +81,16 @@
 
 #include "../cuda/cpu_dlib.cpp"
 #include "../cuda/tensor_tools.cpp"
+#include "../data_io/image_dataset_metadata.cpp"
+#include "../data_io/mnist.cpp"
+#include "../svm/auto.cpp"
+#include "../global_optimization/global_function_search.cpp"
+#include "../filtering/kalman_filter.cpp"
 
 #endif // DLIB_ISO_CPP_ONLY
 
 
 
-#include "../data_io/image_dataset_metadata.cpp"
-#include "../data_io/mnist.cpp"
-#include "../global_optimization/global_function_search.cpp"
-#include "../filtering/kalman_filter.cpp"
-#include "../svm/auto.cpp"
 
 
 #define DLIB_ALL_SOURCE_END

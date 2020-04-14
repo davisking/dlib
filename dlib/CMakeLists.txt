@@ -272,12 +272,7 @@ if (NOT TARGET dlib)
       md5/md5_kernel_1.cpp
       tokenizer/tokenizer_kernel_1.cpp
       unicode/unicode.cpp
-      data_io/image_dataset_metadata.cpp
-      data_io/mnist.cpp
-      global_optimization/global_function_search.cpp
-      filtering/kalman_filter.cpp
       test_for_odr_violations.cpp
-      svm/auto.cpp
       )
 
 
@@ -318,6 +313,11 @@ if (NOT TARGET dlib)
          stack_trace.cpp
          cuda/cpu_dlib.cpp
          cuda/tensor_tools.cpp
+         data_io/image_dataset_metadata.cpp
+         data_io/mnist.cpp
+         global_optimization/global_function_search.cpp
+         filtering/kalman_filter.cpp
+         svm/auto.cpp
          )
 
       if(UNIX)
