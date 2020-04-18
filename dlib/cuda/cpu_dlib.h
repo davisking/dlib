@@ -521,6 +521,57 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+    class compute_loss_mean_squared_per_channel_and_pixel
+    {
+        /*! The point of this class is to compute the loss for loss_mean_squared_per_channel_and_pixel_
+            on the cpu to provide an analogous implementation of the cuda version
+        !*/
+        public:
+
+            compute_loss_mean_squared_per_channel_and_pixel(
+            )
+            {
+            }
+
+        template <
+            typename const_label_iterator
+            >
+        void operator()(
+            const_label_iterator truth,
+            const tensor& output_tensor,
+            tensor& grad,
+            double& loss
+        ) const
+        {
+            // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
+            const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.k() * output_tensor.nr() * output_tensor.nc());
+            loss = 0;
+            float* const g = grad.host();
+            const float* out_data = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
+            {
+                for (long k = 0; k < output_tensor.k(); ++k)
+                {
+                    for (long r = 0; r < output_tensor.nr(); ++r)
+                    {
+                        for (long c = 0; c < output_tensor.nc(); ++c)
+                        {
+                            const float y = (*truth)[k].operator()(r, c);
+                            const size_t idx = ((i * output_tensor.k() + k) * output_tensor.nr() + r) * output_tensor.nc() + c;
+                            const float temp1 = y - out_data[idx];
+                            const float temp2 = scale*temp1;
+                            loss += temp2*temp1;
+                            g[idx] = -temp2;
+                        }
+                    }
+                }
+            }
+        }
+
+    };
+
+    // -----------------------------------------------------------------------------------
+
     } 
 }
 
