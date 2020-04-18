@@ -498,6 +498,8 @@ namespace dlib
             mutable cuda_data_void_ptr buf;
         };
 
+    // ----------------------------------------------------------------------------------------
+
         class compute_loss_multiclass_log_per_pixel
         {
             /*!
@@ -557,6 +559,8 @@ namespace dlib
             mutable cuda_data_void_ptr buf;
         };
 
+    // ----------------------------------------------------------------------------------------
+
         class compute_loss_mean_squared_per_channel_and_pixel
         {
             /*!
@@ -581,15 +585,15 @@ namespace dlib
             ) const
             {
                 const auto image_size = subnetwork_output.nr()*subnetwork_output.nc()*subnetwork_output.k();
-                const size_t bytes_per_plane = image_size*sizeof(float);
+                const size_t bytes_per_image = image_size*sizeof(float);
                 // Allocate a cuda buffer to store all the truth images and also one float
                 // for the scalar loss output.
-                buf = device_global_buffer(subnetwork_output.num_samples()*bytes_per_plane + sizeof(float));
+                buf = device_global_buffer(subnetwork_output.num_samples()*bytes_per_image + sizeof(float));
 
                 cuda_data_ptr<float> loss_buf = static_pointer_cast<float>(buf, 1);
                 buf = buf+sizeof(float);
 
-                const size_t bytes_per_channel = subnetwork_output.nr()*subnetwork_output.nc()*sizeof(float);
+                const size_t bytes_per_plane = subnetwork_output.nr()*subnetwork_output.nc()*sizeof(float);
 
                 // copy the truth data into a cuda buffer.
                 for (long i = 0; i < subnetwork_output.num_samples(); ++i, ++truth)
@@ -599,7 +603,7 @@ namespace dlib
                     for (size_t j = 0; j < t.size(); ++j) {
                         DLIB_ASSERT(t[j].nr() == subnetwork_output.nr());
                         DLIB_ASSERT(t[j].nc() == subnetwork_output.nc());
-                        memcpy(buf + i*bytes_per_plane + j*bytes_per_channel, &t[j](0,0), bytes_per_channel);
+                        memcpy(buf + i*bytes_per_image + j*bytes_per_plane, &t[j](0,0), bytes_per_plane);
                     }
                 }
 

@@ -2640,7 +2640,7 @@ namespace
         tensor& grad = net.subnet().get_gradient_input();
         cuda_compute(labels.begin(), output_tensor, grad, cuda_loss);
         cpu_compute(labels.begin(), output_tensor, grad, cpu_loss);
-        const auto err = ::std::abs<double>(cuda_loss - cpu_loss) / cpu_loss;
+        const auto err = abs(cuda_loss - cpu_loss) / cpu_loss;
         DLIB_TEST_MSG(err < 1e-6, "multi channel cuda and cpu losses differ");
 #endif
     }
