@@ -801,6 +801,40 @@ namespace
             DLIB_TEST(equal_error_rate(vals2, vals1).first == 1);
         }
 
+        void test_equal_error_rate() 
+        {
+            auto result = equal_error_rate({}, {});
+            DLIB_TEST(result.first == 0);
+            DLIB_TEST(result.second == 0);
+
+            // no error case
+            result = equal_error_rate({1,1,1}, {2,2,2});
+            DLIB_TEST_MSG(result.first == 0, result.first);
+            DLIB_TEST_MSG(result.second == 2, result.second);
+
+            // max error case
+            result = equal_error_rate({2,2,2}, {1,1,1});
+            DLIB_TEST_MSG(result.first == 1, result.first);
+            DLIB_TEST_MSG(result.second == 2, result.second);
+            // Another way to have max error
+            result = equal_error_rate({1,1,1}, {1,1,1});
+            DLIB_TEST_MSG(result.second == 1, result.second);
+            DLIB_TEST_MSG(result.first == 1, result.first);
+
+            // wildly unbalanced  
+            result = equal_error_rate({}, {1,1,1});
+            DLIB_TEST_MSG(result.first == 0, result.first);
+
+            // wildly unbalanced  
+            result = equal_error_rate({1,1,1}, {});
+            DLIB_TEST_MSG(result.first == 0, result.first);
+
+            // 25% error case   
+            result = equal_error_rate({1,1,1,3}, {2, 2, 0, 2});
+            DLIB_TEST_MSG(result.first == 0.25, result.first);
+            DLIB_TEST_MSG(result.second == 2, result.second);
+        }
+
         void test_running_stats_decayed()
         {
             print_spinner();
@@ -907,6 +941,7 @@ namespace
             test_event_corr();
             test_running_stats_decayed();
             test_running_scalar_covariance_decayed();
+            test_equal_error_rate();
         }
     } a;
 
