@@ -157,7 +157,7 @@ namespace dlib
         std::vector<std::pair<double,int> > temp;
         temp.reserve(true_detections.size()+false_detections.size());
         // We use -1 for true labels and +1 for false so when we call std::sort() below it will sort
-        // runs with equal detection scores so true come first.  This will avoid it seeming like we
+        // runs with equal detection scores so false come first.  This will avoid it seeming like we
         // can separate true from false when scores are equal in the loop below.
         const int true_label = -1;
         const int false_label = +1;
