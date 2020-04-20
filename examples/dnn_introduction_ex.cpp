@@ -22,7 +22,8 @@
 #include <iostream>
 #include <dlib/data_io.h>
 
-using namespace std;
+using std::cout;
+using std::endl;
 using namespace dlib;
  
 int main(int argc, char** argv) try
@@ -138,7 +139,7 @@ int main(int argc, char** argv) try
     }
     cout << "training num_right: " << num_right << endl;
     cout << "training num_wrong: " << num_wrong << endl;
-    cout << "training accuracy:  " << num_right/(double)(num_right+num_wrong) << endl;
+    cout << "training accuracy:  " << num_right / static_cast<double>(num_right + num_wrong) << endl;
 
     // Let's also see if the network can correctly classify the testing images.  Since
     // MNIST is an easy dataset, we should see at least 99% accuracy.
@@ -155,7 +156,7 @@ int main(int argc, char** argv) try
     }
     cout << "testing num_right: " << num_right << endl;
     cout << "testing num_wrong: " << num_wrong << endl;
-    cout << "testing accuracy:  " << num_right/(double)(num_right+num_wrong) << endl;
+    cout << "testing accuracy:  " << num_right / static_cast<double>(num_right + num_wrong) << endl;
 
 
     // Finally, you can also save network parameters to XML files if you want to do
@@ -167,4 +168,3 @@ catch(std::exception& e)
 {
     cout << e.what() << endl;
 }
-
