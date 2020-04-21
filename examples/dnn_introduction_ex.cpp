@@ -22,8 +22,7 @@
 #include <iostream>
 #include <dlib/data_io.h>
 
-using std::cout;
-using std::endl;
+using namespace std;
 using namespace dlib;
  
 int main(int argc, char** argv) try
