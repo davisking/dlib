@@ -33,7 +33,7 @@ using namespace dlib;
 // convolutionally over an entire image pyramid.  Think of it like a normal
 // sliding window classifier.  This means you need to define a CNN that can look
 // at some part of an image and decide if it is an object of interest.  In this
-// example I've defined a CNN with a receptive field of a little over 50x50
+// example I've defined a CNN with a receptive field of approximately 50x50
 // pixels.  This is reasonable for face detection since you can clearly tell if
 // a 50x50 image contains a face.  Other applications may benefit from CNNs with
 // different architectures.  
