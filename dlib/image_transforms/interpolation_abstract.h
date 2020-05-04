@@ -435,6 +435,7 @@ namespace dlib
                 - #img.nr() == std::round(size_scale*img.nr())
                 - #img.nc() == std::round(size_scale*img.nc())
                 - #img == a bilinearly interpolated copy of the input image.
+            - Returns immediately, if size_scale == 1.0
     !*/
 
 // ----------------------------------------------------------------------------------------
