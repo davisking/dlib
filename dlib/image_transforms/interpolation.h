@@ -1062,7 +1062,7 @@ namespace dlib
             << "\n\t Invalid inputs were given to this function."
             << "\n\t size_scale:  " << size_scale
             );
-
+        if (size_scale == 1.0) return; // no need to do anything at all
         image_type temp;
         set_image_size(temp, std::round(size_scale*num_rows(img)), std::round(size_scale*num_columns(img)));
         resize_image(img, temp);
