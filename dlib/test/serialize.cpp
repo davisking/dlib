@@ -15,28 +15,6 @@
 
 #include "tester.h"
 
-namespace dlib
-{
-    static bool operator!=(const rgb_pixel& a, const rgb_pixel& b)
-    {
-        return !(a.red==b.red && a.green==b.green && a.blue==b.blue);
-    }
-    static bool operator!=(const bgr_pixel& a, const bgr_pixel& b)
-    {
-        return !(a.red==b.red && a.green==b.green && a.blue==b.blue);
-    }
-
-    static bool operator!=(const hsi_pixel& a, const hsi_pixel& b)
-    {
-        return !(a.h==b.h && a.s==b.s && a.i==b.i);
-    }
-    static bool operator!=(const rgb_alpha_pixel& a, const rgb_alpha_pixel& b)
-    {
-        return !(a.red==b.red && a.green==b.green && a.blue==b.blue && a.alpha==b.alpha);
-    }
-
-}
-
 namespace  
 {
 

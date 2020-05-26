@@ -231,129 +231,40 @@ namespace dlib
     public:
         template <typename T, typename image_view_type, typename pixel_type>
         bool operator() (
-            const image_view_type &img,
-            const dlib::vector<T, 2> &p,
-            pixel_type &result
-            ) const
+            const image_view_type& img,
+            const dlib::vector<T, 2>& p,
+            pixel_type& result
+        ) const
         {
             // Interpolation currently supports only fully cartesian (non-polar) spaces.
             COMPILE_TIME_ASSERT(is_color_space_cartesian_image<image_view_type>::value == true);
-            return impl_t<pixel_traits<typename image_view_type::pixel_type>::num>::interpolate(img, p, result);
+
+            using traits = pixel_traits<typename image_view_type::pixel_type>;
+
+            const long left = static_cast<long>(std::floor(p.x()));
+            const long top = static_cast<long>(std::floor(p.y()));
+            const long right = left + 1;
+            const long bottom = top + 1;
+
+            // if the interpolation goes outside img 
+            if (!(left >= 0 && top >= 0 && right < img.nc() && bottom < img.nr()))
+                return false;
+
+            const double lr_frac = p.x() - left;
+            const double tb_frac = p.y() - top;
+
+            auto const tl = pixel_to_vector<typename traits::basic_pixel_type>(img[top][left]);
+            auto const tr = pixel_to_vector<typename traits::basic_pixel_type>(img[top][right]);
+            auto const bl = pixel_to_vector<typename traits::basic_pixel_type>(img[bottom][left]);
+            auto const br = pixel_to_vector<typename traits::basic_pixel_type>(img[bottom][right]);
+            typename ::std::remove_const<decltype(tl)>::type pvout;
+            for (long i = 0; i < traits::num; ++i)
+                pvout(i) = (1 - tb_frac) * ((1 - lr_frac) * tl(i) + lr_frac * tr(i)) +
+                tb_frac * ((1 - lr_frac) * bl(i) + lr_frac * br(i));
+            vector_to_pixel(result, pvout);
+            return true;
         }
 
-    private:
-        template<long num_channels, typename gcc_happy = void>
-        struct impl_t;
-
-        template<typename gcc_happy>
-        struct impl_t<1, gcc_happy>
-        {
-            template <typename T, typename image_view_type, typename pixel_type>
-            static bool interpolate(
-                const image_view_type &img,
-                const dlib::vector<T, 2> &p,
-                pixel_type &result
-                )
-            {
-                COMPILE_TIME_ASSERT(pixel_traits<typename image_view_type::pixel_type>::has_alpha == false);
-                COMPILE_TIME_ASSERT(pixel_traits<typename image_view_type::pixel_type>::grayscale == true);
-
-                const long left = static_cast<long>(std::floor(p.x()));
-                const long top = static_cast<long>(std::floor(p.y()));
-                const long right = left + 1;
-                const long bottom = top + 1;
-
-
-                // if the interpolation goes outside img 
-                if (!(left >= 0 && top >= 0 && right < img.nc() && bottom < img.nr()))
-                    return false;
-
-                const double lr_frac = p.x() - left;
-                const double tb_frac = p.y() - top;
-
-                blend_component<0>(img, lr_frac, tb_frac, left, top, right, bottom, result);
-                return true;
-            }
-        };
-
-        template<typename gcc_happy>
-        struct impl_t<3, gcc_happy>
-        {
-            template <typename T, typename image_view_type, typename pixel_type>
-            static bool interpolate(
-                const image_view_type &img,
-                const dlib::vector<T, 2> &p,
-                pixel_type &result
-                )
-            {
-                const long left = static_cast<long>(std::floor(p.x()));
-                const long top = static_cast<long>(std::floor(p.y()));
-                const long right = left + 1;
-                const long bottom = top + 1;
-
-
-                // if the interpolation goes outside img 
-                if (!(left >= 0 && top >= 0 && right < img.nc() && bottom < img.nr()))
-                    return false;
-
-                const double lr_frac = p.x() - left;
-                const double tb_frac = p.y() - top;
-
-                blend_component<0>(img, lr_frac, tb_frac, left, top, right, bottom, get_component<0>(result));
-                blend_component<1>(img, lr_frac, tb_frac, left, top, right, bottom, get_component<1>(result));
-                blend_component<2>(img, lr_frac, tb_frac, left, top, right, bottom, get_component<2>(result));
-                return true;
-            }
-        };
-
-        template<typename gcc_happy>
-        struct impl_t<4, gcc_happy>
-        {
-            template <typename T, typename image_view_type, typename pixel_type>
-            static bool interpolate(
-                const image_view_type &img,
-                const dlib::vector<T, 2> &p,
-                pixel_type &result
-                )
-            {
-                const long left = static_cast<long>(std::floor(p.x()));
-                const long top = static_cast<long>(std::floor(p.y()));
-                const long right = left + 1;
-                const long bottom = top + 1;
-
-                // if the interpolation goes outside img 
-                if (!(left >= 0 && top >= 0 && right < img.nc() && bottom < img.nr()))
-                    return false;
-
-                const double lr_frac = p.x() - left;
-                const double tb_frac = p.y() - top;
-
-                blend_component<0>(img, lr_frac, tb_frac, left, top, right, bottom, get_component<0>(result));
-                blend_component<1>(img, lr_frac, tb_frac, left, top, right, bottom, get_component<1>(result));
-                blend_component<2>(img, lr_frac, tb_frac, left, top, right, bottom, get_component<2>(result));
-                blend_component<3>(img, lr_frac, tb_frac, left, top, right, bottom, get_component<3>(result));
-                return true;
-            }
-        };
-
-
-        static double blend(double lr_frac, double tb_frac, double tl, double tr, double bl, double br)
-        {
-            return (1 - tb_frac) * ((1 - lr_frac) * tl + lr_frac * tr) +
-                tb_frac * ((1 - lr_frac) * bl + lr_frac * br);
-        }
-
-        template<size_t index, typename image_view_type, typename T>
-        static void blend_component(const image_view_type &img, double lr_frac, double tb_frac, long left, long top, long right, long bottom, T &result)
-        {
-            double tl = 0, tr = 0, bl = 0, br = 0;
-            assign_pixel(tl, get_component<index>(img[top][left]));
-            assign_pixel(tr, get_component<index>(img[top][right]));
-            assign_pixel(bl, get_component<index>(img[bottom][left]));
-            assign_pixel(br, get_component<index>(img[bottom][right]));
-
-            assign_pixel(result, blend(lr_frac, tb_frac, tl, tr, bl, br));
-        }
     };
 
 // ----------------------------------------------------------------------------------------

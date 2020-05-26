@@ -133,51 +133,12 @@ namespace dlib
                 && this->blue  == that.blue;
         }
 
+        bool operator != (const rgb_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
     };
-
-    template<size_t Index>
-    inline unsigned char get_component(rgb_pixel const &p);
-
-    template<>
-    inline unsigned char get_component<0>(rgb_pixel const &p)
-    {
-        return p.red;
-    }
-
-    template<>
-    inline unsigned char get_component<1>(rgb_pixel const &p)
-    {
-        return p.green;
-    }
-
-    template<>
-    inline unsigned char get_component<2>(rgb_pixel const &p)
-    {
-        return p.blue;
-    }
-
-    template<size_t Index>
-    inline unsigned char &get_component(rgb_pixel &p);
-
-    template<>
-    inline unsigned char &get_component<0>(rgb_pixel &p)
-    {
-        return p.red;
-    }
-
-    template<>
-    inline unsigned char &get_component<1>(rgb_pixel &p)
-    {
-        return p.green;
-    }
-
-    template<>
-    inline unsigned char &get_component<2>(rgb_pixel &p)
-    {
-        return p.blue;
-    }
-
-
 
 // ----------------------------------------------------------------------------------------
 
@@ -211,49 +172,12 @@ namespace dlib
                 && this->red   == that.red;
         }
 
+        bool operator != (const bgr_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
     };
-
-    template<size_t Index>
-    inline unsigned char get_component(bgr_pixel const &p);
-
-    template<>
-    inline unsigned char get_component<0>(bgr_pixel const &p)
-    {
-        return p.blue;
-    }
-
-    template<>
-    inline unsigned char get_component<1>(bgr_pixel const &p)
-    {
-        return p.green;
-    }
-
-    template<>
-    inline unsigned char get_component<2>(bgr_pixel const &p)
-    {
-        return p.red;
-    }
-
-    template<size_t Index>
-    inline unsigned char &get_component(bgr_pixel &p);
-
-    template<>
-    inline unsigned char &get_component<0>(bgr_pixel &p)
-    {
-        return p.blue;
-    }
-
-    template<>
-    inline unsigned char &get_component<1>(bgr_pixel &p)
-    {
-        return p.green;
-    }
-
-    template<>
-    inline unsigned char &get_component<2>(bgr_pixel &p)
-    {
-        return p.red;
-    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -288,61 +212,12 @@ namespace dlib
                 && this->alpha == that.alpha;
         }
 
+        bool operator != (const rgb_alpha_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
     };
-
-    template<size_t Index>
-    inline unsigned char get_component(rgb_alpha_pixel const &p);
-
-    template<>
-    inline unsigned char get_component<0>(rgb_alpha_pixel const &p)
-    {
-        return p.red;
-    }
-
-    template<>
-    inline unsigned char get_component<1>(rgb_alpha_pixel const &p)
-    {
-        return p.green;
-    }
-
-    template<>
-    inline unsigned char get_component<2>(rgb_alpha_pixel const &p)
-    {
-        return p.blue;
-    }
-
-    template<>
-    inline unsigned char get_component<3>(rgb_alpha_pixel const &p)
-    {
-        return p.alpha;
-    }
-
-    template<size_t Index>
-    inline unsigned char &get_component(rgb_alpha_pixel &p);
-
-    template<>
-    inline unsigned char &get_component<0>(rgb_alpha_pixel &p)
-    {
-        return p.red;
-    }
-
-    template<>
-    inline unsigned char &get_component<1>(rgb_alpha_pixel &p)
-    {
-        return p.green;
-    }
-
-    template<>
-    inline unsigned char &get_component<2>(rgb_alpha_pixel &p)
-    {
-        return p.blue;
-    }
-
-    template<>
-    inline unsigned char &get_component<3>(rgb_alpha_pixel &p)
-    {
-        return p.alpha;
-    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -373,49 +248,12 @@ namespace dlib
                 && this->i == that.i;
         }
 
+        bool operator != (const hsi_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
     };
-
-    template<size_t Index>
-    inline unsigned char get_component(hsi_pixel const &p);
-
-    template<>
-    inline unsigned char get_component<0>(hsi_pixel const &p)
-    {
-        return p.h;
-    }
-
-    template<>
-    inline unsigned char get_component<1>(hsi_pixel const &p)
-    {
-        return p.s;
-    }
-
-    template<>
-    inline unsigned char get_component<2>(hsi_pixel const &p)
-    {
-        return p.i;
-    }
-
-    template<size_t Index>
-    inline unsigned char &get_component(hsi_pixel &p);
-
-    template<>
-    inline unsigned char &get_component<0>(hsi_pixel &p)
-    {
-        return p.h;
-    }
-
-    template<>
-    inline unsigned char &get_component<1>(hsi_pixel &p)
-    {
-        return p.s;
-    }
-
-    template<>
-    inline unsigned char &get_component<2>(hsi_pixel &p)
-    {
-        return p.i;
-    }
 
     // ----------------------------------------------------------------------------------------
 
@@ -446,49 +284,12 @@ namespace dlib
                 && this->b == that.b;
         }
 
-    };
+        bool operator != (const lab_pixel& that) const
+        {
+            return !(*this == that);
+        }
 
-    template<size_t Index>
-    inline unsigned char get_component(lab_pixel const &p);
-
-    template<>
-    inline unsigned char get_component<0>(lab_pixel const &p)
-    {
-        return p.l;
-    }
-
-    template<>
-    inline  unsigned char get_component<1>(lab_pixel const &p)
-    {
-        return p.a;
-    }
-
-    template<>
-    inline unsigned char get_component<2>(lab_pixel const &p)
-    {
-        return p.b;
-    }
-
-    template<size_t Index>
-    inline unsigned char &get_component(lab_pixel &p);
-
-    template<>
-    inline unsigned char &get_component<0>(lab_pixel &p)
-    {
-        return p.l;
-    }
-
-    template<>
-    inline  unsigned char &get_component<1>(lab_pixel &p)
-    {
-        return p.a;
-    }
-
-    template<>
-    inline unsigned char &get_component<2>(lab_pixel &p)
-    {
-        return p.b;
-    }
+    };    
 
 // ----------------------------------------------------------------------------------------
 
@@ -818,20 +619,6 @@ namespace dlib
     template <> struct pixel_traits<std::complex<float> > :       public float_grayscale_pixel_traits<float> {};
     template <> struct pixel_traits<std::complex<double> > :      public float_grayscale_pixel_traits<double> {};
     template <> struct pixel_traits<std::complex<long double> > : public float_grayscale_pixel_traits<long double> {};
-
-    template<size_t Index, typename T>
-    inline typename std::enable_if<pixel_traits<T>::grayscale, T>::type get_component(T const &p)
-    {
-        COMPILE_TIME_ASSERT(Index == 0);
-        return p;
-    }
-
-    template<size_t Index, typename T>
-    inline typename std::enable_if<pixel_traits<T>::grayscale, T>::type &get_component(T &p)
-    {
-        COMPILE_TIME_ASSERT(Index == 0);
-        return p;
-    }
 
 // ----------------------------------------------------------------------------------------
 

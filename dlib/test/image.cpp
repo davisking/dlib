@@ -2015,16 +2015,11 @@ namespace
             img_s(1, 0) = { 10, 20, 30 };
             img_s(1, 1) = { 10, 20, 30 };
 
-            auto same = [](rgb_pixel p1, rgb_pixel p2)
-            {
-                return std::abs(p1.red - p2.red) + std::abs(p1.green - p2.green) + std::abs(p1.blue - p2.blue) == 0;
-            };
-
             resize_image(img_s, img_d, interpolation_type());
-            DLIB_TEST((same(img_d(0, 0), { 0, 0, 0 })));
-            DLIB_TEST((same(img_d(0, 1), { 5, 10, 15 })));
-            DLIB_TEST((same(img_d(1, 2), { 10, 20, 30 })));
-            DLIB_TEST((same(img_d(2, 2), { 10, 20, 30 })));
+            DLIB_TEST((img_d(0, 0) == rgb_pixel{ 0, 0, 0 }));
+            DLIB_TEST((img_d(0, 1) == rgb_pixel{ 5, 10, 15 }));
+            DLIB_TEST((img_d(1, 2) == rgb_pixel{ 10, 20, 30 }));
+            DLIB_TEST((img_d(2, 2) == rgb_pixel{ 10, 20, 30 }));
         }
 
         {
@@ -2036,16 +2031,11 @@ namespace
             img_s(1, 0) = { 100, 20, 30 };
             img_s(1, 1) = { 100, 20, 30 };
 
-            auto same = [](lab_pixel p1, lab_pixel p2)
-            {
-                return std::abs(p1.l - p2.l) + std::abs(p1.a - p2.a) + std::abs(p1.b - p2.b) == 0;
-            };
-
             resize_image(img_s, img_d, interpolation_type());
-            DLIB_TEST((same(img_d(0, 0), { 0, 0, 0 })));
-            DLIB_TEST((same(img_d(0, 1), { 50, 10, 15 })));
-            DLIB_TEST((same(img_d(1, 2), { 100, 20, 30 })));
-            DLIB_TEST((same(img_d(2, 2), { 100, 20, 30 })));
+            DLIB_TEST((img_d(0, 0) == lab_pixel{ 0, 0, 0 }));
+            DLIB_TEST((img_d(0, 1) == lab_pixel{ 50, 10, 15 }));
+            DLIB_TEST((img_d(1, 2) == lab_pixel{ 100, 20, 30 }));
+            DLIB_TEST((img_d(2, 2) == lab_pixel{ 100, 20, 30 }));
         }
 
     }
@@ -2072,6 +2062,7 @@ namespace
             DLIB_TEST((img_d(0, 1) == 100));
             DLIB_TEST((img_d(1, 0) == 100));
             DLIB_TEST((img_d(1, 1) == 100));
+            //DLIB_TEST(img_d == img_s);
         }
 
         {
@@ -2088,16 +2079,12 @@ namespace
             img_s(2, 1) = { 10, 20, 30 };
             img_s(2, 2) = { 10, 20, 30 };
 
-            auto same = [](rgb_pixel p1, rgb_pixel p2)
-            {
-                return std::abs(p1.red - p2.red) + std::abs(p1.green - p2.green) + std::abs(p1.blue - p2.blue) == 0;
-            };
-
             rotate_image(img_s, img_d, 0, interpolation_type());
-            DLIB_TEST((same(img_d(0, 0), { 0, 0, 0 })));
-            DLIB_TEST((same(img_d(0, 1), { 10, 20, 30 })));
-            DLIB_TEST((same(img_d(1, 0), { 10, 20, 30 })));
-            DLIB_TEST((same(img_d(1, 1), { 10, 20, 30 })));
+            DLIB_TEST((img_d(0, 0) == rgb_pixel{ 0, 0, 0 }));
+            DLIB_TEST((img_d(0, 1) == rgb_pixel{ 10, 20, 30 }));
+            DLIB_TEST((img_d(1, 0) == rgb_pixel{ 10, 20, 30 }));
+            DLIB_TEST((img_d(1, 1) == rgb_pixel{ 10, 20, 30 }));
+            //DLIB_TEST(img_d == img_s);
         }
 
         {
@@ -2114,16 +2101,12 @@ namespace
             img_s(2, 1) = { 100, 20, 30 };
             img_s(2, 2) = { 100, 20, 30 };
 
-            auto same = [](lab_pixel p1, lab_pixel p2)
-            {
-                return std::abs(p1.l - p2.l) + std::abs(p1.a - p2.a) + std::abs(p1.b - p2.b) == 0;
-            };
-
             rotate_image(img_s, img_d, 0, interpolation_type());
-            DLIB_TEST((same(img_d(0, 0), { 0, 0, 0 })));
-            DLIB_TEST((same(img_d(0, 1), { 100, 20, 30 })));
-            DLIB_TEST((same(img_d(1, 0), { 100, 20, 30 })));
-            DLIB_TEST((same(img_d(1, 1), { 100, 20, 30 })));
+            DLIB_TEST((img_d(0, 0) == lab_pixel{ 0, 0, 0 }));
+            DLIB_TEST((img_d(0, 1) == lab_pixel{ 100, 20, 30 }));
+            DLIB_TEST((img_d(1, 0) == lab_pixel{ 100, 20, 30 }));
+            DLIB_TEST((img_d(1, 1) == lab_pixel{ 100, 20, 30 }));
+            //DLIB_TEST(img_d == img_s);
         }
 
     }
