@@ -232,7 +232,7 @@ namespace dlib
         template <typename T, typename image_view_type, typename pixel_type>
         bool operator() (
             const image_view_type& img,
-            const dlib::vector<T, 2>& p,
+            const dlib::vector<T,2>& p,
             pixel_type& result
         ) const
         {
@@ -295,7 +295,7 @@ namespace dlib
             const point pp(p);
 
             // if the interpolation goes outside img 
-            if (!get_rect(img).contains(grow_rect(pp, 1)))
+            if (!get_rect(img).contains(grow_rect(pp,1)))
                 return false;
 
             const long r = pp.y();
@@ -303,7 +303,7 @@ namespace dlib
 
             matrix<double, traits::num, 1> pvout;
             for (long i = 0; i < traits::num; ++i)
-                pvout(i) = interpolate(p - pp,
+                pvout(i) = interpolate(p-pp,
                     pixel_to_vector<double>(img[r-1][c-1])(i),
                     pixel_to_vector<double>(img[r-1][c  ])(i),
                     pixel_to_vector<double>(img[r-1][c+1])(i),
