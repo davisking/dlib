@@ -2062,7 +2062,6 @@ namespace
             DLIB_TEST((img_d(0, 1) == 100));
             DLIB_TEST((img_d(1, 0) == 100));
             DLIB_TEST((img_d(1, 1) == 100));
-            //DLIB_TEST(img_d == img_s);
         }
 
         {
@@ -2084,7 +2083,6 @@ namespace
             DLIB_TEST((img_d(0, 1) == rgb_pixel{ 10, 20, 30 }));
             DLIB_TEST((img_d(1, 0) == rgb_pixel{ 10, 20, 30 }));
             DLIB_TEST((img_d(1, 1) == rgb_pixel{ 10, 20, 30 }));
-            //DLIB_TEST(img_d == img_s);
         }
 
         {
@@ -2106,7 +2104,6 @@ namespace
             DLIB_TEST((img_d(0, 1) == lab_pixel{ 100, 20, 30 }));
             DLIB_TEST((img_d(1, 0) == lab_pixel{ 100, 20, 30 }));
             DLIB_TEST((img_d(1, 1) == lab_pixel{ 100, 20, 30 }));
-            //DLIB_TEST(img_d == img_s);
         }
 
     }

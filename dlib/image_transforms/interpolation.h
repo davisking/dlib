@@ -237,14 +237,14 @@ namespace dlib
         ) const
         {
             // Interpolation currently supports only fully cartesian (non-polar) spaces.
-            COMPILE_TIME_ASSERT(is_color_space_cartesian_image<image_view_type>::value == true);
+            static_assert(is_color_space_cartesian_image<image_view_type>::value == true, "Non-cartesian color space used in interpolation");
 
             using traits = pixel_traits<typename image_view_type::pixel_type>;
 
-            const long left = static_cast<long>(std::floor(p.x()));
-            const long top = static_cast<long>(std::floor(p.y()));
-            const long right = left + 1;
-            const long bottom = top + 1;
+            const long left   = static_cast<long>(std::floor(p.x()));
+            const long top    = static_cast<long>(std::floor(p.y()));
+            const long right  = left+1;
+            const long bottom = top+1;
 
             // if the interpolation goes outside img 
             if (!(left >= 0 && top >= 0 && right < img.nc() && bottom < img.nr()))
@@ -253,10 +253,10 @@ namespace dlib
             const double lr_frac = p.x() - left;
             const double tb_frac = p.y() - top;
 
-            auto const tl = pixel_to_vector<typename traits::basic_pixel_type>(img[top][left]);
-            auto const tr = pixel_to_vector<typename traits::basic_pixel_type>(img[top][right]);
-            auto const bl = pixel_to_vector<typename traits::basic_pixel_type>(img[bottom][left]);
-            auto const br = pixel_to_vector<typename traits::basic_pixel_type>(img[bottom][right]);
+            auto const tl = pixel_to_vector<double>(img[top][left]);
+            auto const tr = pixel_to_vector<double>(img[top][right]);
+            auto const bl = pixel_to_vector<double>(img[bottom][left]);
+            auto const br = pixel_to_vector<double>(img[bottom][right]);
             typename ::std::remove_const<decltype(tl)>::type pvout;
             for (long i = 0; i < traits::num; ++i)
                 pvout(i) = (1 - tb_frac) * ((1 - lr_frac) * tl(i) + lr_frac * tr(i)) +
