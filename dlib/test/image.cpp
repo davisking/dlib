@@ -2039,8 +2039,7 @@ namespace
         }
 
     }
-    
-    template<typename interpolation_type = interpolate_bilinear>
+
     void test_null_rotate_image_with_interpolation()
     {
         {
@@ -2057,7 +2056,7 @@ namespace
             img_s(2, 1) = 100;
             img_s(2, 2) = 100;
 
-            rotate_image(img_s, img_d, 0, interpolation_type());
+            rotate_image(img_s, img_d, 0, interpolate_bilinear());
             DLIB_TEST((img_d(0, 0) == 0));
             DLIB_TEST((img_d(0, 1) == 100));
             DLIB_TEST((img_d(1, 0) == 100));
@@ -2078,7 +2077,7 @@ namespace
             img_s(2, 1) = { 10, 20, 30 };
             img_s(2, 2) = { 10, 20, 30 };
 
-            rotate_image(img_s, img_d, 0, interpolation_type());
+            rotate_image(img_s, img_d, 0, interpolate_bilinear());
             DLIB_TEST((img_d(0, 0) == rgb_pixel{ 0, 0, 0 }));
             DLIB_TEST((img_d(0, 1) == rgb_pixel{ 10, 20, 30 }));
             DLIB_TEST((img_d(1, 0) == rgb_pixel{ 10, 20, 30 }));
@@ -2099,13 +2098,70 @@ namespace
             img_s(2, 1) = { 100, 20, 30 };
             img_s(2, 2) = { 100, 20, 30 };
 
-            rotate_image(img_s, img_d, 0, interpolation_type());
+            rotate_image(img_s, img_d, 0, interpolate_bilinear());
             DLIB_TEST((img_d(0, 0) == lab_pixel{ 0, 0, 0 }));
             DLIB_TEST((img_d(0, 1) == lab_pixel{ 100, 20, 30 }));
             DLIB_TEST((img_d(1, 0) == lab_pixel{ 100, 20, 30 }));
             DLIB_TEST((img_d(1, 1) == lab_pixel{ 100, 20, 30 }));
         }
 
+    }
+
+    void test_null_rotate_image_with_interpolation_quadratic()
+    {
+        {
+            matrix<unsigned char> img_s(3, 3);
+            matrix<unsigned char> img_d;
+
+            img_s(0, 0) = 0;
+            img_s(0, 1) = 100;
+            img_s(0, 2) = 100;
+            img_s(1, 0) = 100;
+            img_s(1, 1) = 100;
+            img_s(1, 2) = 100;
+            img_s(2, 0) = 100;
+            img_s(2, 1) = 100;
+            img_s(2, 2) = 100;
+
+            rotate_image(img_s, img_d, 0, interpolate_quadratic());
+            DLIB_TEST((img_d(1, 1) == 111));
+        }
+
+        {
+            matrix<rgb_pixel> img_s(3, 3);
+            matrix<rgb_pixel> img_d(3, 3);
+
+            img_s(0, 0) = { 0, 0, 0 };
+            img_s(0, 1) = { 10, 20, 30 };
+            img_s(0, 2) = { 10, 20, 30 };
+            img_s(1, 0) = { 10, 20, 30 };
+            img_s(1, 1) = { 10, 20, 30 };
+            img_s(1, 2) = { 10, 20, 30 };
+            img_s(2, 0) = { 10, 20, 30 };
+            img_s(2, 1) = { 10, 20, 30 };
+            img_s(2, 2) = { 10, 20, 30 };
+
+            rotate_image(img_s, img_d, 0, interpolate_quadratic());
+            DLIB_TEST((img_d(1, 1) == rgb_pixel{ 11, 22, 33 }));
+        }
+
+        {
+            matrix<lab_pixel> img_s(3, 3);
+            matrix<lab_pixel> img_d(3, 3);
+
+            img_s(0, 0) = { 0, 0, 0 };
+            img_s(0, 1) = { 100, 20, 30 };
+            img_s(0, 2) = { 100, 20, 30 };
+            img_s(1, 0) = { 100, 20, 30 };
+            img_s(1, 1) = { 100, 20, 30 };
+            img_s(1, 2) = { 100, 20, 30 };
+            img_s(2, 0) = { 100, 20, 30 };
+            img_s(2, 1) = { 100, 20, 30 };
+            img_s(2, 2) = { 100, 20, 30 };
+
+            rotate_image(img_s, img_d, 0, interpolate_quadratic());
+            DLIB_TEST((img_d(1, 1) == lab_pixel{ 111, 22, 33 }));
+        }
     }
 
     void test_interpolate_bilinear()
@@ -2283,7 +2339,8 @@ namespace
 
             test_partition_pixels();
             test_resize_image_with_interpolation<interpolate_bilinear>();
-            test_null_rotate_image_with_interpolation<interpolate_bilinear>();
+            test_null_rotate_image_with_interpolation();
+            test_null_rotate_image_with_interpolation_quadratic();
             test_interpolate_bilinear();
         }
     } a;

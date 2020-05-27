@@ -78,14 +78,13 @@ namespace dlib
                 - image_view_type == an image_view or const_image_view object 
                 - pixel_traits<typename image_view_type::pixel_type>::has_alpha == false
                 - pixel_traits<pixel_type> is defined
+                - pixel_type uses cartesian coordinates color space
             ensures
                 - if (there is an interpolatable image location at point p in img) then
                     - #result == the interpolated pixel value from img at point p.
                     - assign_pixel() will be used to write to #result, therefore any
                       necessary color space conversion will be performed.
                     - returns true
-                    - if img contains RGB pixels then the interpolation will be in color.
-                      Otherwise, the interpolation will be performed in a grayscale mode.
                 - else
                     - returns false
         !*/
@@ -119,14 +118,13 @@ namespace dlib
                 - image_view_type == an image_view or const_image_view object. 
                 - pixel_traits<typename image_view_type::pixel_type>::has_alpha == false
                 - pixel_traits<pixel_type> is defined
+                - pixel_type uses cartesian coordinates color space
             ensures
                 - if (there is an interpolatable image location at point p in img) then
                     - #result == the interpolated pixel value from img at point p
                     - assign_pixel() will be used to write to #result, therefore any
                       necessary color space conversion will be performed.
                     - returns true
-                    - if img contains RGB pixels then the interpolation will be in color.
-                      Otherwise, the interpolation will be performed in a grayscale mode.
                 - else
                     - returns false
         !*/
