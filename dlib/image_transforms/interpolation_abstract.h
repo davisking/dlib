@@ -78,7 +78,7 @@ namespace dlib
                 - image_view_type == an image_view or const_image_view object 
                 - pixel_traits<typename image_view_type::pixel_type>::has_alpha == false
                 - pixel_traits<pixel_type> is defined
-                - pixel_type uses cartesian coordinates color space
+                - is_color_space_cartesian_image<image_view_type>::value == true
             ensures
                 - if (there is an interpolatable image location at point p in img) then
                     - #result == the interpolated pixel value from img at point p.
@@ -118,7 +118,7 @@ namespace dlib
                 - image_view_type == an image_view or const_image_view object. 
                 - pixel_traits<typename image_view_type::pixel_type>::has_alpha == false
                 - pixel_traits<pixel_type> is defined
-                - pixel_type uses cartesian coordinates color space
+                - is_color_space_cartesian_image<image_view_type>::value == true
             ensures
                 - if (there is an interpolatable image location at point p in img) then
                     - #result == the interpolated pixel value from img at point p

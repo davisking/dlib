@@ -241,7 +241,6 @@ namespace dlib
             // Interpolation currently supports only fully cartesian (non-polar) spaces.
             static_assert(is_color_space_cartesian_image<image_view_type>::value == true, "Non-cartesian color space used in interpolation");
 
-            using traits = pixel_traits<typename image_view_type::pixel_type>;
 
             const long left   = static_cast<long>(std::floor(p.x()));
             const long top    = static_cast<long>(std::floor(p.y()));
@@ -255,16 +254,13 @@ namespace dlib
             const double lr_frac = p.x() - left;
             const double tb_frac = p.y() - top;
 
-            auto const tl = pixel_to_vector<double>(img[top][left]);
-            auto const tr = pixel_to_vector<double>(img[top][right]);
-            auto const bl = pixel_to_vector<double>(img[bottom][left]);
-            auto const br = pixel_to_vector<double>(img[bottom][right]);
-            matrix<double, traits::num, 1> pvout;
-            for (long i = 0; i < traits::num; ++i)
-                pvout(i) = (1 - tb_frac) * ((1 - lr_frac) * tl(i) + lr_frac * tr(i)) +
-                tb_frac * ((1 - lr_frac) * bl(i) + lr_frac * br(i));
+            const auto tl = pixel_to_vector<double>(img[top][left]);
+            const auto tr = pixel_to_vector<double>(img[top][right]);
+            const auto bl = pixel_to_vector<double>(img[bottom][left]);
+            const auto br = pixel_to_vector<double>(img[bottom][right]);
             typename image_view_type::pixel_type temp;
-            vector_to_pixel(temp, pvout);
+            vector_to_pixel(temp, (1 - tb_frac) * ((1 - lr_frac) * tl + lr_frac * tr) +
+                tb_frac * ((1 - lr_frac) * bl + lr_frac * br));
             assign_pixel(result, temp);
             return true;
         }
