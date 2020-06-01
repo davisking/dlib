@@ -132,6 +132,12 @@ namespace dlib
                 && this->green == that.green
                 && this->blue  == that.blue;
         }
+
+        bool operator != (const rgb_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -165,6 +171,12 @@ namespace dlib
                 && this->green == that.green
                 && this->red   == that.red;
         }
+
+        bool operator != (const bgr_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -199,6 +211,12 @@ namespace dlib
                 && this->blue  == that.blue
                 && this->alpha == that.alpha;
         }
+
+        bool operator != (const rgb_alpha_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
     };
 
 // ----------------------------------------------------------------------------------------
@@ -229,7 +247,14 @@ namespace dlib
                 && this->s == that.s
                 && this->i == that.i;
         }
+
+        bool operator != (const hsi_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
     };
+
     // ----------------------------------------------------------------------------------------
 
     struct lab_pixel
@@ -258,7 +283,13 @@ namespace dlib
                 && this->a == that.a
                 && this->b == that.b;
         }
-    };
+
+        bool operator != (const lab_pixel& that) const
+        {
+            return !(*this == that);
+        }
+
+    };    
 
 // ----------------------------------------------------------------------------------------
 
