@@ -12,6 +12,34 @@
 
 <current>
 New Features and Improvements:
+   - Added CUDA implementation for loss_mean_squared_per_channel_and_pixel.
+   - Added DCGAN example in examples/dnn_dcgan_train_ex.cpp
+   - Added transfer learning example in examples/dnn_introduction3_ex.cpp
+   - Added leaky_relu activation layer
+   - Added mish activation layer 
+   - Added loss_multiclass_log_weighted
+   - Added loss_binary_log_per_pixel
+   - Minor API simplifications in deep learning tooling.
+   - imglab can automatically select the number of image clusters when --cluster 0 is given.
+   - Added a relative epsilon termination option to svm_c_linear_trainer
+   - Support new version of OpenCV that doesn't have IplImage anymore.
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Corrected interpolate_bilinear for lab_pixel.
+   - Fix build errors in CUDA 10.2
+   - Make equal_error_rate() handle degenerate case where all scores are equal.
+   - Fix DLIB_ISO_CPP_ONLY not working
+   - Fix build errors in C++20 build mode.
+   - Fixed function_evaluation_request::set() invalidating function_evaluation_request::x()
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.19" date="Dec 14, 2019">
+New Features and Improvements:
    - Made find_min_global() and find_max_global() much faster when using them
      to optimize inexpensive functions.  These tools now measure the runtime of
      the objective function and automatically tune themselves to balance solver
@@ -29,7 +57,7 @@ Bug fixes:
    - Fix find_max() going into an infinite loop in some cases when a
      non-differentiable function is given.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
