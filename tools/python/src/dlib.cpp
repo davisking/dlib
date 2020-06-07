@@ -37,7 +37,7 @@ void bind_line(py::module& m);
 void bind_gui(py::module& m);
 #endif
 
-PYBIND11_MODULE(dlib, m)
+PYBIND11_MODULE(_dlib_pybind11, m)
 {
     warn_about_unavailable_but_used_cpu_instructions();
 

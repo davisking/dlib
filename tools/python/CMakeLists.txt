@@ -68,8 +68,6 @@ if(NOT ${DLIB_NO_GUI_SUPPORT})
    list(APPEND python_srcs src/gui.cpp)
 endif()
 
-pybind11_add_module(dlib_python ${python_srcs})
-target_link_libraries(dlib_python PRIVATE dlib::dlib)
-# Set the output library name to dlib because that's what setup.py and distutils expects.
-set_target_properties(dlib_python PROPERTIES OUTPUT_NAME dlib)
+pybind11_add_module(_dlib_pybind11 ${python_srcs})
+target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
 
