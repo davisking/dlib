@@ -1,6 +1,5 @@
-from _dlib_pybind11 import *
-from _dlib_pybind11 import __version__, __time_compiled__
-
+# Copyright (C) 2020  Davis E. King (davis@dlib.net)
+# License: Boost Software License   See LICENSE.txt for the full license.
 
 try:
     import os
@@ -9,3 +8,6 @@ try:
     os.add_dll_directory(os.path.join(os.environ['CUDA_PATH'], 'bin'))
 except (AttributeError,KeyError):
     pass
+
+from _dlib_pybind11 import *
+from _dlib_pybind11 import __version__, __time_compiled__
