@@ -633,7 +633,7 @@ if (NOT TARGET dlib)
                endif()
             endif()
 
-            if (CUDA_VERSION VERSION_EQUAL 10.2)
+            if (CUDA_VERSION VERSION_EQUAL 10.2 OR CUDA_VERSION VERSION_EQUAL 10.1)
                # To avoid this error from nvcc:  
                #    error: calling a constexpr __host__ function("log1p") from a __device__ function("cuda_log1pexp") 
                #    is not allowed. The experimental flag '--expt-relaxed-constexpr' can be used to allow this.
