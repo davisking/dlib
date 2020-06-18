@@ -71,3 +71,4 @@ endif()
 pybind11_add_module(_dlib_pybind11 ${python_srcs})
 target_link_libraries(_dlib_pybind11 PRIVATE dlib::dlib)
 
+configure_file(${PROJECT_SOURCE_DIR}/dlib/__init__.py.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/dlib/__init__.py)
