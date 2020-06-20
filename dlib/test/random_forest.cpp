@@ -62,15 +62,23 @@ namespace
             DLIB_TEST(df.get_num_trees() == 1000);
 
             auto result = test_regression_function(df, samples, labels);
-            // train:    2.239 0.987173 0.970669   1.1399 
+            // train:    1.95064 0.990374  0.92738  1.04536
             dlog << LINFO << "train: " << result;
-            DLIB_TEST_MSG(result(0) < 2.3, result(0));
+            DLIB_TEST_MSG(result(0) < 2.0, result(0));
+
+            // By construction, output values should be in the span of the training labels.
+            const double min_label = min(mat(labels));
+            const double max_label = max(mat(labels));
+            for (auto&& x : samples) {
+                double y = df(x);
+                DLIB_TEST(min_label <= y && y <= max_label);
+            }
 
             running_stats<double> rs;
             for (size_t i = 0; i < oobs.size(); ++i)
                 rs.add(std::pow(oobs[i]-labels[i],2.0));
             dlog << LINFO << "OOB MSE: "<< rs.mean();
-            DLIB_TEST_MSG(rs.mean() < 10.2, rs.mean());
+            DLIB_TEST_MSG(rs.mean() < 10.0, rs.mean());
 
             print_spinner();
 
@@ -80,9 +88,9 @@ namespace
             deserialize(df2, ss);
             DLIB_TEST(df2.get_num_trees() == 1000);
             result = test_regression_function(df2, samples, labels);
-            // train:    2.239 0.987173 0.970669   1.1399 
+            // train:    1.95064 0.990374  0.92738  1.04536
             dlog << LINFO << "serialized train results: " << result;
-            DLIB_TEST_MSG(result(0) < 2.3, result(0));
+            DLIB_TEST_MSG(result(0) < 2.0, result(0));
         }
     } a;
 

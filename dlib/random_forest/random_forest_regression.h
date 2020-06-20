@@ -376,8 +376,6 @@ namespace dlib
             std::vector<std::vector<internal_tree_node<feature_extractor>>> all_trees(num_trees);
             std::vector<std::vector<float>> all_leaves(num_trees);
 
-            const double sumy = sum(mat(y));
-
             const size_t feats_per_node = std::max(1.0,std::round(fe.max_num_feats()*feature_subsampling_frac));
 
             // Each tree couldn't have more than this many interior nodes.  It might
@@ -412,15 +410,18 @@ namespace dlib
                 // don't make any tree.  Just average the things and be done. 
                 if (y.size() <= min_samples_per_leaf)
                 {
-                    leaves.push_back(sumy/y.size());
+                    leaves.push_back(mean(mat(y)));
                     return;
                 }
 
 
+                double sumy = 0;
                 // pick a random bootstrap of the data.
                 std::vector<std::pair<float,uint32_t>> idxs(y.size());
-                for (auto& idx : idxs)
+                for (auto& idx : idxs) {
                     idx = std::make_pair(0.0f, static_cast<uint32_t>(rnd.get_integer(y.size())));
+                    sumy += y[idx.second];
+                }
 
                 // We are going to use ranges_to_process as a stack that tracks which
                 // range of samples we are going to split next.
@@ -702,7 +703,7 @@ namespace dlib
                 for (auto i = range.begin; i < range.end; ++i)
                     idxs[i].first = fe.extract_feature_value(x[idxs[i].second], feat);
 
-                std::sort(idxs.begin()+range.begin, idxs.begin()+range.end, compare_first);
+                std::stable_sort(idxs.begin()+range.begin, idxs.begin()+range.end, compare_first);
 
                 auto split = find_best_split(range, y, idxs);
 
@@ -716,7 +717,7 @@ namespace dlib
             // resort idxs based on winning feat
             for (auto i = range.begin; i < range.end; ++i)
                 idxs[i].first = fe.extract_feature_value(x[idxs[i].second], best.split_feature);
-            std::sort(idxs.begin()+range.begin, idxs.begin()+range.end, compare_first);
+            std::stable_sort(idxs.begin()+range.begin, idxs.begin()+range.end, compare_first);
 
             return best;
         }
