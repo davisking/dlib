@@ -4,5 +4,6 @@ includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
 Name: @PROJECT_NAME@
 Description: Numerical and networking C++ library
 Version: @VERSION@
-Libs: -L${libdir} -ldlib @pkg_config_dlib_needed_libraries@
+Libs: -L${libdir} -ldlib @pkg_config_dlib_needed_public_libraries@
+Libs.private: @pkg_config_dlib_needed_libraries@
 Cflags: -I${includedir} @pkg_config_dlib_needed_includes@
