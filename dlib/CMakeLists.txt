@@ -878,7 +878,15 @@ if (NOT TARGET dlib)
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
-      string (REPLACE ";" " " pkg_config_dlib_needed_libraries "${dlib_needed_libraries}")
+      foreach(LIB ${dlib_needed_libraries})
+        if(LIB MATCHES "^/")
+          get_filename_component(LIB ${LIB} NAME_WE)
+          string(REGEX REPLACE "^lib" "-l" LIB ${LIB})
+        endif()
+        MESSAGE(LIB=${LIB})
+        set(pkg_config_dlib_needed_libraries "${pkg_config_dlib_needed_libraries} ${LIB}")
+      endforeach()
+
       # Make the -I include options for pkg-config
       foreach (ITR ${dlib_needed_includes})
          set (pkg_config_dlib_needed_includes "${pkg_config_dlib_needed_includes} -I${ITR}")
