@@ -277,7 +277,6 @@ if (NOT TARGET dlib)
 
 
    set(dlib_needed_libraries)
-   set(dlib_needed_public_libraries)
    set(dlib_needed_includes)
 
    if (DLIB_ISO_CPP_ONLY)
@@ -423,7 +422,7 @@ if (NOT TARGET dlib)
          find_package(GIF QUIET)
          if (GIF_FOUND)
             set (dlib_needed_includes ${dlib_needed_includes} ${GIF_INCLUDE_DIR})
-            set (dlib_needed_public_libraries ${dlib_needed_public_libraries} ${GIF_LIBRARY})
+            set (dlib_needed_libraries ${dlib_needed_libraries} ${GIF_LIBRARY})
          else()
             set(DLIB_GIF_SUPPORT OFF CACHE STRING ${DLIB_GIF_SUPPORT_STR} FORCE )
             toggle_preprocessor_switch(DLIB_GIF_SUPPORT)
@@ -879,22 +878,13 @@ if (NOT TARGET dlib)
 
    # Install the library
    if (NOT DLIB_IN_PROJECT_BUILD)
-      set(pkg_config_dlib_needed_libraries)
       foreach(LIB ${dlib_needed_libraries})
         if(LIB MATCHES "^/")
           get_filename_component(LIB ${LIB} NAME_WE)
           string(REGEX REPLACE "^lib" "-l" LIB ${LIB})
         endif()
+        MESSAGE(LIB=${LIB})
         set(pkg_config_dlib_needed_libraries "${pkg_config_dlib_needed_libraries} ${LIB}")
-      endforeach()
-
-      set(pkg_config_dlib_needed_public_libraries)
-      foreach(LIB ${dlib_needed_public_libraries})
-        if(LIB MATCHES "^/")
-          get_filename_component(LIB ${LIB} NAME_WE)
-          string(REGEX REPLACE "^lib" "-l" LIB ${LIB})
-        endif()
-        set(pkg_config_dlib_needed_public_libraries "${pkg_config_dlib_needed_public_libraries} ${LIB}")
       endforeach()
 
       # Make the -I include options for pkg-config
