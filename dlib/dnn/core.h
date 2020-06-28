@@ -2684,6 +2684,9 @@ namespace dlib
         {
             static_assert(i < T::num_layers, "Call to layer() attempted to access non-existing layer in neural network.");
             static T& makeT();
+            // If you get error here mentioning lack of member "subnet" in "dlib::input<...>",
+            // then likely your "dlib::layer<...>" invocation wasn't able to find requested layer.
+            // This could happen for instance when trying to use skip layer for non-existing tag.
             using next_type = typename std::remove_reference<decltype(makeT().subnet())>::type;
             using type = typename layer_helper<i-1,next_type>::type;
             static type& layer(T& n)
