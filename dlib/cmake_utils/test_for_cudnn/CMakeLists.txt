@@ -7,7 +7,7 @@ include(../use_cpp_11.cmake)
 option(CUDA_PROPAGATE_HOST_FLAGS "Propage C/CXX_FLAGS and friends to the host compiler via -Xcompile" OFF)
 find_package(CUDA 7.5 REQUIRED)
 set(CUDA_HOST_COMPILATION_CPP ON)
-list(APPEND CUDA_NVCC_FLAGS "-arch=sm_30;-std=c++11;-D__STRICT_ANSI__")
+list(APPEND CUDA_NVCC_FLAGS "-arch=sm_50;-std=c++11;-D__STRICT_ANSI__")
 add_definitions(-DDLIB_USE_CUDA)
 
 include(find_cudnn.txt)
