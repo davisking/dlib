@@ -25,6 +25,8 @@
 #endif
 
 #ifdef _MSC_VER
+#pragma warning(push)
+
 // Disable the following warnings for Visual Studio
 
 // This warning is:
@@ -2165,10 +2167,8 @@ namespace dlib
 }
 
 #ifdef _MSC_VER
-// put warnings back to their default settings
-#pragma warning(default : 4355)
-#pragma warning(default : 4723)
-#pragma warning(default : 4724)
+// restore warnings back to their previous settings
+#pragma warning(pop)
 #endif
 
 #endif // DLIB_MATRIx_
