@@ -15,6 +15,7 @@ namespace dlib
 {
 
     struct LibpngData;
+    struct PngBufferReaderState;
     class png_loader : noncopyable
     {
     public:
@@ -22,6 +23,7 @@ namespace dlib
         png_loader( const char* filename );
         png_loader( const std::string& filename );
         png_loader( const dlib::file& f );
+        png_loader( const unsigned char* image_buffer, size_t buffer_size );
         ~png_loader();
 
         bool is_gray() const;
@@ -191,11 +193,13 @@ namespace dlib
 
     private:
         const unsigned char* get_row( unsigned i ) const;
-        void read_image( const char* filename );
+        FILE* check_file( const char* filename );
+        void read_image( FILE* fp, const unsigned char* image_buffer, size_t buffer_size );
         unsigned height_, width_;
         unsigned bit_depth_;
         int color_type_;
         std::unique_ptr<LibpngData> ld_;
+        std::unique_ptr<PngBufferReaderState> buffer_reader_state_;
     };
 
 // ----------------------------------------------------------------------------------------
@@ -210,6 +214,31 @@ namespace dlib
     {
         png_loader(file_name).get_image(image);
     }
+
+    template <
+        typename image_type
+        >
+    void load_png (
+        image_type& image,
+        const unsigned char* image_buffer,
+        size_t buffer_size
+    )
+    {
+        png_loader(image_buffer, buffer_size).get_image(image);
+    }
+
+    template <
+        typename image_type
+        >
+    void load_png (
+        image_type& image,
+        const char* image_buffer,
+        size_t buffer_size
+    )
+    {
+        png_loader(reinterpret_cast<const unsigned char*>(image_buffer), buffer_size).get_image(image);
+    }
+
 
 // ----------------------------------------------------------------------------------------
 

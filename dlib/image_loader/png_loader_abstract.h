@@ -65,6 +65,19 @@ namespace dlib
                   us from loading the given PNG file.
         !*/
 
+        png_loader( 
+            const unsigned char* image_buffer,
+            size_t buffer_size
+        );
+        /*!
+            ensures
+                - loads the PNG from memory image_buffer of size buffer_size into this object
+            throws
+                - image_load_error
+                  This exception is thrown if there is some error that prevents
+                  us from loading the given PNG buffer.
+        !*/
+
         ~png_loader(
         );
         /*!
@@ -151,6 +164,38 @@ namespace dlib
               dlib/image_processing/generic_image.h 
         ensures
             - performs: png_loader(file_name).get_image(image);
+    !*/
+
+    template <
+        typename image_type
+        >
+    void load_png (
+        image_type& image,
+        const unsigned char* image_buffer,
+        size_t buffer_size
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+        ensures
+            - performs: png_loader(image_buffer, buffer_size).get_image(image);
+    !*/
+
+    template <
+        typename image_type
+        >
+    void load_png (
+        image_type& image,
+        const char* image_buffer,
+        size_t buffer_size
+    );
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h 
+        ensures
+            - performs: png_loader((unsigned char*)image_buffer, buffer_size).get_image(image);
     !*/
 
 // ----------------------------------------------------------------------------------------

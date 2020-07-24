@@ -29,12 +29,19 @@ namespace dlib
         png_infop end_info_;
     };
 
+    struct PngBufferReaderState
+    {
+        const unsigned char* buffer_;
+        size_t buffer_size_;
+        size_t current_pos_;
+    };
+
 // ----------------------------------------------------------------------------------------
 
     png_loader::
     png_loader( const char* filename ) : height_( 0 ), width_( 0 )
     {
-        read_image( filename );
+        read_image( check_file( filename ), NULL, 0L );
     }
 
 // ----------------------------------------------------------------------------------------
@@ -42,7 +49,7 @@ namespace dlib
     png_loader::
     png_loader( const std::string& filename ) : height_( 0 ), width_( 0 )
     {
-        read_image( filename.c_str() );
+        read_image( check_file( filename.c_str() ), NULL, 0L );
     }
 
 // ----------------------------------------------------------------------------------------
@@ -50,7 +57,15 @@ namespace dlib
     png_loader::
     png_loader( const dlib::file& f ) : height_( 0 ), width_( 0 )
     {
-        read_image( f.full_name().c_str() );
+        read_image( check_file( f.full_name().c_str() ), NULL, 0L );
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    png_loader::
+    png_loader( const unsigned char* image_buffer, size_t buffer_size ) : height_( 0 ), width_( 0 )
+    {
+        read_image( NULL, image_buffer, buffer_size );
     }
 
 // ----------------------------------------------------------------------------------------
@@ -97,6 +112,22 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+    
+    FILE* png_loader::check_file( const char* filename )
+    {
+        if ( filename == NULL )
+        {
+            throw image_load_error("png_loader: invalid filename, it is NULL");
+        }
+        FILE* fp = fopen( filename, "rb" );
+        if ( !fp )
+        {
+            throw image_load_error(std::string("png_loader: unable to open file ") + filename);
+        }
+        return fp;
+    }
+
+// ----------------------------------------------------------------------------------------
 
     // Don't do anything when libpng calls us to tell us about an error.  Just return to 
     // our own code and throw an exception (at the long jump target).
@@ -108,35 +139,62 @@ namespace dlib
     {
     }
 
-    void png_loader::read_image( const char* filename )
+    void png_buffer_reader(png_structp png_ptr, png_bytep data, size_t length) 
+    {
+        PngBufferReaderState* state = static_cast<PngBufferReaderState*>( png_get_io_ptr( png_ptr ) );
+        if ( length > ( state->buffer_size_ - state->current_pos_ ) )
+        {
+            png_error(png_ptr, "png_loader: read error in png_buffer_reader");
+        }
+        memcpy( data, state->buffer_ + state->current_pos_, length );
+        state->current_pos_ += length;
+    }
+
+    void png_loader::read_image( FILE* fp, const unsigned char* image_buffer, size_t buffer_size )
     {
         ld_.reset(new LibpngData);
-        if ( filename == NULL )
+
+        static const png_size_t png_header_size = 8;
+        
+        if ( fp != NULL )
         {
-            throw image_load_error("png_loader: invalid filename, it is NULL");
+            png_byte sig[png_header_size];
+            if (fread( sig, 1, png_header_size, fp ) != png_header_size)
+            {
+                fclose( fp );
+                throw image_load_error(std::string("png_loader: error reading file"));
+            }
+            if ( png_sig_cmp( sig, 0, png_header_size ) != 0 )
+            {
+                fclose( fp );
+                throw image_load_error(std::string("png_loader: format error in file"));
+            }
         }
-        FILE *fp = fopen( filename, "rb" );
-        if ( !fp )
+        else
         {
-            throw image_load_error(std::string("png_loader: unable to open file ") + filename);
+            if ( image_buffer == NULL )
+            {
+                throw image_load_error(std::string("png_loader: invalid image buffer, it is NULL"));
+            }
+            if ( buffer_size == 0 )
+            {
+                throw image_load_error(std::string("png_loader: invalid image buffer size, it is 0"));
+            }
+            if ( buffer_size < png_header_size ||
+                 png_sig_cmp( image_buffer, 0, png_header_size ) != 0 )
+            {
+                throw image_load_error(std::string("png_loader: format error in image buffer"));
+            }
+
+            buffer_reader_state_.reset(new PngBufferReaderState);
         }
-        png_byte sig[8];
-        if (fread( sig, 1, 8, fp ) != 8)
-        {
-            fclose( fp );
-            throw image_load_error(std::string("png_loader: error reading file ") + filename);
-        }
-        if ( png_sig_cmp( sig, 0, 8 ) != 0 )
-        {
-            fclose( fp );
-            throw image_load_error(std::string("png_loader: format error in file ") + filename);
-        }
+        
         ld_->png_ptr_ = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, &png_loader_user_error_fn_silent, &png_loader_user_warning_fn_silent );
         if ( ld_->png_ptr_ == NULL )
         {
-            fclose( fp );
+            if ( fp != NULL ) fclose( fp );
             std::ostringstream sout;
-            sout << "Error, unable to allocate png structure while opening file " << filename << std::endl;
+            sout << "Error, unable to allocate png structure" << std::endl;
             const char* runtime_version = png_get_header_ver(NULL);
             if (runtime_version && std::strcmp(PNG_LIBPNG_VER_STRING, runtime_version) != 0)
             {
@@ -149,30 +207,42 @@ namespace dlib
         ld_->info_ptr_ = png_create_info_struct( ld_->png_ptr_ );
         if ( ld_->info_ptr_ == NULL )
         {
-            fclose( fp );
+            if ( fp != NULL ) fclose( fp );
             png_destroy_read_struct( &( ld_->png_ptr_ ), ( png_infopp )NULL, ( png_infopp )NULL );
-            throw image_load_error(std::string("png_loader: parse error in file ") + filename);
+            throw image_load_error(std::string("png_loader: unable to allocate png info structure"));
         }
         ld_->end_info_ = png_create_info_struct( ld_->png_ptr_ );
         if ( ld_->end_info_ == NULL )
         {
-            fclose( fp );
+            if ( fp != NULL ) fclose( fp );
             png_destroy_read_struct( &( ld_->png_ptr_ ), &( ld_->info_ptr_ ), ( png_infopp )NULL );
-            throw image_load_error(std::string("png_loader: parse error in file ") + filename);
+            throw image_load_error(std::string("png_loader: unable to allocate png info structure"));
         }
 
         if (setjmp(png_jmpbuf(ld_->png_ptr_)))
         {
             // If we get here, we had a problem writing the file 
-            fclose(fp);
+            if ( fp != NULL ) fclose( fp );
             png_destroy_read_struct( &( ld_->png_ptr_ ), &( ld_->info_ptr_ ), &( ld_->end_info_ ) );
-            throw image_load_error(std::string("png_loader: parse error in file ") + filename);
+            throw image_load_error(std::string("png_loader: parse error"));
         }
 
         png_set_palette_to_rgb(ld_->png_ptr_);
 
-        png_init_io( ld_->png_ptr_, fp );
-        png_set_sig_bytes( ld_->png_ptr_, 8 );
+        if ( fp != NULL )
+        {
+            png_init_io( ld_->png_ptr_, fp );
+        }
+        else
+        {
+            buffer_reader_state_->buffer_ = image_buffer;
+            buffer_reader_state_->buffer_size_ = buffer_size;
+            // skipping header
+            buffer_reader_state_->current_pos_ = png_header_size;
+            png_set_read_fn( ld_->png_ptr_, buffer_reader_state_.get(), png_buffer_reader );
+        }
+
+        png_set_sig_bytes( ld_->png_ptr_, png_header_size );
         // flags force one byte per channel output
         byte_orderer bo;
         int png_transforms = PNG_TRANSFORM_PACKING;
@@ -190,25 +260,25 @@ namespace dlib
             color_type_ != PNG_COLOR_TYPE_RGB_ALPHA &&
             color_type_ != PNG_COLOR_TYPE_GRAY_ALPHA)
         {
-            fclose( fp );
+            if ( fp != NULL ) fclose( fp );
             png_destroy_read_struct( &( ld_->png_ptr_ ), &( ld_->info_ptr_ ), &( ld_->end_info_ ) );
-            throw image_load_error(std::string("png_loader: unsupported color type in file ") + filename);
+            throw image_load_error(std::string("png_loader: unsupported color type"));
         }
 
         if (bit_depth_ != 8 && bit_depth_ != 16)
         {
-            fclose( fp );
+            if ( fp != NULL ) fclose( fp );
             png_destroy_read_struct( &( ld_->png_ptr_ ), &( ld_->info_ptr_ ), &( ld_->end_info_ ) );
-            throw image_load_error("png_loader: unsupported bit depth of " + cast_to_string(bit_depth_) + " in file " + std::string(filename));
+            throw image_load_error("png_loader: unsupported bit depth of " + cast_to_string(bit_depth_));
         }
 
         ld_->row_pointers_ = png_get_rows( ld_->png_ptr_, ld_->info_ptr_ );
 
-        fclose( fp );
+        if ( fp != NULL ) fclose( fp );
         if ( ld_->row_pointers_ == NULL )
         {
             png_destroy_read_struct( &( ld_->png_ptr_ ), &( ld_->info_ptr_ ), &( ld_->end_info_ ) );
-            throw image_load_error(std::string("png_loader: parse error in file ") + filename);
+            throw image_load_error(std::string("png_loader: parse error"));
         }
     }
 
