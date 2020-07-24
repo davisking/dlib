@@ -105,6 +105,9 @@ target_link_libraries(assignment_learning_ex dlib::dlib)
 # your cmake projects and use the syntax shown above.
 macro(add_example name)
    add_executable(${name} ${name}.cpp)
+IF(WIN32)
+	SET_TARGET_PROPERTIES(${name} PROPERTIES LINK_FLAGS "setargv.obj")
+ENDIF()
    target_link_libraries(${name} dlib::dlib )
 endmacro()
 

@@ -75,8 +75,10 @@ int main(int argc, char** argv)
             // again to find even smaller faces, but note that every time we
             // upsample the image we make the detector run slower since it must
             // process a larger image.
+#ifdef PYRAMID_UP
+            // Make the image larger so we can detect small faces.
             pyramid_up(img);
-
+#endif
             // Now tell the face detector to give us a list of bounding boxes
             // around all the faces it can find in the image.
             std::vector<rectangle> dets = detector(img);
@@ -87,9 +89,10 @@ int main(int argc, char** argv)
             win.clear_overlay();
             win.set_image(img);
             win.add_overlay(dets, rgb_pixel(255,0,0));
-
+#ifdef DEBUG
             cout << "Hit enter to process the next image..." << endl;
             cin.get();
+#endif
         }
     }
     catch (exception& e)
