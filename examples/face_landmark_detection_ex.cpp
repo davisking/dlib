@@ -98,9 +98,9 @@ int main(int argc, char** argv)
         // Loop over all the images provided on the command line.
         for (int i = 2; i < argc; ++i)
         {
-            cout << "processing image " << argv[i] << endl;
+            const char* filename =  argv[i];
+            cout << "processing image " << filename << endl;
             // Output "index" and filename
-            ostream << (i - 2) << "\t" << argv[i] << "\t";
             array2d<rgb_pixel> img;
             load_image(img, argv[i]);
 #ifdef PYRAMID_UP
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
             for (unsigned long j = 0; j <nfaces; ++j)
             {
                 // output face rect to myfile
-                ostream << dets[j] << "\t";
+                ostream << (i - 2) << "\t" << filename << "\t" << dets[j] << "\t";
                 full_object_detection shape = sp(img, dets[j]);
                 int n = shape.num_parts();
                 cout << "number of parts: "<< n << endl;
@@ -132,8 +132,8 @@ int main(int argc, char** argv)
                 // you want them.  Here we just store them in shapes so we can
                 // put them on the screen.
                 shapes.push_back(shape);
+                ostream << endl;
             }
-            ostream << endl;
 
             // Now let's view our face poses on the screen.
             win.clear_overlay();
