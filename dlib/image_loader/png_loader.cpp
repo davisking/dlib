@@ -181,7 +181,7 @@ namespace dlib
                 throw image_load_error(std::string("png_loader: invalid image buffer size, it is 0"));
             }
             if ( buffer_size < png_header_size ||
-                 png_sig_cmp( image_buffer, 0, png_header_size ) != 0 )
+                 png_sig_cmp( (png_bytep)image_buffer, 0, png_header_size ) != 0 )
             {
                 throw image_load_error(std::string("png_loader: format error in image buffer"));
             }
