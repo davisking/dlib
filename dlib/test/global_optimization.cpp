@@ -172,6 +172,11 @@ namespace
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
         print_spinner();
 
+        result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, max_function_calls(100), 0, {function_evaluation({1.1, 0.9}, rosen({1.1, 0.9}))});
+        dlog << LINFO << "rosen: " <<  trans(result.x);
+        DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));
+        print_spinner();
+
         result = find_max_global(rosen, {0.1, 0.1}, {2, 2}, std::chrono::seconds(5));
         dlog << LINFO << "rosen: " <<  trans(result.x);
         DLIB_TEST_MSG(max(abs(true_x-result.x)) < 1e-5, max(abs(true_x-result.x)));

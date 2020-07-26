@@ -80,7 +80,8 @@ namespace dlib
         const std::vector<function_spec>& specs,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
     );
     /*!
         requires
@@ -101,6 +102,12 @@ namespace dlib
             - if (tp.num_threads_in_pool() != 0) then
                 - it must be safe to call the given functions concurrently from multiple
                   threads.
+            - initial_function_evals.empty() || initial_function_evals.size() == functions.size()
+            - for all valid i:
+                - for (item : initial_function_evals[i]):
+                    - functions[i](item.x) == item.y
+                      i.e. initial_function_evals contains a record of evaluations of the given
+                      functions.
         ensures
             - This function performs global optimization on the set of given functions.
               The goal is to maximize the following objective function:
@@ -139,6 +146,11 @@ namespace dlib
               being optimized.  Therefore, this transformation is invisible to the user
               supplied functions.  In most cases, it improves the efficiency of the
               optimizer.
+            - The evaluations in initial_function_evals are incorporated into the solver state at
+              startup.  This is useful if you have information from a previous optimization attempt
+              or just know some good initial x values that should be attempted as a baseline.
+              Giving initial_function_evals allows you to tell the solver to explicitly include
+              those x values in its search.
             - if (tp.num_threads_in_pool() != 0) then
                 - This function will make concurrent calls to the given functions.  In
                   particular, it will submit the calls to the functions as jobs to the
@@ -153,7 +165,8 @@ namespace dlib
         const std::vector<function_spec>& specs,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
     );
     /*!
         this function is identical to the find_max_global() defined immediately above,
@@ -168,7 +181,8 @@ namespace dlib
         const std::vector<function_spec>& specs,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
     );
     /*!
         This function is identical to the find_max_global() defined immediately above,
@@ -184,7 +198,8 @@ namespace dlib
         const std::vector<function_spec>& specs,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
     );
     /*!
         This function is identical to the find_max_global() defined immediately above,
@@ -206,7 +221,8 @@ namespace dlib
         const std::vector<bool>& is_integer_variable,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     );
     /*!
         requires
@@ -225,6 +241,9 @@ namespace dlib
             - if (tp.num_threads_in_pool() != 0) then
                 - it must be safe to call the given function f() concurrently from multiple
                   threads.
+            - for (item : initial_function_evals):
+                - f(item.x) == item.y
+                  i.e. initial_function_evals contains a record of evaluations of f().
         ensures
             - This function performs global optimization on the given f() function.
               The goal is to maximize the following objective function:
@@ -263,6 +282,11 @@ namespace dlib
               being optimized.  Therefore, this transformation is invisible to the user
               supplied functions.  In most cases, it improves the efficiency of the
               optimizer.
+            - The evaluations in initial_function_evals are incorporated into the solver state at
+              startup.  This is useful if you have information from a previous optimization attempt
+              of f(x) or just know some good initial x values that should be attempted as a
+              baseline.  Giving initial_function_evals allows you to tell the solver to explicitly
+              include those x values in its search.
             - if (tp.num_threads_in_pool() != 0) then
                 - This function will make concurrent calls to the given function f().  In
                   particular, it will submit the calls to f() as jobs to the given
@@ -280,7 +304,8 @@ namespace dlib
         const std::vector<bool>& is_integer_variable,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     );
     /*!
         This function is identical to the find_max_global() defined immediately above,
@@ -297,7 +322,8 @@ namespace dlib
         const std::vector<bool>& is_integer_variable,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     );
     /*!
         This function is identical to the find_max_global() defined immediately above,
@@ -315,7 +341,8 @@ namespace dlib
         const std::vector<bool>& is_integer_variable,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     );
     /*!
         This function is identical to the find_min_global() defined immediately above,
@@ -337,10 +364,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const max_function_calls num,
-        double solver_epsilon 
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     )
     {
-        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -352,10 +380,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const max_function_calls num,
-        double solver_epsilon 
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     )
     {
-        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_min_global(std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -368,10 +397,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const max_function_calls num,
-        double solver_epsilon 
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     )
     {
-        return find_max_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_max_global(tp, std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -384,10 +414,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const max_function_calls num,
-        double solver_epsilon 
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     )
     {
-        return find_min_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_min_global(tp, std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -401,10 +432,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -416,10 +448,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
+        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -432,10 +465,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
+        return find_max_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -448,10 +482,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon);
+        return find_min_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon, initial_function_evals);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -464,10 +499,11 @@ namespace dlib
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const max_function_calls num,
-        double solver_epsilon
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -478,10 +514,11 @@ namespace dlib
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const max_function_calls num,
-        double solver_epsilon
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -493,10 +530,11 @@ namespace dlib
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const max_function_calls num,
-        double solver_epsilon
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_max_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -508,10 +546,11 @@ namespace dlib
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const max_function_calls num,
-        double solver_epsilon
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon);
+        return find_min_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -525,10 +564,11 @@ namespace dlib
         const double bound2,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -540,10 +580,11 @@ namespace dlib
         const double bound2,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
+        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -556,10 +597,11 @@ namespace dlib
         const double bound2,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
+        return find_max_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -572,10 +614,11 @@ namespace dlib
         const double bound2,
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon);
+        return find_min_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon, initial_function_evals);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -588,10 +631,11 @@ namespace dlib
         const double bound1,
         const double bound2,
         const max_function_calls num,
-        double solver_epsilon 
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
+        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -602,10 +646,11 @@ namespace dlib
         const double bound1,
         const double bound2,
         const max_function_calls num,
-        double solver_epsilon 
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
+        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -617,10 +662,11 @@ namespace dlib
         const double bound1,
         const double bound2,
         const max_function_calls num,
-        double solver_epsilon 
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
+        return find_max_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon = initial_function_evals);
     }
 
     template <
@@ -632,10 +678,11 @@ namespace dlib
         const double bound1,
         const double bound2,
         const max_function_calls num,
-        double solver_epsilon 
+        double solver_epsilon,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon);
+        return find_min_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -648,10 +695,11 @@ namespace dlib
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -662,10 +710,11 @@ namespace dlib
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -677,10 +726,11 @@ namespace dlib
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -692,10 +742,11 @@ namespace dlib
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_min_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -708,10 +759,11 @@ namespace dlib
         const double bound1,
         const double bound2,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -722,10 +774,11 @@ namespace dlib
         const double bound1,
         const double bound2,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -737,10 +790,11 @@ namespace dlib
         const double bound1,
         const double bound2,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -752,10 +806,11 @@ namespace dlib
         const double bound1,
         const double bound2,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon);
+        return find_min_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -769,10 +824,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -784,10 +840,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
+        return find_min_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -800,10 +857,11 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(tp, std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
+        return find_max_global(tp, std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
 
     template <
@@ -816,11 +874,13 @@ namespace dlib
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
         const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0
+        double solver_epsilon = 0,
+        const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_min_global(tp, std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon);
+        return find_min_global(tp, std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
     }
+
 
 // ----------------------------------------------------------------------------------------
 
