@@ -666,7 +666,7 @@ namespace dlib
         const std::vector<function_evaluation>& initial_function_evals = {}
     ) 
     {
-        return find_max_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon = initial_function_evals);
+        return find_max_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon, initial_function_evals);
     }
 
     template <
