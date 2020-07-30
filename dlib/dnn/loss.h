@@ -785,6 +785,119 @@ namespace dlib
     { return rhs == static_cast<const std::string&>(lhs); }
 
 // ----------------------------------------------------------------------------------------
+
+    class loss_multilabel_log_
+    {
+    public:
+        typedef std::vector<float> training_label_type;
+        typedef std::vector<float> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(output_tensor.nr() == 1 && output_tensor.nc() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+
+            // Note that output_tensor.k() should match the number of labels.
+
+            const float* out_data = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                output_label_type predictions(output_tensor.k(), 0);
+                for (long k = 0; k < output_tensor.k(); ++k)
+                {
+                    predictions[k] = out_data[i * output_tensor.k() + k];
+                }
+                *iter++ = std::move(predictions);
+            }
+        }
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const
+        {
+            const tensor& output_tensor = sub.get_output();
+            tensor& grad = sub.get_gradient_input();
+
+            DLIB_CASSERT(sub.sample_expansion_factor() == 1);
+            DLIB_CASSERT(input_tensor.num_samples() != 0);
+            DLIB_CASSERT(input_tensor.num_samples() % sub.sample_expansion_factor() == 0);
+            DLIB_CASSERT(input_tensor.num_samples() == grad.num_samples());
+            DLIB_CASSERT(input_tensor.num_samples() == output_tensor.num_samples());
+            DLIB_CASSERT(output_tensor.nr() == 1 && output_tensor.nc() == 1);
+            DLIB_CASSERT(grad.nr() == 1 && grad.nc() == 1);
+
+            tt::sigmoid(grad, output_tensor);
+
+            // The loss we output is the average loss over the mini-batch.
+            const double scale = 1.0 / output_tensor.num_samples();
+            double loss = 0;
+            float* g = grad.host();
+            const float* out_data  = output_tensor.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            {
+                for (long k = 0; k < output_tensor.k(); ++k)
+                {
+                    const float y = (*truth)[k];
+                    const size_t idx = i * output_tensor.k() + k;
+                    if (y > 0)
+                    {
+                        const float temp = log1pexp(-out_data[idx]);
+                        loss += y * scale * temp;
+                        g[idx] = y * scale * (g[idx] - 1);
+                    }
+                    else
+                    {
+                        const float temp = -(-out_data[idx] - log1pexp(-out_data[idx]));
+                        loss += -y * scale * temp;
+                        g[idx] = -y * scale * g[idx];
+                    }
+                }
+            }
+            return loss;
+        }
+
+        friend void serialize(const loss_multilabel_log_&, std::ostream& out)
+        {
+            serialize("loss_multilabel_log_", out);
+        }
+
+        friend void deserialize(loss_multilabel_log_&, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "loss_multilabel_log_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_multilabel_log_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const loss_multilabel_log_& )
+        {
+            out << "loss_multilabel_log";
+            return out;
+        }
+
+        friend void to_xml(const loss_multilabel_log_& /*item*/, std::ostream& out)
+        {
+            out << "<loss_multilabel_log/>"
+        }
+    };
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     enum class use_image_pyramid : uint8_t
