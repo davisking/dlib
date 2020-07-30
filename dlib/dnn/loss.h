@@ -5,6 +5,7 @@
 
 #include "loss_abstract.h"
 #include "core.h"
+#include "utilities.h"
 #include "../matrix.h"
 #include "../cuda/tensor_tools.h"
 #include "../geometry.h"
@@ -786,7 +787,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class loss_multilabel_log_
+    class loss_multibinary_log_
     {
     public:
         typedef std::vector<float> training_label_type;
@@ -873,33 +874,33 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_multilabel_log_&, std::ostream& out)
+        friend void serialize(const loss_multibinary_log_&, std::ostream& out)
         {
-            serialize("loss_multilabel_log_", out);
+            serialize("loss_multibinary_log_", out);
         }
 
-        friend void deserialize(loss_multilabel_log_&, std::istream& in)
+        friend void deserialize(loss_multibinary_log_&, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "loss_multilabel_log_")
-                throw serialization_error("Unexpected version found while deserializing dlib::loss_multilabel_log_.");
+            if (version != "loss_multibinary_log_")
+                throw serialization_error("Unexpected version found while deserializing dlib::loss_multibinary_log_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const loss_multilabel_log_& )
+        friend std::ostream& operator<<(std::ostream& out, const loss_multibinary_log_& )
         {
-            out << "loss_multilabel_log";
+            out << "loss_multibinary_log";
             return out;
         }
 
-        friend void to_xml(const loss_multilabel_log_& /*item*/, std::ostream& out)
+        friend void to_xml(const loss_multibinary_log_& /*item*/, std::ostream& out)
         {
-            out << "<loss_multilabel_log/>";
+            out << "<loss_multibinary_log/>";
         }
     };
 
     template <typename SUBNET>
-    using loss_multilabel_log = add_loss_layer<loss_multilabel_log_, SUBNET>;
+    using loss_multibinary_log = add_loss_layer<loss_multibinary_log_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
