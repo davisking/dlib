@@ -893,9 +893,12 @@ namespace dlib
 
         friend void to_xml(const loss_multilabel_log_& /*item*/, std::ostream& out)
         {
-            out << "<loss_multilabel_log/>"
+            out << "<loss_multilabel_log/>";
         }
     };
+
+    template <typename SUBNET>
+    using loss_multilabel_log = add_loss_layer<loss_multilabel_log_, SUBNET>;
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
