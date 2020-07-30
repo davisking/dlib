@@ -849,7 +849,7 @@ namespace dlib
             double loss = 0;
             float* g = grad.host();
             const float* out_data  = output_tensor.host();
-            for (long i = 0; i < output_tensor.num_samples(); ++i)
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
             {
                 for (long k = 0; k < output_tensor.k(); ++k)
                 {
