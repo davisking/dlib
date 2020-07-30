@@ -854,6 +854,7 @@ namespace dlib
                 for (long k = 0; k < output_tensor.k(); ++k)
                 {
                     const float y = (*truth)[k];
+                    DLIB_CASSERT(y != 0, "y: " << y);
                     const size_t idx = i * output_tensor.k() + k;
                     if (y > 0)
                     {
