@@ -233,6 +233,8 @@ namespace dlib
             int forward_algo;
             int backward_data_algo;
             int backward_filters_algo;
+            // true if select_best_algorithms has been called at least once.
+            bool selected_algos = false;
 
             size_t forward_workspace_size_in_bytes;
             size_t backward_data_workspace_size_in_bytes;
