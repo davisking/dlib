@@ -1759,9 +1759,9 @@ namespace dlib
             if (x <= -18)
                 return std::exp(x);
             else if (-18 < x && x <= 9)
-                return std::log1p(std::exp(x));
+                return std::log1pf(std::exp(x));
             else if (9 < x && x <= 16)
-                return x + std::exp(-x);
+                return x + expf(-x);
             else
                 return x;
         }
