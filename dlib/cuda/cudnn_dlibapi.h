@@ -228,6 +228,8 @@ namespace dlib
             int out_nr;
             int out_nc;
 
+            // sets the three _algo fields.
+            void select_best_algorithms(const tensor& data, const tensor_descriptor& dest_desc);
             int forward_algo;
             int backward_data_algo;
             int backward_filters_algo;
