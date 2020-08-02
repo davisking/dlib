@@ -3383,7 +3383,7 @@ namespace
         using net_type = loss_multibinary_log<fc<2, relu<bn_fc<fc<10, input<matrix<float, 0, 1>>>>>>>;
         net_type net;
 
-        auto compute_error = [&net, &samples, &labels]()
+        auto compute_error = [&net, &samples, &labels, dims]()
         {
             const auto preds = net(samples);
             double num_wrong = 0;
