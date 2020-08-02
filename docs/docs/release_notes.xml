@@ -12,6 +12,23 @@
 
 <current>
 New Features and Improvements:
+   - Added support for cuDNN 8.0
+   - Added support for CUDA in Python 3.8 on Windows.
+   - Allow forwarding initial function evaluations into find_max_global()
+
+Non-Backwards Compatible Changes:
+
+Bug fixes:
+   - Improved error messages for python users trying to install dlib
+     with CUDA enabled or who are using windows.
+   - Fix random forest regression not doing quite the right thing.
+
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.20" date="Jun 06, 2020">
+New Features and Improvements:
    - Added CUDA implementation for loss_mean_squared_per_channel_and_pixel.
    - Added DCGAN example in examples/dnn_dcgan_train_ex.cpp
    - Added transfer learning example in examples/dnn_introduction3_ex.cpp
@@ -33,8 +50,7 @@ Bug fixes:
    - Fix DLIB_ISO_CPP_ONLY not working
    - Fix build errors in C++20 build mode.
    - Fixed function_evaluation_request::set() invalidating function_evaluation_request::x()
-
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
