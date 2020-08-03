@@ -16,6 +16,7 @@ namespace dlib
 
     struct LibpngData;
     struct PngBufferReaderState;
+    struct FileInfo;
     class png_loader : noncopyable
     {
     public:
@@ -193,8 +194,8 @@ namespace dlib
 
     private:
         const unsigned char* get_row( unsigned i ) const;
-        FILE* check_file( const char* filename );
-        void read_image( FILE* fp, const unsigned char* image_buffer, size_t buffer_size );
+        std::unique_ptr<FileInfo> check_file( const char* filename );
+        void read_image( std::unique_ptr<FileInfo> file_info );
         unsigned height_, width_;
         unsigned bit_depth_;
         int color_type_;
