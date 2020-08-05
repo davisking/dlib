@@ -46,6 +46,10 @@ namespace dlib
         {
         }
 
+        // no copying this object.
+        FileInfo(const FileInfo&) = delete;
+        FileInfo& operator=(const FileInfo&) = delete;
+
         ~FileInfo()
         {
             if ( fp_ != nullptr ) fclose( fp_ );
@@ -174,7 +178,7 @@ namespace dlib
 
     void png_loader::read_image( std::unique_ptr<FileInfo> file_info )
     {
-        if ( !file_info ) throw image_load_error(std::string("png_loader: invalid file_info, it is NULL"));
+        DLIB_CASSERT(file_info);
 
         ld_.reset(new LibpngData);
 
