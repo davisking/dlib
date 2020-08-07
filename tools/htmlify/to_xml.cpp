@@ -718,7 +718,7 @@ void process_file (
                                 if (class_stack.size() > 0 && namespaces.back() == class_stack.top().name)
                                 {
                                     // If this class is a inner_class of another then push it into the
-                                    // public_inner_classes or protected_inner_classes field of it's containing class.
+                                    // public_inner_classes or protected_inner_classes field of its containing class.
                                     if (class_stack.size() > 1)
                                     {
                                         tok_class_record temp = class_stack.top();

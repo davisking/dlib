@@ -121,7 +121,7 @@ namespace dlib
                     present in the pixel at all and 255 indicating that the color
                     is present in the pixel with maximum intensity.
 
-                    Note that the structure, order, and size of of this struct are 
+                    Note that the structure, order, and size of this struct are 
                     implementation dependent.  It will always contain fields called 
                     red, green, and blue but they may not be in that order and there 
                     may be padding.  

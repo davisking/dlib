@@ -42,7 +42,7 @@ namespace dlib
                 operator--(int)  // post decrement
 
 
-                the other comparason operators(>, !=, <=, and >=) are 
+                the other comparison operators(>, !=, <=, and >=) are 
                 available and come from the templates in dlib::relational_operators
 
             THREAD SAFETY

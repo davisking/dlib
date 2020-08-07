@@ -562,7 +562,7 @@ namespace dlib
                 // this case here covers the unlikly event that you click on a button,
                 // move the mouse off the button and then move it back very quickly and
                 // release the mouse button.   It is possible that this mouse up event
-                // will occurr before any mouse move event so you might not have set
+                // will occur before any mouse move event so you might not have set
                 // that the button is depressed yet.
                 
                 // So we should say that this triggers an on_button_down() event and

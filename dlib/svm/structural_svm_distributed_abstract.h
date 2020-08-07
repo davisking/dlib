@@ -144,7 +144,7 @@ namespace dlib
 
                   Also note that sample risk is an upper bound on a sample's loss.  So
                   you can think of this epsilon value as saying "solve the optimization
-                  problem until the average loss per sample is within epsilon of it's 
+                  problem until the average loss per sample is within epsilon of its 
                   optimal value".
         !*/
 

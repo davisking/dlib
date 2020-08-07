@@ -42,7 +42,7 @@ namespace dlib
                   numbers and we also perform basic centering to ensure the plane passes
                   though the data.
             - This function uses the supplied random number generator, rnd, to drive part
-              of it's processing.  Therefore, giving different random number generators
+              of its processing.  Therefore, giving different random number generators
               will produce different outputs.
     !*/
 
@@ -108,7 +108,7 @@ namespace dlib
                   We train it on randomly selected and randomly labeled points from v.
                   The C SVM parameter is set to the given C argument.
             - This function uses the supplied random number generator, rnd, to drive part
-              of it's processing.  Therefore, giving different random number generators
+              of its processing.  Therefore, giving different random number generators
               will produce different outputs.
     !*/
 

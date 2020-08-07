@@ -247,7 +247,7 @@ void register_extract_image_chip (py::module& m)
     - self.angle == 0 \n\
     - self.rows and self.cols is set such that the total size of the chip is as close \n\
       to size as possible but still matches the aspect ratio of rect. \n\
-    - As long as size and the aspect ratio of of rect stays constant then \n\
+    - As long as size and the aspect ratio of rect stays constant then \n\
       self.rows and self.cols will always have the same values.  This means \n\
       that, for example, if you want all your chips to have the same dimensions \n\
       then ensure that size is always the same and also that rect always has \n\
@@ -261,7 +261,7 @@ void register_extract_image_chip (py::module& m)
                 - self.angle == 0
                 - self.rows and self.cols is set such that the total size of the chip is as close
                   to size as possible but still matches the aspect ratio of rect.
-                - As long as size and the aspect ratio of of rect stays constant then
+                - As long as size and the aspect ratio of rect stays constant then
                   self.rows and self.cols will always have the same values.  This means
                   that, for example, if you want all your chips to have the same dimensions
                   then ensure that size is always the same and also that rect always has
@@ -278,7 +278,7 @@ void register_extract_image_chip (py::module& m)
     - self.angle == angle \n\
     - self.rows and self.cols is set such that the total size of the chip is as \n\
       close to size as possible but still matches the aspect ratio of rect. \n\
-    - As long as size and the aspect ratio of of rect stays constant then \n\
+    - As long as size and the aspect ratio of rect stays constant then \n\
       self.rows and self.cols will always have the same values.  This means \n\
       that, for example, if you want all your chips to have the same dimensions \n\
       then ensure that size is always the same and also that rect always has \n\
@@ -292,7 +292,7 @@ void register_extract_image_chip (py::module& m)
                 - self.angle == angle
                 - self.rows and self.cols is set such that the total size of the chip is as
                   close to size as possible but still matches the aspect ratio of rect.
-                - As long as size and the aspect ratio of of rect stays constant then
+                - As long as size and the aspect ratio of rect stays constant then
                   self.rows and self.cols will always have the same values.  This means
                   that, for example, if you want all your chips to have the same dimensions
                   then ensure that size is always the same and also that rect always has

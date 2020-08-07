@@ -39,7 +39,7 @@ namespace dlib
                 That is, the output vector has a dimensionality that is equal to the number
                 of hash bins times the dimensionality of the lower level vector plus one.
                 The value in the extra dimension concatenated onto the end of the vector is
-                always a constant value of of 1 and serves as a bias value.  This means
+                always a constant value of 1 and serves as a bias value.  This means
                 that, if there are N hash bins, these vectors are capable of representing N
                 different linear functions, each operating on the vectors that fall into
                 their corresponding hash bin.

@@ -24,7 +24,7 @@ namespace dlib
                 of finding which subset a particular integer belongs to as well as
                 merging subsets.  It also allows you to find out how big each subset is.  It 
                 is therefore essentially the same thing as dlib::disjoint_subsets, except
-                it also keeps track of of the size of each subset.
+                it also keeps track of the size of each subset.
         !*/
     public:
 
