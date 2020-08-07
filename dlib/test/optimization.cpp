@@ -1116,11 +1116,21 @@ namespace
         dlog << LINFO << "upper: "<< trans(upper);
         dlog << LINFO << "starting: "<< trans(starting_point);
 
+        // The contract for find_min_box_constrained() says we always call obj() before der().  So
+        // these lambdas verify that this is so.
+        dlib::matrix<double,0,1> last_x;
+        auto obj = [&](const dlib::matrix<double,0,1> &x) { last_x = x; return brown(x); };
+        auto der = [&](const dlib::matrix<double,0,1> &x) { 
+            // check that obj(x) was called before der(x).
+            DLIB_TEST_MSG(max(abs(x - last_x)) == 0, max(abs(x - last_x)));
+            return brown_derivative(x); 
+        };
+
         x = starting_point;
         double val = find_min_box_constrained( 
             search_strategy,
             objective_delta_stop_strategy(1e-16, 500), 
-            brown, brown_derivative, x,
+            obj, der, x,
             lower,  
             upper   
         );
