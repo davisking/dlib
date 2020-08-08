@@ -12,9 +12,10 @@
 
 <current>
 New Features and Improvements:
-   - Added support for cuDNN 8.0
+   - Added support for cuDNN 8.0.
    - Added support for CUDA in Python 3.8 on Windows.
-   - Allow forwarding initial function evaluations into find_max_global()
+   - Allow forwarding initial function evaluations into find_max_global().
+   - Can now load PNG images from a memory buffer.
 
 Non-Backwards Compatible Changes:
 
