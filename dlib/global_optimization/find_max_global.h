@@ -112,7 +112,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
 
 // ----------------------------------------------------------------------------------------
 
-    const auto FOREVER = std::chrono::hours(24*356*290); // 290 years
+    const auto FOREVER = std::chrono::hours(24*365*290); // 290 years
 
 // ----------------------------------------------------------------------------------------
 
