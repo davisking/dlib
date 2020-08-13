@@ -20,6 +20,11 @@ Functions
 
 .. include:: functions.txt
 
+Constants
+==============================================
+
+.. include:: constants.txt
+
 
 Detailed API Listing
 ==============================================
@@ -27,15 +32,15 @@ Detailed API Listing
 .. toctree::
    :maxdepth: 2
 
-.. automodule:: dlib 
+.. automodule:: _dlib_pybind11
    :members:
    :undoc-members:
 
-.. automodule:: dlib.cuda 
+.. automodule:: _dlib_pybind11.cuda 
    :members:
    :undoc-members:
 
-.. automodule:: dlib.image_dataset_metadata
+.. automodule:: _dlib_pybind11.image_dataset_metadata
    :members:
    :undoc-members:
 
