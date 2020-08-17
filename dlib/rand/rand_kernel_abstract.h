@@ -4,6 +4,7 @@
 #ifdef DLIB_RAND_KERNEl_ABSTRACT_
 
 #include <string>
+#include <complex>
 #include "../uintn.h"
 
 namespace dlib
@@ -177,6 +178,14 @@ namespace dlib
             /*!
                 ensures
                     - returns a random number sampled from a Gaussian distribution 
+                      with mean 0 and standard deviation 1. 
+            !*/
+
+            std::complex<double> get_random_complex_gaussian (
+            );
+            /*!
+                ensures
+                    - returns a random complex number sampled from a Gaussian distribution 
                       with mean 0 and standard deviation 1. 
             !*/
 
