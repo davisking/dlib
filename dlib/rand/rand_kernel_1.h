@@ -4,6 +4,7 @@
 #define DLIB_RAND_KERNEl_1_
 
 #include <string>
+#include <complex>
 #include "../algs.h"
 #include "rand_kernel_abstract.h"
 #include "mersenne_twister.h"
@@ -226,16 +227,10 @@ namespace dlib
                     return 1.0f - std::numeric_limits<float>::epsilon();
                 }
             }
-
-            double get_random_gaussian (
+  
+            std::complex<double> get_random_complex_gaussian (
             )
             {
-                if (has_gaussian)
-                {
-                    has_gaussian = false;
-                    return next_gaussian;
-                }
-
                 double x1, x2, w;
 
                 const double rndmax = std::numeric_limits<dlib::uint32>::max();
@@ -252,9 +247,22 @@ namespace dlib
                 } while ( w >= 1.0 );
 
                 w = std::sqrt( (-2.0 * std::log( w ) ) / w );
-                next_gaussian = x2 * w;
+                return std::complex<double>(x1 * w, x2 * w);
+            }
+
+            double get_random_gaussian (
+            )
+            {
+                if (has_gaussian)
+                {
+                    has_gaussian = false;
+                    return next_gaussian;
+                }
+                
+                std::complex<double> r = get_random_complex_gaussian();
+                next_gaussian = r.imag();
                 has_gaussian = true;
-                return x1 * w;
+                return r.real();
             }
 
             void swap (
