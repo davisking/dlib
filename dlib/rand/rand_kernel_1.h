@@ -259,7 +259,7 @@ namespace dlib
                     return next_gaussian;
                 }
                 
-                complex<double> r = get_random_complex_gaussian();
+                std::complex<double> r = get_random_complex_gaussian();
                 next_gaussian = r.imag();
                 has_gaussian = true;
                 return r.real();
