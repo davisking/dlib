@@ -805,9 +805,9 @@ namespace dlib
             cudnnConvolutionFwdAlgo_t forward_best_algo;
 #if CUDNN_MAJOR >= 8
             {
-                int num_possilbe_algorithms = 0;
-                CHECK_CUDNN(cudnnGetConvolutionForwardAlgorithmMaxCount(context(), &num_possilbe_algorithms));
-                std::vector<cudnnConvolutionFwdAlgoPerf_t> perf_results(num_possilbe_algorithms);
+                int num_possible_algorithms = 0;
+                CHECK_CUDNN(cudnnGetConvolutionForwardAlgorithmMaxCount(context(), &num_possible_algorithms));
+                std::vector<cudnnConvolutionFwdAlgoPerf_t> perf_results(num_possible_algorithms);
                 int num_algorithms = 0;
                 CHECK_CUDNN(cudnnFindConvolutionForwardAlgorithm(
                         context(), 
@@ -815,7 +815,7 @@ namespace dlib
                         (const cudnnFilterDescriptor_t)filter_handle,
                         (const cudnnConvolutionDescriptor_t)conv_handle,
                         descriptor(dest_desc),
-                        num_possilbe_algorithms,
+                        num_possible_algorithms,
                         &num_algorithms,
                         perf_results.data()));
                 perf_results.resize(num_algorithms);
@@ -841,9 +841,9 @@ namespace dlib
             cudnnConvolutionBwdDataAlgo_t backward_data_best_algo;
 #if CUDNN_MAJOR >= 8
             {
-                int num_possilbe_algorithms = 0;
-                CHECK_CUDNN(cudnnGetConvolutionBackwardFilterAlgorithmMaxCount(context(), &num_possilbe_algorithms));
-                std::vector<cudnnConvolutionBwdDataAlgoPerf_t> perf_results(num_possilbe_algorithms);
+                int num_possible_algorithms = 0;
+                CHECK_CUDNN(cudnnGetConvolutionBackwardFilterAlgorithmMaxCount(context(), &num_possible_algorithms));
+                std::vector<cudnnConvolutionBwdDataAlgoPerf_t> perf_results(num_possible_algorithms);
                 int num_algorithms = 0;
                 CHECK_CUDNN(cudnnFindConvolutionBackwardDataAlgorithm(
                         context(),
@@ -851,7 +851,7 @@ namespace dlib
                         descriptor(dest_desc),
                         (const cudnnConvolutionDescriptor_t)conv_handle,
                         descriptor(data),
-                        num_possilbe_algorithms,
+                        num_possible_algorithms,
                         &num_algorithms,
                         perf_results.data()));
                 perf_results.resize(num_algorithms);
@@ -878,9 +878,9 @@ namespace dlib
             cudnnConvolutionBwdFilterAlgo_t backward_filters_best_algo;
 #if CUDNN_MAJOR >= 8
             {
-                int num_possilbe_algorithms = 0;
-                CHECK_CUDNN(cudnnGetConvolutionBackwardFilterAlgorithmMaxCount(context(), &num_possilbe_algorithms));
-                std::vector<cudnnConvolutionBwdFilterAlgoPerf_t> perf_results(num_possilbe_algorithms);
+                int num_possible_algorithms = 0;
+                CHECK_CUDNN(cudnnGetConvolutionBackwardFilterAlgorithmMaxCount(context(), &num_possible_algorithms));
+                std::vector<cudnnConvolutionBwdFilterAlgoPerf_t> perf_results(num_possible_algorithms);
                 int num_algorithms = 0;
                 CHECK_CUDNN(cudnnFindConvolutionBackwardFilterAlgorithm(
                         context(),
@@ -888,7 +888,7 @@ namespace dlib
                         descriptor(dest_desc),
                         (const cudnnConvolutionDescriptor_t)conv_handle,
                         (const cudnnFilterDescriptor_t)filter_handle,
-                        num_possilbe_algorithms,
+                        num_possible_algorithms,
                         &num_algorithms,
                         perf_results.data()));
                 perf_results.resize(num_algorithms);
