@@ -1198,15 +1198,18 @@ namespace dlib
             job.test_only = test_only;
 
             // chop the data into devs blocks, each of about block_size elements.
-            size_t block_size = (num+devs-1)/devs;
+            const double block_size = num / static_cast<double>(devs);
 
             const auto prev_dev = dlib::cuda::get_device();
+
+            double j = 0;
+
             for (size_t i = 0; i < devs; ++i)
             {
                 dlib::cuda::set_device(devices[i]->device_id);
 
-                size_t start = i*block_size;
-                size_t stop  = std::min(num, start+block_size);
+                const size_t start = static_cast<size_t>(std::round(j));
+                const size_t stop  = static_cast<size_t>(std::round(j + block_size));
 
                 if (start < stop)
                 {
@@ -1218,7 +1221,11 @@ namespace dlib
                 {
                     job.have_data[i] = false;
                 }
+
+                j += block_size;
             }
+
+            DLIB_ASSERT(std::fabs(j - num) < 1e-10);
 
             dlib::cuda::set_device(prev_dev);
             job_pipe.enqueue(job);
