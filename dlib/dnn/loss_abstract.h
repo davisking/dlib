@@ -767,8 +767,9 @@ namespace dlib
                 - sub.get_output().nc() == 1
                 - sub.get_output().num_samples() == input_tensor.num_samples()
                 - sub.sample_expansion_factor() == 1
-                - all values pointed to by truth are std::vectors of non-zero elements.
-                  Nominally they should be +1 or -1, each indicating the desired class label.
+                - truth points to training_label_type elements, each of size sub.get_output.k().
+                  The elements of each truth training_label_type instance are nominally +1 or -1,
+                  each representing a binary class label.
         !*/
 
     };

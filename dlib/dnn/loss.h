@@ -852,6 +852,11 @@ namespace dlib
             const float* out_data  = output_tensor.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
             {
+                const long long num_label_categories = truth->size();
+                DLIB_CASSERT(output_tensor.k() == num_label_categories,
+                    "Number of label types should match the number of output channels. "
+                    "output_tensor.k(): " << output_tensor.k() 
+                    << ", num_label_categories: "<< num_label_categories);
                 for (long k = 0; k < output_tensor.k(); ++k)
                 {
                     const float y = (*truth)[k];

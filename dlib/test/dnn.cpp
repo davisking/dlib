@@ -3391,9 +3391,11 @@ namespace
             {
                 for (size_t j = 0; j < labels[i].size(); ++j)
                 {
-                    if (labels[i][j] == 1 && preds[i][j] < 0 ||
-                        labels[i][j] == 0 && preds[i][j] > 0)
+                    if ((labels[i][j] == 1 && preds[i][j] < 0) ||
+                        (labels[i][j] == 0 && preds[i][j] > 0))
+                    {
                         ++num_wrong;
+                    }
                 }
             }
             return num_wrong / labels.size() / dims;
