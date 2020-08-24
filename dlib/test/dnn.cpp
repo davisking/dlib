@@ -3350,6 +3350,69 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_loss_multibinary_log()
+    {
+        print_spinner();
+        dlib::rand rnd;
+
+        const long dims = 3;
+        const std::vector<float> empty_label(2, -1.f);
+        std::vector<matrix<float, 0, 1>> samples;
+        std::vector<std::vector<float>> labels(128, empty_label);
+
+        for (size_t i = 0; i < labels.size(); ++i)
+        {
+            matrix<float, 0, 1> x = matrix_cast<float>(randm(dims, 1)) * rnd.get_double_in_range(1, 9);
+            const auto norm = sqrt(sum(squared(x)));
+            if (norm < 3)
+            {
+                labels[i][0] = 1.f;
+            }
+            else if (3 <= norm && norm < 6)
+            {
+                labels[i][0] = 1.f;
+                labels[i][1] = 1.f;
+            }
+            else
+            {
+                labels[i][1] = 1.f;
+            }
+            samples.push_back(std::move(x));
+        }
+
+        using net_type = loss_multibinary_log<fc<2, relu<bn_fc<fc<10, input<matrix<float, 0, 1>>>>>>>;
+        net_type net;
+
+        auto compute_error = [&net, &samples, &labels, dims]()
+        {
+            const auto preds = net(samples);
+            double num_wrong = 0;
+            for (size_t i = 0; i < labels.size(); ++i)
+            {
+                for (size_t j = 0; j < labels[i].size(); ++j)
+                {
+                    if (labels[i][j] == 1 && preds[i][j] < 0 ||
+                        labels[i][j] == 0 && preds[i][j] > 0)
+                        ++num_wrong;
+                }
+            }
+            return num_wrong / labels.size() / dims;
+        };
+
+        dnn_trainer<net_type> trainer(net);
+        const auto error_before = compute_error();
+        trainer.set_learning_rate(0.1);
+        trainer.set_iterations_without_progress_threshold(10);
+        trainer.set_mini_batch_size(128);
+        trainer.set_min_learning_rate(1e-3);
+        trainer.train(samples, labels);
+        const auto error_after = compute_error();
+
+        DLIB_TEST_MSG(error_after < error_before && error_after == 0, "multibinary_log error increased after training");
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_tensor_resize_bilinear(long samps, long k, long nr, long nc,  long onr, long onc)
     {
         resizable_tensor img(samps,k,nr,nc);
@@ -3771,6 +3834,7 @@ namespace
             test_loss_multiclass_per_pixel_with_noise_and_pixels_to_ignore();
             test_loss_multiclass_per_pixel_weighted();
             test_loss_multiclass_log_weighted();
+            test_loss_multibinary_log();
             test_serialization();
             test_loss_dot();
             test_loss_multimulticlass_log();

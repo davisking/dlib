@@ -694,6 +694,89 @@ namespace dlib
     { return rhs == static_cast<const std::string&>(lhs); }
 
 // ----------------------------------------------------------------------------------------
+
+    class loss_multibinary_log_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object implements the loss layer interface defined above by
+                EXAMPLE_LOSS_LAYER_.  In particular, it implements a collection of
+                binary classifiers using the log loss, which is appropriate for
+                binary classification problems where each sample can belong to zero
+                or more categories.  Therefore, there are two possible classes of labels:
+                positive (> 0) and negative (< 0) when using this loss.
+                The absolute value of the label represents its weight.  Putting a larger
+                weight on a sample increases its importance of getting its prediction
+                correct during training.  A good rule of thumb is to use weights with
+                absolute value 1 unless you have a very unbalanced training dataset,
+                in that case, give larger weight to the class with less training examples.
+
+                This loss will cause the network to produce outputs > 0 when predicting a
+                member of the positive classes and values < 0 otherwise.
+
+                To be more specific, this object contains a sigmoid layer followed by a
+                cross-entropy layer.
+
+                An example will make its use clear.  So suppose, for example, that you want
+                to make a classifier for cats and dogs, but what happens if they both
+                appear in one image? Or none of them? This layer allows you to handle
+                those use cases by using the following labels:
+                    - std::vector<float> dog_label = {1.f, -1.f};
+                    - std::vector<float> cat_label = {-1.f , 1.f};
+                    - std::vector<float> both_label = {1.f, 1.f};
+                    - std::vector<float> none_label = {-1.f, -1.f};
+        !*/
+    public:
+        typedef std::vector<float> training_label_type;
+        typedef std::vector<float> output_label_type;
+
+        template <
+            typename SUB_TYPE,
+            typename label_iterator
+            >
+        void to_label (
+            const tensor& input_tensor,
+            const SUB_TYPE& sub,
+            label_iterator iter
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::to_label() except
+            it has the additional calling requirements that: 
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+            and the output labels are the raw scores for each classified object.  If a score
+            is > 0 then the classifier is predicting the +1 class for that category, otherwise
+            it is predicting the -1 class.
+        !*/
+
+        template <
+            typename const_label_iterator,
+            typename SUBNET
+            >
+        double compute_loss_value_and_gradient (
+            const tensor& input_tensor,
+            const_label_iterator truth,
+            SUBNET& sub
+        ) const;
+        /*!
+            This function has the same interface as EXAMPLE_LOSS_LAYER_::compute_loss_value_and_gradient() 
+            except it has the additional calling requirements that:
+                - sub.get_output().nr() == 1
+                - sub.get_output().nc() == 1
+                - sub.get_output().num_samples() == input_tensor.num_samples()
+                - sub.sample_expansion_factor() == 1
+                - all values pointed to by truth are std::vectors of non-zero elements.
+                  Nominally they should be +1 or -1, each indicating the desired class label.
+        !*/
+
+    };
+
+    template <typename SUBNET>
+    using loss_multibinary_log = add_loss_layer<loss_multibinary_log_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
     enum class use_image_pyramid : uint8_t
