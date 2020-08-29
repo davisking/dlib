@@ -1582,9 +1582,9 @@ namespace dlib
                                     double dw = out_data[dets[i].tensor_offset_dw];
                                     double dh = out_data[dets[i].tensor_offset_dh];
 
-                                    dpoint p = dcenter(dets[i].rect_bbr); 
-                                    double w = dets[i].rect_bbr.width()-1;
-                                    double h = dets[i].rect_bbr.height()-1;
+                                    dpoint p = dcenter(dets[i].rect);
+                                    double w = dets[i].rect.width()-1;
+                                    double h = dets[i].rect.height()-1;
                                     drectangle truth_box = (*truth)[hittruth.second].rect;
                                     dpoint p_truth = dcenter(truth_box); 
 
