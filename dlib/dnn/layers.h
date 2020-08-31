@@ -1530,16 +1530,14 @@ namespace dlib
             visitor_bn_no_bias() = default;
 
             template <typename T>
-            void set_no_bias(T&) const
+            void set_input_no_bias(T&) const
             {
                 // ignore other layer types
             }
 
             template <layer_mode mode, typename U, typename E>
-            void set_no_bias(add_layer<bn_<mode>, U, E>& l)
+            void set_input_no_bias(add_layer<bn_<mode>, U, E>& l)
             {
-                l.layer_details().set_bias_learning_rate_multiplier(0);
-                l.layer_details().set_bias_weight_decay_multiplier(0);
                 l.subnet().layer_details().set_bias_learning_rate_multiplier(0);
                 l.subnet().layer_details().set_bias_weight_decay_multiplier(0);
             }
@@ -1553,9 +1551,8 @@ namespace dlib
             template <typename T, typename U, typename E>
             void operator()(size_t , add_layer<T,U,E>& l)
             {
-                set_no_bias(l);
+                set_input_no_bias(l);
             }
-
         };
     }
 
@@ -1569,7 +1566,7 @@ namespace dlib
     }
 
     template <typename net_type>
-    void set_all_bn_no_bias (
+    void set_all_bn_inputs_no_bias (
         net_type& net
     )
     {

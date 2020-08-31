@@ -131,9 +131,9 @@ int main(int argc, char** argv) try
     // Instantiate both generator and discriminator
     generator_type generator;
     discriminator_type discriminator(leaky_relu_(0.2), leaky_relu_(0.2), leaky_relu_(0.2));
-    // Remove the bias learning from all bn_ layers and their inputs in both networks
-    set_all_bn_no_bias(generator);
-    set_all_bn_no_bias(discriminator);
+    // Remove the bias learning from all bn_ inputs in both networks
+    set_all_bn_inputs_no_bias(generator);
+    set_all_bn_inputs_no_bias(discriminator);
     // Forward random noise so that we see the tensor size at each layer
     discriminator(generate_image(generator, make_noise(rnd)));
     cout << "generator" << endl;
