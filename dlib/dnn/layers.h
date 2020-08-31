@@ -1523,11 +1523,11 @@ namespace dlib
             unsigned long new_window_size;
         };
 
-        class visitor_bn_no_bias
+        class visitor_bn_input_no_bias
         {
         public:
 
-            visitor_bn_no_bias() = default;
+            visitor_bn_input_no_bias() = default;
 
             template <typename T>
             void set_input_no_bias(T&) const
@@ -1570,7 +1570,7 @@ namespace dlib
         net_type& net
     )
     {
-        visit_layers(net, impl::visitor_bn_no_bias());
+        visit_layers(net, impl::visitor_bn_input_no_bias());
     }
 
 // ----------------------------------------------------------------------------------------
