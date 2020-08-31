@@ -1523,12 +1523,11 @@ namespace dlib
             unsigned long new_window_size;
         };
 
-        template <typename net_type>
         class visitor_bn_no_bias_prev
         {
         public:
 
-            visitor_bn_no_bias_prev(net_type& net_) : net(net_) {}
+            visitor_bn_no_bias_prev() = default;
 
             template <typename T>
             void set_no_bias(size_t , T&) const
@@ -1555,9 +1554,6 @@ namespace dlib
                 set_no_bias(i, l);
             }
 
-        private:
-
-            net_type& net;
         };
     }
 
@@ -1575,7 +1571,7 @@ namespace dlib
         net_type& net
     )
     {
-        visit_layers(net, impl::visitor_bn_no_bias_prev<net_type>(net));
+        visit_layers(net, impl::visitor_bn_no_bias_prev());
     }
 
 // ----------------------------------------------------------------------------------------

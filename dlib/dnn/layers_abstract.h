@@ -1627,8 +1627,8 @@ namespace dlib
             - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
               add_tag_layer.
         ensures
-            - For all inputs to bn_ layers, sets the bias_learning_rate_multipliers and
-              bias_weight_decay_multipliers to zero.
+            - Sets the get_bias_learning_rate_multiplier() and get_bias_weight_decay_multiplier()
+              to zero of all inputs to bn_ layers in net.
     !*/
 
 // ----------------------------------------------------------------------------------------
