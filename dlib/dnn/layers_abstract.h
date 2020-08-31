@@ -1619,7 +1619,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>
-    void set_all_bn_prev_no_bias(
+    void set_all_bn_no_bias(
         const net_type& net
     );
     /*!
@@ -1628,7 +1628,7 @@ namespace dlib
               add_tag_layer.
         ensures
             - Sets the get_bias_learning_rate_multiplier() and get_bias_weight_decay_multiplier()
-              to zero of all inputs to bn_ layers in net.
+              to zero of all bn_ layers and their inputs.
     !*/
 
 // ----------------------------------------------------------------------------------------

@@ -1523,21 +1523,23 @@ namespace dlib
             unsigned long new_window_size;
         };
 
-        class visitor_bn_no_bias_prev
+        class visitor_bn_no_bias
         {
         public:
 
-            visitor_bn_no_bias_prev() = default;
+            visitor_bn_no_bias() = default;
 
             template <typename T>
-            void set_no_bias(size_t , T&) const
+            void set_no_bias(T&) const
             {
-                // ignore other layer detail types
+                // ignore other layer types
             }
 
             template <layer_mode mode, typename U, typename E>
-            void set_no_bias(size_t , add_layer<bn_<mode>, U, E>& l)
+            void set_no_bias(add_layer<bn_<mode>, U, E>& l)
             {
+                l.layer_details().set_bias_learning_rate_multiplier(0);
+                l.layer_details().set_bias_weight_decay_multiplier(0);
                 l.subnet().layer_details().set_bias_learning_rate_multiplier(0);
                 l.subnet().layer_details().set_bias_weight_decay_multiplier(0);
             }
@@ -1549,9 +1551,9 @@ namespace dlib
             }
 
             template <typename T, typename U, typename E>
-            void operator()(size_t i, add_layer<T,U,E>& l)
+            void operator()(size_t , add_layer<T,U,E>& l)
             {
-                set_no_bias(i, l);
+                set_no_bias(l);
             }
 
         };
@@ -1567,11 +1569,11 @@ namespace dlib
     }
 
     template <typename net_type>
-    void set_all_bn_prev_no_bias (
+    void set_all_bn_no_bias (
         net_type& net
     )
     {
-        visit_layers(net, impl::visitor_bn_no_bias_prev());
+        visit_layers(net, impl::visitor_bn_no_bias());
     }
 
 // ----------------------------------------------------------------------------------------
