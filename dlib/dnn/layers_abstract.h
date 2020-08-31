@@ -1618,6 +1618,21 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename net_type>
+    void set_all_bn_prev_no_bias(
+        const net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+        ensures
+            - For all inputs to bn_ layers, sets the bias_learning_rate_multipliers and
+              bias_weight_decay_multipliers to zero.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     class affine_
     {
         /*!

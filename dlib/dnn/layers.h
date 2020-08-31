@@ -1522,6 +1522,43 @@ namespace dlib
 
             unsigned long new_window_size;
         };
+
+        template <typename net_type>
+        class visitor_bn_no_bias_prev
+        {
+        public:
+
+            visitor_bn_no_bias_prev(net_type& net_) : net(net_) {}
+
+            template <typename T>
+            void set_no_bias(size_t , T&) const
+            {
+                // ignore other layer detail types
+            }
+
+            template <layer_mode mode, typename U, typename E>
+            void set_no_bias(size_t , add_layer<bn_<mode>, U, E>& l)
+            {
+                l.subnet().layer_details().set_bias_learning_rate_multiplier(0);
+                l.subnet().layer_details().set_bias_weight_decay_multiplier(0);
+            }
+
+            template<typename input_layer_type>
+            void operator()(size_t , input_layer_type& ) const
+            {
+                // ignore other layers
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(size_t i, add_layer<T,U,E>& l)
+            {
+                set_no_bias(i, l);
+            }
+
+        private:
+
+            net_type& net;
+        };
     }
 
     template <typename net_type>
@@ -1531,6 +1568,14 @@ namespace dlib
     )
     {
         visit_layers(net, impl::visitor_bn_running_stats_window_size(new_window_size));
+    }
+
+    template <typename net_type>
+    void set_all_bn_prev_no_bias (
+        net_type& net
+    )
+    {
+        visit_layers(net, impl::visitor_bn_no_bias_prev<net_type>(net));
     }
 
 // ----------------------------------------------------------------------------------------

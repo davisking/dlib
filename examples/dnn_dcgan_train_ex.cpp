@@ -35,25 +35,6 @@
 using namespace std;
 using namespace dlib;
 
-// We start by defining a simple visitor to disable bias learning in a network.  By default,
-// biases are initialized to 0, so setting the multipliers to 0 disables bias learning.
-class visitor_no_bias
-{
-public:
-    template <typename input_layer_type>
-    void operator()(size_t , input_layer_type& ) const
-    {
-        // ignore other layers
-    }
-
-    template <typename T, typename U, typename E>
-    void operator()(size_t , add_layer<T, U, E>& l) const
-    {
-        set_bias_learning_rate_multiplier(l.layer_details(), 0);
-        set_bias_weight_decay_multiplier(l.layer_details(), 0);
-    }
-};
-
 // Some helper definitions for the noise generation
 const size_t noise_size = 100;
 using noise_t = std::array<matrix<float, 1, 1>, noise_size>;
@@ -149,11 +130,10 @@ int main(int argc, char** argv) try
 
     // Instantiate both generator and discriminator
     generator_type generator;
-    discriminator_type discriminator(
-        leaky_relu_(0.2), leaky_relu_(0.2), leaky_relu_(0.2));
-    // Remove the bias learning from the networks
-    visit_layers(generator, visitor_no_bias());
-    visit_layers(discriminator, visitor_no_bias());
+    discriminator_type discriminator(leaky_relu_(0.2), leaky_relu_(0.2), leaky_relu_(0.2));
+    // Remove the bias learning from all bn_con inputs in both networks
+    set_all_bn_prev_no_bias(generator);
+    set_all_bn_prev_no_bias(discriminator);
     // Forward random noise so that we see the tensor size at each layer
     discriminator(generate_image(generator, make_noise(rnd)));
     cout << "generator" << endl;
@@ -204,7 +184,7 @@ int main(int argc, char** argv) try
         {
             noises.push_back(make_noise(rnd));
         }
-        // 2. Convert noises into a tensor 
+        // 2. Convert noises into a tensor
         generator.to_tensor(noises.begin(), noises.end(), noises_tensor);
         // 3. Forward the noise through the network and convert the outputs into images.
         const auto fake_samples = get_generated_images(generator.forward(noises_tensor));
