@@ -573,6 +573,13 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier() == val
         !*/
 
+        void disable_bias(
+        );
+        /*!
+            ensures
+                - disables bias for this layer
+        !*/
+
         alias_tensor_const_instance get_weights(
         ) const;
         /*!
@@ -903,6 +910,13 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier() == val
         !*/
 
+        void disable_bias(
+        );
+        /*!
+            ensures
+                - disables bias for this layer
+        !*/
+
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
@@ -1145,6 +1159,13 @@ namespace dlib
                 - val >= 0
             ensures
                 - #get_bias_weight_decay_multiplier() == val
+        !*/
+
+        void disable_bias(
+        );
+        /*!
+            ensures
+                - disables bias for this layer
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -1627,6 +1648,7 @@ namespace dlib
             - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
               add_tag_layer.
         ensures
+            - Disables bias for all bn_ layer inputs.
             - Sets the get_bias_learning_rate_multiplier() and get_bias_weight_decay_multiplier()
               to zero of all bn_ layer inputs.
     !*/

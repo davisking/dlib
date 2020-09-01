@@ -159,6 +159,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T>
+    void disable_bias(
+        T& obj
+    );
+    /*!
+        ensures
+            - if (obj has a disable_bias() member function) then
+                - calls obj.disable_bias()
+            - else
+                - does nothing
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     bool dnn_prefer_fastest_algorithms(
     );
     /*!
