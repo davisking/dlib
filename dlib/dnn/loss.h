@@ -1487,7 +1487,7 @@ namespace dlib
                 // The point of this loop is to fill out the truth_score_hits array. 
                 for (size_t i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
                 {
-                    if (overlaps_any_box_nms(final_dets, dets[i].rect))
+                    if (overlaps_any_box_nms(final_dets, dets[i].rect_bbr))
                         continue;
 
                     const auto& det_label = options.detector_windows[dets[i].tensor_channel].label;
@@ -1556,7 +1556,7 @@ namespace dlib
                 // detections.
                 for (unsigned long i = 0; i < dets.size() && final_dets.size() < max_num_dets; ++i)
                 {
-                    if (overlaps_any_box_nms(final_dets, dets[i].rect))
+                    if (overlaps_any_box_nms(final_dets, dets[i].rect_bbr))
                         continue;
 
                     const auto& det_label = options.detector_windows[dets[i].tensor_channel].label;
