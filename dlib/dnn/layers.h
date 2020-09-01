@@ -1527,8 +1527,6 @@ namespace dlib
         {
         public:
 
-            visitor_bn_input_no_bias() = default;
-
             template <typename T>
             void set_input_no_bias(T&) const
             {
