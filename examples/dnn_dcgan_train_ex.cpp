@@ -10,7 +10,7 @@
     by Alec Radford, Luke Metz, Soumith Chintala.
 
     The main idea is that there are two neural networks training at the same time:
-    - the generator is in charge of generating images that look as close as possible as the
+    - the generator is in charge of generating images that look as close as possible to the
       ones from the dataset.
     - the discriminator will decide whether an image is fake (created by the generator) or real
       (selected from the dataset).
@@ -136,9 +136,9 @@ int main(int argc, char** argv) try
     set_all_bn_inputs_no_bias(discriminator);
     // Forward random noise so that we see the tensor size at each layer
     discriminator(generate_image(generator, make_noise(rnd)));
-    cout << "generator" << endl;
+    cout << "generator (" << count_parameters(generator) << " parameters)" << endl;
     cout << generator << endl;
-    cout << "discriminator" << endl;
+    cout << "discriminator (" << count_parameters(discriminator) << " parameters)" << endl;
     cout << discriminator << endl;
 
     // The solvers for the generator and discriminator networks.  In this example, we are going to
@@ -237,8 +237,11 @@ int main(int argc, char** argv) try
     // output.
     while (!win.is_closed())
     {
-        win.set_image(generate_image(generator, make_noise(rnd)));
-        cout << "Hit enter to generate a new image";
+        const auto image = generate_image(generator, make_noise(rnd));
+        const auto real = discriminator(image) > 0;
+        win.set_image(image);
+        cout << "The discriminator thinks it's " << (real ? "real" : "fake");
+        cout << ". Hit enter to generate a new image";
         cin.get();
     }
 
