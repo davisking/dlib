@@ -1536,8 +1536,8 @@ namespace dlib
             template <layer_mode mode, typename U, typename E>
             void set_input_no_bias(add_layer<bn_<mode>, U, E>& l)
             {
-                l.subnet().layer_details().set_bias_learning_rate_multiplier(0);
-                l.subnet().layer_details().set_bias_weight_decay_multiplier(0);
+                set_bias_learning_rate_multiplier(l.subnet().layer_details(), 0);
+                set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
             }
 
             template<typename input_layer_type>
