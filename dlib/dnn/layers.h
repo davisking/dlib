@@ -1680,7 +1680,7 @@ namespace dlib
         void setup (const SUBNET& sub)
         {
             num_inputs = sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k();
-            if (bias_mode == FC_HAS_BIAS || use_bias)
+            if (bias_mode == FC_HAS_BIAS && use_bias)
                 params.set_size(num_inputs+1, num_outputs);
             else
                 params.set_size(num_inputs, num_outputs);
@@ -1690,7 +1690,7 @@ namespace dlib
 
             weights = alias_tensor(num_inputs, num_outputs);
 
-            if (bias_mode == FC_HAS_BIAS || use_bias)
+            if (bias_mode == FC_HAS_BIAS && use_bias)
             {
                 biases = alias_tensor(1,num_outputs);
                 // set the initial bias values to zero
@@ -1707,7 +1707,7 @@ namespace dlib
 
             auto w = weights(params, 0);
             tt::gemm(0,output, 1,sub.get_output(),false, w,false);
-            if (bias_mode == FC_HAS_BIAS || use_bias)
+            if (bias_mode == FC_HAS_BIAS && use_bias)
             {
                 auto b = biases(params, weights.size());
                 tt::add(1,output,1,b);
@@ -1724,7 +1724,7 @@ namespace dlib
                 auto pw = weights(params_grad, 0);
                 tt::gemm(0,pw, 1,sub.get_output(),true, gradient_input,false);
 
-                if (bias_mode == FC_HAS_BIAS || use_bias)
+                if (bias_mode == FC_HAS_BIAS && use_bias)
                 {
                     // compute the gradient of the bias parameters.  
                     auto pb = biases(params_grad, weights.size());
