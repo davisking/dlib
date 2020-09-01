@@ -59,7 +59,8 @@ namespace dlib
             bias_weight_decay_multiplier(0),
             num_filters_(o.num_outputs),
             padding_y_(_padding_y),
-            padding_x_(_padding_x)
+            padding_x_(_padding_x),
+            use_bias(true)
         {
             DLIB_CASSERT(num_filters_ > 0);
         }
@@ -106,6 +107,7 @@ namespace dlib
         double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
+        void disable_bias() { use_bias = false; }
 
         inline dpoint map_input_to_output (
             dpoint p
@@ -137,7 +139,8 @@ namespace dlib
             bias_weight_decay_multiplier(item.bias_weight_decay_multiplier),
             num_filters_(item.num_filters_),
             padding_y_(item.padding_y_),
-            padding_x_(item.padding_x_)
+            padding_x_(item.padding_x_),
+            use_bias(item.use_bias)
         {
             // this->conv is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
@@ -162,6 +165,7 @@ namespace dlib
             bias_learning_rate_multiplier = item.bias_learning_rate_multiplier;
             bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
             num_filters_ = item.num_filters_;
+            use_bias = item.use_bias;
             return *this;
         }
 
@@ -174,16 +178,18 @@ namespace dlib
             long num_inputs = filt_nr*filt_nc*sub.get_output().k();
             long num_outputs = num_filters_;
             // allocate params for the filters and also for the filter bias values.
-            params.set_size(num_inputs*num_filters_ + num_filters_);
+            params.set_size(num_inputs*num_filters_ + static_cast<int>(use_bias) * num_filters_);
 
             dlib::rand rnd(std::rand());
             randomize_parameters(params, num_inputs+num_outputs, rnd);
 
             filters = alias_tensor(num_filters_, sub.get_output().k(), filt_nr, filt_nc);
-            biases = alias_tensor(1,num_filters_);
-
-            // set the initial bias values to zero
-            biases(params,filters.size()) = 0;
+            if (use_bias)
+            {
+                biases = alias_tensor(1,num_filters_);
+                // set the initial bias values to zero
+                biases(params,filters.size()) = 0;
+            }
         }
 
         template <typename SUBNET>
@@ -198,9 +204,11 @@ namespace dlib
             conv(false, output,
                 sub.get_output(),
                 filters(params,0));
-
-            tt::add(1,output,1,biases(params,filters.size()));
-        } 
+            if (use_bias)
+            {
+                tt::add(1,output,1,biases(params,filters.size()));
+            }
+        }
 
         template <typename SUBNET>
         void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
@@ -211,8 +219,11 @@ namespace dlib
             {
                 auto filt = filters(params_grad,0);
                 conv.get_gradient_for_filters (false, gradient_input, sub.get_output(), filt);
-                auto b = biases(params_grad, filters.size());
-                tt::assign_conv_bias_gradient(b, gradient_input);
+                if (use_bias)
+                {
+                    auto b = biases(params_grad, filters.size());
+                    tt::assign_conv_bias_gradient(b, gradient_input);
+                }
             }
         }
 
@@ -221,7 +232,7 @@ namespace dlib
 
         friend void serialize(const con_& item, std::ostream& out)
         {
-            serialize("con_4", out);
+            serialize("con_5", out);
             serialize(item.params, out);
             serialize(item.num_filters_, out);
             serialize(_nr, out);
@@ -236,6 +247,7 @@ namespace dlib
             serialize(item.weight_decay_multiplier, out);
             serialize(item.bias_learning_rate_multiplier, out);
             serialize(item.bias_weight_decay_multiplier, out);
+            serialize(item.use_bias, out);
         }
 
         friend void deserialize(con_& item, std::istream& in)
@@ -246,7 +258,7 @@ namespace dlib
             long nc;
             int stride_y;
             int stride_x;
-            if (version == "con_4")
+            if (version == "con_4" || version == "con_5")
             {
                 deserialize(item.params, in);
                 deserialize(item.num_filters_, in);
@@ -268,6 +280,10 @@ namespace dlib
                 if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::con_");
                 if (stride_y != _stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::con_");
                 if (stride_x != _stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::con_");
+                if (version == "con_5")
+                {
+                    deserialize(item.use_bias, in);
+                }
             }
             else
             {
@@ -289,8 +305,11 @@ namespace dlib
                 << ")";
             out << " learning_rate_mult="<<item.learning_rate_multiplier;
             out << " weight_decay_mult="<<item.weight_decay_multiplier;
-            out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
-            out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+            if (item.use_bias)
+            {
+                out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
+                out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+            }
             return out;
         }
 
@@ -328,6 +347,7 @@ namespace dlib
         // serialized to disk) used different padding settings.
         int padding_y_;
         int padding_x_;
+        bool use_bias;
 
     };
 
@@ -373,7 +393,8 @@ namespace dlib
             bias_weight_decay_multiplier(0),
             num_filters_(o.num_outputs),
             padding_y_(_padding_y),
-            padding_x_(_padding_x)
+            padding_x_(_padding_x),
+            use_bias(true)
         {
             DLIB_CASSERT(num_filters_ > 0);
         }
@@ -408,6 +429,7 @@ namespace dlib
         double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
+        void disable_bias() { use_bias = false; }
 
         inline dpoint map_output_to_input (
             dpoint p
@@ -439,7 +461,8 @@ namespace dlib
             bias_weight_decay_multiplier(item.bias_weight_decay_multiplier),
             num_filters_(item.num_filters_),
             padding_y_(item.padding_y_),
-            padding_x_(item.padding_x_)
+            padding_x_(item.padding_x_),
+            use_bias(item.use_bias)
         {
             // this->conv is non-copyable and basically stateless, so we have to write our
             // own copy to avoid trying to copy it and getting an error.
@@ -464,6 +487,7 @@ namespace dlib
             bias_learning_rate_multiplier = item.bias_learning_rate_multiplier;
             bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
             num_filters_ = item.num_filters_;
+            use_bias = item.use_bias;
             return *this;
         }
 
@@ -473,16 +497,18 @@ namespace dlib
             long num_inputs = _nr*_nc*sub.get_output().k();
             long num_outputs = num_filters_;
             // allocate params for the filters and also for the filter bias values.
-            params.set_size(num_inputs*num_filters_ + num_filters_);
+            params.set_size(num_inputs*num_filters_ + num_filters_ * static_cast<int>(use_bias));
 
             dlib::rand rnd(std::rand());
             randomize_parameters(params, num_inputs+num_outputs, rnd);
 
             filters = alias_tensor(sub.get_output().k(), num_filters_, _nr, _nc);
-            biases = alias_tensor(1,num_filters_);
-
-            // set the initial bias values to zero
-            biases(params,filters.size()) = 0;
+            if (use_bias)
+            {
+                biases = alias_tensor(1,num_filters_);
+                // set the initial bias values to zero
+                biases(params,filters.size()) = 0;
+            }
         }
 
         template <typename SUBNET>
@@ -496,7 +522,10 @@ namespace dlib
             output.set_size(gnsamps,gk,gnr,gnc);
             conv.setup(output,filt,_stride_y,_stride_x,padding_y_,padding_x_);
             conv.get_gradient_for_data(false, sub.get_output(),filt,output);            
-            tt::add(1,output,1,biases(params,filters.size()));
+            if (use_bias)
+            {
+                tt::add(1,output,1,biases(params,filters.size()));
+            }
         } 
 
         template <typename SUBNET>
@@ -509,8 +538,11 @@ namespace dlib
             {
                 auto filt = filters(params_grad,0);                
                 conv.get_gradient_for_filters (false, sub.get_output(),gradient_input, filt);
-                auto b = biases(params_grad, filters.size());
-                tt::assign_conv_bias_gradient(b, gradient_input);
+                if (use_bias)
+                {
+                    auto b = biases(params_grad, filters.size());
+                    tt::assign_conv_bias_gradient(b, gradient_input);
+                }
             }
         }
 
@@ -519,7 +551,7 @@ namespace dlib
 
         friend void serialize(const cont_& item, std::ostream& out)
         {
-            serialize("cont_1", out);
+            serialize("cont_2", out);
             serialize(item.params, out);
             serialize(item.num_filters_, out);
             serialize(_nr, out);
@@ -534,6 +566,7 @@ namespace dlib
             serialize(item.weight_decay_multiplier, out);
             serialize(item.bias_learning_rate_multiplier, out);
             serialize(item.bias_weight_decay_multiplier, out);
+            serialize(item.use_bias, out);
         }
 
         friend void deserialize(cont_& item, std::istream& in)
@@ -544,7 +577,7 @@ namespace dlib
             long nc;
             int stride_y;
             int stride_x;
-            if (version == "cont_1")
+            if (version == "cont_1" || version == "cont_2")
             {
                 deserialize(item.params, in);
                 deserialize(item.num_filters_, in);
@@ -566,6 +599,10 @@ namespace dlib
                 if (nc != _nc) throw serialization_error("Wrong nc found while deserializing dlib::con_");
                 if (stride_y != _stride_y) throw serialization_error("Wrong stride_y found while deserializing dlib::con_");
                 if (stride_x != _stride_x) throw serialization_error("Wrong stride_x found while deserializing dlib::con_");
+                if (version == "cont_2")
+                {
+                    deserialize(item.use_bias, in);
+                }
             }
             else
             {
@@ -587,8 +624,11 @@ namespace dlib
                 << ")";
             out << " learning_rate_mult="<<item.learning_rate_multiplier;
             out << " weight_decay_mult="<<item.weight_decay_multiplier;
-            out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
-            out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+            if (item.use_bias)
+            {
+                out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
+                out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+            }
             return out;
         }
 
@@ -624,6 +664,8 @@ namespace dlib
 
         int padding_y_;
         int padding_x_;
+
+        bool use_bias;
 
     };
 
@@ -1536,6 +1578,7 @@ namespace dlib
             template <layer_mode mode, typename U, typename E>
             void set_input_no_bias(add_layer<bn_<mode>, U, E>& l)
             {
+                disable_bias(l.subnet().layer_details());
                 set_bias_learning_rate_multiplier(l.subnet().layer_details(), 0);
                 set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
             }
@@ -1599,7 +1642,8 @@ namespace dlib
             learning_rate_multiplier(1),
             weight_decay_multiplier(1),
             bias_learning_rate_multiplier(1),
-            bias_weight_decay_multiplier(0)
+            bias_weight_decay_multiplier(0),
+            use_bias(true)
         {}
 
         fc_() : fc_(num_fc_outputs(num_outputs_)) {}
@@ -1613,6 +1657,7 @@ namespace dlib
         double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
+        void disable_bias() { use_bias = false; }
 
         unsigned long get_num_outputs (
         ) const { return num_outputs; }
@@ -1635,7 +1680,7 @@ namespace dlib
         void setup (const SUBNET& sub)
         {
             num_inputs = sub.get_output().nr()*sub.get_output().nc()*sub.get_output().k();
-            if (bias_mode == FC_HAS_BIAS)
+            if (bias_mode == FC_HAS_BIAS || use_bias)
                 params.set_size(num_inputs+1, num_outputs);
             else
                 params.set_size(num_inputs, num_outputs);
@@ -1645,7 +1690,7 @@ namespace dlib
 
             weights = alias_tensor(num_inputs, num_outputs);
 
-            if (bias_mode == FC_HAS_BIAS)
+            if (bias_mode == FC_HAS_BIAS || use_bias)
             {
                 biases = alias_tensor(1,num_outputs);
                 // set the initial bias values to zero
@@ -1662,7 +1707,7 @@ namespace dlib
 
             auto w = weights(params, 0);
             tt::gemm(0,output, 1,sub.get_output(),false, w,false);
-            if (bias_mode == FC_HAS_BIAS)
+            if (bias_mode == FC_HAS_BIAS || use_bias)
             {
                 auto b = biases(params, weights.size());
                 tt::add(1,output,1,b);
@@ -1679,7 +1724,7 @@ namespace dlib
                 auto pw = weights(params_grad, 0);
                 tt::gemm(0,pw, 1,sub.get_output(),true, gradient_input,false);
 
-                if (bias_mode == FC_HAS_BIAS)
+                if (bias_mode == FC_HAS_BIAS || use_bias)
                 {
                     // compute the gradient of the bias parameters.  
                     auto pb = biases(params_grad, weights.size());
@@ -1721,7 +1766,7 @@ namespace dlib
 
         friend void serialize(const fc_& item, std::ostream& out)
         {
-            serialize("fc_2", out);
+            serialize("fc_3", out);
             serialize(item.num_outputs, out);
             serialize(item.num_inputs, out);
             serialize(item.params, out);
@@ -1732,27 +1777,36 @@ namespace dlib
             serialize(item.weight_decay_multiplier, out);
             serialize(item.bias_learning_rate_multiplier, out);
             serialize(item.bias_weight_decay_multiplier, out);
+            serialize(item.use_bias, out);
         }
 
         friend void deserialize(fc_& item, std::istream& in)
         {
             std::string version;
             deserialize(version, in);
-            if (version != "fc_2")
+            if (version == "fc_2" || version == "fc_3")
+            {
+                deserialize(item.num_outputs, in);
+                deserialize(item.num_inputs, in);
+                deserialize(item.params, in);
+                deserialize(item.weights, in);
+                deserialize(item.biases, in);
+                int bmode = 0;
+                deserialize(bmode, in);
+                if (bias_mode != (fc_bias_mode)bmode) throw serialization_error("Wrong fc_bias_mode found while deserializing dlib::fc_");
+                deserialize(item.learning_rate_multiplier, in);
+                deserialize(item.weight_decay_multiplier, in);
+                deserialize(item.bias_learning_rate_multiplier, in);
+                deserialize(item.bias_weight_decay_multiplier, in);
+                if (version == "fc_3")
+                {
+                    deserialize(item.use_bias, in);
+                }
+            }
+            else
+            {
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::fc_.");
-
-            deserialize(item.num_outputs, in);
-            deserialize(item.num_inputs, in);
-            deserialize(item.params, in);
-            deserialize(item.weights, in);
-            deserialize(item.biases, in);
-            int bmode = 0;
-            deserialize(bmode, in);
-            if (bias_mode != (fc_bias_mode)bmode) throw serialization_error("Wrong fc_bias_mode found while deserializing dlib::fc_");
-            deserialize(item.learning_rate_multiplier, in);
-            deserialize(item.weight_decay_multiplier, in);
-            deserialize(item.bias_learning_rate_multiplier, in);
-            deserialize(item.bias_weight_decay_multiplier, in);
+            }
         }
 
         friend std::ostream& operator<<(std::ostream& out, const fc_& item)
@@ -1764,8 +1818,11 @@ namespace dlib
                     << ")";
                 out << " learning_rate_mult="<<item.learning_rate_multiplier;
                 out << " weight_decay_mult="<<item.weight_decay_multiplier;
-                out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
-                out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+                if (item.use_bias)
+                {
+                    out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
+                    out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+                }
             }
             else
             {
@@ -1814,6 +1871,7 @@ namespace dlib
         double weight_decay_multiplier;
         double bias_learning_rate_multiplier;
         double bias_weight_decay_multiplier;
+        bool use_bias;
     };
 
     template <
