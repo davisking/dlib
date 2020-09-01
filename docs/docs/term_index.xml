@@ -966,7 +966,7 @@
          <term file="metaprogramming.html" name="assign_zero_if_built_in_scalar_type" include="dlib/algs.h"/>
 
 
-         <term link="dlib/platform.h.html" name="POSIX"     include="dlib/platform.h"/>
+         <term link="dlib/platform.h.html" name="DLIB_POSIX"     include="dlib/platform.h"/>
          <term link="dlib/platform.h.html" name="MACOSX"    include="dlib/platform.h"/>
          <term link="dlib/platform.h.html" name="HPUX"      include="dlib/platform.h"/>
          <term link="dlib/platform.h.html" name="WIN32"     include="dlib/platform.h"/>

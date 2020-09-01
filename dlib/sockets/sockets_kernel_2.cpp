@@ -5,7 +5,7 @@
 
 #include "../platform.h"
 
-#ifdef POSIX
+#ifdef DLIB_POSIX
 
 
 #include "sockets_kernel_2.h"
@@ -1104,7 +1104,7 @@ namespace dlib
 
 }
 
-#endif // POSIX
+#endif // DLIB_POSIX
 
 #endif // DLIB_SOCKETS_KERNEL_2_CPp_
 

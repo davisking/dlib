@@ -12,7 +12,7 @@
 /*!
     This file ensures that:
         - if (we are compiling under a posix platform) then
-            - POSIX will be defined
+            - DLIB_POSIX will be defined
             - if (this is also Mac OS X) then
                 - MACOSX will be defined
             - if (this is also HP-UX) then
@@ -36,9 +36,9 @@
 
 #ifndef WIN32
     // since this is the only other platform the library currently supports
-    // just assume it is POSIX if it isn't WIN32
-    #ifndef POSIX
-        #define POSIX
+    // just assume it is DLIB_POSIX if it isn't WIN32
+    #ifndef DLIB_POSIX
+        #define DLIB_POSIX
     #endif
  
     #ifndef HPUX

@@ -20,7 +20,7 @@
 #if defined(WIN32)
 #include <windows.h>
 #include <mbstring.h>
-#elif defined(POSIX)
+#elif defined(DLIB_POSIX)
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -295,7 +295,7 @@ namespace nativefont
                 ~vals_internal(){
                     destroy();
                 }
-#elif defined(POSIX)
+#elif defined(DLIB_POSIX)
                 XImage *ximg;
                 Display *d;
                 GC gc;

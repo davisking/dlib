@@ -4,7 +4,7 @@
 #define DLIB_MISC_API_KERNEL_2_CPp_
 #include "../platform.h"
 
-#ifdef POSIX
+#ifdef DLIB_POSIX
 
 #include <unistd.h>
 #include "misc_api_kernel_2.h"
@@ -117,7 +117,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 }
 
-#endif // POSIX
+#endif // DLIB_POSIX
 
 #endif // DLIB_MISC_API_KERNEL_2_CPp_
 
