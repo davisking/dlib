@@ -108,6 +108,7 @@ namespace dlib
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
         void disable_bias() { use_bias = false; }
+        bool bias_is_disabled() const { return !use_bias; }
 
         inline dpoint map_input_to_output (
             dpoint p
@@ -326,7 +327,8 @@ namespace dlib
                 << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'"
                 << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'"
                 << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'"
-                << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'>\n";
+                << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'"
+                << " use_bias='"<<(item.use_bias?"true":"false")<<"'>\n";
             out << mat(item.params);
             out << "</con>";
         }
@@ -430,6 +432,7 @@ namespace dlib
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
         void disable_bias() { use_bias = false; }
+        bool bias_is_disabled() const { return !use_bias; }
 
         inline dpoint map_output_to_input (
             dpoint p
@@ -645,7 +648,8 @@ namespace dlib
                 << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'"
                 << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'"
                 << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'"
-                << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'>\n";
+                << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'"
+                << " use_bias='"<<(item.use_bias?"true":"false")<<"'>\n";
             out << mat(item.params);
             out << "</cont>";
         }
@@ -1658,6 +1662,7 @@ namespace dlib
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
         void disable_bias() { use_bias = false; }
+        bool bias_is_disabled() const { return !use_bias; }
 
         unsigned long get_num_outputs (
         ) const { return num_outputs; }
@@ -1844,7 +1849,8 @@ namespace dlib
                     << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'"
                     << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'"
                     << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'"
-                    << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'";
+                    << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'"
+                    << " use_bias='"<<(item.use_bias?"true":"false")<<"'>\n";
                 out << ">\n";
                 out << mat(item.params);
                 out << "</fc>\n";

@@ -577,7 +577,16 @@ namespace dlib
         );
         /*!
             ensures
-                - disables bias for this layer
+                - bias_is_disabled() returns true
+        !*/
+
+        bool bias_is_disabled(
+        ) const;
+        /*!
+            ensures
+                - returns true if bias learning is disabled for this layer.  This means the biases will
+                  not be learned during the training and they will not be used in the forward or backward
+                  methods either.
         !*/
 
         alias_tensor_const_instance get_weights(
@@ -914,7 +923,16 @@ namespace dlib
         );
         /*!
             ensures
-                - disables bias for this layer
+                - bias_is_disabled() returns true
+        !*/
+
+        bool bias_is_disabled(
+        ) const;
+        /*!
+            ensures
+                - returns true if bias learning is disabled for this layer.  This means the biases will
+                  not be learned during the training and they will not be used in the forward or backward
+                  methods either.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -1165,7 +1183,16 @@ namespace dlib
         );
         /*!
             ensures
-                - disables bias for this layer
+                - bias_is_disabled() returns true
+        !*/
+
+        bool bias_is_disabled(
+        ) const;
+        /*!
+            ensures
+                - returns true if bias learning is disabled for this layer.  This means the biases will
+                  not be learned during the training and they will not be used in the forward or backward
+                  methods either.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
