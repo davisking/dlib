@@ -2547,6 +2547,9 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
         friend void serialize(const scale_& item, std::ostream& out)
         {
             serialize("scale_", out);
