@@ -311,6 +311,10 @@ namespace dlib
                 out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
                 out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
             }
+            else
+            {
+                out << " use_bias=false";
+            }
             return out;
         }
 
@@ -631,6 +635,10 @@ namespace dlib
             {
                 out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
                 out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+            }
+            else
+            {
+                out << " use_bias=false";
             }
             return out;
         }
@@ -1827,6 +1835,10 @@ namespace dlib
                 {
                     out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
                     out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+                }
+                else
+                {
+                    out << " use_bias=false";
                 }
             }
             else
