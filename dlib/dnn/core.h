@@ -187,6 +187,28 @@ namespace dlib
 
     namespace impl
     {
+        template <typename T, typename int_<decltype(&T::disable_bias)>::type = 0>
+        void disable_bias(
+            T& obj,
+            special_
+        ) { obj.disable_bias(); }
+
+        template <typename T>
+        void disable_bias( const T& , general_) { }
+    }
+
+    template <typename T>
+    void disable_bias(
+        T& obj
+    )
+    {
+        impl::disable_bias(obj, special_());
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
         // The reason we return an int for this version rather than doing the more straight forward thing (like we do above) is to avoid a bug in visual studio 2015.
         template <typename T>
         auto call_clean_method_if_exists (

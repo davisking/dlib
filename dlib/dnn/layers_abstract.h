@@ -573,6 +573,22 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier() == val
         !*/
 
+        void disable_bias(
+        );
+        /*!
+            ensures
+                - bias_is_disabled() returns true
+        !*/
+
+        bool bias_is_disabled(
+        ) const;
+        /*!
+            ensures
+                - returns true if bias learning is disabled for this layer.  This means the biases will
+                  not be learned during the training and they will not be used in the forward or backward
+                  methods either.
+        !*/
+
         alias_tensor_const_instance get_weights(
         ) const;
         /*!
@@ -903,6 +919,22 @@ namespace dlib
                 - #get_bias_weight_decay_multiplier() == val
         !*/
 
+        void disable_bias(
+        );
+        /*!
+            ensures
+                - bias_is_disabled() returns true
+        !*/
+
+        bool bias_is_disabled(
+        ) const;
+        /*!
+            ensures
+                - returns true if bias learning is disabled for this layer.  This means the biases will
+                  not be learned during the training and they will not be used in the forward or backward
+                  methods either.
+        !*/
+
         template <typename SUBNET> void setup (const SUBNET& sub);
         template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
         template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
@@ -1145,6 +1177,22 @@ namespace dlib
                 - val >= 0
             ensures
                 - #get_bias_weight_decay_multiplier() == val
+        !*/
+
+        void disable_bias(
+        );
+        /*!
+            ensures
+                - bias_is_disabled() returns true
+        !*/
+
+        bool bias_is_disabled(
+        ) const;
+        /*!
+            ensures
+                - returns true if bias learning is disabled for this layer.  This means the biases will
+                  not be learned during the training and they will not be used in the forward or backward
+                  methods either.
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
@@ -1614,6 +1662,22 @@ namespace dlib
         ensures
             - Sets the get_running_stats_window_size() field of all bn_ layers in net to
               new_window_size.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename net_type>
+    void set_all_bn_inputs_no_bias (
+        const net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+        ensures
+            - Disables bias for all bn_ layer inputs.
+            - Sets the get_bias_learning_rate_multiplier() and get_bias_weight_decay_multiplier()
+              to zero of all bn_ layer inputs.
     !*/
 
 // ----------------------------------------------------------------------------------------
