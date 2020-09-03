@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <dlib/statistics.h>
+#include <dlib/statistics/running_gradient.h>
 #include <dlib/rand.h>
 #include <dlib/svm.h>
 #include <algorithm>
@@ -900,6 +901,14 @@ namespace
             }
         }
 
+        void test_probability_values_are_increasing() {
+            DLIB_TEST(probability_values_are_increasing(std::vector<double>{1,2,3,4,5,6,7,8}) > 0.99);
+            DLIB_TEST(probability_values_are_increasing(std::vector<double>{8,7,6,5,4,4,3,2}) < 0.01);
+            DLIB_TEST(probability_values_are_increasing_robust(std::vector<double>{1,2,3,4,5,6,7,8}) > 0.99);
+            DLIB_TEST(probability_values_are_increasing_robust(std::vector<double>{8,7,6,5,4,4,3,2}) < 0.01);
+            DLIB_TEST(probability_values_are_increasing(std::vector<double>{1,2,1e10,3,4,5,6,7,8}) < 0.3);
+            DLIB_TEST(probability_values_are_increasing_robust(std::vector<double>{1,2,1e100,3,4,5,6,7,8}) > 0.99);
+        }
 
         void test_event_corr()
         {
@@ -942,6 +951,7 @@ namespace
             test_running_stats_decayed();
             test_running_scalar_covariance_decayed();
             test_equal_error_rate();
+            test_probability_values_are_increasing();
         }
     } a;
 

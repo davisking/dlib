@@ -245,6 +245,50 @@ namespace dlib
     template <
         typename T
         > 
+    double probability_values_are_increasing (
+        const T& container
+    )
+    {
+        running_gradient g;
+        for (auto x : container)
+        {
+            g.add(x);
+        }
+        if (g.current_n() > 2)
+            return g.probability_gradient_greater_than(0);
+        else
+            return 0.5;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        > 
+    double probability_values_are_increasing_robust (
+        const T& container,
+        double quantile_discard = 0.10
+    )
+    {
+        const auto quantile_thresh = find_upper_quantile(container, quantile_discard); 
+        running_gradient g;
+        for (auto x : container)
+        {
+            // Ignore values that are too large.
+            if (x <= quantile_thresh)
+                g.add(x);
+        }
+        if (g.current_n() > 2)
+            return g.probability_gradient_greater_than(0);
+        else
+            return 0.5;
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        > 
     size_t count_steps_without_decrease (
         const T& container,
         double probability_of_decrease = 0.51

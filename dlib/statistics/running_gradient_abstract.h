@@ -171,6 +171,45 @@ namespace dlib
     template <
         typename T
         > 
+    double probability_values_are_increasing (
+        const T& container
+    );
+    /*!
+        requires
+            - container must be a container of double values that can be enumerated with a
+              range based for loop.
+        ensures
+            - Returns the probability that the values in container are increasing.  This is
+              probability_gradient_greater_than(container,0) if container.size() > 2 and 0.5
+              otherwise.
+    !*/
+
+    template <
+        typename T
+        > 
+    double probability_values_are_increasing_robust (
+        const T& container,
+        double quantile_discard = 0.10
+    );
+    /*!
+        requires
+            - container must be a container of double values that can be enumerated with a
+              range based for loop.
+        ensures
+            - This function behaves just like probability_values_are_increasing(container) except
+              that it ignores values in container that are in the upper quantile_discard quantile.
+              So for example, if the quantile discard is 0.1 then the 10% largest values in
+              container are ignored.  This makes the estimate robust to large spurious values that
+              otherwise might confuse the results.  For instance, the sequence of values 
+              {1,2,1e10,3,4,5,6,7,8,9} looks decreasing to probability_values_are_increasing() 
+              but looks increasing to probability_values_are_increasing_robust().
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T
+        > 
     size_t count_steps_without_decrease (
         const T& container,
         double probability_of_decrease = 0.51
