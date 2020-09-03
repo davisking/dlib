@@ -1108,29 +1108,21 @@ namespace dlib
             while (previous_loss_values_to_keep_until_disk_sync.size() > 2 * gradient_updates_since_last_sync)
                 previous_loss_values_to_keep_until_disk_sync.pop_front();
 
-            running_gradient g;
-
+            // Always retry if there are any nan values
             for (auto x : previous_loss_values_to_keep_until_disk_sync)
             {
-                // If we get a NaN value of loss assume things have gone horribly wrong and
-                // we should reload the state of the trainer.
                 if (std::isnan(x))
                     return true;
-
-                g.add(x);
             }
 
             // if we haven't seen much data yet then just say false.
             if (gradient_updates_since_last_sync < 30)
                 return false;
 
-            // if learning rate was changed from outside during training, for example
-            if (g.current_n() <= 2)
-                return false;
-
             // if the loss is very likely to be increasing then return true
-            const double prob = g.probability_gradient_greater_than(0);
-            if (prob > prob_loss_increasing_thresh)
+            const double prob1 = probability_values_are_increasing(previous_loss_values_to_keep_until_disk_sync);
+            const double prob2 = probability_values_are_increasing_robust(previous_loss_values_to_keep_until_disk_sync);
+            if (std::max(prob1, prob2) > prob_loss_increasing_thresh)
             {
                 // Exponentially decay the threshold towards 1 so that if we keep finding
                 // the loss to be increasing over and over we will make the test
