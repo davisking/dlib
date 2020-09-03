@@ -1372,6 +1372,7 @@ namespace dlib
         out << "  net architecture hash: " << md5(cast_to_string(trainer.get_net().subnet())) << endl;
         out << "  loss: " << trainer.get_net().loss_details() << endl;
 
+        out << "  get_train_one_step_calls():                 " << trainer.get_train_one_step_calls() << endl;
         out << "  synchronization file:                       " << trainer.get_synchronization_file() << endl;
         out << "  trainer.get_solvers()[0]:                   " << trainer.get_solvers()[0] << endl;
         auto sched = trainer.get_learning_rate_schedule();
