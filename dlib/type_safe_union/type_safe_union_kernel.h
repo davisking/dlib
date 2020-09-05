@@ -259,8 +259,24 @@ namespace dlib
         type_safe_union() : type_identity(0) 
         { 
         }
-
-        template <typename T>
+        
+        type_safe_union (
+            type_safe_union&& other
+        ) : type_identity(0)
+        {
+            swap(other);
+        }
+        
+        type_safe_union& operator= (
+            type_safe_union&& item
+        ) 
+        { 
+            swap(item); 
+            return *this;
+        }
+        
+        template <typename T, 
+                  typename std::enable_if<not std::is_same<T,type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>>::value>::type* = nullptr>
         type_safe_union (
             const T& item
         ) : type_identity(0)
@@ -268,7 +284,41 @@ namespace dlib
             validate_type<T>();
             construct(item);
         }
-
+        
+        template <typename T, 
+                  typename std::enable_if<not std::is_same<T,type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>>::value>::type* = nullptr>
+        type_safe_union& operator= ( 
+            const T& item
+        ) 
+        { 
+            get<T>() = item; 
+            return *this;
+        }
+        
+        template <typename T, typename std::enable_if<not std::is_same<T,type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>>::value>::type* = nullptr>
+        type_safe_union (
+            T&& item
+        ) : type_identity(0)
+        {
+            validate_type<T>();
+            unchecked_get<T>() = std::move(item);
+            type_identity = get_type_id<T>();
+        }
+        
+        template <typename T, 
+                  typename std::enable_if<not std::is_same<T,type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>>::value>::type* = nullptr>
+        type_safe_union& operator= ( 
+            T&& item
+        ) 
+        { 
+            validate_type<T>();
+            if (type_identity != 0 && type_identity != get_type_id<T>())
+                destruct();
+            unchecked_get<T>() = std::move(item);
+            type_identity = get_type_id<T>();
+            return *this;
+        }
+        
         ~type_safe_union()
         {
             destruct();
@@ -552,11 +602,7 @@ namespace dlib
                 return *static_cast<T*>(mem.get());
             else
                 throw bad_type_safe_union_cast();
-        }
-
-        template <typename T>
-        type_safe_union& operator= ( const T& item) { get<T>() = item; return *this; }
-
+        }        
     };
 
 // ----------------------------------------------------------------------------------------
