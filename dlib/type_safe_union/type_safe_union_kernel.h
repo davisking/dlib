@@ -295,7 +295,8 @@ namespace dlib
             return *this;
         }
         
-        template <typename T, typename std::enable_if<not std::is_same<T,type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>>::value>::type* = nullptr>
+        template <typename T, 
+                  typename std::enable_if<not std::is_same<T,type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>>::value>::type* = nullptr>
         type_safe_union (
             T&& item
         ) : type_identity(0)
