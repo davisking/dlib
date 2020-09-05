@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <dlib/algs.h>
+#include <dlib/metaprogramming.h>
 
 #include "tester.h"
 
@@ -70,6 +71,41 @@ namespace
     }
 
 
+    void test_call_if_valid() 
+    {
+        int value = 0;
+
+        auto foo = [&](int a, int b) { value += a + b; };
+        auto bar = [&](std::string) { value++; };
+        auto baz = [&]() { value++; };
+
+        DLIB_TEST(value == 0);
+        DLIB_TEST(call_if_valid(baz));
+        DLIB_TEST(value == 1);
+        DLIB_TEST(!call_if_valid(foo));
+        DLIB_TEST(value == 1);
+        DLIB_TEST(!call_if_valid(bar));
+        DLIB_TEST(value == 1);
+        DLIB_TEST(call_if_valid(bar, "stuff"));
+        DLIB_TEST(value == 2);
+        DLIB_TEST(!call_if_valid(baz, "stuff"));
+        DLIB_TEST(value == 2);
+        DLIB_TEST(call_if_valid(foo, 3, 1));
+        DLIB_TEST(value == 6);
+        DLIB_TEST(!call_if_valid(bar, 3, 1));
+        DLIB_TEST(value == 6);
+
+
+        // make sure stateful lambdas are modified when called
+        value = 0;
+        auto stateful = [&value, i = value]() mutable { ++i; value = i; };
+        DLIB_TEST(call_if_valid(stateful));
+        DLIB_TEST(value == 1);
+        DLIB_TEST(call_if_valid(stateful));
+        DLIB_TEST(value == 2);
+        DLIB_TEST(call_if_valid(stateful));
+        DLIB_TEST(value == 3);
+    }
 
 
     class metaprogramming_tester : public tester
@@ -85,6 +121,7 @@ namespace
         )
         {
             metaprogramming_test();
+            test_call_if_valid();
         }
     } a;
 

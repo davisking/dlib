@@ -3,6 +3,7 @@
 #ifndef DLIB_METApROGRAMMING_Hh_
 #define DLIB_METApROGRAMMING_Hh_
 
+#include "algs.h"
 
 namespace dlib
 {
@@ -61,6 +62,45 @@ namespace dlib
     };
     // base case
     template <> struct make_compile_time_integer_range<0> { typedef compile_time_integer_list<> type; };
+
+// ----------------------------------------------------------------------------------------
+
+    namespace impl
+    {
+        template <
+            typename Funct, 
+            typename... Args,
+            typename int_<decltype(std::declval<Funct>()(std::declval<Args>()...))>::type = 0
+            >
+        bool call_if_valid (
+            special_,
+            Funct&& f, Args&&... args
+        ) 
+        {  
+            f(std::forward<Args>(args)...);
+            return true;
+        }
+
+        template <
+            typename Funct, 
+            typename... Args
+            >
+        bool call_if_valid (
+            general_,
+            Funct&& /*f*/, Args&&... /*args*/
+        ) { return false; }
+    }
+
+    template <typename Funct, typename... Args>
+    bool call_if_valid(Funct&& f, Args&&... args) 
+    /*!
+        ensures
+            - if f(std::forward<Args>(args)...) is a valid expression then we evaluate it and return
+              true.  Otherwise we do nothing and return false.
+    !*/
+    {
+        return impl::call_if_valid(special_(), f, std::forward<Args>(args)...);
+    }
 
 // ----------------------------------------------------------------------------------------
 
