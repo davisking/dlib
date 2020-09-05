@@ -47,16 +47,10 @@ public:
     visitor_weight_decay_multiplier(double new_weight_decay_multiplier_) :
         new_weight_decay_multiplier(new_weight_decay_multiplier_) {}
 
-    template<typename input_layer_type>
-    void operator()(size_t , input_layer_type& )  const
+    template <typename layer>
+    void operator()(layer& l) const
     {
-        // ignore other layers
-    }
-
-    template <typename T, typename U, typename E>
-    void operator()(size_t , add_layer<T,U,E>& l)  const
-    {
-        set_weight_decay_multiplier(l.layer_details(), new_weight_decay_multiplier);
+        set_weight_decay_multiplier(l, new_weight_decay_multiplier);
     }
 
 private:
@@ -98,7 +92,7 @@ int main() try
 
     // We can use the visit_layers function to modify the weight decay of the entire
     // network:
-    visit_layers(net, visitor_weight_decay_multiplier(0.001));
+    visit_computational_layers(net, visitor_weight_decay_multiplier(0.001));
 
     // We can also use predefined visitors to affect the learning rate of the whole
     // network.
@@ -109,14 +103,14 @@ int main() try
     // visitor that is very similar to the one defined in this example.
 
     // Usually, we want to freeze the network, except for the top layers:
-    visit_layers(net.subnet().subnet(), visitor_weight_decay_multiplier(0));
+    visit_computational_layers(net.subnet().subnet(), visitor_weight_decay_multiplier(0));
     set_all_learning_rate_multipliers(net.subnet().subnet(), 0);
 
     // Alternatively, we can use the visit_layers_range to modify only a specific set of
     // layers:
-    visit_layers_range<0, 2>(net, visitor_weight_decay_multiplier(1));
+    visit_computational_layers_range<0, 2>(net, visitor_weight_decay_multiplier(1));
 
-    // Sometimes we might want to set the learning rate differently thoughout the network.
+    // Sometimes we might want to set the learning rate differently throughout the network.
     // Here we show how to use adjust the learning rate at the different ResNet50's
     // convolutional blocks:
     set_learning_rate_multipliers_range<  0,   2>(net, 1);
@@ -143,7 +137,7 @@ int main() try
     // We can also print the number of parameters of the network:
     cout << "number of network parameters: " << count_parameters(net) << endl;
 
-    // From this point on, we can finetune the new network using this pretrained backbone
+    // From this point on, we can fine-tune the new network using this pretrained backbone
     // on another task, such as the one showed in dnn_metric_learning_on_images_ex.cpp.
 
     return EXIT_SUCCESS;

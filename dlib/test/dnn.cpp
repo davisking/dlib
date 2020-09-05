@@ -1995,14 +1995,14 @@ namespace
             pres<res<res<res_down< // 2 prelu layers here
             tag4<repeat<9,pres,    // 9 groups, each containing 2 prelu layers  
             res_down<
-            res<
+            leaky_relu<res<
             input<matrix<unsigned char>>
-            >>>>>>>>>>>;
+            >>>>>>>>>>>>;
 
         net_type2 pnet;
 
-        DLIB_TEST_MSG(pnet.num_layers == 131, pnet.num_layers);
-        DLIB_TEST_MSG(pnet.num_computational_layers == 109, pnet.num_computational_layers);
+        DLIB_TEST_MSG(pnet.num_layers == 132, pnet.num_layers);
+        DLIB_TEST_MSG(pnet.num_computational_layers == 110, pnet.num_computational_layers);
 
         std::vector<bool> hit(pnet.num_computational_layers, false);
         size_t count = 0;
@@ -2017,6 +2017,14 @@ namespace
         for (auto x : hit2)
             DLIB_TEST(x);
         DLIB_TEST(count == pnet.num_computational_layers);
+
+        int num_relus = 0;
+        visit_computational_layers(pnet, [&num_relus](relu_&) { ++num_relus; });
+        DLIB_TEST(num_relus == 10);
+
+        DLIB_TEST(layer<leaky_relu>(pnet).layer_details().get_alpha() == 0.01f);
+        visit_computational_layers(pnet, [](leaky_relu_& l) { l = leaky_relu_(0.001f); });
+        DLIB_TEST(layer<leaky_relu>(pnet).layer_details().get_alpha() == 0.001f);
     }
 
     float tensor_read_cpu(const tensor& t, long i, long k, long r, long c)

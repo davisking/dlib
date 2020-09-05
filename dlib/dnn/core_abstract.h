@@ -1676,6 +1676,8 @@ namespace dlib
               add_tag_layer.
             - v is a function object with a signature equivalent to: 
                 v(size_t idx, tensor& t)
+              or:
+                v(tensor& t)
         ensures
             - Loops over all the computational layers (i.e. layers with parameters, as
               opposed to loss, tag, or input layers) in net and passes their parameters to
@@ -1709,6 +1711,8 @@ namespace dlib
               add_tag_layer.
             - v is a function object with a signature equivalent to: 
                 v(size_t idx, tensor& t)
+              or:
+                v(tensor& t)
         ensures
             - Loops over all the computational layers (i.e. layers with parameters, as
               opposed to loss, tag, or input layers) in net and passes their parameter
@@ -1743,7 +1747,9 @@ namespace dlib
               add_tag_layer.
             - v is a function object with a signature equivalent to: 
                 v(size_t idx, any_net_type& t)
-              That is, it must take a size_t and then any of the network types such as
+              or:
+                v(any_net_type& t)
+              That is, it takes an optional size_t and then any of the network types such as
               add_layer, add_loss_layer, etc.
         ensures
             - Loops over all the layers in net and calls v() on them.  To be specific, this
@@ -1767,7 +1773,9 @@ namespace dlib
               add_tag_layer.
             - v is a function object with a signature equivalent to: 
                 v(size_t idx, any_net_type& t)
-              That is, it must take a size_t and then any of the network types such as
+              or:
+                v(any_net_type& t)
+              That is, it takes an optional size_t and then any of the network types such as
               add_layer, add_loss_layer, etc.
         ensures
             - Loops over all the layers in net and calls v() on them.  The loop happens in
@@ -1776,6 +1784,64 @@ namespace dlib
 
                 for (size_t i = net_type::num_layers; i != 0; --i)
                     v(i-1, layer<i-1>(net));
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename net_type,
+        typename visitor
+        >
+    void visit_computational_layers(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_computational_layer& t)
+              or:
+                v(any_computational_layer& t)
+              That is, it takes an optional size_t and then any of the computational layers.  E.g.
+              one of the layer types defined in dlib/dnn/layers_abstract.h like fc_ or conv_.
+        ensures
+            - Loops over all the computational layers in net and calls v() on them.  To be specific, this
+              function essentially performs the following:
+
+                for (size_t i = 0; i < net_type::num_layers; ++i)
+                    if (layer<i>(net) is an add_layer type, i.e. it adds a computational layer)
+                        v(i, layer<i>(net).layer_details());
+    !*/
+
+    template <
+        size_t begin,
+        size_t end,
+        typename net_type,
+        typename visitor
+        >
+    void visit_computational_layers_range(
+        net_type& net,
+        visitor v
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - v is a function object with a signature equivalent to: 
+                v(size_t idx, any_computational_layer& t)
+              or:
+                v(any_computational_layer& t)
+              That is, it takes an optional size_t and then any of the computational layers.  E.g.
+              one of the layer types defined in dlib/dnn/layers_abstract.h like fc_ or conv_.
+        ensures
+            - Loops over all the computational layers in the range [begin,end) in net and calls v()
+              on them.  To be specific, this function essentially performs the following:
+
+                for (size_t i = begin; i < end; ++i)
+                    if (layer<i>(net) is an add_layer type, i.e. it adds a computational layer)
+                        v(i, layer<i>(net).layer_details());
     !*/
 
 // ----------------------------------------------------------------------------------------
@@ -1796,13 +1862,14 @@ namespace dlib
               add_tag_layer.
             - v is a function object with a signature equivalent to: 
                 v(size_t idx, any_net_type& t)
-              That is, it must take a size_t and then any of the network types such as
+              or:
+                v(any_net_type& t)
+              That is, it takes an optional size_t and then any of the network types such as
               add_layer, add_loss_layer, etc.
             - begin <= end <= net_type::num_layers
         ensures
             - Loops over the layers in the range [begin,end) in net and calls v() on them.
-              The loop happens in the reverse order of visit_layers().  To be specific,
-              this function essentially performs the following:
+              To be specific, this function essentially performs the following:
 
                 for (size_t i = begin; i < end; ++i)
                     v(i, layer<i>(net));
@@ -1824,7 +1891,9 @@ namespace dlib
               add_tag_layer.
             - v is a function object with a signature equivalent to: 
                 v(size_t idx, any_net_type& t)
-              That is, it must take a size_t and then any of the network types such as
+              or:
+                v(any_net_type& t)
+              That is, it takes an optional size_t and then any of the network types such as
               add_layer, add_loss_layer, etc.
             - begin <= end <= net_type::num_layers
         ensures

@@ -667,7 +667,7 @@ namespace dlib
             // periodically copy these tensors to all the other devices to make sure the
             // different GPUs don't go out of sync.
             std::vector<tensor*> reference_params;
-            visit_layer_parameters(devices[0]->net, [&](size_t, tensor& t) { reference_params.push_back(&t); });
+            visit_layer_parameters(devices[0]->net, [&](tensor& t) { reference_params.push_back(&t); });
 
             // If no external thread pools vector was passed, then create one that will
             // be automatically destructed as soon as the dnn_trainer object goes out of
