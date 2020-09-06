@@ -115,7 +115,6 @@ namespace std
 #include "enable_if.h"
 #include "uintn.h"
 #include "numeric_constants.h"
-#include "platform.h" // for WIN32
 #include "memory_manager_stateless/memory_manager_stateless_kernel_1.h" // for the default memory manager
 
 
@@ -426,7 +425,6 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
     
-#ifndef WIN32 //For some reason, the visual studio compiler throws error : error C2210: 'to': pack expansions cannot be used as arguments to non-packed parameters in alias templates
     /*!A is_any 
 
         This is a template where is_any<T,U,V>::value == true when T is the same type as U or V and false otherwise.   
@@ -442,7 +440,6 @@ namespace dlib
     struct is_any<T, First, Rest...>
         : std::integral_constant<bool, std::is_same<T, First>::value || is_any<T, Rest...>::value>
     {};
-#endif
 // ----------------------------------------------------------------------------------------
 
     /*!A is_float_type
@@ -469,7 +466,6 @@ namespace dlib
     template <typename from, typename to>
     using is_convertible = std::is_convertible<from,to>;    
     
-#ifndef WIN32 //For some reason, the visual studio compiler throws error : error C2210: 'to': pack expansions cannot be used as arguments to non-packed parameters in alias templates
     template<typename T, typename... Rest>
     struct is_convertible_any : std::false_type {};
 
@@ -480,7 +476,6 @@ namespace dlib
     struct is_convertible_any<T, First, Rest...>
         : std::integral_constant<bool, is_convertible<T, First>::value || is_convertible<T, Rest...>::value>
     {};
-#endif 
 // ----------------------------------------------------------------------------------------
 
     struct general_ {};
