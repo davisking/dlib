@@ -2000,31 +2000,69 @@ namespace
             >>>>>>>>>>>>;
 
         net_type2 pnet;
+        const net_type2& const_pnet = pnet;
 
         DLIB_TEST_MSG(pnet.num_layers == 132, pnet.num_layers);
         DLIB_TEST_MSG(pnet.num_computational_layers == 110, pnet.num_computational_layers);
 
-        std::vector<bool> hit(pnet.num_computational_layers, false);
-        size_t count = 0;
-        visit_layer_parameter_gradients(pnet, [&](size_t i, tensor& ){hit[i] = true; ++count; });
-        for (auto x : hit)
-            DLIB_TEST(x);
-        DLIB_TEST(count == pnet.num_computational_layers);
+        {
+            std::vector<bool> hit(pnet.num_computational_layers, false);
+            size_t count = 0;
+            visit_layer_parameter_gradients(pnet, [&](size_t i, tensor& ){hit[i] = true; ++count; });
+            for (auto x : hit)
+                DLIB_TEST(x);
+            DLIB_TEST(count == pnet.num_computational_layers);
+        }
+        {
+            std::vector<bool> hit(pnet.num_computational_layers, false);
+            size_t count = 0;
+            visit_layer_parameter_gradients(const_pnet, [&](size_t i, const tensor& ){hit[i] = true; ++count; });
+            for (auto x : hit)
+                DLIB_TEST(x);
+            DLIB_TEST(count == pnet.num_computational_layers);
+        }
 
-        count = 0;
-        std::vector<bool> hit2(pnet.num_computational_layers, false);
-        visit_layer_parameters(pnet, [&](size_t i, tensor& ){hit2[i] = true; ++count; });
-        for (auto x : hit2)
-            DLIB_TEST(x);
-        DLIB_TEST(count == pnet.num_computational_layers);
+        {
+            size_t count = 0;
+            std::vector<bool> hit2(pnet.num_computational_layers, false);
+            visit_layer_parameters(pnet, [&](size_t i, tensor& ){hit2[i] = true; ++count; });
+            for (auto x : hit2)
+                DLIB_TEST(x);
+            DLIB_TEST(count == pnet.num_computational_layers);
+        }
+        {
+            size_t count = 0;
+            std::vector<bool> hit2(pnet.num_computational_layers, false);
+            visit_layer_parameters(const_pnet, [&](size_t i, const tensor& ){hit2[i] = true; ++count; });
+            for (auto x : hit2)
+                DLIB_TEST(x);
+            DLIB_TEST(count == pnet.num_computational_layers);
+        }
 
         int num_relus = 0;
         visit_computational_layers(pnet, [&num_relus](relu_&) { ++num_relus; });
         DLIB_TEST(num_relus == 10);
+        num_relus = 0;
+        visit_computational_layers(const_pnet, [&num_relus](const relu_&) { ++num_relus; });
+        DLIB_TEST(num_relus == 10);
+        num_relus = 0;
+        visit_computational_layers(const_pnet, [&num_relus](relu_&) { ++num_relus; });
+        // Visiting doesn't happen in this case because a const network can't bind the non-const
+        // relu_ reference used above. 
+        DLIB_TEST(num_relus == 0);
 
         DLIB_TEST(layer<leaky_relu>(pnet).layer_details().get_alpha() == 0.01f);
         visit_computational_layers(pnet, [](leaky_relu_& l) { l = leaky_relu_(0.001f); });
         DLIB_TEST(layer<leaky_relu>(pnet).layer_details().get_alpha() == 0.001f);
+
+        // make sure count_parameters() works since it depends on visiting too.  Initially the
+        // network has 0 parameters.  But once we run something through it it will allocate its
+        // parameters.
+        DLIB_TEST_MSG(count_parameters(pnet) == 0, "count_parameters(pnet): "<< count_parameters(pnet));
+        const matrix<unsigned char> input = zeros_matrix<unsigned char>(40,40);
+        pnet(input);
+        DLIB_TEST_MSG(count_parameters(pnet) == 17606, "count_parameters(pnet): "<< count_parameters(pnet));
+
     }
 
     float tensor_read_cpu(const tensor& t, long i, long k, long r, long c)

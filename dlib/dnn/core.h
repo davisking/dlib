@@ -3680,13 +3680,21 @@ namespace dlib
         public:
             explicit visitor_computational_layer(visitor& v) : v_(v) {}
 
-            template <typename T, typename U, typename E>
-            void operator()(size_t idx, add_layer<T,U,E>& l) const
+            template <typename layer>
+            void do_visit(size_t idx, layer& l) const
             {
                 // Call whatever version of the visitor the user provided.
                 call_if_valid(v_, idx, l.layer_details());
                 call_if_valid(v_, l.layer_details());
             }
+
+            // const case
+            template <typename T, typename U, typename E>
+            void operator()(size_t idx, const add_layer<T,U,E>& l) const { do_visit(idx, l); }
+            // non-const cast
+            template <typename T, typename U, typename E>
+            void operator()(size_t idx, add_layer<T,U,E>& l) const { do_visit(idx, l); }
+
         private:
 
             visitor& v_;
@@ -3771,8 +3779,8 @@ namespace dlib
         public:
             explicit visit_layer_parameter_gradients(visitor& v) : v_(v) {}
 
-            template <typename T, typename U, typename E>
-            void operator()(add_layer<T,U,E>& l) 
+            template <typename layer>
+            void do_visit(layer& l) 
             {
                 // Call whatever version of the visitor the user provided.
                 const bool visitor_called = call_if_valid(v_, computational_layer_idx, l.get_parameter_gradient()) ||
@@ -3780,6 +3788,14 @@ namespace dlib
                 DLIB_CASSERT(visitor_called, "A visitor function with an incorrect signature was given to visit_layer_parameter_gradients()");
                 ++computational_layer_idx;
             }
+
+            // const version
+            template <typename T, typename U, typename E>
+            void operator()(const add_layer<T,U,E>& l) { do_visit(l); }
+            // non-const version
+            template <typename T, typename U, typename E>
+            void operator()(add_layer<T,U,E>& l) { do_visit(l); }
+
         private:
 
             size_t computational_layer_idx = 0;
