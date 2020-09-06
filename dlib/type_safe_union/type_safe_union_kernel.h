@@ -122,29 +122,7 @@ namespace dlib
             // representable by this type_safe_union.  I.e. The given
             // type T isn't one of the ones given to this object's template
             // arguments.
-            COMPILE_TIME_ASSERT(( is_same_type<T,T1>::value ||
-                                 is_same_type<T,T2>::value ||
-                                 is_same_type<T,T3>::value ||
-                                 is_same_type<T,T4>::value ||
-                                 is_same_type<T,T5>::value ||
-                                 is_same_type<T,T6>::value ||
-                                 is_same_type<T,T7>::value ||
-                                 is_same_type<T,T8>::value ||
-                                 is_same_type<T,T9>::value ||
-                                 is_same_type<T,T10>::value ||
-
-                                 is_same_type<T,T11>::value ||
-                                 is_same_type<T,T12>::value ||
-                                 is_same_type<T,T13>::value ||
-                                 is_same_type<T,T14>::value ||
-                                 is_same_type<T,T15>::value ||
-                                 is_same_type<T,T16>::value ||
-                                 is_same_type<T,T17>::value ||
-                                 is_same_type<T,T18>::value ||
-                                 is_same_type<T,T19>::value ||
-                                 is_same_type<T,T20>::value 
-                                    ));
-
+            COMPILE_TIME_ASSERT((is_any<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>::value));
         }
 
 
@@ -305,7 +283,7 @@ namespace dlib
         ) : type_identity(0)
         {
             validate_type<T>();
-            unchecked_get<T>() = std::move(item);
+            new(mem.get()) T(std::move(item)); 
             type_identity = get_type_id<T>();
         }
         
@@ -317,10 +295,16 @@ namespace dlib
         ) 
         { 
             validate_type<T>();
-            if (type_identity != 0 && type_identity != get_type_id<T>())
+            if( type_identity == get_type_id<T>() )
+            {
+                unchecked_get<T>() = std::move(item);
+            }
+            else
+            {
                 destruct();
-            unchecked_get<T>() = std::move(item);
-            type_identity = get_type_id<T>();
+                new(mem.get()) T(std::move(item)); 
+                type_identity = get_type_id<T>();
+            }
             return *this;
         }
         
@@ -622,40 +606,6 @@ namespace dlib
         type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& a, 
         type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>& b 
     ) { a.swap(b); }   
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename from, 
-        typename T1, typename T2, typename T3, typename T4, typename T5,
-        typename T6, typename T7, typename T8, typename T9, typename T10,
-        typename T11, typename T12, typename T13, typename T14, typename T15,
-        typename T16, typename T17, typename T18, typename T19, typename T20
-        >
-    struct is_convertible<from,
-        type_safe_union<T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20> >
-    {
-        const static bool value = is_convertible<from,T1>::value ||
-                                  is_convertible<from,T2>::value ||
-                                  is_convertible<from,T3>::value ||
-                                  is_convertible<from,T4>::value ||
-                                  is_convertible<from,T5>::value ||
-                                  is_convertible<from,T6>::value ||
-                                  is_convertible<from,T7>::value ||
-                                  is_convertible<from,T8>::value ||
-                                  is_convertible<from,T9>::value ||
-                                  is_convertible<from,T10>::value ||
-                                  is_convertible<from,T11>::value ||
-                                  is_convertible<from,T12>::value ||
-                                  is_convertible<from,T13>::value ||
-                                  is_convertible<from,T14>::value ||
-                                  is_convertible<from,T15>::value ||
-                                  is_convertible<from,T16>::value ||
-                                  is_convertible<from,T17>::value ||
-                                  is_convertible<from,T18>::value ||
-                                  is_convertible<from,T19>::value ||
-                                  is_convertible<from,T20>::value;
-    };
 
 // ----------------------------------------------------------------------------------------
 
