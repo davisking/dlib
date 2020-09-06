@@ -26,7 +26,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    struct _void{};
     inline void serialize( const _void&, std::ostream&){}
     inline void deserialize(  _void&, std::istream&){}
 
