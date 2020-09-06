@@ -98,7 +98,8 @@ namespace
 
         // make sure stateful lambdas are modified when called
         value = 0;
-        auto stateful = [&value, i = value]() mutable { ++i; value = i; };
+        int i = 0;
+        auto stateful = [&value, i]() mutable { ++i; value = i; };
         DLIB_TEST(call_if_valid(stateful));
         DLIB_TEST(value == 1);
         DLIB_TEST(call_if_valid(stateful));
