@@ -260,8 +260,8 @@ namespace dlib
             const T& item
         ) : type_identity(0)
         {
-            validate_type<T>();
-            construct(item);
+            new(mem.get()) T(item); 
+            type_identity = get_type_id<T>();
         }
         
         template <typename T 
@@ -282,7 +282,6 @@ namespace dlib
             T&& item
         ) : type_identity(0)
         {
-            validate_type<T>();
             new(mem.get()) T(std::move(item)); 
             type_identity = get_type_id<T>();
         }
@@ -294,7 +293,6 @@ namespace dlib
             T&& item
         ) 
         { 
-            validate_type<T>();
             if( type_identity == get_type_id<T>() )
             {
                 unchecked_get<T>() = std::move(item);
