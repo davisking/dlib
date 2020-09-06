@@ -85,7 +85,7 @@ namespace dlib
         }
 
 
-        const static size_t max_size = tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<
+        constexpr static size_t max_size = tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<
                                        tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<sizeof(T1),
                                                         sizeof(T2)>::value,
                                                         sizeof(T3)>::value,
@@ -560,31 +560,31 @@ namespace dlib
             }
         }
 
-        template <typename T> 
+        template <typename T
+                 ,typename std::enable_if<dlib::is_any<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>::value>::type* = nullptr> 
         T& get(
         ) 
         { 
-            validate_type<T>();
             construct<T>();  
             return *static_cast<T*>(mem.get()); 
         }
 
-        template <typename T>
+        template <typename T
+                 ,typename std::enable_if<dlib::is_any<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>::value>::type* = nullptr> 
         const T& cast_to (
         ) const
         {
-            validate_type<T>();
             if (contains<T>())
                 return *static_cast<const T*>(mem.get());
             else
                 throw bad_type_safe_union_cast();
         }
 
-        template <typename T>
+        template <typename T
+                 ,typename std::enable_if<dlib::is_any<T,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10, T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>::value>::type* = nullptr> 
         T& cast_to (
         ) 
         {
-            validate_type<T>();
             if (contains<T>())
                 return *static_cast<T*>(mem.get());
             else
