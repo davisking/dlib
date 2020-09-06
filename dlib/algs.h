@@ -423,6 +423,8 @@ namespace dlib
     template <typename T, typename U>
     using is_same_type = std::is_same<T,U>;
     
+    
+    struct _void{};
 // ----------------------------------------------------------------------------------------
     
     /*!A is_any 
@@ -430,6 +432,7 @@ namespace dlib
         This is a template where is_any<T,U,V>::value == true when T is the same type as U or V and false otherwise.   
     !*/
     
+#ifndef WIN32
     template<typename T, typename... Rest>
     struct is_any : std::false_type {};
 
@@ -440,6 +443,76 @@ namespace dlib
     struct is_any<T, First, Rest...>
         : std::integral_constant<bool, std::is_same<T, First>::value || is_any<T, Rest...>::value>
     {};
+#else
+    //Visual studio workaround
+    template<typename T, 
+             typename T1,
+             typename T2 = _void,
+             typename T3 = _void,
+             typename T4 = _void,
+             typename T5 = _void, 
+             typename T6 = _void,
+             typename T7 = _void,
+             typename T8 = _void,
+             typename T9 = _void,
+             typename T10 = _void,
+
+             typename T11 = _void,
+             typename T12 = _void,
+             typename T13 = _void,
+             typename T14 = _void,
+             typename T15 = _void,
+             typename T16 = _void,
+             typename T17 = _void,
+             typename T18 = _void,
+             typename T19 = _void,
+             typename T20 = _void,
+            
+             typename T21 = _void,
+             typename T22 = _void,
+             typename T23 = _void,
+             typename T24 = _void,
+             typename T25 = _void,
+             typename T26 = _void,
+             typename T27 = _void,
+             typename T28 = _void,
+             typename T29 = _void,
+             typename T30 = _void>
+    struct is_any : std::integral_constant<bool, 
+                                           std::is_same<T, T1>::value || 
+                                           std::is_same<T, T2>::value || 
+                                           std::is_same<T, T3>::value || 
+                                           std::is_same<T, T4>::value || 
+                                           std::is_same<T, T5>::value || 
+                                           std::is_same<T, T6>::value || 
+                                           std::is_same<T, T7>::value || 
+                                           std::is_same<T, T8>::value || 
+                                           std::is_same<T, T9>::value || 
+                                           std::is_same<T, T10>::value || 
+                                           
+                                           std::is_same<T, T11>::value || 
+                                           std::is_same<T, T12>::value || 
+                                           std::is_same<T, T13>::value || 
+                                           std::is_same<T, T14>::value || 
+                                           std::is_same<T, T15>::value || 
+                                           std::is_same<T, T16>::value || 
+                                           std::is_same<T, T17>::value || 
+                                           std::is_same<T, T18>::value || 
+                                           std::is_same<T, T19>::value || 
+                                           std::is_same<T, T20>::value || 
+    
+                                           std::is_same<T, T21>::value || 
+                                           std::is_same<T, T22>::value || 
+                                           std::is_same<T, T23>::value || 
+                                           std::is_same<T, T24>::value || 
+                                           std::is_same<T, T25>::value || 
+                                           std::is_same<T, T26>::value || 
+                                           std::is_same<T, T27>::value || 
+                                           std::is_same<T, T28>::value || 
+                                           std::is_same<T, T29>::value || 
+                                           std::is_same<T, T30>::value 
+                                          > {};
+#endif
 // ----------------------------------------------------------------------------------------
 
     /*!A is_float_type
@@ -466,6 +539,7 @@ namespace dlib
     template <typename from, typename to>
     using is_convertible = std::is_convertible<from,to>;    
     
+#ifndef WIN32
     template<typename T, typename... Rest>
     struct is_convertible_any : std::false_type {};
 
@@ -476,6 +550,76 @@ namespace dlib
     struct is_convertible_any<T, First, Rest...>
         : std::integral_constant<bool, is_convertible<T, First>::value || is_convertible<T, Rest...>::value>
     {};
+#else
+        //Visual studio workaround
+    template<typename T, 
+             typename T1,
+             typename T2 = _void,
+             typename T3 = _void,
+             typename T4 = _void,
+             typename T5 = _void, 
+             typename T6 = _void,
+             typename T7 = _void,
+             typename T8 = _void,
+             typename T9 = _void,
+             typename T10 = _void,
+
+             typename T11 = _void,
+             typename T12 = _void,
+             typename T13 = _void,
+             typename T14 = _void,
+             typename T15 = _void,
+             typename T16 = _void,
+             typename T17 = _void,
+             typename T18 = _void,
+             typename T19 = _void,
+             typename T20 = _void,
+            
+             typename T21 = _void,
+             typename T22 = _void,
+             typename T23 = _void,
+             typename T24 = _void,
+             typename T25 = _void,
+             typename T26 = _void,
+             typename T27 = _void,
+             typename T28 = _void,
+             typename T29 = _void,
+             typename T30 = _void>
+    struct is_convertible_any : std::integral_constant<bool, 
+                                           std::is_convertible<T, T1>::value || 
+                                           std::is_convertible<T, T2>::value || 
+                                           std::is_convertible<T, T3>::value || 
+                                           std::is_convertible<T, T4>::value || 
+                                           std::is_convertible<T, T5>::value || 
+                                           std::is_convertible<T, T6>::value || 
+                                           std::is_convertible<T, T7>::value || 
+                                           std::is_convertible<T, T8>::value || 
+                                           std::is_convertible<T, T9>::value || 
+                                           std::is_convertible<T, T10>::value || 
+                                           
+                                           std::is_convertible<T, T11>::value || 
+                                           std::is_convertible<T, T12>::value || 
+                                           std::is_convertible<T, T13>::value || 
+                                           std::is_convertible<T, T14>::value || 
+                                           std::is_convertible<T, T15>::value || 
+                                           std::is_convertible<T, T16>::value || 
+                                           std::is_convertible<T, T17>::value || 
+                                           std::is_convertible<T, T18>::value || 
+                                           std::is_convertible<T, T19>::value || 
+                                           std::is_convertible<T, T20>::value || 
+    
+                                           std::is_convertible<T, T21>::value || 
+                                           std::is_convertible<T, T22>::value || 
+                                           std::is_convertible<T, T23>::value || 
+                                           std::is_convertible<T, T24>::value || 
+                                           std::is_convertible<T, T25>::value || 
+                                           std::is_convertible<T, T26>::value || 
+                                           std::is_convertible<T, T27>::value || 
+                                           std::is_convertible<T, T28>::value || 
+                                           std::is_convertible<T, T29>::value || 
+                                           std::is_convertible<T, T30>::value 
+                                          > {};
+#endif
 // ----------------------------------------------------------------------------------------
 
     struct general_ {};
