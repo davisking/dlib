@@ -422,6 +422,42 @@ namespace
                 DLIB_TEST(a.contains<can_not_copy>() == true);
 
             }
+
+            {
+                type_safe_union<int,std::string> a, b;
+                a = std::string("asdf");
+                b = 3;
+                b = std::move(a);
+
+                DLIB_TEST(a.get<int>() == 3);
+                DLIB_TEST(b.get<std::string>() == "asdf");
+            }
+
+            {
+                type_safe_union<int,std::string> a = 3;
+                type_safe_union<int,std::string> b = std::string("asdf");
+
+                DLIB_TEST(a.get<int>() == 3);
+                DLIB_TEST(b.get<std::string>() == "asdf");
+            }
+
+            {
+                using ptr_t = std::unique_ptr<std::string>;
+                type_safe_union<int, ptr_t> a;
+                type_safe_union<int, ptr_t> b = ptr_t(new std::string("asdf"));
+
+                a = std::move(b);
+
+                DLIB_TEST(a.contains<ptr_t>());
+                DLIB_TEST(!b.contains<ptr_t>());
+                DLIB_TEST(*a.get<ptr_t>() == "asdf");
+
+                swap(a,b);
+
+                DLIB_TEST(b.contains<ptr_t>());
+                DLIB_TEST(!a.contains<ptr_t>());
+                DLIB_TEST(*b.get<ptr_t>() == "asdf");
+            }
         }
 
     };
