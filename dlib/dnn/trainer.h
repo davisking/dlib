@@ -764,7 +764,12 @@ namespace dlib
                         {
                             std::vector<tensor*> temp(all_tensors.size());
                             for (size_t j = 0; j < all_tensors.size(); ++j)
+                            {
                                 temp[j] = all_tensors[j][i];
+                                DLIB_CASSERT(temp[0]->size() == temp[j]->size(),
+                                "Make sure you don't modify the network structure "
+                                "or number of parameters after constructing the trainer.");
+                            }
                             // ignore layers that don't have parameters
                             if (temp[0]->size() != 0)
                                 averagers[i].set(temp);
