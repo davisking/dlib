@@ -32,6 +32,12 @@ SET(lapack_without_underscore 0)
 message(STATUS "Searching for BLAS and LAPACK")
 
 if (UNIX OR MINGW)
+   # Add distro detection. This to ensure Arch-based Linux Distro
+   # wouldn't face BLAS linking issue. Added by aviezab on 2020/09/09
+   message(STATUS "Checking Unix Distribution")
+   find_program(LSB_RELEASE_EXEC lsb_release)
+   execute_process(COMMAND ${LSB_RELEASE_EXEC} -is OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT 
+    OUTPUT_STRIP_TRAILING_WHITESPACE )
    message(STATUS "Searching for BLAS and LAPACK")
 
    if (BUILDING_MATLAB_MEX_FILE)
@@ -50,7 +56,15 @@ if (UNIX OR MINGW)
 
       # We need cblas since MATLAB doesn't provide cblas symbols.
       add_subdirectory(external/cblas)
-      set(blas_libraries  cblas  )
+      if("${LSB_RELEASE_ID_SHORT}" STREQUAL "Arch Linux" OR 
+	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "Arch" OR 
+	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ArcoLinux" OR 
+	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "EndeavourOS" OR 
+	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ManjaroLinux")
+	  	 set(blas_libraries "-lcblas;-lblas")
+	  else()
+	    set(blas_libraries  cblas)
+	  endif()
       set(blas_found 1)
       set(lapack_found 1)
       message(STATUS "Will link with MATLAB's BLAS and LAPACK at runtime (hopefully!)")
@@ -67,7 +81,15 @@ if (UNIX OR MINGW)
    pkg_check_modules(BLAS_REFERENCE cblas)
    pkg_check_modules(LAPACK_REFERENCE lapack)
    if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND)
-      set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
+     if("${LSB_RELEASE_ID_SHORT}" STREQUAL "Arch Linux" OR 
+	      "${LSB_RELEASE_ID_SHORT}" STREQUAL "Arch" OR 
+	      "${LSB_RELEASE_ID_SHORT}" STREQUAL "ArcoLinux" OR 
+	      "${LSB_RELEASE_ID_SHORT}" STREQUAL "EndeavourOS" OR 
+	      "${LSB_RELEASE_ID_SHORT}" STREQUAL "ManjaroLinux")
+	  	   set(blas_libraries "-lcblas;-lblas")
+	  else()
+	    set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
+	  endif()
       set(lapack_libraries "${LAPACK_REFERENCE_LDFLAGS}")
       set(blas_found 1)
       set(lapack_found 1)
