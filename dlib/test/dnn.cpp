@@ -3706,6 +3706,58 @@ namespace
 
     }
 
+    void test_layers_scale_and_scale_prev()
+    {
+        print_spinner();
+        using net_type1 = scale1<con<3,1,1,1,1,avg_pool_everything<tag1<input_rgb_image>>>>;
+        using net_type2 = scale_prev2<skip1<tag2<con<3,1,1,1,1,avg_pool_everything<tag1<input_rgb_image>>>>>>;
+
+        dlib::tt::tensor_rand rnd;
+        dlib::resizable_tensor x(1, 3, 64, 64);
+        rnd.fill_gaussian(x);
+        net_type1 net1;
+        net_type2 net2;
+        net1.forward(x);
+        net2.forward(x);
+
+        // make sure both convolutional layers have the same weights
+        layer<3>(net2).layer_details() = layer<1>(net1).layer_details();
+        const auto& params1 = layer<1>(net1).layer_details().get_layer_params();
+        const auto& params2 = layer<3>(net2).layer_details().get_layer_params();
+        DLIB_CASSERT(params1.size() == params2.size());
+        for (size_t i = 0; i < params1.size(); ++i)
+        {
+            DLIB_CASSERT(*(params1.begin() + i) == *(params2.begin() + i));
+        }
+        net2.forward(x);
+
+        // make sure both outputs are the same
+        const auto& out1 = net1.get_output();
+        const auto& out2 = net2.get_output();
+        DLIB_TEST(out1.size() == out2.size());
+        for (size_t i = 0; i < out1.size(); ++i)
+        {
+            DLIB_TEST(*(out1.begin() + i) == *(out2.begin() + i));
+        }
+
+        // make sure gradients are the same (within some precision)
+        const double epsilon = 1e-4;
+        dlib::resizable_tensor gradient(out1);
+        rnd.fill_gaussian(gradient);
+
+        net1.back_propagate_error(x, gradient);
+        const auto& grad1 = layer<1>(net1).get_parameter_gradient();
+
+        net2.back_propagate_error(x, gradient);
+        const auto& grad2 = layer<3>(net2).get_parameter_gradient();
+
+        DLIB_TEST(grad1.size() == grad2.size());
+        for (size_t i = 0; i < grad1.size(); ++i)
+        {
+            DLIB_TEST(::std::abs(*(grad1.begin() + i) - *(grad2.begin() + i)) < epsilon);
+        }
+    }
+
 // ----------------------------------------------------------------------------------------
     
     // This test really just checks if the mmod loss goes negative when a whole lot of overlapping
@@ -3887,6 +3939,7 @@ namespace
             test_loss_dot();
             test_loss_multimulticlass_log();
             test_loss_mmod();
+            test_layers_scale_and_scale_prev();
         }
 
         void perform_test()
