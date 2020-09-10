@@ -2764,9 +2764,6 @@ namespace dlib
         {
             auto&& src = sub.get_output();
             auto&& scales = layer<tag>(sub).get_output();
-            // The gradient just flows backwards to the two layers that forward()
-            // read from.
-            // tt::scale_channels(true, layer<tag>(sub).get_gradient_input(), gradient_input, scales);
             tt::scale_channels(true, sub.get_gradient_input(), gradient_input, scales);
 
             if (reshape_src.num_samples() != src.num_samples())
@@ -2775,7 +2772,7 @@ namespace dlib
                 reshape_src = alias_tensor(src.num_samples()*src.k(),src.nr()*src.nc());
             }
 
-            auto&& scales_grad = sub.get_gradient_input();
+            auto&& scales_grad = layer<tag>(sub).get_gradient_input();
             auto sgrad = reshape_scales(scales_grad);
             tt::dot_prods(true, sgrad, reshape_src(src), reshape_src(gradient_input));
         }
