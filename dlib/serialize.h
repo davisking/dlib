@@ -1837,11 +1837,11 @@ namespace dlib
     }                                                                   \
     inline friend void serialize(const Type& item, std::ostream& out)   \
     {                                                                   \
-        item.serialize_all(out);                                        \
+        item.serialize_to(out);                                         \
     }                                                                   \
     inline friend void deserialize(Type& item, std::istream& in)        \
     {                                                                   \
-        item.deserialize_all(in);                                       \
+        item.deserialize_from(in);                                      \
     }
 }
 
