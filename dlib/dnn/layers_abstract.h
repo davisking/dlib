@@ -2656,6 +2656,80 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <
+        template<typename> class tag
+        >
+    class scale_prev_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  This layer scales the output channels of the tagged layer
+                by multiplying it with the output of the previous layer.  It is excatly the
+                same as the scale_ layer, but with the inputs swapped, which is useful since
+                it allows mapping between inputs and outputs of this layer.  To be specific:
+                    - Let INPUT == sub.get_output()
+                    - Let SCALES == layer<tag>(sub).get_output()
+                    - This layer takes INPUT and SCALES as input.
+                    - The output of this layer has the same dimensions as INPUT.
+                    - This layer requires:
+                        - SCALES.num_samples() == INPUT.num_samples()
+                        - SCALES.k()  == INPUT.k()
+                        - SCALES.nr() == 1
+                        - SCALES.nc() == 1
+                    - The output tensor is produced by pointwise multiplying SCALES with
+                      INPUT at each spatial location.  Therefore, if OUT is the output of
+                      this layer then we would have:
+                        OUT(n,k,r,c) == INPUT(n,k,r,c)*SCALES(n,k)
+        !*/
+
+    public:
+        scale_prev_(
+        );
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+
+    template <
+        template<typename> class tag,
+        typename SUBNET
+        >
+    using scale_prev = add_layer<scale_prev_<tag>, SUBNET>;
+
+    // Here we add some convenient aliases for using scale_prev_ with the tag layers.
+    template <typename SUBNET> using scale_prev1  = scale_prev<tag1, SUBNET>;
+    template <typename SUBNET> using scale_prev2  = scale_prev<tag2, SUBNET>;
+    template <typename SUBNET> using scale_prev3  = scale_prev<tag3, SUBNET>;
+    template <typename SUBNET> using scale_prev4  = scale_prev<tag4, SUBNET>;
+    template <typename SUBNET> using scale_prev5  = scale_prev<tag5, SUBNET>;
+    template <typename SUBNET> using scale_prev6  = scale_prev<tag6, SUBNET>;
+    template <typename SUBNET> using scale_prev7  = scale_prev<tag7, SUBNET>;
+    template <typename SUBNET> using scale_prev8  = scale_prev<tag8, SUBNET>;
+    template <typename SUBNET> using scale_prev9  = scale_prev<tag9, SUBNET>;
+    template <typename SUBNET> using scale_prev10 = scale_prev<tag10, SUBNET>;
+    using scale_prev1_  = scale_prev_<tag1>;
+    using scale_prev2_  = scale_prev_<tag2>;
+    using scale_prev3_  = scale_prev_<tag3>;
+    using scale_prev4_  = scale_prev_<tag4>;
+    using scale_prev5_  = scale_prev_<tag5>;
+    using scale_prev6_  = scale_prev_<tag6>;
+    using scale_prev7_  = scale_prev_<tag7>;
+    using scale_prev8_  = scale_prev_<tag8>;
+    using scale_prev9_  = scale_prev_<tag9>;
+    using scale_prev10_ = scale_prev_<tag10>;
+
+    // ----------------------------------------------------------------------------------------
+
     template<
         template<typename> class... TAG_TYPES
         >
