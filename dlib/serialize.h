@@ -1773,6 +1773,76 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template<typename T>
+    inline void serialize_these(std::ostream& out, const T& x)
+    {
+        using dlib::serialize;
+        serialize(x, out);
+    }
+    
+    template<typename T, typename... Rest>
+    inline void serialize_these(std::ostream& out, const T& x, const Rest& ... rest)
+    {
+        serialize_these(out, x);
+        serialize_these(out, rest...);
+    }
+    
+    template<typename T>
+    inline void deserialize_these(std::istream& in, T& x)
+    {
+        using dlib::deserialize;
+        deserialize(x, in);
+    }
+    
+    template<typename T, typename... Rest>
+    inline void deserialize_these(std::istream& in, T& x, Rest& ... rest)
+    {
+        deserialize_these(in, x);
+        deserialize_these(in, rest...);
+    }  
+    
+    #define DLIB_DEFINE_DEFAULT_SERIALIZATION(Type, ...)    \
+    void serialize_all(std::ostream& out) const             \
+    {                                                       \
+        using dlib::serialize;                              \
+        using dlib::serialize_these;                        \
+        try                                                 \
+        {                                                   \
+            int version = 1;                                \
+            serialize(version, out);                        \
+            serialize_these(out, __VA_ARGS__);              \
+        }                                                   \
+        catch (dlib::serialization_error& e)                \
+        {                                                   \
+            throw dlib::serialization_error(e.info + "\n   while serializing object of type " #Type); \
+        }                                                   \
+    }                                                       \
+                                                            \
+    void deserialize_all(std::istream& in)                  \
+    {                                                       \
+        using dlib::deserialize;                            \
+        using dlib::deserialize_these;                      \
+        try                                                 \
+        {                                                   \
+            int version = 0;                                \
+            deserialize(version, in);                       \
+            if (version != 1)                               \
+                throw dlib::serialization_error("Unexpected version found while deserializing " #Type); \
+            deserialize_these(in, __VA_ARGS__);             \
+        }                                                   \
+        catch (dlib::serialization_error& e)                \
+        {                                                   \
+            throw dlib::serialization_error(e.info + "\n   while deserializing object of type " #Type); \
+        }                                                               \
+    }                                                                   \
+    inline friend void serialize(const Type& item, std::ostream& out)   \
+    {                                                                   \
+        item.serialize_all(out);                                        \
+    }                                                                   \
+    inline friend void deserialize(Type& item, std::istream& in)        \
+    {                                                                   \
+        item.deserialize_all(in);                                       \
+    }
 }
 
 #endif // DLIB_SERIALIZe_
