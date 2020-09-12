@@ -1554,7 +1554,7 @@ namespace dlib
             if (!(*fout))
                 throw serialization_error("Unable to open " + filename + " for writing.");
         }
-
+    
         template <typename T>
         inline proxy_serialize& operator<<(const T& item)
         {
@@ -1802,7 +1802,7 @@ namespace dlib
     }  
     
     #define DLIB_DEFINE_DEFAULT_SERIALIZATION(Type, ...)    \
-    void serialize_all(std::ostream& out) const             \
+    void serialize_to(std::ostream& out) const              \
     {                                                       \
         using dlib::serialize;                              \
         using dlib::serialize_these;                        \
@@ -1818,7 +1818,7 @@ namespace dlib
         }                                                   \
     }                                                       \
                                                             \
-    void deserialize_all(std::istream& in)                  \
+    void deserialize_from(std::istream& in)                 \
     {                                                       \
         using dlib::deserialize;                            \
         using dlib::deserialize_these;                      \
