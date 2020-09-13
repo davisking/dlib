@@ -400,7 +400,33 @@ namespace
         dlib::deserialize(item.b_true,in);
         dlib::deserialize(item.b_false,in);
     }
+    
+    struct my_custom_type
+    {
+        int a;
+        float b;
+        std::vector<float> c;
 
+        bool operator==(const my_custom_type& rhs) const
+        {
+            return std::tie(a,b,c) == std::tie(rhs.a, rhs.b, rhs.c);
+        }
+
+        DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c);
+    };
+
+    struct my_custom_type_array
+    {
+        std::vector<my_custom_type> v;
+
+        bool operator==(const my_custom_type_array& rhs) const
+        {
+            return v == rhs.v;
+        }
+
+        DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type_array, v);
+    };
+    
 // ----------------------------------------------------------------------------------------
 
     // This function returns the contents of the file 'stuff.bin' but using the old 
@@ -1027,6 +1053,29 @@ namespace
             DLIB_TEST(B == b);
         }
     }
+    
+    void test_macros()
+    {
+        my_custom_type t1, t2, t3, t4;
+        t1.a = 1;
+        t1.b = 2.5;
+        t1.c.resize(1024);
+
+        t2.a = 2;
+        t2.b = 4.0;
+        t2.c.resize(10);
+
+        my_custom_type_array v1, v2;
+        v1.v.push_back(t1);
+        v1.v.push_back(t2);
+
+        dlib::serialize("serialization_test_macros.dat") << t1 << t2 << v1;
+        dlib::deserialize("serialization_test_macros.dat") >> t3 >> t4 >> v2;
+
+        DLIB_TEST(t1 == t3);
+        DLIB_TEST(t2 == t4);
+        DLIB_TEST(v1 == v2);
+    }
 
 // ----------------------------------------------------------------------------------------
 
@@ -1056,6 +1105,7 @@ namespace
             test_array2d_and_matrix_serialization();
             test_strings();
             test_std_array();
+            test_macros();
         }
     } a;
 
