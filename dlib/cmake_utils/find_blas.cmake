@@ -64,7 +64,7 @@ if (UNIX OR MINGW)
 	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ArcoLinux" OR 
 	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "EndeavourOS" OR 
 	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ManjaroLinux")
-	  	 set(blas_libraries "-lcblas;-lblas")
+	  	 set(blas_libraries cblas blas)
 	  else()
 	    set(blas_libraries  cblas)
 	  endif()
@@ -93,7 +93,7 @@ if (UNIX OR MINGW)
 	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ArcoLinux" OR 
 	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "EndeavourOS" OR 
 	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ManjaroLinux")
-	  	 set(blas_libraries "-lcblas;-lblas")
+	  	 set(blas_libraries cblas blas)
 		 # OpenBLAS Use set(blas_libraries "-lcblas;-lopenblas")
 	  else()
 	    set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
