@@ -11,6 +11,7 @@
 #include <vector>
 #include <cstdio>
 #include "../algs.h"
+#include "../assert.h"
 
 #ifdef _MSC_VER
 // Disable the warning about inheriting from std::iostream 'via dominance' since this warning is a warning about
@@ -51,7 +52,7 @@ namespace dlib
             pos_type seekoff(off_type off, std::ios_base::seekdir dir,
                              std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out )
             {
-                (void)mode; //don't care what mode is. This class handles both
+                DLIB_ASSERT(mode == std::ios_base::in, "vectorstream does not support std::ios_base::out");
                 switch (dir)
                 {
                     case std::ios_base::beg:
@@ -147,14 +148,10 @@ namespace dlib
         {}
             
         vectorstream(const vectorstream& ori) = delete;
+        vectorstream(vectorstream&& item) = delete;
+        vectorstream& operator=(const vectorstream& ori) = delete;
+        vectorstream& operator=(vectorstream&& item) = delete;
             
-        vectorstream(
-            vectorstream&& item
-        ) : 
-            std::iostream(std::move(item)), 
-            buf(std::move(item.buf))
-        {}
-
     private:
         vector_streambuf buf;
     };
