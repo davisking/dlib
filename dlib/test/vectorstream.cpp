@@ -22,13 +22,6 @@ namespace
 
     logger dlog("test.vectorstream");
           
-    /*
-    * This class helps test the functionality of dlib::vectorstream when an object reference is treated as:
-    * - dlib::vectorstream&
-    * - std::iostream&
-    * Depending on which is used, the underlying function calls might have different call stacks.
-    */
-
     template <typename stream>
     void test1_variant(std::vector<char>& buf, stream& s)
     {
@@ -60,6 +53,20 @@ namespace
         DLIB_TEST(s.get() == EOF);
 
         s.clear();
+        s.seekg(6); //Let iostream decide which path to take. In theory it could decide to use any.
+
+        for (int i = -1000+6; i <= 1000; ++i)
+        {
+            DLIB_TEST(s.peek() != EOF);
+            char ch1 = i;
+            char ch2 = s.get();
+            DLIB_TEST(ch1 == ch2);
+        }
+
+        DLIB_TEST(s.peek() == EOF);
+        DLIB_TEST(s.get() == EOF);
+        
+        s.clear();
         s.seekg(6, std::ios_base::beg);
 
         for (int i = -1000+6; i <= 1000; ++i)
@@ -74,8 +81,10 @@ namespace
         DLIB_TEST(s.get() == EOF);
         
         s.clear();
-        s.seekg(1000, std::ios_base::beg); //read_pos should be 1000
-        s.seekg(6,    std::ios_base::cur); //read_pos should be 1006
+        s.seekg(1000, std::ios_base::beg);  //read_pos should be 1000
+        DLIB_TEST(s.good());                //yep, still good
+        DLIB_TEST(s.peek() == char(0));     //read_pos should still be 1000
+        s.seekg(6, std::ios_base::cur);     //read_pos should be 1006
         
         for (int i = 6; i <= 1000; ++i)
         {
@@ -164,7 +173,7 @@ namespace
         {
             vector<char> buf;
             dlib::vectorstream s1(buf);
-            std::iostream& s2(s1);
+            std::iostream& s2 = s1;
             test1_variant(buf, s2);
         }        
     }
