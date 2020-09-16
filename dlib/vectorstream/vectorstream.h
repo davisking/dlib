@@ -149,8 +149,6 @@ namespace dlib
             
         vectorstream(const vectorstream& ori) = delete;
         vectorstream(vectorstream&& item) = delete;
-        vectorstream& operator=(const vectorstream& ori) = delete;
-        vectorstream& operator=(vectorstream&& item) = delete;
             
     private:
         vector_streambuf buf;
