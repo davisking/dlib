@@ -1597,23 +1597,17 @@ namespace dlib
         }
         
         explicit proxy_serialize (
-            std::ostringstream& ss
-        ) : fout_optional_owning_ptr(nullptr),
-            fout(ss)
-        {}
-        
-        explicit proxy_serialize (
-            std::stringstream& ss
-        ) : fout_optional_owning_ptr(nullptr),
-            fout(ss)
-        {}
-        
-        explicit proxy_serialize (
             std::vector<char>& buf
         ) : fout_optional_owning_ptr(new vectorstream(buf)),
             fout(*fout_optional_owning_ptr)
         {
         }
+        
+        explicit proxy_serialize (
+            std::ostream& ss
+        ) : fout_optional_owning_ptr(nullptr),
+            fout(ss)
+        {}
         
         template <typename T>
         inline proxy_serialize& operator<<(const T& item)
@@ -1631,8 +1625,9 @@ namespace dlib
     {
     public:
         explicit proxy_deserialize (
-            const std::string& filename
-        )  : fin_optional_owning_ptr(new std::ifstream(filename.c_str(), std::ios::binary)),
+            const std::string& filename_
+        )  : filename(filename_),
+             fin_optional_owning_ptr(new std::ifstream(filename.c_str(), std::ios::binary)),
              fin(*fin_optional_owning_ptr)   
         {
             if (!fin)
@@ -1641,25 +1636,17 @@ namespace dlib
         }
         
         explicit proxy_deserialize (
-            std::istringstream& ss
-        ) : fin_optional_owning_ptr(nullptr),
-            fin(ss)
-        {
-            init();
-        }
-        
-        explicit proxy_deserialize (
-            std::stringstream& ss
-        ) : fin_optional_owning_ptr(nullptr),
-            fin(ss)
-        {
-            init();
-        }
-        
-        explicit proxy_deserialize (
             std::vector<char>& buf
         ) : fin_optional_owning_ptr(new vectorstream(buf)),
             fin(*fin_optional_owning_ptr)   
+        {
+            init();
+        }
+        
+        explicit proxy_deserialize (
+            std::istream& ss
+        ) : fin_optional_owning_ptr(nullptr),
+            fin(ss)
         {
             init();
         }
@@ -1704,25 +1691,27 @@ namespace dlib
                 if (looks_like_a_compressed_file())
                     suffix = "\n *** THIS LOOKS LIKE A COMPRESSED FILE.  DID YOU FORGET TO DECOMPRESS IT? *** \n";
 
+                const std::string stream_description = filename.empty() ? "stream" : std::string("file \"") + filename + std::string("\"");
+                
                 if (objects_read == 0)
                 {
                     throw serialization_error("An error occurred while trying to read the first" 
-                        " object from the stream.\nERROR: " + e.info + "\n" + suffix);
+                        " object from the " + stream_description + ".\nERROR: " + e.info + "\n" + suffix);
                 }
                 else if (objects_read == 1)
                 {
                     throw serialization_error("An error occurred while trying to read the second" 
-                        " object from the stream.\nERROR: " + e.info + "\n" + suffix);
+                        " object from the " + stream_description + ".\nERROR: " + e.info + "\n" + suffix);
                 }
                 else if (objects_read == 2)
                 {
                     throw serialization_error("An error occurred while trying to read the third" 
-                        " object from the stream.\nERROR: " + e.info + "\n" + suffix);
+                        " object from the " + stream_description + ".\nERROR: " + e.info + "\n" + suffix);
                 }
                 else 
                 {
                     throw serialization_error("An error occurred while trying to read the " +
-                        std::to_string(objects_read+1) + "th object from stream.\nERROR: " + e.info + "\n" + suffix);
+                        std::to_string(objects_read+1) + "th object from the " + stream_description + ".\nERROR: " + e.info + "\n" + suffix);
                 }
             }
             ++objects_read;
@@ -1730,6 +1719,7 @@ namespace dlib
         }
 
         int objects_read = 0;
+        const std::string filename = "";
         std::unique_ptr<std::istream> fin_optional_owning_ptr;
         std::istream& fin;
 
@@ -1757,17 +1747,13 @@ namespace dlib
 
     inline proxy_serialize serialize(const std::string& filename)
     { return proxy_serialize(filename); }
-    inline proxy_serialize serialize(std::ostringstream& ss)
-    { return proxy_serialize(ss); }
-    inline proxy_serialize serialize(std::stringstream& ss)
+    inline proxy_serialize serialize(std::ostream& ss)
     { return proxy_serialize(ss); }
     inline proxy_serialize serialize(std::vector<char>& buf)
     { return proxy_serialize(buf); }
     inline proxy_deserialize deserialize(const std::string& filename)
     { return proxy_deserialize(filename); }
-    inline proxy_deserialize deserialize(std::istringstream& ss)
-    { return proxy_deserialize(ss); }
-    inline proxy_deserialize deserialize(std::stringstream& ss)
+    inline proxy_deserialize deserialize(std::istream& ss)
     { return proxy_deserialize(ss); }
     inline proxy_deserialize deserialize(std::vector<char>& buf)
     { return proxy_deserialize(buf); }
