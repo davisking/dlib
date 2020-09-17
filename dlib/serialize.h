@@ -203,6 +203,7 @@
 #include "unicode.h"
 #include "byte_orderer.h"
 #include "float_details.h"
+#include "vectorstream.h"
 
 namespace dlib
 {
@@ -1583,47 +1584,86 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    class proxy_serialize 
+    class proxy_serialize
     {
     public:
         explicit proxy_serialize (
             const std::string& filename
-        ) 
+        ) : fout_optional_owning_ptr(new std::ofstream(filename.c_str(), std::ios::binary)),
+            fout(*fout_optional_owning_ptr)
         {
-            fout.reset(new std::ofstream(filename.c_str(), std::ios::binary));
-            if (!(*fout))
+            if (!fout)
                 throw serialization_error("Unable to open " + filename + " for writing.");
         }
-    
+        
+        explicit proxy_serialize (
+            std::ostringstream& ss
+        ) : fout_optional_owning_ptr(nullptr),
+            fout(ss)
+        {}
+        
+        explicit proxy_serialize (
+            std::stringstream& ss
+        ) : fout_optional_owning_ptr(nullptr),
+            fout(ss)
+        {}
+        
+        explicit proxy_serialize (
+            std::vector<char>& buf
+        ) : fout_optional_owning_ptr(new vectorstream(buf)),
+            fout(*fout_optional_owning_ptr)
+        {
+        }
+        
         template <typename T>
         inline proxy_serialize& operator<<(const T& item)
         {
-            serialize(item, *fout);
+            serialize(item, fout);
             return *this;
         }
 
     private:
-        std::shared_ptr<std::ofstream> fout;
+        std::unique_ptr<std::ostream> fout_optional_owning_ptr;
+        std::ostream& fout;
     };
-
-    class proxy_deserialize 
+    
+    class proxy_deserialize
     {
     public:
         explicit proxy_deserialize (
             const std::string& filename
-        )  : filename(filename)
+        )  : fin_optional_owning_ptr(new std::ifstream(filename.c_str(), std::ios::binary)),
+             fin(*fin_optional_owning_ptr)   
         {
-            fin.reset(new std::ifstream(filename.c_str(), std::ios::binary));
-            if (!(*fin))
+            if (!fin)
                 throw serialization_error("Unable to open " + filename + " for reading.");
-
-            // read the file header into a buffer and then seek back to the start of the
-            // file.
-            fin->read(file_header,4);
-            fin->clear();
-            fin->seekg(0);
+            init();
         }
-
+        
+        explicit proxy_deserialize (
+            std::istringstream& ss
+        ) : fin_optional_owning_ptr(nullptr),
+            fin(ss)
+        {
+            init();
+        }
+        
+        explicit proxy_deserialize (
+            std::stringstream& ss
+        ) : fin_optional_owning_ptr(nullptr),
+            fin(ss)
+        {
+            init();
+        }
+        
+        explicit proxy_deserialize (
+            std::vector<char>& buf
+        ) : fin_optional_owning_ptr(new vectorstream(buf)),
+            fin(*fin_optional_owning_ptr)   
+        {
+            init();
+        }
+                
         template <typename T>
         inline proxy_deserialize& operator>>(T& item)
         {
@@ -1635,16 +1675,28 @@ namespace dlib
         {
             return doit(std::move(item));
         }
-
+        
     private:
+
+        void init()
+        {
+            // read the file header into a buffer and then seek back to the start of the
+            // file.
+            fin.read(file_header,4);
+            fin.clear();
+            fin.seekg(0);
+        }
+        
+    private:
+        
         template <typename T>
         inline proxy_deserialize& doit(T&& item)
         {
             try
             {
-                if (fin->peek() == EOF)
-                    throw serialization_error("No more objects were in the file!");
-                deserialize(std::forward<T>(item), *fin);
+                if (fin.peek() == EOF)
+                    throw serialization_error("No more objects were in the stream!");
+                deserialize(std::forward<T>(item), fin);
             }
             catch (serialization_error& e)
             {
@@ -1655,25 +1707,22 @@ namespace dlib
                 if (objects_read == 0)
                 {
                     throw serialization_error("An error occurred while trying to read the first" 
-                        " object from the file " + filename + ".\nERROR: " + e.info + "\n" + suffix);
+                        " object from the stream.\nERROR: " + e.info + "\n" + suffix);
                 }
                 else if (objects_read == 1)
                 {
                     throw serialization_error("An error occurred while trying to read the second" 
-                        " object from the file " + filename +
-                        ".\nERROR: " + e.info + "\n" + suffix);
+                        " object from the stream.\nERROR: " + e.info + "\n" + suffix);
                 }
                 else if (objects_read == 2)
                 {
                     throw serialization_error("An error occurred while trying to read the third" 
-                        " object from the file " + filename +
-                        ".\nERROR: " + e.info + "\n" + suffix);
+                        " object from the stream.\nERROR: " + e.info + "\n" + suffix);
                 }
                 else 
                 {
                     throw serialization_error("An error occurred while trying to read the " +
-                        std::to_string(objects_read+1) + "th object from the file " + filename +
-                        ".\nERROR: " + e.info + "\n" + suffix);
+                        std::to_string(objects_read+1) + "th object from stream.\nERROR: " + e.info + "\n" + suffix);
                 }
             }
             ++objects_read;
@@ -1681,8 +1730,8 @@ namespace dlib
         }
 
         int objects_read = 0;
-        std::string filename;
-        std::shared_ptr<std::ifstream> fin;
+        std::unique_ptr<std::istream> fin_optional_owning_ptr;
+        std::istream& fin;
 
         // We don't need to look at the file header.  However, it's here because people
         // keep posting questions to the dlib forums asking why they get file load errors.
@@ -1708,8 +1757,20 @@ namespace dlib
 
     inline proxy_serialize serialize(const std::string& filename)
     { return proxy_serialize(filename); }
+    inline proxy_serialize serialize(std::ostringstream& ss)
+    { return proxy_serialize(ss); }
+    inline proxy_serialize serialize(std::stringstream& ss)
+    { return proxy_serialize(ss); }
+    inline proxy_serialize serialize(std::vector<char>& buf)
+    { return proxy_serialize(buf); }
     inline proxy_deserialize deserialize(const std::string& filename)
     { return proxy_deserialize(filename); }
+    inline proxy_deserialize deserialize(std::istringstream& ss)
+    { return proxy_deserialize(ss); }
+    inline proxy_deserialize deserialize(std::stringstream& ss)
+    { return proxy_deserialize(ss); }
+    inline proxy_deserialize deserialize(std::vector<char>& buf)
+    { return proxy_deserialize(buf); }
 
 // ----------------------------------------------------------------------------------------
 
