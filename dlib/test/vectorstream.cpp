@@ -21,16 +21,10 @@ namespace
 
 
     logger dlog("test.vectorstream");
-
-// ----------------------------------------------------------------------------------------
-
-    void test1()
+          
+    template <typename stream>
+    void test1_variant(std::vector<char>& buf, stream& s)
     {
-        print_spinner();
-
-        std::vector<char> buf;
-        vectorstream s(buf);
-
         for (int i = -1000; i <= 1000; ++i)
         {
             char ch = i;
@@ -59,7 +53,7 @@ namespace
         DLIB_TEST(s.get() == EOF);
 
         s.clear();
-        s.seekg(6);
+        s.seekg(6); //Let iostream decide which path to take. In theory it could decide to use any.
 
         for (int i = -1000+6; i <= 1000; ++i)
         {
@@ -71,13 +65,58 @@ namespace
 
         DLIB_TEST(s.peek() == EOF);
         DLIB_TEST(s.get() == EOF);
+        
+        s.clear();
+        s.seekg(6, std::ios_base::beg);
 
+        for (int i = -1000+6; i <= 1000; ++i)
+        {
+            DLIB_TEST(s.peek() != EOF);
+            char ch1 = i;
+            char ch2 = s.get();
+            DLIB_TEST(ch1 == ch2);
+        }
+
+        DLIB_TEST(s.peek() == EOF);
+        DLIB_TEST(s.get() == EOF);
+        
+        s.clear();
+        s.seekg(1000, std::ios_base::beg);  //read_pos should be 1000
+        DLIB_TEST(s.good());                //yep, still good
+        DLIB_TEST(s.peek() == char(0));     //read_pos should still be 1000
+        s.seekg(6, std::ios_base::cur);     //read_pos should be 1006
+        
+        for (int i = 6; i <= 1000; ++i)
+        {
+            DLIB_TEST(s.peek() != EOF);
+            char ch1 = i;
+            char ch2 = s.get();
+            DLIB_TEST(ch1 == ch2);
+        }
+
+        DLIB_TEST(s.peek() == EOF);
+        DLIB_TEST(s.get() == EOF);
+        
+        s.clear();
+        s.seekg(-6, std::ios_base::end); //read_pos should be 1995
+
+        for (int i = 995; i <= 1000; ++i)
+        {
+            DLIB_TEST(s.peek() != EOF);
+            char ch1 = i;
+            char ch2 = s.get();
+            DLIB_TEST(ch1 == ch2);
+        }
+        
+        DLIB_TEST(s.peek() == EOF);
+        DLIB_TEST(s.get() == EOF);
+        
         std::string temp;
         temp = "one two three!";
 
+        s.clear();
         s.seekg(0);
         buf.clear();
-        s.clear();
 
         serialize(temp, s);
         std::string temp2;
@@ -117,6 +156,26 @@ namespace
         char sbuf[100];
         s.read(sbuf, sizeof(sbuf));
         DLIB_TEST(s.good() == false);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void test1()
+    {
+        print_spinner();
+
+        {
+            std::vector<char> buf;
+            vectorstream s1(buf);
+            test1_variant(buf, s1);
+        }
+        
+        {
+            vector<char> buf;
+            dlib::vectorstream s1(buf);
+            std::iostream& s2 = s1;
+            test1_variant(buf, s2);
+        }        
     }
 
 // ----------------------------------------------------------------------------------------

@@ -11,7 +11,7 @@
 #include <vector>
 #include <cstdio>
 #include "../algs.h"
-
+#include "../assert.h"
 
 #ifdef _MSC_VER
 // Disable the warning about inheriting from std::iostream 'via dominance' since this warning is a warning about
@@ -42,6 +42,32 @@ namespace dlib
             void seekg(size_type pos)
             {
                 read_pos = pos;
+            }
+            
+            pos_type seekpos(pos_type pos, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
+            {
+                return seekoff(pos - pos_type(off_type(0)), std::ios_base::beg, mode);
+            }
+
+            pos_type seekoff(off_type off, std::ios_base::seekdir dir,
+                             std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out )
+            {
+                DLIB_ASSERT(mode == std::ios_base::in, "vectorstream does not support std::ios_base::out");
+                switch (dir)
+                {
+                    case std::ios_base::beg:
+                        read_pos = off;
+                        break;
+                    case std::ios_base::cur:
+                        read_pos += off;
+                        break;
+                    case std::ios_base::end:
+                        read_pos = buffer.size() + off;
+                        break;
+                    default:
+                        break;
+                }
+                return pos_type(read_pos);
             }
 
             // ------------------------ OUTPUT FUNCTIONS ------------------------
@@ -120,15 +146,10 @@ namespace dlib
             std::iostream(&buf),
             buf(buffer)
         {}
-
-        std::istream& seekg (
-            std::streampos pos
-        )
-        {
-            buf.seekg(pos);
-            return *this;
-        }
-
+            
+        vectorstream(const vectorstream& ori) = delete;
+        vectorstream(vectorstream&& item) = delete;
+            
     private:
         vector_streambuf buf;
     };
