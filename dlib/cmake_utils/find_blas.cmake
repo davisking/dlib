@@ -32,16 +32,10 @@ SET(lapack_without_underscore 0)
 message(STATUS "Searching for BLAS and LAPACK")
 
 if (UNIX OR MINGW)
+   message(STATUS "Searching for BLAS and LAPACK")
    # Add distro detection. This to ensure Arch-based Linux Distro
    # wouldn't face BLAS linking issue. Added by aviezab on 2020/09/09
-   if("${CMAKE_SYSTEM}" MATCHES "Linux")
-   message(STATUS "Checking Unix Distribution")
-   find_program(LSB_RELEASE_EXEC lsb_release)
-   execute_process(COMMAND ${LSB_RELEASE_EXEC} -is OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT 
-    OUTPUT_STRIP_TRAILING_WHITESPACE )
-   endif()
-   message(STATUS "Searching for BLAS and LAPACK")
-
+   CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
    if (BUILDING_MATLAB_MEX_FILE)
       # # This commented out stuff would link directly to MATLAB's built in
       # BLAS and LAPACK. But it's better to not link to anything and do a
@@ -58,16 +52,8 @@ if (UNIX OR MINGW)
 
       # We need cblas since MATLAB doesn't provide cblas symbols.
       add_subdirectory(external/cblas)
-      if("${CMAKE_SYSTEM}" MATCHES "Linux")
-        if("${LSB_RELEASE_ID_SHORT}" STREQUAL "Arch Linux" OR 
-	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "Arch" OR 
-	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ArcoLinux" OR 
-	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "EndeavourOS" OR 
-	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ManjaroLinux")
-	  	 set(blas_libraries cblas blas)
-	  else()
-	    set(blas_libraries  cblas)
-	  endif()
+      if (NOT HAVE_CBLAS)
+	  	set(blas_libraries cblas blas)
       else()
         set(blas_libraries  cblas)
       endif()
@@ -87,19 +73,10 @@ if (UNIX OR MINGW)
    pkg_check_modules(BLAS_REFERENCE cblas)
    pkg_check_modules(LAPACK_REFERENCE lapack)
    if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND)
-      if("${CMAKE_SYSTEM}" MATCHES "Linux")
-        if("${LSB_RELEASE_ID_SHORT}" STREQUAL "Arch Linux" OR 
-	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "Arch" OR 
-	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ArcoLinux" OR 
-	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "EndeavourOS" OR 
-	    "${LSB_RELEASE_ID_SHORT}" STREQUAL "ManjaroLinux")
-	  	 set(blas_libraries cblas blas)
-		 # OpenBLAS Use set(blas_libraries "-lcblas;-lopenblas")
-	  else()
-	    set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
-	  endif()
+	  if (NOT HAVE_CBLAS)
+	  	set(blas_libraries cblas blas)
       else()
-	  set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
+        set(blas_libraries  cblas)
       endif()
       set(lapack_libraries "${LAPACK_REFERENCE_LDFLAGS}")
       set(blas_found 1)
@@ -497,3 +474,4 @@ if (UNIX OR MINGW)
       message(" *****************************************************************************")
    endif()
 endif()
+
