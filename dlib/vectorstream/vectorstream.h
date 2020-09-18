@@ -43,7 +43,7 @@ namespace dlib
             {
                 read_pos = pos;
             }
-            
+
             pos_type seekpos(pos_type pos, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
             {
                 return seekoff(pos - pos_type(off_type(0)), std::ios_base::beg, mode);
@@ -52,7 +52,7 @@ namespace dlib
             pos_type seekoff(off_type off, std::ios_base::seekdir dir,
                              std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out )
             {
-                DLIB_ASSERT(mode == std::ios_base::in, "vectorstream does not support std::ios_base::out");
+                DLIB_CASSERT(mode == std::ios_base::in, "vectorstream does not support std::ios_base::out");
                 switch (dir)
                 {
                     case std::ios_base::beg:
