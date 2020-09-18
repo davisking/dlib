@@ -1691,7 +1691,7 @@ namespace dlib
                 if (looks_like_a_compressed_file())
                     suffix = "\n *** THIS LOOKS LIKE A COMPRESSED FILE.  DID YOU FORGET TO DECOMPRESS IT? *** \n";
 
-                const std::string stream_description = filename.empty() ? "stream" : std::string("file \"") + filename + std::string("\"");
+                const std::string stream_description = filename.empty() ? "stream" : "file '" + filename + "'";
                 
                 if (objects_read == 0)
                 {
