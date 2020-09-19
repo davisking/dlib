@@ -1054,7 +1054,7 @@ namespace
         }
     }
     
-    void test_macros()
+    void test_macros_and_serializers()
     {
         my_custom_type t1, t2, t3, t4;
         t1.a = 1;
@@ -1069,12 +1069,45 @@ namespace
         v1.v.push_back(t1);
         v1.v.push_back(t2);
 
-        dlib::serialize("serialization_test_macros.dat") << t1 << t2 << v1;
-        dlib::deserialize("serialization_test_macros.dat") >> t3 >> t4 >> v2;
+        {
+            dlib::serialize("serialization_test_macros.dat") << t1 << t2 << v1;
+            dlib::deserialize("serialization_test_macros.dat") >> t3 >> t4 >> v2;
 
-        DLIB_TEST(t1 == t3);
-        DLIB_TEST(t2 == t4);
-        DLIB_TEST(v1 == v2);
+            DLIB_TEST(t1 == t3);
+            DLIB_TEST(t2 == t4);
+            DLIB_TEST(v1 == v2);
+        }
+        
+        {
+            std::stringstream ss;
+            dlib::serialize(ss) << t1 << t2 << v1;
+            dlib::deserialize(ss) >> t3 >> t4 >> v2;
+
+            DLIB_TEST(t1 == t3);
+            DLIB_TEST(t2 == t4);
+            DLIB_TEST(v1 == v2);
+        }
+        
+        {
+            std::ostringstream sout;
+            dlib::serialize(sout) << t1 << t2 << v1;
+            std::istringstream sin(sout.str());
+            dlib::deserialize(sin) >> t3 >> t4 >> v2;
+
+            DLIB_TEST(t1 == t3);
+            DLIB_TEST(t2 == t4);
+            DLIB_TEST(v1 == v2);
+        }
+        
+        {
+            std::vector<char> buf;
+            dlib::serialize(buf) << t1 << t2 << v1;
+            dlib::deserialize(buf) >> t3 >> t4 >> v2;
+
+            DLIB_TEST(t1 == t3);
+            DLIB_TEST(t2 == t4);
+            DLIB_TEST(v1 == v2);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -1105,7 +1138,7 @@ namespace
             test_array2d_and_matrix_serialization();
             test_strings();
             test_std_array();
-            test_macros();
+            test_macros_and_serializers();
         }
     } a;
 
