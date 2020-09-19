@@ -49,9 +49,19 @@
     For convenience, you can also serialize to a file using this syntax:
         serialize("your_file.dat") << some_object << another_object;
 
+        // or to a memory buffer.
+        std::vector<char> memory_buffer;
+        serialize(memory_buffer) << some_object << another_object;
+
+        // or some other stream
+        std::ostringstream memory_buffer2;
+        serialize(memory_buffer2) << some_object << another_object;
+
     That overwrites the contents of your_file.dat with the serialized data from some_object
     and another_object.  Then to recall the objects from the file you can do:
         deserialize("your_file.dat") >> some_object >> another_object;
+        // or from a memory buffer or another stream called memory_buffer.
+        deserialize(memory_buffer) >> some_object >> another_object;
 
     Finally, you can chain as many objects together using the << and >> operators as you
     like.
