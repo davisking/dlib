@@ -19,8 +19,11 @@
 #  openmp_libraries         - Set to Intel's OpenMP library if and only if we
 #                             find the MKL.
 
+INCLUDE(CheckFunctionExists)
+
 # setting this makes CMake allow normal looking if else statements
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+SET(CMAKE_REQUIRED_LIBRARIES "cblas")
 
 SET(blas_found 0)
 SET(lapack_found 0)
@@ -32,9 +35,9 @@ SET(lapack_without_underscore 0)
 message(STATUS "Searching for BLAS and LAPACK")
 
 if (UNIX OR MINGW)
-   message(STATUS "Searching for BLAS and LAPACK")
    # Add distro detection. This to ensure Arch-based Linux Distro
    # wouldn't face BLAS linking issue. Added by aviezab on 2020/09/09
+   message(STATUS "Searching for BLAS and LAPACK")
    CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
    if (BUILDING_MATLAB_MEX_FILE)
       # # This commented out stuff would link directly to MATLAB's built in
@@ -53,9 +56,9 @@ if (UNIX OR MINGW)
       # We need cblas since MATLAB doesn't provide cblas symbols.
       add_subdirectory(external/cblas)
       if (NOT HAVE_CBLAS)
-	  	set(blas_libraries cblas blas)
+         set(blas_libraries cblas blas)
       else()
-        set(blas_libraries  cblas)
+         set(blas_libraries  cblas)
       endif()
       set(blas_found 1)
       set(lapack_found 1)
@@ -73,10 +76,10 @@ if (UNIX OR MINGW)
    pkg_check_modules(BLAS_REFERENCE cblas)
    pkg_check_modules(LAPACK_REFERENCE lapack)
    if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND)
-	  if (NOT HAVE_CBLAS)
-	  	set(blas_libraries cblas blas)
+      if (NOT HAVE_CBLAS)
+         set(blas_libraries cblas blas)
       else()
-        set(blas_libraries  cblas)
+         set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
       endif()
       set(lapack_libraries "${LAPACK_REFERENCE_LDFLAGS}")
       set(blas_found 1)
@@ -474,4 +477,3 @@ if (UNIX OR MINGW)
       message(" *****************************************************************************")
    endif()
 endif()
-
