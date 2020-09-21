@@ -3090,6 +3090,7 @@ namespace dlib
     {
     public:
 
+        static const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
         typedef dlib::weighted_label<uint16_t> weighted_label;
         typedef matrix<weighted_label> training_label_type;
         typedef matrix<uint16_t> output_label_type;
@@ -3156,7 +3157,7 @@ namespace dlib
                         const float weight = weighted_label.weight;
                         // The network must produce a number of outputs that is equal to the number
                         // of labels when using this type of loss.
-                        DLIB_CASSERT(static_cast<long>(y) < output_tensor.k() || weight == 0.f,
+                        DLIB_CASSERT(static_cast<long>(y) < output_tensor.k() || label_to_ignore || weight == 0.f,
                                         "y: " << y << ", output_tensor.k(): " << output_tensor.k());
                         for (long k = 0; k < output_tensor.k(); ++k)
                         {
@@ -3165,6 +3166,10 @@ namespace dlib
                             {
                                 loss += weight*scale*-safe_log(g[idx]);
                                 g[idx] = weight*scale*(g[idx] - 1);
+                            }
+                            else if (y == label_to_ignore)
+                            {
+                                g[idx] = 0.f;
                             }
                             else
                             {

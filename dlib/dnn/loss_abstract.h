@@ -1620,6 +1620,7 @@ namespace dlib
         !*/
     public:
 
+        static const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
         typedef dlib::weighted_label<uint16_t> weighted_label;
         typedef matrix<weighted_label> training_label_type;
         typedef matrix<uint16_t> output_label_type;
