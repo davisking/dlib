@@ -19,11 +19,8 @@
 #  openmp_libraries         - Set to Intel's OpenMP library if and only if we
 #                             find the MKL.
 
-INCLUDE(CheckFunctionExists)
-
 # setting this makes CMake allow normal looking if else statements
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
-SET(CMAKE_REQUIRED_LIBRARIES "cblas")
 
 SET(blas_found 0)
 SET(lapack_found 0)
@@ -35,10 +32,8 @@ SET(lapack_without_underscore 0)
 message(STATUS "Searching for BLAS and LAPACK")
 
 if (UNIX OR MINGW)
-   # Add distro detection. This to ensure Arch-based Linux Distro
-   # wouldn't face BLAS linking issue. Added by aviezab on 2020/09/09
    message(STATUS "Searching for BLAS and LAPACK")
-   CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
+
    if (BUILDING_MATLAB_MEX_FILE)
       # # This commented out stuff would link directly to MATLAB's built in
       # BLAS and LAPACK. But it's better to not link to anything and do a
@@ -55,11 +50,7 @@ if (UNIX OR MINGW)
 
       # We need cblas since MATLAB doesn't provide cblas symbols.
       add_subdirectory(external/cblas)
-      if (NOT HAVE_CBLAS)
-         set(blas_libraries cblas blas)
-      else()
-         set(blas_libraries  cblas)
-      endif()
+      set(blas_libraries  cblas  )
       set(blas_found 1)
       set(lapack_found 1)
       message(STATUS "Will link with MATLAB's BLAS and LAPACK at runtime (hopefully!)")
@@ -75,12 +66,16 @@ if (UNIX OR MINGW)
    find_package(PkgConfig)
    pkg_check_modules(BLAS_REFERENCE cblas)
    pkg_check_modules(LAPACK_REFERENCE lapack)
-   if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND)
-      if (NOT HAVE_CBLAS)
-         set(blas_libraries cblas blas)
-      else()
-         set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
-      endif()
+
+   SET(CMAKE_REQUIRED_LIBRARIES "${BLAS_REFERENCE_LDFLAGS}")
+   SET(CMAKE_REQUIRED_LIBRARIES "cblas")
+   INCLUDE(CheckFunctionExists)
+   CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
+   if (BLAS_REFERENCE_FOUND AND LAPACK_REFERENCE_FOUND AND HAVE_CBLAS)
+      set(blas_libraries "${BLAS_REFERENCE_LDFLAGS}")
+   else()
+      set(blas_libraries cblas blas)
+   endif()
       set(lapack_libraries "${LAPACK_REFERENCE_LDFLAGS}")
       set(blas_found 1)
       set(lapack_found 1)
