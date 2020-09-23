@@ -59,7 +59,11 @@ cmake --build . --config Release
 
 Note that on windows your compiler might put the test executable in a subfolder called `Release`. If that's the case then you have to go to that folder before running the test.
 
+<<<<<<< HEAD
 This library is licensed under the Boost Software License, which can be found in LICENSE.txt.  The long and short of the license is that you can use dlib however you like, even in closed source commercial software.
+=======
+This library is licensed under the Boost Software License, which can be found in [LICENSE.txt](https://github.com/meSajied/dlib/blob/master/dlib/LICENSE.txt).  The long and short of the license is that you can use dlib however you like, even in closed source commercial software.
+>>>>>>> 42504059b8e7da4c01337b121734f7d282e91d6f
 
 ## dlib sponsors
 
