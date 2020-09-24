@@ -402,21 +402,15 @@ namespace
     }
     
     template<typename T>
-    bool pointers_equal(const unique_ptr<T>& l, const unique_ptr<T>& r)
+    bool pointers_values_equal(const unique_ptr<T>& l, const unique_ptr<T>& r)
     {
-        bool ptrs_equal = l.operator bool() == r.operator bool();
-        if (ptrs_equal && l)
-            ptrs_equal &= (*l == *r);
-        return ptrs_equal;
+        return l && r ? *l == *r : l == r;
     }
 
     template<typename T>
-    bool pointers_equal(const shared_ptr<T>& l, const shared_ptr<T>& r)
+    bool pointers_values_equal(const shared_ptr<T>& l, const shared_ptr<T>& r)
     {
-        bool ptrs_equal = l.operator bool() == r.operator bool();
-        if (ptrs_equal && l)
-            ptrs_equal &= (*l == *r);
-        return ptrs_equal;
+        return l && r ? *l == *r : l == r;
     }
     
     struct my_custom_type
@@ -442,8 +436,8 @@ namespace
         bool operator==(const my_custom_type& rhs) const
         {         
             return std::tie(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o) == std::tie(rhs.a,rhs.b,rhs.c,rhs.d,rhs.e,rhs.f,rhs.g,rhs.h,rhs.i,rhs.j,rhs.k,rhs.l,rhs.m,rhs.n,rhs.o)
-                    && pointers_equal(ptr_shared1, rhs.ptr_shared1)
-                    && pointers_equal(ptr_shared2, rhs.ptr_shared2);
+                    && pointers_values_equal(ptr_shared1, rhs.ptr_shared1)
+                    && pointers_values_equal(ptr_shared2, rhs.ptr_shared2);
         }
 
         DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, ptr_shared1, ptr_shared2);
@@ -1141,8 +1135,8 @@ namespace
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
-            DLIB_TEST(pointers_equal(uptr1, uptr3));
-            DLIB_TEST(pointers_equal(uptr2, uptr4));
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
         }
         
         {
@@ -1153,8 +1147,8 @@ namespace
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
-            DLIB_TEST(pointers_equal(uptr1, uptr3));
-            DLIB_TEST(pointers_equal(uptr2, uptr4));
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
         }
         
         {
@@ -1166,8 +1160,8 @@ namespace
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
-            DLIB_TEST(pointers_equal(uptr1, uptr3));
-            DLIB_TEST(pointers_equal(uptr2, uptr4));
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
         }
         
         {
@@ -1178,8 +1172,8 @@ namespace
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
-            DLIB_TEST(pointers_equal(uptr1, uptr3));
-            DLIB_TEST(pointers_equal(uptr2, uptr4));
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
         }
     }
 
