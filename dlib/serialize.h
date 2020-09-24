@@ -1232,8 +1232,7 @@ namespace dlib
     {
         try
         { 
-            const unsigned long size = static_cast<unsigned long>(item.size());
-            serialize(size,out); 
+            serialize(item.size(),out); 
             for (const auto& x : item)
             {
                 serialize(x.first,out);
@@ -1253,7 +1252,7 @@ namespace dlib
         try 
         { 
             item.clear();
-            unsigned long size;
+            size_t size;
             deserialize(size,in); 
             domain d;
             range r;
@@ -2178,7 +2177,7 @@ namespace dlib
     {
         try
         {
-            bool is_non_empty = item.operator bool();
+            bool is_non_empty = item != nullptr;
             serialize(is_non_empty, out);
             if (is_non_empty)
                 serialize(*item, out);
@@ -2198,7 +2197,6 @@ namespace dlib
         try
         {
             //when deserializing unique_ptr, this is fresh state, so reset the pointers, even if item is non-empty
-            
             bool is_non_empty;
             deserialize(is_non_empty, in);
             item.reset(is_non_empty ? new T() : nullptr);
@@ -2222,7 +2220,7 @@ namespace dlib
     {
         try
         {
-            bool is_non_empty = item.operator bool();
+            bool is_non_empty = item != nullptr;
             serialize(is_non_empty, out);
             if (is_non_empty)
                 serialize(*item, out);
@@ -2244,7 +2242,7 @@ namespace dlib
             //when deserializing shared_ptr, this is fresh state, so reset the pointers, even if item is non-empty
             bool is_non_empty;
             deserialize(is_non_empty, in);
-            item.reset(is_non_empty ? new T() : nullptr);
+            item = is_non_empty ? std::make_shared<T>() : nullptr;
             
             if (is_non_empty)
                 deserialize(*item, in);
