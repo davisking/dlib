@@ -1252,7 +1252,7 @@ namespace dlib
         try 
         { 
             item.clear();
-            size_t size;
+            std::size_t size;
             deserialize(size,in); 
             domain d;
             range r;
@@ -1277,8 +1277,7 @@ namespace dlib
     {
         try
         { 
-            const unsigned long size = static_cast<unsigned long>(item.size());
-            serialize(size,out); 
+            serialize(item.size(),out); 
             for (const auto& x : item)
             {
                 serialize(x.first,out);
@@ -1298,7 +1297,7 @@ namespace dlib
         try 
         { 
             item.clear();
-            unsigned long size;
+            std::size_t size;
             deserialize(size,in); 
             domain d;
             range r;
@@ -1323,8 +1322,7 @@ namespace dlib
     {
         try
         { 
-            const unsigned long size = static_cast<unsigned long>(item.size());
-            serialize(size,out); 
+            serialize(item.size(),out); 
             for (const auto& x : item)
             {
                 serialize(x.first,out);
@@ -1344,7 +1342,7 @@ namespace dlib
         try 
         { 
             item.clear();
-            unsigned long size;
+            std::size_t size;
             deserialize(size,in); 
             domain d;
             range r;
@@ -1416,8 +1414,7 @@ namespace dlib
     {
         try
         { 
-            const unsigned long size = static_cast<unsigned long>(item.size());
-            serialize(size,out); 
+            serialize(item.size(),out); 
             for (const auto& x : item)
                 serialize(x,out);
         }
@@ -1434,7 +1431,7 @@ namespace dlib
         try 
         { 
             item.clear();
-            unsigned long size;
+            std::size_t size;
             deserialize(size,in); 
             domain d;
             for (unsigned long i = 0; i < size; ++i)
@@ -1457,8 +1454,7 @@ namespace dlib
     {
         try
         { 
-            const unsigned long size = static_cast<unsigned long>(item.size());
-            serialize(size,out); 
+            serialize(item.size(),out); 
             for (const auto& x : item)
                 serialize(x,out);
         }
@@ -1475,7 +1471,7 @@ namespace dlib
         try 
         { 
             item.clear();
-            unsigned long size;
+            std::size_t size;
             deserialize(size,in); 
             domain d;
             for (unsigned long i = 0; i < size; ++i)
@@ -1498,8 +1494,7 @@ namespace dlib
     {
         try
         { 
-            const unsigned long size = static_cast<unsigned long>(item.size());
-            serialize(size,out); 
+            serialize(item.size(),out); 
             for (const auto& x : item)
                 serialize(x,out);
         }
@@ -1516,7 +1511,7 @@ namespace dlib
         try 
         { 
             item.clear();
-            unsigned long size;
+            std::size_t size;
             deserialize(size,in); 
             domain d;
             for (unsigned long i = 0; i < size; ++i)
@@ -2199,7 +2194,7 @@ namespace dlib
             //when deserializing unique_ptr, this is fresh state, so reset the pointers, even if item is non-empty
             bool is_non_empty;
             deserialize(is_non_empty, in);
-            item.reset(is_non_empty ? new T() : nullptr);
+            item.reset(is_non_empty ? new T() : nullptr); //can't use make_unique since dlib does not use C++14 as a minimum requirement.
             
             if (is_non_empty)
                 deserialize(*item, in);
