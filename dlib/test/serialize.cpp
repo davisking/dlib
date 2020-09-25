@@ -401,18 +401,46 @@ namespace
         dlib::deserialize(item.b_false,in);
     }
     
+    template<typename T>
+    bool pointers_values_equal(const unique_ptr<T>& l, const unique_ptr<T>& r)
+    {
+        return l && r ? *l == *r : l == r;
+    }
+
+    template<typename T>
+    bool pointers_values_equal(const shared_ptr<T>& l, const shared_ptr<T>& r)
+    {
+        return l && r ? *l == *r : l == r;
+    }
+    
     struct my_custom_type
     {
         int a;
         float b;
         std::vector<float> c;
+        std::list<string> d;
+        std::forward_list<string> e;
+        std::pair<int,string> f;
+        std::tuple<int,string,float> g;
+        std::map<string,int> h;
+        std::unordered_map<string, int> i;
+        std::multimap<string, int> j;
+        std::unordered_multimap<string, int> k;
+        std::set<string> l;
+        std::unordered_set<string> m;
+        std::multiset<string> n;
+        std::unordered_multiset<string> o;
+        std::shared_ptr<string> ptr_shared1;
+        std::shared_ptr<string> ptr_shared2;    
 
         bool operator==(const my_custom_type& rhs) const
-        {
-            return std::tie(a,b,c) == std::tie(rhs.a, rhs.b, rhs.c);
+        {         
+            return std::tie(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o) == std::tie(rhs.a,rhs.b,rhs.c,rhs.d,rhs.e,rhs.f,rhs.g,rhs.h,rhs.i,rhs.j,rhs.k,rhs.l,rhs.m,rhs.n,rhs.o)
+                    && pointers_values_equal(ptr_shared1, rhs.ptr_shared1)
+                    && pointers_values_equal(ptr_shared2, rhs.ptr_shared2);
         }
 
-        DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c);
+        DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, ptr_shared1, ptr_shared2);
     };
 
     struct my_custom_type_array
@@ -1056,10 +1084,41 @@ namespace
     
     void test_macros_and_serializers()
     {
+        std::unique_ptr<string> uptr1, uptr2, uptr3, uptr4;
+        uptr1.reset(new string("hello from uptr1"));
+    
         my_custom_type t1, t2, t3, t4;
         t1.a = 1;
         t1.b = 2.5;
-        t1.c.resize(1024);
+        t1.c = {1.f, 2.f, 3.f, 4.f, 5.f};
+        t1.d.push_back("hello from back of list");
+        t1.d.push_back("world from back of list");
+        t1.d.push_front("world from front of list");
+        t1.d.push_front("hello from front of list");
+        t1.e.push_front("world from forward_list");
+        t1.e.push_front("hello from forward_list");
+        t1.f = make_pair(2, "hello from pair");
+        std::get<0>(t1.g) = 2;
+        std::get<1>(t1.g) = "hello from tuple";
+        std::get<2>(t1.g) = 1.4142;
+        t1.h["key"] = 15;
+        t1.i["key"] = 16;
+        t1.i.insert({"inserted key", 17});
+        t1.j.insert({"key", 21});
+        t1.j.insert({"key", 22});
+        t1.j.insert({"inserted key", 23});
+        t1.j.insert({"inserted key", 24});
+        t1.j.insert({"key", 25});
+        t1.j.insert({"key", 26});
+        t1.k.insert({"inserted key", 27});
+        t1.k.insert({"inserted key", 28});
+        t1.l.insert("hello from set");
+        t1.m.insert("hello from unordered_set");
+        t1.n.insert("hello from multiset");
+        t1.n.insert("hello from multiset");
+        t1.o.insert("hello from unordered_multiset");
+        t1.o.insert("hello from unordered_multiset");
+        t1.ptr_shared1 = make_shared<string>("hello from shared_ptr");
 
         t2.a = 2;
         t2.b = 4.0;
@@ -1070,43 +1129,51 @@ namespace
         v1.v.push_back(t2);
 
         {
-            dlib::serialize("serialization_test_macros.dat") << t1 << t2 << v1;
-            dlib::deserialize("serialization_test_macros.dat") >> t3 >> t4 >> v2;
+            dlib::serialize("serialization_test_macros.dat") << t1 << t2 << v1 << uptr1 << uptr2;
+            dlib::deserialize("serialization_test_macros.dat") >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
         }
         
         {
             std::stringstream ss;
-            dlib::serialize(ss) << t1 << t2 << v1;
-            dlib::deserialize(ss) >> t3 >> t4 >> v2;
+            dlib::serialize(ss) << t1 << t2 << v1 << uptr1 << uptr2;
+            dlib::deserialize(ss) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
         }
         
         {
             std::ostringstream sout;
-            dlib::serialize(sout) << t1 << t2 << v1;
+            dlib::serialize(sout) << t1 << t2 << v1 << uptr1 << uptr2;
             std::istringstream sin(sout.str());
-            dlib::deserialize(sin) >> t3 >> t4 >> v2;
+            dlib::deserialize(sin) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
         }
         
         {
             std::vector<char> buf;
-            dlib::serialize(buf) << t1 << t2 << v1;
-            dlib::deserialize(buf) >> t3 >> t4 >> v2;
+            dlib::serialize(buf) << t1 << t2 << v1 << uptr1 << uptr2;
+            dlib::deserialize(buf) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
 
             DLIB_TEST(t1 == t3);
             DLIB_TEST(t2 == t4);
             DLIB_TEST(v1 == v2);
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
         }
     }
 

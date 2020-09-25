@@ -68,16 +68,27 @@
 
 
     This file provides serialization support to the following object types:
-        - The C++ base types (NOT including pointer types)
+        - The C++ base types (NOT including raw pointer)
         - std::string
         - std::wstring
         - std::vector
+        - std::list
+        - std::forward_list
         - std::array
         - std::deque
         - std::map
+        - std::unordered_map
+        - std::multimap
+        - std::unordered_multimap
         - std::set
+        - std::unordered_set
+        - std::multiset
+        - std::unordered_multiset
         - std::pair
+        - std::tuple
         - std::complex
+        - std::unique_ptr
+        - std::shared_ptr
         - dlib::uint64
         - dlib::int64
         - float_details
@@ -87,16 +98,27 @@
         - Google protocol buffer objects.
 
     This file provides deserialization support to the following object types:
-        - The C++ base types (NOT including pointer types)
+        - The C++ base types (NOT including raw pointers)
         - std::string
         - std::wstring
         - std::vector
+        - std::list
+        - std::forward_list
         - std::array
         - std::deque
         - std::map
+        - std::unordered_map
+        - std::multimap
+        - std::unordered_multimap
         - std::set
+        - std::unordered_set
+        - std::multiset
+        - std::unordered_multiset
         - std::pair
+        - std::tuple
         - std::complex
+        - std::unique_ptr
+        - std::shared_ptr
         - dlib::uint64
         - dlib::int64
         - float_details
@@ -197,12 +219,17 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <list>
+#include <forward_list>
 #include <array>
 #include <deque>
 #include <complex>
 #include <map>
+#include <unordered_map>
+#include <tuple>
 #include <memory>
 #include <set>
+#include <unordered_set>
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -757,6 +784,42 @@ namespace dlib
         std::map<domain, range, compare, alloc>& item,
         std::istream& in
     );
+    
+    template <typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    void serialize (
+        const std::unordered_map<domain, range, hash, keyEqual, alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    void deserialize (
+        std::unordered_map<domain, range, hash, keyEqual, alloc>& item,
+        std::istream& in
+    );
+    
+    template <typename domain, typename range, typename compare, typename alloc>
+    void serialize (
+        const std::multimap<domain,range, compare, alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename domain, typename range, typename compare, typename alloc>
+    void deserialize (
+        std::multimap<domain, range, compare, alloc>& item,
+        std::istream& in
+    );
+    
+    template <typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    void serialize (
+        const std::unordered_multimap<domain, range, hash, keyEqual, alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    void deserialize (
+        std::unordered_multimap<domain, range, hash, keyEqual, alloc>& item,
+        std::istream& in
+    );
 
     template <typename domain, typename compare, typename alloc>
     void serialize (
@@ -767,6 +830,42 @@ namespace dlib
     template <typename domain, typename compare, typename alloc>
     void deserialize (
         std::set<domain, compare, alloc>& item,
+        std::istream& in
+    );
+    
+    template <typename domain, typename hash, typename keyEqual, typename alloc>
+    void serialize (
+        const std::unordered_set<domain, hash, keyEqual, alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename domain, typename hash, typename keyEqual, typename alloc>
+    void deserialize (
+        std::unordered_set<domain, hash, keyEqual, alloc>& item,
+        std::istream& in
+    );
+    
+    template <typename domain, typename compare, typename alloc>
+    void serialize (
+        const std::multiset<domain, compare, alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename domain, typename compare, typename alloc>
+    void deserialize (
+        std::multiset<domain, compare, alloc>& item,
+        std::istream& in
+    );
+    
+    template <typename domain, typename hash, typename keyEqual, typename alloc>
+    void serialize (
+        const std::unordered_multiset<domain, hash, keyEqual, alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename domain, typename hash, typename keyEqual, typename alloc>
+    void deserialize (
+        std::unordered_multiset<domain, hash, keyEqual, alloc>& item,
         std::istream& in
     );
 
@@ -781,6 +880,30 @@ namespace dlib
         std::vector<T,alloc>& item,
         std::istream& in
     );
+    
+    template <typename T, typename alloc>
+    void serialize (
+        const std::list<T,alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename T, typename alloc>
+    void deserialize (
+        std::list<T,alloc>& item,
+        std::istream& in
+    );
+    
+    template <typename T, typename alloc>
+    void serialize (
+        const std::forward_list<T,alloc>& item,
+        std::ostream& out
+    );
+
+    template <typename T, typename alloc>
+    void deserialize (
+        std::forward_list<T,alloc>& item,
+        std::istream& in
+    );
 
     template <typename T, typename alloc>
     void serialize (
@@ -793,7 +916,43 @@ namespace dlib
         std::deque<T,alloc>& item,
         std::istream& in
     );
+    
+    template <typename... Types>
+    void serialize (
+        const std::tuple<Types...>& item,
+        std::ostream& out
+    );
 
+    template <typename... Types>
+    void deserialize (
+        std::tuple<Types...>& item,
+        std::istream& in
+    );
+
+    template <typename T, typename deleter>
+    void serialize (
+        const std::unique_ptr<T, deleter>& item,
+        std::ostream& out
+    );
+
+    template <typename T, typename deleter>
+    void deserialize (
+        std::unique_ptr<T, deleter>& item,
+        std::istream& in
+    );
+    
+    template <typename T>
+    void serialize (
+        const std::shared_ptr<T>& item,
+        std::ostream& out
+    );
+
+    template <typename T>
+    void deserialize (
+        std::shared_ptr<T>& item,
+        std::istream& in
+    );
+    
     inline void serialize (
         const std::string& item,
         std::ostream& out
@@ -933,6 +1092,88 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template<std::size_t I = 0, typename FuncT, typename... Tp>
+    inline typename std::enable_if<I == sizeof...(Tp), void>::type
+    for_each_in_tuple(std::tuple<Tp...>&, FuncT)
+    {}
+
+    template<std::size_t I = 0, typename FuncT, typename... Tp>
+    inline typename std::enable_if<I < sizeof...(Tp), void>::type
+    for_each_in_tuple(std::tuple<Tp...>& t, FuncT f)
+    {
+        f(std::get<I>(t));
+        for_each_in_tuple<I + 1, FuncT, Tp...>(t, f);
+    }
+    
+    template<std::size_t I = 0, typename FuncT, typename... Tp>
+    inline typename std::enable_if<I == sizeof...(Tp), void>::type
+    for_each_in_tuple(const std::tuple<Tp...>&, FuncT)
+    {}
+
+    template<std::size_t I = 0, typename FuncT, typename... Tp>
+    inline typename std::enable_if<I < sizeof...(Tp), void>::type
+    for_each_in_tuple(const std::tuple<Tp...>& t, FuncT f)
+    {
+        f(std::get<I>(t));
+        for_each_in_tuple<I + 1, FuncT, Tp...>(t, f);
+    }
+    
+    struct serialize_tuple_helper
+    {
+        serialize_tuple_helper(std::ostream& out_) : out(out_) {}
+        
+        template<typename T>
+        void operator()(const T& item)
+        {
+            serialize(item, out);
+        }
+                
+        std::ostream& out;
+    };
+    
+    struct deserialize_tuple_helper
+    {
+        deserialize_tuple_helper(std::istream& in_) : in(in_) {}
+        
+        template<typename T>
+        void operator()(T& item)
+        {
+            deserialize(item, in);
+        }
+                
+        std::istream& in;
+    };
+
+    template <typename... Types>
+    void serialize (
+        const std::tuple<Types...>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            for_each_in_tuple(item, serialize_tuple_helper(out));
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::tuple"); }
+    }
+
+    template <typename... Types>
+    void deserialize (
+        std::tuple<Types...>& item,
+        std::istream& in
+    )
+    {
+        try
+        { 
+            for_each_in_tuple(item, deserialize_tuple_helper(in));
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::tuple"); }
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
     template <typename domain, typename range, typename compare, typename alloc>
     void serialize (
         const std::map<domain,range, compare, alloc>& item,
@@ -983,6 +1224,141 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    void serialize (
+        const std::unordered_map<domain, range, hash, keyEqual, alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            serialize(item.size(),out); 
+            for (const auto& x : item)
+            {
+                serialize(x.first,out);
+                serialize(x.second,out);
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::unordered_map"); }
+    }
+
+    template <typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    void deserialize (
+        std::unordered_map<domain, range, hash, keyEqual, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            item.clear();
+            std::size_t size;
+            deserialize(size,in); 
+            domain d;
+            range r;
+            for (unsigned long i = 0; i < size; ++i)
+            {
+                deserialize(d,in);
+                deserialize(r,in);
+                item[d] = r;
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::unordered_map"); }
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+    template <typename domain, typename range, typename compare, typename alloc>
+    void serialize (
+        const std::multimap<domain,range, compare, alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            serialize(item.size(),out); 
+            for (const auto& x : item)
+            {
+                serialize(x.first,out);
+                serialize(x.second,out);
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::multimap"); }
+    }
+
+    template <typename domain, typename range, typename compare, typename alloc>
+    void deserialize (
+        std::multimap<domain, range, compare, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            item.clear();
+            std::size_t size;
+            deserialize(size,in); 
+            domain d;
+            range r;
+            for (unsigned long i = 0; i < size; ++i)
+            {
+                deserialize(d,in);
+                deserialize(r,in);
+                item.insert({d,r});
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::multimap"); }
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+    template <typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    void serialize (
+        const std::unordered_multimap<domain, range, hash, keyEqual, alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            serialize(item.size(),out); 
+            for (const auto& x : item)
+            {
+                serialize(x.first,out);
+                serialize(x.second,out);
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::unordered_multimap"); }
+    }
+
+    template <typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    void deserialize (
+        std::unordered_multimap<domain, range, hash, keyEqual, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            item.clear();
+            std::size_t size;
+            deserialize(size,in); 
+            domain d;
+            range r;
+            for (unsigned long i = 0; i < size; ++i)
+            {
+                deserialize(d,in);
+                deserialize(r,in);
+                item.insert({d,r});
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::unordered_multimap"); }
+    }
+    
+// ----------------------------------------------------------------------------------------
+   
     template <typename domain, typename compare, typename alloc>
     void serialize (
         const std::set<domain, compare, alloc>& item,
@@ -1028,6 +1404,126 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while deserializing object of type std::set"); }
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template <typename domain, typename hash, typename keyEqual, typename alloc>
+    void serialize (
+        const std::unordered_set<domain, hash, keyEqual, alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            serialize(item.size(),out); 
+            for (const auto& x : item)
+                serialize(x,out);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::unordered_set"); }
+    }
+
+    template <typename domain, typename hash, typename keyEqual, typename alloc>
+    void deserialize (
+        std::unordered_set<domain, hash, keyEqual, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            item.clear();
+            std::size_t size;
+            deserialize(size,in); 
+            domain d;
+            for (unsigned long i = 0; i < size; ++i)
+            {
+                deserialize(d,in);
+                item.insert(d);
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::unordered_set"); }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename domain, typename compare, typename alloc>
+    void serialize (
+        const std::multiset<domain, compare, alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            serialize(item.size(),out); 
+            for (const auto& x : item)
+                serialize(x,out);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::multiset"); }
+    }
+
+    template <typename domain, typename compare, typename alloc>
+    void deserialize (
+        std::multiset<domain, compare, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            item.clear();
+            std::size_t size;
+            deserialize(size,in); 
+            domain d;
+            for (unsigned long i = 0; i < size; ++i)
+            {
+                deserialize(d,in);
+                item.insert(d);
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::multiset"); }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename domain, typename hash, typename keyEqual, typename alloc>
+    void serialize (
+        const std::unordered_multiset<domain, hash, keyEqual, alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            serialize(item.size(),out); 
+            for (const auto& x : item)
+                serialize(x,out);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::unordered_multiset"); }
+    }
+
+    template <typename domain, typename hash, typename keyEqual, typename alloc>
+    void deserialize (
+        std::unordered_multiset<domain, hash, keyEqual, alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            item.clear();
+            std::size_t size;
+            deserialize(size,in); 
+            domain d;
+            for (unsigned long i = 0; i < size; ++i)
+            {
+                deserialize(d,in);
+                item.insert(d);
+            }
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::unordered_multiset"); }
+    }
+        
 // ----------------------------------------------------------------------------------------
 
     template <typename alloc>
@@ -1179,6 +1675,80 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename T, typename alloc>
+    void serialize (
+        const std::list<T,alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            const unsigned long size = static_cast<unsigned long>(item.size());
+            serialize(size,out); 
+            for (const auto& x : item)
+                serialize(x, out);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::list"); }
+    }
+
+    template <typename T, typename alloc>
+    void deserialize (
+        std::list<T,alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            unsigned long size;
+            deserialize(size, in);
+            item.resize(size);
+            for (auto& x : item)
+                deserialize(x, in);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::list"); }
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+    template <typename T, typename alloc>
+    void serialize (
+        const std::forward_list<T,alloc>& item,
+        std::ostream& out
+    )
+    {
+        try
+        { 
+            const unsigned long size = std::distance(item.begin(), item.end());
+            serialize(size,out); 
+            for (const auto& x : item)
+                serialize(x, out);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while serializing object of type std::forward_list"); }
+    }
+
+    template <typename T, typename alloc>
+    void deserialize (
+        std::forward_list<T,alloc>& item,
+        std::istream& in
+    )
+    {
+        try 
+        { 
+            unsigned long size;
+            deserialize(size,in); 
+            item.resize(size);
+            for (auto& x : item)
+                deserialize(x,in);
+        }
+        catch (serialization_error& e)
+        { throw serialization_error(e.info + "\n   while deserializing object of type std::forward_list"); }
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
     template <typename T, typename alloc>
     void serialize (
         const std::deque<T,alloc>& item,
@@ -1589,6 +2159,92 @@ namespace dlib
         catch (serialization_error& e)
         {
             throw serialization_error(e.info + "\n   while deserializing an object of type std::complex");
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T, typename deleter>
+    void serialize (
+        const std::unique_ptr<T, deleter>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            bool is_non_empty = item != nullptr;
+            serialize(is_non_empty, out);
+            if (is_non_empty)
+                serialize(*item, out);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while serializing an object of type std::unique_ptr");
+        }
+    }
+
+    template <typename T, typename deleter>
+    void deserialize (
+        std::unique_ptr<T, deleter>& item,
+        std::istream& in
+    )
+    {
+        try
+        {
+            //when deserializing unique_ptr, this is fresh state, so reset the pointers, even if item is non-empty
+            bool is_non_empty;
+            deserialize(is_non_empty, in);
+            item.reset(is_non_empty ? new T() : nullptr); //can't use make_unique since dlib does not use C++14 as a minimum requirement.
+            
+            if (is_non_empty)
+                deserialize(*item, in);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while deserializing an object of type std::unique_ptr");
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename T>
+    void serialize (
+        const std::shared_ptr<T>& item,
+        std::ostream& out
+    )
+    {
+        try
+        {
+            bool is_non_empty = item != nullptr;
+            serialize(is_non_empty, out);
+            if (is_non_empty)
+                serialize(*item, out);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while serializing an object of type std::shared_ptr");
+        }
+    }
+
+    template <typename T>
+    void deserialize (
+        std::shared_ptr<T>& item,
+        std::istream& in
+    )
+    {
+        try
+        {
+            //when deserializing shared_ptr, this is fresh state, so reset the pointers, even if item is non-empty
+            bool is_non_empty;
+            deserialize(is_non_empty, in);
+            item = is_non_empty ? std::make_shared<T>() : nullptr;
+            
+            if (is_non_empty)
+                deserialize(*item, in);
+        }
+        catch (serialization_error& e)
+        {
+            throw serialization_error(e.info + "\n   while deserializing an object of type std::shared_ptr");
         }
     }
 
