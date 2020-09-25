@@ -60,7 +60,7 @@ double call_func(py::object f, const matrix<double,0,1>& args)
     const auto num = num_function_arguments(f, args.size());
     DLIB_CASSERT(num == args.size(), 
         "The function being optimized takes a number of arguments that doesn't agree with the size of the bounds lists you provided to find_max_global()");
-    DLIB_CASSERT(0 < num && num < 15, "Functions being optimized must take between 1 and 15 scalar arguments.");
+    DLIB_CASSERT(0 < num && num < 35, "Functions being optimized must take between 1 and 35 scalar arguments.");
 
 #define CALL_WITH_N_ARGS(N) case N: return dlib::gopt_impl::_cwv(f,args,typename make_compile_time_integer_range<N>::type()).cast<double>(); 
     switch (num)
@@ -80,6 +80,26 @@ double call_func(py::object f, const matrix<double,0,1>& args)
         CALL_WITH_N_ARGS(13)
         CALL_WITH_N_ARGS(14)
         CALL_WITH_N_ARGS(15)
+        CALL_WITH_N_ARGS(16)
+        CALL_WITH_N_ARGS(17)
+        CALL_WITH_N_ARGS(18)
+        CALL_WITH_N_ARGS(19)
+        CALL_WITH_N_ARGS(20)
+        CALL_WITH_N_ARGS(21)
+        CALL_WITH_N_ARGS(22)
+        CALL_WITH_N_ARGS(23)
+        CALL_WITH_N_ARGS(24)
+        CALL_WITH_N_ARGS(25)
+        CALL_WITH_N_ARGS(26)
+        CALL_WITH_N_ARGS(27)
+        CALL_WITH_N_ARGS(28)
+        CALL_WITH_N_ARGS(29)
+        CALL_WITH_N_ARGS(30)
+        CALL_WITH_N_ARGS(31)
+        CALL_WITH_N_ARGS(32)
+        CALL_WITH_N_ARGS(33)
+        CALL_WITH_N_ARGS(34)
+        CALL_WITH_N_ARGS(35)
 
         default:
             DLIB_CASSERT(false, "oops");
