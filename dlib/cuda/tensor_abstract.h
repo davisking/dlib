@@ -720,6 +720,36 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename label_type>
+    struct weighted_label
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This object represents the truth label of a single sample, together with
+                an associated weight (the higher the weight, the more emphasis the
+                corresponding sample is given during the training).
+                This object is used in the following loss layers:
+                    - loss_multiclass_log_weighted_ with unsigned long as label_type
+                    - loss_multiclass_log_per_pixel_weighted_ with uint16_t as label_type,
+                      since, in semantic segmentation, 65536 classes ought to be enough for
+                      anybody.
+        !*/
+        weighted_label()
+        {}
+
+        weighted_label(label_type label, float weight = 1.f)
+            : label(label), weight(weight)
+        {}
+
+        // The ground truth label
+        label_type label{};
+
+        // The weight of the corresponding sample
+        float weight = 1.f;
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_TENSOR_ABSTRACT_H_

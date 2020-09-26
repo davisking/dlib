@@ -680,6 +680,22 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename label_type>
+    struct weighted_label
+    {
+        weighted_label()
+        {}
+
+        weighted_label(label_type label, float weight = 1.f)
+            : label(label), weight(weight)
+        {}
+
+        label_type label{};
+        float weight = 1.f;
+    };
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_TENSOR_H_

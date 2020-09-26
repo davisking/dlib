@@ -370,22 +370,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename label_type>
-    struct weighted_label
-    {
-        weighted_label()
-        {}
-
-        weighted_label(label_type label, float weight = 1.f)
-            : label(label), weight(weight)
-        {}
-
-        label_type label{};
-        float weight = 1.f;
-    };
-
-// ----------------------------------------------------------------------------------------
-
     class loss_multiclass_log_weighted_
     {
     public:
@@ -3139,6 +3123,11 @@ namespace dlib
                              "output size = " << output_tensor.nr() << " x " << output_tensor.nc());
             }
 
+#ifdef DLIB_USE_CUDA
+            double loss;
+            cuda_compute(truth, output_tensor, grad, loss);
+            return loss;
+#else
             tt::softmax(grad, output_tensor);
 
             // The loss we output is the weighted average loss over the mini-batch, and also over each element of the matrix output.
@@ -3175,6 +3164,7 @@ namespace dlib
                 }
             }
             return loss;
+#endif
         }
 
         friend void serialize(const loss_multiclass_log_per_pixel_weighted_& , std::ostream& out)
@@ -3207,6 +3197,9 @@ namespace dlib
             // See: https://github.com/davisking/dlib/blob/4dfeb7e186dd1bf6ac91273509f687293bd4230a/dlib/dnn/tensor_abstract.h#L38
             return ((sample * t.k() + k) * t.nr() + row) * t.nc() + column;
         }
+#ifdef DLIB_USE_CUDA
+        cuda::compute_loss_multiclass_log_per_pixel_weighted cuda_compute;
+#endif
 
     };
 

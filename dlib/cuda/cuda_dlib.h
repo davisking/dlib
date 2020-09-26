@@ -561,6 +561,82 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        class compute_loss_multiclass_log_per_pixel_weighted
+        {
+            /*!
+                The point of this class is to compute the loss computed by
+                loss_multiclass_log_per_pixel_, but to do so with CUDA.
+            !*/
+        public:
+
+            compute_loss_multiclass_log_per_pixel_weighted(
+            )
+            {
+            }
+
+            template <
+                typename const_label_iterator
+                >
+            void operator() (
+                const_label_iterator truth,
+                const tensor& subnetwork_output,
+                tensor& gradient,
+                double& loss
+            ) const
+            {
+                const auto image_size = subnetwork_output.nr()*subnetwork_output.nc();
+                const size_t bytes_per_plane = image_size*sizeof(uint16_t);
+                const size_t weight_bytes_per_plane = image_size*sizeof(float);
+                matrix<uint16_t> labels(truth->nr(), truth->nc());
+                matrix<float> weights(truth->nr(), truth->nc());
+                // Allocate a cuda buffer to store all the truth images and also one float
+                // for the scalar loss output.
+                buf = device_global_buffer(subnetwork_output.num_samples()*(bytes_per_plane + weight_bytes_per_plane) + sizeof(float));
+
+                cuda_data_ptr<float> loss_buf = static_pointer_cast<float>(buf, 1);
+                buf = buf+sizeof(float);
+                const auto weights_offset = subnetwork_output.num_samples() * bytes_per_plane;
+                // copy the truth data into a cuda buffer.
+                for (long i = 0; i < subnetwork_output.num_samples(); ++i, ++truth)
+                {
+                    const matrix<weighted_label<uint16_t>>& t = *truth;
+                    DLIB_ASSERT(t.nr() == subnetwork_output.nr());
+                    DLIB_ASSERT(t.nc() == subnetwork_output.nc());
+                    for (long r = 0; r < t.nr(); ++r)
+                    {
+                        for (long c = 0; c < t.nc(); ++c)
+                        {
+                            labels(r, c) = t(r, c).label;
+                            weights(r, c) = t(r, c).weight;
+                        }
+                    }
+                    memcpy(buf + i*bytes_per_plane, &labels(0,0), bytes_per_plane);
+                    memcpy(buf + weights_offset + i*weight_bytes_per_plane, &weights(0, 0), weight_bytes_per_plane);
+                }
+
+                auto truth_buf = static_pointer_cast<const uint16_t>(buf, subnetwork_output.num_samples()*image_size);
+                buf = buf+weights_offset;
+                auto weights_buf = static_pointer_cast<const float>(buf, subnetwork_output.num_samples()*image_size);
+
+                do_work(loss_buf, truth_buf, weights_buf, subnetwork_output, gradient, loss);
+            }
+
+        private:
+
+            static void do_work(
+                cuda_data_ptr<float> loss_work_buffer,
+                cuda_data_ptr<const uint16_t> truth_buffer,
+                cuda_data_ptr<const float> weights_buffer,
+                const tensor& subnetwork_output,
+                tensor& gradient,
+                double& loss
+            );
+
+            mutable cuda_data_void_ptr buf;
+        };
+
+    // ----------------------------------------------------------------------------------------
+
         class compute_loss_mean_squared_per_channel_and_pixel
         {
             /*!
