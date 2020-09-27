@@ -565,7 +565,7 @@ namespace dlib
         {
             /*!
                 The point of this class is to compute the loss computed by
-                loss_multiclass_log_per_pixel_, but to do so with CUDA.
+                loss_multiclass_log_per_pixel_weighted_, but to do so with CUDA.
             !*/
         public:
 
