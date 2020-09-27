@@ -3123,48 +3123,13 @@ namespace dlib
                              "output size = " << output_tensor.nr() << " x " << output_tensor.nc());
             }
 
-#ifdef DLIB_USE_CUDA
             double loss;
+#ifdef DLIB_USE_CUDA
             cuda_compute(truth, output_tensor, grad, loss);
-            return loss;
 #else
-            tt::softmax(grad, output_tensor);
-
-            // The loss we output is the weighted average loss over the mini-batch, and also over each element of the matrix output.
-            const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
-            double loss = 0;
-            float* const g = grad.host();
-            for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
-            {
-                for (long r = 0; r < output_tensor.nr(); ++r)
-                {
-                    for (long c = 0; c < output_tensor.nc(); ++c)
-                    {
-                        const weighted_label& weighted_label = truth->operator()(r, c);
-                        const uint16_t y = weighted_label.label;
-                        const float weight = weighted_label.weight;
-                        // The network must produce a number of outputs that is equal to the number
-                        // of labels when using this type of loss.
-                        DLIB_CASSERT(static_cast<long>(y) < output_tensor.k() || weight == 0.f,
-                                        "y: " << y << ", output_tensor.k(): " << output_tensor.k());
-                        for (long k = 0; k < output_tensor.k(); ++k)
-                        {
-                            const size_t idx = tensor_index(output_tensor, i, k, r, c);
-                            if (k == y)
-                            {
-                                loss += weight*scale*-safe_log(g[idx]);
-                                g[idx] = weight*scale*(g[idx] - 1);
-                            }
-                            else
-                            {
-                                g[idx] = weight*scale*g[idx];
-                            }
-                        }
-                    }
-                }
-            }
-            return loss;
+            cpu_compute(truth, output_tensor, grad, loss);
 #endif
+            return loss;
         }
 
         friend void serialize(const loss_multiclass_log_per_pixel_weighted_& , std::ostream& out)
@@ -3199,6 +3164,8 @@ namespace dlib
         }
 #ifdef DLIB_USE_CUDA
         cuda::compute_loss_multiclass_log_per_pixel_weighted cuda_compute;
+#else
+        cpu::compute_loss_multiclass_log_per_pixel_weighted cpu_compute;
 #endif
 
     };
