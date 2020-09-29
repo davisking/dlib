@@ -6,6 +6,7 @@
 #include "loss_abstract.h"
 #include "core.h"
 #include "utilities.h"
+#include "misc.h"
 #include "../matrix.h"
 #include "../cuda/tensor_tools.h"
 #include "../geometry.h"
