@@ -2883,6 +2883,7 @@ namespace
         const int num_correct_required = static_cast<int>(::std::ceil(0.9 * num_correct_max));
         DLIB_TEST_MSG(num_correct >= num_correct_required,
                       "Number of correctly classified elements = " << num_correct << ", required = " << num_correct_required);
+
 #if DLIB_USE_CUDA
         cuda::compute_loss_binary_log_per_pixel cuda_compute;
         cpu::compute_loss_binary_log_per_pixel cpu_compute;
@@ -3228,6 +3229,18 @@ namespace
         const int num_correct_required = static_cast<int>(::std::ceil(0.9 * num_correct_max));
         DLIB_TEST_MSG(num_correct >= num_correct_required,
                       "Number of correctly classified elements = " << num_correct << ", required = " << num_correct_required);
+
+#if DLIB_USE_CUDA
+        cuda::compute_loss_multiclass_log_per_pixel cuda_compute;
+        cpu::compute_loss_multiclass_log_per_pixel cpu_compute;
+        double cuda_loss, cpu_loss;
+        const tensor& output_tensor = net.subnet().get_output();
+        tensor& grad = net.subnet().get_gradient_input();
+        cuda_compute(y.begin(), output_tensor, grad, cuda_loss);
+        cpu_compute(y.begin(), output_tensor, grad, cpu_loss);
+        const auto err = abs(cuda_loss - cpu_loss) / cpu_loss;
+        DLIB_TEST_MSG(err < 1e-6, "multiclass log per pixel cuda and cpu losses differ");
+#endif
     }
 
 // ----------------------------------------------------------------------------------------

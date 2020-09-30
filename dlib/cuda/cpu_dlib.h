@@ -582,6 +582,70 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+    class compute_loss_multiclass_log_per_pixel
+    {
+
+        /*! The point of this class is to compute the loss for loss_multiclass_log_per_pixel_
+            on the cpu to provide an analogous implementation of the cuda version
+        !*/
+    public:
+        compute_loss_multiclass_log_per_pixel(
+        )
+        {
+        }
+
+        template <
+            typename const_label_iterator
+            >
+        void operator()(
+            const_label_iterator truth,
+            const tensor& output_tensor,
+            tensor& grad,
+            double& loss
+        ) const
+        {
+            softmax(grad, output_tensor);
+            // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
+            const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
+            float* const g = grad.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
+            {
+                for (long r = 0; r < output_tensor.nr(); ++r)
+                {
+                    for (long c = 0; c < output_tensor.nc(); ++c)
+                    {
+                        const uint16_t y = truth->operator()(r, c);
+                        // The network must produce a number of outputs that is equal to the number
+                        // of labels when using this type of loss.
+                        DLIB_CASSERT(static_cast<long>(y) < output_tensor.k() || y == label_to_ignore,
+                                        "y: " << y << ", output_tensor.k(): " << output_tensor.k());
+                        for (long k = 0; k < output_tensor.k(); ++k)
+                        {
+                            const size_t idx = output_tensor.index(i, k, r, c);
+                            if (k == y)
+                            {
+                                loss += scale*-safe_log(g[idx]);
+                                g[idx] = scale*(g[idx] - 1);
+                            }
+                            else if (y == label_to_ignore)
+                            {
+                                g[idx] = 0.f;
+                            }
+                            else
+                            {
+                                g[idx] = scale*g[idx];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    private:
+        const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
+    };
+
+    // -----------------------------------------------------------------------------------
+
     class compute_loss_multiclass_log_per_pixel_weighted
     {
 
