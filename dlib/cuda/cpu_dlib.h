@@ -8,6 +8,7 @@
 
 #include "tensor.h"
 #include "../geometry/rectangle.h"
+#include "../dnn/misc.h"
 
 namespace dlib
 {
@@ -518,6 +519,82 @@ namespace dlib
             size_t src_k_offset,
             size_t count_k
         );
+
+    // -----------------------------------------------------------------------------------
+
+    class compute_loss_multiclass_log_per_pixel_weighted
+    {
+
+        /*! The point of this class is to compute the loss for loss_multiclass_log_per_pixel_weighted_
+            on the cpu to provide an analogous implementation of the cuda version
+        !*/
+    public:
+        compute_loss_multiclass_log_per_pixel_weighted(
+        )
+        {
+        }
+
+        template <
+            typename const_label_iterator
+            >
+        void operator()(
+            const_label_iterator truth,
+            const tensor& output_tensor,
+            tensor& grad,
+            double& loss
+        ) const
+        {
+            softmax(grad, output_tensor);
+            // The loss we output is the weighted average loss over the mini-batch, and also over each element of the matrix output.
+            const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
+            loss = 0;
+            float* const g = grad.host();
+            for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
+            {
+                for (long r = 0; r < output_tensor.nr(); ++r)
+                {
+                    for (long c = 0; c < output_tensor.nc(); ++c)
+                    {
+                        const weighted_label<uint16_t>& weighted_label = truth->operator()(r, c);
+                        const uint16_t y = weighted_label.label;
+                        const float weight = weighted_label.weight;
+                        // The network must produce a number of outputs that is equal to the number
+                        // of labels when using this type of loss.
+                        DLIB_CASSERT(static_cast<long>(y) < output_tensor.k() || weight == 0.f,
+                                        "y: " << y << ", output_tensor.k(): " << output_tensor.k());
+                        for (long k = 0; k < output_tensor.k(); ++k)
+                        {
+                            const size_t idx = tensor_index(output_tensor, i, k, r, c);
+                            if (k == y)
+                            {
+                                loss += weight*scale*-safe_log(g[idx]);
+                                g[idx] = weight*scale*(g[idx] - 1);
+                            }
+                            else
+                            {
+                                g[idx] = weight*scale*g[idx];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    private:
+
+        template <typename T>
+        T safe_log(T input, T epsilon = 1e-10) const
+        {
+            // Prevent trying to calculate the logarithm of a very small number (let alone zero)
+            return std::log(std::max(input, epsilon));
+        }
+
+        static size_t tensor_index(const tensor& t, long sample, long k, long row, long column)
+        {
+            // See: https://github.com/davisking/dlib/blob/4dfeb7e186dd1bf6ac91273509f687293bd4230a/dlib/dnn/tensor_abstract.h#L38
+            return ((sample * t.k() + k) * t.nr() + row) * t.nc() + column;
+        }
+    };
 
     // -----------------------------------------------------------------------------------
 

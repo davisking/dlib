@@ -379,11 +379,12 @@ namespace dlib
                 This object represents the truth label of a single sample, together with
                 an associated weight (the higher the weight, the more emphasis the
                 corresponding sample is given during the training).
+                For technical reasons, it is defined in misc.h
                 This object is used in the following loss layers:
                     - loss_multiclass_log_weighted_ with unsigned long as label_type
                     - loss_multiclass_log_per_pixel_weighted_ with uint16_t as label_type,
                       since, in semantic segmentation, 65536 classes ought to be enough for
-                      anybody. 
+                      anybody.
         !*/
         weighted_label()
         {}

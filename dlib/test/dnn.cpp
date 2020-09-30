@@ -3311,6 +3311,18 @@ namespace
             DLIB_TEST_MSG(num_weighted_class > num_not_weighted_class,
                           "The weighted class (" << weighted_class << ") does not dominate: "
                           << num_weighted_class << " <= " << num_not_weighted_class);
+
+#if DLIB_USE_CUDA
+            cuda::compute_loss_multiclass_log_per_pixel_weighted cuda_compute;
+            cpu::compute_loss_multiclass_log_per_pixel_weighted cpu_compute;
+            double cuda_loss, cpu_loss;
+            const tensor& output_tensor = net.subnet().get_output();
+            tensor& grad = net.subnet().get_gradient_input();
+            cuda_compute(y_weighted.begin(), output_tensor, grad, cuda_loss);
+            cpu_compute(y_weighted.begin(), output_tensor, grad, cpu_loss);
+            const auto err = abs(cuda_loss - cpu_loss) / cpu_loss;
+            DLIB_TEST_MSG(err < 1e-6, "multi class log per pixel weighted cuda and cpu losses differ");
+#endif
         }
     }
 
