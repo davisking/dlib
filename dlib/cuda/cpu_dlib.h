@@ -641,7 +641,7 @@ namespace dlib
             }
         }
     private:
-        const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
+        static const uint16_t label_to_ignore = std::numeric_limits<uint16_t>::max();
     };
 
     // -----------------------------------------------------------------------------------
