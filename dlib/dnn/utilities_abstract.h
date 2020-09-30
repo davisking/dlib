@@ -18,6 +18,8 @@ namespace dlib
         ensures
             - returns log(1+exp(x))
               (except computes it using a numerically accurate method)
+
+        NOTE: For technical reasons, it is defined in misc.h.
     !*/
 
 // ----------------------------------------------------------------------------------------
