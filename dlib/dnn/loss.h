@@ -2827,7 +2827,7 @@ namespace dlib
 #ifdef DLIB_USE_CUDA
         cuda::compute_loss_binary_log_per_pixel cuda_compute;
 #else
-        cpu:compute_loss_binary_log_per_pixel cpu_compute;
+        cpu::compute_loss_binary_log_per_pixel cpu_compute;
 #endif
     };
 
@@ -2972,7 +2972,7 @@ namespace dlib
 #ifdef DLIB_USE_CUDA
         cuda::compute_loss_multiclass_log_per_pixel cuda_compute;
 #else
-        cpu::compute_loss_multiclass_log_per_pixel cuda_compute;
+        cpu::compute_loss_multiclass_log_per_pixel cpu_compute;
 #endif
     };
 
