@@ -96,7 +96,6 @@ namespace dlib
                 - returns the index of the element at coordinates (sample,k,r,c)
         !*/
 
-                    host()[((sample*t.k() + k)*t.nr() + r)*t.nc() + c]
         void async_copy_to_device(
         ) const;
         /*!
