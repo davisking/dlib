@@ -2686,7 +2686,7 @@ namespace
         resizable_tensor cuda_grad(output_tensor), cpu_grad(output_tensor);
         cuda_compute(labels.begin(), output_tensor, cuda_grad, cuda_loss);
         cpu_compute(labels.begin(), output_tensor, cpu_grad, cpu_loss);
-        DLIB_CASSERT(cuda_grad.size() == cpu_grad.size());
+        DLIB_TEST(cuda_grad.size() == cpu_grad.size());
         for (size_t i = 0; i < cuda_grad.size(); ++i)
         {
             DLIB_TEST(::std::abs(*(cuda_grad.begin() + i) - *(cpu_grad.begin() + i)) < 1e-8);
@@ -2897,7 +2897,7 @@ namespace
         resizable_tensor cuda_grad(output_tensor), cpu_grad(output_tensor);
         cuda_compute(y.begin(), output_tensor, cuda_grad, cuda_loss);
         cpu_compute(y.begin(), output_tensor, cpu_grad, cpu_loss);
-        DLIB_CASSERT(cuda_grad.size() == cpu_grad.size());
+        DLIB_TEST(cuda_grad.size() == cpu_grad.size());
         for (size_t i = 0; i < cuda_grad.size(); ++i)
         {
             DLIB_TEST(::std::abs(*(cuda_grad.begin() + i) - *(cpu_grad.begin() + i)) < 1e-8);
@@ -3248,7 +3248,7 @@ namespace
         resizable_tensor cuda_grad(output_tensor), cpu_grad(output_tensor);
         cuda_compute(y.begin(), output_tensor, cuda_grad, cuda_loss);
         cpu_compute(y.begin(), output_tensor, cpu_grad, cpu_loss);
-        DLIB_CASSERT(cuda_grad.size() == cpu_grad.size());
+        DLIB_TEST(cuda_grad.size() == cpu_grad.size());
         for (size_t i = 0; i < cuda_grad.size(); ++i)
         {
             DLIB_TEST(::std::abs(*(cuda_grad.begin() + i) - *(cpu_grad.begin() + i)) < 1e-8);
@@ -3359,7 +3359,7 @@ namespace
             resizable_tensor cuda_grad(output_tensor), cpu_grad(output_tensor);
             cuda_compute(y_weighted.begin(), output_tensor, cuda_grad, cuda_loss);
             cpu_compute(y_weighted.begin(), output_tensor, cpu_grad, cpu_loss);
-            DLIB_CASSERT(cuda_grad.size() == cpu_grad.size());
+            DLIB_TEST(cuda_grad.size() == cpu_grad.size());
             for (size_t i = 0; i < cuda_grad.size(); ++i)
             {
                 DLIB_TEST(::std::abs(*(cuda_grad.begin() + i) - *(cpu_grad.begin() + i)) < 1e-8);
