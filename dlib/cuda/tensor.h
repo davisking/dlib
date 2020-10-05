@@ -50,15 +50,6 @@ namespace dlib
         long long nr() const { return m_nr; }
         long long nc() const { return m_nc; }
         size_t size() const { return m_size; }
-        size_t index(
-            const long sample,
-            const long k,
-            const long r,
-            const long c
-        ) const
-        {
-            return ((sample * m_k + k) * m_nr + r) * m_nc + c;
-        }
 
         typedef float* iterator;
         typedef const float* const_iterator;

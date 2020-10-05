@@ -51,6 +51,20 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    static size_t tensor_index(
+        const tensor& t,
+        const long sample,
+        const long k,
+        const long r,
+        const long c
+    )
+    {
+        return ((sample * t.k() + k) * t.nr() + r) * t.nc() + c;
+    }
+
+// ----------------------------------------------------------------------------------------
+
 }
 
 #endif // DLIB_DNn_MISC_h

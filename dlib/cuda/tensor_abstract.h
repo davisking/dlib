@@ -85,17 +85,6 @@ namespace dlib
                   (i.e. the total number of floats in this tensor)
         !*/
 
-        size_t index(
-            const long sample,
-            const long k,
-            const long r,
-            const long c
-        ) const;
-        /*!
-            ensures
-                - returns the index of the element at coordinates (sample,k,r,c)
-        !*/
-
         void async_copy_to_device(
         ) const;
         /*!

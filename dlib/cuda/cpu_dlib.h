@@ -556,7 +556,7 @@ namespace dlib
                     for (long c = 0; c < output_tensor.nc(); ++c)
                     {
                         const float y = truth->operator()(r, c);
-                        const size_t idx = output_tensor.index(i, 0, r, c);
+                        const size_t idx = tensor_index(output_tensor, i, 0, r, c);
 
                         if (y > 0.f)
                         {
@@ -621,7 +621,7 @@ namespace dlib
                                         "y: " << y << ", output_tensor.k(): " << output_tensor.k());
                         for (long k = 0; k < output_tensor.k(); ++k)
                         {
-                            const size_t idx = output_tensor.index(i, k, r, c);
+                            const size_t idx = tensor_index(output_tensor, i, k, r, c);
                             if (k == y)
                             {
                                 loss += scale*-safe_log(g[idx]);
@@ -688,7 +688,7 @@ namespace dlib
                                         "y: " << y << ", output_tensor.k(): " << output_tensor.k());
                         for (long k = 0; k < output_tensor.k(); ++k)
                         {
-                            const size_t idx = output_tensor.index(i, k, r, c);
+                            const size_t idx = tensor_index(output_tensor, i, k, r, c);
                             if (k == y)
                             {
                                 loss += weight*scale*-safe_log(g[idx]);
@@ -744,7 +744,7 @@ namespace dlib
                         for (long c = 0; c < output_tensor.nc(); ++c)
                         {
                             const float y = (*truth)[k].operator()(r, c);
-                            const size_t idx = ((i * output_tensor.k() + k) * output_tensor.nr() + r) * output_tensor.nc() + c;
+                            const size_t idx = tensor_index(output_tensor, i, k, r, c);
                             const float temp1 = y - out_data[idx];
                             const float temp2 = scale*temp1;
                             loss += temp2*temp1;

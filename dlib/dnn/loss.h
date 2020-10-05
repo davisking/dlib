@@ -2752,7 +2752,7 @@ namespace dlib
                 {
                     for (long c = 0; c < output_tensor.nc(); ++c) 
                     {
-                        iter->operator()(r, c) = out_data[output_tensor.index(i, 0, r, c)];
+                        iter->operator()(r, c) = out_data[tensor_index(output_tensor, i, 0, r, c)];
                     }
                 }
             }
@@ -2874,10 +2874,10 @@ namespace dlib
             const auto find_label = [&](long sample, long r, long c) 
             {
                 uint16_t label = 0;
-                float max_value = out_data[output_tensor.index(sample, 0, r, c)];
+                float max_value = out_data[tensor_index(output_tensor, sample, 0, r, c)];
                 for (long k = 1; k < output_tensor.k(); ++k) 
                 {
-                    const float value = out_data[output_tensor.index(sample, k, r, c)];
+                    const float value = out_data[tensor_index(output_tensor, sample, k, r, c)];
                     if (value > max_value) 
                     {
                         label = static_cast<uint16_t>(k);
@@ -3114,7 +3114,7 @@ namespace dlib
                 {
                     for (long c = 0; c < output_tensor.nc(); ++c)
                     {
-                        iter->operator()(r, c) = out_data[output_tensor.index(i, 0, r, c)];
+                        iter->operator()(r, c) = out_data[tensor_index(output_tensor, i, 0, r, c)];
                     }
                 }
             }
@@ -3165,7 +3165,7 @@ namespace dlib
                     for (long c = 0; c < output_tensor.nc(); ++c)
                     {
                         const float y = truth->operator()(r, c);
-                        const size_t idx = output_tensor.index(i, 0, r, c);
+                        const size_t idx = tensor_index(output_tensor, i, 0, r, c);
                         const float temp1 = y - out_data[idx];
                         const float temp2 = scale*temp1;
                         loss += temp2*temp1;
@@ -3243,7 +3243,7 @@ namespace dlib
                     {
                         for (long c = 0; c < output_tensor.nc(); ++c)
                         {
-                            (*iter)[k].operator()(r, c) = out_data[output_tensor.index(i, k, r, c)];
+                            (*iter)[k].operator()(r, c) = out_data[tensor_index(output_tensor, i, k, r, c)];
                         }
                     }
                 }
