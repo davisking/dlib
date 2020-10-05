@@ -2683,9 +2683,14 @@ namespace
         cpu::compute_loss_mean_squared_per_channel_and_pixel cpu_compute;
         double cuda_loss, cpu_loss;
         const tensor& output_tensor = net.subnet().get_output();
-        tensor& grad = net.subnet().get_gradient_input();
-        cuda_compute(labels.begin(), output_tensor, grad, cuda_loss);
-        cpu_compute(labels.begin(), output_tensor, grad, cpu_loss);
+        resizable_tensor cuda_grad(output_tensor), cpu_grad(output_tensor);
+        cuda_compute(labels.begin(), output_tensor, cuda_grad, cuda_loss);
+        cpu_compute(labels.begin(), output_tensor, cpu_grad, cpu_loss);
+        DLIB_CASSERT(cuda_grad.size() == cpu_grad.size());
+        for (size_t i = 0; i < cuda_grad.size(); ++i)
+        {
+            DLIB_TEST(::std::abs(*(cuda_grad.begin() + i) - *(cpu_grad.begin() + i)) < 1e-8);
+        }
         const auto err = abs(cuda_loss - cpu_loss) / cpu_loss;
         DLIB_TEST_MSG(err < 1e-6, "multi channel cuda and cpu losses differ");
 #endif
@@ -2889,9 +2894,14 @@ namespace
         cpu::compute_loss_binary_log_per_pixel cpu_compute;
         double cuda_loss, cpu_loss;
         const tensor& output_tensor = net.subnet().get_output();
-        tensor& grad = net.subnet().get_gradient_input();
-        cuda_compute(y.begin(), output_tensor, grad, cuda_loss);
-        cpu_compute(y.begin(), output_tensor, grad, cpu_loss);
+        resizable_tensor cuda_grad(output_tensor), cpu_grad(output_tensor);
+        cuda_compute(y.begin(), output_tensor, cuda_grad, cuda_loss);
+        cpu_compute(y.begin(), output_tensor, cpu_grad, cpu_loss);
+        DLIB_CASSERT(cuda_grad.size() == cpu_grad.size());
+        for (size_t i = 0; i < cuda_grad.size(); ++i)
+        {
+            DLIB_TEST(::std::abs(*(cuda_grad.begin() + i) - *(cpu_grad.begin() + i)) < 1e-8);
+        }
         const auto err = abs(cuda_loss - cpu_loss) / cpu_loss;
         DLIB_TEST_MSG(err < 1e-6, "binary log per pixel cuda and cpu losses differ");
 #endif
@@ -3235,9 +3245,14 @@ namespace
         cpu::compute_loss_multiclass_log_per_pixel cpu_compute;
         double cuda_loss, cpu_loss;
         const tensor& output_tensor = net.subnet().get_output();
-        tensor& grad = net.subnet().get_gradient_input();
-        cuda_compute(y.begin(), output_tensor, grad, cuda_loss);
-        cpu_compute(y.begin(), output_tensor, grad, cpu_loss);
+        resizable_tensor cuda_grad(output_tensor), cpu_grad(output_tensor);
+        cuda_compute(y.begin(), output_tensor, cuda_grad, cuda_loss);
+        cpu_compute(y.begin(), output_tensor, cpu_grad, cpu_loss);
+        DLIB_CASSERT(cuda_grad.size() == cpu_grad.size());
+        for (size_t i = 0; i < cuda_grad.size(); ++i)
+        {
+            DLIB_TEST(::std::abs(*(cuda_grad.begin() + i) - *(cpu_grad.begin() + i)) < 1e-8);
+        }
         const auto err = abs(cuda_loss - cpu_loss) / cpu_loss;
         DLIB_TEST_MSG(err < 1e-6, "multiclass log per pixel cuda and cpu losses differ");
 #endif
@@ -3341,9 +3356,14 @@ namespace
             cpu::compute_loss_multiclass_log_per_pixel_weighted cpu_compute;
             double cuda_loss, cpu_loss;
             const tensor& output_tensor = net.subnet().get_output();
-            tensor& grad = net.subnet().get_gradient_input();
-            cuda_compute(y_weighted.begin(), output_tensor, grad, cuda_loss);
-            cpu_compute(y_weighted.begin(), output_tensor, grad, cpu_loss);
+            resizable_tensor cuda_grad(output_tensor), cpu_grad(output_tensor);
+            cuda_compute(y_weighted.begin(), output_tensor, cuda_grad, cuda_loss);
+            cpu_compute(y_weighted.begin(), output_tensor, cpu_grad, cpu_loss);
+            DLIB_CASSERT(cuda_grad.size() == cpu_grad.size());
+            for (size_t i = 0; i < cuda_grad.size(); ++i)
+            {
+                DLIB_TEST(::std::abs(*(cuda_grad.begin() + i) - *(cpu_grad.begin() + i)) < 1e-8);
+            }
             const auto err = abs(cuda_loss - cpu_loss) / cpu_loss;
             DLIB_TEST_MSG(err < 1e-6, "multi class log per pixel weighted cuda and cpu losses differ");
 #endif

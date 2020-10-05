@@ -547,6 +547,7 @@ namespace dlib
             sigmoid(grad, output_tensor);
             // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0/(output_tensor.num_samples()*output_tensor.nr()*output_tensor.nc());
+            loss = 0;
             float* const g = grad.host();
             const float* const out_data = output_tensor.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
@@ -607,6 +608,7 @@ namespace dlib
             softmax(grad, output_tensor);
             // The loss we output is the average loss over the mini-batch, and also over each element of the matrix output.
             const double scale = 1.0 / (output_tensor.num_samples() * output_tensor.nr() * output_tensor.nc());
+            loss = 0;
             float* const g = grad.host();
             for (long i = 0; i < output_tensor.num_samples(); ++i, ++truth)
             {
