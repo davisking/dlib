@@ -272,7 +272,7 @@ namespace
     void test_gelu()
     {
 #ifdef DLIB_USE_CUDA
-        // make sure that cuda::mish and cpu::mish return the same results
+        // make sure that cuda::gelu and cpu::gelu return the same results
         using namespace dlib::tt;
         print_spinner();
         const long n = 5;

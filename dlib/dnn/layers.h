@@ -3337,7 +3337,7 @@ namespace dlib
             std::string version;
             deserialize(version, in);
             if (version != "gelu_")
-                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::mish_.");
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::gelu_.");
         }
 
         friend std::ostream& operator<<(std::ostream& out, const gelu_& /*item*/)
