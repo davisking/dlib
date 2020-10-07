@@ -1520,6 +1520,40 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void gelu (
+        tensor& dest,
+        const tensor& src
+    );
+    /*!
+        requires
+            - have_same_dimensions(dest, src) == true
+        ensures
+            - for all valid i:
+                - #dest.host()[i] == 0.5 * (1 + erf(src.host()[i]/sqrt(2))
+            - This function supports in-place operation, i.e. having
+              is_same_object(dest, src)==true
+    !*/
+
+    void gelu_gradient (
+        tensor& grad,
+        const tensor& dest,
+        const tensor& gradient_input
+    );
+    /*!
+        requires
+            - have_same_dimensions(dest,gradient_input) == true
+            - have_same_dimensions(dest,grad) == true
+        ensures
+            - This function computes the gradient of f() with respect to SRC and stores
+              it to grad.  Moreover, if is_same_object(grad,gradient_input)==true then
+              the output is assigned to grad, replacing its previous contents.
+              Otherwise the output is added to grad.
+            - This function supports in-place operation, i.e. having
+              is_same_object(grad, gradient_input)==true
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     void resize_bilinear (
         tensor& dest,
         long dest_row_stride,

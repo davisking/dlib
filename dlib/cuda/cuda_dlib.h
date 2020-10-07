@@ -398,6 +398,19 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void gelu (
+            tensor& dest,
+            const tensor& src
+        );
+
+        void gelu_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input
+        );
+
+    // ----------------------------------------------------------------------------------------
+
         void resize_bilinear (
             tensor& dest,
             long dest_row_stride,
