@@ -1711,9 +1711,9 @@ namespace dlib
             const tensor& gradient_input
         )
         {
-            const auto compute_gradient = [](float x)
+            const float beta = 1.0f / std::sqrt(pi) / sqrt_2;
+            const auto compute_gradient = [beta](float x)
             {
-                const float beta = M_2_SQRTPI * M_SQRT1_2 * 0.5f;
                 const float cdf = 0.5f*(1.0f + std::erf(x/sqrt_2));
                 const float pdf = beta*std::exp(-0.5f*x*x);
                 return cdf + x * pdf;

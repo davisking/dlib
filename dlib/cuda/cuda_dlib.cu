@@ -1501,7 +1501,7 @@ namespace dlib
 
         __device__ float gelu_compute_gradient(float x)
         {
-                const float beta = M_2_SQRTPI * M_SQRT1_2 * 0.5f;
+                const float beta = 1.0f / std::sqrt(pi) / sqrt_2;
                 const float cdf = normcdf(x);
                 const float pdf = beta*std::exp(-0.5f*x*x);
                 return cdf + x * pdf;
