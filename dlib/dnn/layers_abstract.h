@@ -2319,7 +2319,7 @@ namespace dlib
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it defines a gelu layer.  Therefore, it
                 passes its inputs through the function
-                        f(x)= 0.5 * (1 + erf(x/sqrt(2))
+                        f(x)= x/2 * (1 + erf(x/sqrt(2))
                 where f() is applied pointwise across the input tensor.
 
                 This is the layer type introduced in the paper:

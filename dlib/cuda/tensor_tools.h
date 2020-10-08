@@ -1529,7 +1529,7 @@ namespace dlib { namespace tt
             - have_same_dimensions(dest, src) == true
         ensures
             - for all valid i:
-                - #dest.host()[i] == 0.5 * (1 + erf(src.host()[i]/sqrt(2))
+                - #dest.host()[i] == src.host()[i]/2 * (1 + erf(src.host()[i]/sqrt(2))
             - This function supports in-place operation, i.e. having
               is_same_object(dest, src)==true
     !*/
