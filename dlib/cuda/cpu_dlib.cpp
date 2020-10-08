@@ -1702,7 +1702,7 @@ namespace dlib
             const auto d = dest.host();
             const auto s = src.host();
             for (size_t i = 0; i < src.size(); ++i)
-                d[i] = s[i]*1/(1+std::exp(-s[i]*1.702));
+                d[i] = 0.5f*s[i]*(1.0f + std::erf(s[i]/sqrt_2));
         }
 
         void gelu_gradient (
@@ -1713,10 +1713,10 @@ namespace dlib
         {
             const auto compute_gradient = [](float x)
             {
-                const float temp1 = 1.702*x;
-                const float temp2 = std::exp(temp1);
-                const float temp3 = temp2 + 1;
-                return temp2*(temp1+temp3)/temp3/temp3;
+                const float beta = M_2_SQRTPI * M_SQRT1_2 * 0.5f;
+                const float cdf = 0.5f*(1.0f + std::erf(x/sqrt_2));
+                const float pdf = beta*std::exp(-0.5f*x*x);
+                return cdf + x * pdf;
             };
             const auto g = grad.host();
             const auto s = src.host();

@@ -1485,7 +1485,7 @@ namespace dlib
         {
             for (auto i : grid_stride_range(0, n))
             {
-                d[i] = s[i]*1/(1+std::exp(-s[i]*1.702));
+                d[i] = s[i] * normcdf(s[i]);
             }
         }
 
@@ -1501,10 +1501,10 @@ namespace dlib
 
         __device__ float gelu_compute_gradient(float x)
         {
-                const float temp1 = 1.702*x;
-                const float temp2 = std::exp(temp1);
-                const float temp3 = temp2 + 1;
-                return temp2*(temp1+temp3)/temp3/temp3;
+                const float beta = M_2_SQRTPI * M_SQRT1_2 * 0.5f;
+                const float cdf = normcdf(x);
+                const float pdf = beta*std::exp(-0.5f*x*x);
+                return cdf + x * pdf;
         }
 
         __global__ void _cuda_gelu_gradient_inplace(float* out, const float* s, const float* gi, size_t n)
