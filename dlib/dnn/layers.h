@@ -3289,6 +3289,78 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class gelu_
+    {
+    public:
+        gelu_()
+        {
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        template <typename SUBNET>
+        void forward(
+            const SUBNET& sub,
+            resizable_tensor& data_output
+        )
+        {
+            data_output.copy_size(sub.get_output());
+            tt::gelu(data_output, sub.get_output());
+        }
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor&
+        )
+        {
+            tt::gelu_gradient(sub.get_gradient_input(), sub.get_output(), gradient_input);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const gelu_& /*item*/, std::ostream& out)
+        {
+            serialize("gelu_", out);
+        }
+
+        friend void deserialize(gelu_& /*item*/, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "gelu_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::gelu_.");
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const gelu_& /*item*/)
+        {
+            out << "gelu";
+            return out;
+        }
+
+        friend void to_xml(const gelu_& /*item*/, std::ostream& out)
+        {
+            out << "<gelu/>\n";
+        }
+
+
+    private:
+        resizable_tensor params;
+    };
+
+    template <typename SUBNET>
+    using gelu = add_layer<gelu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class softmax_
     {
     public:

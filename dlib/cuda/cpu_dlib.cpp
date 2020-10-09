@@ -1694,6 +1694,47 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        void gelu (
+            tensor& dest,
+            const tensor& src
+        )
+        {
+            const auto d = dest.host();
+            const auto s = src.host();
+            for (size_t i = 0; i < src.size(); ++i)
+                d[i] = 0.5f*s[i]*(1.0f + std::erf(s[i]/sqrt_2));
+        }
+
+        void gelu_gradient (
+            tensor& grad,
+            const tensor& src,
+            const tensor& gradient_input
+        )
+        {
+            const float beta = 1.0f / std::sqrt(pi) / sqrt_2;
+            const auto compute_gradient = [beta](float x)
+            {
+                const float cdf = 0.5f*(1.0f + std::erf(x/sqrt_2));
+                const float pdf = beta*std::exp(-0.5f*x*x);
+                return cdf + x * pdf;
+            };
+            const auto g = grad.host();
+            const auto s = src.host();
+            const auto in = gradient_input.host();
+            if (is_same_object(grad, gradient_input))
+            {
+                for (size_t i = 0; i < src.size(); ++i)
+                    g[i] = in[i]*compute_gradient(s[i]);
+            }
+            else
+            {
+                for (size_t i = 0; i < src.size(); ++i)
+                    g[i] += in[i]*compute_gradient(s[i]);
+            }
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         void resize_bilinear (
             tensor& dest,
             long dest_row_stride,

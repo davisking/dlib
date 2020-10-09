@@ -269,6 +269,32 @@ namespace
 #endif // DLIB_USE_CUDA
     }
 
+    void test_gelu()
+    {
+#ifdef DLIB_USE_CUDA
+        // make sure that cuda::gelu and cpu::gelu return the same results
+        using namespace dlib::tt;
+        print_spinner();
+        const long n = 5;
+        const long k = 5;
+        const long nr = 3;
+        const long nc = 3;
+        resizable_tensor src(n,k,nr,nc);
+        tt::tensor_rand rnd;
+        rnd.fill_uniform(src);
+
+        resizable_tensor dest1, dest2;
+        dest1.copy_size(src);
+        dest2.copy_size(src);
+        // initialize to different values in order to make sure the output is actually changed
+        dest1 = 1;
+        dest2 = 2;
+        cuda::gelu(dest1, src);
+        cpu::gelu(dest2, src);
+        DLIB_TEST_MSG(max(abs(mat(dest1) - mat(dest2))) < 1e-7, max(abs(mat(dest1) - mat(dest2))));
+#endif // DLIB_USE_CUDA
+    }
+
     void test_batch_normalize()
     {
         using namespace dlib::tt;
@@ -1913,6 +1939,12 @@ namespace
         {
             print_spinner();
             htan_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            gelu_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
@@ -3967,6 +3999,7 @@ namespace
             test_sigmoid();
             test_mish();
             test_leaky_relu();
+            test_gelu();
             test_batch_normalize();
             test_batch_normalize_conv();
             test_basic_tensor_ops();

@@ -967,6 +967,33 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void gelu (
+        tensor& dest,
+        const tensor& src
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::gelu(dest,src);
+#else
+        cpu::gelu(dest,src);
+#endif
+    }
+
+    void gelu_gradient (
+        tensor& grad,
+        const tensor& src,
+        const tensor& gradient_input
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::gelu_gradient(grad, src, gradient_input);
+#else
+        cpu::gelu_gradient(grad, src, gradient_input);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void resize_bilinear (
         tensor& dest,
         long dest_row_stride,
