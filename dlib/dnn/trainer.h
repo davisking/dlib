@@ -1127,6 +1127,8 @@ namespace dlib
             // if the loss is very likely to be increasing then return true
             const double prob1 = probability_values_are_increasing(previous_loss_values_to_keep_until_disk_sync);
             const double prob2 = probability_values_are_increasing_robust(previous_loss_values_to_keep_until_disk_sync);
+            if (std::isnan(prob2))
+                return true;
             if (std::max(prob1, prob2) > prob_loss_increasing_thresh)
             {
                 // Exponentially decay the threshold towards 1 so that if we keep finding
