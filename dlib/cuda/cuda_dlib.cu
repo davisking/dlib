@@ -3,8 +3,8 @@
 
 #include "cuda_utils.h"
 #include "cuda_dlib.h"
-#include <math_constants.h>
 #include "cudnn_dlibapi.h"
+#include <math_constants.h>
 
 
 namespace dlib 
