@@ -4,6 +4,7 @@
 #include "cuda_utils.h"
 #include "cuda_dlib.h"
 #include "cudnn_dlibapi.h"
+#include <math_constants.h>
 
 
 namespace dlib 
@@ -1501,7 +1502,7 @@ namespace dlib
 
         __device__ float gelu_compute_gradient(float x)
         {
-                const float beta = 1.0f / std::sqrt(pi) / sqrt_2;
+                const float beta = 1.0f / CUDART_SQRT_2PI;
                 const float cdf = normcdf(x);
                 const float pdf = beta*std::exp(-0.5f*x*x);
                 return cdf + x * pdf;
