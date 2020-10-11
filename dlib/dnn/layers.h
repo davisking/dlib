@@ -1627,6 +1627,141 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
+
+    const double DEFAULT_LAYER_NORM_EPS = 1e-5;
+
+    class layer_norm_
+    {
+    public:
+        explicit layer_norm_(
+            double eps_ = DEFAULT_LAYER_NORM_EPS
+        ) :
+            learning_rate_multiplier(1),
+            weight_decay_multiplier(0),
+            bias_learning_rate_multiplier(1),
+            bias_weight_decay_multiplier(1),
+            eps(eps_)
+        {
+        }
+
+        double get_eps() const { return eps; }
+
+        double get_learning_rate_multiplier () const  { return learning_rate_multiplier; }
+        double get_weight_decay_multiplier () const   { return weight_decay_multiplier; }
+        void set_learning_rate_multiplier(double val) { learning_rate_multiplier = val; }
+        void set_weight_decay_multiplier(double val)  { weight_decay_multiplier  = val; }
+
+        double get_bias_learning_rate_multiplier () const  { return bias_learning_rate_multiplier; }
+        double get_bias_weight_decay_multiplier () const   { return bias_weight_decay_multiplier; }
+        void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
+        void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& sub)
+        {
+            gamma = alias_tensor(sub.get_output().num_samples());
+            beta = gamma;
+
+            params.set_size(gamma.size()+beta.size());
+
+            gamma(params,0) = 1;
+            beta(params,gamma.size()) = 0;
+        }
+
+        template <typename SUBNET>
+        void forward(const SUBNET& sub, resizable_tensor& output)
+        {
+            auto g = gamma(params,0);
+            auto b = beta(params,gamma.size());
+            tt::layer_normalize(eps, output, means, invstds, sub.get_output(), g, b);
+        }
+
+        template <typename SUBNET>
+        void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad)
+        {
+            auto g = gamma(params, 0);
+            auto g_grad = gamma(params_grad, 0);
+            auto b_grad = beta(params_grad, gamma.size());
+            tt::layer_normalize_gradient(eps, gradient_input, means, invstds, sub.get_output(), g, sub.get_gradient_input(), g_grad, b_grad);
+        }
+
+        const tensor& get_layer_params() const { return params; };
+        tensor& get_layer_params() { return params; };
+
+        friend void serialize(const layer_norm_& item, std::ostream& out)
+        {
+            serialize("layer_norm_", out);
+            serialize(item.params, out);
+            serialize(item.gamma, out);
+            serialize(item.beta, out);
+            serialize(item.means, out);
+            serialize(item.invstds, out);
+            serialize(item.learning_rate_multiplier, out);
+            serialize(item.weight_decay_multiplier, out);
+            serialize(item.bias_learning_rate_multiplier, out);
+            serialize(item.bias_weight_decay_multiplier, out);
+            serialize(item.eps, out);
+        }
+
+        friend void deserialize(layer_norm_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "layer_norm_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::layer_norm_.");
+            deserialize(item.params, in);
+            deserialize(item.gamma, in);
+            deserialize(item.beta, in);
+            deserialize(item.means, in);
+            deserialize(item.invstds, in);
+            deserialize(item.learning_rate_multiplier, in);
+            deserialize(item.weight_decay_multiplier, in);
+            deserialize(item.bias_learning_rate_multiplier, in);
+            deserialize(item.bias_weight_decay_multiplier, in);
+            deserialize(item.eps, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const layer_norm_& item)
+        {
+            out << "layer_norm";
+            out << " eps="<<item.eps;
+            out << " learning_rate_mult="<<item.learning_rate_multiplier;
+            out << " weight_decay_mult="<<item.weight_decay_multiplier;
+            out << " bias_learning_rate_mult="<<item.bias_learning_rate_multiplier;
+            out << " bias_weight_decay_mult="<<item.bias_weight_decay_multiplier;
+            return out;
+        }
+
+        friend void to_xml(const layer_norm_& item, std::ostream& out)
+        {
+            out << "layer_norm";
+            out << " eps='"<<item.eps<<"'";
+            out << " learning_rate_mult='"<<item.learning_rate_multiplier<<"'";
+            out << " weight_decay_mult='"<<item.weight_decay_multiplier<<"'";
+            out << " bias_learning_rate_mult='"<<item.bias_learning_rate_multiplier<<"'";
+            out << " bias_weight_decay_mult='"<<item.bias_weight_decay_multiplier<<"'";
+            out << ">\n";
+            out << mat(item.params);
+            out << "</layer_norm>\n";
+        }
+
+    private:
+        resizable_tensor params;
+        alias_tensor gamma, beta;
+        resizable_tensor means, invstds;
+        double learning_rate_multiplier;
+        double weight_decay_multiplier;
+        double bias_learning_rate_multiplier;
+        double bias_weight_decay_multiplier;
+        double eps;
+    };
+
+    template <typename SUBNET>
+    using layer_norm = add_layer<layer_norm_, SUBNET>;
+
 // ----------------------------------------------------------------------------------------
 
     enum fc_bias_mode

@@ -231,6 +231,30 @@ namespace dlib
 
     // -----------------------------------------------------------------------------------
 
+        void layer_normalize (
+            const double eps,
+            resizable_tensor& dest,
+            resizable_tensor& means,
+            resizable_tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            const tensor& beta
+        );
+
+        void layer_normalize_gradient (
+            const double eps,
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad,
+            tensor& beta_grad
+        );
+
+    // -----------------------------------------------------------------------------------
+
         void threshold (
             tensor& data,
             float thresh
