@@ -1751,6 +1751,115 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
+        __global__ void _cuda_layer_normalize(float* out, const float* s, float* m, float* v, const float* g, const float* b, float eps, size_t ns, size_t num)
+        {
+           // compute means and sum of squares
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                for (auto i : grid_stride_range(0, num))
+                {
+                    const float val = s[n*num+i];
+                    m[n] += val;
+                    v[n] += val*val;
+                }
+            }
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                for (auto i : grid_stride_range(0, 1))
+                {
+                    m[n] /= num;
+                    v[n] /= num;
+                }
+            }
+            __syncthreads();
+
+            // compute variances
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                for (auto i : grid_stride_range(0, 1))
+                {
+                    auto var = v[n] - m[n] * m[n];
+                    v[n] = 1.0f / std::sqrt(var + eps);
+                }
+            }
+            __syncthreads();
+
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                for (auto i : grid_stride_range(0, num))
+                {
+                    const float val = (s[n*num+i]-m[n])*v[n];
+                    out[n*num+i] = val*g[n]+b[n];
+                }
+            }
+        }
+
+        void layer_normalize (
+            const double eps,
+            resizable_tensor& dest,
+            resizable_tensor& means,
+            resizable_tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            const tensor& beta
+        )
+        {
+            const long num = src.k() * src.nr() * src.nc();
+            DLIB_CASSERT(
+                have_same_dimensions(gamma, beta) &&
+                src.num_samples() == gamma.size() &&
+                src.num_samples() == beta.size() &&
+                eps > 0,
+                "\ngamma.k():  " << gamma.k() <<
+                "\ngamma.nr(): " << gamma.nr() <<
+                "\ngamma.nc(): " << gamma.nc() <<
+                "\nbeta.k():   " << beta.k() <<
+                "\nbeta.nr():  " << beta.nr() <<
+                "\nbeta.nc():  " << beta.nc() <<
+                "\nsrc.k():   " << src.k() <<
+                "\nsrc.nr():  " << src.nr() <<
+                "\nsrc.nc():  " << src.nc() <<
+                "\neps:  " << eps
+            );
+
+            dest.copy_size(src);
+            means.set_size(src.num_samples());
+            invstds.set_size(src.num_samples());
+            means = 0;
+            invstds = 0;
+            launch_kernel(_cuda_layer_normalize, max_jobs(num, src.num_samples()), dest.device(), src.device(),
+                          means.device(), invstds.device(), gamma.device(), beta.device(),
+                          eps, src.num_samples(), num);
+        }
+
+        void layer_normalize_gradient (
+            const double eps,
+            const tensor& gradient_input,
+            const tensor& means,
+            const tensor& invstds,
+            const tensor& src,
+            const tensor& gamma,
+            tensor& src_grad,
+            tensor& gamma_grad,
+            tensor& beta_grad
+        )
+        {
+            const long num = src.k() * src.nr() * src.nc();
+            DLIB_CASSERT(src.num_samples() == means.size());
+            DLIB_CASSERT(src.num_samples() == invstds.size());
+            DLIB_CASSERT(src.num_samples() == gamma.size());
+            DLIB_CASSERT(src.num_samples() == gamma_grad.size());
+            DLIB_CASSERT(src.num_samples() == beta_grad.size());
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src));
+            DLIB_CASSERT(have_same_dimensions(gradient_input, src_grad));
+            DLIB_CASSERT(eps > 0);
+
+            beta_grad = 0;
+            gamma_grad = 0;
+        }
+
+    // ----------------------------------------------------------------------------------------
+
         __global__ void _cuda_copy_tensor_add_to (float* dest, size_t size,  const float* src,  size_t dest_stride, size_t src_stride, size_t block_size)
         {
             for(auto i : grid_stride_range(0, size)) 

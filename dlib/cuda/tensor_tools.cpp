@@ -668,7 +668,11 @@ namespace dlib { namespace tt
         const tensor& beta
     )
     {
+#ifdef DLIB_USE_CUDA
+        cuda::layer_normalize(eps, dest, means, vars, src, gamma, beta);
+#else
         cpu::layer_normalize(eps, dest, means, vars, src, gamma, beta);
+#endif
     }
 
     void layer_normalize_gradient (
