@@ -1328,6 +1328,7 @@ namespace dlib
             {
                 for (long i = 0; i < num; ++i)
                 {
+                    // printf("%ld, %ld: %f, %f, %f\n", n, i, *p_src, p_means[n], p_invstds[n]);
                     *p_dest = (*p_src - p_means[n])*p_invstds[n];
                     *p_dest = (*p_dest)*p_gamma[n] + p_beta[n];
                     ++p_src;

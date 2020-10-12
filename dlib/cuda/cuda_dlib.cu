@@ -1754,44 +1754,49 @@ namespace dlib
         __global__ void _cuda_layer_normalize(float* out, const float* s, float* m, float* v, const float* g, const float* b, float eps, size_t ns, size_t num)
         {
            // compute means and sum of squares
-            for (auto n : grid_stride_range_y(0, ns))
+            for (auto n : grid_stride_range(0, ns))
             {
-                for (auto i : grid_stride_range(0, num))
+                for (auto i : grid_stride_range_y(0, num))
                 {
                     const float val = s[n*num+i];
                     m[n] += val;
                     v[n] += val*val;
                 }
             }
-            for (auto n : grid_stride_range_y(0, ns))
+            __syncthreads();
+            for (auto n : grid_stride_range(0, ns))
             {
-                for (auto i : grid_stride_range(0, 1))
+                for (auto i : grid_stride_range_y(0, 1))
                 {
                     m[n] /= num;
                     v[n] /= num;
                 }
             }
             __syncthreads();
-
             // compute variances
-            for (auto n : grid_stride_range_y(0, ns))
+            for (auto n : grid_stride_range(0, ns))
             {
-                for (auto i : grid_stride_range(0, 1))
+                for (auto i : grid_stride_range_y(0, 1))
                 {
                     auto var = v[n] - m[n] * m[n];
                     v[n] = 1.0f / std::sqrt(var + eps);
                 }
             }
             __syncthreads();
-
-            for (auto n : grid_stride_range_y(0, ns))
+            for (auto n : grid_stride_range(0, ns))
             {
-                for (auto i : grid_stride_range(0, num))
+                for (auto i : grid_stride_range_y(0, num))
                 {
+                    // printf("%d, %d: %f, %f, %f\n", (int)n, (int)i, s[n*num+i], m[n], v[n]);
                     const float val = (s[n*num+i]-m[n])*v[n];
                     out[n*num+i] = val*g[n]+b[n];
                 }
             }
+        }
+
+        __global__ void _cuda_layer_normalize_gradient(float* out, float* gg, float* bg, const float* s, const float* gi, const float* m, const float* v, const float* g, float* dm, float* dv, float eps, size_t ns, size_t num)
+        {
+            // TODO
         }
 
         void layer_normalize (
@@ -1856,6 +1861,15 @@ namespace dlib
 
             beta_grad = 0;
             gamma_grad = 0;
+            resizable_tensor dvars, dmeans;
+            dvars.copy_size(invstds);
+            dmeans.copy_size(means);
+            dvars = 0;
+            dmeans = 0;
+            launch_kernel(_cuda_layer_normalize_gradient, max_jobs(num, src.num_samples()),
+                          src_grad.device(), gamma_grad.device(), beta_grad.device(), src.device(),
+                          gradient_input.device(), means.device(), invstds.device(), gamma.device(),
+                          dmeans.device(), dvars.device(), eps, src.num_samples(), num);
         }
 
     // ----------------------------------------------------------------------------------------
