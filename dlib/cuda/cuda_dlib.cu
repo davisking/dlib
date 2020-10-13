@@ -1756,23 +1756,19 @@ namespace dlib
            // compute means and sum of squares
             for (auto n : grid_stride_range_y(0, ns))
             {
+                auto p = s + n * num;
+                float means = 0;
+                float invstds = 0;
                 for (auto i : grid_stride_range(0, num))
                 {
-                    const float val = s[n*num+i];
-                    m[n] += val;
-                    v[n] += val*val;
+                    means += p[i];
+                    invstds += p[i] * p[i];
                 }
+                warp_reduce_atomic_add(m[n], means/num);
+                warp_reduce_atomic_add(v[n], invstds/num);
             }
             __syncthreads();
-            for (auto n : grid_stride_range_y(0, ns))
-            {
-                for (auto i : grid_stride_range(0, 1))
-                {
-                    m[n] /= num;
-                    v[n] /= num;
-                }
-            }
-            __syncthreads();
+
             // compute variances
             for (auto n : grid_stride_range_y(0, ns))
             {
@@ -1783,6 +1779,7 @@ namespace dlib
                 }
             }
             __syncthreads();
+
             for (auto n : grid_stride_range_y(0, ns))
             {
                 for (auto i : grid_stride_range(0, num))
@@ -1831,9 +1828,8 @@ namespace dlib
             invstds.set_size(src.num_samples());
             means = 0;
             invstds = 0;
-            launch_kernel(_cuda_layer_normalize, max_jobs(src.num_samples(), num), dest.device(), src.device(),
-                          means.device(), invstds.device(), gamma.device(), beta.device(),
-                          eps, src.num_samples(), num);
+            launch_kernel(_cuda_layer_normalize, max_jobs(num, src.num_samples()), dest.device(), src.device(),
+                          means.device(), invstds.device(), gamma.device(), beta.device(), eps, src.num_samples(), num);
         }
 
         void layer_normalize_gradient (
