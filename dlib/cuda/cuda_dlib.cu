@@ -1792,7 +1792,52 @@ namespace dlib
 
         __global__ void _cuda_layer_normalize_gradient(float* out, float* gg, float* bg, const float* s, const float* gi, const float* m, const float* v, const float* g, float* dm, float* dv, float eps, size_t ns, size_t num)
         {
-            // TODO
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                float temp_bg = 0;
+                float temp_gg = 0;
+                float temp_dv = 0;
+                for (auto i : grid_stride_range(0, num))
+                {
+                    auto idx = n*num+i;
+                    const float x_hat = (s[idx] - m[n])*v[n];
+                    temp_bg += gi[idx];
+                    temp_gg += gi[idx]*x_hat;
+
+                    const float dx = gi[idx] * g[n];
+                    temp_dv += dx*(s[idx] - m[n])*-0.5*v[n]*v[n]*v[n];
+                }
+                warp_reduce_atomic_add(bg[n], temp_bg);
+                warp_reduce_atomic_add(gg[n], temp_gg);
+                warp_reduce_atomic_add(dv[n], temp_dv);
+            }
+            __syncthreads();
+
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                float temp_dm = 0;
+                for (auto i : grid_stride_range(0, num))
+                {
+                    auto idx = n*num+i;
+                    const float dx = gi[idx]*g[n];
+                    temp_dm += dx*-v[n] + dv[n] * -2*(s[idx] - m[n])/num;
+                    // dm[n] += dx*-v[n] + dv[n] * -2*(s[idx] - m[n])/num;
+                }
+                warp_reduce_atomic_add(dm[n], temp_dm);
+            }
+            __syncthreads();
+
+            for (auto n : grid_stride_range_y(0, ns))
+            {
+                float temp = 0;
+                for (auto i : grid_stride_range(0, num))
+                {
+                    auto idx = n*num+i;
+                    const float dx = gi[idx]*g[n];
+                    out[idx] += dx*v[n] + dv[n] * 2*(s[idx] - m[n])/num + dm[n]/num;
+                    // temp += dx*v[n] + dv[n] * 2*(s[idx] - m[n])/num + dm[n]/num;
+                }
+            }
         }
 
         void layer_normalize (
