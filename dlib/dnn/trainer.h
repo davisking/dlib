@@ -1113,10 +1113,10 @@ namespace dlib
             while (previous_loss_values_to_keep_until_disk_sync.size() > 2 * gradient_updates_since_last_sync)
                 previous_loss_values_to_keep_until_disk_sync.pop_front();
 
-            // Always retry if there are any nan values
+            // Always retry if there are any nan or inf values
             for (auto x : previous_loss_values_to_keep_until_disk_sync)
             {
-                if (std::isnan(x))
+                if (std::isnan(x) || std::isinf(x))
                     return true;
             }
 
@@ -1127,8 +1127,6 @@ namespace dlib
             // if the loss is very likely to be increasing then return true
             const double prob1 = probability_values_are_increasing(previous_loss_values_to_keep_until_disk_sync);
             const double prob2 = probability_values_are_increasing_robust(previous_loss_values_to_keep_until_disk_sync);
-            if (std::isnan(prob2))
-                return true;
             if (std::max(prob1, prob2) > prob_loss_increasing_thresh)
             {
                 // Exponentially decay the threshold towards 1 so that if we keep finding
