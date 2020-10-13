@@ -1754,9 +1754,9 @@ namespace dlib
         __global__ void _cuda_layer_normalize(float* out, const float* s, float* m, float* v, const float* g, const float* b, float eps, size_t ns, size_t num)
         {
            // compute means and sum of squares
-            for (auto n : grid_stride_range(0, ns))
+            for (auto n : grid_stride_range_y(0, ns))
             {
-                for (auto i : grid_stride_range_y(0, num))
+                for (auto i : grid_stride_range(0, num))
                 {
                     const float val = s[n*num+i];
                     m[n] += val;
@@ -1764,9 +1764,9 @@ namespace dlib
                 }
             }
             __syncthreads();
-            for (auto n : grid_stride_range(0, ns))
+            for (auto n : grid_stride_range_y(0, ns))
             {
-                for (auto i : grid_stride_range_y(0, 1))
+                for (auto i : grid_stride_range(0, 1))
                 {
                     m[n] /= num;
                     v[n] /= num;
@@ -1774,20 +1774,19 @@ namespace dlib
             }
             __syncthreads();
             // compute variances
-            for (auto n : grid_stride_range(0, ns))
+            for (auto n : grid_stride_range_y(0, ns))
             {
-                for (auto i : grid_stride_range_y(0, 1))
+                for (auto i : grid_stride_range(0, 1))
                 {
                     auto var = v[n] - m[n] * m[n];
                     v[n] = 1.0f / std::sqrt(var + eps);
                 }
             }
             __syncthreads();
-            for (auto n : grid_stride_range(0, ns))
+            for (auto n : grid_stride_range_y(0, ns))
             {
-                for (auto i : grid_stride_range_y(0, num))
+                for (auto i : grid_stride_range(0, num))
                 {
-                    // printf("%d, %d: %f, %f, %f\n", (int)n, (int)i, s[n*num+i], m[n], v[n]);
                     const float val = (s[n*num+i]-m[n])*v[n];
                     out[n*num+i] = val*g[n]+b[n];
                 }
@@ -1832,7 +1831,7 @@ namespace dlib
             invstds.set_size(src.num_samples());
             means = 0;
             invstds = 0;
-            launch_kernel(_cuda_layer_normalize, max_jobs(num, src.num_samples()), dest.device(), src.device(),
+            launch_kernel(_cuda_layer_normalize, max_jobs(src.num_samples(), num), dest.device(), src.device(),
                           means.device(), invstds.device(), gamma.device(), beta.device(),
                           eps, src.num_samples(), num);
         }
