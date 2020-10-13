@@ -1436,6 +1436,149 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    const double DEFAULT_LAYER_NORM_EPS = 1e-5;
+
+    class layer_norm_
+    {
+        /*!
+            WHAT THIS OBJECT REPRESENTS
+                This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
+                defined above.  In particular, it defines a batch normalization layer that
+                implements the method described in the paper: 
+                    Layer Normalization by Jimmy Lei Ba, Jamie Ryan Kiros, Geoffrey E. Hinton
+
+                In particular, this layer produces output tensors with the same
+                dimensionality as the input tensors, except that the mean and variances of
+                the elements in each sample have been standardized to 0 and 1 respectively.
+                This is different from batch normalization, since this layer learns one scaling
+                factor and one bias for each sample in the batch, independently.  As a result,
+                this layer is batch-size independent.
+        !*/
+    public:
+        layer_norm_(
+        );
+        /*!
+            ensures
+                - #get_learning_rate_multiplier()       == 1
+                - #get_weight_decay_multiplier()        == 0
+                - #get_bias_learning_rate_multiplier()  == 1
+                - #get_bias_weight_decay_multiplier()   == 1
+                - #get_eps() == DEFAULT_LAYER_NORM_EPS
+        !*/
+
+        explicit layer_norm_(
+            double eps_ = DEFAULT_LAYER_NORM_EPS
+        )
+        /*!
+            requires
+                - eps > 0
+            ensures
+                - #get_learning_rate_multiplier()      == 1
+                - #get_weight_decay_multiplier()       == 0
+                - #get_bias_learning_rate_multiplier() == 1
+                - #get_bias_weight_decay_multiplier()  == 1
+                - #get_eps() == eps
+        !*/
+
+        double get_eps(
+        ) const;
+        /*!
+            ensures
+                - When doing layer normalization, we are dividing by the standard
+                  deviation.  This epsilon value returned by this function is added to the
+                  variance to prevent the division from dividing by zero.
+        !*/
+
+        double get_learning_rate_multiplier(
+        ) const;
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its parameters be
+                  multiplied by get_learning_rate_multiplier().
+        !*/
+
+        double get_weight_decay_multiplier(
+        ) const;
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its parameters be
+                  multiplied by get_weight_decay_multiplier().
+        !*/
+
+        void set_learning_rate_multiplier(
+            double val
+        );
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_learning_rate_multiplier() == val
+        !*/
+
+        void set_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_weight_decay_multiplier() == val
+        !*/
+
+        double get_bias_learning_rate_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the learning rate used to optimize its bias parameters be
+                  multiplied by get_learning_rate_multiplier()*get_bias_learning_rate_multiplier().
+        !*/
+
+        double get_bias_weight_decay_multiplier(
+        ) const; 
+        /*!
+            ensures
+                - returns a multiplier number.  The interpretation is that this object is
+                  requesting that the weight decay used to optimize its bias parameters be
+                  multiplied by get_weight_decay_multiplier()*get_bias_weight_decay_multiplier().
+        !*/
+
+        void set_bias_learning_rate_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_learning_rate_multiplier() == val
+        !*/
+
+        void set_bias_weight_decay_multiplier(
+            double val
+        ); 
+        /*!
+            requires
+                - val >= 0
+            ensures
+                - #get_bias_weight_decay_multiplier() == val
+        !*/
+
+        template <typename SUBNET> void setup (const SUBNET& sub);
+        template <typename SUBNET> void forward(const SUBNET& sub, resizable_tensor& output);
+        template <typename SUBNET> void backward(const tensor& gradient_input, SUBNET& sub, tensor& params_grad);
+        dpoint map_input_to_output(dpoint p) const;
+        dpoint map_output_to_input(dpoint p) const;
+        const tensor& get_layer_params() const;
+        tensor& get_layer_params();
+        /*!
+            These functions are implemented as described in the EXAMPLE_COMPUTATIONAL_LAYER_ interface.
+        !*/
+    };
+
+// ----------------------------------------------------------------------------------------
+
     enum layer_mode
     {
         CONV_MODE = 0, // convolutional mode
