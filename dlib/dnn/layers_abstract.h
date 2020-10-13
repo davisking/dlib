@@ -1444,7 +1444,7 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
                 defined above.  In particular, it defines a batch normalization layer that
-                implements the method described in the paper: 
+                implements the method described in the paper:
                     Layer Normalization by Jimmy Lei Ba, Jamie Ryan Kiros, Geoffrey E. Hinton
 
                 In particular, this layer produces output tensors with the same
@@ -1519,7 +1519,7 @@ namespace dlib
 
         void set_weight_decay_multiplier(
             double val
-        ); 
+        );
         /*!
             requires
                 - val >= 0
@@ -1528,7 +1528,7 @@ namespace dlib
         !*/
 
         double get_bias_learning_rate_multiplier(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns a multiplier number.  The interpretation is that this object is
@@ -1537,7 +1537,7 @@ namespace dlib
         !*/
 
         double get_bias_weight_decay_multiplier(
-        ) const; 
+        ) const;
         /*!
             ensures
                 - returns a multiplier number.  The interpretation is that this object is
@@ -1547,7 +1547,7 @@ namespace dlib
 
         void set_bias_learning_rate_multiplier(
             double val
-        ); 
+        );
         /*!
             requires
                 - val >= 0
@@ -1557,7 +1557,7 @@ namespace dlib
 
         void set_bias_weight_decay_multiplier(
             double val
-        ); 
+        );
         /*!
             requires
                 - val >= 0
