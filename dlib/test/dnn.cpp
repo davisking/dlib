@@ -504,7 +504,7 @@ namespace
                 }
             }
             DLIB_TEST(::std::abs(rs.mean()) < 1e-6);
-            DLIB_TEST(::std::abs(rs.variance() - 1.0f) < 0.02);
+            DLIB_TEST(::std::abs(rs.stddev() - 1.0f) < 0.01);
         }
         // check that the CPU and the CUDA implementation are equivalent
 #if DLIB_USE_CUDA
