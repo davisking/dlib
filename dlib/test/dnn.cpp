@@ -478,16 +478,12 @@ namespace
         resizable_tensor y_cpu(x);
         tt::tensor_rand rnd(0);
         rnd.fill_uniform(x);
-        resizable_tensor means(x.num_samples()), invstds(x.num_samples());
+        resizable_tensor means_cpu(x.num_samples()), invstds_cpu(x.num_samples());
         resizable_tensor gamma(x.num_samples()), beta(x.num_samples());
         gamma = 1;
         beta = 0;
         const float eps = 1e-5;
-        resizable_tensor gradient_input(x), src_grad_cpu(x);
-        resizable_tensor gamma_grad_cpu(x.num_samples()), beta_grad_cpu(x.num_samples());
-        src_grad_cpu = 0;
-        rnd.fill_gaussian(gradient_input);
-        cpu::layer_normalize(eps, y_cpu, means, invstds, x, gamma, beta);
+        cpu::layer_normalize(eps, y_cpu, means_cpu, invstds_cpu, x, gamma, beta);
         // check that the mean and var per sample are 0 and 1
         const float* p = y_cpu.host();
         for (long n = 0; n < y_cpu.num_samples(); ++n)
@@ -509,17 +505,22 @@ namespace
         // check that the CPU and the CUDA implementation are equivalent
 #if DLIB_USE_CUDA
         resizable_tensor y_cuda(x);
-        cuda::layer_normalize(eps, y_cuda, means, invstds, x, gamma, beta);
+        resizable_tensor means_cuda(x.num_samples()), invstds_cuda(x.num_samples());
+        cuda::layer_normalize(eps, y_cuda, means_cuda, invstds_cuda, x, gamma, beta);
         DLIB_TEST(max(abs(mat(y_cpu) - mat(y_cuda))) < 1e-5);
-#endif
-        cpu::layer_normalize_gradient(eps, gradient_input, means, invstds, x, gamma, src_grad_cpu, gamma_grad_cpu, beta_grad_cpu);
-#if DLIB_USE_CUDA
+        DLIB_TEST(max(abs(mat(means_cpu) - mat(means_cuda))) < 1e-5);
+        DLIB_TEST(max(abs(mat(invstds_cpu) - mat(invstds_cuda))) < 1e-5);
+        resizable_tensor gradient_input(x);
+        resizable_tensor src_grad_cpu(x), gamma_grad_cpu(x.num_samples()), beta_grad_cpu(x.num_samples());
         resizable_tensor src_grad_cuda(x), gamma_grad_cuda(x.num_samples()), beta_grad_cuda(x.num_samples());
+        rnd.fill_gaussian(gradient_input);
+        src_grad_cpu = 0;
         src_grad_cuda = 0;
-        cuda::layer_normalize_gradient(eps, gradient_input, means, invstds, x, gamma, src_grad_cuda, gamma_grad_cuda, beta_grad_cuda);
-        DLIB_TEST(max(abs(mat(src_grad_cpu) - mat(src_grad_cuda))) < 1e-6);
-        DLIB_TEST(max(abs(mat(gamma_grad_cpu) - mat(gamma_grad_cuda))) < 1e-6);
-        DLIB_TEST(max(abs(mat(beta_grad_cpu) - mat(beta_grad_cuda))) < 1e-6);
+        cpu::layer_normalize_gradient(eps, gradient_input, means_cpu, invstds_cpu, x, gamma, src_grad_cpu, gamma_grad_cpu, beta_grad_cpu);
+        cuda::layer_normalize_gradient(eps, gradient_input, means_cuda, invstds_cuda, x, gamma, src_grad_cuda, gamma_grad_cuda, beta_grad_cuda);
+        DLIB_TEST(max(abs(mat(src_grad_cpu) - mat(src_grad_cuda))) < 1e-5);
+        DLIB_TEST(max(abs(mat(gamma_grad_cpu) - mat(gamma_grad_cuda))) < 1e-5);
+        DLIB_TEST(max(abs(mat(beta_grad_cpu) - mat(beta_grad_cuda))) < 1e-5);
 #endif
     }
 
