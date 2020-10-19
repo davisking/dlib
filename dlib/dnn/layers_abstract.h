@@ -1810,7 +1810,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>
-    void set_all_bn_inputs_no_bias (
+    void disable_duplicative_bias (
         const net_type& net
     );
     /*!
@@ -1818,9 +1818,9 @@ namespace dlib
             - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
               add_tag_layer.
         ensures
-            - Disables bias for all bn_ layer inputs.
+            - Disables bias for all bn_ and layer_norm_ inputs.
             - Sets the get_bias_learning_rate_multiplier() and get_bias_weight_decay_multiplier()
-              to zero of all bn_ layer inputs.
+              to zero of all bn_ and layer_norm_ inputs.
     !*/
 
 // ----------------------------------------------------------------------------------------

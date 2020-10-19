@@ -1712,18 +1712,18 @@ namespace dlib
             unsigned long new_window_size;
         };
 
-        class visitor_bn_input_no_bias
+        class visitor_disable_input_bias
         {
         public:
 
             template <typename T>
-            void set_input_no_bias(T&) const
+            void disable_input_bias(T&) const
             {
                 // ignore other layer types
             }
 
             template <typename U, typename E>
-            void set_input_no_bias(add_layer<layer_norm_, U, E>& l)
+            void disable_input_bias(add_layer<layer_norm_, U, E>& l)
             {
                 disable_bias(l.subnet().layer_details());
                 set_bias_learning_rate_multiplier(l.subnet().layer_details(), 0);
@@ -1731,11 +1731,19 @@ namespace dlib
             }
 
             template <layer_mode mode, typename U, typename E>
-            void set_input_no_bias(add_layer<bn_<mode>, U, E>& l)
+            void disable_input_bias(add_layer<bn_<mode>, U, E>& l)
             {
                 disable_bias(l.subnet().layer_details());
                 set_bias_learning_rate_multiplier(l.subnet().layer_details(), 0);
                 set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
+            }
+
+            template <layer_mode mode, size_t N, template <typename> class R, typename U, typename E>
+            void disable_input_bias(add_layer<bn_<mode>, repeat<N, R, U>, E>& l)
+            {
+                disable_bias(l.subnet().get_repeated_layer(0).layer_details());
+                set_bias_learning_rate_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
+                set_bias_weight_decay_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
             }
 
             template<typename input_layer_type>
@@ -1747,7 +1755,7 @@ namespace dlib
             template <typename T, typename U, typename E>
             void operator()(size_t , add_layer<T,U,E>& l)
             {
-                set_input_no_bias(l);
+                disable_input_bias(l);
             }
         };
     }
@@ -1762,11 +1770,11 @@ namespace dlib
     }
 
     template <typename net_type>
-    void set_all_bn_inputs_no_bias (
+    void disable_duplicative_bias (
         net_type& net
     )
     {
-        visit_layers(net, impl::visitor_bn_input_no_bias());
+        visit_layers(net, impl::visitor_disable_input_bias());
     }
 
 // ----------------------------------------------------------------------------------------
