@@ -472,6 +472,60 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    void test_layer_normalize()
+    {
+        resizable_tensor x(2, 3, 4, 5);
+        resizable_tensor y_cpu(x);
+        tt::tensor_rand rnd(0);
+        rnd.fill_uniform(x);
+        resizable_tensor means_cpu(x.num_samples()), invstds_cpu(x.num_samples());
+        resizable_tensor gamma(x.num_samples()), beta(x.num_samples());
+        gamma = 1;
+        beta = 0;
+        const float eps = 1e-5;
+        cpu::layer_normalize(eps, y_cpu, means_cpu, invstds_cpu, x, gamma, beta);
+        // check that the mean and var per sample are 0 and 1
+        const float* p = y_cpu.host();
+        for (long n = 0; n < y_cpu.num_samples(); ++n)
+        {
+            running_stats<float> rs;
+            for (long k = 0; k < y_cpu.k(); ++k)
+            {
+                for (long r = 0; r < y_cpu.nr(); ++r)
+                {
+                    for (long c = 0; c < y_cpu.nc(); ++c)
+                    {
+                        rs.add(p[tensor_index(y_cpu, n, k, r, c)]);
+                    }
+                }
+            }
+            DLIB_TEST(::std::abs(rs.mean()) < 1e-6);
+            DLIB_TEST(::std::abs(rs.stddev() - 1.0f) < 0.01);
+        }
+        // check that the CPU and the CUDA implementation are equivalent
+#if DLIB_USE_CUDA
+        resizable_tensor y_cuda(x);
+        resizable_tensor means_cuda(x.num_samples()), invstds_cuda(x.num_samples());
+        cuda::layer_normalize(eps, y_cuda, means_cuda, invstds_cuda, x, gamma, beta);
+        DLIB_TEST(max(abs(mat(y_cpu) - mat(y_cuda))) < 1e-5);
+        DLIB_TEST(max(abs(mat(means_cpu) - mat(means_cuda))) < 1e-5);
+        DLIB_TEST(max(abs(mat(invstds_cpu) - mat(invstds_cuda))) < 1e-5);
+        resizable_tensor gradient_input(x);
+        resizable_tensor src_grad_cpu(x), gamma_grad_cpu(x.num_samples()), beta_grad_cpu(x.num_samples());
+        resizable_tensor src_grad_cuda(x), gamma_grad_cuda(x.num_samples()), beta_grad_cuda(x.num_samples());
+        rnd.fill_gaussian(gradient_input);
+        src_grad_cpu = 0;
+        src_grad_cuda = 0;
+        cpu::layer_normalize_gradient(eps, gradient_input, means_cpu, invstds_cpu, x, gamma, src_grad_cpu, gamma_grad_cpu, beta_grad_cpu);
+        cuda::layer_normalize_gradient(eps, gradient_input, means_cuda, invstds_cuda, x, gamma, src_grad_cuda, gamma_grad_cuda, beta_grad_cuda);
+        DLIB_TEST(max(abs(mat(src_grad_cpu) - mat(src_grad_cuda))) < 1e-5);
+        DLIB_TEST(max(abs(mat(gamma_grad_cpu) - mat(gamma_grad_cuda))) < 1e-5);
+        DLIB_TEST(max(abs(mat(beta_grad_cpu) - mat(beta_grad_cuda))) < 1e-5);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void test_basic_tensor_ops()
     {
         using namespace dlib::tt;
@@ -1813,6 +1867,12 @@ namespace
         {
             print_spinner();
             bn_<FC_MODE> l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            layer_norm_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
         }
@@ -3847,6 +3907,46 @@ namespace
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <long num_filters, long ks, int s, typename SUBNET>
+    using conp = add_layer<con_<num_filters, ks, ks, s, s, ks/2, ks/2>, SUBNET>;
+    template <typename INPUT>
+    using stem = add_layer<max_pool_<3, 3, 2, 2, 1, 1>, relu<bn_con<conp<16, 7, 2, INPUT>>>>;
+    template <long num_filters, long growth_rate, typename SUBNET>
+    using dense_layer = concat2<tag1, tag2,
+                        tag2<conp<growth_rate, 3, 1,
+                        relu<bn_con<conp<4 * growth_rate, 1, 1,
+                        relu<bn_con<tag1<SUBNET>>>>>>>>>;
+    template <typename SUBNET> using dense_layer_32 = dense_layer<32, 8, SUBNET>;
+    void test_disable_duplicative_bias()
+    {
+        using net_type = fc<10, relu<layer_norm<fc<15, relu<bn_fc<fc<20,
+                         relu<layer_norm<conp<32, 3, 1,
+                         repeat<2, dense_layer_32,
+                         stem<input_rgb_image>>>>>>>>>>>>;
+        net_type net;
+        DLIB_TEST(layer<0>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<3>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<6>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<9>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<12>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<15>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<21>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<24>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<31>(net).layer_details().bias_is_disabled() == false);
+        disable_duplicative_bias(net);
+        DLIB_TEST(layer<0>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<3>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<6>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<9>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<12>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<15>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<21>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<24>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<31>(net).layer_details().bias_is_disabled() == true);
+    }
+
+// ----------------------------------------------------------------------------------------
     
     // This test really just checks if the mmod loss goes negative when a whole lot of overlapping
     // truth rectangles are given.  
@@ -4002,6 +4102,7 @@ namespace
             test_gelu();
             test_batch_normalize();
             test_batch_normalize_conv();
+            test_layer_normalize();
             test_basic_tensor_ops();
             test_layers();
             test_visit_functions();
@@ -4029,6 +4130,7 @@ namespace
             test_loss_multimulticlass_log();
             test_loss_mmod();
             test_layers_scale_and_scale_prev();
+            test_disable_duplicative_bias();
         }
 
         void perform_test()
