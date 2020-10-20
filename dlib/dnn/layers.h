@@ -1730,6 +1730,7 @@ namespace dlib
                 set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
             }
 
+            // handle the standard case
             template <layer_mode mode, typename U, typename E>
             void disable_input_bias(add_layer<bn_<mode>, U, E>& l)
             {
@@ -1738,12 +1739,19 @@ namespace dlib
                 set_bias_weight_decay_multiplier(l.subnet().layer_details(), 0);
             }
 
+            // handle input repeat layer case
             template <layer_mode mode, size_t N, template <typename> class R, typename U, typename E>
             void disable_input_bias(add_layer<bn_<mode>, repeat<N, R, U>, E>& l)
             {
                 disable_bias(l.subnet().get_repeated_layer(0).layer_details());
                 set_bias_learning_rate_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
                 set_bias_weight_decay_multiplier(l.subnet().get_repeated_layer(0).layer_details(), 0);
+            }
+
+            // handle input repeat layer with tag case
+            template <layer_mode mode, unsigned long ID, typename E, typename F>
+            void disable_input_bias(add_layer<bn_<mode>, add_tag_layer<ID, impl::repeat_input_layer, E>, F>& l)
+            {
             }
 
             template<typename input_layer_type>
