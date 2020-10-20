@@ -3907,6 +3907,46 @@ namespace
     }
 
 // ----------------------------------------------------------------------------------------
+
+    template <long num_filters, long ks, int s, typename SUBNET>
+    using conp = add_layer<con_<num_filters, ks, ks, s, s, ks/2, ks/2>, SUBNET>;
+    template <typename INPUT>
+    using stem = add_layer<max_pool_<3, 3, 2, 2, 1, 1>, relu<bn_con<conp<16, 7, 2, INPUT>>>>;
+    template <long num_filters, long growth_rate, typename SUBNET>
+    using dense_layer = concat2<tag1, tag2,
+                        tag2<conp<growth_rate, 3, 1,
+                        relu<bn_con<conp<4 * growth_rate, 1, 1,
+                        relu<bn_con<tag1<SUBNET>>>>>>>>>;
+    template <typename SUBNET> using dense_layer_32 = dense_layer<32, 8, SUBNET>;
+    void test_disable_duplicative_bias()
+    {
+        using net_type = fc<10, relu<layer_norm<fc<15, relu<bn_fc<fc<20,
+                         relu<layer_norm<conp<32, 3, 1,
+                         repeat<2, dense_layer_32,
+                         stem<input_rgb_image>>>>>>>>>>>>;
+        net_type net;
+        DLIB_TEST(layer<0>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<3>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<6>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<9>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<12>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<15>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<21>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<24>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<31>(net).layer_details().bias_is_disabled() == false);
+        disable_duplicative_bias(net);
+        DLIB_TEST(layer<0>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<3>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<6>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<9>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<12>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<15>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<21>(net).layer_details().bias_is_disabled() == false);
+        DLIB_TEST(layer<24>(net).layer_details().bias_is_disabled() == true);
+        DLIB_TEST(layer<31>(net).layer_details().bias_is_disabled() == true);
+    }
+
+// ----------------------------------------------------------------------------------------
     
     // This test really just checks if the mmod loss goes negative when a whole lot of overlapping
     // truth rectangles are given.  
@@ -4090,6 +4130,7 @@ namespace
             test_loss_multimulticlass_log();
             test_loss_mmod();
             test_layers_scale_and_scale_prev();
+            test_disable_duplicative_bias();
         }
 
         void perform_test()
