@@ -1821,7 +1821,6 @@ namespace dlib
                     auto idx = n*num+i;
                     const float dx = gi[idx]*g[n];
                     temp_dm += dx*-v[n] + dv[n] * -2*(s[idx] - m[n])/num;
-                    // dm[n] += dx*-v[n] + dv[n] * -2*(s[idx] - m[n])/num;
                 }
                 warp_reduce_atomic_add(dm[n], temp_dm);
             }
@@ -1829,13 +1828,11 @@ namespace dlib
 
             for (auto n : grid_stride_range_y(0, ns))
             {
-                float temp = 0;
                 for (auto i : grid_stride_range(0, num))
                 {
                     auto idx = n*num+i;
                     const float dx = gi[idx]*g[n];
                     out[idx] += dx*v[n] + dv[n] * 2*(s[idx] - m[n])/num + dm[n]/num;
-                    // temp += dx*v[n] + dv[n] * 2*(s[idx] - m[n])/num + dm[n]/num;
                 }
             }
         }
