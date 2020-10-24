@@ -99,7 +99,7 @@ namespace dlib
                             fout << "      <label>" << b.label << "</label>\n";
                         
                         // save all the parts
-                        std::map<std::string,point>::const_iterator itr;
+                        std::map<std::string,dpoint>::const_iterator itr;
                         for (itr = b.parts.begin(); itr != b.parts.end(); ++itr)
                         {
                             fout << "      <part name='"<< itr->first << "' x='"<< itr->second.x() <<"' y='"<< itr->second.y() <<"'/>\n";

@@ -13,7 +13,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    const static point OBJECT_PART_NOT_PRESENT(0x7FFFFFFF,
+    const static dpoint OBJECT_PART_NOT_PRESENT(0x7FFFFFFF,
                                                 0x7FFFFFFF);
 
 // ----------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ namespace dlib
     public:
         full_object_detection(
             const rectangle& rect_,
-            const std::vector<point>& parts_
+            const std::vector<dpoint>& parts_
         ) : rect(rect_), parts(parts_) {}
 
         full_object_detection(){}
@@ -36,13 +36,13 @@ namespace dlib
         rectangle& get_rect() { return rect; }
         unsigned long num_parts() const { return parts.size(); }
 
-        const point& part(
+        const dpoint& part(
             unsigned long idx
         ) const 
         { 
             // make sure requires clause is not broken
             DLIB_ASSERT(idx < num_parts(),
-                "\t point full_object_detection::part()"
+                "\t dpoint full_object_detection::part()"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t idx:         " << idx  
                 << "\n\t num_parts(): " << num_parts()  
@@ -51,13 +51,13 @@ namespace dlib
             return parts[idx]; 
         }
 
-        point& part(
+        dpoint& part(
             unsigned long idx
         )  
         { 
             // make sure requires clause is not broken
             DLIB_ASSERT(idx < num_parts(),
-                "\t point full_object_detection::part()"
+                "\t dpoint full_object_detection::part()"
                 << "\n\t Invalid inputs were given to this function "
                 << "\n\t idx:         " << idx  
                 << "\n\t num_parts(): " << num_parts()  
@@ -109,7 +109,7 @@ namespace dlib
 
     private:
         rectangle rect;
-        std::vector<point> parts;  
+        std::vector<dpoint> parts;  
     };
 
 // ----------------------------------------------------------------------------------------

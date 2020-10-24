@@ -75,16 +75,16 @@ std::shared_ptr<full_object_detection> full_obj_det_init(const rectangle& rect, 
         auto&& pyparts = pyparts_.cast<py::list>();
 
         const unsigned long num_parts = py::len(pyparts);
-        std::vector<point> parts;
+        std::vector<dpoint> parts;
         for (const auto& item : pyparts)
-            parts.push_back(item.cast<point>());
+            parts.push_back(item.cast<dpoint>());
 
         return std::make_shared<full_object_detection>(rect, parts);
     }
     catch (py::cast_error&)
     {
         // if it's not a py::list it better be a vector<point>.
-        auto&& parts = pyparts_.cast<const std::vector<point>&>();
+        auto&& parts = pyparts_.cast<const std::vector<dpoint>&>();
         return std::make_shared<full_object_detection>(rect, parts);
     }
 }

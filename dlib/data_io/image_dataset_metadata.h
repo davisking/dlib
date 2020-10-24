@@ -67,7 +67,7 @@ namespace dlib
 
             rectangle rect;
 
-            std::map<std::string,point> parts;
+            std::map<std::string,dpoint> parts;
 
             // optional fields
             std::string label;
