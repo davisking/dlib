@@ -94,12 +94,12 @@ dataset py_load_image_dataset_metadata(
     return temp;
 }
 
-std::shared_ptr<std::map<std::string,point>> map_from_object(py::dict obj)
+std::shared_ptr<std::map<std::string,dpoint>> map_from_object(py::dict obj)
 {
-    auto ret = std::make_shared<std::map<std::string,point>>();
+    auto ret = std::make_shared<std::map<std::string,dpoint>>();
     for (const auto& v : obj)
     {
-        (*ret)[v.first.cast<std::string>()] = v.second.cast<point>();
+        (*ret)[v.first.cast<std::string>()] = v.second.cast<dpoint>();
     }
     return ret;
 }
@@ -171,7 +171,7 @@ void bind_image_dataset_metadata(py::module &m_)
         .def("__str__", imagesstr)
         .def("__repr__", imagesstr);
 
-    auto partsstr = [](const std::map<std::string,point>& item) {
+    auto partsstr = [](const std::map<std::string,dpoint>& item) {
         std::ostringstream sout;
         sout << "{";
         for (const auto& v : item) 
@@ -179,7 +179,7 @@ void bind_image_dataset_metadata(py::module &m_)
         sout << "}";
         return sout.str();
     };
-    auto partsrepr = [](const std::map<std::string,point>& item) {
+    auto partsrepr = [](const std::map<std::string,dpoint>& item) {
         std::ostringstream sout;
         sout << "dlib.image_dataset_metadata.parts({\n";
         for (const auto& v : item) 
@@ -188,7 +188,7 @@ void bind_image_dataset_metadata(py::module &m_)
         return sout.str();
     };
 
-    py::bind_map_no_default_repr<std::map<std::string,point>, std::shared_ptr<std::map<std::string,point>> >(m, "parts", 
+    py::bind_map_no_default_repr<std::map<std::string,dpoint>, std::shared_ptr<std::map<std::string,dpoint>> >(m, "parts", 
         "This object is a dictionary mapping string names to object part locations.")
         .def(py::init(&map_from_object))
         .def("__str__", partsstr)
