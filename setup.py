@@ -77,7 +77,7 @@ def get_extra_cmake_options():
         if arg == '--yes':
             print("The --yes options to dlib's setup.py don't do anything since all these options ")
             print("are on by default.  So --yes has been removed.  Do not give it to setup.py.")
-            sys.exit(1)
+            sys.exit(0)
         if arg in ['--no', '--set', '--compiler-flags']:
             opt_key = arg[2:].lower()
             sys.argv.remove(arg)
