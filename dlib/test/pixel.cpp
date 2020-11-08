@@ -447,8 +447,8 @@ namespace
         p_rgba.alpha = 7;
 
         p_gray = 8;
-        p_schar = 8;
-        p_int = 8;
+        p_schar = 9;
+        p_int = 10;
         p_float = 8.5;
 
         p_hsi.h = 9;
@@ -499,8 +499,8 @@ namespace
         DLIB_TEST(p_rgba.alpha == 7);
 
         DLIB_TEST(p_gray == 8);
-        DLIB_TEST(p_schar == 8);
-        DLIB_TEST(p_int == 8);
+        DLIB_TEST(p_schar == 9);
+        DLIB_TEST(p_int == 10);
         DLIB_TEST(p_float == 8.5);
 
         DLIB_TEST(p_hsi.h == 9);
@@ -549,9 +549,9 @@ namespace
             DLIB_TEST(p_rgba.alpha == 7);
 
             DLIB_TEST(p_gray == 8);
-            DLIB_TEST(p_int == 8);
+            DLIB_TEST(p_int == 10);
             DLIB_TEST(p_float == 8.5);
-            DLIB_TEST(p_schar == 8);
+            DLIB_TEST(p_schar == 9);
 
             DLIB_TEST(p_hsi.h == 9);
             DLIB_TEST(p_hsi.s == 10);
