@@ -3049,7 +3049,7 @@ namespace dlib
             const M& m
         )
         {
-            pixel = static_cast<unsigned char>(m(0));
+            pixel = static_cast<P>(m(0));
         }
     };
 

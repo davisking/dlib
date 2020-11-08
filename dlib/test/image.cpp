@@ -1754,6 +1754,23 @@ namespace
                 << " error: " << max(abs(chip-255)) );
         }
 
+        // So the same as above, but for an image with float values that are all the same to make
+        // sure noting funny happens for float images.
+        {
+            print_spinner();
+            const long nr = 53;
+            const long nc = 67;
+            const long size = 8*9;
+            const double angle = 30*pi/180;
+
+            matrix<float> img(501,501), chip;
+            img = 1234.5;
+            chip_details details(centered_rect(center(get_rect(img)),nr,nc), size, angle);
+            extract_image_chip(img, details, chip);
+            DLIB_TEST_MSG(max(abs(chip-1234.5))==0,"nr: " << nr << "  nc: "<< nc << "  size: " << size << "  angle: " << angle 
+                << " error: " << max(abs(chip-255)) );
+        }
+
 
         {
             // Make sure that the interpolation in extract_image_chip() keeps stuff in the
