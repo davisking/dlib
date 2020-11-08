@@ -27,15 +27,16 @@
 #  endif
 #endif
 
-#if !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+#if !(defined(_MSC_VER) && __cplusplus == 199711L) && !defined(__INTEL_COMPILER)
 #  if __cplusplus >= 201402L
 #    define PYBIND11_CPP14
-#    if __cplusplus > 201402L /* Temporary: should be updated to >= the final C++17 value once known */
+#    if __cplusplus >= 201703L
 #      define PYBIND11_CPP17
 #    endif
 #  endif
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && __cplusplus == 199711L
 // MSVC sets _MSVC_LANG rather than __cplusplus (supposedly until the standard is fully implemented)
+// Unless you use the /Zc:__cplusplus flag on Visual Studio 2017 15.7 Preview 3 or newer
 #  if _MSVC_LANG >= 201402L
 #    define PYBIND11_CPP14
 #    if _MSVC_LANG > 201402L && _MSC_VER >= 1910
@@ -46,8 +47,8 @@
 
 // Compiler version assertions
 #if defined(__INTEL_COMPILER)
-#  if __INTEL_COMPILER < 1500
-#    error pybind11 requires Intel C++ compiler v15 or newer
+#  if __INTEL_COMPILER < 1700
+#    error pybind11 requires Intel C++ compiler v17 or newer
 #  endif
 #elif defined(__clang__) && !defined(__apple_build_version__)
 #  if __clang_major__ < 3 || (__clang_major__ == 3 && __clang_minor__ < 3)
@@ -93,7 +94,7 @@
 
 #define PYBIND11_VERSION_MAJOR 2
 #define PYBIND11_VERSION_MINOR 2
-#define PYBIND11_VERSION_PATCH 2
+#define PYBIND11_VERSION_PATCH 4
 
 /// Include Python header, disable linking to pythonX_d.lib on Windows in debug mode
 #if defined(_MSC_VER)
@@ -481,7 +482,7 @@ template <typename...> struct void_t_impl { using type = void; };
 template <typename... Ts> using void_t = typename void_t_impl<Ts...>::type;
 
 /// Compile-time all/any/none of that check the boolean value of all template types
-#ifdef __cpp_fold_expressions
+#if defined(__cpp_fold_expressions) && !(defined(_MSC_VER) && (_MSC_VER < 1916))
 template <class... Ts> using all_of = bool_constant<(Ts::value && ...)>;
 template <class... Ts> using any_of = bool_constant<(Ts::value || ...)>;
 #elif !defined(_MSC_VER)

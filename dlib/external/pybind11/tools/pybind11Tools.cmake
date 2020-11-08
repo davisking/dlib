@@ -135,6 +135,13 @@ function(pybind11_add_module target_name)
     PRIVATE ${pybind11_INCLUDE_DIR}  # from pybind11Config
     PRIVATE ${PYTHON_INCLUDE_DIRS})
 
+  # Python debug libraries expose slightly different objects
+  # https://docs.python.org/3.6/c-api/intro.html#debugging-builds
+  # https://stackoverflow.com/questions/39161202/how-to-work-around-missing-pymodule-create2-in-amd64-win-python35-d-lib
+  if(PYTHON_IS_DEBUG)
+    target_compile_definitions(${target_name} PRIVATE Py_DEBUG)
+  endif()
+
   # The prefix and extension are provided by FindPythonLibsNew.cmake
   set_target_properties(${target_name} PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}")
   set_target_properties(${target_name} PROPERTIES SUFFIX "${PYTHON_MODULE_EXTENSION}")
@@ -145,7 +152,6 @@ function(pybind11_add_module target_name)
   # namespace; also turning it on for a pybind module compilation here avoids
   # potential warnings or issues from having mixed hidden/non-hidden types.
   set_target_properties(${target_name} PROPERTIES CXX_VISIBILITY_PRESET "hidden")
-  set_target_properties(${target_name} PROPERTIES CUDA_VISIBILITY_PRESET "hidden")
 
   if(WIN32 OR CYGWIN)
     # Link against the Python shared library on Windows
@@ -198,15 +204,6 @@ function(pybind11_add_module target_name)
   if(MSVC)
     # /MP enables multithreaded builds (relevant when there are many files), /bigobj is
     # needed for bigger binding projects due to the limit to 64k addressable sections
-    set(msvc_extra_options /MP /bigobj)
-    if(CMAKE_VERSION VERSION_LESS 3.11)
-      target_compile_options(${target_name} PRIVATE ${msvc_extra_options})
-    else()
-      # Only set these options for C++ files.  This is important so that, for
-      # instance, projects that include other types of source files like CUDA
-      # .cu files don't get these options propagated to nvcc since that would
-      # cause the build to fail.
-      target_compile_options(${target_name} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${msvc_extra_options}>)
-    endif()
+    target_compile_options(${target_name} PRIVATE /MP /bigobj)
   endif()
 endfunction()
