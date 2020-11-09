@@ -207,13 +207,13 @@ function(pybind11_add_module target_name)
     # needed for bigger binding projects due to the limit to 64k addressable sections
     set(msvc_extra_options /MP /bigobj)
     if(CMAKE_VERSION VERSION_LESS 3.11)
-          target_compile_options(${target_name} PRIVATE ${msvc_extra_options})
-        else()
-          # Only set these options for C++ files.  This is important so that, for
-          # instance, projects that include other types of source files like CUDA
-          # .cu files don't get these options propagated to nvcc since that would
-          # cause the build to fail.
-          target_compile_options(${target_name} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${msvc_extra_options}>)
-      endif()
+      target_compile_options(${target_name} PRIVATE ${msvc_extra_options})
+    else()
+      # Only set these options for C++ files.  This is important so that, for
+      # instance, projects that include other types of source files like CUDA
+      # .cu files don't get these options propagated to nvcc since that would
+      # cause the build to fail.
+      target_compile_options(${target_name} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${msvc_extra_options}>)
+    endif()
   endif()
 endfunction()
