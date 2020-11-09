@@ -130,7 +130,6 @@ IF(NOT CMAKE_CROSSCOMPILING)
     endif()
 endif()
 
-
 # The built-in FindPython didn't always give the version numbers
 string(REGEX REPLACE "\\." ";" _PYTHON_VERSION_LIST ${_PYTHON_VERSION_LIST})
 list(GET _PYTHON_VERSION_LIST 0 PYTHON_VERSION_MAJOR)
