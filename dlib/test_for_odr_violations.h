@@ -19,9 +19,6 @@ extern "C"
 #ifdef ENABLE_ASSERTS
     const extern int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1;
     const int DLIB_NO_WARN_UNUSED dlib_check_assert_helper_variable = USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1;
-#else
-    const extern int USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1_;
-    const int DLIB_NO_WARN_UNUSED dlib_check_assert_helper_variable = USER_ERROR__inconsistent_build_configuration__see_dlib_faq_1_;
 #endif
 
 
