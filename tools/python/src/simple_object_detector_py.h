@@ -202,6 +202,9 @@ namespace dlib
 
     )
     {
+        // Release the GIL so that this code can be run in parallel.
+        py::gil_scoped_release release;
+
         std::vector<double> detection_confidences;
         std::vector<unsigned long> weight_indices;
         const double adjust_threshold = 0.0;
