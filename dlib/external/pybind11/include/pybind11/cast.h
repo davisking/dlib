@@ -1171,7 +1171,7 @@ private:
 #else
         // PyPy seems to have multiple problems related to PyUnicode_UTF*: the UTF8 version
         // sometimes segfaults for unknown reasons, while the UTF16 and 32 versions require a
-        // non-const char * arguments, which is also a nuissance, so bypass the whole thing by just
+        // non-const char * arguments, which is also a nuisance, so bypass the whole thing by just
         // passing the encoding as a string value, which works properly:
         return PyUnicode_Decode(buffer, nbytes, UTF_N == 8 ? "utf-8" : UTF_N == 16 ? "utf-16" : "utf-32", nullptr);
 #endif
@@ -1392,7 +1392,7 @@ public:
 
     explicit operator type*() { return this->value; }
     explicit operator type&() { return *(this->value); }
-    explicit operator holder_type*() { return &holder; }
+    explicit operator holder_type*() { return std::addressof(holder); }
 
     // Workaround for Intel compiler bug
     // see pybind11 issue 94
@@ -1462,7 +1462,7 @@ struct move_only_holder_caster {
 
     static handle cast(holder_type &&src, return_value_policy, handle) {
         auto *ptr = holder_helper<holder_type>::get(src);
-        return type_caster_base<type>::cast_holder(ptr, &src);
+        return type_caster_base<type>::cast_holder(ptr, std::addressof(src));
     }
     static PYBIND11_DESCR name() { return type_caster_base<type>::name(); }
 };
@@ -1561,9 +1561,13 @@ template <typename type> using cast_is_temporary_value_reference = bool_constant
 
 // When a value returned from a C++ function is being cast back to Python, we almost always want to
 // force `policy = move`, regardless of the return value policy the function/method was declared
-// with.  Some classes (most notably Eigen::Ref and related) need to avoid this, and so can do so by
-// specializing this struct.
+// with.
 template <typename Return, typename SFINAE = void> struct return_value_policy_override {
+    static return_value_policy policy(return_value_policy p) { return p; }
+};
+
+template <typename Return> struct return_value_policy_override<Return,
+        detail::enable_if_t<std::is_base_of<type_caster_generic, make_caster<Return>>::value, void>> {
     static return_value_policy policy(return_value_policy p) {
         return !std::is_lvalue_reference<Return>::value && !std::is_pointer<Return>::value
             ? return_value_policy::move : p;
