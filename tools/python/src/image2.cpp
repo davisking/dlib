@@ -372,6 +372,11 @@ ensures \n\
         .def_readwrite("rows", &chip_details::rows)
         .def_readwrite("cols", &chip_details::cols);
 
+    {
+    typedef std::vector<chip_details> type;
+    py::bind_vector<type>(m, "chip_detailss", "An array of chip_details objects.")
+        .def("extend", extend_vector_with_python_list<type>);
+    }
 
     m.def("extract_image_chip", &py_extract_image_chip<uint8_t>, py::arg("img"), py::arg("chip_location"));
     m.def("extract_image_chip", &py_extract_image_chip<uint16_t>, py::arg("img"), py::arg("chip_location"));
@@ -447,6 +452,19 @@ ensures \n\
     !*/
         );
 
+    m.def("get_face_chip_details",
+          static_cast<chip_details (*)(const full_object_detection&, const unsigned long, const double)>(&get_face_chip_details),
+          py::arg("det"), py::arg("size")=200, py::arg("padding")=0.2,
+        "Given a full_object_detection det, returns a chip_details object which can be \n\
+         used to extract an image of given size and padding."
+        );
+
+    m.def("get_face_chip_details",
+          static_cast<std::vector<chip_details> (*)(const std::vector<full_object_detection>&, const unsigned long, const double)>(&get_face_chip_details),
+          py::arg("dets"), py::arg("size")=200, py::arg("padding")=0.2,
+        "Given a list of full_object_detection dets, returns a chip_details object which can be \n\
+         used to extract an image of given size and padding."
+        );
 }
 
 // ----------------------------------------------------------------------------------------
