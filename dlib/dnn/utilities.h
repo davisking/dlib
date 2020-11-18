@@ -64,13 +64,13 @@ namespace dlib
             }
 
             template <unsigned long ID, typename U, typename E>
-            void operator()(size_t idx, const add_tag_layer<ID,U,E>& l) 
+            void operator()(size_t idx, const add_tag_layer<ID,U,E>& /*l*/) 
             {
                 out << "<layer idx='"<<idx<<"' type='tag' id='"<<ID<<"'/>\n";
             }
 
             template <template<typename> class T, typename U>
-            void operator()(size_t idx, const add_skip_layer<T,U>& l) 
+            void operator()(size_t idx, const add_skip_layer<T,U>& /*l*/) 
             {
                 out << "<layer idx='"<<idx<<"' type='skip' id='"<<(tag_id<T>::id)<<"'/>\n";
             }
