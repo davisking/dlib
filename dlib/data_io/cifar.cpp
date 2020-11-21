@@ -38,34 +38,51 @@ namespace dlib
             if (!fins[i]) throw error("Unable to open file " + file_names[i]);
         }
 
-        training_images.resize(5000);
-        training_labels.resize(5000);
-        testing_images.resize(1000);
-        testing_labels.resize(1000);
+        const size_t images_per_batch = 10000;
+        const size_t training_batches = 5;
+        const size_t testing_batches = 1;
+        const long nr = 32;
+        const long nc = 32;
+        const long plane_size = nr * nc;
+        const long image_size = 3 * plane_size;
+
+        training_images.resize(images_per_batch * training_batches);
+        training_labels.resize(images_per_batch * training_batches);
+        testing_images.resize(images_per_batch * testing_batches);
+        testing_labels.resize(images_per_batch * testing_batches);
+
         for (size_t i = 0; i < fins.size(); ++i)
         {
-            for (size_t j = 0; j < 10000; ++i)
+            for (size_t j = 0; j < images_per_batch; ++j)
             {
+                const auto idx = i * images_per_batch + j;
+
                 char l;
                 fins[i].read(&l, 1);
-                if (i == fins.size() -1)
-                    testing_labels[i*1000+j] = l;
-                else
-                    training_labels[i*1000+j] = l;
-                char* data;
-                fins[i].read(data, 3072);
-                training_images[i*1000+j].set_size(32, 32);
-                for (size_t k = 0; k < 1024; ++k)
+                if (i == fins.size() - 1)
                 {
-                    char r = data[0 * 1024  +k];
-                    char g = data[1 * 1024 + k];
-                    char b = data[2 * 1024 + k];
-                    const long row = 1024 / k;
-                    const long col = 1024 % k;
-                    if (i == fins.size() -1)
-                        testing_images[i*1000+j](row, col) = rgb_pixel(r, g, b);
+                    testing_labels[idx] = l;
+                    testing_images[idx].set_size(nr, nc);
+                }
+                else
+                {
+                    training_labels[idx] = l;
+                    training_images[idx].set_size(nr, nc);
+                }
+
+                std::array<unsigned char, image_size> buffer;
+                fins[i].read((char*)(buffer.begin()), buffer.size());
+                for (long k = 0; k < plane_size; ++k)
+                {
+                    char r = buffer[0 * plane_size + k];
+                    char g = buffer[1 * plane_size + k];
+                    char b = buffer[2 * plane_size + k];
+                    const long row = k / nr;
+                    const long col = k % nr;
+                    if (i == fins.size() - 1)
+                        testing_images[idx](row, col) = rgb_pixel(r, g, b);
                     else
-                        training_images[i*1000+j](row, col) = rgb_pixel(r, g, b);
+                        training_images[idx](row, col) = rgb_pixel(r, g, b);
                 }
             }
         }
@@ -81,7 +98,6 @@ namespace dlib
         }
     }
 }
-
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_CIFAR_CPp_
