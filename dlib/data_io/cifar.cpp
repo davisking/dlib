@@ -20,17 +20,17 @@ namespace dlib
     {
         using namespace std;
         std::vector<string> file_names{
-            folder_name + "/data_batch_1.bin",
-            folder_name + "/data_batch_2.bin",
-            folder_name + "/data_batch_3.bin",
-            folder_name + "/data_batch_4.bin",
-            folder_name + "/data_batch_5.bin",
-            folder_name + "/test_batch.bin"
+            "data_batch_1.bin",
+            "data_batch_2.bin",
+            "data_batch_3.bin",
+            "data_batch_4.bin",
+            "data_batch_5.bin",
+            "test_batch.bin"
         };
         std::vector<ifstream> fins;
         for (const auto& file_name : file_names)
         {
-            fins.emplace_back(file_name, ios::binary);
+            fins.emplace_back((folder_name + "/" + file_name).c_str(), ios::binary);
         }
 
         for (size_t i = 0; i < fins.size(); ++i)
