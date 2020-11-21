@@ -30,7 +30,7 @@ namespace dlib
         std::vector<ifstream> fins;
         for (const auto& file_name : file_names)
         {
-            fins.emplace_back(file_name);
+            fins.emplace_back(file_name, ios::binary);
         }
 
         for (size_t i = 0; i < fins.size(); ++i)
