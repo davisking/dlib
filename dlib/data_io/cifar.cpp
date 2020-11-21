@@ -53,14 +53,16 @@ namespace dlib
 
         for (size_t i = 0; i < fins.size(); ++i)
         {
+            bool test_batch = i == fins.size() - 1;
             for (size_t j = 0; j < images_per_batch; ++j)
             {
-                const auto idx = i * images_per_batch + j;
+                auto idx = i * images_per_batch + j;
 
                 char l;
                 fins[i].read(&l, 1);
-                if (i == fins.size() - 1)
+                if (test_batch)
                 {
+                    idx -= training_images.size();
                     testing_labels[idx] = l;
                     testing_images[idx].set_size(nr, nc);
                 }
@@ -71,7 +73,7 @@ namespace dlib
                 }
 
                 std::array<unsigned char, image_size> buffer;
-                fins[i].read((char*)(buffer.begin()), buffer.size());
+                fins[i].read((char*)buffer.begin(), buffer.size());
                 for (long k = 0; k < plane_size; ++k)
                 {
                     char r = buffer[0 * plane_size + k];
@@ -79,7 +81,7 @@ namespace dlib
                     char b = buffer[2 * plane_size + k];
                     const long row = k / nr;
                     const long col = k % nr;
-                    if (i == fins.size() - 1)
+                    if (test_batch)
                         testing_images[idx](row, col) = rgb_pixel(r, g, b);
                     else
                         training_images[idx](row, col) = rgb_pixel(r, g, b);
