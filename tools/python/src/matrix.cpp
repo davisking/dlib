@@ -108,6 +108,16 @@ long matrix_double__len__(matrix<double>& c)
     return c.nr();
 }
 
+void matrix_double_serialize(const matrix<double>& m, const std::string& file)
+{
+    serialize(file) << m;
+}
+
+void matrix_double_deserialize(matrix<double>& m, const std::string& file)
+{
+    deserialize(file) >> m;
+}
+
 struct mat_row
 {
     mat_row() : data(0),size(0) {}
@@ -202,6 +212,8 @@ void bind_matrix(py::module& m)
         .def("__str__", &matrix_double__str__)
         .def("nr", &matrix<double>::nr, "Return the number of rows in the matrix.")
         .def("nc", &matrix<double>::nc, "Return the number of columns in the matrix.")
+        .def("serialize", &matrix_double_serialize, py::arg("file"), "Serialize the matrix to a file")
+        .def("deserialize", &matrix_double_deserialize, py::arg("file"), "Deserialize the matrix from a file")
         .def("__len__", &matrix_double__len__)
         .def("__getitem__", &matrix_double__getitem__, py::keep_alive<0,1>())
         .def_property_readonly("shape", &get_matrix_size)
