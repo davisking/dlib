@@ -2555,7 +2555,7 @@ namespace dlib
     }  
     
     #define DLIB_DEFINE_DEFAULT_SERIALIZATION(Type, ...)                \
-    void serialize_to(std::ostream& __out) const                        \
+    void serialize_to(std::ostream& dlibDefaultSer$_out) const          \
     {                                                                   \
         using dlib::serialize;                                          \
         using dlib::serialize_these;                                    \
@@ -2565,9 +2565,9 @@ namespace dlib
             /* you realize you need to change the serialization    */   \
             /* format you can identify which version of the format */   \
             /* you are encountering when reading old files.        */   \
-            int version = 1;                                            \
-            serialize(version, __out);                                  \
-            serialize_these(__out, __VA_ARGS__);                        \
+            int dlibDefaultSer$_version = 1;                            \
+            serialize(dlibDefaultSer$_version, dlibDefaultSer$_out);    \
+            serialize_these(dlibDefaultSer$_out, __VA_ARGS__);          \
         }                                                               \
         catch (dlib::serialization_error& e)                            \
         {                                                               \
@@ -2575,17 +2575,17 @@ namespace dlib
         }                                                               \
     }                                                                   \
                                                                         \
-    void deserialize_from(std::istream& __in)                           \
+    void deserialize_from(std::istream& dlibDefaultSer$_in)             \
     {                                                                   \
         using dlib::deserialize;                                        \
         using dlib::deserialize_these;                                  \
         try                                                             \
         {                                                               \
-            int version = 0;                                            \
-            deserialize(version, __in);                                 \
+            int dlibDefaultSer$_version = 0;                            \
+            deserialize(dlibDefaultSer$_version, dlibDefaultSer$_in);   \
             if (version != 1)                                           \
                 throw dlib::serialization_error("Unexpected version found while deserializing " #Type); \
-            deserialize_these(__in, __VA_ARGS__);                       \
+            deserialize_these(dlibDefaultSer$_in, __VA_ARGS__);         \
         }                                                               \
         catch (dlib::serialization_error& e)                            \
         {                                                               \
