@@ -73,7 +73,7 @@ namespace dlib
                 }
 
                 std::array<unsigned char, image_size> buffer;
-                fins[i].read((char*)buffer.begin(), buffer.size());
+                fins[i].read((char*)(&buffer[0]), buffer.size());
                 for (long k = 0; k < plane_size; ++k)
                 {
                     char r = buffer[0 * plane_size + k];
