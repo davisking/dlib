@@ -2583,7 +2583,7 @@ namespace dlib
         {                                                               \
             int dlibDefaultSer$_version = 0;                            \
             deserialize(dlibDefaultSer$_version, dlibDefaultSer$_in);   \
-            if (version != 1)                                           \
+            if (dlibDefaultSer$_version != 1)                           \
                 throw dlib::serialization_error("Unexpected version found while deserializing " #Type); \
             deserialize_these(dlibDefaultSer$_in, __VA_ARGS__);         \
         }                                                               \
