@@ -433,7 +433,7 @@ namespace
         std::unordered_multiset<string> o;
         std::shared_ptr<string> ptr_shared1;
         std::shared_ptr<string> ptr_shared2;
-	std::vector<std::complex<double>> p;    
+        std::vector<std::complex<double>> p;    
 
         bool operator==(const my_custom_type& rhs) const
         {         
