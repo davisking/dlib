@@ -1121,9 +1121,9 @@ namespace
         t1.o.insert("hello from unordered_multiset");
         t1.o.insert("hello from unordered_multiset");
         t1.ptr_shared1 = make_shared<string>("hello from shared_ptr");
-	dlib::rand rng(std::time(NULL));
-	for (int i = 0 ; i < 1024 ; i++)
-	    t1.p.push_back(rng.get_random_gaussian());
+        dlib::rand rng(std::time(NULL));
+        for (int i = 0 ; i < 1024 ; i++)
+            t1.p.push_back(rng.get_random_gaussian());
 
         t2.a = 2;
         t2.b = 4.0;
