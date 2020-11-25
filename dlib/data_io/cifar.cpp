@@ -21,8 +21,7 @@ namespace dlib
             std::vector<unsigned long>& labels
         )
         {
-            using namespace std;
-            ifstream fin((folder_name + "/" + batch_name).c_str(), ios::binary);
+            std::ifstream fin((folder_name + "/" + batch_name).c_str(), std::ios::binary);
             if (!fin) throw error("Unable to open file " + batch_name);
             const long nr = 32;
             const long nc = 32;
@@ -105,6 +104,3 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_CIFAR_CPp_
-
-
-

@@ -29,5 +29,3 @@ namespace dlib
 #endif
 
 #endif // DLIB_CIFAR_Hh_
-
-
