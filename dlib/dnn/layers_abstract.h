@@ -1810,7 +1810,7 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <typename net_type>
-    void disable_duplicative_bias (
+    void disable_duplicative_biases (
         const net_type& net
     );
     /*!

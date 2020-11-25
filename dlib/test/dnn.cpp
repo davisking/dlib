@@ -3918,7 +3918,7 @@ namespace
                         relu<bn_con<conp<4 * growth_rate, 1, 1,
                         relu<bn_con<tag1<SUBNET>>>>>>>>>;
     template <typename SUBNET> using dense_layer_32 = dense_layer<32, 8, SUBNET>;
-    void test_disable_duplicative_bias()
+    void test_disable_duplicative_biases()
     {
         using net_type = fc<10, relu<layer_norm<fc<15, relu<bn_fc<fc<20,
                          relu<layer_norm<conp<32, 3, 1,
@@ -3934,7 +3934,7 @@ namespace
         DLIB_TEST(layer<21>(net).layer_details().bias_is_disabled() == false);
         DLIB_TEST(layer<24>(net).layer_details().bias_is_disabled() == false);
         DLIB_TEST(layer<31>(net).layer_details().bias_is_disabled() == false);
-        disable_duplicative_bias(net);
+        disable_duplicative_biases(net);
         DLIB_TEST(layer<0>(net).layer_details().bias_is_disabled() == false);
         DLIB_TEST(layer<3>(net).layer_details().bias_is_disabled() == true);
         DLIB_TEST(layer<6>(net).layer_details().bias_is_disabled() == true);
@@ -4130,7 +4130,7 @@ namespace
             test_loss_multimulticlass_log();
             test_loss_mmod();
             test_layers_scale_and_scale_prev();
-            test_disable_duplicative_bias();
+            test_disable_duplicative_biases();
         }
 
         void perform_test()
