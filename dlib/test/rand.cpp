@@ -10,6 +10,7 @@
 #include <dlib/rand.h>
 #include <dlib/compress_stream.h>
 #include <dlib/hash.h>
+#include <dlib/statistics.h>
 
 #include "tester.h"
 
@@ -407,6 +408,24 @@ namespace
 
     }
 
+    void test_weibull_distribution()
+    {
+        print_spinner();
+        dlib::rand rnd;
+        
+        const size_t N = 1024*1024*4;
+        double a=1.0, b=2.0, g=6.0;
+
+        dlib::running_stats<double> stats;
+        for (size_t i = 0; i < N; i++) 
+            stats.add(get_random_weibull(rng, a, b, g));
+
+        double expected_mean = g + b*tgamma(1 + 1.0 / a);
+        double expected_var  = b*b*(tgamma(1 + 2.0 / a) - std::pow(tgamma(1 + 1.0 / a),2));
+        DLIB_TEST(std::abs(stats.mean() - expected_mean) < 0.01);
+        DLIB_TEST(std::abs(stats.variance() - expected_var) < 0.01);
+    }
+    
     class rand_tester : public tester
     {
     public:
@@ -428,6 +447,7 @@ namespace
             test_gaussian_random_hash();
             test_uniform_random_hash();
             test_get_integer();
+            test_weibull_distribution();
         }
     } a;
 
