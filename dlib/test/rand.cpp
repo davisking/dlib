@@ -420,8 +420,8 @@ namespace
         for (size_t i = 0; i < N; i++) 
             stats.add(get_random_weibull(rng, a, b, g));
 
-        double expected_mean = g + b*tgamma(1 + 1.0 / a);
-        double expected_var  = b*b*(tgamma(1 + 2.0 / a) - std::pow(tgamma(1 + 1.0 / a),2));
+        double expected_mean = g + b*std::tgamma(1 + 1.0 / a);
+        double expected_var  = b*b*(std::tgamma(1 + 2.0 / a) - std::pow(std::tgamma(1 + 1.0 / a),2));
         DLIB_TEST(std::abs(stats.mean() - expected_mean) < 0.01);
         DLIB_TEST(std::abs(stats.variance() - expected_var) < 0.01);
     }
