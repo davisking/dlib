@@ -265,6 +265,20 @@ namespace dlib
                 return r.real();
             }
 
+            double get_random_exponential (
+	        double lambda
+            )
+            {
+                DLIB_ASSERT(lambda > 0, "lambda must be greater than zero");
+                double u;
+                do
+                {
+                    u = get_random_double();
+                } 
+                while (u == 0.0);
+                return -log( u ) / lambda;
+            }
+
             void swap (
                 rand& item
             )
