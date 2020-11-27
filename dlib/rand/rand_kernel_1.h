@@ -266,7 +266,7 @@ namespace dlib
             }
 
             double get_random_exponential (
-	        double lambda
+                double lambda
             )
             {
                 DLIB_ASSERT(lambda > 0, "lambda must be greater than zero");
