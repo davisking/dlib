@@ -276,7 +276,7 @@ namespace dlib
                     u = get_random_double();
                 } 
                 while (u == 0.0);
-                return -log( u ) / lambda;
+                return -std::log( u ) / lambda;
             }
 
             void swap (
