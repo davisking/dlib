@@ -418,7 +418,7 @@ namespace
 
         dlib::running_stats<double> stats;
         for (size_t i = 0; i < N; i++) 
-            stats.add(get_random_weibull(rng, a, b, g));
+            stats.add(rnd.get_random_weibull(a, b, g));
 
         double expected_mean = g + b*std::tgamma(1 + 1.0 / a);
         double expected_var  = b*b*(std::tgamma(1 + 2.0 / a) - std::pow(std::tgamma(1 + 1.0 / a),2));
