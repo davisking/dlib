@@ -445,7 +445,7 @@ namespace
             DLIB_TEST(std::abs(stats.mean() - 1.0 / lambda) < tol);
             DLIB_TEST(std::abs(stats.variance() - 1.0 / (lambda*lambda)) < tol);
             DLIB_TEST(std::abs(stats.skewness() - 2.0) < tol);
-            DLIB_TEST(std::abs(stats.ex_kurtosis() - 6.0) < tol);
+            DLIB_TEST(std::abs(stats.ex_kurtosis() - 6.0) < 0.1);
         }
     }
     
