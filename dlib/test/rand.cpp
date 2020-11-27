@@ -411,9 +411,10 @@ namespace
     void test_weibull_distribution()
     {
         print_spinner();
-        dlib::rand rnd;
+        dlib::rand rnd(0);
         
         const size_t N = 1024*1024*4;
+        const double tol = 0.01;
         double a=1.0, b=2.0, g=6.0;
 
         dlib::running_stats<double> stats;
@@ -422,8 +423,29 @@ namespace
 
         double expected_mean = g + b*std::tgamma(1 + 1.0 / a);
         double expected_var  = b*b*(std::tgamma(1 + 2.0 / a) - std::pow(std::tgamma(1 + 1.0 / a),2));
-        DLIB_TEST(std::abs(stats.mean() - expected_mean) < 0.01);
-        DLIB_TEST(std::abs(stats.variance() - expected_var) < 0.01);
+        DLIB_TEST(std::abs(stats.mean() - expected_mean) < tol);
+        DLIB_TEST(std::abs(stats.variance() - expected_var) < tol);
+    }
+    
+    void test_exponential_distribution()
+    {
+        print_spinner();
+        dlib::rand rnd(0);
+        
+        const size_t N = 1024*1024*128;
+        const double tol = 0.01;
+        
+        for (double lambda = 6 ; lambda < 20 ; lambda += 0.1)
+        {
+            dlib::running_stats<double> stats;
+            for (size_t i = 0; i < N; i++) 
+                stats.add(rnd.get_random_exponential(lambda));
+            
+            DLIB_TEST(std::abs(stats.mean() - 1.0 / lambda) < tol);
+            DLIB_TEST(std::abs(stats.variance() - 1.0 / (lambda*lambda)) < tol);
+            DLIB_TEST(std::abs(stats.skewness() - 2.0) < tol);
+            DLIB_TEST(std::abs(stats.ex_kurtosis() - 6.0) < tol);
+        }
     }
     
     class rand_tester : public tester
@@ -448,6 +470,7 @@ namespace
             test_uniform_random_hash();
             test_get_integer();
             test_weibull_distribution();
+            test_exponential_distribution();
         }
     } a;
 
