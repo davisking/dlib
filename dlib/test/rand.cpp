@@ -437,6 +437,7 @@ namespace
         
         for (double lambda = 6 ; lambda < 20 ; lambda += 0.1)
         {
+            print_spinner();
             dlib::running_stats<double> stats;
             for (size_t i = 0; i < N; i++) 
                 stats.add(rnd.get_random_exponential(lambda));
