@@ -270,15 +270,26 @@ namespace dlib
             )
             {
                 DLIB_ASSERT(lambda > 0, "lambda must be greater than zero");
-                double u;
-                do
-                {
+                double u = 0.0;
+                while (u == 0.0)
                     u = get_random_double();
-                } 
-                while (u == 0.0);
                 return -std::log( u ) / lambda;
             }
 
+            double get_random_weibull (
+                double alpha,
+                double beta,
+                double gamma
+            )
+            {
+                DLIB_ASSERT(alpha > 0, "alpha must be greater than zero");
+                DLIB_ASSERT(beta > 0, "beta must be greater than zero");
+                double u = 0.0;
+                while (u == 0.0)
+                    u = get_random_double();
+                return gamma + beta*std::pow(-std::log(u), 1.0 / alpha);
+            }
+            
             void swap (
                 rand& item
             )
