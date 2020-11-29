@@ -315,6 +315,7 @@ if (NOT TARGET dlib)
          cuda/tensor_tools.cpp
          data_io/image_dataset_metadata.cpp
          data_io/mnist.cpp
+         data_io/cifar.cpp
          global_optimization/global_function_search.cpp
          filtering/kalman_filter.cpp
          svm/auto.cpp
