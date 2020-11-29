@@ -415,14 +415,14 @@ namespace
         
         const size_t N = 1024*1024*4;
         const double tol = 0.01;
-        double a=1.0, b=2.0, g=6.0;
+        double k=1.0, lambda=2.0, g=6.0;
 
         dlib::running_stats<double> stats;
         for (size_t i = 0; i < N; i++) 
-            stats.add(rnd.get_random_weibull(a, b, g));
+            stats.add(rnd.get_random_weibull(lambda, k, g));
 
-        double expected_mean = g + b*std::tgamma(1 + 1.0 / a);
-        double expected_var  = b*b*(std::tgamma(1 + 2.0 / a) - std::pow(std::tgamma(1 + 1.0 / a),2));
+        double expected_mean = g + lambda*std::tgamma(1 + 1.0 / k);
+        double expected_var  = lambda*lambda*(std::tgamma(1 + 2.0 / k) - std::pow(std::tgamma(1 + 1.0 / k),2));
         DLIB_TEST(std::abs(stats.mean() - expected_mean) < tol);
         DLIB_TEST(std::abs(stats.variance() - expected_var) < tol);
     }
