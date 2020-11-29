@@ -21,7 +21,7 @@ namespace dlib
             std::vector<unsigned long>& labels
         )
         {
-            std::ifstream fin((folder_name + "/" + batch_name).c_str(), std::ios::binary);
+            std::ifstream fin(folder_name + "/" + batch_name, std::ios::binary);
             if (!fin) throw error("Unable to open file " + batch_name);
             const long nr = 32;
             const long nc = 32;
