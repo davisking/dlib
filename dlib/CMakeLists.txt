@@ -615,6 +615,12 @@ if (NOT TARGET dlib)
             set(CUDA_FOUND 0)
          endif()
 
+         if (NOT CUDA_CUBLAS_LIBRARIES)
+            message(STATUS "Found CUDA, but CMake was unable to find the cuBLAS libraries that should be part of every basic CUDA "
+               "install. Your CUDA install is somehow broken or incomplete. Since cuBLAS is required for dlib to use CUDA we won't use CUDA.")
+            set(CUDA_FOUND 0)
+         endif()
+
          if (CUDA_FOUND AND (NOT USING_OLD_VISUAL_STUDIO_COMPILER))
 
             # There is some bug in cmake that causes it to mess up the
