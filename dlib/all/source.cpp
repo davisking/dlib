@@ -83,6 +83,7 @@
 #include "../cuda/tensor_tools.cpp"
 #include "../data_io/image_dataset_metadata.cpp"
 #include "../data_io/mnist.cpp"
+#include "../data_io/cifar.cpp"
 #include "../svm/auto.cpp"
 #include "../global_optimization/global_function_search.cpp"
 #include "../filtering/kalman_filter.cpp"

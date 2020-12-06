@@ -315,6 +315,7 @@ if (NOT TARGET dlib)
          cuda/tensor_tools.cpp
          data_io/image_dataset_metadata.cpp
          data_io/mnist.cpp
+         data_io/cifar.cpp
          global_optimization/global_function_search.cpp
          filtering/kalman_filter.cpp
          svm/auto.cpp
@@ -611,6 +612,12 @@ if (NOT TARGET dlib)
 
          if (CUDA_FOUND AND MSVC AND NOT CUDA_CUBLAS_LIBRARIES AND "${CMAKE_SIZEOF_VOID_P}" EQUAL "4")
             message(WARNING "You have CUDA installed, but we can't use it unless you put visual studio in 64bit mode.")
+            set(CUDA_FOUND 0)
+         endif()
+
+         if (NOT CUDA_CUBLAS_LIBRARIES)
+            message(STATUS "Found CUDA, but CMake was unable to find the cuBLAS libraries that should be part of every basic CUDA "
+               "install. Your CUDA install is somehow broken or incomplete. Since cuBLAS is required for dlib to use CUDA we won't use CUDA.")
             set(CUDA_FOUND 0)
          endif()
 

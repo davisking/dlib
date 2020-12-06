@@ -134,8 +134,8 @@ int main(int argc, char** argv) try
     // setup all leaky_relu_ layers in the discriminator to have alpha = 0.2
     visit_computational_layers(discriminator, [](leaky_relu_& l){ l = leaky_relu_(0.2); });
     // Remove the bias learning from all bn_ inputs in both networks
-    disable_duplicative_bias(generator);
-    disable_duplicative_bias(discriminator);
+    disable_duplicative_biases(generator);
+    disable_duplicative_biases(discriminator);
     // Forward random noise so that we see the tensor size at each layer
     discriminator(generate_image(generator, make_noise(rnd)));
     cout << "generator (" << count_parameters(generator) << " parameters)" << endl;

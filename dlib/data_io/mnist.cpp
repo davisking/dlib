@@ -59,24 +59,24 @@ namespace dlib
         fin1.read((char*)&nr, sizeof(nr));  bo.big_to_host(nr);
         fin1.read((char*)&nc, sizeof(nc));  bo.big_to_host(nc);
         if (magic != 2051 || num != 60000 || nr != 28 || nc != 28)
-            throw error("mndist dat files are corrupted.");
+            throw error("mnist dat files are corrupted.");
 
         fin2.read((char*)&magic, sizeof(magic));  bo.big_to_host(magic);
         fin2.read((char*)&num2, sizeof(num2));  bo.big_to_host(num2);
         if (magic != 2049 || num2 != 60000)
-            throw error("mndist dat files are corrupted.");
+            throw error("mnist dat files are corrupted.");
 
         fin3.read((char*)&magic, sizeof(magic));  bo.big_to_host(magic);
         fin3.read((char*)&num3, sizeof(num3));  bo.big_to_host(num3);
         fin3.read((char*)&nr, sizeof(nr));  bo.big_to_host(nr);
         fin3.read((char*)&nc, sizeof(nc));  bo.big_to_host(nc);
         if (magic != 2051 || num3 != 10000 || nr != 28 || nc != 28)
-            throw error("mndist dat files are corrupted.");
+            throw error("mnist dat files are corrupted.");
 
         fin4.read((char*)&magic, sizeof(magic));  bo.big_to_host(magic);
         fin4.read((char*)&num4, sizeof(num4));  bo.big_to_host(num4);
         if (magic != 2049 || num4 != 10000)
-            throw error("mndist dat files are corrupted.");
+            throw error("mnist dat files are corrupted.");
 
         if (!fin1) throw error("Unable to read train-images-idx3-ubyte");
         if (!fin2) throw error("Unable to read train-labels-idx1-ubyte");

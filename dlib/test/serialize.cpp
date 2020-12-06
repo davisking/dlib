@@ -12,6 +12,7 @@
 #include <ctime>
 #include <dlib/serialize.h>
 #include <dlib/image_transforms.h>
+#include <dlib/rand.h>
 
 #include "tester.h"
 
@@ -431,16 +432,17 @@ namespace
         std::multiset<string> n;
         std::unordered_multiset<string> o;
         std::shared_ptr<string> ptr_shared1;
-        std::shared_ptr<string> ptr_shared2;    
+        std::shared_ptr<string> ptr_shared2;
+        std::vector<std::complex<double>> p;    
 
         bool operator==(const my_custom_type& rhs) const
         {         
-            return std::tie(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o) == std::tie(rhs.a,rhs.b,rhs.c,rhs.d,rhs.e,rhs.f,rhs.g,rhs.h,rhs.i,rhs.j,rhs.k,rhs.l,rhs.m,rhs.n,rhs.o)
+            return std::tie(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p) == std::tie(rhs.a,rhs.b,rhs.c,rhs.d,rhs.e,rhs.f,rhs.g,rhs.h,rhs.i,rhs.j,rhs.k,rhs.l,rhs.m,rhs.n,rhs.o,rhs.p)
                     && pointers_values_equal(ptr_shared1, rhs.ptr_shared1)
                     && pointers_values_equal(ptr_shared2, rhs.ptr_shared2);
         }
 
-        DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, ptr_shared1, ptr_shared2);
+        DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, ptr_shared1, ptr_shared2);
     };
 
     struct my_custom_type_array
@@ -1119,6 +1121,9 @@ namespace
         t1.o.insert("hello from unordered_multiset");
         t1.o.insert("hello from unordered_multiset");
         t1.ptr_shared1 = make_shared<string>("hello from shared_ptr");
+        dlib::rand rng(std::time(NULL));
+        for (int i = 0 ; i < 1024 ; i++)
+            t1.p.push_back(rng.get_random_gaussian());
 
         t2.a = 2;
         t2.b = 4.0;

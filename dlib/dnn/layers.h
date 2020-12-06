@@ -1791,7 +1791,7 @@ namespace dlib
     }
 
     template <typename net_type>
-    void disable_duplicative_bias (
+    void disable_duplicative_biases (
         net_type& net
     )
     {
