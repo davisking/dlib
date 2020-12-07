@@ -17,9 +17,6 @@ void mkl_fft(const std::vector<int>& dims, const std::complex<T>* fin, std::comp
 
     DFTI_DESCRIPTOR_HANDLE h;
     MKL_LONG status;
-
-    status = DftiCreateDescriptor(&h, dfti_type, DFTI_COMPLEX, dims.size(), dims[0]);
-    DLIB_DFTI_CHECK_STATUS(status);
         
     if (dims.size() == 1)
     {
