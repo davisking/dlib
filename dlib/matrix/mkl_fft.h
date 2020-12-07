@@ -25,7 +25,7 @@ void mkl_fft(const std::vector<int>& dims, const std::complex<T>* fin, std::comp
     }
     else if (dims.size() == 2)
     {
-        MKL_LONG size[] = {dims[0], dims[1]}
+        MKL_LONG size[] = {dims[0], dims[1]};
         status = DftiCreateDescriptor(&h, dfti_type, DFTI_COMPLEX, 2, size);
         DLIB_DFTI_CHECK_STATUS(status);
 
@@ -54,9 +54,9 @@ void mkl_fft(const std::vector<int>& dims, const std::complex<T>* fin, std::comp
     DLIB_DFTI_CHECK_STATUS(status);
 
     if (is_inverse)
-        status = DftiComputeBackward(h, fin, fout);
+        status = DftiComputeBackward(h, (void*)fin, (void*)fout);
     else
-        status = DftiComputeForward(h, fin, fout);
+        status = DftiComputeForward(h, (void*)fin, (void*)fout);
     DLIB_DFTI_CHECK_STATUS(status);
 
     status = DftiFreeDescriptor(&h);
