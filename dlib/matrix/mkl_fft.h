@@ -61,8 +61,6 @@ void mkl_fft(const std::vector<int>& dims, const std::complex<T>* fin, std::comp
 
     status = DftiFreeDescriptor(&h);
     DLIB_DFTI_CHECK_STATUS(status);
-
-    return out;
 }
 
 #endif // DLIB_MKL_FFT_H
