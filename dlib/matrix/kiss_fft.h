@@ -3,6 +3,7 @@
 
 #include <complex>
 #include <vector>
+#include <cmath>
 #include <stdexcept>
 #include <algorithm>
 #include <unordered_map>
