@@ -509,7 +509,6 @@ namespace dlib
     )
     { 
         std::ios::fmtflags oldflags = out.flags();  
-        out.flags(); 
         out << item << ' '; 
         out.flags(oldflags); 
         if (!out) throw serialization_error("Error serializing object of type bigint_kernel_c"); 
@@ -521,8 +520,8 @@ namespace dlib
     ) 
     { 
         std::ios::fmtflags oldflags = in.flags();  
-        in.flags(); 
-        in >> item; in.flags(oldflags); 
+        in >> item;
+        in.flags(oldflags); 
         if (in.get() != ' ')
         {
             item = 0;
