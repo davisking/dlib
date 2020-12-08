@@ -1,3 +1,11 @@
+/*
+ *  Copyright (c) 2003-2010, Mark Borgerding. All rights reserved.
+ *  This file is part of KISS FFT - https://github.com/mborgerding/kissfft
+ *
+ *  SPDX-License-Identifier: BSD-3-Clause
+ *  See COPYING file for more information.
+ */
+
 #ifndef DLIB_KISS_FFT_H
 #define DLIB_KISS_FFT_H
 
@@ -8,6 +16,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <mutex>
+#include <numeric>
 #include "../hash.h"
 
 #define C_FIXDIV(x,y) /*noop*/
@@ -20,6 +29,31 @@ namespace dlib
 {
     namespace kiss_details
     {
+        struct plan_key
+        {
+            std::vector<int> dims;
+            bool is_inverse;
+
+            plan_key(const std::vector<int>& dims, bool is_inverse)
+            {
+                this->dims = dims;
+                this->is_inverse = is_inverse;
+            }
+            
+            bool operator==(const plan_key& other) const
+            {
+                return std::tie(dims, is_inverse) == std::tie(other.dims, other.is_inverse);
+            }
+
+            uint32_t hash() const
+            {
+                uint32_t ret = 0;
+                ret = dlib::hash(dims, ret);
+                ret = dlib::hash((uint32_t)is_inverse, ret);
+                return ret;
+            }
+        };
+
         template<typename T>
         struct kiss_fft_state
         {
@@ -27,14 +61,40 @@ namespace dlib
             bool inverse;
             std::vector<int> factors;
             std::vector<std::complex<T>> twiddles;
+            
+            kiss_fft_state() = default;
+            kiss_fft_state(const plan_key& key);
         };
 
         template<typename T>
         struct kiss_fftnd_state
         {
-            int dimprod;
             std::vector<int> dims;
             std::vector<kiss_fft_state<T>> plans;
+            
+            int dimprod() const {return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<int>());}
+            kiss_fftnd_state() = default;
+            kiss_fftnd_state(const plan_key& key);
+        };
+
+        template<typename T>
+        struct kiss_fftr_state
+        {
+            kiss_fft_state<T> substate;
+            std::vector<std::complex<T>> super_twiddles;
+            
+            kiss_fftr_state() = default;
+            kiss_fftr_state(const plan_key& key);
+        };
+
+        template<typename T>
+        struct kiss_fftndr_state
+        {
+            kiss_fftr_state<T> cfg_r;
+            kiss_fftnd_state<T> cfg_nd;
+            
+            kiss_fftndr_state() = default;
+            kiss_fftndr_state(const plan_key& key);
         };
 
         template<typename T>
@@ -256,30 +316,6 @@ namespace dlib
             const int m=*factors++; /* stage's fft length/p */
             const std::complex<T> * Fout_end = Fout + p*m;
 
-        #ifdef _OPENMP
-            // use openmp extensions at the
-            // top-level (not recursive)
-            if (fstride==1 && p<=5 && m!=1)
-            {
-                int k;
-
-                // execute the p different work units in different threads
-        #       pragma omp parallel for
-                for (k=0;k<p;++k)
-                    kf_work( Fout +k*m, f+ fstride*in_stride*k,fstride*p,in_stride,factors,st);
-                // all threads have joined by this point
-
-                switch (p) {
-                    case 2: kf_bfly2(Fout,fstride,st,m); break;
-                    case 3: kf_bfly3(Fout,fstride,st,m); break;
-                    case 4: kf_bfly4(Fout,fstride,st,m); break;
-                    case 5: kf_bfly5(Fout,fstride,st,m); break;
-                    default: kf_bfly_generic(Fout,fstride,st,m,p); break;
-                }
-                return;
-            }
-        #endif
-
             if (m==1) {
                 do{
                     *Fout = *f;
@@ -336,24 +372,21 @@ namespace dlib
         }
 
         template<typename T>
-        kiss_fft_state<T> kiss_fft_plan(int nfft,bool is_inverse)
+        inline kiss_fft_state<T>::kiss_fft_state(const plan_key& key)
         {
-            kiss_fft_state<T> plan;
-            plan.nfft       = nfft;
-            plan.inverse    = is_inverse;
-            plan.twiddles.resize(nfft);
+            nfft       = key.dims[0];
+            inverse    = key.is_inverse;
+            twiddles.resize(nfft);
 
             for (int i = 0 ; i < nfft ; ++i) 
             {
                 double phase = -2*M_PI*i / nfft;
-                if (plan.inverse)
+                if (inverse)
                     phase *= -1;
-                plan.twiddles[i] = std::polar(1.0, phase);
+                twiddles[i] = std::polar(1.0, phase);
             }
 
-            kf_factor(nfft,plan.factors);
-
-            return plan;
+            kf_factor(nfft,factors);
         }
 
         template<typename T>
@@ -375,19 +408,11 @@ namespace dlib
         }
 
         template<typename T>
-        kiss_fftnd_state<T> kiss_fftnd_plan(const std::vector<int>& dims, bool is_inverse)
+        inline kiss_fftnd_state<T>::kiss_fftnd_state(const plan_key& key)
         {
-            kiss_fftnd_state<T> plan;
-            plan.dims = dims;
-            plan.dimprod = 1;
-
-            for (size_t i = 0 ; i < plan.dims.size() ; i++)
-            {
-                plan.plans.push_back(std::move(kiss_fft_plan<T>(plan.dims[i], is_inverse)));
-                plan.dimprod *= plan.dims[i];
-            }
-
-            return plan;
+            dims = key.dims;
+            for (size_t i = 0 ; i < dims.size() ; i++)
+                plans.push_back(std::move(kiss_fft_state<T>(plan_key({dims[i]}, key.is_inverse))));
         }
 
         template<typename T>
@@ -395,14 +420,14 @@ namespace dlib
         {
             const std::complex<T>* bufin=fin;
             std::complex<T>* bufout;
-            std::vector<std::complex<T>> tmpbuf(cfg.dimprod);
+            std::vector<std::complex<T>> tmpbuf(cfg.dimprod());
 
             /*arrange it so the last bufout == fout*/
             if ( cfg.dims.size() & 1 )
             {
                 bufout = fout;
                 if (fin==fout) {
-                    std::copy(fin, fin + cfg.dimprod, tmpbuf.begin());
+                    std::copy(fin, fin + cfg.dimprod(), tmpbuf.begin());
                     bufin = &tmpbuf[0];
                 }
             }
@@ -412,7 +437,7 @@ namespace dlib
             for (size_t k=0; k < cfg.dims.size(); ++k) 
             {
                 int curdim = cfg.dims[k];
-                int stride = cfg.dimprod / curdim;
+                int stride = cfg.dimprod() / curdim;
 
                 for (int i=0 ; i<stride ; ++i ) 
                     kiss_fft_stride(cfg.plans[k], bufin+i , bufout+i*curdim, stride );
@@ -431,132 +456,252 @@ namespace dlib
             }
         }
 
-        struct plan_key
+        template<typename T>
+        inline kiss_fftr_state<T>::kiss_fftr_state(const plan_key& key)
         {
-            std::vector<int> dims;
-            bool is_inverse;
-            
-            bool operator==(const plan_key& other) const
+            const int nfft = key.dims[0] / 2;
+            substate = kiss_fft_state<T>(plan_key({nfft}, key.is_inverse));
+            super_twiddles.resize(nfft/2);
+
+            for (size_t i = 0 ; i < super_twiddles.size() ; ++i) 
             {
-                return std::tie(dims, is_inverse) == std::tie(other.dims, other.is_inverse);
+                double phase = -M_PI * ((i+1) * 1.0 / nfft + 0.5);
+                if (key.is_inverse)
+                    phase *= -1;
+                super_twiddles[i] = std::polar(1.0, phase);
             }
-            
-            uint32_t hash() const
+        }
+
+        template<typename T>
+        void kiss_fftr(const kiss_fftr_state<T>& plan, const T* timedata, std::complex<T>* freqdata)
+        {
+            if (plan.substate.inverse)
+                throw std::runtime_error("bad fftr plan : need a forward plan. This is an inverse plan");
+
+            const int nfft_h = plan.substate.nfft; //recall that the FFT size is actually half the original requested FFT size, i.e. the size of timedata
+
+            /*perform the parallel fft of two real signals packed in real,imag*/
+            std::vector<std::complex<T>> tmpbuf(nfft_h);
+            kiss_fft_stride(plan.substate, (const std::complex<T>*)timedata, &tmpbuf[0], 1);
+            /* The real part of the DC element of the frequency spectrum in st->tmpbuf
+             * contains the sum of the even-numbered elements of the input time sequence
+             * The imag part is the sum of the odd-numbered elements
+             *
+             * The sum of tdc.r and tdc.i is the sum of the input time sequence.
+             *      yielding DC of input time sequence
+             * The difference of tdc.r - tdc.i is the sum of the input (dot product) [1,-1,1,-1...
+             *      yielding Nyquist bin of input time sequence
+             */
+
+            freqdata[0]         = std::complex<T>(tmpbuf[0].real() + tmpbuf[0].imag(), 0);
+            freqdata[nfft_h]    = std::complex<T>(tmpbuf[0].real() - tmpbuf[0].imag(), 0);
+
+            for (int k = 1 ; k <= nfft_h / 2 ; k++)
             {
-                uint32_t ret = 0;
-                ret = dlib::hash(dims, ret);
-                ret = dlib::hash((uint32_t)is_inverse, ret);
-                return ret;
+                auto fpk  = tmpbuf[0];
+                auto fpnk = std::complex<T>(tmpbuf[nfft_h-k].real(), -tmpbuf[nfft_h-k].imag());
+                auto f1k = fpk + fpnk;
+                auto f2k = fpk - fpnk;
+                auto tw  = f2k * plan.super_twiddles[k-1];
+                freqdata[k]         = 0.5 * (f1k + tw);
+                freqdata[nfft_h-k]  = 0.5 * std::complex<T>(f1k.real() - tw.real(), tw.imag() - f1k.imag());
             }
-        };
+        }
+
+        template<typename T>
+        void kiss_fftri(const kiss_fftr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
+        {
+            if (!plan.substate.inverse)
+                throw std::runtime_error("bad fftr plan : need an inverse plan. This is a forward plan");
+
+            const int nfft_h = plan.substate.nfft; //recall that the FFT size is actually half the original requested FFT size, i.e. the size of timedata
+
+            std::vector<std::complex<T>> tmpbuf(nfft_h);
+
+            tmpbuf[0] = std::complex<T>(freqdata[0].real() + freqdata[nfft_h].real(),
+                                        freqdata[0].real() - freqdata[nfft_h].real());
+
+            for (int k = 1; k <= nfft_h / 2; ++k)
+            {
+                std::complex<T> fk      = freqdata[k];
+                std::complex<T> fnkc    = std::complex<T>(freqdata[nfft_h - k].real(), 
+                                                          -freqdata[nfft_h - k].imag());
+                auto fek = fk + fnkc;
+                auto tmp = fk - fnkc;
+                auto fok = tmp * plan.super_twiddles[k-1];
+                tmpbuf[k] = fek + fok;
+                tmpbuf[nfft_h - k] = fek - fok;
+                tmpbuf[nfft_h - k].imag(-tmpbuf[nfft_h - k].imag());
+            }
+
+            kiss_fft_stride (plan.substate, &tmpbuf[0], (std::complex<T>*)timedata);
+        }
+
+        template<typename T>
+        inline kiss_fftndr_state<T>::kiss_fftndr_state(const plan_key& key)
+        {
+            std::vector<int> frontdims = key.dims;
+            frontdims.pop_back();
+            cfg_r  = kiss_fftr_state<T>(key.dims.back(), key.is_inverse);
+            cfg_nd = kiss_fftnd_state<T>(frontdims, key.is_inverse);
+        }
+
+        template<typename T>
+        void kiss_fftndr(const kiss_fftndr_state<T>& plan, const T* timedata, std::complex<T>* freqdata)
+        {
+            int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
+            int dimOther = plan.cfg_nd.dimprod();
+            int nrbins   = dimReal/2+1;
+
+            std::vector<std::complex<T>> tmp1(std::max<int>(nrbins, dimOther));
+            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dimprod()*dimReal);
+
+            // take a real chunk of data, fft it and place the output at correct intervals
+            for (int k1 = 0; k1 < dimOther; ++k1) 
+            {
+                kiss_fftr(plan.cfg_r, timedata + k1*dimReal , &tmp1[0]); // tmp1 now holds nrbins complex points
+                for (int k2 = 0; k2 < nrbins; ++k2)
+                   tmp2[k2*dimOther+k1] = tmp1[k2];
+            }
+
+            for (int k2 = 0; k2 < nrbins; ++k2) 
+            {
+                kiss_fftnd(plan.cfg_nd, &tmp2[k2*dimOther], &tmp1[0]);  // tmp1 now holds dimOther complex points
+                for (int k1 = 0; k1 < dimOther; ++k1) 
+                    freqdata[ k1*(nrbins) + k2] = tmp1[k1];
+            }
+        }
+
+        template<typename T>
+        void kiss_fftndri(const kiss_fftndr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
+        {
+            int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
+            int dimOther = plan.cfg_nd.dimprod();
+            int nrbins   = dimReal/2+1;
+
+            std::vector<std::complex<T>> tmp1(std::max<int>(nrbins, dimOther));
+            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dimprod()*dimReal);
+
+            for (int k2 = 0; k2 < nrbins; ++k2) 
+            {
+                for (int k1 = 0; k1 < dimOther; ++k1) 
+                    tmp1[k1] = freqdata[ k1*(nrbins) + k2 ];
+                kiss_fftnd(plan.cfg_nd, &tmp1[0], &tmp2[k2*dimOther]);
+            }
+
+            for (int k1 = 0; k1 < dimOther; ++k1) 
+            {
+                for (int k2 = 0; k2 < nrbins; ++k2)
+                    tmp1[k2] = tmp2[ k2*dimOther+k1 ];
+                kiss_fftri(plan.cfg_r, &tmp1[0], timedata + k1*dimReal);
+            }
+        }
 
         struct hasher
         {
             size_t operator()(const plan_key& key) const {return key.hash();}
         };
 
-        class kiss_fft_cache
+        template<typename plan_type>
+        class cache
         {
         public:
-            kiss_fft_cache() 
+            static cache& get()
             {
+                static cache singleton;
+                return singleton;
             }
 
-            void get_plan(plan_key key, kiss_fft_state<float>& plan)
+            void get_plan(const plan_key& key, plan_type& plan)
             {
                 std::lock_guard<std::mutex> l(m);
-                auto it = plans_float.find(key);
-                if (it != plans_float.end())
+                auto it = plans.find(key);
+                if (it != plans.end())
                 {
                     plan = it->second;
                 }
                 else
                 {
-                    plans_float[key] = kiss_fft_plan<float>(key.dims[0], key.is_inverse);
-                    plan = plans_float[key];
+                    plans[key] = plan_type(key);
+                    plan = plans[key];
                 }
-            }
-
-            void get_plan(plan_key key, kiss_fft_state<double>& plan)
-            {
-                std::lock_guard<std::mutex> l(m);
-                auto it = plans_double.find(key);
-                if (it != plans_double.end())
-                {
-                    plan = it->second;
-                }
-                else
-                {
-                    plans_double[key] = kiss_fft_plan<double>(key.dims[0], key.is_inverse);
-                    plan = plans_double[key];
-                };
-            }
-
-            void get_plan(plan_key key, kiss_fftnd_state<float>& plan)
-            {
-                std::lock_guard<std::mutex> l(m);
-                auto it = plans_floatnd.find(key);
-                if (it != plans_floatnd.end())
-                {
-                    plan = it->second;
-                }
-                else
-                {
-                    plans_floatnd[key] = kiss_fftnd_plan<float>(key.dims, key.is_inverse);
-                    plan = plans_floatnd[key];
-                }
-            }
-
-            void get_plan(plan_key key, kiss_fftnd_state<double>& plan)
-            {
-                std::lock_guard<std::mutex> l(m);
-                auto it = plans_doublend.find(key);
-                if (it != plans_doublend.end())
-                {
-                    plan = it->second;
-                }
-                else
-                {
-                    plans_doublend[key] = kiss_fftnd_plan<double>(key.dims, key.is_inverse);
-                    plan = plans_doublend[key];
-                };
             }
 
         private:
-            std::unordered_map<plan_key, kiss_fft_state<float>,    hasher>  plans_float;
-            std::unordered_map<plan_key, kiss_fft_state<double>,   hasher>  plans_double;
-            std::unordered_map<plan_key, kiss_fftnd_state<float>,  hasher>  plans_floatnd;
-            std::unordered_map<plan_key, kiss_fftnd_state<double>, hasher>  plans_doublend;
+            cache() = default;
+            cache(const cache& orig) = delete;
+            cache& operator=(const cache& orig) = delete;
+
+            std::unordered_map<plan_key, plan_type, hasher> plans;
             std::mutex m;
-
-            kiss_fft_cache(const kiss_fft_cache& orig) = delete;
-            kiss_fft_cache& operator=(const kiss_fft_cache& orig) = delete;
         };
-
-        inline kiss_fft_cache& CACHE()
-        {
-            static kiss_fft_cache singleton;
-            return singleton;
-        }
     }
-    
+
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
     void kiss_fft(const std::vector<int>& dims, const std::complex<T>* fin, std::complex<T>* fout, bool is_inverse)
     {
+        using namespace kiss_details;
+
         if (dims.size() == 1)
         {
-            kiss_details::kiss_fft_state<T> plan;
-            kiss_details::CACHE().get_plan({dims,is_inverse}, plan);
-            kiss_details::kiss_fft_stride(plan, fin, fout, 1);
+            kiss_fft_state<T> plan;
+            cache<kiss_fft_state<T>>::get().get_plan({dims, is_inverse}, plan);
+            kiss_fft_stride(plan, fin, fout, 1);
         }
         else
         {
-            kiss_details::kiss_fftnd_state<T> plan;
-            kiss_details::CACHE().get_plan({dims,is_inverse}, plan);
-            kiss_details::kiss_fftnd(plan, fin, fout);
+            kiss_fftnd_state<T> plan;
+            cache<kiss_fftnd_state<T>>::get().get_plan({dims,is_inverse}, plan);
+            kiss_fftnd(plan, fin, fout);
         }
     }
-    
+
+    /*
+     *  fin  has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
+     *  fout has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
+     */
+    template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
+    void kiss_fftr(const std::vector<int>& dims, const T* fin, std::complex<T>* fout)
+    {
+        using namespace kiss_details;
+
+        if (dims.size() == 1)
+        {
+            kiss_fftr_state<T> plan;
+            cache<kiss_fftr_state<T>>::get().get_plan({dims,false}, plan);
+            kiss_fftr(plan, fin, fout);
+        }
+        else
+        {
+            kiss_fftndr_state<T> plan;
+            cache<kiss_fftndr_state<T>>::get().get_plan({dims,false}, plan);
+            kiss_fftndr(plan, fin, fout);
+        }
+    }
+
+    /*
+     *  fin  has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
+     *  fout has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
+     */
+    template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
+    void kiss_fftri(const std::vector<int>& dims, const std::complex<T>* fin, T* fout)
+    {
+        using namespace kiss_details;
+
+        if (dims.size() == 1)
+        {
+            kiss_fftr_state<T> plan;
+            cache<kiss_fftr_state<T>>::get().get_plan({dims,true}, plan);
+            kiss_fftri(plan, fin, fout);
+        }
+        else
+        {
+            kiss_fftndr_state<T> plan;
+            cache<kiss_fftndr_state<T>>::get().get_plan({dims,true}, plan);
+            kiss_fftndri(plan, fin, fout);
+        }
+    }
+
     inline int kiss_fft_next_fast_size(int n)
     {
         while(1) {
