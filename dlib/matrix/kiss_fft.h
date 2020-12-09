@@ -21,10 +21,6 @@
 
 #define C_FIXDIV(x,y) /*noop*/
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
 namespace dlib
 {
     namespace kiss_details
@@ -138,6 +134,8 @@ namespace dlib
 
             tw1=tw2=&cfg.twiddles[0];
 
+            static constexpr T half = 0.5;
+            
             for (size_t k = 0 ; k < m ; k++)
             {
                 C_FIXDIV(Fout[k],3); C_FIXDIV(Fout[k+m],3); C_FIXDIV(Fout[m2+k],3); //noop for float and double
@@ -148,7 +146,7 @@ namespace dlib
                 scratch[3] = scratch[1] + scratch[2];
                 scratch[0] = scratch[1] - scratch[2];
 
-                Fout[m+k] = Fout[k] - T(0.5) * scratch[3];
+                Fout[m+k] = Fout[k] - half * scratch[3];
 
                 scratch[0] *= epi3.imag();
 
@@ -374,13 +372,14 @@ namespace dlib
         template<typename T>
         inline kiss_fft_state<T>::kiss_fft_state(const plan_key& key)
         {
+            static constexpr double twopi = 6.283185307179586476925286766559005768394338798;
             nfft       = key.dims[0];
             inverse    = key.is_inverse;
             twiddles.resize(nfft);
 
             for (int i = 0 ; i < nfft ; ++i) 
             {
-                double phase = -2*M_PI*i / nfft;
+                double phase = -twopi*i / nfft;
                 if (inverse)
                     phase *= -1;
                 twiddles[i] = std::polar(1.0, phase);
@@ -459,13 +458,14 @@ namespace dlib
         template<typename T>
         inline kiss_fftr_state<T>::kiss_fftr_state(const plan_key& key)
         {
+            static constexpr double pi = 3.141592653589793238462643383279502884197169399;
             const int nfft = key.dims[0] / 2;
             substate = kiss_fft_state<T>(plan_key({nfft}, key.is_inverse));
             super_twiddles.resize(nfft/2);
 
             for (size_t i = 0 ; i < super_twiddles.size() ; ++i) 
             {
-                double phase = -M_PI * ((i+1) * 1.0 / nfft + 0.5);
+                double phase = -pi * ((i+1) * 1.0 / nfft + 0.5);
                 if (key.is_inverse)
                     phase *= -1;
                 super_twiddles[i] = std::polar(1.0, phase);
@@ -496,15 +496,17 @@ namespace dlib
             freqdata[0]         = std::complex<T>(tmpbuf[0].real() + tmpbuf[0].imag(), 0);
             freqdata[nfft_h]    = std::complex<T>(tmpbuf[0].real() - tmpbuf[0].imag(), 0);
 
+            static constexpr T half = 0.5;
+            
             for (int k = 1 ; k <= nfft_h / 2 ; k++)
             {
                 auto fpk  = tmpbuf[0];
-                auto fpnk = std::complex<T>(tmpbuf[nfft_h-k].real(), -tmpbuf[nfft_h-k].imag());
+                auto fpnk = std::conj(tmpbuf[nfft_h-k]);
                 auto f1k = fpk + fpnk;
                 auto f2k = fpk - fpnk;
                 auto tw  = f2k * plan.super_twiddles[k-1];
-                freqdata[k]         = 0.5 * (f1k + tw);
-                freqdata[nfft_h-k]  = 0.5 * std::complex<T>(f1k.real() - tw.real(), tw.imag() - f1k.imag());
+                freqdata[k]         = half * (f1k + tw);
+                freqdata[nfft_h-k]  = half * std::conj(f1k - tw);
             }
         }
 
@@ -534,7 +536,7 @@ namespace dlib
                 tmpbuf[nfft_h - k].imag(-tmpbuf[nfft_h - k].imag());
             }
 
-            kiss_fft_stride (plan.substate, &tmpbuf[0], (std::complex<T>*)timedata);
+            kiss_fft_stride (plan.substate, &tmpbuf[0], (std::complex<T>*)timedata, 1);
         }
 
         template<typename T>
@@ -542,8 +544,8 @@ namespace dlib
         {
             std::vector<int> frontdims = key.dims;
             frontdims.pop_back();
-            cfg_r  = kiss_fftr_state<T>(key.dims.back(), key.is_inverse);
-            cfg_nd = kiss_fftnd_state<T>(frontdims, key.is_inverse);
+            cfg_r  = kiss_fftr_state<T>(plan_key({key.dims.back()}, key.is_inverse));
+            cfg_nd = kiss_fftnd_state<T>(plan_key(frontdims, key.is_inverse));
         }
 
         template<typename T>
