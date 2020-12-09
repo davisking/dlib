@@ -112,6 +112,38 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
+    template <typename EXP>
+    matrix<std::complex<typename EXP::type>> fftr (const matrix_exp<EXP>& data)
+    {
+        // You have to give a complex matrix
+        COMPILE_TIME_ASSERT(std::is_floating_point<typename EXP::type>::value);
+        DLIB_ASSERT(data.nc() % 2 == 0, "last dimension needs to be even otherwise ifftr(fftr(data)) won't have matching dimensions : " << data.nc());
+        matrix<typename EXP::type> in(data);
+        matrix<std::complex<typename EXP::type>> out(in.nr(), in.nc()/2+1);
+        kiss_fftr({(int)in.nr(), (int)in.nc()}, &in(0,0), &out(0,0));
+        return out;
+    }
+
+// ----------------------------------------------------------------------------------------
+    
+    template <typename EXP>
+    matrix<typename remove_complex<typename EXP::type>::type> ifftr (const matrix_exp<EXP>& data)
+    {
+        // You have to give a complex matrix
+        COMPILE_TIME_ASSERT(is_complex<typename EXP::type>::value);        
+        matrix<typename remove_complex<typename EXP::type>::type> out;
+        if (data.size() == 0)
+            return out;
+        matrix<typename EXP::type> in = data;
+        const int nc = 2*(in.nc()-1);
+        out.set_size(in.nr(), nc);
+        kiss_fftri({(int)in.nr(),nc}, &in(0,0), &out(0,0));
+        out /= out.size();
+        return out;
+    }
+
+// ----------------------------------------------------------------------------------------
+    
 #endif // DLIB_USE_MKL_FFT
 }
 
