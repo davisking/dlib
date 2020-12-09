@@ -48,6 +48,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    /*!A remove_complex
+        This is a template that can be used to remove std::complex from the underlying type.
+
+        For example:
+            remove_complex<float>::type == float
+            remove_complex<std::complex<float> >::type == float
+    !*/
+    template <typename T>
+    struct remove_complex {typedef T type;};
+    template <typename T>
+    struct remove_complex<std::complex<T> > {typedef T type;};
+
+// ----------------------------------------------------------------------------------------
+    
     template <typename EXP>
     inline bool is_row_vector (
         const matrix_exp<EXP>& m
