@@ -44,7 +44,7 @@ namespace
 // ----------------------------------------------------------------------------------------
 
     template<typename R>
-    matrix<complex<R> > rand_complex(long nr, long nc)
+    matrix<complex<R> > rand_complex(long nr, long nc, R scale = 10.0)
     {
         matrix<complex<R> > m(nr,nc);
 
@@ -52,7 +52,7 @@ namespace
         {
             for (long c = 0; c < m.nc(); ++c)
             {
-                m(r,c) = std::complex<R>(rnd.get_random_gaussian() * 10.0, rnd.get_random_gaussian() * 10.0);
+                m(r,c) = std::complex<R>(rnd.get_random_gaussian() * scale, rnd.get_random_gaussian() * scale);
             }
         }
         return m;
@@ -307,9 +307,11 @@ namespace
     
 // ----------------------------------------------------------------------------------------
     
+    template<typename R>
     void test_time_shift()
     {
-        static constexpr double tol = 1e-15;
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-1;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
         int test = 0;
         
@@ -320,22 +322,22 @@ namespace
                 if (++test % 100 == 0)
                     print_spinner();
                 
-                matrix<complex<double>> x1 = rand_complex<double>(1,size);
-                matrix<complex<double>> x2 = x1;
+                matrix<complex<R>> x1 = rand_complex<R>(1,size, 1.0);
+                matrix<complex<R>> x2 = x1;
                 std::rotate(x2.begin(), x2.begin() + time_shift, x2.end());
 
-                matrix<complex<double>> f1 = fft(x1);
-                matrix<complex<double>> f2 = fft(x2);
-                matrix<complex<double>> f2_expected = f1;
+                matrix<complex<R>> f1 = fft(x1);
+                matrix<complex<R>> f2 = fft(x2);
+                matrix<complex<R>> f2_expected = f1;
 
                 for (long i = 0 ; i < f1.size() ; i++)
-                    f2_expected(i) = f1(i)*polar<double>(1.0, 2*M_PI*time_shift*i / size);
+                    f2_expected(i) = f1(i)*polar<R>(1.0, 2*M_PI*time_shift*i / size);
 
                 const auto diff_real = max(squared(real(f2) - real(f2_expected)));
                 const auto diff_imag = max(squared(imag(f2) - imag(f2_expected)));
 
-                DLIB_TEST_MSG(diff_real < tol, "diff_real " << diff_real << " size " << size << " shift " << time_shift);
-                DLIB_TEST_MSG(diff_imag < tol, "diff_real " << diff_imag << " size " << size << " shift " << time_shift);
+                DLIB_TEST_MSG(diff_real < tol, typelabel << " diff_real " << diff_real << " size " << size << " shift " << time_shift);
+                DLIB_TEST_MSG(diff_imag < tol, typelabel << " diff_real " << diff_imag << " size " << size << " shift " << time_shift);
             }
         }
     }
@@ -363,7 +365,8 @@ namespace
             test_linearity_complex<double>();
             test_kronecker_delta_impulse_response<float>();
             test_kronecker_delta_impulse_response<double>();
-            test_time_shift();
+            test_time_shift<float>();
+            test_time_shift<double>();
         }
     } a;
 
