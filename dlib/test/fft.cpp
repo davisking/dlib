@@ -25,7 +25,7 @@ namespace
     
 // ----------------------------------------------------------------------------------------
     
-    static inline int fft_next_fast_size(int n)
+    inline int fft_next_fast_size(int n)
     {
         while(1) {
             int m=n;
