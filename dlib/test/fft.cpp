@@ -297,10 +297,10 @@ namespace
             test_against_saved_good_ffts();
             test_random_ffts();
             test_random_real_ffts();
-            test_linearity_complex<float>();
-            test_linearity_complex<double>();
             test_linearity_real<float>();
             test_linearity_real<double>();
+            test_linearity_complex<float>();
+            test_linearity_complex<double>();
         }
     } a;
 
