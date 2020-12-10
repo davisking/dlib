@@ -27,10 +27,10 @@ namespace dlib
     {
         struct plan_key
         {
-            std::vector<int> dims;
+            std::vector<long> dims;
             bool is_inverse;
 
-            plan_key(const std::vector<int>& dims, bool is_inverse)
+            plan_key(const std::vector<long>& dims, bool is_inverse)
             {
                 this->dims = dims;
                 this->is_inverse = is_inverse;
@@ -53,7 +53,7 @@ namespace dlib
         template<typename T>
         struct kiss_fft_state
         {
-            int nfft;
+            long nfft;
             bool inverse;
             std::vector<int> factors;
             std::vector<std::complex<T>> twiddles;
@@ -65,10 +65,10 @@ namespace dlib
         template<typename T>
         struct kiss_fftnd_state
         {
-            std::vector<int> dims;
+            std::vector<long> dims;
             std::vector<kiss_fft_state<T>> plans;
             
-            int dimprod() const {return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<int>());}
+            long dimprod() const {return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<long>());}
             kiss_fftnd_state() = default;
             kiss_fftnd_state(const plan_key& key);
         };
@@ -542,7 +542,7 @@ namespace dlib
         template<typename T>
         inline kiss_fftndr_state<T>::kiss_fftndr_state(const plan_key& key)
         {
-            std::vector<int> frontdims = key.dims;
+            std::vector<long> frontdims = key.dims;
             frontdims.pop_back();
             cfg_r  = kiss_fftr_state<T>(plan_key({key.dims.back()}, key.is_inverse));
             cfg_nd = kiss_fftnd_state<T>(plan_key(frontdims, key.is_inverse));
@@ -640,7 +640,7 @@ namespace dlib
     }
 
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fft(std::vector<int> dims, const std::complex<T>* fin, std::complex<T>* fout, bool is_inverse)
+    void kiss_fft(std::vector<long> dims, const std::complex<T>* fin, std::complex<T>* fout, bool is_inverse)
     {
         using namespace kiss_details;
         
@@ -665,7 +665,7 @@ namespace dlib
      *  fout has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
      */
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fftr(std::vector<int> dims, const T* fin, std::complex<T>* fout)
+    void kiss_fftr(std::vector<long> dims, const T* fin, std::complex<T>* fout)
     {
         using namespace kiss_details;
         
@@ -690,7 +690,7 @@ namespace dlib
      *  fout has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
      */
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fftri(std::vector<int> dims, const std::complex<T>* fin, T* fout)
+    void kiss_fftri(std::vector<long> dims, const std::complex<T>* fin, T* fout)
     {
         using namespace kiss_details;
 
