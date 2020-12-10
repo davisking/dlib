@@ -13,7 +13,7 @@
 namespace dlib
 {
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void mkl_fft(const std::vector<int>& dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
+    void mkl_fft(const std::vector<long>& dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
     {
         static constexpr DFTI_CONFIG_VALUE dfti_type = std::is_same<T,float>::value ? DFTI_SINGLE : DFTI_DOUBLE;
 
