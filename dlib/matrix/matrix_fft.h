@@ -72,7 +72,7 @@ namespace dlib
     matrix<typename EXP::type> fft (const matrix_exp<EXP>& data)
     {
         // You have to give a complex matrix
-        COMPILE_TIME_ASSERT(is_complex<typename EXP::type>::value);
+        static_assert(is_complex<typename EXP::type>::value, "input should be complex");
         matrix<typename EXP::type> eval(data); //potentially 2 copies: 1 for evaluating the matrix expression and 1 for doing the out-of-place FFT. hmm...
         kiss_fft({(int)eval.nr(), (int)eval.nc()}, &eval(0,0), &eval(0,0), false);
         return eval;
@@ -84,7 +84,7 @@ namespace dlib
     matrix<typename EXP::type> ifft (const matrix_exp<EXP>& data)
     {
         // You have to give a complex matrix
-        COMPILE_TIME_ASSERT(is_complex<typename EXP::type>::value);
+        static_assert(is_complex<typename EXP::type>::value, "input should be complex");
         matrix<typename EXP::type> eval;
         if (data.size() == 0)
             return eval;
@@ -116,7 +116,7 @@ namespace dlib
     matrix<std::complex<typename EXP::type>> fftr (const matrix_exp<EXP>& data)
     {
         // You have to give a complex matrix
-        COMPILE_TIME_ASSERT(std::is_floating_point<typename EXP::type>::value);
+        static_assert(std::is_floating_point<typename EXP::type>::value, "input should be a real floating point type.");
         DLIB_ASSERT(data.nc() % 2 == 0, "last dimension needs to be even otherwise ifftr(fftr(data)) won't have matching dimensions : " << data.nc());
         matrix<typename EXP::type> in(data);
         matrix<std::complex<typename EXP::type>> out(in.nr(), in.nc()/2+1);
@@ -130,7 +130,7 @@ namespace dlib
     matrix<typename remove_complex<typename EXP::type>::type> ifftr (const matrix_exp<EXP>& data)
     {
         // You have to give a complex matrix
-        COMPILE_TIME_ASSERT(is_complex<typename EXP::type>::value);        
+        static_assert(is_complex<typename EXP::type>::value, "input should be complex");        
         matrix<typename remove_complex<typename EXP::type>::type> out;
         if (data.size() == 0)
             return out;
