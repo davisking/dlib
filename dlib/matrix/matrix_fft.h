@@ -26,7 +26,7 @@ namespace dlib
         // You have to give a complex matrix
         COMPILE_TIME_ASSERT(is_complex<typename EXP::type>::value);
         matrix<typename EXP::type> eval(data); //potentially 2 copies: 1 for evaluating the matrix expression and 1 for doing the in-place FFT. hmm...
-        mkl_fft({(int)eval.nr(), (int)eval.nc()}, &eval(0,0), &eval(0,0), false);
+        mkl_fft({eval.nr(),eval.nc()}, &eval(0,0), &eval(0,0), false);
         return eval;
     }
 
@@ -41,7 +41,7 @@ namespace dlib
         if (data.size() == 0)
             return eval;
         eval = data;
-        mkl_fft({(int)eval.nr(), (int)eval.nc()}, &eval(0,0), &eval(0,0), true);
+        mkl_fft({eval.nr(),eval.nc()}, &eval(0,0), &eval(0,0), true);
         eval /= data.size();
         return eval;
     }
@@ -51,7 +51,7 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
-        mkl_fft({(int)data.nr(),(int)data.nc()}, &data(0,0), &data(0,0), false);
+        mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
-        mkl_fft({(int)data.nr(), (int)data.nc()}, &data(0,0), &data(0,0), true);
+        mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ namespace dlib
         // You have to give a complex matrix
         static_assert(is_complex<typename EXP::type>::value, "input should be complex");
         matrix<typename EXP::type> eval(data); //potentially 2 copies: 1 for evaluating the matrix expression and 1 for doing the out-of-place FFT. hmm...
-        kiss_fft({(int)eval.nr(), (int)eval.nc()}, &eval(0,0), &eval(0,0), false);
+        kiss_fft({eval.nr(),eval.nc()}, &eval(0,0), &eval(0,0), false);
         return eval;
     }
 
@@ -89,7 +89,7 @@ namespace dlib
         if (data.size() == 0)
             return eval;
         eval = data;
-        kiss_fft({(int)eval.nr(),(int)eval.nc()}, &eval(0,0), &eval(0,0), true);
+        kiss_fft({eval.nr(),eval.nc()}, &eval(0,0), &eval(0,0), true);
         eval /= data.size();
         return eval;
     }
@@ -99,7 +99,7 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
-        kiss_fft({(int)data.nr(), (int)data.nc()}, &data(0,0), &data(0,0), false);
+        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
-        kiss_fft({(int)data.nr(), (int)data.nc()}, &data(0,0), &data(0,0), true);
+        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -120,24 +120,24 @@ namespace dlib
         DLIB_ASSERT(data.nc() % 2 == 0, "last dimension needs to be even otherwise ifftr(fftr(data)) won't have matching dimensions : " << data.nc());
         matrix<typename EXP::type> in(data);
         matrix<std::complex<typename EXP::type>> out(in.nr(), in.nc()/2+1);
-        kiss_fftr({(int)in.nr(), (int)in.nc()}, &in(0,0), &out(0,0));
+        kiss_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
         return out;
     }
 
 // ----------------------------------------------------------------------------------------
     
     template <typename EXP>
-    matrix<typename remove_complex<typename EXP::type>::type> ifftr (const matrix_exp<EXP>& data)
+    matrix<remove_complex_t<typename EXP::type>> ifftr (const matrix_exp<EXP>& data)
     {
         // You have to give a complex matrix
         static_assert(is_complex<typename EXP::type>::value, "input should be complex");        
-        matrix<typename remove_complex<typename EXP::type>::type> out;
+        matrix<remove_complex_t<typename EXP::type>> out;
         if (data.size() == 0)
             return out;
         matrix<typename EXP::type> in = data;
-        const int nc = 2*(in.nc()-1);
+        const long nc = 2*(in.nc()-1);
         out.set_size(in.nr(), nc);
-        kiss_fftri({(int)in.nr(),nc}, &in(0,0), &out(0,0));
+        kiss_fftri({in.nr(),nc}, &in(0,0), &out(0,0));
         out /= out.size();
         return out;
     }
