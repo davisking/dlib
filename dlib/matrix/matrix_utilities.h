@@ -59,6 +59,9 @@ namespace dlib
     struct remove_complex {typedef T type;};
     template <typename T>
     struct remove_complex<std::complex<T> > {typedef T type;};
+    
+    template<typename T>
+    using remove_complex_t = typename remove_complex<T>::type;
 
 // ----------------------------------------------------------------------------------------
     
