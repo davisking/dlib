@@ -458,14 +458,16 @@ namespace dlib
         template<typename T>
         inline kiss_fftr_state<T>::kiss_fftr_state(const plan_key& key)
         {
-            static constexpr double pi = 3.141592653589793238462643383279502884197169399;
+            if (key.dims[0] & 1)
+                throw std::runtime_error("real FFT must have even dimension");
+            
             const int nfft = key.dims[0] / 2;
             substate = kiss_fft_state<T>(plan_key({nfft}, key.is_inverse));
             super_twiddles.resize(nfft/2);
 
             for (size_t i = 0 ; i < super_twiddles.size() ; ++i) 
             {
-                double phase = -pi * ((i+1) * 1.0 / nfft + 0.5);
+                double phase = -3.141592653589793238462643383279502884197169399 * ((double) (i+1) / nfft + .5);
                 if (key.is_inverse)
                     phase *= -1;
                 super_twiddles[i] = std::polar(1.0, phase);
@@ -498,9 +500,9 @@ namespace dlib
 
             static constexpr T half = 0.5;
             
-            for (int k = 1 ; k <= nfft_h / 2 ; k++)
+            for (int k = 1 ; k <= nfft_h / 2 ; ++k)
             {
-                auto fpk  = tmpbuf[0];
+                auto fpk  = tmpbuf[k];
                 auto fpnk = std::conj(tmpbuf[nfft_h-k]);
                 auto f1k = fpk + fpnk;
                 auto f2k = fpk - fpnk;
@@ -525,15 +527,13 @@ namespace dlib
 
             for (int k = 1; k <= nfft_h / 2; ++k)
             {
-                std::complex<T> fk      = freqdata[k];
-                std::complex<T> fnkc    = std::complex<T>(freqdata[nfft_h - k].real(), 
-                                                          -freqdata[nfft_h - k].imag());
+                std::complex<T> fk   = freqdata[k];
+                std::complex<T> fnkc = std::conj(freqdata[nfft_h - k]);
                 auto fek = fk + fnkc;
                 auto tmp = fk - fnkc;
                 auto fok = tmp * plan.super_twiddles[k-1];
                 tmpbuf[k] = fek + fok;
-                tmpbuf[nfft_h - k] = fek - fok;
-                tmpbuf[nfft_h - k].imag(-tmpbuf[nfft_h - k].imag());
+                tmpbuf[nfft_h - k] = std::conj(fek - fok);
             }
 
             kiss_fft_stride (plan.substate, &tmpbuf[0], (std::complex<T>*)timedata, 1);
@@ -640,10 +640,12 @@ namespace dlib
     }
 
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fft(const std::vector<int>& dims, const std::complex<T>* fin, std::complex<T>* fout, bool is_inverse)
+    void kiss_fft(std::vector<int> dims, const std::complex<T>* fin, std::complex<T>* fout, bool is_inverse)
     {
         using namespace kiss_details;
-
+        
+        dims.erase(std::remove(dims.begin(), dims.end(), 1), dims.end());
+        
         if (dims.size() == 1)
         {
             kiss_fft_state<T> plan;
@@ -663,9 +665,11 @@ namespace dlib
      *  fout has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
      */
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fftr(const std::vector<int>& dims, const T* fin, std::complex<T>* fout)
+    void kiss_fftr(std::vector<int> dims, const T* fin, std::complex<T>* fout)
     {
         using namespace kiss_details;
+        
+        dims.erase(std::remove(dims.begin(), dims.end(), 1), dims.end());
 
         if (dims.size() == 1)
         {
@@ -686,10 +690,12 @@ namespace dlib
      *  fout has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
      */
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fftri(const std::vector<int>& dims, const std::complex<T>* fin, T* fout)
+    void kiss_fftri(std::vector<int> dims, const std::complex<T>* fin, T* fout)
     {
         using namespace kiss_details;
 
+        dims.erase(std::remove(dims.begin(), dims.end(), 1), dims.end());
+        
         if (dims.size() == 1)
         {
             kiss_fftr_state<T> plan;
