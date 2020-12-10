@@ -13,7 +13,7 @@
 namespace dlib
 {
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void mkl_fft(const std::vector<int>& dims, const std::complex<T>* fin, std::complex<T>* fout, bool is_inverse)
+    void mkl_fft(const std::vector<int>& dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
     {
         static constexpr DFTI_CONFIG_VALUE dfti_type = std::is_same<T,float>::value ? DFTI_SINGLE : DFTI_DOUBLE;
 
@@ -42,9 +42,11 @@ namespace dlib
             DLIB_DFTI_CHECK_STATUS(status);
         }
         else
+        {
             throw dlib::error("Need to implement MKL 3D FFT");
+        }
 
-        const DFTI_CONFIG_VALUE inplacefft = fin == fout ? DFTI_INPLACE : DFTI_NOT_INPLACE;
+        const DFTI_CONFIG_VALUE inplacefft = in == out ? DFTI_INPLACE : DFTI_NOT_INPLACE;
         status = DftiSetValue(h, DFTI_PLACEMENT, inplacefft);
         DLIB_DFTI_CHECK_STATUS(status);
 
@@ -56,9 +58,9 @@ namespace dlib
         DLIB_DFTI_CHECK_STATUS(status);
 
         if (is_inverse)
-            status = DftiComputeBackward(h, (void*)fin, (void*)fout);
+            status = DftiComputeBackward(h, in, out);
         else
-            status = DftiComputeForward(h, (void*)fin, (void*)fout);
+            status = DftiComputeForward(h, in, out);
         DLIB_DFTI_CHECK_STATUS(status);
 
         status = DftiFreeDescriptor(&h);
