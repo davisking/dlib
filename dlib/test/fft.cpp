@@ -282,6 +282,66 @@ namespace
 
 // ----------------------------------------------------------------------------------------
     
+    template<typename R>
+    void test_kronecker_delta_impulse_response()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
+        
+        print_spinner();
+        
+        for (size_t size = 2 ; size < 1024 ; size = fft_next_fast_size(size+1))
+        {
+            matrix<R> ones = dlib::ones_matrix<R>((long)size, (long)1);
+            
+            std::vector<complex<R>> x(size, R(0));
+            x[0] = 1;
+            
+            matrix<complex<R>> f = fft(mat(x));
+            
+            R diff_real = max(squared(real(f) - ones));
+            R diff_imag = max(squared(imag(f)));
+            DLIB_TEST(diff_real < tol);
+            DLIB_TEST(diff_imag < tol);
+        }
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+    void test_time_shift()
+    {
+        static constexpr double tol = 1e-15;
+        
+        int test = 0;
+        
+        for (size_t size = 32 ; size < 1024*4 ; size = fft_next_fast_size(size+1))
+        {
+            for (size_t time_shift = 10 ; time_shift < size/2 + 1 ; time_shift += 10)
+            {
+                if (++test % 100 == 0)
+                    print_spinner();
+                
+                matrix<complex<double>> x1 = rand_complex<double>(1,size);
+                matrix<complex<double>> x2 = x1;
+                std::rotate(x2.begin(), x2.begin() + time_shift, x2.end());
+
+                matrix<complex<double>> f1 = fft(x1);
+                matrix<complex<double>> f2 = fft(x2);
+                matrix<complex<double>> f2_expected = f1;
+
+                for (long i = 0 ; i < f1.size() ; i++)
+                    f2_expected(i) = f1(i)*polar<double>(1.0, 2*M_PI*time_shift*i / size);
+
+                const auto diff_real = max(squared(real(f2) - real(f2_expected)));
+                const auto diff_imag = max(squared(imag(f2) - imag(f2_expected)));
+
+                DLIB_TEST_MSG(diff_real < tol, "diff_real " << diff_real << " size " << size << " shift " << time_shift);
+                DLIB_TEST_MSG(diff_imag < tol, "diff_real " << diff_imag << " size " << size << " shift " << time_shift);
+            }
+        }
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
     class test_fft : public tester
     {
     public:
@@ -301,6 +361,9 @@ namespace
             test_linearity_real<double>();
             test_linearity_complex<float>();
             test_linearity_complex<double>();
+            test_kronecker_delta_impulse_response<float>();
+            test_kronecker_delta_impulse_response<double>();
+            test_time_shift();
         }
     } a;
 
