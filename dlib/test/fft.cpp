@@ -331,7 +331,7 @@ namespace
                 matrix<complex<R>> f2_expected = f1;
 
                 for (long i = 0 ; i < f1.size() ; i++)
-                    f2_expected(i) = f1(i)*polar<R>(1.0, 2*M_PI*time_shift*i / size);
+                    f2_expected(i) = f1(i)*polar<R>(1.0, 2*3.141592653589793238462643383279502884197169399*time_shift*i / size);
 
                 const auto diff_real = max(squared(real(f2) - real(f2_expected)));
                 const auto diff_imag = max(squared(imag(f2) - imag(f2_expected)));
