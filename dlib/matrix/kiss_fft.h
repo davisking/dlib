@@ -614,18 +614,18 @@ namespace dlib
                 return singleton;
             }
 
-            void get_plan(const plan_key& key, plan_type& plan)
+            const plan_type& get_plan(const plan_key& key)
             {
                 std::lock_guard<std::mutex> l(m);
                 auto it = plans.find(key);
                 if (it != plans.end())
                 {
-                    plan = it->second;
+                    return it->second;
                 }
                 else
                 {
                     plans[key] = plan_type(key);
-                    plan = plans[key];
+                    return plans[key];
                 }
             }
 
@@ -648,14 +648,12 @@ namespace dlib
         
         if (dims.size() == 1)
         {
-            kiss_fft_state<T> plan;
-            cache<kiss_fft_state<T>>::get().get_plan({dims, is_inverse}, plan);
+            const auto& plan = cache<kiss_fft_state<T>>::get().get_plan({dims, is_inverse});
             kiss_fft_stride(plan, fin, fout, 1);
         }
         else
         {
-            kiss_fftnd_state<T> plan;
-            cache<kiss_fftnd_state<T>>::get().get_plan({dims,is_inverse}, plan);
+            const auto& plan = cache<kiss_fftnd_state<T>>::get().get_plan({dims,is_inverse});
             kiss_fftnd(plan, fin, fout);
         }
     }
@@ -673,14 +671,12 @@ namespace dlib
 
         if (dims.size() == 1)
         {
-            kiss_fftr_state<T> plan;
-            cache<kiss_fftr_state<T>>::get().get_plan({dims,false}, plan);
+            const auto& plan = cache<kiss_fftr_state<T>>::get().get_plan({dims,false});
             kiss_fftr(plan, fin, fout);
         }
         else
         {
-            kiss_fftndr_state<T> plan;
-            cache<kiss_fftndr_state<T>>::get().get_plan({dims,false}, plan);
+            const auto& plan = cache<kiss_fftndr_state<T>>::get().get_plan({dims,false});
             kiss_fftndr(plan, fin, fout);
         }
     }
@@ -698,14 +694,12 @@ namespace dlib
         
         if (dims.size() == 1)
         {
-            kiss_fftr_state<T> plan;
-            cache<kiss_fftr_state<T>>::get().get_plan({dims,true}, plan);
+            const auto& plan = cache<kiss_fftr_state<T>>::get().get_plan({dims,true});
             kiss_fftri(plan, fin, fout);
         }
         else
         {
-            kiss_fftndr_state<T> plan;
-            cache<kiss_fftndr_state<T>>::get().get_plan({dims,true}, plan);
+            const auto& plan = cache<kiss_fftndr_state<T>>::get().get_plan({dims,true});
             kiss_fftndri(plan, fin, fout);
         }
     }
