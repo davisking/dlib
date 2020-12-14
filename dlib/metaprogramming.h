@@ -65,7 +65,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl
+    namespace civ_impl
     {
         template <
             typename Funct, 
@@ -99,7 +99,7 @@ namespace dlib
               true.  Otherwise we do nothing and return false.
     !*/
     {
-        return impl::call_if_valid(special_(), f, std::forward<Args>(args)...);
+        return civ_impl::call_if_valid(special_(), f, std::forward<Args>(args)...);
     }
 
 // ----------------------------------------------------------------------------------------
