@@ -941,6 +941,9 @@ namespace dlib
         test_box_overlap overlaps_ignore;
         bool use_bounding_box_regression = false; 
         double bbr_lambda = 100; 
+        // This field is intentionally not serialized because I want people to really think hard
+        // about ignoring the warnings that this suppresses.
+        bool be_quiet = false;
 
         use_image_pyramid assume_image_pyramid = use_image_pyramid::yes;
 
@@ -1432,10 +1435,13 @@ namespace dlib
                         const auto i = idx_to_truth_rect.find(idx);
                         if (i != idx_to_truth_rect.end())
                         {
-                            // Ignore duplicate truth box in feature coordinates.
-                            std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << x.rect;
-                            std::cout << ", and we are ignoring it because it maps to the exact same feature coordinates ";
-                            std::cout << "as another truth rectangle located at " << i->second << "." << std::endl;
+                            if (!options.be_quiet) 
+                            {
+                                // Ignore duplicate truth box in feature coordinates.
+                                std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << x.rect;
+                                std::cout << ", and we are ignoring it because it maps to the exact same feature coordinates ";
+                                std::cout << "as another truth rectangle located at " << i->second << "." << std::endl;
+                            }
 
                             loss -= options.loss_per_missed_target;
                             truth_idxs.push_back(-1);
@@ -1515,11 +1521,14 @@ namespace dlib
                                 // added for it in the code above.
                                 loss -= options.loss_per_missed_target-out_data[idx];
                                 g[idx] = 0;
-                                std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << (*truth)[i].rect;
-                                std::cout << " that is suppressed by non-max-suppression ";
-                                std::cout << "because it is overlapped by another truth rectangle located at " << best_matching_truth_box 
-                                          << " (IoU:"<< box_intersection_over_union(best_matching_truth_box,(*truth)[i]) <<", Percent covered:" 
-                                          << box_percent_covered(best_matching_truth_box,(*truth)[i]) << ")." << std::endl;
+                                if (!options.be_quiet) 
+                                {
+                                    std::cout << "Warning, ignoring object.  We encountered a truth rectangle located at " << (*truth)[i].rect;
+                                    std::cout << " that is suppressed by non-max-suppression ";
+                                    std::cout << "because it is overlapped by another truth rectangle located at " << best_matching_truth_box 
+                                        << " (IoU:"<< box_intersection_over_union(best_matching_truth_box,(*truth)[i]) <<", Percent covered:" 
+                                        << box_percent_covered(best_matching_truth_box,(*truth)[i]) << ")." << std::endl;
+                                }
                             }
                         }
                     }
