@@ -268,10 +268,15 @@ namespace
                     const matrix<complex<R>> f2 = fftr(m2);
                     const matrix<complex<R>> f3 = fftr(m3);
                     
+                    DLIB_TEST(f1.nr() == m1.nr());
+                    DLIB_TEST(f1.nc() == fftr_nc_size(m1.nc()));
+                    
                     R diff = max(norm(f3 - a1*f1 - a2*f2));
                     DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " iter " << iter << " type " << typelabel);
                     
                     const matrix<R> m4 = ifftr(f3);
+                    DLIB_TEST(m4.nr() == f3.nr());
+                    DLIB_TEST(m4.nc() == ifftr_nc_size(f3.nc()));
                     
                     diff = max(squared(m4 - m3));
                     DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " iter " << iter << " type " << typelabel);
@@ -287,22 +292,35 @@ namespace
     {
         static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
         
-        print_spinner();
+        int test = 0;
         
-        for (size_t size = 2 ; size < 1024 ; size = fft_next_fast_size(size+1))
+        auto func = [&](long nr, long nc)
         {
-            matrix<R> ones = dlib::ones_matrix<R>((long)size, (long)1);
+            if (++test % 100 == 0)
+                print_spinner();
+            matrix<R> ones  = dlib::ones_matrix<R>(nr,nc);
+            matrix<complex<R>> x = dlib::zeros_matrix<complex<R>>(nr,nc);
+            x(0,0) = 1.0f;
             
-            std::vector<complex<R>> x(size, R(0));
-            x[0] = 1;
-            
-            matrix<complex<R>> f = fft(mat(x));
+            matrix<complex<R>> f = fft(x);
             
             R diff_real = max(squared(real(f) - ones));
             R diff_imag = max(squared(imag(f)));
             DLIB_TEST(diff_real < tol);
             DLIB_TEST(diff_imag < tol);
+        };
+        
+        for (int nr = 1; nr <= 128; nr = fft_next_fast_size(nr + 1))
+        {
+            for (int nc = 1; nc <= 128; nc = fft_next_fast_size(nc + 1))
+            {
+                func(nr,nc);
+            }
         }
+        
+        //some odd balls...
+        func(3, 1021);  print_spinner();
+        func(123, 103); print_spinner();
     }
     
 // ----------------------------------------------------------------------------------------
@@ -315,31 +333,41 @@ namespace
         
         int test = 0;
         
+        auto func = [&](size_t size, size_t time_shift)
+        {
+            if (++test % 100 == 0)
+                print_spinner();
+
+            matrix<complex<R>> x1 = rand_complex<R>(1,size, 1.0);
+            matrix<complex<R>> x2 = x1;
+            std::rotate(x2.begin(), x2.begin() + time_shift, x2.end());
+
+            matrix<complex<R>> f1 = fft(x1);
+            matrix<complex<R>> f2 = fft(x2);
+            matrix<complex<R>> f2_expected = f1;
+
+            for (long i = 0 ; i < f1.size() ; i++)
+                f2_expected(i) = f1(i)*std::polar<R>(R(1), R(6.283185307179586476925286766559005768394338798*time_shift*i / size));
+
+            const auto diff_real = max(squared(real(f2) - real(f2_expected)));
+            const auto diff_imag = max(squared(imag(f2) - imag(f2_expected)));
+
+            DLIB_TEST_MSG(diff_real < tol, typelabel << " diff_real " << diff_real << " size " << size << " shift " << time_shift);
+            DLIB_TEST_MSG(diff_imag < tol, typelabel << " diff_real " << diff_imag << " size " << size << " shift " << time_shift);
+        };
+        
         for (size_t size = 32 ; size < 1024*4 ; size = fft_next_fast_size(size+1))
         {
             for (size_t time_shift = 10 ; time_shift < size/2 + 1 ; time_shift += 10)
             {
-                if (++test % 100 == 0)
-                    print_spinner();
-                
-                matrix<complex<R>> x1 = rand_complex<R>(1,size, 1.0);
-                matrix<complex<R>> x2 = x1;
-                std::rotate(x2.begin(), x2.begin() + time_shift, x2.end());
-
-                matrix<complex<R>> f1 = fft(x1);
-                matrix<complex<R>> f2 = fft(x2);
-                matrix<complex<R>> f2_expected = f1;
-
-                for (long i = 0 ; i < f1.size() ; i++)
-                    f2_expected(i) = f1(i)*std::polar<R>(R(1), R(6.283185307179586476925286766559005768394338798*time_shift*i / size));
-
-                const auto diff_real = max(squared(real(f2) - real(f2_expected)));
-                const auto diff_imag = max(squared(imag(f2) - imag(f2_expected)));
-
-                DLIB_TEST_MSG(diff_real < tol, typelabel << " diff_real " << diff_real << " size " << size << " shift " << time_shift);
-                DLIB_TEST_MSG(diff_imag < tol, typelabel << " diff_real " << diff_imag << " size " << size << " shift " << time_shift);
+                func(size, time_shift);
             }
         }
+        
+        //some odd balls...
+        func(3,1);
+        func(123,16);
+        func(123,122);
     }
     
 // ----------------------------------------------------------------------------------------
