@@ -86,6 +86,7 @@ if (UNIX OR MINGW)
 
    if (SIZE_OF_VOID_PTR EQUAL 8)
       set( mkl_search_path
+         /opt/intel/oneapi/mkl/latest/lib/intel64
          /opt/intel/mkl/*/lib/em64t
          /opt/intel/mkl/lib/intel64
          /opt/intel/lib/intel64
@@ -99,6 +100,7 @@ if (UNIX OR MINGW)
       mark_as_advanced(mkl_intel)
    else()
       set( mkl_search_path
+         /opt/intel/oneapi/mkl/latest/lib/ia32
          /opt/intel/mkl/*/lib/32
          /opt/intel/mkl/lib/ia32
          /opt/intel/lib/ia32
@@ -114,6 +116,7 @@ if (UNIX OR MINGW)
 
    # Get mkl_include_dir
    set(mkl_include_search_path
+      /opt/intel/oneapi/mkl/latest/include
       /opt/intel/mkl/include
       /opt/intel/include
       )
