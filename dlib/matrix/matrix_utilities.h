@@ -64,6 +64,23 @@ namespace dlib
     using remove_complex_t = typename remove_complex<T>::type;
 
 // ----------------------------------------------------------------------------------------
+
+    /*!A add_complex
+        This is a template that can be used to add std::complex to the underlying type if it isn't already complex.
+
+        For example:
+            add_complex<float>::type == std::complex<float>
+            add_complex<std::complex<float> >::type == std::complex<float>
+    !*/
+    template <typename T>
+    struct add_complex {typedef std::complex<T> type;};
+    template <typename T>
+    struct add_complex<std::complex<T> > {typedef std::complex<T> type;};
+    
+    template<typename T>
+    using add_complex_t = typename add_complex<T>::type;
+
+// ----------------------------------------------------------------------------------------
     
     template <typename EXP>
     inline bool is_row_vector (
