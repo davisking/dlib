@@ -18,6 +18,7 @@
 #include <mutex>
 #include <numeric>
 #include "../hash.h"
+#include "../assert.h"
 
 #define C_FIXDIV(x,y) /*noop*/
 
@@ -134,7 +135,7 @@ namespace dlib
 
             tw1=tw2=&cfg.twiddles[0];
 
-            static constexpr T half = 0.5;
+            constexpr T half = 0.5;
             
             for (size_t k = 0 ; k < m ; k++)
             {
@@ -206,37 +207,35 @@ namespace dlib
             int m
         )
         {
-            std::complex<T> *Fout0,*Fout1,*Fout2,*Fout3,*Fout4;
-            int u;
             std::complex<T> scratch[13];
             const std::complex<T> * twiddles = &cfg.twiddles[0];
-            const std::complex<T> *tw;
             std::complex<T> ya,yb;
             ya = twiddles[fstride*m];
             yb = twiddles[fstride*2*m];
 
-            Fout0=Fout;
-            Fout1=Fout0+m;
-            Fout2=Fout0+2*m;
-            Fout3=Fout0+3*m;
-            Fout4=Fout0+4*m;
+            std::complex<T> *Fout0=Fout;
+            std::complex<T> *Fout1=Fout0+m;
+            std::complex<T> *Fout2=Fout0+2*m;
+            std::complex<T> *Fout3=Fout0+3*m;
+            std::complex<T> *Fout4=Fout0+4*m;
 
-            tw=&cfg.twiddles[0];
-            for ( u=0; u<m; ++u ) {
-                C_FIXDIV( *Fout0,5); C_FIXDIV( *Fout1,5); C_FIXDIV( *Fout2,5); C_FIXDIV( *Fout3,5); C_FIXDIV( *Fout4,5);
-                scratch[0] = *Fout0;
+            const std::complex<T> *tw = &cfg.twiddles[0];
+            
+            for (int u=0; u<m; ++u ) 
+            {
+                scratch[0] = Fout0[u];
 
-                scratch[1] = *Fout1 * tw[u*fstride]; //C_MUL(scratch[1] ,*Fout1, tw[u*fstride]);
-                scratch[2] = *Fout2 * tw[2*u*fstride]; //C_MUL(scratch[2] ,*Fout2, tw[2*u*fstride]);
-                scratch[3] = *Fout3 * tw[3*u*fstride]; //C_MUL(scratch[3] ,*Fout3, tw[3*u*fstride]);
-                scratch[4] = *Fout4 * tw[4*u*fstride]; //C_MUL(scratch[4] ,*Fout4, tw[4*u*fstride]);
+                scratch[1] = Fout1[u] * tw[u*fstride]; //C_MUL(scratch[1] ,*Fout1, tw[u*fstride]);
+                scratch[2] = Fout2[u] * tw[2*u*fstride]; //C_MUL(scratch[2] ,*Fout2, tw[2*u*fstride]);
+                scratch[3] = Fout3[u] * tw[3*u*fstride]; //C_MUL(scratch[3] ,*Fout3, tw[3*u*fstride]);
+                scratch[4] = Fout4[u] * tw[4*u*fstride]; //C_MUL(scratch[4] ,*Fout4, tw[4*u*fstride]);
 
                 scratch[7]  = scratch[1] + scratch[4]; //C_ADD( scratch[7],scratch[1],scratch[4]);
                 scratch[10] = scratch[1] - scratch[4]; //C_SUB( scratch[10],scratch[1],scratch[4]);
                 scratch[8]  = scratch[2] + scratch[3]; //C_ADD( scratch[8],scratch[2],scratch[3]);
                 scratch[9]  = scratch[2] - scratch[3]; //C_SUB( scratch[9],scratch[2],scratch[3]);
 
-                *Fout0 += scratch[7] + scratch[8];
+                Fout0[u] += scratch[7] + scratch[8];
 
                 scratch[5].real(scratch[0].real() + scratch[7].real() * ya.real() + scratch[8].real() * yb.real());
                 scratch[5].imag(scratch[0].imag() + scratch[7].imag() * ya.real() + scratch[8].imag() * yb.real());
@@ -244,18 +243,16 @@ namespace dlib
                 scratch[6].real(scratch[10].imag() * ya.imag() + scratch[9].imag() * yb.imag());
                 scratch[6].imag(-scratch[10].real() * ya.imag() - scratch[9].real() * yb.imag());
 
-                *Fout1 = scratch[5] - scratch[6]; //C_SUB(*Fout1,scratch[5],scratch[6]);
-                *Fout4 = scratch[5] + scratch[6]; //C_ADD(*Fout4,scratch[5],scratch[6]);
+                Fout1[u] = scratch[5] - scratch[6]; //C_SUB(*Fout1,scratch[5],scratch[6]);
+                Fout4[u] = scratch[5] + scratch[6]; //C_ADD(*Fout4,scratch[5],scratch[6]);
 
                 scratch[11].real(scratch[0].real() + scratch[7].real()*yb.real() + scratch[8].real()*ya.real());
                 scratch[11].imag(scratch[0].imag() + scratch[7].imag()*yb.real() + scratch[8].imag()*ya.real());
                 scratch[12].real(- scratch[10].imag()*yb.imag() + scratch[9].imag()*ya.imag());
                 scratch[12].imag(scratch[10].real()*yb.imag() - scratch[9].real()*ya.imag());
 
-                *Fout2 = scratch[11] + scratch[12];
-                *Fout3 = scratch[11] - scratch[12];
-
-                ++Fout0;++Fout1;++Fout2;++Fout3;++Fout4;
+                Fout2[u] = scratch[11] + scratch[12];
+                Fout3[u] = scratch[11] - scratch[12];
             }
         }
 
@@ -389,20 +386,18 @@ namespace dlib
         }
 
         template<typename T>
-        void kiss_fft_stride(const kiss_fft_state<T>& cfg, const std::complex<T>* fin, std::complex<T>* fout,int fin_stride)
+        void kiss_fft_stride(const kiss_fft_state<T>& cfg, const std::complex<T>* in, std::complex<T>* out,int fin_stride)
         {
-            if (fin == fout) 
+            if (in == out) 
             {
-                if (fout == nullptr)
-                    throw std::runtime_error("fout buffer NULL.");
-
+                DLIB_ASSERT(out != nullptr, "out buffer is NULL!");
                 std::vector<std::complex<T>> tmpbuf(cfg.nfft);
-                kiss_fft_stride(cfg, fin, &tmpbuf[0], fin_stride);
-                std::copy(tmpbuf.begin(), tmpbuf.end(), fout);
+                kiss_fft_stride(cfg, in, &tmpbuf[0], fin_stride);
+                std::copy(tmpbuf.begin(), tmpbuf.end(), out);
             }
             else
             {
-                kf_work(cfg, &cfg.factors[0], fout, fin, 1, fin_stride);
+                kf_work(cfg, &cfg.factors[0], out, in, 1, fin_stride);
             }
         }
 
@@ -415,18 +410,18 @@ namespace dlib
         }
 
         template<typename T>
-        void kiss_fftnd(const kiss_fftnd_state<T>& cfg, const std::complex<T>* fin, std::complex<T>* fout)
+        void kiss_fftnd(const kiss_fftnd_state<T>& cfg, const std::complex<T>* in, std::complex<T>* out)
         {
-            const std::complex<T>* bufin=fin;
+            const std::complex<T>* bufin=in;
             std::complex<T>* bufout;
             std::vector<std::complex<T>> tmpbuf(cfg.dimprod());
 
-            /*arrange it so the last bufout == fout*/
+            /*arrange it so the last bufout == out*/
             if ( cfg.dims.size() & 1 )
             {
-                bufout = fout;
-                if (fin==fout) {
-                    std::copy(fin, fin + cfg.dimprod(), tmpbuf.begin());
+                bufout = out;
+                if (in==out) {
+                    std::copy(in, in + cfg.dimprod(), tmpbuf.begin());
                     bufin = &tmpbuf[0];
                 }
             }
@@ -444,13 +439,13 @@ namespace dlib
                 /*toggle back and forth between the two buffers*/
                 if (bufout == &tmpbuf[0])
                 {
-                    bufout = fout;
+                    bufout = out;
                     bufin = &tmpbuf[0];
                 }
                 else
                 {
                     bufout = &tmpbuf[0];
-                    bufin = fout;
+                    bufin = out;
                 }
             }
         }
@@ -458,8 +453,7 @@ namespace dlib
         template<typename T>
         inline kiss_fftr_state<T>::kiss_fftr_state(const plan_key& key)
         {
-            if (key.dims[0] & 1)
-                throw std::runtime_error("real FFT must have even dimension");
+            DLIB_ASSERT((key.dims[0] & 1) == 0, "real FFT must have even dimension");
             
             const int nfft = key.dims[0] / 2;
             substate = kiss_fft_state<T>(plan_key({nfft}, key.is_inverse));
@@ -477,14 +471,13 @@ namespace dlib
         template<typename T>
         void kiss_fftr(const kiss_fftr_state<T>& plan, const T* timedata, std::complex<T>* freqdata)
         {
-            if (plan.substate.inverse)
-                throw std::runtime_error("bad fftr plan : need a forward plan. This is an inverse plan");
+            DLIB_ASSERT(!plan.substate.inverse, "bad fftr plan : need a forward plan. This is an inverse plan");
 
             const int nfft_h = plan.substate.nfft; //recall that the FFT size is actually half the original requested FFT size, i.e. the size of timedata
 
             /*perform the parallel fft of two real signals packed in real,imag*/
             std::vector<std::complex<T>> tmpbuf(nfft_h);
-            kiss_fft_stride(plan.substate, (const std::complex<T>*)timedata, &tmpbuf[0], 1);
+            kiss_fft_stride(plan.substate, reinterpret_cast<const std::complex<T>*>(timedata), &tmpbuf[0], 1);
             /* The real part of the DC element of the frequency spectrum in st->tmpbuf
              * contains the sum of the even-numbered elements of the input time sequence
              * The imag part is the sum of the odd-numbered elements
@@ -515,8 +508,7 @@ namespace dlib
         template<typename T>
         void kiss_fftri(const kiss_fftr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
         {
-            if (!plan.substate.inverse)
-                throw std::runtime_error("bad fftr plan : need an inverse plan. This is a forward plan");
+            DLIB_ASSERT(plan.substate.inverse, "bad Ifftr plan : need an inverse plan. This is a forward plan")
 
             const int nfft_h = plan.substate.nfft; //recall that the FFT size is actually half the original requested FFT size, i.e. the size of timedata
 
@@ -605,65 +597,56 @@ namespace dlib
         };
 
         template<typename plan_type>
-        class cache
+        const plan_type& get_plan(const plan_key& key)
         {
-        public:
-            static cache& get()
+            static std::mutex m;
+            static std::unordered_map<plan_key, plan_type, hasher> plans;
+            
+            std::lock_guard<std::mutex> l(m);
+            auto it = plans.find(key);
+            if (it != plans.end())
             {
-                static cache singleton;
-                return singleton;
+                return it->second;
             }
-
-            const plan_type& get_plan(const plan_key& key)
+            else
             {
-                std::lock_guard<std::mutex> l(m);
-                auto it = plans.find(key);
-                if (it != plans.end())
-                {
-                    return it->second;
-                }
-                else
-                {
-                    plans[key] = plan_type(key);
-                    return plans[key];
-                }
+                plans[key] = plan_type(key);
+                return plans[key];
             }
-
-        private:
-            cache() = default;
-            cache(const cache& orig) = delete;
-            cache& operator=(const cache& orig) = delete;
-
-            std::unordered_map<plan_key, plan_type, hasher> plans;
-            std::mutex m;
-        };
+        }
     }
 
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fft(std::vector<long> dims, const std::complex<T>* fin, std::complex<T>* fout, bool is_inverse)
+    void kiss_fft(std::vector<long> dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
     {
         using namespace kiss_details;
         
+        const long dimprod = std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<long>());
         dims.erase(std::remove(dims.begin(), dims.end(), 1), dims.end());
         
-        if (dims.size() == 1)
+        if (dims.size() == 0)
         {
-            const auto& plan = cache<kiss_fft_state<T>>::get().get_plan({dims, is_inverse});
-            kiss_fft_stride(plan, fin, fout, 1);
+            //if original dims == {1,1,1} then dimprod == 1, but dims post erasure is {}
+            std::copy(in, in + dimprod, out);
+        }
+        else if (dims.size() == 1)
+        {
+            const auto& plan = get_plan<kiss_fft_state<T>>({dims, is_inverse});
+            kiss_fft_stride(plan, in, out, 1);
         }
         else
         {
-            const auto& plan = cache<kiss_fftnd_state<T>>::get().get_plan({dims,is_inverse});
-            kiss_fftnd(plan, fin, fout);
+            const auto& plan = get_plan<kiss_fftnd_state<T>>({dims,is_inverse});
+            kiss_fftnd(plan, in, out);
         }
     }
 
     /*
-     *  fin  has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
-     *  fout has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
+     *  in  has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
+     *  out has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
      */
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fftr(std::vector<long> dims, const T* fin, std::complex<T>* fout)
+    void kiss_fftr(std::vector<long> dims, const T* in, std::complex<T>* out)
     {
         using namespace kiss_details;
         
@@ -671,22 +654,22 @@ namespace dlib
 
         if (dims.size() == 1)
         {
-            const auto& plan = cache<kiss_fftr_state<T>>::get().get_plan({dims,false});
-            kiss_fftr(plan, fin, fout);
+            const auto& plan = get_plan<kiss_fftr_state<T>>({dims,false});
+            kiss_fftr(plan, in, out);
         }
         else
         {
-            const auto& plan = cache<kiss_fftndr_state<T>>::get().get_plan({dims,false});
-            kiss_fftndr(plan, fin, fout);
+            const auto& plan = get_plan<kiss_fftndr_state<T>>({dims,false});
+            kiss_fftndr(plan, in, out);
         }
     }
 
     /*
-     *  fin  has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
-     *  fout has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
+     *  in  has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
+     *  out has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
      */
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fftri(std::vector<long> dims, const std::complex<T>* fin, T* fout)
+    void kiss_fftri(std::vector<long> dims, const std::complex<T>* in, T* out)
     {
         using namespace kiss_details;
 
@@ -694,13 +677,13 @@ namespace dlib
         
         if (dims.size() == 1)
         {
-            const auto& plan = cache<kiss_fftr_state<T>>::get().get_plan({dims,true});
-            kiss_fftri(plan, fin, fout);
+            const auto& plan = get_plan<kiss_fftr_state<T>>({dims,true});
+            kiss_fftri(plan, in, out);
         }
         else
         {
-            const auto& plan = cache<kiss_fftndr_state<T>>::get().get_plan({dims,true});
-            kiss_fftndri(plan, fin, fout);
+            const auto& plan = get_plan<kiss_fftndr_state<T>>({dims,true});
+            kiss_fftndri(plan, in, out);
         }
     }
 
