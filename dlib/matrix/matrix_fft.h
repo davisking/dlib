@@ -67,10 +67,24 @@ namespace dlib
 #else
      
 // ----------------------------------------------------------------------------------------
-
+    
+    constexpr long fftr_nc_size(long nc)
+    {
+        return nc == 0 ? 0 : nc/2+1;
+    }
+    
+    constexpr long ifftr_nc_size(long nc)
+    {
+        return nc == 0 ? 0 : 2*(nc-1);
+    }
+  
+// ----------------------------------------------------------------------------------------
+    
     template < typename T, long NR, long NC, typename MM, typename L >
     matrix<std::complex<T>,NR,NC,MM,L> fft (const matrix<std::complex<T>,NR,NC,MM,L>& in)
     {
+        /*complex FFT*/
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
         matrix<std::complex<T>,NR,NC,MM,L> out(in.nr(), in.nc());
         kiss_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
         return out;
@@ -78,19 +92,33 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
     
-    template <typename EXP>
-    matrix<typename EXP::type> fft (const matrix_exp<EXP>& data)
+    template<typename T, long NR, long NC, typename MM, typename L>
+    matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> fft (const matrix<T,NR,NC,MM,L>& in)
     {
-        static_assert(is_complex<typename EXP::type>::value, "input should be complex");
+        /*real FFT*/
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
+        DLIB_ASSERT(in.nc() % 2 == 0, "last dimension needs to be even otherwise ifftr(fftr(data)) won't have matching dimensions : " << in.nc());
+        matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> out(in.nr(), fftr_nc_size(in.nc()));
+        kiss_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
+        return out;
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+    template <typename EXP>
+    matrix<add_complex_t<typename EXP::type>> fft (const matrix_exp<EXP>& data)
+    {
         matrix<typename EXP::type> in(data);
         return fft(in);
     }
-
+    
 // ----------------------------------------------------------------------------------------
 
     template < typename T, long NR, long NC, typename MM, typename L >
     matrix<std::complex<T>,NR,NC,MM,L> ifft (const matrix<std::complex<T>,NR,NC,MM,L>& in)
     {
+        /*inverse complex FFT*/
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
         matrix<std::complex<T>,NR,NC,MM,L> out(in.nr(), in.nc());
         if (in.size() != 0)
         {
@@ -105,58 +133,10 @@ namespace dlib
     template <typename EXP>
     matrix<typename EXP::type> ifft (const matrix_exp<EXP>& data)
     {
+        /*inverse complex FFT for expression template*/
         static_assert(is_complex<typename EXP::type>::value, "input should be complex");
         matrix<typename EXP::type> in(data);
         return ifft(in);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template < typename T, long NR, long NC, typename MM, typename L >
-    void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
-    {
-        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template < typename T, long NR, long NC, typename MM, typename L >
-    void ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
-    {
-        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
-    }
-    
-// ----------------------------------------------------------------------------------------
-    
-    constexpr long fftr_nc_size(long nc)
-    {
-        return nc == 0 ? 0 : nc/2+1;
-    }
-    
-    constexpr long ifftr_nc_size(long nc)
-    {
-        return nc == 0 ? 0 : 2*(nc-1);
-    }
-  
-// ----------------------------------------------------------------------------------------
-    
-    template<typename T, long NR, long NC, typename MM, typename L>
-    matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> fftr (const matrix<T,NR,NC,MM,L>& in)
-    {
-        DLIB_ASSERT(in.nc() % 2 == 0, "last dimension needs to be even otherwise ifftr(fftr(data)) won't have matching dimensions : " << in.nc());
-        matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> out(in.nr(), fftr_nc_size(in.nc()));
-        kiss_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
-        return out;
-    }
-    
-// ----------------------------------------------------------------------------------------
-    
-    template <typename EXP>
-    matrix<std::complex<typename EXP::type>> fftr (const matrix_exp<EXP>& data)
-    {
-        static_assert(std::is_floating_point<typename EXP::type>::value, "input should be a real floating point type.");
-        matrix<typename EXP::type> in(data);
-        return fftr(in);
     }
 
 // ----------------------------------------------------------------------------------------
@@ -164,6 +144,8 @@ namespace dlib
     template<typename T, long NR, long NC, typename MM, typename L>
     matrix<T,NR,ifftr_nc_size(NC),MM,L> ifftr (const matrix<std::complex<T>,NR,NC,MM,L>& in)
     {
+        /*inverse real FFT*/
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
         matrix<T,NR,ifftr_nc_size(NC),MM,L> out(in.nr(), ifftr_nc_size(in.nc()));
         if (in.size() != 0)
         {
@@ -178,9 +160,26 @@ namespace dlib
     template <typename EXP>
     matrix<remove_complex_t<typename EXP::type>> ifftr (const matrix_exp<EXP>& data)
     {
+        /*inverse real FFT for expression template*/
         static_assert(is_complex<typename EXP::type>::value, "input should be complex");        
         matrix<typename EXP::type> in(data);
         return ifftr(in);
+    }
+
+// ----------------------------------------------------------------------------------------
+    
+    template < typename T, long NR, long NC, typename MM, typename L >
+    void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
+    {
+        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template < typename T, long NR, long NC, typename MM, typename L >
+    void ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
+    {
+        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
     }
 
 // ----------------------------------------------------------------------------------------
