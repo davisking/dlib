@@ -652,6 +652,7 @@ namespace dlib
         using namespace kiss_details;
         
         dims.remove_ones();
+        DLIB_ASSERT(dims.size() > 0);
 
         if (dims.size() == 1)
         {
@@ -675,6 +676,7 @@ namespace dlib
         using namespace kiss_details;
 
         dims.remove_ones();
+        DLIB_ASSERT(dims.size() > 0);
         
         if (dims.size() == 1)
         {
