@@ -861,6 +861,11 @@ namespace dlib
         // getting the bounding box shape correct.
         double bbr_lambda = 100; 
 
+        // Tell the loss not to print warnings about impossible labels.  You should think very hard
+        // before turning this off as it's very often telling you something is really wrong with
+        // your training data.
+        bool be_quiet = false;
+
         mmod_options (
             const std::vector<std::vector<mmod_rect>>& boxes,
             const unsigned long target_size,      

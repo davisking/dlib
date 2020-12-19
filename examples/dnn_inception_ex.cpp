@@ -87,7 +87,7 @@ int main(int argc, char** argv) try
     cout << net << endl;
 
 
-    cout << "Traning NN..." << endl;
+    cout << "Training NN..." << endl;
     dnn_trainer<net_type> trainer(net);
     trainer.set_learning_rate(0.01);
     trainer.set_min_learning_rate(0.00001);

@@ -4006,6 +4006,7 @@ namespace
         const std::vector<mmod_rect> labels = generate_labels();
 
         mmod_options options(use_image_pyramid::no, { labels });
+        options.be_quiet = true;
 
         // Define a simple network.
         using net_type = loss_mmod<con<1,5,5,1,1,con<1,5,5,2,2,input<input_image_type>>>>;

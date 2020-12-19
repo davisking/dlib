@@ -52,16 +52,21 @@ namespace dlib
         if (is_image<unsigned char>(img))
         {
             array2d<unsigned char> temp;
+            auto img_view = make_image_view(numpy_image<unsigned char>(img));
+
+            // Release the GIL so that this code can be run in parallel.
+            py::gil_scoped_release release;
+
             if (upsampling_amount == 0)
             {
-                detector(numpy_image<unsigned char>(img), rect_detections, adjust_threshold);
+                detector(img_view, rect_detections, adjust_threshold);
                 split_rect_detections(rect_detections, rectangles,
                                       detection_confidences, weight_indices);
                 return rectangles;
             }
             else
             {
-                pyramid_up(numpy_image<unsigned char>(img), temp, pyr);
+                pyramid_up(img_view, temp, pyr);
                 unsigned int levels = upsampling_amount-1;
                 while (levels > 0)
                 {
@@ -82,16 +87,21 @@ namespace dlib
         else if (is_image<rgb_pixel>(img))
         {
             array2d<rgb_pixel> temp;
+            auto img_view = make_image_view(numpy_image<rgb_pixel>(img));
+
+            // Release the GIL so that this code can be run in parallel.
+            py::gil_scoped_release release;
+
             if (upsampling_amount == 0)
             {
-                detector(numpy_image<rgb_pixel>(img), rect_detections, adjust_threshold);
+                detector(img_view, rect_detections, adjust_threshold);
                 split_rect_detections(rect_detections, rectangles,
                                       detection_confidences, weight_indices);
                 return rectangles;
             }
             else
             {
-                pyramid_up(numpy_image<rgb_pixel>(img), temp, pyr);
+                pyramid_up(img_view, temp, pyr);
                 unsigned int levels = upsampling_amount-1;
                 while (levels > 0)
                 {
