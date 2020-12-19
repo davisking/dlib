@@ -432,21 +432,18 @@ namespace
         print_spinner();
         dlib::rand rnd(0);
         
-        const size_t N = 1024*1024*128;
-        const double tol = 0.01;
+        const size_t N = 1024*1024*5;
         
-        for (double lambda = 6 ; lambda < 20 ; lambda += 0.1)
-        {
-            print_spinner();
-            dlib::running_stats<double> stats;
-            for (size_t i = 0; i < N; i++) 
-                stats.add(rnd.get_random_exponential(lambda));
-            
-            DLIB_TEST(std::abs(stats.mean() - 1.0 / lambda) < tol);
-            DLIB_TEST(std::abs(stats.variance() - 1.0 / (lambda*lambda)) < tol);
-            DLIB_TEST(std::abs(stats.skewness() - 2.0) < tol);
-            DLIB_TEST(std::abs(stats.ex_kurtosis() - 6.0) < 0.1);
-        }
+        const double lambda = 1.5;
+        print_spinner();
+        dlib::running_stats<double> stats;
+        for (size_t i = 0; i < N; i++) 
+            stats.add(rnd.get_random_exponential(lambda));
+        
+        DLIB_TEST(std::abs(stats.mean() - 1.0 / lambda) < 0.001);
+        DLIB_TEST(std::abs(stats.variance() - 1.0 / (lambda*lambda)) < 0.001);
+        DLIB_TEST(std::abs(stats.skewness() - 2.0) < 0.01);
+        DLIB_TEST(std::abs(stats.ex_kurtosis() - 6.0) < 0.1);
     }
     
     class rand_tester : public tester
