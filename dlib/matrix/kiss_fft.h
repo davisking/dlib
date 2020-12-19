@@ -17,21 +17,22 @@
 #include <unordered_map>
 #include <mutex>
 #include <numeric>
+#include "fft_size.h"
 #include "../hash.h"
 #include "../assert.h"
 
 #define C_FIXDIV(x,y) /*noop*/
 
 namespace dlib
-{
+{    
     namespace kiss_details
     {
         struct plan_key
         {
-            std::vector<long> dims;
+            fft_size dims;
             bool is_inverse;
 
-            plan_key(const std::vector<long>& dims, bool is_inverse)
+            plan_key(const fft_size& dims, bool is_inverse)
             {
                 this->dims = dims;
                 this->is_inverse = is_inverse;
@@ -42,11 +43,12 @@ namespace dlib
                 return std::tie(dims, is_inverse) == std::tie(other.dims, other.is_inverse);
             }
 
-            uint32_t hash() const
+            uint32 hash() const
             {
-                uint32_t ret = 0;
-                ret = dlib::hash(dims, ret);
-                ret = dlib::hash((uint32_t)is_inverse, ret);
+                using dlib::hash;
+                uint32 ret = 0;
+                ret = hash(dims, ret);
+                ret = hash((uint32)is_inverse, ret);
                 return ret;
             }
         };
@@ -66,10 +68,9 @@ namespace dlib
         template<typename T>
         struct kiss_fftnd_state
         {
-            std::vector<long> dims;
+            fft_size dims;
             std::vector<kiss_fft_state<T>> plans;
             
-            long dimprod() const {return std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<long>());}
             kiss_fftnd_state() = default;
             kiss_fftnd_state(const plan_key& key);
         };
@@ -414,14 +415,14 @@ namespace dlib
         {
             const std::complex<T>* bufin=in;
             std::complex<T>* bufout;
-            std::vector<std::complex<T>> tmpbuf(cfg.dimprod());
+            std::vector<std::complex<T>> tmpbuf(cfg.dims.dimprod());
 
             /*arrange it so the last bufout == out*/
             if ( cfg.dims.size() & 1 )
             {
                 bufout = out;
                 if (in==out) {
-                    std::copy(in, in + cfg.dimprod(), tmpbuf.begin());
+                    std::copy(in, in + cfg.dims.dimprod(), tmpbuf.begin());
                     bufin = &tmpbuf[0];
                 }
             }
@@ -431,7 +432,7 @@ namespace dlib
             for (size_t k=0; k < cfg.dims.size(); ++k) 
             {
                 int curdim = cfg.dims[k];
-                int stride = cfg.dimprod() / curdim;
+                int stride = cfg.dims.dimprod() / curdim;
 
                 for (int i=0 ; i<stride ; ++i ) 
                     kiss_fft_stride(cfg.plans[k], bufin+i , bufout+i*curdim, stride );
@@ -534,7 +535,7 @@ namespace dlib
         template<typename T>
         inline kiss_fftndr_state<T>::kiss_fftndr_state(const plan_key& key)
         {
-            std::vector<long> frontdims = key.dims;
+            fft_size frontdims = key.dims;
             frontdims.pop_back();
             cfg_r  = kiss_fftr_state<T>(plan_key({key.dims.back()}, key.is_inverse));
             cfg_nd = kiss_fftnd_state<T>(plan_key(frontdims, key.is_inverse));
@@ -544,11 +545,11 @@ namespace dlib
         void kiss_fftndr(const kiss_fftndr_state<T>& plan, const T* timedata, std::complex<T>* freqdata)
         {
             int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
-            int dimOther = plan.cfg_nd.dimprod();
+            int dimOther = plan.cfg_nd.dims.dimprod();
             int nrbins   = dimReal/2+1;
 
             std::vector<std::complex<T>> tmp1(std::max<int>(nrbins, dimOther));
-            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dimprod()*dimReal);
+            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dims.dimprod()*dimReal);
 
             // take a real chunk of data, fft it and place the output at correct intervals
             for (int k1 = 0; k1 < dimOther; ++k1) 
@@ -570,11 +571,11 @@ namespace dlib
         void kiss_fftndri(const kiss_fftndr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
         {
             int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
-            int dimOther = plan.cfg_nd.dimprod();
+            int dimOther = plan.cfg_nd.dims.dimprod();
             int nrbins   = dimReal/2+1;
 
             std::vector<std::complex<T>> tmp1(std::max<int>(nrbins, dimOther));
-            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dimprod()*dimReal);
+            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dims.dimprod()*dimReal);
 
             for (int k2 = 0; k2 < nrbins; ++k2) 
             {
@@ -617,12 +618,12 @@ namespace dlib
     }
 
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fft(std::vector<long> dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
+    void kiss_fft(fft_size dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
     {
         using namespace kiss_details;
         
-        const long dimprod = std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<long>());
-        dims.erase(std::remove(dims.begin(), dims.end(), 1), dims.end());
+        const long dimprod = dims.dimprod();
+        dims.remove_ones();
         
         if (dims.size() == 0)
         {
@@ -646,11 +647,11 @@ namespace dlib
      *  out has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
      */
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fftr(std::vector<long> dims, const T* in, std::complex<T>* out)
+    void kiss_fftr(fft_size dims, const T* in, std::complex<T>* out)
     {
         using namespace kiss_details;
         
-        dims.erase(std::remove(dims.begin(), dims.end(), 1), dims.end());
+        dims.remove_ones();
 
         if (dims.size() == 1)
         {
@@ -669,11 +670,11 @@ namespace dlib
      *  out has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
      */
     template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
-    void kiss_fftri(std::vector<long> dims, const std::complex<T>* in, T* out)
+    void kiss_fftri(fft_size dims, const std::complex<T>* in, T* out)
     {
         using namespace kiss_details;
 
-        dims.erase(std::remove(dims.begin(), dims.end(), 1), dims.end());
+        dims.remove_ones();
         
         if (dims.size() == 1)
         {
