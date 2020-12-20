@@ -680,7 +680,7 @@ namespace dlib
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
-
+            
         dims.remove_ones();
         DLIB_ASSERT(dims.size() > 0);
         
