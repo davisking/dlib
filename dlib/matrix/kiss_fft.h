@@ -617,18 +617,22 @@ namespace dlib
         }
     }
 
-    template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
+    template<typename T>
     void kiss_fft(fft_size dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
     {
         using namespace kiss_details;
+        static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
         
         const long dimprod = dims.dimprod();
         dims.remove_ones();
         
         if (dims.size() == 0)
         {
-            //if original dims == {1,1,1} then dimprod == 1, but dims post erasure is {}
-            std::copy(in, in + dimprod, out);
+            if (in != out)
+            {
+                //if original dims == {1,1,1} then dimprod == 1, but dims post erasure is {}
+                std::copy(in, in + dimprod, out);
+            }
         }
         else if (dims.size() == 1)
         {
@@ -646,10 +650,11 @@ namespace dlib
      *  in  has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
      *  out has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
      */
-    template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
+    template<typename T>
     void kiss_fftr(fft_size dims, const T* in, std::complex<T>* out)
     {
         using namespace kiss_details;
+        static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
         
         dims.remove_ones();
         DLIB_ASSERT(dims.size() > 0);
@@ -670,10 +675,11 @@ namespace dlib
      *  in  has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
      *  out has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
      */
-    template<typename T, typename std::enable_if<std::is_floating_point<T>::value>::type* = nullptr>
+    template<typename T>
     void kiss_fftri(fft_size dims, const std::complex<T>* in, T* out)
     {
         using namespace kiss_details;
+        static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
 
         dims.remove_ones();
         DLIB_ASSERT(dims.size() > 0);
