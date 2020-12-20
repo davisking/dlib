@@ -21,7 +21,7 @@ namespace
     using namespace std;
 
     logger dlog("test.fft");
-    static dlib::rand rnd;
+    static dlib::rand rnd(10000);
     
 // ----------------------------------------------------------------------------------------
     
@@ -227,7 +227,7 @@ namespace
                     const matrix<complex<R>> f1 = fft(m1);
                     const matrix<complex<R>> f2 = fft(m2);
                     const matrix<complex<R>> f3 = fft(m3);
-                    
+                                        
                     R diff = max(norm(f3 - a1*f1 - a2*f2));
                     DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " iter " << iter << " type " << typelabel);
                     
