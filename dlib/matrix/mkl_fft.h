@@ -107,6 +107,9 @@ namespace dlib
         const DFTI_CONFIG_VALUE inplacefft = (void*)in == (void*)out ? DFTI_INPLACE : DFTI_NOT_INPLACE;
         status = DftiSetValue(h, DFTI_PLACEMENT, inplacefft);
         DLIB_DFTI_CHECK_STATUS(status);
+        
+        status = DftiSetValue(h, DFTI_CONJUGATE_EVEN_STORAGE, DFTI_COMPLEX_COMPLEX);
+        DLIB_DFTI_CHECK_STATUS(status);
 
         // Unless we use sequential mode, the fft results are not correct.
         status = DftiSetValue(h, DFTI_THREAD_LIMIT, 1);
@@ -163,6 +166,9 @@ namespace dlib
         status = DftiSetValue(h, DFTI_PLACEMENT, inplacefft);
         DLIB_DFTI_CHECK_STATUS(status);
 
+        status = DftiSetValue(h, DFTI_CONJUGATE_EVEN_STORAGE, DFTI_COMPLEX_COMPLEX);
+        DLIB_DFTI_CHECK_STATUS(status);
+        
         // Unless we use sequential mode, the fft results are not correct.
         status = DftiSetValue(h, DFTI_THREAD_LIMIT, 1);
         DLIB_DFTI_CHECK_STATUS(status);
