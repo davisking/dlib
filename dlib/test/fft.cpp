@@ -11,6 +11,10 @@
 #include <dlib/compress_stream.h>
 #include <dlib/base64.h>
 
+#ifdef DLIB_USE_MKL_FFT
+#include <dlib/matrix/kiss_fft.h>
+#include <dlib/matrix/mkl_fft.h>
+#endif
 #include "tester.h"
 
 namespace  
@@ -372,6 +376,48 @@ namespace
     
 // ----------------------------------------------------------------------------------------
     
+#ifdef DLIB_USE_MKL_FFT
+    template<typename R>
+    void test_kiss_vs_mkl()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        
+        int test = 0;  
+        for (int iter = 0; iter < 10; ++iter)
+        {
+            for (int nr = 2; nr <= 128; nr += 2)
+            {
+                for (int nc = 2; nc <= 128; nc += 2)
+                {
+                    if (++test % 100 == 0)
+                        print_spinner();
+                    
+                    std::vector<float> x1(nr*nc), y1(nr*nc), y2(nr*nc);
+                    std::vector<std::complex<float>> f1(nr*(nc/2+1)), f2(nr*(nc/2+1));
+
+                    for (size_t i = 0 ; i < (nr*nc) ; i++)
+                        x1[i] = rng.get_random_gaussian();
+
+                    kiss_fftr({nr,nc}, &x1[0], &f1[0]);
+                    mkl_fftr({nr,nc}, &x1[0], &f2[0]);
+
+                    const R diff1 = max(norm(mat(f1) - mat(f2)));
+                    
+                    DLIB_TEST(diff1 < tol);
+            
+                    kiss_fftri({nr,nc}, &f1[0], &y1[0]);
+                    mkl_fftri({nr,nc}, &f2[0], &y2[0]);
+                    
+                    const R diff2 = max(squared(mat(y1) - mat(y2)));
+
+                    DLIB_TEST(diff2 < tol);
+                }
+            }
+        }
+    }
+#endif
+    
     class test_fft : public tester
     {
     public:
@@ -395,6 +441,10 @@ namespace
             test_kronecker_delta_impulse_response<double>();
             test_time_shift<float>();
             test_time_shift<double>();
+#ifdef DLIB_USE_MKL_FFT
+            test_kiss_vs_mkl<float>();
+            test_kiss_vs_mkl<double>();
+#endif
         }
     } a;
 
