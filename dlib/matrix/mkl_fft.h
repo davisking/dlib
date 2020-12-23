@@ -89,19 +89,28 @@ namespace dlib
         }
         else
         {
+            const long lastdim  = dims[1]/2+1;
             MKL_LONG size[] = {dims[0], dims[1]};
             status = DftiCreateDescriptor(&h, dfti_type, DFTI_REAL, 2, size);
             DLIB_DFTI_CHECK_STATUS(status);
 
-            MKL_LONG strides[3];
-            strides[0] = 0;
-            strides[1] = size[1];
-            strides[2] = 1;
+            {
+                MKL_LONG strides[3];
+                strides[0] = 0;
+                strides[1] = size[1];
+                strides[2] = 1;
 
-            status = DftiSetValue(h, DFTI_INPUT_STRIDES, strides);
-            DLIB_DFTI_CHECK_STATUS(status);
-            status = DftiSetValue(h, DFTI_OUTPUT_STRIDES, strides);
-            DLIB_DFTI_CHECK_STATUS(status);
+                status = DftiSetValue(h, DFTI_INPUT_STRIDES, strides);
+                DLIB_DFTI_CHECK_STATUS(status);
+            }
+            {
+                MKL_LONG strides[3];
+                strides[0] = 0;
+                strides[1] = lastdim;
+                strides[2] = 1;
+                status = DftiSetValue(h, DFTI_OUTPUT_STRIDES, strides);
+                DLIB_DFTI_CHECK_STATUS(status);
+            }   
         }
 
         const DFTI_CONFIG_VALUE inplacefft = (void*)in == (void*)out ? DFTI_INPLACE : DFTI_NOT_INPLACE;
@@ -147,19 +156,28 @@ namespace dlib
         }
         else
         {
+            const long lastdim  = dims[1]/2+1;
             MKL_LONG size[] = {dims[0], dims[1]};
             status = DftiCreateDescriptor(&h, dfti_type, DFTI_REAL, 2, size);
             DLIB_DFTI_CHECK_STATUS(status);
 
-            MKL_LONG strides[3];
-            strides[0] = 0;
-            strides[1] = size[1];
-            strides[2] = 1;
+            {
+                MKL_LONG strides[3];
+                strides[0] = 0;
+                strides[1] = lastdim;
+                strides[2] = 1;
 
-            status = DftiSetValue(h, DFTI_INPUT_STRIDES, strides);
-            DLIB_DFTI_CHECK_STATUS(status);
-            status = DftiSetValue(h, DFTI_OUTPUT_STRIDES, strides);
-            DLIB_DFTI_CHECK_STATUS(status);
+                status = DftiSetValue(h, DFTI_INPUT_STRIDES, strides);
+                DLIB_DFTI_CHECK_STATUS(status);
+            }
+            {
+                MKL_LONG strides[3];
+                strides[0] = 0;
+                strides[1] = dims[1];
+                strides[2] = 1;
+                status = DftiSetValue(h, DFTI_OUTPUT_STRIDES, strides);
+                DLIB_DFTI_CHECK_STATUS(status);
+            }   
         }
 
         const DFTI_CONFIG_VALUE inplacefft = (void*)in == (void*)out ? DFTI_INPLACE : DFTI_NOT_INPLACE;
