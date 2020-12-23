@@ -13,7 +13,6 @@ namespace dlib
     {   
     private:
         using container_type    = std::array<long,5>;
-        using reference         = container_type::reference;
         using const_reference   = container_type::const_reference;
 
         size_t _size = 0;
@@ -34,22 +33,10 @@ namespace dlib
             return _size;
         }
 
-        reference operator[](size_t index)
-        {
-            DLIB_ASSERT(index < _size);
-            return _dims[index];
-        }
-
         const_reference operator[](size_t index) const
         {
             DLIB_ASSERT(index < _size);
             return _dims[index];
-        }
-        
-        reference back()
-        {
-            DLIB_ASSERT(_size > 0);
-            return _dims[_size-1];
         }
         
         const_reference back() const
@@ -58,39 +45,44 @@ namespace dlib
             return _dims[_size-1];
         }
 
-        void pop_back()
-        {
-            if (_size > 0)
-                _size--;
-        }
-
         long dimprod() const
         {
             return std::accumulate(_dims.begin(), _dims.begin() + _size, 1, std::multiplies<long>());
         }
 
-        void remove_ones()
-        {
-            const auto newend = std::remove(_dims.begin(), _dims.begin() + _size, 1);
-            const long nremoved = std::distance(newend, _dims.begin() + _size);
-            _size -= nremoved;
-        }
-        
         bool operator==(const fft_size& other) const
         {
             return this->_size == other._size && std::equal(_dims.begin(), _dims.begin() + _size, other._dims.begin());
         }
         
-        friend inline uint32 hash(
+        /*global helpers*/
+        friend inline dlib::uint32 hash(
             const fft_size& item,
-            uint32 seed = 0)
+            dlib::uint32 seed = 0)
         {
-            seed = dlib::hash((uint64)item._size, seed);
-            seed = std::accumulate(item._dims.begin(), item._dims.begin() + item._size, seed, [](uint32 seed, long next) {
-                return dlib::hash((uint64)next, seed);
+            seed = dlib::hash((dlib::uint64)item._size, seed);
+            seed = std::accumulate(item._dims.begin(), item._dims.begin() + item._size, seed, [](dlib::uint32 seed, long next) {
+                return dlib::hash((dlib::uint64)next, seed);
             });
             return seed;
         }
+        
+        friend inline fft_size squeeze_ones(const fft_size& size)
+        {
+            fft_size newsize = size;
+            const auto newend = std::remove(newsize._dims.begin(), newsize._dims.begin() + newsize._size, 1);
+            const long nremoved = std::distance(newend, newsize._dims.begin() + newsize._size);
+            newsize._size -= nremoved;
+            return newsize;
+        }
+        
+        friend inline fft_size pop_back(const fft_size& size)
+        {
+            fft_size newsize = size;
+            newsize._size--;
+            return newsize;
+        }
+        /*global helpers*/
     };
 }
 
