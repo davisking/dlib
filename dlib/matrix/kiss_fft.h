@@ -535,10 +535,10 @@ namespace dlib
         template<typename T>
         inline kiss_fftndr_state<T>::kiss_fftndr_state(const plan_key& key)
         {
-            fft_size frontdims = key.dims;
-            frontdims.pop_back();
-            cfg_r  = kiss_fftr_state<T>(plan_key({key.dims.back()}, key.is_inverse));
-            cfg_nd = kiss_fftnd_state<T>(plan_key(frontdims, key.is_inverse));
+            const long realdim = key.dims.back();
+            const fft_size otherdims = pop_back(key.dims);
+            cfg_r  = kiss_fftr_state<T>(plan_key({realdim}, key.is_inverse));
+            cfg_nd = kiss_fftnd_state<T>(plan_key(otherdims, key.is_inverse));
         }
 
         template<typename T>
@@ -618,30 +618,30 @@ namespace dlib
     }
 
     template<typename T>
-    void kiss_fft(fft_size dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
+    void kiss_fft(const fft_size& dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
         
         const long dimprod = dims.dimprod();
-        dims.remove_ones();
+        const fft_size squeezed_dims = squeeze_ones(dims);
+        DLIB_ASSERT(dimprod > 0, "invalid FFT dimensions");
         
-        if (dims.size() == 0)
+        if (dimprod == 1)
         {
             if (in != out)
             {
-                //if original dims == {1,1,1} then dimprod == 1, but dims post erasure is {}
-                std::copy(in, in + dimprod, out);
+                out[0] = in[0];
             }
         }
-        else if (dims.size() == 1)
+        else if (squeezed_dims.size() == 1)
         {
-            const auto& plan = get_plan<kiss_fft_state<T>>({dims, is_inverse});
+            const auto& plan = get_plan<kiss_fft_state<T>>({squeezed_dims, is_inverse});
             kiss_fft_stride(plan, in, out, 1);
         }
         else
         {
-            const auto& plan = get_plan<kiss_fftnd_state<T>>({dims,is_inverse});
+            const auto& plan = get_plan<kiss_fftnd_state<T>>({squeezed_dims,is_inverse});
             kiss_fftnd(plan, in, out);
         }
     }
@@ -651,22 +651,22 @@ namespace dlib
      *  out has dims[0] * dims[1] * ... * dims[-2] * (dims[-1]/2+1) points
      */
     template<typename T>
-    void kiss_fftr(fft_size dims, const T* in, std::complex<T>* out)
+    void kiss_fftr(const fft_size& dims, const T* in, std::complex<T>* out)
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
         
-        dims.remove_ones();
-        DLIB_ASSERT(dims.size() > 0);
+        const fft_size squeezed_dims = squeeze_ones(dims);
+        DLIB_ASSERT(squeezed_dims.size() > 0, "squeezed FFT dimensions are empty");
 
-        if (dims.size() == 1)
+        if (squeezed_dims.size() == 1)
         {
-            const auto& plan = get_plan<kiss_fftr_state<T>>({dims,false});
+            const auto& plan = get_plan<kiss_fftr_state<T>>({squeezed_dims,false});
             kiss_fftr(plan, in, out);
         }
         else
         {
-            const auto& plan = get_plan<kiss_fftndr_state<T>>({dims,false});
+            const auto& plan = get_plan<kiss_fftndr_state<T>>({squeezed_dims,false});
             kiss_fftndr(plan, in, out);
         }
     }
@@ -676,22 +676,22 @@ namespace dlib
      *  out has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
      */
     template<typename T>
-    void kiss_fftri(fft_size dims, const std::complex<T>* in, T* out)
+    void kiss_fftri(const fft_size& dims, const std::complex<T>* in, T* out)
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
             
-        dims.remove_ones();
-        DLIB_ASSERT(dims.size() > 0);
+        const fft_size squeezed_dims = squeeze_ones(dims);
+        DLIB_ASSERT(squeezed_dims.size() > 0, "squeezed FFT dimensions are empty");
         
-        if (dims.size() == 1)
+        if (squeezed_dims.size() == 1)
         {
-            const auto& plan = get_plan<kiss_fftr_state<T>>({dims,true});
+            const auto& plan = get_plan<kiss_fftr_state<T>>({squeezed_dims,true});
             kiss_fftri(plan, in, out);
         }
         else
         {
-            const auto& plan = get_plan<kiss_fftndr_state<T>>({dims,true});
+            const auto& plan = get_plan<kiss_fftndr_state<T>>({squeezed_dims,true});
             kiss_fftndri(plan, in, out);
         }
     }
