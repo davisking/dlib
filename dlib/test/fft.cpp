@@ -380,8 +380,8 @@ namespace
     template<typename R>
     void test_kiss_vs_mkl()
     {
-        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
-//        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-11 : 1e-2;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
         int test = 0;  
         for (int iter = 0; iter < 10; ++iter)
@@ -404,14 +404,14 @@ namespace
 
                     const R diff1 = max(norm(mat(f1) - mat(f2)));
                     
-                    DLIB_TEST(diff1 < tol);
+                    DLIB_TEST_MSG(diff1 < tol, typelabel << " diff1 " << diff1 << " nr " << nr << " nc " << nc);
             
                     kiss_fftri({nr,nc}, &f1[0], &y1[0]);
                     mkl_fftri({nr,nc}, &f2[0], &y2[0]);
                     
                     const R diff2 = max(squared(mat(y1) - mat(y2)));
 
-                    DLIB_TEST(diff2 < tol);
+                    DLIB_TEST_MSG(diff2 < tol, typelabel << " diff2 " << diff2 << " nr " << nr << " nc " << nc);
                 }
             }
         }
