@@ -182,6 +182,7 @@ namespace dlib
             }
             else
             {
+                newsize = size;
                 const auto newend = std::remove(newsize.begin(), newsize.end(), 1);
                 const long nremoved = std::distance(newend, newsize.end());
                 newsize._size -= nremoved;
