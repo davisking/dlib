@@ -381,7 +381,7 @@ namespace
     void test_kiss_vs_mkl()
     {
         static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
-        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+//        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
         int test = 0;  
         for (int iter = 0; iter < 10; ++iter)
@@ -396,8 +396,8 @@ namespace
                     std::vector<float> x1(nr*nc), y1(nr*nc), y2(nr*nc);
                     std::vector<std::complex<float>> f1(nr*(nc/2+1)), f2(nr*(nc/2+1));
 
-                    for (size_t i = 0 ; i < (nr*nc) ; i++)
-                        x1[i] = rng.get_random_gaussian();
+                    for (int i = 0 ; i < (nr*nc) ; i++)
+                        x1[i] = rnd.get_random_gaussian();
 
                     kiss_fftr({nr,nc}, &x1[0], &f1[0]);
                     mkl_fftr({nr,nc}, &x1[0], &f2[0]);
