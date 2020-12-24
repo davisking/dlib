@@ -43,22 +43,22 @@ namespace dlib
         
         iterator begin()
         {
-            return _size > 0 ? _dims.begin() : nullptr;
+            return _dims.begin();
         }
         
         const_iterator begin() const
         {
-            return _size > 0 ? _dims.begin() : nullptr;
+            return _dims.begin();
         }
         
         iterator end()
         {
-            return _size > 0 ? _dims.begin() + _size : nullptr;
+            return _dims.begin() + _size;
         }
         
         const_iterator end() const
         {
-            return _size > 0 ? _dims.begin() + _size : nullptr;
+            return _dims.begin() + _size;
         }
 
     public:
