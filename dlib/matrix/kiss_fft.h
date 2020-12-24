@@ -32,11 +32,9 @@ namespace dlib
             fft_size dims;
             bool is_inverse;
 
-            plan_key(const fft_size& dims, bool is_inverse)
-            {
-                this->dims = dims;
-                this->is_inverse = is_inverse;
-            }
+            plan_key(const fft_size& dims_, bool is_inverse_)
+            :   dims(dims_), is_inverse(is_inverse_) 
+            {}
             
             bool operator==(const plan_key& other) const
             {
