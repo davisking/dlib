@@ -17,6 +17,7 @@ namespace dlib
     void mkl_fft(const fft_size& dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
     {
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
+        DLIB_ASSERT(dims.is_valid(), "dimensions aren't valid. They need to be non-empty and strictly positive");
         DLIB_ASSERT(dims.size() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
 
         constexpr DFTI_CONFIG_VALUE dfti_type = std::is_same<T,float>::value ? DFTI_SINGLE : DFTI_DOUBLE;
@@ -75,6 +76,8 @@ namespace dlib
     void mkl_fftr(const fft_size& dims, const T* in, std::complex<T>* out)
     {
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
+        DLIB_ASSERT(dims.is_valid(), "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.dimprod() % 2 == 0, "last dimension needs to be even");
         DLIB_ASSERT(dims.size() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
 
         constexpr DFTI_CONFIG_VALUE dfti_type = std::is_same<T,float>::value ? DFTI_SINGLE : DFTI_DOUBLE;
@@ -142,6 +145,8 @@ namespace dlib
     void mkl_fftri(const fft_size& dims, const std::complex<T>* in, T* out)
     {
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
+        DLIB_ASSERT(dims.is_valid(), "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.dimprod() % 2 == 0, "last dimension needs to be even");
         DLIB_ASSERT(dims.size() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
 
         constexpr DFTI_CONFIG_VALUE dfti_type = std::is_same<T,float>::value ? DFTI_SINGLE : DFTI_DOUBLE;

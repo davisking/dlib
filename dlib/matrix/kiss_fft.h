@@ -622,12 +622,11 @@ namespace dlib
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
+        DLIB_ASSERT(dims.is_valid(), "dimensions aren't valid. They need to be non-empty and strictly positive");
         
-        const long dimprod = dims.dimprod();
         const fft_size squeezed_dims = squeeze_ones(dims);
-        DLIB_ASSERT(dimprod > 0, "invalid FFT dimensions");
         
-        if (dimprod == 1)
+        if (squeezed_dims.dimprod() == 1)
         {
             if (in != out)
             {
@@ -655,9 +654,10 @@ namespace dlib
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
+        DLIB_ASSERT(dims.is_valid(), "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.dimprod() % 2 == 0, "last dimension needs to be even");
         
         const fft_size squeezed_dims = squeeze_ones(dims);
-        DLIB_ASSERT(squeezed_dims.size() > 0, "squeezed FFT dimensions are empty");
 
         if (squeezed_dims.size() == 1)
         {
@@ -680,9 +680,10 @@ namespace dlib
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
-            
+        DLIB_ASSERT(dims.is_valid(), "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.dimprod() % 2 == 0, "last dimension needs to be even");
+        
         const fft_size squeezed_dims = squeeze_ones(dims);
-        DLIB_ASSERT(squeezed_dims.size() > 0, "squeezed FFT dimensions are empty");
         
         if (squeezed_dims.size() == 1)
         {
