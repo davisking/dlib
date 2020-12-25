@@ -380,7 +380,7 @@ namespace
     template<typename R>
     void test_kiss_vs_mkl()
     {
-        static constexpr double tol = std::is_same<R,double>::value ? 1e-11 : 1e-2;
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-7 : 1e-2;
         static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
         int test = 0;  
