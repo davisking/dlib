@@ -96,7 +96,7 @@ namespace dlib
         const std::shared_ptr<font>& f = default_font::get_font(),
         typename std::basic_string<T,traits,alloc>::size_type first = 0,
         typename std::basic_string<T,traits,alloc>::size_type last = (std::basic_string<T,traits,alloc>::npos)
-    )
+    );
 
     /*!
         requires
