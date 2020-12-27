@@ -108,6 +108,7 @@ namespace dlib
               starting from point p.
             - The string is drawn with the color given by val and font f;
     !*/
+
 // ----------------------------------------------------------------------------------------
 
     template <
