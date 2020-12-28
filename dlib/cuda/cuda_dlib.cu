@@ -1549,12 +1549,12 @@ namespace dlib
                 const int c = idx%dnc;
 
                 const float y = r*y_scale;
-                const int top    = static_cast<int>(::floor(y));
+                const int top    = static_cast<int>(::floorf(y));
                 const int bottom = ::min(top+1, snr-1);
                 const float tb_frac = y - top;
 
                 const float x = c*x_scale;
-                const int left   = static_cast<int>(::floor(x));
+                const int left   = static_cast<int>(::floorf(x));
                 const int right  = ::min(left+1, snc-1);
                 const float lr_frac = x - left;
 
@@ -1586,12 +1586,12 @@ namespace dlib
                 const int didx = channel*dest_chan_size_strided + r*dest_row_stride+c;
 
                 const float y = r*y_scale;
-                const int top    = static_cast<int>(::floor(y));
+                const int top    = static_cast<int>(::floorf(y));
                 const int bottom = ::min(top+1, snr-1);
                 const float tb_frac = y - top;
 
                 const float x = c*x_scale;
-                const int left   = static_cast<int>(::floor(x));
+                const int left   = static_cast<int>(::floorf(x));
                 const int right  = ::min(left+1, snc-1);
                 const float lr_frac = x - left;
 
@@ -1660,12 +1660,12 @@ namespace dlib
                 const int c = idx%dnc;
 
                 const float y = r*y_scale;
-                const int top    = static_cast<int>(::floor(y));
+                const int top    = static_cast<int>(::floorf(y));
                 const int bottom = ::min(top+1, snr-1);
                 const float tb_frac = y - top;
 
                 const float x = c*x_scale;
-                const int left   = static_cast<int>(::floor(x));
+                const int left   = static_cast<int>(::floorf(x));
                 const int right  = ::min(left+1, snc-1);
                 const float lr_frac = x - left;
 
@@ -1696,12 +1696,12 @@ namespace dlib
                 const float tmp = d[didx + r*dest_row_stride+c];
 
                 const float y = r*y_scale;
-                const int top    = static_cast<int>(::floor(y));
+                const int top    = static_cast<int>(::floorf(y));
                 const int bottom = ::min(top+1, snr-1);
                 const float tb_frac = y - top;
 
                 const float x = c*x_scale;
-                const int left   = static_cast<int>(::floor(x));
+                const int left   = static_cast<int>(::floorf(x));
                 const int right  = ::min(left+1, snc-1);
                 const float lr_frac = x - left;
 
