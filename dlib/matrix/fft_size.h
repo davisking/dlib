@@ -15,11 +15,11 @@ namespace dlib
             WHAT THIS OBJECT REPRESENTS
             This object is a container used to store the dimensions of an FFT 
             operation. It is implemented as a stack-based container with an 
-            upper bound of 5 elements (batch,channels,height,width,depth).
-            All elements must be strictly positive.
+            upper bound of 5 dimensions (batch,channels,height,width,depth).
+            All dimensions must be strictly positive.
          
-            The object is either default constructed or constructed with an 
-            initialiser list.
+            The object is either default constructed, constructed with an 
+            initialiser list or with a pair of iterators
 
             If default-constructed, the object is empty and in an invalid state.
             That is, FFT functions will throw if attempted to be used with such 
@@ -29,6 +29,10 @@ namespace dlib
             initialised provided:
                - L.size() > 0 and L.size() <= 5
                - L contains strictly positive values
+         
+            If constructed with a pair of iterators, the behaviour of the 
+            constructor is exactly the same as if constructed with an 
+            initializer list spanned by those iterators.
 
             Once the object is constructed, it is immutable.
         !*/
@@ -39,44 +43,53 @@ namespace dlib
         using const_iterator    = container_type::const_iterator;
         
         size_t _size = 0;
+        size_t _num_elements = 0;
         container_type _dims;
-        
-        iterator begin()
-        {
-            return _dims.begin();
-        }
-        
-        const_iterator begin() const
-        {
-            return _dims.begin();
-        }
-        
-        iterator end()
-        {
-            return _dims.begin() + _size;
-        }
-        
-        const_iterator end() const
-        {
-            return _dims.begin() + _size;
-        }
 
     public:
         fft_size() = default;
         /*!
             ensures
-                - this is properly initialised
+                - *this is properly initialised
                 - size() == 0
-                - is_valid() == false
+        !*/
+        
+        fft_size(const_iterator dims_begin, const_iterator dims_end)
+        {
+            const size_t ndims = std::distance(dims_begin, dims_end);
+            DLIB_ASSERT(ndims > 0, "the initialiser list must be non-empty");
+            DLIB_ASSERT(ndims <= _dims.size(), "the initialiser list must have size less than 6");
+            DLIB_ASSERT(std::find_if(dims_begin, dims_end, [](long dim) {return dim <= 0;}) == dims_end, "the initialiser list must contain strictly positive values");
+            
+            _num_elements = std::accumulate(dims_begin, dims_end, 1, std::multiplies<long>());
+            
+            if (_num_elements == 1)
+            {
+                _dims[0] = 1;
+                _size = 1;
+            }
+            else
+            {
+                auto end = std::copy_if(dims_begin, dims_end, _dims.begin(), [](long dim) {return dim != 1;});
+                _size = std::distance(_dims.begin(), end);
+            }
+        }
+        /*!
+            requires
+                - std::distance(dims_begin, dims_end) > 0
+                - std::distance(dims_begin, dims_end) <= 5
+                - range contains strictly positive values
+            ensures
+                - *this is properly initialised
+                - size() <= std::distance(dims_begin, dims_end)
+                - num_elements() == product of all values in range
+            throws
+                - dlib::fatal_error if requirements aren't satisfied.
         !*/
         
         fft_size(std::initializer_list<long> dims)
+        : fft_size(dims.begin(), dims.end())
         {
-            DLIB_ASSERT(dims.size() > 0, "the initialiser list must be non-empty");
-            DLIB_ASSERT(dims.size() <= _dims.size(), "the initialiser list must have size less than 6");
-            std::copy(dims.begin(), dims.end(), _dims.begin());
-            _size = dims.size();
-            DLIB_ASSERT(is_valid(), "the initialiser list must contain strictly positive values");
         }
         /*!
             requires
@@ -84,19 +97,32 @@ namespace dlib
                 - dims contains strictly positive values
             ensures
                 - *this is properly initialised
-                - size() == dims.size()
-                - is_valid() == true 
+                - size() <= dims.size()
+                - num_elements() == product of all values in dims
             throws
                 - dlib::fatal_error if requirements aren't satisfied.
         !*/
         
-        size_t size() const
+        size_t num_dims() const
         {
             return _size;
         }
         /*!
             ensures
-                - returns the number of elements in *this
+                - returns the number of dimensions
+                - if _size == 0, then *this is in an invalid state.
+                  if _size > 0, then *this is in a valid state
+        !*/
+        
+        long num_elements() const
+        {
+            return _num_elements;
+        }
+        /*!
+            ensures
+                - if _size > 0, returns the product of all dimensions, i.e. the total number
+                  of elements
+                - if _size == 0, returns 0
         !*/
 
         const_reference operator[](size_t index) const
@@ -109,7 +135,7 @@ namespace dlib
                 - size() > 0
                 - index < size()
             ensures
-                - returns a const reference to the element at position index
+                - returns a const reference to the dimension at position index
         !*/
         
         const_reference back() const
@@ -123,18 +149,25 @@ namespace dlib
             ensures
                 - returns a const reference to (*this)[size()-1]
         !*/
-        
-        long dimprod() const
+                
+        const_iterator begin() const
         {
-            DLIB_ASSERT(_size > 0, "object is empty");
-            return std::accumulate(begin(), end(), 1, std::multiplies<long>());
+            return _dims.begin();
         }
         /*!
-            requires
-                - size() > 0
             ensures
-                - returns the product of all dimensions, i.e. the total number
-                  of elements.
+                - returns a const iterator that points to the first dimension 
+                  in this container or end() if the array is empty.
+        !*/
+        
+        const_iterator end() const
+        {
+            return _dims.begin() + _size;
+        }
+        /*!
+            ensures
+                - returns a const iterator that points to one past the end of 
+                  the container.
         !*/
         
         bool operator==(const fft_size& other) const
@@ -143,73 +176,36 @@ namespace dlib
         }
         /*!
             ensures
-                - returns true if two fft_size objects have same size and same elements.
+                - returns true if two fft_size objects have same size and same dimensions, i.e. if they have identical states
         !*/
-        
-        bool is_valid() const
-        {
-            return _size > 0 && std::find_if(begin(), end(), [](long dim) {return dim <= 0;}) == end();
-        }
-        /*!
-            ensures
-                - returns true if:
-                    - size() > 0
-                    - (*this) contains strictly positive elements
-        !*/
-        
-        /*global helpers*/
-        friend inline dlib::uint32 hash(
-            const fft_size& item,
-            dlib::uint32 seed = 0)
-        {
-            seed = dlib::hash((dlib::uint64)item.size(), seed);
-            seed = std::accumulate(item.begin(), item.end(), seed, [](dlib::uint32 seed, long next) {
-                return dlib::hash((dlib::uint64)next, seed);
-            });
-            return seed;
-        }
-        /*!
-            ensures
-                - returns a 32bit hash of the data stored in item.
-        !*/
-        
-        friend inline fft_size squeeze_ones(const fft_size& size)
-        {
-            fft_size newsize;
-            if (size.dimprod() == 1)
-            {
-                newsize = {1};
-            }
-            else
-            {
-                newsize = size;
-                const auto newend = std::remove(newsize.begin(), newsize.end(), 1);
-                const long nremoved = std::distance(newend, newsize.end());
-                newsize._size -= nremoved;
-            }
-            return newsize;
-        }
-        /*!
-            ensures
-                - returns a copy of size with all but 1 elements equal to 1 removed
-        !*/
-        
-        friend inline fft_size pop_back(const fft_size& size)
-        {
-            DLIB_ASSERT(size.size() > 0);
-            fft_size newsize = size;
-            newsize._size--;
-            return newsize;
-        }
-        /*!
-            requires
-                - size.size() > 0
-            ensures
-                - returns a copy of size with the last element removed.
-        !*/
-        
-        /*global helpers*/
     };
+    
+    inline dlib::uint32 hash(
+        const fft_size& item,
+        dlib::uint32 seed = 0)
+    {
+        seed = dlib::hash((dlib::uint64)item.num_dims(), seed);
+        seed = std::accumulate(item.begin(), item.end(), seed, [](dlib::uint32 seed, long next) {
+            return dlib::hash((dlib::uint64)next, seed);
+        });
+        return seed;
+    }
+    /*!
+        ensures
+            - returns a 32bit hash of the data stored in item.
+    !*/
+
+    inline fft_size pop_back(const fft_size& size)
+    {
+        DLIB_ASSERT(size.num_dims() > 0);
+        return fft_size(size.begin(), size.end() - 1);
+    }
+    /*!
+        requires
+            - size.size() > 0
+        ensures
+            - returns a copy of size with the last dimension removed.
+    !*/
 }
 
 #endif //DLIB_FFT_SIZE_H
