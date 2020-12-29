@@ -54,7 +54,7 @@ namespace dlib
                 - size() == 0
         !*/
         
-        fft_size(const_iterator dims_begin, const_iterator dims_end)
+        fft_size(const long* dims_begin, const long* dims_end)
         {
             const size_t ndims = std::distance(dims_begin, dims_end);
             DLIB_ASSERT(ndims > 0, "the initialiser list must be non-empty");
