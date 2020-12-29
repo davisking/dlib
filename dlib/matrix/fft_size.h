@@ -61,18 +61,9 @@ namespace dlib
             DLIB_ASSERT(ndims <= _dims.size(), "the initialiser list must have size less than 6");
             DLIB_ASSERT(std::find_if(dims_begin, dims_end, [](long dim) {return dim <= 0;}) == dims_end, "the initialiser list must contain strictly positive values");
             
+            std::copy(dims_begin, dims_end, _dims.begin());
+            _size = ndims;
             _num_elements = std::accumulate(dims_begin, dims_end, 1, std::multiplies<long>());
-            
-            if (_num_elements == 1)
-            {
-                _dims[0] = 1;
-                _size = 1;
-            }
-            else
-            {
-                auto end = std::copy_if(dims_begin, dims_end, _dims.begin(), [](long dim) {return dim != 1;});
-                _size = std::distance(_dims.begin(), end);
-            }
         }
         /*!
             requires
@@ -81,15 +72,21 @@ namespace dlib
                 - range contains strictly positive values
             ensures
                 - *this is properly initialised
-                - size() <= std::distance(dims_begin, dims_end)
+                - size() == std::distance(dims_begin, dims_end)
                 - num_elements() == product of all values in range
             throws
                 - dlib::fatal_error if requirements aren't satisfied.
         !*/
         
         fft_size(std::initializer_list<long> dims)
-        : fft_size(dims.begin(), dims.end())
         {
+            DLIB_ASSERT(dims.size() > 0, "the initialiser list must be non-empty");
+            DLIB_ASSERT(dims.size() <= _dims.size(), "the initialiser list must have size less than 6");
+            DLIB_ASSERT(std::find_if(dims.begin(), dims.end(), [](long dim) {return dim <= 0;}) == dims.end(), "the initialiser list must contain strictly positive values");
+            
+            std::copy(dims.begin(), dims.end(), _dims.begin());
+            _size = dims.size();
+            _num_elements = std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<long>());
         }
         /*!
             requires
@@ -97,7 +94,7 @@ namespace dlib
                 - dims contains strictly positive values
             ensures
                 - *this is properly initialised
-                - size() <= dims.size()
+                - size() == dims.size()
                 - num_elements() == product of all values in dims
             throws
                 - dlib::fatal_error if requirements aren't satisfied.
@@ -206,6 +203,23 @@ namespace dlib
         ensures
             - returns a copy of size with the last dimension removed.
     !*/
+    
+    inline fft_size squeeze_ones(const fft_size size)
+    {
+        DLIB_ASSERT(size.num_dims() > 0);
+        fft_size newsize;
+        if (size.num_elements() == 1)
+        {
+            newsize = {1};
+        }
+        else
+        {
+            std::array<long,5> tmp;
+            auto end = std::copy_if(size.begin(), size.end(), tmp.begin(), [](long dim){return dim != 1;});
+            newsize = fft_size(tmp.begin(), end);
+        }
+        return newsize;
+    }
 }
 
 #endif //DLIB_FFT_SIZE_H
