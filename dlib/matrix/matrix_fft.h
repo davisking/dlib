@@ -10,14 +10,8 @@
 
 #ifdef DLIB_USE_MKL_FFT
 #include "mkl_fft.h"
-#define impl_fft    mkl_fft
-#define impl_fftr   mkl_fftr
-#define impl_fftri  mkl_fftri
 #else
 #include "kiss_fft.h"
-#define impl_fft    kiss_fft
-#define impl_fftr   kiss_fftr
-#define impl_fftri  kiss_fftri
 #endif
 
 namespace dlib
@@ -39,46 +33,43 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     matrix<std::complex<T>,NR,NC,MM,L> fft (const matrix<std::complex<T>,NR,NC,MM,L>& in)
     {
-        /*complex FFT*/
+        //complex FFT
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         matrix<std::complex<T>,NR,NC,MM,L> out(in.nr(), in.nc());
-        impl_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
-        return out;
-    }
-    
-// ----------------------------------------------------------------------------------------
-    
-    template<typename T, long NR, long NC, typename MM, typename L>
-    matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> fft (const matrix<T,NR,NC,MM,L>& in)
-    {
-        /*real FFT*/
-        static_assert(std::is_floating_point<T>::value, "only support floating point types");
-        DLIB_ASSERT(in.nc() % 2 == 0, "last dimension needs to be even otherwise ifftr(fftr(data)) won't have matching dimensions : " << in.nc());
-        matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> out(in.nr(), fftr_nc_size(in.nc()));
-        impl_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
+#ifdef DLIB_USE_MKL_FFT
+        mkl_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
+#else
+        kiss_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
+#endif
         return out;
     }
     
 // ----------------------------------------------------------------------------------------
     
     template <typename EXP>
-    matrix<add_complex_t<typename EXP::type>> fft (const matrix_exp<EXP>& data)
+    matrix<typename EXP::type> fft (const matrix_exp<EXP>& data)
     {
+        //complex FFT for expression template
+        static_assert(is_complex<typename EXP::type>::value, "input should be complex");
         matrix<typename EXP::type> in(data);
         return fft(in);
     }
     
 // ----------------------------------------------------------------------------------------
-
+    
     template < typename T, long NR, long NC, typename MM, typename L >
     matrix<std::complex<T>,NR,NC,MM,L> ifft (const matrix<std::complex<T>,NR,NC,MM,L>& in)
     {
-        /*inverse complex FFT*/
+        //inverse complex FFT
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         matrix<std::complex<T>,NR,NC,MM,L> out(in.nr(), in.nc());
         if (in.size() != 0)
         {
-            impl_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), true);
+#ifdef DLIB_USE_MKL_FFT
+            mkl_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), true);
+#else
+            kiss_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), true);
+#endif
             out /= out.size();
         }
         return out;
@@ -89,7 +80,7 @@ namespace dlib
     template <typename EXP>
     matrix<typename EXP::type> ifft (const matrix_exp<EXP>& data)
     {
-        /*inverse complex FFT for expression template*/
+        //inverse complex FFT for expression template
         static_assert(is_complex<typename EXP::type>::value, "input should be complex");
         matrix<typename EXP::type> in(data);
         return ifft(in);
@@ -98,14 +89,46 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
     
     template<typename T, long NR, long NC, typename MM, typename L>
+    matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> fftr (const matrix<T,NR,NC,MM,L>& in)
+    {
+        //real FFT
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
+        DLIB_ASSERT(in.nc() % 2 == 0, "last dimension " << in.nc() << " needs to be even otherwise ifftr(fftr(data)) won't have matching dimensions");
+        matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> out(in.nr(), fftr_nc_size(in.nc()));
+#ifdef DLIB_USE_MKL_FFT
+        mkl_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
+#else
+        kiss_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
+#endif
+        return out;
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+    template <typename EXP>
+    matrix<add_complex_t<typename EXP::type>> fftr (const matrix_exp<EXP>& data)
+    {
+        //real FFT for expression template
+        static_assert(std::is_floating_point<typename EXP::type>::value, "input should be real");
+        matrix<typename EXP::type> in(data);
+        return fft(in);
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+    template<typename T, long NR, long NC, typename MM, typename L>
     matrix<T,NR,ifftr_nc_size(NC),MM,L> ifftr (const matrix<std::complex<T>,NR,NC,MM,L>& in)
     {
-        /*inverse real FFT*/
+        //inverse real FFT
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         matrix<T,NR,ifftr_nc_size(NC),MM,L> out(in.nr(), ifftr_nc_size(in.nc()));
         if (in.size() != 0)
         {
-            impl_fftri({out.nr(),out.nc()}, &in(0,0), &out(0,0));
+#ifdef DLIB_USE_MKL_FFT
+            mlk_fftri({out.nr(),out.nc()}, &in(0,0), &out(0,0));
+#else
+            kiss_fftri({out.nr(),out.nc()}, &in(0,0), &out(0,0));
+#endif
             out /= out.size();
         }
         return out;
@@ -116,7 +139,7 @@ namespace dlib
     template <typename EXP>
     matrix<remove_complex_t<typename EXP::type>> ifftr (const matrix_exp<EXP>& data)
     {
-        /*inverse real FFT for expression template*/
+        //inverse real FFT for expression template
         static_assert(is_complex<typename EXP::type>::value, "input should be complex");        
         matrix<typename EXP::type> in(data);
         return ifftr(in);
@@ -127,7 +150,11 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
-        impl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
+#ifdef DLIB_USE_MKL_FFT
+        mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
+#else
+        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
@@ -135,7 +162,11 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
-        impl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
+#ifdef DLIB_USE_MKL_FFT
+        mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
+#else
+        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
+#endif
     }
 
 // ----------------------------------------------------------------------------------------
