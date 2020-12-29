@@ -90,7 +90,7 @@ namespace dlib
     /*!
         requires
             - T must be either float or double
-            - dims represent the dimensions of in
+            - dims represent the dimensions of `in`
             - `out` has dimensions {dims[0], dims[1], ..., dims[-2], dims[-1]/2+1}
             - dims.num_dims() > 0
             - dims.num_dims() <= 3
@@ -172,7 +172,7 @@ namespace dlib
     /*!
         requires
             - T must be either float or double
-            - dims represent the dimensions of out
+            - dims represent the dimensions of `out`
             - `in` has dimensions {dims[0], dims[1], ..., dims[-2], dims[-1]/2+1}
             - dims.num_dims() > 0
             - dims.num_dims() <= 3
