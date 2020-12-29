@@ -15,6 +15,19 @@ namespace dlib
 {
     template<typename T>
     void mkl_fft(const fft_size& dims, const std::complex<T>* in, std::complex<T>* out, bool is_inverse)
+    /*!
+        requires
+            - T must be either float or double
+            - dims represents the dimensions of both `in` and `out`
+            - dims.num_dims() > 0
+            - dims.num_dims() < 3
+        ensures
+            - performs an FFT on `in` and stores the result in `out`.
+            - if `is_inverse` is true, a backward FFT is performed, 
+              otherwise a forward FFT is performed.
+        throws
+            - dlib::fatal_error if requirements aren't satisfied.
+    !*/
     {
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
         DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
@@ -74,6 +87,19 @@ namespace dlib
      */
     template<typename T>
     void mkl_fftr(const fft_size& dims, const T* in, std::complex<T>* out)
+    /*!
+        requires
+            - T must be either float or double
+            - dims represent the dimensions of in
+            - `out` has dimensions {dims[0], dims[1], ..., dims[-2], dims[-1]/2+1}
+            - dims.num_dims() > 0
+            - dims.num_dims() <= 3
+            - dims.back() must be even
+        ensures
+            - performs a real FFT on `in` and stores the result in `out`.
+        throws
+            - dlib::fatal_error if requirements aren't satisfied.
+    !*/
     {
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
         DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
@@ -143,6 +169,19 @@ namespace dlib
      */
     template<typename T>
     void mkl_fftri(const fft_size& dims, const std::complex<T>* in, T* out)
+    /*!
+        requires
+            - T must be either float or double
+            - dims represent the dimensions of out
+            - `in` has dimensions {dims[0], dims[1], ..., dims[-2], dims[-1]/2+1}
+            - dims.num_dims() > 0
+            - dims.num_dims() <= 3
+            - dims.back() must be even
+        ensures
+            - performs an inverse real FFT on `in` and stores the result in `out`.
+        throws
+            - dlib::fatal_error if requirements aren't satisfied.
+    !*/
     {
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
         DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
