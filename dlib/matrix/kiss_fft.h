@@ -404,7 +404,7 @@ namespace dlib
         inline kiss_fftnd_state<T>::kiss_fftnd_state(const plan_key& key)
         {
             dims = key.dims;
-            for (size_t i = 0 ; i < dims.size() ; i++)
+            for (size_t i = 0 ; i < dims.num_dims() ; i++)
                 plans.push_back(std::move(kiss_fft_state<T>(plan_key({dims[i]}, key.is_inverse))));
         }
 
@@ -413,24 +413,24 @@ namespace dlib
         {
             const std::complex<T>* bufin=in;
             std::complex<T>* bufout;
-            std::vector<std::complex<T>> tmpbuf(cfg.dims.dimprod());
+            std::vector<std::complex<T>> tmpbuf(cfg.dims.num_elements());
 
             /*arrange it so the last bufout == out*/
-            if ( cfg.dims.size() & 1 )
+            if ( cfg.dims.num_dims() & 1 )
             {
                 bufout = out;
                 if (in==out) {
-                    std::copy(in, in + cfg.dims.dimprod(), tmpbuf.begin());
+                    std::copy(in, in + cfg.dims.num_elements(), tmpbuf.begin());
                     bufin = &tmpbuf[0];
                 }
             }
             else
                 bufout = &tmpbuf[0];
 
-            for (size_t k=0; k < cfg.dims.size(); ++k) 
+            for (size_t k=0; k < cfg.dims.num_dims(); ++k) 
             {
                 int curdim = cfg.dims[k];
-                int stride = cfg.dims.dimprod() / curdim;
+                int stride = cfg.dims.num_elements() / curdim;
 
                 for (int i=0 ; i<stride ; ++i ) 
                     kiss_fft_stride(cfg.plans[k], bufin+i , bufout+i*curdim, stride );
@@ -543,11 +543,11 @@ namespace dlib
         void kiss_fftndr(const kiss_fftndr_state<T>& plan, const T* timedata, std::complex<T>* freqdata)
         {
             int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
-            int dimOther = plan.cfg_nd.dims.dimprod();
+            int dimOther = plan.cfg_nd.dims.num_elements();
             int nrbins   = dimReal/2+1;
 
             std::vector<std::complex<T>> tmp1(std::max<int>(nrbins, dimOther));
-            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dims.dimprod()*dimReal);
+            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dims.num_elements()*dimReal);
 
             // take a real chunk of data, fft it and place the output at correct intervals
             for (int k1 = 0; k1 < dimOther; ++k1) 
@@ -569,11 +569,11 @@ namespace dlib
         void kiss_fftndri(const kiss_fftndr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
         {
             int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
-            int dimOther = plan.cfg_nd.dims.dimprod();
+            int dimOther = plan.cfg_nd.dims.num_elements();
             int nrbins   = dimReal/2+1;
 
             std::vector<std::complex<T>> tmp1(std::max<int>(nrbins, dimOther));
-            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dims.dimprod()*dimReal);
+            std::vector<std::complex<T>> tmp2(plan.cfg_nd.dims.num_elements()*dimReal);
 
             for (int k2 = 0; k2 < nrbins; ++k2) 
             {
@@ -620,25 +620,23 @@ namespace dlib
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
-        DLIB_ASSERT(dims.is_valid(), "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
         
-        const fft_size squeezed_dims = squeeze_ones(dims);
-        
-        if (squeezed_dims.dimprod() == 1)
+        if (dims.num_elements() == 1)
         {
             if (in != out)
             {
                 out[0] = in[0];
             }
         }
-        else if (squeezed_dims.size() == 1)
+        else if (dims.num_dims() == 1)
         {
-            const auto& plan = get_plan<kiss_fft_state<T>>({squeezed_dims, is_inverse});
+            const auto& plan = get_plan<kiss_fft_state<T>>({dims, is_inverse});
             kiss_fft_stride(plan, in, out, 1);
         }
         else
         {
-            const auto& plan = get_plan<kiss_fftnd_state<T>>({squeezed_dims,is_inverse});
+            const auto& plan = get_plan<kiss_fftnd_state<T>>({dims,is_inverse});
             kiss_fftnd(plan, in, out);
         }
     }
@@ -652,19 +650,17 @@ namespace dlib
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
-        DLIB_ASSERT(dims.is_valid(), "dimensions aren't valid. They need to be non-empty and strictly positive");
-        DLIB_ASSERT(dims.dimprod() % 2 == 0, "last dimension needs to be even");
-        
-        const fft_size squeezed_dims = squeeze_ones(dims);
+        DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
 
-        if (squeezed_dims.size() == 1)
+        if (dims.num_dims() == 1)
         {
-            const auto& plan = get_plan<kiss_fftr_state<T>>({squeezed_dims,false});
+            const auto& plan = get_plan<kiss_fftr_state<T>>({dims,false});
             kiss_fftr(plan, in, out);
         }
         else
         {
-            const auto& plan = get_plan<kiss_fftndr_state<T>>({squeezed_dims,false});
+            const auto& plan = get_plan<kiss_fftndr_state<T>>({dims,false});
             kiss_fftndr(plan, in, out);
         }
     }
@@ -678,19 +674,17 @@ namespace dlib
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
-        DLIB_ASSERT(dims.is_valid(), "dimensions aren't valid. They need to be non-empty and strictly positive");
-        DLIB_ASSERT(dims.dimprod() % 2 == 0, "last dimension needs to be even");
-        
-        const fft_size squeezed_dims = squeeze_ones(dims);
-        
-        if (squeezed_dims.size() == 1)
+        DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
+
+        if (dims.num_dims() == 1)
         {
-            const auto& plan = get_plan<kiss_fftr_state<T>>({squeezed_dims,true});
+            const auto& plan = get_plan<kiss_fftr_state<T>>({dims,true});
             kiss_fftri(plan, in, out);
         }
         else
         {
-            const auto& plan = get_plan<kiss_fftndr_state<T>>({squeezed_dims,true});
+            const auto& plan = get_plan<kiss_fftndr_state<T>>({dims,true});
             kiss_fftndri(plan, in, out);
         }
     }
