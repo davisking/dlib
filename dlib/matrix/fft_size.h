@@ -51,10 +51,11 @@ namespace dlib
         /*!
             ensures
                 - *this is properly initialised
-                - size() == 0
+                - num_dims() == 0
         !*/
         
-        fft_size(const_iterator dims_begin, const_iterator dims_end)
+        template<typename ConstIterator>
+        fft_size(ConstIterator dims_begin, ConstIterator dims_end)
         {
             const size_t ndims = std::distance(dims_begin, dims_end);
             DLIB_ASSERT(ndims > 0, "the initialiser list must be non-empty");
@@ -67,26 +68,21 @@ namespace dlib
         }
         /*!
             requires
+                - ConstIterator is const iterator type that points to a long object
                 - std::distance(dims_begin, dims_end) > 0
                 - std::distance(dims_begin, dims_end) <= 5
                 - range contains strictly positive values
             ensures
                 - *this is properly initialised
-                - size() == std::distance(dims_begin, dims_end)
+                - num_dims() == std::distance(dims_begin, dims_end)
                 - num_elements() == product of all values in range
             throws
                 - dlib::fatal_error if requirements aren't satisfied.
         !*/
         
         fft_size(std::initializer_list<long> dims)
+        : fft_size(dims.begin(), dims.end())
         {
-            DLIB_ASSERT(dims.size() > 0, "the initialiser list must be non-empty");
-            DLIB_ASSERT(dims.size() <= _dims.size(), "the initialiser list must have size less than 6");
-            DLIB_ASSERT(std::find_if(dims.begin(), dims.end(), [](long dim) {return dim <= 0;}) == dims.end(), "the initialiser list must contain strictly positive values");
-            
-            std::copy(dims.begin(), dims.end(), _dims.begin());
-            _size = dims.size();
-            _num_elements = std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<long>());
         }
         /*!
             requires
@@ -94,7 +90,7 @@ namespace dlib
                 - dims contains strictly positive values
             ensures
                 - *this is properly initialised
-                - size() == dims.size()
+                - num_dims() == dims.size()
                 - num_elements() == product of all values in dims
             throws
                 - dlib::fatal_error if requirements aren't satisfied.
@@ -107,8 +103,8 @@ namespace dlib
         /*!
             ensures
                 - returns the number of dimensions
-                - if _size == 0, then *this is in an invalid state.
-                  if _size > 0, then *this is in a valid state
+                - if num_dims() == 0, then *this is in an invalid state.
+                  if num_dims() > 0, then *this is in a valid state
         !*/
         
         long num_elements() const
@@ -117,9 +113,9 @@ namespace dlib
         }
         /*!
             ensures
-                - if _size > 0, returns the product of all dimensions, i.e. the total number
+                - if num_dims() > 0, returns the product of all dimensions, i.e. the total number
                   of elements
-                - if _size == 0, returns 0
+                - if num_dims() == 0, returns 0
         !*/
 
         const_reference operator[](size_t index) const
@@ -129,8 +125,8 @@ namespace dlib
         }
         /*!
             requires
-                - size() > 0
-                - index < size()
+                - num_dims() > 0
+                - index < num_dims()
             ensures
                 - returns a const reference to the dimension at position index
         !*/
@@ -142,9 +138,9 @@ namespace dlib
         }
         /*!
             requires
-                - size() > 0
+                - num_dims() > 0
             ensures
-                - returns a const reference to (*this)[size()-1]
+                - returns a const reference to (*this)[num_dims()-1]
         !*/
                 
         const_iterator begin() const
@@ -199,7 +195,7 @@ namespace dlib
     }
     /*!
         requires
-            - size.size() > 0
+            - num_dims.size() > 0
         ensures
             - returns a copy of size with the last dimension removed.
     !*/
@@ -220,6 +216,12 @@ namespace dlib
         }
         return newsize;
     }
+    /*!
+        requires
+            - num_dims.size() > 0
+        ensures
+            - removes dimensions with values equal to 1, yielding a new fft_size object with the same num_elements() but fewer dimensions
+    !*/
 }
 
 #endif //DLIB_FFT_SIZE_H
