@@ -125,7 +125,7 @@ namespace dlib
         if (in.size() != 0)
         {
 #ifdef DLIB_USE_MKL_FFT
-            mlk_fftri({out.nr(),out.nc()}, &in(0,0), &out(0,0));
+            mkl_fftri({out.nr(),out.nc()}, &in(0,0), &out(0,0));
 #else
             kiss_fftri({out.nr(),out.nc()}, &in(0,0), &out(0,0));
 #endif
