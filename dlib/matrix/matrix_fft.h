@@ -47,11 +47,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
     
     template <typename EXP>
-    matrix<typename EXP::type> fft (const matrix_exp<EXP>& data)
+    typename EXP::matrix_type fft (const matrix_exp<EXP>& data)
     {
         //complex FFT for expression template
         static_assert(is_complex<typename EXP::type>::value, "input should be complex");
-        matrix<typename EXP::type> in(data);
+        typename EXP::matrix_type in(data);
         return fft(in);
     }
     
@@ -78,11 +78,11 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
     
     template <typename EXP>
-    matrix<typename EXP::type> ifft (const matrix_exp<EXP>& data)
+    typename EXP::matrix_type ifft (const matrix_exp<EXP>& data)
     {
         //inverse complex FFT for expression template
         static_assert(is_complex<typename EXP::type>::value, "input should be complex");
-        matrix<typename EXP::type> in(data);
+        typename EXP::matrix_type in(data);
         return ifft(in);
     }
 
