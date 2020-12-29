@@ -268,9 +268,9 @@ namespace
                     const R a2 = rnd.get_double_in_range(-10.0, 10.0);
                     const matrix<R> m3 = a1*m1 + a2*m2;
                     
-                    const matrix<complex<R>> f1 = fft(m1);
-                    const matrix<complex<R>> f2 = fft(m2);
-                    const matrix<complex<R>> f3 = fft(m3);
+                    const matrix<complex<R>> f1 = fftr(m1);
+                    const matrix<complex<R>> f2 = fftr(m2);
+                    const matrix<complex<R>> f3 = fftr(m3);
                     
                     DLIB_TEST(f1.nr() == m1.nr());
                     DLIB_TEST(f1.nc() == fftr_nc_size(m1.nc()));
