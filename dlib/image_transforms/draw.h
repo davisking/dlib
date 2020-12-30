@@ -7,6 +7,7 @@
 #include "../algs.h"
 #include "../pixel.h"
 #include "../matrix.h"
+#include "../gui_widgets.h"
 #include <cmath>
 
 namespace dlib
@@ -222,6 +223,104 @@ namespace dlib
             else
                 draw_rectangle(c,grow_rect(rect,(i+1)/2),val);
         }
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename T,
+        typename traits,
+        typename alloc,
+        typename image_type,
+        typename pixel_type
+    >
+    void draw_string (
+        image_type& c,
+        const dlib::point& p,
+        const std::basic_string<T,traits,alloc>& str,
+        const pixel_type& color,
+        const std::shared_ptr<font>& f_ptr = default_font::get_font(),
+        typename std::basic_string<T,traits,alloc>::size_type first = 0,
+        typename std::basic_string<T,traits,alloc>::size_type last = (std::basic_string<T,traits,alloc>::npos)
+    )
+    {
+        using string = std::basic_string<T,traits,alloc>;
+        DLIB_ASSERT((last == string::npos) || (first <= last && last < str.size()),
+                    "\tvoid dlib::draw_string()"
+                    << "\n\tlast == string::npos: " << ((last == string::npos)?"true":"false")
+                    << "\n\tfirst: " << (unsigned long)first
+                    << "\n\tlast:  " << (unsigned long)last
+                    << "\n\tstr.size():  " << (unsigned long)str.size());
+
+        if (last == string::npos)
+            last = str.size()-1;
+
+        const rectangle rect(p, p);
+        const font& f = *f_ptr;
+
+        long y_offset = rect.top() + f.ascender() - 1;
+
+        long pos = rect.left()+f.left_overflow();
+        for (typename string::size_type i = first; i <= last; ++i)
+        {
+            // ignore the '\r' character
+            if (str[i] == '\r')
+                continue;
+
+            // A combining character should be applied to the previous character, and we
+            // therefore make one step back. If a combining comes right after a newline, 
+            // then there must be some kind of error in the string, and we don't combine.
+            if(is_combining_char(str[i]) && 
+               pos > rect.left() + static_cast<long>(f.left_overflow()))
+            {
+                pos -= f[str[i]].width();
+            }
+
+            if (str[i] == '\n')
+            {
+                y_offset += f.height();
+                pos = rect.left()+f.left_overflow();
+                continue;
+            }
+
+            // only look at letters in the intersection area
+            if (c.nr() + static_cast<long>(f.height()) < y_offset)
+            {
+                // the string is now below our rectangle so we are done
+                break;
+            }
+            else if (0 > pos - static_cast<long>(f.left_overflow()) && 
+                pos + static_cast<long>(f[str[i]].width() + f.right_overflow()) < 0)
+            {
+                pos += f[str[i]].width();
+                continue;
+            }
+            else if (c.nc() + static_cast<long>(f.right_overflow()) < pos)
+            {
+                // keep looking because there might be a '\n' in the string that
+                // will wrap us around and put us back into our rectangle.
+                continue;
+            }
+
+            // at this point in the loop we know that f[str[i]] overlaps 
+            // horizontally with the intersection rectangle area.
+
+            const letter& l = f[str[i]];
+            for (unsigned short i = 0; i < l.num_of_points(); ++i)
+            {
+                const long x = l[i].x + pos;
+                const long y = l[i].y + y_offset;
+                // draw each pixel of the letter if it is inside the intersection
+                // rectangle
+                if (x >= 0 && x < c.nc() && y >= 0 && y < c.nr())
+                {
+                    assign_pixel(c(y, x), color);
+                }
+            }
+
+            pos += l.width();
+        }
+
     }
 
 // ----------------------------------------------------------------------------------------

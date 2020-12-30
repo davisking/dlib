@@ -82,6 +82,36 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
+        typename T,
+        typename traits,
+        typename alloc,
+        typename image_type,
+        typename pixel_type
+    >
+    void draw_string (
+        image_type& img,
+        const dlib::point& p,
+        const std::basic_string<T,traits,alloc>& str,
+        const pixel_type& val,
+        const std::shared_ptr<font>& f = default_font::get_font(),
+        typename std::basic_string<T,traits,alloc>::size_type first = 0,
+        typename std::basic_string<T,traits,alloc>::size_type last = (std::basic_string<T,traits,alloc>::npos)
+    );
+
+    /*!
+        requires
+            - image_type == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - pixel_traits<pixel_type> is defined
+        ensures
+            - Draws the given string from first to last character onto the image img
+              starting from point p.
+            - The string is drawn with the color given by val and font f;
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
         typename image_type,
         typename pixel_type
         >
