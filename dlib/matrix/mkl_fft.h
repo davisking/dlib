@@ -25,12 +25,10 @@ namespace dlib
             - performs an FFT on `in` and stores the result in `out`.
             - if `is_inverse` is true, a backward FFT is performed, 
               otherwise a forward FFT is performed.
-        throws
-            - dlib::fatal_error if requirements aren't satisfied.
     !*/
     {
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
-        DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         DLIB_ASSERT(dims.num_dims() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
 
         constexpr DFTI_CONFIG_VALUE dfti_type = std::is_same<T,float>::value ? DFTI_SINGLE : DFTI_DOUBLE;
@@ -97,12 +95,10 @@ namespace dlib
             - dims.back() must be even
         ensures
             - performs a real FFT on `in` and stores the result in `out`.
-        throws
-            - dlib::fatal_error if requirements aren't satisfied.
     !*/
     {
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
-        DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         DLIB_ASSERT(dims.num_dims() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
         DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
         
@@ -168,7 +164,7 @@ namespace dlib
      *  out has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
      */
     template<typename T>
-    void mkl_fftri(const fft_size& dims, const std::complex<T>* in, T* out)
+    void mkl_ifftr(const fft_size& dims, const std::complex<T>* in, T* out)
     /*!
         requires
             - T must be either float or double
@@ -179,12 +175,10 @@ namespace dlib
             - dims.back() must be even
         ensures
             - performs an inverse real FFT on `in` and stores the result in `out`.
-        throws
-            - dlib::fatal_error if requirements aren't satisfied.
     !*/
     {
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floatint point type");
-        DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         DLIB_ASSERT(dims.num_dims() < 3, "we currently only support up to 2D FFT. Please submit an issue on github if 3D or above is required.");
         DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
 
