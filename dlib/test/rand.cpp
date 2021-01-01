@@ -413,7 +413,7 @@ namespace
         print_spinner();
         dlib::rand rnd(0);
         
-        const size_t N = 1024*1024*16;
+        const size_t N = 1024*1024*4;
         const double tol = 0.01;
         double k=1.0, lambda=2.0, g=6.0;
 
