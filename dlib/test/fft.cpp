@@ -273,37 +273,47 @@ namespace
         static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
         int test = 0;
+        
+        auto func = [&](long nr, long nc)
+        {
+            if (++test % 100 == 0)
+                print_spinner();
+
+            const matrix<R> m1 = rand_real<R>(nr,nc);
+            const matrix<R> m2 = rand_real<R>(nr,nc);
+            const R a1 = rnd.get_double_in_range(-10.0, 10.0);
+            const R a2 = rnd.get_double_in_range(-10.0, 10.0);
+            const matrix<R> m3 = a1*m1 + a2*m2;
+
+            const matrix<complex<R>> f1 = fftr(m1);
+            const matrix<complex<R>> f2 = fftr(m2);
+            const matrix<complex<R>> f3 = fftr(m3);
+
+            DLIB_TEST(f1.nr() == m1.nr());
+            DLIB_TEST(f1.nc() == fftr_nc_size(m1.nc()));
+
+            R diff = max(norm(f3 - a1*f1 - a2*f2));
+            DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
+
+            const matrix<R> m4 = ifftr(f3);
+            DLIB_TEST(m4.nr() == f3.nr());
+            DLIB_TEST(m4.nc() == ifftr_nc_size(f3.nc()));
+
+            diff = max(squared(m4 - m3));
+            DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
+        };
+        
         for (int nr = 2; nr <= 128; nr += 2)
         {
             for (int nc = 2; nc <= 128; nc += 2)
             {
-                if (++test % 100 == 0)
-                    print_spinner();
-
-                const matrix<R> m1 = rand_real<R>(nr,nc);
-                const matrix<R> m2 = rand_real<R>(nr,nc);
-                const R a1 = rnd.get_double_in_range(-10.0, 10.0);
-                const R a2 = rnd.get_double_in_range(-10.0, 10.0);
-                const matrix<R> m3 = a1*m1 + a2*m2;
-
-                const matrix<complex<R>> f1 = fftr(m1);
-                const matrix<complex<R>> f2 = fftr(m2);
-                const matrix<complex<R>> f3 = fftr(m3);
-
-                DLIB_TEST(f1.nr() == m1.nr());
-                DLIB_TEST(f1.nc() == fftr_nc_size(m1.nc()));
-
-                R diff = max(norm(f3 - a1*f1 - a2*f2));
-                DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
-
-                const matrix<R> m4 = ifftr(f3);
-                DLIB_TEST(m4.nr() == f3.nr());
-                DLIB_TEST(m4.nc() == ifftr_nc_size(f3.nc()));
-
-                diff = max(squared(m4 - m3));
-                DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
+                func(nr,nc);
             }
         }
+        
+        //some odd balls...
+        func(89, 102);  print_spinner();
+        func(123, 48);   print_spinner();
     }
 
 // ----------------------------------------------------------------------------------------
