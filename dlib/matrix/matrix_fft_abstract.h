@@ -43,32 +43,6 @@ namespace dlib
     !*/
     
 // ----------------------------------------------------------------------------------------
-
-    template < 
-        typename T, 
-        long NR,
-        long NC,
-        typename MM,
-        typename L 
-        >
-    matrix<std::complex<T>,NR,NC,MM,L> fft (
-        const matrix<std::complex<T>,NR,NC,MM,L>& data
-    );
-    /*!
-        requires
-            - data contains elements of type std::complex<> that itself contains double, float, or long double.
-        ensures
-            - Computes the 1 or 2 dimensional discrete Fourier transform of the given data
-              matrix and returns it.  In particular, we return a matrix D such that:
-                - D.nr() == data.nr()
-                - D.nc() == data.nc()
-                - D(0,0) == the DC term of the Fourier transform.
-                - starting with D(0,0), D contains progressively higher frequency components
-                  of the input data.
-                - ifft(D) == data
-    !*/
-   
-// ----------------------------------------------------------------------------------------
     
     template <typename EXP>
     typename EXP::matrix_type fft (
@@ -86,30 +60,6 @@ namespace dlib
                 - starting with D(0,0), D contains progressively higher frequency components
                   of the input data.
                 - ifft(D) == data
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template < 
-        typename T, 
-        long NR,
-        long NC,
-        typename MM,
-        typename L 
-        >
-    matrix<std::complex<T>,NR,NC,MM,L> ifft (
-        const matrix<std::complex<T>,NR,NC,MM,L>& data
-    );
-    /*!
-        requires
-            - data contains elements of type std::complex<> that itself contains double, float, or long double.
-        ensures
-            - Computes the 1 or 2 dimensional inverse discrete Fourier transform of the
-              given data vector and returns it.  In particular, we return a matrix D such
-              that:
-                - D.nr() == data.nr()
-                - D.nc() == data.nc()
-                - fft(D) == data
     !*/
     
 // ----------------------------------------------------------------------------------------
@@ -131,34 +81,7 @@ namespace dlib
     !*/
 
 // ----------------------------------------------------------------------------------------
-    
-    template < 
-        typename T, 
-        long NR,
-        long NC,
-        typename MM,
-        typename L 
-        >
-    matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> fftr (
-        const matrix<T,NR,NC,MM,L>& data
-    );
-    /*!
-        requires
-            - data contains elements of type double, float, or long double.
-            - data.nc() is even
-        ensures
-            - Computes the 1 or 2 dimensional real discrete Fourier transform of the given data
-              matrix and returns it.  In particular, we return a matrix D such that:
-                - D.nr() == data.nr()
-                - D.nc() == fftr_nc_size(data.nc())
-                - D(0,0) == the DC term of the Fourier transform.
-                - starting with D(0,0), D contains progressively higher frequency components
-                  of the input data.
-                - ifftr(D) == data
-    !*/
-   
-// ----------------------------------------------------------------------------------------
-    
+        
     template <typename EXP>
     matrix<add_complex_t<typename EXP::type>> fftr (
         const matrix_exp<EXP>& data
@@ -178,30 +101,6 @@ namespace dlib
                 - ifftr(D) == data
     !*/
 
-// ----------------------------------------------------------------------------------------
-
-    template < 
-        typename T, 
-        long NR,
-        long NC,
-        typename MM,
-        typename L 
-        >
-    matrix<T,NR,ifftr_nc_size(NC),MM,L> ifftr (
-        const matrix<std::complex<T>,NR,NC,MM,L>& in
-    );
-    /*!
-        requires
-            - data contains elements of type std::complex<> that itself contains double, float, or long double.
-        ensures
-            - Computes the 1 or 2 dimensional inverse real discrete Fourier transform of the
-              given data vector and returns it.  In particular, we return a matrix D such
-              that:
-                - D.nr() == data.nr()
-                - D.nc() == ifftr_nc_size(data.nc())
-                - fftr(D) == data
-    !*/
-    
 // ----------------------------------------------------------------------------------------
 
     template <typename EXP>
