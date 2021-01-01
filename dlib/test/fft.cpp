@@ -185,7 +185,7 @@ namespace
     template<typename R>
     void test_linearity_complex()
     {
-        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 5e-2;
         static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
         int test = 0;
