@@ -505,7 +505,7 @@ namespace dlib
         }
 
         template<typename T>
-        void kiss_fftri(const kiss_fftr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
+        void kiss_ifftr(const kiss_fftr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
         {
             DLIB_ASSERT(plan.substate.inverse, "bad Ifftr plan : need an inverse plan. This is a forward plan")
 
@@ -566,7 +566,7 @@ namespace dlib
         }
 
         template<typename T>
-        void kiss_fftndri(const kiss_fftndr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
+        void kiss_ifftndr(const kiss_fftndr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
         {
             int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
             int dimOther = plan.cfg_nd.dims.num_elements();
@@ -586,7 +586,7 @@ namespace dlib
             {
                 for (int k2 = 0; k2 < nrbins; ++k2)
                     tmp1[k2] = tmp2[ k2*dimOther+k1 ];
-                kiss_fftri(plan.cfg_r, &tmp1[0], timedata + k1*dimReal);
+                kiss_ifftr(plan.cfg_r, &tmp1[0], timedata + k1*dimReal);
             }
         }
 
@@ -626,13 +626,11 @@ namespace dlib
             - performs an FFT on `in` and stores the result in `out`.
             - if `is_inverse` is true, a backward FFT is performed, 
               otherwise a forward FFT is performed.
-        throws
-            - dlib::fatal_error if requirements aren't satisfied.
     !*/
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
-        DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         
         const fft_size squeezed_dims = squeeze_ones(dims);
         
@@ -670,13 +668,11 @@ namespace dlib
             - dims.back() must be even
         ensures
             - performs a real FFT on `in` and stores the result in `out`.
-        throws
-            - dlib::fatal_error if requirements aren't satisfied.
     !*/
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
-        DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
 
         const fft_size squeezed_dims = squeeze_ones(dims);
@@ -698,7 +694,7 @@ namespace dlib
      *  out has dims[0] * dims[1] * ... * dims[-2] * dims[-1] points
      */
     template<typename T>
-    void kiss_fftri(const fft_size& dims, const std::complex<T>* in, T* out)
+    void kiss_ifftr(const fft_size& dims, const std::complex<T>* in, T* out)
     /*!
         requires
             - T must be either float or double
@@ -708,13 +704,11 @@ namespace dlib
             - dims.back() must be even
         ensures
             - performs an inverse real FFT on `in` and stores the result in `out`.
-        throws
-            - dlib::fatal_error if requirements aren't satisfied.
     !*/
     {
         using namespace kiss_details;
         static_assert(std::is_floating_point<T>::value, "template parameter needs to be a floating point type");
-        DLIB_ASSERT(dims.num_dims() > 0, "dimensions aren't valid. They need to be non-empty and strictly positive");
+        DLIB_ASSERT(dims.num_dims() > 0, "dims can't be empty");
         DLIB_ASSERT(dims.back() % 2 == 0, "last dimension needs to be even");
 
         const fft_size squeezed_dims = squeeze_ones(dims);
@@ -722,12 +716,12 @@ namespace dlib
         if (squeezed_dims.num_dims() == 1)
         {
             const auto& plan = get_plan<kiss_fftr_state<T>>({squeezed_dims,true});
-            kiss_fftri(plan, in, out);
+            kiss_ifftr(plan, in, out);
         }
         else
         {
             const auto& plan = get_plan<kiss_fftndr_state<T>>({squeezed_dims,true});
-            kiss_fftndri(plan, in, out);
+            kiss_ifftndr(plan, in, out);
         }
     }
 
