@@ -26,25 +26,7 @@ namespace
 
     logger dlog("test.fft");
     static dlib::rand rnd(10000);
-    
-// ----------------------------------------------------------------------------------------
-    
-    inline int fft_next_fast_size(int n)
-    {
-        while(1) {
-            int m=n;
-            while ( (m%2) == 0 ) m/=2;
-            while ( (m%3) == 0 ) m/=3;
-            while ( (m%5) == 0 ) m/=5;
-            while ( (m%7) == 0 ) m/=7;
-            while ( (m%11) == 0 ) m/=11;
-            if (m<=1)
-                break;
-            n++;
-        }
-        return n;
-    }
-    
+        
 // ----------------------------------------------------------------------------------------
 
     template<typename R>
@@ -107,32 +89,29 @@ namespace
     void test_random_ffts()
     {
         int test = 0;  
-        for (int iter = 0; iter < 10; ++iter)
+        for (int nr = 1; nr <= 128; nr++)
         {
-            for (int nr = 1; nr <= 128; nr = fft_next_fast_size(nr + 1))
+            for (int nc = 1; nc <= 128; nc++)
             {
-                for (int nc = 1; nc <= 128; nc = fft_next_fast_size(nc + 1))
-                {
-                    if (++test % 100 == 0)
-                        print_spinner();
-                    
-                    const matrix<complex<double> > m1 = rand_complex<double>(nr,nc);
-                    const matrix<complex<float> > fm1 = rand_complex<float>(nr,nc);
+                if (++test % 100 == 0)
+                    print_spinner();
 
-                    DLIB_TEST(max(norm(ifft(fft(m1))-m1)) < 1e-16);
-                    DLIB_TEST(max(norm(ifft(fft(fm1))-fm1)) < 1e-7);
+                const matrix<complex<double> > m1 = rand_complex<double>(nr,nc);
+                const matrix<complex<float> > fm1 = rand_complex<float>(nr,nc);
 
-                    matrix<complex<double> > temp = m1;
-                    matrix<complex<float> > ftemp = fm1;
-                    fft_inplace(temp);
-                    fft_inplace(ftemp);
-                    DLIB_TEST(max(norm(temp-fft(m1))) < 1e-16);
-                    DLIB_TEST(max(norm(ftemp-fft(fm1))) < 1e-7);
-                    ifft_inplace(temp);
-                    ifft_inplace(ftemp);
-                    DLIB_TEST(max(norm(temp/temp.size()-m1)) < 1e-16);
-                    DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
-                }
+                DLIB_TEST(max(norm(ifft(fft(m1))-m1)) < 1e-16);
+                DLIB_TEST(max(norm(ifft(fft(fm1))-fm1)) < 1e-7);
+
+                matrix<complex<double> > temp = m1;
+                matrix<complex<float> > ftemp = fm1;
+                fft_inplace(temp);
+                fft_inplace(ftemp);
+                DLIB_TEST(max(norm(temp-fft(m1))) < 1e-16);
+                DLIB_TEST(max(norm(ftemp-fft(fm1))) < 1e-7);
+                ifft_inplace(temp);
+                ifft_inplace(ftemp);
+                DLIB_TEST(max(norm(temp/temp.size()-m1)) < 1e-16);
+                DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
             }
         }
     }
@@ -164,32 +143,29 @@ namespace
     void test_random_real_ffts()
     {
         int test = 0;
-        for (int iter = 0; iter < 10; ++iter)
+        for (int nr = 1; nr <= 128; nr++)
         {
-            for (int nr = 1; nr <= 128; nr = fft_next_fast_size(nr + 1))
+            for (int nc = 1; nc <= 128; nc++)
             {
-                for (int nc = 1; nc <= 128; nc = fft_next_fast_size(nc + 1))
-                {
-                    if (++test % 100 == 0)
-                        print_spinner();
-                    
-                    const matrix<complex<double> > m1 = complex_matrix(rand_real<double>(nr,nc));
-                    const matrix<complex<float> > fm1 = complex_matrix(rand_real<float>(nr,nc));
+                if (++test % 100 == 0)
+                    print_spinner();
 
-                    DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(m1))))-m1)) < 1e-16);
-                    DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(fm1))))-fm1)) < 1e-7);
+                const matrix<complex<double> > m1 = complex_matrix(rand_real<double>(nr,nc));
+                const matrix<complex<float> > fm1 = complex_matrix(rand_real<float>(nr,nc));
 
-                    matrix<complex<double> > temp = m1;
-                    matrix<complex<float> > ftemp = fm1;
-                    fft_inplace(temp);
-                    fft_inplace(ftemp);
-                    DLIB_TEST(max(norm(temp-fft(m1))) < 1e-16);
-                    DLIB_TEST(max(norm(ftemp-fft(fm1))) < 1e-7);
-                    ifft_inplace(temp);
-                    ifft_inplace(ftemp);
-                    DLIB_TEST(max(norm(temp/temp.size()-m1)) < 1e-16);
-                    DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
-                }
+                DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(m1))))-m1)) < 1e-16);
+                DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(fm1))))-fm1)) < 1e-7);
+
+                matrix<complex<double> > temp = m1;
+                matrix<complex<float> > ftemp = fm1;
+                fft_inplace(temp);
+                fft_inplace(ftemp);
+                DLIB_TEST(max(norm(temp-fft(m1))) < 1e-16);
+                DLIB_TEST(max(norm(ftemp-fft(fm1))) < 1e-7);
+                ifft_inplace(temp);
+                ifft_inplace(ftemp);
+                DLIB_TEST(max(norm(temp/temp.size()-m1)) < 1e-16);
+                DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
             }
         }
 
@@ -212,34 +188,31 @@ namespace
         static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
         static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
-        int test = 0;  
-        for (int iter = 0; iter < 10; ++iter)
+        int test = 0;
+        for (int nr = 1; nr <= 128; nr++)
         {
-            for (int nr = 1; nr <= 128; nr = fft_next_fast_size(nr + 1))
+            for (int nc = 1; nc <= 128; nc++)
             {
-                for (int nc = 1; nc <= 128; nc = fft_next_fast_size(nc + 1))
-                {
-                    if (++test % 100 == 0)
-                        print_spinner();
-                    
-                    const matrix<complex<R>> m1 = rand_complex<R>(nr,nc);
-                    const matrix<complex<R>> m2 = rand_complex<R>(nr,nc);
-                    const R a1 = rnd.get_double_in_range(-10.0, 10.0);
-                    const R a2 = rnd.get_double_in_range(-10.0, 10.0);
-                    const matrix<complex<R>> m3 = a1*m1 + a2*m2;
-                    
-                    const matrix<complex<R>> f1 = fft(m1);
-                    const matrix<complex<R>> f2 = fft(m2);
-                    const matrix<complex<R>> f3 = fft(m3);
-                                        
-                    R diff = max(norm(f3 - a1*f1 - a2*f2));
-                    DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " iter " << iter << " type " << typelabel);
-                    
-                    const matrix<complex<R>> m4 = ifft(f3);
-                    
-                    diff = max(norm(m4 - m3));
-                    DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " iter " << iter << " type " << typelabel);
-                }
+                if (++test % 100 == 0)
+                    print_spinner();
+
+                const matrix<complex<R>> m1 = rand_complex<R>(nr,nc);
+                const matrix<complex<R>> m2 = rand_complex<R>(nr,nc);
+                const R a1 = rnd.get_double_in_range(-10.0, 10.0);
+                const R a2 = rnd.get_double_in_range(-10.0, 10.0);
+                const matrix<complex<R>> m3 = a1*m1 + a2*m2;
+
+                const matrix<complex<R>> f1 = fft(m1);
+                const matrix<complex<R>> f2 = fft(m2);
+                const matrix<complex<R>> f3 = fft(m3);
+
+                R diff = max(norm(f3 - a1*f1 - a2*f2));
+                DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
+
+                const matrix<complex<R>> m4 = ifft(f3);
+
+                diff = max(norm(m4 - m3));
+                DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
             }
         }
     }
@@ -252,39 +225,36 @@ namespace
         static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
         static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
-        int test = 0;  
-        for (int iter = 0; iter < 10; ++iter)
+        int test = 0;
+        for (int nr = 2; nr <= 128; nr += 2)
         {
-            for (int nr = 2; nr <= 128; nr += 2)
+            for (int nc = 2; nc <= 128; nc += 2)
             {
-                for (int nc = 2; nc <= 128; nc += 2)
-                {
-                    if (++test % 100 == 0)
-                        print_spinner();
-                    
-                    const matrix<R> m1 = rand_real<R>(nr,nc);
-                    const matrix<R> m2 = rand_real<R>(nr,nc);
-                    const R a1 = rnd.get_double_in_range(-10.0, 10.0);
-                    const R a2 = rnd.get_double_in_range(-10.0, 10.0);
-                    const matrix<R> m3 = a1*m1 + a2*m2;
-                    
-                    const matrix<complex<R>> f1 = fftr(m1);
-                    const matrix<complex<R>> f2 = fftr(m2);
-                    const matrix<complex<R>> f3 = fftr(m3);
-                    
-                    DLIB_TEST(f1.nr() == m1.nr());
-                    DLIB_TEST(f1.nc() == fftr_nc_size(m1.nc()));
-                    
-                    R diff = max(norm(f3 - a1*f1 - a2*f2));
-                    DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " iter " << iter << " type " << typelabel);
-                    
-                    const matrix<R> m4 = ifftr(f3);
-                    DLIB_TEST(m4.nr() == f3.nr());
-                    DLIB_TEST(m4.nc() == ifftr_nc_size(f3.nc()));
-                    
-                    diff = max(squared(m4 - m3));
-                    DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " iter " << iter << " type " << typelabel);
-                }
+                if (++test % 100 == 0)
+                    print_spinner();
+
+                const matrix<R> m1 = rand_real<R>(nr,nc);
+                const matrix<R> m2 = rand_real<R>(nr,nc);
+                const R a1 = rnd.get_double_in_range(-10.0, 10.0);
+                const R a2 = rnd.get_double_in_range(-10.0, 10.0);
+                const matrix<R> m3 = a1*m1 + a2*m2;
+
+                const matrix<complex<R>> f1 = fftr(m1);
+                const matrix<complex<R>> f2 = fftr(m2);
+                const matrix<complex<R>> f3 = fftr(m3);
+
+                DLIB_TEST(f1.nr() == m1.nr());
+                DLIB_TEST(f1.nc() == fftr_nc_size(m1.nc()));
+
+                R diff = max(norm(f3 - a1*f1 - a2*f2));
+                DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
+
+                const matrix<R> m4 = ifftr(f3);
+                DLIB_TEST(m4.nr() == f3.nr());
+                DLIB_TEST(m4.nc() == ifftr_nc_size(f3.nc()));
+
+                diff = max(squared(m4 - m3));
+                DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
             }
         }
     }
@@ -314,9 +284,9 @@ namespace
             DLIB_TEST(diff_imag < tol);
         };
         
-        for (int nr = 1; nr <= 128; nr = fft_next_fast_size(nr + 1))
+        for (int nr = 1; nr <= 128; nr++)
         {
-            for (int nc = 1; nc <= 128; nc = fft_next_fast_size(nc + 1))
+            for (int nc = 1; nc <= 128; nc++)
             {
                 func(nr,nc);
             }
@@ -360,7 +330,7 @@ namespace
             DLIB_TEST_MSG(diff_imag < tol, typelabel << " diff_real " << diff_imag << " size " << size << " shift " << time_shift);
         };
         
-        for (size_t size = 32 ; size < 1024*4 ; size = fft_next_fast_size(size+1))
+        for (size_t size = 32 ; size < 1024*4 ; size++)
         {
             for (size_t time_shift = 10 ; time_shift < size/2 + 1 ; time_shift += 10)
             {
@@ -383,36 +353,33 @@ namespace
         static constexpr double tol = std::is_same<R,double>::value ? 1e-2 : 1e-2;
         static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
-        int test = 0;  
-        for (int iter = 0; iter < 10; ++iter)
+        int test = 0; 
+        for (int nr = 2; nr <= 128; nr += 2)
         {
-            for (int nr = 2; nr <= 128; nr += 2)
+            for (int nc = 2; nc <= 128; nc += 2)
             {
-                for (int nc = 2; nc <= 128; nc += 2)
-                {
-                    if (++test % 100 == 0)
-                        print_spinner();
-                    
-                    std::vector<float> x1(nr*nc), y1(nr*nc), y2(nr*nc);
-                    std::vector<std::complex<float>> f1(nr*(nc/2+1)), f2(nr*(nc/2+1));
+                if (++test % 100 == 0)
+                    print_spinner();
 
-                    for (int i = 0 ; i < (nr*nc) ; i++)
-                        x1[i] = rnd.get_random_gaussian();
+                std::vector<float> x1(nr*nc), y1(nr*nc), y2(nr*nc);
+                std::vector<std::complex<float>> f1(nr*(nc/2+1)), f2(nr*(nc/2+1));
 
-                    kiss_fftr({nr,nc}, &x1[0], &f1[0]);
-                    mkl_fftr({nr,nc}, &x1[0], &f2[0]);
+                for (int i = 0 ; i < (nr*nc) ; i++)
+                    x1[i] = rnd.get_random_gaussian();
 
-                    const R diff1 = max(norm(mat(f1) - mat(f2)));
-                    
-                    DLIB_TEST_MSG(diff1 < tol, typelabel << " diff1 " << diff1 << " nr " << nr << " nc " << nc);
-            
-                    kiss_fftri({nr,nc}, &f1[0], &y1[0]);
-                    mkl_fftri({nr,nc}, &f2[0], &y2[0]);
-                    
-                    const R diff2 = max(squared(mat(y1) - mat(y2)));
+                kiss_fftr({nr,nc}, &x1[0], &f1[0]);
+                mkl_fftr({nr,nc}, &x1[0], &f2[0]);
 
-                    DLIB_TEST_MSG(diff2 < tol, typelabel << " diff2 " << diff2 << " nr " << nr << " nc " << nc);
-                }
+                const R diff1 = max(norm(mat(f1) - mat(f2)));
+
+                DLIB_TEST_MSG(diff1 < tol, typelabel << " diff1 " << diff1 << " nr " << nr << " nc " << nc);
+
+                kiss_fftri({nr,nc}, &f1[0], &y1[0]);
+                mkl_fftri({nr,nc}, &f2[0], &y2[0]);
+
+                const R diff2 = max(squared(mat(y1) - mat(y2)));
+
+                DLIB_TEST_MSG(diff2 < tol, typelabel << " diff2 " << diff2 << " nr " << nr << " nc " << nc);
             }
         }
     }
