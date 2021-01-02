@@ -392,6 +392,39 @@ namespace
     }
     
 // ----------------------------------------------------------------------------------------
+   
+    template<typename R>
+    void test_fftr_conjugacy_1D()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-6;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        
+        auto func = [&](long nc)
+        {
+            print_spinner();
+
+            matrix<R> m1 = rand_real<R>(1, nc);
+            matrix<complex<R>> f1 = fftr(m1);
+            matrix<complex<R>> f2 = fft(complex_matrix(m1));
+            matrix<complex<R>> f3 = join_rows(f1, conj(fliplr(colm(f1,range(1,f1.nc()-2)))));
+            const R diff = max(norm(f2-f3));
+            DLIB_TEST_MSG(diff < tol, typelabel << " diff " << diff << " nr " << m1.nr() << " nc " << m1.nc() << " tol " << tol);
+        };
+        
+        //don't start from 2, as that is a special case where fft and fftr 
+        //give the same number of columns.
+        //Therefore, fiplr(colm(f1,range(1,f1.nc()-2))) wouldn't work
+        for (long nc = 4 ; nc <= 128 ; nc+=2) 
+        {
+            func(nc);
+        }
+        
+        //some odd balls...
+        func(480);
+        func(130);
+    }
+    
+// ----------------------------------------------------------------------------------------
     
 #ifdef DLIB_USE_MKL_FFT
     template<typename R>
@@ -456,6 +489,8 @@ namespace
             test_kronecker_delta_impulse_response<double>();
             test_time_shift<float>();
             test_time_shift<double>();
+            test_fftr_conjugacy_1D<float>();
+            test_fftr_conjugacy_1D<double>();
 #ifdef DLIB_USE_MKL_FFT
             test_kiss_vs_mkl<float>();
             test_kiss_vs_mkl<double>();
