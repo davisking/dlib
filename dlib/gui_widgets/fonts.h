@@ -8,7 +8,6 @@
 #include <string>
 
 #include "fonts_abstract.h"
-#include "../gui_core.h"
 #include "../algs.h"
 #include "../serialize.h"
 #include "../unicode.h"
@@ -224,9 +223,9 @@ namespace dlib
 
     // ------------------------------------------------------------------------------------
 
-        template <typename T, typename traits, typename alloc, typename pixel_type>
+        template <typename C, typename T, typename traits, typename alloc, typename pixel_type>
         void draw_string (
-            const canvas& c,
+            const C& c,
             const rectangle& rect,
             const std::basic_string<T,traits,alloc>& str,
             const pixel_type& color,
@@ -316,9 +315,9 @@ namespace dlib
                 pos += l.width();
             }
         }
-        template <typename T, typename traits, typename alloc>
+        template <typename C, typename T, typename traits, typename alloc>
         void draw_string (
-            const canvas& c,
+            const C& c,
             const rectangle& rect,
             const std::basic_string<T,traits,alloc>& str
         ) const 
