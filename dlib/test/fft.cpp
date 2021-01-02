@@ -16,6 +16,7 @@
 #include <dlib/matrix/mkl_fft.h>
 #endif
 #include "tester.h"
+#include "fftr_good_data.h"
 
 namespace  
 {
@@ -105,16 +106,22 @@ namespace
 // ----------------------------------------------------------------------------------------
     
     void test_against_saved_good_fftrs()
-    {
-        print_spinner();
-        std::ifstream sin("test_data_fftr.dat", std::ios::binary);
+    {       
+        std::stringstream base64_in, decompressed_in, decompressed_out;
+        dlib::base64 base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        base64_in << GOOD_FFTRs_COMPRESSED_BASE64_ENCODED;
+        base64_coder.decode(base64_in, decompressed_in);
+        compressor.decompress(decompressed_in, decompressed_out);
+
         matrix<double> m1;
         matrix<complex<double>> m2;
 
-        while (sin.peek() != EOF)
+        while (decompressed_out.peek() != EOF)
         {
-            deserialize(m1,sin);
-            deserialize(m2,sin);
+            print_spinner();
+            deserialize(m1,decompressed_out);
+            deserialize(m2,decompressed_out);
 
             DLIB_TEST(max(norm(fftr(m1)-m2)) < 1e-16);
             DLIB_TEST(max(squared(m1-ifftr(m2))) < 1e-16);
