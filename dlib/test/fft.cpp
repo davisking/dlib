@@ -27,25 +27,7 @@ namespace
 
     logger dlog("test.fft");
     static dlib::rand rnd(10000);
-        
-// ----------------------------------------------------------------------------------------
-
-    inline int fft_next_fast_size(int n)
-    {
-        while(1) {
-            int m=n;
-            while ( (m%2) == 0 ) m/=2;
-            while ( (m%3) == 0 ) m/=3;
-            while ( (m%5) == 0 ) m/=5;
-            while ( (m%7) == 0 ) m/=7;
-            while ( (m%11) == 0 ) m/=11;
-            if (m<=1)
-                break;
-            n++;
-        }
-        return n;
-    }
-    
+            
 // ----------------------------------------------------------------------------------------
 
     template<typename R>
@@ -133,9 +115,9 @@ namespace
     void test_random_ffts()
     {
         int test = 0;  
-        for (int nr = 1; nr <= 128; nr = fft_next_fast_size(nr + 1))
+        for (int nr = 1; nr <= 64; nr++)
         {
-            for (int nc = 1; nc <= 128; nc = fft_next_fast_size(nc + 1))
+            for (int nc = 1; nc <= 64; nc++)
             {
                 if (++test % 100 == 0)
                     print_spinner();
@@ -187,9 +169,9 @@ namespace
     void test_random_real_ffts()
     {
         int test = 0;
-        for (int nr = 1; nr <= 128; nr = fft_next_fast_size(nr + 1))
+        for (int nr = 1; nr <= 64; nr++)
         {
-            for (int nc = 1; nc <= 128; nc = fft_next_fast_size(nc + 1))
+            for (int nc = 1; nc <= 64; nc++)
             {
                 if (++test % 100 == 0)
                     print_spinner();
@@ -219,9 +201,9 @@ namespace
         test_real_compile_time_sized_ffts<480,480>(); //2^5 * 3 * 5
         test_real_compile_time_sized_ffts<480,1>();   //2^5 * 3 * 5
         test_real_compile_time_sized_ffts<1,480>();   //2^5 * 3 * 5
-        test_real_compile_time_sized_ffts<1031,1031>(); //some large prime
-        test_real_compile_time_sized_ffts<1031,1>();    //some large prime
-        test_real_compile_time_sized_ffts<1,1031>();    //some large prime
+        test_real_compile_time_sized_ffts<131,131>(); //some large prime
+        test_real_compile_time_sized_ffts<131,1>();    //some large prime
+        test_real_compile_time_sized_ffts<1,131>();    //some large prime
     }
 
 // ----------------------------------------------------------------------------------------
@@ -258,16 +240,16 @@ namespace
             DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
         };
         
-        for (int nr = 1; nr <= 128; nr = fft_next_fast_size(nr + 1))
+        for (int nr = 1; nr <= 64; nr++)
         {
-            for (int nc = 1; nc <= 128; nc = fft_next_fast_size(nc + 1))
+            for (int nc = 1; nc <= 64; nc++)
             {
                 func(nr,nc);
             }
         }
         
         //some odd balls...
-        func(3, 1021);  print_spinner();
+        func(3, 131);  print_spinner();
         func(123, 103); print_spinner();
     }
 
@@ -310,9 +292,9 @@ namespace
             DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
         };
         
-        for (int nr = 2; nr <= 128; nr += 2)
+        for (int nr = 2; nr <= 64; nr += 2)
         {
-            for (int nc = 2; nc <= 128; nc += 2)
+            for (int nc = 2; nc <= 64; nc += 2)
             {
                 func(nr,nc);
             }
@@ -348,16 +330,16 @@ namespace
             DLIB_TEST(diff_imag < tol);
         };
         
-        for (int nr = 1; nr <= 128; nr = fft_next_fast_size(nr + 1))
+        for (int nr = 1; nr <= 64; nr++)
         {
-            for (int nc = 1; nc <= 128; nc = fft_next_fast_size(nc + 1))
+            for (int nc = 1; nc <= 64; nc++)
             {
                 func(nr,nc);
             }
         }
         
         //some odd balls...
-        func(3, 1021);  print_spinner();
+        func(3, 131);  print_spinner();
         func(123, 103); print_spinner();
     }
     
@@ -394,7 +376,7 @@ namespace
             DLIB_TEST_MSG(diff_imag < tol, typelabel << " diff_real " << diff_imag << " size " << size << " shift " << time_shift);
         };
         
-        for (size_t size = 32 ; size < 1024*4 ; size = fft_next_fast_size(size+1))
+        for (size_t size = 16 ; size < 64 ; size++)
         {
             for (size_t time_shift = 10 ; time_shift < size/2 + 1 ; time_shift += 10)
             {
@@ -418,9 +400,9 @@ namespace
         static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
         
         int test = 0; 
-        for (int nr = 2; nr <= 128; nr += 2)
+        for (int nr = 2; nr <= 64; nr += 2)
         {
-            for (int nc = 2; nc <= 128; nc += 2)
+            for (int nc = 2; nc <= 64; nc += 2)
             {
                 if (++test % 100 == 0)
                     print_spinner();
