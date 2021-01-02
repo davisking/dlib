@@ -657,7 +657,7 @@ namespace dlib
         return true;
     }
 
-#if !DLIB_NO_GUI_SUPPORT
+#ifndef DLIB_NO_GUI_SUPPORT
 // ----------------------------------------------------------------------------------------
 
     const std::shared_ptr<font> get_native_font (
