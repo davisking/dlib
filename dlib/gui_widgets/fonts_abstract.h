@@ -286,8 +286,7 @@ namespace dlib
         ) const;
         /*!
             requires
-                - C is a dlib::canvas (defined in here as a template parameter
-                  for implementation reasons)
+                - C is a dlib::canvas or an object with a compatible interface.
                 - if (last != std::basic_string<T,traits,alloc>::npos) then
                     - first <= last
                     - last < str.size()
@@ -481,6 +480,8 @@ namespace dlib
     const shared_ptr_thread_safe<font> get_native_font(
     );
     /*!
+        requires
+            - DLIB_NO_GUI_SUPPORT is not defined
         ensures
             - returns a font object that uses the local font
     !*/
