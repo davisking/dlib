@@ -269,6 +269,7 @@ if (NOT TARGET dlib)
       entropy_decoder/entropy_decoder_kernel_2.cpp
       entropy_encoder/entropy_encoder_kernel_1.cpp
       entropy_encoder/entropy_encoder_kernel_2.cpp
+      gui_widgets/fonts.cpp
       md5/md5_kernel_1.cpp
       tokenizer/tokenizer_kernel_1.cpp
       unicode/unicode.cpp
@@ -406,7 +407,6 @@ if (NOT TARGET dlib)
 
       if (NOT DLIB_NO_GUI_SUPPORT)
          set(source_files ${source_files}
-            gui_widgets/fonts.cpp
             gui_widgets/widgets.cpp
             gui_widgets/drawable.cpp
             gui_widgets/canvas_drawing.cpp

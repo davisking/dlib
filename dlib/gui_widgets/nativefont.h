@@ -2,10 +2,12 @@
 // License: Boost Software License   See LICENSE.txt for the full license.
 #ifndef DLIB_IGG_FONT_RENDERER_H_
 #define DLIB_IGG_FONT_RENDERER_H_
+#ifndef DLIB_NO_GUI_SUPPORT
+
 #include "../platform.h"
 
 
-#include "../gui_widgets.h"
+#include "../gui_widgets/fonts.h"
 #include "../unicode.h"
 #include "../uintn.h"
 
@@ -608,5 +610,6 @@ namespace nativefont
 
 }
 
+#endif // DLIB_NO_GUI_SUPPORT
 #endif // DLIB_IGG_FONT_RENDERER_H_
 

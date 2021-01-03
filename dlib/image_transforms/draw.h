@@ -7,7 +7,7 @@
 #include "../algs.h"
 #include "../pixel.h"
 #include "../matrix.h"
-#include "../gui_widgets.h"
+#include "../gui_widgets/fonts.h"
 #include <cmath>
 
 namespace dlib
