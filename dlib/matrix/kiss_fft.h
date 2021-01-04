@@ -98,7 +98,7 @@ namespace dlib
             std::complex<T> * Fout,
             const size_t fstride,
             const kiss_fft_state<T>& cfg,
-            int m
+            const int m
         )
         {
             const std::complex<T> * tw1 = &cfg.twiddles[0];
@@ -124,7 +124,7 @@ namespace dlib
             std::complex<T> * Fout,
             const size_t fstride,
             const kiss_fft_state<T>& cfg,
-            size_t m
+            const size_t m
         )
         {
             const size_t m2 = 2*m;
@@ -203,14 +203,13 @@ namespace dlib
             std::complex<T> * Fout,
             const size_t fstride,
             const kiss_fft_state<T>& cfg,
-            int m
+            const int m
         )
         {
             std::complex<T> scratch[13];
             const std::complex<T> * twiddles = &cfg.twiddles[0];
-            std::complex<T> ya,yb;
-            ya = twiddles[fstride*m];
-            yb = twiddles[fstride*2*m];
+            const std::complex<T> ya = twiddles[fstride*m];
+            const std::complex<T> yb = twiddles[fstride*2*m];
 
             std::complex<T> *Fout0=Fout;
             std::complex<T> *Fout1=Fout0+m;
@@ -261,14 +260,14 @@ namespace dlib
             std::complex<T> * Fout,
             const size_t fstride,
             const kiss_fft_state<T>& cfg,
-            int m,
-            int p
+            const int m,
+            const int p
         )
         {
             int u,k,q1,q;
             const std::complex<T> * twiddles = &cfg.twiddles[0];
             std::complex<T> t;
-            int Norig = cfg.nfft;
+            const int Norig = cfg.nfft;
 
             std::vector<std::complex<T>> scratch(p);
 
@@ -302,7 +301,7 @@ namespace dlib
             std::complex<T>* Fout,
             const std::complex<T>* f,
             const size_t fstride,
-            int in_stride
+            const int in_stride
         )
         {
             std::complex<T> * Fout_beg = Fout;
@@ -345,8 +344,7 @@ namespace dlib
         inline void kf_factor(int n, std::vector<int>& facbuf)
         {
             int p=4;
-            double floor_sqrt;
-            floor_sqrt = std::floor( std::sqrt((double)n) );
+            const double floor_sqrt = std::floor( std::sqrt((double)n) );
 
             /*factor out powers of 4, powers of 2, then any remaining primes */
             do {
@@ -368,7 +366,7 @@ namespace dlib
         template<typename T>
         inline kiss_fft_state<T>::kiss_fft_state(const plan_key& key)
         {
-            static constexpr double twopi = 6.283185307179586476925286766559005768394338798;
+            constexpr double twopi = 6.283185307179586476925286766559005768394338798;
             nfft       = key.dims[0];
             inverse    = key.is_inverse;
             twiddles.resize(nfft);
@@ -490,15 +488,15 @@ namespace dlib
             freqdata[0]         = std::complex<T>(tmpbuf[0].real() + tmpbuf[0].imag(), 0);
             freqdata[nfft_h]    = std::complex<T>(tmpbuf[0].real() - tmpbuf[0].imag(), 0);
 
-            static constexpr T half = 0.5;
+            constexpr T half = 0.5;
             
             for (int k = 1 ; k <= nfft_h / 2 ; ++k)
             {
-                auto fpk  = tmpbuf[k];
-                auto fpnk = std::conj(tmpbuf[nfft_h-k]);
-                auto f1k = fpk + fpnk;
-                auto f2k = fpk - fpnk;
-                auto tw  = f2k * plan.super_twiddles[k-1];
+                const auto fpk  = tmpbuf[k];
+                const auto fpnk = std::conj(tmpbuf[nfft_h-k]);
+                const auto f1k = fpk + fpnk;
+                const auto f2k = fpk - fpnk;
+                const auto tw  = f2k * plan.super_twiddles[k-1];
                 freqdata[k]         = half * (f1k + tw);
                 freqdata[nfft_h-k]  = half * std::conj(f1k - tw);
             }
@@ -542,9 +540,9 @@ namespace dlib
         template<typename T>
         void kiss_fftndr(const kiss_fftndr_state<T>& plan, const T* timedata, std::complex<T>* freqdata)
         {
-            int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
-            int dimOther = plan.cfg_nd.dims.num_elements();
-            int nrbins   = dimReal/2+1;
+            const int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
+            const int dimOther = plan.cfg_nd.dims.num_elements();
+            const int nrbins   = dimReal/2+1;
 
             std::vector<std::complex<T>> tmp1(std::max<int>(nrbins, dimOther));
             std::vector<std::complex<T>> tmp2(plan.cfg_nd.dims.num_elements()*dimReal);
@@ -568,9 +566,9 @@ namespace dlib
         template<typename T>
         void kiss_ifftndr(const kiss_fftndr_state<T>& plan, const std::complex<T>* freqdata, T* timedata)
         {
-            int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
-            int dimOther = plan.cfg_nd.dims.num_elements();
-            int nrbins   = dimReal/2+1;
+            const int dimReal  = plan.cfg_r.substate.nfft*2; //recall the real fft size is half the length of the input
+            const int dimOther = plan.cfg_nd.dims.num_elements();
+            const int nrbins   = dimReal/2+1;
 
             std::vector<std::complex<T>> tmp1(std::max<int>(nrbins, dimOther));
             std::vector<std::complex<T>> tmp2(plan.cfg_nd.dims.num_elements()*dimReal);
