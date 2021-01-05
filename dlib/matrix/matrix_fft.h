@@ -150,11 +150,14 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
+        if (data.size() != 0)
+        {
 #ifdef DLIB_USE_MKL_FFT
-        mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
+            mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
 #else
-        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
+            kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), false);
 #endif
+        }
     }
 
 // ----------------------------------------------------------------------------------------
@@ -162,11 +165,14 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
+        if (data.size() != 0)
+        {
 #ifdef DLIB_USE_MKL_FFT
-        mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
+            mkl_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
 #else
-        kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
+            kiss_fft({data.nr(),data.nc()}, &data(0,0), &data(0,0), true);
 #endif
+        }
     }
 
 // ----------------------------------------------------------------------------------------
