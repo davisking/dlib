@@ -11,8 +11,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    bool is_power_of_two (
-        const unsigned long& value
+    constexpr bool is_power_of_two (
+        const unsigned long value
     );
     /*!
         ensures
@@ -22,10 +22,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
    
-    constexpr long fftr_nc_size(long nc)
-    {
-        return nc == 0 ? 0 : nc/2+1;
-    }
+    constexpr long fftr_nc_size(
+        long nc
+    );
     /*!
         ensures
             - returns the output dimension of a 1D real FFT
@@ -33,10 +32,9 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
     
-    constexpr long ifftr_nc_size(long nc)
-    {
-        return nc == 0 ? 0 : 2*(nc-1);
-    }
+    constexpr long ifftr_nc_size(
+        long nc
+    );
     /*!
         ensures
             - returns the output dimension of an inverse 1D real FFT
