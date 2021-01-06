@@ -45,11 +45,14 @@ namespace dlib
         //complex FFT
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         matrix<std::complex<T>,NR,NC,MM,L> out(in.nr(), in.nc());
+        if (in.size() != 0)
+        {
 #ifdef DLIB_USE_MKL_FFT
-        mkl_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
+            mkl_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
 #else
-        kiss_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
+            kiss_fft({in.nr(),in.nc()}, &in(0,0), &out(0,0), false);
 #endif
+        }
         return out;
     }
     
@@ -104,11 +107,14 @@ namespace dlib
         static_assert(std::is_floating_point<T>::value, "only support floating point types");
         DLIB_ASSERT(in.nc() % 2 == 0, "last dimension " << in.nc() << " needs to be even otherwise ifftr(fftr(data)) won't have matching dimensions");
         matrix<std::complex<T>,NR,fftr_nc_size(NC),MM,L> out(in.nr(), fftr_nc_size(in.nc()));
+        if (in.size() != 0)
+        {
 #ifdef DLIB_USE_MKL_FFT
-        mkl_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
+            mkl_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
 #else
-        kiss_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
+            kiss_fftr({in.nr(),in.nc()}, &in(0,0), &out(0,0));
 #endif
+        }
         return out;
     }
     

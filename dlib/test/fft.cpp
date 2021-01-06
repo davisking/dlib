@@ -141,6 +141,23 @@ namespace
                 DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
             }
         }
+
+        {
+            // test size 0 matrices.
+            matrix<complex<double>> temp;
+            matrix<complex<float>> ftemp;
+            fft_inplace(temp);
+            fft_inplace(ftemp);
+            DLIB_TEST(temp.size() == 0);
+            DLIB_TEST(ftemp.size() == 0);
+
+            DLIB_TEST(fft(temp).size() == 0);
+            DLIB_TEST(ifft(temp).size() == 0);
+
+            matrix<double> rtemp;
+            DLIB_TEST(fftr(rtemp).size() == 0);
+            DLIB_TEST(ifftr(temp).size() == 0);
+        }
     }
 
 // ----------------------------------------------------------------------------------------
