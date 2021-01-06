@@ -11,7 +11,12 @@
 #include <dlib/compress_stream.h>
 #include <dlib/base64.h>
 
+#ifdef DLIB_USE_MKL_FFT
+#include <dlib/matrix/kiss_fft.h>
+#include <dlib/matrix/mkl_fft.h>
+#endif
 #include "tester.h"
+#include "fftr_good_data.h"
 
 namespace  
 {
@@ -21,19 +26,35 @@ namespace
     using namespace std;
 
     logger dlog("test.fft");
-
+    static dlib::rand rnd(10000);
+            
 // ----------------------------------------------------------------------------------------
 
-    matrix<complex<double> > rand_complex(long nr, long nc)
+    template<typename R>
+    matrix<complex<R> > rand_complex(long nr, long nc, R scale = 10.0)
     {
-        static dlib::rand rnd;
-        matrix<complex<double> > m(nr,nc);
+        matrix<complex<R> > m(nr,nc);
 
         for (long r = 0; r < m.nr(); ++r)
         {
             for (long c = 0; c < m.nc(); ++c)
             {
-                m(r,c) = complex<double>(rnd.get_random_gaussian()*10, rnd.get_random_gaussian()*10);
+                m(r,c) = std::complex<R>(rnd.get_random_gaussian() * scale, rnd.get_random_gaussian() * scale);
+            }
+        }
+        return m;
+    }
+    
+    template<typename R>
+    matrix<R> rand_real(long nr, long nc)
+    {
+        matrix<R> m(nr,nc);
+
+        for (long r = 0; r < m.nr(); ++r)
+        {
+            for (long c = 0; c < m.nc(); ++c)
+            {
+                m(r,c) = rnd.get_random_gaussian() * 10.0;
             }
         }
         return m;
@@ -65,34 +86,77 @@ namespace
     }
 
 // ----------------------------------------------------------------------------------------
+    
+    void test_against_saved_good_fftrs()
+    {       
+        std::stringstream base64_in, decompressed_in, decompressed_out;
+        dlib::base64 base64_coder;
+        dlib::compress_stream::kernel_1ea compressor;
+        
+        base64_in = get_fftr_stringstream();
+        base64_coder.decode(base64_in, decompressed_in);
+        compressor.decompress(decompressed_in, decompressed_out);
 
-    void test_random_ffts()
-    {
-        for (int iter = 0; iter < 10; ++iter)
+        matrix<double> m1;
+        matrix<complex<double>> m2;
+
+        while (decompressed_out.peek() != EOF)
         {
             print_spinner();
-            for (int nr = 1; nr <= 128; nr*=2)
+            deserialize(m1,decompressed_out);
+            deserialize(m2,decompressed_out);
+
+            DLIB_TEST(max(norm(fftr(m1)-m2)) < 1e-16);
+            DLIB_TEST(max(squared(m1-ifftr(m2))) < 1e-16);
+        }
+    }
+
+// ----------------------------------------------------------------------------------------
+    
+    void test_random_ffts()
+    {
+        int test = 0;  
+        for (int nr = 1; nr <= 64; nr++)
+        {
+            for (int nc = 1; nc <= 64; nc++)
             {
-                for (int nc = 1; nc <= 128; nc *= 2)
-                {
-                    const matrix<complex<double> > m1 = rand_complex(nr,nc);
-                    const matrix<complex<float> > fm1 = matrix_cast<complex<float> >(rand_complex(nr,nc));
+                if (++test % 100 == 0)
+                    print_spinner();
 
-                    DLIB_TEST(max(norm(ifft(fft(m1))-m1)) < 1e-16);
-                    DLIB_TEST(max(norm(ifft(fft(fm1))-fm1)) < 1e-7);
+                const matrix<complex<double> > m1 = rand_complex<double>(nr,nc);
+                const matrix<complex<float> > fm1 = rand_complex<float>(nr,nc);
 
-                    matrix<complex<double> > temp = m1;
-                    matrix<complex<float> > ftemp = fm1;
-                    fft_inplace(temp);
-                    fft_inplace(ftemp);
-                    DLIB_TEST(max(norm(temp-fft(m1))) < 1e-16);
-                    DLIB_TEST(max(norm(ftemp-fft(fm1))) < 1e-7);
-                    ifft_inplace(temp);
-                    ifft_inplace(ftemp);
-                    DLIB_TEST(max(norm(temp/temp.size()-m1)) < 1e-16);
-                    DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
-                }
+                DLIB_TEST(max(norm(ifft(fft(m1))-m1)) < 1e-16);
+                DLIB_TEST(max(norm(ifft(fft(fm1))-fm1)) < 1e-7);
+
+                matrix<complex<double> > temp = m1;
+                matrix<complex<float> > ftemp = fm1;
+                fft_inplace(temp);
+                fft_inplace(ftemp);
+                DLIB_TEST(max(norm(temp-fft(m1))) < 1e-16);
+                DLIB_TEST(max(norm(ftemp-fft(fm1))) < 1e-7);
+                ifft_inplace(temp);
+                ifft_inplace(ftemp);
+                DLIB_TEST(max(norm(temp/temp.size()-m1)) < 1e-16);
+                DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
             }
+        }
+
+        {
+            // test size 0 matrices.
+            matrix<complex<double>> temp;
+            matrix<complex<float>> ftemp;
+            fft_inplace(temp);
+            fft_inplace(ftemp);
+            DLIB_TEST(temp.size() == 0);
+            DLIB_TEST(ftemp.size() == 0);
+
+            DLIB_TEST(fft(temp).size() == 0);
+            DLIB_TEST(ifft(temp).size() == 0);
+
+            matrix<double> rtemp;
+            DLIB_TEST(fftr(rtemp).size() == 0);
+            DLIB_TEST(ifftr(temp).size() == 0);
         }
     }
 
@@ -102,8 +166,8 @@ namespace
     void test_real_compile_time_sized_ffts()
     {
         print_spinner();
-        const matrix<complex<double>,nr,nc> m1 = complex_matrix(real(rand_complex(nr,nc)));
-        const matrix<complex<float>,nr,nc> fm1 = matrix_cast<complex<float> >(complex_matrix(real(rand_complex(nr,nc))));
+        const matrix<complex<double>,nr,nc> m1 = complex_matrix(rand_real<double>(nr,nc));
+        const matrix<complex<float>,nr,nc> fm1 = complex_matrix(rand_real<float>(nr,nc));
 
         DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(m1))))-m1)) < 1e-16);
         DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(fm1))))-fm1)) < 1e-7);
@@ -122,40 +186,302 @@ namespace
 
     void test_random_real_ffts()
     {
-        for (int iter = 0; iter < 10; ++iter)
+        int test = 0;
+        for (int nr = 1; nr <= 64; nr++)
         {
-            print_spinner();
-            for (int nr = 1; nr <= 128; nr*=2)
+            for (int nc = 1; nc <= 64; nc++)
             {
-                for (int nc = 1; nc <= 128; nc *= 2)
-                {
-                    const matrix<complex<double> > m1 = complex_matrix(real(rand_complex(nr,nc)));
-                    const matrix<complex<float> > fm1 = matrix_cast<complex<float> >(complex_matrix(real(rand_complex(nr,nc))));
+                if (++test % 100 == 0)
+                    print_spinner();
 
-                    DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(m1))))-m1)) < 1e-16);
-                    DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(fm1))))-fm1)) < 1e-7);
+                const matrix<complex<double> > m1 = complex_matrix(rand_real<double>(nr,nc));
+                const matrix<complex<float> > fm1 = complex_matrix(rand_real<float>(nr,nc));
 
-                    matrix<complex<double> > temp = m1;
-                    matrix<complex<float> > ftemp = fm1;
-                    fft_inplace(temp);
-                    fft_inplace(ftemp);
-                    DLIB_TEST(max(norm(temp-fft(m1))) < 1e-16);
-                    DLIB_TEST(max(norm(ftemp-fft(fm1))) < 1e-7);
-                    ifft_inplace(temp);
-                    ifft_inplace(ftemp);
-                    DLIB_TEST(max(norm(temp/temp.size()-m1)) < 1e-16);
-                    DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
-                }
+                DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(m1))))-m1)) < 1e-16);
+                DLIB_TEST(max(norm(ifft(fft(complex_matrix(real(fm1))))-fm1)) < 1e-7);
+
+                matrix<complex<double> > temp = m1;
+                matrix<complex<float> > ftemp = fm1;
+                fft_inplace(temp);
+                fft_inplace(ftemp);
+                DLIB_TEST(max(norm(temp-fft(m1))) < 1e-16);
+                DLIB_TEST(max(norm(ftemp-fft(fm1))) < 1e-7);
+                ifft_inplace(temp);
+                ifft_inplace(ftemp);
+                DLIB_TEST(max(norm(temp/temp.size()-m1)) < 1e-16);
+                DLIB_TEST(max(norm(ftemp/ftemp.size()-fm1)) < 1e-7);
             }
         }
 
         test_real_compile_time_sized_ffts<16,16>();
         test_real_compile_time_sized_ffts<16,1>();
         test_real_compile_time_sized_ffts<1,16>();
+        test_real_compile_time_sized_ffts<480,480>(); //2^5 * 3 * 5
+        test_real_compile_time_sized_ffts<480,1>();   //2^5 * 3 * 5
+        test_real_compile_time_sized_ffts<1,480>();   //2^5 * 3 * 5
+        test_real_compile_time_sized_ffts<131,131>(); //some large prime
+        test_real_compile_time_sized_ffts<131,1>();    //some large prime
+        test_real_compile_time_sized_ffts<1,131>();    //some large prime
     }
 
 // ----------------------------------------------------------------------------------------
+    
+    template<typename R>
+    void test_linearity_complex()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 5e-2;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        
+        int test = 0;
+        
+        auto func = [&](long nr, long nc)
+        {
+            if (++test % 100 == 0)
+                print_spinner();
 
+            const matrix<complex<R>> m1 = rand_complex<R>(nr,nc);
+            const matrix<complex<R>> m2 = rand_complex<R>(nr,nc);
+            const R a1 = rnd.get_double_in_range(-10.0, 10.0);
+            const R a2 = rnd.get_double_in_range(-10.0, 10.0);
+            const matrix<complex<R>> m3 = a1*m1 + a2*m2;
+
+            const matrix<complex<R>> f1 = fft(m1);
+            const matrix<complex<R>> f2 = fft(m2);
+            const matrix<complex<R>> f3 = fft(m3);
+
+            R diff = max(norm(f3 - a1*f1 - a2*f2));
+            DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
+
+            const matrix<complex<R>> m4 = ifft(f3);
+
+            diff = max(norm(m4 - m3));
+            DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
+        };
+        
+        for (int nr = 1; nr <= 64; nr++)
+        {
+            for (int nc = 1; nc <= 64; nc++)
+            {
+                func(nr,nc);
+            }
+        }
+        
+        //some odd balls...
+        func(3, 131);  print_spinner();
+        func(123, 103); print_spinner();
+    }
+
+// ----------------------------------------------------------------------------------------
+    
+    template<typename R>
+    void test_linearity_real()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        
+        int test = 0;
+        
+        auto func = [&](long nr, long nc)
+        {
+            if (++test % 100 == 0)
+                print_spinner();
+
+            const matrix<R> m1 = rand_real<R>(nr,nc);
+            const matrix<R> m2 = rand_real<R>(nr,nc);
+            const R a1 = rnd.get_double_in_range(-10.0, 10.0);
+            const R a2 = rnd.get_double_in_range(-10.0, 10.0);
+            const matrix<R> m3 = a1*m1 + a2*m2;
+
+            const matrix<complex<R>> f1 = fftr(m1);
+            const matrix<complex<R>> f2 = fftr(m2);
+            const matrix<complex<R>> f3 = fftr(m3);
+
+            DLIB_TEST(f1.nr() == m1.nr());
+            DLIB_TEST(f1.nc() == fftr_nc_size(m1.nc()));
+
+            R diff = max(norm(f3 - a1*f1 - a2*f2));
+            DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
+
+            const matrix<R> m4 = ifftr(f3);
+            DLIB_TEST(m4.nr() == f3.nr());
+            DLIB_TEST(m4.nc() == ifftr_nc_size(f3.nc()));
+
+            diff = max(squared(m4 - m3));
+            DLIB_TEST_MSG(diff < tol, "diff " << diff << " not within tol " << tol << " where (nr,nc) = (" << nr << "," << nc << ")" << " type " << typelabel);
+        };
+        
+        for (int nr = 2; nr <= 64; nr += 2)
+        {
+            for (int nc = 2; nc <= 64; nc += 2)
+            {
+                func(nr,nc);
+            }
+        }
+        
+        //some odd balls...
+        func(89, 102);  print_spinner();
+        func(123, 48);   print_spinner();
+    }
+
+// ----------------------------------------------------------------------------------------
+    
+    template<typename R>
+    void test_kronecker_delta_impulse_response()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-3;
+        
+        int test = 0;
+        
+        auto func = [&](long nr, long nc)
+        {
+            if (++test % 100 == 0)
+                print_spinner();
+            matrix<R> ones  = dlib::ones_matrix<R>(nr,nc);
+            matrix<complex<R>> x = dlib::zeros_matrix<complex<R>>(nr,nc);
+            x(0,0) = 1.0f;
+            
+            matrix<complex<R>> f = fft(x);
+            
+            R diff_real = max(squared(real(f) - ones));
+            R diff_imag = max(squared(imag(f)));
+            DLIB_TEST(diff_real < tol);
+            DLIB_TEST(diff_imag < tol);
+        };
+        
+        for (int nr = 1; nr <= 64; nr++)
+        {
+            for (int nc = 1; nc <= 64; nc++)
+            {
+                func(nr,nc);
+            }
+        }
+        
+        //some odd balls...
+        func(3, 131);  print_spinner();
+        func(123, 103); print_spinner();
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+    template<typename R>
+    void test_time_shift()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-1;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        
+        int test = 0;
+        
+        auto func = [&](size_t size, size_t time_shift)
+        {
+            if (++test % 100 == 0)
+                print_spinner();
+
+            matrix<complex<R>> x1 = rand_complex<R>(1,size, 1.0);
+            matrix<complex<R>> x2 = x1;
+            std::rotate(x2.begin(), x2.begin() + time_shift, x2.end());
+
+            matrix<complex<R>> f1 = fft(x1);
+            matrix<complex<R>> f2 = fft(x2);
+            matrix<complex<R>> f2_expected = f1;
+
+            for (long i = 0 ; i < f1.size() ; i++)
+                f2_expected(i) = f1(i)*std::polar<R>(R(1), R(6.283185307179586476925286766559005768394338798*time_shift*i / size));
+
+            const auto diff_real = max(squared(real(f2) - real(f2_expected)));
+            const auto diff_imag = max(squared(imag(f2) - imag(f2_expected)));
+
+            DLIB_TEST_MSG(diff_real < tol, typelabel << " diff_real " << diff_real << " size " << size << " shift " << time_shift);
+            DLIB_TEST_MSG(diff_imag < tol, typelabel << " diff_real " << diff_imag << " size " << size << " shift " << time_shift);
+        };
+        
+        for (size_t size = 16 ; size < 64 ; size++)
+        {
+            for (size_t time_shift = 10 ; time_shift < size/2 + 1 ; time_shift += 10)
+            {
+                func(size, time_shift);
+            }
+        }
+        
+        //some odd balls...
+        func(3,1);
+        func(123,16);
+        func(123,122);
+    }
+    
+// ----------------------------------------------------------------------------------------
+   
+    template<typename R>
+    void test_fftr_conjugacy_1D()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-15 : 1e-6;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        
+        auto func = [&](long nc)
+        {
+            print_spinner();
+
+            matrix<R> m1 = rand_real<R>(1, nc);
+            matrix<complex<R>> f1 = fftr(m1);
+            matrix<complex<R>> f2 = fft(complex_matrix(m1));
+            matrix<complex<R>> f3 = join_rows(f1, conj(fliplr(colm(f1,range(1,f1.nc()-2)))));
+            const R diff = max(norm(f2-f3));
+            DLIB_TEST_MSG(diff < tol, typelabel << " diff " << diff << " nr " << m1.nr() << " nc " << m1.nc() << " tol " << tol);
+        };
+        
+        //don't start from 2, as that is a special case where fft and fftr 
+        //give the same number of columns.
+        //Therefore, fiplr(colm(f1,range(1,f1.nc()-2))) wouldn't work
+        for (long nc = 4 ; nc <= 128 ; nc+=2) 
+        {
+            func(nc);
+        }
+        
+        //some odd balls...
+        func(480);
+        func(130);
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+#ifdef DLIB_USE_MKL_FFT
+    template<typename R>
+    void test_kiss_vs_mkl()
+    {
+        static constexpr double tol = std::is_same<R,double>::value ? 1e-2 : 1e-2;
+        static constexpr const char* typelabel = std::is_same<R,double>::value ? "double" : "float";
+        
+        int test = 0; 
+        for (int nr = 2; nr <= 64; nr += 2)
+        {
+            for (int nc = 2; nc <= 64; nc += 2)
+            {
+                if (++test % 100 == 0)
+                    print_spinner();
+
+                std::vector<float> x1(nr*nc), y1(nr*nc), y2(nr*nc);
+                std::vector<std::complex<float>> f1(nr*(nc/2+1)), f2(nr*(nc/2+1));
+
+                for (int i = 0 ; i < (nr*nc) ; i++)
+                    x1[i] = rnd.get_random_gaussian();
+
+                kiss_fftr({nr,nc}, &x1[0], &f1[0]);
+                mkl_fftr({nr,nc}, &x1[0], &f2[0]);
+
+                const R diff1 = max(norm(mat(f1) - mat(f2)));
+
+                DLIB_TEST_MSG(diff1 < tol, typelabel << " diff1 " << diff1 << " nr " << nr << " nc " << nc);
+
+                kiss_ifftr({nr,nc}, &f1[0], &y1[0]);
+                mkl_ifftr({nr,nc}, &f2[0], &y2[0]);
+
+                const R diff2 = max(squared(mat(y1) - mat(y2)));
+
+                DLIB_TEST_MSG(diff2 < tol, typelabel << " diff2 " << diff2 << " nr " << nr << " nc " << nc);
+            }
+        }
+    }
+#endif
+    
     class test_fft : public tester
     {
     public:
@@ -169,8 +495,23 @@ namespace
         )
         {
             test_against_saved_good_ffts();
+            test_against_saved_good_fftrs();
             test_random_ffts();
             test_random_real_ffts();
+            test_linearity_real<float>();
+            test_linearity_real<double>();
+            test_linearity_complex<float>();
+            test_linearity_complex<double>();
+            test_kronecker_delta_impulse_response<float>();
+            test_kronecker_delta_impulse_response<double>();
+            test_time_shift<float>();
+            test_time_shift<double>();
+            test_fftr_conjugacy_1D<float>();
+            test_fftr_conjugacy_1D<double>();
+#ifdef DLIB_USE_MKL_FFT
+            test_kiss_vs_mkl<float>();
+            test_kiss_vs_mkl<double>();
+#endif
         }
     } a;
 
