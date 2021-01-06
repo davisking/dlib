@@ -89,11 +89,10 @@ namespace
     
     void test_against_saved_good_fftrs()
     {       
-        std::stringstream base64_in, decompressed_in, decompressed_out;
+        std::stringstream base64_in(get_fftr_stringstream()), decompressed_in, decompressed_out;
         dlib::base64 base64_coder;
         dlib::compress_stream::kernel_1ea compressor;
         
-        base64_in = get_fftr_stringstream();
         base64_coder.decode(base64_in, decompressed_in);
         compressor.decompress(decompressed_in, decompressed_out);
 

@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-inline std::stringstream get_fftr_stringstream()
+inline std::string get_fftr_stringstream()
 {
     std::stringstream ss;
     ss << "gREgHkVPSRDT5z8rk175NS624DOfWDQcPg2MOBWP6zKp5jxHZcD2U1VxamzdjaOSqfLISuO5XxmI";
@@ -3037,7 +3037,7 @@ inline std::stringstream get_fftr_stringstream()
     ss << "7JaHbCjsyBzkKxy4v6APayQluxVwujyu6ln+IUmGUzRs2mUgaYziWzuGopQ/bwqfzpjh4qPNLgms";
     ss << "bb2qcmOPSNthd0G/u1cEMK4knOauP0VYpl3yIJNQaVVflh1tkTTYSzHWmEOTyrrT3Yc4v2S1lD10";
     ss << "dzewCaAafqZ1K1RJ7khOyQ6bGAvAXLGrDBYIuI2mIw6h2+PnD6rpT7IpcVkSHzB6Wa/ltwA=";
-    return ss;
+    return ss.str();
 }	
 
 #endif /* FFTR_GOOD_DATA_H */
