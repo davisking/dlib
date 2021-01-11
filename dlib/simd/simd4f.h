@@ -524,7 +524,7 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-#ifndef vec_rsqrt
+#if defined(DLIB_HAVE_VSX) && !defined(vec_rsqrt)
     extern inline __vector float __attribute__((always_inline)) vec_rsqrt(const __vector float& a)
     { return vec_div((__vector float){1, 1, 1, 1}, vec_sqrt(a)); }
 #endif
