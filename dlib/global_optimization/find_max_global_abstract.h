@@ -10,10 +10,21 @@
 #include "../threads/thread_pool_extension_abstract.h"
 #include <utility>
 #include <chrono>
+#include <functional>
 
 namespace dlib
 {
 
+    /*!
+       WHAT THIS OBJECT REPRESENTS
+          A call-back that returns true when the search should stop
+
+          It is useful when the user either wants to terminate the search based on either special knowledge
+          of the function, the user's preferences regarding what is a "good-enough" solution, or
+          based on the results of some external process which may have found a solution and this search
+          is no longer required.
+     !*/
+    using stop_condition = std::function<bool(double)>;
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -81,7 +92,8 @@ namespace dlib
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 0,
-        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
+        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {},
+        stop_condition should_stop = never_stop_early
     );
     /*!
         requires
@@ -134,6 +146,7 @@ namespace dlib
             - find_max_global() runs until one of the following is true:
                 - The total number of calls to the provided functions is == num.max_calls
                 - More than max_runtime time has elapsed since the start of this function.
+                - should_stop(f(x)) returns true
             - Any variables that satisfy the following conditions are optimized on a log-scale:
                 - The lower bound on the variable is > 0
                 - The ratio of the upper bound to lower bound is >= 1000
@@ -166,7 +179,8 @@ namespace dlib
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 0,
-        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
+        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {},
+        stop_condition should_stop = never_stop_early
     );
     /*!
         this function is identical to the find_max_global() defined immediately above,
@@ -182,7 +196,8 @@ namespace dlib
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 0,
-        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
+        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {},
+        stop_condition should_stop = never_stop_early
     );
     /*!
         This function is identical to the find_max_global() defined immediately above,
@@ -199,7 +214,8 @@ namespace dlib
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 0,
-        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
+        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {},
+        stop_condition should_stop = never_stop_early
     );
     /*!
         This function is identical to the find_max_global() defined immediately above,
@@ -222,7 +238,8 @@ namespace dlib
         const max_function_calls num,
         const std::chrono::nanoseconds max_runtime = FOREVER,
         double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
+        const std::vector<function_evaluation>& initial_function_evals = {},
+        stop_condition should_stop = never_stop_early
     );
     /*!
         requires
@@ -270,6 +287,7 @@ namespace dlib
             - find_max_global() runs until one of the following is true:
                 - The total number of calls to f() is == num.max_calls
                 - More than max_runtime time has elapsed since the start of this function.
+                - should_stop(f(x)) returns true
             - Any variables that satisfy the following conditions are optimized on a log-scale:
                 - The lower bound on the variable is > 0
                 - The ratio of the upper bound to lower bound is >= 1000
