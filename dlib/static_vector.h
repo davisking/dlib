@@ -204,11 +204,11 @@ namespace dlib
             const auto nremoved = std::distance(erase_begin, erase_end);
             iterator mut_begin  = const_cast<iterator>(erase_begin);
             iterator mut_end    = const_cast<iterator>(erase_end);
+            iterator new_end    = std::move(mut_end, end(), mut_begin);
             std::for_each(
-                mut_begin,
-                mut_end,
+                new_end,
+                end(),
                 [&](reference r) { r.~value_type(); });
-            std::move(mut_end, end(), mut_begin);
             m_size -= nremoved;
             return mut_begin;
         }
