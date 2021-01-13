@@ -163,10 +163,8 @@ namespace dlib
                 throw std::out_of_range("count");
 
             iterator mut_pos = const_cast<iterator>(pos);
-            std::move_backward(mut_pos, end(), end() + count);
-            std::uninitialized_fill(storage_begin() + (mut_pos - begin()), 
-                                    storage_begin() + (mut_pos - begin()) + count, 
-                                    value);
+            std::uninitialized_fill(end(), end() + count, value);
+            std::rotate(mut_pos, end(), end() + count);
             m_size += count;
             return mut_pos;
         }
