@@ -1001,6 +1001,64 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
+    void clipped_relu (
+        tensor& dest,
+        const tensor& src,
+        const float ceiling
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::clipped_relu(dest, src, ceiling);
+#else
+        cpu::clipped_relu(dest, src, ceiling);
+#endif
+    }
+
+    void clipped_relu_gradient (
+        tensor& grad,
+        const tensor& dest,
+        const tensor& gradient_input,
+        const float ceiling
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::clipped_relu_gradient(grad, dest, gradient_input, ceiling);
+#else
+        cpu::clipped_relu_gradient(grad, dest, gradient_input, ceiling);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
+    void elu (
+        tensor& dest,
+        const tensor& src,
+        const float alpha
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::elu(dest, src, alpha);
+#else
+        cpu::elu(dest, src, alpha);
+#endif
+    }
+
+    void elu_gradient (
+        tensor& grad,
+        const tensor& dest,
+        const tensor& gradient_input,
+        const float alpha
+    )
+    {
+#ifdef DLIB_USE_CUDA
+        cuda::elu_gradient(grad, dest, gradient_input, alpha);
+#else
+        cpu::elu_gradient(grad, dest, gradient_input, alpha);
+#endif
+    }
+
+// ----------------------------------------------------------------------------------------
+
     void gelu (
         tensor& dest,
         const tensor& src
