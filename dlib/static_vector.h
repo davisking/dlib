@@ -18,6 +18,74 @@
 
 namespace dlib 
 {    
+    #if __cplusplus < 201703L
+    template<typename...> using void_t = void;
+    #else
+    using std::void_t;
+    #endif
+
+    template<typename T, typename dummy>
+    using std_hash_helper = T;
+    
+    inline void hash_combine(std::size_t& seed) { }
+
+    template <typename T, typename... Rest>
+    inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
+    {
+        seed ^= std::hash<T>{}(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+        hash_combine(seed, rest...);
+    }
+
+    template <typename T, typename = void>
+    struct is_dlib_hashable : std::false_type {};
+    
+    template <typename T>
+    struct is_dlib_hashable<T, void_t<decltype(dlib::hash(std::declval<const T&>(), std::declval<dlib::uint32>()))>> : std::true_type {};
+    
+    template <typename T, typename = void>
+    struct is_std_hashable : std::false_type {};
+
+    template <typename T>
+    struct is_std_hashable<T, void_t<decltype(std::declval<std::hash<T>>()(std::declval<const T&>())),
+                                     decltype(std::declval<std::hash<T>>()(std::declval<T const&>()))>> : std::true_type {};
+                                     
+    template <typename T, typename = void>
+    struct is_swappable : std::false_type {};
+                      
+    template <typename T>
+    struct is_swappable<T, void_t<decltype(swap(std::declval<T&>(), std::declval<T&>()))>> : std::true_type {};
+                   
+    template<typename Iter>
+    using iter_value_type_t = typename std::iterator_traits<Iter>::value_type;
+    
+    template<typename ForwardIt,
+             typename std::enable_if<std::is_move_constructible<iter_value_type_t<ForwardIt>>::value>::type* = nullptr>
+    void rotate_custom(ForwardIt first, ForwardIt n_first, ForwardIt last)
+    {
+        std::rotate(first, n_first, last);
+    }
+    
+    template<typename ForwardIt,
+             typename std::enable_if<not std::is_move_constructible<iter_value_type_t<ForwardIt>>::value and 
+                                     is_swappable<iter_value_type_t<ForwardIt>>::value>::type* = nullptr>
+    void rotate_custom(ForwardIt first, ForwardIt n_first, ForwardIt last)
+    {
+        using std::swap;
+        ForwardIt next = n_first;
+        while (first != next)
+        {
+            swap(*(first++), *(next++));
+            if (next == last)
+            {
+                next = n_first;
+            }
+            else if (first == n_first)
+            {
+                n_first = next;
+            }
+        }
+    }
+    
     template <typename T, std::size_t Capacity>
     class static_vector
     {        
@@ -202,9 +270,9 @@ namespace dlib
             const auto nremoved = std::distance(erase_begin, erase_end);
             iterator mut_begin  = const_cast<iterator>(erase_begin);
             iterator mut_end    = const_cast<iterator>(erase_end);
-            iterator new_end    = std::move(mut_end, end(), mut_begin);
+            rotate_custom(mut_begin, mut_end, end());
             std::for_each(
-                new_end,
+                end() - nremoved,
                 end(),
                 [&](reference r) { r.~value_type(); });
             m_size -= nremoved;
@@ -368,37 +436,6 @@ namespace dlib
             throw serialization_error(e.info + "\n   while deserializing object of type static_vector"); 
         }
     }
-    
-    #if __cplusplus < 201703L
-    template<typename...> using void_t = void;
-    #else
-    using std::void_t;
-    #endif
-
-    template<typename T, typename dummy>
-    using std_hash_helper = T;
-    
-    inline void hash_combine(std::size_t& seed) { }
-
-    template <typename T, typename... Rest>
-    inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
-    {
-        seed ^= std::hash<T>{}(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-        hash_combine(seed, rest...);
-    }
-
-    template <typename T, typename = void>
-    struct is_dlib_hashable : std::false_type {};
-    
-    template <typename T>
-    struct is_dlib_hashable<T, void_t<decltype(dlib::hash(std::declval<const T&>(), std::declval<dlib::uint32>()))>> : std::true_type {};
-    
-    template <typename T, typename = void>
-    struct is_std_hashable : std::false_type {};
-
-    template <typename T>
-    struct is_std_hashable<T, void_t<decltype(std::declval<std::hash<T>>()(std::declval<const T&>())),
-                                     decltype(std::declval<std::hash<T>>()(std::declval<T const&>()))>> : std::true_type {};
 
     template <
         typename T, 
