@@ -1544,7 +1544,7 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void clipped_relu(
+    void clipped_relu (
         tensor& dest,
         const tensor& src,
         const float ceiling
@@ -1582,7 +1582,7 @@ namespace dlib { namespace tt
 
 // ----------------------------------------------------------------------------------------
 
-    void elu(
+    void elu (
         tensor& dest,
         const tensor& src,
         const float alpha
