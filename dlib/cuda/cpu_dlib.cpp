@@ -1930,17 +1930,17 @@ namespace dlib
             const float alpha
         )
         {
-            const auto g = grad.host();
-            const auto d = dest.host();
-            const auto in = gradient_input.host();
+            const auto out = grad.host();
+            const auto in = dest.host();
+            const auto gi = gradient_input.host();
             if (is_same_object(grad, gradient_input))
             {
                 for (size_t i = 0; i < dest.size(); ++i)
                 {
                     if (in[i] > 0)
-                        g[i] = in[i];
+                        out[i] = gi[i];
                     else
-                        g[i] = alpha * std::exp(in[i]);
+                        out[i] = alpha * std::exp(in[i]) * gi[i];
                 }
             }
             else
@@ -1948,9 +1948,9 @@ namespace dlib
                 for (size_t i = 0; i < dest.size(); ++i)
                 {
                     if (in[i] > 0)
-                        g[i] += in[i];
+                        out[i] += gi[i];
                     else
-                        g[i] = alpha * std::exp(in[i]);
+                        out[i] += alpha * std::exp(in[i]) * gi[i];
                 }
             }
         }
