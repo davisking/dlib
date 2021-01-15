@@ -161,6 +161,11 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
             {
                 initial_function_evals.resize(specs.size());
             }
+            for (auto& evals : initial_function_evals) {
+                for (auto& eval : evals) {
+                    eval.y *= ymult;
+                }
+            }
 
             global_function_search opt(specs, {initial_function_evals});
             opt.set_solver_epsilon(solver_epsilon);
