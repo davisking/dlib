@@ -62,6 +62,9 @@ namespace dlib
     
     template <typename T>
     struct is_swappable : public swap_details::is_swappable<T> {};
+    
+    template <class T>
+    inline constexpr bool is_swappable_v = is_swappable<T>::value;
                       
     template<typename Iter>
     using iter_value_type_t = typename std::iterator_traits<Iter>::value_type;
@@ -75,7 +78,7 @@ namespace dlib
     
     template<typename ForwardIt,
              typename std::enable_if<not std::is_move_constructible<iter_value_type_t<ForwardIt>>::value and 
-                                     is_swappable<iter_value_type_t<ForwardIt>>::value>::type* = nullptr>
+                                     is_swappable_v<iter_value_type_t<ForwardIt>>>::type* = nullptr>
     void rotate_custom(ForwardIt first, ForwardIt n_first, ForwardIt last)
     {
         using std::swap;
