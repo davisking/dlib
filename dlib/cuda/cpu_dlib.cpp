@@ -1871,10 +1871,7 @@ namespace dlib
             const float ceiling
         )
         {
-            const auto d = dest.host();
-            const auto s = src.host();
-            for (size_t i = 0; i < src.size(); ++i)
-                d[i] = std::min(std::max(s[i], 0.f), ceiling);
+            dest = upperbound(lowerbound(mat(src), 0), ceiling);
         }
 
         void clipped_relu_gradient (
