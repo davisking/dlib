@@ -1881,17 +1881,17 @@ namespace dlib
             const float ceiling
         )
         {
-            const auto g = grad.host();
-            const auto d = dest.host();
-            const auto in = gradient_input.host();
+            const auto out = grad.host();
+            const auto in = dest.host();
+            const auto gi = gradient_input.host();
             if (is_same_object(grad, gradient_input))
             {
                 for (size_t i = 0; i < dest.size(); ++i)
                 {
                     if (in[i] > 0 && in[i] < ceiling)
-                        g[i] = in[i];
+                        out[i] = gi[i];
                     else
-                        g[i] = 0;
+                        out[i] = 0;
                 }
             }
             else
@@ -1899,7 +1899,7 @@ namespace dlib
                 for (size_t i = 0; i < dest.size(); ++i)
                 {
                     if (in[i] > 0 && in[i] < ceiling)
-                        g[i] += in[i];
+                        out[i] += gi[i];
                 }
             }
         }
