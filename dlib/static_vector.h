@@ -240,7 +240,7 @@ namespace dlib
 
             iterator mut_pos = const_cast<iterator>(pos);
             std::uninitialized_fill(end(), end() + count, value);
-            std::rotate(mut_pos, end(), end() + count);
+            rotate_custom(mut_pos, end(), end() + count);
             m_size += count;
             return mut_pos;
         }
@@ -256,7 +256,7 @@ namespace dlib
                 throw std::out_of_range("size()");
             iterator mut_pos = const_cast<iterator>(pos);
             new (end()) value_type(std::move(value));
-            std::rotate(mut_pos, end(), end() + 1);
+            rotate_custom(mut_pos, end(), end() + 1);
             m_size++;
             return mut_pos;
         }
@@ -268,7 +268,7 @@ namespace dlib
                 throw std::out_of_range("size()");
             iterator mut_pos = const_cast<iterator>(pos);
             new (end()) value_type(std::forward<CtorArgs>(args)...);
-            std::rotate(mut_pos, end(), end() + 1);
+            rotate_custom(mut_pos, end(), end() + 1);
             m_size++;
             return mut_pos;
         }
