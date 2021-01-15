@@ -269,6 +269,58 @@ namespace
 #endif // DLIB_USE_CUDA
     }
 
+    void test_clipped_relu()
+    {
+#ifdef DLIB_USE_CUDA
+        using namespace dlib::tt;
+        print_spinner();
+        const long n = 5;
+        const long k = 5;
+        const long nr = 3;
+        const long nc = 3;
+        const float ceiling = 6.0f;
+        resizable_tensor src(n, k, nr, nc);
+        tt::tensor_rand rnd;
+        rnd.fill_uniform(src);
+        resizable_tensor dest1, dest2;
+        dest1.copy_size(src);
+        dest2.copy_size(src);
+        // initialize to different values in order to make sure the output is actually changed
+        dest1 = 1;
+        dest2 = 2;
+        cuda::clipped_relu(dest1, src, ceiling);
+        cpu::clipped_relu(dest2, src, ceiling);
+
+        DLIB_TEST_MSG(max(abs(mat(dest1) - mat(dest2))) < 1e-7, max(abs(mat(dest1) - mat(dest2))));
+#endif // DLIB_USE_CUDA
+    }
+
+    void test_elu()
+    {
+#ifdef DLIB_USE_CUDA
+        using namespace dlib::tt;
+        print_spinner();
+        const long n = 5;
+        const long k = 5;
+        const long nr = 3;
+        const long nc = 3;
+        const float alpha = 1.0f;
+        resizable_tensor src(n, k, nr, nc);
+        tt::tensor_rand rnd;
+        rnd.fill_uniform(src);
+        resizable_tensor dest1, dest2;
+        dest1.copy_size(src);
+        dest2.copy_size(src);
+        // initialize to different values in order to make sure the output is actually changed
+        dest1 = 1;
+        dest2 = 2;
+        cuda::elu(dest1, src, alpha);
+        cpu::elu(dest2, src, alpha);
+
+        DLIB_TEST_MSG(max(abs(mat(dest1) - mat(dest2))) < 1e-7, max(abs(mat(dest1) - mat(dest2))));
+#endif // DLIB_USE_CUDA
+    }
+
     void test_gelu()
     {
 #ifdef DLIB_USE_CUDA
@@ -4112,6 +4164,8 @@ namespace
             test_sigmoid();
             test_mish();
             test_leaky_relu();
+            test_clipped_relu();
+            test_elu();
             test_gelu();
             test_batch_normalize();
             test_batch_normalize_conv();
