@@ -422,15 +422,6 @@ namespace dlib
 
     // ----------------------------------------------------------------------------------------
 
-        void elu_gradient (
-            tensor& grad,
-            const tensor& dest,
-            const tensor& gradient_input,
-            const float coef
-        );
-
-    // ----------------------------------------------------------------------------------------
-
         void gelu (
             tensor& dest,
             const tensor& src
