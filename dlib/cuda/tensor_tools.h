@@ -1595,7 +1595,7 @@ namespace dlib { namespace tt
                 - if (src.host()[i] > 0) then
                     - #dest.host()[i] == src.host()[i]
                 - else
-                    - #dest.host()[i] == std::exp(src.host()[i]) * alpha
+                    - #dest.host()[i] == alpha * (std::exp(src.host()[i]) - 1)
             - This function supports in-place operation, i.e. having
               is_same_object(dest, src)==true
     !*/
