@@ -2004,6 +2004,18 @@ namespace
         }
         {
             print_spinner();
+            clipped_relu_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
+            elu_ l;
+            auto res = test_layer(l);
+            DLIB_TEST_MSG(res, res);
+        }
+        {
+            print_spinner();
             gelu_ l;
             auto res = test_layer(l);
             DLIB_TEST_MSG(res, res);
