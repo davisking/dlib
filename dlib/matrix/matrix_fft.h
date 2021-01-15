@@ -39,6 +39,25 @@ namespace dlib
   
 // ----------------------------------------------------------------------------------------
     
+    template < typename T, typename Alloc >
+    matrix<std::complex<T>,0,1> fft (const std::vector<std::complex<T>, Alloc>& in)
+    {
+        //complex FFT
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
+        matrix<std::complex<T>,0,1> out(in.size());
+        if (in.size() != 0)
+        {
+#ifdef DLIB_USE_MKL_FFT
+            mkl_fft({(long)in.size()}, &in[0], &out(0,0), false);
+#else
+            kiss_fft({(long)in.size()}, &in[0], &out(0,0), false);
+#endif
+        }
+        return out;
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
     template < typename T, long NR, long NC, typename MM, typename L >
     matrix<std::complex<T>,NR,NC,MM,L> fft (const matrix<std::complex<T>,NR,NC,MM,L>& in)
     {
@@ -65,6 +84,26 @@ namespace dlib
         static_assert(is_complex<typename EXP::type>::value, "input should be complex");
         typename EXP::matrix_type in(data);
         return fft(in);
+    }
+    
+// ----------------------------------------------------------------------------------------
+    
+    template < typename T, typename Alloc >
+    matrix<std::complex<T>,0,1> ifft (const std::vector<std::complex<T>, Alloc>& in)
+    {
+        //complex FFT
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
+        matrix<std::complex<T>,0,1> out(in.size());
+        if (in.size() != 0)
+        {
+#ifdef DLIB_USE_MKL_FFT
+            mkl_fft({(long)in.size()}, &in[0], &out(0,0), true);
+#else
+            kiss_fft({(long)in.size()}, &in[0], &out(0,0), true);
+#endif
+            out /= out.size();
+        }
+        return out;
     }
     
 // ----------------------------------------------------------------------------------------
@@ -159,7 +198,22 @@ namespace dlib
         matrix<typename EXP::type> in(data);
         return ifftr(in);
     }
-
+    
+// ----------------------------------------------------------------------------------------
+    
+    template < typename T, typename Alloc >
+    void fft_inplace (std::vector<std::complex<T>, Alloc>& data)
+    {
+        if (data.size() != 0)
+        {
+#ifdef DLIB_USE_MKL_FFT
+            mkl_fft({(long)data.size()}, &data[0], &data[0], false);
+#else
+            kiss_fft({(long)data.size()}, &data[0], &data[0], false);
+#endif
+        }
+    }
+    
 // ----------------------------------------------------------------------------------------
     
     template < typename T, long NR, long NC, typename MM, typename L >
@@ -175,6 +229,21 @@ namespace dlib
         }
     }
 
+// ----------------------------------------------------------------------------------------
+
+    template < typename T, typename Alloc >
+    void ifft_inplace (std::vector<std::complex<T>, Alloc>& data)
+    {
+        if (data.size() != 0)
+        {
+#ifdef DLIB_USE_MKL_FFT
+            mkl_fft({(long)data.size()}, &data[0], &data[0], true);
+#else
+            kiss_fft({(long)data.size()}, &data[0], &data[0], true);
+#endif
+        }
+    }
+    
 // ----------------------------------------------------------------------------------------
 
     template < typename T, long NR, long NC, typename MM, typename L >
