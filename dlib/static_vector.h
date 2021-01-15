@@ -48,13 +48,21 @@ namespace dlib
     template <typename T>
     struct is_std_hashable<T, void_t<decltype(std::declval<std::hash<T>>()(std::declval<const T&>())),
                                      decltype(std::declval<std::hash<T>>()(std::declval<T const&>()))>> : std::true_type {};
-                                     
-    template <typename T, typename = void>
-    struct is_swappable : std::false_type {};
-                      
+                                   
+    namespace swap_details
+    {
+        using std::swap;
+
+        template <typename T, typename = void>
+        struct is_swappable : std::false_type {};
+
+        template <typename T>
+        struct is_swappable<T, void_t<decltype(swap(std::declval<T&>(), std::declval<T&>()))>> : std::true_type {};
+    }
+    
     template <typename T>
-    struct is_swappable<T, void_t<decltype(swap(std::declval<T&>(), std::declval<T&>()))>> : std::true_type {};
-                   
+    struct is_swappable : public swap_details::is_swappable<T> {};
+                      
     template<typename Iter>
     using iter_value_type_t = typename std::iterator_traits<Iter>::value_type;
     
