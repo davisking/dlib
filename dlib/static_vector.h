@@ -4,104 +4,56 @@
 #ifndef DLIB_STATIC_VECTOR_H
 #define DLIB_STATIC_VECTOR_H
 
-#include <type_traits>
 #include <iterator>
-#include <numeric>
 #include <utility>
 #include <algorithm>
 #include <array>
 #include <exception>
 #include <memory>
 #include <functional>
-#include <dlib/serialize.h>
-#include <dlib/hash.h>
+#include "traits.h"
+#include "serialize.h"
+#include "hash.h"
 
 namespace dlib 
 {    
-    #if __cplusplus < 201703L
-    template<typename...> using void_t = void;
-    #else
-    using std::void_t;
-    #endif
-
-    template<typename T, typename dummy>
-    using std_hash_helper = T;
-    
-    inline void hash_combine(std::size_t& seed) { }
-
-    template <typename T, typename... Rest>
-    inline void hash_combine(std::size_t& seed, const T& v, Rest... rest)
+    namespace static_vector_details
     {
-        seed ^= std::hash<T>{}(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-        hash_combine(seed, rest...);
-    }
-    
-    namespace hash_details
-    {
-        using dlib::hash;
+        template<typename T, typename dummy>
+        using std_hash_helper = T;
 
-        template <typename T, typename = void>
-        struct is_dlib_hashable : std::false_type {};
+        template<typename Iter>
+        using iter_value_type_t = typename std::iterator_traits<Iter>::value_type;
 
-        template <typename T>
-        struct is_dlib_hashable<T, void_t<decltype(hash(std::declval<const T&>(), std::declval<dlib::uint32>()))>> : std::true_type {};
-    }
-
-    template <typename T>
-    struct is_dlib_hashable : public hash_details::is_dlib_hashable<T> {};
-        
-    template <typename T, typename = void>
-    struct is_std_hashable : std::false_type {};
-
-    template <typename T>
-    struct is_std_hashable<T, void_t<decltype(std::declval<std::hash<T>>()(std::declval<const T&>())),
-                                     decltype(std::declval<std::hash<T>>()(std::declval<T const&>()))>> : std::true_type {};
-                                   
-    namespace swap_details
-    {
-        using std::swap;
-
-        template <typename T, typename = void>
-        struct is_swappable : std::false_type {};
-
-        template <typename T>
-        struct is_swappable<T, void_t<decltype(swap(std::declval<T&>(), std::declval<T&>()))>> : std::true_type {};
-    }
-    
-    template <typename T>
-    struct is_swappable : public swap_details::is_swappable<T> {};
-                          
-    template<typename Iter>
-    using iter_value_type_t = typename std::iterator_traits<Iter>::value_type;
-    
-    template<typename ForwardIt,
-             typename std::enable_if<std::is_move_constructible<iter_value_type_t<ForwardIt>>::value>::type* = nullptr>
-    void rotate_custom(ForwardIt first, ForwardIt n_first, ForwardIt last)
-    {
-        std::rotate(first, n_first, last);
-    }
-    
-    template<typename ForwardIt,
-             typename std::enable_if<not std::is_move_constructible<iter_value_type_t<ForwardIt>>::value and 
-                                     is_swappable<iter_value_type_t<ForwardIt>>::value>::type* = nullptr>
-    void rotate_custom(ForwardIt first, ForwardIt n_first, ForwardIt last)
-    {
-        using std::swap;
-        ForwardIt next = n_first;
-        while (first != next)
+        template<typename ForwardIt,
+                 typename std::enable_if<std::is_move_constructible<iter_value_type_t<ForwardIt>>::value>::type* = nullptr>
+        void rotate_custom(ForwardIt first, ForwardIt n_first, ForwardIt last)
         {
-            swap(*(first++), *(next++));
-            if (next == last)
+            std::rotate(first, n_first, last);
+        }
+
+        template<typename ForwardIt,
+                 typename std::enable_if<not std::is_move_constructible<iter_value_type_t<ForwardIt>>::value and 
+                                         is_swappable<iter_value_type_t<ForwardIt>>::value>::type* = nullptr>
+        void rotate_custom(ForwardIt first, ForwardIt n_first, ForwardIt last)
+        {
+            using std::swap;
+            ForwardIt next = n_first;
+            while (first != next)
             {
-                next = n_first;
-            }
-            else if (first == n_first)
-            {
-                n_first = next;
+                swap(*(first++), *(next++));
+                if (next == last)
+                {
+                    next = n_first;
+                }
+                else if (first == n_first)
+                {
+                    n_first = next;
+                }
             }
         }
     }
-    
+
     template <typename T, std::size_t Capacity>
     class static_vector
     {        
@@ -248,7 +200,7 @@ namespace dlib
 
             iterator mut_pos = const_cast<iterator>(pos);
             std::uninitialized_fill(end(), end() + count, value);
-            rotate_custom(mut_pos, end(), end() + count);
+            static_vector_details::rotate_custom(mut_pos, end(), end() + count);
             m_size += count;
             return mut_pos;
         }
@@ -264,7 +216,7 @@ namespace dlib
                 throw std::out_of_range("size()");
             iterator mut_pos = const_cast<iterator>(pos);
             new (end()) value_type(std::move(value));
-            rotate_custom(mut_pos, end(), end() + 1);
+            static_vector_details::rotate_custom(mut_pos, end(), end() + 1);
             m_size++;
             return mut_pos;
         }
@@ -276,7 +228,7 @@ namespace dlib
                 throw std::out_of_range("size()");
             iterator mut_pos = const_cast<iterator>(pos);
             new (end()) value_type(std::forward<CtorArgs>(args)...);
-            rotate_custom(mut_pos, end(), end() + 1);
+            static_vector_details::rotate_custom(mut_pos, end(), end() + 1);
             m_size++;
             return mut_pos;
         }
@@ -286,7 +238,7 @@ namespace dlib
             const auto nremoved = std::distance(erase_begin, erase_end);
             iterator mut_begin  = const_cast<iterator>(erase_begin);
             iterator mut_end    = const_cast<iterator>(erase_end);
-            rotate_custom(mut_begin, mut_end, end());
+            static_vector_details::rotate_custom(mut_begin, mut_end, end());
             std::for_each(
                 end() - nremoved,
                 end(),
@@ -477,15 +429,17 @@ namespace std
         typename T, 
         std::size_t Capacity
         >
-    struct hash<dlib::std_hash_helper<dlib::static_vector<T,Capacity>, typename std::enable_if<dlib::is_std_hashable<T>::value>::type>>
+    struct hash<dlib::static_vector_details::std_hash_helper<dlib::static_vector<T,Capacity>, typename std::enable_if<dlib::is_std_hashable<T>::value>::type>>
     {
-        std::hash<T> hasher;
+        std::hash<T> hasher_items;
+        std::hash<size_t> hasher_sizes;
         std::size_t operator()(const dlib::static_vector<T,Capacity>& item) const 
         {
             std::size_t seed = 0;
-            dlib::hash_combine(seed, item.capacity(), item.size());
+            seed ^= hasher_sizes(item.capacity()) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+            seed ^= hasher_sizes(item.size())     + 0x9e3779b9 + (seed<<6) + (seed>>2);
             for (const auto& x : item)
-                seed ^= hasher(x) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+                seed ^= hasher_items(x) + 0x9e3779b9 + (seed<<6) + (seed>>2);
             return seed;
         }
     };

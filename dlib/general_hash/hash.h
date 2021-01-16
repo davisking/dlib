@@ -136,6 +136,29 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace hash_details
+    {
+        using dlib::hash;
+
+        template <typename T, typename = void>
+        struct is_dlib_hashable : std::false_type {};
+
+        template <typename T>
+        struct is_dlib_hashable<T, void_t<decltype(hash(std::declval<const T&>(), std::declval<dlib::uint32>()))>> : std::true_type {};
+    }
+
+    /*!A is_dlib_hashable
+        This is a type trait that determines if there exists a dlib::hash 
+        function for type T
+
+        For example:
+            is_dlib_hashable<uint32>::value == true
+    !*/
+    
+    template <typename T>
+    struct is_dlib_hashable : public hash_details::is_dlib_hashable<T> {};
+    
+// ----------------------------------------------------------------------------------------  
 }
 
 #endif // DLIB_HAsH_Hh_

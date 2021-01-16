@@ -18,68 +18,10 @@
 #include "matrix_op.h"
 #include "../general_hash/random_hashing.h"
 #include "matrix_mat.h"
-
+#include "../traits.h"
 
 namespace dlib
 {
-
-// ----------------------------------------------------------------------------------------
-
-    /*!A is_complex
-        This is a template that can be used to determine if a type is a specialization
-        of the std::complex template class.
-
-        For example:
-            is_complex<float>::value == false              
-            is_complex<std::complex<float> >::value == true   
-    !*/
-
-    template <typename T>
-    struct is_complex { static const bool value = false; };
-
-    template <typename T>
-    struct is_complex<std::complex<T> >         { static const bool value = true; };
-    template <typename T>
-    struct is_complex<std::complex<T>& >        { static const bool value = true; };
-    template <typename T>
-    struct is_complex<const std::complex<T>& >  { static const bool value = true; };
-    template <typename T>
-    struct is_complex<const std::complex<T> >   { static const bool value = true; };
-
-// ----------------------------------------------------------------------------------------
-
-    /*!A remove_complex
-        This is a template that can be used to remove std::complex from the underlying type.
-
-        For example:
-            remove_complex<float>::type == float
-            remove_complex<std::complex<float> >::type == float
-    !*/
-    template <typename T>
-    struct remove_complex {typedef T type;};
-    template <typename T>
-    struct remove_complex<std::complex<T> > {typedef T type;};
-    
-    template<typename T>
-    using remove_complex_t = typename remove_complex<T>::type;
-
-// ----------------------------------------------------------------------------------------
-
-    /*!A add_complex
-        This is a template that can be used to add std::complex to the underlying type if it isn't already complex.
-
-        For example:
-            add_complex<float>::type == std::complex<float>
-            add_complex<std::complex<float> >::type == std::complex<float>
-    !*/
-    template <typename T>
-    struct add_complex {typedef std::complex<T> type;};
-    template <typename T>
-    struct add_complex<std::complex<T> > {typedef std::complex<T> type;};
-    
-    template<typename T>
-    using add_complex_t = typename add_complex<T>::type;
-
 // ----------------------------------------------------------------------------------------
     
     template <typename EXP>
