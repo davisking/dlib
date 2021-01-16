@@ -10,6 +10,7 @@
 #include <chrono>
 #include <memory>
 #include <thread>
+#include <functional>
 #include "../threads/thread_pool_extension.h"
 #include "../statistics/statistics.h"
 #include "../enable_if.h"
@@ -114,6 +115,8 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
 // ----------------------------------------------------------------------------------------
 
     const auto FOREVER = std::chrono::hours(24*365*290); // 290 years
+    using stop_condition = std::function<bool(double)>;
+    const stop_condition never_stop_early = [](double) { return false; };
 
 // ----------------------------------------------------------------------------------------
 
@@ -131,7 +134,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
             const std::chrono::nanoseconds max_runtime = FOREVER,
             double solver_epsilon = 0,
             std::vector<std::vector<function_evaluation>> initial_function_evals = {},
-            stop_condition& should_stop = never_stop_early
+            stop_condition should_stop = never_stop_early
         ) 
         {
             // Decide which parameters should be searched on a log scale.  Basically, it's
@@ -368,12 +371,9 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         // find_max_global() instances below and turn them into the argument types expected by
         // find_max_global() above.
         template <typename T>
-        const T& normalize(const T& item) {
+        const T& normalize(const T& item) 
+        {
             return item;
-        }
-
-        inline stop_condition& normalize(stop_condition& condition) {
-          return condition;
         }
 
         inline std::vector<std::vector<function_evaluation>> normalize(

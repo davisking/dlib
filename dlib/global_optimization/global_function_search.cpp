@@ -9,10 +9,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    stop_condition never_stop_early([](double){ return false; });
-
-// ----------------------------------------------------------------------------------------
-
     namespace qopt_impl
     {
         void fit_quadratic_to_points_mse(

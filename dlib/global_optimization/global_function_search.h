@@ -13,10 +13,6 @@
 
 namespace dlib
 {
-    using stop_condition = std::function<bool(double)>;
-
-    // a default stop condition that never terminates early
-    extern stop_condition never_stop_early;
 
 // ----------------------------------------------------------------------------------------
 
