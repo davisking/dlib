@@ -713,7 +713,7 @@ namespace dlib
                 for (long i = 0; i < subnetwork_output.num_samples(); ++i, ++truth)
                 {
                     const auto& t = *truth;
-                    DLIB_ASSERT(t.size() == subnetwork_output.k());
+                    DLIB_ASSERT(static_cast<long>(t.size()) == subnetwork_output.k());
                     for (size_t j = 0; j < t.size(); ++j) {
                         DLIB_ASSERT(t[j].nr() == subnetwork_output.nr());
                         DLIB_ASSERT(t[j].nc() == subnetwork_output.nc());
