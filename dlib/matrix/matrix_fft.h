@@ -204,6 +204,7 @@ namespace dlib
     template < typename T, typename Alloc >
     void fft_inplace (std::vector<std::complex<T>, Alloc>& data)
     {
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
         if (data.size() != 0)
         {
 #ifdef DLIB_USE_MKL_FFT
@@ -219,6 +220,7 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void fft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
         if (data.size() != 0)
         {
 #ifdef DLIB_USE_MKL_FFT
@@ -234,6 +236,7 @@ namespace dlib
     template < typename T, typename Alloc >
     void ifft_inplace (std::vector<std::complex<T>, Alloc>& data)
     {
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
         if (data.size() != 0)
         {
 #ifdef DLIB_USE_MKL_FFT
@@ -249,6 +252,7 @@ namespace dlib
     template < typename T, long NR, long NC, typename MM, typename L >
     void ifft_inplace (matrix<std::complex<T>,NR,NC,MM,L>& data)
     {
+        static_assert(std::is_floating_point<T>::value, "only support floating point types");
         if (data.size() != 0)
         {
 #ifdef DLIB_USE_MKL_FFT
