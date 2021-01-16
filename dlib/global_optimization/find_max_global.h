@@ -12,6 +12,7 @@
 #include <thread>
 #include "../threads/thread_pool_extension.h"
 #include "../statistics/statistics.h"
+#include "../enable_if.h"
 
 namespace dlib
 {
@@ -122,14 +123,14 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
             typename funct
             >
         std::pair<size_t,function_evaluation> find_max_global (
+            double ymult,
             thread_pool& tp,
             std::vector<funct>& functions,
             std::vector<function_spec> specs,
             const max_function_calls num,
-            const std::chrono::nanoseconds max_runtime,
-            double solver_epsilon,
-            double ymult,
-            std::vector<std::vector<function_evaluation>> initial_function_evals
+            const std::chrono::nanoseconds max_runtime = FOREVER,
+            double solver_epsilon = 0,
+            std::vector<std::vector<function_evaluation>> initial_function_evals = {}
         ) 
         {
             // Decide which parameters should be searched on a log scale.  Basically, it's
@@ -268,132 +269,190 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
             return std::make_pair(function_idx, function_evaluation(x,y/ymult));
         }
 
+        // This overload allows the order of max_runtime and num to be reversed.
         template <
-            typename funct
+            typename funct,
+            typename ...Args
             >
         std::pair<size_t,function_evaluation> find_max_global (
+            double ymult,
+            thread_pool& tp,
+            std::vector<funct>& functions,
+            std::vector<function_spec> specs,
+            const std::chrono::nanoseconds max_runtime,
+            const max_function_calls num,
+            double solver_epsilon = 0,
+            Args&& ...args
+        ) 
+        {
+            return find_max_global(ymult, tp, functions, std::move(specs), num, max_runtime, solver_epsilon, std::forward<Args>(args)...);
+        }
+
+        // This overload allows the num argument to be skipped.
+        template <
+            typename funct,
+            typename ...Args
+            >
+        std::pair<size_t,function_evaluation> find_max_global (
+            double ymult,
+            thread_pool& tp,
+            std::vector<funct>& functions,
+            std::vector<function_spec> specs,
+            const std::chrono::nanoseconds max_runtime,
+            double solver_epsilon = 0,
+            Args&& ...args
+        ) 
+        {
+            return find_max_global(ymult, tp, functions, std::move(specs), max_function_calls(), max_runtime, solver_epsilon, std::forward<Args>(args)...);
+        }
+
+        // This overload allows the max_runtime argument to be skipped.
+        template <
+            typename funct,
+            typename ...Args
+            >
+        std::pair<size_t,function_evaluation> find_max_global (
+            double ymult,
+            thread_pool& tp,
             std::vector<funct>& functions,
             std::vector<function_spec> specs,
             const max_function_calls num,
-            const std::chrono::nanoseconds max_runtime,
             double solver_epsilon,
+            Args&& ...args
+        ) 
+        {
+            return find_max_global(ymult, tp, functions, std::move(specs), num, FOREVER, solver_epsilon, std::forward<Args>(args)...);
+        }
+
+        // This overload makes the thread_pool argument optional.
+        template <
+            typename funct,
+            typename ...Args
+            >
+        std::pair<size_t,function_evaluation> find_max_global (
             double ymult,
-            const std::vector<std::vector<function_evaluation>>& initial_function_evals
+            std::vector<funct>& functions,
+            Args&& ...args
         ) 
         {
             // disabled, don't use any threads
             thread_pool tp(0);
 
-            return find_max_global(tp, functions, std::move(specs), num, max_runtime, solver_epsilon, ymult, initial_function_evals);
+            return find_max_global(ymult, tp, functions, std::forward<Args>(args)...);
+        }
+
+        // The point of normalize() is to handle some of the overloaded argument types in
+        // find_max_global() instances below and turn them into the argument types expected by
+        // find_max_global() above.
+        template <typename T>
+        const T& normalize(const T& item) {
+            return item;
+        }
+
+        inline std::vector<std::vector<function_evaluation>> normalize(
+            const std::vector<function_evaluation>& initial_function_evals
+        )
+        {
+            return {initial_function_evals};
         }
     }
 
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename funct
+        typename funct,
+        typename ...Args
         >
     std::pair<size_t,function_evaluation> find_max_global (
         std::vector<funct>& functions,
         std::vector<function_spec> specs,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
+        Args&& ...args
     ) 
     {
-        return impl::find_max_global(functions, std::move(specs), num, max_runtime, solver_epsilon, +1, initial_function_evals);
+        return impl::find_max_global(+1, functions, std::move(specs), std::forward<Args>(args)...);
     }
 
     template <
-        typename funct
+        typename funct,
+        typename ...Args
         >
     std::pair<size_t,function_evaluation> find_min_global (
         std::vector<funct>& functions,
         std::vector<function_spec> specs,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
+        Args&& ...args
     ) 
     {
-        return impl::find_max_global(functions, std::move(specs), num, max_runtime, solver_epsilon, -1, initial_function_evals);
+        return impl::find_max_global(-1, functions, std::move(specs), std::forward<Args>(args)...);
     }
 
     template <
-        typename funct
+        typename funct,
+        typename ...Args
         >
     std::pair<size_t,function_evaluation> find_max_global (
         thread_pool& tp,
         std::vector<funct>& functions,
         std::vector<function_spec> specs,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
+        Args&& ...args
     ) 
     {
-        return impl::find_max_global(tp, functions, std::move(specs), num, max_runtime, solver_epsilon, +1, initial_function_evals);
+        return impl::find_max_global(+1, tp, functions, std::move(specs), std::forward<Args>(args)...);
     }
 
     template <
-        typename funct
+        typename funct,
+        typename ...Args
         >
     std::pair<size_t,function_evaluation> find_min_global (
         thread_pool& tp,
         std::vector<funct>& functions,
         std::vector<function_spec> specs,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<std::vector<function_evaluation>>& initial_function_evals = {}
+        Args&& ...args
     ) 
     {
-        return impl::find_max_global(tp, functions, std::move(specs), num, max_runtime, solver_epsilon, -1, initial_function_evals);
+        return impl::find_max_global(-1, tp, functions, std::move(specs), std::forward<Args>(args)...);
     }
 
 // ----------------------------------------------------------------------------------------
 
+// Overloads that take function objects and simple matrix bounds instead of function_specs.
     template <
-        typename funct
+        typename funct,
+        typename ...Args
         >
     function_evaluation find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
+        Args&& ...args
     ) 
     {
         std::vector<funct> functions(1,std::move(f));
         std::vector<function_spec> specs(1, function_spec(bound1, bound2, is_integer_variable));
-        return find_max_global(functions, std::move(specs), num, max_runtime, solver_epsilon, {initial_function_evals}).second;
+        return find_max_global(functions, std::move(specs), impl::normalize(args)...).second;
     }
 
     template <
-        typename funct
+        typename funct,
+        typename ...Args
         >
     function_evaluation find_min_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
+        Args&& ...args
     ) 
     {
         std::vector<funct> functions(1,std::move(f));
         std::vector<function_spec> specs(1, function_spec(bound1, bound2, is_integer_variable));
-        return find_min_global(functions, std::move(specs), num, max_runtime, solver_epsilon, {initial_function_evals}).second;
+        return find_min_global(functions, std::move(specs), impl::normalize(args)...).second;
     }
 
     template <
-        typename funct
+        typename funct,
+        typename ...Args
         >
     function_evaluation find_max_global (
         thread_pool& tp,
@@ -401,19 +460,17 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
+        Args&& ...args
     ) 
     {
         std::vector<funct> functions(1,std::move(f));
         std::vector<function_spec> specs(1, function_spec(bound1, bound2, is_integer_variable));
-        return find_max_global(tp, functions, std::move(specs), num, max_runtime, solver_epsilon, {initial_function_evals}).second;
+        return find_max_global(tp, functions, std::move(specs), impl::normalize(args)...).second;
     }
 
     template <
-        typename funct
+        typename funct,
+        typename ...Args
         >
     function_evaluation find_min_global (
         thread_pool& tp,
@@ -421,543 +478,158 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
         const std::vector<bool>& is_integer_variable,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
+        Args&& ...args
     ) 
     {
         std::vector<funct> functions(1,std::move(f));
         std::vector<function_spec> specs(1, function_spec(bound1, bound2, is_integer_variable));
-        return find_min_global(tp, functions, std::move(specs), num, max_runtime, solver_epsilon, {initial_function_evals}).second;
+        return find_min_global(tp, functions, std::move(specs), impl::normalize(args)...).second;
     }
 
 // ----------------------------------------------------------------------------------------
 
+// overloads that are the same as above, but is_integer_variable defaulted to false for all parameters.
     template <
-        typename funct
+        typename funct,
+        typename T,
+        typename ...Args
         >
-    function_evaluation find_max_global (
+    typename disable_if<std::is_same<T,std::vector<bool>>, function_evaluation>::type 
+    find_max_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
-        const std::vector<bool>& is_integer_variable,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    )
+        const T& arg,
+        Args&& ...args
+    ) 
     {
-        return find_max_global(std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon, initial_function_evals);
+        const std::vector<bool> is_integer_variable(bound1.size(),false);
+        return find_max_global(std::move(f), bound1, bound2, is_integer_variable, arg, impl::normalize(args)...);
     }
 
     template <
-        typename funct
+        typename funct,
+        typename T,
+        typename ...Args
         >
-    function_evaluation find_min_global (
+    typename disable_if<std::is_same<T,std::vector<bool>>, function_evaluation>::type 
+    find_min_global (
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
-        const std::vector<bool>& is_integer_variable,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    )
+        const T& arg,
+        Args&& ...args
+    ) 
     {
-        return find_min_global(std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon, initial_function_evals);
+        const std::vector<bool> is_integer_variable(bound1.size(),false);
+        return find_min_global(std::move(f), bound1, bound2, is_integer_variable, arg, impl::normalize(args)...);
     }
 
     template <
-        typename funct
+        typename funct,
+        typename T,
+        typename ...Args
         >
-    function_evaluation find_max_global (
+    typename disable_if<std::is_same<T,std::vector<bool>>, function_evaluation>::type 
+    find_max_global (
         thread_pool& tp,
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
-        const std::vector<bool>& is_integer_variable,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    )
+        const T& arg,
+        Args&& ...args
+    ) 
     {
-        return find_max_global(tp, std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon, initial_function_evals);
+        const std::vector<bool> is_integer_variable(bound1.size(),false);
+        return find_max_global(tp, std::move(f), bound1, bound2, is_integer_variable, arg, impl::normalize(args)...);
     }
 
     template <
-        typename funct
+        typename funct,
+        typename T,
+        typename ...Args
         >
-    function_evaluation find_min_global (
+    typename disable_if<std::is_same<T,std::vector<bool>>, function_evaluation>::type 
+    find_min_global (
         thread_pool& tp,
         funct f,
         const matrix<double,0,1>& bound1,
         const matrix<double,0,1>& bound2,
-        const std::vector<bool>& is_integer_variable,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    )
+        const T& arg,
+        Args&& ...args
+    ) 
     {
-        return find_min_global(tp, std::move(f), bound1, bound2, is_integer_variable, num, FOREVER, solver_epsilon, initial_function_evals);
+        const std::vector<bool> is_integer_variable(bound1.size(),false);
+        return find_min_global(tp, std::move(f), bound1, bound2, is_integer_variable, arg, impl::normalize(args)...);
     }
 
 // ----------------------------------------------------------------------------------------
 
+// overloads for a function taking a single scalar.
     template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        thread_pool& tp,
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        thread_pool& tp,
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        thread_pool& tp,
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        thread_pool& tp,
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(tp, std::move(f), bound1, bound2, std::vector<bool>(bound1.size(),false), num, FOREVER, solver_epsilon, initial_function_evals);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct
+        typename funct,
+        typename T,
+        typename ...Args
         >
     function_evaluation find_max_global (
         funct f,
         const double bound1,
         const double bound2,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
+        const T& arg,
+        Args&& ...args
     ) 
     {
-        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon, initial_function_evals);
+        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), arg, impl::normalize(args)...);
     }
 
     template <
-        typename funct
+        typename funct,
+        typename T,
+        typename ...Args
         >
     function_evaluation find_min_global (
         funct f,
         const double bound1,
         const double bound2,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
+        const T& arg,
+        Args&& ...args
     ) 
     {
-        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon, initial_function_evals);
+        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), arg, impl::normalize(args)...);
     }
 
     template <
-        typename funct
+        typename funct,
+        typename T,
+        typename ...Args
         >
     function_evaluation find_max_global (
         thread_pool& tp,
         funct f,
         const double bound1,
         const double bound2,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
+        const T& arg,
+        Args&& ...args
     ) 
     {
-        return find_max_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon, initial_function_evals);
+        return find_max_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), arg, impl::normalize(args)...);
     }
 
     template <
-        typename funct
+        typename funct,
+        typename T,
+        typename ...Args
         >
     function_evaluation find_min_global (
         thread_pool& tp,
         funct f,
         const double bound1,
         const double bound2,
-        const max_function_calls num,
-        const std::chrono::nanoseconds max_runtime = FOREVER,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
+        const T& arg,
+        Args&& ...args
     ) 
     {
-        return find_min_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        funct f,
-        const double bound1,
-        const double bound2,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        funct f,
-        const double bound1,
-        const double bound2,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        thread_pool& tp,
-        funct f,
-        const double bound1,
-        const double bound2,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        thread_pool& tp,
-        funct f,
-        const double bound1,
-        const double bound2,
-        const max_function_calls num,
-        double solver_epsilon,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), num, FOREVER, solver_epsilon, initial_function_evals);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        thread_pool& tp,
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        thread_pool& tp,
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        funct f,
-        const double bound1,
-        const double bound2,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        funct f,
-        const double bound1,
-        const double bound2,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        thread_pool& tp,
-        funct f,
-        const double bound1,
-        const double bound2,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        thread_pool& tp,
-        funct f,
-        const double bound1,
-        const double bound2,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(tp, std::move(f), bound1, bound2, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const std::vector<bool>& is_integer_variable,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const std::vector<bool>& is_integer_variable,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_max_global (
-        thread_pool& tp,
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const std::vector<bool>& is_integer_variable,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_max_global(tp, std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
-    }
-
-    template <
-        typename funct
-        >
-    function_evaluation find_min_global (
-        thread_pool& tp,
-        funct f,
-        const matrix<double,0,1>& bound1,
-        const matrix<double,0,1>& bound2,
-        const std::vector<bool>& is_integer_variable,
-        const std::chrono::nanoseconds max_runtime,
-        double solver_epsilon = 0,
-        const std::vector<function_evaluation>& initial_function_evals = {}
-    ) 
-    {
-        return find_min_global(tp, std::move(f), bound1, bound2, is_integer_variable, max_function_calls(), max_runtime, solver_epsilon, initial_function_evals);
+        return find_min_global(tp, std::move(f), matrix<double,0,1>({bound1}), matrix<double,0,1>({bound2}), arg, impl::normalize(args)...);
     }
 
 // ----------------------------------------------------------------------------------------
