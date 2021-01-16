@@ -281,11 +281,30 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
             std::vector<function_spec> specs,
             const std::chrono::nanoseconds max_runtime,
             const max_function_calls num,
-            double solver_epsilon = 0,
+            double solver_epsilon,
             Args&& ...args
         ) 
         {
             return find_max_global(ymult, tp, functions, std::move(specs), num, max_runtime, solver_epsilon, std::forward<Args>(args)...);
+        }
+        // This overload shouldn't be required but it works around a bug in gcc 4.8 which has a bug
+        // that makes it complain about setting a default for solver_epsilon but then following it
+        // by args that "isn't defaulted" according to gcc 4.8.
+        template <
+            typename funct,
+            typename ...Args
+            >
+        std::pair<size_t,function_evaluation> find_max_global (
+            double ymult,
+            thread_pool& tp,
+            std::vector<funct>& functions,
+            std::vector<function_spec> specs,
+            const std::chrono::nanoseconds max_runtime,
+            const max_function_calls num,
+            double solver_epsilon = 0
+        ) 
+        {
+            return find_max_global(ymult, tp, functions, std::move(specs), num, max_runtime, solver_epsilon);
         }
 
         // This overload allows the num argument to be skipped.
