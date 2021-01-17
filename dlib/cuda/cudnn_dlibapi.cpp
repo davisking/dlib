@@ -1756,6 +1756,9 @@ namespace dlib
                                          dest.device()));
         }
 
+        // The CUDNN implementation seems to be bugged, so the elu_gradient is implemented
+        // in dlib/cuda/cuda_dlib.cu
+
         // void elu_gradient (
         //     tensor& grad,
         //     const tensor& dest,
