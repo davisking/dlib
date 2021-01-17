@@ -10,6 +10,7 @@
 #include <chrono>
 #include <memory>
 #include <thread>
+#include <functional>
 #include "../threads/thread_pool_extension.h"
 #include "../statistics/statistics.h"
 #include "../enable_if.h"
@@ -114,6 +115,8 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
 // ----------------------------------------------------------------------------------------
 
     const auto FOREVER = std::chrono::hours(24*365*290); // 290 years
+    using stop_condition = std::function<bool(double)>;
+    const stop_condition never_stop_early = [](double) { return false; };
 
 // ----------------------------------------------------------------------------------------
 
@@ -130,7 +133,8 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
             const max_function_calls num,
             const std::chrono::nanoseconds max_runtime = FOREVER,
             double solver_epsilon = 0,
-            std::vector<std::vector<function_evaluation>> initial_function_evals = {}
+            std::vector<std::vector<function_evaluation>> initial_function_evals = {},
+            stop_condition should_stop = never_stop_early
         ) 
         {
             // Decide which parameters should be searched on a log scale.  Basically, it's
@@ -176,17 +180,19 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
             using namespace std::chrono;
 
             const auto time_to_stop = steady_clock::now() + max_runtime;
+            //atomic<bool> doesn't support .fetch_or, use std::atomic<int> instead
+            std::atomic<int> this_should_stop{false};
 
             double max_solver_overhead_time = 0;
 
             // Now run the main solver loop.
-            for (size_t i = 0; i < num.max_calls && steady_clock::now() < time_to_stop; ++i)
+            for (size_t i = 0; i < num.max_calls && steady_clock::now() < time_to_stop && !this_should_stop.load(); ++i)
             {
                 const auto get_next_x_start_time = steady_clock::now();
                 auto next = std::make_shared<function_evaluation_request>(opt.get_next_x());
                 const auto get_next_x_runtime = steady_clock::now() - get_next_x_start_time;
 
-                auto execute_call = [&functions,&ymult,&log_scale,&eval_time_mutex,&objective_funct_eval_time,next]() {
+                auto execute_call = [&functions,&ymult,&log_scale,&eval_time_mutex,&objective_funct_eval_time,next,&should_stop,&this_should_stop]() {
                     matrix<double,0,1> x = next->x();
                     // Undo any log-scaling that was applied to the variables before we pass them
                     // to the functions being optimized.
@@ -198,6 +204,7 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
                     const auto funct_eval_start = steady_clock::now();
                     double y = ymult*call_function_and_expand_args(functions[next->function_idx()], x);
                     const double funct_eval_runtime = duration_cast<nanoseconds>(steady_clock::now() - funct_eval_start).count();
+                    this_should_stop.fetch_or(should_stop(y*ymult));
                     next->set(y);
                     
                     std::lock_guard<std::mutex> lock(eval_time_mutex);
@@ -364,7 +371,8 @@ template <typename T> static auto go(T&& f, const matrix<double, 0, 1>& a) -> de
         // find_max_global() instances below and turn them into the argument types expected by
         // find_max_global() above.
         template <typename T>
-        const T& normalize(const T& item) {
+        const T& normalize(const T& item) 
+        {
             return item;
         }
 
