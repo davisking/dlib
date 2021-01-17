@@ -1756,34 +1756,34 @@ namespace dlib
                                          dest.device()));
         }
 
-        void elu_gradient (
-            tensor& grad,
-            const tensor& dest,
-            const tensor& gradient_input,
-            const float coef
-        )
-        {
-            DLIB_CASSERT(
-                  have_same_dimensions(dest,gradient_input) == true &&
-                  have_same_dimensions(dest,grad) == true);
-            if (dest.size() == 0)
-                return;
+        // void elu_gradient (
+        //     tensor& grad,
+        //     const tensor& dest,
+        //     const tensor& gradient_input,
+        //     const float coef
+        // )
+        // {
+        //     DLIB_CASSERT(
+        //           have_same_dimensions(dest,gradient_input) == true &&
+        //           have_same_dimensions(dest,grad) == true);
+        //     if (dest.size() == 0)
+        //         return;
 
-            const float alpha = 1;
-            const float beta = is_same_object(grad,gradient_input) ? 0 : 1;
-            CHECK_CUDNN(cudnnActivationBackward(context(),
-                                          elu_activation_descriptor(coef),
-                                          &alpha,
-                                          descriptor(dest),
-                                          dest.device(),
-                                          descriptor(gradient_input),
-                                          gradient_input.device(),
-                                          descriptor(dest),
-                                          dest.device(),
-                                          &beta,
-                                          descriptor(grad),
-                                          grad.device()));
-        }
+        //     const float alpha = 1;
+        //     const float beta = is_same_object(grad,gradient_input) ? 0 : 1;
+        //     CHECK_CUDNN(cudnnActivationBackward(context(),
+        //                                   elu_activation_descriptor(coef),
+        //                                   &alpha,
+        //                                   descriptor(dest),
+        //                                   dest.device(),
+        //                                   descriptor(gradient_input),
+        //                                   gradient_input.device(),
+        //                                   descriptor(dest),
+        //                                   dest.device(),
+        //                                   &beta,
+        //                                   descriptor(grad),
+        //                                   grad.device()));
+        // }
 
     // ------------------------------------------------------------------------------------
     }
