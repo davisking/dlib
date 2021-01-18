@@ -1009,9 +1009,9 @@ namespace dlib
             }
 
             //clamping
-            c2.l = max(0.0, (116.0 * var_Y) - 16);
-            c2.a = max(-128.0, min(127.0, 500.0 * (var_X - var_Y)));
-            c2.b = max(-128.0, min(127.0, 200.0 * (var_Y - var_Z)));
+            c2.l = std::max(0.0, (116.0 * var_Y) - 16);
+            c2.a = std::max(-128.0, std::min(127.0, 500.0 * (var_X - var_Y)));
+            c2.b = std::max(-128.0, std::min(127.0, 200.0 * (var_Y - var_Z)));
 
             return c2;
         }
@@ -1080,9 +1080,9 @@ namespace dlib
             }
 
             // clamping
-            c2.r = max(0.0, min(1.0, var_R));
-            c2.g = max(0.0, min(1.0, var_G));
-            c2.b = max(0.0, min(1.0, var_B));
+            c2.r = std::max(0.0, std::min(1.0, var_R));
+            c2.g = std::max(0.0, std::min(1.0, var_G));
+            c2.b = std::max(0.0, std::min(1.0, var_B));
 
             return (c2);
         }
