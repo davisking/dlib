@@ -41,9 +41,11 @@ jobs:
             gcc: 7
           - os: ubuntu-16.04
             cuda: "10.2"
+            cudnn: "8"
             gcc: 7
           - os: ubuntu-16.04
             cuda: "10.1"
+            cudnn: "8"
             gcc: 7
           - os: ubuntu-16.04
             cuda: "10.0"
@@ -115,8 +117,15 @@ jobs:
             echo "----"
           fi
 
-
-
     - name: Build dlib
       working-directory: ${{ env.build_dir }}
       run: cmake --build . --target all --verbose -j `nproc`
+
+    - name: Build tests
+      working-directory: ${{ github.workspace }}/dlib/test
+      run: |
+          cmake . -B { env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }}
+
+    - name: Run tests
+      working-directory: ${{ github.workspace }}/dlib/test/${{ env.build }}
+      run: ./dtest --runall
