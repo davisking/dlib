@@ -124,6 +124,7 @@ jobs:
     - name: Build tests
       working-directory: ${{ github.workspace }}/test
       run: |
+        echo `pwd`
         cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
         cmake --build .
 

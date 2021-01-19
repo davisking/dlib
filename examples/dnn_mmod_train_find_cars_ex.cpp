@@ -1,6 +1,6 @@
 // The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 /*
-    This example shows how to train a CNN based object detector using dlib's 
+    This example shows how to train a CNN based object detector using dlib's
     loss_mmod loss layer.  This loss layer implements the Max-Margin Object
     Detection loss as described in the paper:
         Max-Margin Object Detection by Davis E. King (http://arxiv.org/abs/1502.00046).
@@ -13,12 +13,12 @@
     example.  So you should read dnn_introduction_ex.cpp and dnn_introduction2_ex.cpp
     before reading this example program.  You should also read the introductory DNN+MMOD
     example dnn_mmod_ex.cpp as well before proceeding.
-    
+
 
     This example is essentially a more complex version of dnn_mmod_ex.cpp.  In it we train
     a detector that finds the rear ends of motor vehicles.  I will also discuss some
-    aspects of data preparation useful when training this kind of detector.  
-    
+    aspects of data preparation useful when training this kind of detector.
+
 */
 
 
@@ -35,7 +35,11 @@ template <long num_filters, typename SUBNET> using con5d = con<num_filters,5,5,2
 template <long num_filters, typename SUBNET> using con5  = con<num_filters,5,5,1,1,SUBNET>;
 template <typename SUBNET> using downsampler  = relu<bn_con<con5d<32, relu<bn_con<con5d<32, relu<bn_con<con5d<16,SUBNET>>>>>>>>>;
 template <typename SUBNET> using rcon5  = relu<bn_con<con5<55,SUBNET>>>;
-using net_type = loss_mmod<con<1,9,9,1,1,rcon5<rcon5<rcon5<downsampler<input_rgb_image_pyramid<pyramid_down<6>>>>>>>>;
+// using net_type = loss_mmod<con<1,9,9,1,1,rcon5<rcon5<rcon5<downsampler<input_rgb_image_pyramid<pyramid_down<6>>>>>>>>;
+// scale1<sig<con<55,1,1,1,1,avg_pool_everything<tag1<
+using net_type = loss_mmod<con<1,9,9,1,1,
+scale_prev2<skip1<tag2<sig<con<55,1,1,1,1,avg_pool_everything<tag1<
+rcon5<rcon5<rcon5<downsampler<input_rgb_image_pyramid<pyramid_down<6>>>>>>>>>>>>>>>;
 
 
 // ----------------------------------------------------------------------------------------
@@ -107,21 +111,21 @@ int main(int argc, char** argv) try
     // image is implicitly assumed to be not a car, and the algorithm will use it as
     // negative training data.  So every car must be labeled, either with a normal
     // rectangle or an "ignore" rectangle that tells MMOD to simply ignore it (i.e. neither
-    // treat it as a thing to detect nor as negative training data).  
-    // 
+    // treat it as a thing to detect nor as negative training data).
+    //
     // In our present case, many images contain very tiny cars in the distance, ones that
     // are essentially just dark smudges.  It's not reasonable to expect the CNN
     // architecture we defined to detect such vehicles.  However, I erred on the side of
     // having more complete annotations when creating the dataset.  So when I labeled these
-    // images I labeled many of these really difficult cases as vehicles to detect.   
+    // images I labeled many of these really difficult cases as vehicles to detect.
     //
     // So the first thing we are going to do is clean up our dataset a little bit.  In
     // particular, we are going to mark boxes smaller than 35*35 pixels as ignore since
     // only really small and blurry cars appear at those sizes.  We will also mark boxes
     // that are heavily overlapped by another box as ignore.  We do this because we want to
     // allow for stronger non-maximum suppression logic in the learned detector, since that
-    // will help make it easier to learn a good detector. 
-    // 
+    // will help make it easier to learn a good detector.
+    //
     // To explain this non-max suppression idea further it's important to understand how
     // the detector works.  Essentially, sliding window detectors scan all image locations
     // and ask "is there a car here?".  If there really is a car in a specific location in
@@ -143,7 +147,7 @@ int main(int argc, char** argv) try
     // "close to" measure will be configured to allow detections to really overlap a whole
     // lot.  On the other hand, if your dataset didn't contain any overlapped boxes at all,
     // then the non-max suppression logic would be configured to filter out any boxes that
-    // overlapped at all, and thus would be performing a much stronger non-max suppression.  
+    // overlapped at all, and thus would be performing a much stronger non-max suppression.
     //
     // Why does this matter?  Well, remember that we want to avoid duplicate detections.
     // If non-max suppression just kills everything in a really wide area around a car then
@@ -183,8 +187,8 @@ int main(int argc, char** argv) try
             // really extreme aspect ratios.  However, some datasets do, often because of
             // bad labeling.  So it's a good idea to check for that and either eliminate
             // those boxes or set them to ignore.  Although, this depends on your
-            // application.  
-            // 
+            // application.
+            //
             // For instance, if your dataset has boxes with an aspect ratio
             // of 10 then you should think about what that means for the network
             // architecture.  Does the receptive field even cover the entirety of the box
@@ -196,13 +200,13 @@ int main(int argc, char** argv) try
             // errors, but are annotated in a sloppy and inconsistent way.  Fixing those
             // errors and inconsistencies can often greatly improve models trained from
             // such data.  It's almost always worth the time to try and improve your
-            // training dataset.   
+            // training dataset.
             //
             // In any case, my point is that there are other types of dataset cleaning you
             // could put here.  What exactly you need depends on your application.  But you
             // should carefully consider it and not take your dataset as a given.  The work
             // of creating a good detector is largely about creating a high quality
-            // training dataset.  
+            // training dataset.
         }
     }
 
@@ -226,7 +230,7 @@ int main(int argc, char** argv) try
     // each of the sliding windows needs to be so as to be able to detect all the vehicles.
     // Since our dataset has basically these 3 different aspect ratios, it will decide to
     // use 3 different sliding windows.  This means the final con layer in the network will
-    // have 3 filters, one for each of these aspect ratios. 
+    // have 3 filters, one for each of these aspect ratios.
     //
     // Another thing to consider when setting the sliding window size is the "stride" of
     // your network.  The network we defined above downsamples the image by a factor of 8x
@@ -237,7 +241,7 @@ int main(int argc, char** argv) try
     // pixels at a time when scanning. This is obviously a problem since 75% of the image
     // won't even be visited by the sliding window.  So you need to set the window size to
     // be big enough relative to the stride of your network.  In our case, the windows are
-    // at least 30 pixels in length, so being moved by 8 pixel steps is fine. 
+    // at least 30 pixels in length, so being moved by 8 pixel steps is fine.
     mmod_options options(boxes_train, 70, 30);
 
 
@@ -247,22 +251,22 @@ int main(int argc, char** argv) try
     // also contained a lot of ignore boxes.  Some of them are large boxes that encompass
     // large parts of an image and the intention is to have everything inside those boxes
     // be ignored.  Therefore, we need to tell the MMOD algorithm to do that, which we do
-    // by setting options.overlaps_ignore appropriately.  
-    // 
+    // by setting options.overlaps_ignore appropriately.
+    //
     // But first, we need to understand exactly what this option does.  The MMOD loss
     // is essentially counting the number of false alarms + missed detections produced by
     // the detector for each image.  During training, the code is running the detector on
     // each image in a mini-batch and looking at its output and counting the number of
     // mistakes.  The optimizer tries to find parameters settings that minimize the number
     // of detector mistakes.
-    // 
+    //
     // This overlaps_ignore option allows you to tell the loss that some outputs from the
     // detector should be totally ignored, as if they never happened.  In particular, if a
     // detection overlaps a box in the training data with ignore==true then that detection
     // is ignored.  This overlap is determined by calling
     // options.overlaps_ignore(the_detection, the_ignored_training_box).  If it returns
     // true then that detection is ignored.
-    // 
+    //
     // You should read the documentation for test_box_overlap, the class type for
     // overlaps_ignore for full details.  However, the gist is that the default behavior is
     // to only consider boxes as overlapping if their intersection over union is > 0.5.
@@ -275,7 +279,7 @@ int main(int argc, char** argv) try
 
     net_type net(options);
 
-    // The final layer of the network must be a con layer that contains 
+    // The final layer of the network must be a con layer that contains
     // options.detector_windows.size() filters.  This is because these final filters are
     // what perform the final "sliding window" detection in the network.  For the dlib
     // vehicle dataset, there will be 3 sliding window detectors, so we will be setting
@@ -306,13 +310,13 @@ int main(int argc, char** argv) try
 
 
     std::vector<matrix<rgb_pixel>> mini_batch_samples;
-    std::vector<std::vector<mmod_rect>> mini_batch_labels; 
+    std::vector<std::vector<mmod_rect>> mini_batch_labels;
     random_cropper cropper;
     cropper.set_seed(time(0));
     cropper.set_chip_dims(350, 350);
     // Usually you want to give the cropper whatever min sizes you passed to the
     // mmod_options constructor, or very slightly smaller sizes, which is what we do here.
-    cropper.set_min_object_size(69,28); 
+    cropper.set_min_object_size(69,28);
     cropper.set_max_rotation_degrees(2);
     dlib::rand rnd;
 
@@ -320,10 +324,10 @@ int main(int argc, char** argv) try
     cout << trainer << cropper << endl;
 
     int cnt = 1;
-    // Run the trainer until the learning rate gets small.  
+    // Run the trainer until the learning rate gets small.
     while(trainer.get_learning_rate() >= 1e-4)
     {
-        // Every 30 mini-batches we do a testing mini-batch.  
+        // Every 30 mini-batches we do a testing mini-batch.
         if (cnt%30 != 0 || images_test.size() == 0)
         {
             cropper(87, images_train, boxes_train, mini_batch_samples, mini_batch_labels);
@@ -375,7 +379,7 @@ int main(int argc, char** argv) try
     cout << "\nsync_filename: " << sync_filename << endl;
     cout << "num training images: "<< images_train.size() << endl;
     cout << "training results: " << test_object_detection_function(net, images_train, boxes_train, test_box_overlap(), 0, options.overlaps_ignore);
-    // Upsampling the data will allow the detector to find smaller cars.  Recall that 
+    // Upsampling the data will allow the detector to find smaller cars.  Recall that
     // we configured it to use a sliding window nominally 70 pixels in size.  So upsampling
     // here will let it find things nominally 35 pixels in size.  Although we include a
     // limit of 1800*1800 here which means "don't upsample an image if it's already larger
@@ -405,11 +409,11 @@ int main(int argc, char** argv) try
 
         Also, the training and testing accuracies were:
             num training images: 2217
-            training results: 0.990738 0.736431 0.736073 
-            training upsampled results: 0.986837 0.937694 0.936912 
+            training results: 0.990738 0.736431 0.736073
+            training upsampled results: 0.986837 0.937694 0.936912
             num testing images: 135
-            testing results: 0.988827 0.471372 0.470806 
-            testing upsampled results: 0.987879 0.651132 0.650399 
+            testing results: 0.988827 0.471372 0.470806
+            testing upsampled results: 0.987879 0.651132 0.650399
     */
 
     return 0;
