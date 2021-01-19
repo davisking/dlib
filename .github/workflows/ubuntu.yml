@@ -25,32 +25,34 @@ jobs:
             cuda: "11.0"
             cudnn: "8"
             gcc: 8
-          # - os: ubuntu-18.04
-          #   cuda: "10.2"
-          #   cudnn: "8"
-          #   gcc: 8
-          # - os: ubuntu-18.04
-          #   cuda: "10.1"
-          #   cudnn: "8"
-          #   gcc: 8
+          - os: ubuntu-18.04
+            cuda: "10.2"
+            cudnn: "8"
+            gcc: 8
+          - os: ubuntu-18.04
+            cuda: "10.1"
+            cudnn: "8"
+            gcc: 8
 
           # 16.04 supports CUDA 8+
-          # - os: ubuntu-16.04
-          #   cuda: "11.0"
-          #   cudnn: "8"
-          #   gcc: 7
-          # - os: ubuntu-16.04
-          #   cuda: "10.2"
-          #   cudnn: "8"
-          #   gcc: 7
-          # - os: ubuntu-16.04
-          #   cuda: "10.1"
-          #   cudnn: "8"
-          #   gcc: 7
-          # - os: ubuntu-16.04
-          #   cuda: "10.0"
-          #   cudnn: "8"
-          #   gcc: 7
+          - os: ubuntu-16.04
+            cuda: "11.0"
+            cudnn: "8"
+            gcc: 7
+          - os: ubuntu-16.04
+            cuda: "10.2"
+            cudnn: "8"
+            gcc: 7
+          - os: ubuntu-16.04
+            cuda: "10.1"
+            cudnn: "8"
+            gcc: 7
+          - os: ubuntu-16.04
+            cuda: "10.0"
+            cudnn: "8"
+            gcc: 7
+
+          # These don't seem to work
           # - os: ubuntu-16.04
           #   cuda: "9.2"
           #   cudnn: "7"
@@ -64,10 +66,6 @@ jobs:
           #   cudnn: "7"
           #   gcc: 6
 
-          # Libraries-dev subpackage does not exist for CUDA 8. Should make a better way of providing version specific subpackages.
-          # - os: ubuntu-16.04
-          #   cuda: "8.0"
-          #   gcc: 6
     env:
       build_dir: "build"
       config: "Release"
