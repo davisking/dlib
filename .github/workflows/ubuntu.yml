@@ -122,10 +122,10 @@ jobs:
       run: cmake --build . --target all --verbose -j `nproc`
 
     - name: Build tests
-      working-directory: ${{ github.workspace }}/dlib/test
+      working-directory: ${{ github.workspace }}/test
       run: |
           cmake . -B { env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }}
 
     - name: Run tests
-      working-directory: ${{ github.workspace }}/dlib/test/${{ env.build }}
+      working-directory: ${{ github.workspace }}/test/${{ env.build }}
       run: ./dtest --runall
