@@ -100,7 +100,7 @@ jobs:
 
     - name: Configure cmake
       id: configure
-      run: cmake -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
+      run: cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
 
     - name: Configure Error Processing
       if: ${{ failure() && steps.configure.outcome == 'failure' }}
@@ -119,12 +119,12 @@ jobs:
 
     - name: Build dlib
       working-directory: ${{ env.build_dir }}
-      run: cmake --build
+      run: cmake --build .
 
     - name: Build tests
       working-directory: ${{ github.workspace }}/test
       run: |
-        cmake -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
+        cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
         cmake --build ${{ env.build_dir }}
 
     - name: Run tests
