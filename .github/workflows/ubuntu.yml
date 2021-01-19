@@ -6,11 +6,11 @@ on:
       - "**"
       - "!.github/**"
       - ".github/workflows/ubuntu.yml"
-  # pull_request:
-  #   paths:
-  #     - "**"
-  #     - "!.github"
-  #     - ".github/workflows/Ubuntu.yml"
+  pull_request:
+    paths:
+      - "**"
+      - "!.github"
+      - ".github/workflows/ubuntu.yml"
 
 jobs:
   build:
@@ -93,40 +93,40 @@ jobs:
     # Specify the correct host compilers
     - name: Install/Select gcc and g++
       run: |
-        sudo apt-get install -y gcc-${{ matrix.gcc }} g++-${{ matrix.gcc }}
+        sudo apt-get install -y gcc-${{ matrix.gcc }} g++-${{ matrix.gcc }} ninja-build
         echo "CC=/usr/bin/gcc-${{ matrix.gcc }}" >> $GITHUB_ENV
         echo "CXX=/usr/bin/g++-${{ matrix.gcc }}" >> $GITHUB_ENV
         echo "CUDAHOSTCXX=/usr/bin/g++-${{ matrix.gcc }}" >> $GITHUB_ENV
 
     - name: Configure cmake
       id: configure
-      run: cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }}
+      run: cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
 
     - name: Configure Error Processing
       if: ${{ failure() && steps.configure.outcome == 'failure' }}
       working-directory: ${{ env.build_dir }}
       run: |
-          if [[ -f "CMakeFiles/CMakeOutput.log" ]]; then
-            echo "---- CMakeFiles/CMakeOutput.log"
-            cat CMakeFiles/CMakeOutput.log
-            echo "----"
-          fi
-          if [[ -f "CMakeFiles/CMakeError.log" ]]; then
-            echo "---- CMakeFiles/CMakeError.log"
-            cat CMakeFiles/CMakeError.log
-            echo "----"
-          fi
+        if [[ -f "CMakeFiles/CMakeOutput.log" ]]; then
+          echo "---- CMakeFiles/CMakeOutput.log"
+          cat CMakeFiles/CMakeOutput.log
+          echo "----"
+        fi
+        if [[ -f "CMakeFiles/CMakeError.log" ]]; then
+          echo "---- CMakeFiles/CMakeError.log"
+          cat CMakeFiles/CMakeError.log
+          echo "----"
+        fi
 
     - name: Build dlib
       working-directory: ${{ env.build_dir }}
-      run: cmake --build . --target all --verbose -j `nproc`
+      run: cmake --build .
 
     - name: Build tests
       working-directory: ${{ github.workspace }}/test
       run: |
-          pwd
-          cmake . -B { env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }}
-          cmake --build . --target all --verbose -j `nproc`
+        pwd
+        cmake . -B ${ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
+        cmake --build .
 
     - name: Run tests
       working-directory: ${{ github.workspace }}/test/${{ env.build }}
