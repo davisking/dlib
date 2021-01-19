@@ -13,7 +13,7 @@
     For an introduction to dlib's DNN module read the dnn_introduction_ex.cpp and
     dnn_introduction2_ex.cpp example programs.
 
-
+    
     Finally, these tools will use CUDA and cuDNN to drastically accelerate
     network training and testing.  CMake should automatically find them if they
     are installed and configure things appropriately.  If not, the program will
@@ -30,7 +30,7 @@
 
 using namespace std;
 using namespace dlib;
-
+ 
 // ----------------------------------------------------------------------------------------
 
 // This block of statements defines the resnet-34 network
@@ -41,7 +41,7 @@ using residual = add_prev1<block<N,BN,1,tag1<SUBNET>>>;
 template <template <int,template<typename>class,int,typename> class block, int N, template<typename>class BN, typename SUBNET>
 using residual_down = add_prev2<avg_pool<2,2,2,2,skip1<tag2<block<N,BN,2,tag1<SUBNET>>>>>>;
 
-template <int N, template <typename> class BN, int stride, typename SUBNET>
+template <int N, template <typename> class BN, int stride, typename SUBNET> 
 using block  = BN<con<N,3,3,1,1,relu<BN<con<N,3,3,stride,stride,SUBNET>>>>>;
 
 template <int N, typename SUBNET> using ares      = relu<residual<block,N,affine,SUBNET>>;
@@ -130,7 +130,7 @@ int main(int argc, char** argv) try
     // already does this.  But if we instead want to get the probability of each
     // class as output we need to replace the last layer of the network with a
     // softmax layer, which we do as follows:
-    softmax<anet_type::subnet_type> snet;
+    softmax<anet_type::subnet_type> snet; 
     snet.subnet() = net.subnet();
 
     dlib::array<matrix<rgb_pixel>> images;
@@ -150,24 +150,17 @@ int main(int argc, char** argv) try
         // p(i) == the probability the image contains object of class i.
         matrix<float,1,1000> p = sum_rows(mat(snet(images.begin(), images.end())))/num_crops;
 
-        // win.set_image(img);
-        bool keep = false;
+        win.set_image(img);
         // Print the 5 most probable labels
         for (int k = 0; k < 5; ++k)
         {
             unsigned long predicted_label = index_of_max(p);
-            // cout << p(predicted_label) << ": " << labels[predicted_label] << endl;
+            cout << p(predicted_label) << ": " << labels[predicted_label] << endl;
             p(predicted_label) = 0;
-            if (labels[predicted_label] == "racket" or labels[predicted_label] == "tennis_ball")
-                keep = true;
         }
-        if (not keep)
-        {
-            std::remove(argv[i]);
-            cout << "removing " << argv[i] << '\n';
-        }
-        // cout << "Hit enter to process the next image";
-        // cin.get();
+
+        cout << "Hit enter to process the next image";
+        cin.get();
     }
 
 }

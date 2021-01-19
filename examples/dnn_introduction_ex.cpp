@@ -9,7 +9,7 @@
     The specific network we will run is from the paper
         LeCun, Yann, et al. "Gradient-based learning applied to document recognition."
         Proceedings of the IEEE 86.11 (1998): 2278-2324.
-    except that we replace the sigmoid non-linearities with rectified linear units.
+    except that we replace the sigmoid non-linearities with rectified linear units. 
 
     These tools will use CUDA and cuDNN to drastically accelerate network
     training and testing.  CMake should automatically find them if they are
@@ -24,10 +24,10 @@
 
 using namespace std;
 using namespace dlib;
-
+ 
 int main(int argc, char** argv) try
 {
-    // This example is going to run on the MNIST dataset.
+    // This example is going to run on the MNIST dataset.  
     if (argc != 2)
     {
         cout << "This example needs the MNIST dataset to run!" << endl;
@@ -50,8 +50,8 @@ int main(int argc, char** argv) try
 
     // Now let's define the LeNet.  Broadly speaking, there are 3 parts to a network
     // definition.  The loss layer, a bunch of computational layers, and then an input
-    // layer.  You can see these components in the network definition below.
-    //
+    // layer.  You can see these components in the network definition below.  
+    // 
     // The input layer here says the network expects to be given matrix<unsigned char>
     // objects as input.  In general, you can use any dlib image or matrix type here, or
     // even define your own types by creating custom input layers.
@@ -59,29 +59,29 @@ int main(int argc, char** argv) try
     // Then the middle layers define the computation the network will do to transform the
     // input into whatever we want.  Here we run the image through multiple convolutions,
     // ReLU units, max pooling operations, and then finally a fully connected layer that
-    // converts the whole thing into just 10 numbers.
-    //
+    // converts the whole thing into just 10 numbers.  
+    // 
     // Finally, the loss layer defines the relationship between the network outputs, our 10
     // numbers, and the labels in our dataset.  Since we selected loss_multiclass_log it
     // means we want to do multiclass classification with our network.   Moreover, the
     // number of network outputs (i.e. 10) is the number of possible labels.  Whichever
     // network output is largest is the predicted label.  So for example, if the first
     // network output is largest then the predicted digit is 0, if the last network output
-    // is largest then the predicted digit is 9.
+    // is largest then the predicted digit is 9.  
     using net_type = loss_multiclass_log<
-                                fc<10,
-                                elu<fc<84,
-                                elu<fc<120,
-                                max_pool<2,2,2,2,elu<con<16,5,5,1,1,
-                                max_pool<2,2,2,2,elu<con<6,5,5,1,1,
-                                input<matrix<unsigned char>>
+                                fc<10,        
+                                relu<fc<84,   
+                                relu<fc<120,  
+                                max_pool<2,2,2,2,relu<con<16,5,5,1,1,
+                                max_pool<2,2,2,2,relu<con<6,5,5,1,1,
+                                input<matrix<unsigned char>> 
                                 >>>>>>>>>>>>;
     // This net_type defines the entire network architecture.  For example, the block
     // relu<fc<84,SUBNET>> means we take the output from the subnetwork, pass it through a
     // fully connected layer with 84 outputs, then apply ReLU.  Similarly, a block of
     // max_pool<2,2,2,2,relu<con<16,5,5,1,1,SUBNET>>> means we apply 16 convolutions with a
     // 5x5 filter size and 1x1 stride to the output of a subnetwork, then apply ReLU, then
-    // perform max pooling with a 2x2 window and 2x2 stride.
+    // perform max pooling with a 2x2 window and 2x2 stride.  
 
 
 
@@ -105,7 +105,7 @@ int main(int argc, char** argv) try
     // learning rate until the loss stops decreasing.  Then it reduces the learning rate by
     // a factor of 10 and continues running until the loss stops decreasing again.  It will
     // keep doing this until the learning rate has dropped below the min learning rate
-    // defined above or the maximum number of epochs as been executed (defaulted to 10000).
+    // defined above or the maximum number of epochs as been executed (defaulted to 10000). 
     trainer.train(training_images, training_labels);
 
     // At this point our net object should have learned how to classify MNIST images.  But
@@ -134,7 +134,7 @@ int main(int argc, char** argv) try
             ++num_right;
         else
             ++num_wrong;
-
+        
     }
     cout << "training num_right: " << num_right << endl;
     cout << "training num_wrong: " << num_wrong << endl;
@@ -151,7 +151,7 @@ int main(int argc, char** argv) try
             ++num_right;
         else
             ++num_wrong;
-
+        
     }
     cout << "testing num_right: " << num_right << endl;
     cout << "testing num_wrong: " << num_wrong << endl;
