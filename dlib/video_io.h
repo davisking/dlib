@@ -18,12 +18,14 @@ extern "C"
 
 #include <string>
 #include <vector>
+#include <map>
 #include <cstdint>
 #include <chrono>
 #include <iostream>
 #include <utility>
 #include <vector>
 #include <thread>
+#include <dlib/string.h>
 #include <dlib/image_transforms/assign_image.h>
 
 namespace dlib
@@ -68,6 +70,7 @@ namespace dlib
         {
             uint8_t* data[4] = {nullptr};
             int linesize[4] = {0};
+            int64_t timestamp_ns = 0;
             
             frame() = default;
             frame(const frame& ori) = delete;
@@ -104,6 +107,7 @@ namespace dlib
                     linesize[1] = 0;
                     linesize[2] = 0;
                     linesize[3] = 0;
+                    timestamp_ns = 0;
                 }
             }
             
@@ -114,10 +118,11 @@ namespace dlib
                     throw std::bad_alloc();
             }
             
-            void fill(int srcw, int srch, AVPixelFormat srcfmt, AVFrame* av_frame)
+            void fill(AVFrame* av_frame)
             {
-                resize(srcw, srch, srcfmt);
-                av_image_copy(data, linesize, (const uint8_t**)av_frame->data, av_frame->linesize, srcfmt, srcw, srch);
+                timestamp_ns = av_frame->best_effort_timestamp;
+                resize(av_frame->width, av_frame->height, (enum AVPixelFormat)av_frame->format);
+                av_image_copy(data, linesize, (const uint8_t**)av_frame->data, av_frame->linesize, (enum AVPixelFormat)av_frame->format, av_frame->width, av_frame->height);
             }
         };
     }
@@ -127,7 +132,7 @@ namespace dlib
     private:
         std::string         _arg;
         bool                _connected      = false;
-        int                 videoStream     = -1;   
+        int                 videoStream     = -1;  
         AVFormatContext*    pFormatCtx      = nullptr;
         AVCodecContext*     pCodecCtx       = nullptr;
         AVFrame*            pFrame          = nullptr;
@@ -137,6 +142,26 @@ namespace dlib
         AVPixelFormat       _dst_format;
         int _dst_h = 0;
         int _dst_w = 0;
+        std::map<std::string,std::string> video_stream_metadata;
+        
+        void populate_metadata()
+        {
+            std::string metadata_str;
+            {
+                char* charbuf = 0;
+                av_dict_get_string(pFormatCtx->streams[videoStream]->metadata, &charbuf, ',', ';');
+                metadata_str = std::string(charbuf);
+                free(charbuf);
+            }
+            
+            std::vector<std::string> keyvals = dlib::split(metadata_str, ";");
+            for (size_t kv = 0 ; kv < keyvals.size() ; kv++)
+            {
+                std::vector<std::string> kv_item = dlib::split(keyvals[kv], ",");
+                assert(kv_item.size() == 2);
+                video_stream_metadata[kv_item[0]] = kv_item[1];
+            }
+        }
         
         bool connect(bool is_rtsp, int nthreads)
         {
@@ -193,7 +218,9 @@ namespace dlib
 
             if (avcodec_parameters_to_context(pCodecCtx, pFormatCtx->streams[videoStream]->codecpar) < 0)
                 return false;
-
+            
+            populate_metadata();
+            
             pCodecCtx->thread_count = nthreads;
 
             /* init the video decoder */
@@ -202,11 +229,6 @@ namespace dlib
                 std::cout << "AV : failed to open video decoder" << std::endl;
                 return false;
             }
-
-            pCodecCtx->bit_rate = 0;
-            pCodecCtx->time_base.num = 1;
-            pCodecCtx->time_base.den = 10;
-            pCodecCtx->frame_number = 1;
 
             pFrame = av_frame_alloc();
             
@@ -286,7 +308,7 @@ namespace dlib
                                     //packet has multiple frames.
                                     do_read = false;
                                     ffmpeg_impl::frame f;
-                                    f.fill(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pFrame);
+                                    f.fill(pFrame);
                                     _src_frame_buffer.push_back(std::move(f));
                                 }
                             }
@@ -365,7 +387,7 @@ namespace dlib
         }
 
     public:
-        video_capture()                                        = default;
+        video_capture()                                       = default;
         video_capture(const video_capture& ori)               = delete;
         video_capture(video_capture&& ori)                    = delete;
         video_capture& operator=(const video_capture& ori)    = delete;
@@ -427,6 +449,7 @@ namespace dlib
             }
             
             _dst_frame.reset();
+            _src_frame_buffer.clear();
         }
 
         std::string get_label() const
@@ -437,6 +460,37 @@ namespace dlib
         bool is_open() const
         {
             return _connected;
+        }
+        
+        int frame_number() const
+        {
+            return pCodecCtx ? pCodecCtx->frame_number : -1;
+        }
+        
+        int src_width() const
+        {
+            return pCodecCtx ? pCodecCtx->width : -1;
+        }
+        
+        int src_height() const
+        {
+            return pCodecCtx ? pCodecCtx->height : -1;
+        }
+        
+        std::string src_format() const
+        {
+            return pCodecCtx ? av_get_pix_fmt_name(pCodecCtx->pix_fmt) : "";
+        }
+        
+        std::map<std::string,std::string> get_video_metadata() const
+        {
+            return video_stream_metadata;
+        }
+        
+        int get_rotation_angle() const
+        {
+            const auto it = video_stream_metadata.find("rotate");
+            return it != video_stream_metadata.end() ? std::stoi(it->second) : 0;
         }
 
         template<typename ImageType,
