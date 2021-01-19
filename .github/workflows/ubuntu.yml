@@ -126,5 +126,5 @@ jobs:
         cmake --build ${{ env.build_dir }}
 
     - name: Run tests
-      working-directory: ${{ github.workspace }}/test/${{ env.build }}
+      working-directory: ${{ github.workspace }}dlib/test/${{ env.build }}
       run: ./dtest --runall
