@@ -122,7 +122,7 @@ jobs:
       run: cmake --build .
 
     - name: Build tests
-      working-directory: ${{ github.workspace }}/test
+      working-directory: ${{ github.workspace }}/dlib/test
       run: |
         cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
         cmake --build ${{ env.build_dir }}
