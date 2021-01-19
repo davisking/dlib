@@ -1,0 +1,121 @@
+name: Ubuntu
+
+on:
+  push:
+    paths:
+      - "**"
+      - "!.github/**"
+      - ".github/workflows/ubuntu.yml"
+  # pull_request:
+  #   paths:
+  #     - "**"
+  #     - "!.github"
+  #     - ".github/workflows/Ubuntu.yml"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      # explicit include-based build matrix, of known valid options
+      matrix:
+        include:
+          # 18.04 supports CUDA 10.1+ (gxx <= 8)
+          - os: ubuntu-18.04
+            cuda: "11.0"
+            cudnn: "8"
+            gcc: 8
+          - os: ubuntu-18.04
+            cuda: "10.2"
+            cudnn: "8"
+            gcc: 8
+          - os: ubuntu-18.04
+            cuda: "10.1"
+            cudnn: "8"
+            gcc: 8
+
+          # 16.04 supports CUDA 8+
+          - os: ubuntu-16.04
+            cuda: "11.0"
+            cudnn: "8"
+            gcc: 7
+          # - os: ubuntu-16.04
+          #   cuda: "10.2"
+          #   gcc: 7
+          # - os: ubuntu-16.04
+          #   cuda: "10.1"
+          #   gcc: 7
+          - os: ubuntu-16.04
+            cuda: "10.0"
+            cudnn: "8"
+            gcc: 7
+          - os: ubuntu-16.04
+            cuda: "9.2"
+            cudnn: "7"
+            gcc: 7
+          - os: ubuntu-16.04
+            cuda: "9.1"
+            cudnn: "7"
+            gcc: 6
+          - os: ubuntu-16.04
+            cuda: "9.0"
+            cudnn: "7"
+            gcc: 6
+
+          # Libraries-dev subpackage does not exist for CUDA 8. Should make a better way of providing version specific subpackages.
+          # - os: ubuntu-16.04
+          #   cuda: "8.0"
+          #   gcc: 6
+    env:
+      build_dir: "build"
+      config: "Release"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install CUDA
+      env:
+        cuda: ${{ matrix.cuda }}
+      run: |
+        source ./.github/scripts/install_cuda_ubuntu.sh
+        if [[ $? -eq 0 ]]; then
+          # Set paths for subsequent steps, using ${CUDA_PATH}
+          echo "Adding CUDA to CUDA_PATH, PATH and LD_LIBRARY_PATH"
+          echo "CUDA_PATH=${CUDA_PATH}" >> $GITHUB_ENV
+          echo "${CUDA_PATH}/bin" >> $GITHUB_PATH
+          echo "LD_LIBRARY_PATH=${CUDA_PATH}/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    # Specify the correct host compilers
+    - name: Install/Select gcc and g++
+      run: |
+        sudo apt-get install -y gcc-${{ matrix.gcc }} g++-${{ matrix.gcc }}
+        echo "CC=/usr/bin/gcc-${{ matrix.gcc }}" >> $GITHUB_ENV
+        echo "CXX=/usr/bin/g++-${{ matrix.gcc }}" >> $GITHUB_ENV
+        echo "CUDAHOSTCXX=/usr/bin/g++-${{ matrix.gcc }}" >> $GITHUB_ENV
+
+    - name: Configure cmake
+      id: configure
+      run: cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }}
+
+    - name: Configure Error Processing
+      if: ${{ failure() && steps.configure.outcome == 'failure' }}
+      working-directory: ${{ env.build_dir }}
+      run: |
+          if [[ -f "CMakeFiles/CMakeOutput.log" ]]; then
+            echo "---- CMakeFiles/CMakeOutput.log"
+            cat CMakeFiles/CMakeOutput.log
+            echo "----"
+          fi
+          if [[ -f "CMakeFiles/CMakeError.log" ]]; then
+            echo "---- CMakeFiles/CMakeError.log"
+            cat CMakeFiles/CMakeError.log
+            echo "----"
+          fi
+
+
+
+    - name: Build dlib
+      working-directory: ${{ env.build_dir }}
+      run: cmake --build . --target all --verbose -j `nproc`
