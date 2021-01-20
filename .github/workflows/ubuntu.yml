@@ -127,4 +127,4 @@ jobs:
 
     - name: Run tests
       working-directory: ${{ github.workspace }}/dlib/test
-      run: ./{{ env.build }}/dtest --runall
+      run: ./${{ env.build }}/dtest --runall
