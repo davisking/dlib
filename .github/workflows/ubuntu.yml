@@ -17,18 +17,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      # explicit include-based build matrix, of known valid options
       matrix:
         include:
           # 18.04 supports CUDA 10.1+ (gxx <= 8)
-          - os: ubuntu-18.04
-            cuda: "11.0"
-            cudnn: "8"
-            gcc: 8
-          - os: ubuntu-18.04
-            cuda: "10.2"
-            cudnn: "8"
-            gcc: 8
           - os: ubuntu-18.04
             cuda: "10.1"
             cudnn: "8"
@@ -36,35 +27,9 @@ jobs:
 
           # 16.04 supports CUDA 8+
           - os: ubuntu-16.04
-            cuda: "11.0"
-            cudnn: "8"
-            gcc: 7
-          - os: ubuntu-16.04
-            cuda: "10.2"
-            cudnn: "8"
-            gcc: 7
-          - os: ubuntu-16.04
             cuda: "10.1"
             cudnn: "8"
             gcc: 7
-          - os: ubuntu-16.04
-            cuda: "10.0"
-            cudnn: "8"
-            gcc: 7
-
-          # These don't seem to work
-          # - os: ubuntu-16.04
-          #   cuda: "9.2"
-          #   cudnn: "7"
-          #   gcc: 7
-          # - os: ubuntu-16.04
-          #   cuda: "9.1"
-          #   cudnn: "7"
-          #   gcc: 6
-          # - os: ubuntu-16.04
-          #   cuda: "9.0"
-          #   cudnn: "7"
-          #   gcc: 6
 
     env:
       build_dir: "build"
@@ -124,4 +89,4 @@ jobs:
 
     - name: Test
       working-directory: ${{ github.workspace }}/dlib/test
-      run: ./${{ env.build_dir }}/dtest --runall
+      run: ./${{ env.build_dir }}/dtest --runall -q
