@@ -98,11 +98,12 @@ jobs:
 
     - name: Configure cmake
       id: configure
+      working-directory: ${{ github.workspace }}/dlib/test
       run: cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
 
     - name: Configure Error Processing
       if: ${{ failure() && steps.configure.outcome == 'failure' }}
-      working-directory: ${{ env.build_dir }}
+      working-directory: ${{ github.workspace }}/dlib/test
       run: |
         if [[ -f "CMakeFiles/CMakeOutput.log" ]]; then
           echo "---- CMakeFiles/CMakeOutput.log"
@@ -115,16 +116,12 @@ jobs:
           echo "----"
         fi
 
-    - name: Build dlib
-      working-directory: ${{ env.build_dir }}
-      run: cmake --build .
-
-    - name: Build tests
+    - name: Build
       working-directory: ${{ github.workspace }}/dlib/test
       run: |
         cmake . -B ${{ env.build_dir }} -DCMAKE_BUILD_TYPE=${{ env.config }} -G Ninja
         cmake --build ${{ env.build_dir }}
 
-    - name: Run tests
+    - name: Test
       working-directory: ${{ github.workspace }}/dlib/test
-      run: ./${{ env.build }}/dtest --runall
+      run: ./${{ env.build_dir }}/dtest --runall
