@@ -132,34 +132,37 @@ namespace dlib
     private:
         std::string         _arg;
         bool                _connected      = false;
-        int                 videoStream     = -1;  
-        AVFormatContext*    pFormatCtx      = nullptr;
-        AVCodecContext*     pCodecCtx       = nullptr;
-        AVFrame*            pFrame          = nullptr;
-        SwsContext*         imgConvertCtx   = nullptr;
+        int                 _videoStream    = -1;  
+        AVFormatContext*    _pFormatCtx     = nullptr;
+        AVCodecContext*     _pCodecCtx      = nullptr;
+        AVFrame*            _pFrame         = nullptr;
+        SwsContext*         _imgConvertCtx  = nullptr;
         std::vector<ffmpeg_impl::frame> _src_frame_buffer;
         ffmpeg_impl::frame  _dst_frame;
         AVPixelFormat       _dst_format;
-        int _dst_h = 0;
-        int _dst_w = 0;
-        std::map<std::string,std::string> video_stream_metadata;
+        int                 _dst_h = 0;
+        int                 _dst_w = 0;
+        std::map<int,std::map<std::string,std::string>> _metadata;
         
         void populate_metadata()
         {
-            std::string metadata_str;
+            for (int i = 0 ; i < _pFormatCtx->nb_streams ; i++)
             {
-                char* charbuf = 0;
-                av_dict_get_string(pFormatCtx->streams[videoStream]->metadata, &charbuf, ',', ';');
-                metadata_str = std::string(charbuf);
-                free(charbuf);
-            }
-            
-            std::vector<std::string> keyvals = dlib::split(metadata_str, ";");
-            for (size_t kv = 0 ; kv < keyvals.size() ; kv++)
-            {
-                std::vector<std::string> kv_item = dlib::split(keyvals[kv], ",");
-                assert(kv_item.size() == 2);
-                video_stream_metadata[kv_item[0]] = kv_item[1];
+                std::string metadata_str;
+                {
+                    char* charbuf = 0;
+                    av_dict_get_string(_pFormatCtx->streams[i]->metadata, &charbuf, ',', ';');
+                    metadata_str = std::string(charbuf);
+                    free(charbuf);
+                }
+
+                std::vector<std::string> keyvals = dlib::split(metadata_str, ";");
+                for (size_t kv = 0 ; kv < keyvals.size() ; kv++)
+                {
+                    std::vector<std::string> kv_item = dlib::split(keyvals[kv], ",");
+                    assert(kv_item.size() == 2);
+                    _metadata[i][kv_item[0]] = dlib::trim(kv_item[1]);
+                }
             }
         }
         
@@ -175,7 +178,7 @@ namespace dlib
                 av_dict_set(&avdic,"max_delay","5000000",0);
             }
 
-            int ret = avformat_open_input(&pFormatCtx, _arg.c_str(), NULL, &avdic);
+            int ret = avformat_open_input(&_pFormatCtx, _arg.c_str(), NULL, &avdic);
             if (avdic)
                 av_dict_free(&avdic);
 
@@ -185,9 +188,9 @@ namespace dlib
                 return false;
             }
 
-            pFormatCtx->probesize = 100000000;
+            _pFormatCtx->probesize = 100000000;
 
-            if ((ret = avformat_find_stream_info(pFormatCtx, NULL)) < 0)
+            if ((ret = avformat_find_stream_info(_pFormatCtx, NULL)) < 0)
             {
                 std::cout << "can't find stream information error : " << ffmpeg_impl::get_av_error(ret) << std::endl;
                 return false;
@@ -195,47 +198,47 @@ namespace dlib
 
             /* select the video stream */
             AVCodec* pCodec = 0;
-            videoStream = av_find_best_stream(pFormatCtx, AVMEDIA_TYPE_VIDEO, -1, -1, &pCodec, 0);
+            _videoStream = av_find_best_stream(_pFormatCtx, AVMEDIA_TYPE_VIDEO, -1, -1, &pCodec, 0);
 
-            if (videoStream < 0 || videoStream == AVERROR_STREAM_NOT_FOUND || videoStream == AVERROR_DECODER_NOT_FOUND)
+            if (_videoStream < 0 || _videoStream == AVERROR_STREAM_NOT_FOUND || _videoStream == AVERROR_DECODER_NOT_FOUND)
             {
-                if (videoStream == AVERROR_STREAM_NOT_FOUND)
+                if (_videoStream == AVERROR_STREAM_NOT_FOUND)
                     std::cout << "AV : stream not found" << std::endl;
-                else if (videoStream == AVERROR_DECODER_NOT_FOUND)
+                else if (_videoStream == AVERROR_DECODER_NOT_FOUND)
                     std::cout << "AV : decoder not found" << std::endl;
                 else
-                    std::cout << "AV : unknown error in finding stream " << videoStream << std::endl;
+                    std::cout << "AV : unknown error in finding stream " << _videoStream << std::endl;
                 return false;
             }
 
             /* create decoding context */
-            pCodecCtx = avcodec_alloc_context3(pCodec);
-            if (!pCodecCtx)
+            _pCodecCtx = avcodec_alloc_context3(pCodec);
+            if (!_pCodecCtx)
             {
                 std::cout << "AV : failed to create decoding context" << std::endl;
                 return false;
             }
 
-            if (avcodec_parameters_to_context(pCodecCtx, pFormatCtx->streams[videoStream]->codecpar) < 0)
+            if (avcodec_parameters_to_context(_pCodecCtx, _pFormatCtx->streams[_videoStream]->codecpar) < 0)
                 return false;
             
             populate_metadata();
             
-            pCodecCtx->thread_count = nthreads;
+            _pCodecCtx->thread_count = nthreads;
 
             /* init the video decoder */
-            if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) 
+            if (avcodec_open2(_pCodecCtx, pCodec, NULL) < 0) 
             {
                 std::cout << "AV : failed to open video decoder" << std::endl;
                 return false;
             }
 
-            pFrame = av_frame_alloc();
+            _pFrame = av_frame_alloc();
             
             //set dst format to src format. Maybe we won't need to convert at all.
-            _dst_h      = pCodecCtx->height;
-            _dst_w      = pCodecCtx->width;
-            _dst_format = pCodecCtx->pix_fmt;
+            _dst_h      = _pCodecCtx->height;
+            _dst_w      = _pCodecCtx->width;
+            _dst_format = _pCodecCtx->pix_fmt;
             
             return true;
         }
@@ -259,16 +262,16 @@ namespace dlib
 //                packet.data = NULL;
 //                packet.size = 0;
     
-                if (av_read_frame(pFormatCtx, &packet) < 0)
+                if (av_read_frame(_pFormatCtx, &packet) < 0)
                 {
                     std::cout << "AV : failed to read packet. Probably EOF" << std::endl;
                     do_read = false;
                 }
                 else
                 {
-                    if (packet.stream_index == videoStream)
+                    if (packet.stream_index == _videoStream)
                     {
-                        if (avcodec_send_packet(pCodecCtx, &packet) < 0)
+                        if (avcodec_send_packet(_pCodecCtx, &packet) < 0)
                         {
                             std::cout << "AV : error while sending a packet to the decoder" << std::endl;
                             do_read = false;
@@ -279,7 +282,7 @@ namespace dlib
                             
                             while (do_receive)
                             {
-                                int ret = avcodec_receive_frame(pCodecCtx, pFrame);
+                                int ret = avcodec_receive_frame(_pCodecCtx, _pFrame);
                                 
                                 if (ret == AVERROR(EAGAIN))
                                 {
@@ -308,7 +311,7 @@ namespace dlib
                                     //packet has multiple frames.
                                     do_read = false;
                                     ffmpeg_impl::frame f;
-                                    f.fill(pFrame);
+                                    f.fill(_pFrame);
                                     _src_frame_buffer.push_back(std::move(f));
                                 }
                             }
@@ -335,23 +338,23 @@ namespace dlib
             
             if ((h > 0 && h != _dst_h) || (w > 0 && w != _dst_w) || (dst_format != _dst_format))
             {
-                if (imgConvertCtx)
+                if (_imgConvertCtx)
                 {
-                    sws_freeContext(imgConvertCtx);
-                    imgConvertCtx = nullptr;
+                    sws_freeContext(_imgConvertCtx);
+                    _imgConvertCtx = nullptr;
                 }
 
                 _dst_frame.reset();
 
-                _dst_h = h > 0 ? h : pCodecCtx->height;
-                _dst_w = w > 0 ? w : pCodecCtx->width;
+                _dst_h = h > 0 ? h : _pCodecCtx->height;
+                _dst_w = w > 0 ? w : _pCodecCtx->width;
                 _dst_format = dst_format;
                 std::cout << "Resetting sws converter to " << _dst_h << "x" << _dst_w << " " << av_get_pix_fmt_name(_dst_format) << std::endl;
 
                 /*Is the new destination format different to the original frame format?*/
-                if (_dst_h != pCodecCtx->height || _dst_w != pCodecCtx->width || _dst_format != pCodecCtx->pix_fmt)
+                if (_dst_h != _pCodecCtx->height || _dst_w != _pCodecCtx->width || _dst_format != _pCodecCtx->pix_fmt)
                 {
-                    imgConvertCtx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, 
+                    _imgConvertCtx = sws_getContext(_pCodecCtx->width, _pCodecCtx->height, _pCodecCtx->pix_fmt, 
                                                    _dst_w, _dst_h, _dst_format, 
                                                    SWS_BICUBIC, NULL, NULL, NULL);
 
@@ -374,9 +377,9 @@ namespace dlib
             ffmpeg_impl::frame f(std::move(_src_frame_buffer.back()));
             _src_frame_buffer.pop_back();
             
-            if (imgConvertCtx)
+            if (_imgConvertCtx)
             {
-                sws_scale(imgConvertCtx, f.data, f.linesize, 0, pCodecCtx->height, 
+                sws_scale(_imgConvertCtx, f.data, f.linesize, 0, _pCodecCtx->height, 
                           _dst_frame.data, _dst_frame.linesize);
                 memcpy(img.begin(), _dst_frame.data[0], size);
             }
@@ -412,40 +415,44 @@ namespace dlib
             {
                 std::cout << "Already connected to " << _arg << std::endl;
             }
+            if (!_connected)
+            {
+                close();
+            }
             return _connected;
         }
 
         void close()
         {
-            _arg        = "";
-            _connected  = false;
-            videoStream = -1;
-            _dst_h      = 0;
-            _dst_w      = 0;
+            _arg            = "";
+            _connected      = false;
+            _videoStream    = -1;
+            _dst_h          = 0;
+            _dst_w          = 0;
 
-            if (pFormatCtx)
+            if (_pFormatCtx)
             {
-                avformat_close_input(&pFormatCtx);
-                avformat_free_context(pFormatCtx);
-                pFormatCtx = nullptr;
+                avformat_close_input(&_pFormatCtx);
+                avformat_free_context(_pFormatCtx);
+                _pFormatCtx = nullptr;
             }
 
-            if (pCodecCtx)
+            if (_pCodecCtx)
             {
-                avcodec_free_context(&pCodecCtx);
-                pCodecCtx = nullptr;
+                avcodec_free_context(&_pCodecCtx);
+                _pCodecCtx = nullptr;
             }
 
-            if (imgConvertCtx)
+            if (_imgConvertCtx)
             {
-                sws_freeContext(imgConvertCtx);
-                imgConvertCtx = nullptr;
+                sws_freeContext(_imgConvertCtx);
+                _imgConvertCtx = nullptr;
             }
 
-            if (pFrame)
+            if (_pFrame)
             {
-                av_frame_free(&pFrame);
-                pFrame = nullptr;
+                av_frame_free(&_pFrame);
+                _pFrame = nullptr;
             }
             
             _dst_frame.reset();
@@ -464,33 +471,49 @@ namespace dlib
         
         int frame_number() const
         {
-            return pCodecCtx ? pCodecCtx->frame_number : -1;
+            return _pCodecCtx ? _pCodecCtx->frame_number : -1;
         }
         
         int src_width() const
         {
-            return pCodecCtx ? pCodecCtx->width : -1;
+            return _pCodecCtx ? _pCodecCtx->width : -1;
         }
         
         int src_height() const
         {
-            return pCodecCtx ? pCodecCtx->height : -1;
+            return _pCodecCtx ? _pCodecCtx->height : -1;
         }
         
         std::string src_format() const
         {
-            return pCodecCtx ? av_get_pix_fmt_name(pCodecCtx->pix_fmt) : "";
+            return _pCodecCtx ? av_get_pix_fmt_name(_pCodecCtx->pix_fmt) : "";
+        }
+        
+        std::map<int,std::map<std::string,std::string>> get_all_metadata() const
+        {
+            const static std::map<int,std::map<std::string,std::string>> emtpy;
+            return _pFormatCtx ? _metadata : emtpy;
         }
         
         std::map<std::string,std::string> get_video_metadata() const
         {
-            return video_stream_metadata;
+            const static std::map<std::string,std::string> empty;
+            return _pFormatCtx ? _metadata.at(_videoStream) : empty;
         }
         
-        int get_rotation_angle() const
+        float get_rotation_angle() const
         {
-            const auto it = video_stream_metadata.find("rotate");
-            return it != video_stream_metadata.end() ? std::stoi(it->second) : 0;
+            if (_pFormatCtx)
+            {
+                const auto it = _metadata.at(_videoStream).find("rotate");
+                return it != _metadata.at(_videoStream).end() ? std::stof(it->second) : 0;
+            }
+            return 0.0f;
+        }
+        
+        float get_fps() const
+        {
+            return _pFormatCtx ? (float)_pFormatCtx->streams[_videoStream]->r_frame_rate.num / (float)_pFormatCtx->streams[_videoStream]->r_frame_rate.den : 0.0f;
         }
 
         template<typename ImageType,
