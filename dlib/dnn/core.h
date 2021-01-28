@@ -1901,6 +1901,9 @@ namespace dlib
             return details[0].get_gradient_input();
         }
 
+        const tensor& get_final_data_gradient(
+        ) const { return subnetwork.get_final_data_gradient(); }
+
         const tensor& get_parameter_gradient(
         ) const { return details[0].get_parameter_gradient(); }
 
