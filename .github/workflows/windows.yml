@@ -83,12 +83,13 @@ jobs:
 
     - name: Configure CMake
       id: configure
+      working-directory: dlib/test
       shell: bash
       run: cmake . -B ${{ env.build_dir }} -G "${{ matrix.visual_studio }}" -A x64 
 
     - name: Configure Error Processing
       if: ${{ (failure() && steps.configure.outcome == 'failure') || success() }}
-      working-directory: ${{ env.build_dir }}
+      working-directory: dlib/test/${{ env.build_dir }}
       shell: bash
       run: |
           if [[ -f "CMakeFiles/CMakeOutput.log" ]]; then
@@ -103,5 +104,9 @@ jobs:
           fi
 
     - name: Build
-      working-directory: ${{ env.build_dir }}
+      working-directory: dlib/test/${{ env.build_dir }}
       run: cmake --build . --config ${{ env.config }} --target ALL_BUILD --verbose
+
+    - name: Test
+      working-directory: dlib/test/${{ env.build_dir }}
+      run: ./dtest --runall -q
