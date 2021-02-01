@@ -60,7 +60,7 @@ jobs:
       shell: powershell
       run: |
         # Install CUDA via a powershell script
-        .\github\scripts\install_cuda_windows.ps1
+        .\.github\scripts\install_cuda_windows.ps1
         if ($?) {
           # Set paths for subsequent steps, using $env:CUDA_PATH
           echo "Adding CUDA to CUDA_PATH, CUDA_PATH_X_Y and PATH"
