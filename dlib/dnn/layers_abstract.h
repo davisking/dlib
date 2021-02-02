@@ -926,6 +926,13 @@ namespace dlib
                 - bias_is_disabled() returns true
         !*/
 
+        void enable_bias(
+        );
+        /*!
+            ensures
+                - bias_is_disabled() returns false
+        !*/
+
         bool bias_is_disabled(
         ) const;
         /*!
@@ -1897,6 +1904,30 @@ namespace dlib
         /*!
             ensures
                 - returns the mode of this layer, either CONV_MODE or FC_MODE.  
+        !*/
+
+        alias_tensor_instance get_gamma();
+        /*!
+            ensures
+                - returns the gamma that define the behavior of forward().
+        !*/
+
+        alias_tensor_const_instance get_gamma() const;
+        /*!
+            ensures
+                - returns the gamma that define the behavior of forward().
+        !*/
+
+        alias_tensor_instance get_beta();
+        /*!
+            ensures
+                - returns the beta that define the behavior of forward().
+        !*/
+
+        alias_tensor_const_instance get_beta() const;
+        /*!
+            ensures
+                - returns the beta that define the behavior of forward().
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);

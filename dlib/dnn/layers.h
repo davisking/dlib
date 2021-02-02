@@ -108,6 +108,7 @@ namespace dlib
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
         void disable_bias() { use_bias = false; }
+        void enable_bias() { use_bias = true; }
         bool bias_is_disabled() const { return !use_bias; }
 
         inline dpoint map_input_to_output (
@@ -2390,6 +2391,12 @@ namespace dlib
                     tt::multiply_conv(true, data_grad, gradient_input, g);
             }
         }
+
+        alias_tensor_instance get_gamma() { return gamma(params, 0); };
+        alias_tensor_const_instance get_gamma() const { return gamma(params, 0); };
+
+        alias_tensor_instance get_beta() { return beta(params, gamma.size()); };
+        alias_tensor_const_instance get_beta() const { return beta(params, gamma.size()); };
 
         const tensor& get_layer_params() const { return empty_params; }
         tensor& get_layer_params() { return empty_params; }
