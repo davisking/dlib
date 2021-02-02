@@ -17,6 +17,10 @@ $CUDA_KNOWN_URLS = @{
     "11.0.167" = "http://developer.download.nvidia.com/compute/cuda/11.0.1/network_installers/cuda_11.0.1_win10_network.exe"
 }
 
+$CUDNN_KNOWN_URLS = @{
+    "8.1.0.77" = "https://developer.nvidia.com/compute/machine-learning/cudnn/secure/8.1.0.77/11.2_20210127/cudnn-11.2-windows-x64-v8.1.0.77.zip"
+}
+
 # @todo - change this to be based on _MSC_VER intead, or invert it to be CUDA keyed instead?
 $VISUAL_STUDIO_MIN_CUDA = @{
     "2019" = "10.1";
@@ -32,6 +36,7 @@ $CUDA_PACKAGES_IN = @(
     "curand_dev";
     "nvrtc_dev";
     "cudart";
+    "cublas_dev";
 )
 
 
