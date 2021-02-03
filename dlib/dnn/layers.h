@@ -2478,8 +2478,8 @@ namespace dlib
             else
                 out << "<affine_fc";
             if (item.is_disabled)
-                out << " disabled='"<<(item.is_disabled?"true":"false");
-            out << "'>\n";
+                out << " disabled='"<< std::boolalpha << item.is_disabled << "'";
+            out << ">\n";
             out << mat(item.params);
 
             if (item.mode==CONV_MODE)
