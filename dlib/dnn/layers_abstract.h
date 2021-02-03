@@ -1909,25 +1909,25 @@ namespace dlib
         alias_tensor_instance get_gamma();
         /*!
             ensures
-                - returns the gamma that define the behavior of forward().
+                - returns the gamma parameter that defines the behavior of forward().
         !*/
 
         alias_tensor_const_instance get_gamma() const;
         /*!
             ensures
-                - returns the gamma that define the behavior of forward().
+                - returns the gamma parameter that defines the behavior of forward().
         !*/
 
         alias_tensor_instance get_beta();
         /*!
             ensures
-                - returns the beta that define the behavior of forward().
+                - returns the beta parameter that defines the behavior of forward().
         !*/
 
         alias_tensor_const_instance get_beta() const;
         /*!
             ensures
-                - returns the beta that define the behavior of forward().
+                - returns the beta parameter that defines the behavior of forward().
         !*/
 
         template <typename SUBNET> void setup (const SUBNET& sub);
