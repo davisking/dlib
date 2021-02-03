@@ -1961,7 +1961,7 @@ namespace dlib
 
     template <typename net_type>
     void fuse_convolutions (
-        const net_type& net
+        net_type& net
     );
     /*!
         requires
