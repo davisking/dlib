@@ -2331,12 +2331,21 @@ namespace dlib
 
         layer_mode get_mode() const { return mode; }
 
+        void disable()
+        {
+            params.clear();
+            is_disabled = true;
+        }
+
         inline dpoint map_input_to_output (const dpoint& p) const { return p; }
         inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
+            if (is_disabled)
+                return;
+
             if (mode == FC_MODE)
             {
                 gamma = alias_tensor(1,
@@ -2358,6 +2367,9 @@ namespace dlib
 
         void forward_inplace(const tensor& input, tensor& output)
         {
+            if (is_disabled)
+                return;
+
             auto g = gamma(params,0);
             auto b = beta(params,gamma.size());
             if (mode == FC_MODE)
@@ -2372,6 +2384,9 @@ namespace dlib
             tensor& /*params_grad*/
         )
         {
+            if (is_disabled)
+                return;
+
             auto g = gamma(params,0);
             auto b = beta(params,gamma.size());
 
@@ -2403,11 +2418,12 @@ namespace dlib
 
         friend void serialize(const affine_& item, std::ostream& out)
         {
-            serialize("affine_", out);
+            serialize("affine_2", out);
             serialize(item.params, out);
             serialize(item.gamma, out);
             serialize(item.beta, out);
             serialize((int)item.mode, out);
+            serialize(item.is_disabled, out);
         }
 
         friend void deserialize(affine_& item, std::istream& in)
@@ -2435,7 +2451,7 @@ namespace dlib
                 return;
             }
 
-            if (version != "affine_")
+            if (version != "affine_" && version != "affine_2")
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::affine_.");
             deserialize(item.params, in);
             deserialize(item.gamma, in);
@@ -2443,21 +2459,27 @@ namespace dlib
             int mode;
             deserialize(mode, in);
             item.mode = (layer_mode)mode;
+            if (version == "affine_2")
+                deserialize(item.is_disabled, in);
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const affine_& /*item*/)
+        friend std::ostream& operator<<(std::ostream& out, const affine_& item)
         {
             out << "affine";
+            if (item.is_disabled)
+                out << "\t (disabled)";
             return out;
         }
 
         friend void to_xml(const affine_& item, std::ostream& out)
         {
             if (item.mode==CONV_MODE)
-                out << "<affine_con>\n";
+                out << "<affine_con";
             else
-                out << "<affine_fc>\n";
-
+                out << "<affine_fc";
+            if (item.is_disabled)
+                out << " disabled='"<<(item.is_disabled?"true":"false");
+            out << "'>\n";
             out << mat(item.params);
 
             if (item.mode==CONV_MODE)
@@ -2470,6 +2492,7 @@ namespace dlib
         resizable_tensor params, empty_params; 
         alias_tensor gamma, beta;
         layer_mode mode;
+        bool is_disabled = false;
     };
 
     template <typename SUBNET>
