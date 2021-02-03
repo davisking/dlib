@@ -1906,6 +1906,14 @@ namespace dlib
                 - returns the mode of this layer, either CONV_MODE or FC_MODE.  
         !*/
 
+        void disable(
+        );
+        /*!
+            ensures
+                - sets the params.size() of this layer to 0.
+                - when forward_inplace and backward_inplace are called, they return immediately.
+        !*/
+
         alias_tensor_instance get_gamma();
         /*!
             ensures
