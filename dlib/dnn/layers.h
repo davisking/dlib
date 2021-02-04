@@ -2532,13 +2532,13 @@ namespace dlib
                 // set the new number of parameters for this convolution and enable bias if needed
                 const size_t num_params = num_filters_in * num_filters_out * num_rows * num_cols + num_filters_out;
                 resizable_tensor new_params(num_params);
+                std::copy(params.begin(), params.end(), new_params.begin());
                 alias_tensor filters(num_filters_out, num_filters_in, num_rows, num_cols);
                 alias_tensor biases(1, num_filters_out);
                 if (conv.bias_is_disabled())
                 {
                     conv.enable_bias();
                     new_params.set_size(num_params);
-                    std::copy(params.begin(), params.end(), new_params.begin());
                     biases(new_params, filters.size()) = 0;
                 }
 
