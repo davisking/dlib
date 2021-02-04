@@ -2544,6 +2544,7 @@ namespace dlib
                 {
                     conv.enable_bias();
                     conv.params.set_size(num_params);
+                    conv.biases = alias_tensor(1, num_filters_out);
                     biases(conv.params, filters.size()) = 0;
                 }
 
