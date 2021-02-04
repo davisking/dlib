@@ -2539,7 +2539,9 @@ namespace dlib
                     const size_t num_params = k_in * conv.num_filters() * conv.nr() * conv.nc() + conv.num_filters();
                     DLIB_CASSERT(num_params == conv.params.size() + conv.num_filters());
                     conv.enable_bias();
+                    resizable_tensor filters = conv.params;
                     conv.params.set_size(num_params);
+                    std::copy(filters.begin(), filters.end(), conv.params.begin());
                     conv.biases = alias_tensor(1, conv.num_filters());
                     conv.biases(conv.params, conv.filters.size()) = 0;
                 }
