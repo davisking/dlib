@@ -2525,49 +2525,35 @@ namespace dlib
 
                 // get the convolution below the affine layer and its paramaters
                 auto& conv = l.subnet().layer_details();
-                const long num_filters_out = conv.num_filters();
-                const long num_rows = conv.nr();
-                const long num_cols = conv.nc();
-                // tensor& params = conv.get_layer_params();
-                // guess the number of input filters
-                long num_filters_in;
+                // guess the number of input channels
+                long k_in;
                 if (conv.bias_is_disabled())
-                    num_filters_in = conv.params.size() / num_filters_out / num_rows / num_cols;
+                    k_in = conv.params.size() / conv.num_filters() / conv.nr() / conv.nc();
                 else
-                    num_filters_in = (conv.params.size() - num_filters_out) / num_filters_out / num_rows / num_cols;
+                    k_in = (conv.params.size() - conv.num_filters()) / conv.num_filters() / conv.nr() / conv.nc();
 
-                // set the new number of parameters for this convolution and enable bias if needed
-                const size_t num_params = num_filters_in * num_filters_out * num_rows * num_cols + num_filters_out;
-                alias_tensor filters(num_filters_out, num_filters_in, num_rows, num_cols);
-                alias_tensor biases(1, num_filters_out);
+                // enable bias and update the parameters size
                 if (conv.bias_is_disabled())
                 {
+                    const size_t num_params = k_in * conv.num_filters() * conv.nr() * conv.nc() + conv.num_filters();
+                    DLIB_CASSERT(conv.params.size() + conv.num_filters() == num_params);
                     conv.enable_bias();
                     conv.params.set_size(num_params);
-                    biases(conv.params, filters.size()) = 0;
+                    conv.biases(conv.params, conv.filters.size()) = 0;
                 }
 
                 // update the biases
-                biases(conv.params, filters.size()) += mat(beta);
+                conv.biases(conv.params, conv.filters.size()) += mat(beta);
 
                 // rescale the filters
-                DLIB_CASSERT(filters.num_samples() == gamma.k());
-                auto t = filters(conv.params, 0);
-                float* f = t.host();
+                DLIB_CASSERT(conv.num_filters() == gamma.k());
+                alias_tensor filter(1, k_in, conv.nr(), conv.nc());
                 const float* g = gamma.host();
-                for (long n = 0; n < filters.num_samples(); ++n)
+                for (long n = 0; n < conv.num_filters(); ++n)
                 {
-                    for (long k = 0; k < filters.k(); ++k)
-                    {
-                        for (long r = 0; r < filters.nr(); ++r)
-                        {
-                            for (long c = 0; c < filters.nc(); ++c)
-                            {
-                                f[tensor_index(t, n, k, r, c)] *= g[n];
-                            }
-                        }
-                    }
+                    filter(conv.params, n * filter.size()) *= g[n];
                 }
+
                 // disable the affine layer
                 l.layer_details().disable();
             }
