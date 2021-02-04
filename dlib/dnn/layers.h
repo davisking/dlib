@@ -2531,24 +2531,24 @@ namespace dlib
 
                 // set the new number of parameters for this convolution and enable bias if needed
                 const size_t num_params = num_filters_in * num_filters_out * num_rows * num_cols + num_filters_out;
+                resizable_tensor new_params(num_params);
                 alias_tensor filters(num_filters_out, num_filters_in, num_rows, num_cols);
                 alias_tensor biases(1, num_filters_out);
                 if (conv.bias_is_disabled())
                 {
                     conv.enable_bias();
-                    resizable_tensor new_params = params;
                     new_params.set_size(num_params);
+                    std::copy(params.begin(), params.end(), new_params.begin());
                     biases(new_params, filters.size()) = 0;
-                    params = new_params;
                 }
 
                 // update the biases
-                auto b = biases(params, filters.size());
+                auto b = biases(new_params, filters.size());
                 b+= mat(beta);
 
                 // rescale the filters
                 DLIB_CASSERT(filters.num_samples() == gamma.k());
-                auto t = filters(params, 0);
+                auto t = filters(new_params, 0);
                 float* f = t.host();
                 const float* g = gamma.host();
                 for (long n = 0; n < filters.num_samples(); ++n)
@@ -2565,6 +2565,7 @@ namespace dlib
                     }
                 }
                 // disable the affine layer
+                params = new_params;
                 l.layer_details().disable();
             }
 
