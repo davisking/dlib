@@ -113,7 +113,6 @@ namespace dlib
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
         void disable_bias() { use_bias = false; }
-        void enable_bias() { use_bias = true; }
         bool bias_is_disabled() const { return !use_bias; }
 
         inline dpoint map_input_to_output (
@@ -2538,7 +2537,7 @@ namespace dlib
                 {
                     const size_t num_params = k_in * conv.num_filters() * conv.nr() * conv.nc() + conv.num_filters();
                     DLIB_CASSERT(num_params == conv.params.size() + conv.num_filters());
-                    conv.enable_bias();
+                    conv.use_bias = true;
                     resizable_tensor filters = conv.params;
                     conv.params.set_size(num_params);
                     std::copy(filters.begin(), filters.end(), conv.params.begin());

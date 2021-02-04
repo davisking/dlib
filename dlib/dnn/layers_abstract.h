@@ -926,13 +926,6 @@ namespace dlib
                 - bias_is_disabled() returns true
         !*/
 
-        void enable_bias(
-        );
-        /*!
-            ensures
-                - bias_is_disabled() returns false
-        !*/
-
         bool bias_is_disabled(
         ) const;
         /*!
