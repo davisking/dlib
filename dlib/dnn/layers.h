@@ -2540,6 +2540,7 @@ namespace dlib
                     DLIB_CASSERT(num_params == conv.params.size() + conv.num_filters());
                     conv.enable_bias();
                     conv.params.set_size(num_params);
+                    conv.biases = alias_tensor(1, conv.num_filters());
                     conv.biases(conv.params, conv.filters.size()) = 0;
                 }
 
