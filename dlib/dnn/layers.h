@@ -2569,7 +2569,7 @@ namespace dlib
             }
 
             template <typename input_layer_type>
-            void operator()(size_t , input_layer_type& l) const
+            void operator()(size_t , input_layer_type& ) const
             {
                 // ignore other layers
             }
@@ -2587,6 +2587,7 @@ namespace dlib
         net_type& net
     )
     {
+        DLIB_CASSERT(count_parameters(net) > 0, "The network has to be allocated before fusing the convolutions.");
         visit_layers_backwards(net, impl::visitor_fuse_convolutions());
     }
 
