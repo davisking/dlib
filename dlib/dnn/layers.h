@@ -21,6 +21,11 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    namespace impl
+    {
+        class visitor_fuse_convolutions;
+    }
+
     struct num_con_outputs
     {
         num_con_outputs(unsigned long n) : num_outputs(n) {}
@@ -337,6 +342,8 @@ namespace dlib
             out << mat(item.params);
             out << "</con>";
         }
+
+        friend class impl::visitor_fuse_convolutions;
 
     private:
 
@@ -2521,34 +2528,31 @@ namespace dlib
                 const long num_filters_out = conv.num_filters();
                 const long num_rows = conv.nr();
                 const long num_cols = conv.nc();
-                tensor& params = conv.get_layer_params();
+                // tensor& params = conv.get_layer_params();
                 // guess the number of input filters
                 long num_filters_in;
                 if (conv.bias_is_disabled())
-                    num_filters_in = params.size() / num_filters_out / num_rows / num_cols;
+                    num_filters_in = conv.params.size() / num_filters_out / num_rows / num_cols;
                 else
-                    num_filters_in = (params.size() - num_filters_out) / num_filters_out / num_rows / num_cols;
+                    num_filters_in = (conv.params.size() - num_filters_out) / num_filters_out / num_rows / num_cols;
 
                 // set the new number of parameters for this convolution and enable bias if needed
                 const size_t num_params = num_filters_in * num_filters_out * num_rows * num_cols + num_filters_out;
-                resizable_tensor new_params(num_params);
-                std::copy(params.begin(), params.end(), new_params.begin());
                 alias_tensor filters(num_filters_out, num_filters_in, num_rows, num_cols);
                 alias_tensor biases(1, num_filters_out);
                 if (conv.bias_is_disabled())
                 {
                     conv.enable_bias();
-                    new_params.set_size(num_params);
-                    biases(new_params, filters.size()) = 0;
+                    conv.params.set_size(num_params);
+                    biases(conv.params, filters.size()) = 0;
                 }
 
                 // update the biases
-                auto b = biases(new_params, filters.size());
-                b+= mat(beta);
+                biases(conv.params, filters.size()) += mat(beta);
 
                 // rescale the filters
                 DLIB_CASSERT(filters.num_samples() == gamma.k());
-                auto t = filters(new_params, 0);
+                auto t = filters(conv.params, 0);
                 float* f = t.host();
                 const float* g = gamma.host();
                 for (long n = 0; n < filters.num_samples(); ++n)
@@ -2565,7 +2569,6 @@ namespace dlib
                     }
                 }
                 // disable the affine layer
-                params = new_params;
                 l.layer_details().disable();
             }
 
