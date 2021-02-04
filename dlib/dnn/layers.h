@@ -2523,8 +2523,9 @@ namespace dlib
                 auto gamma = l.layer_details().get_gamma();
                 auto beta = l.layer_details().get_beta();
 
-                // get the convolution below the affine layer and its paramaters
+                // get the convolution below the affine layer
                 auto& conv = l.subnet().layer_details();
+
                 // guess the number of input channels
                 long k_in;
                 if (conv.bias_is_disabled())
@@ -2536,7 +2537,7 @@ namespace dlib
                 if (conv.bias_is_disabled())
                 {
                     const size_t num_params = k_in * conv.num_filters() * conv.nr() * conv.nc() + conv.num_filters();
-                    DLIB_CASSERT(conv.params.size() + conv.num_filters() == num_params);
+                    DLIB_CASSERT(num_params == conv.params.size() + conv.num_filters());
                     conv.enable_bias();
                     conv.params.set_size(num_params);
                     conv.biases(conv.params, conv.filters.size()) = 0;
