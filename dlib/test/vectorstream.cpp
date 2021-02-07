@@ -166,13 +166,13 @@ namespace
 
         {
             std::vector<char> buf;
-            vectorstream s1(buf);
+            vectorstream<char> s1(buf);
             test1_variant(buf, s1);
         }
         
         {
             vector<char> buf;
-            dlib::vectorstream s1(buf);
+            dlib::vectorstream<char> s1(buf);
             std::iostream& s2 = s1;
             test1_variant(buf, s2);
         }        
