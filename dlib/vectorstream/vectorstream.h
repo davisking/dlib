@@ -27,6 +27,7 @@ namespace dlib
     {
         class vector_streambuf : public std::basic_streambuf<CharType>
         {
+            using traits_type = typename std::basic_streambuf<CharType>::traits_type;
             using size_type = typename std::vector<CharType>::size_type;
             using pos_type  = typename std::basic_streambuf<CharType>::pos_type;
             using off_type  = typename std::basic_streambuf<CharType>::off_type;
@@ -78,7 +79,7 @@ namespace dlib
 
             int_type overflow ( int_type c)
             {
-                if (c != EOF) buffer.push_back(static_cast<char>(c));
+                if (c != traits_type::eof()) buffer.push_back(static_cast<char>(c));
                 return c;
             }
 
@@ -96,7 +97,7 @@ namespace dlib
                 if (read_pos < buffer.size())
                     return static_cast<unsigned char>(buffer[read_pos]);
                 else
-                    return EOF;
+                    return traits_type::eof();
             }
 
             int_type uflow( 
@@ -105,7 +106,7 @@ namespace dlib
                 if (read_pos < buffer.size())
                     return static_cast<unsigned char>(buffer[read_pos++]);
                 else
-                    return EOF;
+                    return traits_type::eof();
             }
 
             int_type pbackfail(
@@ -115,10 +116,10 @@ namespace dlib
                 // if they are trying to push back a character that they didn't read last
                 // that is an error
                 const unsigned long prev = read_pos-1;
-                if (c != EOF && prev < buffer.size() && 
+                if (c != traits_type::eof() && prev < buffer.size() && 
                     c != static_cast<unsigned char>(buffer[prev]))
                 {
-                    return EOF;
+                    return traits_type::eof();
                 }
 
                 read_pos = prev;

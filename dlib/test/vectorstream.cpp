@@ -22,12 +22,12 @@ namespace
 
     logger dlog("test.vectorstream");
           
-    template <typename stream>
-    void test1_variant(std::vector<char>& buf, stream& s)
+    template <typename CharType, typename stream>
+    void test1_variant(std::vector<CharType>& buf, stream& s)
     {
         for (int i = -1000; i <= 1000; ++i)
         {
-            char ch = i;
+            CharType ch = i;
             s.put(ch);
         }
 
@@ -36,49 +36,49 @@ namespace
         int cnt = -1000;
         for (unsigned long i = 0; i < buf.size(); ++i)
         {
-            char ch = cnt;
+            CharType ch = cnt;
             DLIB_TEST(buf[i] == ch);
             ++cnt;
         }
 
         for (int i = -1000; i <= 1000; ++i)
         {
-            DLIB_TEST(s.peek() != EOF);
-            char ch1 = i;
-            char ch2 = s.get();
+            DLIB_TEST(s.peek() != stream::traits_type::eof());
+            CharType ch1 = i;
+            CharType ch2 = s.get();
             DLIB_TEST(ch1 == ch2);
         }
 
-        DLIB_TEST(s.peek() == EOF);
-        DLIB_TEST(s.get() == EOF);
+        DLIB_TEST(s.peek() == stream::traits_type::eof());
+        DLIB_TEST(s.get() == stream::traits_type::eof());
 
         s.clear();
         s.seekg(6); //Let iostream decide which path to take. In theory it could decide to use any.
 
         for (int i = -1000+6; i <= 1000; ++i)
         {
-            DLIB_TEST(s.peek() != EOF);
-            char ch1 = i;
-            char ch2 = s.get();
+            DLIB_TEST(s.peek() != stream::traits_type::eof());
+            CharType ch1 = i;
+            CharType ch2 = s.get();
             DLIB_TEST(ch1 == ch2);
         }
 
-        DLIB_TEST(s.peek() == EOF);
-        DLIB_TEST(s.get() == EOF);
+        DLIB_TEST(s.peek() == stream::traits_type::eof());
+        DLIB_TEST(s.get() == stream::traits_type::eof());
         
         s.clear();
         s.seekg(6, std::ios_base::beg);
 
         for (int i = -1000+6; i <= 1000; ++i)
         {
-            DLIB_TEST(s.peek() != EOF);
-            char ch1 = i;
-            char ch2 = s.get();
+            DLIB_TEST(s.peek() != stream::traits_type::eof());
+            CharType ch1 = i;
+            CharType ch2 = s.get();
             DLIB_TEST(ch1 == ch2);
         }
 
-        DLIB_TEST(s.peek() == EOF);
-        DLIB_TEST(s.get() == EOF);
+        DLIB_TEST(s.peek() == stream::traits_type::eof());
+        DLIB_TEST(s.get() == stream::traits_type::eof());
         
         s.clear();
         s.seekg(1000, std::ios_base::beg);  //read_pos should be 1000
@@ -88,28 +88,28 @@ namespace
         
         for (int i = 6; i <= 1000; ++i)
         {
-            DLIB_TEST(s.peek() != EOF);
-            char ch1 = i;
-            char ch2 = s.get();
+            DLIB_TEST(s.peek() != stream::traits_type::eof());
+            CharType ch1 = i;
+            CharType ch2 = s.get();
             DLIB_TEST(ch1 == ch2);
         }
 
-        DLIB_TEST(s.peek() == EOF);
-        DLIB_TEST(s.get() == EOF);
+        DLIB_TEST(s.peek() == stream::traits_type::eof());
+        DLIB_TEST(s.get() == stream::traits_type::eof());
         
         s.clear();
         s.seekg(-6, std::ios_base::end); //read_pos should be 1995
 
         for (int i = 995; i <= 1000; ++i)
         {
-            DLIB_TEST(s.peek() != EOF);
-            char ch1 = i;
-            char ch2 = s.get();
+            DLIB_TEST(s.peek() != stream::traits_type::eof());
+            CharType ch1 = i;
+            CharType ch2 = s.get();
             DLIB_TEST(ch1 == ch2);
         }
         
-        DLIB_TEST(s.peek() == EOF);
-        DLIB_TEST(s.get() == EOF);
+        DLIB_TEST(s.peek() == stream::traits_type::eof());
+        DLIB_TEST(s.get() == stream::traits_type::eof());
         
         std::string temp;
         temp = "one two three!";
@@ -143,17 +143,17 @@ namespace
         DLIB_TEST(s.get() == '3');
         DLIB_TEST(s.get() == '4');
         DLIB_TEST(s.good() == true);
-        DLIB_TEST(s.get() == EOF);
+        DLIB_TEST(s.get() == stream::traits_type::eof());
         DLIB_TEST(s.good() == false);
 
         // make sure seeking to a crazy offset doesn't mess things up
         s.clear();
         s.seekg(1000000);
-        DLIB_TEST(s.get() == EOF);
+        DLIB_TEST(s.get() == stream::traits_type::eof());
         DLIB_TEST(s.good() == false);
         s.clear();
         s.seekg(1000000);
-        char sbuf[100];
+        CharType sbuf[100];
         s.read(sbuf, sizeof(sbuf));
         DLIB_TEST(s.good() == false);
     }
@@ -175,7 +175,33 @@ namespace
             dlib::vectorstream<char> s1(buf);
             std::iostream& s2 = s1;
             test1_variant(buf, s2);
-        }        
+        }    
+        
+        {
+            std::vector<uint8_t> buf;
+            vectorstream<uint8_t> s1(buf);
+            test1_variant(buf, s1);
+        }
+        
+        {
+            vector<uint8_t> buf;
+            dlib::vectorstream<uint8_t> s1(buf);
+            std::basic_iostream<uint8_t>& s2 = s1;
+            test1_variant(buf, s2);
+        } 
+        
+        {
+            std::vector<int8_t> buf;
+            vectorstream<int8_t> s1(buf);
+            test1_variant(buf, s1);
+        }
+        
+        {
+            vector<int8_t> buf;
+            dlib::vectorstream<int8_t> s1(buf);
+            std::basic_iostream<int8_t>& s2 = s1;
+            test1_variant(buf, s2);
+        } 
     }
 
 // ----------------------------------------------------------------------------------------
