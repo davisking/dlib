@@ -1895,13 +1895,16 @@ namespace dlib
         std::basic_ostream<CharType, CharTraits>& out
     )
     {
-        const unsigned long size = static_cast<unsigned long>(item.size());
-        try{ serialize(size,out); }
-        catch (serialization_error& e)
-        { throw serialization_error(e.info + "\n   while serializing object of type std::string"); }
-
-        out.write(item.c_str(),size);
-        if (!out) throw serialization_error("Error serializing object of type std::string");
+        try
+        {
+            serialize(item.size(), out);
+            for (const auto& c : item)
+                serialize(c, out);
+        }
+        catch(serialization_error& e)
+        {
+            throw serialization_error("Error serializing object of type std::string");
+        }
     }
 
     template<typename CharType, typename CharTraits>
@@ -1910,16 +1913,17 @@ namespace dlib
         std::basic_istream<CharType, CharTraits>& in
     )
     {
-        unsigned long size;
-        try { deserialize(size,in); }
-        catch (serialization_error& e)
-        { throw serialization_error(e.info + "\n   while deserializing object of type std::string"); }
-
-        item.resize(size);
-        if (size != 0)
+        try
         {
-            in.read(&item[0],size);
-            if (!in) throw serialization_error("Error deserializing object of type std::string");
+            size_t size;
+            deserialize(size, in);
+            item.resize(size);
+            for (auto& c : item)
+                deserialize(c, in);
+        }
+        catch(serialization_error& e)
+        {
+            throw serialization_error("Error deserializing object of type std::string");
         }
     }
 
