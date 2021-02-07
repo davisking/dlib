@@ -8,7 +8,8 @@
 
 namespace dlib
 {
-    class vectorstream : public std::iostream
+    template<typename CharType>
+    class vectorstream : public std::basic_iostream<CharType>
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -16,7 +17,7 @@ namespace dlib
                 It functions very much the same way as the std::stringstream object.
                 However, while the std::stringstream holds its buffer internally and it can
                 only be accessed by copying it out, the vectorstream uses an external
-                std::vector<char> as its buffer.  That is, it holds a reference to an
+                std::vector<CharType> as its buffer.  That is, it holds a reference to an
                 external vector and does not contain any internal buffers of its own.  
 
                 This object is useful as a slightly more efficient alternative to the
@@ -28,7 +29,7 @@ namespace dlib
     public:
 
         vectorstream (
-            std::vector<char>& buffer
+            std::vector<CharType>& buffer
         );
         /*!
             ensures

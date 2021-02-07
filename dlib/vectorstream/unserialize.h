@@ -13,14 +13,18 @@
 
 namespace dlib
 {
-    class unserialize : public std::istream
+    template<typename CharType = char>
+    class unserialize : public std::basic_istream<CharType>
     {
-        class mystreambuf : public std::streambuf
+        class mystreambuf : public std::basic_streambuf<CharType>
         {
-            typedef std::vector<char>::size_type size_type;
+            using size_type = typename std::vector<CharType>::size_type;
+            using pos_type  = typename std::basic_streambuf<CharType>::pos_type;
+            using off_type  = typename std::basic_streambuf<CharType>::off_type;
+            using int_type  = typename std::basic_streambuf<CharType>::int_type;
             size_type read_pos; // buffer[read_pos] == next byte to read from buffer
         public:
-            std::vector<char> buffer;
+            std::vector<CharType> buffer;
             std::istream& str;
 
             template <typename T>
@@ -32,7 +36,7 @@ namespace dlib
                 str(str_) 
             {
                 // put the item into our buffer.
-                vectorstream vstr(buffer);
+                vectorstream<CharType> vstr(buffer);
                 serialize(item, vstr);
             }
 
@@ -58,7 +62,7 @@ namespace dlib
             }
 
             std::streamsize xsgetn (
-                char* s, 
+                CharType* s, 
                 std::streamsize n
             )
             { 
@@ -83,9 +87,9 @@ namespace dlib
         template <typename T>
         unserialize (
             const T& item,
-            std::istream& str 
+            std::basic_istream<CharType>& str 
         ) :
-            std::istream(&buf),
+            std::basic_istream<CharType>(&buf),
             buf(item, str)
         {}
 

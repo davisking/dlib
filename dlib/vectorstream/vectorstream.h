@@ -22,17 +22,21 @@
 
 namespace dlib
 {
-    class vectorstream : public std::iostream
+    template<typename CharType = char>
+    class vectorstream : public std::basic_iostream<CharType>
     {
-        class vector_streambuf : public std::streambuf
+        class vector_streambuf : public std::basic_streambuf<CharType>
         {
-            typedef std::vector<char>::size_type size_type;
+            using size_type = typename std::vector<CharType>::size_type;
+            using pos_type  = typename std::basic_streambuf<CharType>::pos_type;
+            using off_type  = typename std::basic_streambuf<CharType>::off_type;
+            using int_type  = typename std::basic_streambuf<CharType>::int_type;
             size_type read_pos; // buffer[read_pos] == next byte to read from buffer
         public:
-            std::vector<char>& buffer;
+            std::vector<CharType>& buffer;
 
             vector_streambuf(
-                std::vector<char>& buffer_
+                std::vector<CharType>& buffer_
             ) :
                 read_pos(0),
                 buffer(buffer_) 
@@ -78,7 +82,7 @@ namespace dlib
                 return c;
             }
 
-            std::streamsize xsputn ( const char* s, std::streamsize num)
+            std::streamsize xsputn ( const CharType* s, std::streamsize num)
             {
                 buffer.insert(buffer.end(), s, s+num);
                 return num;
@@ -122,7 +126,7 @@ namespace dlib
             }
 
             std::streamsize xsgetn (
-                char* s, 
+                CharType* s, 
                 std::streamsize n
             )
             { 
@@ -141,9 +145,9 @@ namespace dlib
     public:
 
         vectorstream (
-            std::vector<char>& buffer
+            std::vector<CharType>& buffer
         ) :
-            std::iostream(&buf),
+            std::basic_iostream<CharType>(&buf),
             buf(buffer)
         {}
             

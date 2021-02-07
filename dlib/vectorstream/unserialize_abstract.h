@@ -8,7 +8,8 @@
 
 namespace dlib
 {
-    class unserialize : public std::istream
+    template<typename CharType>
+    class unserialize : public std::basic_istream<CharType>
     {
         /*!
             WHAT THIS OBJECT REPRESENTS
@@ -38,10 +39,10 @@ namespace dlib
 
     public:
 
-        template <typename T>
+        template <typename CharType, typename CharTraits, typename T>
         unserialize (
             const T& item,
-            std::istream& in 
+            std::basic_istream<CharType, CharTraits>& in 
         );
         /*!
             requires

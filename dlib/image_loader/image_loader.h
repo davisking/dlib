@@ -762,7 +762,7 @@ namespace dlib
                 deserialize(expbuf, in);
                 typedef entropy_decoder::kernel_2a decoder_type;
                 typedef entropy_decoder_model<256,decoder_type>::kernel_4a edm_exp_type; 
-                vectorstream inexp(expbuf);
+                vectorstream<char> inexp(expbuf);
                 decoder_type decoder;
                 decoder.set_stream(inexp);
 

@@ -389,7 +389,7 @@ namespace dlib
                 );
 
             std::vector<char> buf;
-            vectorstream sout(buf);
+            vectorstream<char> sout(buf);
             serialize(item, sout);
             send_data(buf, target_node_id);
         }
@@ -400,7 +400,7 @@ namespace dlib
         ) 
         {
             std::vector<char> buf;
-            vectorstream sout(buf);
+            vectorstream<char> sout(buf);
             serialize(item, sout);
             for (unsigned long i = 0; i < number_of_nodes(); ++i)
             {
@@ -464,7 +464,7 @@ namespace dlib
             std::shared_ptr<std::vector<char> > temp;
             if (receive_data(temp, sending_node_id))
             {
-                vectorstream sin(*temp);
+                vectorstream<char> sin(*temp);
                 deserialize(item, sin);
                 if (sin.peek() != EOF)
                     throw serialization_error("deserialize() did not consume all bytes produced by serialize().  "

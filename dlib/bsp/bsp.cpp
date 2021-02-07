@@ -165,7 +165,7 @@ namespace dlib
             {
                 impl1::msg_data msg;
                 msg.data.reset(new std::vector<char>);
-                vectorstream sout(*msg.data);
+                vectorstream<char> sout(*msg.data);
                 sout << "An exception was thrown while attempting to receive a message from processing node " << sender_id << ".\n";
                 sout << "  Sending processing node address:   " << con->con->get_foreign_ip() << ":" << con->con->get_foreign_port() << std::endl;
                 sout << "  Receiving processing node address: " << con->con->get_local_ip() << ":" << con->con->get_local_port() << std::endl;
@@ -181,7 +181,7 @@ namespace dlib
             {
                 impl1::msg_data msg;
                 msg.data.reset(new std::vector<char>);
-                vectorstream sout(*msg.data);
+                vectorstream<char> sout(*msg.data);
                 sout << "An exception was thrown while attempting to receive a message from processing node " << sender_id << ".\n";
                 sout << "  Sending processing node address:   " << con->con->get_foreign_ip() << ":" << con->con->get_foreign_port() << std::endl;
                 sout << "  Receiving processing node address: " << con->con->get_local_ip() << ":" << con->con->get_local_port() << std::endl;

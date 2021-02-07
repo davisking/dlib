@@ -291,7 +291,7 @@ namespace dlib
                 // to the stream at the end of the loops.
                 std::vector<char> expbuf;
                 expbuf.reserve(image.size()*2);
-                vectorstream outexp(expbuf);
+                vectorstream<char> outexp(expbuf);
                 encoder_type encoder;
                 encoder.set_stream(outexp);
 
