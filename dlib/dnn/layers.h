@@ -2254,7 +2254,7 @@ namespace dlib
             {
                 // Since we can build a multiply_ from a dropout_ we check if that's what
                 // is in the stream and if so then just convert it right here.
-                unserialize sin(version, in);
+                unserialize<char> sin(version, in);
                 dropout_ temp;
                 deserialize(temp, sin);
                 item = temp;
@@ -2411,7 +2411,7 @@ namespace dlib
             {
                 // Since we can build an affine_ from a bn_ we check if that's what is in
                 // the stream and if so then just convert it right here.
-                unserialize sin(version, in);
+                unserialize<char> sin(version, in);
                 bn_<CONV_MODE> temp;
                 deserialize(temp, sin);
                 item = temp;
@@ -2421,7 +2421,7 @@ namespace dlib
             {
                 // Since we can build an affine_ from a bn_ we check if that's what is in
                 // the stream and if so then just convert it right here.
-                unserialize sin(version, in);
+                unserialize<char> sin(version, in);
                 bn_<FC_MODE> temp;
                 deserialize(temp, sin);
                 item = temp;
