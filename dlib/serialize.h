@@ -423,7 +423,7 @@ namespace dlib
 
             item = 0;
             int ch = sbuf->sbumpc();
-            if (ch != EOF)
+            if (ch != std::basic_istream<CharType, CharTraits>::traits_type::eof())
             {
                 size = static_cast<unsigned char>(ch);
             }
@@ -543,7 +543,7 @@ namespace dlib
 
             auto* sbuf = in.rdbuf();
             int ch = sbuf->sbumpc();
-            if (ch != EOF)
+            if (ch != std::basic_istream<CharType, CharTraits>::traits_type::eof())
             {
                 size = static_cast<unsigned char>(ch);
             }
@@ -562,7 +562,7 @@ namespace dlib
                 return true;
            
 
-            if (sbuf->sgetn(reinterpret_cast<char*>(&buf),size) != size)
+            if (sbuf->sgetn(reinterpret_cast<CharType*>(&buf),size) != size)
             {
                 in.setstate(std::ios::badbit);
                 return true;
@@ -602,7 +602,7 @@ namespace dlib
     )
     {
         auto* sbuf = out.rdbuf();
-        return (sbuf->sputc((CharType)ch) == EOF);
+        return (sbuf->sputc((CharType)ch) == std::basic_ostream<CharType, CharTraits>::traits_type::eof());
     }
 
     template <
@@ -617,7 +617,7 @@ namespace dlib
     {
         auto* sbuf = in.rdbuf();
         int temp = sbuf->sbumpc();
-        if (temp != EOF)
+        if (temp != std::basic_istream<CharType, CharTraits>::traits_type::eof())
         {
             ch = static_cast<T>(temp);
             return false;
@@ -1143,7 +1143,7 @@ namespace dlib
     )
     {
         int ch = in.get();
-        if (ch != EOF)
+        if (ch != std::basic_istream<CharType, CharTraits>::traits_type::eof())
         {
             if (ch == '1')
                 item = true;
