@@ -9,7 +9,7 @@
         
         void serialize (
             const serializable_type& item,
-            std::basic_ostream<CharType, CharTraits>& out
+            std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
         );
         /!*
             ensures
@@ -25,7 +25,7 @@
 
         void deserialize (
             serializable_type& item,
-            std::basic_istream<CharType, CharTraits>& in
+            std::basic_istream<CharType, dlib_char_traits<CharType>>& in
         );
         /!*
             ensures
@@ -188,10 +188,10 @@
                     float b;
                     std::vector<float> c;
                 };
-                template<typename CharType, typename CharTraits>
-                void serialize (const my_custom_type& item, std::basic_ostream<CharType, CharTraits>& out);
-                template<typename CharType, typename CharTraits>
-                void deserialize (my_custom_type& item, std::basic_istream<CharType, CharTraits>& in);
+                template<typename CharType>
+                void serialize (const my_custom_type& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out);
+                template<typename CharType>
+                void deserialize (my_custom_type& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in);
             }
        
         That's all you need to do.  You may optionally avail yourself of the
@@ -246,7 +246,7 @@
 
 namespace dlib
 {
-
+    
 // ----------------------------------------------------------------------------------------
 
     class serialization_error : public error 
@@ -263,12 +263,11 @@ namespace dlib
 
 
     template<
-        typename CharType,
-        typename CharTraits
+        typename CharType
     >
     void check_serialized_version(
         const std::string& expected_version, 
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     /*!
         ensures
@@ -316,12 +315,11 @@ namespace dlib
 
     template <
         typename CharType,
-        typename CharTraits,
         typename T
         >
     void serialize (
         const ramdump_t<const T>& item_, 
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         // Move the const from inside the ramdump_t template to outside so we can bind
@@ -339,12 +337,11 @@ namespace dlib
 
         template <
             typename CharType,
-            typename CharTraits,
             typename T
             >
         typename enable_if_c<std::numeric_limits<T>::is_signed,bool>::type pack_int (
             T item,
-            std::basic_ostream<CharType, CharTraits>& out
+            std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
         )
         /*!
             requires
@@ -393,12 +390,11 @@ namespace dlib
 
         template <
             typename CharType,
-            typename CharTraits,
             typename T
             >
         typename enable_if_c<std::numeric_limits<T>::is_signed,bool>::type unpack_int (
             T& item,
-            std::basic_istream<CharType, CharTraits>& in
+            std::basic_istream<CharType, dlib_char_traits<CharType>>& in
         )
         /*!
             requires
@@ -413,7 +409,7 @@ namespace dlib
         !*/
         {
             COMPILE_TIME_ASSERT(sizeof(T) <= 8);
-
+            using int_type = typename std::basic_istream<CharType, dlib_char_traits<CharType>>::int_type;
 
             unsigned char buf[8];
             unsigned char size;
@@ -422,8 +418,8 @@ namespace dlib
             auto* sbuf = in.rdbuf();
 
             item = 0;
-            int ch = sbuf->sbumpc();
-            if (ch != std::basic_istream<CharType, CharTraits>::traits_type::eof())
+            const int_type ch = sbuf->sbumpc();
+            if (ch != std::basic_istream<CharType, dlib_char_traits<CharType>>::traits_type::eof())
             {
                 size = static_cast<unsigned char>(ch);
             }
@@ -471,12 +467,11 @@ namespace dlib
 
         template <
             typename CharType,
-            typename CharTraits,
             typename T
             >
         typename disable_if_c<std::numeric_limits<T>::is_signed,bool>::type pack_int (
             T item,
-            std::basic_ostream<CharType, CharTraits>& out
+            std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
         )
         /*!
             requires
@@ -515,12 +510,11 @@ namespace dlib
 
         template <
             typename CharType,
-            typename CharTraits,
             typename T
             >
         typename disable_if_c<std::numeric_limits<T>::is_signed,bool>::type unpack_int (
             T& item,
-            std::basic_istream<CharType, CharTraits>& in
+            std::basic_istream<CharType, dlib_char_traits<CharType>>& in
         )
         /*!
             requires
@@ -535,7 +529,7 @@ namespace dlib
         !*/
         {
             COMPILE_TIME_ASSERT(sizeof(T) <= 8);
-            using int_type = typename std::basic_istream<CharType, CharTraits>::int_type;
+            using int_type = typename std::basic_istream<CharType, dlib_char_traits<CharType>>::int_type;
             
             unsigned char buf[8];
             unsigned char size;
@@ -544,7 +538,7 @@ namespace dlib
 
             auto* sbuf = in.rdbuf();
             const int_type ch = sbuf->sbumpc();
-            if (ch != std::basic_istream<CharType, CharTraits>::traits_type::eof())
+            if (ch != std::basic_istream<CharType, dlib_char_traits<CharType>>::traits_type::eof())
             {
                 size = static_cast<unsigned char>(ch);
             }
@@ -585,41 +579,39 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     #define USE_DEFAULT_INT_SERIALIZATION_FOR(T)  \
-        template<typename CharType,typename CharTraits> \
-        inline void serialize (const T& item, std::basic_ostream<CharType, CharTraits>& out) \
+        template<typename CharType> \
+        inline void serialize (const T& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out) \
         { if (ser_helper::pack_int(item,out)) throw serialization_error("Error serializing object of type " + std::string(#T)); }   \
-        template<typename CharType,typename CharTraits> \
-        inline void deserialize (T& item, std::basic_istream<CharType, CharTraits>& in) \
+        template<typename CharType> \
+        inline void deserialize (T& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in) \
         { if (ser_helper::unpack_int(item,in)) throw serialization_error("Error deserializing object of type " + std::string(#T)); }   
 
     template <
         typename CharType,
-        typename CharTraits,
         typename T
     >
     inline bool pack_byte (
         const T& ch,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         auto* sbuf = out.rdbuf();
-        return (sbuf->sputc((CharType)ch) == std::basic_ostream<CharType, CharTraits>::traits_type::eof());
+        return (sbuf->sputc((CharType)ch) == std::basic_ostream<CharType, dlib_char_traits<CharType>>::traits_type::eof());
     }
 
     template <
         typename CharType,
-        typename CharTraits,
         typename T
     >
     inline bool unpack_byte (
         T& ch,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
-        using int_type = typename std::basic_istream<CharType, CharTraits>::int_type;
+        using int_type = typename std::basic_istream<CharType, dlib_char_traits<CharType>>::int_type;
         auto* sbuf = in.rdbuf();
         const int_type temp = sbuf->sbumpc();
-        if (temp != std::basic_istream<CharType, CharTraits>::traits_type::eof())
+        if (temp != std::basic_istream<CharType, dlib_char_traits<CharType>>::traits_type::eof())
         {
             ch = static_cast<T>(temp);
             return false;
@@ -631,11 +623,11 @@ namespace dlib
     }
 
     #define USE_DEFAULT_BYTE_SERIALIZATION_FOR(T)  \
-        template<typename CharType,typename CharTraits> \
-        inline void serialize (const T& item,std::basic_ostream<CharType, CharTraits>& out) \
+        template<typename CharType> \
+        inline void serialize (const T& item,std::basic_ostream<CharType, dlib_char_traits<CharType>>& out) \
         { if (pack_byte(item,out)) throw serialization_error("Error serializing object of type " + std::string(#T)); } \
-        template<typename CharType,typename CharTraits> \
-        inline void deserialize (T& item, std::basic_istream<CharType, CharTraits>& in) \
+        template<typename CharType> \
+        inline void deserialize (T& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in) \
         { if (unpack_byte(item,in)) throw serialization_error("Error deserializing object of type " + std::string(#T)); }   
 
 // ----------------------------------------------------------------------------------------
@@ -663,20 +655,20 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename CharType,typename CharTraits> \
+    template<typename CharType> \
     inline void serialize(
         const float_details& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         serialize(item.mantissa, out);
         serialize(item.exponent, out);
     }
 
-    template<typename CharType,typename CharTraits> \
+    template<typename CharType> \
     inline void deserialize(
         float_details& item,
-        std::basic_istream<CharType, CharTraits>& in 
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in 
     )
     {
         deserialize(item.mantissa, in);
@@ -685,10 +677,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType,typename CharTraits,typename T>
+    template <typename CharType,typename T>
     inline void serialize_floating_point (
         const T& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     { 
         try
@@ -700,10 +692,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing a floating point number."); }
     }
 
-    template <typename CharType,typename CharTraits,typename T>
+    template <typename CharType,typename T>
     inline bool old_deserialize_floating_point (
         T& item,
-        std::basic_istream<CharType, CharTraits>& in 
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in 
     )
     {
         std::ios::fmtflags oldflags = in.flags();  
@@ -740,10 +732,10 @@ namespace dlib
         return (in.get() != ' ');
     }
 
-    template <typename CharType,typename CharTraits,typename T>
+    template <typename CharType,typename T>
     inline void deserialize_floating_point (
         T& item,
-        std::basic_istream<CharType, CharTraits>& in 
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in 
     )
     {
         // check if the serialized data uses the older ASCII based format.  We can check
@@ -772,38 +764,38 @@ namespace dlib
         }
     }
 
-    template<typename CharType,typename CharTraits>
-    inline void serialize ( const float& item, std::basic_ostream<CharType, CharTraits>& out) 
+    template<typename CharType>
+    inline void serialize ( const float& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out) 
     { 
         serialize_floating_point(item,out);
     }
 
-    template<typename CharType,typename CharTraits>
-    inline void deserialize (float& item, std::basic_istream<CharType, CharTraits>& in) 
+    template<typename CharType>
+    inline void deserialize (float& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in) 
     { 
         deserialize_floating_point(item,in);
     }
 
-    template<typename CharType,typename CharTraits>
-    inline void serialize ( const double& item, std::basic_ostream<CharType, CharTraits>& out) 
+    template<typename CharType>
+    inline void serialize ( const double& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out) 
     { 
         serialize_floating_point(item,out);
     }
 
-    template<typename CharType,typename CharTraits>
-    inline void deserialize (double& item, std::basic_istream<CharType, CharTraits>& in) 
+    template<typename CharType>
+    inline void deserialize (double& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in) 
     { 
         deserialize_floating_point(item,in);
     }
 
-    template<typename CharType,typename CharTraits>
-    inline void serialize ( const long double& item, std::basic_ostream<CharType, CharTraits>& out) 
+    template<typename CharType>
+    inline void serialize ( const long double& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out) 
     { 
         serialize_floating_point(item,out);
     }
 
-    template<typename CharType,typename CharTraits>
-    inline void deserialize ( long double& item, std::basic_istream<CharType, CharTraits>& in) 
+    template<typename CharType>
+    inline void deserialize ( long double& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in) 
     { 
         deserialize_floating_point(item,in);
     }
@@ -812,12 +804,11 @@ namespace dlib
 
     template <
         typename CharType,
-        typename CharTraits,
         typename T
         >
     inline void serialize (
         const std::complex<T>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -835,12 +826,11 @@ namespace dlib
 
     template <
         typename CharType,
-        typename CharTraits,
         typename T
         >
     inline void deserialize (
         std::complex<T>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try
@@ -859,263 +849,259 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // prototypes
 
-    template <typename CharType, typename CharTraits,typename domain, typename range, typename compare, typename alloc>
+    template <typename CharType,typename domain, typename range, typename compare, typename alloc>
     void serialize (
         const std::map<domain,range, compare, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename domain, typename range, typename compare, typename alloc>
+    template <typename CharType,typename domain, typename range, typename compare, typename alloc>
     void deserialize (
         std::map<domain, range, compare, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType,typename domain, typename range, typename hash, typename keyEqual, typename alloc>
     void serialize (
         const std::unordered_map<domain, range, hash, keyEqual, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType,typename domain, typename range, typename hash, typename keyEqual, typename alloc>
     void deserialize (
         std::unordered_map<domain, range, hash, keyEqual, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename domain, typename range, typename compare, typename alloc>
+    template <typename CharType,typename domain, typename range, typename compare, typename alloc>
     void serialize (
         const std::multimap<domain,range, compare, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename domain, typename range, typename compare, typename alloc>
+    template <typename CharType,typename domain, typename range, typename compare, typename alloc>
     void deserialize (
         std::multimap<domain, range, compare, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType,typename domain, typename range, typename hash, typename keyEqual, typename alloc>
     void serialize (
         const std::unordered_multimap<domain, range, hash, keyEqual, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType,typename domain, typename range, typename hash, typename keyEqual, typename alloc>
     void deserialize (
         std::unordered_multimap<domain, range, hash, keyEqual, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
 
-    template <typename CharType, typename CharTraits,typename domain, typename compare, typename alloc>
+    template <typename CharType,typename domain, typename compare, typename alloc>
     void serialize (
         const std::set<domain, compare, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename domain, typename compare, typename alloc>
+    template <typename CharType,typename domain, typename compare, typename alloc>
     void deserialize (
         std::set<domain, compare, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename domain, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType,typename domain, typename hash, typename keyEqual, typename alloc>
     void serialize (
         const std::unordered_set<domain, hash, keyEqual, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename domain, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType,typename domain, typename hash, typename keyEqual, typename alloc>
     void deserialize (
         std::unordered_set<domain, hash, keyEqual, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename domain, typename compare, typename alloc>
+    template <typename CharType,typename domain, typename compare, typename alloc>
     void serialize (
         const std::multiset<domain, compare, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename domain, typename compare, typename alloc>
+    template <typename CharType,typename domain, typename compare, typename alloc>
     void deserialize (
         std::multiset<domain, compare, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename domain, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType,typename domain, typename hash, typename keyEqual, typename alloc>
     void serialize (
         const std::unordered_multiset<domain, hash, keyEqual, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename domain, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType,typename domain, typename hash, typename keyEqual, typename alloc>
     void deserialize (
         std::unordered_multiset<domain, hash, keyEqual, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
 
-    template <typename CharType, typename CharTraits,typename T, typename alloc>
+    template <typename CharType,typename T, typename alloc>
     void serialize (
         const std::vector<T,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename T, typename alloc>
+    template <typename CharType,typename T, typename alloc>
     void deserialize (
         std::vector<T,alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename T, typename alloc>
+    template <typename CharType,typename T, typename alloc>
     void serialize (
         const std::list<T,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename T, typename alloc>
+    template <typename CharType,typename T, typename alloc>
     void deserialize (
         std::list<T,alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename T, typename alloc>
+    template <typename CharType,typename T, typename alloc>
     void serialize (
         const std::forward_list<T,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename T, typename alloc>
+    template <typename CharType,typename T, typename alloc>
     void deserialize (
         std::forward_list<T,alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
 
-    template <typename CharType, typename CharTraits,typename T, typename alloc>
+    template <typename CharType,typename T, typename alloc>
     void serialize (
         const std::deque<T,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename T, typename alloc>
+    template <typename CharType,typename T, typename alloc>
     void deserialize (
         std::deque<T,alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename... Types>
+    template <typename CharType,typename... Types>
     void serialize (
         const std::tuple<Types...>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename... Types>
+    template <typename CharType,typename... Types>
     void deserialize (
         std::tuple<Types...>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
 
-    template <typename CharType, typename CharTraits,typename T, typename deleter>
+    template <typename CharType,typename T, typename deleter>
     void serialize (
         const std::unique_ptr<T, deleter>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename T, typename deleter>
+    template <typename CharType,typename T, typename deleter>
     void deserialize (
         std::unique_ptr<T, deleter>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits,typename T>
+    template <typename CharType,typename T>
     void serialize (
         const std::shared_ptr<T>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits,typename T>
+    template <typename CharType,typename T>
     void deserialize (
         std::shared_ptr<T>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
     
-    template <typename CharType, typename CharTraits>
+    template <typename CharType>
     inline void serialize (
         const std::string& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits>
+    template <typename CharType>
     inline void deserialize (
         std::string& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
 
-    template <typename CharType, typename CharTraits>
+    template <typename CharType>
     inline void serialize (
         const std::wstring& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits>
+    template <typename CharType>
     inline void deserialize (
         std::wstring& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
 
-    template <typename CharType, typename CharTraits>
+    template <typename CharType>
     inline void serialize (
         const ustring& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
-    template <typename CharType, typename CharTraits>
+    template <typename CharType>
     inline void deserialize (
         ustring& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
 
     template <
         typename CharType, 
-        typename CharTraits,
         typename T
         >
     inline void serialize (
         const enumerable<T>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
     template <
         typename CharType, 
-        typename CharTraits,
         typename domain,
         typename range
         >
     inline void serialize (
         const map_pair<domain,range>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
     template <
         typename CharType, 
-        typename CharTraits,
         typename T,
         size_t length
         >
     inline void serialize (
         const T (&array)[length],
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     );
 
     template <
         typename CharType, 
-        typename CharTraits,
         typename T,
         size_t length
         >
     inline void deserialize (
         T (&array)[length],
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     );
 
 // ----------------------------------------------------------------------------------------
@@ -1123,10 +1109,10 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     inline void serialize (
         bool item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         if (item)
@@ -1138,14 +1124,14 @@ namespace dlib
             throw serialization_error("Error serializing object of type bool");    
     }
 
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     inline void deserialize (
         bool& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         int ch = in.get();
-        if (ch != std::basic_istream<CharType, CharTraits>::traits_type::eof())
+        if (ch != std::basic_istream<CharType, dlib_char_traits<CharType>>::traits_type::eof())
         {
             if (ch == '1')
                 item = true;
@@ -1162,10 +1148,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename first_type, typename second_type>
+    template <typename CharType, typename first_type, typename second_type>
     void serialize (
         const std::pair<first_type, second_type>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1177,10 +1163,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::pair"); }
     }
 
-    template <typename CharType, typename CharTraits, typename first_type, typename second_type>
+    template <typename CharType, typename first_type, typename second_type>
     void deserialize (
         std::pair<first_type, second_type>& item,
-        std::basic_istream<CharType, CharTraits>& in 
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in 
     )
     {
         try
@@ -1220,10 +1206,10 @@ namespace dlib
         for_each_in_tuple<I + 1, FuncT, Tp...>(t, f);
     }
     
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     struct serialize_tuple_helper
     {
-        serialize_tuple_helper(std::basic_ostream<CharType, CharTraits>& out_) : out(out_) {}
+        serialize_tuple_helper(std::basic_ostream<CharType, dlib_char_traits<CharType>>& out_) : out(out_) {}
         
         template<typename T>
         void operator()(const T& item)
@@ -1231,13 +1217,13 @@ namespace dlib
             serialize(item, out);
         }
                 
-        std::basic_ostream<CharType, CharTraits>& out;
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out;
     };
     
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     struct deserialize_tuple_helper
     {
-        deserialize_tuple_helper(std::basic_istream<CharType, CharTraits>& in_) : in(in_) {}
+        deserialize_tuple_helper(std::basic_istream<CharType, dlib_char_traits<CharType>>& in_) : in(in_) {}
         
         template<typename T>
         void operator()(T& item)
@@ -1245,32 +1231,32 @@ namespace dlib
             deserialize(item, in);
         }
                 
-        std::basic_istream<CharType, CharTraits>& in;
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in;
     };
 
-    template <typename CharType, typename CharTraits, typename... Types>
+    template <typename CharType, typename... Types>
     void serialize (
         const std::tuple<Types...>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
         { 
-            for_each_in_tuple(item, serialize_tuple_helper<CharType,CharTraits>(out));
+            for_each_in_tuple(item, serialize_tuple_helper<CharType>(out));
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while serializing object of type std::tuple"); }
     }
 
-    template <typename CharType, typename CharTraits, typename... Types>
+    template <typename CharType, typename... Types>
     void deserialize (
         std::tuple<Types...>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try
         { 
-            for_each_in_tuple(item, deserialize_tuple_helper<CharType,CharTraits>(in));
+            for_each_in_tuple(item, deserialize_tuple_helper<CharType>(in));
         }
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std::tuple"); }
@@ -1278,10 +1264,10 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
     
-    template <typename CharType, typename CharTraits, typename domain, typename range, typename compare, typename alloc>
+    template <typename CharType, typename domain, typename range, typename compare, typename alloc>
     void serialize (
         const std::map<domain,range, compare, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1301,10 +1287,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::map"); }
     }
 
-    template <typename CharType, typename CharTraits, typename domain, typename range, typename compare, typename alloc>
+    template <typename CharType, typename domain, typename range, typename compare, typename alloc>
     void deserialize (
         std::map<domain, range, compare, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1328,10 +1314,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType, typename domain, typename range, typename hash, typename keyEqual, typename alloc>
     void serialize (
         const std::unordered_map<domain, range, hash, keyEqual, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1347,10 +1333,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::unordered_map"); }
     }
 
-    template <typename CharType, typename CharTraits, typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType, typename domain, typename range, typename hash, typename keyEqual, typename alloc>
     void deserialize (
         std::unordered_map<domain, range, hash, keyEqual, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1373,10 +1359,10 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
     
-    template <typename CharType, typename CharTraits, typename domain, typename range, typename compare, typename alloc>
+    template <typename CharType, typename domain, typename range, typename compare, typename alloc>
     void serialize (
         const std::multimap<domain,range, compare, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1392,10 +1378,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::multimap"); }
     }
 
-    template <typename CharType, typename CharTraits, typename domain, typename range, typename compare, typename alloc>
+    template <typename CharType, typename domain, typename range, typename compare, typename alloc>
     void deserialize (
         std::multimap<domain, range, compare, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1418,10 +1404,10 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
     
-    template <typename CharType, typename CharTraits, typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType, typename domain, typename range, typename hash, typename keyEqual, typename alloc>
     void serialize (
         const std::unordered_multimap<domain, range, hash, keyEqual, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1437,10 +1423,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::unordered_multimap"); }
     }
 
-    template <typename CharType, typename CharTraits, typename domain, typename range, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType, typename domain, typename range, typename hash, typename keyEqual, typename alloc>
     void deserialize (
         std::unordered_multimap<domain, range, hash, keyEqual, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1463,10 +1449,10 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
    
-    template <typename CharType, typename CharTraits, typename domain, typename compare, typename alloc>
+    template <typename CharType, typename domain, typename compare, typename alloc>
     void serialize (
         const std::set<domain, compare, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1485,10 +1471,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::set"); }
     }
 
-    template <typename CharType, typename CharTraits, typename domain, typename compare, typename alloc>
+    template <typename CharType, typename domain, typename compare, typename alloc>
     void deserialize (
         std::set<domain, compare, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1510,10 +1496,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename domain, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType, typename domain, typename hash, typename keyEqual, typename alloc>
     void serialize (
         const std::unordered_set<domain, hash, keyEqual, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1526,10 +1512,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::unordered_set"); }
     }
 
-    template <typename CharType, typename CharTraits, typename domain, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType, typename domain, typename hash, typename keyEqual, typename alloc>
     void deserialize (
         std::unordered_set<domain, hash, keyEqual, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1550,10 +1536,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename domain, typename compare, typename alloc>
+    template <typename CharType, typename domain, typename compare, typename alloc>
     void serialize (
         const std::multiset<domain, compare, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1566,10 +1552,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::multiset"); }
     }
 
-    template <typename CharType, typename CharTraits, typename domain, typename compare, typename alloc>
+    template <typename CharType, typename domain, typename compare, typename alloc>
     void deserialize (
         std::multiset<domain, compare, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1590,10 +1576,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename domain, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType, typename domain, typename hash, typename keyEqual, typename alloc>
     void serialize (
         const std::unordered_multiset<domain, hash, keyEqual, alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1606,10 +1592,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::unordered_multiset"); }
     }
 
-    template <typename CharType, typename CharTraits, typename domain, typename hash, typename keyEqual, typename alloc>
+    template <typename CharType, typename domain, typename hash, typename keyEqual, typename alloc>
     void deserialize (
         std::unordered_multiset<domain, hash, keyEqual, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1630,10 +1616,10 @@ namespace dlib
         
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename alloc>
+    template <typename CharType, typename alloc>
     void serialize (
         const std::vector<bool,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         std::vector<unsigned char> temp(item.size());
@@ -1647,10 +1633,10 @@ namespace dlib
         serialize(temp, out);
     }
 
-    template <typename CharType, typename CharTraits, typename alloc>
+    template <typename CharType, typename alloc>
     void deserialize (
         std::vector<bool,alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in 
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in 
     )
     {
         std::vector<unsigned char> temp;
@@ -1667,10 +1653,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename T, typename alloc>
+    template <typename CharType, typename T, typename alloc>
     void serialize (
         const std::vector<T,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1685,10 +1671,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::vector"); }
     }
 
-    template <typename CharType, typename CharTraits, typename T, typename alloc>
+    template <typename CharType, typename T, typename alloc>
     void deserialize (
         std::vector<T, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1705,10 +1691,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename alloc>
+    template <typename CharType, typename alloc>
     void serialize (
         const std::vector<char,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1722,10 +1708,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::vector"); }
     }
 
-    template <typename CharType, typename CharTraits, typename alloc>
+    template <typename CharType, typename alloc>
     void deserialize (
         std::vector<char, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1742,10 +1728,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename alloc>
+    template <typename CharType, typename alloc>
     void serialize (
         const std::vector<unsigned char,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1759,10 +1745,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::vector"); }
     }
 
-    template <typename CharType, typename CharTraits, typename alloc>
+    template <typename CharType, typename alloc>
     void deserialize (
         std::vector<unsigned char, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1779,10 +1765,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename T, typename alloc>
+    template <typename CharType, typename T, typename alloc>
     void serialize (
         const std::list<T,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1796,10 +1782,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::list"); }
     }
 
-    template <typename CharType, typename CharTraits, typename T, typename alloc>
+    template <typename CharType, typename T, typename alloc>
     void deserialize (
         std::list<T,alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1816,10 +1802,10 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
     
-    template <typename CharType, typename CharTraits, typename T, typename alloc>
+    template <typename CharType, typename T, typename alloc>
     void serialize (
         const std::forward_list<T,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1833,10 +1819,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::forward_list"); }
     }
 
-    template <typename CharType, typename CharTraits, typename T, typename alloc>
+    template <typename CharType, typename T, typename alloc>
     void deserialize (
         std::forward_list<T,alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1853,10 +1839,10 @@ namespace dlib
     
 // ----------------------------------------------------------------------------------------
     
-    template <typename CharType, typename CharTraits, typename T, typename alloc>
+    template <typename CharType, typename T, typename alloc>
     void serialize (
         const std::deque<T,alloc>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1871,10 +1857,10 @@ namespace dlib
         { throw serialization_error(e.info + "\n   while serializing object of type std::deque"); }
     }
 
-    template <typename CharType, typename CharTraits, typename T, typename alloc>
+    template <typename CharType, typename T, typename alloc>
     void deserialize (
         std::deque<T, alloc>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try 
@@ -1891,10 +1877,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     inline void serialize (
         const std::string& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1909,10 +1895,10 @@ namespace dlib
         }
     }
 
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     inline void deserialize (
         std::string& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try
@@ -1931,10 +1917,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     inline void serialize (
         const std::wstring& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         const unsigned long size = static_cast<unsigned long>(item.size());
@@ -1947,10 +1933,10 @@ namespace dlib
         if (!out) throw serialization_error("Error serializing object of type std::wstring");
     }
 
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     inline void deserialize (
         std::wstring& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         unsigned long size;
@@ -1967,10 +1953,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     inline void serialize (
         const ustring& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         const unsigned long size = static_cast<unsigned long>(item.size());
@@ -1983,10 +1969,10 @@ namespace dlib
         if (!out) throw serialization_error("Error serializing object of type ustring");
     }
 
-    template<typename CharType, typename CharTraits>
+    template<typename CharType>
     inline void deserialize (
         ustring& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         unsigned long size;
@@ -2004,12 +1990,12 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         typename T
         >
     inline void serialize (
         const enumerable<T>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -2029,13 +2015,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         typename domain,
         typename range
         >
     inline void serialize (
         const map_pair<domain,range>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -2052,13 +2038,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         typename T,
         size_t length
         >
     inline void serialize (
         const T (&array)[length],
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -2074,12 +2060,12 @@ namespace dlib
     }
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         size_t length
         >
     inline void serialize (
         const char (&array)[length],
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         if (length != 0 && array[length-1] == '\0')
@@ -2112,13 +2098,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         typename T,
         size_t length
         >
     inline void deserialize (
         T (&array)[length],
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         size_t size;
@@ -2141,12 +2127,12 @@ namespace dlib
     }
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         size_t length
         >
     inline void deserialize (
         char (&array)[length],
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         size_t size;
@@ -2183,13 +2169,13 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         typename T,
         size_t N
         >
     inline void serialize (
         const std::array<T,N>& array,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         typedef T c_array_type[N];
@@ -2197,13 +2183,13 @@ namespace dlib
     }
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         typename T,
         size_t N
         >
     inline void deserialize (
         std::array<T,N>& array,
-        std::basic_istream<CharType, CharTraits>& in 
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in 
     )
     {
         typedef T c_array_type[N];
@@ -2211,12 +2197,12 @@ namespace dlib
     }
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         typename T
         >
     inline void serialize (
         const std::array<T,0>& /*array*/,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         size_t N = 0;
@@ -2224,12 +2210,12 @@ namespace dlib
     }
 
     template <
-        typename CharType, typename CharTraits,
+        typename CharType,
         typename T
         >
     inline void deserialize (
         std::array<T,0>& /*array*/,
-        std::basic_istream<CharType, CharTraits>& in 
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in 
     )
     {
         size_t N;
@@ -2244,10 +2230,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits,typename T, typename deleter>
+    template <typename CharType,typename T, typename deleter>
     void serialize (
         const std::unique_ptr<T, deleter>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -2263,10 +2249,10 @@ namespace dlib
         }
     }
 
-    template <typename CharType, typename CharTraits,typename T, typename deleter>
+    template <typename CharType,typename T, typename deleter>
     void deserialize (
         std::unique_ptr<T, deleter>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try
@@ -2287,10 +2273,10 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename CharType, typename CharTraits, typename T>
+    template <typename CharType, typename T>
     void serialize (
         const std::shared_ptr<T>& item,
-        std::basic_ostream<CharType, CharTraits>& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -2306,10 +2292,10 @@ namespace dlib
         }
     }
 
-    template <typename CharType, typename CharTraits, typename T>
+    template <typename CharType, typename T>
     void deserialize (
         std::shared_ptr<T>& item,
-        std::basic_istream<CharType, CharTraits>& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try
@@ -2536,8 +2522,8 @@ namespace dlib
         static const bool value = true;
     };
 
-    template <typename CharType, typename CharTraits, typename T>
-    typename enable_if<is_protocol_buffer<T> >::type serialize(const T& item, std::basic_ostream<CharType, CharTraits>& out)
+    template <typename CharType, typename T>
+    typename enable_if<is_protocol_buffer<T> >::type serialize(const T& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
     {
         // Note that Google protocol buffer messages are not self delimiting 
         // (see https://developers.google.com/protocol-buffers/docs/techniques)
@@ -2561,8 +2547,8 @@ namespace dlib
         out.write(temp.c_str(), temp.size());
     }
 
-    template <typename CharType, typename CharTraits, typename T>
-    typename enable_if<is_protocol_buffer<T> >::type deserialize(T& item, std::basic_istream<CharType, CharTraits>& in)
+    template <typename CharType, typename T>
+    typename enable_if<is_protocol_buffer<T> >::type deserialize(T& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
     {
         // Note that Google protocol buffer messages are not self delimiting 
         // (see https://developers.google.com/protocol-buffers/docs/techniques)
@@ -2593,8 +2579,8 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename CharType, typename CharTraits>
-    inline void check_serialized_version(const std::string& expected_version, std::basic_istream<CharType, CharTraits>& in)
+    template<typename CharType>
+    inline void check_serialized_version(const std::string& expected_version, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
     {
         std::string version;
         deserialize(version, in);
@@ -2607,37 +2593,37 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template<typename CharType, typename CharTraits, typename T>
-    inline void serialize_these(std::basic_ostream<CharType, CharTraits>& out, const T& x)
+    template<typename CharType, typename T>
+    inline void serialize_these(std::basic_ostream<CharType, dlib_char_traits<CharType>>& out, const T& x)
     {
         using dlib::serialize;
         serialize(x, out);
     }
     
-    template<typename CharType, typename CharTraits, typename T, typename... Rest>
-    inline void serialize_these(std::basic_ostream<CharType, CharTraits>& out, const T& x, const Rest& ... rest)
+    template<typename CharType, typename T, typename... Rest>
+    inline void serialize_these(std::basic_ostream<CharType, dlib_char_traits<CharType>>& out, const T& x, const Rest& ... rest)
     {
         serialize_these(out, x);
         serialize_these(out, rest...);
     }
     
-    template<typename CharType, typename CharTraits, typename T>
-    inline void deserialize_these(std::basic_istream<CharType, CharTraits>& in, T& x)
+    template<typename CharType, typename T>
+    inline void deserialize_these(std::basic_istream<CharType, dlib_char_traits<CharType>>& in, T& x)
     {
         using dlib::deserialize;
         deserialize(x, in);
     }
     
-    template<typename CharType, typename CharTraits, typename T, typename... Rest>
-    inline void deserialize_these(std::basic_istream<CharType, CharTraits>& in, T& x, Rest& ... rest)
+    template<typename CharType, typename T, typename... Rest>
+    inline void deserialize_these(std::basic_istream<CharType, dlib_char_traits<CharType>>& in, T& x, Rest& ... rest)
     {
         deserialize_these(in, x);
         deserialize_these(in, rest...);
     }  
     
     #define DLIB_DEFINE_DEFAULT_SERIALIZATION(Type, ...)                \
-    template<typename CharType, typename CharTraits>                    \
-    void serialize_to(std::basic_ostream<CharType, CharTraits>& dlibDefaultSer$_out) const          \
+    template<typename CharType>                    \
+    void serialize_to(std::basic_ostream<CharType, dlib_char_traits<CharType>>& dlibDefaultSer$_out) const          \
     {                                                                   \
         using dlib::serialize;                                          \
         using dlib::serialize_these;                                    \
@@ -2657,8 +2643,8 @@ namespace dlib
         }                                                               \
     }                                                                   \
                                                                         \
-    template<typename CharType, typename CharTraits>                    \
-    void deserialize_from(std::basic_istream<CharType, CharTraits>& dlibDefaultSer$_in)             \
+    template<typename CharType>                    \
+    void deserialize_from(std::basic_istream<CharType, dlib_char_traits<CharType>>& dlibDefaultSer$_in)             \
     {                                                                   \
         using dlib::deserialize;                                        \
         using dlib::deserialize_these;                                  \
@@ -2675,13 +2661,13 @@ namespace dlib
             throw dlib::serialization_error(e.info + "\n   while deserializing object of type " #Type); \
         }                                                               \
     }                                                                   \
-    template<typename CharType, typename CharTraits>                    \
-    inline friend void serialize(const Type& item, std::basic_ostream<CharType, CharTraits>& out)   \
+    template<typename CharType>                    \
+    inline friend void serialize(const Type& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)   \
     {                                                                   \
         item.serialize_to(out);                                         \
     }                                                                   \
-    template<typename CharType, typename CharTraits>                    \
-    inline friend void deserialize(Type& item, std::basic_istream<CharType, CharTraits>& in)        \
+    template<typename CharType>                    \
+    inline friend void deserialize(Type& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)        \
     {                                                                   \
         item.deserialize_from(in);                                      \
     }

@@ -13,15 +13,15 @@
 
 namespace dlib
 {
-    template<typename CharType = char>
-    class unserialize : public std::basic_istream<CharType>
+    template<typename CharType>
+    class unserialize : public std::basic_istream<CharType,dlib_char_traits<CharType>>
     {
-        class mystreambuf : public std::basic_streambuf<CharType>
+        class mystreambuf : public std::basic_streambuf<CharType,dlib_char_traits<CharType>>
         {
             using size_type = typename std::vector<CharType>::size_type;
-            using pos_type  = typename std::basic_streambuf<CharType>::pos_type;
-            using off_type  = typename std::basic_streambuf<CharType>::off_type;
-            using int_type  = typename std::basic_streambuf<CharType>::int_type;
+            using pos_type  = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::pos_type;
+            using off_type  = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::off_type;
+            using int_type  = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::int_type;
             size_type read_pos; // buffer[read_pos] == next byte to read from buffer
         public:
             std::vector<CharType> buffer;
@@ -87,9 +87,9 @@ namespace dlib
         template <typename T>
         unserialize (
             const T& item,
-            std::basic_istream<CharType>& str 
+            std::basic_istream<CharType,dlib_char_traits<CharType>>& str 
         ) :
-            std::basic_istream<CharType>(&buf),
+            std::basic_istream<CharType,dlib_char_traits<CharType>>(&buf),
             buf(item, str)
         {}
 

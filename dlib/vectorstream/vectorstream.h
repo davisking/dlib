@@ -10,6 +10,7 @@
 #include <streambuf>
 #include <vector>
 #include <cstdio>
+#include <type_traits>
 #include "../algs.h"
 #include "../assert.h"
 
@@ -22,16 +23,36 @@
 
 namespace dlib
 {
-    template<typename CharType = char>
-    class vectorstream : public std::basic_iostream<CharType>
+    struct dlib_int8_t_traits : std::char_traits<int8_t>
     {
-        class vector_streambuf : public std::basic_streambuf<CharType>
+        // To keep both the byte 0xff and the eof symbol from coinciding
+        static constexpr bool lt(int8_t c1, int8_t c2) noexcept
         {
-            using traits_type = typename std::basic_streambuf<CharType>::traits_type;
+            return (static_cast<unsigned char>(c1) < static_cast<unsigned char>(c2));
+        }
+        
+        // To keep both the byte 0xff and the eof symbol from coinciding
+        static constexpr int_type to_int_type(int8_t c) noexcept
+        { 
+            return static_cast<int_type>(static_cast<unsigned char>(c)); 
+        }
+    };
+        
+    template<class CharType>
+    using dlib_char_traits = typename std::conditional<std::is_same<CharType,int8_t>::value,
+                                                       dlib_int8_t_traits,
+                                                       std::char_traits<CharType>>::type;
+    
+    template<typename CharType>
+    class vectorstream : public std::basic_iostream<CharType,dlib_char_traits<CharType>>
+    {
+        class vector_streambuf : public std::basic_streambuf<CharType,dlib_char_traits<CharType>>
+        {
+            using traits_type = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::traits_type;
             using size_type = typename std::vector<CharType>::size_type;
-            using pos_type  = typename std::basic_streambuf<CharType>::pos_type;
-            using off_type  = typename std::basic_streambuf<CharType>::off_type;
-            using int_type  = typename std::basic_streambuf<CharType>::int_type;
+            using pos_type  = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::pos_type;
+            using off_type  = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::off_type;
+            using int_type  = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::int_type;
             size_type read_pos; // buffer[read_pos] == next byte to read from buffer
         public:
             std::vector<CharType>& buffer;
@@ -148,7 +169,7 @@ namespace dlib
         vectorstream (
             std::vector<CharType>& buffer
         ) :
-            std::basic_iostream<CharType>(&buf),
+            std::basic_iostream<CharType,dlib_char_traits<CharType>>(&buf),
             buf(buffer)
         {}
             

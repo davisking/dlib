@@ -190,18 +190,18 @@ namespace
             test1_variant(buf, s2);
         } 
         
-//        {
-//            std::vector<int8_t> buf;
-//            vectorstream<int8_t> s1(buf);
-//            test1_variant(buf, s1);
-//        }
-//        
-//        {
-//            vector<int8_t> buf;
-//            dlib::vectorstream<int8_t> s1(buf);
-//            std::basic_iostream<int8_t>& s2 = s1;
-//            test1_variant(buf, s2);
-//        } 
+        {
+            std::vector<int8_t> buf;
+            vectorstream<int8_t> s1(buf);
+            test1_variant(buf, s1);
+        }
+        
+        {
+            vector<int8_t> buf;
+            dlib::vectorstream<int8_t> s1(buf);
+            std::basic_iostream<int8_t, dlib::dlib_int8_t_traits>& s2 = s1;
+            test1_variant(buf, s2);
+        } 
     }
 
 // ----------------------------------------------------------------------------------------
