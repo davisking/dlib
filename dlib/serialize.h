@@ -2497,8 +2497,8 @@ namespace dlib
         static_assert(std::is_same<CharType,char>::value or std::is_same<CharType,int8_t>::value or std::is_same<CharType,uint8_t>::value, "CharType needs to be either char, int8_t or uint8_t");
                 
         explicit proxy_deserialize2 (
-            std::vector<char>& buf
-        ) : fin(new vectorstream<char>(buf)),
+            std::vector<CharType>& buf
+        ) : fin(new vectorstream<CharType>(buf)),
             base("", *fin)
         {
             base.init();
@@ -2528,7 +2528,7 @@ namespace dlib
         
     private:
         std::unique_ptr<std::basic_istream<CharType,dlib_char_traits<CharType>>> fin;
-        proxy_deserialize_base<char> base;
+        proxy_deserialize_base<CharType> base;
     };
 
     inline proxy_serialize1 serialize(const std::string& filename)
