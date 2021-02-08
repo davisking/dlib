@@ -115,7 +115,8 @@ namespace dlib
 
         }
 
-        friend void serialize(const input_rgb_image& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const input_rgb_image& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("input_rgb_image", out);
             serialize(item.avg_red, out);
@@ -123,7 +124,8 @@ namespace dlib
             serialize(item.avg_blue, out);
         }
 
-        friend void deserialize(input_rgb_image& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(input_rgb_image& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -244,7 +246,8 @@ namespace dlib
 
         }
 
-        friend void serialize(const input_rgb_image_sized& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const input_rgb_image_sized& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("input_rgb_image_sized", out);
             serialize(item.avg_red, out);
@@ -254,7 +257,8 @@ namespace dlib
             serialize(NC, out);
         }
 
-        friend void deserialize(input_rgb_image_sized& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(input_rgb_image_sized& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -375,12 +379,14 @@ namespace dlib
 
         }
 
-        friend void serialize(const input& /*item*/, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const input& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("input<matrix>", out);
         }
 
-        friend void deserialize(input& /*item*/, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(input& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -468,12 +474,14 @@ namespace dlib
 
         }
 
-        friend void serialize(const input& /*item*/, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const input& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("input<array<matrix>>", out);
         }
 
-        friend void deserialize(input& /*item*/, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(input& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -564,12 +572,14 @@ namespace dlib
 
         }
 
-        friend void serialize(const input& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const input& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("input<array2d>", out);
         }
 
-        friend void deserialize(input& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(input& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -750,14 +760,16 @@ namespace dlib
             this->create_tiled_pyramid(rects, data);
         }
 
-        friend void serialize(const input_grayscale_image_pyramid& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const input_grayscale_image_pyramid& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("input_grayscale_image_pyramid", out);
             serialize(item.pyramid_padding, out);
             serialize(item.pyramid_outer_padding, out);
         }
 
-        friend void deserialize(input_grayscale_image_pyramid& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(input_grayscale_image_pyramid& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -865,7 +877,8 @@ namespace dlib
             this->create_tiled_pyramid(rects, data);
         }
 
-        friend void serialize(const input_rgb_image_pyramid& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const input_rgb_image_pyramid& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("input_rgb_image_pyramid2", out);
             serialize(item.avg_red, out);
@@ -875,7 +888,8 @@ namespace dlib
             serialize(item.pyramid_outer_padding, out);
         }
 
-        friend void deserialize(input_rgb_image_pyramid& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(input_rgb_image_pyramid& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
