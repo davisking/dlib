@@ -79,7 +79,7 @@ namespace dlib
 
             int_type overflow ( int_type c)
             {
-                if (c != traits_type::eof()) buffer.push_back(static_cast<char>(c));
+                if (c != traits_type::eof()) buffer.push_back(static_cast<CharType>(c));
                 return c;
             }
 
