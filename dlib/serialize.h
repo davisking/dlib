@@ -535,14 +535,15 @@ namespace dlib
         !*/
         {
             COMPILE_TIME_ASSERT(sizeof(T) <= 8);
-
+            using int_type = typename std::basic_istream<CharType, CharTraits>::int_type;
+            
             unsigned char buf[8];
             unsigned char size;
 
             item = 0;
 
             auto* sbuf = in.rdbuf();
-            int ch = sbuf->sbumpc();
+            const int_type ch = sbuf->sbumpc();
             if (ch != std::basic_istream<CharType, CharTraits>::traits_type::eof())
             {
                 size = static_cast<unsigned char>(ch);
@@ -615,8 +616,9 @@ namespace dlib
         std::basic_istream<CharType, CharTraits>& in
     )
     {
+        using int_type = typename std::basic_istream<CharType, CharTraits>::int_type;
         auto* sbuf = in.rdbuf();
-        int temp = sbuf->sbumpc();
+        const int_type temp = sbuf->sbumpc();
         if (temp != std::basic_istream<CharType, CharTraits>::traits_type::eof())
         {
             ch = static_cast<T>(temp);
