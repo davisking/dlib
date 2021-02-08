@@ -462,7 +462,7 @@ namespace dlib
             // platform is encountered.
             bo.host_to_little(d);
             static_assert(sizeof(d)==4, "This serialization code assumes we are writing 4 byte floats");
-            sbuf->sputn((char*)&d, sizeof(d));
+            sbuf->sputn((CharType*)&d, sizeof(d));
         }
     }
 
@@ -485,7 +485,7 @@ namespace dlib
         for (auto& d : item)
         {
             static_assert(sizeof(d)==4, "This serialization code assumes we are writing 4 byte floats");
-            if (sbuf->sgetn((char*)&d,sizeof(d)) != sizeof(d))
+            if (sbuf->sgetn((CharType*)&d,sizeof(d)) != sizeof(d))
             {
                 in.setstate(std::ios::badbit);
                 throw serialization_error("Error reading data while deserializing dlib::resizable_tensor.");
