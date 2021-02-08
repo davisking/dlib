@@ -2341,7 +2341,7 @@ namespace dlib
     class proxy_serialize2
     {
     public:     
-        static_assert(std::is_same<CharType,char>::value or std::is_same<CharType,int8_t>::value or std::is_same<CharType,uint8_t>::value, "CharType needs to be either char, int8_t or uint8_t");
+        static_assert((std::is_same<CharType,char>::value || std::is_same<CharType,int8_t>::value || std::is_same<CharType,uint8_t>::value), "CharType needs to be either char, int8_t or uint8_t");
         
         explicit proxy_serialize2 (
             std::vector<CharType>& buf
@@ -2494,7 +2494,7 @@ namespace dlib
     class proxy_deserialize2 
     {
     public:
-        static_assert(std::is_same<CharType,char>::value or std::is_same<CharType,int8_t>::value or std::is_same<CharType,uint8_t>::value, "CharType needs to be either char, int8_t or uint8_t");
+        static_assert((std::is_same<CharType,char>::value || std::is_same<CharType,int8_t>::value || std::is_same<CharType,uint8_t>::value), "CharType needs to be either char, int8_t or uint8_t");
                 
         explicit proxy_deserialize2 (
             std::vector<CharType>& buf
