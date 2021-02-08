@@ -253,8 +253,10 @@ namespace dlib
             {
             }
 
-            friend void serialize(const repeat_input_layer&, std::ostream&){}
-            friend void deserialize(repeat_input_layer&, std::istream&){}
+            template<typename CharType>
+            friend void serialize(const repeat_input_layer&, std::basic_ostream<CharType, dlib_char_traits<CharType>>&){}
+            template<typename CharType>
+            friend void deserialize(repeat_input_layer&, std::basic_istream<CharType, dlib_char_traits<CharType>>&){}
             friend std::ostream& operator<<(std::ostream& out, const repeat_input_layer&) { return out; }
         };
 
@@ -723,10 +725,10 @@ namespace dlib
     template <typename LAYER_DETAILS, typename SUBNET, typename enabled = void>
     class add_layer;
 
-    template <typename LAYER_DETAILS, typename SUBNET, typename enabled>
-    void serialize(const add_layer<LAYER_DETAILS,SUBNET,enabled>& item, std::ostream& out);
-    template <typename LAYER_DETAILS, typename SUBNET, typename enabled>
-    void deserialize(add_layer<LAYER_DETAILS,SUBNET,enabled>& item, std::istream& in);
+    template <typename CharType, typename LAYER_DETAILS, typename SUBNET, typename enabled>
+    void serialize(const add_layer<LAYER_DETAILS,SUBNET,enabled>& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out);
+    template <typename CharType, typename LAYER_DETAILS, typename SUBNET, typename enabled>
+    void deserialize(add_layer<LAYER_DETAILS,SUBNET,enabled>& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in);
 
     template <typename T, typename U>
     struct is_nonloss_layer_type<add_layer<T,U>> : std::true_type {};
@@ -1053,7 +1055,8 @@ namespace dlib
             call_clean_method_if_exists(details);
         }
 
-        friend void serialize(const add_layer& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const add_layer& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             int version = 2;
             serialize(version, out);
@@ -1067,7 +1070,8 @@ namespace dlib
             serialize(item.params_grad, out);
         }
 
-        friend void deserialize(add_layer& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(add_layer& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             int version = 0;
             deserialize(version, in);
@@ -1422,7 +1426,8 @@ namespace dlib
             call_clean_method_if_exists(details);
         }
 
-        friend void serialize(const add_layer& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const add_layer& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             int version = 3;
             serialize(version, out);
@@ -1437,7 +1442,8 @@ namespace dlib
             serialize(item._sample_expansion_factor, out);
         }
 
-        friend void deserialize(add_layer& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(add_layer& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             int version = 0;
             deserialize(version, in);
@@ -1659,14 +1665,16 @@ namespace dlib
             subnetwork.clean();
         }
 
-        friend void serialize(const add_tag_layer& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const add_tag_layer& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             int version = 1;
             serialize(version, out);
             serialize(item.subnetwork, out);
         }
 
-        friend void deserialize(add_tag_layer& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(add_tag_layer& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             int version = 0;
             deserialize(version, in);
@@ -1961,7 +1969,8 @@ namespace dlib
                 d.clean();
         }
 
-        friend void serialize(const repeat& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const repeat& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             int version = 1;
             serialize(version, out);
@@ -1969,7 +1978,8 @@ namespace dlib
             serialize(item.subnetwork, out);
         }
 
-        friend void deserialize(repeat& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(repeat& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             int version = 0;
             deserialize(version, in);
@@ -2194,7 +2204,8 @@ namespace dlib
             cached_output_ptr = 0;
         }
 
-        friend void serialize(const add_tag_layer& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const add_tag_layer& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             int version = 2;
             serialize(version, out);
@@ -2205,7 +2216,8 @@ namespace dlib
             serialize(item._sample_expansion_factor, out);
         }
 
-        friend void deserialize(add_tag_layer& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(add_tag_layer& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             int version = 0;
             deserialize(version, in);
@@ -2638,10 +2650,10 @@ namespace dlib
             subnetwork.clean();
         }
 
-        template <typename T, typename U>
-        friend void serialize(const add_loss_layer<T,U>& item, std::ostream& out);
-        template <typename T, typename U>
-        friend void deserialize(add_loss_layer<T,U>& item, std::istream& in);
+        template <typename CharType,typename T, typename U>
+        friend void serialize(const add_loss_layer<T,U>& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out);
+        template <typename CharType, typename T, typename U>
+        friend void deserialize(add_loss_layer<T,U>& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in);
 
         friend std::ostream& operator<< (std::ostream& out, const add_loss_layer& item)
         {
@@ -2674,8 +2686,8 @@ namespace dlib
         resizable_tensor temp_tensor;
     };
 
-    template <typename LOSS_DETAILS, typename SUBNET>
-    void serialize(const add_loss_layer<LOSS_DETAILS,SUBNET>& item, std::ostream& out)
+    template <typename CharType, typename LOSS_DETAILS, typename SUBNET>
+    void serialize(const add_loss_layer<LOSS_DETAILS,SUBNET>& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
     {
         int version = 1;
         serialize(version, out);
@@ -2683,8 +2695,8 @@ namespace dlib
         serialize(item.subnetwork, out);
     }
 
-    template <typename LOSS_DETAILS, typename SUBNET>
-    void deserialize(add_loss_layer<LOSS_DETAILS,SUBNET>& item, std::istream& in)
+    template <typename CharType, typename LOSS_DETAILS, typename SUBNET>
+    void deserialize(add_loss_layer<LOSS_DETAILS,SUBNET>& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
     {
         int version = 0;
         deserialize(version, in);
@@ -3049,14 +3061,16 @@ namespace dlib
             subnetwork.clean();
         }
 
-        friend void serialize(const add_skip_layer& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const add_skip_layer& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             int version = 1;
             serialize(version, out);
             serialize(item.subnetwork, out);
         }
 
-        friend void deserialize(add_skip_layer& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(add_skip_layer& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             int version = 0;
             deserialize(version, in);
