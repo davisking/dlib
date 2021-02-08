@@ -48,11 +48,11 @@ namespace dlib
     {
         class vector_streambuf : public std::basic_streambuf<CharType,dlib_char_traits<CharType>>
         {
-            using traits_type = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::traits_type;
-            using size_type = typename std::vector<CharType>::size_type;
-            using pos_type  = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::pos_type;
-            using off_type  = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::off_type;
-            using int_type  = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::int_type;
+            using size_type     = typename std::vector<CharType>::size_type;
+            using pos_type      = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::pos_type;
+            using off_type      = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::off_type;
+            using int_type      = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::int_type;
+            using traits_type   = typename std::basic_streambuf<CharType,dlib_char_traits<CharType>>::traits_type;
             size_type read_pos; // buffer[read_pos] == next byte to read from buffer
         public:
             std::vector<CharType>& buffer;
