@@ -441,7 +441,8 @@ namespace dlib
         virtual const gpu_data& data() const { return data_instance; }
     };
 
-    inline void serialize(const tensor& item, std::ostream& out)
+    template<typename CharType>
+    inline void serialize(const tensor& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
     {
         int version = 2;
         serialize(version, out);
@@ -465,7 +466,8 @@ namespace dlib
         }
     }
 
-    inline void deserialize(resizable_tensor& item, std::istream& in)
+    template<typename CharType>
+    inline void deserialize(resizable_tensor& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
     {
         int version;
         deserialize(version, in);
@@ -654,7 +656,8 @@ namespace dlib
         mutable alias_tensor_instance inst;
     };
 
-    inline void serialize(const alias_tensor& item, std::ostream& out)
+    template<typename CharType>
+    inline void serialize(const alias_tensor& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
     {
         int version = 1;
         serialize(version, out);
@@ -664,7 +667,8 @@ namespace dlib
         serialize(item.nc(), out);
     }
 
-    inline void deserialize(alias_tensor& item, std::istream& in)
+    template<typename CharType>
+    inline void deserialize(alias_tensor& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
     {
         int version = 0;
         deserialize(version, in);
