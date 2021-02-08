@@ -1865,6 +1865,7 @@ namespace dlib
     ) { a.swap(b); }
 
     template <
+        typename CharType,
         typename T,
         long NR,
         long NC,
@@ -1873,7 +1874,7 @@ namespace dlib
         >
     void serialize (
         const matrix<T,NR,NC,mm,l>& item, 
-        std::ostream& out
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
         try
@@ -1899,6 +1900,7 @@ namespace dlib
     }
 
     template <
+        typename CharType,
         typename T,
         long NR,
         long NC,
@@ -1907,7 +1909,7 @@ namespace dlib
         >
     void deserialize (
         matrix<T,NR,NC,mm,l>& item, 
-        std::istream& in
+        std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
         try
