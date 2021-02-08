@@ -231,7 +231,8 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const con_& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const con_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("con_5", out);
             serialize(item.params, out);
@@ -251,7 +252,8 @@ namespace dlib
             serialize(item.use_bias, out);
         }
 
-        friend void deserialize(con_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(con_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -556,7 +558,8 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const cont_& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const cont_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("cont_2", out);
             serialize(item.params, out);
@@ -576,7 +579,8 @@ namespace dlib
             serialize(item.use_bias, out);
         }
 
-        friend void deserialize(cont_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(cont_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -745,14 +749,16 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const upsample_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const upsample_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("upsample_", out);
             serialize(scale_y, out);
             serialize(scale_x, out);
         }
 
-        friend void deserialize(upsample_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(upsample_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -851,7 +857,8 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
         
-        friend void serialize(const resize_to_& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const resize_to_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("resize_to_", out);
             serialize(NR_, out);
@@ -860,7 +867,8 @@ namespace dlib
             serialize(item.scale_x, out);
         }
         
-        friend void deserialize(resize_to_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(resize_to_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -1014,7 +1022,8 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const max_pool_& item, std::ostream& out)
+        template<typename CharType>
+        friend void serialize(const max_pool_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("max_pool_2", out);
             serialize(_nr, out);
@@ -1025,7 +1034,8 @@ namespace dlib
             serialize(item.padding_x_, out);
         }
 
-        friend void deserialize(max_pool_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(max_pool_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -1211,7 +1221,8 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const avg_pool_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const avg_pool_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("avg_pool_2", out);
             serialize(_nr, out);
@@ -1222,7 +1233,8 @@ namespace dlib
             serialize(item.padding_x_, out);
         }
 
-        friend void deserialize(avg_pool_& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(avg_pool_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -1365,7 +1377,8 @@ namespace dlib
         const tensor& get_layer_params() const { return params; };
         tensor& get_layer_params() { return params; };
 
-        friend void serialize(const layer_norm_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const layer_norm_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("layer_norm_", out);
             serialize(item.params, out);
@@ -1380,7 +1393,8 @@ namespace dlib
             serialize(item.eps, out);
         }
 
-        friend void deserialize(layer_norm_& item, std::istream& in)
+        template<typename CharType>
+        friend void deserialize(layer_norm_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -1560,7 +1574,8 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const bn_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const bn_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             if (mode == CONV_MODE)
                 serialize("bn_con2", out);
@@ -1582,7 +1597,8 @@ namespace dlib
             serialize(item.eps, out);
         }
 
-        friend void deserialize(bn_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(bn_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -1948,7 +1964,8 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const fc_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const fc_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("fc_3", out);
             serialize(item.num_outputs, out);
@@ -1964,7 +1981,8 @@ namespace dlib
             serialize(item.use_bias, out);
         }
 
-        friend void deserialize(fc_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(fc_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2143,14 +2161,16 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const dropout_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const dropout_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("dropout_", out);
             serialize(item.drop_rate, out);
             serialize(item.mask, out);
         }
 
-        friend void deserialize(dropout_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(dropout_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2240,13 +2260,15 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const multiply_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const multiply_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("multiply_", out);
             serialize(item.val, out);
         }
 
-        friend void deserialize(multiply_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(multiply_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2394,7 +2416,8 @@ namespace dlib
         const tensor& get_layer_params() const { return empty_params; }
         tensor& get_layer_params() { return empty_params; }
 
-        friend void serialize(const affine_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const affine_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("affine_", out);
             serialize(item.params, out);
@@ -2403,7 +2426,8 @@ namespace dlib
             serialize((int)item.mode, out);
         }
 
-        friend void deserialize(affine_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(affine_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2514,12 +2538,14 @@ namespace dlib
         inline dpoint map_input_to_output (const dpoint& p) const { return p; }
         inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
-        friend void serialize(const add_prev_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const add_prev_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("add_prev_", out);
         }
 
-        friend void deserialize(add_prev_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(add_prev_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2617,12 +2643,14 @@ namespace dlib
         inline dpoint map_input_to_output (const dpoint& p) const { return p; }
         inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
-        friend void serialize(const mult_prev_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const mult_prev_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("mult_prev_", out);
         }
 
-        friend void deserialize(mult_prev_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(mult_prev_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2739,12 +2767,14 @@ namespace dlib
         inline dpoint map_input_to_output (const dpoint& p) const { return p; }
         inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
-        friend void serialize(const resize_prev_to_tagged_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const resize_prev_to_tagged_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("resize_prev_to_tagged_", out);
         }
 
-        friend void deserialize(resize_prev_to_tagged_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(resize_prev_to_tagged_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2832,14 +2862,16 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const scale_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const scale_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("scale_", out);
             serialize(item.reshape_scales, out);
             serialize(item.reshape_src, out);
         }
 
-        friend void deserialize(scale_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(scale_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2954,14 +2986,16 @@ namespace dlib
         inline dpoint map_input_to_output (const dpoint& p) const { return p; }
         inline dpoint map_output_to_input (const dpoint& p) const { return p; }
 
-        friend void serialize(const scale_prev_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const scale_prev_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("scale_prev_", out);
             serialize(item.reshape_scales, out);
             serialize(item.reshape_src, out);
         }
 
-        friend void deserialize(scale_prev_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(scale_prev_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3051,12 +3085,14 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const relu_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const relu_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("relu_", out);
         }
 
-        friend void deserialize(relu_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(relu_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3131,14 +3167,16 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const prelu_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const prelu_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("prelu_", out);
             serialize(item.params, out);
             serialize(item.initial_param_value, out);
         }
 
-        friend void deserialize(prelu_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(prelu_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3212,13 +3250,15 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const leaky_relu_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const leaky_relu_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("leaky_relu_", out);
             serialize(item.alpha, out);
         }
 
-        friend void deserialize(leaky_relu_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(leaky_relu_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3284,12 +3324,14 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const sig_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const sig_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("sig_", out);
         }
 
-        friend void deserialize(sig_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(sig_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3357,12 +3399,14 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const mish_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const mish_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("mish_", out);
         }
 
-        friend void deserialize(mish_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(mish_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3425,12 +3469,14 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const htan_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const htan_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("htan_", out);
         }
 
-        friend void deserialize(htan_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(htan_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3498,12 +3544,14 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const gelu_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const gelu_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("gelu_", out);
         }
 
-        friend void deserialize(gelu_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(gelu_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3562,12 +3610,14 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const softmax_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const softmax_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("softmax_", out);
         }
 
-        friend void deserialize(softmax_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(softmax_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3625,12 +3675,14 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const softmax_all_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const softmax_all_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("softmax_all_", out);
         }
 
-        friend void deserialize(softmax_all_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(softmax_all_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3760,14 +3812,16 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const concat_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const concat_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("concat_", out);
             size_t count = tag_count();
             serialize(count, out);
         }
 
-        friend void deserialize(concat_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(concat_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3918,13 +3972,15 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const l2normalize_& item, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const l2normalize_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("l2normalize_", out);
             serialize(item.eps, out);
         }
 
-        friend void deserialize(l2normalize_& item, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(l2normalize_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -4015,7 +4071,8 @@ namespace dlib
         const tensor& get_layer_params() const { return params; }
         tensor& get_layer_params() { return params; }
 
-        friend void serialize(const extract_& /*item*/, std::ostream& out)
+        template<typename CharType> 
+        friend void serialize(const extract_& /*item*/, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("extract_", out);
             serialize(_offset, out);
@@ -4024,7 +4081,8 @@ namespace dlib
             serialize(_nc, out);
         }
 
-        friend void deserialize(extract_& /*item*/, std::istream& in)
+        template<typename CharType> 
+        friend void deserialize(extract_& /*item*/, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
