@@ -99,12 +99,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_binary_hinge_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_binary_hinge_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_binary_hinge_", out);
         }
 
-        friend void deserialize(loss_binary_hinge_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_binary_hinge_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -216,12 +216,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_binary_log_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_binary_log_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_binary_log_", out);
         }
 
-        friend void deserialize(loss_binary_log_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_binary_log_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -333,12 +333,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_multiclass_log_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_multiclass_log_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_multiclass_log_", out);
         }
 
-        friend void deserialize(loss_multiclass_log_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_multiclass_log_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -452,12 +452,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_multiclass_log_weighted_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_multiclass_log_weighted_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_multiclass_log_weighted_", out);
         }
 
-        friend void deserialize(loss_multiclass_log_weighted_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_multiclass_log_weighted_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -691,13 +691,13 @@ namespace dlib
         }
 
 
-        friend void serialize(const loss_multimulticlass_log_& item, std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_multimulticlass_log_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_multimulticlass_log_", out);
             serialize(item.get_labels(), out);
         }
 
-        friend void deserialize(loss_multimulticlass_log_& item, std::istream& in)
+        template<typename CharType> friend void deserialize(loss_multimulticlass_log_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -857,12 +857,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_multibinary_log_&, std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_multibinary_log_&, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_multibinary_log_", out);
         }
 
-        friend void deserialize(loss_multibinary_log_&, std::istream& in)
+        template<typename CharType> friend void deserialize(loss_multibinary_log_&, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -908,7 +908,8 @@ namespace dlib
             unsigned long height = 0;
             std::string label;
 
-            friend inline void serialize(const detector_window_details& item, std::ostream& out)
+            template<typename CharType>
+            friend inline void serialize(const detector_window_details& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
             {
                 int version = 2;
                 serialize(version, out);
@@ -917,7 +918,8 @@ namespace dlib
                 serialize(item.label, out);
             }
 
-            friend inline void deserialize(detector_window_details& item, std::istream& in)
+            template<typename CharType>
+            friend inline void deserialize(detector_window_details& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
             {
                 int version = 0;
                 deserialize(version, in);
@@ -1177,7 +1179,8 @@ namespace dlib
         }
     };
 
-    inline void serialize(const mmod_options& item, std::ostream& out)
+    template<typename CharType>
+    inline void serialize(const mmod_options& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
     {
         int version = 4;
 
@@ -1193,7 +1196,8 @@ namespace dlib
         serialize(item.bbr_lambda, out);
     }
 
-    inline void deserialize(mmod_options& item, std::istream& in)
+    template<typename CharType>
+    inline void deserialize(mmod_options& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
     {
         int version = 0;
         deserialize(version, in);
@@ -1651,13 +1655,13 @@ namespace dlib
         }
 
 
-        friend void serialize(const loss_mmod_& item, std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_mmod_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_mmod_", out);
             serialize(item.options, out);
         }
 
-        friend void deserialize(loss_mmod_& item, std::istream& in)
+        template<typename CharType> friend void deserialize(loss_mmod_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2173,14 +2177,14 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_metric_& item, std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_metric_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_metric_2", out);
             serialize(item.margin, out);
             serialize(item.dist_thresh, out);
         }
 
-        friend void deserialize(loss_metric_& item, std::istream& in)
+        template<typename CharType> friend void deserialize(loss_metric_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2340,12 +2344,12 @@ namespace dlib
             return loss*scale;
         }
 
-        friend void serialize(const loss_ranking_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_ranking_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_ranking_", out);
         }
 
-        friend void deserialize(loss_ranking_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_ranking_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2447,12 +2451,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_mean_squared_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_mean_squared_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_mean_squared_", out);
         }
 
-        friend void deserialize(loss_mean_squared_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_mean_squared_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2573,13 +2577,13 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_epsilon_insensitive_& item, std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_epsilon_insensitive_& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_epsilon_insensitive_", out);
             serialize(item.eps, out);
         }
 
-        friend void deserialize(loss_epsilon_insensitive_& item, std::istream& in)
+        template<typename CharType> friend void deserialize(loss_epsilon_insensitive_& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2697,12 +2701,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_mean_squared_multioutput_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_mean_squared_multioutput_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_mean_squared_multioutput_", out);
         }
 
-        friend void deserialize(loss_mean_squared_multioutput_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_mean_squared_multioutput_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2807,12 +2811,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_binary_log_per_pixel_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_binary_log_per_pixel_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_binary_log_per_pixel_", out);
         }
 
-        friend void deserialize(loss_binary_log_per_pixel_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_binary_log_per_pixel_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -2952,12 +2956,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_multiclass_log_per_pixel_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_multiclass_log_per_pixel_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_multiclass_log_per_pixel_", out);
         }
 
-        friend void deserialize(loss_multiclass_log_per_pixel_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_multiclass_log_per_pixel_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3052,12 +3056,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_multiclass_log_per_pixel_weighted_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_multiclass_log_per_pixel_weighted_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_multiclass_log_per_pixel_weighted_", out);
         }
 
-        friend void deserialize(loss_multiclass_log_per_pixel_weighted_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_multiclass_log_per_pixel_weighted_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3185,12 +3189,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_mean_squared_per_pixel_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_mean_squared_per_pixel_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_mean_squared_per_pixel_", out);
         }
 
-        friend void deserialize(loss_mean_squared_per_pixel_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_mean_squared_per_pixel_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3303,12 +3307,12 @@ namespace dlib
             return loss;
         }
 
-        friend void serialize(const loss_mean_squared_per_channel_and_pixel_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_mean_squared_per_channel_and_pixel_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_mean_squared_per_channel_and_pixel_", out);
         }
 
-        friend void deserialize(loss_mean_squared_per_channel_and_pixel_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_mean_squared_per_channel_and_pixel_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
@@ -3416,12 +3420,12 @@ namespace dlib
             return loss*scale;
         }
 
-        friend void serialize(const loss_dot_& , std::ostream& out)
+        template<typename CharType> friend void serialize(const loss_dot_& , std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)
         {
             serialize("loss_dot_", out);
         }
 
-        friend void deserialize(loss_dot_& , std::istream& in)
+        template<typename CharType> friend void deserialize(loss_dot_& , std::basic_istream<CharType, dlib_char_traits<CharType>>& in)
         {
             std::string version;
             deserialize(version, in);
