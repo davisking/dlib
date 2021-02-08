@@ -2315,88 +2315,71 @@ namespace dlib
     }
 
 // ----------------------------------------------------------------------------------------
-
-    class proxy_serialize
+    class proxy_serialize1
     {
     public:
-        explicit proxy_serialize (
+        explicit proxy_serialize1 (
             const std::string& filename
-        ) : fout_optional_owning_ptr(new std::ofstream(filename.c_str(), std::ios::binary)),
-            fout(*fout_optional_owning_ptr)
+        ) : fout(filename.c_str(), std::ios::binary)
         {
             if (!fout)
                 throw serialization_error("Unable to open " + filename + " for writing.");
         }
-        
-        explicit proxy_serialize (
-            std::vector<char>& buf
-        ) : fout_optional_owning_ptr(new vectorstream<char>(buf)),
-            fout(*fout_optional_owning_ptr)
-        {
-        }
-        
-        explicit proxy_serialize (
-            std::ostream& ss
-        ) : fout_optional_owning_ptr(nullptr),
-            fout(ss)
-        {}
-        
+                
         template <typename T>
-        inline proxy_serialize& operator<<(const T& item)
+        inline proxy_serialize1& operator<<(const T& item)
         {
             serialize(item, fout);
             return *this;
         }
 
     private:
-        std::unique_ptr<std::ostream> fout_optional_owning_ptr;
-        std::ostream& fout;
+        std::ofstream fout;
     };
     
-    class proxy_deserialize
+    template<typename CharType>
+    class proxy_serialize2
+    {
+    public:     
+        static_assert(std::is_same<CharType,char>::value or std::is_same<CharType,int8_t>::value or std::is_same<CharType,uint8_t>::value, "CharType needs to be either char, int8_t or uint8_t");
+        
+        explicit proxy_serialize2 (
+            std::vector<CharType>& buf
+        ) : fout_optional_owning_ptr(new vectorstream<CharType>(buf)),
+            fout(*fout_optional_owning_ptr)
+        {
+        }
+        
+        explicit proxy_serialize2 (
+            std::basic_ostream<CharType, dlib_char_traits<CharType>>& ss
+        ) : fout_optional_owning_ptr(nullptr),
+            fout(ss)
+        {}
+        
+        template <typename T>
+        inline proxy_serialize2& operator<<(const T& item)
+        {
+            serialize(item, fout);
+            return *this;
+        }
+
+    private:
+        std::unique_ptr<std::basic_ostream<CharType, dlib_char_traits<CharType>>> fout_optional_owning_ptr;
+        std::basic_ostream<CharType, dlib_char_traits<CharType>>& fout;
+    };
+    
+    template<typename CharType>
+    class proxy_deserialize_base
     {
     public:
-        explicit proxy_deserialize (
-            const std::string& filename_
-        )  : filename(filename_),
-             fin_optional_owning_ptr(new std::ifstream(filename.c_str(), std::ios::binary)),
-             fin(*fin_optional_owning_ptr)   
+        explicit proxy_deserialize_base(
+            const std::string& filename_,
+            std::basic_istream<CharType,dlib_char_traits<CharType>>& fin_
+        ) : filename(filename_),
+            fin(fin_)
         {
-            if (!fin)
-                throw serialization_error("Unable to open " + filename + " for reading.");
-            init();
         }
         
-        explicit proxy_deserialize (
-            std::vector<char>& buf
-        ) : fin_optional_owning_ptr(new vectorstream<char>(buf)),
-            fin(*fin_optional_owning_ptr)   
-        {
-            init();
-        }
-        
-        explicit proxy_deserialize (
-            std::istream& ss
-        ) : fin_optional_owning_ptr(nullptr),
-            fin(ss)
-        {
-            init();
-        }
-                
-        template <typename T>
-        inline proxy_deserialize& operator>>(T& item)
-        {
-            return doit(item);
-        }
-
-        template <typename T>
-        inline proxy_deserialize& operator>>(ramdump_t<T>&& item)
-        {
-            return doit(std::move(item));
-        }
-        
-    private:
-
         void init()
         {
             // read the file header into a buffer and then seek back to the start of the
@@ -2406,10 +2389,8 @@ namespace dlib
             fin.seekg(0);
         }
         
-    private:
-        
         template <typename T>
-        inline proxy_deserialize& doit(T&& item)
+        void doit(T&& item)
         {
             try
             {
@@ -2447,13 +2428,13 @@ namespace dlib
                 }
             }
             ++objects_read;
-            return *this;
         }
 
+    private:
+        
         int objects_read = 0;
         const std::string filename = "";
-        std::unique_ptr<std::istream> fin_optional_owning_ptr;
-        std::istream& fin;
+        std::basic_istream<CharType,dlib_char_traits<CharType>>& fin;
 
         // We don't need to look at the file header.  However, it's here because people
         // keep posting questions to the dlib forums asking why they get file load errors.
@@ -2476,19 +2457,97 @@ namespace dlib
             return false;
         }
     };
+    
+    class proxy_deserialize1
+    {
+    public:
+        explicit proxy_deserialize1 (
+            const std::string& filename_
+        ) : fin(filename_.c_str(), std::ios::binary),
+            base(filename_, fin)
+        {
+            if (!fin)
+                throw serialization_error("Unable to open " + filename_ + " for reading.");
+            base.init();
+        }
+        
+        template <typename T>
+        inline proxy_deserialize1& operator>>(T& item)
+        {
+            base.doit(item);
+            return *this;
+        }
 
-    inline proxy_serialize serialize(const std::string& filename)
-    { return proxy_serialize(filename); }
-    inline proxy_serialize serialize(std::ostream& ss)
-    { return proxy_serialize(ss); }
-    inline proxy_serialize serialize(std::vector<char>& buf)
-    { return proxy_serialize(buf); }
-    inline proxy_deserialize deserialize(const std::string& filename)
-    { return proxy_deserialize(filename); }
-    inline proxy_deserialize deserialize(std::istream& ss)
-    { return proxy_deserialize(ss); }
-    inline proxy_deserialize deserialize(std::vector<char>& buf)
-    { return proxy_deserialize(buf); }
+        template <typename T>
+        inline proxy_deserialize1& operator>>(ramdump_t<T>&& item)
+        {
+            base.doit(std::move(item));
+            return *this;
+        }
+        
+    private:
+        std::ifstream fin;
+        proxy_deserialize_base<char> base;
+    };
+    
+    template<typename CharType>
+    class proxy_deserialize2 
+    {
+    public:
+        static_assert(std::is_same<CharType,char>::value or std::is_same<CharType,int8_t>::value or std::is_same<CharType,uint8_t>::value, "CharType needs to be either char, int8_t or uint8_t");
+                
+        explicit proxy_deserialize2 (
+            std::vector<char>& buf
+        ) : fin(new vectorstream<char>(buf)),
+            base("", *fin)
+        {
+            base.init();
+        }
+        
+        explicit proxy_deserialize2 (
+            std::basic_istream<CharType,dlib_char_traits<CharType>>& ss
+        ) : fin(nullptr),
+            base("", ss)
+        {
+            base.init();
+        }
+        
+        template <typename T>
+        inline proxy_deserialize2& operator>>(T& item)
+        {
+            base.doit(item);
+            return *this;
+        }
+
+        template <typename T>
+        inline proxy_deserialize2& operator>>(ramdump_t<T>&& item)
+        {
+            base.doit(std::move(item));
+            return *this;
+        }
+        
+    private:
+        std::unique_ptr<std::basic_istream<CharType,dlib_char_traits<CharType>>> fin;
+        proxy_deserialize_base<char> base;
+    };
+
+    inline proxy_serialize1 serialize(const std::string& filename)
+    { return proxy_serialize1(filename); }
+    template<typename CharType>
+    inline proxy_serialize2<CharType> serialize(std::basic_ostream<CharType, dlib_char_traits<CharType>>& ss)
+    { return proxy_serialize2<CharType>(ss); }
+    template<typename CharType>
+    inline proxy_serialize2<CharType> serialize(std::vector<CharType>& buf)
+    { return proxy_serialize2<CharType>(buf); }
+    
+    inline proxy_deserialize1 deserialize(const std::string& filename)
+    { return proxy_deserialize1(filename); }
+    template<typename CharType>
+    inline proxy_deserialize2<CharType> deserialize(std::basic_istream<CharType, dlib_char_traits<CharType>>& ss)
+    { return proxy_deserialize2<CharType>(ss); }
+    template<typename CharType>
+    inline proxy_deserialize2<CharType> deserialize(std::vector<CharType>& buf)
+    { return proxy_deserialize2<CharType>(buf); }
 
 // ----------------------------------------------------------------------------------------
 
