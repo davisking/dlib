@@ -1180,7 +1180,71 @@ namespace
             DLIB_TEST(pointers_values_equal(uptr1, uptr3));
             DLIB_TEST(pointers_values_equal(uptr2, uptr4));
         }
+        
+        {
+            std::vector<int8_t> buf;
+            dlib::serialize(buf) << t1 << t2 << v1 << uptr1 << uptr2;
+            dlib::deserialize(buf) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+
+            DLIB_TEST(t1 == t3);
+            DLIB_TEST(t2 == t4);
+            DLIB_TEST(v1 == v2);
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+        }
+        
+        {
+            std::vector<uint8_t> buf;
+            dlib::serialize(buf) << t1 << t2 << v1 << uptr1 << uptr2;
+            dlib::deserialize(buf) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+
+            DLIB_TEST(t1 == t3);
+            DLIB_TEST(t2 == t4);
+            DLIB_TEST(v1 == v2);
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+        }
+        
+        {
+            std::vector<char> buf1;
+            dlib::serialize(buf1) << t1 << t2 << v1 << uptr1 << uptr2;
+            std::vector<int8_t> buf2(buf1.begin(), buf1.end());
+            dlib::deserialize(buf2) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+
+            DLIB_TEST(t1 == t3);
+            DLIB_TEST(t2 == t4);
+            DLIB_TEST(v1 == v2);
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+        }
+        
+        {
+            std::vector<char> buf1;
+            dlib::serialize(buf1) << t1 << t2 << v1 << uptr1 << uptr2;
+            std::vector<uint8_t> buf2(buf1.begin(), buf1.end());
+            dlib::deserialize(buf2) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+
+            DLIB_TEST(t1 == t3);
+            DLIB_TEST(t2 == t4);
+            DLIB_TEST(v1 == v2);
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+        }
+        
+         {
+            std::vector<int8_t> buf1;
+            dlib::serialize(buf1) << t1 << t2 << v1 << uptr1 << uptr2;
+            std::vector<uint8_t> buf2(buf1.begin(), buf1.end());
+            dlib::deserialize(buf2) >> t3 >> t4 >> v2 >> uptr3 >> uptr4;
+
+            DLIB_TEST(t1 == t3);
+            DLIB_TEST(t2 == t4);
+            DLIB_TEST(v1 == v2);
+            DLIB_TEST(pointers_values_equal(uptr1, uptr3));
+            DLIB_TEST(pointers_values_equal(uptr2, uptr4));
+        }
     }
+    
 
 // ----------------------------------------------------------------------------------------
 
