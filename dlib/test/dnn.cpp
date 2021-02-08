@@ -3753,6 +3753,11 @@ namespace
         const std::string serialized = out.str();
         std::istringstream in(serialized);
         dlib::deserialize(net2, in);
+        
+        std::vector<char> buf1;
+        dlib::serialize(buf1) << net;
+        std::vector<uint8_t> buf2(buf1.begin(), buf1.end());
+        dlib::deserialize(buf2) >> net2;
     }
 
 // ----------------------------------------------------------------------------------------
