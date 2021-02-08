@@ -1115,10 +1115,8 @@ namespace dlib
         std::basic_ostream<CharType, dlib_char_traits<CharType>>& out
     )
     {
-        if (item)
-            out << '1';
-        else
-            out << '0';
+        const CharType x = item ? '1' : '0';
+        out.put(x);
 
         if (!out) 
             throw serialization_error("Error serializing object of type bool");    
@@ -1130,7 +1128,9 @@ namespace dlib
         std::basic_istream<CharType, dlib_char_traits<CharType>>& in
     )
     {
-        int ch = in.get();
+        using int_type = typename std::basic_istream<CharType, dlib_char_traits<CharType>>::int_type;
+        
+        const int_type ch = in.get();
         if (ch != std::basic_istream<CharType, dlib_char_traits<CharType>>::traits_type::eof())
         {
             if (ch == '1')
@@ -2394,7 +2394,7 @@ namespace dlib
         {
             try
             {
-                if (fin.peek() == EOF)
+                if (fin.peek() == std::basic_istream<CharType,dlib_char_traits<CharType>>::traits_type::eof())
                     throw serialization_error("No more objects were in the stream!");
                 deserialize(std::forward<T>(item), fin);
             }
@@ -2443,7 +2443,7 @@ namespace dlib
         // deserialization errors is because they didn't decompress the file.  So we are
         // going to check if this file looks like a compressed file and if so then emit an
         // error message telling them to unzip the file. :(
-        char file_header[4] = {0,0,0,0};
+        CharType file_header[4] = {0,0,0,0};
 
         bool looks_like_a_compressed_file(
         ) const 
@@ -2682,7 +2682,7 @@ namespace dlib
     
     #define DLIB_DEFINE_DEFAULT_SERIALIZATION(Type, ...)                \
     template<typename CharType>                    \
-    void serialize_to(std::basic_ostream<CharType, dlib_char_traits<CharType>>& dlibDefaultSer$_out) const          \
+    void serialize_to(std::basic_ostream<CharType, dlib::dlib_char_traits<CharType>>& dlibDefaultSer$_out) const          \
     {                                                                   \
         using dlib::serialize;                                          \
         using dlib::serialize_these;                                    \
@@ -2703,7 +2703,7 @@ namespace dlib
     }                                                                   \
                                                                         \
     template<typename CharType>                    \
-    void deserialize_from(std::basic_istream<CharType, dlib_char_traits<CharType>>& dlibDefaultSer$_in)             \
+    void deserialize_from(std::basic_istream<CharType, dlib::dlib_char_traits<CharType>>& dlibDefaultSer$_in)             \
     {                                                                   \
         using dlib::deserialize;                                        \
         using dlib::deserialize_these;                                  \
@@ -2721,12 +2721,12 @@ namespace dlib
         }                                                               \
     }                                                                   \
     template<typename CharType>                    \
-    inline friend void serialize(const Type& item, std::basic_ostream<CharType, dlib_char_traits<CharType>>& out)   \
+    inline friend void serialize(const Type& item, std::basic_ostream<CharType, dlib::dlib_char_traits<CharType>>& out)   \
     {                                                                   \
         item.serialize_to(out);                                         \
     }                                                                   \
     template<typename CharType>                    \
-    inline friend void deserialize(Type& item, std::basic_istream<CharType, dlib_char_traits<CharType>>& in)        \
+    inline friend void deserialize(Type& item, std::basic_istream<CharType, dlib::dlib_char_traits<CharType>>& in)        \
     {                                                                   \
         item.deserialize_from(in);                                      \
     }
