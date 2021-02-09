@@ -21,11 +21,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    namespace impl
-    {
-        class visitor_fuse_convolutions;
-    }
-
     struct num_con_outputs
     {
         num_con_outputs(unsigned long n) : num_outputs(n) {}
@@ -113,8 +108,23 @@ namespace dlib
         void set_bias_learning_rate_multiplier(double val) { bias_learning_rate_multiplier = val; }
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
         void disable_bias() { use_bias = false; }
-        void enable_bias() { use_bias = true; }
         bool bias_is_disabled() const { return !use_bias; }
+        void enable_bias()
+        {
+            if (use_bias == true)
+                return;
+            else
+                use_bias = true;
+            // setup biases if network has been allocated
+            if (params.size() > 0)
+            {
+                auto temp = params;
+                params.set_size(params.size() + num_filters_);
+                std::copy(temp.begin(), temp.end(), params.begin());
+                biases = alias_tensor(1, num_filters_);
+                biases(params, filters.size()) = 0;
+            }
+        }
 
         inline dpoint map_input_to_output (
             dpoint p
@@ -342,8 +352,6 @@ namespace dlib
             out << mat(item.params);
             out << "</con>";
         }
-
-        friend class impl::visitor_fuse_convolutions;
 
     private:
 
@@ -2526,28 +2534,19 @@ namespace dlib
                 // get the convolution below the affine layer
                 auto& conv = l.subnet().layer_details();
 
-                // guess the number of input channels
-                long k_in;
-                if (conv.bias_is_disabled())
-                    k_in = conv.params.size() / conv.num_filters() / conv.nr() / conv.nc();
-                else
-                    k_in = (conv.params.size() - conv.num_filters()) / conv.num_filters() / conv.nr() / conv.nc();
-
-                // enable bias and update the parameters size
                 if (conv.bias_is_disabled())
                 {
-                    const size_t num_params = k_in * conv.num_filters() * conv.nr() * conv.nc() + conv.num_filters();
-                    DLIB_CASSERT(num_params == conv.params.size() + conv.num_filters());
                     conv.enable_bias();
-                    resizable_tensor filters = conv.params;
-                    conv.params.set_size(num_params);
-                    std::copy(filters.begin(), filters.end(), conv.params.begin());
-                    conv.biases = alias_tensor(1, conv.num_filters());
-                    conv.biases(conv.params, conv.filters.size()) = 0;
                 }
 
+                tensor& params = conv.get_layer_params();
+
                 // update the biases
-                conv.biases(conv.params, conv.filters.size()) += mat(beta);
+                auto biases = alias_tensor(1, conv.num_filters());
+                biases(params, params.size() - conv.num_filters()) += mat(beta);
+
+                // guess the number of input channels
+                const long k_in = (params.size() - conv.num_filters()) / conv.num_filters() / conv.nr() / conv.nc();
 
                 // rescale the filters
                 DLIB_CASSERT(conv.num_filters() == gamma.k());
@@ -2555,7 +2554,7 @@ namespace dlib
                 const float* g = gamma.host();
                 for (long n = 0; n < conv.num_filters(); ++n)
                 {
-                    filter(conv.params, n * filter.size()) *= g[n];
+                    filter(params, n * filter.size()) *= g[n];
                 }
 
                 // disable the affine layer
