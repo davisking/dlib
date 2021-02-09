@@ -1363,7 +1363,7 @@ namespace dlib
         net_type temp = trainer.get_net(); // make a copy so that we can clean it without mutating the trainer's net.
         temp.clean();
         serialize(temp, sout);
-        out << "  net size: " << sout.str().size()/1024.0/1024.0 << "MB" << endl;
+        out << "  net size: " << sout.str().size()/1024.0/1024.0 << " MiB" << endl;
         // Don't include the loss params in the hash since we print them on the next line.
         // They also aren't really part of the "architecture" of the network.
         out << "  net architecture hash: " << md5(cast_to_string(trainer.get_net().subnet())) << endl;
