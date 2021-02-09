@@ -115,8 +115,8 @@ namespace dlib
                 return;
             else
                 use_bias = true;
-            // setup biases if network has been allocated
-            if (params.size() > 0)
+            // setup biases if network has been allocated and it doesn't have bias
+            if (params.size() == filters.size())
             {
                 auto temp = params;
                 params.set_size(params.size() + num_filters_);
