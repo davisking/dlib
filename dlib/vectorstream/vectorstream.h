@@ -143,38 +143,35 @@ namespace dlib
 
         vectorstream (
             std::vector<char>& buffer
-        ) : std::iostream(&buf1),
-            buf1(buffer),
-            buf2(dummy2),
-            buf3(dummy3)
-        {}
+        ) : std::iostream(0)
+        {
+            buf1.reset(new vector_streambuf<char>(buffer));
+            rdbuf(buf1.get());
+        }
         
         vectorstream (
             std::vector<int8_t>& buffer
-        ) : std::iostream(&buf2),
-            buf1(dummy1),
-            buf2(buffer),
-            buf3(dummy3)
-        {}
+        ) : std::iostream(0)
+        {
+            buf2.reset(new vector_streambuf<int8_t>(buffer));
+            rdbuf(buf2.get());
+        }
         
         vectorstream (
             std::vector<uint8_t>& buffer
-        ) : std::iostream(&buf3),
-            buf1(dummy1),
-            buf2(dummy2),
-            buf3(buffer)
-        {}
+        ) : std::iostream(0)
+        {
+            buf3.reset(new vector_streambuf<uint8_t>(buffer));
+            rdbuf(buf3.get());
+        }
             
         vectorstream(const vectorstream& ori) = delete;
         vectorstream(vectorstream&& item) = delete;
-            
+        
     private:
-        std::vector<char>       dummy1;
-        std::vector<int8_t>     dummy2;
-        std::vector<uint8_t>    dummy3;
-        vector_streambuf<char>      buf1;
-        vector_streambuf<int8_t>    buf2;
-        vector_streambuf<uint8_t>   buf3;
+        std::unique_ptr<vector_streambuf<char>>     buf1;
+        std::unique_ptr<vector_streambuf<int8_t>>   buf2;
+        std::unique_ptr<vector_streambuf<uint8_t>>  buf3;
     };
 }
 
