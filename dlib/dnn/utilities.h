@@ -281,7 +281,7 @@ namespace dlib
             {
                 set_learning_rate_multiplier(l, new_learning_rate_multiplier);
             }
-                
+
         private:
 
             double new_learning_rate_multiplier;
@@ -309,7 +309,7 @@ namespace dlib
         static_assert(end <= net_type::num_layers, "Invalid range");
         DLIB_CASSERT(learning_rate_multiplier >= 0);
         impl::visitor_learning_rate_multiplier temp(learning_rate_multiplier);
-        visit_layers_range<begin, end>(net, temp);
+        visit_computational_layers_range<begin, end>(net, temp);
     }
 
 // ----------------------------------------------------------------------------------------
