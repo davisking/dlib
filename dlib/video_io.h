@@ -10,10 +10,13 @@
 
 extern "C"
 {
-#include "libavutil/imgutils.h"
-#include "libavdevice/avdevice.h"
-#include "libavcodec/avcodec.h"
-#include "libswscale/swscale.h"
+#include <libavutil/imgutils.h>
+#include <libavutil/frame.h>
+#include <libavdevice/avdevice.h>
+#include <libavcodec/avcodec.h>
+#include <libavcodec/packet.h>
+#include <libavcodec/codec.h>
+#include <libswscale/swscale.h>
 }
 
 #include <string>
@@ -78,20 +81,26 @@ namespace dlib
             
             frame(frame&& ori)
             {
-                std::swap(data, ori.data);
-                std::swap(linesize, ori.linesize);
+                swap(ori);
             }
             
             frame& operator=(frame&& ori)
             {
                 reset();
-                new (this) frame(std::move(ori));
+                swap(ori);
                 return *this;
             }
             
             ~frame()
             {
                 reset();
+            }
+            
+            void swap(frame& o)
+            {
+                std::swap(data, o.data);
+                std::swap(linesize, o.linesize);
+                std::swap(timestamp_ns, o.timestamp_ns);
             }
             
             void reset()
@@ -146,7 +155,7 @@ namespace dlib
         
         void populate_metadata()
         {
-            for (int i = 0 ; i < _pFormatCtx->nb_streams ; i++)
+            for (unsigned int i = 0 ; i < _pFormatCtx->nb_streams ; i++)
             {
                 std::string metadata_str;
                 {
@@ -168,12 +177,12 @@ namespace dlib
         
         bool connect(bool is_rtsp, int nthreads)
         {
-    //        av_register_all();
+//            av_register_all();
 
             AVDictionary *avdic = NULL;
             if (is_rtsp)
             {
-    //            avformat_network_init();
+//                avformat_network_init();
                 av_dict_set(&avdic,"rtsp_transport","tcp",0);
                 av_dict_set(&avdic,"max_delay","5000000",0);
             }
@@ -349,7 +358,6 @@ namespace dlib
                 _dst_h = h > 0 ? h : _pCodecCtx->height;
                 _dst_w = w > 0 ? w : _pCodecCtx->width;
                 _dst_format = dst_format;
-                std::cout << "Resetting sws converter to " << _dst_h << "x" << _dst_w << " " << av_get_pix_fmt_name(_dst_format) << std::endl;
 
                 /*Is the new destination format different to the original frame format?*/
                 if (_dst_h != _pCodecCtx->height || _dst_w != _pCodecCtx->width || _dst_format != _pCodecCtx->pix_fmt)
@@ -358,6 +366,12 @@ namespace dlib
                                                    _dst_w, _dst_h, _dst_format, 
                                                    SWS_BICUBIC, NULL, NULL, NULL);
 
+                    std::cout << "Resetting sws converter " 
+                              << "(" << _pCodecCtx->height << "," << _pCodecCtx->width << "," << av_get_pix_fmt_name(_pCodecCtx->pix_fmt) << ")" 
+                              << " -> " 
+                              << "(" << _dst_h << "," << _dst_w << "," << av_get_pix_fmt_name(_dst_format) << ")" 
+                              << std::endl;
+                    
                     _dst_frame.resize(_dst_w, _dst_h, _dst_format);
                 }
             }
@@ -554,6 +568,335 @@ namespace dlib
             return true;
         }
     };
+    
+    class video_encoder
+    {
+    private:
+        bool            _connected      = false;
+        AVCodecContext* _pCodecCtx      = nullptr;
+        SwsContext*     _imgConvertCtx  = nullptr;
+        AVPacket*       _pkt            = nullptr;
+        AVFrame*        _dst_frame      = nullptr;
+        ffmpeg_impl::frame _tmp_frame;
+        int _src_h = 0;
+        int _src_w = 0;
+        AVPixelFormat _src_format = AV_PIX_FMT_NONE;
+        
+        void reset_converter(int h, int w, AVPixelFormat src_format)
+        {
+            /*
+             * This function resets source pixel formats if required.
+             * This function gets called all the time. But, I reckon branch
+             * prediction will optimise this out. Indeed, we don't expect
+             * there to be a conversion all the time, probably just once, 
+             * at the start.
+             */
+            
+            if (h != _src_h || w != _src_w || src_format != _src_format)
+            {
+                if (_imgConvertCtx)
+                {
+                    sws_freeContext(_imgConvertCtx);
+                    _imgConvertCtx = nullptr;
+                }
+
+                _src_h = h;
+                _src_w = w;
+                _src_format = src_format;
+
+                /*Do we actually need to convert anything ? */
+                if (_src_h != _pCodecCtx->height || _src_w != _pCodecCtx->width || _src_format != _pCodecCtx->pix_fmt)
+                {
+                    _imgConvertCtx = sws_getContext(_src_w, _src_h, _src_format, 
+                                                    _pCodecCtx->width, _pCodecCtx->height, _pCodecCtx->pix_fmt, 
+                                                    SWS_BICUBIC, NULL, NULL, NULL);
+                    
+                    _tmp_frame.resize(_src_w, _src_h, _src_format);
+                    
+                    std::cout << "Resetting sws converter " 
+                              << "(" << _src_h << "," << _src_w << "," << av_get_pix_fmt_name(_src_format) << ")" 
+                              << " -> " 
+                              << "(" << _pCodecCtx->height << "," << _pCodecCtx->width << "," << av_get_pix_fmt_name(_pCodecCtx->pix_fmt) << ")" 
+                              << std::endl;
+                }
+            }
+        }
+        
+        template<typename ImageType>
+        void image_to_frame(const ImageType& img)
+        {
+            /*
+             * At this stage, internal state has been set. Just need to write 
+             * to _dst_frame
+             */
+            
+            using pixel_type = typename ImageType::type;
+            const size_t size = img.size()*pixel_traits<pixel_type>::num;
+            
+            if (_imgConvertCtx)
+            {
+                memcpy(_tmp_frame.data[0], img.begin(), size);
+                sws_scale(_imgConvertCtx, 
+                          _tmp_frame.data, _tmp_frame.linesize, 0, _src_h, 
+                          _dst_frame->data, _dst_frame->linesize);
+            }
+            else
+            {
+                memcpy(_dst_frame->data[0], img.begin(), size);
+            }
+        }
+        
+        bool encode(bool flush, std::vector<char>& encoded_buf)
+        {
+            /*
+             * At this stage, internal state has been set and _dst_frame is
+             * full. Ready to encode.
+             */
+            int ret = avcodec_send_frame(_pCodecCtx, flush ? NULL : _dst_frame);
+            _dst_frame->pts++;
+            
+            bool ok = ret == 0;
+            
+            if (ret < 0)
+            {
+                std::cout << "AV : error : " << ffmpeg_impl::get_av_error(ret) << std::endl;
+                ok = false;
+            }
+            else
+            {
+                bool keep_receiving = true;
+                
+                while (keep_receiving)
+                {
+                    ret = avcodec_receive_packet(_pCodecCtx, _pkt);
+
+                    if (ret == AVERROR(EAGAIN))
+                    {
+//                        std::cout << "AV : need more input" << std::endl;
+                        keep_receiving = false;
+                    }
+                    else if (ret == AVERROR_EOF)
+                    {
+//                        std::cout << "AV : flushed." << std::endl;
+                        keep_receiving = false;
+                    }
+                    else if (ret < 0)
+                    {
+                        std::cout << "AV : encoder error : " << ffmpeg_impl::get_av_error(ret) << std::endl;
+                        keep_receiving = false;
+                        ok = false;
+                    }
+                    else
+                    {
+                        /*
+                         * We have a packet so we are going to add this to our
+                         * buffer. Now, for whatever reason, the vector might
+                         * throw because the system has run out of memory. This
+                         * is unlikely but you never know. We are avoid exceptions
+                         * in this class. Instead look at the return code.
+                         */
+                        try
+                        {
+                            encoded_buf.insert(encoded_buf.end(), _pkt->data, _pkt->data + _pkt->size);
+                        }
+                        catch (const std::exception& e)
+                        {
+                            std::cout << "Failed to insert encoded data : '" << e.what() << "'. Try again next iteration" << std::endl;
+                            keep_receiving = false;
+                        }
+                        
+                        av_packet_unref(_pkt);
+                    }
+                }
+            }
+            return ok;
+        }
+        
+    public:
+        video_encoder()                                       = default;
+        video_encoder(const video_encoder& ori)               = delete;
+        video_encoder& operator=(const video_encoder& ori)    = delete;
+        
+        video_encoder(video_encoder&& ori)
+        {
+            swap(ori);
+        }
+        
+        video_encoder& operator=(video_encoder&& ori)
+        {
+            close();
+            swap(ori);
+            return *this;
+        }
+        
+        ~video_encoder()
+        {
+            close();
+        }
+        
+        void swap(video_encoder& o)
+        {
+            std::swap(_connected,       o._connected);
+            std::swap(_src_h,           o._src_h);
+            std::swap(_src_w,           o._src_w);
+            std::swap(_src_format,      o._src_format);
+            std::swap(_pCodecCtx,       o._pCodecCtx);
+            std::swap(_imgConvertCtx,   o._imgConvertCtx);
+            std::swap(_pkt,             o._pkt);
+            std::swap(_dst_frame,       o._dst_frame);
+            std::swap(_tmp_frame,       o._tmp_frame);
+        }
+        
+        bool is_open() const
+        {
+            return _connected;
+        }
+        
+        bool open(
+            AVCodecID codec_id,
+            AVPixelFormat pix_fmt,
+            int fps_num, int fps_denom,
+            int h, int w,
+            std::vector<std::pair<std::string,std::string>> codec_options, //you need to know what you are doing here
+            int nthreads = std::thread::hardware_concurrency()
+        )
+        {
+            close();
+            
+            AVCodec* codec = avcodec_find_encoder(codec_id);
+            if (!codec)
+            {
+                std::cout << "Codec " << codec_id << " not found" << std::endl;
+                return false;
+            }
+            
+            _pCodecCtx = avcodec_alloc_context3(codec);
+            if (!_pCodecCtx)
+            {
+                std::cout << "Could not allocate video context" << std::endl;
+                return false;
+            }
+            
+            _pCodecCtx->thread_count    = nthreads;
+            _pCodecCtx->height          = h;
+            _pCodecCtx->width           = w;
+            _pCodecCtx->pix_fmt         = pix_fmt;
+            _pCodecCtx->time_base       = (AVRational){fps_denom, fps_num};
+            _pCodecCtx->framerate       = (AVRational){fps_num, fps_denom};
+            _pCodecCtx->bit_rate        = 400000;   //not sure what a good value for this should be. Does this control lossyness ?
+            _pCodecCtx->gop_size        = 10;       //not sure what to put here
+            _pCodecCtx->max_b_frames    = 1;        //not sure what to put here
+            for (auto it = codec_options.begin() ; it != codec_options.end() ; it++)
+                av_opt_set(_pCodecCtx->priv_data, it->first.c_str(), it->second.c_str(), 0);
+            
+            /* init the video decoder */
+            int ret = avcodec_open2(_pCodecCtx, codec, NULL);
+            if (ret < 0) 
+            {
+                std::cout << "AV : failed to open video encoder : " << ffmpeg_impl::get_av_error(ret) << std::endl;
+                return false;
+            }
+            
+            _dst_frame = av_frame_alloc();
+            if (!_dst_frame)
+            {
+                std::cout << "AV : failed to allocate video frame" << std::endl;
+                return false;
+            }
+            
+            _dst_frame->format  = pix_fmt;
+            _dst_frame->height  = h;
+            _dst_frame->width   = w;
+            _dst_frame->pts     = 0;
+            if (av_frame_get_buffer(_dst_frame, 0) < 0)
+            {
+                std::cout << "AV : failed to allocate video frame data" << std::endl;
+                return false;
+            }
+            if (av_frame_make_writable(_dst_frame) < 0)
+            {
+                std::cout << "AV : failed to make video frame writeable" << std::endl;
+                return false;
+            }
+            
+            _pkt = av_packet_alloc();
+            if (!_pkt)
+            {
+                std::cout << "AV : failed to allocate encoded packet" << std::endl;
+                return false;
+            }
+            
+            _connected = true;
+            return _connected;
+        }
+        
+        void close()
+        {
+            _connected  = false;
+            _src_h      = 0;
+            _src_w      = 0;
+            _src_format = AV_PIX_FMT_NONE;
+            
+            if (_pCodecCtx)
+            {
+                avcodec_free_context(&_pCodecCtx);
+                _pCodecCtx = nullptr;
+            }
+
+            if (_imgConvertCtx)
+            {
+                sws_freeContext(_imgConvertCtx);
+                _imgConvertCtx = nullptr;
+            }
+            
+            if (_dst_frame)
+            {
+                av_frame_free(&_dst_frame);
+                _dst_frame = nullptr;
+            }
+            
+            if (_pkt)
+            {
+                av_packet_free(&_pkt);
+                _pkt = nullptr;
+            }
+            
+            _tmp_frame.reset();
+        }
+        
+        template<typename ImageType,
+                 typename pixel_traits<typename ImageType::type>::basic_pixel_type* = nullptr>
+        bool push(const ImageType& img, std::vector<char>& encoded_buf)
+        {
+            using pixel_type = typename ImageType::type;
+            
+            /*
+             * libswscale will do either a full conversion to the correct 
+             * destination pixel format, or dlib will first convert to RGB 
+             * then swscale will do the rest. 
+             */
+            reset_converter(img.nr(), img.nc(), ffmpeg_impl::conversion_capabilities<pixel_type>::format);
+            
+            if (ffmpeg_impl::is_ffmpeg_convertible<pixel_type>())
+            {
+                image_to_frame(img); 
+            }
+            else
+            {
+                array2d<typename ffmpeg_impl::conversion_capabilities<pixel_type>::pixel_type> tmp;
+                assign_image(tmp, img);
+                image_to_frame(tmp);
+            }
+            
+            _connected = encode(false, encoded_buf);
+            return _connected;
+        }
+        
+        bool flush(std::vector<char>& encoded_buf)
+        {
+            return encode(true, encoded_buf);
+        }
+    };
 
     inline void ffmpeg_list_available_protocols()
     {
@@ -561,6 +904,46 @@ namespace dlib
         const char* name = 0;
         while ((name = avio_enum_protocols(&opaque, 0)))
             std::cout << name << std::endl;
+    }
+    
+    struct codec_details
+    {
+        std::string codec_name;
+        bool supports_encoding;
+        bool supports_decoding;
+    };
+    
+    inline std::vector<codec_details> ffmpeg_list_codecs()
+    {
+        std::vector<codec_details> details;
+        void* opaque = nullptr;
+        const AVCodec* codec = NULL;
+        while ((codec = av_codec_iterate(&opaque)))
+        {
+            codec_details detail;
+            detail.codec_name = codec->name;
+            detail.supports_encoding = av_codec_is_encoder(codec);
+            detail.supports_decoding = av_codec_is_decoder(codec);
+            details.push_back(std::move(detail));
+        }
+        //sort
+        std::sort(details.begin(), details.end(), [](const codec_details& a, const codec_details& b) {return a.codec_name < b.codec_name;});
+        //merge
+        auto it = details.begin() + 1;
+        while (it != details.end())
+        {
+            auto prev = it - 1;
+            
+            if (it->codec_name == prev->codec_name)
+            {
+                prev->supports_encoding |= it->supports_encoding;
+                prev->supports_decoding |= it->supports_decoding;
+                it = details.erase(it);
+            }
+            else
+                it++;
+        }
+        return details;
     }
 }
 
