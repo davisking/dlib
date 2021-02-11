@@ -143,62 +143,44 @@ namespace dlib
 
         vectorstream (
             std::vector<char>& buffer
-        ) : std::iostream(0)
+        ) : std::iostream(0),
+            buf1(buffer),
+            buf2(dummy2),
+            buf3(dummy3)
         {
-            new(&mem) T0(buffer);
-            rdbuf(reinterpret_cast<T0*>(&mem));
-            type_identity = 0;
+            rdbuf(&buf1);
         }
         
         vectorstream (
             std::vector<int8_t>& buffer
-        ) : std::iostream(0)
+        ) : std::iostream(0),
+            buf1(dummy1),
+            buf2(buffer),
+            buf3(dummy3)
         {
-            new(&mem) T1(buffer);
-            rdbuf(reinterpret_cast<T1*>(&mem));
-            type_identity = 1;
+            rdbuf(&buf2);
         }
         
         vectorstream (
             std::vector<uint8_t>& buffer
-        ) : std::iostream(0)
+        ) : std::iostream(0),
+            buf1(dummy1),
+            buf2(dummy2),
+            buf3(buffer)
         {
-            new(&mem) T2(buffer);
-            rdbuf(reinterpret_cast<T2*>(&mem));
-            type_identity = 2;
+            rdbuf(&buf3);
         }
             
         vectorstream(const vectorstream& ori) = delete;
         vectorstream(vectorstream&& item) = delete;
-        
-        virtual ~vectorstream()
-        {
-            if (type_identity == 0)
-            {
-                T0* ptr = reinterpret_cast<T0*>(&mem);
-                ptr->~T0();
-            }
-            else if (type_identity == 1)
-            {
-                T1* ptr = reinterpret_cast<T1*>(&mem);
-                ptr->~T1();
-            }
-            else if (type_identity == 2)
-            {
-                T2* ptr = reinterpret_cast<T2*>(&mem);
-                ptr->~T2();
-            }
-        }
-        
+                
     private:
-        using T0 = vector_streambuf<char>;
-        using T1 = vector_streambuf<int8_t>;
-        using T2 = vector_streambuf<uint8_t>;
-        const static size_t storage_capacity = tmax<tmax<sizeof(T0),
-                                                         sizeof(T1)>::value,
-                                                         sizeof(T2)>::value;
-        std::aligned_union<storage_capacity,T0,T1,T2>::type mem;
-        int type_identity;
+        std::vector<char>           dummy1;
+        std::vector<int8_t>         dummy2;
+        std::vector<uint8_t>        dummy3;
+        vector_streambuf<char>      buf1;
+        vector_streambuf<int8_t>    buf2;
+        vector_streambuf<uint8_t>   buf3;
     };
 }
 
