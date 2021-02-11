@@ -932,8 +932,8 @@ namespace dlib
             ensures
                 - bias_is_disabled() returns false
                 - if bias was disabled and not allocated, it resizes the layer parameters
-                  to accommodate the biases
-                - the biases are initialized to 0
+                  to accommodate the new zero-inizialized biases
+                - if called after disable_bias, the previous biases will be used
         !*/
 
         bool bias_is_disabled(
