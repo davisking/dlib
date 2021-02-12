@@ -314,6 +314,9 @@ namespace
             serialize(c2,sout);
             serialize(d1,sout);
             serialize(d2,sout);
+            
+            std::vector<int8_t> buf1;
+            dlib::serialize(buf1) << a1 << a2 << b1 << b2 << c1 << c2 << d1 << d2;
 
             DLIB_TEST(a1 == orig1);
             DLIB_TEST(a2 == orig2);
@@ -361,8 +364,27 @@ namespace
             DLIB_TEST(c2 == orig2);
             DLIB_TEST(d1 == orig1);
             DLIB_TEST(d2 == orig2);
-
-
+            
+            set_all_elements(a1,99);
+            set_all_elements(a2,99);
+            set_all_elements(b1,99);
+            set_all_elements(b2,99);
+            set_all_elements(c1,99);
+            set_all_elements(c2,99);
+            set_all_elements(d1,99);
+            set_all_elements(d2,99);
+            
+            std::vector<uint8_t> buf2(buf1.begin(), buf1.end());
+            dlib::deserialize(buf2) >> a1 >> a2 >> b1 >> b2 >> c1 >> c2 >> d1 >> d2;
+            
+            DLIB_TEST(a1 == orig1);
+            DLIB_TEST(a2 == orig2);
+            DLIB_TEST(b1 == orig1);
+            DLIB_TEST(b2 == orig2);
+            DLIB_TEST(c1 == orig1);
+            DLIB_TEST(c2 == orig2);
+            DLIB_TEST(d1 == orig1);
+            DLIB_TEST(d2 == orig2);
         }
 
         {
