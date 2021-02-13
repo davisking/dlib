@@ -185,6 +185,22 @@ namespace dlib
                 const tensor& filters
             );
 
+            void operator() (
+                const bool add_to_output,
+                tensor& output,
+                const tensor& data,
+                const tensor& filters,
+                const tensor& biases
+            );
+
+            void operator() (
+                const bool add_to_output,
+                resizable_tensor& output,
+                const tensor& data,
+                const tensor& filters,
+                const tensor& biases
+            );
+
             void get_gradient_for_data (
                 const bool add_to_output,
                 const tensor& gradient_input, 
@@ -208,6 +224,16 @@ namespace dlib
                 int padding_x
             );
 
+           void setup(
+                const tensor& data,
+                const tensor& filters,
+                const tensor& biases,
+                int stride_y,
+                int stride_x,
+                int padding_y,
+                int padding_x
+            );
+
         private:
 
             // These variables record the type of data given to the last call to setup().
@@ -221,6 +247,7 @@ namespace dlib
 
             void* filter_handle;
             void* conv_handle;
+            void* bias_handle = nullptr;
 
             // dimensions of the output tensor from operator()
             int out_num_samples;

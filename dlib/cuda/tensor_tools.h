@@ -1009,6 +1009,62 @@ namespace dlib { namespace tt
                 - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
         !*/
 
+        void operator() (
+            const bool add_to_output,
+            tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        ) { impl(add_to_output,output,data,filters,biases); }
+        /*!
+            requires
+                - setup() has been called.  Specifically, setup() has been called like this:
+                    this->setup(data, filters, stride_y, stride_x, padding_y, padding_x);
+                - is_same_object(output,data) == false
+                - is_same_object(output,filters) == false
+                - filters.k() == data.k()
+                - filters.nr() <= src.nr() + 2*padding_y
+                - filters.nc() <= src.nc() + 2*padding_x
+                - #output.num_samples() == data.num_samples()
+                - #output.k() == filters.num_samples()
+                - #output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
+                - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
+            ensures
+                - Convolves filters over data.  If add_to_output==true then we add the
+                  results to output, otherwise we assign to output, overwriting the
+                  previous values in output.
+                - Adds biases to the result of the convolved data
+                - filters contains filters.num_samples() filters.
+        !*/
+
+        void operator() (
+            const bool add_to_output,
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        ) { impl(add_to_output,output,data,filters, biases); }
+        /*!
+            requires
+                - setup() has been called.  Specifically, setup() has been called like this:
+                    this->setup(data, filters, stride_y, stride_x, padding_y, padding_x);
+                - is_same_object(output,data) == false
+                - is_same_object(output,filters) == false
+                - filters.k() == data.k()
+                - filters.nr() <= src.nr() + 2*padding_y
+                - filters.nc() <= src.nc() + 2*padding_x
+            ensures
+                - Convolves filters over data.  If add_to_output==true then we add the
+                  results to output, otherwise we assign to output, overwriting the
+                  previous values in output.
+                - Adds biases to the result of the convolved data
+                - filters contains filters.num_samples() filters.
+                - #output.num_samples() == data.num_samples()
+                - #output.k() == filters.num_samples()
+                - #output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
+                - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
+        !*/
+
         void get_gradient_for_data (
             const bool add_to_output,
             const tensor& gradient_input, 
@@ -1108,7 +1164,37 @@ namespace dlib { namespace tt
                   the tensors, or store any kind of references to the data or filter
                   tensors. 
         !*/
-       
+
+        void setup(
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases,
+            int stride_y,
+            int stride_x,
+            int padding_y,
+            int padding_x
+        ) { impl.setup(data,filters,biases,stride_y,stride_x,padding_y,padding_x); }
+        /*!
+            requires
+                - filters.k() == data.k()
+                - stride_y > 0
+                - stride_x > 0
+                - 0 <= padding_y < filters.nr()
+                - 0 <= padding_x < filters.nc()
+            ensures
+                - When operator() is called, the output tensor will have these dimensions:
+                    - output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
+                    - output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
+                    - output.num_samples() == data.num_samples()
+                    - output.k() == filters.num_samples()
+                - The point of setup() is to allow this object to gather information about
+                  all the tensor sizes and filter layouts involved in the computation.  In
+                  particular, the reason the tensors are input into setup() is just to
+                  observe their sizes.  setup() doesn't do anything with the contents of
+                  the tensors, or store any kind of references to the data or filter
+                  tensors.
+        !*/
+
     private:
 #ifdef DLIB_USE_CUDA
         cuda::tensor_conv impl;

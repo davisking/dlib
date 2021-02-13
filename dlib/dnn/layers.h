@@ -212,18 +212,31 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
-            conv.setup(sub.get_output(),
-                       filters(params,0),
-                       _stride_y,
-                       _stride_x,
-                       padding_y_,
-                       padding_x_);
-            conv(false, output,
-                sub.get_output(),
-                filters(params,0));
             if (use_bias)
             {
-                tt::add(1,output,1,biases(params,filters.size()));
+                conv.setup(sub.get_output(),
+                           filters(params,0),
+                           biases(params, filters.size()),
+                           _stride_y,
+                           _stride_x,
+                           padding_y_,
+                           padding_x_);
+                conv(false, output,
+                    sub.get_output(),
+                    filters(params,0),
+                    biases(params, filters.size()));
+            }
+            else
+            {
+                conv.setup(sub.get_output(),
+                               filters(params,0),
+                               _stride_y,
+                               _stride_x,
+                               padding_y_,
+                               padding_x_);
+                conv(false, output,
+                    sub.get_output(),
+                    filters(params,0));
             }
         }
 

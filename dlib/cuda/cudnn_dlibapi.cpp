@@ -152,6 +152,12 @@ namespace dlib
             cudnnActivationDescriptor_t handle;
         };
 
+        static cudnnActivationDescriptor_t identity_activation_descriptor()
+        {
+            thread_local cudnn_activation_descriptor des(CUDNN_ACTIVATION_IDENTITY, CUDNN_PROPAGATE_NAN,0);
+            return des.get_handle();
+        }
+
         static cudnnActivationDescriptor_t relu_activation_descriptor()
         {
             thread_local cudnn_activation_descriptor des(CUDNN_ACTIVATION_RELU, CUDNN_PROPAGATE_NAN,0);
@@ -720,8 +726,11 @@ namespace dlib
                 cudnnDestroyFilterDescriptor((cudnnFilterDescriptor_t)filter_handle);
             if (conv_handle) 
                 cudnnDestroyConvolutionDescriptor((cudnnConvolutionDescriptor_t)conv_handle);
+            if (bias_handle)
+                cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)bias_handle);
             filter_handle = nullptr;
             conv_handle = nullptr;
+            bias_handle = nullptr;
             out_num_samples = 0;
             out_k = 0;
             out_nr = 0;
@@ -1052,6 +1061,29 @@ namespace dlib
             }
         }
 
+       void tensor_conv::setup(
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases,
+            int stride_y,
+            int stride_x,
+            int padding_y,
+            int padding_x
+        )
+       {
+            DLIB_CASSERT(filters.num_samples() == biases.k());
+            setup(data, filters, stride_y, stride_x, padding_y, padding_x);
+            CHECK_CUDNN(cudnnCreateTensorDescriptor((cudnnTensorDescriptor_t*)&bias_handle));
+            CHECK_CUDNN(cudnnSetTensor4dDescriptor((cudnnTensorDescriptor_t)bias_handle,
+                    CUDNN_TENSOR_NCHW,
+                    CUDNN_DATA_FLOAT,
+                    1,
+                    biases.k(),
+                    1,
+                    1));
+       }
+
+
         tensor_conv::
         ~tensor_conv (
         )
@@ -1126,6 +1158,87 @@ namespace dlib
                     forward_workspace,
                     forward_workspace_size_in_bytes,
                     &beta,
+                    descriptor(output),
+                    output.device()));
+
+        }
+
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            resizable_tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        )
+        {
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
+
+            output.set_size(out_num_samples, out_k, out_nr, out_nc);
+            (*this)(add_to_output, static_cast<tensor&>(output), data, filters, biases);
+        }
+
+        void tensor_conv::operator() (
+            const bool add_to_output,
+            tensor& output,
+            const tensor& data,
+            const tensor& filters,
+            const tensor& biases
+        )
+        {
+            DLIB_CASSERT(is_same_object(output,data) == false);
+            DLIB_CASSERT(is_same_object(output,filters) == false);
+            DLIB_CASSERT(filters.k() == data.k());
+            DLIB_CASSERT(stride_y > 0 && stride_x > 0, "You must call setup() before calling this function");
+            DLIB_CASSERT(filters.nc() <= data.nc() + 2*padding_x,
+                "Filter windows must be small enough to fit into the padded image."
+                << "\n\t filters.nc(): " << filters.nc()
+                << "\n\t data.nc():  " << data.nc()
+                << "\n\t padding_x: " << padding_x
+                );
+            DLIB_CASSERT(filters.nr() <= data.nr() + 2*padding_y,
+                "Filter windows must be small enough to fit into the padded image."
+                << "\n\t filters.nr(): " << filters.nr()
+                << "\n\t data.nr():  " << data.nr()
+                << "\n\t padding_y: " << padding_y
+                );
+
+
+            DLIB_CASSERT(output.num_samples() == data.num_samples(),out_num_samples << "  " << data.num_samples());
+            DLIB_CASSERT(output.k() == filters.num_samples());
+            DLIB_CASSERT(output.nr() == 1+(data.nr()+2*padding_y-filters.nr())/stride_y);
+            DLIB_CASSERT(output.nc() == 1+(data.nc()+2*padding_x-filters.nc())/stride_x);
+
+
+
+            const float alpha1 = 1;
+            const float alpha2 = 0;
+
+            // Since cudnnConvolutionForward() is an asynchronous call, we need to hold a
+            // reference to the workspace buffer so we can be sure it isn't reallocated
+            // while the function is still executing on the device.  But each time we come
+            // here, we make sure to grab the latest workspace buffer so that, globally, we
+            // minimize the number of such buffers.
+            forward_workspace = device_global_buffer(forward_workspace_size_in_bytes);
+
+            const float* b = biases.device();
+
+            CHECK_CUDNN(cudnnConvolutionBiasActivationForward(
+                    context(),
+                    &alpha1,
+                    descriptor(data),
+                    data.device(),
+                    (const cudnnFilterDescriptor_t)filter_handle,
+                    filters.device(),
+                    (const cudnnConvolutionDescriptor_t)conv_handle,
+                    (cudnnConvolutionFwdAlgo_t)forward_algo,
+                    forward_workspace,
+                    forward_workspace_size_in_bytes,
+                    &alpha2,
+                    (const cudnnTensorDescriptor_t)bias_handle,
+                    b,
+                    (const cudnnTensorDescriptor_t)bias_handle,
+                    b,
+                    identity_activation_descriptor(),
                     descriptor(output),
                     output.device()));
         }
