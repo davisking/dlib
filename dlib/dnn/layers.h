@@ -214,6 +214,7 @@ namespace dlib
         {
             if (use_bias)
             {
+#ifdef DLIB_USE_CUDA
                 conv.setup(sub.get_output(),
                            filters(params,0),
                            biases(params, filters.size()),
@@ -221,19 +222,35 @@ namespace dlib
                            _stride_x,
                            padding_y_,
                            padding_x_);
+
                 conv(false, output,
                     sub.get_output(),
                     filters(params,0),
                     biases(params, filters.size()));
+#else
+                conv.setup(sub.get_output(),
+                           filters(params,0),
+                           _stride_y,
+                           _stride_x,
+                           padding_y_,
+                           padding_x_);
+
+                conv(false, output,
+                    sub.get_output(),
+                    filters(params,0));
+
+                tt::add(1,output,1,biases(params,filters.size()));
+#endif
             }
             else
             {
                 conv.setup(sub.get_output(),
-                               filters(params,0),
-                               _stride_y,
-                               _stride_x,
-                               padding_y_,
-                               padding_x_);
+                           filters(params,0),
+                           _stride_y,
+                           _stride_x,
+                           padding_y_,
+                           padding_x_);
+
                 conv(false, output,
                     sub.get_output(),
                     filters(params,0));

@@ -1009,6 +1009,7 @@ namespace dlib { namespace tt
                 - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
         !*/
 
+#ifdef DLIB_USE_CUDA
         void operator() (
             const bool add_to_output,
             tensor& output,
@@ -1064,6 +1065,7 @@ namespace dlib { namespace tt
                 - #output.nr() == 1+(data.nr() + 2*padding_y - filters.nr())/stride_y
                 - #output.nc() == 1+(data.nc() + 2*padding_x - filters.nc())/stride_x
         !*/
+#endif
 
         void get_gradient_for_data (
             const bool add_to_output,
@@ -1165,6 +1167,7 @@ namespace dlib { namespace tt
                   tensors. 
         !*/
 
+#ifdef DLIB_USE_CUDA
         void setup(
             const tensor& data,
             const tensor& filters,
@@ -1194,6 +1197,7 @@ namespace dlib { namespace tt
                   the tensors, or store any kind of references to the data or filter
                   tensors.
         !*/
+#endif
 
     private:
 #ifdef DLIB_USE_CUDA
