@@ -2284,6 +2284,27 @@ namespace dlib
         }
         
         explicit proxy_serialize (
+            dlib::shared_buf<char>& buf
+        ) : fout_optional_owning_ptr(new vectorstream(buf)),
+            fout(*fout_optional_owning_ptr)
+        {
+        }
+        
+        explicit proxy_serialize (
+            dlib::shared_buf<int8_t>& buf
+        ) : fout_optional_owning_ptr(new vectorstream(buf)),
+            fout(*fout_optional_owning_ptr)
+        {
+        }
+        
+        explicit proxy_serialize (
+            dlib::shared_buf<uint8_t>& buf
+        ) : fout_optional_owning_ptr(new vectorstream(buf)),
+            fout(*fout_optional_owning_ptr)
+        {
+        }
+        
+        explicit proxy_serialize (
             std::ostream& ss
         ) : fout_optional_owning_ptr(nullptr),
             fout(ss)
@@ -2333,6 +2354,30 @@ namespace dlib
          
         explicit proxy_deserialize (
             std::vector<uint8_t>& buf
+        ) : fin_optional_owning_ptr(new vectorstream(buf)),
+            fin(*fin_optional_owning_ptr)   
+        {
+            init();
+        }
+        
+        explicit proxy_deserialize (
+            dlib::shared_buf<char>& buf
+        ) : fin_optional_owning_ptr(new vectorstream(buf)),
+            fin(*fin_optional_owning_ptr)   
+        {
+            init();
+        }
+        
+        explicit proxy_deserialize (
+            dlib::shared_buf<int8_t>& buf
+        ) : fin_optional_owning_ptr(new vectorstream(buf)),
+            fin(*fin_optional_owning_ptr)   
+        {
+            init();
+        }
+         
+        explicit proxy_deserialize (
+            dlib::shared_buf<uint8_t>& buf
         ) : fin_optional_owning_ptr(new vectorstream(buf)),
             fin(*fin_optional_owning_ptr)   
         {
@@ -2451,6 +2496,12 @@ namespace dlib
     { return proxy_serialize(buf); }
     inline proxy_serialize serialize(std::vector<uint8_t>& buf)
     { return proxy_serialize(buf); }
+    inline proxy_serialize serialize(dlib::shared_buf<char>& buf)
+    { return proxy_serialize(buf); }
+    inline proxy_serialize serialize(dlib::shared_buf<int8_t>& buf)
+    { return proxy_serialize(buf); }
+    inline proxy_serialize serialize(dlib::shared_buf<uint8_t>& buf)
+    { return proxy_serialize(buf); }
     inline proxy_deserialize deserialize(const std::string& filename)
     { return proxy_deserialize(filename); }
     inline proxy_deserialize deserialize(std::istream& ss)
@@ -2460,6 +2511,12 @@ namespace dlib
     inline proxy_deserialize deserialize(std::vector<int8_t>& buf)
     { return proxy_deserialize(buf); }
     inline proxy_deserialize deserialize(std::vector<uint8_t>& buf)
+    { return proxy_deserialize(buf); }
+    inline proxy_deserialize deserialize(dlib::shared_buf<char>& buf)
+    { return proxy_deserialize(buf); }
+    inline proxy_deserialize deserialize(dlib::shared_buf<int8_t>& buf)
+    { return proxy_deserialize(buf); }
+    inline proxy_deserialize deserialize(dlib::shared_buf<uint8_t>& buf)
     { return proxy_deserialize(buf); }
 
 // ----------------------------------------------------------------------------------------

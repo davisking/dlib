@@ -22,8 +22,8 @@ namespace
 
     logger dlog("test.vectorstream");
           
-    template <typename CharType, typename stream>
-    void test1_variant(std::vector<CharType>& buf, stream& s)
+    template <typename VectorCharType, typename stream>
+    void test1_variant(VectorCharType& buf, stream& s)
     {
         for (int i = -1000; i <= 1000; ++i)
         {
@@ -198,6 +198,45 @@ namespace
         
         {
             vector<uint8_t> buf;
+            dlib::vectorstream s1(buf);
+            std::iostream& s2 = s1;
+            test1_variant(buf, s2);
+        }   
+        
+        {
+            dlib::shared_buf<char> buf;
+            vectorstream s1(buf);
+            test1_variant(buf, s1);
+        }
+        
+        {
+            dlib::shared_buf<char> buf;
+            dlib::vectorstream s1(buf);
+            std::iostream& s2 = s1;
+            test1_variant(buf, s2);
+        }   
+        
+        {
+            dlib::shared_buf<int8_t> buf;
+            vectorstream s1(buf);
+            test1_variant(buf, s1);
+        }
+        
+        {
+            dlib::shared_buf<int8_t> buf;
+            dlib::vectorstream s1(buf);
+            std::iostream& s2 = s1;
+            test1_variant(buf, s2);
+        }   
+        
+        {
+            dlib::shared_buf<uint8_t> buf;
+            vectorstream s1(buf);
+            test1_variant(buf, s1);
+        }
+        
+        {
+            dlib::shared_buf<uint8_t> buf;
             dlib::vectorstream s1(buf);
             std::iostream& s2 = s1;
             test1_variant(buf, s2);
