@@ -3331,24 +3331,19 @@ namespace dlib
         {
         }
 
-        template <typename SUBNET>
-        void forward(
-            const SUBNET& sub,
-            resizable_tensor& data_output
-        )
+        void forward_inplace(const tensor& input, tensor& output)
         {
-            data_output.copy_size(sub.get_output());
-            tt::mish(data_output, sub.get_output());
+            tt::mish(output, input);
         }
 
-        template <typename SUBNET>
-        void backward(
+        void backward_inplace(
+            const tensor& computed_output,
             const tensor& gradient_input,
-            SUBNET& sub,
+            tensor& data_grad,
             tensor&
         )
         {
-            tt::mish_gradient(sub.get_gradient_input(), sub.get_output(), gradient_input);
+            tt::mish_gradient(data_grad, computed_output, gradient_input);
         }
 
         inline dpoint map_input_to_output (const dpoint& p) const { return p; }
