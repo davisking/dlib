@@ -1678,16 +1678,8 @@ namespace dlib
                 return e*omega/(delta*delta);
             };
 
-            if (is_same_object(gradient_input, grad))
-            {
-                for (size_t i = 0; i < src.size(); ++i)
-                    g[i] = in[i]*calculate_gradient(s[i]);
-            }
-            else
-            {
-                for (size_t i = 0; i < src.size(); ++i)
-                    g[i] += in[i]*calculate_gradient(s[i]);
-            }
+            for (size_t i = 0; i < src.size(); ++i)
+                g[i] += in[i]*calculate_gradient(s[i]);
         }
 
     // ------------------------------------------------------------------------------------
@@ -1892,16 +1884,8 @@ namespace dlib
             const auto g = grad.host();
             const auto s = src.host();
             const auto in = gradient_input.host();
-            if (is_same_object(grad, gradient_input))
-            {
-                for (size_t i = 0; i < src.size(); ++i)
-                    g[i] = in[i]*compute_gradient(s[i]);
-            }
-            else
-            {
-                for (size_t i = 0; i < src.size(); ++i)
-                    g[i] += in[i]*compute_gradient(s[i]);
-            }
+            for (size_t i = 0; i < src.size(); ++i)
+                g[i] += in[i]*compute_gradient(s[i]);
         }
 
     // ----------------------------------------------------------------------------------------

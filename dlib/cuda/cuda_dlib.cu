@@ -1454,12 +1454,6 @@ namespace dlib
             return e*omega/(delta*delta);
         }
 
-        __global__ void _cuda_mish_gradient_inplace(float* out, const float* s, const float* gi, size_t n)
-        {
-            for (auto i : grid_stride_range(0, n))
-                out[i] = gi[i]*mish_compute_gradient(s[i]);
-        }
-
         __global__ void _cuda_mish_gradient(float* out, const float* s, const float* gi, size_t n)
         {
             for (auto i : grid_stride_range(0, n))
@@ -1474,10 +1468,7 @@ namespace dlib
         {
             float* out = grad.device();
             const float* gi = gradient_input.device();
-            if (out == gi)
-                launch_kernel(_cuda_mish_gradient_inplace, max_jobs(grad.size()), out, src.device(), gi, grad.size());
-            else
-                launch_kernel(_cuda_mish_gradient, max_jobs(grad.size()), out, src.device(), gi, grad.size());
+            launch_kernel(_cuda_mish_gradient, max_jobs(grad.size()), out, src.device(), gi, grad.size());
         }
 
     // ----------------------------------------------------------------------------------------
@@ -1508,12 +1499,6 @@ namespace dlib
                 return cdf + x * pdf;
         }
 
-        __global__ void _cuda_gelu_gradient_inplace(float* out, const float* s, const float* gi, size_t n)
-        {
-            for (auto i : grid_stride_range(0, n))
-                out[i] = gi[i]*gelu_compute_gradient(s[i]);
-        }
-
         __global__ void _cuda_gelu_gradient(float* out, const float* s, const float* gi, size_t n)
         {
             for (auto i : grid_stride_range(0, n))
@@ -1528,10 +1513,7 @@ namespace dlib
         {
             float* out = grad.device();
             const float* gi = gradient_input.device();
-            if (out == gi)
-                launch_kernel(_cuda_gelu_gradient_inplace, max_jobs(grad.size()), out, src.device(), gi, grad.size());
-            else
-                launch_kernel(_cuda_gelu_gradient, max_jobs(grad.size()), out, src.device(), gi, grad.size());
+            launch_kernel(_cuda_gelu_gradient, max_jobs(grad.size()), out, src.device(), gi, grad.size());
         }
 
     // ----------------------------------------------------------------------------------------
