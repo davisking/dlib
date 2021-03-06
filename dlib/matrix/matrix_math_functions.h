@@ -442,6 +442,47 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename M> struct op_softmax
+    {
+        op_softmax(const M& m_) : m(m_)
+        {
+            COMPILE_TIME_ASSERT((is_same_type<type, float>::value == true ||
+                                 is_same_type<type, double>::value == true ||
+                                 is_same_type<type, long double>::value == true));
+            exps = exp(m - max(m));
+            denom = sum(exps);
+        }
+        const M& m;
+        const static long cost = M::cost + 9;
+        const static long NR = M::NR;
+        const static long NC = M::NC;
+        typedef typename M::type type;
+        typedef typename M::mem_manager_type mem_manager_type;
+        typedef typename M::layout_type layout_type;
+        typedef type const_ret_type;
+        const_ret_type apply(long r, long c) const { return exps(r, c) / denom; }
+        long nr() const { return m.nr(); }
+        long nc() const { return m.nc(); }
+        template <typename U> bool aliases(const matrix_exp<U>& item) const
+        {
+            return m.aliases(item);
+        }
+        template <typename U> bool destructively_aliases(const matrix_exp<U>& item) const
+        {
+            return m.destructively_aliases(item);
+        }
+
+        private:
+        type denom;
+        matrix<type, NR, NC> exps;
+    };
+
+    template <typename M> const matrix_op<op_softmax<M>> soft_max(const matrix_exp<M>& m)
+    {
+        typedef op_softmax<M> op;
+        return matrix_op<op>(op(m.ref()));
+    }
+
 }
 
 #endif // DLIB_MATRIx_MATH_FUNCTIONS
