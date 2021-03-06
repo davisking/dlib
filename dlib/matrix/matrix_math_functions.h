@@ -463,7 +463,7 @@ namespace dlib
         const matrix_exp<EXP>& m
     )
     {
-        // you can only compute normalized matrices that contain floats, doubles or long doubles.
+        // you can only compute softmax on matrices that contain floats, doubles or long doubles.
         COMPILE_TIME_ASSERT((
               is_same_type<typename EXP::type,float>::value == true ||
               is_same_type<typename EXP::type,double>::value == true ||
