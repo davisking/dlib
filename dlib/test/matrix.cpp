@@ -13,7 +13,6 @@
 #include "../array.h"
 #include "../rand.h"
 
-#include "dlib/statistics/statistics.h"
 #include "tester.h"
 #include <dlib/memory_manager_stateless.h>
 #include <dlib/array2d.h>
