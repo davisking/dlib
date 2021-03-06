@@ -13,6 +13,7 @@
 #include "../array.h"
 #include "../rand.h"
 
+#include "dlib/statistics/statistics.h"
 #include "tester.h"
 #include <dlib/memory_manager_stateless.h>
 #include <dlib/array2d.h>
@@ -1517,6 +1518,22 @@ namespace
             set_rowm(a,0) = trans(m*b);
             DLIB_TEST(equal(rowm(a,0) , trans(m*b)));
             DLIB_TEST(!equal(rowm(a,0) , m*b));
+        }
+        {
+            matrix<double> x, y;
+            x = 10 * gaussian_randm(100, 1) - 10;
+            y = soft_max(x);
+
+            double max_val = -std::numeric_limits<double>::infinity();
+            for (const auto i : x)
+                max_val = std::max(max_val, i);
+
+            double sum_exps = 0;
+            for (const auto i : x)
+                sum_exps += std::exp(i - max_val);
+
+            for (long i = 0; i < x.nr(); ++i)
+                DLIB_CASSERT(y(i) == std::exp(x(i) - max_val) / sum_exps);
         }
     }
 
