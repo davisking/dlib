@@ -442,44 +442,34 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename M> struct op_softmax
+    template <typename M>
+    struct op_softmax : basic_op_m<M>
     {
-        op_softmax(const M& m_) : m(m_)
-        {
-            COMPILE_TIME_ASSERT((is_same_type<type, float>::value == true ||
-                                 is_same_type<type, double>::value == true ||
-                                 is_same_type<type, long double>::value == true));
-            exps = exp(m - max(m));
-            denom = sum(exps);
-        }
-        const M& m;
+        op_softmax(const M& m_) : basic_op_m<M>(m_), exps(exp(this->m - max(this->m))), denom(sum(exps)) {}
+
         const static long cost = M::cost + 9;
-        const static long NR = M::NR;
-        const static long NC = M::NC;
         typedef typename M::type type;
-        typedef typename M::mem_manager_type mem_manager_type;
-        typedef typename M::layout_type layout_type;
         typedef type const_ret_type;
         const_ret_type apply(long r, long c) const { return exps(r, c) / denom; }
-        long nr() const { return m.nr(); }
-        long nc() const { return m.nc(); }
-        template <typename U> bool aliases(const matrix_exp<U>& item) const
-        {
-            return m.aliases(item);
-        }
-        template <typename U> bool destructively_aliases(const matrix_exp<U>& item) const
-        {
-            return m.destructively_aliases(item);
-        }
 
-        private:
-        type denom;
-        matrix<type, NR, NC> exps;
+        const matrix<type, M::NR, M::NC> exps;
+        const type denom;
     };
 
-    template <typename M> const matrix_op<op_softmax<M>> soft_max(const matrix_exp<M>& m)
+    template <
+      typename EXP
+      >
+    const matrix_op<op_softmax<EXP> > soft_max (
+        const matrix_exp<EXP>& m
+    )
     {
-        typedef op_softmax<M> op;
+        // you can only compute normalized matrices that contain floats, doubles or long doubles.
+        COMPILE_TIME_ASSERT((
+              is_same_type<typename EXP::type,float>::value == true ||
+              is_same_type<typename EXP::type,double>::value == true ||
+              is_same_type<typename EXP::type,long double>::value == true
+        ));
+        typedef op_softmax<EXP> op;
         return matrix_op<op>(op(m.ref()));
     }
 
