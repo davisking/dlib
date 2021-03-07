@@ -445,15 +445,16 @@ namespace dlib
     template <typename M>
     struct op_softmax : basic_op_m<M>
     {
-        op_softmax(const M& m_) : basic_op_m<M>(m_), exps(exp(this->m - max(this->m))), denom(sum(exps)) {}
+        typedef typename M::type type;
+
+        op_softmax(const M& m_, const type& d_, const type& v_) : basic_op_m<M>(m_), d(d_), v(v_){}
+
+        const type d;
+        const type v;
 
         const static long cost = M::cost + 9;
-        typedef typename M::type type;
         typedef type const_ret_type;
-        const_ret_type apply(long r, long c) const { return exps(r, c) / denom; }
-
-        const matrix<type, M::NR, M::NC> exps;
-        const type denom;
+        const_ret_type apply(long r, long c) const { return std::exp(this->m(r, c) - v) / d; }
     };
 
     template <
@@ -470,7 +471,9 @@ namespace dlib
               is_same_type<typename EXP::type,long double>::value == true
         ));
         typedef op_softmax<EXP> op;
-        return matrix_op<op>(op(m.ref()));
+        typename EXP::type max_val = max(m);
+        typename EXP::type denom = sum(exp(m - max_val));
+        return matrix_op<op>(op(m.ref(), denom, max_val));
     }
 
 }
