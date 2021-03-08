@@ -442,6 +442,40 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename M>
+    struct op_softmax : basic_op_m<M>
+    {
+        typedef typename M::type type;
+
+        op_softmax(const M& m_, const type& s_, const type& v_) : basic_op_m<M>(m_), s(s_), v(v_){}
+
+        const type s;
+        const type v;
+
+        const static long cost = M::cost + 9;
+        typedef type const_ret_type;
+        const_ret_type apply(long r, long c) const { return std::exp(this->m(r, c) - v) * s; }
+    };
+
+    template <
+      typename EXP
+      >
+    const matrix_op<op_softmax<EXP> > soft_max (
+        const matrix_exp<EXP>& m
+    )
+    {
+        // you can only compute softmax on matrices that contain floats, doubles or long doubles.
+        COMPILE_TIME_ASSERT((
+              is_same_type<typename EXP::type,float>::value == true ||
+              is_same_type<typename EXP::type,double>::value == true ||
+              is_same_type<typename EXP::type,long double>::value == true
+        ));
+        typedef op_softmax<EXP> op;
+        typename EXP::type max_val = max(m);
+        typename EXP::type temp = static_cast<typename EXP::type>(1) / sum(exp(m - max_val));
+        return matrix_op<op>(op(m.ref(), temp, max_val));
+    }
+
 }
 
 #endif // DLIB_MATRIx_MATH_FUNCTIONS

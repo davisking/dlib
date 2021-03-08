@@ -1518,6 +1518,23 @@ namespace
             DLIB_TEST(equal(rowm(a,0) , trans(m*b)));
             DLIB_TEST(!equal(rowm(a,0) , m*b));
         }
+        {
+            matrix<double> x, y;
+            x = 10 * gaussian_randm(100, 1) - 10;
+            y = soft_max(x);
+
+            double max_val = -std::numeric_limits<double>::infinity();
+            for (const auto i : x)
+                max_val = std::max(max_val, i);
+
+            double sum_exps = 0;
+            for (const auto i : x)
+                sum_exps += std::exp(i - max_val);
+            double scale = 1.0 / sum_exps;
+
+            for (long i = 0; i < x.nr(); ++i)
+                DLIB_CASSERT(y(i) == std::exp(x(i) - max_val) * scale);
+        }
     }
 
 
