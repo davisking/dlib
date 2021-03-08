@@ -600,7 +600,7 @@ namespace dlib
                 - R::type == the same type that was in m
                 - R has the same dimensions as m
                 - for all valid r and c:
-                  R(r,c) == std::exp(m(r,c) / sum(std::exp(m))
+                  R(r,c) == std::exp(m(r,c)) / sum(std::exp(m))
     !*/
 
 // ----------------------------------------------------------------------------------------
