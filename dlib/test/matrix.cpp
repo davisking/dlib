@@ -1530,9 +1530,10 @@ namespace
             double sum_exps = 0;
             for (const auto i : x)
                 sum_exps += std::exp(i - max_val);
+            double scale = 1.0 / sum_exps;
 
             for (long i = 0; i < x.nr(); ++i)
-                DLIB_CASSERT(y(i) == std::exp(x(i) - max_val) / sum_exps);
+                DLIB_CASSERT(y(i) == std::exp(x(i) - max_val) * scale);
         }
     }
 

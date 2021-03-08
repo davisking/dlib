@@ -447,14 +447,14 @@ namespace dlib
     {
         typedef typename M::type type;
 
-        op_softmax(const M& m_, const type& d_, const type& v_) : basic_op_m<M>(m_), d(d_), v(v_){}
+        op_softmax(const M& m_, const type& s_, const type& v_) : basic_op_m<M>(m_), s(s_), v(v_){}
 
-        const type d;
+        const type s;
         const type v;
 
         const static long cost = M::cost + 9;
         typedef type const_ret_type;
-        const_ret_type apply(long r, long c) const { return std::exp(this->m(r, c) - v) / d; }
+        const_ret_type apply(long r, long c) const { return std::exp(this->m(r, c) - v) * s; }
     };
 
     template <
@@ -472,8 +472,8 @@ namespace dlib
         ));
         typedef op_softmax<EXP> op;
         typename EXP::type max_val = max(m);
-        typename EXP::type denom = sum(exp(m - max_val));
-        return matrix_op<op>(op(m.ref(), denom, max_val));
+        typename EXP::type temp = static_cast<typename EXP::type>(1) / sum(exp(m - max_val));
+        return matrix_op<op>(op(m.ref(), temp, max_val));
     }
 
 }
