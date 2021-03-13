@@ -1238,7 +1238,7 @@ namespace dlib
                     b,
                     (const cudnnTensorDescriptor_t)bias_handle,
                     b,
-                    identity_activation_descriptor(),
+                    relu_activation_descriptor(),
                     descriptor(output),
                     output.device()));
         }

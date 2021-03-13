@@ -2365,7 +2365,7 @@ namespace dlib
 
             auto g = gamma(params,0);
             auto b = beta(params,gamma.size());
-            
+
             resizable_tensor temp(item.params);
             auto sg = gamma(temp,0);
             auto sb = beta(temp,gamma.size());
@@ -2379,8 +2379,10 @@ namespace dlib
         void disable()
         {
             params.clear();
-            is_disabled = true;
+            disabled = true;
         }
+
+        bool is_disabled() const { return disabled; }
 
         inline dpoint map_input_to_output (const dpoint& p) const { return p; }
         inline dpoint map_output_to_input (const dpoint& p) const { return p; }
@@ -2388,7 +2390,7 @@ namespace dlib
         template <typename SUBNET>
         void setup (const SUBNET& sub)
         {
-            if (is_disabled)
+            if (disabled)
                 return;
 
             if (mode == FC_MODE)
@@ -2412,7 +2414,7 @@ namespace dlib
 
         void forward_inplace(const tensor& input, tensor& output)
         {
-            if (is_disabled)
+            if (disabled)
                 return;
 
             auto g = gamma(params,0);
@@ -2429,7 +2431,7 @@ namespace dlib
             tensor& /*params_grad*/
         )
         {
-            if (is_disabled)
+            if (disabled)
                 return;
 
             auto g = gamma(params,0);
@@ -2468,7 +2470,7 @@ namespace dlib
             serialize(item.gamma, out);
             serialize(item.beta, out);
             serialize((int)item.mode, out);
-            serialize(item.is_disabled, out);
+            serialize(item.disabled, out);
         }
 
         friend void deserialize(affine_& item, std::istream& in)
@@ -2505,13 +2507,13 @@ namespace dlib
             deserialize(mode, in);
             item.mode = (layer_mode)mode;
             if (version == "affine_2")
-                deserialize(item.is_disabled, in);
+                deserialize(item.disabled, in);
         }
 
         friend std::ostream& operator<<(std::ostream& out, const affine_& item)
         {
             out << "affine";
-            if (item.is_disabled)
+            if (item.disabled)
                 out << "\t (disabled)";
             return out;
         }
@@ -2522,8 +2524,8 @@ namespace dlib
                 out << "<affine_con";
             else
                 out << "<affine_fc";
-            if (item.is_disabled)
-                out << " disabled='"<< std::boolalpha << item.is_disabled << "'";
+            if (item.disabled)
+                out << " disabled='"<< std::boolalpha << item.disabled << "'";
             out << ">\n";
             out << mat(item.params);
 
@@ -2537,12 +2539,12 @@ namespace dlib
         resizable_tensor params, empty_params; 
         alias_tensor gamma, beta;
         layer_mode mode;
-        bool is_disabled = false;
+        bool disabled = false;
     };
 
     template <typename SUBNET>
     using affine = add_layer<affine_, SUBNET>;
-
+    class relu_;
     namespace impl
     {
         class visitor_fuse_convolutions
@@ -2553,10 +2555,24 @@ namespace dlib
                 // disable other layer types
             }
 
+            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E1, typename E2>
+            void fuse_convolutions(
+                add_layer<relu_,
+                add_layer<affine_,
+                add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E1>, E2>& l)
+            {
+                // l.layer_details().disable();
+                fuse_convolutions(l.subnet());
+            }
+
             // handle the standard case (convolutional layer followed by affine;
             template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
             void fuse_convolutions(add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>& l)
             {
+                if (l.layer_details().is_disabled())
+                {
+                    return;
+                }
                 // get the parameters from the affine layer as alias_tensor_instance
                 auto gamma = l.layer_details().get_gamma();
                 auto beta = l.layer_details().get_beta();
@@ -2611,7 +2627,7 @@ namespace dlib
     )
     {
         DLIB_CASSERT(count_parameters(net) > 0, "The network has to be allocated before fusing the convolutions.");
-        visit_layers_backwards(net, impl::visitor_fuse_convolutions());
+        visit_layers(net, impl::visitor_fuse_convolutions());
     }
 
 // ----------------------------------------------------------------------------------------
@@ -3178,6 +3194,8 @@ namespace dlib
 
         void forward_inplace(const tensor& input, tensor& output)
         {
+            if (disabled)
+                return;
             tt::relu(output, input);
         } 
 
@@ -3188,8 +3206,14 @@ namespace dlib
             tensor& 
         )
         {
+            if (disabled)
+                return;
             tt::relu_gradient(data_grad, computed_output, gradient_input);
         }
+
+        void disable() { disabled = true; }
+        void enable() { disabled = false; }
+        bool is_disabled() const { return disabled; }
 
         inline dpoint map_input_to_output (const dpoint& p) const { return p; }
         inline dpoint map_output_to_input (const dpoint& p) const { return p; }
@@ -3222,6 +3246,7 @@ namespace dlib
         }
 
     private:
+        bool disabled = false;
         resizable_tensor params;
     };
 
