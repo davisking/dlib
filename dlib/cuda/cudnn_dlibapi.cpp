@@ -1077,10 +1077,10 @@ namespace dlib
             CHECK_CUDNN(cudnnSetTensor4dDescriptor((cudnnTensorDescriptor_t)bias_handle,
                     CUDNN_TENSOR_NCHW,
                     CUDNN_DATA_FLOAT,
-                    1,
-                    biases.k(),
-                    1,
-                    1));
+                    static_cast<int>(biases.num_samples()),
+                    static_cast<int>(biases.k()),
+                    static_cast<int>(biases.nr()),
+                    static_cast<int>(biases.nc())));
        }
 
 
