@@ -2561,7 +2561,7 @@ namespace dlib
                 add_layer<affine_,
                 add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E1>, E2>& l)
             {
-                // l.layer_details().disable();
+                l.layer_details().disable();
                 fuse_convolutions(l.subnet());
             }
 
@@ -3234,9 +3234,11 @@ namespace dlib
                 throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::relu_.");
         }
 
-        friend std::ostream& operator<<(std::ostream& out, const relu_& /*item*/)
+        friend std::ostream& operator<<(std::ostream& out, const relu_& item)
         {
             out << "relu";
+            if (item.disabled)
+                out << "\t (disabled)";
             return out;
         }
 
