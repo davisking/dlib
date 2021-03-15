@@ -19,7 +19,8 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename T
+        typename T,
+        typename mem_manager = default_memory_manager
         >
     class integral_image_generic : noncopyable
     {
@@ -102,16 +103,17 @@ namespace dlib
 
     private:
 
-        array2d<T> int_img;
+        array2d<T, mem_manager> int_img;
     };
 
 
     template <
-        typename T
+        typename T,
+        typename mem_manager
         >
     void swap (
-        integral_image_generic<T>& a,
-        integral_image_generic<T>& b
+        integral_image_generic<T, mem_manager>& a,
+        integral_image_generic<T, mem_manager>& b
     ) { a.swap(b); }
 
 // ----------------------------------------------------------------------------------------
