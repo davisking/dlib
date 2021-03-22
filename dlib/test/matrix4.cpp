@@ -641,6 +641,20 @@ namespace
             
             DLIB_TEST(equal(A,B));
         }
+
+        {
+            matrix<double,9,5> A = randm(9,5);
+            matrix<double,9,5> B = randm(9,5);
+            matrix<double,9,5> C = pointwise_pow(A, B);
+
+            for (long r = 0; r < C.nr(); ++r)
+            {
+                for (long c = 0; c < C.nc(); ++c)
+                {
+                    DLIB_TEST(C(r, c) == std::pow(A(r, c), B(r, c)));
+                }
+            }
+        }
     }
 
 
