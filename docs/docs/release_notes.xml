@@ -10,7 +10,40 @@
 
 <!-- **************************************************************************************  -->
 
+
 <current>
+New Features and Improvements:
+   - Deep learning tooling:
+      - Added loss_multibinary_log_
+      - Added scale_prev layer
+      - Various ease of use improvements to the deep learning tooling, such as improved layer
+        visitors and increased DNN training stability.
+      - Added CUDA implementation for loss_multiclass_log_per_pixel_weighted.
+      - Add GELU activation layer
+      - Add Layer Normalization
+      - Add CIFAR-10 dataset loader: load_cifar_10_dataset()
+   - Add probability_values_are_increasing() and probability_values_are_increasing_robust().
+   - Expanded list of serializable types and added DLIB_DEFINE_DEFAULT_SERIALIZATION, a macro that
+     lets you make a class serializable with a single simple declaration.
+   - Added exponential and Weibull distributions to dlib::rand.
+   - For dlib::matrix:
+         - Added soft_max() and pointwise_pow()
+         - The FFT methods now support arbitrary sized FFTs and are more performant.
+   - Added user definable stopping condition support to find_min_global() and find_max_global().
+
+Non-Backwards Compatible Changes:
+   - Rename POSIX macro to DLIB_POSIX to avoid name clashes with some libraries.
+   - Dropped support for gcc 4.8.
+
+Bug fixes:
+   - Fixed bug in loss_mmod that degraded the quality of bounding box regression.  Now
+     bounding box regression works a lot better.
+   - Fixes for code not compiling in various environments and support newer CUDA tooling.
+</current>
+
+<!-- **************************************************************************************  -->
+
+<old name="19.21" date="Aug 08, 2020">
 New Features and Improvements:
    - Added support for cuDNN 8.0.
    - Added support for CUDA in Python 3.8 on Windows.
@@ -24,7 +57,7 @@ Bug fixes:
      with CUDA enabled or who are using windows.
    - Fix random forest regression not doing quite the right thing.
 
-</current>
+</old>
 
 <!-- **************************************************************************************  -->
 
