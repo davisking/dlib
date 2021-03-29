@@ -89,7 +89,8 @@ fi
 ## -------------------------------
 ## Select CUDA packages to install
 ## -------------------------------
-CUDA_PACKAGES="cuda-toolkit-${CUDA_MAJOR}-${CUDA_MINOR} libcublas-dev libcudnn${CUDNN_VERSION_MAJOR}-dev"
+CUDA_PACKAGES="cuda-toolkit-${CUDA_MAJOR}-${CUDA_MINOR} libcublas-${CUDA_MAJOR}-${CUDA_MINOR}-dev libcudnn${CUDNN_VERSION_MAJOR}-dev"
+CUDA_PACKAGES=`${CUDA_PACKAGES/libcublas-10-2/libcublas}`
 # for package in "${CUDA_PACKAGES_IN[@]}"
 # do : 
 #     # @todo This is not perfect. Should probably provide a separate list for diff versions
