@@ -85,4 +85,8 @@ jobs:
 
     - name: Test
       working-directory: ${{ github.workspace }}/dlib/test
-      run: ./${{ env.build_dir }}/dtest --runall -q
+      run: |
+        pwd
+        ls ${{ env.build_dir }}
+        ${{ env.build_dir }}/dtest --runall -q
+        ./${{ env.build_dir }}/dtest --runall -q
