@@ -84,9 +84,5 @@ jobs:
       run: cmake --build ${{ env.build_dir }}
 
     - name: Test
-      working-directory: ${{ github.workspace }}/dlib/test
-      run: |
-        pwd
-        ls ${{ env.build_dir }}
-        ${{ env.build_dir }}/dtest --runall -q
-        ./${{ env.build_dir }}/dtest --runall -q
+      working-directory: ${{ github.workspace }}/dlib/test/${{ env.build_dir }}
+      run: ./dtest --runall -q
