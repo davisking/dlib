@@ -19,6 +19,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          -os: ubuntu-20.10
+            cuda: "11.2"
+            cudnn: "8"
+            gcc: 10
+
           # 18.04 supports CUDA 10.1+ (gxx <= 8)
           - os: ubuntu-18.04
             cuda: "10.1"
