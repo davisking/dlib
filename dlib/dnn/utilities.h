@@ -213,11 +213,11 @@ namespace dlib
             template <size_t N, template <typename> class R, typename U>
             void operator()(const repeat<N, R, U>& net)
             {
-                (*this)(net.subnet());
                 for (size_t i = 0; i < N; ++i)
                 {
-                    (*this)(net.get_repeated_layer(N-1-i).subnet());
+                    (*this)(net.get_repeated_layer(i).subnet());
                 }
+                (*this)(net.subnet());
             }
 
 
