@@ -48,6 +48,8 @@ jobs:
           echo "CUDA_PATH=${CUDA_PATH}" >> $GITHUB_ENV
           echo "${CUDA_PATH}/bin" >> $GITHUB_PATH
           echo "LD_LIBRARY_PATH=${CUDA_PATH}/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+          echo "Loading kernel module"
+          nvidia-modprobe
         fi
       shell: bash
 
