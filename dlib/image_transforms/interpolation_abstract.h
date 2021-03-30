@@ -438,6 +438,24 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename image_type>
+    point_transform_affine letterbox_image (
+        const image_type& img_in,
+        image_type& img_out,
+        long size
+    );
+    /*!
+        requires
+            - size > 0
+        ensures
+            - scales #image so that it fits into a #size * #size square
+            - it preserves the aspect ratio of the #image by padding the shortest side
+            - returns a transformation object that maps points in in_img into their
+              corresponding location in #out_img.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
     template <
         typename image_type1,
         typename image_type2
