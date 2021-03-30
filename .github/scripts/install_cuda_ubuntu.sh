@@ -89,7 +89,7 @@ fi
 ## -------------------------------
 ## Select CUDA packages to install
 ## -------------------------------
-CUDA_PACKAGES="cuda-toolkit-${CUDA_MAJOR}-${CUDA_MINOR} libcublas-dev-${CUDA_MAJOR}-${CUDA_MINOR} libcudnn${CUDNN_VERSION_MAJOR}-dev"
+CUDA_PACKAGES="cuda-toolkit-${CUDA_MAJOR}-${CUDA_MINOR} libcublas-dev-${CUDA_MAJOR}-${CUDA_MINOR} libcudnn${CUDNN_VERSION_MAJOR}-dev nvidia-driver-460 nvidia-driver-460-server"
 CUDA_PACKAGES=${CUDA_PACKAGES/libcublas-dev-10-2/libcublas-dev}
 # for package in "${CUDA_PACKAGES_IN[@]}"
 # do : 
