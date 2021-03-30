@@ -141,6 +141,15 @@ namespace dlib
                 (*this)(net.subnet());
                 p = net.layer_details().map_input_to_output(p);
             }
+            template <size_t N, template <typename> class R, typename U>
+            void operator()(const repeat<N, R, U>& net)
+            {
+                (*this)(net.subnet());
+                for (size_t i = 0; i < N; ++i)
+                {
+                    (*this)(net.get_repeated_layer(N-1-i).subnet());
+                }
+            }
 
 
             template <unsigned long ID, typename U, typename E>
@@ -200,6 +209,15 @@ namespace dlib
             {
                 p = net.layer_details().map_output_to_input(p);
                 (*this)(net.subnet());
+            }
+            template <size_t N, template <typename> class R, typename U>
+            void operator()(const repeat<N, R, U>& net)
+            {
+                (*this)(net.subnet());
+                for (size_t i = 0; i < N; ++i)
+                {
+                    (*this)(net.get_repeated_layer(N-1-i).subnet());
+                }
             }
 
 
