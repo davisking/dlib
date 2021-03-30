@@ -14,10 +14,10 @@ jobs:
         os: [ubuntu-20.04, macos-10.15, windows-2019]
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup Python
+      - name: Setup python
         uses: actions/setup-python@v2
 
       - name: Build wheels
@@ -27,11 +27,24 @@ jobs:
           CIBW_BUILD: 'cp37-* cp38-* cp39-*'
           CIBW_ARCHS: auto64
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
 
-      - uses: pypa/gh-action-pypi-publish@master
+  publish_on_pypi:
+    name: "Publish on pypi.org"
+    needs: [build_wheels]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+
+      - name: Publish wheels
+        uses: pypa/gh-action-pypi-publish@master
         with:
           user: __token__
           password: ${{ secrets.PYPI_PASSWORD }}
