@@ -979,7 +979,7 @@ namespace dlib
         const auto scale = size / std::max<double>(img_in.nr(), img_in.nc());
 
         // early return if the image has already the requested size and no padding is needed
-        if (scale == 1 and img_in.nr() == img_in.nc())
+        if (scale == 1 && img_in.nr() == img_in.nc())
         {
             img_out = img_in;
             return point_transform_affine();
