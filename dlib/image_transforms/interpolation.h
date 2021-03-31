@@ -975,34 +975,34 @@ namespace dlib
     )
     {
         DLIB_CASSERT(size > 0, "size must be bigger than zero, but was " << size);
+        const_image_view<image_type> vimg_in(img_in);
+        image_view<image_type> vimg_out(img_out);
+
         // the scaling factor of the image
-        const auto scale = size / std::max<double>(img_in.nr(), img_in.nc());
+        const auto scale = size / std::max<double>(vimg_in.nr(), vimg_in.nc());
 
         // early return if the image has already the requested size and no padding is needed
-        if (scale == 1 && img_in.nr() == img_in.nc())
+        if (scale == 1 && vimg_in.nr() == vimg_in.nc())
         {
-            img_out = img_in;
+            assign_image(vimg_out, vimg_in);
             return point_transform_affine();
         }
 
         // black background
-        img_out.set_size(size, size);
-        assign_all_pixels(img_out, 0);
+        vimg_out.set_size(size, size);
+        assign_all_pixels(vimg_out, 0);
 
         // resize the image so that it fits into a size x size image
-        image_type temp = img_in;
-        resize_image(scale, temp);
-
-        // get the row and column offsets (the padding size)
-        const point offset((size - temp.nc()) / 2, (size - temp.nr()) / 2);
-        for (long r = 0; r < temp.nr(); ++r)
-        {
-            for (long c = 0; c < temp.nc(); ++c)
-            {
-                img_out(offset.y() + r, offset.x() + c) = temp(r, c);
-            }
-        }
-        return point_transform_affine(identity_matrix<double>(2) * scale, offset);
+        image_type temp;
+        image_view<image_type> vtemp(temp);
+        vtemp.set_size(std::round(scale * vimg_in.nr()), std::round(scale * vimg_in.nc()));
+        resize_image(vimg_in, temp);
+        dpoint offset((size - vtemp.nc()) / 2.0, (size - vtemp.nr()) / 2.0);
+        const auto tform = point_transform_affine(identity_matrix<double>(2) * scale, offset);
+        const auto r = rectangle(offset.x(), offset.y(), offset.x() + vtemp.nc() - 1, offset.y() + vtemp.nr() - 1);
+        auto si = sub_image(img_out, r);
+        assign_image(si, vtemp);
+        return tform;
     }
 
 // ----------------------------------------------------------------------------------------

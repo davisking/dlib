@@ -449,7 +449,7 @@ namespace dlib
             - size > 0
         ensures
             - scales #image so that it fits into a #size * #size square
-            - it preserves the aspect ratio of the #image by padding the shortest side
+            - it preserves the aspect ratio of the #image by 0-padding the shortest side
             - returns a transformation object that maps points in in_img into their
               corresponding location in #out_img.
     !*/
