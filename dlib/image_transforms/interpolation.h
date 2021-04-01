@@ -967,11 +967,15 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename image_type>
+    template <
+        typename image_type,
+        typename interpolation_type
+        >
     point_transform_affine letterbox_image (
         const image_type& img_in,
         image_type& img_out,
-        long size
+        long size,
+        const interpolation_type& interp
     )
     {
         DLIB_CASSERT(size > 0, "size must be bigger than zero, but was " << size);
@@ -999,8 +1003,31 @@ namespace dlib
         dpoint offset((size - vtemp.nc()) / 2.0, (size - vtemp.nr()) / 2.0);
         const auto r = rectangle(offset.x(), offset.y(), offset.x() + vtemp.nc() - 1, offset.y() + vtemp.nr() - 1);
         auto si = sub_image(img_out, r);
-        resize_image(vimg_in, si);
+        resize_image(vimg_in, si, interp);
         return point_transform_affine(identity_matrix<double>(2) * scale, offset);
+    }
+
+    template <
+        typename image_type
+        >
+    point_transform_affine letterbox_image (
+        const image_type& img_in,
+        image_type& img_out,
+        long size
+    )
+    {
+        return letterbox_image(img_in, img_out, size, interpolate_bilinear());
+    }
+
+    template <
+        typename image_type
+        >
+    point_transform_affine letterbox_image (
+        const image_type& img_in,
+        image_type& img_out
+    )
+    {
+        return letterbox_image(img_in, img_out, std::max(num_rows(img_in), num_columns(img_in)), interpolate_bilinear());
     }
 
 // ----------------------------------------------------------------------------------------
