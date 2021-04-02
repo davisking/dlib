@@ -439,18 +439,21 @@ namespace dlib
 // ----------------------------------------------------------------------------------------
 
     template <
-        typename image_type,
+        typename image_type1,
+        typename image_type2,
         typename interpolation_type
         >
     point_transform_affine letterbox_image (
-        const image_type& img_in,
-        image_type& img_out,
+        const image_type1& img_in,
+        image_type2& img_out,
         long size
         const interpolation_type interp
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - image_type2 == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h
             - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear,
               interpolate_quadratic, or a type with a compatible interface.
@@ -465,15 +468,20 @@ namespace dlib
               corresponding location in #out_img.
     !*/
 
-    template <typename image_type>
+    template <
+        typename image_type1,
+        typename image_type2
+        >
     point_transform_affine letterbox_image (
-        const image_type& img_in,
-        image_type& img_out,
+        const image_type1& img_in,
+        image_type2& img_out,
         long size
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - image_type2 == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h
             - size > 0
             - is_same_object(in_img, out_img) == false
@@ -486,14 +494,19 @@ namespace dlib
               corresponding location in #out_img.
     !*/
 
-    template <typename image_type>
+    template <
+        typename image_type1,
+        typename image_type2
+        >
     point_transform_affine letterbox_image (
-        const image_type& img_in,
-        image_type& img_out
+        const image_type1& img_in,
+        image_type2& img_out
     );
     /*!
         requires
-            - image_type == an image object that implements the interface defined in
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - image_type2 == an image object that implements the interface defined in
               dlib/image_processing/generic_image.h
             - is_same_object(in_img, out_img) == false
         ensures
