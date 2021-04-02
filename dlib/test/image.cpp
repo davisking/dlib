@@ -2278,7 +2278,6 @@ namespace
         auto si = sub_image(img_t, r);
         assign_image(si, img_w);
         DLIB_TEST(img_d == img_t);
-
     }
 
     void test_draw_string()
