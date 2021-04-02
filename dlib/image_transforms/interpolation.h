@@ -982,7 +982,6 @@ namespace dlib
         const_image_view<image_type> vimg_in(img_in);
         image_view<image_type> vimg_out(img_out);
 
-        // the scaling factor of the image
         const auto scale = size / std::max<double>(vimg_in.nr(), vimg_in.nc());
 
         // early return if the image has already the requested size and no padding is needed
@@ -992,16 +991,13 @@ namespace dlib
             return point_transform_affine();
         }
 
-        // black background
         vimg_out.set_size(size, size);
-        assign_all_pixels(vimg_out, 0);
 
-        // resize the image so that it fits into a size x size image
-        image_type temp;
-        image_view<image_type> vtemp(temp);
-        vtemp.set_size(std::round(scale * vimg_in.nr()), std::round(scale * vimg_in.nc()));
-        dpoint offset((size - vtemp.nc()) / 2.0, (size - vtemp.nr()) / 2.0);
-        const auto r = rectangle(offset.x(), offset.y(), offset.x() + vtemp.nc() - 1, offset.y() + vtemp.nr() - 1);
+        const long nr = std::round(scale * vimg_in.nr());
+        const long nc = std::round(scale * vimg_in.nc());
+        dpoint offset((size - nc) / 2.0, (size - nr) / 2.0);
+        const auto r = rectangle(offset.x(), offset.y(), offset.x() + nc - 1, offset.y() + nr - 1);
+        zero_border_pixels(vimg_out, r);
         auto si = sub_image(img_out, r);
         resize_image(vimg_in, si, interp);
         return point_transform_affine(identity_matrix<double>(2) * scale, offset);
