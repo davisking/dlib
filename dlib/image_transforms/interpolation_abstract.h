@@ -440,6 +440,95 @@ namespace dlib
 
     template <
         typename image_type1,
+        typename image_type2,
+        typename interpolation_type
+        >
+    point_transform_affine letterbox_image (
+        const image_type1& img_in,
+        image_type2& img_out,
+        long size
+        const interpolation_type interp
+    );
+    /*!
+        requires
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - interpolation_type == interpolate_nearest_neighbor, interpolate_bilinear,
+              interpolate_quadratic, or a type with a compatible interface.
+            - size > 0
+            - is_same_object(in_img, out_img) == false
+        ensures
+            - Scales in_img so that it fits into a size * size square.
+              In particular, we will have:
+                - #img_out.nr() == size
+                - #img_out.nc() == size
+            - Preserves the aspect ratio of in_img by 0-padding the shortest side.
+            - Uses the supplied interpolation routine interp to perform the necessary
+              pixel interpolation.
+            - Returns a transformation object that maps points in in_img into their
+              corresponding location in #out_img.
+    !*/
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    point_transform_affine letterbox_image (
+        const image_type1& img_in,
+        image_type2& img_out,
+        long size
+    );
+    /*!
+        requires
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - size > 0
+            - is_same_object(in_img, out_img) == false
+        ensures
+            - Scales in_img so that it fits into a size * size square.
+              In particular, we will have:
+                - #img_out.nr() == size
+                - #img_out.nc() == size
+            - Preserves the aspect ratio of in_img by 0-padding the shortest side.
+            - Uses the bilinear interpolation to perform the necessary pixel
+              interpolation.
+            - Returns a transformation object that maps points in in_img into their
+              corresponding location in #out_img.
+    !*/
+
+    template <
+        typename image_type1,
+        typename image_type2
+        >
+    point_transform_affine letterbox_image (
+        const image_type1& img_in,
+        image_type2& img_out
+    );
+    /*!
+        requires
+            - image_type1 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - image_type2 == an image object that implements the interface defined in
+              dlib/image_processing/generic_image.h
+            - is_same_object(in_img, out_img) == false
+        ensures
+            - 0-pads in_img so that it fits into a square whose side is computed as
+              max(num_rows(in_img), num_columns(in_img)) and stores into #out_img.
+              In particular, we will have:
+                - #img_out.nr() == max(num_rows(in_img), num_columns(in_img))
+                - #img_out.nc() == max(num_rows(in_img), num_columns(in_img))
+            - Returns a transformation object that maps points in in_img into their
+              corresponding location in #out_img.
+    !*/
+
+// ----------------------------------------------------------------------------------------
+
+    template <
+        typename image_type1,
         typename image_type2
         >
     point_transform_affine flip_image_left_right (
