@@ -3972,6 +3972,20 @@ namespace
 
 // ----------------------------------------------------------------------------------------
 
+    template <typename SUBNET>
+    using conblock = relu<bn_con<add_layer<con_<16, 3, 3, 2, 2, 1, 1>, SUBNET>>>;
+
+    void test_input_ouput_mappers()
+    {
+        using net_type = loss_binary_log_per_pixel<con<1, 1, 1, 1, 1,repeat<3, conblock, tag1<input_rgb_image>>>>;
+        net_type net;
+        point p(32, 32);
+        DLIB_TEST(input_tensor_to_output_tensor(net, p) == p / 8);
+        DLIB_TEST(output_tensor_to_input_tensor(net, p) == p * 8);
+    }
+
+// ----------------------------------------------------------------------------------------
+
     // This test really just checks if the mmod loss goes negative when a whole lot of overlapping
     // truth rectangles are given.  
     void test_loss_mmod()
@@ -4157,6 +4171,7 @@ namespace
             test_layers_scale_and_scale_prev();
             test_disable_duplicative_biases();
             test_set_learning_rate_multipliers();
+            test_input_ouput_mappers();
         }
 
         void perform_test()
