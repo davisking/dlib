@@ -256,16 +256,16 @@ namespace
         resizable_tensor src(n, k, nr, nc);
         tt::tensor_rand rnd;
         rnd.fill_uniform(src);
-        resizable_tensor dest1, dest2;
-        dest1.copy_size(src);
-        dest2.copy_size(src);
+        resizable_tensor dest_cuda, dest_cpu;
+        dest_cuda.copy_size(src);
+        dest_cpu.copy_size(src);
         // initialize to different values in order to make sure the output is actually changed
-        dest1 = 1;
-        dest2 = 2;
-        cuda::leaky_relu(dest1, src, alpha);
-        cpu::leaky_relu(dest2, src, alpha);
+        dest_cuda = 1;
+        dest_cpu = 2;
+        cuda::leaky_relu(dest_cuda, src, alpha);
+        cpu::leaky_relu(dest_cpu, src, alpha);
 
-        DLIB_TEST_MSG(max(abs(mat(dest1) - mat(dest2))) < 1e-7, max(abs(mat(dest1) - mat(dest2))));
+        DLIB_TEST_MSG(max(abs(mat(dest_cuda) - mat(dest_cpu))) < 1e-7, max(abs(mat(dest_cuda) - mat(dest_cpu))));
 #endif // DLIB_USE_CUDA
     }
 
@@ -282,16 +282,29 @@ namespace
         resizable_tensor src(n, k, nr, nc);
         tt::tensor_rand rnd;
         rnd.fill_uniform(src);
-        resizable_tensor dest1, dest2;
-        dest1.copy_size(src);
-        dest2.copy_size(src);
+        resizable_tensor dest_cuda, dest_cpu;
+        dest_cuda.copy_size(src);
+        dest_cpu.copy_size(src);
         // initialize to different values in order to make sure the output is actually changed
-        dest1 = 1;
-        dest2 = 2;
-        cuda::clipped_relu(dest1, src, ceiling);
-        cpu::clipped_relu(dest2, src, ceiling);
+        dest_cuda = 1;
+        dest_cpu = 2;
+        cuda::clipped_relu(dest_cuda, src, ceiling);
+        cpu::clipped_relu(dest_cpu, src, ceiling);
+        auto error = max(abs(mat(dest_cuda) - mat(dest_cpu)));
+        DLIB_TEST_MSG(error < 1e-7, "error: " << error);
 
-        DLIB_TEST_MSG(max(abs(mat(dest1) - mat(dest2))) < 1e-7, max(abs(mat(dest1) - mat(dest2))));
+        // test gradients
+        resizable_tensor grad_cuda, grad_cpu, grad_input;
+        grad_cuda.copy_size(src);
+        grad_cpu.copy_size(src);
+        grad_input.copy_size(src);
+        rnd.fill_uniform(grad_input);
+        grad_cuda = 0;
+        grad_cpu = 0;
+        cuda::clipped_relu_gradient(grad_cuda, dest_cuda, grad_input, ceiling);
+        cpu::clipped_relu_gradient(grad_cpu, dest_cpu, grad_input, ceiling);
+        error = max(abs(mat(grad_cuda) - mat(grad_cpu)));
+        DLIB_TEST_MSG(error < 1e-7, "error: " << error);
 #endif // DLIB_USE_CUDA
     }
 
@@ -308,16 +321,28 @@ namespace
         resizable_tensor src(n, k, nr, nc);
         tt::tensor_rand rnd;
         rnd.fill_uniform(src);
-        resizable_tensor dest1, dest2;
-        dest1.copy_size(src);
-        dest2.copy_size(src);
+        resizable_tensor dest_cuda, dest_cpu;
+        dest_cuda.copy_size(src);
+        dest_cpu.copy_size(src);
         // initialize to different values in order to make sure the output is actually changed
-        dest1 = 1;
-        dest2 = 2;
-        cuda::elu(dest1, src, alpha);
-        cpu::elu(dest2, src, alpha);
-
-        DLIB_TEST_MSG(max(abs(mat(dest1) - mat(dest2))) < 1e-7, max(abs(mat(dest1) - mat(dest2))));
+        dest_cuda = 1;
+        dest_cpu = 2;
+        cuda::elu(dest_cuda, src, alpha);
+        cpu::elu(dest_cpu, src, alpha);
+        auto error = max(abs(mat(dest_cuda) - mat(dest_cpu)));
+        DLIB_TEST_MSG(error < 1e-7, "error: " << error);
+        // test gradients
+        resizable_tensor grad_cuda, grad_cpu, grad_input;
+        grad_cuda.copy_size(src);
+        grad_cpu.copy_size(src);
+        grad_input.copy_size(src);
+        rnd.fill_uniform(grad_input);
+        grad_cuda = 0;
+        grad_cpu = 0;
+        cuda::elu_gradient(grad_cuda, dest_cuda, grad_input, alpha);
+        cpu::elu_gradient(grad_cpu, dest_cpu, grad_input, alpha);
+        error = max(abs(mat(grad_cuda) - mat(grad_cpu)));
+        DLIB_TEST_MSG(error < 1e-7, "error: " << error);
 #endif // DLIB_USE_CUDA
     }
 

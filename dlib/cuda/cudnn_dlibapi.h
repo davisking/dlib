@@ -406,12 +406,12 @@ namespace dlib
         // The CUDNN implementation seems to be bugged, so the elu_gradient is defined
         // in dlib/cuda/cuda_dlib.h
 
-        // void elu_gradient (
-        //     tensor& grad,
-        //     const tensor& dest,
-        //     const tensor& gradient_input,
-        //     const float coef
-        // );
+        void elu_gradient (
+            tensor& grad,
+            const tensor& dest,
+            const tensor& gradient_input,
+            const float coef
+        );
 
     // ------------------------------------------------------------------------------------
 
