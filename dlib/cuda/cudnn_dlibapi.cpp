@@ -1211,7 +1211,7 @@ namespace dlib
 
 
             const float alpha1 = 1;
-            const float alpha2 = 0;
+            const float alpha2 = add_to_output ? 1 : 0;
 
             // Since cudnnConvolutionForward() is an asynchronous call, we need to hold a
             // reference to the workspace buffer so we can be sure it isn't reallocated
@@ -1220,7 +1220,8 @@ namespace dlib
             // minimize the number of such buffers.
             forward_workspace = device_global_buffer(forward_workspace_size_in_bytes);
 
-            const float* b = biases.device();
+            float* out = output.device();
+            const cudnnTensorDescriptor_t out_desc = descriptor(output);
 
             CHECK_CUDNN(cudnnConvolutionBiasActivationForward(
                     context(),
@@ -1234,13 +1235,13 @@ namespace dlib
                     forward_workspace,
                     forward_workspace_size_in_bytes,
                     &alpha2,
+                    out_desc,
+                    out,
                     (const cudnnTensorDescriptor_t)bias_handle,
-                    b,
-                    (const cudnnTensorDescriptor_t)bias_handle,
-                    b,
+                    biases.device(),
                     relu_activation_descriptor(),
-                    descriptor(output),
-                    output.device()));
+                    out_desc,
+                    out));
         }
 
         void tensor_conv::get_gradient_for_data (

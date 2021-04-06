@@ -60,7 +60,8 @@ namespace dlib
             num_filters_(o.num_outputs),
             padding_y_(_padding_y),
             padding_x_(_padding_x),
-            use_bias(true)
+            use_bias(true),
+            is_fused(false)
         {
             DLIB_CASSERT(num_filters_ > 0);
         }
@@ -109,6 +110,7 @@ namespace dlib
         void set_bias_weight_decay_multiplier(double val)  { bias_weight_decay_multiplier  = val; }
         void disable_bias() { use_bias = false; }
         bool bias_is_disabled() const { return !use_bias; }
+        void fuse() { is_fused = true; }
         void enable_bias()
         {
             if (use_bias == true)
@@ -183,6 +185,7 @@ namespace dlib
             bias_weight_decay_multiplier = item.bias_weight_decay_multiplier;
             num_filters_ = item.num_filters_;
             use_bias = item.use_bias;
+            is_fused = item.is_fused;
             return *this;
         }
 
@@ -223,10 +226,22 @@ namespace dlib
                            padding_y_,
                            padding_x_);
 
-                conv(false, output,
-                    sub.get_output(),
-                    filters(params,0),
-                    biases(params, filters.size()));
+                // this convolution has been fused with the batch norm and the activation
+                if (is_fused)
+                {
+                    conv(false, output,
+                        sub.get_output(),
+                        filters(params,0),
+                        biases(params, filters.size()));
+                }
+                else
+                {
+                    conv(false, output,
+                        sub.get_output(),
+                        filters(params,0));
+                    tt::add(1,output,1,biases(params,filters.size()));
+                }
+
 #else
                 conv.setup(sub.get_output(),
                            filters(params,0),
@@ -279,7 +294,7 @@ namespace dlib
 
         friend void serialize(const con_& item, std::ostream& out)
         {
-            serialize("con_5", out);
+            serialize("con_6", out);
             serialize(item.params, out);
             serialize(item.num_filters_, out);
             serialize(_nr, out);
@@ -295,6 +310,7 @@ namespace dlib
             serialize(item.bias_learning_rate_multiplier, out);
             serialize(item.bias_weight_decay_multiplier, out);
             serialize(item.use_bias, out);
+            serialize(item.is_fused, out);
         }
 
         friend void deserialize(con_& item, std::istream& in)
@@ -305,7 +321,7 @@ namespace dlib
             long nc;
             int stride_y;
             int stride_x;
-            if (version == "con_4" || version == "con_5")
+            if (version == "con_4" || version == "con_5" || version == "con_6")
             {
                 deserialize(item.params, in);
                 deserialize(item.num_filters_, in);
@@ -330,6 +346,10 @@ namespace dlib
                 if (version == "con_5")
                 {
                     deserialize(item.use_bias, in);
+                }
+                if (version == "con_6")
+                {
+                    deserialize(item.is_fused, in);
                 }
             }
             else
@@ -400,6 +420,7 @@ namespace dlib
         int padding_y_;
         int padding_x_;
         bool use_bias;
+        bool is_fused;
 
     };
 
@@ -2559,9 +2580,10 @@ namespace dlib
             void fuse_convolutions(
                 add_layer<relu_,
                 add_layer<affine_,
-                add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E1>, E2>& l)
+                add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E2>, E1>& l)
             {
                 l.layer_details().disable();
+                l.subnet().subnet().layer_details().fuse();
                 fuse_convolutions(l.subnet());
             }
 
