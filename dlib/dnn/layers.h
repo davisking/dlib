@@ -217,7 +217,6 @@ namespace dlib
         {
             if (use_bias)
             {
-#ifdef DLIB_USE_CUDA
                 conv.setup(sub.get_output(),
                            filters(params,0),
                            biases(params, filters.size()),
@@ -225,7 +224,7 @@ namespace dlib
                            _stride_x,
                            padding_y_,
                            padding_x_);
-
+#ifdef DLIB_USE_CUDA
                 // this convolution has been fused with the batch norm and the activation
                 if (is_fused)
                 {
@@ -241,7 +240,6 @@ namespace dlib
                         filters(params,0));
                     tt::add(1,output,1,biases(params,filters.size()));
                 }
-
 #else
                 conv.setup(sub.get_output(),
                            filters(params,0),
@@ -2563,95 +2561,6 @@ namespace dlib
         bool disabled = false;
     };
 
-    template <typename SUBNET>
-    using affine = add_layer<affine_, SUBNET>;
-    class relu_;
-    namespace impl
-    {
-        class visitor_fuse_convolutions
-        {
-            public:
-            template <typename T> void fuse_convolutions(T&) const
-            {
-                // disable other layer types
-            }
-
-            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E1, typename E2>
-            void fuse_convolutions(
-                add_layer<relu_,
-                add_layer<affine_,
-                add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E2>, E1>& l)
-            {
-                l.layer_details().disable();
-                l.subnet().subnet().layer_details().fuse();
-                fuse_convolutions(l.subnet());
-            }
-
-            // handle the standard case (convolutional layer followed by affine;
-            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
-            void fuse_convolutions(add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>& l)
-            {
-                if (l.layer_details().is_disabled())
-                {
-                    return;
-                }
-                // get the parameters from the affine layer as alias_tensor_instance
-                auto gamma = l.layer_details().get_gamma();
-                auto beta = l.layer_details().get_beta();
-
-                // get the convolution below the affine layer
-                auto& conv = l.subnet().layer_details();
-
-                if (conv.bias_is_disabled())
-                {
-                    conv.enable_bias();
-                }
-
-                tensor& params = conv.get_layer_params();
-
-                // update the biases
-                auto biases = alias_tensor(1, conv.num_filters());
-                biases(params, params.size() - conv.num_filters()) += mat(beta);
-
-                // guess the number of input channels
-                const long k_in = (params.size() - conv.num_filters()) / conv.num_filters() / conv.nr() / conv.nc();
-
-                // rescale the filters
-                DLIB_CASSERT(conv.num_filters() == gamma.k());
-                alias_tensor filter(1, k_in, conv.nr(), conv.nc());
-                const float* g = gamma.host();
-                for (long n = 0; n < conv.num_filters(); ++n)
-                {
-                    filter(params, n * filter.size()) *= g[n];
-                }
-
-                // disable the affine layer
-                l.layer_details().disable();
-            }
-
-            template <typename input_layer_type>
-            void operator()(size_t , input_layer_type& ) const
-            {
-                // ignore other layers
-            }
-
-            template <typename T, typename U, typename E>
-            void operator()(size_t , add_layer<T, U, E>& l)
-            {
-                fuse_convolutions(l);
-            }
-        };
-    }
-
-    template <typename net_type>
-    void fuse_convolutions(
-        net_type& net
-    )
-    {
-        DLIB_CASSERT(count_parameters(net) > 0, "The network has to be allocated before fusing the convolutions.");
-        visit_layers(net, impl::visitor_fuse_convolutions());
-    }
-
 // ----------------------------------------------------------------------------------------
 
     template <
@@ -4275,6 +4184,99 @@ namespace dlib
         typename SUBNET
         >
     using extract = add_layer<extract_<offset,k,nr,nc>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename SUBNET>
+    using affine = add_layer<affine_, SUBNET>;
+    class relu_;
+    namespace impl
+    {
+        class visitor_fuse_convolutions
+        {
+            public:
+            template <typename T> void fuse_convolutions(T&) const
+            {
+                // disable other layer types
+            }
+
+            // TODO: implement other activations and activation + convolution combinations
+
+            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E1, typename E2>
+            void fuse_convolutions(
+                add_layer<relu_,
+                add_layer<affine_,
+                add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E2>, E1>& l)
+            {
+                l.layer_details().disable();
+                l.subnet().subnet().layer_details().fuse();
+                fuse_convolutions(l.subnet());
+            }
+
+            // handle the standard case (convolutional layer followed by affine;
+            template <long nf, long nr, long nc, int sy, int sx, int py, int px, typename U, typename E>
+            void fuse_convolutions(add_layer<affine_, add_layer<con_<nf, nr, nc, sy, sx, py, px>, U>, E>& l)
+            {
+                if (l.layer_details().is_disabled())
+                {
+                    return;
+                }
+                // get the parameters from the affine layer as alias_tensor_instance
+                auto gamma = l.layer_details().get_gamma();
+                auto beta = l.layer_details().get_beta();
+
+                // get the convolution below the affine layer
+                auto& conv = l.subnet().layer_details();
+
+                if (conv.bias_is_disabled())
+                {
+                    conv.enable_bias();
+                }
+
+                tensor& params = conv.get_layer_params();
+
+                // update the biases
+                auto biases = alias_tensor(1, conv.num_filters());
+                biases(params, params.size() - conv.num_filters()) += mat(beta);
+
+                // guess the number of input channels
+                const long k_in = (params.size() - conv.num_filters()) / conv.num_filters() / conv.nr() / conv.nc();
+
+                // rescale the filters
+                DLIB_CASSERT(conv.num_filters() == gamma.k());
+                alias_tensor filter(1, k_in, conv.nr(), conv.nc());
+                const float* g = gamma.host();
+                for (long n = 0; n < conv.num_filters(); ++n)
+                {
+                    filter(params, n * filter.size()) *= g[n];
+                }
+
+                // disable the affine layer
+                l.layer_details().disable();
+            }
+
+            template <typename input_layer_type>
+            void operator()(size_t , input_layer_type& ) const
+            {
+                // ignore other layers
+            }
+
+            template <typename T, typename U, typename E>
+            void operator()(size_t , add_layer<T, U, E>& l)
+            {
+                fuse_convolutions(l);
+            }
+        };
+    }
+
+    template <typename net_type>
+    void fuse_convolutions(
+        net_type& net
+    )
+    {
+        DLIB_CASSERT(count_parameters(net) > 0, "The network has to be allocated before fusing the convolutions.");
+        visit_layers(net, impl::visitor_fuse_convolutions());
+    }
 
 // ----------------------------------------------------------------------------------------
 

@@ -1962,23 +1962,6 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
-    template <typename net_type>
-    void fuse_convolutions (
-        net_type& net
-    );
-    /*!
-        requires
-            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
-              add_tag_layer.
-            - net has been properly allocated, that is: count_parameters(net) > 0.
-        ensures
-            - Disables all the affine_ layers that have a convolution as an input.
-            - Updates the convolutions beneath the affine_ layers to produce the same output
-              as with the affine_ layers enabled.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
     template <
         long _nr,
         long _nc,
@@ -3194,6 +3177,23 @@ namespace dlib
         typename SUBNET
         >
     using extract = add_layer<extract_<offset,k,nr,nc>, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    template <typename net_type>
+    void fuse_convolutions (
+        net_type& net
+    );
+    /*!
+        requires
+            - net_type is an object of type add_layer, add_loss_layer, add_skip_layer, or
+              add_tag_layer.
+            - net has been properly allocated, that is: count_parameters(net) > 0.
+        ensures
+            - Disables all the affine_ layers that have a convolution as an input.
+            - Updates the convolutions beneath the affine_ layers to produce the same output
+              as with the affine_ layers enabled.
+    !*/
 
 // ----------------------------------------------------------------------------------------
 
