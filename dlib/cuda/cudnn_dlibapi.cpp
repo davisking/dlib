@@ -726,11 +726,8 @@ namespace dlib
                 cudnnDestroyFilterDescriptor((cudnnFilterDescriptor_t)filter_handle);
             if (conv_handle) 
                 cudnnDestroyConvolutionDescriptor((cudnnConvolutionDescriptor_t)conv_handle);
-            if (bias_handle)
-                cudnnDestroyTensorDescriptor((cudnnTensorDescriptor_t)bias_handle);
             filter_handle = nullptr;
             conv_handle = nullptr;
-            bias_handle = nullptr;
             out_num_samples = 0;
             out_k = 0;
             out_nr = 0;
@@ -1061,29 +1058,6 @@ namespace dlib
             }
         }
 
-       void tensor_conv::setup(
-            const tensor& data,
-            const tensor& filters,
-            const tensor& biases,
-            int stride_y,
-            int stride_x,
-            int padding_y,
-            int padding_x
-        )
-       {
-            DLIB_CASSERT(filters.num_samples() == biases.k());
-            setup(data, filters, stride_y, stride_x, padding_y, padding_x);
-            CHECK_CUDNN(cudnnCreateTensorDescriptor((cudnnTensorDescriptor_t*)&bias_handle));
-            CHECK_CUDNN(cudnnSetTensor4dDescriptor((cudnnTensorDescriptor_t)bias_handle,
-                    CUDNN_TENSOR_NCHW,
-                    CUDNN_DATA_FLOAT,
-                    static_cast<int>(biases.num_samples()),
-                    static_cast<int>(biases.k()),
-                    static_cast<int>(biases.nr()),
-                    static_cast<int>(biases.nc())));
-       }
-
-
         tensor_conv::
         ~tensor_conv (
         )
@@ -1237,7 +1211,7 @@ namespace dlib
                     &alpha2,
                     out_desc,
                     out,
-                    (const cudnnTensorDescriptor_t)bias_handle,
+                    descriptor(biases),
                     biases.device(),
                     relu_activation_descriptor(),
                     out_desc,

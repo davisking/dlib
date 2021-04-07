@@ -215,15 +215,14 @@ namespace dlib
         template <typename SUBNET>
         void forward(const SUBNET& sub, resizable_tensor& output)
         {
+            conv.setup(sub.get_output(),
+                       filters(params,0),
+                       _stride_y,
+                       _stride_x,
+                       padding_y_,
+                       padding_x_);
             if (use_bias)
             {
-                conv.setup(sub.get_output(),
-                           filters(params,0),
-                           biases(params, filters.size()),
-                           _stride_y,
-                           _stride_x,
-                           padding_y_,
-                           padding_x_);
 #ifdef DLIB_USE_CUDA
                 // this convolution has been fused with the batch norm and the activation
                 if (is_fused)
@@ -241,17 +240,9 @@ namespace dlib
                     tt::add(1,output,1,biases(params,filters.size()));
                 }
 #else
-                conv.setup(sub.get_output(),
-                           filters(params,0),
-                           _stride_y,
-                           _stride_x,
-                           padding_y_,
-                           padding_x_);
-
                 conv(false, output,
                     sub.get_output(),
                     filters(params,0));
-
                 tt::add(1,output,1,biases(params,filters.size()));
 #endif
             }

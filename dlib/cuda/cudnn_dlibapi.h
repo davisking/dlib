@@ -247,7 +247,6 @@ namespace dlib
 
             void* filter_handle;
             void* conv_handle;
-            void* bias_handle = nullptr;
 
             // dimensions of the output tensor from operator()
             int out_num_samples;
