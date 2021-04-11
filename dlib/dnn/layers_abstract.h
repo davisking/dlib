@@ -2463,7 +2463,7 @@ namespace dlib
         /*!
             WHAT THIS OBJECT REPRESENTS
                 This is an implementation of the EXAMPLE_COMPUTATIONAL_LAYER_ interface
-                defined above.  In particular, it defines a hyperbolic tangent layer.
+                defined above.  In particular, it defines a clipped version of the relu layer.
                 Therefore, it passes its inputs through the function
                     f(x) = min(max(x, 0), ceiling)
                 where f() is applied pointwise across the input tensor and ceiling is a
