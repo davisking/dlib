@@ -3460,6 +3460,174 @@ namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
+    class clipped_relu_
+    {
+    public:
+        clipped_relu_(
+            const float ceiling_ = 6.0f
+        ) : ceiling(ceiling_)
+        {
+        }
+
+        float get_ceiling(
+        ) const {
+            return ceiling;
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        template <typename SUBNET>
+        void forward(
+            SUBNET& sub,
+            resizable_tensor& data_output
+        )
+        {
+            data_output.copy_size(sub.get_output());
+            tt::clipped_relu(data_output, sub.get_output(), ceiling);
+        }
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor&
+        )
+        {
+            tt::clipped_relu_gradient(sub.get_gradient_input(), sub.get_output(), gradient_input, ceiling);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const clipped_relu_& item, std::ostream& out)
+        {
+            serialize("clipped_relu_", out);
+            serialize(item.ceiling, out);
+        }
+
+        friend void deserialize(clipped_relu_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "clipped_relu_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::clipped_relu_.");
+            deserialize(item.ceiling, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const clipped_relu_& item)
+        {
+            out << "clipped_relu\t("
+                << "ceiling=" << item.ceiling
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const clipped_relu_& item, std::ostream& out)
+        {
+            out << "<clipped_relu ceiling='" << item.ceiling << "'/>\n";
+        }
+
+
+    private:
+        resizable_tensor params;
+        float ceiling;
+    };
+
+    template <typename SUBNET>
+    using clipped_relu = add_layer<clipped_relu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
+    class elu_
+    {
+    public:
+        elu_(
+            const float alpha_ = 1.0f
+        ) : alpha(alpha_)
+        {
+        }
+
+        float get_alpha(
+        ) const {
+            return alpha;
+        }
+
+        template <typename SUBNET>
+        void setup (const SUBNET& /*sub*/)
+        {
+        }
+
+        template <typename SUBNET>
+        void forward(
+            SUBNET& sub,
+            resizable_tensor& data_output
+        )
+        {
+            data_output.copy_size(sub.get_output());
+            tt::elu(data_output, sub.get_output(), alpha);
+        }
+
+        template <typename SUBNET>
+        void backward(
+            const tensor& gradient_input,
+            SUBNET& sub,
+            tensor&
+        )
+        {
+            tt::elu_gradient(sub.get_gradient_input(), sub.get_output(), gradient_input, alpha);
+        }
+
+        inline dpoint map_input_to_output (const dpoint& p) const { return p; }
+        inline dpoint map_output_to_input (const dpoint& p) const { return p; }
+
+        const tensor& get_layer_params() const { return params; }
+        tensor& get_layer_params() { return params; }
+
+        friend void serialize(const elu_& item, std::ostream& out)
+        {
+            serialize("elu_", out);
+            serialize(item.alpha, out);
+        }
+
+        friend void deserialize(elu_& item, std::istream& in)
+        {
+            std::string version;
+            deserialize(version, in);
+            if (version != "elu_")
+                throw serialization_error("Unexpected version '"+version+"' found while deserializing dlib::elu_.");
+            deserialize(item.alpha, in);
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, const elu_& item)
+        {
+            out << "elu\t ("
+                << "alpha=" << item.alpha
+                << ")";
+            return out;
+        }
+
+        friend void to_xml(const elu_& item, std::ostream& out)
+        {
+            out << "<elu alpha='" << item.alpha << "'/>\n";
+        }
+
+
+    private:
+        resizable_tensor params;
+        float alpha;
+    };
+
+    template <typename SUBNET>
+    using elu = add_layer<elu_, SUBNET>;
+
+// ----------------------------------------------------------------------------------------
+
     class gelu_
     {
     public:
