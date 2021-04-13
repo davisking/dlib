@@ -1571,7 +1571,7 @@ namespace dlib
                 if (s[i] > 0)
                     out[i] = gi[i];
                 else
-                    out[i] = alpha * std::exp(s[i]) * gi[i];
+                    out[i] = (alpha + s[i]) * gi[i];
             }
         }
 
@@ -1582,7 +1582,7 @@ namespace dlib
                 if (s[i] > 0)
                     out[i] += gi[i];
                 else
-                    out[i] += alpha * std::exp(s[i]) * gi[i];
+                    out[i] += (alpha + s[i]) * gi[i];
             }
         }
 
