@@ -274,14 +274,14 @@ namespace
 #ifdef DLIB_USE_CUDA
         using namespace dlib::tt;
         print_spinner();
-        const long n = 5;
+        const long n = 4;
         const long k = 5;
         const long nr = 3;
         const long nc = 3;
         const float ceiling = 6.0f;
         resizable_tensor src(n, k, nr, nc);
         tt::tensor_rand rnd;
-        rnd.fill_uniform(src);
+        rnd.fill_gaussian(src, 0, 3);
         resizable_tensor dest_cuda, dest_cpu;
         dest_cuda.copy_size(src);
         dest_cpu.copy_size(src);
@@ -313,14 +313,14 @@ namespace
 #ifdef DLIB_USE_CUDA
         using namespace dlib::tt;
         print_spinner();
-        const long n = 5;
+        const long n = 4;
         const long k = 5;
         const long nr = 3;
         const long nc = 3;
         const float alpha = 1.0f;
         resizable_tensor src(n, k, nr, nc);
         tt::tensor_rand rnd;
-        rnd.fill_uniform(src);
+        rnd.fill_gaussian(src);
         resizable_tensor dest_cuda, dest_cpu;
         dest_cuda.copy_size(src);
         dest_cpu.copy_size(src);
@@ -336,13 +336,13 @@ namespace
         grad_cuda.copy_size(src);
         grad_cpu.copy_size(src);
         grad_input.copy_size(src);
-        rnd.fill_uniform(grad_input);
+        rnd.fill_gaussian(grad_input);
         grad_cuda = 0;
         grad_cpu = 0;
         cuda::elu_gradient(grad_cuda, dest_cuda, grad_input, alpha);
         cpu::elu_gradient(grad_cpu, dest_cpu, grad_input, alpha);
         error = max(abs(mat(grad_cuda) - mat(grad_cpu)));
-        DLIB_TEST_MSG(error < 1e-7, "error: " << error);
+        DLIB_TEST_MSG(error < 1e-6, "error: " << error);
 #endif // DLIB_USE_CUDA
     }
 

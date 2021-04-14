@@ -1486,10 +1486,12 @@ namespace dlib
         {
             for (auto i : grid_stride_range(0, n))
             {
-                if (s[i] > 0 && s[i] < alpha)
-                    d[i] = s[i];
+                if (s[i] < 0)
+                    d[i] = 0;
+                else if (s[i] > alpha)
+                    d[i] = alpha;
                 else
-                    d[i] = 0.f;
+                    d[i] = s[i];
             }
         }
 
@@ -1571,7 +1573,7 @@ namespace dlib
                 if (s[i] > 0)
                     out[i] = gi[i];
                 else
-                    out[i] = alpha * std::exp(s[i]) * gi[i];
+                    out[i] = (alpha + s[i]) * gi[i];
             }
         }
 
@@ -1582,7 +1584,7 @@ namespace dlib
                 if (s[i] > 0)
                     out[i] += gi[i];
                 else
-                    out[i] += alpha * std::exp(s[i]) * gi[i];
+                    out[i] += (alpha + s[i]) * gi[i];
             }
         }
 

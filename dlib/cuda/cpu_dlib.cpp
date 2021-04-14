@@ -1940,7 +1940,7 @@ namespace dlib
                     if (in[i] > 0)
                         out[i] = gi[i];
                     else
-                        out[i] = alpha * std::exp(in[i]) * gi[i];
+                        out[i] = (alpha + in[i]) * gi[i];
                 }
             }
             else
@@ -1950,7 +1950,7 @@ namespace dlib
                     if (in[i] > 0)
                         out[i] += gi[i];
                     else
-                        out[i] += alpha * std::exp(in[i]) * gi[i];
+                        out[i] += (alpha + in[i]) * gi[i];
                 }
             }
         }
