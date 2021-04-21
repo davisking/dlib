@@ -62,7 +62,7 @@ namespace dlib
             CONVENTION
                 - is_empty() ==  (type_identity == 0)
                 - contains<T>() == (type_identity == get_type_id<T>())
-                - mem.get() == the block of memory on the stack which is
+                - mem == the aligned block of memory on the stack which is
                   where objects in the union are stored
         !*/
 
@@ -111,7 +111,10 @@ namespace dlib
         // --------------------------------------------
 
         // member data
-        stack_based_memory_block<max_size> mem;
+        typename std::aligned_union<max_size, T1,T2,T3,T4,T5, 
+                                              T6,T7,T8,T9,T10,
+                                              T11,T12,T13,T14,T15,
+                                              T16,T17,T18,T19,T20>::type mem;
         int type_identity;
 
         // --------------------------------------------
@@ -179,7 +182,7 @@ namespace dlib
             if (type_identity != get_type_id<T>())
             {
                 destruct(); 
-                new(mem.get()) T(); 
+                new(&mem) T(); 
                 type_identity = get_type_id<T>();
             }
         }
@@ -193,7 +196,7 @@ namespace dlib
             if (type_identity != get_type_id<U>())
             {
                 destruct(); 
-                new(mem.get()) U(std::forward<T>(item)); 
+                new(&mem) U(std::forward<T>(item)); 
                 type_identity = get_type_id<U>();
             }
         }
@@ -208,7 +211,7 @@ namespace dlib
                 - returns a non-const reference to the T object
         !*/
         { 
-            return *static_cast<T*>(mem.get()); 
+            return *reinterpret_cast<T*>(&mem); 
         }
 
         template <typename T> 
@@ -221,7 +224,7 @@ namespace dlib
                 - returns a const reference to the T object
         !*/
         { 
-            return *static_cast<const T*>(mem.get()); 
+            return *reinterpret_cast<const T*>(&mem); 
         }
 
         template <typename T>
@@ -538,7 +541,7 @@ namespace dlib
         { 
             validate_type<T>();
             construct<T>();  
-            return *static_cast<T*>(mem.get()); 
+            return *reinterpret_cast<T*>(&mem); 
         }
 
         template <typename T>
@@ -547,7 +550,7 @@ namespace dlib
         {
             validate_type<T>();
             if (contains<T>())
-                return *static_cast<const T*>(mem.get());
+                return *reinterpret_cast<const T*>(&mem);
             else
                 throw bad_type_safe_union_cast();
         }
@@ -558,7 +561,7 @@ namespace dlib
         {
             validate_type<T>();
             if (contains<T>())
-                return *static_cast<T*>(mem.get());
+                return *reinterpret_cast<T*>(&mem);
             else
                 throw bad_type_safe_union_cast();
         }
