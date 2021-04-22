@@ -62,7 +62,7 @@ namespace dlib
             CONVENTION
                 - is_empty() ==  (type_identity == 0)
                 - contains<T>() == (type_identity == get_type_id<T>())
-                - mem.get() == the block of memory on the stack which is
+                - mem == the aligned block of memory on the stack which is
                   where objects in the union are stored
         !*/
 
@@ -85,33 +85,11 @@ namespace dlib
         {
         }
 
-
-        const static size_t max_size = tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<
-                                       tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<tmax<sizeof(T1),
-                                                        sizeof(T2)>::value,
-                                                        sizeof(T3)>::value,
-                                                        sizeof(T4)>::value,
-                                                        sizeof(T5)>::value,
-                                                        sizeof(T6)>::value,
-                                                        sizeof(T7)>::value,
-                                                        sizeof(T8)>::value,
-                                                        sizeof(T9)>::value,
-                                                        sizeof(T10)>::value,
-                                                        sizeof(T11)>::value,
-                                                        sizeof(T12)>::value,
-                                                        sizeof(T13)>::value,
-                                                        sizeof(T14)>::value,
-                                                        sizeof(T15)>::value,
-                                                        sizeof(T16)>::value,
-                                                        sizeof(T17)>::value,
-                                                        sizeof(T18)>::value,
-                                                        sizeof(T19)>::value,
-                                                        sizeof(T20)>::value;
-
-        // --------------------------------------------
-
         // member data
-        stack_based_memory_block<max_size> mem;
+        typename std::aligned_union<0, T1,T2,T3,T4,T5, 
+                                       T6,T7,T8,T9,T10,
+                                       T11,T12,T13,T14,T15,
+                                       T16,T17,T18,T19,T20>::type mem;
         int type_identity;
 
         // --------------------------------------------
@@ -120,32 +98,11 @@ namespace dlib
         void validate_type() const
         {
             // ERROR: You are trying to get a type of object that isn't
-            // representable by this type_safe_union.  I.e. The given
-            // type T isn't one of the ones given to this object's template
-            // arguments.
-            COMPILE_TIME_ASSERT(( is_same_type<T,T1>::value ||
-                                 is_same_type<T,T2>::value ||
-                                 is_same_type<T,T3>::value ||
-                                 is_same_type<T,T4>::value ||
-                                 is_same_type<T,T5>::value ||
-                                 is_same_type<T,T6>::value ||
-                                 is_same_type<T,T7>::value ||
-                                 is_same_type<T,T8>::value ||
-                                 is_same_type<T,T9>::value ||
-                                 is_same_type<T,T10>::value ||
-
-                                 is_same_type<T,T11>::value ||
-                                 is_same_type<T,T12>::value ||
-                                 is_same_type<T,T13>::value ||
-                                 is_same_type<T,T14>::value ||
-                                 is_same_type<T,T15>::value ||
-                                 is_same_type<T,T16>::value ||
-                                 is_same_type<T,T17>::value ||
-                                 is_same_type<T,T18>::value ||
-                                 is_same_type<T,T19>::value ||
-                                 is_same_type<T,T20>::value 
-                                    ));
-
+            // representable by this type_safe_union.
+            static_assert(is_any<T,T1,T2,T3,T4,T5,
+                                   T6,T7,T8,T9,T10,
+                                   T11,T12,T13,T14,T15,
+                                   T16,T17,T18,T19,T20>::value, "Type T isn't one of the ones given to this object's template arguments.");
         }
 
 
@@ -179,7 +136,7 @@ namespace dlib
             if (type_identity != get_type_id<T>())
             {
                 destruct(); 
-                new(mem.get()) T(); 
+                new(&mem) T(); 
                 type_identity = get_type_id<T>();
             }
         }
@@ -193,7 +150,7 @@ namespace dlib
             if (type_identity != get_type_id<U>())
             {
                 destruct(); 
-                new(mem.get()) U(std::forward<T>(item)); 
+                new(&mem) U(std::forward<T>(item)); 
                 type_identity = get_type_id<U>();
             }
         }
@@ -208,7 +165,7 @@ namespace dlib
                 - returns a non-const reference to the T object
         !*/
         { 
-            return *static_cast<T*>(mem.get()); 
+            return *reinterpret_cast<T*>(&mem); 
         }
 
         template <typename T> 
@@ -221,7 +178,7 @@ namespace dlib
                 - returns a const reference to the T object
         !*/
         { 
-            return *static_cast<const T*>(mem.get()); 
+            return *reinterpret_cast<const T*>(&mem); 
         }
 
         template <typename T>
@@ -287,29 +244,29 @@ namespace dlib
         static int get_type_id (
         ) 
         {
-            if (is_same_type<T,T1>::value) return 1;
-            if (is_same_type<T,T2>::value) return 2;
-            if (is_same_type<T,T3>::value) return 3;
-            if (is_same_type<T,T4>::value) return 4;
-            if (is_same_type<T,T5>::value) return 5;
+            if (std::is_same<T,T1>::value) return 1;
+            if (std::is_same<T,T2>::value) return 2;
+            if (std::is_same<T,T3>::value) return 3;
+            if (std::is_same<T,T4>::value) return 4;
+            if (std::is_same<T,T5>::value) return 5;
 
-            if (is_same_type<T,T6>::value) return 6;
-            if (is_same_type<T,T7>::value) return 7;
-            if (is_same_type<T,T8>::value) return 8;
-            if (is_same_type<T,T9>::value) return 9;
-            if (is_same_type<T,T10>::value) return 10;
+            if (std::is_same<T,T6>::value) return 6;
+            if (std::is_same<T,T7>::value) return 7;
+            if (std::is_same<T,T8>::value) return 8;
+            if (std::is_same<T,T9>::value) return 9;
+            if (std::is_same<T,T10>::value) return 10;
 
-            if (is_same_type<T,T11>::value) return 11;
-            if (is_same_type<T,T12>::value) return 12;
-            if (is_same_type<T,T13>::value) return 13;
-            if (is_same_type<T,T14>::value) return 14;
-            if (is_same_type<T,T15>::value) return 15;
+            if (std::is_same<T,T11>::value) return 11;
+            if (std::is_same<T,T12>::value) return 12;
+            if (std::is_same<T,T13>::value) return 13;
+            if (std::is_same<T,T14>::value) return 14;
+            if (std::is_same<T,T15>::value) return 15;
 
-            if (is_same_type<T,T16>::value) return 16;
-            if (is_same_type<T,T17>::value) return 17;
-            if (is_same_type<T,T18>::value) return 18;
-            if (is_same_type<T,T19>::value) return 19;
-            if (is_same_type<T,T20>::value) return 20;
+            if (std::is_same<T,T16>::value) return 16;
+            if (std::is_same<T,T17>::value) return 17;
+            if (std::is_same<T,T18>::value) return 18;
+            if (std::is_same<T,T19>::value) return 19;
+            if (std::is_same<T,T20>::value) return 20;
 
             // return a number that doesn't match any of the
             // valid states of type_identity
@@ -538,7 +495,7 @@ namespace dlib
         { 
             validate_type<T>();
             construct<T>();  
-            return *static_cast<T*>(mem.get()); 
+            return *reinterpret_cast<T*>(&mem); 
         }
 
         template <typename T>
@@ -547,7 +504,7 @@ namespace dlib
         {
             validate_type<T>();
             if (contains<T>())
-                return *static_cast<const T*>(mem.get());
+                return *reinterpret_cast<const T*>(&mem);
             else
                 throw bad_type_safe_union_cast();
         }
@@ -558,7 +515,7 @@ namespace dlib
         {
             validate_type<T>();
             if (contains<T>())
-                return *static_cast<T*>(mem.get());
+                return *reinterpret_cast<T*>(&mem);
             else
                 throw bad_type_safe_union_cast();
         }
