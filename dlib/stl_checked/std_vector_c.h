@@ -22,18 +22,18 @@ namespace dlib
         typedef typename std::vector<T,Allocator> base_type;
     public:
         // types:
-        typedef typename Allocator::reference         reference;
-        typedef typename Allocator::const_reference   const_reference;
+        typedef typename base_type::reference         reference;
+        typedef typename base_type::const_reference   const_reference;
         typedef typename base_type::iterator          iterator;       // See 23.1
         typedef typename base_type::const_iterator    const_iterator; // See 23.1
         typedef typename base_type::size_type         size_type;      // See 23.1
         typedef typename base_type::difference_type   difference_type;// See 23.1
-        typedef T                                     value_type;
-        typedef Allocator                             allocator_type;
-        typedef typename Allocator::pointer           pointer;
-        typedef typename Allocator::const_pointer     const_pointer;
-        typedef std::reverse_iterator<iterator>       reverse_iterator;
-        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+        typedef typename base_type::value_type        value_type;
+        typedef typename base_type::allocator_type    allocator_type;
+        typedef typename base_type::pointer           pointer;
+        typedef typename base_type::const_pointer     const_pointer;
+        typedef typename base_type::reverse_iterator  reverse_iterator;
+        typedef typename base_type::const_reverse_iterator const_reverse_iterator;
 
 
         // 23.2.4.1 construct/copy/destroy:
