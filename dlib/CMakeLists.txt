@@ -58,6 +58,11 @@ if(has_parent)
    endif()
 endif()
 
+if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 4.8.5)
+    message(FATAL_ERROR "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_VERSION} is too old for dlib ${VERSION}.\n\
+    Either update your compiler to be fully compliant with C++11 or build an older version of dlib, such as 19.21.")
+endif()
+
 if (COMMAND pybind11_add_module AND MSVC)
    # True when building a python extension module using Visual Studio.  We care
    # about this because a huge number of windows users have broken systems, and
