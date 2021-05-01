@@ -163,7 +163,7 @@ namespace dlib
     private:        
         size_t _size = 0;
         size_t _num_elements = 0;
-        container_type _dims;
+        container_type _dims{};
     };
     
     inline dlib::uint32 hash(
