@@ -83,6 +83,26 @@ namespace dlib
                   begins with layer2.
         !*/
 
+        const INPUT_LAYER& input_layer(
+        ) const;
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
+        INPUT_LAYER& input_layer(
+        );
+        /*!
+            ensures
+                - returns the very first layer in *this network.  It's equivalent to calling
+                  subnet() recursively until you get to the first layer.  This means it will return
+                  the object that is an implementation of the EXAMPLE_INPUT_LAYER interface defined
+                  in input_abstract.h
+        !*/
+
         const layer_details_type& layer_details(
         ) const; 
         /*!
