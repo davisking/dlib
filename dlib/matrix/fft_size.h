@@ -13,28 +13,28 @@ namespace dlib
     {   
         /*!
             WHAT THIS OBJECT REPRESENTS
-            This object is a container used to store the dimensions of an FFT 
-            operation. It is implemented as a stack-based container with an 
-            upper bound of 5 dimensions (batch,channels,height,width,depth).
-            All dimensions must be strictly positive.
+                This object is a container used to store the dimensions of an FFT 
+                operation. It is implemented as a stack-based container with an 
+                upper bound of 5 dimensions (batch,channels,height,width,depth).
+                All dimensions must be strictly positive.
          
-            The object is either default constructed, constructed with an 
-            initialiser list or with a pair of iterators
+                The object is either default constructed, constructed with an 
+                initialiser list or with a pair of iterators
 
-            If default-constructed, the object is empty and in an invalid state.
-            That is, FFT functions will throw if attempted to be used with such 
-            an object.
+                If default-constructed, the object is empty and in an invalid state.
+                That is, FFT functions will throw if attempted to be used with such 
+                an object.
 
-            If constructed with an initialiser list L, the object is properly
-            initialised provided:
-               - L.size() > 0 and L.size() <= 5
-               - L contains strictly positive values
+                If constructed with an initialiser list L, the object is properly
+                initialised provided:
+                    - L.size() > 0 and L.size() <= 5
+                    - L contains strictly positive values
          
-            If constructed with a pair of iterators, the behaviour of the 
-            constructor is exactly the same as if constructed with an 
-            initializer list spanned by those iterators.
+                If constructed with a pair of iterators, the behaviour of the 
+                constructor is exactly the same as if constructed with an 
+                initializer list spanned by those iterators.
 
-            Once the object is constructed, it is immutable.
+                Once the object is constructed, it is immutable.
         !*/
     public:
         using container_type    = std::array<long,5>;
