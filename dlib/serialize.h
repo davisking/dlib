@@ -1269,7 +1269,7 @@ namespace dlib
     )
     {
         std::size_t index = 0;
-        deserialize(bin, index);
+        deserialize(index, in);
         detail::deserialize_variant_helper(item, in, index);
     }
     
