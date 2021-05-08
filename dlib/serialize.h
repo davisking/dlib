@@ -89,6 +89,7 @@
         - std::complex
         - std::unique_ptr
         - std::shared_ptr
+        - std::variant (if C++17 is used)
         - dlib::uint64
         - dlib::int64
         - float_details
@@ -119,6 +120,7 @@
         - std::complex
         - std::unique_ptr
         - std::shared_ptr
+        - std::variant (if C++17 is used)
         - dlib::uint64
         - dlib::int64
         - float_details
@@ -233,6 +235,9 @@
 #include <limits>
 #include <type_traits>
 #include <utility>
+#if __cplusplus >= 201703L
+#include <variant>
+#endif
 #include "uintn.h"
 #include "interfaces/enumerable.h"
 #include "interfaces/map_pair.h"
@@ -1215,6 +1220,60 @@ namespace dlib
         catch (serialization_error& e)
         { throw serialization_error(e.info + "\n   while deserializing object of type std::tuple"); }
     }
+    
+// ----------------------------------------------------------------------------------------
+    
+#if __cplusplus >= 201703L
+    
+    namespace detail
+    {
+        template<typename Variant, std::size_t I = 0>
+        void deserialize_variant_helper(Variant& item, std::istream& in, std::size_t index)
+        {
+            if constexpr (I < std::variant_size_v<Variant>)
+            {
+                if (I == index)
+                {
+                    std::variant_alternative_t<I,Variant> tmp;
+                    deserialize(tmp, in);
+                    item = std::move(tmp);
+                }
+                else
+                {
+                    deserialize_variant_helper<Variant, I+1>(item, in, index);
+                }
+            }
+            else
+            {
+                throw serialization_error("deserialize_variant_helper() index is out of range of variant size");
+            }
+        }
+    }
+    
+    template<typename... Types>
+    void serialize(
+        const std::variant<Types...>& item,
+        std::ostream& out
+    )
+    {
+        serialize(item.index(),  out);
+        std::visit([&out](const auto& x) {
+            serialize(x, out);
+        }, item);
+    }
+    
+    template <typename... Types>
+    void deserialize(
+        std::variant<Types...>& item,
+        std::istream& in
+    )
+    {
+        std::size_t index = 0;
+        deserialize(bin, index);
+        detail::deserialize_variant_helper(item, in, index);
+    }
+    
+#endif
     
 // ----------------------------------------------------------------------------------------
     
