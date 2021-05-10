@@ -414,6 +414,19 @@ namespace
         return l && r ? *l == *r : l == r;
     }
     
+    struct immutable_type
+    {
+        immutable_type() = default;
+        immutable_type(const immutable_type& other)             = delete;
+        immutable_type& operator=(const immutable_type& other)  = delete;
+        immutable_type(immutable_type&& other)                  = delete;
+        immutable_type& operator=(immutable_type&& other)       = delete;
+        
+        friend void serialize(const immutable_type& x, std::ostream& out) {}
+        friend void deserialize(immutable_type& x, std::istream& in) {}
+        bool operator==(const immutable_type& other) const {return true;}
+    };
+    
     struct my_custom_type
     {
         int a;
@@ -433,16 +446,29 @@ namespace
         std::unordered_multiset<string> o;
         std::shared_ptr<string> ptr_shared1;
         std::shared_ptr<string> ptr_shared2;
-        std::vector<std::complex<double>> p;    
+        std::vector<std::complex<double>> p; 
+#if __cplusplus >= 201703L
+        std::variant<int,float,std::string,immutable_type> q;
+#endif
 
         bool operator==(const my_custom_type& rhs) const
         {         
+#if __cplusplus >= 201703L
+            const bool cpp17_ok = q == rhs.q;
+#else
+            const bool cpp17_ok = true;
+#endif
             return std::tie(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p) == std::tie(rhs.a,rhs.b,rhs.c,rhs.d,rhs.e,rhs.f,rhs.g,rhs.h,rhs.i,rhs.j,rhs.k,rhs.l,rhs.m,rhs.n,rhs.o,rhs.p)
+                    && cpp17_ok
                     && pointers_values_equal(ptr_shared1, rhs.ptr_shared1)
                     && pointers_values_equal(ptr_shared2, rhs.ptr_shared2);
         }
 
+#if __cplusplus >= 201703L
+        DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, ptr_shared1, ptr_shared2, q);
+#else
         DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, ptr_shared1, ptr_shared2);
+#endif
     };
 
     struct my_custom_type_array
@@ -1124,7 +1150,9 @@ namespace
         dlib::rand rng(std::time(NULL));
         for (int i = 0 ; i < 1024 ; i++)
             t1.p.push_back(rng.get_random_gaussian());
-
+#if __cplusplus >= 201703L
+        t1.q = "hello there from std::variant, welcome!";
+#endif
         t2.a = 2;
         t2.b = 4.0;
         t2.c.resize(10);
