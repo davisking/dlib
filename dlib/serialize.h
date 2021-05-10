@@ -1278,7 +1278,7 @@ namespace dlib
     template<typename T>
     void serialize(const std::optional<T>& item, std::ostream& out)
     {
-        serialize(bout, item.has_value());
+        serialize(item.has_value(), out);
         if (item)
             serialize(item.value(), out);
     }
@@ -1287,7 +1287,7 @@ namespace dlib
     void deserialize(std::optional<T>& item, std::istream& in)
     {
         bool has_value = false;
-        deserialize(bin, has_value);
+        deserialize(has_value, in);
         if (has_value)
         {
             deserialize(item.has_value() ? item.value() : item.emplace(), in);
