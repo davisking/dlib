@@ -414,6 +414,19 @@ namespace
         return l && r ? *l == *r : l == r;
     }
     
+    struct immutable_type
+    {
+        immutable_type() = default;
+        immutable_type(const immutable_type& other)             = delete;
+        immutable_type& operator=(const immutable_type& other)  = delete;
+        immutable_type(immutable_type&& other)                  = delete;
+        immutable_type& operator=(immutable_type&& other)       = delete;
+        
+        friend void serialize(const immutable_type& x, std::ostream& out) {}
+        friend void deserialize(immutable_type& x, std::istream& in) {}
+        bool operator==(const immutable_type& other) const {return true;}
+    };
+    
     struct my_custom_type
     {
         int a;
@@ -435,7 +448,7 @@ namespace
         std::shared_ptr<string> ptr_shared2;
         std::vector<std::complex<double>> p; 
 #if __cplusplus >= 201703L
-        std::variant<int,float,std::string> q;
+        std::variant<int,float,std::string,immutable_type> q;
 #endif
 
         bool operator==(const my_custom_type& rhs) const
