@@ -1290,8 +1290,7 @@ namespace dlib
         deserialize(bin, has_value);
         if (has_value)
         {
-            auto& x = item.emplace();
-            deserialize(bin, x);
+            deserialize(item.has_value() ? item.value() : item.emplace(), in);
         }
         else
         {
