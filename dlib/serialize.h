@@ -1234,9 +1234,8 @@ namespace dlib
             {
                 if (I == index)
                 {
-                    std::variant_alternative_t<I,Variant> tmp;
-                    deserialize(tmp, in);
-                    item = std::move(tmp);
+                    auto& x = item.template emplace<std::variant_alternative_t<I,Variant>>();
+                    deserialize(bin, x);
                 }
                 else
                 {
