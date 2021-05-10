@@ -90,6 +90,7 @@
         - std::unique_ptr
         - std::shared_ptr
         - std::variant (if C++17 is used)
+        - std::optional (if C++17 is used) 
         - dlib::uint64
         - dlib::int64
         - float_details
@@ -121,6 +122,7 @@
         - std::unique_ptr
         - std::shared_ptr
         - std::variant (if C++17 is used)
+        - std::optional (if C++17 is used)
         - dlib::uint64
         - dlib::int64
         - float_details
@@ -237,6 +239,7 @@
 #include <utility>
 #if __cplusplus >= 201703L
 #include <variant>
+#include <optional>
 #endif
 #include "uintn.h"
 #include "interfaces/enumerable.h"
@@ -1270,6 +1273,30 @@ namespace dlib
         std::size_t index = 0;
         deserialize(index, in);
         detail::deserialize_variant_helper(item, in, index);
+    }
+    
+    template<typename T>
+    void serialize(const std::optional<T>& item, std::ostream& out)
+    {
+        serialize(bout, item.has_value());
+        if (item)
+            serialize(item.value(), out);
+    }
+    
+    template <typename T>
+    void deserialize(std::optional<T>& item, std::istream& in)
+    {
+        bool has_value = false;
+        deserialize(bin, has_value);
+        if (has_value)
+        {
+            auto& x = item.emplace();
+            deserialize(bin, x);
+        }
+        else
+        {
+            item.reset();
+        }
     }
     
 #endif
