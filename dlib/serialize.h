@@ -1235,7 +1235,7 @@ namespace dlib
                 if (I == index)
                 {
                     auto& x = item.template emplace<std::variant_alternative_t<I,Variant>>();
-                    deserialize(in, x);
+                    deserialize(x, in);
                 }
                 else
                 {
