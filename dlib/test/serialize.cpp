@@ -422,9 +422,9 @@ namespace
         immutable_type(immutable_type&& other)                  = delete;
         immutable_type& operator=(immutable_type&& other)       = delete;
         
-        friend void serialize(const immutable_type& x, std::ostream& out) {}
-        friend void deserialize(immutable_type& x, std::istream& in) {}
-        bool operator==(const immutable_type& other) const {return true;}
+        friend void serialize(const immutable_type&, std::ostream&) {}
+        friend void deserialize(immutable_type&, std::istream&) {}
+        bool operator==(const immutable_type&) const {return true;}
     };
     
     struct my_custom_type
@@ -449,12 +449,13 @@ namespace
         std::vector<std::complex<double>> p; 
 #if __cplusplus >= 201703L
         std::variant<int,float,std::string,immutable_type> q;
+        std::optional<std::vector<std::string>> r;
 #endif
 
         bool operator==(const my_custom_type& rhs) const
         {         
 #if __cplusplus >= 201703L
-            const bool cpp17_ok = q == rhs.q;
+            const bool cpp17_ok = std::tie(q, r) == std::tie(rhs.q, rhs.r);
 #else
             const bool cpp17_ok = true;
 #endif
@@ -465,7 +466,7 @@ namespace
         }
 
 #if __cplusplus >= 201703L
-        DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, ptr_shared1, ptr_shared2, q);
+        DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, ptr_shared1, ptr_shared2, q, r);
 #else
         DLIB_DEFINE_DEFAULT_SERIALIZATION(my_custom_type, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, ptr_shared1, ptr_shared2);
 #endif
@@ -1152,6 +1153,7 @@ namespace
             t1.p.push_back(rng.get_random_gaussian());
 #if __cplusplus >= 201703L
         t1.q = "hello there from std::variant, welcome!";
+        t1.r = {"hello from optional vector of string"};
 #endif
         t2.a = 2;
         t2.b = 4.0;
