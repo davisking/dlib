@@ -8,7 +8,7 @@ if [ -n "${MATRIX_EVAL+set}" ]; then
 fi
 
 CXX_FLAGS="-std=c++11"
-if [ ! -z ${CXXFLAGS+x} ]; then
+if [ ! -z ${CXXFLAGS+set} ]; then
     CXX_FLAGS="${CXXFLAGS}"
 fi
 
@@ -88,4 +88,3 @@ if [ "$VARIANT" = "python-api" ]; then
   pip uninstall numpy -y
   python setup.py test --clean
 fi
-
