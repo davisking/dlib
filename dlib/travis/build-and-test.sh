@@ -7,11 +7,16 @@ if [ -n "${MATRIX_EVAL+set}" ]; then
     eval "${MATRIX_EVAL}"
 fi
 
+CXX_FLAGS="-std=c++11"
+if [ ! -z ${CXXFLAGS+x} ]; then
+    CXX_FLAGS="${CXXFLAGS}"
+fi
+
 # build dlib and tests
 if [ "$VARIANT" = "test" ]; then
   mkdir build
   cd build
-  cmake ../dlib/test -DCMAKE_CXX_FLAGS="${CXXFLAGS}"
+  cmake ../dlib/test -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
   cmake --build . --target dtest -- -j 2
   ./dtest --runall $DISABLED_TESTS
 fi
@@ -20,7 +25,7 @@ fi
 if [ "$VARIANT" = "test-debug" ]; then
   mkdir build
   cd build
-  cmake ../dlib/test -DDLIB_ENABLE_ASSERTS=1 -DCMAKE_CXX_FLAGS="${CXXFLAGS}"
+  cmake ../dlib/test -DDLIB_ENABLE_ASSERTS=1 -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
   cmake --build . --target dtest -- -j 2
   ./dtest --runall $DISABLED_TESTS
 fi
@@ -28,14 +33,14 @@ fi
 if [ "$VARIANT" = "dlib_all_source_cpp" ]; then
   mkdir build
   cd build
-  cmake ../dlib/test -DCMAKE_CXX_FLAGS="${CXXFLAGS}"
+  cmake ../dlib/test -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
   cmake --build . --target dlib_all_source_cpp -- -j 2
 fi
 
 if [ "$VARIANT" = "tools" ]; then
   mkdir build
   cd build
-  cmake ../dlib/test/tools -DCMAKE_CXX_FLAGS="${CXXFLAGS}"
+  cmake ../dlib/test/tools -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
   cmake --build .  -- -j 2
 fi
 
@@ -44,7 +49,7 @@ fi
 if [ "$VARIANT" = "old-cmake" ]; then
   mkdir build
   cd build
-  CMAKEDIR=../cmake -DCMAKE_CXX_FLAGS="${CXXFLAGS}"
+  CMAKEDIR=../cmake -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
 
   $CMAKEDIR/2.8/bin/cmake ../dlib/test/tools
   $CMAKEDIR/2.8/bin/cmake --build .  -- -j 2
@@ -67,14 +72,14 @@ fi
 if [ "$VARIANT" = "examples" ]; then
   mkdir build
   cd build
-  cmake ../examples -DCMAKE_CXX_FLAGS="${CXXFLAGS}"
+  cmake ../examples -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
   cmake --build . -- -j 1
 fi
 
 if [ "$VARIANT" = "examples-debug" ]; then
   mkdir build
   cd build
-  cmake ../examples -DDLIB_ENABLE_ASSERTS=1 -DCMAKE_CXX_FLAGS="${CXXFLAGS}"
+  cmake ../examples -DDLIB_ENABLE_ASSERTS=1 -DCMAKE_CXX_FLAGS="${CXX_FLAGS}"
   cmake --build . -- -j 1
 fi
 
