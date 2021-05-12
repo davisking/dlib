@@ -1768,12 +1768,12 @@ namespace dlib
             }
 
             // handle skip layer case
-            template <layer_mode mode, template <typename> class TAG, typename E, typename U>
+            template <layer_mode mode, template <typename> class TAG, typename U, typename E>
             void disable_input_bias(add_layer<bn_<mode>, add_skip_layer<TAG, U>, E>& )
             {
             }
 
-            template <unsigned long ID, template <typename> class TAG, typename E, typename U>
+            template <template <typename> class TAG, typename U, typename E>
             void disable_input_bias(add_layer<layer_norm_, add_skip_layer<TAG, U>, E>& )
             {
             }
