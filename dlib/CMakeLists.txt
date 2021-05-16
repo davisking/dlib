@@ -188,6 +188,8 @@ if (NOT TARGET dlib)
       "Disable this is you don't want to use the MKL DFTI FFT implementation" )
    set (DLIB_ENABLE_ASSERTS_STR
       "Enable this if you want to turn on the DLIB_ASSERT macro" )
+   set (DLIB_USE_FFMPEG_STR
+      "Disable this if you don't want to use the FFMPEG library" )
 
 
    option(DLIB_ENABLE_ASSERTS ${DLIB_ENABLE_ASSERTS_STR} OFF)
@@ -239,6 +241,7 @@ if (NOT TARGET dlib)
       option(DLIB_GIF_SUPPORT ${DLIB_GIF_SUPPORT_STR} OFF)
       #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} OFF)
       option(DLIB_USE_MKL_FFT ${DLIB_USE_MKL_FFT_STR} OFF)
+      option(DLIB_USE_FFMPEG ${DLIB_USE_FFMPEG_STR} OFF)
    else()
       option(DLIB_JPEG_SUPPORT ${DLIB_JPEG_SUPPORT_STR} ON)
       option(DLIB_LINK_WITH_SQLITE3 ${DLIB_LINK_WITH_SQLITE3_STR} ON)
@@ -249,6 +252,7 @@ if (NOT TARGET dlib)
       option(DLIB_GIF_SUPPORT ${DLIB_GIF_SUPPORT_STR} ON)
       #option(DLIB_USE_FFTW ${DLIB_USE_FFTW_STR} ON)
       option(DLIB_USE_MKL_FFT ${DLIB_USE_MKL_FFT_STR} ON)
+      option(DLIB_USE_FFMPEG ${DLIB_USE_FFMPEG_STR} ON)
    endif()
    toggle_preprocessor_switch(DLIB_JPEG_SUPPORT)
    toggle_preprocessor_switch(DLIB_USE_BLAS)
@@ -258,6 +262,7 @@ if (NOT TARGET dlib)
    toggle_preprocessor_switch(DLIB_GIF_SUPPORT) 
    #toggle_preprocessor_switch(DLIB_USE_FFTW)
    toggle_preprocessor_switch(DLIB_USE_MKL_FFT)
+   toggle_preprocessor_switch(DLIB_USE_FFMPEG)
 
 
    set(source_files 
@@ -600,6 +605,15 @@ if (NOT TARGET dlib)
          endif()
       endif()
 
+      include(cmake_utils/find_ffmpeg.cmake)
+      if (DLIB_USE_FFMPEG)
+         if (FFMPEG_FOUND)
+            set (dlib_needed_libraries ${dlib_needed_libraries} ${FFMPEG_LIBRARIES})
+            set (dlib_needed_includes ${dlib_needed_includes} ${FFMPEG_INCLUDE_DIRS})
+         else()
+            toggle_preprocessor_switch(DLIB_USE_FFMPEG)
+         endif()
+      endif()
 
       if (DLIB_USE_CUDA)
          find_package(CUDA 7.5)
